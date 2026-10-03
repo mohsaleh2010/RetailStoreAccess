@@ -1,0 +1,591 @@
+"""Generate the Access build module and reference docs from tools/schema.py.
+
+Usage:  python3 tools/generate.py
+"""
+
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(__file__))
+from schema import TABLES, Table, Field  # noqa: E402
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+KIND_LABEL = {
+    "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
+    "BYTE": "Number (Byte)", "MONEY": "Currency", "QTY": "Currency (كمية)",
+    "RATE": "Currency (نسبة)", "DATE": "Date/Time (تاريخ)", "DATETIME": "Date/Time",
+    "BOOL": "Yes/No", "TEXT": "Short Text", "MEMO": "Long Text",
+}
+
+
+# --------------------------------------------------------------------------
+# VBA helpers
+# --------------------------------------------------------------------------
+def vba_str(s) -> str:
+    """Return a VBA string literal."""
+    if s is None:
+        s = ""
+    s = str(s).replace("\u2212", "-")   # Unicode minus is not in Windows-1256
+    return '"' + s.replace('"', '""') + '"'
+
+
+def sql_value(v) -> str:
+    if v is None:
+        return "Null"
+    if isinstance(v, bool):
+        return "True" if v else "False"
+    if isinstance(v, (int, float)):
+        return repr(v)
+    return "'" + str(v).replace("'", "''") + "'"
+
+
+def vba_table_sub(t: Table) -> str:
+    out = [f"Private Sub CreateTable_{t.name}()",
+           "    Dim tdf As DAO.TableDef",
+           f"    If Not BeginTable(tdf, {vba_str(t.name)}) Then Exit Sub"]
+    for f in t.fields:
+        out.append(
+            "    AddField tdf, {name}, {kind}, {size}, {req}, {default}, _\n"
+            "             {rule}, {rule_text}, {caption}, {note}".format(
+                name=vba_str(f.name), kind=vba_str(f.kind), size=f.size,
+                req="True" if f.required else "False",
+                default=vba_str(f.default), rule=vba_str(f.rule),
+                rule_text=vba_str(f.rule_text), caption=vba_str(f.caption),
+                note=vba_str(f.note)))
+    out.append(f"    AddIndex tdf, \"PrimaryKey\", {vba_str(','.join(t.pk))}, True, True, False")
+    for ix in t.indexes:
+        out.append("    AddIndex tdf, {n}, {f}, False, {u}, {ign}".format(
+            n=vba_str(ix.name), f=vba_str(",".join(ix.fields)),
+            u="True" if ix.unique else "False", ign="True" if ix.ignore_nulls else "False"))
+    out.append("    EndTable tdf, {d}, {r}, {rt}".format(
+        d=vba_str(f"{t.caption}: {t.purpose}"), r=vba_str(t.rule), rt=vba_str(t.rule_text)))
+    out.append("End Sub")
+    return "\n".join(out)
+
+
+def vba_seed_sub(t: Table) -> str:
+    cols = ", ".join(f"[{c}]" for c in t.seed_columns)
+    out = [f"Private Sub Seed_{t.name}()",
+           f"    If Not BeginSeed({vba_str(t.name)}) Then Exit Sub"]
+    for row in t.seed_rows:
+        vals = ", ".join(sql_value(v) for v in row)
+        sql = f"INSERT INTO [{t.name}] ({cols}) VALUES ({vals})"
+        out.append(f"    ExecSeed {vba_str(sql)}")
+    out.append(f"    EndSeed {vba_str(t.name)}, {len(t.seed_rows)}")
+    out.append("End Sub")
+    return "\n".join(out)
+
+
+VBA_HEADER = r'''Attribute VB_Name = "modBuildSchema"
+'==============================================================================
+' modBuildSchema  -  Retail Store Management System (Phase 2: Tables)
+'
+' GENERATED FILE - do not edit by hand.
+' Source of truth: tools/schema.py  ->  python3 tools/generate.py
+'
+' Public procedures (run from the Immediate window, Ctrl+G):
+'   BuildSchema            creates RetailStore_BE.accdb next to this file,
+'                          creates every missing table, seeds lookup data,
+'                          then links the tables into this front-end.
+'   BuildSchema "D:\Shop\RetailStore_BE.accdb"   same, custom back-end path.
+'   VerifySchema           checks tables, field counts, seed data, Arabic text.
+'   LinkBackEnd            (re)links all back-end tables into this front-end.
+'   DropSchema             DEVELOPMENT ONLY: deletes all system tables.
+'
+' Requires: Access 2010 or later (DAO 12+ is referenced by default).
+' Arabic text: Windows "Language for non-Unicode programs" must be Arabic.
+'==============================================================================
+Option Compare Database
+Option Explicit
+
+Private Const SCHEMA_VERSION As String = "2.0"
+Private Const BE_FILE_NAME As String = "RetailStore_BE.accdb"
+Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
+Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
+Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
+
+'@@SCHEMA_CONSTANTS@@
+
+Private m_db As DAO.Database
+Private m_pending As Collection
+Private m_log As String
+Private m_created As Long
+Private m_skipped As Long
+Private m_seeded As Long
+Private m_currentStep As String
+Private m_inTrans As Boolean
+
+'------------------------------------------------------------------------------
+' Public entry points
+'------------------------------------------------------------------------------
+Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolean
+    On Error GoTo EH
+    If Len(BackEndPath) = 0 Then BackEndPath = DefaultBackEndPath()
+    If StrComp(BackEndPath, CurrentProject.FullName, vbTextCompare) = 0 Then
+        MsgBox "مسار ملف البيانات يجب أن يختلف عن ملف الواجهة الحالي.", vbExclamation + MSG_RTL
+        Exit Function
+    End If
+
+    m_log = "": m_created = 0: m_skipped = 0: m_seeded = 0
+    LogLine "=== BuildSchema " & SCHEMA_VERSION & "  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
+
+    m_currentStep = "open back-end"
+    If Len(Dir$(BackEndPath)) = 0 Then
+        Set m_db = DBEngine.CreateDatabase(BackEndPath, dbLangArabic, DB_VERSION_120)
+        LogLine "تم إنشاء ملف البيانات: " & BackEndPath
+    Else
+        Set m_db = DBEngine.OpenDatabase(BackEndPath)
+        LogLine "ملف البيانات موجود: " & BackEndPath
+    End If
+
+    CreateAllTables
+    SeedAll
+
+    m_db.Close
+    Set m_db = Nothing
+
+    m_currentStep = "link tables"
+    LinkBackEnd BackEndPath
+
+    LogLine "--- جداول جديدة: " & m_created & " | موجودة مسبقًا: " & m_skipped & _
+            " | جداول تمت تعبئتها: " & m_seeded
+    MsgBox "تم بناء الجداول بنجاح." & vbCrLf & vbCrLf & _
+           "جداول جديدة: " & m_created & vbCrLf & _
+           "جداول موجودة مسبقًا: " & m_skipped & vbCrLf & _
+           "جداول تمت تعبئة بياناتها الأساسية: " & m_seeded & vbCrLf & vbCrLf & _
+           "التفاصيل في نافذة Immediate (Ctrl+G)." & vbCrLf & _
+           "الخطوة التالية: شغّل VerifySchema", vbInformation + MSG_RTL, "BuildSchema"
+    BuildSchema = True
+    Exit Function
+
+EH:
+    Dim errText As String
+    errText = "خطأ " & Err.Number & " أثناء [" & m_currentStep & "]: " & Err.Description
+    If m_inTrans Then
+        DBEngine.Workspaces(0).Rollback
+        m_inTrans = False
+    End If
+    LogLine errText
+    On Error Resume Next
+    If Not m_db Is Nothing Then m_db.Close
+    Set m_db = Nothing
+    MsgBox errText & vbCrLf & vbCrLf & "يمكن إعادة تشغيل BuildSchema بعد الإصلاح؛ " & _
+           "الجداول التي أُنشئت لن تتكرر.", vbCritical + MSG_RTL, "BuildSchema"
+End Function
+
+Public Sub LinkBackEnd(Optional ByVal BackEndPath As String = "")
+    Dim dbFE As DAO.Database, dbBE As DAO.Database
+    Dim tdfBE As DAO.TableDef, tdfFE As DAO.TableDef
+    Dim linked As Long, refreshed As Long
+
+    If Len(BackEndPath) = 0 Then BackEndPath = DefaultBackEndPath()
+    Set dbFE = CurrentDb
+    Set dbBE = DBEngine.OpenDatabase(BackEndPath, False, True)
+
+    For Each tdfBE In dbBE.TableDefs
+        If IsUserTable(tdfBE) Then
+            If TableExistsIn(dbFE, tdfBE.Name) Then
+                Set tdfFE = dbFE.TableDefs(tdfBE.Name)
+                If Len(tdfFE.Connect) > 0 Then
+                    tdfFE.Connect = ";DATABASE=" & BackEndPath
+                    tdfFE.RefreshLink
+                    refreshed = refreshed + 1
+                Else
+                    LogLine "تنبيه: يوجد جدول محلي بنفس الاسم في الواجهة ولم يتم ربطه: " & tdfBE.Name
+                End If
+            Else
+                Set tdfFE = dbFE.CreateTableDef(tdfBE.Name)
+                tdfFE.Connect = ";DATABASE=" & BackEndPath
+                tdfFE.SourceTableName = tdfBE.Name
+                dbFE.TableDefs.Append tdfFE
+                linked = linked + 1
+            End If
+        End If
+    Next
+
+    dbBE.Close
+    dbFE.TableDefs.Refresh
+    Application.RefreshDatabaseWindow
+    LogLine "الربط: " & linked & " جدول جديد، " & refreshed & " جدول تم تحديث ربطه."
+End Sub
+
+Public Function VerifySchema(Optional ByVal BackEndPath As String = "") As Boolean
+    Dim db As DAO.Database, rs As DAO.Recordset
+    Dim items() As String, parts() As String, i As Long
+    Dim problems As Long, report As String, s As String
+
+    If Len(BackEndPath) = 0 Then BackEndPath = DefaultBackEndPath()
+    If Len(Dir$(BackEndPath)) = 0 Then
+        MsgBox "ملف البيانات غير موجود: " & BackEndPath, vbCritical + MSG_RTL
+        Exit Function
+    End If
+    Set db = DBEngine.OpenDatabase(BackEndPath, False, True)
+
+    ' 1) every table exists with the expected number of fields
+    items = Split(EXPECTED_FIELD_COUNTS, ";")
+    For i = 0 To UBound(items)
+        parts = Split(items(i), "=")
+        If Not TableExistsIn(db, parts(0)) Then
+            s = "[X] الجدول غير موجود: " & parts(0)
+            problems = problems + 1
+        ElseIf db.TableDefs(parts(0)).Fields.Count <> CLng(parts(1)) Then
+            s = "[X] " & parts(0) & ": عدد الحقول " & db.TableDefs(parts(0)).Fields.Count & _
+                " والمتوقع " & parts(1)
+            problems = problems + 1
+        Else
+            s = "[OK] " & parts(0) & " (" & parts(1) & " حقل)"
+        End If
+        Debug.Print s
+        If Left$(s, 3) = "[X]" Then report = report & s & vbCrLf
+    Next
+
+    ' 2) lookup data exists
+    items = Split(EXPECTED_SEED_COUNTS, ";")
+    For i = 0 To UBound(items)
+        parts = Split(items(i), "=")
+        If TableExistsIn(db, parts(0)) Then
+            Set rs = db.OpenRecordset("SELECT COUNT(*) FROM [" & parts(0) & "]", dbOpenSnapshot)
+            If rs(0) < CLng(parts(1)) Then
+                s = "[X] " & parts(0) & ": " & rs(0) & " سجل والمتوقع " & parts(1) & " على الأقل"
+                problems = problems + 1
+                report = report & s & vbCrLf
+            Else
+                s = "[OK] بيانات " & parts(0) & ": " & rs(0) & " سجل"
+            End If
+            rs.Close
+            Debug.Print s
+        End If
+    Next
+
+    ' 3) Arabic text survived the VBA code page
+    If TableExistsIn(db, "Roles") Then
+        Set rs = db.OpenRecordset("SELECT RoleName FROM Roles WHERE RoleID=1", dbOpenSnapshot)
+        If Not rs.EOF Then
+            If AscW(Left$(rs!RoleName & " ", 1)) < &H600 Then
+                s = "[X] النص العربي محفوظ بشكل خاطئ (" & rs!RoleName & ")." & vbCrLf & _
+                    "    اضبط Windows > Region > Administrative > Language for non-Unicode programs = Arabic" & _
+                    " ثم أعد الاستيراد والبناء."
+                problems = problems + 1
+                report = report & s & vbCrLf
+            Else
+                s = "[OK] النص العربي سليم: " & rs!RoleName
+            End If
+            Debug.Print s
+        End If
+        rs.Close
+    End If
+
+    db.Close
+    If problems = 0 Then
+        MsgBox "الفحص ناجح: جميع الجداول (" & (UBound(Split(SCHEMA_TABLES, ",")) + 1) & _
+               ") والبيانات الأساسية سليمة.", vbInformation + MSG_RTL, "VerifySchema"
+        VerifySchema = True
+    Else
+        MsgBox "عدد المشكلات: " & problems & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _
+               "VerifySchema"
+    End If
+End Function
+
+Public Sub DropSchema(Optional ByVal BackEndPath As String = "")
+    ' DEVELOPMENT ONLY - deletes every table of this system and all of its data.
+    Dim db As DAO.Database, dbFE As DAO.Database, i As Long, names() As String
+
+    If InputBox("سيتم حذف جميع جداول النظام وبياناتها نهائيًا." & vbCrLf & _
+                "للتأكيد اكتب DELETE", "DropSchema") <> "DELETE" Then Exit Sub
+    If Len(BackEndPath) = 0 Then BackEndPath = DefaultBackEndPath()
+
+    names = Split(SCHEMA_TABLES, ",")
+    Set db = DBEngine.OpenDatabase(BackEndPath)
+    For i = db.Relations.Count - 1 To 0 Step -1
+        If InSchema(db.Relations(i).Table) Or InSchema(db.Relations(i).ForeignTable) Then
+            db.Relations.Delete db.Relations(i).Name
+        End If
+    Next
+    For i = UBound(names) To 0 Step -1
+        If TableExistsIn(db, names(i)) Then db.TableDefs.Delete names(i)
+    Next
+    db.Close
+
+    Set dbFE = CurrentDb
+    For i = UBound(names) To 0 Step -1
+        If TableExistsIn(dbFE, names(i)) Then
+            If Len(dbFE.TableDefs(names(i)).Connect) > 0 Then dbFE.TableDefs.Delete names(i)
+        End If
+    Next
+    Application.RefreshDatabaseWindow
+    MsgBox "تم حذف جداول النظام.", vbInformation + MSG_RTL
+End Sub
+
+'------------------------------------------------------------------------------
+' Table building helpers
+'------------------------------------------------------------------------------
+Private Function BeginTable(ByRef tdf As DAO.TableDef, ByVal TableName As String) As Boolean
+    m_currentStep = "create table " & TableName
+    If TableExistsIn(m_db, TableName) Then
+        LogLine "  = موجود مسبقًا: " & TableName
+        m_skipped = m_skipped + 1
+        Exit Function
+    End If
+    Set tdf = m_db.CreateTableDef(TableName)
+    Set m_pending = New Collection
+    BeginTable = True
+End Function
+
+Private Sub AddField(ByVal tdf As DAO.TableDef, ByVal FieldName As String, ByVal Kind As String, _
+                     ByVal Size As Long, ByVal IsRequired As Boolean, ByVal DefaultValue As String, _
+                     ByVal ValidationRule As String, ByVal ValidationText As String, _
+                     ByVal Caption As String, ByVal Description As String)
+    Dim fld As DAO.Field
+    m_currentStep = "field " & tdf.Name & "." & FieldName
+
+    Select Case Kind
+        Case "AUTO"
+            Set fld = tdf.CreateField(FieldName, dbLong)
+            fld.Attributes = fld.Attributes Or dbAutoIncrField
+        Case "LONG":                     Set fld = tdf.CreateField(FieldName, dbLong)
+        Case "INT":                      Set fld = tdf.CreateField(FieldName, dbInteger)
+        Case "BYTE":                     Set fld = tdf.CreateField(FieldName, dbByte)
+        Case "MONEY", "QTY", "RATE":     Set fld = tdf.CreateField(FieldName, dbCurrency)
+        Case "DATE", "DATETIME":         Set fld = tdf.CreateField(FieldName, dbDate)
+        Case "BOOL":                     Set fld = tdf.CreateField(FieldName, dbBoolean)
+        Case "MEMO":                     Set fld = tdf.CreateField(FieldName, dbMemo)
+        Case "TEXT"
+            Set fld = tdf.CreateField(FieldName, dbText, Size)
+            fld.AllowZeroLength = False
+        Case Else
+            Err.Raise vbObjectError + 513, "AddField", "Unknown field kind: " & Kind
+    End Select
+
+    If Kind <> "AUTO" And Kind <> "BOOL" Then fld.Required = IsRequired
+    If Len(DefaultValue) > 0 Then fld.DefaultValue = DefaultValue
+    If Len(ValidationRule) > 0 Then
+        fld.ValidationRule = ValidationRule
+        fld.ValidationText = ValidationText
+    End If
+    tdf.Fields.Append fld
+
+    ' Properties that can only be set after the table is saved
+    If Len(Caption) > 0 Then AddPending FieldName, "Caption", dbText, Caption
+    If Len(Description) > 0 Then AddPending FieldName, "Description", dbText, Description
+    Select Case Kind
+        Case "MONEY":    AddPending FieldName, "Format", dbText, "#,##0.00"
+        Case "QTY":      AddPending FieldName, "Format", dbText, "#,##0.###"
+        Case "RATE":     AddPending FieldName, "Format", dbText, "0.00%"
+        Case "DATE":     AddPending FieldName, "Format", dbText, "yyyy/mm/dd"
+        Case "DATETIME": AddPending FieldName, "Format", dbText, "yyyy/mm/dd hh:nn"
+        Case "BOOL":     AddPending FieldName, "DisplayControl", dbInteger, DISPLAY_CHECKBOX
+    End Select
+End Sub
+
+Private Sub AddIndex(ByVal tdf As DAO.TableDef, ByVal IndexName As String, ByVal FieldList As String, _
+                     ByVal IsPrimary As Boolean, ByVal IsUnique As Boolean, ByVal IgnoreNulls As Boolean)
+    Dim idx As DAO.Index, fieldName As Variant
+    m_currentStep = "index " & tdf.Name & "." & IndexName
+    Set idx = tdf.CreateIndex(IndexName)
+    For Each fieldName In Split(FieldList, ",")
+        idx.Fields.Append idx.CreateField(CStr(fieldName))
+    Next
+    idx.Primary = IsPrimary
+    idx.Unique = IsUnique Or IsPrimary
+    idx.IgnoreNulls = IgnoreNulls
+    tdf.Indexes.Append idx
+End Sub
+
+Private Sub EndTable(ByVal tdf As DAO.TableDef, ByVal Description As String, _
+                     ByVal TableRule As String, ByVal TableRuleText As String)
+    Dim item As Variant, saved As DAO.TableDef
+    m_currentStep = "save table " & tdf.Name
+    If Len(TableRule) > 0 Then
+        tdf.ValidationRule = TableRule
+        tdf.ValidationText = TableRuleText
+    End If
+    m_db.TableDefs.Append tdf
+    m_db.TableDefs.Refresh
+
+    Set saved = m_db.TableDefs(tdf.Name)
+    SetProp saved, "Description", dbText, Description
+    For Each item In m_pending
+        m_currentStep = "property " & tdf.Name & "." & item(0) & "." & item(1)
+        SetProp saved.Fields(item(0)), item(1), item(2), item(3)
+    Next
+    Set m_pending = Nothing
+    m_created = m_created + 1
+    LogLine "  + تم إنشاء الجدول: " & tdf.Name
+End Sub
+
+Private Sub AddPending(ByVal FieldName As String, ByVal PropName As String, _
+                       ByVal PropType As Integer, ByVal PropValue As Variant)
+    m_pending.Add Array(FieldName, PropName, PropType, PropValue)
+End Sub
+
+Private Sub SetProp(ByVal obj As Object, ByVal PropName As String, _
+                    ByVal PropType As Integer, ByVal PropValue As Variant)
+    Dim prp As Object
+    On Error Resume Next
+    Set prp = obj.Properties(PropName)
+    On Error GoTo 0
+    If prp Is Nothing Then
+        obj.Properties.Append obj.CreateProperty(PropName, PropType, PropValue)
+    Else
+        prp.Value = PropValue
+    End If
+End Sub
+
+'------------------------------------------------------------------------------
+' Seed helpers (lookup data is inserted only into empty tables)
+'------------------------------------------------------------------------------
+Private Function BeginSeed(ByVal TableName As String) As Boolean
+    Dim rs As DAO.Recordset
+    m_currentStep = "seed " & TableName
+    Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & TableName & "]", dbOpenSnapshot)
+    If rs(0) > 0 Then
+        rs.Close
+        Exit Function
+    End If
+    rs.Close
+    DBEngine.Workspaces(0).BeginTrans
+    m_inTrans = True
+    BeginSeed = True
+End Function
+
+Private Sub ExecSeed(ByVal Sql As String)
+    m_db.Execute Sql, dbFailOnError
+End Sub
+
+Private Sub EndSeed(ByVal TableName As String, ByVal RowCount As Long)
+    DBEngine.Workspaces(0).CommitTrans
+    m_inTrans = False
+    m_seeded = m_seeded + 1
+    LogLine "  * بيانات أساسية: " & TableName & " (" & RowCount & " سجل)"
+End Sub
+
+'------------------------------------------------------------------------------
+' General helpers
+'------------------------------------------------------------------------------
+Private Function DefaultBackEndPath() As String
+    DefaultBackEndPath = CurrentProject.Path & "\" & BE_FILE_NAME
+End Function
+
+Private Function TableExistsIn(ByVal db As DAO.Database, ByVal TableName As String) As Boolean
+    Dim tdf As DAO.TableDef
+    For Each tdf In db.TableDefs
+        If StrComp(tdf.Name, TableName, vbTextCompare) = 0 Then
+            TableExistsIn = True
+            Exit Function
+        End If
+    Next
+End Function
+
+Private Function IsUserTable(ByVal tdf As DAO.TableDef) As Boolean
+    If (tdf.Attributes And dbSystemObject) <> 0 Then Exit Function
+    If Left$(tdf.Name, 4) = "MSys" Or Left$(tdf.Name, 1) = "~" Then Exit Function
+    IsUserTable = True
+End Function
+
+Private Function InSchema(ByVal TableName As String) As Boolean
+    InSchema = InStr(1, "," & SCHEMA_TABLES & ",", "," & TableName & ",", vbTextCompare) > 0
+End Function
+
+Private Sub LogLine(ByVal Msg As String)
+    m_log = m_log & Msg & vbCrLf
+    Debug.Print Msg
+End Sub
+
+'------------------------------------------------------------------------------
+' Generated: table definitions
+'------------------------------------------------------------------------------
+'''
+
+
+def build_vba() -> str:
+    names = ",".join(t.name for t in TABLES)
+    field_counts = ";".join(f"{t.name}={len(t.fields)}" for t in TABLES)
+    seed_counts = ";".join(f"{t.name}={len(t.seed_rows)}" for t in TABLES if t.seed_rows)
+    consts = "\n".join([
+        f"Private Const SCHEMA_TABLES As String = {vba_str(names)}",
+        f"Private Const EXPECTED_FIELD_COUNTS As String = {vba_str(field_counts)}",
+        f"Private Const EXPECTED_SEED_COUNTS As String = {vba_str(seed_counts)}",
+    ])
+    parts = [VBA_HEADER.replace("'@@SCHEMA_CONSTANTS@@", consts)]
+
+    parts.append("Private Sub CreateAllTables()\n" +
+                 "\n".join(f"    CreateTable_{t.name}" for t in TABLES) + "\nEnd Sub\n")
+    for t in TABLES:
+        parts.append(vba_table_sub(t) + "\n")
+
+    seeded = [t for t in TABLES if t.seed_rows]
+    parts.append("'" + "-" * 78 + "\n' Generated: lookup / initial data\n'" + "-" * 78)
+    parts.append("Private Sub SeedAll()\n" +
+                 "\n".join(f"    Seed_{t.name}" for t in seeded) + "\nEnd Sub\n")
+    for t in seeded:
+        parts.append(vba_seed_sub(t) + "\n")
+    return "\n".join(parts)
+
+
+# --------------------------------------------------------------------------
+# Markdown reference
+# --------------------------------------------------------------------------
+def md_escape(s) -> str:
+    if s is None or s == "":
+        return ""
+    return str(s).replace("|", "\\|")
+
+
+def build_reference_md() -> str:
+    out = ["# مرجع الجداول (Tables Reference)",
+           "",
+           "> ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.",
+           "",
+           f"عدد الجداول: **{len(TABLES)}** | عدد الحقول: **{sum(len(t.fields) for t in TABLES)}**",
+           "",
+           "## الفهرس",
+           ""]
+    for i, t in enumerate(TABLES, 1):
+        out.append(f"{i}. [`{t.name}`](#{t.name.lower()}) – {t.caption}")
+    out.append("")
+    for t in TABLES:
+        out += [f"## {t.name}", "", f"**{t.caption}** – {t.purpose}", "",
+                "| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |",
+                "|---|---|---|---|---|---|---|---|---|"]
+        for i, f in enumerate(t.fields, 1):
+            name = f"**{f.name}** 🔑" if f.name in t.pk else f.name
+            desc = f.caption + (f" – {f.note}" if f.note else "")
+            out.append("| {i} | {n} | {k} | {s} | {r} | {d} | {v} | {fk} | {desc} |".format(
+                i=i, n=name, k=KIND_LABEL[f.kind], s=f.size or "",
+                r="✔" if (f.required and f.kind not in ("AUTO", "BOOL")) else "",
+                d=f"`{md_escape(f.default)}`" if f.default else "",
+                v=f"`{md_escape(f.rule)}`" if f.rule else "",
+                fk=f"`{f.fk}`" if f.fk else "", desc=md_escape(desc)))
+        idx_lines = [f"- المفتاح الأساسي: `{', '.join(t.pk)}`"]
+        for ix in t.indexes:
+            kind = "فريد" if ix.unique else "عادي"
+            extra = " (يتجاهل الفارغ)" if ix.ignore_nulls else ""
+            idx_lines.append(f"- فهرس {kind}{extra}: `{', '.join(ix.fields)}`")
+        if t.rule:
+            idx_lines.append(f"- قاعدة تحقق على مستوى الجدول: `{md_escape(t.rule)}` – {t.rule_text}")
+        if t.seed_rows:
+            idx_lines.append(f"- بيانات أساسية: {len(t.seed_rows)} سجل")
+        out += ["", *idx_lines, ""]
+    return "\n".join(out)
+
+
+# --------------------------------------------------------------------------
+def write(path, text, encoding="utf-8", newline="\n"):
+    full = os.path.join(ROOT, path)
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, "w", encoding=encoding, newline=newline) as fh:
+        fh.write(text if text.endswith("\n") else text + "\n")
+    print("wrote", path)
+
+
+def main():
+    vba = build_vba()
+    write("src/vba/modBuildSchema.bas", vba)
+    # Access imports .bas files in the system ANSI code page -> Windows-1256 + CRLF
+    write("dist/vba/modBuildSchema.bas", vba, encoding="cp1256", newline="\r\n")
+    write("docs/02-Tables-Reference.md", build_reference_md())
+
+
+if __name__ == "__main__":
+    main()

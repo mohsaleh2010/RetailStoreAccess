@@ -6,8 +6,8 @@
 
 | المرحلة | الموضوع | الحالة | الملف |
 |---|---|---|---|
-| 1 | تحليل النظام | ✅ بانتظار الموافقة | [docs/01-System-Analysis.md](docs/01-System-Analysis.md) |
-| 2 | تصميم الجداول | ⏳ | |
+| 1 | تحليل النظام | ✅ تمت الموافقة | [docs/01-System-Analysis.md](docs/01-System-Analysis.md) |
+| 2 | تصميم الجداول | ✅ بانتظار الموافقة | [docs/02-Table-Design.md](docs/02-Table-Design.md) · [مرجع الجداول](docs/02-Tables-Reference.md) |
 | 3 | العلاقات | ⏳ | |
 | 4 | الاستعلامات | ⏳ | |
 | 5 | النماذج | ⏳ | |
@@ -18,3 +18,14 @@
 | 10 | الصلاحيات | ⏳ | |
 | 11 | الاختبار | ⏳ | |
 | 12 | دليل الاستخدام | ⏳ | |
+
+## هيكل المستودع
+
+| المسار | المحتوى |
+|---|---|
+| `dist/vba/` | ملفات VBA الجاهزة للاستيراد في Access (Windows-1256) |
+| `src/vba/` | نفس الملفات بترميز UTF-8 للقراءة |
+| `docs/` | توثيق كل مرحلة |
+| `tools/schema.py` | تعريف الجداول (المصدر الوحيد) |
+| `tools/generate.py` | يولّد الكود والمرجع: `python3 tools/generate.py` |
+| `tests/` | الاختبارات الآلية: `python3 -m unittest discover -s tests -v` |

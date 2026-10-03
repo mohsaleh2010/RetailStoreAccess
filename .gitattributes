@@ -1,0 +1,2 @@
+# Files imported into Access must keep Windows-1256 encoding and CRLF line endings
+dist/** binary
