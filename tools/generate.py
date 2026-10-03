@@ -8,6 +8,8 @@ import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
 from schema import TABLES, Table, Field  # noqa: E402
+from generate_common import vba_str  # noqa: E402
+import gen_relations  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -22,14 +24,6 @@ KIND_LABEL = {
 # --------------------------------------------------------------------------
 # VBA helpers
 # --------------------------------------------------------------------------
-def vba_str(s) -> str:
-    """Return a VBA string literal."""
-    if s is None:
-        s = ""
-    s = str(s).replace("\u2212", "-")   # Unicode minus is not in Windows-1256
-    return '"' + s.replace('"', '""') + '"'
-
-
 def sql_value(v) -> str:
     if v is None:
         return "Null"
@@ -585,6 +579,11 @@ def main():
     # Access imports .bas files in the system ANSI code page -> Windows-1256 + CRLF
     write("dist/vba/modBuildSchema.bas", vba, encoding="cp1256", newline="\r\n")
     write("docs/02-Tables-Reference.md", build_reference_md())
+
+    rel = gen_relations.build_relations_vba()
+    write("src/vba/modBuildRelations.bas", rel)
+    write("dist/vba/modBuildRelations.bas", rel, encoding="cp1256", newline="\r\n")
+    write("docs/03-Relationships-Reference.md", gen_relations.build_relations_md())
 
 
 if __name__ == "__main__":

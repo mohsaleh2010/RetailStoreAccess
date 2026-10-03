@@ -3,17 +3,12 @@
 Run:  python3 -m unittest discover -s tests -v
 """
 
-import os
 import re
-import sqlite3
-import sys
 import unittest
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "tools"))
-
-from schema import TABLES, table  # noqa: E402
-import generate  # noqa: E402
+from helpers import VbaModuleChecks, build_sqlite
+from schema import TABLES, table
+import generate
 
 KINDS = {"AUTO", "LONG", "INT", "BYTE", "MONEY", "QTY", "RATE", "DATE", "DATETIME",
          "BOOL", "TEXT", "MEMO"}
@@ -31,26 +26,6 @@ RESERVED = {
     "top", "percent", "distinct", "having", "as", "asc", "desc", "all", "any", "exists",
     "owner", "level", "option", "references", "constraint", "unique", "primary",
 }
-
-SQLITE_TYPE = {
-    "AUTO": "INTEGER", "LONG": "INTEGER", "INT": "INTEGER", "BYTE": "INTEGER",
-    "MONEY": "NUMERIC", "QTY": "NUMERIC", "RATE": "NUMERIC", "DATE": "TEXT",
-    "DATETIME": "TEXT", "BOOL": "INTEGER", "TEXT": "TEXT", "MEMO": "TEXT",
-}
-
-
-def sqlite_default(access_default):
-    """Translate an Access DefaultValue expression to SQLite."""
-    d = access_default
-    if d in ("Now()", "Date()"):
-        return "CURRENT_TIMESTAMP"
-    if d in ("True", "False"):
-        return "1" if d == "True" else "0"
-    if d.startswith('"'):
-        return "'" + d.strip('"') + "'"
-    float(d)  # anything else must be a plain number
-    return d
-
 
 def field(table_name, field_name):
     for f in table(table_name).fields:
@@ -236,105 +211,26 @@ class SeedDataTests(unittest.TestCase):
                                 "ADJUSTMENT": 0, "OPENING": 1})
 
     def test_seed_loads_into_relational_db_with_foreign_keys(self):
-        con = sqlite3.connect(":memory:")
-        con.execute("PRAGMA foreign_keys = ON")
-        for t in TABLES:
-            cols = []
-            for f in t.fields:
-                c = f'"{f.name}" {SQLITE_TYPE[f.kind]}'
-                if f.required and f.kind not in ("AUTO", "BOOL"):
-                    c += " NOT NULL"
-                if f.default is not None:
-                    c += " DEFAULT " + sqlite_default(f.default)
-                cols.append(c)
-            cols.append("PRIMARY KEY (" + ", ".join(f'"{k}"' for k in t.pk) + ")")
-            for f in t.fields:
-                if f.fk:
-                    tt, tf = f.fk.split(".")
-                    cols.append(f'FOREIGN KEY ("{f.name}") REFERENCES "{tt}" ("{tf}")')
-            for ix in t.indexes:
-                if ix.unique:
-                    cols.append("UNIQUE (" + ", ".join(f'"{k}"' for k in ix.fields) + ")")
-            con.execute(f'CREATE TABLE "{t.name}" ({", ".join(cols)})')
-        for t in TABLES:
-            for row in t.seed_rows:
-                ph = ", ".join("?" for _ in row)
-                cols = ", ".join(f'"{c}"' for c in t.seed_columns)
-                con.execute(f'INSERT INTO "{t.name}" ({cols}) VALUES ({ph})', row)
+        con = build_sqlite()
         self.assertEqual(con.execute("PRAGMA foreign_key_check").fetchall(), [])
         self.assertEqual(con.execute("SELECT COUNT(*) FROM RolePermissions").fetchone()[0],
                          len(table("RolePermissions").seed_rows))
 
 
-class GeneratedVbaTests(unittest.TestCase):
-
-    @classmethod
-    def setUpClass(cls):
-        cls.vba = generate.build_vba()
-        cls.lines = cls.vba.splitlines()
-
-    def test_generated_files_are_up_to_date(self):
-        with open(os.path.join(ROOT, "src/vba/modBuildSchema.bas"), encoding="utf-8") as fh:
-            self.assertEqual(fh.read().rstrip("\n"), self.vba.rstrip("\n"),
-                             "run: python3 tools/generate.py")
-        with open(os.path.join(ROOT, "dist/vba/modBuildSchema.bas"), "rb") as fh:
-            data = fh.read()
-        self.assertEqual(data.decode("cp1256").replace("\r\n", "\n").rstrip("\n"),
-                         self.vba.rstrip("\n"))
-        self.assertNotIn(b"\n", data.replace(b"\r\n", b""), "dist file must use CRLF only")
-
-    def test_module_header(self):
-        self.assertEqual(self.lines[0], 'Attribute VB_Name = "modBuildSchema"')
-        self.assertIn("Option Explicit", self.lines)
-
-    def test_windows_1256_encodable(self):
-        self.vba.encode("cp1256")
-
-    def test_line_length_and_continuations(self):
-        run = 0
-        for n, line in enumerate(self.lines, 1):
-            self.assertLess(len(line.encode("cp1256")), 1000, f"line {n} too long")
-            run = run + 1 if line.endswith(" _") else 0
-            self.assertLess(run, 24, f"too many continuations at line {n}")
-
-    def test_blocks_balanced(self):
-        code = [l.split("'")[0].strip() if not l.strip().startswith("'") else ""
-                for l in self.lines]
-        opens = sum(1 for l in code if re.match(r"^(Public |Private )?(Sub|Function) ", l))
-        closes = sum(1 for l in code if l in ("End Sub", "End Function"))
-        self.assertEqual(opens, closes)
-        self.assertEqual(sum(1 for l in code if re.match(r"^For ", l)),
-                         sum(1 for l in code if l.startswith("Next")))
-        self.assertEqual(sum(1 for l in code if l.startswith("Select Case")),
-                         sum(1 for l in code if l == "End Select"))
-        block_if = sum(1 for l in code if re.match(r"^(If|ElseIf) .* Then$", l)
-                       and not l.startswith("ElseIf"))
-        self.assertEqual(block_if, sum(1 for l in code if l == "End If"))
+class GeneratedSchemaModuleTests(VbaModuleChecks, unittest.TestCase):
+    module_name = "modBuildSchema"
+    vba = generate.build_vba()
 
     def test_every_called_procedure_is_defined(self):
         defined = set(re.findall(r"(?:Sub|Function) (\w+)\(", self.vba))
+        create_all = self.vba.split("Private Sub CreateAllTables")[1].split("End Sub")[0]
         for t in TABLES:
             self.assertIn(f"CreateTable_{t.name}", defined)
-            self.assertIn(f"CreateTable_{t.name}", self.vba.split("Private Sub CreateAllTables")[1])
+            self.assertIn(f"CreateTable_{t.name}", create_all)
         for name in ("BuildSchema", "VerifySchema", "LinkBackEnd", "DropSchema", "AddField",
                      "AddIndex", "BeginTable", "EndTable", "SetProp", "BeginSeed", "ExecSeed",
                      "EndSeed", "SeedAll", "CreateAllTables"):
             self.assertIn(name, defined)
-
-    def test_vba_string_literals_balanced(self):
-        for n, line in enumerate(self.lines, 1):
-            code = line
-            if code.lstrip().startswith("'"):
-                continue
-            # remove doubled quotes, then quotes must pair up
-            stripped = code.replace('""', "")
-            in_str = False
-            for ch in stripped:
-                if ch == '"':
-                    in_str = not in_str
-                elif ch == "'" and not in_str:
-                    break
-            self.assertFalse(in_str, f"unbalanced quotes at line {n}: {line}")
 
 
 if __name__ == "__main__":

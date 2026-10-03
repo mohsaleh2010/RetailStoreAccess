@@ -60,7 +60,7 @@
 | 16 | PricesIncludeVAT | Yes/No |  |  | `True` |  |  | الأسعار شاملة الضريبة |
 | 17 | AllowNegativeStock | Yes/No |  |  | `False` |  |  | السماح بالبيع بالسالب |
 | 18 | CurrencyCode | Short Text | 3 | ✔ | `"SAR"` |  |  | العملة |
-| 19 | DefaultCustomerID | Number (Long) |  | ✔ | `1` |  |  | العميل الافتراضي |
+| 19 | DefaultCustomerID | Number (Long) |  | ✔ | `1` |  | `Customers.CustomerID` | العميل الافتراضي |
 | 20 | ZatcaPhase | Number (Byte) |  | ✔ | `1` | `In (1,2)` |  | مرحلة فاتورة |
 | 21 | ZatcaEnvironment | Short Text | 20 |  |  |  |  | بيئة الربط مع الهيئة |
 | 22 | LastInvoiceHash | Short Text | 255 |  |  |  |  | بصمة آخر مستند – تبدأ بالقيمة الافتراضية التي تحددها الهيئة لأول فاتورة |
