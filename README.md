@@ -10,8 +10,8 @@
 | 2 | تصميم الجداول | ✅ تمت الموافقة | [docs/02-Table-Design.md](docs/02-Table-Design.md) · [مرجع الجداول](docs/02-Tables-Reference.md) |
 | 3 | العلاقات | ✅ تمت الموافقة | [docs/03-Relationships.md](docs/03-Relationships.md) · [مرجع العلاقات](docs/03-Relationships-Reference.md) |
 | 4 | الاستعلامات | ✅ تمت الموافقة | [docs/04-Queries.md](docs/04-Queries.md) · [مرجع الاستعلامات](docs/04-Queries-Reference.md) |
-| 5 | النماذج | ✅ بانتظار الموافقة | [docs/05-Forms.md](docs/05-Forms.md) |
-| 6 | نظام المبيعات | ⏳ | |
+| 5 | النماذج | ✅ تمت الموافقة | [docs/05-Forms.md](docs/05-Forms.md) |
+| 6 | نظام المبيعات | ✅ بانتظار الموافقة | [docs/06-Sales.md](docs/06-Sales.md) |
 | 7 | المشتريات والمخزون | ⏳ | |
 | 8 | التقارير | ⏳ | |
 | 9 | لوحة التحكم | ⏳ | |
@@ -30,6 +30,9 @@
 | `tools/relations.py` | العلاقات المشتقة من الجداول وسيناريو اختبارها |
 | `tools/queries.py` | الاستعلامات وبيانات الاختبار والنتائج المتوقعة |
 | `tools/forms.py` | تعريف الشاشات وتخطيطها، قوالب البحث، قائمة التقارير |
+| `tools/forms_sales.py`, `tools/reports.py` | شاشات المبيعات، وتقارير الفاتورة |
+| `tools/pricing.py`, `tools/zatca_reference.py`, `tools/qr_reference.py` | المراجع الحسابية: الفاتورة، حمولة QR للهيئة، مولّد QR |
+| `tests/vba_harness.py` | تشغيل كود VBA الحسابي فعليًا عبر LibreOffice للتحقق منه |
 | `tools/generate.py` | يولّد الكود والمرجع: `python3 tools/generate.py` |
 | `tests/` | الاختبارات الآلية: `python3 -m unittest discover -s tests -v` |
 
@@ -41,3 +44,13 @@
 | 2 | `dist/vba/modBuildRelations.bas` | `BuildRelationships` | `TestRelationships` |
 | 3 | `dist/vba/modQueryParams.bas` (دائمة) ثم `dist/vba/modBuildQueries.bas` | `BuildQueries` | `TestQueries` |
 | 4 | `modCommon`, `modStartup`, `modForms`, `modScreens`, `modAppData` (دائمة) ثم `modBuildForms` | `BuildForms` | `TestForms` |
+| 5 | `modZatca`, `modQRCode`, `modSales`, `modPOS` (دائمة) ثم `modBuildReports`, `modTestSales` | `BuildQueries`, `BuildForms`, `BuildReports` | `TestSales` |
+
+> عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
+
+### الاختبارات الآلية
+```
+python3 tools/generate.py
+python3 -m unittest discover -s tests -v
+```
+اختبارات `test_vba_runtime` تشغّل كود VBA فعليًا وتحتاج LibreOffice (`soffice` و `python3-uno`)، وتُتخطى تلقائيًا إن لم يكن مثبتًا.

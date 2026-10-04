@@ -95,8 +95,12 @@ Public Function CurrentUserName() As String
 End Function
 
 Public Function HasPermission(ByVal PermissionKey As String) As Boolean
-    ' Phase 10 replaces this with a check against RolePermissions.
-    HasPermission = True
+    ' True when the role of the current user has the permission (table RolePermissions).
+    Dim roleID As Variant
+    roleID = DLookup("RoleID", "Employees", "EmployeeID = " & CurrentUserID() & " AND IsActive = True")
+    If IsNull(roleID) Then Exit Function
+    HasPermission = DCount("*", "RolePermissions", "RoleID = " & roleID & _
+                           " AND PermissionKey = " & SqlText(PermissionKey)) > 0
 End Function
 
 '------------------------------------------------------------------------------
@@ -169,7 +173,17 @@ End Function
 ' Settings and audit log
 '------------------------------------------------------------------------------
 Public Function SettingValue(ByVal FieldName As String) As Variant
-    SettingValue = DLookup("[" & FieldName & "]", "Settings", "SettingID = 1")
+    SettingValue = DbValue("SELECT [" & FieldName & "] FROM [Settings] WHERE [SettingID] = 1")
+End Function
+
+Public Function DbValue(ByVal Sql As String) As Variant
+    ' First column of the first row, or Null. Unlike DLookup it reads through CurrentDb,
+    ' so it also sees changes made earlier in the same (not yet committed) transaction.
+    Dim rs As DAO.Recordset
+    DbValue = Null
+    Set rs = CurrentDb.OpenRecordset(Sql, dbOpenSnapshot)
+    If Not rs.EOF Then DbValue = rs(0).Value
+    rs.Close
 End Function
 
 Public Sub LogAction(ByVal ActionType As String, Optional ByVal ObjectName As String = "", _

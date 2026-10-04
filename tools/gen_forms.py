@@ -13,7 +13,7 @@ EVENT_PROPERTY = {
 
 HELPER_PROPS = {"Caption", "FontSize", "FontBold", "ForeColor", "BackColor", "TextAlign",
                 "RowSource", "ColumnCount", "ColumnWidths", "ColumnHeads", "Style",
-                "RowSourceType"}
+                "RowSourceType", "SourceObject"}
 
 
 def lit(v) -> str:
@@ -78,11 +78,18 @@ def control_lines(c: F.Control):
             out.append('    c.RowSourceType = "Value List"')
         if "FontSize" in p:
             out.append(f"    c.FontSize = {p['FontSize']}")
+    elif c.kind == "subform":
+        out.append(f"    Set c = AddSubform({vba_str(c.name)}, {vba_str(p['SourceObject'])}, {c.x}, {c.y}, "
+                   f"{c.w}, {c.h})")
     elif c.kind == "button":
         out.append(f"    Set c = AddButton({vba_str(c.name)}, {vba_str(p['Caption'])}, {c.x}, {c.y}, "
                    f"{c.w}, {c.h}, {vba_str(p['Style'])})")
     else:
         raise ValueError(c.kind)
+    if c.kind in ("text", "combo", "button") and "FontSize" in p:
+        out.append(f"    c.FontSize = {p['FontSize']}")
+    if c.kind in ("text", "combo") and p.get("FontBold"):
+        out.append("    c.FontBold = True")
     for key, value in p.items():
         if key in HELPER_PROPS:
             continue
@@ -101,6 +108,8 @@ def form_sub(m: F.FormModel):
              f"    StartForm {vba_str(m.name)}, {vba_str(m.caption)}, {vba_str(m.record_source)}, "
              f"{m.width}, {m.height}, {lit(m.popup)}, {lit(m.allow_add)}, {lit(m.allow_edit)}, _",
              f"              {vba_str(m.tag)}"]
+    for key, value in m.form_props.items():
+        lines.append(f"    SetFormProp {vba_str(key)}, {lit(value)}")
     for c in m.controls:
         lines += control_lines(c)
     for ev in m.form_events:
@@ -156,6 +165,7 @@ Public Function BuildForms() As Boolean
     m_built = 0: m_failed = 0: m_report = "": m_warnings = ""
     Debug.Print "=== BuildForms  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     CloseAllForms
+    EnsureLocalTables                      ' tmpPOSLines / tmpReturnLines (modPOS)
     DoCmd.Echo False, "جاري بناء الشاشات..."
     BuildAllForms
     DoCmd.Echo True
@@ -387,6 +397,17 @@ Private Function AddList(ByVal CtlName As String, ByVal L As Long, ByVal T As Lo
     Set AddList = c
 End Function
 
+Private Function AddSubform(ByVal CtlName As String, ByVal SourceObject As String, ByVal L As Long, _
+                            ByVal T As Long, ByVal W As Long, ByVal H As Long) As Access.Control
+    Dim c As Access.Control
+    Set c = NewCtl(acSubform, CtlName, L, T, W, H)
+    c.SourceObject = SourceObject
+    c.BorderStyle = 1
+    c.BorderColor = CLR_BORDER
+    c.SpecialEffect = 0
+    Set AddSubform = c
+End Function
+
 Private Function AddButton(ByVal CtlName As String, ByVal Caption As String, ByVal L As Long, _
                            ByVal T As Long, ByVal W As Long, ByVal H As Long, _
                            ByVal Style As String) As Access.Control
@@ -468,7 +489,8 @@ Private Sub TestHelpers()
     Call Record(RoundMoney(-2.345) = -2.35, "تقريب -2.345 = -2.35")
     Call Record(RoundMoney(149.999, 2) = 150, "تقريب 149.999 = 150")
     Call Record(LikePattern("a'b*") = "'*a''b[*]*'", "تهريب نص البحث")
-    Call Record(SqlDate(#3/15/2026 2:05:09 PM#) = "#2026-03-15 14:05:09#", "صيغة التاريخ في SQL")
+    Call Record(SqlDate(DateSerial(2026, 3, 15) + TimeSerial(14, 5, 9)) = "#2026-03-15 14:05:09#", _
+                "صيغة التاريخ في SQL")
 End Sub
 
 Private Sub TestProductScreen()

@@ -20,7 +20,7 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qrySalesDocPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -484,6 +484,12 @@ Private Sub RunChecks()
         "SELECT InputVAT FROM VatSummaryQuery", -15
     Chk "«·÷—Ì»…: «·’«›Ì «·„” Õﬁ = 204 + 15", _
         "SELECT NetVATDue FROM VatSummaryQuery", 219
+    Chk "ÿ»«⁄… «·›« Ê—… «·¬Ã·…: ”ÿ—«‰", _
+        "SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = " & R("INV2"), 2
+    Chk "ÿ»«⁄… «·›« Ê—… «·¬Ã·…: „Ã„Ê⁄ «·√”ÿ— = 460", _
+        "SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = " & R("INV2"), 460
+    Chk "ÿ»«⁄… «·≈‘⁄«— «·œ«∆‰: ”ÿ— Ê«Õœ »ﬁÌ„… 46", _
+        "SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = " & R("CRN1"), 46
     Chk "›Õ’ «·”·«„…: ·«  ÊÃœ „‘ﬂ·« ", _
         "SELECT COUNT(*) FROM IntegrityCheckQuery", 0
 End Sub
@@ -543,6 +549,7 @@ Private Sub CreateAllQueries()
     Q_qryVatInputPurchases
     Q_qryVatInputExpenses
     Q_VatSummaryQuery
+    Q_qrySalesDocPrint
     Q_qrySalesInvoiceLineTotals
     Q_qryPurchaseInvoiceLineTotals
     Q_qrySalesReturnedQty
@@ -1013,6 +1020,38 @@ Private Sub Q_VatSummaryQuery()
     s = s & "       o.OutputVAT - p.PurchaseVAT - e.ExpenseVAT AS NetVATDue" & vbCrLf
     s = s & "FROM qryVatOutput AS o, qryVatInputPurchases AS p, qryVatInputExpenses AS e" & vbCrLf
     SaveQuery "VatSummaryQuery", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›… ··› —… (··≈ﬁ—«— «·÷—Ì»Ì)", s
+End Sub
+
+Private Sub Q_qrySalesDocPrint()
+    Dim s As String
+    s = "SELECT 'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber," & vbCrLf
+    s = s & "       h.InvoiceDate AS DocDate, '' AS OriginalNumber, h.InvoiceSubType, h.PaymentType," & vbCrLf
+    s = s & "       h.CustomerID, c.CustomerName, c.VATNumber AS CustomerVAT, c.City AS CustomerCity," & vbCrLf
+    s = s & "       c.District AS CustomerDistrict, c.StreetName AS CustomerStreet," & vbCrLf
+    s = s & "       c.BuildingNo AS CustomerBuilding, c.PostalCode AS CustomerPostal, e.EmployeeName," & vbCrLf
+    s = s & "       h.SubTotal AS DocSubTotal, h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax," & vbCrLf
+    s = s & "       h.TotalAmount, h.PaidAmount, h.RemainingAmount, h.AmountTendered, h.ChangeDue," & vbCrLf
+    s = s & "       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, d.Quantity, d.UnitPrice," & vbCrLf
+    s = s & "       d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal" & vbCrLf
+    s = s & "FROM ((((SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID)" & vbCrLf
+    s = s & "       INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
+    s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
+    s = s & "     INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, o.InvoiceNumber, r.InvoiceSubType," & vbCrLf
+    s = s & "       r.RefundType, r.CustomerID, c.CustomerName, c.VATNumber, c.City, c.District, c.StreetName," & vbCrLf
+    s = s & "       c.BuildingNo, c.PostalCode, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax," & vbCrLf
+    s = s & "       r.TotalAmount, r.RefundedAmount, r.TotalAmount - r.RefundedAmount, CCur(0), CCur(0)," & vbCrLf
+    s = s & "       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, rd.Quantity, rd.UnitPrice," & vbCrLf
+    s = s & "       rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal" & vbCrLf
+    s = s & "FROM (((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)" & vbCrLf
+    s = s & "        INNER JOIN SalesInvoices AS o ON r.SalesInvoiceID = o.SalesInvoiceID)" & vbCrLf
+    s = s & "       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)" & vbCrLf
+    s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
+    s = s & "     INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID" & vbCrLf
+    SaveQuery "qrySalesDocPrint", "»Ì«‰«  ÿ»«⁄… ›Ê« Ì— «·»Ì⁄ Ê«·≈‘⁄«—«  «·œ«∆‰… (”ÿ— ·ﬂ· ’‰›)", s
 End Sub
 
 Private Sub Q_qrySalesInvoiceLineTotals()

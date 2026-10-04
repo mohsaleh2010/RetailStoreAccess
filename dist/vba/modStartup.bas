@@ -98,7 +98,8 @@ End Sub
 ' Navigation
 '------------------------------------------------------------------------------
 Public Function OpenScreen(ByVal FormName As String, Optional ByVal PhaseNo As Integer = 0, _
-                           Optional ByVal RecordID As Variant = Null) As Boolean
+                           Optional ByVal RecordID As Variant) As Boolean
+    If IsMissing(RecordID) Then RecordID = Null
     If Not FormExists(FormName) Then
         If PhaseNo > 0 Then
             ShowInfo "Â–Â «·‘«‘… ” ﬂÊ‰ „ «Õ… »⁄œ  ‰›Ì– «·„—Õ·… " & PhaseNo & "."

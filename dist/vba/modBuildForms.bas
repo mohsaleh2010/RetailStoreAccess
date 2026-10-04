@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCategories,frmUnits,frmExpenseTypes,frmSettings,frmSearch,frmReportCenter"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCategories,frmUnits,frmExpenseTypes,frmSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -41,6 +41,7 @@ Public Function BuildForms() As Boolean
     m_built = 0: m_failed = 0: m_report = "": m_warnings = ""
     Debug.Print "=== BuildForms  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     CloseAllForms
+    EnsureLocalTables                      ' tmpPOSLines / tmpReturnLines (modPOS)
     DoCmd.Echo False, "Ã«—Ì »‰«¡ «·‘«‘« ..."
     BuildAllForms
     DoCmd.Echo True
@@ -272,6 +273,17 @@ Private Function AddList(ByVal CtlName As String, ByVal L As Long, ByVal T As Lo
     Set AddList = c
 End Function
 
+Private Function AddSubform(ByVal CtlName As String, ByVal SourceObject As String, ByVal L As Long, _
+                            ByVal T As Long, ByVal W As Long, ByVal H As Long) As Access.Control
+    Dim c As Access.Control
+    Set c = NewCtl(acSubform, CtlName, L, T, W, H)
+    c.SourceObject = SourceObject
+    c.BorderStyle = 1
+    c.BorderColor = CLR_BORDER
+    c.SpecialEffect = 0
+    Set AddSubform = c
+End Function
+
 Private Function AddButton(ByVal CtlName As String, ByVal Caption As String, ByVal L As Long, _
                            ByVal T As Long, ByVal W As Long, ByVal H As Long, _
                            ByVal Style As String) As Access.Control
@@ -353,7 +365,8 @@ Private Sub TestHelpers()
     Call Record(RoundMoney(-2.345) = -2.35, " ﬁ—Ì» -2.345 = -2.35")
     Call Record(RoundMoney(149.999, 2) = 150, " ﬁ—Ì» 149.999 = 150")
     Call Record(LikePattern("a'b*") = "'*a''b[*]*'", " Â—Ì» ‰’ «·»ÕÀ")
-    Call Record(SqlDate(#3/15/2026 2:05:09 PM#) = "#2026-03-15 14:05:09#", "’Ì€… «· «—ÌŒ ›Ì SQL")
+    Call Record(SqlDate(DateSerial(2026, 3, 15) + TimeSerial(14, 5, 9)) = "#2026-03-15 14:05:09#", _
+                "’Ì€… «· «—ÌŒ ›Ì SQL")
 End Sub
 
 Private Sub TestProductScreen()
@@ -540,6 +553,12 @@ Private Sub BuildAllForms()
     BuildForm_frmSettings
     BuildForm_frmSearch
     BuildForm_frmReportCenter
+    BuildForm_frmPOSLines
+    BuildForm_frmPOS
+    BuildForm_frmReturnLines
+    BuildForm_frmSalesReturn
+    BuildForm_frmCustomerPayment
+    BuildForm_frmSalesInvoice
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -882,6 +901,8 @@ Private Sub BuildForm_frmCustomers()
     c.OnClick = EP
     Set c = AddButton("btnDelete", "Õ–›", 4649, 1021, 1361, 482, "danger")
     c.OnClick = EP
+    Set c = AddButton("btnPayment", "”‰œ ﬁ»÷", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "≈€·«ﬁ", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "»ÕÀ (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -986,6 +1007,9 @@ Private Sub BuildForm_frmCustomers()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnDelete_Click()" & vbCrLf
     s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPayment_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmCustomerPayment"", 6, Me!CustomerID" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
@@ -1807,4 +1831,417 @@ Private Sub BuildForm_frmReportCenter()
     Exit Sub
 EH:
     AbortForm "frmReportCenter", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmPOSLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmPOSLines", "√”ÿ— «·›« Ê—…", "SELECT * FROM tmpPOSLines ORDER BY LineNo", 12020, 425, False, False, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    Set c = AddText("LineNo", "LineNo", 28, 0, 567, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("ProductName", "ProductName", 623, 0, 4252, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("Quantity", "Quantity", 4903, 0, 1247, 425)
+    SetCtlProp c, "Format", "#,##0.###"
+    c.AfterUpdate = EP
+    Set c = AddText("UnitPrice", "UnitPrice", 6178, 0, 1474, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddText("LineDiscount", "LineDiscount", 7680, 0, 1247, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddText("LineTotal", "LineTotal", 8955, 0, 1588, 425)
+    c.FontBold = True
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("Available", "Available", 10571, 0, 907, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 11506, 17, 454, 391, "danger")
+    SetCtlProp c, "FontName", ICON_FONT
+    c.OnClick = EP
+    s = ""
+    s = s & "Private Sub Quantity_AfterUpdate()" & vbCrLf
+    s = s & "    LineChanged Me, ""Quantity""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub UnitPrice_AfterUpdate()" & vbCrLf
+    s = s & "    LineChanged Me, ""UnitPrice""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub LineDiscount_AfterUpdate()" & vbCrLf
+    s = s & "    LineChanged Me, ""LineDiscount""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    RemoveCurrentLine Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmPOSLines", s
+    Exit Sub
+EH:
+    AbortForm "frmPOSLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmPOS()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmPOS", "‰ﬁÿ… «·»Ì⁄", "", 18994, 10546, False, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 18994, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "‰ﬁÿ… «·»Ì⁄", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "F9 Õ›Ÿ  |  F12 Õ›Ÿ Êÿ»«⁄…  |  F5 ›« Ê—… ÃœÌœ…  |  F4 »ÕÀ »«·«”„  |  F8 «·„»·€ «·„œ›Ê⁄  |  F2 «·»«—ﬂÊœ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtBarcode", "", 227, 1304, 4536, 567)
+    c.FontSize = 16
+    c.OnKeyDown = EP
+    Set c = AddLabel("lblBarcode", "«·»«—ﬂÊœ √Ê ﬂÊœ «·„‰ Ã (Enter)", 227, 992, 4536, 284, 9, False, CLR_MUTED, "txtBarcode", 0)
+    Set c = AddText("txtQty", "", 4933, 1304, 1134, 567)
+    c.FontSize = 16
+    SetCtlProp c, "Format", "#,##0.###"
+    SetCtlProp c, "DefaultValue", "1"
+    Set c = AddLabel("lblQty", "«·ﬂ„Ì…", 4933, 992, 1134, 284, 9, False, CLR_MUTED, "txtQty", 0)
+    Set c = AddCombo("cboProduct", "", 6237, 1304, 6010, 567, "SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, SellingPrice FROM Products WHERE IsActive = True ORDER BY ProductName", 3, "0;4536;1134")
+    c.FontSize = 13
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblProduct", "√Ê «»ÕÀ »«”„ «·„‰ Ã (F4)", 6237, 992, 6010, 284, 9, False, CLR_MUTED, "cboProduct", 0)
+    Set c = AddLabel("lblCol1", "#", 255, 2041, 567, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "«·’‰›", 850, 2041, 4252, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "«·ﬂ„Ì…", 5130, 2041, 1247, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "«·”⁄—", 6405, 2041, 1474, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol5", "Œ’„ «·”ÿ—", 7907, 2041, 1247, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol6", "«·≈Ã„«·Ì", 9182, 2041, 1588, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol7", "«·„ Ê›—", 10798, 2041, 907, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subLines", "frmPOSLines", 227, 2410, 12020, 6237)
+    Set c = AddLabel("lblStatus", " ", 227, 8760, 12020, 397, 11, True, CLR_MUTED, "", 0)
+    Set c = AddButton("btnSave", "Õ›Ÿ (F9)", 227, 9412, 1928, 624, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnSavePrint", "Õ›Ÿ Êÿ»«⁄… (F12)", 2268, 9412, 2381, 624, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnNewSale", "›« Ê—… ÃœÌœ… (F5)", 4762, 9412, 2155, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnReturn", "„— Ã⁄", 7030, 9412, 1474, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPayment", "”‰œ ﬁ»÷", 8617, 9412, 1474, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnReprint", "≈⁄«œ… ÿ»«⁄…", 10204, 9412, 1588, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddCombo("cboCustomer", "", 12474, 1304, 6294, 454, "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName", 2, "0;5670")
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblCustomer", "«·⁄„Ì·", 12474, 992, 6294, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
+    Set c = AddLabel("lblCustomerInfo", " ", 12474, 1786, 6294, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddCombo("cboPaymentType", "", 12474, 2438, 3033, 454, "CASH;‰ﬁœÌ;CREDIT;¬Ã·", 2, "0;2835")
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblPaymentType", "‰Ê⁄ «·»Ì⁄", 12474, 2126, 3033, 284, 9, False, CLR_MUTED, "cboPaymentType", 0)
+    Set c = AddCombo("cboPaymentMethod", "", 15735, 2438, 3033, 454, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;2835")
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblPaymentMethod", "ÿ—Ìﬁ… «·œ›⁄", 15735, 2126, 3033, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
+    Set c = AddText("txtInvoiceDiscount", "", 12474, 3260, 3033, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblInvoiceDiscount", "Œ’„ ⁄·Ï «·›« Ê—…", 12474, 2948, 3033, 284, 9, False, CLR_MUTED, "txtInvoiceDiscount", 0)
+    Set c = AddText("txtNotes", "", 15735, 3260, 3033, 454)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 15735, 2948, 3033, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddRect("boxTotals", 12474, 3884, 6294, 3289, CLR_SURFACE)
+    Set c = AddLabel("lblCapSubTotal", "«·„Ã„Ê⁄ ﬁ»· «·Œ’„ Ê«·÷—Ì»…", 12644, 3969, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblSubTotal", "0.00", 16386, 3969, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapDiscount", "«·Œ’„", 12644, 4366, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblDiscount", "0.00", 16386, 4366, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapTax", "÷—Ì»… «·ﬁÌ„… «·„÷«›…", 12644, 4763, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTax", "0.00", 16386, 4763, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapTotal", "«·≈Ã„«·Ì ‘«„· «·÷—Ì»…", 12644, 5245, 5954, 340, 12, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTotal", "0.00", 12644, 5613, 5954, 964, 34, True, CLR_ACCENT, "", 2)
+    Set c = AddLabel("lblItems", " ", 12644, 6662, 5954, 340, 10, False, CLR_MUTED, "", 2)
+    Set c = AddText("txtTendered", "", 12474, 7598, 6294, 567)
+    c.FontSize = 16
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblTendered", "«·„»·€ «·„œ›Ê⁄ (F8) - « —ﬂÂ ›«—€« ≈–« œ›⁄ «·„»·€ »«·÷»ÿ", 12474, 7286, 6294, 284, 9, False, CLR_MUTED, "txtTendered", 0)
+    Set c = AddLabel("lblChange", " ", 12474, 8250, 6294, 454, 14, True, CLR_SUCCESS, "", 2)
+    Set c = AddLabel("lblLastInvoiceCap", "¬Œ— ›« Ê—…:", 12474, 8817, 1701, 312, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblLastInvoice", " ", 14232, 8817, 2835, 312, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 17067, 9412, 1701, 624, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    POSLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    POSKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not POSUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtBarcode_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    BarcodeKeyDown Me, KeyCode" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboProduct_AfterUpdate()" & vbCrLf
+    s = s & "    ProductPicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboCustomer_AfterUpdate()" & vbCrLf
+    s = s & "    CustomerChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboPaymentType_AfterUpdate()" & vbCrLf
+    s = s & "    PaymentTypeChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboPaymentMethod_AfterUpdate()" & vbCrLf
+    s = s & "    PaymentMethodChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtInvoiceDiscount_AfterUpdate()" & vbCrLf
+    s = s & "    RecalcPOS Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtTendered_AfterUpdate()" & vbCrLf
+    s = s & "    RecalcPOS Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    SavePOS Me, False" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSavePrint_Click()" & vbCrLf
+    s = s & "    SavePOS Me, True" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNewSale_Click()" & vbCrLf
+    s = s & "    NewSale Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReturn_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmSalesReturn"", 6" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPayment_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmCustomerPayment"", 6, Me!cboCustomer.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReprint_Click()" & vbCrLf
+    s = s & "    ReprintLast Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmPOS", s
+    Exit Sub
+EH:
+    AbortForm "frmPOS", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmReturnLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmReturnLines", "√”ÿ— «·„— Ã⁄", "SELECT * FROM tmpReturnLines ORDER BY SalesDetailID", 14855, 425, False, False, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    Set c = AddText("ProductName", "ProductName", 28, 0, 5103, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("SoldQty", "SoldQty", 5159, 0, 1474, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("ReturnedQty", "ReturnedQty", 6661, 0, 1474, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("AvailableQty", "AvailableQty", 8163, 0, 1474, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("ReturnQty", "ReturnQty", 9665, 0, 1588, 425)
+    c.FontBold = True
+    SetCtlProp c, "Format", "#,##0.###"
+    c.AfterUpdate = EP
+    Set c = AddCheck("ReturnToStock", "ReturnToStock", 11876, 68)
+    c.AfterUpdate = EP
+    Set c = AddText("ReturnAmount", "ReturnAmount", 12783, 0, 1928, 425)
+    c.FontBold = True
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    s = ""
+    s = s & "Private Sub ReturnQty_AfterUpdate()" & vbCrLf
+    s = s & "    ReturnLineChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub ReturnToStock_AfterUpdate()" & vbCrLf
+    s = s & "    ReturnLineChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmReturnLines", s
+    Exit Sub
+EH:
+    AbortForm "frmReturnLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmSalesReturn()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmSalesReturn", "„— Ã⁄ „»Ì⁄« ", "", 15309, 9639, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "„— Ã⁄ „»Ì⁄«  (≈‘⁄«— œ«∆‰)", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "«Œ — «·›« Ê—… «·√’·Ì… À„ Õœœ «·ﬂ„Ì«  «·„— Ã⁄…", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtInvoiceID", "", 14742, 57, 340, 227)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtInvoiceNo", "", 227, 1304, 2835, 454)
+    c.FontSize = 12
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblInvoiceNo", "—ﬁ„ «·›« Ê—… «·√’·Ì…", 227, 992, 2835, 284, 9, False, CLR_MUTED, "txtInvoiceNo", 0)
+    Set c = AddButton("btnFind", "»ÕÀ", 3175, 1304, 1134, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblInvoiceInfo", " ", 4479, 1361, 10603, 397, 10, False, CLR_TEXT, "", 0)
+    Set c = AddLabel("lblCol1", "«·’‰›", 255, 1956, 5103, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "«·ﬂ„Ì… «·„»«⁄…", 5386, 1956, 1474, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "„— Ã⁄ ”«»ﬁ«", 6888, 1956, 1474, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "«·„ «Õ ··≈—Ã«⁄", 8390, 1956, 1474, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol5", "«·ﬂ„Ì… «·„— Ã⁄…", 9892, 1956, 1588, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol6", "Ì⁄Êœ ··„Œ“Ê‰", 11508, 1956, 1474, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol7", "ﬁÌ„… «·„— Ã⁄", 13010, 1956, 1928, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subReturnLines", "frmReturnLines", 227, 2296, 14855, 4309)
+    Set c = AddText("txtReason", "", 227, 7002, 6577, 454)
+    Set c = AddLabel("lblReason", "”»» «·≈—Ã«⁄ *", 227, 6690, 6577, 284, 9, False, CLR_MUTED, "txtReason", 0)
+    Set c = AddCombo("cboRefundType", "", 6974, 7002, 3742, 454, "CASH;—œ ‰ﬁœÌ;CREDIT;Œ’„ „‰ —’Ìœ «·⁄„Ì·", 2, "0;3402")
+    Set c = AddLabel("lblRefundType", "ÿ—Ìﬁ… —œ «·„»·€", 6974, 6690, 3742, 284, 9, False, CLR_MUTED, "cboRefundType", 0)
+    Set c = AddCombo("cboPaymentMethod", "", 10886, 7002, 4196, 454, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;3402")
+    Set c = AddLabel("lblPaymentMethod", "ÿ—Ìﬁ… «·—œ", 10886, 6690, 4196, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
+    Set c = AddLabel("lblReturnTotalCap", "ﬁÌ„… «·„— Ã⁄:", 227, 7711, 2268, 454, 13, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblReturnTotal", "0.00", 2552, 7598, 3402, 624, 20, True, CLR_DANGER, "", 0)
+    Set c = AddButton("btnReturnAll", "≈—Ã«⁄ «·ﬂ·", 227, 8675, 1814, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSaveReturn", "Õ›Ÿ «·„— Ã⁄", 2154, 8675, 2041, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnSaveReturnPrint", "Õ›Ÿ Êÿ»«⁄…", 4308, 8675, 2041, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13608, 8675, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    ReturnLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtInvoiceNo_AfterUpdate()" & vbCrLf
+    s = s & "    ReturnFindInvoice Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnFind_Click()" & vbCrLf
+    s = s & "    ReturnFindInvoice Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReturnAll_Click()" & vbCrLf
+    s = s & "    ReturnAll Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSaveReturn_Click()" & vbCrLf
+    s = s & "    SaveReturn Me, False" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSaveReturnPrint_Click()" & vbCrLf
+    s = s & "    SaveReturn Me, True" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmSalesReturn", s
+    Exit Sub
+EH:
+    AbortForm "frmSalesReturn", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmCustomerPayment()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmCustomerPayment", "”‰œ ﬁ»÷", "", 9072, 5783, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 9072, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "”‰œ ﬁ»÷", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", " ”ÃÌ· œ›⁄… „‰ ⁄„Ì· ⁄·Ï Õ”«»Â", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboCustomer", "", 227, 1361, 8618, 454, "SELECT CustomerID, CustomerName FROM Customers WHERE IsSystem = False AND IsActive = True ORDER BY CustomerName", 2, "0;5670")
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblCustomer", "«·⁄„Ì·", 227, 1049, 8618, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
+    Set c = AddLabel("lblBalance", " ", 227, 1871, 8618, 340, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddText("txtAmount", "", 227, 2608, 4196, 510)
+    c.FontSize = 14
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddLabel("lblAmount", "«·„»·€ *", 227, 2296, 4196, 284, 9, False, CLR_MUTED, "txtAmount", 0)
+    Set c = AddCombo("cboPaymentMethod", "", 4649, 2608, 4196, 510, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;3402")
+    Set c = AddLabel("lblPaymentMethod", "ÿ—Ìﬁ… «·œ›⁄", 4649, 2296, 4196, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
+    Set c = AddText("txtNotes", "", 227, 3515, 8618, 454)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 227, 3203, 8618, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddButton("btnSave", "Õ›Ÿ «·”‰œ", 227, 4763, 2268, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 7371, 4763, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    PaymentLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboCustomer_AfterUpdate()" & vbCrLf
+    s = s & "    PaymentCustomerChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    SavePayment Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmCustomerPayment", s
+    Exit Sub
+EH:
+    AbortForm "frmCustomerPayment", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmSalesInvoice()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmSalesInvoice", "›« Ê—… »Ì⁄", "", 15309, 8845, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "›« Ê—… »Ì⁄", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "⁄—÷ ›ﬁÿ - «· ’ÕÌÕ ÌﬂÊ‰ »„— Ã⁄", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtInvoiceID", "", 14742, 57, 340, 227)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblHeader", " ", 227, 1021, 14855, 397, 10, False, CLR_TEXT, "", 0)
+    Set c = AddList("lstLines", 227, 1531, 14855, 3742, 7, "567;5103;1418;1984;1418;1701;2268", True)
+    Set c = AddLabel("lblReturnsCap", "«·„— Ã⁄«  ⁄·Ï Â–Â «·›« Ê—…", 227, 5386, 4536, 312, 10, True, CLR_MUTED, "", 0)
+    Set c = AddList("lstReturns", 227, 5727, 14855, 1304, 4, "2268;2835;1984;6804", True)
+    Set c = AddLabel("lblTotals", " ", 227, 7144, 14855, 397, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnPrint", "ÿ»«⁄…", 227, 7881, 1588, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrintA4", "ÿ»«⁄… A4", 1928, 7881, 1588, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnReturn", "„— Ã⁄", 3629, 7881, 1474, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13608, 7881, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    InvoiceViewLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintSalesDocument ""SALE"", Me!txtInvoiceID.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrintA4_Click()" & vbCrLf
+    s = s & "    PrintSalesDocument ""SALE"", Me!txtInvoiceID.Value, True" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReturn_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmSalesReturn"", 6, Me!txtInvoiceID.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmSalesInvoice", s
+    Exit Sub
+EH:
+    AbortForm "frmSalesInvoice", Err.Number, Err.Description
 End Sub

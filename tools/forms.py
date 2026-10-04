@@ -154,6 +154,7 @@ DATA_SCREENS: List[DataScreen] = [
         list_headers=[("العميل", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
         search=["t.CustomerName", "t.Mobile", "t.Phone", "t.VATNumber"],
         active="t.IsActive",
+        extra_buttons=[("btnPayment", "سند قبض", 'OpenScreen "frmCustomerPayment", 6, Me!CustomerID')],
         fields=[
             Fld("CustomerName", span=2), Fld("Mobile"), Fld("Phone"),
             Fld("Email"), Fld("VATNumber", hint="للعملاء المنشآت (فاتورة ضريبية)"),
@@ -369,6 +370,7 @@ class FormModel:
     controls: List[Control] = field(default_factory=list)
     form_events: List[str] = field(default_factory=list)
     code: List[str] = field(default_factory=list)       # module lines
+    form_props: Dict[str, object] = field(default_factory=dict)   # extra form properties
 
     def add(self, c: Control) -> Control:
         self.controls.append(c)
@@ -735,5 +737,6 @@ def layout_report_center() -> FormModel:
 
 
 def all_forms() -> List[FormModel]:
+    from forms_sales import sales_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
-            + [layout_search(), layout_report_center()])
+            + [layout_search(), layout_report_center()] + sales_forms())

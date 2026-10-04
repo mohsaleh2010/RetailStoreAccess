@@ -391,6 +391,36 @@ SELECT QDate('PeriodStart') AS PeriodFrom, DateAdd('d', -1, QDate('PeriodEnd')) 
        o.OutputVAT - p.PurchaseVAT - e.ExpenseVAT AS NetVATDue
 FROM qryVatOutput AS o, qryVatInputPurchases AS p, qryVatInputExpenses AS e""", P),
 
+    # ============================================================ PRINTING
+    Query("qrySalesDocPrint", "بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف)", """
+SELECT 'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber,
+       h.InvoiceDate AS DocDate, '' AS OriginalNumber, h.InvoiceSubType, h.PaymentType,
+       h.CustomerID, c.CustomerName, c.VATNumber AS CustomerVAT, c.City AS CustomerCity,
+       c.District AS CustomerDistrict, c.StreetName AS CustomerStreet,
+       c.BuildingNo AS CustomerBuilding, c.PostalCode AS CustomerPostal, e.EmployeeName,
+       h.SubTotal AS DocSubTotal, h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax,
+       h.TotalAmount, h.PaidAmount, h.RemainingAmount, h.AmountTendered, h.ChangeDue,
+       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, d.Quantity, d.UnitPrice,
+       d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal
+FROM ((((SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID)
+       INNER JOIN Products AS p ON d.ProductID = p.ProductID)
+      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+     INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID)
+    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID
+UNION ALL
+SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, o.InvoiceNumber, r.InvoiceSubType,
+       r.RefundType, r.CustomerID, c.CustomerName, c.VATNumber, c.City, c.District, c.StreetName,
+       c.BuildingNo, c.PostalCode, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax,
+       r.TotalAmount, r.RefundedAmount, r.TotalAmount - r.RefundedAmount, CCur(0), CCur(0),
+       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, rd.Quantity, rd.UnitPrice,
+       rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal
+FROM (((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)
+        INNER JOIN SalesInvoices AS o ON r.SalesInvoiceID = o.SalesInvoiceID)
+       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)
+      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+     INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID)
+    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID"""),
+
     # ============================================================ INTEGRITY
     Query("qrySalesInvoiceLineTotals", "مجموع أسطر كل فاتورة بيع", """
 SELECT SalesInvoiceID, Sum(LineTotal) AS LinesTotal
@@ -769,6 +799,14 @@ CHECKS: List[Check] = [
           "SELECT InputVAT FROM VatSummaryQuery", -15),
     Check("الضريبة: الصافي المستحق = 204 + 15",
           "SELECT NetVATDue FROM VatSummaryQuery", 219),
+
+    # Printing
+    Check("طباعة الفاتورة الآجلة: سطران",
+          "SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}", 2),
+    Check("طباعة الفاتورة الآجلة: مجموع الأسطر = 460",
+          "SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}", 460),
+    Check("طباعة الإشعار الدائن: سطر واحد بقيمة 46",
+          "SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = {ref:CRN1}", 46),
 
     # Integrity
     Check("فحص السلامة: لا توجد مشكلات",

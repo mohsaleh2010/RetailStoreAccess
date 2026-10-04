@@ -100,14 +100,12 @@ class WiringTests(unittest.TestCase):
             code = "\n".join(m.code)
             for name, args in re.findall(r"^Private Sub (\w+)(\(.*\))", code, re.M):
                 event = name.split("_")[-1]
-                if name.startswith("Form_") and event in ("BeforeUpdate", "AfterUpdate"):
+                if name.startswith("Form_"):
                     expected = sig.get(event, "()")
-                elif event == "DblClick":
-                    expected = sig["DblClick"]
-                elif name.startswith("Form_"):
-                    expected = sig.get(event, "()")
+                elif event in ("DblClick", "KeyDown"):          # control events with arguments
+                    expected = sig[event]
                 else:
-                    expected = "()"
+                    expected = "()"                              # BeforeUpdate on controls unused
                 self.assertEqual(args, expected, f"{m.name}.{name}")
 
     def test_navigation_targets(self):
@@ -304,16 +302,26 @@ class ProjectStaticTests(unittest.TestCase):
         known = set()
         for t in modules.values():
             known |= procedures(t)
+            known |= set(re.findall(r"Declare (?:PtrSafe )?(?:Function|Sub) (\w+)", t))   # Windows API
         vba_and_access = set("""Nz DLookup DCount DMax IIf Format Format$ Left Left$ Mid Mid$ Len Trim Trim$
             Replace Split InStr UCase UCase$ CStr CLng CDbl CCur CDec CDate Fix Abs DateSerial DateValue
             DateAdd Date Now Year Month IsNull IsNumeric IsDate IsEmpty Array LBound UBound MsgBox
             InputBox Environ Environ$ String String$ ChrW Debug CurrentDb CreateForm CreateControl
             Forms TempVars Application DBEngine Err Erl CurrentProject RGB Val Dir Dir$ Lines
             Round Int Space StrComp InStrRev LCase LCase$ Asc AscW Chr Chr$ Hex Sgn TimeSerial
-            Hour Minute Weekday DatePart DateDiff Time Timer Erase CVar CInt CBool""".split())
+            Hour Minute Weekday DatePart DateDiff Time Timer Erase CVar CInt CBool IsArray Choose
+            DoEvents IsMissing IsObject TypeName VarType CSng Sqr Exp Log Rnd Second Day Hex$
+            StrConv LenB AscB ChrB MidB Filter Join InStrB DMin DSum DAvg Eval Reports
+            CreateReport CreateReportControl CreateGroupLevel""".split())
         for name, text in modules.items():
+            in_type = False
             for line in logical_lines(text):
-                if line.startswith(("'", "Attribute")) or not line:
+                if re.match(r"^(Private |Public )?Type \w+", line):
+                    in_type = True
+                if line == "End Type":
+                    in_type = False
+                    continue
+                if in_type or "Declare " in line or line.startswith(("'", "Attribute", "#")) or not line:
                     continue
                 code = re.sub(r'"[^"]*"', '""', line)
                 for call in re.findall(r"(?<![\w.!])([A-Z]\w+)\(", code):
