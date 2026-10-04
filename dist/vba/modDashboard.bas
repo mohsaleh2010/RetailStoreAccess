@@ -197,10 +197,10 @@ Public Function TestDashboard() As Boolean
     GoSub Restore
     g_SilentMode = False
     If failed = 0 Then
-        MsgBox "Ã„Ì⁄ «Œ »«—«  ·ÊÕ… «· Õﬂ„ ‰«ÃÕ… (" & passed & " «Œ »«—«).", vbInformation + MSG_RTL, "TestDashboard"
+        TestMsg "Ã„Ì⁄ «Œ »«—«  ·ÊÕ… «· Õﬂ„ ‰«ÃÕ… (" & passed & " «Œ »«—«).", vbInformation + MSG_RTL, "TestDashboard"
         TestDashboard = True
     Else
-        MsgBox "‰ÃÕ " & passed & " Ê›‘· " & failed & ":" & vbCrLf & report, vbExclamation + MSG_RTL, "TestDashboard"
+        TestMsg "‰ÃÕ " & passed & " Ê›‘· " & failed & ":" & vbCrLf & report, vbExclamation + MSG_RTL, "TestDashboard"
     End If
     Exit Function
 Restore:
@@ -214,7 +214,7 @@ Restore:
     Return
 EH:
     g_SilentMode = False
-    MsgBox "Œÿ√ " & Err.Number & ": " & Err.Description, vbCritical + MSG_RTL, "TestDashboard"
+    TestMsg "Œÿ√ " & Err.Number & ": " & Err.Description, vbCritical + MSG_RTL, "TestDashboard"
 End Function
 
 Private Sub CheckResult(ByVal Passed As Boolean, ByVal Label As String, ByRef PassedCount As Long, _

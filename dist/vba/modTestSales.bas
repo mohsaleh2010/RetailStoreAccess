@@ -34,11 +34,11 @@ Public Function TestSales() As Boolean
     g_SilentMode = False
     Debug.Print "--- äÌÍ: " & m_passed & " | İÔá: " & m_failed
     If m_failed = 0 Then
-        MsgBox "ÌãíÚ ÇÎÊÈÇÑÇÊ ÇáãÈíÚÇÊ äÇÌÍÉ (" & m_passed & " ÇÎÊÈÇÑğÇ)." & vbCrLf & _
+        TestMsg "ÌãíÚ ÇÎÊÈÇÑÇÊ ÇáãÈíÚÇÊ äÇÌÍÉ (" & m_passed & " ÇÎÊÈÇÑğÇ)." & vbCrLf & _
                "áã ÊõÊÑß Ãí ÈíÇäÇÊ ÇÎÊÈÇÑ.", vbInformation + MSG_RTL, "TestSales"
         TestSales = True
     Else
-        MsgBox "äÌÍ " & m_passed & " æİÔá " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
+        TestMsg "äÌÍ " & m_passed & " æİÔá " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
                vbExclamation + MSG_RTL, "TestSales"
     End If
 End Function

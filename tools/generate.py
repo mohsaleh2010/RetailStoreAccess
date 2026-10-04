@@ -17,12 +17,13 @@ import gen_reports  # noqa: E402
 import gen_test_sales  # noqa: E402
 import gen_test_purchases  # noqa: E402
 import gen_test_security  # noqa: E402
+import gen_demo  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -222,7 +223,7 @@ Public Function VerifySchema(Optional ByVal BackEndPath As String = "") As Boole
 
     If Len(BackEndPath) = 0 Then BackEndPath = DefaultBackEndPath()
     If Len(Dir$(BackEndPath)) = 0 Then
-        MsgBox "ملف البيانات غير موجود: " & BackEndPath, vbCritical + MSG_RTL
+        Call ResultBox("ملف البيانات غير موجود: " & BackEndPath, vbCritical + MSG_RTL)
         Exit Function
     End If
     Set db = DBEngine.OpenDatabase(BackEndPath, False, True)
@@ -283,14 +284,24 @@ Public Function VerifySchema(Optional ByVal BackEndPath As String = "") As Boole
 
     db.Close
     If problems = 0 Then
-        MsgBox "الفحص ناجح: جميع الجداول (" & (UBound(Split(SCHEMA_TABLES, ",")) + 1) & _
-               ") والبيانات الأساسية سليمة.", vbInformation + MSG_RTL, "VerifySchema"
+        Call ResultBox("الفحص ناجح: جميع الجداول (" & (UBound(Split(SCHEMA_TABLES, ",")) + 1) & _
+               ") والبيانات الأساسية سليمة.", vbInformation + MSG_RTL, "VerifySchema")
         VerifySchema = True
     Else
-        MsgBox "عدد المشكلات: " & problems & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _
-               "VerifySchema"
+        Call ResultBox("عدد المشكلات: " & problems & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _
+               "VerifySchema")
     End If
 End Function
+
+Private Sub ResultBox(ByVal Text As String, ByVal Style As Long, Optional ByVal Title As String = "")
+    ' Through modCommon.TestMsg when it is installed (RunAllTests collects the results),
+    ' otherwise a plain message box: this module is installed before modCommon.
+    On Error GoTo Plain
+    Application.Run "TestMsg", Text, Style, Title
+    Exit Sub
+Plain:
+    MsgBox Text, Style, Title
+End Sub
 
 Public Sub DropSchema(Optional ByVal BackEndPath As String = "")
     ' DEVELOPMENT ONLY - deletes every table of this system and all of its data.
@@ -607,7 +618,8 @@ def main():
                        ("modBuildReports", gen_reports.build_reports_vba()),
                        ("modTestSales", gen_test_sales.build_test_sales_vba()),
                        ("modTestPurchases", gen_test_purchases.build_test_purchases_vba()),
-                       ("modTestSecurity", gen_test_security.build_test_security_vba())):
+                       ("modTestSecurity", gen_test_security.build_test_security_vba()),
+                       ("modDemoData", gen_demo.build_demo_vba())):
         write(f"src/vba/{name}.bas", text)
         write(f"dist/vba/{name}.bas", text, encoding="cp1256", newline="\r\n")
 

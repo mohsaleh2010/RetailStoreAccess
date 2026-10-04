@@ -133,10 +133,10 @@ Public Function TestReports() As Boolean
     g_SilentMode = False
     Debug.Print "--- نجح: " & m_passed & " | فشل: " & m_failed
     If m_failed = 0 Then
-        MsgBox "جميع اختبارات التقارير ناجحة (" & m_passed & " اختبارًا).", vbInformation + MSG_RTL, "TestReports"
+        TestMsg "جميع اختبارات التقارير ناجحة (" & m_passed & " اختبارًا).", vbInformation + MSG_RTL, "TestReports"
         TestReports = True
     Else
-        MsgBox "نجح " & m_passed & " وفشل " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
+        TestMsg "نجح " & m_passed & " وفشل " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
                vbExclamation + MSG_RTL, "TestReports"
     End If
 End Function

@@ -44,6 +44,11 @@ Public g_SilentMode As Boolean
 Public g_AutoAnswer As Boolean
 Public g_LastMessage As String
 
+' RunAllTests (modTestAll) collects the result message of every test instead of
+' showing one message box per test.
+Public g_CollectTests As Boolean
+Public g_TestSummary As String
+
 '------------------------------------------------------------------------------
 ' Messages
 '------------------------------------------------------------------------------
@@ -69,6 +74,15 @@ Public Function AskYesNo(ByVal Text As String, Optional ByVal Title As String = 
     If Len(Title) = 0 Then Title = APP_TITLE
     AskYesNo = (MsgBox(Text, vbQuestion + vbYesNo + vbDefaultButton2 + MSG_RTL, Title) = vbYes)
 End Function
+
+Public Sub TestMsg(ByVal Text As String, ByVal Style As Long, Optional ByVal Title As String = "")
+    ' The final message of an in-Access test (TestSales, TestForms, ...).
+    If g_CollectTests Then
+        g_TestSummary = g_TestSummary & "- " & Title & ": " & Replace(Left$(Text, 700), vbCrLf, " | ") & vbCrLf
+    Else
+        MsgBox Text, Style, Title
+    End If
+End Sub
 
 Private Sub ShowMessage(ByVal Text As String, ByVal Icon As VbMsgBoxStyle, ByVal Title As String)
     g_LastMessage = Text

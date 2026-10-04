@@ -89,11 +89,11 @@ Public Function TestForms() As Boolean
     g_SilentMode = False
     Debug.Print "--- ‰ÃÕ: " & m_passed & " | ›‘·: " & m_failed
     If m_failed = 0 Then
-        MsgBox "Ã„Ì⁄ «Œ »«—«  «·‘«‘«  ‰«ÃÕ… (" & m_passed & " «Œ »«—«)." & vbCrLf & _
+        TestMsg "Ã„Ì⁄ «Œ »«—«  «·‘«‘«  ‰«ÃÕ… (" & m_passed & " «Œ »«—«)." & vbCrLf & _
                " „ Õ–› »Ì«‰«  «·«Œ »«—.", vbInformation + MSG_RTL, "TestForms"
         TestForms = True
     Else
-        MsgBox "‰ÃÕ " & m_passed & " Ê›‘· " & m_failed & ":" & vbCrLf & vbCrLf & _
+        TestMsg "‰ÃÕ " & m_passed & " Ê›‘· " & m_failed & ":" & vbCrLf & vbCrLf & _
                Left$(m_report, 900), vbExclamation + MSG_RTL, "TestForms"
     End If
     Exit Function
@@ -106,7 +106,7 @@ EH:
     CloseAllForms
     CleanUpTestData lastLog
     g_SilentMode = False
-    MsgBox errText, vbCritical + MSG_RTL, "TestForms"
+    TestMsg errText, vbCritical + MSG_RTL, "TestForms"
 End Function
 
 '------------------------------------------------------------------------------

@@ -24,8 +24,7 @@ import pricing as P
 import purchases_reference as R
 import vba_harness as H
 
-TT = {"PURCHASE": 1, "SALE": 2, "PURCHASE_RETURN": 3, "SALES_RETURN": 4, "STOCK_IN": 5,
-      "STOCK_OUT": 6, "ADJUSTMENT": 7, "OPENING": 8}
+from sim import Store, TT   # Python replay of the posting functions (tools/sim.py)
 
 
 def read(name):
@@ -40,177 +39,15 @@ def proc(text, name):
     return m.group(0)
 
 
-# --------------------------------------------------------------------------
-# Python replay of the modPurchases posting rules on the SQLite mirror
-# --------------------------------------------------------------------------
-class Store:
-    """Each method mirrors one VBA posting function (same names in comments)."""
-
-    def __init__(self, db: AccessOnSqlite):
-        self.db = db
-        self.c = db.con
-
-    def one(self, sql, *args):
-        row = self.c.execute(sql, args).fetchone()
-        return None if row is None else row[0]
-
-    def insert(self, table, **values):
-        cols = ", ".join(values)
-        ph = ", ".join("?" for _ in values)
-        return self.c.execute(f'INSERT INTO "{table}" ({cols}) VALUES ({ph})', list(values.values())).lastrowid
-
-    def next_number(self, seq):                                   # modCommon.NextNumber
-        n, prefix, pad = self.c.execute("SELECT NextValue, Prefix, PadLength FROM Sequences "
-                                        "WHERE SequenceName = ?", (seq,)).fetchone()
-        self.c.execute("UPDATE Sequences SET NextValue = NextValue + 1 WHERE SequenceName = ?", (seq,))
-        return (prefix or "") + (str(n).zfill(pad) if pad else str(n))
-
-    def apply_stock(self, pid, qty, tt, cost, ref_type, ref_id, ref_no, recalc=False):   # ApplyStockMovement
-        cur, avg = self.c.execute("SELECT CurrentQuantity, AverageCost FROM Products WHERE ProductID = ?",
-                                  (pid,)).fetchone()
-        new = D(str(cur)) + qty
-        if recalc:
-            avg = P.weighted_average(D(str(cur)), D(str(avg)), qty, cost)
-        self.c.execute("UPDATE Products SET CurrentQuantity = ?, AverageCost = ? WHERE ProductID = ?",
-                       (float(new), float(avg), pid))
-        self.insert("InventoryTransactions", TransactionDate=self.db.value(R_NOW), ProductID=pid,
-                    TransactionTypeID=tt, Quantity=float(qty), UnitCost=float(cost), QuantityAfter=float(new),
-                    ReferenceType=ref_type, ReferenceID=ref_id or None, ReferenceNumber=ref_no, EmployeeID=1)
-
-    def adjust_supplier(self, sid, delta):                          # AdjustBalance "Suppliers"
-        self.c.execute("UPDATE Suppliers SET CurrentBalance = CurrentBalance + ? WHERE SupplierID = ?",
-                       (float(delta), sid))
-
-    def purchase(self, sid, lines, credit, paid=None, charge_vat=True, supplier_no=None):   # PostPurchaseFromCart
-        out = P.calc([P.LineIn(D(q), D(c), D(0), D("0.15") if charge_vat else D(0)) for _, q, c in lines],
-                     D(0), False)
-        tendered = (D(0) if credit else out.total) if paid is None else D(paid)
-        paid_amt, remaining, _ = P.settle(out.total, tendered, credit)
-        no = self.next_number("PURCHASE_INVOICE")
-        inv = self.insert("PurchaseInvoices", InvoiceNumber=no, SupplierInvoiceNo=supplier_no,
-                          InvoiceDate=self.db.value(R_NOW), SupplierID=sid, EmployeeID=1,
-                          PaymentType="CREDIT" if credit else "CASH", PaymentMethodID=1,
-                          SubTotal=float(out.subtotal), Discount=float(out.discount),
-                          TaxableAmount=float(out.taxable), Tax=float(out.tax), TotalAmount=float(out.total),
-                          PaidAmount=float(paid_amt), RemainingAmount=float(remaining))
-        for i, ((pid, q, c), ln) in enumerate(zip(lines, out.lines)):
-            self.insert("PurchaseInvoiceDetails", PurchaseInvoiceID=inv, LineNumber=i + 1, ProductID=pid,
-                        Quantity=float(q), UnitCost=float(ln.unit_price), Discount=float(ln.discount),
-                        NetAmount=float(ln.net), VATRate=0.15 if charge_vat else 0, Tax=float(ln.tax),
-                        LineTotal=float(ln.total))
-            cost = P.purchase_unit_cost(ln.net, ln.total, D(q), True)
-            self.apply_stock(pid, D(q), TT["PURCHASE"], cost, "PURCHASE", inv, no, recalc=True)
-            self.c.execute("UPDATE Products SET PurchasePrice = ? WHERE ProductID = ?", (float(ln.unit_price), pid))
-        if remaining:
-            self.adjust_supplier(sid, remaining)
-        return inv
-
-    def sale(self, pid, qty):                                       # PostSaleFromCart (cash)
-        price, avg = self.c.execute("SELECT SellingPrice, AverageCost FROM Products WHERE ProductID = ?",
-                                    (pid,)).fetchone()
-        out = P.calc([P.LineIn(D(qty), D(str(price)))], D(0), True)
-        ln = out.lines[0]
-        no = self.next_number("SALES_INVOICE")
-        inv = self.insert("SalesInvoices", InvoiceNumber=no, InvoiceDate=self.db.value(R_NOW), CustomerID=1,
-                          EmployeeID=1, PaymentType="CASH", PaymentMethodID=1, SubTotal=float(out.subtotal),
-                          Discount=float(out.discount), TaxableAmount=float(out.taxable), Tax=float(out.tax),
-                          TotalAmount=float(out.total), PaidAmount=float(out.total), RemainingAmount=0,
-                          AmountTendered=float(out.total), ChangeDue=0)
-        self.insert("SalesInvoiceDetails", SalesInvoiceID=inv, LineNumber=1, ProductID=pid, Quantity=float(qty),
-                    UnitPrice=float(ln.unit_price), Discount=float(ln.discount), NetAmount=float(ln.net),
-                    VATRate=0.15, Tax=float(ln.tax), LineTotal=float(ln.total), UnitCost=avg)
-        self.apply_stock(pid, -D(qty), TT["SALE"], D(str(avg)), "SALE", inv, no)
-        return inv
-
-    def purchase_return(self, inv, qty_by_detail, cash_refund=False):   # PostPurchaseReturn
-        sid = self.one("SELECT SupplierID FROM PurchaseInvoices WHERE PurchaseInvoiceID = ?", inv)
-        rows, total_sum, tax_sum = [], D(0), D(0)
-        for detail, qty in qty_by_detail.items():
-            pid, q, total, tax, net = self.c.execute(
-                "SELECT ProductID, Quantity, LineTotal, Tax, NetAmount FROM PurchaseInvoiceDetails "
-                "WHERE PurchaseDetailID = ?", (detail,)).fetchone()
-            prev = self.c.execute("SELECT Sum(Quantity), Sum(LineTotal), Sum(Tax) FROM PurchaseReturnDetails "
-                                  "WHERE PurchaseDetailID = ?", (detail,)).fetchone()
-            pq, pt, px = (D(str(v or 0)) for v in prev)
-            r_net, r_tax, r_total = P.return_amounts(D(str(q)), D(str(total)), D(str(tax)), pq, pt, px, D(qty))
-            cost = P.purchase_unit_cost(D(str(net)), D(str(total)), D(str(q)), True)
-            rows.append((detail, pid, D(qty), r_net, r_tax, r_total, cost))
-            total_sum += r_total
-            tax_sum += r_tax
-        refunded = total_sum if cash_refund else D(0)
-        no = self.next_number("PURCHASE_RETURN")
-        ret = self.insert("PurchaseReturns", ReturnNumber=no, ReturnDate=self.db.value(R_NOW),
-                          PurchaseInvoiceID=inv, SupplierID=sid, EmployeeID=1, Reason="TEST",
-                          RefundType="CASH" if cash_refund else "CREDIT", SubTotal=float(total_sum - tax_sum),
-                          Discount=0, TaxableAmount=float(total_sum - tax_sum), Tax=float(tax_sum),
-                          TotalAmount=float(total_sum), RefundedAmount=float(refunded))
-        for detail, pid, qty, r_net, r_tax, r_total, cost in rows:
-            self.insert("PurchaseReturnDetails", PurchaseReturnID=ret, PurchaseDetailID=detail, ProductID=pid,
-                        Quantity=float(qty), UnitCost=float(cost), Discount=0, NetAmount=float(r_net),
-                        VATRate=0.15, Tax=float(r_tax), LineTotal=float(r_total))
-            self.apply_stock(pid, -qty, TT["PURCHASE_RETURN"], cost, "PURCHASE_RETURN", ret, no, recalc=True)
-        if refunded - total_sum:
-            self.adjust_supplier(sid, refunded - total_sum)
-        return ret, total_sum, tax_sum
-
-    def payment(self, sid, amount):                                 # PostSupplierPayment
-        no = self.next_number("SUPPLIER_PAYMENT")
-        self.insert("SupplierPayments", PaymentNumber=no, SupplierID=sid, PaymentDate=self.db.value(R_NOW),
-                    Amount=float(amount), PaymentMethodID=1, EmployeeID=1)
-        self.adjust_supplier(sid, -D(amount))
-
-    def manual(self, pid, tt, qty, cost=None):                      # PostManualStock
-        avg = D(str(self.one("SELECT AverageCost FROM Products WHERE ProductID = ?", pid)))
-        no = self.next_number("STOCK_ADJUST")
-        if tt == TT["STOCK_OUT"]:
-            self.apply_stock(pid, -D(qty), tt, avg, "MANUAL", None, no)
-        else:
-            self.apply_stock(pid, D(qty), tt, D(cost) if cost is not None else avg, "MANUAL", None, no, recalc=True)
-
-    def stock_count(self, category, actual_by_product):             # CreateStockCount + PostStockCount
-        no = self.next_number("STOCK_COUNT")
-        cid = self.insert("StockCounts", CountNumber=no, CountDate=self.db.value(R_NOW), CategoryID=category,
-                          Status="OPEN", EmployeeID=1)
-        self.c.execute("INSERT INTO StockCountDetails (StockCountID, ProductID, SystemQuantity, ActualQuantity, "
-                       "Difference, UnitCost, DifferenceValue) SELECT ?, ProductID, CurrentQuantity, NULL, 0, "
-                       "AverageCost, 0 FROM Products WHERE IsActive = 1 AND CategoryID = ?", (cid, category))
-        for pid, actual in actual_by_product.items():
-            self.c.execute("UPDATE StockCountDetails SET ActualQuantity = ? WHERE StockCountID = ? AND ProductID = ?",
-                           (float(actual), cid, pid))
-        lines, value = 0, D(0)
-        for detail, pid, actual in self.c.execute(
-                "SELECT StockCountDetailID, ProductID, ActualQuantity FROM StockCountDetails "
-                "WHERE StockCountID = ?", (cid,)).fetchall():
-            sys_qty, cost = (D(str(v)) for v in self.c.execute(
-                "SELECT CurrentQuantity, AverageCost FROM Products WHERE ProductID = ?", (pid,)).fetchone())
-            act = sys_qty if actual is None else D(str(actual))
-            diff = act - sys_qty
-            val = P.r2(diff * cost)
-            self.c.execute("UPDATE StockCountDetails SET SystemQuantity = ?, Difference = ?, UnitCost = ?, "
-                           "DifferenceValue = ? WHERE StockCountDetailID = ?",
-                           (float(sys_qty), float(diff), float(cost), float(val), detail))
-            if diff:
-                self.apply_stock(pid, diff, TT["ADJUSTMENT"], cost, "STOCK_COUNT", cid, no)
-                lines += 1
-                value += val
-        self.c.execute("UPDATE StockCounts SET Status = 'POSTED' WHERE StockCountID = ?", (cid,))
-        return cid, lines, value
-
-
-R_NOW = None   # replaced in setUpClass by a Day() value inside the test period
-
-
 class ScenarioOnMirrorTests(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        global R_NOW
         import queries as Q
-        R_NOW = Q.Day(0, 1)
         cls.db = AccessOnSqlite()
         cls.db.load_fixture()
         cls.db.set_period(0)                     # today only: the scenario's documents
-        cls.s = s = Store(cls.db)
+        cls.s = s = Store(cls.db.con, now=cls.db.value(Q.Day(0, 1)))
         cls.e = R.expectations()
         cls.integrity_before = s.one("SELECT COUNT(*) FROM IntegrityCheckQuery")
         cls.profit_adj_before = s.one("SELECT InventoryAdjustments FROM ProfitQuery")
@@ -225,7 +62,7 @@ class ScenarioOnMirrorTests(unittest.TestCase):
         log["inv1"] = s.purchase(cls.sid, [(cls.pa, R.P1_QTY, R.P1_COST)], credit=True, paid=R.P1_PAID,
                                  supplier_no="S-1")
         log["after_p1"] = cls.snapshot()
-        s.sale(cls.pa, R.SALE_QTY)
+        s.sale([(cls.pa, R.SALE_QTY)])
         log["after_sale"] = cls.snapshot()
         s.purchase(cls.sid, [(cls.pa, R.P2_QTY, R.P2_COST)], credit=False)
         log["after_p2"] = cls.snapshot()

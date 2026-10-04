@@ -89,11 +89,11 @@ Public Function TestForms() As Boolean
     g_SilentMode = False
     Debug.Print "--- نجح: " & m_passed & " | فشل: " & m_failed
     If m_failed = 0 Then
-        MsgBox "جميع اختبارات الشاشات ناجحة (" & m_passed & " اختبارًا)." & vbCrLf & _
+        TestMsg "جميع اختبارات الشاشات ناجحة (" & m_passed & " اختبارًا)." & vbCrLf & _
                "تم حذف بيانات الاختبار.", vbInformation + MSG_RTL, "TestForms"
         TestForms = True
     Else
-        MsgBox "نجح " & m_passed & " وفشل " & m_failed & ":" & vbCrLf & vbCrLf & _
+        TestMsg "نجح " & m_passed & " وفشل " & m_failed & ":" & vbCrLf & vbCrLf & _
                Left$(m_report, 900), vbExclamation + MSG_RTL, "TestForms"
     End If
     Exit Function
@@ -106,7 +106,7 @@ EH:
     CloseAllForms
     CleanUpTestData lastLog
     g_SilentMode = False
-    MsgBox errText, vbCritical + MSG_RTL, "TestForms"
+    TestMsg errText, vbCritical + MSG_RTL, "TestForms"
 End Function
 
 '------------------------------------------------------------------------------

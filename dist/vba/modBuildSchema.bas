@@ -140,7 +140,7 @@ Public Function VerifySchema(Optional ByVal BackEndPath As String = "") As Boole
 
     If Len(BackEndPath) = 0 Then BackEndPath = DefaultBackEndPath()
     If Len(Dir$(BackEndPath)) = 0 Then
-        MsgBox "„·› «·»Ì«‰«  €Ì— „ÊÃÊœ: " & BackEndPath, vbCritical + MSG_RTL
+        Call ResultBox("„·› «·»Ì«‰«  €Ì— „ÊÃÊœ: " & BackEndPath, vbCritical + MSG_RTL)
         Exit Function
     End If
     Set db = DBEngine.OpenDatabase(BackEndPath, False, True)
@@ -201,14 +201,24 @@ Public Function VerifySchema(Optional ByVal BackEndPath As String = "") As Boole
 
     db.Close
     If problems = 0 Then
-        MsgBox "«·›Õ’ ‰«ÃÕ: Ã„Ì⁄ «·Ãœ«Ê· (" & (UBound(Split(SCHEMA_TABLES, ",")) + 1) & _
-               ") Ê«·»Ì«‰«  «·√”«”Ì… ”·Ì„….", vbInformation + MSG_RTL, "VerifySchema"
+        Call ResultBox("«·›Õ’ ‰«ÃÕ: Ã„Ì⁄ «·Ãœ«Ê· (" & (UBound(Split(SCHEMA_TABLES, ",")) + 1) & _
+               ") Ê«·»Ì«‰«  «·√”«”Ì… ”·Ì„….", vbInformation + MSG_RTL, "VerifySchema")
         VerifySchema = True
     Else
-        MsgBox "⁄œœ «·„‘ﬂ·« : " & problems & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _
-               "VerifySchema"
+        Call ResultBox("⁄œœ «·„‘ﬂ·« : " & problems & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _
+               "VerifySchema")
     End If
 End Function
+
+Private Sub ResultBox(ByVal Text As String, ByVal Style As Long, Optional ByVal Title As String = "")
+    ' Through modCommon.TestMsg when it is installed (RunAllTests collects the results),
+    ' otherwise a plain message box: this module is installed before modCommon.
+    On Error GoTo Plain
+    Application.Run "TestMsg", Text, Style, Title
+    Exit Sub
+Plain:
+    MsgBox Text, Style, Title
+End Sub
 
 Public Sub DropSchema(Optional ByVal BackEndPath As String = "")
     ' DEVELOPMENT ONLY - deletes every table of this system and all of its data.

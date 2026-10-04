@@ -15,8 +15,8 @@
 | 7 | المشتريات والمخزون | ✅ تمت الموافقة | [docs/07-Purchases-Inventory.md](docs/07-Purchases-Inventory.md) |
 | 8 | التقارير | ✅ تمت الموافقة | [docs/08-Reports.md](docs/08-Reports.md) |
 | 9 | لوحة التحكم | ✅ تمت الموافقة | [docs/09-Dashboard.md](docs/09-Dashboard.md) |
-| 10 | المستخدمون والصلاحيات والنسخ الاحتياطي | ✅ بانتظار الموافقة | [docs/10-Security.md](docs/10-Security.md) |
-| 11 | الاختبار | ⏳ | |
+| 10 | المستخدمون والصلاحيات والنسخ الاحتياطي | ✅ تمت الموافقة | [docs/10-Security.md](docs/10-Security.md) |
+| 11 | الاختبار الشامل والبيانات التجريبية | ✅ بانتظار الموافقة | [docs/11-Testing-Demo.md](docs/11-Testing-Demo.md) |
 | 12 | دليل الاستخدام | ⏳ | |
 
 ## هيكل المستودع
@@ -32,6 +32,7 @@
 | `tools/forms.py` | تعريف الشاشات وتخطيطها، قوالب البحث، قائمة التقارير |
 | `tools/forms_sales.py`, `tools/reports.py` | شاشات المبيعات، وتقارير الفاتورة |
 | `tools/reports_catalog.py`, `tools/reports_docs.py`, `tools/tafqeet.py` | التقارير المنسقة لمركز التقارير، والمستندات، ومرجع المبلغ بالحروف |
+| `tools/demo_data.py`, `tools/sim.py` | البيانات التجريبية وخطتها، وإعادة تنفيذ دوال الحفظ بـ Python للتحقق |
 | `tools/forms_security.py`, `tools/security_reference.py` | شاشات الدخول والمستخدمين والصلاحيات والنسخ، ومرجع SHA-256 والنسخ |
 | `dist/tools/EnableShiftKey.vbs` | إعادة تفعيل مفتاح Shift إذا تعذر دخول المدير |
 | `tools/forms_purchases.py`, `tools/purchases_reference.py` | شاشات المشتريات والمخزون والجرد، وسيناريو المرحلة 7 بنتائجه المتوقعة |
@@ -53,6 +54,7 @@
 | 7 | `modReports` (دائمة) ثم `modBuildReports` | `BuildQueries`, `BuildForms`, `BuildReports` | `TestReports` |
 | 8 | `modDashboard` (دائمة) | `BuildQueries`, `BuildForms` | `TestDashboard` |
 | 9 | `modSecurity`, `modSecurityScreens`, `modBackup` (دائمة) ثم `modTestSecurity` | `BuildForms`, `BuildReports` | `TestSecurity` |
+| 10 | `modTestAll`, `modDemoData` | `LoadDemoData` (اختياري، للتدريب) | **`RunAllTests`** (كل الاختبارات) |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

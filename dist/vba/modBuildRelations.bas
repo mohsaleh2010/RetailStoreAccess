@@ -159,13 +159,13 @@ Public Function TestRelationships(Optional ByVal BackEndPath As String = "") As 
 
     Debug.Print "--- ‰ÃÕ: " & m_passed & " | ›‘·: " & m_failed & " ( „ «· —«Ã⁄ ⁄‰ ﬂ· »Ì«‰«  «·«Œ »«—)"
     If m_failed = 0 Then
-        MsgBox "Ã„Ì⁄ «Œ »«—«  «·⁄·«ﬁ«  ‰«ÃÕ… (" & m_passed & " «Œ »«—«)." & vbCrLf & _
+        Call ResultBox("Ã„Ì⁄ «Œ »«—«  «·⁄·«ﬁ«  ‰«ÃÕ… (" & m_passed & " «Œ »«—«)." & vbCrLf & _
                "·« Ì„ﬂ‰ ≈œŒ«· ”Ã·«  Ì Ì„…° Ê·« Õ–› »Ì«‰«  „” Œœ„…." & vbCrLf & _
-               "·„  ı —ﬂ √Ì »Ì«‰«  «Œ »«— ›Ì «·ﬁ«⁄œ….", vbInformation + MSG_RTL, "TestRelationships"
+               "·„  ı —ﬂ √Ì »Ì«‰«  «Œ »«— ›Ì «·ﬁ«⁄œ….", vbInformation + MSG_RTL, "TestRelationships")
         TestRelationships = True
     Else
-        MsgBox "‰ÃÕ " & m_passed & " Ê›‘· " & m_failed & ":" & vbCrLf & vbCrLf & _
-               Left$(m_report, 900), vbExclamation + MSG_RTL, "TestRelationships"
+        Call ResultBox("‰ÃÕ " & m_passed & " Ê›‘· " & m_failed & ":" & vbCrLf & vbCrLf & _
+               Left$(m_report, 900), vbExclamation + MSG_RTL, "TestRelationships")
     End If
     Exit Function
 
@@ -176,9 +176,19 @@ EH:
     On Error Resume Next
     If inTrans Then ws.Rollback
     db.Close
-    MsgBox errText & vbCrLf & " „ «· —«Ã⁄ ⁄‰ »Ì«‰«  «·«Œ »«—.", vbCritical + MSG_RTL, _
-           "TestRelationships"
+    Call ResultBox(errText & vbCrLf & " „ «· —«Ã⁄ ⁄‰ »Ì«‰«  «·«Œ »«—.", vbCritical + MSG_RTL, _
+           "TestRelationships")
 End Function
+
+Private Sub ResultBox(ByVal Text As String, ByVal Style As Long, Optional ByVal Title As String = "")
+    ' Through modCommon.TestMsg when it is installed (RunAllTests collects the results),
+    ' otherwise a plain message box: this module is installed before modCommon.
+    On Error GoTo Plain
+    Application.Run "TestMsg", Text, Style, Title
+    Exit Sub
+Plain:
+    MsgBox Text, Style, Title
+End Sub
 
 Public Sub DropRelationships(Optional ByVal BackEndPath As String = "")
     ' DEVELOPMENT ONLY - removes the relationships created by BuildRelationships.

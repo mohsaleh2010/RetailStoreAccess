@@ -133,10 +133,10 @@ Public Function TestReports() As Boolean
     g_SilentMode = False
     Debug.Print "--- ‰ÃÕ: " & m_passed & " | ›‘·: " & m_failed
     If m_failed = 0 Then
-        MsgBox "Ã„Ì⁄ «Œ »«—«  «· ﬁ«—Ì— ‰«ÃÕ… (" & m_passed & " «Œ »«—«).", vbInformation + MSG_RTL, "TestReports"
+        TestMsg "Ã„Ì⁄ «Œ »«—«  «· ﬁ«—Ì— ‰«ÃÕ… (" & m_passed & " «Œ »«—«).", vbInformation + MSG_RTL, "TestReports"
         TestReports = True
     Else
-        MsgBox "‰ÃÕ " & m_passed & " Ê›‘· " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
+        TestMsg "‰ÃÕ " & m_passed & " Ê›‘· " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
                vbExclamation + MSG_RTL, "TestReports"
     End If
 End Function

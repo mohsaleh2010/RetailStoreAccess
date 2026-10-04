@@ -36,11 +36,11 @@ Public Function TestPurchases() As Boolean
     g_SilentMode = False
     Debug.Print "--- ‰ÃÕ: " & m_passed & " | ›‘·: " & m_failed
     If m_failed = 0 Then
-        MsgBox "Ã„Ì⁄ «Œ »«—«  «·„‘ —Ì«  Ê«·„Œ“Ê‰ ‰«ÃÕ… (" & m_passed & " «Œ »«—«)." & vbCrLf & _
+        TestMsg "Ã„Ì⁄ «Œ »«—«  «·„‘ —Ì«  Ê«·„Œ“Ê‰ ‰«ÃÕ… (" & m_passed & " «Œ »«—«)." & vbCrLf & _
                "·„  ı —ﬂ √Ì »Ì«‰«  «Œ »«—.", vbInformation + MSG_RTL, "TestPurchases"
         TestPurchases = True
     Else
-        MsgBox "‰ÃÕ " & m_passed & " Ê›‘· " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
+        TestMsg "‰ÃÕ " & m_passed & " Ê›‘· " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
                vbExclamation + MSG_RTL, "TestPurchases"
     End If
 End Function

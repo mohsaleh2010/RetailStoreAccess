@@ -69,8 +69,8 @@ Public Function TestQueries() As Boolean
 
     blocker = ExistingDataTable()
     If Len(blocker) > 0 Then
-        MsgBox "íÚãá åĞÇ ÇáÇÎÊÈÇÑ Úáì ŞÇÚÏÉ ÈÏæä ÍÑßÇÊ İŞØ¡ áÃä äÊÇÆÌå ÃÑŞÇã ãÍÏÏÉ ãÓÈŞğÇ." & _
-               vbCrLf & "íæÌÏ ÈíÇäÇÊ İí ÇáÌÏæá: " & blocker, vbExclamation + MSG_RTL, "TestQueries"
+        Call ResultBox("íÚãá åĞÇ ÇáÇÎÊÈÇÑ Úáì ŞÇÚÏÉ ÈÏæä ÍÑßÇÊ İŞØ¡ áÃä äÊÇÆÌå ÃÑŞÇã ãÍÏÏÉ ãÓÈŞğÇ." & _
+               vbCrLf & "íæÌÏ ÈíÇäÇÊ İí ÇáÌÏæá: " & blocker, vbExclamation + MSG_RTL, "TestQueries")
         Exit Function
     End If
 
@@ -97,13 +97,13 @@ Public Function TestQueries() As Boolean
 
     Debug.Print "--- äÌÍ: " & m_passed & " | İÔá: " & m_failed & " (Êã ÇáÊÑÇÌÚ Úä ÈíÇäÇÊ ÇáÇÎÊÈÇÑ)"
     If m_failed = 0 Then
-        MsgBox "ÌãíÚ ÇÎÊÈÇÑÇÊ ÇáÇÓÊÚáÇãÇÊ äÇÌÍÉ (" & m_passed & " ÇÎÊÈÇÑğÇ)." & vbCrLf & _
+        Call ResultBox("ÌãíÚ ÇÎÊÈÇÑÇÊ ÇáÇÓÊÚáÇãÇÊ äÇÌÍÉ (" & m_passed & " ÇÎÊÈÇÑğÇ)." & vbCrLf & _
                "ÇáÃÑŞÇã ãØÇÈŞÉ ááÍÓÇÈÇÊ ÇáíÏæíÉ¡ æáã ÊõÊÑß Ãí ÈíÇäÇÊ ÇÎÊÈÇÑ.", _
-               vbInformation + MSG_RTL, "TestQueries"
+               vbInformation + MSG_RTL, "TestQueries")
         TestQueries = True
     Else
-        MsgBox "äÌÍ " & m_passed & " æİÔá " & m_failed & ":" & vbCrLf & vbCrLf & _
-               Left$(m_report, 900), vbExclamation + MSG_RTL, "TestQueries"
+        Call ResultBox("äÌÍ " & m_passed & " æİÔá " & m_failed & ":" & vbCrLf & vbCrLf & _
+               Left$(m_report, 900), vbExclamation + MSG_RTL, "TestQueries")
     End If
     Exit Function
 
@@ -115,8 +115,18 @@ EH:
     If inTrans Then ws.Rollback
     CleanUpAfterTest slowDays
     ClearQueryParams
-    MsgBox errText & vbCrLf & "Êã ÇáÊÑÇÌÚ Úä ÈíÇäÇÊ ÇáÇÎÊÈÇÑ.", vbCritical + MSG_RTL, "TestQueries"
+    Call ResultBox(errText & vbCrLf & "Êã ÇáÊÑÇÌÚ Úä ÈíÇäÇÊ ÇáÇÎÊÈÇÑ.", vbCritical + MSG_RTL, "TestQueries")
 End Function
+
+Private Sub ResultBox(ByVal Text As String, ByVal Style As Long, Optional ByVal Title As String = "")
+    ' Through modCommon.TestMsg when it is installed (RunAllTests collects the results),
+    ' otherwise a plain message box: this module is installed before modCommon.
+    On Error GoTo Plain
+    Application.Run "TestMsg", Text, Style, Title
+    Exit Sub
+Plain:
+    MsgBox Text, Style, Title
+End Sub
 
 Public Sub DropQueries()
     ' DEVELOPMENT ONLY - deletes the queries created by BuildQueries.
