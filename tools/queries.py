@@ -400,6 +400,39 @@ SELECT QDate('PeriodStart') AS PeriodFrom, DateAdd('d', -1, QDate('PeriodEnd')) 
        o.OutputVAT - p.PurchaseVAT - e.ExpenseVAT AS NetVATDue
 FROM qryVatOutput AS o, qryVatInputPurchases AS p, qryVatInputExpenses AS e""", P),
 
+    # ============================================================ DASHBOARD
+    # Own parameters (set by modDashboard), so the dashboard never changes the
+    # period chosen in the report centre: DashDay = today, DashMonth = first day
+    # of the month, DashEnd = tomorrow (exclusive).
+    Query("DashboardQuery", "مؤشرات لوحة التحكم في سجل واحد (اليوم، الشهر، الأرصدة، المخزون)", f"""
+SELECT (SELECT {nz("Sum(d.GrossAmount)")} FROM qrySalesDocuments AS d
+        WHERE d.DocDate >= QDate('DashDay') AND d.DocDate < QDate('DashEnd')) AS TodaySales,
+       (SELECT Count(*) FROM SalesInvoices AS h
+        WHERE h.InvoiceDate >= QDate('DashDay') AND h.InvoiceDate < QDate('DashEnd')) AS TodayInvoices,
+       (SELECT {nz("Sum(d.GrossAmount)")} FROM qrySalesDocuments AS d
+        WHERE d.DocDate >= QDate('DashMonth') AND d.DocDate < QDate('DashEnd')) AS MonthSales,
+       (SELECT {nz("Sum(d.VATAmount)")} FROM qrySalesDocuments AS d
+        WHERE d.DocDate >= QDate('DashMonth') AND d.DocDate < QDate('DashEnd')) AS MonthVAT,
+       (SELECT Count(*) FROM SalesInvoices AS h
+        WHERE h.InvoiceDate >= QDate('DashMonth') AND h.InvoiceDate < QDate('DashEnd')) AS MonthInvoices,
+       (SELECT {nz("Sum(e.Amount)")} FROM Expenses AS e
+        WHERE e.ExpenseDate >= QDate('DashMonth') AND e.ExpenseDate < QDate('DashEnd')) AS MonthExpenses,
+       (SELECT {nz("Sum(c.CurrentBalance)")} FROM Customers AS c WHERE c.CurrentBalance > 0) AS CustomerDebt,
+       (SELECT Count(*) FROM Customers AS c WHERE c.CurrentBalance > 0) AS DebtorCount,
+       (SELECT {nz("Sum(s.CurrentBalance)")} FROM Suppliers AS s WHERE s.CurrentBalance > 0) AS SupplierDue,
+       (SELECT {nz("Sum(p.CurrentQuantity * p.AverageCost)")} FROM Products AS p
+        WHERE p.IsActive = True AND p.CurrentQuantity > 0) AS StockValue,
+       (SELECT Count(*) FROM LowStockQuery) AS LowStockCount
+FROM Settings AS st
+WHERE st.SettingID = 1""", ["DashDay", "DashMonth", "DashEnd"]),
+
+    Query("qryDashboardTopProducts", "صافي الكمية المباعة لكل منتج منذ بداية الشهر (لوحة التحكم)", """
+SELECT l.ProductID, p.ProductName, Sum(l.SignedQty) AS NetQty, Sum(l.LineGross) AS NetSales
+FROM qrySalesLineItems AS l INNER JOIN Products AS p ON l.ProductID = p.ProductID
+WHERE l.DocDate >= QDate('DashMonth') AND l.DocDate < QDate('DashEnd')
+GROUP BY l.ProductID, p.ProductName
+HAVING Sum(l.SignedQty) > 0""", ["DashMonth", "DashEnd"]),
+
     # ============================================================ PRINTING
     Query("qrySalesDocPrint", "بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف)", """
 SELECT 'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber,

@@ -20,7 +20,9 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCou" & _
+    "ntQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,DashboardQuery,qryDashboard" & _
+    "TopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -568,6 +570,8 @@ Private Sub CreateAllQueries()
     Q_qryVatInputPurchases
     Q_qryVatInputExpenses
     Q_VatSummaryQuery
+    Q_DashboardQuery
+    Q_qryDashboardTopProducts
     Q_qrySalesDocPrint
     Q_qryPurchaseDocPrint
     Q_qryVoucherPrint
@@ -1053,6 +1057,41 @@ Private Sub Q_VatSummaryQuery()
     s = s & "       o.OutputVAT - p.PurchaseVAT - e.ExpenseVAT AS NetVATDue" & vbCrLf
     s = s & "FROM qryVatOutput AS o, qryVatInputPurchases AS p, qryVatInputExpenses AS e" & vbCrLf
     SaveQuery "VatSummaryQuery", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›… ··› —… (··≈ﬁ—«— «·÷—Ì»Ì)", s
+End Sub
+
+Private Sub Q_DashboardQuery()
+    Dim s As String
+    s = "SELECT (SELECT CCur(Nz(Sum(d.GrossAmount), 0)) FROM qrySalesDocuments AS d" & vbCrLf
+    s = s & "        WHERE d.DocDate >= QDate('DashDay') AND d.DocDate < QDate('DashEnd')) AS TodaySales," & vbCrLf
+    s = s & "       (SELECT Count(*) FROM SalesInvoices AS h" & vbCrLf
+    s = s & "        WHERE h.InvoiceDate >= QDate('DashDay') AND h.InvoiceDate < QDate('DashEnd')) AS TodayInvoices," & vbCrLf
+    s = s & "       (SELECT CCur(Nz(Sum(d.GrossAmount), 0)) FROM qrySalesDocuments AS d" & vbCrLf
+    s = s & "        WHERE d.DocDate >= QDate('DashMonth') AND d.DocDate < QDate('DashEnd')) AS MonthSales," & vbCrLf
+    s = s & "       (SELECT CCur(Nz(Sum(d.VATAmount), 0)) FROM qrySalesDocuments AS d" & vbCrLf
+    s = s & "        WHERE d.DocDate >= QDate('DashMonth') AND d.DocDate < QDate('DashEnd')) AS MonthVAT," & vbCrLf
+    s = s & "       (SELECT Count(*) FROM SalesInvoices AS h" & vbCrLf
+    s = s & "        WHERE h.InvoiceDate >= QDate('DashMonth') AND h.InvoiceDate < QDate('DashEnd')) AS MonthInvoices," & vbCrLf
+    s = s & "       (SELECT CCur(Nz(Sum(e.Amount), 0)) FROM Expenses AS e" & vbCrLf
+    s = s & "        WHERE e.ExpenseDate >= QDate('DashMonth') AND e.ExpenseDate < QDate('DashEnd')) AS MonthExpenses," & vbCrLf
+    s = s & "       (SELECT CCur(Nz(Sum(c.CurrentBalance), 0)) FROM Customers AS c WHERE c.CurrentBalance > 0) AS CustomerDebt," & vbCrLf
+    s = s & "       (SELECT Count(*) FROM Customers AS c WHERE c.CurrentBalance > 0) AS DebtorCount," & vbCrLf
+    s = s & "       (SELECT CCur(Nz(Sum(s.CurrentBalance), 0)) FROM Suppliers AS s WHERE s.CurrentBalance > 0) AS SupplierDue," & vbCrLf
+    s = s & "       (SELECT CCur(Nz(Sum(p.CurrentQuantity * p.AverageCost), 0)) FROM Products AS p" & vbCrLf
+    s = s & "        WHERE p.IsActive = True AND p.CurrentQuantity > 0) AS StockValue," & vbCrLf
+    s = s & "       (SELECT Count(*) FROM LowStockQuery) AS LowStockCount" & vbCrLf
+    s = s & "FROM Settings AS st" & vbCrLf
+    s = s & "WHERE st.SettingID = 1" & vbCrLf
+    SaveQuery "DashboardQuery", "„ƒ‘—«  ·ÊÕ… «· Õﬂ„ ›Ì ”Ã· Ê«Õœ («·ÌÊ„° «·‘Â—° «·√—’œ…° «·„Œ“Ê‰)", s
+End Sub
+
+Private Sub Q_qryDashboardTopProducts()
+    Dim s As String
+    s = "SELECT l.ProductID, p.ProductName, Sum(l.SignedQty) AS NetQty, Sum(l.LineGross) AS NetSales" & vbCrLf
+    s = s & "FROM qrySalesLineItems AS l INNER JOIN Products AS p ON l.ProductID = p.ProductID" & vbCrLf
+    s = s & "WHERE l.DocDate >= QDate('DashMonth') AND l.DocDate < QDate('DashEnd')" & vbCrLf
+    s = s & "GROUP BY l.ProductID, p.ProductName" & vbCrLf
+    s = s & "HAVING Sum(l.SignedQty) > 0" & vbCrLf
+    SaveQuery "qryDashboardTopProducts", "’«›Ì «·ﬂ„Ì… «·„»«⁄… ·ﬂ· „‰ Ã „‰– »œ«Ì… «·‘Â— (·ÊÕ… «· Õﬂ„)", s
 End Sub
 
 Private Sub Q_qrySalesDocPrint()

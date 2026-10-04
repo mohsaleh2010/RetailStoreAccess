@@ -101,7 +101,7 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = @@PERIOD@@
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "@@NAMES@@"
+Private Const QUERY_NAMES As String = @@NAMES@@
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -404,6 +404,12 @@ End Sub
 '''
 
 
+def names_literal(text: str, width: int = 400) -> str:
+    """A long constant split over continuation lines (each physical line < 1000 bytes)."""
+    parts = [text[i:i + width] for i in range(0, len(text), width)]
+    return " & _\n    ".join(f'"{p}"' for p in parts)
+
+
 def build_queries_vba() -> str:
     corruption_lines = []
     for update, check in Q.CORRUPTIONS:
@@ -412,7 +418,7 @@ def build_queries_vba() -> str:
     text = VBA_TEMPLATE
     for key, value in {
         "@@PERIOD@@": str(Q.PERIOD_START_DAYS_AGO),
-        "@@NAMES@@": ",".join(q.name for q in Q.QUERIES),
+        "@@NAMES@@": names_literal(",".join(q.name for q in Q.QUERIES)),
         "@@FIXTURE@@": "\n".join(fixture_line(r) for r in Q.FIXTURE),
         "@@CHECKS@@": "\n".join(check_lines(c) for c in Q.CHECKS),
         "@@CORRUPTIONS@@": "\n".join(corruption_lines),

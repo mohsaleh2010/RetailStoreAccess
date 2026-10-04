@@ -13,8 +13,8 @@
 | 5 | النماذج | ✅ تمت الموافقة | [docs/05-Forms.md](docs/05-Forms.md) |
 | 6 | نظام المبيعات | ✅ تمت الموافقة | [docs/06-Sales.md](docs/06-Sales.md) |
 | 7 | المشتريات والمخزون | ✅ تمت الموافقة | [docs/07-Purchases-Inventory.md](docs/07-Purchases-Inventory.md) |
-| 8 | التقارير | ✅ بانتظار الموافقة | [docs/08-Reports.md](docs/08-Reports.md) |
-| 9 | لوحة التحكم | ⏳ | |
+| 8 | التقارير | ✅ تمت الموافقة | [docs/08-Reports.md](docs/08-Reports.md) |
+| 9 | لوحة التحكم | ✅ بانتظار الموافقة | [docs/09-Dashboard.md](docs/09-Dashboard.md) |
 | 10 | الصلاحيات | ⏳ | |
 | 11 | الاختبار | ⏳ | |
 | 12 | دليل الاستخدام | ⏳ | |
@@ -49,6 +49,7 @@
 | 5 | `modZatca`, `modQRCode`, `modSales`, `modPOS` (دائمة) ثم `modBuildReports`, `modTestSales` | `BuildQueries`, `BuildForms`, `BuildReports` | `TestSales` |
 | 6 | `modPurchases`, `modPurchaseScreens` (دائمة) ثم `modTestPurchases` | `BuildQueries`, `BuildForms` | `TestPurchases` |
 | 7 | `modReports` (دائمة) ثم `modBuildReports` | `BuildQueries`, `BuildForms`, `BuildReports` | `TestReports` |
+| 8 | `modDashboard` (دائمة) | `BuildQueries`, `BuildForms` | `TestDashboard` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 

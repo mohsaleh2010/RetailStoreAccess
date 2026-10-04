@@ -588,6 +588,11 @@ def layout_data_screen(s: DataScreen) -> FormModel:
     return m
 
 
+DASHBOARD_TILES = [("TODAY", "مبيعات اليوم"), ("MONTH", "مبيعات الشهر"), ("PROFIT", "صافي ربح الشهر (تقريبي)"),
+                   ("LOW", "منتجات منخفضة المخزون"), ("DEBT", "ديون العملاء"), ("DUE", "مستحقات الموردين"),
+                   ("STOCK", "قيمة المخزون بالتكلفة"), ("EXPENSES", "مصروفات الشهر")]
+
+
 def layout_main() -> FormModel:
     width, height = cm(33.5), cm(19.0)
     m = FormModel("frmMain", "نظام إدارة المحل", width, height, popup=False, allow_add=False,
@@ -626,26 +631,51 @@ def layout_main() -> FormModel:
                   {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED")}))
     m.add(Control("label", "lblUser", cx + cw - cm(9), cm(1.6), cm(9), cm(0.6),
                   {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 3}))
-    tiles = ["مبيعات اليوم", "مبيعات الشهر", "صافي الربح التقريبي", "منتجات منخفضة المخزون"]
+    button(m, "btnRefresh", "تحديث", cx + cw - cm(2.4), cm(0.6), "secondary", w=cm(2.4), h=cm(0.8),
+           call="DashboardRefresh Me")
+    m.add(Control("label", "lblUpdated", cx + cw - cm(8.8), cm(0.75), cm(6.2), cm(0.55),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 3}))
     tile_w = (cw - cm(0.4) * 3) // 4
-    for i, caption in enumerate(tiles):
-        tx = cx + i * (tile_w + cm(0.4))
-        m.add(Control("rect", f"boxTile{i + 1}", tx, cm(2.7), tile_w, cm(2.5),
+    for i, (key, caption) in enumerate(DASHBOARD_TILES):
+        tx = cx + (i % 4) * (tile_w + cm(0.4))
+        ty = cm(2.5) + (i // 4) * cm(2.75)
+        n = i + 1
+        m.add(Control("rect", f"boxTile{n}", tx, ty, tile_w, cm(2.45),
                       {"BackColor": Sym("CLR_SURFACE")}, decorative=True))
-        m.add(Control("label", f"lblTileTitle{i + 1}", tx + cm(0.3), cm(2.9), tile_w - cm(0.6),
-                      cm(0.6), {"Caption": caption, "FontSize": 10, "ForeColor": Sym("CLR_MUTED")},
-                      decorative=True))
-        m.add(Control("label", f"lblTileValue{i + 1}", tx + cm(0.3), cm(3.6), tile_w - cm(0.6),
-                      cm(1.0), {"Caption": "-", "FontSize": 20, "FontBold": True,
-                                "ForeColor": Sym("CLR_PRIMARY")}, decorative=True))
-    m.add(Control("label", "lblTilesNote", cx, cm(5.4), cw, cm(0.6),
-                  {"Caption": "مؤشرات لوحة التحكم تُفعَّل في المرحلة 9", "FontSize": 9,
-                   "ForeColor": Sym("CLR_MUTED")}))
+        m.add(Control("label", f"lblTileTitle{n}", tx + cm(0.3), ty + cm(0.15), tile_w - cm(0.6), cm(0.6),
+                      {"Caption": caption, "FontSize": 10, "ForeColor": Sym("CLR_MUTED")}, events=["Click"]))
+        m.add(Control("label", f"lblTileValue{n}", tx + cm(0.3), ty + cm(0.75), tile_w - cm(0.6), cm(1.0),
+                      {"Caption": "-", "FontSize": 20, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")},
+                      events=["Click"]))
+        m.add(Control("label", f"lblTileSub{n}", tx + cm(0.3), ty + cm(1.8), tile_w - cm(0.6), cm(0.5),
+                      {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+        for part in ("Title", "Value"):
+            m.code += [f"Private Sub lblTile{part}{n}_Click()", f'    DashboardTileClick "{key}"', "End Sub"]
+    list_w = (cw - cm(0.4) * 2) // 3
+    for i, (name, caption, columns, widths) in enumerate([
+            ("lstRecentSales", "فواتير اليوم (نقر مزدوج للعرض)", 5, "0;2.2;1.3;2.8;1.9"),
+            ("lstLowStock", "منخفضة المخزون (نقر مزدوج للمنتج)", 4, "0;4.6;1.8;1.8"),
+            ("lstTopProducts", "الأكثر مبيعًا هذا الشهر", 4, "0;4.2;1.8;2.2")]):
+        lx = cx + i * (list_w + cm(0.4))
+        m.add(Control("label", f"lblCap{name[3:]}", lx, cm(8.05), list_w, cm(0.6),
+                      {"Caption": caption, "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_TEXT")}))
+        m.add(Control("list", name, lx, cm(8.7), list_w, cm(8.8),
+                      {"ColumnCount": columns, "ColumnWidths": widths, "ColumnHeads": True},
+                      events=["DblClick"]))
+    m.code += ["Private Sub lstRecentSales_DblClick(Cancel As Integer)",
+               '    OpenScreen "frmSalesInvoice", 6, Me!lstRecentSales.Value', "End Sub",
+               "Private Sub lstLowStock_DblClick(Cancel As Integer)",
+               '    OpenScreen "frmProducts", 0, Me!lstLowStock.Value', "End Sub",
+               "Private Sub lstTopProducts_DblClick(Cancel As Integer)",
+               '    OpenScreen "frmProducts", 0, Me!lstTopProducts.Value', "End Sub"]
     m.add(Control("label", "lblIntegrity", cx, height - cm(1.2), cw, cm(0.6),
                   {"Caption": " ", "FontSize": 10, "FontBold": True,
                    "ForeColor": Sym("CLR_MUTED")}))
-    m.form_events = ["Load"]
-    m.code = ["Private Sub Form_Load()", "    MainLoad Me", "End Sub"] + m.code
+    m.form_events = ["Load", "Activate", "Timer"]
+    m.form_props = {"TimerInterval": 300000}          # refresh the dashboard every 5 minutes
+    m.code = ["Private Sub Form_Load()", "    MainLoad Me", "End Sub",
+              "Private Sub Form_Activate()", "    DashboardActivate Me", "End Sub",
+              "Private Sub Form_Timer()", "    DashboardRefresh Me", "End Sub"] + m.code
     return m
 
 

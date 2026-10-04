@@ -9,6 +9,7 @@ EVENT_PROPERTY = {
     "Load": "OnLoad", "Open": "OnOpen", "Current": "OnCurrent", "BeforeUpdate": "BeforeUpdate",
     "AfterUpdate": "AfterUpdate", "Error": "OnError", "KeyDown": "OnKeyDown",
     "Unload": "OnUnload", "Click": "OnClick", "DblClick": "OnDblClick", "Change": "OnChange",
+    "Activate": "OnActivate", "Timer": "OnTimer",
 }
 
 HELPER_PROPS = {"Caption", "FontSize", "FontBold", "ForeColor", "BackColor", "TextAlign",

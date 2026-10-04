@@ -22,7 +22,8 @@ Public Sub MainLoad(ByVal frm As Access.Form)
     frm!lblStoreName.Caption = Nz(SettingValue("StoreName"), APP_TITLE)
     frm!lblToday.Caption = Format$(Date, "dddd  yyyy/mm/dd")
     frm!lblUser.Caption = "«·„” Œœ„: " & CurrentUserName()
-    RefreshIntegrityStatus frm
+    DashboardRefresh frm                      ' tiles, lists and the integrity line (modDashboard)
+    If Not g_SilentMode Then LowStockAlert    ' once per session
 End Sub
 
 Public Sub RefreshIntegrityStatus(ByVal frm As Access.Form)
