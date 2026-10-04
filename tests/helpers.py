@@ -50,6 +50,9 @@ def build_sqlite(with_relationship_rules=False):
                 c += " NOT NULL"
             if f.default is not None:
                 c += " DEFAULT " + sqlite_default(f.default)
+            if f.kind in ("TEXT", "MEMO"):
+                # Access text fields are created with AllowZeroLength = False
+                c += f' CHECK ("{f.name}" <> \'\')'
             cols.append(c)
         cols.append("PRIMARY KEY (" + ", ".join(f'"{k}"' for k in t.pk) + ")")
         for f in t.fields:

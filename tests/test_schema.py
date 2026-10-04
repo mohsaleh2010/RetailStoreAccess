@@ -182,6 +182,15 @@ class SeedDataTests(unittest.TestCase):
             for row in t.seed_rows:
                 self.assertEqual(len(row), len(t.seed_columns), f"{t.name} {row}")
 
+    def test_no_zero_length_text_in_seed(self):
+        # Access text fields refuse '' (AllowZeroLength = False, error 3315): use None
+        for t in TABLES:
+            kinds = {f.name: f.kind for f in t.fields}
+            for row in t.seed_rows:
+                for c, v in zip(t.seed_columns, row):
+                    if kinds[c] in ("TEXT", "MEMO"):
+                        self.assertNotEqual(v, "", f"{t.name}.{c} in {row}")
+
     def test_cash_customer_and_admin(self):
         cust = table("Customers")
         row = dict(zip(cust.seed_columns, cust.seed_rows[0]))

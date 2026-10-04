@@ -1432,7 +1432,7 @@ Private Sub Seed_Sequences()
     ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_COUNT', 'CNT-', 1, 5, 'جلسات الجرد')"
     ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_ADJUST', 'ADJ-', 1, 6, 'حركات المخزون اليدوية')"
     ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PRODUCT_CODE', 'P', 1, 5, 'أكواد المنتجات')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ZATCA_ICV', '', 1, 0, 'عدّاد ICV لمستندات فاتورة')"
+    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ZATCA_ICV', Null, 1, 0, 'عدّاد ICV لمستندات فاتورة')"
     EndSeed "Sequences", 11
 End Sub
 

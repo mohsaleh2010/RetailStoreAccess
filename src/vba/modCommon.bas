@@ -173,7 +173,13 @@ Public Function SqlDate(ByVal d As Date) As String
 End Function
 
 Public Function SqlText(ByVal s As Variant) As String
-    SqlText = "'" & Replace(Nz(s, ""), "'", "''") & "'"
+    ' Empty text becomes Null: text fields do not accept zero-length strings
+    ' (AllowZeroLength = False), and  Field = Null  matches nothing, like  Field = ''  did.
+    If Len(Nz(s, "")) = 0 Then
+        SqlText = "Null"
+    Else
+        SqlText = "'" & Replace(s, "'", "''") & "'"
+    End If
 End Function
 
 Public Function LikePattern(ByVal s As String) As String

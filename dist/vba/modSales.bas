@@ -625,7 +625,7 @@ Public Sub ApplyStockMovement(ByVal db As DAO.Database, ByVal ProductID As Long,
     rs!QuantityAfter = newQty
     rs!ReferenceType = RefType
     If RefID > 0 Then rs!ReferenceID = RefID
-    rs!ReferenceNumber = Left$(RefNumber, 20)
+    If Len(RefNumber) > 0 Then rs!ReferenceNumber = Left$(RefNumber, 20)
     rs!EmployeeID = CurrentUserID()
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     rs.Update
