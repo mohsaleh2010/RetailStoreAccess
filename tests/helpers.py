@@ -95,6 +95,25 @@ def logical_lines(vba):
     return out
 
 
+def split_statements(line):
+    """Split a logical line on ': ' statement separators outside string literals."""
+    out, buf, in_str = [], "", False
+    i = 0
+    while i < len(line):
+        ch = line[i]
+        if ch == '"':
+            in_str = not in_str
+        if not in_str and line.startswith(": ", i):
+            out.append(buf)
+            buf = ""
+            i += 2
+            continue
+        buf += ch
+        i += 1
+    out.append(buf)
+    return out
+
+
 def strip_comment(line):
     in_str = False
     for i, ch in enumerate(line):
@@ -164,7 +183,7 @@ class VbaModuleChecks:
 
     def test_variables_declared(self):
         """Option Explicit: every assigned local identifier must be declared somewhere."""
-        declared = set()
+        declared = {"calendar"}   # built-in VBA properties that may be assigned
         for l in logical_lines(self.vba):
             for m in re.finditer(r"\b(?:Dim|Private|Public|Const|ByVal|ByRef|Optional)\s+"
                                  r"(?:Const\s+)?(?:ByVal\s+|ByRef\s+)?(\w+)", l):
@@ -178,7 +197,7 @@ class VbaModuleChecks:
             if m:
                 self.assertIn(m.group(1).lower(), declared, f"loop variable {m.group(1)}")
         for l in logical_lines(self.vba):
-            for stmt in l.split(": "):
+            for stmt in split_statements(l):
                 m = re.match(r"^(?:Set\s+)?(\w+)\s*=(?!=)", stmt.strip())
                 if m and not stmt.strip().startswith(("If ", "ElseIf ", "Case ")):
                     self.assertIn(m.group(1).lower(), declared, f"undeclared: {stmt.strip()}")

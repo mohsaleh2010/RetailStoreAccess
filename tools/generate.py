@@ -10,8 +10,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 from schema import TABLES, Table, Field  # noqa: E402
 from generate_common import vba_str  # noqa: E402
 import gen_relations  # noqa: E402
+import gen_queries  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_MODULES = ["modQueryParams"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -584,6 +586,16 @@ def main():
     write("src/vba/modBuildRelations.bas", rel)
     write("dist/vba/modBuildRelations.bas", rel, encoding="cp1256", newline="\r\n")
     write("docs/03-Relationships-Reference.md", gen_relations.build_relations_md())
+
+    qry = gen_queries.build_queries_vba()
+    write("src/vba/modBuildQueries.bas", qry)
+    write("dist/vba/modBuildQueries.bas", qry, encoding="cp1256", newline="\r\n")
+    write("docs/04-Queries-Reference.md", gen_queries.build_queries_md())
+
+    # hand-written modules: readable copy in src/, import copy in dist/
+    for name in STATIC_MODULES:
+        with open(os.path.join(ROOT, "src", "vba", name + ".bas"), encoding="utf-8") as fh:
+            write(f"dist/vba/{name}.bas", fh.read(), encoding="cp1256", newline="\r\n")
 
 
 if __name__ == "__main__":
