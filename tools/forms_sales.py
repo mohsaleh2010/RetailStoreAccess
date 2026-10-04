@@ -269,8 +269,10 @@ def layout_customer_payment() -> FormModel:
     labelled(m, "cboPaymentMethod", "طريقة الدفع", c)
     c = m.add(Control("text", "txtNotes", cm(0.4), cm(6.2), width - cm(0.8), cm(0.8), {}))
     labelled(m, "txtNotes", "ملاحظات", c)
-    button(m, "btnSave", "حفظ السند", cm(0.4), cm(8.4), "primary", w=cm(4.0), h=cm(1.0),
+    button(m, "btnSave", "حفظ السند", cm(0.4), cm(8.4), "primary", w=cm(3.4), h=cm(1.0),
            call="SavePayment Me")
+    button(m, "btnSavePrint", "حفظ وطباعة", cm(4.0), cm(8.4), "primary", w=cm(3.4), h=cm(1.0),
+           call="SavePayment Me, True")
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(8.4), "secondary", w=cm(2.6),
            h=cm(1.0), call="DoCmd.Close acForm, Me.Name")
     m.form_events = ["Load"]

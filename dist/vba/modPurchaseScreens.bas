@@ -1,6 +1,6 @@
 Attribute VB_Name = "modPurchaseScreens"
 '==============================================================================
-' modPurchaseScreens  -  Retail Store Management System (Phase 7)
+' modPurchaseScreens  -  Retail Store Management System (Phases 7-8)
 '
 ' Behaviour of the purchase and inventory screens:
 '   frmPurchaseInvoice + frmPurchaseLines            purchase invoice (cart in tmpPurchaseLines)
@@ -405,7 +405,7 @@ Public Sub RecalcPurchaseReturn(ByVal frm As Access.Form)
     frm!lblReturnTotal.Caption = Format$(total, "#,##0.00")
 End Sub
 
-Public Function SavePurchaseReturn(ByVal frm As Access.Form) As Boolean
+Public Function SavePurchaseReturn(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
     Dim msg As String, newID As Long
     If IsNull(frm!txtInvoiceID.Value) Then
         ShowWarning "«Œ — ›« Ê—… «·‘—«¡ √Ê·«."
@@ -420,6 +420,7 @@ Public Function SavePurchaseReturn(ByVal frm As Access.Form) As Boolean
     End If
     ShowInfo " „ Õ›Ÿ „— Ã⁄ «·„‘ —Ì«  " & DLookup("ReturnNumber", "PurchaseReturns", "PurchaseReturnID = " & newID) & _
              "  »ﬁÌ„… " & Format$(DLookup("TotalAmount", "PurchaseReturns", "PurchaseReturnID = " & newID), "#,##0.00")
+    If PrintAfter Then PrintPurchaseDocument "RETURN", newID
     LoadPurchaseForReturn frm, frm!txtInvoiceID.Value
     frm!txtReason.Value = Null
     SavePurchaseReturn = True
@@ -443,7 +444,7 @@ Public Sub SupplierPaymentChanged(ByVal frm As Access.Form)
     End If
 End Sub
 
-Public Function SaveSupplierPayment(ByVal frm As Access.Form) As Boolean
+Public Function SaveSupplierPayment(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
     Dim msg As String, newID As Long
     If IsNull(frm!cboSupplier.Value) Then
         ShowWarning "«Œ — «·„Ê—œ."
@@ -456,6 +457,7 @@ Public Function SaveSupplierPayment(ByVal frm As Access.Form) As Boolean
         Exit Function
     End If
     ShowInfo " „ Õ›Ÿ ”‰œ «·’—› " & DLookup("PaymentNumber", "SupplierPayments", "PaymentID = " & newID)
+    If PrintAfter Then PrintVoucher "PAYMENT", newID
     frm!txtAmount.Value = Null
     frm!txtNotes.Value = Null
     SupplierPaymentChanged frm
@@ -495,8 +497,9 @@ Public Sub PurchaseViewLoad(ByVal frm As Access.Form)
         "d.UnitCost AS [ ﬂ·›… «·ÊÕœ…], d.Discount AS [«·Œ’„], d.Tax AS [«·÷—Ì»…], d.LineTotal AS [«·≈Ã„«·Ì] " & _
         "FROM PurchaseInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID " & _
         "WHERE d.PurchaseInvoiceID = " & id & " ORDER BY d.LineNumber"
-    frm!lstReturns.RowSource = "SELECT ReturnNumber AS [«·„— Ã⁄], ReturnDate AS [«· «—ÌŒ], TotalAmount AS [«·ﬁÌ„…], " & _
-        "Reason AS [«·”»»] FROM PurchaseReturns WHERE PurchaseInvoiceID = " & id & " ORDER BY ReturnDate"
+    frm!lstReturns.RowSource = "SELECT PurchaseReturnID, ReturnNumber AS [«·„— Ã⁄], ReturnDate AS [«· «—ÌŒ], " & _
+        "TotalAmount AS [«·ﬁÌ„…], Reason AS [«·”»»] FROM PurchaseReturns WHERE PurchaseInvoiceID = " & id & _
+        " ORDER BY ReturnDate"
 End Sub
 
 '==============================================================================
@@ -802,8 +805,3 @@ Public Function CancelCountScreen(ByVal frm As Access.Form) As Boolean
     ShowStockCount frm
     CancelCountScreen = True
 End Function
-
-Public Sub CountShowDifferences(ByVal frm As Access.Form)
-    If IsNull(frm!cboCount.Value) Then Exit Sub
-    OpenReportOrQuery "rptStockCount", "StockCountQuery", "[StockCountID] = " & CLng(frm!cboCount.Value)
-End Sub

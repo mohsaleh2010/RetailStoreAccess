@@ -133,7 +133,7 @@ class ReportLayoutTests(unittest.TestCase):
         cls.columns = {d[0] for d in cur.description}
 
     def test_controls_inside_sections_and_not_overlapping(self):
-        for m in RP.all_reports():
+        for m in RP.sales_reports():
             for sec, ctls in m.controls.items():
                 for c in ctls:
                     with self.subTest(report=m.name, control=c.name):
@@ -146,7 +146,7 @@ class ReportLayoutTests(unittest.TestCase):
                         self.assertFalse(overlaps(a, b), f"{m.name}: {a.name} / {b.name}")
 
     def test_fields_exist_in_print_query(self):
-        for m in RP.all_reports():
+        for m in RP.sales_reports():
             for ctls in m.controls.values():
                 for c in ctls:
                     if c.kind != "text":
@@ -156,7 +156,7 @@ class ReportLayoutTests(unittest.TestCase):
                         self.assertIn(ref, self.columns, f"{m.name}.{c.name}")
 
     def test_qr_box_is_centred_and_large_enough(self):
-        for m in RP.all_reports():
+        for m in RP.sales_reports():
             box = next(c for c in m.controls[RP.SEC_FOOTER] if c.name == "boxQR")
             self.assertEqual(box.x * 2 + box.w, m.width - (m.width - box.w) % 2)
             self.assertGreaterEqual(box.w, F.cm(3.0), "ZATCA QR should be readable (>= 3 cm)")

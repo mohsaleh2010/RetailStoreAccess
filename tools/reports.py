@@ -1,4 +1,5 @@
 """Phase 6 reports: sales invoice / credit note, 80 mm receipt and A4.
+Phase 8 adds the other documents (reports_docs.py) and the catalogue (reports_catalog.py).
 
 Reports are grouped on DocID (header = seller/buyer/document info,
 footer = totals + QR code) and sorted on LineNumber. Positions are in twips,
@@ -6,11 +7,14 @@ x measured from the start (right) edge like the forms.
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from forms import Control, Sym, cm
 
-SEC_DETAIL, SEC_HEADER, SEC_FOOTER = 0, 5, 6
+# Access section numbers. Documents use the DocID group header/footer (5/6);
+# list reports use the page header (3), report footer (2) and page footer (4).
+SEC_DETAIL, SEC_RPT_HEADER, SEC_RPT_FOOTER, SEC_PAGE_HEADER, SEC_PAGE_FOOTER = 0, 1, 2, 3, 4
+SEC_HEADER, SEC_FOOTER = 5, 6
 SECTION_NAMES = {SEC_DETAIL: "Detail", SEC_HEADER: "secHeader", SEC_FOOTER: "secTotals"}
 
 TITLE_AR = ('=IIf([DocKind]="RETURN","إشعار دائن",IIf([InvoiceSubType]="STANDARD",'
@@ -27,12 +31,30 @@ class ReportModel:
     width: int
     heights: Dict[int, int]
     record_source: str = "qrySalesDocPrint"
-    controls: Dict[int, List[Control]] = field(default_factory=lambda: {0: [], 5: [], 6: []})
-    code: List[str] = field(default_factory=list)
+    controls: Dict[int, List[Control]] = field(default_factory=dict)
+    code: List[str] = field(default_factory=list)       # report module lines
+    events: List[str] = field(default_factory=list)     # e.g. "m_rpt.OnNoData = EP"
+    group: str = "DocID"                                  # "" = no group header/footer
+    sorts: List[Tuple[str, bool]] = field(default_factory=lambda: [("LineNumber", False)])
+    landscape: bool = False
+    page_setup: bool = False                              # A4 margins (list reports)
+    no_data: str = ""                                     # message instead of an empty report
+
+    def __post_init__(self):
+        for sec in self.heights:
+            self.controls.setdefault(sec, [])
+        if self.no_data:
+            self.events.append("m_rpt.OnNoData = EP")
+            self.code += ["Private Sub Report_NoData(Cancel As Integer)",
+                          f"    ReportNoData Cancel, {vba_literal(self.no_data)}", "End Sub"]
 
     def add(self, section, c: Control):
         self.controls[section].append(c)
         return c
+
+
+def vba_literal(text: str) -> str:
+    return '"' + text.replace('"', '""') + '"'
 
 
 def txt(m, sec, name, source, x, y, w, h, size=9, bold=False, align=0, fmt=None, grow=False,
@@ -62,10 +84,11 @@ def qr_box(m: ReportModel, y: int, size: int):
     m.add(SEC_FOOTER, Control("rect", "boxQR", x, y, size, size, {}, decorative=True))
     txt(m, SEC_FOOTER, "txtDocKind", "DocKind", 0, y, cm(0.5), cm(0.4), visible=False)
     txt(m, SEC_FOOTER, "txtDocID", "DocID", 0, y + cm(0.45), cm(0.5), cm(0.4), visible=False)
-    m.code = ["Private Sub secTotals_Print(Cancel As Integer, PrintCount As Integer)",
-              "    DrawDocumentQR Me, Me!txtDocKind.Value, Me!txtDocID.Value, Me!boxQR.Left, _",
-              "                   Me!boxQR.Top, Me!boxQR.Width",
-              "End Sub"]
+    m.events.append("m_rpt.Section(6).OnPrint = EP")
+    m.code += ["Private Sub secTotals_Print(Cancel As Integer, PrintCount As Integer)",
+               "    DrawDocumentQR Me, Me!txtDocKind.Value, Me!txtDocID.Value, Me!boxQR.Left, _",
+               "                   Me!boxQR.Top, Me!boxQR.Width",
+               "End Sub"]
 
 
 def setting(name, prefix=""):
@@ -231,5 +254,11 @@ def a4() -> ReportModel:
     return m
 
 
-def all_reports() -> List[ReportModel]:
+def sales_reports() -> List[ReportModel]:
     return [receipt(), a4()]
+
+
+def all_reports() -> List[ReportModel]:
+    from reports_docs import document_reports
+    from reports_catalog import catalog_reports
+    return sales_reports() + document_reports() + catalog_reports()

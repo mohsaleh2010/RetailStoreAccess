@@ -912,6 +912,8 @@ Private Sub BuildForm_frmCustomers()
     c.OnClick = EP
     Set c = AddButton("btnPayment", "سند قبض", 6123, 1021, 1701, 482, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnStatement", "كشف حساب", 7937, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -1020,6 +1022,9 @@ Private Sub BuildForm_frmCustomers()
     s = s & "Private Sub btnPayment_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmCustomerPayment"", 6, Me!CustomerID" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStatement_Click()" & vbCrLf
+    s = s & "    PrintPartyStatement ""C"", Me!CustomerID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -1056,6 +1061,8 @@ Private Sub BuildForm_frmSuppliers()
     Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
     c.OnClick = EP
     Set c = AddButton("btnPayment", "سند صرف", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnStatement", "كشف حساب", 7937, 1021, 1701, 482, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
@@ -1150,6 +1157,9 @@ Private Sub BuildForm_frmSuppliers()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnPayment_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmSupplierPayment"", 7, Me!SupplierID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStatement_Click()" & vbCrLf
+    s = s & "    PrintPartyStatement ""S"", Me!SupplierID" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
@@ -1809,9 +1819,13 @@ Private Sub BuildForm_frmReportCenter()
     Set c = AddLabel("lblProduct", "المنتج", 5670, 5244, 5103, 284, 9, False, CLR_MUTED, "cboProduct", 0)
     Set c = AddButton("btnRun", "عرض التقرير", 5670, 6548, 2835, 567, "primary")
     c.OnClick = EP
+    Set c = AddButton("btnPdf", "حفظ PDF", 8618, 6548, 1701, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnExcel", "تصدير Excel", 10433, 6548, 1701, 567, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "رجوع", 13948, 6548, 1134, 567, "secondary")
     c.OnClick = EP
-    Set c = AddLabel("lblPhaseNote", "التقارير المنسقة للطباعة تُضاف في المرحلة 8، وحتى ذلك الحين تُعرض النتائج كجدول.", 5670, 7342, 9412, 567, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblPhaseNote", "يُعرض التقرير للمعاينة ومنها الطباعة. «حفظ PDF» و«تصدير Excel» يحفظان الملف في مجلد Reports بجانب ملف البرنامج.", 5670, 7342, 9412, 567, 9, False, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
@@ -1837,6 +1851,12 @@ Private Sub BuildForm_frmReportCenter()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnRun_Click()" & vbCrLf
     s = s & "    RunReport Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPdf_Click()" & vbCrLf
+    s = s & "    ExportReport Me, ""PDF""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnExcel_Click()" & vbCrLf
+    s = s & "    ExportReport Me, ""XLSX""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -2189,7 +2209,9 @@ Private Sub BuildForm_frmCustomerPayment()
     Set c = AddLabel("lblPaymentMethod", "طريقة الدفع", 4649, 2296, 4196, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
     Set c = AddText("txtNotes", "", 227, 3515, 8618, 454)
     Set c = AddLabel("lblNotes", "ملاحظات", 227, 3203, 8618, 284, 9, False, CLR_MUTED, "txtNotes", 0)
-    Set c = AddButton("btnSave", "حفظ السند", 227, 4763, 2268, 567, "primary")
+    Set c = AddButton("btnSave", "حفظ السند", 227, 4763, 1928, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnSavePrint", "حفظ وطباعة", 2268, 4763, 1928, 567, "primary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 7371, 4763, 1474, 567, "secondary")
     c.OnClick = EP
@@ -2203,6 +2225,9 @@ Private Sub BuildForm_frmCustomerPayment()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSave_Click()" & vbCrLf
     s = s & "    SavePayment Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSavePrint_Click()" & vbCrLf
+    s = s & "    SavePayment Me, True" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -2560,6 +2585,8 @@ Private Sub BuildForm_frmPurchaseReturn()
     c.OnClick = EP
     Set c = AddButton("btnSaveReturn", "حفظ المرتجع", 2154, 8675, 2041, 567, "primary")
     c.OnClick = EP
+    Set c = AddButton("btnSaveReturnPrint", "حفظ وطباعة", 4308, 8675, 2041, 567, "primary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13608, 8675, 1474, 567, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -2578,6 +2605,9 @@ Private Sub BuildForm_frmPurchaseReturn()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSaveReturn_Click()" & vbCrLf
     s = s & "    SavePurchaseReturn Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSaveReturnPrint_Click()" & vbCrLf
+    s = s & "    SavePurchaseReturn Me, True" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -2609,7 +2639,9 @@ Private Sub BuildForm_frmSupplierPayment()
     Set c = AddLabel("lblPaymentMethod", "طريقة الدفع", 4649, 2296, 4196, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
     Set c = AddText("txtNotes", "", 227, 3515, 8618, 454)
     Set c = AddLabel("lblNotes", "ملاحظات", 227, 3203, 8618, 284, 9, False, CLR_MUTED, "txtNotes", 0)
-    Set c = AddButton("btnSave", "حفظ السند", 227, 4763, 2268, 567, "primary")
+    Set c = AddButton("btnSave", "حفظ السند", 227, 4763, 1928, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnSavePrint", "حفظ وطباعة", 2268, 4763, 1928, 567, "primary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 7371, 4763, 1474, 567, "secondary")
     c.OnClick = EP
@@ -2623,6 +2655,9 @@ Private Sub BuildForm_frmSupplierPayment()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSave_Click()" & vbCrLf
     s = s & "    SaveSupplierPayment Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSavePrint_Click()" & vbCrLf
+    s = s & "    SaveSupplierPayment Me, True" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -2648,12 +2683,15 @@ Private Sub BuildForm_frmPurchaseView()
     SetCtlProp c, "Visible", False
     Set c = AddLabel("lblHeader", " ", 227, 1021, 14855, 397, 10, False, CLR_TEXT, "", 0)
     Set c = AddList("lstLines", 227, 1531, 14855, 3742, 7, "567;5103;1418;1984;1418;1701;2268", True)
-    Set c = AddLabel("lblReturnsCap", "المرتجعات على هذه الفاتورة", 227, 5386, 4536, 312, 10, True, CLR_MUTED, "", 0)
-    Set c = AddList("lstReturns", 227, 5727, 14855, 1304, 4, "2268;2835;1984;6804", True)
+    Set c = AddLabel("lblReturnsCap", "المرتجعات على هذه الفاتورة (نقر مزدوج للطباعة)", 227, 5386, 6804, 312, 10, True, CLR_MUTED, "", 0)
+    Set c = AddList("lstReturns", 227, 5727, 14855, 1304, 5, "0;2268;2835;1984;6804", True)
+    c.OnDblClick = EP
     Set c = AddLabel("lblTotals", " ", 227, 7144, 14855, 397, 11, True, CLR_PRIMARY, "", 0)
-    Set c = AddButton("btnReturn", "مرتجع", 227, 7881, 1474, 567, "secondary")
+    Set c = AddButton("btnPrint", "طباعة", 227, 7881, 1474, 567, "primary")
     c.OnClick = EP
-    Set c = AddButton("btnPayment", "سند صرف", 1814, 7881, 1588, 567, "secondary")
+    Set c = AddButton("btnReturn", "مرتجع", 1814, 7881, 1474, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPayment", "سند صرف", 3401, 7881, 1588, 567, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13608, 7881, 1474, 567, "secondary")
     c.OnClick = EP
@@ -2661,6 +2699,12 @@ Private Sub BuildForm_frmPurchaseView()
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    PurchaseViewLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstReturns_DblClick(Cancel As Integer)" & vbCrLf
+    s = s & "    PrintPurchaseDocument ""RETURN"", Me!lstReturns.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintPurchaseDocument ""PURCHASE"", Me!txtInvoiceID.Value" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnReturn_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmPurchaseReturn"", 7, Me!txtInvoiceID.Value" & vbCrLf
@@ -2864,7 +2908,7 @@ Private Sub BuildForm_frmStockCount()
     c.OnClick = EP
     Set c = AddButton("btnCancelCount", "إلغاء الجرد", 2268, 9412, 1701, 624, "danger")
     c.OnClick = EP
-    Set c = AddButton("btnCountReport", "عرض الفروقات", 4082, 9412, 1928, 624, "secondary")
+    Set c = AddButton("btnCountReport", "طباعة الجرد", 4082, 9412, 1928, 624, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 17066, 9412, 1701, 624, "secondary")
     c.OnClick = EP
@@ -2895,7 +2939,7 @@ Private Sub BuildForm_frmStockCount()
     s = s & "    CancelCountScreen Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnCountReport_Click()" & vbCrLf
-    s = s & "    CountShowDifferences Me" & vbCrLf
+    s = s & "    PrintStockCount Me!cboCount.Value" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf

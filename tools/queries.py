@@ -229,11 +229,12 @@ GROUP BY c.CategoryID, c.CategoryName
 ORDER BY c.CategoryName"""),
 
     Query("StockCountQuery", "تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته", """
-SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, d.ProductID,
-       p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference,
+SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, g.CategoryName,
+       d.ProductID, p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference,
        d.UnitCost, d.DifferenceValue, d.Notes
-FROM (StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)
-     INNER JOIN Products AS p ON d.ProductID = p.ProductID
+FROM ((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)
+      INNER JOIN Products AS p ON d.ProductID = p.ProductID)
+     LEFT JOIN Categories AS g ON c.CategoryID = g.CategoryID
 ORDER BY c.StockCountID, p.ProductName"""),
 
     # ============================================================ CUSTOMERS
@@ -428,6 +429,52 @@ FROM (((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturn
       INNER JOIN Units AS u ON p.UnitID = u.UnitID)
      INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID)
     INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID"""),
+
+    Query("qryPurchaseDocPrint", "بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف)", """
+SELECT 'PURCHASE' AS DocKind, h.PurchaseInvoiceID AS DocID, h.InvoiceNumber AS DocNumber,
+       h.InvoiceDate AS DocDate, h.SupplierInvoiceNo, '' AS OriginalNumber, h.PaymentType,
+       '' AS Reason, h.SupplierID, s.SupplierName, s.VATNumber AS SupplierVAT,
+       s.Mobile AS SupplierMobile, e.EmployeeName, h.SubTotal AS DocSubTotal,
+       h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax, h.TotalAmount,
+       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName, u.UnitName,
+       d.Quantity, d.UnitCost, d.Discount AS LineDiscount, d.NetAmount, d.VATRate,
+       d.Tax AS LineTax, d.LineTotal
+FROM ((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d
+         ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)
+       INNER JOIN Products AS p ON d.ProductID = p.ProductID)
+      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+     INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID)
+    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID
+UNION ALL
+SELECT 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, o.SupplierInvoiceNo,
+       o.InvoiceNumber, r.RefundType, r.Reason, r.SupplierID, s.SupplierName, s.VATNumber,
+       s.Mobile, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax, r.TotalAmount,
+       r.RefundedAmount, r.TotalAmount - r.RefundedAmount, od.LineNumber, p.ProductCode,
+       p.ProductName, u.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount,
+       rd.VATRate, rd.Tax, rd.LineTotal
+FROM ((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd
+           ON r.PurchaseReturnID = rd.PurchaseReturnID)
+         INNER JOIN PurchaseInvoiceDetails AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)
+        INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)
+       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)
+      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+     INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID)
+    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID"""),
+
+    Query("qryVoucherPrint", "بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين)", """
+SELECT 'RECEIPT' AS DocKind, p.PaymentID AS DocID, p.PaymentNumber AS DocNumber,
+       p.PaymentDate AS DocDate, 1 AS LineNumber, c.CustomerName AS PartyName,
+       c.Mobile AS PartyMobile, p.Amount, m.MethodName, p.Notes, e.EmployeeName,
+       c.CurrentBalance AS PartyBalance
+FROM ((CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID)
+      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)
+     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID
+UNION ALL
+SELECT 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, 1, s.SupplierName, s.Mobile,
+       p.Amount, m.MethodName, p.Notes, e.EmployeeName, s.CurrentBalance
+FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID)
+      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)
+     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID"""),
 
     # ============================================================ INTEGRITY
     Query("qrySalesInvoiceLineTotals", "مجموع أسطر كل فاتورة بيع", """
@@ -712,6 +759,15 @@ CHECKS: List[Check] = [
           "SELECT COUNT(*) FROM LowStockQuery", 1),
     Check("منخفض المخزون: المنتج 2 (186 ≤ 200)",
           "SELECT ShortageQty FROM LowStockQuery WHERE ProductID = {ref:P2}", 14),
+    Check("طباعة فاتورة الشراء: سطران",
+          "SELECT COUNT(*) FROM qryPurchaseDocPrint WHERE DocKind = 'PURCHASE' AND DocID = {ref:PUR1}", 2),
+    Check("طباعة مرتجع الشراء: رقم السطر الأصلي ورقم الفاتورة الأصلية",
+          "SELECT COUNT(*) FROM qryPurchaseDocPrint WHERE DocKind = 'RETURN' AND DocID = {ref:PRT1} "
+          "AND LineNumber = 1 AND OriginalNumber = 'TEST-PUR-1' AND RemainingAmount = 345", 1),
+    Check("طباعة سند الصرف: المبلغ وطريقة الدفع",
+          "SELECT Amount FROM qryVoucherPrint WHERE DocKind = 'PAYMENT' AND DocID = {ref:PAY1}", 1000),
+    Check("طباعة سند القبض",
+          "SELECT COUNT(*) FROM qryVoucherPrint WHERE DocKind = 'RECEIPT' AND DocID = {ref:RCV1}", 1),
     Check("الجرد المفتوح: عجز المنتج 1 = −3 × 60",
           "SELECT DifferenceValue FROM StockCountQuery WHERE ProductID = {ref:P1}", -180),
     Check("الجرد المفتوح: صنف واحد لم يُعدّ بعد",

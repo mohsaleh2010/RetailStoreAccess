@@ -12,8 +12,8 @@
 | 4 | الاستعلامات | ✅ تمت الموافقة | [docs/04-Queries.md](docs/04-Queries.md) · [مرجع الاستعلامات](docs/04-Queries-Reference.md) |
 | 5 | النماذج | ✅ تمت الموافقة | [docs/05-Forms.md](docs/05-Forms.md) |
 | 6 | نظام المبيعات | ✅ تمت الموافقة | [docs/06-Sales.md](docs/06-Sales.md) |
-| 7 | المشتريات والمخزون | ✅ بانتظار الموافقة | [docs/07-Purchases-Inventory.md](docs/07-Purchases-Inventory.md) |
-| 8 | التقارير | ⏳ | |
+| 7 | المشتريات والمخزون | ✅ تمت الموافقة | [docs/07-Purchases-Inventory.md](docs/07-Purchases-Inventory.md) |
+| 8 | التقارير | ✅ بانتظار الموافقة | [docs/08-Reports.md](docs/08-Reports.md) |
 | 9 | لوحة التحكم | ⏳ | |
 | 10 | الصلاحيات | ⏳ | |
 | 11 | الاختبار | ⏳ | |
@@ -31,6 +31,7 @@
 | `tools/queries.py` | الاستعلامات وبيانات الاختبار والنتائج المتوقعة |
 | `tools/forms.py` | تعريف الشاشات وتخطيطها، قوالب البحث، قائمة التقارير |
 | `tools/forms_sales.py`, `tools/reports.py` | شاشات المبيعات، وتقارير الفاتورة |
+| `tools/reports_catalog.py`, `tools/reports_docs.py`, `tools/tafqeet.py` | التقارير المنسقة لمركز التقارير، والمستندات، ومرجع المبلغ بالحروف |
 | `tools/forms_purchases.py`, `tools/purchases_reference.py` | شاشات المشتريات والمخزون والجرد، وسيناريو المرحلة 7 بنتائجه المتوقعة |
 | `tools/pricing.py`, `tools/zatca_reference.py`, `tools/qr_reference.py` | المراجع الحسابية: الفاتورة، حمولة QR للهيئة، مولّد QR |
 | `tests/vba_harness.py` | تشغيل كود VBA الحسابي فعليًا عبر LibreOffice للتحقق منه |
@@ -47,6 +48,7 @@
 | 4 | `modCommon`, `modStartup`, `modForms`, `modScreens`, `modAppData` (دائمة) ثم `modBuildForms` | `BuildForms` | `TestForms` |
 | 5 | `modZatca`, `modQRCode`, `modSales`, `modPOS` (دائمة) ثم `modBuildReports`, `modTestSales` | `BuildQueries`, `BuildForms`, `BuildReports` | `TestSales` |
 | 6 | `modPurchases`, `modPurchaseScreens` (دائمة) ثم `modTestPurchases` | `BuildQueries`, `BuildForms` | `TestPurchases` |
+| 7 | `modReports` (دائمة) ثم `modBuildReports` | `BuildQueries`, `BuildForms`, `BuildReports` | `TestReports` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 
@@ -55,4 +57,4 @@
 python3 tools/generate.py
 python3 -m unittest discover -s tests -v
 ```
-اختبارات `test_vba_runtime` و `test_purchases` تشغّل كود VBA الحسابي فعليًا وتحتاج LibreOffice (`soffice` و `python3-uno`)، وتُتخطى تلقائيًا إن لم يكن مثبتًا.
+اختبارات `test_vba_runtime` و `test_purchases` و `test_reports` تشغّل كود VBA الحسابي فعليًا وتحتاج LibreOffice (`soffice` و `python3-uno`)، وتُتخطى تلقائيًا إن لم يكن مثبتًا.

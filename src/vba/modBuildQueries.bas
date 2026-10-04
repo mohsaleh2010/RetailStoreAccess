@@ -20,7 +20,7 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qrySalesDocPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -392,6 +392,14 @@ Private Sub RunChecks()
         "SELECT COUNT(*) FROM LowStockQuery", 1
     Chk "منخفض المخزون: المنتج 2 (186 <= 200)", _
         "SELECT ShortageQty FROM LowStockQuery WHERE ProductID = " & R("P2"), 14
+    Chk "طباعة فاتورة الشراء: سطران", _
+        "SELECT COUNT(*) FROM qryPurchaseDocPrint WHERE DocKind = 'PURCHASE' AND DocID = " & R("PUR1"), 2
+    Chk "طباعة مرتجع الشراء: رقم السطر الأصلي ورقم الفاتورة الأصلية", _
+        "SELECT COUNT(*) FROM qryPurchaseDocPrint WHERE DocKind = 'RETURN' AND DocID = " & R("PRT1") & " AND LineNumber = 1 AND OriginalNumber = 'TEST-PUR-1' AND RemainingAmount = 345", 1
+    Chk "طباعة سند الصرف: المبلغ وطريقة الدفع", _
+        "SELECT Amount FROM qryVoucherPrint WHERE DocKind = 'PAYMENT' AND DocID = " & R("PAY1"), 1000
+    Chk "طباعة سند القبض", _
+        "SELECT COUNT(*) FROM qryVoucherPrint WHERE DocKind = 'RECEIPT' AND DocID = " & R("RCV1"), 1
     Chk "الجرد المفتوح: عجز المنتج 1 = -3 × 60", _
         "SELECT DifferenceValue FROM StockCountQuery WHERE ProductID = " & R("P1"), -180
     Chk "الجرد المفتوح: صنف واحد لم يُعدّ بعد", _
@@ -561,6 +569,8 @@ Private Sub CreateAllQueries()
     Q_qryVatInputExpenses
     Q_VatSummaryQuery
     Q_qrySalesDocPrint
+    Q_qryPurchaseDocPrint
+    Q_qryVoucherPrint
     Q_qrySalesInvoiceLineTotals
     Q_qryPurchaseInvoiceLineTotals
     Q_qrySalesReturnedQty
@@ -820,11 +830,12 @@ End Sub
 
 Private Sub Q_StockCountQuery()
     Dim s As String
-    s = "SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, d.ProductID," & vbCrLf
-    s = s & "       p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference," & vbCrLf
+    s = "SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, g.CategoryName," & vbCrLf
+    s = s & "       d.ProductID, p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference," & vbCrLf
     s = s & "       d.UnitCost, d.DifferenceValue, d.Notes" & vbCrLf
-    s = s & "FROM (StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)" & vbCrLf
-    s = s & "     INNER JOIN Products AS p ON d.ProductID = p.ProductID" & vbCrLf
+    s = s & "FROM ((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)" & vbCrLf
+    s = s & "      INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
+    s = s & "     LEFT JOIN Categories AS g ON c.CategoryID = g.CategoryID" & vbCrLf
     s = s & "ORDER BY c.StockCountID, p.ProductName" & vbCrLf
     SaveQuery "StockCountQuery", "تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته", s
 End Sub
@@ -1074,6 +1085,58 @@ Private Sub Q_qrySalesDocPrint()
     s = s & "     INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID)" & vbCrLf
     s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID" & vbCrLf
     SaveQuery "qrySalesDocPrint", "بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف)", s
+End Sub
+
+Private Sub Q_qryPurchaseDocPrint()
+    Dim s As String
+    s = "SELECT 'PURCHASE' AS DocKind, h.PurchaseInvoiceID AS DocID, h.InvoiceNumber AS DocNumber," & vbCrLf
+    s = s & "       h.InvoiceDate AS DocDate, h.SupplierInvoiceNo, '' AS OriginalNumber, h.PaymentType," & vbCrLf
+    s = s & "       '' AS Reason, h.SupplierID, s.SupplierName, s.VATNumber AS SupplierVAT," & vbCrLf
+    s = s & "       s.Mobile AS SupplierMobile, e.EmployeeName, h.SubTotal AS DocSubTotal," & vbCrLf
+    s = s & "       h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax, h.TotalAmount," & vbCrLf
+    s = s & "       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName, u.UnitName," & vbCrLf
+    s = s & "       d.Quantity, d.UnitCost, d.Discount AS LineDiscount, d.NetAmount, d.VATRate," & vbCrLf
+    s = s & "       d.Tax AS LineTax, d.LineTotal" & vbCrLf
+    s = s & "FROM ((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d" & vbCrLf
+    s = s & "         ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)" & vbCrLf
+    s = s & "       INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
+    s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
+    s = s & "     INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, o.SupplierInvoiceNo," & vbCrLf
+    s = s & "       o.InvoiceNumber, r.RefundType, r.Reason, r.SupplierID, s.SupplierName, s.VATNumber," & vbCrLf
+    s = s & "       s.Mobile, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax, r.TotalAmount," & vbCrLf
+    s = s & "       r.RefundedAmount, r.TotalAmount - r.RefundedAmount, od.LineNumber, p.ProductCode," & vbCrLf
+    s = s & "       p.ProductName, u.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount," & vbCrLf
+    s = s & "       rd.VATRate, rd.Tax, rd.LineTotal" & vbCrLf
+    s = s & "FROM ((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd" & vbCrLf
+    s = s & "           ON r.PurchaseReturnID = rd.PurchaseReturnID)" & vbCrLf
+    s = s & "         INNER JOIN PurchaseInvoiceDetails AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)" & vbCrLf
+    s = s & "        INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)" & vbCrLf
+    s = s & "       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)" & vbCrLf
+    s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
+    s = s & "     INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID" & vbCrLf
+    SaveQuery "qryPurchaseDocPrint", "بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف)", s
+End Sub
+
+Private Sub Q_qryVoucherPrint()
+    Dim s As String
+    s = "SELECT 'RECEIPT' AS DocKind, p.PaymentID AS DocID, p.PaymentNumber AS DocNumber," & vbCrLf
+    s = s & "       p.PaymentDate AS DocDate, 1 AS LineNumber, c.CustomerName AS PartyName," & vbCrLf
+    s = s & "       c.Mobile AS PartyMobile, p.Amount, m.MethodName, p.Notes, e.EmployeeName," & vbCrLf
+    s = s & "       c.CurrentBalance AS PartyBalance" & vbCrLf
+    s = s & "FROM ((CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
+    s = s & "     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, 1, s.SupplierName, s.Mobile," & vbCrLf
+    s = s & "       p.Amount, m.MethodName, p.Notes, e.EmployeeName, s.CurrentBalance" & vbCrLf
+    s = s & "FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
+    s = s & "     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID" & vbCrLf
+    SaveQuery "qryVoucherPrint", "بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين)", s
 End Sub
 
 Private Sub Q_qrySalesInvoiceLineTotals()

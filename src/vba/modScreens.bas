@@ -1,6 +1,6 @@
 Attribute VB_Name = "modScreens"
 '==============================================================================
-' modScreens  -  Retail Store Management System (Phase 5)
+' modScreens  -  Retail Store Management System (Phases 5 and 8)
 '
 ' Behaviour of the unbound screens: main menu (frmMain), advanced search
 ' (frmSearch) and report centre (frmReportCenter).
@@ -182,30 +182,69 @@ Public Sub SetQuickPeriod(ByVal frm As Access.Form, ByVal Which As String)
 End Sub
 
 Public Sub RunReport(ByVal frm As Access.Form)
-    Dim r As Variant, needs As String, where As String, fromDate As Date, toDate As Date
+    Dim r As Variant, where As String, criteria As String
+    If Not PrepareReport(frm, r, where, criteria) Then Exit Sub
+    LogAction "REPORT", CStr(r(0))
+    OpenReportOrQuery CStr(r(3)), CStr(r(2)), where, criteria
+End Sub
+
+Public Sub ExportReport(ByVal frm As Access.Form, ByVal FileKind As String)
+    ' FileKind: "PDF" (the formatted report) or "XLSX" (the report data for Excel).
+    Dim r As Variant, where As String, criteria As String, file As String
+    If Not PrepareReport(frm, r, where, criteria) Then Exit Sub
+    On Error GoTo EH
+    file = ReportsFolder() & "" & r(0) & "_" & Format$(Now, "yyyymmdd_hhnnss") & "." & LCase$(FileKind)
+    If FileKind = "PDF" Then
+        If Not ReportExists(CStr(r(3))) Then
+            ShowWarning "التقرير غير موجود: " & r(3) & vbCrLf & "شغّل BuildReports."
+            Exit Sub
+        End If
+        TempVars.Add "ReportCriteria", criteria
+        DoCmd.OpenReport CStr(r(3)), acViewPreview, , where, acHidden
+        DoCmd.OutputTo acOutputReport, CStr(r(3)), acFormatPDF, file
+        DoCmd.Close acReport, CStr(r(3)), acSaveNo
+    Else
+        WritePreviewQuery CStr(r(2)), where
+        DoCmd.OutputTo acOutputQuery, "qryReportPreview", acFormatXLSX, file
+    End If
+    LogAction "REPORT_EXPORT", CStr(r(0)), , file
+    ShowInfo "تم الحفظ في:" & vbCrLf & file
+    If Not g_SilentMode Then Application.FollowHyperlink file
+    Exit Sub
+EH:
+    If Err.Number <> 2501 Then ShowError "تعذر التصدير: " & Err.Description   ' 2501 = no data
+End Sub
+
+Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByRef where As String, _
+                               ByRef criteria As String) As Boolean
+    ' Checks the choices, sets the query parameters and builds the filter and the criteria line.
+    Dim needs As String, fromDate As Date, toDate As Date
     r = SelectedReport(frm)
     If IsEmpty(r) Then
         ShowWarning "اختر تقريرًا من القائمة أولًا."
-        Exit Sub
+        Exit Function
     End If
     needs = r(4)
+    where = ""
+    criteria = ""
 
     If HasNeed(needs, "P") Or HasNeed(needs, "D") Then
         If Not IsDate(frm!txtFrom.Value) Or Not IsDate(frm!txtTo.Value) Then
             ShowWarning "أدخل تاريخ البداية وتاريخ النهاية."
-            Exit Sub
+            Exit Function
         End If
         fromDate = DateValue(frm!txtFrom.Value)
         toDate = DateValue(frm!txtTo.Value)
         If toDate < fromDate Then
             ShowWarning "تاريخ النهاية يجب أن يكون بعد تاريخ البداية."
-            Exit Sub
+            Exit Function
         End If
         SetPeriod fromDate, toDate
+        criteria = PeriodText(fromDate, toDate)
     End If
-    If Not RequireChoice(frm!cboCustomer, HasNeed(needs, "C"), "CustomerID", "العميل") Then Exit Sub
-    If Not RequireChoice(frm!cboSupplier, HasNeed(needs, "S"), "SupplierID", "المورد") Then Exit Sub
-    If Not RequireChoice(frm!cboProduct, HasNeed(needs, "R"), "ProductID", "المنتج") Then Exit Sub
+    If Not RequireChoice(frm!cboCustomer, HasNeed(needs, "C"), "CustomerID", "العميل") Then Exit Function
+    If Not RequireChoice(frm!cboSupplier, HasNeed(needs, "S"), "SupplierID", "المورد") Then Exit Function
+    If Not RequireChoice(frm!cboProduct, HasNeed(needs, "R"), "ProductID", "المنتج") Then Exit Function
 
     If HasNeed(needs, "D") Then
         where = "[" & r(5) & "] >= " & SqlDate(fromDate) & " AND [" & r(5) & "] < " & _
@@ -214,19 +253,38 @@ Public Sub RunReport(ByVal frm As Access.Form)
     If HasNeed(needs, "c") Then AddFilter where, frm!cboCustomer, "CustomerID"
     If HasNeed(needs, "s") Then AddFilter where, frm!cboSupplier, "SupplierID"
     If HasNeed(needs, "r") Then AddFilter where, frm!cboProduct, "ProductID"
+    AddCriteria criteria, frm!cboCustomer, HasNeed(needs, "C") Or HasNeed(needs, "c"), "العميل"
+    AddCriteria criteria, frm!cboSupplier, HasNeed(needs, "S") Or HasNeed(needs, "s"), "المورد"
+    AddCriteria criteria, frm!cboProduct, HasNeed(needs, "R") Or HasNeed(needs, "r"), "المنتج"
+    PrepareReport = True
+End Function
 
-    LogAction "REPORT", CStr(r(0))
-    OpenReportOrQuery CStr(r(3)), CStr(r(2)), where
+Private Sub AddCriteria(ByRef criteria As String, ByVal cbo As Access.ComboBox, ByVal Used As Boolean, _
+                        ByVal Caption As String)
+    If Not Used Or IsNull(cbo.Value) Then Exit Sub
+    If Len(criteria) > 0 Then criteria = criteria & "    "
+    criteria = criteria & Caption & ": " & cbo.Column(1)
 End Sub
 
 Public Sub OpenReportOrQuery(ByVal ReportName As String, ByVal QueryName As String, _
-                             ByVal WhereCondition As String)
-    ' Formatted reports arrive in Phase 8; until then the query is shown as a table.
-    Dim sql As String, db As DAO.Database
+                             ByVal WhereCondition As String, Optional ByVal Criteria As String = "")
+    ' The formatted report when it exists (Phase 8), otherwise the query as a table.
+    ' Criteria is the line printed under the report title (period, customer, ...).
+    On Error GoTo EH
     If ReportExists(ReportName) Then
+        TempVars.Add "ReportCriteria", Criteria
         DoCmd.OpenReport ReportName, acViewPreview, , WhereCondition
         Exit Sub
     End If
+    WritePreviewQuery QueryName, WhereCondition
+    DoCmd.OpenQuery "qryReportPreview", acViewNormal, acReadOnly
+    Exit Sub
+EH:
+    If Err.Number <> 2501 Then ShowError "تعذر فتح التقرير: " & Err.Description   ' 2501 = no data
+End Sub
+
+Private Sub WritePreviewQuery(ByVal QueryName As String, ByVal WhereCondition As String)
+    Dim sql As String, db As DAO.Database
     sql = "SELECT * FROM [" & QueryName & "]"
     If Len(WhereCondition) > 0 Then sql = sql & " WHERE " & WhereCondition
     Set db = CurrentDb
@@ -234,7 +292,6 @@ Public Sub OpenReportOrQuery(ByVal ReportName As String, ByVal QueryName As Stri
     db.QueryDefs.Delete "qryReportPreview"
     On Error GoTo 0
     db.CreateQueryDef "qryReportPreview", sql
-    DoCmd.OpenQuery "qryReportPreview", acViewNormal, acReadOnly
 End Sub
 
 Private Function SelectedReport(ByVal frm As Access.Form) As Variant

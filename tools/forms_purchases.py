@@ -221,7 +221,8 @@ def layout_purchase_return(line_heads) -> FormModel:
     bx = cm(0.4)
     for name, caption, style, w, call in [
             ("btnReturnAll", "إرجاع الكل", "secondary", 3.2, "PurReturnAll Me"),
-            ("btnSaveReturn", "حفظ المرتجع", "primary", 3.6, "SavePurchaseReturn Me")]:
+            ("btnSaveReturn", "حفظ المرتجع", "primary", 3.6, "SavePurchaseReturn Me"),
+            ("btnSaveReturnPrint", "حفظ وطباعة", "primary", 3.6, "SavePurchaseReturn Me, True")]:
         button(m, name, caption, bx, cm(15.3), style, w=cm(w), h=cm(1.0), call=call)
         bx += cm(w) + cm(0.2)
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(15.3), "secondary", w=cm(2.6),
@@ -252,8 +253,10 @@ def layout_supplier_payment() -> FormModel:
     labelled(m, "cboPaymentMethod", "طريقة الدفع", c)
     c = m.add(Control("text", "txtNotes", cm(0.4), cm(6.2), width - cm(0.8), cm(0.8), {}))
     labelled(m, "txtNotes", "ملاحظات", c)
-    button(m, "btnSave", "حفظ السند", cm(0.4), cm(8.4), "primary", w=cm(4.0), h=cm(1.0),
+    button(m, "btnSave", "حفظ السند", cm(0.4), cm(8.4), "primary", w=cm(3.4), h=cm(1.0),
            call="SaveSupplierPayment Me")
+    button(m, "btnSavePrint", "حفظ وطباعة", cm(4.0), cm(8.4), "primary", w=cm(3.4), h=cm(1.0),
+           call="SaveSupplierPayment Me, True")
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(8.4), "secondary", w=cm(2.6),
            h=cm(1.0), call="DoCmd.Close acForm, Me.Name")
     m.form_events = ["Load"]
@@ -276,15 +279,17 @@ def layout_purchase_view() -> FormModel:
                   {"Caption": " ", "FontSize": 10, "ForeColor": Sym("CLR_TEXT")}))
     m.add(Control("list", "lstLines", cm(0.4), cm(2.7), width - cm(0.8), cm(6.6),
                   {"ColumnCount": 7, "ColumnWidths": "1;9;2.5;3.5;2.5;3;4", "ColumnHeads": True}))
-    m.add(Control("label", "lblReturnsCap", cm(0.4), cm(9.5), cm(8), cm(0.55),
-                  {"Caption": "المرتجعات على هذه الفاتورة", "FontSize": 10, "FontBold": True,
-                   "ForeColor": Sym("CLR_MUTED")}))
+    m.add(Control("label", "lblReturnsCap", cm(0.4), cm(9.5), cm(12), cm(0.55),
+                  {"Caption": "المرتجعات على هذه الفاتورة (نقر مزدوج للطباعة)", "FontSize": 10,
+                   "FontBold": True, "ForeColor": Sym("CLR_MUTED")}))
     m.add(Control("list", "lstReturns", cm(0.4), cm(10.1), width - cm(0.8), cm(2.3),
-                  {"ColumnCount": 4, "ColumnWidths": "4;5;3.5;12", "ColumnHeads": True}))
+                  {"ColumnCount": 5, "ColumnWidths": "0;4;5;3.5;12", "ColumnHeads": True},
+                  events=["DblClick"]))
     m.add(Control("label", "lblTotals", cm(0.4), cm(12.6), width - cm(0.8), cm(0.7),
                   {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
     bx = cm(0.4)
     for name, caption, style, w, call in [
+            ("btnPrint", "طباعة", "primary", 2.6, 'PrintPurchaseDocument "PURCHASE", Me!txtInvoiceID.Value'),
             ("btnReturn", "مرتجع", "secondary", 2.6,
              'OpenScreen "frmPurchaseReturn", 7, Me!txtInvoiceID.Value'),
             ("btnPayment", "سند صرف", "secondary", 2.8,
@@ -294,7 +299,9 @@ def layout_purchase_view() -> FormModel:
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(13.9), "secondary", w=cm(2.6),
            h=cm(1.0), call="DoCmd.Close acForm, Me.Name")
     m.form_events = ["Load"]
-    m.code = ["Private Sub Form_Load()", "    PurchaseViewLoad Me", "End Sub"] + m.code
+    m.code = (["Private Sub Form_Load()", "    PurchaseViewLoad Me", "End Sub",
+               "Private Sub lstReturns_DblClick(Cancel As Integer)",
+               '    PrintPurchaseDocument "RETURN", Me!lstReturns.Value', "End Sub"] + m.code)
     return m
 
 
@@ -430,7 +437,7 @@ def layout_stock_count(line_heads) -> FormModel:
     for name, caption, style, w, call in [
             ("btnPostCount", "ترحيل الجرد", "primary", 3.4, "PostCountScreen Me"),
             ("btnCancelCount", "إلغاء الجرد", "danger", 3.0, "CancelCountScreen Me"),
-            ("btnCountReport", "عرض الفروقات", "secondary", 3.4, "CountShowDifferences Me")]:
+            ("btnCountReport", "طباعة الجرد", "secondary", 3.4, "PrintStockCount Me!cboCount.Value")]:
         button(m, name, caption, bx, cm(16.6), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(3.0), cm(16.6), "secondary", w=cm(3.0),

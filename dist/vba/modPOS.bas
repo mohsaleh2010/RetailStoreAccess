@@ -486,7 +486,7 @@ Public Sub PaymentCustomerChanged(ByVal frm As Access.Form)
     End If
 End Sub
 
-Public Function SavePayment(ByVal frm As Access.Form) As Boolean
+Public Function SavePayment(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
     Dim msg As String, newID As Long
     If IsNull(frm!cboCustomer.Value) Then
         ShowWarning "«Œ — «·⁄„Ì·."
@@ -499,6 +499,7 @@ Public Function SavePayment(ByVal frm As Access.Form) As Boolean
         Exit Function
     End If
     ShowInfo " „ Õ›Ÿ ”‰œ «·ﬁ»÷ " & DLookup("PaymentNumber", "CustomerPayments", "PaymentID = " & newID)
+    If PrintAfter Then PrintVoucher "RECEIPT", newID
     frm!txtAmount.Value = Null
     frm!txtNotes.Value = Null
     PaymentCustomerChanged frm

@@ -154,7 +154,8 @@ DATA_SCREENS: List[DataScreen] = [
         list_headers=[("العميل", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
         search=["t.CustomerName", "t.Mobile", "t.Phone", "t.VATNumber"],
         active="t.IsActive",
-        extra_buttons=[("btnPayment", "سند قبض", 'OpenScreen "frmCustomerPayment", 6, Me!CustomerID')],
+        extra_buttons=[("btnPayment", "سند قبض", 'OpenScreen "frmCustomerPayment", 6, Me!CustomerID'),
+                       ("btnStatement", "كشف حساب", 'PrintPartyStatement "C", Me!CustomerID')],
         fields=[
             Fld("CustomerName", span=2), Fld("Mobile"), Fld("Phone"),
             Fld("Email"), Fld("VATNumber", hint="للعملاء المنشآت (فاتورة ضريبية)"),
@@ -172,7 +173,8 @@ DATA_SCREENS: List[DataScreen] = [
         list_headers=[("المورد", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
         search=["t.SupplierName", "t.ContactPerson", "t.Mobile", "t.VATNumber"],
         active="t.IsActive",
-        extra_buttons=[("btnPayment", "سند صرف", 'OpenScreen "frmSupplierPayment", 7, Me!SupplierID')],
+        extra_buttons=[("btnPayment", "سند صرف", 'OpenScreen "frmSupplierPayment", 7, Me!SupplierID'),
+                       ("btnStatement", "كشف حساب", 'PrintPartyStatement "S", Me!SupplierID')],
         fields=[
             Fld("SupplierName", span=2), Fld("ContactPerson"), Fld("Mobile"),
             Fld("Phone"), Fld("Email"), Fld("VATNumber"), Fld("CRNumber"),
@@ -723,11 +725,15 @@ def layout_report_center() -> FormModel:
         y += cm(1.45)
     button(m, "btnRun", "عرض التقرير", px, y + cm(0.3), "primary", w=cm(5.0), h=cm(1.0),
            call="RunReport Me")
+    button(m, "btnPdf", "حفظ PDF", px + cm(5.2), y + cm(0.3), "secondary", w=cm(3.0), h=cm(1.0),
+           call='ExportReport Me, "PDF"')
+    button(m, "btnExcel", "تصدير Excel", px + cm(8.4), y + cm(0.3), "secondary", w=cm(3.0), h=cm(1.0),
+           call='ExportReport Me, "XLSX"')
     button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.0), y + cm(0.3), "secondary",
            w=cm(2.0), h=cm(1.0), call='DoCmd.Close acForm, Me.Name')
     m.add(Control("label", "lblPhaseNote", px, y + cm(1.7), pw, cm(1.0),
-                  {"Caption": "التقارير المنسقة للطباعة تُضاف في المرحلة 8، وحتى ذلك الحين "
-                              "تُعرض النتائج كجدول.", "FontSize": 9,
+                  {"Caption": "يُعرض التقرير للمعاينة ومنها الطباعة. «حفظ PDF» و«تصدير Excel» يحفظان "
+                              "الملف في مجلد Reports بجانب ملف البرنامج.", "FontSize": 9,
                    "ForeColor": Sym("CLR_MUTED")}))
     m.form_events = ["Load"]
     m.code = (["Private Sub Form_Load()", "    ReportCenterLoad Me", "End Sub",

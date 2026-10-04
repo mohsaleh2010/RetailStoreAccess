@@ -8,14 +8,18 @@ from generate_common import vba_str
 
 TEMPLATE = r'''Attribute VB_Name = "modBuildReports"
 '==============================================================================
-' modBuildReports  -  Retail Store Management System (Phase 6: invoice reports)
+' modBuildReports  -  Retail Store Management System (Phases 6 and 8: reports)
 '
-' GENERATED FILE - do not edit by hand.  Source: tools/reports.py
+' GENERATED FILE - do not edit by hand.
+' Source: tools/reports.py, tools/reports_docs.py, tools/reports_catalog.py
 '
-'   BuildReports   (re)creates the invoice / credit-note reports:
-'                  rptSalesReceipt (80 mm thermal) and rptSalesInvoiceA4.
-' Both read qrySalesDocPrint, group on DocID and draw the ZATCA QR code in the
-' totals section (DrawDocumentQR in modPOS -> DrawQR in modQRCode).
+'   BuildReports   (re)creates every report:
+'                  - sales invoice / credit note: rptSalesReceipt (80 mm) and
+'                    rptSalesInvoiceA4, with the ZATCA QR code (DrawDocumentQR);
+'                  - documents: purchase invoice / return, vouchers, stocktake sheet;
+'                  - the report centre catalogue (one report per saved query).
+'   TestReports    opens every report in preview (hidden) and checks it.
+' Text functions used by the reports are in modReports.
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -29,6 +33,8 @@ Private m_width As Long
 Private m_built As Long
 Private m_failed As Long
 Private m_report As String
+Private m_passed As Long
+Private Const REPORT_NAMES As String = "@@REPORT_NAMES@@"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -53,12 +59,75 @@ EH:
     MsgBox "خطأ " & Err.Number & ": " & Err.Description, vbCritical + MSG_RTL, "BuildReports"
 End Function
 
+Public Function TestReports() As Boolean
+    ' Opens every report hidden in preview (with this year's period and the first customer,
+    ' supplier and product as parameters) and checks the amount-in-words function.
+    Dim f As Variant
+    m_passed = 0: m_failed = 0: m_report = ""
+    Debug.Print "=== TestReports  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
+    Calendar = vbCalGreg
+    g_SilentMode = True
+    SetPeriod DateSerial(Year(Date), 1, 1), Date
+    SetQueryParam "CustomerID", Nz(DMin("CustomerID", "Customers"), 0)
+    SetQueryParam "SupplierID", Nz(DMin("SupplierID", "Suppliers"), 0)
+    SetQueryParam "ProductID", Nz(DMin("ProductID", "Products"), 0)
+    For Each f In Split(REPORT_NAMES, ",")
+        CheckReportOpens CStr(f)
+    Next
+@@WORDS@@
+    TempVars.Add "ReportCriteria", ""
+    g_SilentMode = False
+    Debug.Print "--- نجح: " & m_passed & " | فشل: " & m_failed
+    If m_failed = 0 Then
+        MsgBox "جميع اختبارات التقارير ناجحة (" & m_passed & " اختبارًا).", vbInformation + MSG_RTL, "TestReports"
+        TestReports = True
+    Else
+        MsgBox "نجح " & m_passed & " وفشل " & m_failed & ":" & vbCrLf & vbCrLf & Left$(m_report, 900), _
+               vbExclamation + MSG_RTL, "TestReports"
+    End If
+End Function
+
+Private Sub CheckReportOpens(ByVal ReportName As String)
+    On Error GoTo EH
+    If Not ReportExists(ReportName) Then
+        RecordR False, "التقرير غير موجود: " & ReportName & " (شغّل BuildReports)"
+        Exit Sub
+    End If
+    TempVars.Add "ReportCriteria", "TEST"
+    DoCmd.OpenReport ReportName, acViewPreview, , , acHidden
+    DoCmd.Close acReport, ReportName, acSaveNo
+    RecordR True, "التقرير " & ReportName & " يفتح"
+    Exit Sub
+EH:
+    If Err.Number = 2501 Then              ' cancelled by Report_NoData: no data yet, not an error
+        RecordR True, "التقرير " & ReportName & " يفتح (لا توجد بيانات بعد)"
+    Else
+        RecordR False, ReportName & ": خطأ " & Err.Number & " - " & Err.Description
+    End If
+    On Error Resume Next
+    DoCmd.Close acReport, ReportName, acSaveNo
+End Sub
+
+Private Sub RecordR(ByVal Passed As Boolean, ByVal Label As String)
+    If Passed Then
+        m_passed = m_passed + 1
+        Debug.Print "[OK] " & Label
+    Else
+        m_failed = m_failed + 1
+        m_report = m_report & "- " & Label & vbCrLf
+        Debug.Print "[X] " & Label
+    End If
+End Sub
+
 '------------------------------------------------------------------------------
 ' Helpers
 '------------------------------------------------------------------------------
 Private Sub StartReport(ByVal FinalName As String, ByVal Caption As String, ByVal RecordSource As String, _
-                        ByVal ReportWidth As Long, ByVal HeaderHeight As Long, ByVal DetailHeight As Long, _
-                        ByVal FooterHeight As Long)
+                        ByVal ReportWidth As Long, ByVal GroupField As String, ByVal SortFields As String, _
+                        ByVal Landscape As Boolean, ByVal PageSetup As Boolean)
+    ' GroupField: document reports group on it (header 5 = secHeader, footer 6 = secTotals).
+    ' SortFields: "Field1,-Field2" (a leading "-" sorts descending). Reports ignore ORDER BY.
+    Dim f As Variant, level As Long, fieldName As String
     If ReportExists(FinalName) Then DoCmd.DeleteObject acReport, FinalName
     Set m_rpt = CreateReport()
     m_tmp = m_rpt.Name
@@ -66,26 +135,71 @@ Private Sub StartReport(ByVal FinalName As String, ByVal Caption As String, ByVa
     SetRptProp "Orientation", 1                     ' right-to-left
     m_rpt.RecordSource = RecordSource
     m_rpt.Caption = Caption
-    CreateGroupLevel m_tmp, "DocID", True, True     ' sections 5 (header) and 6 (footer)
-    CreateGroupLevel m_tmp, "LineNumber", False, False
+    If Len(GroupField) > 0 Then
+        CreateGroupLevel m_tmp, GroupField, True, True
+        level = 1
+    End If
+    If Len(SortFields) > 0 Then
+        For Each f In Split(SortFields, ",")
+            fieldName = CStr(f)
+            If Left$(fieldName, 1) = "-" Then fieldName = Mid$(fieldName, 2)
+            CreateGroupLevel m_tmp, fieldName, False, False
+            If Left$(CStr(f), 1) = "-" Then m_rpt.GroupLevel(level).SortOrder = True
+            level = level + 1
+        Next
+    End If
     m_rpt.Width = ReportWidth
-    m_rpt.Section(acDetail).Height = DetailHeight
-    m_rpt.Section(5).Height = HeaderHeight
-    m_rpt.Section(6).Height = FooterHeight
-    m_rpt.Section(5).Name = "secHeader"
-    m_rpt.Section(6).Name = "secTotals"
-    m_rpt.Section(6).KeepTogether = True
-    HideSection acPageHeader
-    HideSection acPageFooter
-    HideSection acHeader
-    HideSection acFooter
+    If Len(GroupField) > 0 Then
+        m_rpt.Section(5).Name = "secHeader"
+        m_rpt.Section(6).Name = "secTotals"
+        m_rpt.Section(6).KeepTogether = True
+    End If
+    If PageSetup Then SetPage Landscape
     m_rpt.HasModule = True
+End Sub
+
+Private Sub SetSection(ByVal SectionIndex As Integer, ByVal SectionHeight As Long)
+    EnsureSection SectionIndex
+    m_rpt.Section(SectionIndex).Height = SectionHeight
+    m_rpt.Section(SectionIndex).Visible = True
+End Sub
+
+Private Sub EnsureSection(ByVal SectionIndex As Integer)
+    ' Page and report header/footer sections come in pairs and are switched on with RunCommand.
+    Dim h As Long, missing As Boolean
+    On Error Resume Next
+    h = m_rpt.Section(SectionIndex).Height
+    missing = (Err.Number <> 0)
+    On Error GoTo 0
+    If Not missing Then Exit Sub
+    DoCmd.SelectObject acReport, m_tmp
+    If SectionIndex = acPageHeader Or SectionIndex = acPageFooter Then
+        DoCmd.RunCommand acCmdPageHdrFtr
+    ElseIf SectionIndex = acHeader Or SectionIndex = acFooter Then
+        DoCmd.RunCommand acCmdReportHdrFtr
+    End If
+End Sub
+
+Private Sub SetPage(ByVal Landscape As Boolean)
+    ' A4 with 0.8 cm side margins. Needs a printer driver; without one the layout still works.
+    On Error Resume Next
+    m_rpt.Printer.PaperSize = 9                     ' A4
+    If Landscape Then m_rpt.Printer.Orientation = 2 Else m_rpt.Printer.Orientation = 1
+    m_rpt.Printer.LeftMargin = 454
+    m_rpt.Printer.RightMargin = 454
+    m_rpt.Printer.TopMargin = 567
+    m_rpt.Printer.BottomMargin = 567
 End Sub
 
 Private Sub HideSection(ByVal SectionIndex As Integer)
     On Error Resume Next                             ' the section may not exist
     m_rpt.Section(SectionIndex).Height = 0
     m_rpt.Section(SectionIndex).Visible = False
+End Sub
+
+Private Sub SetSecProp(ByVal SectionIndex As Integer, ByVal PropName As String, ByVal Value As Variant)
+    On Error Resume Next
+    m_rpt.Section(SectionIndex).Properties(PropName).Value = Value
 End Sub
 
 Private Function NewRptCtl(ByVal CtlType As AcControlType, ByVal SectionIndex As Integer, _
@@ -190,7 +304,7 @@ def control_lines(sec, c):
     if c.kind == "text":
         out.append(f"    Set c = RText({sec}, {vba_str(c.name)}, {vba_str(c.source)}, {c.x}, {c.y}, {c.w}, "
                    f"{c.h}, {p.get('FontSize', 9)}, {lit(bool(p.get('FontBold')))}, {p.get('TextAlign', 0)})")
-        for key in ("Format", "CanGrow", "Visible"):
+        for key in ("Format", "CanGrow", "Visible", "RunningSum"):
             if key in p:
                 out.append(f"    SetCtl c, {vba_str(key)}, {lit(p[key])}")
     elif c.kind == "label":
@@ -209,17 +323,30 @@ def control_lines(sec, c):
     return out
 
 
+def sort_spec(m: RP.ReportModel) -> str:
+    return ",".join(("-" if desc else "") + f for f, desc in m.sorts)
+
+
+SECTION_ORDER = [RP.SEC_PAGE_HEADER, RP.SEC_PAGE_FOOTER, RP.SEC_RPT_HEADER, RP.SEC_RPT_FOOTER, RP.SEC_DETAIL,
+                 RP.SEC_HEADER, RP.SEC_FOOTER]
+
+
 def report_sub(m: RP.ReportModel) -> str:
     lines = [f"Private Sub BuildReport_{m.name}()",
              "    Dim c As Access.Control, s As String",
              "    On Error GoTo EH",
              f"    StartReport {vba_str(m.name)}, {vba_str(m.caption)}, {vba_str(m.record_source)}, {m.width}, "
-             f"{m.heights[RP.SEC_HEADER]}, {m.heights[RP.SEC_DETAIL]}, {m.heights[RP.SEC_FOOTER]}"]
-    for sec in (RP.SEC_HEADER, RP.SEC_DETAIL, RP.SEC_FOOTER):
-        for c in m.controls[sec]:
+             f"{vba_str(m.group)}, {vba_str(sort_spec(m))}, {lit(m.landscape)}, {lit(m.page_setup)}"]
+    for sec in SECTION_ORDER:
+        if sec in m.heights:
+            lines.append(f"    SetSection {sec}, {m.heights[sec]}")
+    for sec in (RP.SEC_RPT_HEADER, RP.SEC_RPT_FOOTER, RP.SEC_PAGE_HEADER, RP.SEC_PAGE_FOOTER):
+        if sec not in m.heights:
+            lines.append(f"    HideSection {sec}")
+    for sec in SECTION_ORDER:
+        for c in m.controls.get(sec, []):
             lines += control_lines(sec, c)
-    if m.code:
-        lines.append("    m_rpt.Section(6).OnPrint = EP")
+    lines += [f"    {e}" for e in m.events]
     lines.append('    s = ""')
     for code_line in m.code:
         lines.append(f"    s = s & {vba_str(code_line)} & vbCrLf")
@@ -228,9 +355,20 @@ def report_sub(m: RP.ReportModel) -> str:
     return "\n".join(lines)
 
 
+def words_lines() -> str:
+    import tafqeet as T
+    out = []
+    for amount in T.CASES:
+        out.append(f"    RecordR AmountInWords({amount}) = {vba_str(T.amount_in_words(amount))}, "
+                   f"{vba_str('المبلغ بالحروف: ' + str(amount))}")
+    return "\n".join(out)
+
+
 def build_reports_vba() -> str:
     models = RP.all_reports()
     text = TEMPLATE.replace("@@BUILD_ALL@@", "\n".join(f"    BuildReport_{m.name}" for m in models))
+    text = text.replace("@@REPORT_NAMES@@", ",".join(m.name for m in models))
+    text = text.replace("@@WORDS@@", words_lines())
     text = text.replace("@@REPORT_SUBS@@", "\n\n".join(report_sub(m) for m in models))
     assert not re.search(r"@@[A-Z_]+@@", text)
     return text
