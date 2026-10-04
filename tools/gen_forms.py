@@ -196,6 +196,7 @@ Public Function TestForms() As Boolean
     Calendar = vbCalGreg
     CloseAllForms
     lastLog = Nz(DMax("LogID", "AuditLog"), 0)
+    EnsureTestUser                         ' run as the administrator when nobody is logged in
     g_SilentMode = True
     g_AutoAnswer = True
 
@@ -723,6 +724,13 @@ Public Function ReportCount() As Long
     ReportCount = @@REPORT_COUNT@@
 End Function
 
+Public Function ScreenPermission(ByVal FormName As String) As String
+    ' Permission needed to open a screen ("" = any logged-in user). Source: forms.SCREEN_PERMISSIONS
+    Select Case FormName
+@@SCREEN_CASES@@
+    End Select
+End Function
+
 Public Function ReportRow(ByVal Index As Long) As Variant
     ' Array(Key, Title, QueryName, ReportName, Needs, DateColumn)
     Select Case Index
@@ -752,6 +760,8 @@ def build_appdata_vba() -> str:
         "@@WIDTH_CASES@@": "\n".join(width_cases),
         "@@REPORT_COUNT@@": str(len(F.REPORTS)),
         "@@REPORT_CASES@@": "\n".join(report_cases),
+        "@@SCREEN_CASES@@": "\n".join(f'        Case {vba_str(form)}: ScreenPermission = {vba_str(key)}'
+                                     for form, key in F.SCREEN_PERMISSIONS.items() if key),
     }.items():
         text = text.replace(key, value)
     assert not re.search(r"@@[A-Z_]+@@", text)

@@ -165,6 +165,7 @@ Public Function TestDashboard() As Boolean
     Dim report As String, cap As String, ok As Boolean, savedStart As Variant, savedEnd As Variant
     On Error GoTo EH
     Calendar = vbCalGreg
+    EnsureTestUser
     g_SilentMode = True
     savedStart = TempVars("PeriodStart")
     savedEnd = TempVars("PeriodEnd")

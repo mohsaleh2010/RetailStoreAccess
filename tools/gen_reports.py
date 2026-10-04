@@ -66,6 +66,7 @@ Public Function TestReports() As Boolean
     m_passed = 0: m_failed = 0: m_report = ""
     Debug.Print "=== TestReports  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     Calendar = vbCalGreg
+    EnsureTestUser
     g_SilentMode = True
     SetPeriod DateSerial(Year(Date), 1, 1), Date
     SetQueryParam "CustomerID", Nz(DMin("CustomerID", "Customers"), 0)

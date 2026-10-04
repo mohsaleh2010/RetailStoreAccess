@@ -4,11 +4,12 @@ Attribute VB_Name = "modStartup"
 '
 ' Application start-up, hiding the Access interface, and screen navigation.
 '
-'   InstallUserMode        end-user look: opens on frmMain, no ribbon,
+'   InstallUserMode        end-user look: opens on frmLogin, no ribbon,
 '                          no navigation pane, no design shortcuts.
 '                          Close and reopen the file to see it.
 '   InstallDeveloperMode   restores the full Access interface.
-'   (Holding SHIFT while opening the file always skips the start-up settings.)
+'   User mode also disables the SHIFT bypass key (AllowBypassKey). To get back:
+'   frmBackup > "وضع المطوّر" (administrator), or dist\tools\EnableShiftKey.vbs.
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -22,7 +23,6 @@ Public Sub AppStartup()
     Calendar = vbCalGreg
     On Error Resume Next
     Application.SetOption "Use Hijri Calendar", False
-    If IsNull(TempVars("UserID")) Then TempVars.Add "UserID", 1   ' login arrives in Phase 10
     On Error GoTo 0
     If Not IsDeveloperMode() Then HideAccessUI
 End Sub
@@ -67,7 +67,8 @@ Private Sub ApplyStartupProperties(ByVal Developer As Boolean)
     Dim db As DAO.Database
     Set db = CurrentDb
     SetDbProp db, "AppTitle", dbText, APP_TITLE
-    SetDbProp db, "StartupForm", dbText, "frmMain"
+    SetDbProp db, "StartupForm", dbText, "frmLogin"
+    SetDbProp db, "AllowBypassKey", dbBoolean, Developer   ' user mode: SHIFT no longer skips the start-up
     SetDbProp db, "StartupShowDBWindow", dbBoolean, Developer
     SetDbProp db, "StartupShowStatusBar", dbBoolean, True
     SetDbProp db, "AllowBuiltInToolbars", dbBoolean, Developer
@@ -108,6 +109,7 @@ Public Function OpenScreen(ByVal FormName As String, Optional ByVal PhaseNo As I
         End If
         Exit Function
     End If
+    If Not CanOpenScreen(FormName) Then Exit Function          ' permission of the user's role
     If IsFormOpen(FormName) Then DoCmd.Close acForm, FormName
     DoCmd.OpenForm FormName, acNormal, , , , acWindowNormal, RecordID
     OpenScreen = True
@@ -115,6 +117,7 @@ End Function
 
 Public Sub ExitApplication()
     If AskYesNo("هل تريد الخروج من النظام؟") Then
+        OfferBackupOnExit
         LogAction "LOGOUT"
         Application.Quit acQuitSaveNone
     End If

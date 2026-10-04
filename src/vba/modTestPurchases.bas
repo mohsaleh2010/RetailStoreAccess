@@ -24,6 +24,7 @@ Public Function TestPurchases() As Boolean
     m_passed = 0: m_failed = 0: m_report = ""
     Debug.Print "=== TestPurchases  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     Calendar = vbCalGreg
+    EnsureTestUser
     g_SilentMode = True
     g_AutoAnswer = True
     EnsureLocalTables

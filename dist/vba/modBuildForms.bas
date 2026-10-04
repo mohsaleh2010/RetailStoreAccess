@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCategories,frmUnits,frmExpenseTypes,frmSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmBackup"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -71,6 +71,7 @@ Public Function TestForms() As Boolean
     Calendar = vbCalGreg
     CloseAllForms
     lastLog = Nz(DMax("LogID", "AuditLog"), 0)
+    EnsureTestUser                         ' run as the administrator when nobody is logged in
     g_SilentMode = True
     g_AutoAnswer = True
 
@@ -547,6 +548,7 @@ Private Sub BuildAllForms()
     BuildForm_frmCustomers
     BuildForm_frmSuppliers
     BuildForm_frmExpenses
+    BuildForm_frmUsers
     BuildForm_frmCategories
     BuildForm_frmUnits
     BuildForm_frmExpenseTypes
@@ -568,6 +570,11 @@ Private Sub BuildAllForms()
     BuildForm_frmInventory
     BuildForm_frmStockCountLines
     BuildForm_frmStockCount
+    BuildForm_frmLogin
+    BuildForm_frmChangePassword
+    BuildForm_frmRolePermLines
+    BuildForm_frmRoles
+    BuildForm_frmBackup
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -581,54 +588,67 @@ Private Sub BuildForm_frmMain()
     Set c = AddLabel("lblAppTitle", "‰Ÿ«„ ≈œ«—… «·„Õ·", 850, 227, 2551, 425, 15, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblStoreName", " ", 850, 652, 2551, 312, 9, False, CLR_SIDEBAR_TEXT, "", 0)
     Set c = AddButton("btnNavSales", "«·„»Ì⁄« ", 142, 1304, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmPOS"
     c.OnClick = EP
     Set c = AddIcon("icoSales", ChrW(&HE7BF), 255, 1389, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavPurchases", "«·„‘ —Ì« ", 142, 1899, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmPurchaseInvoice"
     c.OnClick = EP
     Set c = AddIcon("icoPurchases", ChrW(&HE896), 255, 1984, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavInventory", "«·„Œ“Ê‰", 142, 2494, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmInventory"
     c.OnClick = EP
     Set c = AddIcon("icoInventory", ChrW(&HE7B8), 255, 2579, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavProducts", "«·„‰ Ã« ", 142, 3089, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmProducts"
     c.OnClick = EP
     Set c = AddIcon("icoProducts", ChrW(&HE8EC), 255, 3174, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavCustomers", "«·⁄„·«¡", 142, 3684, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmCustomers"
     c.OnClick = EP
     Set c = AddIcon("icoCustomers", ChrW(&HE716), 255, 3769, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavSuppliers", "«·„Ê—œÊ‰", 142, 4279, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmSuppliers"
     c.OnClick = EP
     Set c = AddIcon("icoSuppliers", ChrW(&HE77B), 255, 4364, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavExpenses", "«·„’—Ê›« ", 142, 4874, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmExpenses"
     c.OnClick = EP
     Set c = AddIcon("icoExpenses", ChrW(&HE8C7), 255, 4959, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavStockCount", "«·Ã—œ", 142, 5469, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmStockCount"
     c.OnClick = EP
     Set c = AddIcon("icoStockCount", ChrW(&HE8EF), 255, 5554, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavReports", "«· ﬁ«—Ì—", 142, 6064, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmReportCenter"
     c.OnClick = EP
     Set c = AddIcon("icoReports", ChrW(&HE8A5), 255, 6149, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavSearch", "«·»ÕÀ", 142, 6659, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmSearch"
     c.OnClick = EP
     Set c = AddIcon("icoSearch", ChrW(&HE721), 255, 6744, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavSettings", "«·≈⁄œ«œ« ", 142, 7254, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmSettings"
     c.OnClick = EP
     Set c = AddIcon("icoSettings", ChrW(&HE713), 255, 7339, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavUsers", "«·„” Œœ„Ê‰", 142, 7849, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmUsers"
     c.OnClick = EP
     Set c = AddIcon("icoUsers", ChrW(&HE8D7), 255, 7934, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddButton("btnNavBackup", "‰”Œ… «Õ Ì«ÿÌ…", 142, 8444, 3231, 539, "nav")
+    SetCtlProp c, "Tag", "frmBackup"
     c.OnClick = EP
     Set c = AddIcon("icoBackup", ChrW(&HE8B7), 255, 8529, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
@@ -640,6 +660,8 @@ Private Sub BuildForm_frmMain()
     Set c = AddLabel("lblToday", " ", 3969, 907, 5670, 340, 11, False, CLR_MUTED, "", 0)
     Set c = AddLabel("lblUser", " ", 13437, 907, 5103, 340, 11, False, CLR_MUTED, "", 3)
     Set c = AddButton("btnRefresh", " ÕœÌÀ", 17179, 340, 1361, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnChangePassword", "ﬂ·„… «·„—Ê—", 11964, 340, 1531, 454, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblUpdated", " ", 13550, 425, 3515, 312, 9, False, CLR_MUTED, "", 3)
     Set c = AddRect("boxTile1", 3969, 1418, 3472, 1389, CLR_SURFACE)
@@ -700,10 +722,14 @@ Private Sub BuildForm_frmMain()
     Set c = AddList("lstTopProducts", 13833, 4933, 4705, 4990, 4, "0;2381;1021;1247", True)
     c.OnDblClick = EP
     Set c = AddLabel("lblIntegrity", " ", 3969, 10093, 14571, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnOpen = EP
     m_frm.OnLoad = EP
     m_frm.OnActivate = EP
     m_frm.OnTimer = EP
     s = ""
+    s = s & "Private Sub Form_Open(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not MainOpen(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    MainLoad Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -792,13 +818,16 @@ Private Sub BuildForm_frmMain()
     s = s & "    OpenScreen ""frmBackup"", 10" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnNavLogout_Click()" & vbCrLf
-    s = s & "    ExitApplication" & vbCrLf
+    s = s & "    LogoutUser" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub icoLogout_Click()" & vbCrLf
-    s = s & "    ExitApplication" & vbCrLf
+    s = s & "    LogoutUser" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnRefresh_Click()" & vbCrLf
     s = s & "    DashboardRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnChangePassword_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmChangePassword"", 10" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub lblTileTitle1_Click()" & vbCrLf
     s = s & "    DashboardTileClick ""TODAY""" & vbCrLf
@@ -1420,6 +1449,148 @@ Private Sub BuildForm_frmExpenses()
     Exit Sub
 EH:
     AbortForm "frmExpenses", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmUsers()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmUsers", "«·„” Œœ„Ê‰", "SELECT * FROM Employees", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=Employees|PK=EmployeeID|LIST=SELECT t.EmployeeID, t.Username AS [«·„” Œœ„], t.EmployeeName AS [«·«”„], r.RoleName AS [«·œÊ—] FROM Employees AS t INNER JOIN Roles AS r ON t.RoleID = r.RoleID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.EmployeeName|SEARCH=t.EmployeeName,t.Username,t.Mobile|ACTIVE=t.IsActive|UNIQUE=Username"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8D7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "«·„” Œœ„Ê‰", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "«·„ÊŸ›Ê‰ Ê√”„«¡ «·œŒÊ· Ê«·√œÊ«—", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "ÃœÌœ", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "Õ›Ÿ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", " —«Ã⁄", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSetPassword", "ﬂ·„… «·„—Ê—", 4649, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnlock", "›ﬂ «·ﬁ›·", 6463, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnRoles", "«·’·«ÕÌ« ", 8277, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "»ÕÀ (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddCheck("chkShowInactive", "", 227, 2579)
+    SetCtlProp c, "DefaultValue", "False"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblShowInactive", "≈ŸÂ«— €Ì— «·‰‘ÿ", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 4, "0;1361;2155;1247", True)
+    c.AfterUpdate = EP
+    Set c = AddText("EmployeeName", "EmployeeName", 7201, 1701, 7881, 425)
+    Set c = AddLabel("lblEmployeeName", "«”„ «·„ÊŸ› *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "EmployeeName", 0)
+    Set c = AddText("Username", "Username", 7201, 2268, 2948, 425)
+    SetCtlProp c, "ControlTipText", "»œÊ‰ „”«›« ° 3 √Õ—› ⁄·Ï «·√ﬁ·"
+    SetCtlProp c, "StatusBarText", "»œÊ‰ „”«›« ° 3 √Õ—› ⁄·Ï «·√ﬁ·"
+    Set c = AddLabel("lblUsername", "«”„ «·„” Œœ„ *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "Username", 0)
+    Set c = AddCombo("RoleID", "RoleID", 12134, 2268, 2948, 425, "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID", 2, "0;2268")
+    Set c = AddLabel("lblRoleID", "«·œÊ— *", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "RoleID", 0)
+    Set c = AddText("JobTitle", "JobTitle", 7201, 2835, 2948, 425)
+    Set c = AddLabel("lblJobTitle", "«·„”„Ï «·ÊŸÌ›Ì", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "JobTitle", 0)
+    Set c = AddText("Mobile", "Mobile", 12134, 2835, 2948, 425)
+    Set c = AddLabel("lblMobile", "«·ÃÊ«·", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "Mobile", 0)
+    Set c = AddText("MaxDiscountPercent", "MaxDiscountPercent", 7201, 3402, 2948, 425)
+    SetCtlProp c, "Format", "0.00%"
+    SetCtlProp c, "ControlTipText", "√ﬁ’Ï Œ’„ »œÊ‰ „Ê«›ﬁ… („À«· 5%)"
+    SetCtlProp c, "StatusBarText", "√ﬁ’Ï Œ’„ »œÊ‰ „Ê«›ﬁ… („À«· 5%)"
+    Set c = AddLabel("lblMaxDiscountPercent", "√ﬁ’Ï ‰”»… Œ’„", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "MaxDiscountPercent", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 3487)
+    Set c = AddLabel("lblIsActive", "‰‘ÿ", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddCheck("MustChangePassword", "MustChangePassword", 7201, 4054)
+    Set c = AddLabel("lblMustChangePassword", "ÌÃ»  €ÌÌ— ﬂ·„… «·„—Ê—", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "MustChangePassword", 0)
+    Set c = AddText("LastLoginAt", "LastLoginAt", 12134, 3969, 2948, 425)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddLabel("lblLastLoginAt", "¬Œ— œŒÊ·", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "LastLoginAt", 0)
+    Set c = AddText("FailedLoginCount", "FailedLoginCount", 7201, 4536, 2948, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddLabel("lblFailedLoginCount", "„Õ«Ê·«  «·œŒÊ· «·›«‘·…", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "FailedLoginCount", 0)
+    Set c = AddText("LockedUntil", "LockedUntil", 12134, 4536, 2948, 425)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddLabel("lblLockedUntil", "„ﬁ›· Õ Ï", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "LockedUntil", 0)
+    Set c = AddLabel("lblPasswordState", " ", 5443, 5103, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 5670, 7881, 907)
+    SetCtlProp c, "EnterKeyBehavior", True
+    SetCtlProp c, "ScrollBars", 2
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 6832, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSetPassword_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmChangePassword"", 10, Me!EmployeeID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnlock_Click()" & vbCrLf
+    s = s & "    UnlockUser Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRoles_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmRoles"", 10" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub chkShowInactive_AfterUpdate()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmUsers", s
+    Exit Sub
+EH:
+    AbortForm "frmUsers", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmCategories()
@@ -3064,4 +3235,229 @@ Private Sub BuildForm_frmStockCount()
     Exit Sub
 EH:
     AbortForm "frmStockCount", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmLogin()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmLogin", " ”ÃÌ· «·œŒÊ·", "", 9072, 5443, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 9072, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8D7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", " ”ÃÌ· «·œŒÊ·", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "‰Ÿ«„ ≈œ«—… «·„Õ·", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblStoreName", " ", 227, 992, 8618, 425, 13, True, CLR_PRIMARY, "", 0)
+    Set c = AddText("txtUsername", "", 227, 1758, 8618, 510)
+    c.FontSize = 13
+    c.OnKeyDown = EP
+    Set c = AddLabel("lblUsername", "«”„ «·„” Œœ„", 227, 1446, 8618, 284, 9, False, CLR_MUTED, "txtUsername", 0)
+    Set c = AddText("txtPassword", "", 227, 2608, 8618, 510)
+    c.FontSize = 13
+    SetCtlProp c, "InputMask", "Password"
+    c.OnKeyDown = EP
+    Set c = AddLabel("lblPassword", "ﬂ·„… «·„—Ê—", 227, 2296, 8618, 284, 9, False, CLR_MUTED, "txtPassword", 0)
+    Set c = AddLabel("lblMessage", " ", 227, 3204, 8618, 680, 10, True, CLR_DANGER, "", 0)
+    Set c = AddButton("btnLogin", "œŒÊ·", 227, 4196, 3062, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnExit", "Œ—ÊÃ", 5783, 4196, 3062, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    LoginLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtUsername_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    LoginKeyDown Me, KeyCode, False" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtPassword_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    LoginKeyDown Me, KeyCode, True" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnLogin_Click()" & vbCrLf
+    s = s & "    DoLogin Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnExit_Click()" & vbCrLf
+    s = s & "    LoginExit" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmLogin", s
+    Exit Sub
+EH:
+    AbortForm "frmLogin", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmChangePassword()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmChangePassword", "ﬂ·„… «·„—Ê—", "", 9072, 5897, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 9072, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8D7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "ﬂ·„… «·„—Ê—", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", " €ÌÌ— √Ê  ⁄ÌÌ‰ ﬂ·„… «·„—Ê—", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblFor", " ", 227, 992, 8618, 369, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddText("txtOld", "", 227, 1729, 8618, 482)
+    c.FontSize = 12
+    SetCtlProp c, "InputMask", "Password"
+    Set c = AddLabel("lblOld", "ﬂ·„… «·„—Ê— «·Õ«·Ì…", 227, 1417, 8618, 284, 9, False, CLR_MUTED, "txtOld", 0)
+    Set c = AddText("txtNew", "", 227, 2551, 8618, 482)
+    c.FontSize = 12
+    SetCtlProp c, "InputMask", "Password"
+    Set c = AddLabel("lblNew", "ﬂ·„… «·„—Ê— «·ÃœÌœ…", 227, 2239, 8618, 284, 9, False, CLR_MUTED, "txtNew", 0)
+    Set c = AddText("txtConfirm", "", 227, 3373, 8618, 482)
+    c.FontSize = 12
+    SetCtlProp c, "InputMask", "Password"
+    Set c = AddLabel("lblConfirm", " √ﬂÌœ ﬂ·„… «·„—Ê— «·ÃœÌœ…", 227, 3061, 8618, 284, 9, False, CLR_MUTED, "txtConfirm", 0)
+    Set c = AddCheck("chkMustChange", "", 227, 4196)
+    Set c = AddLabel("lblMustChange", "Ì€Ì¯—Â« «·„” Œœ„ ⁄‰œ √Ê· œŒÊ· (ﬂ·„… „ƒﬁ …)", 596, 4111, 8249, 454, 10, False, CLR_TEXT, "chkMustChange", 0)
+    Set c = AddLabel("lblRules", "6 √Õ—› ⁄·Ï «·√ﬁ·° Ê·«  ”«ÊÌ «”„ «·„” Œœ„", 227, 4593, 8618, 312, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnSave", "Õ›Ÿ", 227, 5103, 3062, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnCancel", "≈·€«¡", 5783, 5103, 3062, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    ChangePasswordLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    SaveChangedPassword Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCancel_Click()" & vbCrLf
+    s = s & "    CancelChangePassword Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmChangePassword", s
+    Exit Sub
+EH:
+    AbortForm "frmChangePassword", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmRolePermLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmRolePermLines", "’·«ÕÌ«  «·œÊ—", "SELECT * FROM tmpRolePermissions ORDER BY SortOrder", 8392, 397, False, False, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    Set c = AddCheck("Granted", "Granted", 339, 68)
+    Set c = AddText("PermissionName", "PermissionName", 963, 0, 5386, 397)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("ModuleName", "ModuleName", 6377, 0, 1928, 397)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    s = ""
+    FinishForm "frmRolePermLines", s
+    Exit Sub
+EH:
+    AbortForm "frmRolePermLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmRoles()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmRoles", "«·√œÊ«— Ê«·’·«ÕÌ« ", "", 9072, 9072, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 9072, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8D7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "«·√œÊ«— Ê«·’·«ÕÌ« ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "Õœœ „« Ì” ÿÌ⁄ ﬂ· œÊ— ›⁄·Â", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboRole", "", 227, 1304, 3969, 454, "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID", 2, "0;3402")
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblRole", "«·œÊ—", 227, 992, 3969, 284, 9, False, CLR_MUTED, "cboRole", 0)
+    Set c = AddLabel("lblRoleInfo", " ", 4366, 1332, 4479, 397, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCol1", "„„‰ÊÕ…", 255, 1956, 907, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "«·’·«ÕÌ…", 1190, 1956, 5386, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "«·ﬁ”„", 6604, 1956, 1928, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subPermissions", "frmRolePermLines", 227, 2296, 8392, 5443)
+    Set c = AddLabel("lblLockedNote", " ", 227, 7825, 8618, 340, 9, True, CLR_WARNING, "", 0)
+    Set c = AddButton("btnSaveRole", "Õ›Ÿ «·’·«ÕÌ« ", 227, 8278, 2155, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnAll", " ÕœÌœ «·ﬂ·", 2495, 8278, 1701, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnNone", "≈·€«¡ «·ﬂ·", 4309, 8278, 1701, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 7371, 8278, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    RolesLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboRole_AfterUpdate()" & vbCrLf
+    s = s & "    RolePicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSaveRole_Click()" & vbCrLf
+    s = s & "    SaveRolePermissions Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAll_Click()" & vbCrLf
+    s = s & "    RoleSelectAll Me, True" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNone_Click()" & vbCrLf
+    s = s & "    RoleSelectAll Me, False" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmRoles", s
+    Exit Sub
+EH:
+    AbortForm "frmRoles", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmBackup()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmBackup", "«·‰”Œ «·«Õ Ì«ÿÌ", "", 11340, 8392, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 11340, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8B7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "«·‰”Œ «·«Õ Ì«ÿÌ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "‰”Œ… „‰ „·› «·»Ì«‰«  »«· «—ÌŒ Ê«·Êﬁ ° Ê«·«” ⁄«œ… ⁄‰œ «·Õ«Ã…", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblDataFile", " ", 227, 1021, 10886, 340, 9, False, CLR_TEXT, "", 0)
+    Set c = AddLabel("lblFolder", " ", 227, 1418, 7654, 340, 9, False, CLR_TEXT, "", 0)
+    Set c = AddButton("btnChooseFolder", " €ÌÌ— «·„Ã·œ", 7995, 1372, 1474, 425, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnOpenFolder", "› Õ «·„Ã·œ", 9639, 1372, 1474, 425, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblLast", " ", 227, 1871, 10886, 340, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnBackupNow", "‰”Œ… «Õ Ì«ÿÌ… «·¬‰", 227, 2325, 3062, 624, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblListCap", "«·‰”Œ «·„ÊÃÊœ… («·√ÕœÀ √Ê·«)", 227, 3147, 6804, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddList("lstBackups", 227, 3515, 10886, 3686, 3, "5670;2835;1984", True)
+    c.RowSourceType = "Value List"
+    Set c = AddButton("btnRestore", "«” ⁄«œ… «·‰”Œ… «·„Õœœ…", 227, 7484, 3062, 567, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnDevMode", "Ê÷⁄ «·„ÿÊ¯—", 3402, 7484, 2041, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 9639, 7484, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    BackupLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnChooseFolder_Click()" & vbCrLf
+    s = s & "    BackupChooseFolder Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpenFolder_Click()" & vbCrLf
+    s = s & "    BackupOpenFolder" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnBackupNow_Click()" & vbCrLf
+    s = s & "    BackupRun Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRestore_Click()" & vbCrLf
+    s = s & "    BackupRestoreSelected Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDevMode_Click()" & vbCrLf
+    s = s & "    DeveloperModeFromApp" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmBackup", s
+    Exit Sub
+EH:
+    AbortForm "frmBackup", Err.Number, Err.Description
 End Sub

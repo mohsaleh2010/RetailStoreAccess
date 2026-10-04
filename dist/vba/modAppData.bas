@@ -62,14 +62,42 @@ Public Function ReportCount() As Long
     ReportCount = 21
 End Function
 
+Public Function ScreenPermission(ByVal FormName As String) As String
+    ' Permission needed to open a screen ("" = any logged-in user). Source: forms.SCREEN_PERMISSIONS
+    Select Case FormName
+        Case "frmPOS": ScreenPermission = "SALES_POS"
+        Case "frmSalesInvoice": ScreenPermission = "SALES_VIEW"
+        Case "frmSalesReturn": ScreenPermission = "SALES_RETURN"
+        Case "frmCustomerPayment": ScreenPermission = "CUSTOMER_PAYMENTS"
+        Case "frmCustomers": ScreenPermission = "CUSTOMERS"
+        Case "frmSuppliers": ScreenPermission = "SUPPLIERS"
+        Case "frmSupplierPayment": ScreenPermission = "SUPPLIER_PAYMENTS"
+        Case "frmPurchaseInvoice": ScreenPermission = "PURCHASES"
+        Case "frmPurchaseView": ScreenPermission = "PURCHASES"
+        Case "frmPurchaseReturn": ScreenPermission = "PURCHASE_RETURN"
+        Case "frmProducts": ScreenPermission = "PRODUCTS"
+        Case "frmCategories": ScreenPermission = "PRODUCTS"
+        Case "frmUnits": ScreenPermission = "PRODUCTS"
+        Case "frmInventory": ScreenPermission = "PRODUCTS"
+        Case "frmStockCount": ScreenPermission = "STOCK_COUNT"
+        Case "frmExpenses": ScreenPermission = "EXPENSES"
+        Case "frmExpenseTypes": ScreenPermission = "EXPENSES"
+        Case "frmReportCenter": ScreenPermission = "REPORTS"
+        Case "frmSettings": ScreenPermission = "SETTINGS"
+        Case "frmUsers": ScreenPermission = "USERS"
+        Case "frmRoles": ScreenPermission = "USERS"
+        Case "frmBackup": ScreenPermission = "BACKUP"
+    End Select
+End Function
+
 Public Function ReportRow(ByVal Index As Long) As Variant
     ' Array(Key, Title, QueryName, ReportName, Needs, DateColumn)
     Select Case Index
         Case 1: ReportRow = Array("DAILY_SALES", "«·„»Ì⁄«  «·ÌÊ„Ì…", "DailySalesQuery", "rptDailySales", "D", "SaleDate")
-        Case 2: ReportRow = Array("MONTHLY_SALES", "«·„»Ì⁄«  «·‘Â—Ì…", "MonthlySalesQuery", "rptMonthlySales", "", "")
+        Case 2: ReportRow = Array("MONTHLY_SALES", "«·„»Ì⁄«  «·‘Â—Ì…", "MonthlySalesQuery", "rptMonthlySales", "$", "")
         Case 3: ReportRow = Array("SALES_PERIOD", "«·„»Ì⁄«  Õ”» › —…", "SalesByPeriodQuery", "rptSalesByPeriod", "Pc", "")
-        Case 4: ReportRow = Array("SALES_PRODUCT", "«·„»Ì⁄«  Õ”» «·„‰ Ã", "SalesByProductQuery", "rptSalesByProduct", "Pr", "")
-        Case 5: ReportRow = Array("BEST_SELLING", "√›÷· «·„‰ Ã«  „»Ì⁄«", "BestSellingProductsQuery", "rptBestSelling", "P", "")
+        Case 4: ReportRow = Array("SALES_PRODUCT", "«·„»Ì⁄«  Õ”» «·„‰ Ã", "SalesByProductQuery", "rptSalesByProduct", "Pr$", "")
+        Case 5: ReportRow = Array("BEST_SELLING", "√›÷· «·„‰ Ã«  „»Ì⁄«", "BestSellingProductsQuery", "rptBestSelling", "P$", "")
         Case 6: ReportRow = Array("LEAST_SELLING", "√ﬁ· «·„‰ Ã«  „»Ì⁄«", "LeastSellingProductsQuery", "rptLeastSelling", "P", "")
         Case 7: ReportRow = Array("PURCHASES", "«·„‘ —Ì« ", "PurchasesQuery", "rptPurchases", "Ps", "")
         Case 8: ReportRow = Array("STOCK", "«·„Œ“Ê‰ «·Õ«·Ì", "StockBalanceQuery", "rptStockBalance", "", "")
@@ -79,10 +107,10 @@ Public Function ReportRow(ByVal Index As Long) As Variant
         Case 12: ReportRow = Array("SUPPLIER_STATEMENT", "ﬂ‘› Õ”«» „Ê—œ", "SupplierStatementQuery", "rptSupplierStatement", "PS", "")
         Case 13: ReportRow = Array("EXPENSES", "«·„’—Ê›« ", "ExpensesQuery", "rptExpenses", "P", "")
         Case 14: ReportRow = Array("EXPENSES_BY_TYPE", "«·„’—Ê›«  Õ”» «·‰Ê⁄", "ExpensesByTypeQuery", "rptExpensesByType", "P", "")
-        Case 15: ReportRow = Array("PROFIT", "«·√—»«Õ", "ProfitQuery", "rptProfit", "P", "")
+        Case 15: ReportRow = Array("PROFIT", "«·√—»«Õ", "ProfitQuery", "rptProfit", "P$", "")
         Case 16: ReportRow = Array("SLOW_MOVING", "«·„‰ Ã«  €Ì— «·„ Õ—ﬂ…", "SlowMovingProductsQuery", "rptSlowMoving", "", "")
         Case 17: ReportRow = Array("STOCK_BY_CATEGORY", "«·„Œ“Ê‰ Õ”» «· ’‰Ì›", "StockByCategoryQuery", "rptStockByCategory", "", "")
-        Case 18: ReportRow = Array("VAT_SUMMARY", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›…", "VatSummaryQuery", "rptVatSummary", "P", "")
+        Case 18: ReportRow = Array("VAT_SUMMARY", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›…", "VatSummaryQuery", "rptVatSummary", "P$", "")
         Case 19: ReportRow = Array("CUSTOMER_BALANCES", "√—’œ… «·⁄„·«¡", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
         Case 20: ReportRow = Array("SUPPLIER_BALANCES", "√—’œ… «·„Ê—œÌ‰", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
         Case 21: ReportRow = Array("INTEGRITY", "›Õ’ ”·«„… «·»Ì«‰« ", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")

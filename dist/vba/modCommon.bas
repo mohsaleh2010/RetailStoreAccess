@@ -81,13 +81,14 @@ Private Sub ShowMessage(ByVal Text As String, ByVal Icon As VbMsgBoxStyle, ByVal
 End Sub
 
 '------------------------------------------------------------------------------
-' Current user (the login screen in Phase 10 sets these TempVars)
+' Current user: set by the login screen (modSecurity.LoginUser). 0 = nobody,
+' so without a login no permission is granted.
 '------------------------------------------------------------------------------
 Public Function CurrentUserID() As Long
     Dim v As Variant
     On Error Resume Next
     v = TempVars("UserID")
-    If IsNumeric(v) Then CurrentUserID = CLng(v) Else CurrentUserID = 1
+    If IsNumeric(v) Then CurrentUserID = CLng(v)
 End Function
 
 Public Function CurrentUserName() As String
@@ -97,10 +98,11 @@ End Function
 Public Function HasPermission(ByVal PermissionKey As String) As Boolean
     ' True when the role of the current user has the permission (table RolePermissions).
     Dim roleID As Variant
-    roleID = DLookup("RoleID", "Employees", "EmployeeID = " & CurrentUserID() & " AND IsActive = True")
+    ' DbValue reads through CurrentDb, so it also sees changes made inside an open transaction.
+    roleID = DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & CurrentUserID() & " AND IsActive = True")
     If IsNull(roleID) Then Exit Function
-    HasPermission = DCount("*", "RolePermissions", "RoleID = " & roleID & _
-                           " AND PermissionKey = " & SqlText(PermissionKey)) > 0
+    HasPermission = Nz(DbValue("SELECT COUNT(*) FROM RolePermissions WHERE RoleID = " & roleID & _
+                               " AND PermissionKey = " & SqlText(PermissionKey)), 0) > 0
 End Function
 
 '------------------------------------------------------------------------------

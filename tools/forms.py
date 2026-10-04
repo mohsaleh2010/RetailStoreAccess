@@ -124,6 +124,7 @@ PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Ite
                 "FROM Products ORDER BY ProductName")
 EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName"
 PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder"
+ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 
 
@@ -201,6 +202,27 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("Description", span=2),
         ]),
     DataScreen(
+        "frmUsers", "Employees", "المستخدمون", "الموظفون وأسماء الدخول والأدوار", "users",
+        list_select="t.Username AS [المستخدم], t.EmployeeName AS [الاسم], r.RoleName AS [الدور]",
+        list_from="Employees AS t INNER JOIN Roles AS r ON t.RoleID = r.RoleID",
+        list_order="t.EmployeeName",
+        list_headers=[("المستخدم", 2.4), ("الاسم", 3.8), ("الدور", 2.2)],
+        search=["t.EmployeeName", "t.Username", "t.Mobile"], active="t.IsActive", unique=["Username"],
+        allow_delete=False,
+        extra_buttons=[("btnSetPassword", "كلمة المرور", 'OpenScreen "frmChangePassword", 10, Me!EmployeeID'),
+                       ("btnUnlock", "فك القفل", "UnlockUser Me"),
+                       ("btnRoles", "الصلاحيات", 'OpenScreen "frmRoles", 10')],
+        fields=[
+            Fld("EmployeeName", span=2), Fld("Username", hint="بدون مسافات، 3 أحرف على الأقل"),
+            Fld("RoleID", rows=ROLE_ROWS, widths="0;4"),
+            Fld("JobTitle"), Fld("Mobile"),
+            Fld("MaxDiscountPercent", hint="أقصى خصم بدون موافقة (مثال 5%)"), Fld("IsActive"),
+            Fld("MustChangePassword"), Fld("LastLoginAt", locked=True),
+            Fld("FailedLoginCount", locked=True), Fld("LockedUntil", locked=True),
+            Info("lblPasswordState"),
+            Fld("Notes", span=2),
+        ]),
+    DataScreen(
         "frmCategories", "Categories", "التصنيفات", "تصنيفات المنتجات", "category",
         list_select="t.CategoryName AS [التصنيف]", list_from="Categories AS t",
         list_order="t.CategoryName", list_headers=[("التصنيف", 8.4)],
@@ -268,6 +290,22 @@ NAV_ITEMS: List[NavItem] = [
 ]
 
 
+# Permission needed to open each screen ("" = everyone logged in). Subforms open
+# with their parent and are not listed. modAppData.ScreenPermission is generated
+# from this table and OpenScreen refuses a screen the user may not open.
+SCREEN_PERMISSIONS = {
+    "frmMain": "", "frmSearch": "", "frmLogin": "", "frmChangePassword": "",
+    "frmPOS": "SALES_POS", "frmSalesInvoice": "SALES_VIEW", "frmSalesReturn": "SALES_RETURN",
+    "frmCustomerPayment": "CUSTOMER_PAYMENTS", "frmCustomers": "CUSTOMERS",
+    "frmSuppliers": "SUPPLIERS", "frmSupplierPayment": "SUPPLIER_PAYMENTS",
+    "frmPurchaseInvoice": "PURCHASES", "frmPurchaseView": "PURCHASES", "frmPurchaseReturn": "PURCHASE_RETURN",
+    "frmProducts": "PRODUCTS", "frmCategories": "PRODUCTS", "frmUnits": "PRODUCTS", "frmInventory": "PRODUCTS",
+    "frmStockCount": "STOCK_COUNT", "frmExpenses": "EXPENSES", "frmExpenseTypes": "EXPENSES",
+    "frmReportCenter": "REPORTS", "frmSettings": "SETTINGS", "frmUsers": "USERS", "frmRoles": "USERS",
+    "frmBackup": "BACKUP",
+}
+
+
 # --------------------------------------------------------------------------
 # Search templates and report catalogue (runtime data, emitted to modAppData)
 # Tokens: {LIKE} quoted Like pattern, {NUM} exact id or -1, {FROM}/{TO} date literals
@@ -333,10 +371,10 @@ class ReportEntry:
 
 REPORTS: List[ReportEntry] = [
     ReportEntry("DAILY_SALES", "المبيعات اليومية", "DailySalesQuery", "rptDailySales", "D", "SaleDate"),
-    ReportEntry("MONTHLY_SALES", "المبيعات الشهرية", "MonthlySalesQuery", "rptMonthlySales"),
+    ReportEntry("MONTHLY_SALES", "المبيعات الشهرية", "MonthlySalesQuery", "rptMonthlySales", "$"),
     ReportEntry("SALES_PERIOD", "المبيعات حسب فترة", "SalesByPeriodQuery", "rptSalesByPeriod", "Pc"),
-    ReportEntry("SALES_PRODUCT", "المبيعات حسب المنتج", "SalesByProductQuery", "rptSalesByProduct", "Pr"),
-    ReportEntry("BEST_SELLING", "أفضل المنتجات مبيعًا", "BestSellingProductsQuery", "rptBestSelling", "P"),
+    ReportEntry("SALES_PRODUCT", "المبيعات حسب المنتج", "SalesByProductQuery", "rptSalesByProduct", "Pr$"),
+    ReportEntry("BEST_SELLING", "أفضل المنتجات مبيعًا", "BestSellingProductsQuery", "rptBestSelling", "P$"),
     ReportEntry("LEAST_SELLING", "أقل المنتجات مبيعًا", "LeastSellingProductsQuery", "rptLeastSelling", "P"),
     ReportEntry("PURCHASES", "المشتريات", "PurchasesQuery", "rptPurchases", "Ps"),
     ReportEntry("STOCK", "المخزون الحالي", "StockBalanceQuery", "rptStockBalance"),
@@ -346,10 +384,10 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("SUPPLIER_STATEMENT", "كشف حساب مورد", "SupplierStatementQuery", "rptSupplierStatement", "PS"),
     ReportEntry("EXPENSES", "المصروفات", "ExpensesQuery", "rptExpenses", "P"),
     ReportEntry("EXPENSES_BY_TYPE", "المصروفات حسب النوع", "ExpensesByTypeQuery", "rptExpensesByType", "P"),
-    ReportEntry("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P"),
+    ReportEntry("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P$"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
-    ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P"),
+    ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),
     ReportEntry("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances"),
     ReportEntry("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances"),
     ReportEntry("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck"),
@@ -612,9 +650,11 @@ def layout_main() -> FormModel:
     y = cm(2.3)
     for item in NAV_ITEMS:
         name = f"btnNav{item.key}"
-        call = (f'OpenScreen "{item.target}", {item.phase}' if item.target else "ExitApplication")
+        call = (f'OpenScreen "{item.target}", {item.phase}' if item.target else "LogoutUser")
         button(m, name, item.caption, cm(0.25), y, "nav", w=side_w - cm(0.5), h=cm(0.95),
                call=call)
+        if item.target:
+            m.controls[-1].props["Tag"] = item.target       # MainLoad disables what the user may not open
         icon = m.add(Control("icon", f"ico{item.key}", cm(0.45), y + cm(0.15), cm(0.8),
                              cm(0.65), {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"),
                                         "FontSize": 13, "ForeColor": Sym("CLR_SIDEBAR_TEXT")},
@@ -633,6 +673,8 @@ def layout_main() -> FormModel:
                   {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 3}))
     button(m, "btnRefresh", "تحديث", cx + cw - cm(2.4), cm(0.6), "secondary", w=cm(2.4), h=cm(0.8),
            call="DashboardRefresh Me")
+    button(m, "btnChangePassword", "كلمة المرور", cx + cm(14.1), cm(0.6), "secondary", w=cm(2.7), h=cm(0.8),
+           call='OpenScreen "frmChangePassword", 10')
     m.add(Control("label", "lblUpdated", cx + cw - cm(8.8), cm(0.75), cm(6.2), cm(0.55),
                   {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 3}))
     tile_w = (cw - cm(0.4) * 3) // 4
@@ -671,9 +713,10 @@ def layout_main() -> FormModel:
     m.add(Control("label", "lblIntegrity", cx, height - cm(1.2), cw, cm(0.6),
                   {"Caption": " ", "FontSize": 10, "FontBold": True,
                    "ForeColor": Sym("CLR_MUTED")}))
-    m.form_events = ["Load", "Activate", "Timer"]
+    m.form_events = ["Open", "Load", "Activate", "Timer"]
     m.form_props = {"TimerInterval": 300000}          # refresh the dashboard every 5 minutes
-    m.code = ["Private Sub Form_Load()", "    MainLoad Me", "End Sub",
+    m.code = ["Private Sub Form_Open(Cancel As Integer)", "    Cancel = Not MainOpen(Me)", "End Sub",
+              "Private Sub Form_Load()", "    MainLoad Me", "End Sub",
               "Private Sub Form_Activate()", "    DashboardActivate Me", "End Sub",
               "Private Sub Form_Timer()", "    DashboardRefresh Me", "End Sub"] + m.code
     return m
@@ -776,5 +819,7 @@ def layout_report_center() -> FormModel:
 def all_forms() -> List[FormModel]:
     from forms_sales import sales_forms
     from forms_purchases import purchase_forms
+    from forms_security import security_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
-            + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms())
+            + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
+            + security_forms())

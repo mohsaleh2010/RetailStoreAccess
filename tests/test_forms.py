@@ -93,7 +93,7 @@ class WiringTests(unittest.TestCase):
             self.assertEqual(procs, expected, m.name)
 
     def test_event_procedure_signatures(self):
-        sig = {"BeforeUpdate": "(Cancel As Integer)", "Unload": "(Cancel As Integer)",
+        sig = {"BeforeUpdate": "(Cancel As Integer)", "Unload": "(Cancel As Integer)", "Open": "(Cancel As Integer)",
                "Error": "(DataErr As Integer, Response As Integer)",
                "KeyDown": "(KeyCode As Integer, Shift As Integer)", "DblClick": "(Cancel As Integer)"}
         for m in MODELS:
@@ -312,7 +312,8 @@ class ProjectStaticTests(unittest.TestCase):
             Hour Minute Weekday DatePart DateDiff Time Timer Erase CVar CInt CBool IsArray Choose
             DoEvents IsMissing IsObject TypeName VarType CSng Sqr Exp Log Rnd Second Day Hex$
             StrConv LenB AscB ChrB MidB Filter Join InStrB DMin DSum DAvg Eval Reports
-            CreateReport CreateReportControl CreateGroupLevel""".split())
+            CreateReport CreateReportControl CreateGroupLevel GetSetting SaveSetting FileDateTime FileLen
+            CreateObject""".split())
         for name, text in modules.items():
             in_type = False
             for line in logical_lines(text):

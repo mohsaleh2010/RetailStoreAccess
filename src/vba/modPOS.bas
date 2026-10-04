@@ -31,6 +31,11 @@ Public Sub EnsureLocalTables()
             "PRIMARY KEY, ProductID LONG, ProductName TEXT(150), SoldQty CURRENCY, ReturnedQty CURRENCY, " & _
             "AvailableQty CURRENCY, ReturnQty CURRENCY, ReturnToStock BIT, ReturnAmount CURRENCY)", dbFailOnError
     End If
+    ' Phase 10: permissions of the role being edited in frmRoles
+    If Not LocalTableExists("tmpRolePermissions") Then
+        CurrentDb.Execute "CREATE TABLE tmpRolePermissions (PermissionKey TEXT(50) CONSTRAINT pkRolePerm PRIMARY KEY, " & _
+            "PermissionName TEXT(100), ModuleName TEXT(50), SortOrder INTEGER, Granted BIT)", dbFailOnError
+    End If
     ' Phase 7: purchase invoice lines and purchase return lines
     If Not LocalTableExists("tmpPurchaseLines") Then
         CurrentDb.Execute "CREATE TABLE tmpPurchaseLines (LineNo COUNTER CONSTRAINT pkPurchaseLines PRIMARY KEY, " & _

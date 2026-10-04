@@ -46,6 +46,7 @@ Public Sub FormCurrent(ByVal frm As Access.Form)
     Select Case TagValue(frm, "TABLE")
         Case "Products": UpdatePriceInfo frm
         Case "Customers", "Suppliers": LockPartnerFields frm
+        Case "Employees": UserCurrent frm                           ' modSecurityScreens
     End Select
 End Sub
 
@@ -60,6 +61,8 @@ Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
             If Not ValidateExpense(frm) Then Exit Function
         Case "Settings"
             If Not ValidateSettings(frm) Then Exit Function
+        Case "Employees"
+            If Not ValidateEmployee(frm) Then Exit Function        ' modSecurity
     End Select
     If Not CheckUnique(frm) Then Exit Function
     If Not AssignSequence(frm) Then Exit Function      ' last: a refused save wastes no number

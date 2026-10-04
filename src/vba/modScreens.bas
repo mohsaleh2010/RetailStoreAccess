@@ -21,7 +21,10 @@ Public Sub MainLoad(ByVal frm As Access.Form)
     End If
     frm!lblStoreName.Caption = Nz(SettingValue("StoreName"), APP_TITLE)
     frm!lblToday.Caption = Format$(Date, "dddd  yyyy/mm/dd")
-    frm!lblUser.Caption = "المستخدم: " & CurrentUserName()
+    frm!lblUser.Caption = "المستخدم: " & CurrentUserName() & "  (" & _
+        Nz(DbValue("SELECT r.RoleName FROM Employees AS e INNER JOIN Roles AS r ON e.RoleID = r.RoleID " & _
+                   "WHERE e.EmployeeID = " & CurrentUserID()), "") & ")"
+    ApplyNavPermissions frm                   ' modSecurityScreens
     DashboardRefresh frm                      ' tiles, lists and the integrity line (modDashboard)
     If Not g_SilentMode Then LowStockAlert    ' once per session
 End Sub
@@ -123,6 +126,7 @@ End Sub
 '                 D = filter DateColumn by the period
 '                 C / S / R = customer / supplier / product required
 '                 c / s / r = optional filter on CustomerID / SupplierID / ProductID
+'                 $ = shows cost / profit: needs the REPORTS_PROFIT permission
 '------------------------------------------------------------------------------
 Public Sub ReportCenterLoad(ByVal frm As Access.Form)
     Dim i As Long, r As Variant, rows As String
@@ -228,6 +232,10 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
     needs = r(4)
     where = ""
     criteria = ""
+    If HasNeed(needs, "$") And Not HasPermission("REPORTS_PROFIT") Then
+        ShowWarning "هذا التقرير يعرض التكلفة والأرباح ويحتاج صلاحية «تقارير الأرباح والضريبة»."
+        Exit Function
+    End If
 
     If HasNeed(needs, "P") Or HasNeed(needs, "D") Then
         If Not IsDate(frm!txtFrom.Value) Or Not IsDate(frm!txtTo.Value) Then
