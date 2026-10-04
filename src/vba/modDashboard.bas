@@ -163,6 +163,7 @@ End Function
 Public Function TestDashboard() As Boolean
     Dim frm As Access.Form, opened As Boolean, i As Integer, passed As Long, failed As Long
     Dim report As String, cap As String, ok As Boolean, savedStart As Variant, savedEnd As Variant
+    Dim rows As Long, expected As Long
     On Error GoTo EH
     Calendar = vbCalGreg
     EnsureTestUser
@@ -191,8 +192,12 @@ Public Function TestDashboard() As Boolean
                 "عدد فواتير اليوم", passed, failed, report
     CheckResult TempVars("PeriodStart") = DateSerial(2020, 1, 1) And TempVars("PeriodEnd") = DateSerial(2020, 2, 1), _
                 "لوحة التحكم لا تغيّر فترة مركز التقارير", passed, failed, report
-    CheckResult frm!lstLowStock.ListCount - 1 = DCount("*", "LowStockQuery") Or DCount("*", "LowStockQuery") > 30, _
-                "قائمة النواقص", passed, failed, report
+    ' an empty list does not count its heading row, so never go below 0
+    rows = frm!lstLowStock.ListCount - 1
+    If rows < 0 Then rows = 0
+    expected = DCount("*", "LowStockQuery")
+    If expected > 30 Then expected = 30
+    CheckResult rows = expected, "قائمة النواقص (" & rows & " من " & expected & ")", passed, failed, report
     If opened Then DoCmd.Close acForm, "frmMain", acSaveNo
     GoSub Restore
     g_SilentMode = False

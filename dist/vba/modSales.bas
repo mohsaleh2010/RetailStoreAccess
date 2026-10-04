@@ -401,6 +401,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     Dim costs() As Currency, rates() As Currency, cats() As String, discs() As Currency
     Dim sumNet As Currency, sumTax As Currency, sumTotal As Currency, sumDisc As Currency
     Dim refunded As Currency, customerID As Long, retID As Long, retNo As String, retDate As Date
+    Dim subType As String
 
     On Error GoTo EH
     NewReturnID = 0
@@ -413,10 +414,13 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     Set inv = db.OpenRecordset("SELECT * FROM SalesInvoices WHERE SalesInvoiceID = " & SalesInvoiceID, _
                                dbOpenSnapshot)
     If inv.EOF Then
+        inv.Close
         PostSalesReturn = "«·›« Ê—… «·√’·Ì… €Ì— „ÊÃÊœ…."
         Exit Function
     End If
     customerID = inv!CustomerID
+    subType = inv!InvoiceSubType
+    inv.Close           ' before BeginTrans: closing it inside the transaction raises 3246
     If CustomerID = Nz(SettingValue("DefaultCustomerID"), 1) Then RefundType = "CASH"
 
     Set rs = db.OpenRecordset( _
@@ -491,12 +495,11 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     rs!Tax = sumTax
     rs!TotalAmount = sumTotal
     rs!RefundedAmount = refunded
-    SetZatcaFields rs, inv!InvoiceSubType, "381", retDate, sumTotal, sumTax
+    SetZatcaFields rs, subType, "381", retDate, sumTotal, sumTax
     rs.Update
     rs.Bookmark = rs.LastModified
     retID = rs!SalesReturnID
     rs.Close
-    inv.Close
 
     Set rs = db.OpenRecordset("SalesReturnDetails", dbOpenDynaset, dbAppendOnly)
     For i = 0 To n - 1

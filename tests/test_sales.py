@@ -5,6 +5,7 @@ pricing invariants, report layout and bindings, and the generated modules.
 Run:  python3 -m unittest discover -s tests -v
 """
 
+import os
 import random
 import re
 import string
@@ -12,7 +13,7 @@ import unittest
 from decimal import Decimal as D
 
 from access_sqlite import AccessOnSqlite
-from helpers import VbaModuleChecks
+from helpers import ROOT, VbaModuleChecks
 import forms as F
 import gen_qr
 import gen_reports
@@ -210,3 +211,34 @@ Static_modPOS = _static("modPOS")
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TransactionScopeTests(unittest.TestCase):
+
+    def test_no_recordset_opened_before_a_transaction_is_closed_inside_it(self):
+        # DAO raises 3246 "Operation not supported in transactions" when a recordset
+        # opened before BeginTrans is closed between BeginTrans and CommitTrans.
+        import glob
+        problems = []
+        for path in glob.glob(os.path.join(ROOT, "src", "vba", "*.bas")):
+            with open(path, encoding="utf-8") as fh:
+                lines = fh.read().split("\n")
+            before, in_trans, func = {}, False, ""
+            for n, line in enumerate(lines, 1):
+                m = re.match(r"\s*(?:Public |Private )?(?:Function|Sub) (\w+)", line)
+                if m:
+                    before, in_trans, func = {}, False, m.group(1)
+                if ".BeginTrans" in line:
+                    in_trans = True
+                if ".CommitTrans" in line or ".Rollback" in line:
+                    in_trans = False
+                closed = re.search(r"\b(\w+)\.Close\b", line)
+                if closed and in_trans and closed.group(1) in before:
+                    problems.append(f"{os.path.basename(path)}:{n} {func}: {closed.group(1)}")
+                opened = re.search(r"Set (\w+) = \w+\.OpenRecordset", line)
+                if opened:
+                    if in_trans:
+                        before.pop(opened.group(1), None)
+                    else:
+                        before[opened.group(1)] = n
+        self.assertEqual(problems, [])
