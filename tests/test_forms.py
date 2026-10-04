@@ -377,3 +377,16 @@ Static_modScreens = _static("modScreens")
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class FormRecordAccessTests(unittest.TestCase):
+
+    def test_no_current_record_reads_through_form_recordset(self):
+        # On a new record (or an empty table) frm.Recordset has no current row:
+        # Access raises 3021 "No current record". Read and write frm("Field") instead.
+        bad = re.compile(r"\.Recordset\.Fields\([^)]*\)\.Value|\.Recordset![A-Za-z]", re.I)
+        for path in glob.glob(os.path.join(ROOT, "src", "vba", "*.bas")):
+            with open(path, encoding="utf-8") as fh:
+                lines = fh.readlines()
+            for n, line in enumerate(lines, 1):
+                self.assertIsNone(bad.search(line), f"{os.path.basename(path)}:{n}: {line.strip()}")

@@ -66,7 +66,7 @@ Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
     End Select
     If Not CheckUnique(frm) Then Exit Function
     If Not AssignSequence(frm) Then Exit Function      ' last: a refused save wastes no number
-    If HasRecordField(frm, "UpdatedAt") Then frm.Recordset.Fields("UpdatedAt").Value = Now
+    If HasRecordField(frm, "UpdatedAt") Then frm("UpdatedAt").Value = Now
     FormBeforeUpdate = True
 End Function
 
@@ -182,7 +182,7 @@ Private Sub DeleteRecord(ByVal frm As Access.Form)
     pk = TagValue(frm, "PK")
     id = frm(pk).Value
     If HasRecordField(frm, "IsSystem") Then
-        If Nz(frm.Recordset.Fields("IsSystem").Value, False) Then
+        If Nz(frm("IsSystem").Value, False) Then
             ShowWarning "åÐÇ ÓÌá ÃÓÇÓí Ýí ÇáäÙÇã æáÇ íãßä ÍÐÝå."
             Exit Sub
         End If
@@ -298,8 +298,9 @@ Private Function CheckUnique(ByVal frm As Access.Form) As Boolean
     Dim f As Variant, v As Variant, pkValue As Variant, table As String, pk As String
     table = TagValue(frm, "TABLE")
     pk = TagValue(frm, "PK")
-    pkValue = Nz(frm.Recordset.Fields(pk).Value, 0)
-    If frm.NewRecord Then pkValue = 0
+    ' a new record has no current row in frm.Recordset (error 3021): read the form itself
+    pkValue = 0
+    If Not frm.NewRecord Then pkValue = Nz(frm(pk).Value, 0)
     For Each f In Split(TagValue(frm, "UNIQUE"), ",")
         If Len(f) > 0 Then
             v = frm(f).Value
@@ -373,7 +374,7 @@ Private Function ValidatePartner(ByVal frm As Access.Form) As Boolean
         Exit Function
     End If
     If HasRecordField(frm, "IsSystem") Then
-        If Nz(frm.Recordset.Fields("IsSystem").Value, False) Then
+        If Nz(frm("IsSystem").Value, False) Then
             frm!AllowCredit.Value = False
             frm!OpeningBalance.Value = 0
         End If
@@ -434,7 +435,7 @@ Private Sub LockPartnerFields(ByVal frm As Access.Form)
     If Not frm.NewRecord Then locked = PartnerHasMovements(frm)
     SetLocked frm!OpeningBalance, locked
     If HasRecordField(frm, "IsSystem") Then
-        isSystem = Nz(frm.Recordset.Fields("IsSystem").Value, False) And Not frm.NewRecord
+        If Not frm.NewRecord Then isSystem = Nz(frm("IsSystem").Value, False)
         SetLocked frm!AllowCredit, isSystem
         SetLocked frm!IsActive, isSystem
     End If
