@@ -11,9 +11,10 @@ from schema import TABLES, Table, Field  # noqa: E402
 from generate_common import vba_str  # noqa: E402
 import gen_relations  # noqa: E402
 import gen_queries  # noqa: E402
+import gen_forms  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STATIC_MODULES = ["modQueryParams"]   # hand-written (not generated) VBA modules
+STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -591,6 +592,11 @@ def main():
     write("src/vba/modBuildQueries.bas", qry)
     write("dist/vba/modBuildQueries.bas", qry, encoding="cp1256", newline="\r\n")
     write("docs/04-Queries-Reference.md", gen_queries.build_queries_md())
+
+    for name, text in (("modBuildForms", gen_forms.build_forms_vba()),
+                       ("modAppData", gen_forms.build_appdata_vba())):
+        write(f"src/vba/{name}.bas", text)
+        write(f"dist/vba/{name}.bas", text, encoding="cp1256", newline="\r\n")
 
     # hand-written modules: readable copy in src/, import copy in dist/
     for name in STATIC_MODULES:

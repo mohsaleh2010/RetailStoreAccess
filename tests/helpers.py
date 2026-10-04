@@ -95,6 +95,17 @@ def logical_lines(vba):
     return out
 
 
+def project_public_variables():
+    """Public variables declared in any module under src/vba (visible project-wide)."""
+    import glob
+    names = set()
+    for path in glob.glob(os.path.join(ROOT, "src", "vba", "*.bas")):
+        with open(path, encoding="utf-8") as fh:
+            for m in re.finditer(r"^Public (?!Const|Sub|Function)(\w+) As\b", fh.read(), re.M):
+                names.add(m.group(1).lower())
+    return names
+
+
 def split_statements(line):
     """Split a logical line on ': ' statement separators outside string literals."""
     out, buf, in_str = [], "", False
@@ -183,7 +194,7 @@ class VbaModuleChecks:
 
     def test_variables_declared(self):
         """Option Explicit: every assigned local identifier must be declared somewhere."""
-        declared = {"calendar"}   # built-in VBA properties that may be assigned
+        declared = {"calendar"} | project_public_variables()   # + built-in VBA properties
         for l in logical_lines(self.vba):
             for m in re.finditer(r"\b(?:Dim|Private|Public|Const|ByVal|ByRef|Optional)\s+"
                                  r"(?:Const\s+)?(?:ByVal\s+|ByRef\s+)?(\w+)", l):

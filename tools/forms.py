@@ -1,0 +1,739 @@
+"""Phase 5: screen definitions and layout.
+
+Every screen is described here; layout() turns it into a flat list of
+controls with positions in twips (567 twips = 1 cm). Positions are logical:
+x is measured from the START edge (the right edge, the form is right-to-left).
+gen_forms.py turns the result into VBA that builds the forms in Access.
+"""
+
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Tuple
+
+from schema import table
+
+CM = 567
+
+
+def cm(x: float) -> int:
+    return int(round(x * CM))
+
+
+# --------------------------------------------------------------------------
+# Icons: Segoe MDL2 Assets code points (Windows 10/11)
+# --------------------------------------------------------------------------
+ICONS = {
+    "sales": 0xE7BF, "purchases": 0xE896, "inventory": 0xE7B8, "products": 0xE8EC,
+    "customers": 0xE716, "suppliers": 0xE77B, "expenses": 0xE8C7, "stocktake": 0xE8EF,
+    "reports": 0xE8A5, "search": 0xE721, "settings": 0xE713, "users": 0xE8D7,
+    "backup": 0xE8B7, "logout": 0xE7E8, "home": 0xE80F, "category": 0xE8FD,
+}
+
+
+@dataclass
+class Control:
+    kind: str            # rect, label, icon, text, combo, check, list, button
+    name: str
+    x: int
+    y: int
+    w: int
+    h: int
+    props: Dict[str, object] = field(default_factory=dict)
+    events: List[str] = field(default_factory=list)     # e.g. ["Click"]
+    parent: str = ""     # attached label -> owner control
+    source: str = ""     # bound field
+    decorative: bool = False   # may overlap other controls (backgrounds, icons)
+
+
+@dataclass
+class Sym:
+    """A VBA symbol (constant or expression) emitted as-is."""
+    code: str
+
+
+# --------------------------------------------------------------------------
+# Screen definitions
+# --------------------------------------------------------------------------
+@dataclass
+class Fld:
+    field: str
+    label: Optional[str] = None
+    span: int = 1
+    locked: bool = False
+    rows: Optional[str] = None          # combo row source (SQL) or value list "a;b;c;d"
+    widths: Optional[str] = None        # combo column widths in cm, e.g. "0;5"
+    hook: bool = False                  # AfterUpdate -> FieldChanged
+    button: Optional[Tuple[str, str, str]] = None   # (name, caption, handler call)
+    hint: str = ""
+
+
+@dataclass
+class Info:
+    """A full-width information label inside the field grid."""
+    name: str
+    text: str = " "
+
+
+@dataclass
+class DataScreen:
+    name: str
+    table: str
+    caption: str
+    subtitle: str
+    icon: str
+    fields: List[object]
+    kind: str = "LIST"                   # LIST (list + detail) or SINGLE (one record)
+    list_select: str = ""                # columns after the key, "t." alias
+    list_from: str = ""
+    list_order: str = ""
+    list_headers: List[Tuple[str, float]] = field(default_factory=list)   # (header, width cm)
+    search: List[str] = field(default_factory=list)
+    active: str = ""                     # e.g. "t.IsActive"
+    seq: str = ""                        # "SEQUENCE:Field"
+    unique: List[str] = field(default_factory=list)
+    extra_buttons: List[Tuple[str, str, str]] = field(default_factory=list)
+    allow_add: bool = True
+    allow_delete: bool = True
+    record_source: str = ""
+
+    @property
+    def pk(self):
+        return table(self.table).pk[0]
+
+    def list_template(self) -> str:
+        return (f"SELECT t.{self.pk}, {self.list_select} FROM {self.list_from} "
+                f"WHERE ({{ACTIVE}}) AND ({{SEARCH}}) ORDER BY {self.list_order}")
+
+    def tag(self) -> str:
+        parts = [f"KIND={self.kind}", f"TABLE={self.table}", f"PK={self.pk}"]
+        if self.kind == "LIST":
+            parts += [f"LIST={self.list_template()}", "SEARCH=" + ",".join(self.search)]
+        if self.active:
+            parts.append(f"ACTIVE={self.active}")
+        if self.seq:
+            parts.append(f"SEQ={self.seq}")
+        if self.unique:
+            parts.append("UNIQUE=" + ",".join(self.unique))
+        return "|".join(parts)
+
+
+CATEGORY_ROWS = "SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryName"
+UNIT_ROWS = "SELECT UnitID, UnitName FROM Units ORDER BY UnitName"
+SUPPLIER_ROWS = "SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName"
+CUSTOMER_ROWS = "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName"
+PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Item "
+                "FROM Products ORDER BY ProductName")
+EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName"
+PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder"
+VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
+
+
+DATA_SCREENS: List[DataScreen] = [
+    DataScreen(
+        "frmProducts", "Products", "المنتجات", "إضافة وتعديل الأصناف والأسعار", "products",
+        list_select="t.ProductCode AS [الكود], t.ProductName AS [المنتج], t.CurrentQuantity AS [الكمية]",
+        list_from="Products AS t", list_order="t.ProductName",
+        list_headers=[("الكود", 2.0), ("المنتج", 4.9), ("الكمية", 1.5)],
+        search=["t.ProductName", "t.ProductCode", "t.Barcode", "t.ProductNameEn"],
+        active="t.IsActive", seq="PRODUCT_CODE:ProductCode", unique=["ProductCode", "Barcode"],
+        fields=[
+            Fld("ProductCode", hint="يُولَّد تلقائيًا إذا تُرك فارغًا"), Fld("Barcode"),
+            Fld("ProductName", span=2), Fld("ProductNameEn", span=2),
+            Fld("CategoryID", rows=CATEGORY_ROWS), Fld("UnitID", rows=UNIT_ROWS),
+            Fld("SupplierID", rows=SUPPLIER_ROWS), Fld("VATCategory", rows=VAT_CATEGORY_LIST, widths="0;4.5", hook=True),
+            Fld("SellingPrice", label="سعر البيع", hook=True), Fld("PurchasePrice"),
+            Info("lblPriceInfo"),
+            Fld("AverageCost", locked=True), Fld("CurrentQuantity", locked=True),
+            Fld("MinimumQuantity"), Fld("ProductLocation"),
+            Fld("IsActive"), Info("lblStockNote", "الكمية تتغير فقط من المشتريات والمبيعات والجرد"),
+            Fld("Notes", span=2),
+        ]),
+    DataScreen(
+        "frmCustomers", "Customers", "العملاء", "بيانات العملاء وأرصدتهم", "customers",
+        list_select="t.CustomerName AS [العميل], t.Mobile AS [الجوال], t.CurrentBalance AS [الرصيد]",
+        list_from="Customers AS t", list_order="t.CustomerName",
+        list_headers=[("العميل", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
+        search=["t.CustomerName", "t.Mobile", "t.Phone", "t.VATNumber"],
+        active="t.IsActive",
+        fields=[
+            Fld("CustomerName", span=2), Fld("Mobile"), Fld("Phone"),
+            Fld("Email"), Fld("VATNumber", hint="للعملاء المنشآت (فاتورة ضريبية)"),
+            Fld("CRNumber"), Fld("City"), Fld("District"), Fld("StreetName"),
+            Fld("BuildingNo"), Fld("PostalCode"), Fld("Address", span=2),
+            Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
+            Fld("AllowCredit"), Fld("CreditLimit", hint="0 = بدون حد"),
+            Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق على العميل"),
+            Fld("Notes", span=2),
+        ]),
+    DataScreen(
+        "frmSuppliers", "Suppliers", "الموردون", "بيانات الموردين وأرصدتهم", "suppliers",
+        list_select="t.SupplierName AS [المورد], t.Mobile AS [الجوال], t.CurrentBalance AS [الرصيد]",
+        list_from="Suppliers AS t", list_order="t.SupplierName",
+        list_headers=[("المورد", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
+        search=["t.SupplierName", "t.ContactPerson", "t.Mobile", "t.VATNumber"],
+        active="t.IsActive",
+        fields=[
+            Fld("SupplierName", span=2), Fld("ContactPerson"), Fld("Mobile"),
+            Fld("Phone"), Fld("Email"), Fld("VATNumber"), Fld("CRNumber"),
+            Fld("City"), Info("lblSupplierNote", " "), Fld("Address", span=2),
+            Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
+            Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق للمورد"),
+            Fld("Notes", span=2),
+        ]),
+    DataScreen(
+        "frmExpenses", "Expenses", "المصروفات", "تسجيل مصروفات المحل", "expenses",
+        list_select=("t.ExpenseNumber AS [الرقم], t.ExpenseDate AS [التاريخ], "
+                     "x.ExpenseTypeName AS [النوع], t.TotalAmount AS [المبلغ]"),
+        list_from="Expenses AS t INNER JOIN ExpenseTypes AS x ON t.ExpenseTypeID = x.ExpenseTypeID",
+        list_order="t.ExpenseDate DESC, t.ExpenseID DESC",
+        list_headers=[("الرقم", 2.0), ("التاريخ", 2.1), ("النوع", 2.6), ("المبلغ", 1.7)],
+        search=["t.ExpenseNumber", "t.Description", "x.ExpenseTypeName", "t.SupplierInvoiceRef"],
+        seq="EXPENSE:ExpenseNumber", unique=["ExpenseNumber"],
+        fields=[
+            Fld("ExpenseNumber", locked=True, hint="يُولَّد عند الحفظ"), Fld("ExpenseDate"),
+            Fld("ExpenseTypeID", rows=EXPENSE_TYPE_ROWS), Fld("PaymentMethodID", rows=PAYMENT_ROWS),
+            Fld("Amount", hook=True), Fld("Tax", hook=True,
+                                         button=("btnCalcVat", "احسب 15%", "CalcExpenseVat Me")),
+            Fld("TotalAmount", locked=True), Fld("SupplierInvoiceRef"),
+            Fld("Description", span=2),
+        ]),
+    DataScreen(
+        "frmCategories", "Categories", "التصنيفات", "تصنيفات المنتجات", "category",
+        list_select="t.CategoryName AS [التصنيف]", list_from="Categories AS t",
+        list_order="t.CategoryName", list_headers=[("التصنيف", 8.4)],
+        search=["t.CategoryName", "t.Description"], active="t.IsActive", unique=["CategoryName"],
+        fields=[Fld("CategoryName", span=2), Fld("Description", span=2), Fld("IsActive")]),
+    DataScreen(
+        "frmUnits", "Units", "وحدات القياس", "وحدات بيع المنتجات", "category",
+        list_select="t.UnitName AS [الوحدة], t.ZatcaUnitCode AS [الرمز]", list_from="Units AS t",
+        list_order="t.UnitName", list_headers=[("الوحدة", 5.4), ("الرمز", 3.0)],
+        search=["t.UnitName", "t.ZatcaUnitCode"], active="t.IsActive", unique=["UnitName"],
+        fields=[Fld("UnitName"), Fld("ZatcaUnitCode", hint="مثال: PCE للحبة، KGM للكيلو"),
+                Fld("IsActive")]),
+    DataScreen(
+        "frmExpenseTypes", "ExpenseTypes", "أنواع المصروفات", "قائمة أنواع المصروفات", "expenses",
+        list_select="t.ExpenseTypeName AS [النوع]", list_from="ExpenseTypes AS t",
+        list_order="t.ExpenseTypeName", list_headers=[("النوع", 8.4)],
+        search=["t.ExpenseTypeName"], active="t.IsActive", unique=["ExpenseTypeName"],
+        fields=[Fld("ExpenseTypeName", span=2), Fld("IsActive")]),
+    DataScreen(
+        "frmSettings", "Settings", "الإعدادات", "بيانات المحل الضريبية وإعدادات التشغيل", "settings",
+        kind="SINGLE", allow_add=False, allow_delete=False,
+        record_source="SELECT * FROM Settings WHERE SettingID = 1",
+        extra_buttons=[("btnCategories", "التصنيفات", 'OpenScreen "frmCategories"'),
+                       ("btnUnits", "الوحدات", 'OpenScreen "frmUnits"'),
+                       ("btnExpenseTypes", "أنواع المصروفات", 'OpenScreen "frmExpenseTypes"')],
+        fields=[
+            Fld("StoreName"), Fld("StoreNameEn"),
+            Fld("VATNumber", hint="15 رقمًا يبدأ وينتهي بـ 3"), Fld("CRNumber"),
+            Fld("BuildingNo"), Fld("StreetName"), Fld("District"), Fld("City"),
+            Fld("PostalCode"), Fld("AdditionalNo"), Fld("Phone"), Fld("Email"),
+            Fld("VATRate"), Fld("PricesIncludeVAT"),
+            Fld("AllowNegativeStock"), Fld("SlowMovingDays"),
+            Fld("BackupFolder", button=("btnBrowseBackup", "استعراض", 'BrowseFolder Me, "BackupFolder"')),
+            Fld("BackupKeepCount"),
+            Fld("LogoPath", button=("btnBrowseLogo", "استعراض", 'BrowseFile Me, "LogoPath"')),
+            Fld("ReceiptFooter"),
+        ]),
+]
+
+
+@dataclass
+class NavItem:
+    key: str
+    caption: str
+    icon: str
+    target: str          # form name, or "" for the logout action
+    phase: int
+
+
+NAV_ITEMS: List[NavItem] = [
+    NavItem("Sales", "المبيعات", "sales", "frmPOS", 6),
+    NavItem("Purchases", "المشتريات", "purchases", "frmPurchaseInvoice", 7),
+    NavItem("Inventory", "المخزون", "inventory", "frmInventory", 7),
+    NavItem("Products", "المنتجات", "products", "frmProducts", 5),
+    NavItem("Customers", "العملاء", "customers", "frmCustomers", 5),
+    NavItem("Suppliers", "الموردون", "suppliers", "frmSuppliers", 5),
+    NavItem("Expenses", "المصروفات", "expenses", "frmExpenses", 5),
+    NavItem("StockCount", "الجرد", "stocktake", "frmStockCount", 7),
+    NavItem("Reports", "التقارير", "reports", "frmReportCenter", 5),
+    NavItem("Search", "البحث", "search", "frmSearch", 5),
+    NavItem("Settings", "الإعدادات", "settings", "frmSettings", 5),
+    NavItem("Users", "المستخدمون", "users", "frmUsers", 10),
+    NavItem("Backup", "نسخة احتياطية", "backup", "frmBackup", 10),
+    NavItem("Logout", "تسجيل الخروج", "logout", "", 0),
+]
+
+
+# --------------------------------------------------------------------------
+# Search templates and report catalogue (runtime data, emitted to modAppData)
+# Tokens: {LIKE} quoted Like pattern, {NUM} exact id or -1, {FROM}/{TO} date literals
+# --------------------------------------------------------------------------
+@dataclass
+class SearchKind:
+    key: str
+    caption: str
+    sql: str
+    widths: List[float]     # cm per column, first = hidden id (0)
+
+
+SEARCH_KINDS: List[SearchKind] = [
+    SearchKind("PRODUCT", "المنتجات",
+               "SELECT p.ProductID, p.ProductCode AS [الكود], p.Barcode AS [الباركود], "
+               "p.ProductName AS [المنتج], p.CurrentQuantity AS [الكمية], p.SellingPrice AS [السعر] "
+               "FROM Products AS p WHERE p.ProductName Like {LIKE} OR p.ProductCode Like {LIKE} "
+               "OR p.Barcode Like {LIKE} OR p.ProductNameEn Like {LIKE} OR p.ProductID = {NUM} "
+               "ORDER BY p.ProductName",
+               [0, 2.5, 3.5, 9, 2.5, 2.5]),
+    SearchKind("CUSTOMER", "العملاء",
+               "SELECT c.CustomerID, c.CustomerName AS [العميل], c.Mobile AS [الجوال], "
+               "c.VATNumber AS [الرقم الضريبي], c.CurrentBalance AS [الرصيد] "
+               "FROM Customers AS c WHERE c.CustomerName Like {LIKE} OR c.Mobile Like {LIKE} "
+               "OR c.Phone Like {LIKE} OR c.VATNumber Like {LIKE} OR c.CustomerID = {NUM} "
+               "ORDER BY c.CustomerName",
+               [0, 9, 3.5, 4.5, 3]),
+    SearchKind("SUPPLIER", "الموردون",
+               "SELECT s.SupplierID, s.SupplierName AS [المورد], s.ContactPerson AS [المسؤول], "
+               "s.Mobile AS [الجوال], s.CurrentBalance AS [الرصيد] "
+               "FROM Suppliers AS s WHERE s.SupplierName Like {LIKE} OR s.ContactPerson Like {LIKE} "
+               "OR s.Mobile Like {LIKE} OR s.VATNumber Like {LIKE} OR s.SupplierID = {NUM} "
+               "ORDER BY s.SupplierName",
+               [0, 8, 5, 3.5, 3]),
+    SearchKind("SALE", "فواتير البيع",
+               "SELECT h.SalesInvoiceID, h.InvoiceNumber AS [رقم الفاتورة], h.InvoiceDate AS [التاريخ], "
+               "c.CustomerName AS [العميل], h.TotalAmount AS [الإجمالي], h.RemainingAmount AS [المتبقي] "
+               "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID "
+               "WHERE (h.InvoiceNumber Like {LIKE} OR c.CustomerName Like {LIKE} OR c.Mobile Like {LIKE}) "
+               "AND h.InvoiceDate >= {FROM} AND h.InvoiceDate < {TO} ORDER BY h.InvoiceDate DESC",
+               [0, 3.5, 4, 8, 3, 3]),
+    SearchKind("PURCHASE", "فواتير الشراء",
+               "SELECT h.PurchaseInvoiceID, h.InvoiceNumber AS [رقم الفاتورة], "
+               "h.SupplierInvoiceNo AS [فاتورة المورد], h.InvoiceDate AS [التاريخ], "
+               "s.SupplierName AS [المورد], h.TotalAmount AS [الإجمالي] "
+               "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID "
+               "WHERE (h.InvoiceNumber Like {LIKE} OR h.SupplierInvoiceNo Like {LIKE} "
+               "OR s.SupplierName Like {LIKE}) AND h.InvoiceDate >= {FROM} AND h.InvoiceDate < {TO} "
+               "ORDER BY h.InvoiceDate DESC",
+               [0, 3.5, 3.5, 4, 7, 3]),
+]
+
+
+@dataclass
+class ReportEntry:
+    key: str
+    title: str
+    query: str
+    report: str
+    needs: str = ""
+    date_column: str = ""
+
+
+REPORTS: List[ReportEntry] = [
+    ReportEntry("DAILY_SALES", "المبيعات اليومية", "DailySalesQuery", "rptDailySales", "D", "SaleDate"),
+    ReportEntry("MONTHLY_SALES", "المبيعات الشهرية", "MonthlySalesQuery", "rptMonthlySales"),
+    ReportEntry("SALES_PERIOD", "المبيعات حسب فترة", "SalesByPeriodQuery", "rptSalesByPeriod", "Pc"),
+    ReportEntry("SALES_PRODUCT", "المبيعات حسب المنتج", "SalesByProductQuery", "rptSalesByProduct", "Pr"),
+    ReportEntry("BEST_SELLING", "أفضل المنتجات مبيعًا", "BestSellingProductsQuery", "rptBestSelling", "P"),
+    ReportEntry("LEAST_SELLING", "أقل المنتجات مبيعًا", "LeastSellingProductsQuery", "rptLeastSelling", "P"),
+    ReportEntry("PURCHASES", "المشتريات", "PurchasesQuery", "rptPurchases", "Ps"),
+    ReportEntry("STOCK", "المخزون الحالي", "StockBalanceQuery", "rptStockBalance"),
+    ReportEntry("LOW_STOCK", "المنتجات منخفضة المخزون", "LowStockQuery", "rptLowStock"),
+    ReportEntry("PRODUCT_MOVEMENT", "حركة منتج", "ProductMovementQuery", "rptProductMovement", "PR"),
+    ReportEntry("CUSTOMER_STATEMENT", "كشف حساب عميل", "CustomerStatementQuery", "rptCustomerStatement", "PC"),
+    ReportEntry("SUPPLIER_STATEMENT", "كشف حساب مورد", "SupplierStatementQuery", "rptSupplierStatement", "PS"),
+    ReportEntry("EXPENSES", "المصروفات", "ExpensesQuery", "rptExpenses", "P"),
+    ReportEntry("EXPENSES_BY_TYPE", "المصروفات حسب النوع", "ExpensesByTypeQuery", "rptExpensesByType", "P"),
+    ReportEntry("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P"),
+    ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
+    ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
+    ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P"),
+    ReportEntry("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances"),
+    ReportEntry("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances"),
+    ReportEntry("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck"),
+]
+
+
+# --------------------------------------------------------------------------
+# Layout
+# --------------------------------------------------------------------------
+@dataclass
+class FormModel:
+    name: str
+    caption: str
+    width: int
+    height: int
+    popup: bool
+    record_source: str = ""
+    tag: str = ""
+    allow_add: bool = True
+    allow_edit: bool = True
+    controls: List[Control] = field(default_factory=list)
+    form_events: List[str] = field(default_factory=list)
+    code: List[str] = field(default_factory=list)       # module lines
+
+    def add(self, c: Control) -> Control:
+        self.controls.append(c)
+        return c
+
+
+BUTTON_W, BUTTON_H, GAP = cm(2.4), cm(0.85), cm(0.2)
+
+
+def title_band(m: FormModel, title: str, subtitle: str, icon: str):
+    m.add(Control("rect", "boxTitle", 0, 0, m.width, cm(1.5), {"BackColor": Sym("CLR_PRIMARY")},
+                  decorative=True))
+    m.add(Control("icon", "icoTitle", cm(0.4), cm(0.3), cm(0.9), cm(0.9),
+                  {"Caption": Sym(f"ChrW(&H{ICONS[icon]:X})"), "FontSize": 20,
+                   "ForeColor": Sym("CLR_SURFACE")}, decorative=True))
+    m.add(Control("label", "lblTitle", cm(1.5), cm(0.18), cm(14), cm(0.75),
+                  {"Caption": title, "FontSize": 16, "FontBold": True,
+                   "ForeColor": Sym("CLR_SURFACE")}, decorative=True))
+    m.add(Control("label", "lblSubtitle", cm(1.5), cm(0.9), cm(14), cm(0.5),
+                  {"Caption": subtitle, "FontSize": 9, "ForeColor": Sym("CLR_SIDEBAR_TEXT")},
+                  decorative=True))
+
+
+def button(m: FormModel, name, caption, x, y, style="secondary", w=BUTTON_W, h=BUTTON_H,
+           call=None):
+    m.add(Control("button", name, x, y, w, h, {"Caption": caption, "Style": style},
+                  events=["Click"]))
+    if call:
+        m.code += [f"Private Sub {name}_Click()", f"    {call}", "End Sub"]
+
+
+def kind_of(table_name: str, field_name: str):
+    for f in table(table_name).fields:
+        if f.name == field_name:
+            return f
+    raise KeyError(f"{table_name}.{field_name}")
+
+
+def input_control(m: FormModel, screen: DataScreen, fld: Fld, x, y, w, h, multiline=False):
+    f = kind_of(screen.table, fld.field)
+    props: Dict[str, object] = {}
+    if f.kind == "BOOL":
+        c = Control("check", fld.field, x, y + cm(0.15), cm(0.5), cm(0.5), props,
+                    source=fld.field)
+    elif fld.rows:
+        props["RowSource"] = fld.rows
+        props["ColumnCount"] = 2
+        props["ColumnWidths"] = fld.widths or "0;6"
+        c = Control("combo", fld.field, x, y, w, h, props, source=fld.field)
+    else:
+        if f.kind in ("MONEY",):
+            props["Format"] = "#,##0.00"
+        elif f.kind == "QTY":
+            props["Format"] = "#,##0.###"
+        elif f.kind == "RATE":
+            props["Format"] = "0.00%"
+        elif f.kind in ("DATE", "DATETIME"):
+            props["Format"] = "yyyy/mm/dd"
+        if multiline:
+            props["EnterKeyBehavior"] = True
+            props["ScrollBars"] = 2
+        c = Control("text", fld.field, x, y, w, h, props, source=fld.field)
+    if fld.locked:
+        c.props["Locked"] = True
+        c.props["TabStop"] = False
+    if fld.hook:
+        c.events.append("AfterUpdate")
+        m.code += [f"Private Sub {fld.field}_AfterUpdate()",
+                   f'    FieldChanged Me, "{fld.field}"', "End Sub"]
+    m.add(c)
+    return c, f
+
+
+def layout_data_screen(s: DataScreen) -> FormModel:
+    width = cm(27.0)
+    m = FormModel(s.name, s.caption, width, 0, popup=True,
+                  record_source=s.record_source or f"SELECT * FROM {s.table}",
+                  tag=s.tag(), allow_add=s.allow_add)
+    title_band(m, s.caption, s.subtitle, s.icon)
+
+    # toolbar
+    y = cm(1.8)
+    x = cm(0.4)
+    toolbar = []
+    if s.allow_add:
+        toolbar.append(("btnNew", "جديد", "secondary", 'FormAction Me, "NEW"'))
+    toolbar.append(("btnSave", "حفظ", "primary", 'FormAction Me, "SAVE"'))
+    toolbar.append(("btnUndo", "تراجع", "secondary", 'FormAction Me, "UNDO"'))
+    if s.allow_delete:
+        toolbar.append(("btnDelete", "حذف", "danger", 'FormAction Me, "DELETE"'))
+    for name, caption, style, call in toolbar:
+        button(m, name, caption, x, y, style, call=call)
+        x += BUTTON_W + GAP
+    for name, caption, call in s.extra_buttons:
+        button(m, name, caption, x, y, "secondary", w=cm(3.0), call=call)
+        x += cm(3.0) + GAP
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - BUTTON_W, y, "secondary",
+           call='FormAction Me, "CLOSE"')
+
+    top = cm(3.0)
+    if s.kind == "LIST":
+        lx, lw = cm(0.4), cm(8.8)
+        m.add(Control("label", "lblSearch", lx, top, cm(5.5), cm(0.5),
+                      {"Caption": "بحث (F3)", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")},
+                      decorative=True))
+        m.add(Control("label", "lblCount", lx + cm(5.6), top, lw - cm(5.6), cm(0.5),
+                      {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED"),
+                       "TextAlign": 3}, decorative=True))
+        m.add(Control("text", "txtSearch", lx, top + cm(0.5), lw, cm(0.8), {}, events=["Change"]))
+        m.code += ["Private Sub txtSearch_Change()", "    RefreshList Me", "End Sub"]
+        list_top = top + cm(1.5)
+        if s.active:
+            m.add(Control("check", "chkShowInactive", lx, list_top + cm(0.05), cm(0.5), cm(0.5),
+                          {"DefaultValue": "False"}, events=["AfterUpdate"]))
+            m.add(Control("label", "lblShowInactive", lx + cm(0.6), list_top, cm(5), cm(0.6),
+                          {"Caption": "إظهار غير النشط", "FontSize": 9,
+                           "ForeColor": Sym("CLR_MUTED")}, decorative=True))
+            m.code += ["Private Sub chkShowInactive_AfterUpdate()", "    RefreshList Me", "End Sub"]
+            list_top += cm(0.8)
+        widths = ";".join(["0"] + [f"{w:g}" for _, w in s.list_headers])
+        list_ctl = m.add(Control("list", "lstItems", lx, list_top, lw, 0,
+                                 {"ColumnCount": len(s.list_headers) + 1, "ColumnWidths": widths,
+                                  "ColumnHeads": True}, events=["AfterUpdate"]))
+        m.code += ["Private Sub lstItems_AfterUpdate()", "    ListPick Me", "End Sub"]
+        dx, dw = cm(9.6), width - cm(0.4) - cm(9.6)
+        label_w = cm(3.0)
+    else:
+        list_ctl = None
+        dx, dw = cm(0.4), width - cm(0.8)
+        label_w = cm(4.0)
+
+    # field grid: two columns, label on the start side of each input
+    col_gap = cm(0.4)
+    col_w = (dw - col_gap) // 2
+    row_h, ctl_h = cm(1.0), cm(0.75)
+    y = top
+    col = 0
+    for item in s.fields:
+        if isinstance(item, Info):
+            if col == 1:
+                cx = dx + col_w + col_gap
+                m.add(Control("label", item.name, cx, y, col_w, ctl_h,
+                              {"Caption": item.text, "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+                y += row_h
+                col = 0
+            else:
+                m.add(Control("label", item.name, dx, y, dw, ctl_h,
+                              {"Caption": item.text, "FontSize": 10, "ForeColor": Sym("CLR_ACCENT"),
+                               "FontBold": True}))
+                y += row_h
+            continue
+        f = kind_of(s.table, item.field)
+        span = 2 if item.span == 2 else 1
+        if span == 2 and col == 1:
+            y += row_h
+            col = 0
+        cx = dx + (col_w + col_gap) * col
+        w_total = dw if span == 2 else col_w
+        tall = f.kind == "MEMO" or (span == 2 and item.field == "Description")
+        h = cm(1.6) if tall else ctl_h
+        input_w = w_total - label_w - cm(0.1)
+        if item.button:
+            input_w -= cm(2.3)
+        ctl, f = input_control(m, s, item, cx + label_w + cm(0.1), y, input_w, h, multiline=tall)
+        caption = item.label or f.caption
+        seq_field = s.seq.split(":")[1] if s.seq else ""
+        if (f.required and f.default is None and f.kind not in ("AUTO", "BOOL")
+                and not item.locked and item.field != seq_field):
+            caption += " *"
+        m.add(Control("label", "lbl" + item.field, cx, y, label_w, ctl_h,
+                      {"Caption": caption, "FontSize": 10, "ForeColor": Sym("CLR_MUTED")},
+                      parent=item.field))
+        if item.hint:
+            ctl.props["ControlTipText"] = item.hint
+            ctl.props["StatusBarText"] = item.hint
+        if item.button:
+            bname, bcaption, call = item.button
+            button(m, bname, bcaption, cx + w_total - cm(2.2), y, "secondary", w=cm(2.2),
+                   h=ctl_h, call=call)
+        advance = h + (row_h - ctl_h)
+        if span == 2:
+            y += advance
+            col = 0
+        elif col == 0:
+            col = 1
+            row_advance = advance
+        else:
+            y += max(advance, row_advance)
+            col = 0
+    if col == 1:
+        y += row_advance
+    status_y = y + cm(0.2)
+    m.add(Control("label", "lblStatus", dx, status_y, dw, cm(0.6),
+                  {"Caption": " ", "FontSize": 10, "FontBold": True,
+                   "ForeColor": Sym("CLR_MUTED")}))
+    m.height = max(status_y + cm(1.2), cm(14.5))
+    if list_ctl:
+        list_ctl.h = m.height - list_ctl.y - cm(0.5)
+
+    m.form_events = ["Load", "Current", "BeforeUpdate", "AfterUpdate", "Error", "KeyDown", "Unload"]
+    m.code = [
+        "Private Sub Form_Load()", "    FormLoad Me", "End Sub",
+        "Private Sub Form_Current()", "    FormCurrent Me", "End Sub",
+        "Private Sub Form_BeforeUpdate(Cancel As Integer)", "    Cancel = Not FormBeforeUpdate(Me)", "End Sub",
+        "Private Sub Form_AfterUpdate()", "    FormAfterUpdate Me", "End Sub",
+        "Private Sub Form_Error(DataErr As Integer, Response As Integer)",
+        "    Response = FormError(Me, DataErr)", "End Sub",
+        "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)",
+        "    FormKeyDown Me, KeyCode, Shift", "End Sub",
+        "Private Sub Form_Unload(Cancel As Integer)", "    Cancel = Not FormUnload(Me)", "End Sub",
+    ] + m.code
+    return m
+
+
+def layout_main() -> FormModel:
+    width, height = cm(33.5), cm(19.0)
+    m = FormModel("frmMain", "نظام إدارة المحل", width, height, popup=False, allow_add=False,
+                  allow_edit=False)
+    side_w = cm(6.2)
+    m.add(Control("rect", "boxSidebar", 0, 0, side_w, height, {"BackColor": Sym("CLR_PRIMARY")},
+                  decorative=True))
+    m.add(Control("icon", "icoApp", cm(0.4), cm(0.45), cm(1.0), cm(1.0),
+                  {"Caption": Sym(f"ChrW(&H{ICONS['home']:X})"), "FontSize": 22,
+                   "ForeColor": Sym("CLR_SURFACE")}, decorative=True))
+    m.add(Control("label", "lblAppTitle", cm(1.5), cm(0.4), side_w - cm(1.7), cm(0.75),
+                  {"Caption": "نظام إدارة المحل", "FontSize": 15, "FontBold": True,
+                   "ForeColor": Sym("CLR_SURFACE")}, decorative=True))
+    m.add(Control("label", "lblStoreName", cm(1.5), cm(1.15), side_w - cm(1.7), cm(0.55),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_SIDEBAR_TEXT")},
+                  decorative=True))
+    y = cm(2.3)
+    for item in NAV_ITEMS:
+        name = f"btnNav{item.key}"
+        call = (f'OpenScreen "{item.target}", {item.phase}' if item.target else "ExitApplication")
+        button(m, name, item.caption, cm(0.25), y, "nav", w=side_w - cm(0.5), h=cm(0.95),
+               call=call)
+        icon = m.add(Control("icon", f"ico{item.key}", cm(0.45), y + cm(0.15), cm(0.8),
+                             cm(0.65), {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"),
+                                        "FontSize": 13, "ForeColor": Sym("CLR_SIDEBAR_TEXT")},
+                             events=["Click"], decorative=True))
+        m.code += [f"Private Sub {icon.name}_Click()", f"    {call}", "End Sub"]
+        y += cm(1.05)
+
+    cx = side_w + cm(0.8)
+    cw = width - cx - cm(0.8)
+    m.add(Control("label", "lblWelcome", cx, cm(0.6), cm(14), cm(0.95),
+                  {"Caption": "لوحة التحكم", "FontSize": 20, "FontBold": True,
+                   "ForeColor": Sym("CLR_TEXT")}))
+    m.add(Control("label", "lblToday", cx, cm(1.6), cm(10), cm(0.6),
+                  {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED")}))
+    m.add(Control("label", "lblUser", cx + cw - cm(9), cm(1.6), cm(9), cm(0.6),
+                  {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 3}))
+    tiles = ["مبيعات اليوم", "مبيعات الشهر", "صافي الربح التقريبي", "منتجات منخفضة المخزون"]
+    tile_w = (cw - cm(0.4) * 3) // 4
+    for i, caption in enumerate(tiles):
+        tx = cx + i * (tile_w + cm(0.4))
+        m.add(Control("rect", f"boxTile{i + 1}", tx, cm(2.7), tile_w, cm(2.5),
+                      {"BackColor": Sym("CLR_SURFACE")}, decorative=True))
+        m.add(Control("label", f"lblTileTitle{i + 1}", tx + cm(0.3), cm(2.9), tile_w - cm(0.6),
+                      cm(0.6), {"Caption": caption, "FontSize": 10, "ForeColor": Sym("CLR_MUTED")},
+                      decorative=True))
+        m.add(Control("label", f"lblTileValue{i + 1}", tx + cm(0.3), cm(3.6), tile_w - cm(0.6),
+                      cm(1.0), {"Caption": "-", "FontSize": 20, "FontBold": True,
+                                "ForeColor": Sym("CLR_PRIMARY")}, decorative=True))
+    m.add(Control("label", "lblTilesNote", cx, cm(5.4), cw, cm(0.6),
+                  {"Caption": "مؤشرات لوحة التحكم تُفعَّل في المرحلة 9", "FontSize": 9,
+                   "ForeColor": Sym("CLR_MUTED")}))
+    m.add(Control("label", "lblIntegrity", cx, height - cm(1.2), cw, cm(0.6),
+                  {"Caption": " ", "FontSize": 10, "FontBold": True,
+                   "ForeColor": Sym("CLR_MUTED")}))
+    m.form_events = ["Load"]
+    m.code = ["Private Sub Form_Load()", "    MainLoad Me", "End Sub"] + m.code
+    return m
+
+
+def labelled(m: FormModel, name, caption, ctl: Control, label_h=cm(0.5)):
+    m.add(Control("label", "lbl" + name[3:], ctl.x, ctl.y - label_h - cm(0.05), ctl.w, label_h,
+                  {"Caption": caption, "FontSize": 9, "ForeColor": Sym("CLR_MUTED")},
+                  parent=ctl.name))
+
+
+def layout_search() -> FormModel:
+    width, height = cm(27.0), cm(17.0)
+    m = FormModel("frmSearch", "البحث المتقدم", width, height, popup=False, allow_add=False)
+    title_band(m, "البحث المتقدم", "ابحث بالاسم أو الكود أو الباركود أو رقم الفاتورة أو الجوال",
+               "search")
+    y = cm(2.45)
+    kinds = ";".join(f"{k.key};{k.caption}" for k in SEARCH_KINDS)
+    cbo = m.add(Control("combo", "cboKind", cm(0.4), y, cm(4.2), cm(0.8),
+                        {"RowSource": kinds, "ColumnCount": 2, "ColumnWidths": "0;4",
+                         "DefaultValue": '"PRODUCT"'}, events=["AfterUpdate"]))
+    labelled(m, "cboKind", "ابحث في", cbo)
+    txt = m.add(Control("text", "txtText", cm(4.9), y, cm(8.6), cm(0.8), {}, events=["AfterUpdate"]))
+    labelled(m, "txtText", "كلمة البحث (اسم، كود، باركود، رقم، جوال)", txt)
+    d1 = m.add(Control("text", "txtFrom", cm(13.8), y, cm(3.2), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtFrom", "من تاريخ", d1)
+    d2 = m.add(Control("text", "txtTo", cm(17.3), y, cm(3.2), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtTo", "إلى تاريخ", d2)
+    button(m, "btnSearch", "بحث", cm(20.8), y - cm(0.03), "primary", call="RunSearch Me")
+    button(m, "btnClear", "مسح", cm(23.4), y - cm(0.03), "secondary", w=cm(1.6),
+           call="SearchClear Me")
+    button(m, "btnClose", "رجوع", width - cm(0.4) - cm(1.6), y - cm(0.03), "secondary",
+           w=cm(1.6), call='DoCmd.Close acForm, Me.Name')
+    m.add(Control("list", "lstResults", cm(0.4), cm(3.7), width - cm(0.8), height - cm(3.7) - cm(1.2),
+                  {"ColumnHeads": True, "ColumnCount": 6}, events=["DblClick"]))
+    m.add(Control("label", "lblCount", cm(0.4), height - cm(0.95), width - cm(0.8), cm(0.6),
+                  {"Caption": " ", "FontSize": 10, "ForeColor": Sym("CLR_MUTED")}))
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    SearchLoad Me", "End Sub",
+               "Private Sub cboKind_AfterUpdate()", "    SearchKindChanged Me", "End Sub",
+               "Private Sub txtText_AfterUpdate()", "    RunSearch Me", "End Sub",
+               "Private Sub lstResults_DblClick(Cancel As Integer)", "    SearchOpen Me", "End Sub"]
+              + m.code)
+    return m
+
+
+def layout_report_center() -> FormModel:
+    width, height = cm(27.0), cm(17.0)
+    m = FormModel("frmReportCenter", "التقارير", width, height, popup=False, allow_add=False)
+    title_band(m, "مركز التقارير", "اختر التقرير ثم حدد الفترة أو العميل أو المنتج", "reports")
+    m.add(Control("list", "lstReports", cm(0.4), cm(1.9), cm(9.0), height - cm(2.4),
+                  {"RowSourceType": "Value List", "ColumnCount": 2, "ColumnWidths": "0;8.6",
+                   "ColumnHeads": False, "FontSize": 11}, events=["AfterUpdate", "DblClick"]))
+    px, pw = cm(10.0), width - cm(10.0) - cm(0.4)
+    m.add(Control("label", "lblReportTitle", px, cm(1.9), pw, cm(0.85),
+                  {"Caption": " ", "FontSize": 16, "FontBold": True,
+                   "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("label", "lblNeeds", px, cm(2.8), pw, cm(0.6),
+                  {"Caption": " ", "FontSize": 10, "ForeColor": Sym("CLR_MUTED")}))
+    y = cm(4.1)
+    d1 = m.add(Control("text", "txtFrom", px, y, cm(4.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtFrom", "من تاريخ", d1)
+    d2 = m.add(Control("text", "txtTo", px + cm(4.4), y, cm(4.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtTo", "إلى تاريخ", d2)
+    y = cm(5.2)
+    for i, (name, caption, which) in enumerate([("btnToday", "اليوم", "TODAY"),
+                                                ("btnThisMonth", "هذا الشهر", "MONTH"),
+                                                ("btnLastMonth", "الشهر الماضي", "LASTMONTH"),
+                                                ("btnThisYear", "هذه السنة", "YEAR")]):
+        button(m, name, caption, px + i * cm(3.1), y, "secondary", w=cm(2.9), h=cm(0.75),
+               call=f'SetQuickPeriod Me, "{which}"')
+    y = cm(6.9)
+    for name, caption, rows in [("cboCustomer", "العميل", CUSTOMER_ROWS),
+                                ("cboSupplier", "المورد", SUPPLIER_ROWS),
+                                ("cboProduct", "المنتج", PRODUCT_ROWS)]:
+        c = m.add(Control("combo", name, px, y, cm(9.0), cm(0.8),
+                          {"RowSource": rows, "ColumnCount": 2, "ColumnWidths": "0;9"}))
+        labelled(m, name, caption, c)
+        y += cm(1.45)
+    button(m, "btnRun", "عرض التقرير", px, y + cm(0.3), "primary", w=cm(5.0), h=cm(1.0),
+           call="RunReport Me")
+    button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.0), y + cm(0.3), "secondary",
+           w=cm(2.0), h=cm(1.0), call='DoCmd.Close acForm, Me.Name')
+    m.add(Control("label", "lblPhaseNote", px, y + cm(1.7), pw, cm(1.0),
+                  {"Caption": "التقارير المنسقة للطباعة تُضاف في المرحلة 8، وحتى ذلك الحين "
+                              "تُعرض النتائج كجدول.", "FontSize": 9,
+                   "ForeColor": Sym("CLR_MUTED")}))
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    ReportCenterLoad Me", "End Sub",
+               "Private Sub lstReports_AfterUpdate()", "    ReportSelected Me", "End Sub",
+               "Private Sub lstReports_DblClick(Cancel As Integer)", "    RunReport Me", "End Sub"]
+              + m.code)
+    return m
+
+
+def all_forms() -> List[FormModel]:
+    return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
+            + [layout_search(), layout_report_center()])
