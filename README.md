@@ -11,8 +11,8 @@
 | 3 | العلاقات | ✅ تمت الموافقة | [docs/03-Relationships.md](docs/03-Relationships.md) · [مرجع العلاقات](docs/03-Relationships-Reference.md) |
 | 4 | الاستعلامات | ✅ تمت الموافقة | [docs/04-Queries.md](docs/04-Queries.md) · [مرجع الاستعلامات](docs/04-Queries-Reference.md) |
 | 5 | النماذج | ✅ تمت الموافقة | [docs/05-Forms.md](docs/05-Forms.md) |
-| 6 | نظام المبيعات | ✅ بانتظار الموافقة | [docs/06-Sales.md](docs/06-Sales.md) |
-| 7 | المشتريات والمخزون | ⏳ | |
+| 6 | نظام المبيعات | ✅ تمت الموافقة | [docs/06-Sales.md](docs/06-Sales.md) |
+| 7 | المشتريات والمخزون | ✅ بانتظار الموافقة | [docs/07-Purchases-Inventory.md](docs/07-Purchases-Inventory.md) |
 | 8 | التقارير | ⏳ | |
 | 9 | لوحة التحكم | ⏳ | |
 | 10 | الصلاحيات | ⏳ | |
@@ -31,6 +31,7 @@
 | `tools/queries.py` | الاستعلامات وبيانات الاختبار والنتائج المتوقعة |
 | `tools/forms.py` | تعريف الشاشات وتخطيطها، قوالب البحث، قائمة التقارير |
 | `tools/forms_sales.py`, `tools/reports.py` | شاشات المبيعات، وتقارير الفاتورة |
+| `tools/forms_purchases.py`, `tools/purchases_reference.py` | شاشات المشتريات والمخزون والجرد، وسيناريو المرحلة 7 بنتائجه المتوقعة |
 | `tools/pricing.py`, `tools/zatca_reference.py`, `tools/qr_reference.py` | المراجع الحسابية: الفاتورة، حمولة QR للهيئة، مولّد QR |
 | `tests/vba_harness.py` | تشغيل كود VBA الحسابي فعليًا عبر LibreOffice للتحقق منه |
 | `tools/generate.py` | يولّد الكود والمرجع: `python3 tools/generate.py` |
@@ -45,6 +46,7 @@
 | 3 | `dist/vba/modQueryParams.bas` (دائمة) ثم `dist/vba/modBuildQueries.bas` | `BuildQueries` | `TestQueries` |
 | 4 | `modCommon`, `modStartup`, `modForms`, `modScreens`, `modAppData` (دائمة) ثم `modBuildForms` | `BuildForms` | `TestForms` |
 | 5 | `modZatca`, `modQRCode`, `modSales`, `modPOS` (دائمة) ثم `modBuildReports`, `modTestSales` | `BuildQueries`, `BuildForms`, `BuildReports` | `TestSales` |
+| 6 | `modPurchases`, `modPurchaseScreens` (دائمة) ثم `modTestPurchases` | `BuildQueries`, `BuildForms` | `TestPurchases` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 
@@ -53,4 +55,4 @@
 python3 tools/generate.py
 python3 -m unittest discover -s tests -v
 ```
-اختبارات `test_vba_runtime` تشغّل كود VBA فعليًا وتحتاج LibreOffice (`soffice` و `python3-uno`)، وتُتخطى تلقائيًا إن لم يكن مثبتًا.
+اختبارات `test_vba_runtime` و `test_purchases` تشغّل كود VBA الحسابي فعليًا وتحتاج LibreOffice (`soffice` و `python3-uno`)، وتُتخطى تلقائيًا إن لم يكن مثبتًا.

@@ -20,7 +20,7 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qrySalesDocPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qrySalesDocPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -365,6 +365,12 @@ Private Sub LoadFixture()
         "INSERT INTO [InventoryTransactions] ([TransactionDate], [ProductID], [TransactionTypeID], [Quantity], [UnitCost], [QuantityAfter], [ReferenceType], [ReferenceID], [ReferenceNumber], [EmployeeID]) VALUES (" & D(1, 10) & ", " & R("P1") & ", 3, -5, 60, 83, 'PURCHASE_RETURN', " & R("PRT1") & ", 'TEST-PRT-1', 1)"
     Ins "T10", "InventoryTransactions", "TransactionID", _
         "INSERT INTO [InventoryTransactions] ([TransactionDate], [ProductID], [TransactionTypeID], [Quantity], [UnitCost], [QuantityAfter], [ReferenceType], [ReferenceID], [ReferenceNumber], [EmployeeID]) VALUES (" & D(1, 15) & ", " & R("P2") & ", 6, -1, 10, 186, 'MANUAL', Null, 'TEST-ADJ-1', 1)"
+    Ins "CNT1", "StockCounts", "StockCountID", _
+        "INSERT INTO [StockCounts] ([CountNumber], [CountDate], [Status], [EmployeeID]) VALUES ('TEST-CNT-1', " & D(1, 18) & ", 'OPEN', 1)"
+    Ins "CNT1L1", "StockCountDetails", "StockCountDetailID", _
+        "INSERT INTO [StockCountDetails] ([StockCountID], [ProductID], [SystemQuantity], [ActualQuantity], [Difference], [UnitCost], [DifferenceValue]) VALUES (" & R("CNT1") & ", " & R("P1") & ", 83, 80, -3, 60, -180)"
+    Ins "CNT1L2", "StockCountDetails", "StockCountDetailID", _
+        "INSERT INTO [StockCountDetails] ([StockCountID], [ProductID], [SystemQuantity], [ActualQuantity], [Difference], [UnitCost], [DifferenceValue]) VALUES (" & R("CNT1") & ", " & R("P2") & ", 186, Null, 0, 10, 0)"
     Ins "EXP1", "Expenses", "ExpenseID", _
         "INSERT INTO [Expenses] ([ExpenseNumber], [ExpenseDate], [ExpenseTypeID], [Amount], [Tax], [TotalAmount], [PaymentMethodID], [Description], [EmployeeID]) VALUES ('TEST-EXP-1', " & D(6, 0) & ", 2, 200, 30, 230, 1, 'TEST ﬂÂ—»«¡', 1)"
     Ins "EXP2", "Expenses", "ExpenseID", _
@@ -386,6 +392,10 @@ Private Sub RunChecks()
         "SELECT COUNT(*) FROM LowStockQuery", 1
     Chk "„‰Œ›÷ «·„Œ“Ê‰: «·„‰ Ã 2 (186 <= 200)", _
         "SELECT ShortageQty FROM LowStockQuery WHERE ProductID = " & R("P2"), 14
+    Chk "«·Ã—œ «·„› ÊÕ: ⁄Ã“ «·„‰ Ã 1 = -3 ◊ 60", _
+        "SELECT DifferenceValue FROM StockCountQuery WHERE ProductID = " & R("P1"), -180
+    Chk "«·Ã—œ «·„› ÊÕ: ’‰› Ê«Õœ ·„ Ìı⁄œ¯ »⁄œ", _
+        "SELECT COUNT(*) FROM StockCountQuery WHERE ActualQuantity Is Null", 1
     Chk "€Ì— «·„ Õ—ﬂ…: „‰ Ã Ê«Õœ", _
         "SELECT COUNT(*) FROM SlowMovingProductsQuery", 1
     Chk "€Ì— «·„ Õ—ﬂ…: «·„‰ Ã 3 »ﬁÌ„… 200", _
@@ -530,6 +540,7 @@ Private Sub CreateAllQueries()
     Q_ProductMovementQuery
     Q_SlowMovingProductsQuery
     Q_StockByCategoryQuery
+    Q_StockCountQuery
     Q_qryCustomerLedger
     Q_qryCustomerLedgerTotals
     Q_CustomerBalanceQuery
@@ -805,6 +816,17 @@ Private Sub Q_StockByCategoryQuery()
     s = s & "GROUP BY c.CategoryID, c.CategoryName" & vbCrLf
     s = s & "ORDER BY c.CategoryName" & vbCrLf
     SaveQuery "StockByCategoryQuery", "«·„Œ“Ê‰ Õ”» «· ’‰Ì›: ⁄œœ «·„‰ Ã«  Ê«·ﬂ„Ì… Ê«·ﬁÌ„…", s
+End Sub
+
+Private Sub Q_StockCountQuery()
+    Dim s As String
+    s = "SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, d.ProductID," & vbCrLf
+    s = s & "       p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference," & vbCrLf
+    s = s & "       d.UnitCost, d.DifferenceValue, d.Notes" & vbCrLf
+    s = s & "FROM (StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)" & vbCrLf
+    s = s & "     INNER JOIN Products AS p ON d.ProductID = p.ProductID" & vbCrLf
+    s = s & "ORDER BY c.StockCountID, p.ProductName" & vbCrLf
+    SaveQuery "StockCountQuery", " ›«’Ì· Ã·”«  «·Ã—œ: «·ﬂ„Ì… «·„”Ã·… Ê«·›⁄·Ì… Ê«·›—ﬁ ÊﬁÌ„ Â", s
 End Sub
 
 Private Sub Q_qryCustomerLedger()

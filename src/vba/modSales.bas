@@ -1,6 +1,6 @@
 Attribute VB_Name = "modSales"
 '==============================================================================
-' modSales  -  Retail Store Management System (Phase 6)
+' modSales  -  Retail Store Management System (Phases 6-7)
 '
 ' 1) Invoice calculation engine (also used by purchases in Phase 7):
 '      CalcReset / CalcAddLine / CalcRun / CalcLine / CalcTotal
@@ -207,6 +207,39 @@ Public Function ReturnAmounts(ByVal SoldQty As Currency, ByVal SoldTotal As Curr
         TaxOut = RoundMoney(CDec(SoldTax) * CDec(Qty) / CDec(SoldQty))
     End If
     NetOut = TotalOut - TaxOut
+End Function
+
+Public Function WeightedAverage(ByVal CurQty As Currency, ByVal CurAvg As Currency, _
+                                ByVal Qty As Currency, ByVal UnitCost As Currency) As Currency
+    ' Average cost after Qty units (signed) at UnitCost. Same rule as tools/pricing.py.
+    '   in : (CurQty x CurAvg + Qty x UnitCost) / (CurQty + Qty); no stock before -> UnitCost
+    '   out at a known cost (purchase return): the same formula with a negative Qty, as long as
+    '        stock remains and the result is not negative; otherwise the average is kept.
+    Dim newQty As Currency, v As Currency
+    newQty = CurQty + Qty
+    WeightedAverage = CurAvg
+    If Qty > 0 Then
+        If CurQty <= 0 Then
+            WeightedAverage = UnitCost
+        Else
+            WeightedAverage = RoundMoney((CDec(CurQty) * CDec(CurAvg) + CDec(Qty) * CDec(UnitCost)) / CDec(newQty), 4)
+        End If
+    ElseIf Qty < 0 And newQty > 0 And CurQty > 0 Then
+        v = RoundMoney((CDec(CurQty) * CDec(CurAvg) + CDec(Qty) * CDec(UnitCost)) / CDec(newQty), 4)
+        If v >= 0 Then WeightedAverage = v
+    End If
+End Function
+
+Public Function PurchaseUnitCost(ByVal NetAmount As Currency, ByVal LineTotal As Currency, _
+                                 ByVal Qty As Currency, ByVal VatRegistered As Boolean) As Currency
+    ' Cost of one purchased unit after discounts. A VAT-registered store reclaims the input VAT,
+    ' so its cost excludes VAT; an unregistered store bears the VAT as part of the cost.
+    If Qty <= 0 Then Exit Function
+    If VatRegistered Then
+        PurchaseUnitCost = RoundMoney(CDec(NetAmount) / CDec(Qty), 4)
+    Else
+        PurchaseUnitCost = RoundMoney(CDec(LineTotal) / CDec(Qty), 4)
+    End If
 End Function
 
 '==============================================================================
@@ -568,21 +601,15 @@ Public Sub ApplyStockMovement(ByVal db As DAO.Database, ByVal ProductID As Long,
                               ByVal RefType As String, ByVal RefID As Long, ByVal RefNumber As String, _
                               Optional ByVal Notes As String = "", _
                               Optional ByVal RecalcAverage As Boolean = False)
-    ' Qty is signed (+ in, - out). RecalcAverage: incoming goods update the weighted average cost.
+    ' Qty is signed (+ in, - out). RecalcAverage: goods coming in (purchase, opening, stock in,
+    ' sales return) or going back to the supplier at their purchase cost update the average cost.
     Dim rs As DAO.Recordset, curQty As Currency, newQty As Currency
     Set rs = db.OpenRecordset("SELECT ProductID, CurrentQuantity, AverageCost, PurchasePrice, UpdatedAt " & _
                               "FROM Products WHERE ProductID = " & ProductID, dbOpenDynaset)
     rs.Edit
     curQty = rs!CurrentQuantity
     newQty = curQty + Qty
-    If RecalcAverage And Qty > 0 Then
-        If curQty <= 0 Then
-            rs!AverageCost = UnitCost
-        Else
-            rs!AverageCost = RoundMoney((CDec(curQty) * CDec(rs!AverageCost) + CDec(Qty) * CDec(UnitCost)) _
-                                        / CDec(newQty), 4)
-        End If
-    End If
+    If RecalcAverage Then rs!AverageCost = WeightedAverage(curQty, rs!AverageCost, Qty, UnitCost)
     rs!CurrentQuantity = newQty
     rs!UpdatedAt = Now
     rs.Update
@@ -641,14 +668,25 @@ Private Function CheckCustomer(ByVal CustomerID As Long, ByVal IsCredit As Boole
 End Function
 
 Private Function CheckStock(ByRef ProductIDs() As Long, ByVal n As Long) As String
-    ' Sum the cart per product and compare with the available quantity.
+    Dim qtys() As Currency, i As Long
+    ReDim qtys(0 To n - 1)
+    For i = 0 To n - 1
+        qtys(i) = CalcLine(i, "QTY")
+    Next
+    CheckStock = CheckStockAvailable(ProductIDs, qtys, n, "البيع")
+End Function
+
+Public Function CheckStockAvailable(ByRef ProductIDs() As Long, ByRef Qtys() As Currency, ByVal n As Long, _
+                                    ByVal Operation As String) As String
+    ' Sums the quantities per product and compares them with the stock. Taking out more than
+    ' the stock needs the AllowNegativeStock setting or an administrator's approval.
     Dim i As Long, j As Long, need As Currency, available As Currency, shortList As String
     For i = 0 To n - 1
         need = 0
         For j = 0 To n - 1
             If ProductIDs(j) = ProductIDs(i) Then
                 If j < i Then GoTo NextLine          ' already checked
-                need = need + CalcLine(j, "QTY")
+                need = need + Qtys(j)
             End If
         Next
         available = Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & ProductIDs(i)), 0)
@@ -661,17 +699,17 @@ NextLine:
     If Len(shortList) = 0 Then Exit Function
 
     If Nz(SettingValue("AllowNegativeStock"), False) Then
-        LogAction "NEGATIVE_STOCK", "Products", "", "Allowed by settings:" & shortList
+        LogAction "NEGATIVE_STOCK", "Products", "", Operation & " - allowed by settings:" & shortList
     ElseIf HasPermission("ALLOW_NEGATIVE_STOCK") Then
         If AskYesNo("الكمية المتوفرة غير كافية:" & shortList & vbCrLf & vbCrLf & _
-                    "هل تسمح بالبيع رغم ذلك؟ (بصلاحية مدير النظام)") Then
-            LogAction "NEGATIVE_STOCK", "Products", "", "Approved by user:" & shortList
+                    "هل تسمح بإتمام العملية (" & Operation & ") رغم ذلك؟ (بصلاحية مدير النظام)") Then
+            LogAction "NEGATIVE_STOCK", "Products", "", Operation & " - approved by user:" & shortList
         Else
-            CheckStock = "تم إلغاء الحفظ: الكمية غير كافية."
+            CheckStockAvailable = "تم إلغاء الحفظ: الكمية غير كافية."
         End If
     Else
-        CheckStock = "الكمية المتوفرة غير كافية:" & shortList & vbCrLf & _
-                     "البيع بأكثر من المتوفر يحتاج موافقة مدير النظام."
+        CheckStockAvailable = "الكمية المتوفرة غير كافية:" & shortList & vbCrLf & _
+                              Operation & " بأكثر من المتوفر يحتاج موافقة مدير النظام."
     End If
 End Function
 

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **45**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **46**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -26,31 +26,32 @@
 | 18 | [`ProductMovementQuery`](#productmovementquery) | حركة منتج خلال فترة مع رصيد أول المدة (الرصيد التراكمي في التقرير) | `PeriodStart`, `PeriodEnd`, `ProductID` |
 | 19 | [`SlowMovingProductsQuery`](#slowmovingproductsquery) ⭐ | المنتجات غير المتحركة: لها رصيد ولم تُبع منذ عدد الأيام المحدد في الإعدادات |  |
 | 20 | [`StockByCategoryQuery`](#stockbycategoryquery) | المخزون حسب التصنيف: عدد المنتجات والكمية والقيمة |  |
-| 21 | [`qryCustomerLedger`](#qrycustomerledger) | دفتر حساب العملاء: مدين (عليه) / دائن (له) |  |
-| 22 | [`qryCustomerLedgerTotals`](#qrycustomerledgertotals) | مجاميع حساب كل عميل |  |
-| 23 | [`CustomerBalanceQuery`](#customerbalancequery) ⭐ | رصيد كل عميل محسوبًا من الحركات (موجب = عليه للمحل) |  |
-| 24 | [`CustomersWithDebtQuery`](#customerswithdebtquery) | العملاء الذين عليهم مبالغ مستحقة |  |
-| 25 | [`CustomerStatementQuery`](#customerstatementquery) | كشف حساب عميل لفترة: رصيد سابق ثم الحركات | `PeriodStart`, `PeriodEnd`, `CustomerID` |
-| 26 | [`qrySupplierLedger`](#qrysupplierledger) | دفتر حساب الموردين: دائن (للمورد) / مدين (سُدِّد له) |  |
-| 27 | [`qrySupplierLedgerTotals`](#qrysupplierledgertotals) | مجاميع حساب كل مورد |  |
-| 28 | [`SupplierBalanceQuery`](#supplierbalancequery) ⭐ | رصيد كل مورد محسوبًا من الحركات (موجب = مستحق للمورد) |  |
-| 29 | [`SupplierStatementQuery`](#supplierstatementquery) | كشف حساب مورد لفترة: رصيد سابق ثم الحركات | `PeriodStart`, `PeriodEnd`, `SupplierID` |
-| 30 | [`ExpensesQuery`](#expensesquery) | المصروفات خلال فترة | `PeriodStart`, `PeriodEnd` |
-| 31 | [`ExpensesByTypeQuery`](#expensesbytypequery) | المصروفات مجمّعة حسب النوع خلال فترة | `PeriodStart`, `PeriodEnd` |
-| 32 | [`qryProfitSales`](#qryprofitsales) | صافي المبيعات وتكلفتها خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 33 | [`qryProfitAdjustments`](#qryprofitadjustments) | قيمة فروقات المخزون (جرد، إضافة، خصم) خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 34 | [`qryProfitExpenses`](#qryprofitexpenses) | المصروفات (بدون ضريبة) خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 35 | [`ProfitQuery`](#profitquery) ⭐ | الأرباح: صافي المبيعات − التكلفة = مجمل الربح؛ ثم ± فروقات المخزون − المصروفات = صافي الربح | `PeriodStart`, `PeriodEnd` |
-| 36 | [`qryVatOutput`](#qryvatoutput) | ضريبة المخرجات (المبيعات ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
-| 37 | [`qryVatInputPurchases`](#qryvatinputpurchases) | ضريبة المدخلات من المشتريات (ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
-| 38 | [`qryVatInputExpenses`](#qryvatinputexpenses) | ضريبة المدخلات من المصروفات | `PeriodStart`, `PeriodEnd` |
-| 39 | [`VatSummaryQuery`](#vatsummaryquery) | ملخص ضريبة القيمة المضافة للفترة (للإقرار الضريبي) | `PeriodStart`, `PeriodEnd` |
-| 40 | [`qrySalesDocPrint`](#qrysalesdocprint) | بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف) |  |
-| 41 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 42 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 43 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 44 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 45 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 21 | [`StockCountQuery`](#stockcountquery) | تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته |  |
+| 22 | [`qryCustomerLedger`](#qrycustomerledger) | دفتر حساب العملاء: مدين (عليه) / دائن (له) |  |
+| 23 | [`qryCustomerLedgerTotals`](#qrycustomerledgertotals) | مجاميع حساب كل عميل |  |
+| 24 | [`CustomerBalanceQuery`](#customerbalancequery) ⭐ | رصيد كل عميل محسوبًا من الحركات (موجب = عليه للمحل) |  |
+| 25 | [`CustomersWithDebtQuery`](#customerswithdebtquery) | العملاء الذين عليهم مبالغ مستحقة |  |
+| 26 | [`CustomerStatementQuery`](#customerstatementquery) | كشف حساب عميل لفترة: رصيد سابق ثم الحركات | `PeriodStart`, `PeriodEnd`, `CustomerID` |
+| 27 | [`qrySupplierLedger`](#qrysupplierledger) | دفتر حساب الموردين: دائن (للمورد) / مدين (سُدِّد له) |  |
+| 28 | [`qrySupplierLedgerTotals`](#qrysupplierledgertotals) | مجاميع حساب كل مورد |  |
+| 29 | [`SupplierBalanceQuery`](#supplierbalancequery) ⭐ | رصيد كل مورد محسوبًا من الحركات (موجب = مستحق للمورد) |  |
+| 30 | [`SupplierStatementQuery`](#supplierstatementquery) | كشف حساب مورد لفترة: رصيد سابق ثم الحركات | `PeriodStart`, `PeriodEnd`, `SupplierID` |
+| 31 | [`ExpensesQuery`](#expensesquery) | المصروفات خلال فترة | `PeriodStart`, `PeriodEnd` |
+| 32 | [`ExpensesByTypeQuery`](#expensesbytypequery) | المصروفات مجمّعة حسب النوع خلال فترة | `PeriodStart`, `PeriodEnd` |
+| 33 | [`qryProfitSales`](#qryprofitsales) | صافي المبيعات وتكلفتها خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 34 | [`qryProfitAdjustments`](#qryprofitadjustments) | قيمة فروقات المخزون (جرد، إضافة، خصم) خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 35 | [`qryProfitExpenses`](#qryprofitexpenses) | المصروفات (بدون ضريبة) خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 36 | [`ProfitQuery`](#profitquery) ⭐ | الأرباح: صافي المبيعات − التكلفة = مجمل الربح؛ ثم ± فروقات المخزون − المصروفات = صافي الربح | `PeriodStart`, `PeriodEnd` |
+| 37 | [`qryVatOutput`](#qryvatoutput) | ضريبة المخرجات (المبيعات ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
+| 38 | [`qryVatInputPurchases`](#qryvatinputpurchases) | ضريبة المدخلات من المشتريات (ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
+| 39 | [`qryVatInputExpenses`](#qryvatinputexpenses) | ضريبة المدخلات من المصروفات | `PeriodStart`, `PeriodEnd` |
+| 40 | [`VatSummaryQuery`](#vatsummaryquery) | ملخص ضريبة القيمة المضافة للفترة (للإقرار الضريبي) | `PeriodStart`, `PeriodEnd` |
+| 41 | [`qrySalesDocPrint`](#qrysalesdocprint) | بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف) |  |
+| 42 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 43 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 44 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 45 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 46 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -65,55 +66,57 @@
 | 5 | قيمة مخزون المنتج 1 بالتكلفة = 83 × 60 | `SELECT StockCostValue FROM StockBalanceQuery WHERE ProductID = {ref:P1}` | 4980 |
 | 6 | منخفض المخزون: منتج واحد فقط | `SELECT COUNT(*) FROM LowStockQuery` | 1 |
 | 7 | منخفض المخزون: المنتج 2 (186 ≤ 200) | `SELECT ShortageQty FROM LowStockQuery WHERE ProductID = {ref:P2}` | 14 |
-| 8 | غير المتحركة: منتج واحد | `SELECT COUNT(*) FROM SlowMovingProductsQuery` | 1 |
-| 9 | غير المتحركة: المنتج 3 بقيمة 200 | `SELECT StockCostValue FROM SlowMovingProductsQuery WHERE ProductID = {ref:P3}` | 200 |
-| 10 | المخزون حسب التصنيف: تصنيف عام = 83 + 20 | `SELECT TotalQuantity FROM StockByCategoryQuery WHERE CategoryID = 1` | 103 |
-| 11 | المخزون حسب التصنيف: قيمة تصنيف عام = 4980 + 200 | `SELECT StockCostValue FROM StockByCategoryQuery WHERE CategoryID = 1` | 5180 |
-| 12 | المخزون حسب التصنيف: قيمة التصنيف 2 = 186 × 10 | `SELECT StockCostValue FROM StockByCategoryQuery WHERE CategoryID = {ref:CAT2}` | 1860 |
-| 13 | حركة المنتج 2: رصيد أول المدة = 195 | `SELECT NetQty FROM ProductMovementQuery WHERE SortKey = 0` | 195 |
-| 14 | حركة المنتج 2: 3 حركات + سطر الرصيد السابق | `SELECT COUNT(*) FROM ProductMovementQuery` | 4 |
-| 15 | حركة المنتج 2: الرصيد الختامي = 186 | `SELECT Sum(NetQty) FROM ProductMovementQuery` | 186 |
-| 16 | المبيعات اليومية: يوم الفاتورة الآجلة = 460 | `SELECT NetSalesTotal FROM DailySalesQuery WHERE SaleDate = DateValue({day:5})` | 460 |
-| 17 | المبيعات اليومية: الآجل في نفس اليوم = 460 | `SELECT CreditSales FROM DailySalesQuery WHERE SaleDate = DateValue({day:5})` | 460 |
-| 18 | المبيعات اليومية: يوم الفاتورة النقدية = 1150 نقدًا | `SELECT CashSales FROM DailySalesQuery WHERE SaleDate = DateValue({day:10})` | 1150 |
-| 19 | المبيعات اليومية: يوم المرتجع = −46 | `SELECT NetSalesTotal FROM DailySalesQuery WHERE SaleDate = DateValue({day:2})` | -46 |
-| 20 | المبيعات الشهرية: صافي كل الأشهر = 100 + 1000 + 400 − 40 | `SELECT Sum(NetSalesExVAT) FROM MonthlySalesQuery` | 1460 |
-| 21 | المبيعات الشهرية: مجمل ربح كل الأشهر = 1460 − 850 | `SELECT Sum(GrossProfit) FROM MonthlySalesQuery` | 610 |
-| 22 | المبيعات خلال الفترة: فاتورتان ومرتجع | `SELECT COUNT(*) FROM SalesByPeriodQuery` | 3 |
-| 23 | المبيعات خلال الفترة: الإجمالي = 1150 + 460 − 46 | `SELECT Sum(GrossAmount) FROM SalesByPeriodQuery` | 1564 |
-| 24 | المبيعات حسب المنتج: المنتج 1 صافي كمية 12 | `SELECT NetQty FROM SalesByProductQuery WHERE ProductID = {ref:P1}` | 12 |
-| 25 | المبيعات حسب المنتج: ربح المنتج 1 = 1200 − 720 | `SELECT GrossProfit FROM SalesByProductQuery WHERE ProductID = {ref:P1}` | 480 |
-| 26 | المبيعات حسب المنتج: المنتج 2 مرتجع 2 | `SELECT QtyReturned FROM SalesByProductQuery WHERE ProductID = {ref:P2}` | 2 |
-| 27 | المبيعات حسب المنتج: صافي مبيعات المنتج 2 = 200 − 40 | `SELECT NetSales FROM SalesByProductQuery WHERE ProductID = {ref:P2}` | 160 |
-| 28 | الأكثر مبيعًا: المنتج 1 | `SELECT TOP 1 ProductID FROM BestSellingProductsQuery ORDER BY NetQty DESC, NetSales DESC` | رقم P1 |
-| 29 | الأقل مبيعًا: المنتج 3 (لم يُبع) | `SELECT TOP 1 ProductID FROM LeastSellingProductsQuery ORDER BY NetQtySold, ProductName` | رقم P3 |
-| 30 | المشتريات خلال الفترة: مرتجع الشراء فقط | `SELECT COUNT(*) FROM PurchasesQuery` | 1 |
-| 31 | المشتريات خلال الفترة: −345 | `SELECT Sum(GrossAmount) FROM PurchasesQuery` | -345 |
-| 32 | رصيد العميل الآجل = 50 + 460 − 100 − 46 − 200 | `SELECT Balance FROM CustomerBalanceQuery WHERE CustomerID = {ref:C2}` | 164 |
-| 33 | رصيد العميل النقدي = 0 | `SELECT Balance FROM CustomerBalanceQuery WHERE CustomerID = 1` | 0 |
-| 34 | العملاء المدينون: عميل واحد | `SELECT COUNT(*) FROM CustomersWithDebtQuery` | 1 |
-| 35 | كشف العميل: الرصيد السابق = 50 | `SELECT Debit FROM CustomerStatementQuery WHERE SortKey = 0` | 50 |
-| 36 | كشف العميل: رصيد سابق + 3 حركات | `SELECT COUNT(*) FROM CustomerStatementQuery` | 4 |
-| 37 | كشف العميل: الرصيد الختامي = 164 | `SELECT Sum(Debit) - Sum(Credit) FROM CustomerStatementQuery` | 164 |
-| 38 | رصيد المورد = 9200 − 5000 − 1000 − 345 | `SELECT Balance FROM SupplierBalanceQuery WHERE SupplierID = {ref:S1}` | 2855 |
-| 39 | كشف المورد: الرصيد السابق = 4200 | `SELECT Credit FROM SupplierStatementQuery WHERE SortKey = 0` | 4200 |
-| 40 | كشف المورد: الرصيد الختامي = 2855 | `SELECT Sum(Credit) - Sum(Debit) FROM SupplierStatementQuery` | 2855 |
-| 41 | المصروفات خلال الفترة: مصروف واحد | `SELECT COUNT(*) FROM ExpensesQuery` | 1 |
-| 42 | المصروفات خلال الفترة: 230 شامل الضريبة | `SELECT Sum(TotalAmount) FROM ExpensesQuery` | 230 |
-| 43 | المصروفات حسب النوع: الكهرباء 200 | `SELECT AmountExVAT FROM ExpensesByTypeQuery` | 200 |
-| 44 | الأرباح: صافي المبيعات = 1000 + 400 − 40 | `SELECT NetSales FROM ProfitQuery` | 1360 |
-| 45 | الأرباح: تكلفة المبيعات = 600 + 220 − 20 | `SELECT CostOfSales FROM ProfitQuery` | 800 |
-| 46 | الأرباح: مجمل الربح = 1360 − 800 | `SELECT GrossProfit FROM ProfitQuery` | 560 |
-| 47 | الأرباح: فروقات المخزون = −10 (منتج تالف) | `SELECT InventoryAdjustments FROM ProfitQuery` | -10 |
-| 48 | الأرباح: المصروفات = 200 | `SELECT TotalExpenses FROM ProfitQuery` | 200 |
-| 49 | الأرباح: صافي الربح = 560 − 10 − 200 | `SELECT NetProfit FROM ProfitQuery` | 350 |
-| 50 | الضريبة: ضريبة المخرجات = 150 + 60 − 6 | `SELECT OutputVAT FROM VatSummaryQuery` | 204 |
-| 51 | الضريبة: ضريبة المدخلات = −45 (مرتجع شراء) + 30 (مصروف) | `SELECT InputVAT FROM VatSummaryQuery` | -15 |
-| 52 | الضريبة: الصافي المستحق = 204 + 15 | `SELECT NetVATDue FROM VatSummaryQuery` | 219 |
-| 53 | طباعة الفاتورة الآجلة: سطران | `SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 2 |
-| 54 | طباعة الفاتورة الآجلة: مجموع الأسطر = 460 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 460 |
-| 55 | طباعة الإشعار الدائن: سطر واحد بقيمة 46 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = {ref:CRN1}` | 46 |
-| 56 | فحص السلامة: لا توجد مشكلات | `SELECT COUNT(*) FROM IntegrityCheckQuery` | 0 |
+| 8 | الجرد المفتوح: عجز المنتج 1 = −3 × 60 | `SELECT DifferenceValue FROM StockCountQuery WHERE ProductID = {ref:P1}` | -180 |
+| 9 | الجرد المفتوح: صنف واحد لم يُعدّ بعد | `SELECT COUNT(*) FROM StockCountQuery WHERE ActualQuantity Is Null` | 1 |
+| 10 | غير المتحركة: منتج واحد | `SELECT COUNT(*) FROM SlowMovingProductsQuery` | 1 |
+| 11 | غير المتحركة: المنتج 3 بقيمة 200 | `SELECT StockCostValue FROM SlowMovingProductsQuery WHERE ProductID = {ref:P3}` | 200 |
+| 12 | المخزون حسب التصنيف: تصنيف عام = 83 + 20 | `SELECT TotalQuantity FROM StockByCategoryQuery WHERE CategoryID = 1` | 103 |
+| 13 | المخزون حسب التصنيف: قيمة تصنيف عام = 4980 + 200 | `SELECT StockCostValue FROM StockByCategoryQuery WHERE CategoryID = 1` | 5180 |
+| 14 | المخزون حسب التصنيف: قيمة التصنيف 2 = 186 × 10 | `SELECT StockCostValue FROM StockByCategoryQuery WHERE CategoryID = {ref:CAT2}` | 1860 |
+| 15 | حركة المنتج 2: رصيد أول المدة = 195 | `SELECT NetQty FROM ProductMovementQuery WHERE SortKey = 0` | 195 |
+| 16 | حركة المنتج 2: 3 حركات + سطر الرصيد السابق | `SELECT COUNT(*) FROM ProductMovementQuery` | 4 |
+| 17 | حركة المنتج 2: الرصيد الختامي = 186 | `SELECT Sum(NetQty) FROM ProductMovementQuery` | 186 |
+| 18 | المبيعات اليومية: يوم الفاتورة الآجلة = 460 | `SELECT NetSalesTotal FROM DailySalesQuery WHERE SaleDate = DateValue({day:5})` | 460 |
+| 19 | المبيعات اليومية: الآجل في نفس اليوم = 460 | `SELECT CreditSales FROM DailySalesQuery WHERE SaleDate = DateValue({day:5})` | 460 |
+| 20 | المبيعات اليومية: يوم الفاتورة النقدية = 1150 نقدًا | `SELECT CashSales FROM DailySalesQuery WHERE SaleDate = DateValue({day:10})` | 1150 |
+| 21 | المبيعات اليومية: يوم المرتجع = −46 | `SELECT NetSalesTotal FROM DailySalesQuery WHERE SaleDate = DateValue({day:2})` | -46 |
+| 22 | المبيعات الشهرية: صافي كل الأشهر = 100 + 1000 + 400 − 40 | `SELECT Sum(NetSalesExVAT) FROM MonthlySalesQuery` | 1460 |
+| 23 | المبيعات الشهرية: مجمل ربح كل الأشهر = 1460 − 850 | `SELECT Sum(GrossProfit) FROM MonthlySalesQuery` | 610 |
+| 24 | المبيعات خلال الفترة: فاتورتان ومرتجع | `SELECT COUNT(*) FROM SalesByPeriodQuery` | 3 |
+| 25 | المبيعات خلال الفترة: الإجمالي = 1150 + 460 − 46 | `SELECT Sum(GrossAmount) FROM SalesByPeriodQuery` | 1564 |
+| 26 | المبيعات حسب المنتج: المنتج 1 صافي كمية 12 | `SELECT NetQty FROM SalesByProductQuery WHERE ProductID = {ref:P1}` | 12 |
+| 27 | المبيعات حسب المنتج: ربح المنتج 1 = 1200 − 720 | `SELECT GrossProfit FROM SalesByProductQuery WHERE ProductID = {ref:P1}` | 480 |
+| 28 | المبيعات حسب المنتج: المنتج 2 مرتجع 2 | `SELECT QtyReturned FROM SalesByProductQuery WHERE ProductID = {ref:P2}` | 2 |
+| 29 | المبيعات حسب المنتج: صافي مبيعات المنتج 2 = 200 − 40 | `SELECT NetSales FROM SalesByProductQuery WHERE ProductID = {ref:P2}` | 160 |
+| 30 | الأكثر مبيعًا: المنتج 1 | `SELECT TOP 1 ProductID FROM BestSellingProductsQuery ORDER BY NetQty DESC, NetSales DESC` | رقم P1 |
+| 31 | الأقل مبيعًا: المنتج 3 (لم يُبع) | `SELECT TOP 1 ProductID FROM LeastSellingProductsQuery ORDER BY NetQtySold, ProductName` | رقم P3 |
+| 32 | المشتريات خلال الفترة: مرتجع الشراء فقط | `SELECT COUNT(*) FROM PurchasesQuery` | 1 |
+| 33 | المشتريات خلال الفترة: −345 | `SELECT Sum(GrossAmount) FROM PurchasesQuery` | -345 |
+| 34 | رصيد العميل الآجل = 50 + 460 − 100 − 46 − 200 | `SELECT Balance FROM CustomerBalanceQuery WHERE CustomerID = {ref:C2}` | 164 |
+| 35 | رصيد العميل النقدي = 0 | `SELECT Balance FROM CustomerBalanceQuery WHERE CustomerID = 1` | 0 |
+| 36 | العملاء المدينون: عميل واحد | `SELECT COUNT(*) FROM CustomersWithDebtQuery` | 1 |
+| 37 | كشف العميل: الرصيد السابق = 50 | `SELECT Debit FROM CustomerStatementQuery WHERE SortKey = 0` | 50 |
+| 38 | كشف العميل: رصيد سابق + 3 حركات | `SELECT COUNT(*) FROM CustomerStatementQuery` | 4 |
+| 39 | كشف العميل: الرصيد الختامي = 164 | `SELECT Sum(Debit) - Sum(Credit) FROM CustomerStatementQuery` | 164 |
+| 40 | رصيد المورد = 9200 − 5000 − 1000 − 345 | `SELECT Balance FROM SupplierBalanceQuery WHERE SupplierID = {ref:S1}` | 2855 |
+| 41 | كشف المورد: الرصيد السابق = 4200 | `SELECT Credit FROM SupplierStatementQuery WHERE SortKey = 0` | 4200 |
+| 42 | كشف المورد: الرصيد الختامي = 2855 | `SELECT Sum(Credit) - Sum(Debit) FROM SupplierStatementQuery` | 2855 |
+| 43 | المصروفات خلال الفترة: مصروف واحد | `SELECT COUNT(*) FROM ExpensesQuery` | 1 |
+| 44 | المصروفات خلال الفترة: 230 شامل الضريبة | `SELECT Sum(TotalAmount) FROM ExpensesQuery` | 230 |
+| 45 | المصروفات حسب النوع: الكهرباء 200 | `SELECT AmountExVAT FROM ExpensesByTypeQuery` | 200 |
+| 46 | الأرباح: صافي المبيعات = 1000 + 400 − 40 | `SELECT NetSales FROM ProfitQuery` | 1360 |
+| 47 | الأرباح: تكلفة المبيعات = 600 + 220 − 20 | `SELECT CostOfSales FROM ProfitQuery` | 800 |
+| 48 | الأرباح: مجمل الربح = 1360 − 800 | `SELECT GrossProfit FROM ProfitQuery` | 560 |
+| 49 | الأرباح: فروقات المخزون = −10 (منتج تالف) | `SELECT InventoryAdjustments FROM ProfitQuery` | -10 |
+| 50 | الأرباح: المصروفات = 200 | `SELECT TotalExpenses FROM ProfitQuery` | 200 |
+| 51 | الأرباح: صافي الربح = 560 − 10 − 200 | `SELECT NetProfit FROM ProfitQuery` | 350 |
+| 52 | الضريبة: ضريبة المخرجات = 150 + 60 − 6 | `SELECT OutputVAT FROM VatSummaryQuery` | 204 |
+| 53 | الضريبة: ضريبة المدخلات = −45 (مرتجع شراء) + 30 (مصروف) | `SELECT InputVAT FROM VatSummaryQuery` | -15 |
+| 54 | الضريبة: الصافي المستحق = 204 + 15 | `SELECT NetVATDue FROM VatSummaryQuery` | 219 |
+| 55 | طباعة الفاتورة الآجلة: سطران | `SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 2 |
+| 56 | طباعة الفاتورة الآجلة: مجموع الأسطر = 460 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 460 |
+| 57 | طباعة الإشعار الدائن: سطر واحد بقيمة 46 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = {ref:CRN1}` | 46 |
+| 58 | فحص السلامة: لا توجد مشكلات | `SELECT COUNT(*) FROM IntegrityCheckQuery` | 0 |
 
 ## qrySalesDocuments
 
@@ -417,6 +420,19 @@ FROM Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID
 WHERE p.IsActive = True
 GROUP BY c.CategoryID, c.CategoryName
 ORDER BY c.CategoryName
+```
+
+## StockCountQuery
+
+تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته
+
+```sql
+SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, d.ProductID,
+       p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference,
+       d.UnitCost, d.DifferenceValue, d.Notes
+FROM (StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)
+     INNER JOIN Products AS p ON d.ProductID = p.ProductID
+ORDER BY c.StockCountID, p.ProductName
 ```
 
 ## qryCustomerLedger

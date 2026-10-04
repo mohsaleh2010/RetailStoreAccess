@@ -134,6 +134,45 @@ def return_amounts(sold_qty, sold_total, sold_tax, prev_qty, prev_total, prev_ta
     return total - tax, tax, total
 
 
+def weighted_average(cur_qty, cur_avg, qty, unit_cost):
+    """Average cost after `qty` units (signed) at `unit_cost` (modSales.WeightedAverage).
+    Incoming: weighted average, or the new cost when there was no stock.
+    Outgoing at a known cost (purchase return): the same formula while stock
+    remains and the result is not negative; otherwise the average is kept."""
+    cur_qty, cur_avg, qty, unit_cost = D(cur_qty), D(cur_avg), D(qty), D(unit_cost)
+    new_qty = cur_qty + qty
+    if qty > 0:
+        if cur_qty <= 0:
+            return unit_cost
+        return r4((cur_qty * cur_avg + qty * unit_cost) / new_qty)
+    if qty < 0 and new_qty > 0 and cur_qty > 0:
+        v = r4((cur_qty * cur_avg + qty * unit_cost) / new_qty)
+        if v >= 0:
+            return v
+    return cur_avg
+
+
+def purchase_unit_cost(net, total, qty, vat_registered):
+    """Cost of one purchased unit: excl. VAT when the store reclaims input VAT."""
+    qty = D(qty)
+    if qty <= 0:
+        return D(0)
+    return r4((D(net) if vat_registered else D(total)) / qty)
+
+
+AVERAGE_CASES = [
+    # (label, current qty, current average, qty signed, unit cost)
+    ("أول شراء بدون رصيد", "0", "0", "100", "52.1739"),
+    ("شراء ثانٍ بسعر أعلى", "90", "50", "10", "60"),
+    ("كسور تحتاج تقريب 4 خانات", "3", "10", "7", "10.3333"),
+    ("شراء بعد رصيد سالب", "-5", "40", "20", "45"),
+    ("مرتجع شراء بتكلفة الشراء", "100", "55", "-10", "60"),
+    ("مرتجع يُفرغ المخزون يبقي المتوسط", "10", "55", "-10", "60"),
+    ("مرتجع ينتج متوسطًا سالبًا يبقي المتوسط", "2", "1", "-1", "5"),
+    ("حركة صفرية", "10", "55", "0", "99"),
+]
+
+
 RETURN_CASES = [
     # sold (qty, total, tax) and successive return quantities
     ("إرجاع 3 من 3 دفعة واحدة", ("3", "29.97", "3.91"), ["3"]),

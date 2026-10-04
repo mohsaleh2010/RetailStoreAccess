@@ -172,6 +172,7 @@ DATA_SCREENS: List[DataScreen] = [
         list_headers=[("المورد", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
         search=["t.SupplierName", "t.ContactPerson", "t.Mobile", "t.VATNumber"],
         active="t.IsActive",
+        extra_buttons=[("btnPayment", "سند صرف", 'OpenScreen "frmSupplierPayment", 7, Me!SupplierID')],
         fields=[
             Fld("SupplierName", span=2), Fld("ContactPerson"), Fld("Mobile"),
             Fld("Phone"), Fld("Email"), Fld("VATNumber"), Fld("CRNumber"),
@@ -738,5 +739,6 @@ def layout_report_center() -> FormModel:
 
 def all_forms() -> List[FormModel]:
     from forms_sales import sales_forms
+    from forms_purchases import purchase_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
-            + [layout_search(), layout_report_center()] + sales_forms())
+            + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms())

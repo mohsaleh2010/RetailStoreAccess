@@ -228,6 +228,14 @@ WHERE p.IsActive = True
 GROUP BY c.CategoryID, c.CategoryName
 ORDER BY c.CategoryName"""),
 
+    Query("StockCountQuery", "تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته", """
+SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, d.ProductID,
+       p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference,
+       d.UnitCost, d.DifferenceValue, d.Notes
+FROM (StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)
+     INNER JOIN Products AS p ON d.ProductID = p.ProductID
+ORDER BY c.StockCountID, p.ProductName"""),
+
     # ============================================================ CUSTOMERS
     Query("qryCustomerLedger", "دفتر حساب العملاء: مدين (عليه) / دائن (له)", """
 SELECT h.CustomerID, h.InvoiceDate AS EntryDate, 'SALE' AS EntryType,
@@ -655,6 +663,16 @@ FIXTURE: List[Row] = [
     # 1 x P2 damaged (manual stock-out)
     _inv_tx("T10", Day(1, 15), "P2", 6, -1, 10, 186, "MANUAL", None, "TEST-ADJ-1"),
 
+    # An open stocktake (not posted, so no stock movement): P1 counted 80, P2 not counted yet
+    Row("CNT1", "StockCounts", {"CountNumber": "TEST-CNT-1", "CountDate": Day(1, 18),
+                                "Status": "OPEN", "EmployeeID": 1}),
+    Row("CNT1L1", "StockCountDetails", {
+        "StockCountID": Ref("CNT1"), "ProductID": Ref("P1"), "SystemQuantity": 83,
+        "ActualQuantity": 80, "Difference": -3, "UnitCost": 60, "DifferenceValue": -180}),
+    Row("CNT1L2", "StockCountDetails", {
+        "StockCountID": Ref("CNT1"), "ProductID": Ref("P2"), "SystemQuantity": 186,
+        "ActualQuantity": None, "Difference": 0, "UnitCost": 10, "DifferenceValue": 0}),
+
     # Expenses: electricity inside the period, rent outside it
     Row("EXP1", "Expenses", {
         "ExpenseNumber": "TEST-EXP-1", "ExpenseDate": Day(6), "ExpenseTypeID": 2, "Amount": 200,
@@ -694,6 +712,10 @@ CHECKS: List[Check] = [
           "SELECT COUNT(*) FROM LowStockQuery", 1),
     Check("منخفض المخزون: المنتج 2 (186 ≤ 200)",
           "SELECT ShortageQty FROM LowStockQuery WHERE ProductID = {ref:P2}", 14),
+    Check("الجرد المفتوح: عجز المنتج 1 = −3 × 60",
+          "SELECT DifferenceValue FROM StockCountQuery WHERE ProductID = {ref:P1}", -180),
+    Check("الجرد المفتوح: صنف واحد لم يُعدّ بعد",
+          "SELECT COUNT(*) FROM StockCountQuery WHERE ActualQuantity Is Null", 1),
     Check("غير المتحركة: منتج واحد",
           "SELECT COUNT(*) FROM SlowMovingProductsQuery", 1),
     Check("غير المتحركة: المنتج 3 بقيمة 200",

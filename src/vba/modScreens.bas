@@ -103,7 +103,7 @@ Public Sub SearchOpen(ByVal frm As Access.Form)
         Case "CUSTOMER": OpenScreen "frmCustomers", 0, id
         Case "SUPPLIER": OpenScreen "frmSuppliers", 0, id
         Case "SALE":     OpenScreen "frmSalesInvoice", 6, id
-        Case "PURCHASE": OpenScreen "frmPurchaseInvoice", 7, id
+        Case "PURCHASE": OpenScreen "frmPurchaseView", 7, id
     End Select
 End Sub
 

@@ -8,6 +8,7 @@ Attribute VB_Name = "modPOS"
 '   frmCustomerPayment              receipt voucher
 '   frmSalesInvoice                 read-only invoice view (search, reprint, return)
 ' The cart tables live in the front-end file, so every cashier PC has its own.
+' EnsureLocalTables also creates the Phase 7 purchase working tables.
 ' Calculations and posting are in modSales.
 '==============================================================================
 Option Compare Database
@@ -29,6 +30,17 @@ Public Sub EnsureLocalTables()
         CurrentDb.Execute "CREATE TABLE tmpReturnLines (SalesDetailID LONG CONSTRAINT pkReturnLines " & _
             "PRIMARY KEY, ProductID LONG, ProductName TEXT(150), SoldQty CURRENCY, ReturnedQty CURRENCY, " & _
             "AvailableQty CURRENCY, ReturnQty CURRENCY, ReturnToStock BIT, ReturnAmount CURRENCY)", dbFailOnError
+    End If
+    ' Phase 7: purchase invoice lines and purchase return lines
+    If Not LocalTableExists("tmpPurchaseLines") Then
+        CurrentDb.Execute "CREATE TABLE tmpPurchaseLines (LineNo COUNTER CONSTRAINT pkPurchaseLines PRIMARY KEY, " & _
+            "ProductID LONG, ProductCode TEXT(30), ProductName TEXT(150), Quantity CURRENCY, UnitCost CURRENCY, " & _
+            "LineDiscount CURRENCY, LineTotal CURRENCY, SellingPrice CURRENCY, NewSellingPrice CURRENCY)", dbFailOnError
+    End If
+    If Not LocalTableExists("tmpPurchaseReturnLines") Then
+        CurrentDb.Execute "CREATE TABLE tmpPurchaseReturnLines (PurchaseDetailID LONG CONSTRAINT pkPurchaseReturnLines " & _
+            "PRIMARY KEY, ProductID LONG, ProductName TEXT(150), BoughtQty CURRENCY, ReturnedQty CURRENCY, " & _
+            "AvailableQty CURRENCY, InStock CURRENCY, ReturnQty CURRENCY, ReturnAmount CURRENCY)", dbFailOnError
     End If
 End Sub
 

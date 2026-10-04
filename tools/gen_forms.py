@@ -165,7 +165,7 @@ Public Function BuildForms() As Boolean
     m_built = 0: m_failed = 0: m_report = "": m_warnings = ""
     Debug.Print "=== BuildForms  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     CloseAllForms
-    EnsureLocalTables                      ' tmpPOSLines / tmpReturnLines (modPOS)
+    EnsureLocalTables                      ' tmp* working tables of the sales and purchase screens (modPOS)
     DoCmd.Echo False, "جاري بناء الشاشات..."
     BuildAllForms
     DoCmd.Echo True

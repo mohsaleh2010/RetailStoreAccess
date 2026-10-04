@@ -15,10 +15,12 @@ import gen_forms  # noqa: E402
 import gen_qr  # noqa: E402
 import gen_reports  # noqa: E402
 import gen_test_sales  # noqa: E402
+import gen_test_purchases  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
-                  "modZatca", "modSales", "modPOS"]   # hand-written (not generated) VBA modules
+                  "modZatca", "modSales", "modPOS", "modPurchases",
+                  "modPurchaseScreens"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -601,7 +603,8 @@ def main():
                        ("modAppData", gen_forms.build_appdata_vba()),
                        ("modQRCode", gen_qr.build_qr_vba()),
                        ("modBuildReports", gen_reports.build_reports_vba()),
-                       ("modTestSales", gen_test_sales.build_test_sales_vba())):
+                       ("modTestSales", gen_test_sales.build_test_sales_vba()),
+                       ("modTestPurchases", gen_test_purchases.build_test_purchases_vba())):
         write(f"src/vba/{name}.bas", text)
         write(f"dist/vba/{name}.bas", text, encoding="cp1256", newline="\r\n")
 
