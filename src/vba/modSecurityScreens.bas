@@ -27,8 +27,7 @@ Public Sub LoginLoad(ByVal frm As Access.Form)
     End If
     frm!lblStoreName.Caption = Nz(SettingValue("StoreName"), APP_TITLE)
     frm!txtUsername.Value = GetSetting("RetailStore", "Login", "LastUser", "")
-    If IsNull(DbValue("SELECT PasswordHash FROM Employees WHERE EmployeeID = 1")) And _
-       IsNull(DbValue("SELECT LastLoginAt FROM Employees WHERE EmployeeID = 1")) Then
+    If IsNull(DbValue("SELECT PasswordHash FROM Employees WHERE EmployeeID = 1")) Then
         frm!lblMessage.Caption = "الدخول الأول: اسم المستخدم admin بدون كلمة مرور، وسيُطلب منك تعيينها."
         frm!lblMessage.ForeColor = CLR_PRIMARY
         frm!txtUsername.Value = "admin"

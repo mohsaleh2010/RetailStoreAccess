@@ -222,8 +222,9 @@ Public Function LoginUser(ByVal Username As String, ByVal Password As String, By
         LoginUser = "ÇáÍÓÇÈ ãŞİá ãÄŞÊğÇ ÈÓÈÈ ãÍÇæáÇÊ ÏÎæá ÎÇØÆÉ ÍÊì ÇáÓÇÚÉ " & _
                     Format$(rs!LockedUntil, "hh:nn") & "."
     ElseIf IsNull(rs!PasswordHash) Then
-        ' only the built-in administrator, before the very first login, may enter without a password
-        If rs!EmployeeID = 1 And IsNull(rs!LastLoginAt) And Len(Password) = 0 Then
+        ' only the built-in administrator may enter without a password, and only until one is set:
+        ' DoLogin then forces the password screen (closing it logs out, so this stays possible)
+        If rs!EmployeeID = 1 And Len(Password) = 0 Then
             EmployeeID = 1
         Else
             LoginUser = "áã ÊõÚíóøä ßáãÉ ãÑæÑ áåĞÇ ÇáãÓÊÎÏã ÈÚÏ. ÇØáÈ ãä ãÏíÑ ÇáäÙÇã ÊÚííäåÇ."
