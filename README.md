@@ -17,7 +17,7 @@
 | 9 | لوحة التحكم | ✅ تمت الموافقة | [docs/09-Dashboard.md](docs/09-Dashboard.md) |
 | 10 | المستخدمون والصلاحيات والنسخ الاحتياطي | ✅ تمت الموافقة | [docs/10-Security.md](docs/10-Security.md) |
 | 11 | الاختبار الشامل والبيانات التجريبية | ✅ تمت الموافقة | [docs/11-Testing-Demo.md](docs/11-Testing-Demo.md) |
-| 12 | دليل الاستخدام | ✅ بانتظار الموافقة | [docs/12-User-Guide.md](docs/12-User-Guide.md) |
+| 12 | دليل الاستخدام | ✅ تمت الموافقة | [docs/12-User-Guide.md](docs/12-User-Guide.md) |
 
 ## هيكل المستودع
 
