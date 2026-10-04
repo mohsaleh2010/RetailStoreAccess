@@ -413,6 +413,7 @@ Private Sub BuildReport_rptSalesReceipt()
     m_rpt.Section(6).OnPrint = EP
     s = ""
     s = s & "Private Sub secTotals_Print(Cancel As Integer, PrintCount As Integer)" & vbCrLf
+    s = s & "    If Me.HasData = 0 Then Exit Sub   ' no document: the fields have no value (2427)" & vbCrLf
     s = s & "    DrawDocumentQR Me, Me!txtDocKind.Value, Me!txtDocID.Value, Me!boxQR.Left, _" & vbCrLf
     s = s & "                   Me!boxQR.Top, Me!boxQR.Width" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -512,6 +513,7 @@ Private Sub BuildReport_rptSalesInvoiceA4()
     m_rpt.Section(6).OnPrint = EP
     s = ""
     s = s & "Private Sub secTotals_Print(Cancel As Integer, PrintCount As Integer)" & vbCrLf
+    s = s & "    If Me.HasData = 0 Then Exit Sub   ' no document: the fields have no value (2427)" & vbCrLf
     s = s & "    DrawDocumentQR Me, Me!txtDocKind.Value, Me!txtDocID.Value, Me!boxQR.Left, _" & vbCrLf
     s = s & "                   Me!boxQR.Top, Me!boxQR.Width" & vbCrLf
     s = s & "End Sub" & vbCrLf

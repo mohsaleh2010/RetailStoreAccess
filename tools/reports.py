@@ -86,6 +86,7 @@ def qr_box(m: ReportModel, y: int, size: int):
     txt(m, SEC_FOOTER, "txtDocID", "DocID", 0, y + cm(0.45), cm(0.5), cm(0.4), visible=False)
     m.events.append("m_rpt.Section(6).OnPrint = EP")
     m.code += ["Private Sub secTotals_Print(Cancel As Integer, PrintCount As Integer)",
+               "    If Me.HasData = 0 Then Exit Sub   ' no document: the fields have no value (2427)",
                "    DrawDocumentQR Me, Me!txtDocKind.Value, Me!txtDocID.Value, Me!boxQR.Left, _",
                "                   Me!boxQR.Top, Me!boxQR.Width",
                "End Sub"]
