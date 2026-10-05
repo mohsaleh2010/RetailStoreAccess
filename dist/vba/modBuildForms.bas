@@ -583,10 +583,10 @@ End Sub
 Private Sub BuildForm_frmMain()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmMain", "‰Ÿ«„ ≈œ«—… «·„Õ·", "", 18994, 9526, False, False, False, _
+    StartForm "frmMain", "‰Ÿ«„ ≈œ«—… «·„Õ·", "", 18994, 9412, False, False, False, _
               ""
     SetFormProp "TimerInterval", 300000
-    Set c = AddRect("boxSidebar", 0, 0, 3515, 9526, CLR_PRIMARY)
+    Set c = AddRect("boxSidebar", 0, 0, 3515, 9412, CLR_PRIMARY)
     Set c = AddIcon("icoApp", ChrW(&HE80F), 227, 255, 567, 567, 22, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblAppTitle", "‰Ÿ«„ ≈œ«—… «·„Õ·", 850, 227, 2551, 425, 15, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblStoreName", " ", 850, 652, 2551, 312, 9, False, CLR_SIDEBAR_TEXT, "", 0)
@@ -659,72 +659,154 @@ Private Sub BuildForm_frmMain()
     c.OnClick = EP
     Set c = AddIcon("icoLogout", ChrW(&HE7E8), 255, 8760, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblWelcome", "·ÊÕ… «· Õﬂ„", 3969, 340, 7938, 539, 20, True, CLR_TEXT, "", 0)
-    Set c = AddLabel("lblToday", " ", 3969, 907, 5670, 340, 11, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblUser", " ", 13437, 907, 5103, 340, 11, False, CLR_MUTED, "", 3)
-    Set c = AddButton("btnRefresh", " ÕœÌÀ", 17179, 340, 1361, 454, "secondary")
+    Set c = AddLabel("lblWelcome", "·ÊÕ… «· Õﬂ„", 11736, 284, 6804, 539, 20, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblToday", " ", 11736, 879, 6804, 340, 11, False, CLR_MUTED, "", 3)
+    Set c = AddButton("btnRefresh", " ÕœÌÀ", 3969, 340, 1361, 454, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnChangePassword", "ﬂ·„… «·„—Ê—", 11964, 340, 1531, 454, "secondary")
+    Set c = AddButton("btnChangePassword", "ﬂ·„… «·„—Ê—", 5443, 340, 1531, 454, "secondary")
     c.OnClick = EP
-    Set c = AddLabel("lblUpdated", " ", 13550, 425, 3515, 312, 9, False, CLR_MUTED, "", 3)
-    Set c = AddRect("boxTile1", 3969, 1418, 3472, 1389, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle1", "„»Ì⁄«  «·ÌÊ„", 4139, 1503, 3132, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblUpdated", " ", 7087, 425, 3402, 312, 9, False, CLR_MUTED, "", 1)
+    Set c = AddLabel("lblUser", " ", 3969, 879, 6520, 340, 11, False, CLR_MUTED, "", 1)
+    Set c = AddRect("boxTile1", 15066, 1418, 3472, 1361, CLR_SURFACE)
+    Set c = AddRect("boxKpiIcon1", 17461, 1645, 907, 907, RGB(67, 160, 71))
+    Set c = AddIcon("icoKpi1", ChrW(&HE7BF), 17461, 1787, 907, 624, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileTitle1", "„»Ì⁄«  «·ÌÊ„", 15236, 1503, 2111, 312, 10, False, CLR_MUTED, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue1", "-", 4139, 1843, 3132, 567, 20, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTileValue1", "-", 15236, 1815, 2111, 567, 20, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub1", " ", 4139, 2439, 3132, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile2", 7668, 1418, 3472, 1389, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle2", "„»Ì⁄«  «·‘Â—", 7838, 1503, 3132, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTileSub1", " ", 15236, 2410, 2111, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile2", 11367, 1418, 3472, 1361, CLR_SURFACE)
+    Set c = AddRect("boxKpiIcon2", 13762, 1645, 907, 907, RGB(30, 136, 229))
+    Set c = AddIcon("icoKpi2", ChrW(&HE8A5), 13762, 1787, 907, 624, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileTitle2", "„»Ì⁄«  «·‘Â—", 11537, 1503, 2111, 312, 10, False, CLR_MUTED, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue2", "-", 7838, 1843, 3132, 567, 20, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTileValue2", "-", 11537, 1815, 2111, 567, 20, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub2", " ", 7838, 2439, 3132, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile3", 11367, 1418, 3472, 1389, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle3", "’«›Ì —»Õ «·‘Â— ( ﬁ—Ì»Ì)", 11537, 1503, 3132, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTileSub2", " ", 11537, 2410, 2111, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile3", 7668, 1418, 3472, 1361, CLR_SURFACE)
+    Set c = AddRect("boxKpiIcon3", 10063, 1645, 907, 907, RGB(229, 57, 53))
+    Set c = AddIcon("icoKpi3", ChrW(&HE8C7), 10063, 1787, 907, 624, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileTitle3", "’«›Ì —»Õ «·‘Â— ( ﬁ—Ì»Ì)", 7838, 1503, 2111, 312, 10, False, CLR_MUTED, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue3", "-", 11537, 1843, 3132, 567, 20, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTileValue3", "-", 7838, 1815, 2111, 567, 20, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub3", " ", 11537, 2439, 3132, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile4", 15066, 1418, 3472, 1389, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle4", "„‰ Ã«  „‰Œ›÷… «·„Œ“Ê‰", 15236, 1503, 3132, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTileSub3", " ", 7838, 2410, 2111, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile4", 3969, 1418, 3472, 1361, CLR_SURFACE)
+    Set c = AddRect("boxKpiIcon4", 6364, 1645, 907, 907, RGB(251, 140, 0))
+    Set c = AddIcon("icoKpi4", ChrW(&HE7B8), 6364, 1787, 907, 624, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileTitle4", "„‰ Ã«  „‰Œ›÷… «·„Œ“Ê‰", 4139, 1503, 2111, 312, 10, False, CLR_MUTED, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue4", "-", 15236, 1843, 3132, 567, 20, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTileValue4", "-", 4139, 1815, 2111, 567, 20, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub4", " ", 15236, 2439, 3132, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile5", 3969, 2977, 3472, 1389, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle5", "œÌÊ‰ «·⁄„·«¡", 4139, 3062, 3132, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTileSub4", " ", 4139, 2410, 2111, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxNavSales", 15066, 2948, 3472, 1361, RGB(67, 160, 71))
+    Set c = AddIcon("icoTileSales", ChrW(&HE7BF), 15066, 3118, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileSales", "«·„»Ì⁄« ", 15066, 3798, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileSales", "«·„»Ì⁄« ", 15066, 2948, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmPOS"
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue5", "-", 4139, 3402, 3132, 567, 20, True, CLR_PRIMARY, "", 0)
+    Set c = AddRect("boxNavPurchases", 11367, 2948, 3472, 1361, RGB(30, 136, 229))
+    Set c = AddIcon("icoTilePurchases", ChrW(&HE896), 11367, 3118, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTilePurchases", "«·„‘ —Ì« ", 11367, 3798, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTilePurchases", "«·„‘ —Ì« ", 11367, 2948, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmPurchaseInvoice"
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub5", " ", 4139, 3998, 3132, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile6", 7668, 2977, 3472, 1389, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle6", "„” Õﬁ«  «·„Ê—œÌ‰", 7838, 3062, 3132, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxNavInventory", 7668, 2948, 3472, 1361, RGB(251, 140, 0))
+    Set c = AddIcon("icoTileInventory", ChrW(&HE7B8), 7668, 3118, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileInventory", "«·„Œ“Ê‰", 7668, 3798, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileInventory", "«·„Œ“Ê‰", 7668, 2948, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmInventory"
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue6", "-", 7838, 3402, 3132, 567, 20, True, CLR_PRIMARY, "", 0)
+    Set c = AddRect("boxNavProducts", 3969, 2948, 3472, 1361, RGB(142, 36, 170))
+    Set c = AddIcon("icoTileProducts", ChrW(&HE8EC), 3969, 3118, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileProducts", "«·„‰ Ã« ", 3969, 3798, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileProducts", "«·„‰ Ã« ", 3969, 2948, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmProducts"
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub6", " ", 7838, 3998, 3132, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile7", 11367, 2977, 3472, 1389, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle7", "ﬁÌ„… «·„Œ“Ê‰ »«· ﬂ·›…", 11537, 3062, 3132, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxNavCustomers", 15066, 4479, 3472, 1361, RGB(229, 57, 53))
+    Set c = AddIcon("icoTileCustomers", ChrW(&HE716), 15066, 4649, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileCustomers", "«·⁄„·«¡", 15066, 5329, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileCustomers", "«·⁄„·«¡", 15066, 4479, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmCustomers"
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue7", "-", 11537, 3402, 3132, 567, 20, True, CLR_PRIMARY, "", 0)
+    Set c = AddRect("boxNavSuppliers", 11367, 4479, 3472, 1361, RGB(57, 73, 171))
+    Set c = AddIcon("icoTileSuppliers", ChrW(&HE77B), 11367, 4649, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileSuppliers", "«·„Ê—œÊ‰", 11367, 5329, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileSuppliers", "«·„Ê—œÊ‰", 11367, 4479, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmSuppliers"
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub7", " ", 11537, 3998, 3132, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile8", 15066, 2977, 3472, 1389, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle8", "„’—Ê›«  «·‘Â—", 15236, 3062, 3132, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxNavExpenses", 7668, 4479, 3472, 1361, RGB(0, 137, 123))
+    Set c = AddIcon("icoTileExpenses", ChrW(&HE8C7), 7668, 4649, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileExpenses", "«·„’—Ê›« ", 7668, 5329, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileExpenses", "«·„’—Ê›« ", 7668, 4479, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmExpenses"
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue8", "-", 15236, 3402, 3132, 567, 20, True, CLR_PRIMARY, "", 0)
+    Set c = AddRect("boxNavReports", 3969, 4479, 3472, 1361, RGB(216, 27, 96))
+    Set c = AddIcon("icoTileReports", ChrW(&HE8A5), 3969, 4649, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileReports", "«· ﬁ«—Ì—", 3969, 5329, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileReports", "«· ﬁ«—Ì—", 3969, 4479, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmReportCenter"
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub8", " ", 15236, 3998, 3132, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblCapRecentSales", "›Ê« Ì— «·ÌÊ„ (‰ﬁ— „“œÊÃ ··⁄—÷)", 3969, 4564, 4705, 340, 10, True, CLR_TEXT, "", 0)
-    Set c = AddList("lstRecentSales", 3969, 4933, 4705, 3743, 5, "0;1247;737;1588;1077", True)
-    c.OnDblClick = EP
-    Set c = AddLabel("lblCapLowStock", "„‰Œ›÷… «·„Œ“Ê‰ (‰ﬁ— „“œÊÃ ··„‰ Ã)", 8901, 4564, 4705, 340, 10, True, CLR_TEXT, "", 0)
-    Set c = AddList("lstLowStock", 8901, 4933, 4705, 3743, 4, "0;2608;1021;1021", True)
-    c.OnDblClick = EP
-    Set c = AddLabel("lblCapTopProducts", "«·√ﬂÀ— „»Ì⁄« Â–« «·‘Â—", 13833, 4564, 4705, 340, 10, True, CLR_TEXT, "", 0)
-    Set c = AddList("lstTopProducts", 13833, 4933, 4705, 3743, 4, "0;2381;1021;1247", True)
-    c.OnDblClick = EP
-    Set c = AddLabel("lblIntegrity", " ", 3969, 8846, 14571, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddRect("boxNavSettings", 15066, 6010, 3472, 1361, RGB(232, 236, 243))
+    Set c = AddIcon("icoTileSettings", ChrW(&HE713), 15066, 6180, 3472, 652, 26, False, CLR_PRIMARY, "", 2)
+    Set c = AddLabel("lblTileSettings", "«·≈⁄œ«œ« ", 15066, 6860, 3472, 397, 13, True, CLR_TEXT, "", 2)
+    Set c = AddButton("btnTileSettings", "«·≈⁄œ«œ« ", 15066, 6010, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmSettings"
+    c.OnClick = EP
+    Set c = AddRect("boxNavUsers", 11367, 6010, 3472, 1361, RGB(232, 236, 243))
+    Set c = AddIcon("icoTileUsers", ChrW(&HE8D7), 11367, 6180, 3472, 652, 26, False, CLR_PRIMARY, "", 2)
+    Set c = AddLabel("lblTileUsers", "«·„” Œœ„Ê‰", 11367, 6860, 3472, 397, 13, True, CLR_TEXT, "", 2)
+    Set c = AddButton("btnTileUsers", "«·„” Œœ„Ê‰", 11367, 6010, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmUsers"
+    c.OnClick = EP
+    Set c = AddRect("boxNavBackup", 7668, 6010, 3472, 1361, RGB(232, 236, 243))
+    Set c = AddIcon("icoTileBackup", ChrW(&HE8B7), 7668, 6180, 3472, 652, 26, False, CLR_PRIMARY, "", 2)
+    Set c = AddLabel("lblTileBackup", "«·‰”Œ «·«Õ Ì«ÿÌ", 7668, 6860, 3472, 397, 13, True, CLR_TEXT, "", 2)
+    Set c = AddButton("btnTileBackup", "«·‰”Œ «·«Õ Ì«ÿÌ", 7668, 6010, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmBackup"
+    c.OnClick = EP
+    Set c = AddRect("boxNavLogout", 3969, 6010, 3472, 1361, RGB(244, 81, 30))
+    Set c = AddIcon("icoTileLogout", ChrW(&HE7E8), 3969, 6180, 3472, 652, 26, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileLogout", " ”ÃÌ· «·Œ—ÊÃ", 3969, 6860, 3472, 397, 13, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileLogout", " ”ÃÌ· «·Œ—ÊÃ", 3969, 6010, 3472, 1361, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxTile5", 15066, 7541, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle5", "œÌÊ‰ «·⁄„·«¡", 15236, 7598, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileValue5", "-", 15236, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileSub5", " ", 15236, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile6", 11367, 7541, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle6", "„” Õﬁ«  «·„Ê—œÌ‰", 11537, 7598, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileValue6", "-", 11537, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileSub6", " ", 11537, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile7", 7668, 7541, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle7", "ﬁÌ„… «·„Œ“Ê‰ »«· ﬂ·›…", 7838, 7598, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileValue7", "-", 7838, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileSub7", " ", 7838, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile8", 3969, 7541, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle8", "„’—Ê›«  «·‘Â—", 4139, 7598, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileValue8", "-", 4139, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileSub8", " ", 4139, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblIntegrity", " ", 3969, 8958, 14571, 312, 10, True, CLR_MUTED, "", 0)
     m_frm.OnOpen = EP
     m_frm.OnLoad = EP
     m_frm.OnActivate = EP
@@ -833,6 +915,42 @@ Private Sub BuildForm_frmMain()
     s = s & "Private Sub btnChangePassword_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmChangePassword"", 10" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileSales_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmPOS"", 6" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTilePurchases_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmPurchaseInvoice"", 7" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileInventory_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmInventory"", 7" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileProducts_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmProducts"", 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileCustomers_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmCustomers"", 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileSuppliers_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmSuppliers"", 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileExpenses_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmExpenses"", 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileReports_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmReportCenter"", 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileSettings_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmSettings"", 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileUsers_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmUsers"", 10" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileBackup_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmBackup"", 10" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileLogout_Click()" & vbCrLf
+    s = s & "    LogoutUser" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub lblTileTitle1_Click()" & vbCrLf
     s = s & "    DashboardTileClick ""TODAY""" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -881,26 +999,25 @@ Private Sub BuildForm_frmMain()
     s = s & "Private Sub lblTileValue8_Click()" & vbCrLf
     s = s & "    DashboardTileClick ""EXPENSES""" & vbCrLf
     s = s & "End Sub" & vbCrLf
-    s = s & "Private Sub lstRecentSales_DblClick(Cancel As Integer)" & vbCrLf
-    s = s & "    OpenScreen ""frmSalesInvoice"", 6, Me!lstRecentSales.Value" & vbCrLf
-    s = s & "End Sub" & vbCrLf
-    s = s & "Private Sub lstLowStock_DblClick(Cancel As Integer)" & vbCrLf
-    s = s & "    OpenScreen ""frmProducts"", 0, Me!lstLowStock.Value" & vbCrLf
-    s = s & "End Sub" & vbCrLf
-    s = s & "Private Sub lstTopProducts_DblClick(Cancel As Integer)" & vbCrLf
-    s = s & "    OpenScreen ""frmProducts"", 0, Me!lstTopProducts.Value" & vbCrLf
-    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
-    s = s & "    spec = ""boxSidebar,0,0,3515,9526,0,0,0,1000;lblUser,13437,907,5103,340,1000,0,0,0;btnRefresh,17179,340,1361,454,1000,0,0,0;btnChangePassword,11964,340,1531,454,1000,0,0,0;lblUpdated,13550,425,3515,312,1000,0,0,0;boxTile1,3969,1418,3472,1389,0,250,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileTitle1,4139,1503,3132,340,0,250,0,0;lblTileValue1,4139,1843,3132,567,0,250,0,0;lblTileSub1,4139,2439,3132,284,0,250,0,0;boxTile2,7668,1418,3472,1389,250,250,0,0;lblTileTitle2,7838,1503,3132,340,250,250,0,0;lblTileValue2,7838,1843,3132,567,250,250,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileSub2,7838,2439,3132,284,250,250,0,0;boxTile3,11367,1418,3472,1389,500,250,0,0;lblTileTitle3,11537,1503,3132,340,500,250,0,0;lblTileValue3,11537,1843,3132,567,500,250,0,0;lblTileSub3,11537,2439,3132,284,500,250,0,0;boxTile4,15066,1418,3472,1389,750,250,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileTitle4,15236,1503,3132,340,750,250,0,0;lblTileValue4,15236,1843,3132,567,750,250,0,0;lblTileSub4,15236,2439,3132,284,750,250,0,0;boxTile5,3969,2977,3472,1389,0,250,0,0;lblTileTitle5,4139,3062,3132,340,0,250,0,0;lblTileValue5,4139,3402,3132,567,0,250,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileSub5,4139,3998,3132,284,0,250,0,0;boxTile6,7668,2977,3472,1389,250,250,0,0;lblTileTitle6,7838,3062,3132,340,250,250,0,0;lblTileValue6,7838,3402,3132,567,250,250,0,0;lblTileSub6,7838,3998,3132,284,250,250,0,0;boxTile7,11367,2977,3472,1389,500,250,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileTitle7,11537,3062,3132,340,500,250,0,0;lblTileValue7,11537,3402,3132,567,500,250,0,0;lblTileSub7,11537,3998,3132,284,500,250,0,0;boxTile8,15066,2977,3472,1389,750,250,0,0;lblTileTitle8,15236,3062,3132,340,750,250,0,0;lblTileValue8,15236,3402,3132,567,750,250,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileSub8,15236,3998,3132,284,750,250,0,0;lblCapRecentSales,3969,4564,4705,340,0,333,0,0;lstRecentSales,3969,4933,4705,3743,0,333,0,1000;lblCapLowStock,8901,4564,4705,340,333,333,0,0;lstLowStock,8901,4933,4705,3743,333,333,0,1000;lblCapTopProducts,13833,4564,4705,340,666,333,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lstTopProducts,13833,4933,4705,3743,666,333,0,1000;lblIntegrity,3969,8846,14571,340,0,1000,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 9526, -142, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    spec = ""boxSidebar,0,0,3515,9412,0,0,0,1000;lblWelcome,11736,284,6804,539,1000,0,0,0;lblToday,11736,879,6804,340,1000,0,0,0;boxTile1,15066,1418,3472,1361,750,250,0,0;boxKpiIcon1,17461,1645,907,907,750,250,0,0;icoKpi1,17461,1787,907,624,750,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle1,15236,1503,2111,312,750,250,0,0;lblTileValue1,15236,1815,2111,567,750,250,0,0;lblTileSub1,15236,2410,2111,284,750,250,0,0;boxTile2,11367,1418,3472,1361,500,250,0,0;boxKpiIcon2,13762,1645,907,907,500,250,0,0;icoKpi2,13762,1787,907,624,500,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle2,11537,1503,2111,312,500,250,0,0;lblTileValue2,11537,1815,2111,567,500,250,0,0;lblTileSub2,11537,2410,2111,284,500,250,0,0;boxTile3,7668,1418,3472,1361,250,250,0,0;boxKpiIcon3,10063,1645,907,907,250,250,0,0;icoKpi3,10063,1787,907,624,250,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle3,7838,1503,2111,312,250,250,0,0;lblTileValue3,7838,1815,2111,567,250,250,0,0;lblTileSub3,7838,2410,2111,284,250,250,0,0;boxTile4,3969,1418,3472,1361,0,250,0,0;boxKpiIcon4,6364,1645,907,907,0,250,0,0;icoKpi4,6364,1787,907,624,0,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle4,4139,1503,2111,312,0,250,0,0;lblTileValue4,4139,1815,2111,567,0,250,0,0;lblTileSub4,4139,2410,2111,284,0,250,0,0;boxNavSales,15066,2948,3472,1361,750,250,0,333;icoTileSales,15066,3118,3472,652,750,250,0,333;lblTileSales,15066,3798,3472,397,750,250,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";btnTileSales,15066,2948,3472,1361,750,250,0,333;boxNavPurchases,11367,2948,3472,1361,500,250,0,333;icoTilePurchases,11367,3118,3472,652,500,250,0,333;lblTilePurchases,11367,3798,3472,397,500,250,0,333;btnTilePurchases,11367,2948,3472,1361,500,250,0,333;boxNavInventory,7668,2948,3472,1361,250,250,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";icoTileInventory,7668,3118,3472,652,250,250,0,333;lblTileInventory,7668,3798,3472,397,250,250,0,333;btnTileInventory,7668,2948,3472,1361,250,250,0,333;boxNavProducts,3969,2948,3472,1361,0,250,0,333;icoTileProducts,3969,3118,3472,652,0,250,0,333;lblTileProducts,3969,3798,3472,397,0,250,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";btnTileProducts,3969,2948,3472,1361,0,250,0,333;boxNavCustomers,15066,4479,3472,1361,750,250,333,333;icoTileCustomers,15066,4649,3472,652,750,250,333,333;lblTileCustomers,15066,5329,3472,397,750,250,333,333;btnTileCustomers,15066,4479,3472,1361,750,250,333,333;boxNavSuppliers,11367,4479,3472,1361,500,250,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";icoTileSuppliers,11367,4649,3472,652,500,250,333,333;lblTileSuppliers,11367,5329,3472,397,500,250,333,333;btnTileSuppliers,11367,4479,3472,1361,500,250,333,333;boxNavExpenses,7668,4479,3472,1361,250,250,333,333;icoTileExpenses,7668,4649,3472,652,250,250,333,333;lblTileExpenses,7668,5329,3472,397,250,250,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";btnTileExpenses,7668,4479,3472,1361,250,250,333,333;boxNavReports,3969,4479,3472,1361,0,250,333,333;icoTileReports,3969,4649,3472,652,0,250,333,333;lblTileReports,3969,5329,3472,397,0,250,333,333;btnTileReports,3969,4479,3472,1361,0,250,333,333;boxNavSettings,15066,6010,3472,1361,750,250,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";icoTileSettings,15066,6180,3472,652,750,250,666,333;lblTileSettings,15066,6860,3472,397,750,250,666,333;btnTileSettings,15066,6010,3472,1361,750,250,666,333;boxNavUsers,11367,6010,3472,1361,500,250,666,333;icoTileUsers,11367,6180,3472,652,500,250,666,333;lblTileUsers,11367,6860,3472,397,500,250,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";btnTileUsers,11367,6010,3472,1361,500,250,666,333;boxNavBackup,7668,6010,3472,1361,250,250,666,333;icoTileBackup,7668,6180,3472,652,250,250,666,333;lblTileBackup,7668,6860,3472,397,250,250,666,333;btnTileBackup,7668,6010,3472,1361,250,250,666,333;boxNavLogout,3969,6010,3472,1361,0,250,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";icoTileLogout,3969,6180,3472,652,0,250,666,333;lblTileLogout,3969,6860,3472,397,0,250,666,333;btnTileLogout,3969,6010,3472,1361,0,250,666,333;boxTile5,15066,7541,3472,1049,750,250,1000,0;lblTileTitle5,15236,7598,3132,284,750,250,1000,0;lblTileValue5,15236,7893,3132,408,750,250,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub5,15236,8306,3132,255,750,250,1000,0;boxTile6,11367,7541,3472,1049,500,250,1000,0;lblTileTitle6,11537,7598,3132,284,500,250,1000,0;lblTileValue6,11537,7893,3132,408,500,250,1000,0;lblTileSub6,11537,8306,3132,255,500,250,1000,0;boxTile7,7668,7541,3472,1049,250,250,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle7,7838,7598,3132,284,250,250,1000,0;lblTileValue7,7838,7893,3132,408,250,250,1000,0;lblTileSub7,7838,8306,3132,255,250,250,1000,0;boxTile8,3969,7541,3472,1049,0,250,1000,0;lblTileTitle8,4139,7598,3132,284,0,250,1000,0;lblTileValue8,4139,7893,3132,408,0,250,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub8,4139,8306,3132,255,0,250,1000,0;lblIntegrity,3969,8958,14571,312,0,1000,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9412, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmMain", s
     Exit Sub

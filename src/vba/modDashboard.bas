@@ -3,10 +3,10 @@ Attribute VB_Name = "modDashboard"
 ' modDashboard  -  Retail Store Management System (Phase 9)
 '
 ' The dashboard of frmMain:
-'   8 tiles    today / month sales, month net profit, low-stock products,
-'              customer debts, supplier dues, stock value, month expenses
-'   3 lists    latest sales invoices, low-stock products, best sellers this month
-' Figures come from DashboardQuery and qryDashboardTopProducts (own parameters
+'   4 cards    today / month sales, month net profit, low-stock products
+'   12 tiles   coloured shortcuts to the screens (disabled without permission)
+'   4 cards    customer debts, supplier dues, stock value, month expenses
+' Figures come from DashboardQuery (own parameters
 ' DashDay / DashMonth / DashEnd, so the report-centre period is never changed);
 ' the month profit comes from ProfitQuery with the report period saved and restored.
 '
@@ -48,19 +48,6 @@ Public Sub DashboardRefresh(ByVal frm As Access.Form)
     SetTile frm, 7, Money(rs!StockValue, financial), "بمتوسط التكلفة"
     SetTile frm, 8, Money(rs!MonthExpenses, financial), "بدون الضريبة"
     rs.Close
-
-    frm!lstRecentSales.RowSource = "SELECT TOP 15 h.SalesInvoiceID, h.InvoiceNumber AS [الرقم], " & _
-        "Format(h.InvoiceDate, 'hh:nn') AS [الوقت], c.CustomerName AS [العميل], " & _
-        IIf(financial, "h.TotalAmount", "'-'") & " AS [الإجمالي] " & _
-        "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID " & _
-        "WHERE h.InvoiceDate >= " & SqlDate(Date) & _
-        IIf(financial, "", " AND h.EmployeeID = " & CurrentUserID()) & _
-        " ORDER BY h.SalesInvoiceID DESC"
-    frm!lstLowStock.RowSource = "SELECT TOP 30 ProductID, ProductName AS [المنتج], CurrentQuantity AS [المتوفر], " & _
-        "MinimumQuantity AS [الحد] FROM LowStockQuery ORDER BY ShortageQty DESC, ProductName"
-    frm!lstTopProducts.RowSource = "SELECT TOP 10 ProductID, ProductName AS [المنتج], NetQty AS [الكمية], " & _
-        IIf(financial, "NetSales", "'-'") & " AS [المبيعات] FROM qryDashboardTopProducts " & _
-        "ORDER BY NetQty DESC, ProductName"
     frm!lblUpdated.Caption = "آخر تحديث: " & Format$(Now, "hh:nn")
     m_lastRefresh = Now
     RefreshIntegrityStatus frm
@@ -163,7 +150,6 @@ End Function
 Public Function TestDashboard() As Boolean
     Dim frm As Access.Form, opened As Boolean, i As Integer, passed As Long, failed As Long
     Dim report As String, cap As String, ok As Boolean, savedStart As Variant, savedEnd As Variant
-    Dim rows As Long, expected As Long
     On Error GoTo EH
     Calendar = vbCalGreg
     EnsureTestUser
@@ -192,12 +178,8 @@ Public Function TestDashboard() As Boolean
                 "عدد فواتير اليوم", passed, failed, report
     CheckResult TempVars("PeriodStart") = DateSerial(2020, 1, 1) And TempVars("PeriodEnd") = DateSerial(2020, 2, 1), _
                 "لوحة التحكم لا تغيّر فترة مركز التقارير", passed, failed, report
-    ' an empty list does not count its heading row, so never go below 0
-    rows = frm!lstLowStock.ListCount - 1
-    If rows < 0 Then rows = 0
-    expected = DCount("*", "LowStockQuery")
-    If expected > 30 Then expected = 30
-    CheckResult rows = expected, "قائمة النواقص (" & rows & " من " & expected & ")", passed, failed, report
+    CheckResult frm!btnTileSales.Transparent And frm!btnTileSales.Tag = "frmPOS", _
+                "مربعات الشاشات الملونة تعمل كأزرار", passed, failed, report
     If opened Then DoCmd.Close acForm, "frmMain", acSaveNo
     GoSub Restore
     g_SilentMode = False

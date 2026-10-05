@@ -19,6 +19,7 @@
 | 11 | الاختبار الشامل والبيانات التجريبية | ✅ تمت الموافقة | [docs/11-Testing-Demo.md](docs/11-Testing-Demo.md) |
 | 12 | دليل الاستخدام | ✅ تمت الموافقة | [docs/12-User-Guide.md](docs/12-User-Guide.md) |
 | + | طباعة ملصقات الباركود | ✅ بانتظار الموافقة | [docs/13-Barcode-Labels.md](docs/13-Barcode-Labels.md) |
+| + | لوحة التحكم الجديدة والإحصائيات بالرسوم البيانية | ✅ بانتظار الموافقة | [docs/14-Dashboard-Charts.md](docs/14-Dashboard-Charts.md) |
 
 ## هيكل المستودع
 
@@ -58,6 +59,7 @@
 | 9 | `modSecurity`, `modSecurityScreens`, `modBackup` (دائمة) ثم `modTestSecurity` | `BuildForms`, `BuildReports` | `TestSecurity` |
 | 10 | `modTestAll`, `modDemoData` | `LoadDemoData` (اختياري، للتدريب) | **`RunAllTests`** (كل الاختبارات) |
 | 11 | `modLabels` (دائمة) | `BuildSchema`, `BuildForms`, `BuildReports` | `TestLabels` |
+| 12 | `modCharts` (دائمة) | `BuildQueries`, `BuildForms`, `BuildReports` | `TestDashboard`, `TestReports` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

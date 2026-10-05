@@ -26,7 +26,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -42,6 +42,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptVoucher
     BuildReport_rptStockCount
     BuildReport_rptBarcodeLabels
+    BuildReport_rptStatistics
     BuildReport_rptDailySales
     BuildReport_rptMonthlySales
     BuildReport_rptSalesByPeriod
@@ -753,6 +754,36 @@ Private Sub BuildReport_rptBarcodeLabels()
     Exit Sub
 EH:
     AbortReport "rptBarcodeLabels", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptStatistics()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptStatistics", "الإحصائيات والرسوم البيانية", "", 10773, "", "", False, True
+    SetSection 3, 1134
+    SetSection 4, 397
+    SetSection 0, 13381
+    HideSection 1
+    HideSection 2
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 5500, 57, 5273, 397, 13, True, 3)
+    Set c = RLabel(3, "lblTitle", "الإحصائيات والرسوم البيانية", 0, 57, 5273, 425, 16, True, 0)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 539, 10773, 284, 9, False, 2)
+    Set c = RLine(3, "lnHeader", 964, 10773)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6237, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 6237, 57, 4536, 255, 8, False, 3)
+    Set c = RBox(0, "boxCharts", 0, 0, 10773, 13381)
+    SetCtl c, "BorderStyle", 0
+    SetCtl c, "BackStyle", 0
+    m_rpt.Section(0).Name = "secCharts"
+    m_rpt.Section(0).OnPrint = EP
+    s = ""
+    s = s & "Private Sub secCharts_Print(Cancel As Integer, PrintCount As Integer)" & vbCrLf
+    s = s & "    DrawStatistics Me, Me!boxCharts.Left, Me!boxCharts.Top, Me!boxCharts.Width, Me!boxCharts.Height" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptStatistics", s
+    Exit Sub
+EH:
+    AbortReport "rptStatistics", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptDailySales()

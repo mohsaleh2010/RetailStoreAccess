@@ -126,6 +126,13 @@ ORDER BY p.ProductName""", P),
 SELECT * FROM SalesByProductQuery
 ORDER BY NetQty DESC, NetSales DESC""", P),
 
+    Query("SalesByCategoryQuery", "المبيعات حسب التصنيف خلال فترة (للرسم الدائري)", """
+SELECT CategoryName, Count(*) AS ProductCount, Sum(NetQty) AS CategoryQty,
+       Sum(NetSales) AS CategoryNet, Sum(SalesTotal) AS CategoryTotal, Sum(GrossProfit) AS CategoryProfit
+FROM SalesByProductQuery
+GROUP BY CategoryName
+ORDER BY Sum(SalesTotal) DESC""", P),
+
     Query("LeastSellingProductsQuery", "أقل المنتجات مبيعًا خلال فترة (تشمل المنتجات التي لم تُبع)", f"""
 SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity,
        {nz("s.NetQty")} AS NetQtySold, {nz("s.NetSales")} AS NetSalesAmount
@@ -848,6 +855,11 @@ CHECKS: List[Check] = [
           "SELECT QtyReturned FROM SalesByProductQuery WHERE ProductID = {ref:P2}", 2),
     Check("المبيعات حسب المنتج: صافي مبيعات المنتج 2 = 200 − 40",
           "SELECT NetSales FROM SalesByProductQuery WHERE ProductID = {ref:P2}", 160),
+    Check("المبيعات حسب التصنيف: المجموع = المبيعات حسب المنتج",
+          "SELECT (SELECT Sum(CategoryTotal) FROM SalesByCategoryQuery) - "
+          "(SELECT Sum(SalesTotal) FROM SalesByProductQuery) FROM Settings", 0),
+    Check("المبيعات حسب التصنيف: صافي الكمية = 12 + 8",
+          "SELECT Sum(CategoryQty) FROM SalesByCategoryQuery", 20),
     Check("الأكثر مبيعًا: المنتج 1",
           "SELECT TOP 1 ProductID FROM BestSellingProductsQuery ORDER BY NetQty DESC, NetSales DESC",
           "ref:P1"),

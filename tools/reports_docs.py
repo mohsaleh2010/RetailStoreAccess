@@ -8,7 +8,8 @@
 from typing import List
 
 from forms import Control, Sym, cm
-from reports import (ReportModel, MONEY, SEC_DETAIL, SEC_HEADER, SEC_FOOTER, setting, txt, lbl, hline)
+from reports import (ReportModel, MONEY, SEC_DETAIL, SEC_HEADER, SEC_FOOTER, SEC_PAGE_HEADER, SEC_PAGE_FOOTER,
+                     setting, txt, lbl, hline)
 
 QTY = "#,##0.###"
 W = cm(19.0)
@@ -194,5 +195,28 @@ def barcode_labels() -> ReportModel:
     return m
 
 
+def statistics() -> ReportModel:
+    """Charts drawn by modCharts.DrawStatistics in the Print event of the (unbound) detail section."""
+    m = ReportModel("rptStatistics", "الإحصائيات والرسوم البيانية", W,
+                    {SEC_PAGE_HEADER: cm(2.0), SEC_DETAIL: cm(23.6), SEC_PAGE_FOOTER: cm(0.7)},
+                    record_source="", group="", sorts=[], page_setup=True)
+    half = cm(9.3)
+    txt(m, SEC_PAGE_HEADER, "txtStoreName", setting("StoreName"), W - half, cm(0.1), half, cm(0.7), 13, True,
+        align=3)
+    lbl(m, SEC_PAGE_HEADER, "lblTitle", "الإحصائيات والرسوم البيانية", 0, cm(0.1), half, cm(0.75), 16, True)
+    txt(m, SEC_PAGE_HEADER, "txtCriteria", "=ReportCriteria()", 0, cm(0.95), W, cm(0.5), 9, align=2)
+    hline(m, SEC_PAGE_HEADER, "lnHeader", cm(1.7), W)
+    m.add(SEC_DETAIL, Control("rect", "boxCharts", 0, 0, W, cm(23.6), {"BorderStyle": 0, "BackStyle": 0},
+                              decorative=True))
+    txt(m, SEC_PAGE_FOOTER, "txtPrinted", "=ReportPrintedAt()", 0, cm(0.1), cm(11), cm(0.45), 8)
+    txt(m, SEC_PAGE_FOOTER, "txtPage", '="صفحة " & [Page] & " من " & [Pages]', cm(11), cm(0.1), W - cm(11),
+        cm(0.45), 8, align=3)
+    m.events += ['m_rpt.Section(0).Name = "secCharts"', "m_rpt.Section(0).OnPrint = EP"]
+    m.code += ["Private Sub secCharts_Print(Cancel As Integer, PrintCount As Integer)",
+               "    DrawStatistics Me, Me!boxCharts.Left, Me!boxCharts.Top, Me!boxCharts.Width, Me!boxCharts.Height",
+               "End Sub"]
+    return m
+
+
 def document_reports() -> List[ReportModel]:
-    return [purchase_document(), voucher(), stock_count_sheet(), barcode_labels()]
+    return [purchase_document(), voucher(), stock_count_sheet(), barcode_labels(), statistics()]

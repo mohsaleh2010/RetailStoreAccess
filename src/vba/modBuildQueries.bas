@@ -20,9 +20,9 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCou" & _
-    "ntQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,DashboardQuery,qryDashboard" & _
-    "TopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
+    "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,Dashbo" & _
+    "ardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -459,6 +459,10 @@ Private Sub RunChecks()
         "SELECT QtyReturned FROM SalesByProductQuery WHERE ProductID = " & R("P2"), 2
     Chk "المبيعات حسب المنتج: صافي مبيعات المنتج 2 = 200 - 40", _
         "SELECT NetSales FROM SalesByProductQuery WHERE ProductID = " & R("P2"), 160
+    Chk "المبيعات حسب التصنيف: المجموع = المبيعات حسب المنتج", _
+        "SELECT (SELECT Sum(CategoryTotal) FROM SalesByCategoryQuery) - (SELECT Sum(SalesTotal) FROM SalesByProductQuery) FROM Settings", 0
+    Chk "المبيعات حسب التصنيف: صافي الكمية = 12 + 8", _
+        "SELECT Sum(CategoryQty) FROM SalesByCategoryQuery", 20
     Chk "الأكثر مبيعًا: المنتج 1", _
         "SELECT TOP 1 ProductID FROM BestSellingProductsQuery ORDER BY NetQty DESC, NetSales DESC", CDbl(R("P1"))
     Chk "الأقل مبيعًا: المنتج 3 (لم يُبع)", _
@@ -550,6 +554,7 @@ Private Sub CreateAllQueries()
     Q_SalesByPeriodQuery
     Q_SalesByProductQuery
     Q_BestSellingProductsQuery
+    Q_SalesByCategoryQuery
     Q_LeastSellingProductsQuery
     Q_qryPurchaseDocuments
     Q_PurchasesQuery
@@ -710,6 +715,16 @@ Private Sub Q_BestSellingProductsQuery()
     s = "SELECT * FROM SalesByProductQuery" & vbCrLf
     s = s & "ORDER BY NetQty DESC, NetSales DESC" & vbCrLf
     SaveQuery "BestSellingProductsQuery", "أفضل المنتجات مبيعًا خلال فترة (حسب صافي الكمية)", s
+End Sub
+
+Private Sub Q_SalesByCategoryQuery()
+    Dim s As String
+    s = "SELECT CategoryName, Count(*) AS ProductCount, Sum(NetQty) AS CategoryQty," & vbCrLf
+    s = s & "       Sum(NetSales) AS CategoryNet, Sum(SalesTotal) AS CategoryTotal, Sum(GrossProfit) AS CategoryProfit" & vbCrLf
+    s = s & "FROM SalesByProductQuery" & vbCrLf
+    s = s & "GROUP BY CategoryName" & vbCrLf
+    s = s & "ORDER BY Sum(SalesTotal) DESC" & vbCrLf
+    SaveQuery "SalesByCategoryQuery", "المبيعات حسب التصنيف خلال فترة (للرسم الدائري)", s
 End Sub
 
 Private Sub Q_LeastSellingProductsQuery()

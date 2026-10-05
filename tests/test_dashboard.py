@@ -100,7 +100,23 @@ class DashboardCodeTests(unittest.TestCase):
         self.assertIn('financial = HasPermission("DASHBOARD_FINANCIAL")', body)
         for field in ("TodaySales", "MonthSales", "CustomerDebt", "SupplierDue", "StockValue", "MonthExpenses"):
             self.assertIn(f"Money(rs!{field}, financial)", body, field)
-        self.assertIn('IIf(financial, "h.TotalAmount", "\'-\'")', body)
+
+    def test_launcher_tiles(self):
+        main = next(m for m in F.all_forms() if m.name == "frmMain")
+        ctl = {c.name: c for c in main.controls}
+        targets = {i.key: i.target for i in F.NAV_ITEMS}
+        self.assertEqual(len(F.LAUNCH_TILES), 12)
+        for key, *_ in F.LAUNCH_TILES:
+            btn = ctl[f"btnTile{key}"]
+            self.assertTrue(btn.props["Transparent"])
+            self.assertEqual(btn.props.get("Tag", ""), targets[key])
+            for part in ("boxNav", "icoTile", "lblTile"):
+                c = ctl[f"{part}{key}"]
+                self.assertEqual((c.x, c.w), (btn.x, btn.w), part + key)
+                self.assertTrue(btn.y <= c.y and c.y + c.h <= btn.y + btn.h, part + key)   # under the button
+                self.assertTrue(c.decorative)
+        self.assertIn('frm.Controls("boxNav" & Mid$(ctl.Name, 8)).BackColor = RGB(205, 210, 218)',
+                      read("modSecurityScreens"))
 
     def test_report_period_is_restored(self):
         body = self.text.split("Private Function MonthNetProfit(")[1].split("\nEnd Function")[0]

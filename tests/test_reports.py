@@ -83,6 +83,11 @@ class LayoutTests(unittest.TestCase):
                     self.assertTrue(c.props["Caption"].strip(), f"{m.name}.{c.name}")
 
 
+# unbound reports that draw their own content (modCharts); the report-centre query is only the
+# fallback shown when the report is missing
+DRAWN = {"rptStatistics"}
+
+
 class CatalogueTests(unittest.TestCase):
 
     def test_every_report_centre_entry_has_its_report(self):
@@ -90,9 +95,12 @@ class CatalogueTests(unittest.TestCase):
         for r in F.REPORTS:
             with self.subTest(r.key):
                 self.assertIn(r.report, by_name)
-                self.assertEqual(by_name[r.report].record_source, r.query)
+                if r.report in DRAWN:
+                    self.assertEqual(by_name[r.report].record_source, "")
+                else:
+                    self.assertEqual(by_name[r.report].record_source, r.query)
         self.assertEqual({s.key for s in RC.LIST_SPECS} | {s.key for s in RC.CARD_SPECS},
-                         {r.key for r in F.REPORTS})
+                         {r.key for r in F.REPORTS if r.report not in DRAWN})
 
     def test_low_stock_report_exists(self):
         """Required by the specification: "Low Stock Products Report"."""
@@ -102,7 +110,7 @@ class CatalogueTests(unittest.TestCase):
 
     def test_every_list_and_document_report_handles_no_data(self):
         for m in MODELS:
-            if m.page_setup:
+            if m.page_setup and m.name not in DRAWN:
                 self.assertIn("m_rpt.OnNoData = EP", m.events, m.name)
                 self.assertTrue(any("ReportNoData" in line for line in m.code), m.name)
 
@@ -129,6 +137,9 @@ class SourceTests(unittest.TestCase):
         for m in MODELS:
             if m.record_source not in cls.columns:
                 src = m.record_source
+                if not src:                         # unbound (rptStatistics draws its own content)
+                    cls.columns[src] = set()
+                    continue
                 sql = f"SELECT * FROM ({src})" if src.upper().startswith("SELECT ") else f'SELECT * FROM "{src}"'
                 cur = db.con.execute(sql)
                 cls.columns[m.record_source] = {d[0] for d in cur.description}

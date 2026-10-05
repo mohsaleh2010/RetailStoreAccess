@@ -76,7 +76,7 @@ def prepare(code: str) -> str:
     # LibreOffice differences that are not VBA bugs:
     text = text.replace("CDec(", "HarnessDec(")        # Decimal is Windows-only in LO
     text = text.replace("hh:nn:ss", "hh:mm:ss")       # LO reads "nn" as a weekday
-    text = re.sub(r"^(\s*)(rpt\.Line \()", r"\1' \2", text, flags=re.M)   # Access report drawing
+    text = re.sub(r"^(\s*)(rpt\.(?:Line|Circle) \(|rpt\.Print )", r"\1' \2", text, flags=re.M)   # report drawing
     text = re.sub(r"\bAs (?:Access|DAO)\.\w+", "As Object", text)          # Access/DAO object types
     # RoundMoney relies on Decimal; replace it with an equivalent Double version.
     text = re.sub(r"Public Function RoundMoney\(.*?\nEnd Function", HARNESS_ROUND, text, flags=re.S)

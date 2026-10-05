@@ -94,11 +94,16 @@ Public Function MainOpen(ByVal frm As Access.Form) As Boolean
 End Function
 
 Public Sub ApplyNavPermissions(ByVal frm As Access.Form)
-    ' Side-menu buttons of screens the user may not open are disabled.
-    Dim ctl As Access.Control
+    ' Side-menu buttons and dashboard tiles of screens the user may not open are disabled;
+    ' such a tile is also shown in grey.
+    Dim ctl As Access.Control, allowed As Boolean
     For Each ctl In frm.Controls
-        If Left$(ctl.Name, 6) = "btnNav" And Len(ctl.Tag) > 0 Then
-            ctl.Enabled = CanOpenScreen(ctl.Tag, True)
+        If (Left$(ctl.Name, 6) = "btnNav" Or Left$(ctl.Name, 7) = "btnTile") And Len(ctl.Tag) > 0 Then
+            allowed = CanOpenScreen(ctl.Tag, True)
+            ctl.Enabled = allowed
+            If Left$(ctl.Name, 7) = "btnTile" And Not allowed Then
+                frm.Controls("boxNav" & Mid$(ctl.Name, 8)).BackColor = RGB(205, 210, 218)
+            End If
         End If
     Next
 End Sub

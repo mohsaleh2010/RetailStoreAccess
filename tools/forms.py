@@ -393,6 +393,7 @@ class ReportEntry:
 
 
 REPORTS: List[ReportEntry] = [
+    ReportEntry("STATISTICS", "الإحصائيات والرسوم البيانية", "SalesByCategoryQuery", "rptStatistics", "P"),
     ReportEntry("DAILY_SALES", "المبيعات اليومية", "DailySalesQuery", "rptDailySales", "D", "SaleDate"),
     ReportEntry("MONTHLY_SALES", "المبيعات الشهرية", "MonthlySalesQuery", "rptMonthlySales", "$"),
     ReportEntry("SALES_PERIOD", "المبيعات حسب فترة", "SalesByPeriodQuery", "rptSalesByPeriod", "Pc"),
@@ -697,6 +698,21 @@ DASHBOARD_TILES = [("TODAY", "مبيعات اليوم"), ("MONTH", "مبيعات
                    ("STOCK", "قيمة المخزون بالتكلفة"), ("EXPENSES", "مصروفات الشهر")]
 
 
+# figure cards 1-4: icon and colour of the square
+KPI_STYLE = {"TODAY": ("sales", (67, 160, 71)), "MONTH": ("reports", (30, 136, 229)),
+             "PROFIT": ("expenses", (229, 57, 53)), "LOW": ("inventory", (251, 140, 0))}
+
+# launcher tiles: (NAV_ITEMS key, caption, colour, light tile)
+LAUNCH_TILES = [
+    ("Sales", "المبيعات", (67, 160, 71), False), ("Purchases", "المشتريات", (30, 136, 229), False),
+    ("Inventory", "المخزون", (251, 140, 0), False), ("Products", "المنتجات", (142, 36, 170), False),
+    ("Customers", "العملاء", (229, 57, 53), False), ("Suppliers", "الموردون", (57, 73, 171), False),
+    ("Expenses", "المصروفات", (0, 137, 123), False), ("Reports", "التقارير", (216, 27, 96), False),
+    ("Settings", "الإعدادات", (232, 236, 243), True), ("Users", "المستخدمون", (232, 236, 243), True),
+    ("Backup", "النسخ الاحتياطي", (232, 236, 243), True), ("Logout", "تسجيل الخروج", (244, 81, 30), False),
+]
+
+
 def layout_main() -> FormModel:
     width, height = cm(33.5), cm(19.0)
     m = FormModel("frmMain", "نظام إدارة المحل", width, height, popup=False, allow_add=False,
@@ -730,71 +746,108 @@ def layout_main() -> FormModel:
 
     cx = side_w + cm(0.8)
     cw = width - cx - cm(0.8)
-    m.add(Control("label", "lblWelcome", cx, cm(0.6), cm(14), cm(0.95),
-                  {"Caption": "لوحة التحكم", "FontSize": 20, "FontBold": True,
+    # header: title and date on the right, buttons and user on the left (Arabic reading order)
+    m.add(Control("label", "lblWelcome", cx + cw - cm(12), cm(0.5), cm(12), cm(0.95),
+                  {"Caption": "لوحة التحكم", "FontSize": 20, "FontBold": True, "TextAlign": 3,
                    "ForeColor": Sym("CLR_TEXT")}))
-    m.add(Control("label", "lblToday", cx, cm(1.6), cm(10), cm(0.6),
-                  {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED")}))
-    m.add(Control("label", "lblUser", cx + cw - cm(9), cm(1.6), cm(9), cm(0.6),
+    m.add(Control("label", "lblToday", cx + cw - cm(12), cm(1.55), cm(12), cm(0.6),
                   {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 3}))
-    button(m, "btnRefresh", "تحديث", cx + cw - cm(2.4), cm(0.6), "secondary", w=cm(2.4), h=cm(0.8),
+    button(m, "btnRefresh", "تحديث", cx, cm(0.6), "secondary", w=cm(2.4), h=cm(0.8),
            call="DashboardRefresh Me")
-    button(m, "btnChangePassword", "كلمة المرور", cx + cm(14.1), cm(0.6), "secondary", w=cm(2.7), h=cm(0.8),
+    button(m, "btnChangePassword", "كلمة المرور", cx + cm(2.6), cm(0.6), "secondary", w=cm(2.7), h=cm(0.8),
            call='OpenScreen "frmChangePassword", 10')
-    m.add(Control("label", "lblUpdated", cx + cw - cm(8.8), cm(0.75), cm(6.2), cm(0.55),
-                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 3}))
-    tile_w = (cw - cm(0.4) * 3) // 4
-    for i, (key, caption) in enumerate(DASHBOARD_TILES):
-        tx = cx + (i % 4) * (tile_w + cm(0.4))
-        ty = cm(2.5) + (i // 4) * cm(2.75)
-        n = i + 1
-        m.add(Control("rect", f"boxTile{n}", tx, ty, tile_w, cm(2.45),
-                      {"BackColor": Sym("CLR_SURFACE")}, decorative=True))
-        m.add(Control("label", f"lblTileTitle{n}", tx + cm(0.3), ty + cm(0.15), tile_w - cm(0.6), cm(0.6),
+    m.add(Control("label", "lblUpdated", cx + cm(5.5), cm(0.75), cm(6.0), cm(0.55),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 1}))
+    m.add(Control("label", "lblUser", cx, cm(1.55), cm(11.5), cm(0.6),
+                  {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 1}))
+    gap = cm(0.4)
+    tile_w = (cw - gap * 3) // 4
+    extra = {"boxSidebar": (0, 0, 0, 1000), "lblWelcome": (1000, 0, 0, 0), "lblToday": (1000, 0, 0, 0)}
+
+    def col_x(i):                                # first card on the right (Arabic reading order)
+        return cx + (3 - i % 4) * (tile_w + gap)
+
+    def col_fit(i, my=0, mh=0):
+        return ((3 - i % 4) * 250, 250, my, mh)
+
+    # 4 large figure cards with a coloured icon (tiles 1-4)
+    for i, (key, caption) in enumerate(DASHBOARD_TILES[:4]):
+        n, tx, ty = i + 1, col_x(i), cm(2.5)
+        icon_key, rgb = KPI_STYLE[key]
+        m.add(Control("rect", f"boxTile{n}", tx, ty, tile_w, cm(2.4), {"BackColor": Sym("CLR_SURFACE")},
+                      decorative=True))
+        m.add(Control("rect", f"boxKpiIcon{n}", tx + tile_w - cm(1.9), ty + cm(0.4), cm(1.6), cm(1.6),
+                      {"BackColor": Sym(f"RGB({rgb[0]}, {rgb[1]}, {rgb[2]})")}, decorative=True))
+        m.add(Control("icon", f"icoKpi{n}", tx + tile_w - cm(1.9), ty + cm(0.65), cm(1.6), cm(1.1),
+                      {"Caption": Sym(f"ChrW(&H{ICONS[icon_key]:X})"), "FontSize": 22, "TextAlign": 2,
+                       "ForeColor": Sym("CLR_SURFACE")}, decorative=True))
+        text_w = tile_w - cm(2.4)
+        m.add(Control("label", f"lblTileTitle{n}", tx + cm(0.3), ty + cm(0.15), text_w, cm(0.55),
                       {"Caption": caption, "FontSize": 10, "ForeColor": Sym("CLR_MUTED")}, events=["Click"]))
-        m.add(Control("label", f"lblTileValue{n}", tx + cm(0.3), ty + cm(0.75), tile_w - cm(0.6), cm(1.0),
+        m.add(Control("label", f"lblTileValue{n}", tx + cm(0.3), ty + cm(0.7), text_w, cm(1.0),
                       {"Caption": "-", "FontSize": 20, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")},
                       events=["Click"]))
-        m.add(Control("label", f"lblTileSub{n}", tx + cm(0.3), ty + cm(1.8), tile_w - cm(0.6), cm(0.5),
+        m.add(Control("label", f"lblTileSub{n}", tx + cm(0.3), ty + cm(1.75), text_w, cm(0.5),
                       {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+        for part in ("boxTile", "boxKpiIcon", "icoKpi", "lblTileTitle", "lblTileValue", "lblTileSub"):
+            extra[f"{part}{n}"] = col_fit(i)
+
+    # 12 coloured launcher tiles (3 rows share the extra height)
+    by_key = {item.key: item for item in NAV_ITEMS}
+    row_h, row_gap, top = cm(2.4), cm(0.3), cm(5.2)
+    for i, (key, caption, rgb, light) in enumerate(LAUNCH_TILES):
+        item = by_key[key]
+        tx, ty, row = col_x(i), top + (i // 4) * (row_h + row_gap), i // 4
+        call = f'OpenScreen "{item.target}", {item.phase}' if item.target else "LogoutUser"
+        fore = "CLR_PRIMARY" if light else "CLR_SURFACE"
+        m.add(Control("rect", f"boxNav{key}", tx, ty, tile_w, row_h,
+                      {"BackColor": Sym(f"RGB({rgb[0]}, {rgb[1]}, {rgb[2]})")}, decorative=True))
+        m.add(Control("icon", f"icoTile{key}", tx, ty + cm(0.3), tile_w, cm(1.15),
+                      {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"), "FontSize": 26, "TextAlign": 2,
+                       "ForeColor": Sym(fore)}, decorative=True))
+        m.add(Control("label", f"lblTile{key}", tx, ty + cm(1.5), tile_w, cm(0.7),
+                      {"Caption": caption, "FontSize": 13, "FontBold": True, "TextAlign": 2,
+                       "ForeColor": Sym("CLR_TEXT" if light else "CLR_SURFACE")}, decorative=True))
+        button(m, f"btnTile{key}", caption, tx, ty, "secondary", w=tile_w, h=row_h, call=call)
+        m.controls[-1].props["Transparent"] = True       # the coloured tile under it shows through
+        if item.target:
+            m.controls[-1].props["Tag"] = item.target    # MainLoad disables what the user may not open
+        for name in (f"boxNav{key}", f"icoTile{key}", f"lblTile{key}", f"btnTile{key}"):
+            extra[name] = col_fit(i, row * 333, 333)
+
+    # 4 smaller figure cards (tiles 5-8)
+    sy = top + 3 * row_h + 2 * row_gap + cm(0.3)
+    for i, (key, caption) in enumerate(DASHBOARD_TILES[4:]):
+        n, tx = i + 5, col_x(i)
+        m.add(Control("rect", f"boxTile{n}", tx, sy, tile_w, cm(1.85), {"BackColor": Sym("CLR_SURFACE")},
+                      decorative=True))
+        m.add(Control("label", f"lblTileTitle{n}", tx + cm(0.3), sy + cm(0.1), tile_w - cm(0.6), cm(0.5),
+                      {"Caption": caption, "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}, events=["Click"]))
+        m.add(Control("label", f"lblTileValue{n}", tx + cm(0.3), sy + cm(0.62), tile_w - cm(0.6), cm(0.72),
+                      {"Caption": "-", "FontSize": 15, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")},
+                      events=["Click"]))
+        m.add(Control("label", f"lblTileSub{n}", tx + cm(0.3), sy + cm(1.35), tile_w - cm(0.6), cm(0.45),
+                      {"Caption": " ", "FontSize": 8, "ForeColor": Sym("CLR_MUTED")}))
+        for part in ("boxTile", "lblTileTitle", "lblTileValue", "lblTileSub"):
+            extra[f"{part}{n}"] = col_fit(i, 1000)
+    for i, (key, _) in enumerate(DASHBOARD_TILES):
         for part in ("Title", "Value"):
-            m.code += [f"Private Sub lblTile{part}{n}_Click()", f'    DashboardTileClick "{key}"', "End Sub"]
-    list_w = (cw - cm(0.4) * 2) // 3
-    for i, (name, caption, columns, widths) in enumerate([
-            ("lstRecentSales", "فواتير اليوم (نقر مزدوج للعرض)", 5, "0;2.2;1.3;2.8;1.9"),
-            ("lstLowStock", "منخفضة المخزون (نقر مزدوج للمنتج)", 4, "0;4.6;1.8;1.8"),
-            ("lstTopProducts", "الأكثر مبيعًا هذا الشهر", 4, "0;4.2;1.8;2.2")]):
-        lx = cx + i * (list_w + cm(0.4))
-        m.add(Control("label", f"lblCap{name[3:]}", lx, cm(8.05), list_w, cm(0.6),
-                      {"Caption": caption, "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_TEXT")}))
-        m.add(Control("list", name, lx, cm(8.7), list_w, cm(8.8),
-                      {"ColumnCount": columns, "ColumnWidths": widths, "ColumnHeads": True},
-                      events=["DblClick"]))
-    m.code += ["Private Sub lstRecentSales_DblClick(Cancel As Integer)",
-               '    OpenScreen "frmSalesInvoice", 6, Me!lstRecentSales.Value', "End Sub",
-               "Private Sub lstLowStock_DblClick(Cancel As Integer)",
-               '    OpenScreen "frmProducts", 0, Me!lstLowStock.Value', "End Sub",
-               "Private Sub lstTopProducts_DblClick(Cancel As Integer)",
-               '    OpenScreen "frmProducts", 0, Me!lstTopProducts.Value', "End Sub"]
-    m.add(Control("label", "lblIntegrity", cx, height - cm(1.2), cw, cm(0.6),
+            m.code += [f"Private Sub lblTile{part}{i + 1}_Click()", f'    DashboardTileClick "{key}"', "End Sub"]
+
+    height = max(sy + cm(1.85) + cm(1.0), y + cm(0.3))     # y: below the last side-menu button
+    m.height = height
+    m.controls[0].h = height                     # side bar
+    m.add(Control("label", "lblIntegrity", cx, height - cm(0.8), cw, cm(0.55),
                   {"Caption": " ", "FontSize": 10, "FontBold": True,
                    "ForeColor": Sym("CLR_MUTED")}))
+    extra["lblIntegrity"] = (0, 1000, 1000, 0)
     m.form_events = ["Open", "Load", "Activate", "Timer"]
     m.form_props = {"TimerInterval": 300000}          # refresh the dashboard every 5 minutes
     m.code = ["Private Sub Form_Open(Cancel As Integer)", "    Cancel = Not MainOpen(Me)", "End Sub",
               "Private Sub Form_Load()", "    MainLoad Me", "End Sub",
               "Private Sub Form_Activate()", "    DashboardActivate Me", "End Sub",
               "Private Sub Form_Timer()", "    DashboardRefresh Me", "End Sub"] + m.code
-    shrink_area(m, ("lstRecentSales", "lstLowStock", "lstTopProducts"), cm(2.2))
-    extra = {"boxSidebar": (0, 0, 0, 1000), "lblIntegrity": (0, 1000, 1000, 0)}
-    for n in range(1, 9):                       # 4 tile columns share the extra width
-        col = ((n - 1) % 4) * 250
-        for part in ("boxTile", "lblTileTitle", "lblTileValue", "lblTileSub"):
-            extra[f"{part}{n}"] = (col, 250, 0, 0)
-    for i, name in enumerate(("RecentSales", "LowStock", "TopProducts")):
-        extra["lst" + name] = (i * 333, 333, 0, 1000)
-        extra["lblCap" + name] = (i * 333, 333, 0, 0)
-    fit_window(m, split_x=cm(21.0), extra=extra)
+    fit_window(m, extra=extra)
     return m
 
 
