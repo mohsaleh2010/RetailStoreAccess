@@ -88,6 +88,19 @@ class TouchRuntimeTests(unittest.TestCase):
         self.assertEqual(self.call("ImageCandidate", "\\\\srv\\a.png", "D:\\Img"), "\\\\srv\\a.png")
         self.assertEqual(self.call("ImageCandidate", "  ", "D:\\Img"), "")
 
+    def test_cafe_helpers(self):
+        self.assertEqual(self.call("ToggleInList", ",", "5"), ",5,")
+        self.assertEqual(self.call("ToggleInList", ",5,7,", "5"), ",7,")
+        self.assertEqual(self.call("ToggleInList", "", "3"), ",3,")
+        self.assertTrue(self.call("InList", ",12,3,", "3"))
+        self.assertFalse(self.call("InList", ",12,3,", "1"))
+        self.assertEqual(self.call("SizeName", "L"), "كبير")
+        self.assertEqual(self.call("SizeName", "S"), "صغير")
+        self.assertEqual(self.call("CafeLineNote", "كبير", ",3,1,"), "كبير، بدون سكر، ثلج قليل")
+        self.assertEqual(self.call("CafeLineNote", "وسط", ","), "وسط")
+        self.assertEqual(self.call("OrderTypeText", "TAKEAWAY", "", "سارة"), "طلب سفري  -  الاسم: سارة")
+        self.assertEqual(self.call("CafeNote", 5), "")
+
     def test_tile_colours_cover_the_choices(self):
         codes = F.TILE_COLORS.split(";")[0::2]
         values = {self.call("TileColorValue", c) for c in codes}
@@ -99,34 +112,43 @@ class ScreenTests(unittest.TestCase):
     def names(self, form):
         return {c.name for c in FORMS[form].controls}
 
-    def test_touch_screen_has_every_control_the_shop_pos_code_uses(self):
+    def test_touch_screens_have_every_control_the_shop_pos_code_uses(self):
         used = set()
         for header in ("Public Sub ResetSaleHeader(", "Public Sub RecalcPOS(", "Public Function SavePOS(",
                        "Public Sub CustomerChanged(", "Public Sub NewSale(", "Public Sub ReprintLast(",
                        "Private Sub SetPOSStatus(", "Public Sub AddLine("):
             used |= set(re.findall(r"frm!(\w+)", body("modPOS", header)))
-        missing = used - self.names("frmTouchPOS")
-        self.assertEqual(missing, set())
+        for form in ("frmTouchPOS", "frmCafePOS"):
+            self.assertEqual(used - self.names(form), set(), form)
 
-    def test_touch_screen_has_the_controls_of_modtouchpos(self):
+    def test_screens_have_the_controls_of_modtouchpos(self):
         text = read("modTouchPOS").split("Public Function TestTouchPOS(")[0]
-        names = self.names("frmTouchPOS") | self.names("frmTouchPay")
+        names = set().union(*(self.names(f) for f in ("frmTouchPOS", "frmTouchPay", "frmCafePOS", "frmCafeItem")))
         for name in set(re.findall(r"frm!(\w+)", text)):
             self.assertIn(name, names)
-        for prefix, count in (("boxCat", FT.CAT_TILES), ("imgCat", FT.CAT_TILES), ("lblCat", FT.CAT_TILES),
-                              ("btnCat", FT.CAT_TILES), ("boxProd", FT.PRODUCT_TILES), ("imgProd", FT.PRODUCT_TILES),
-                              ("boxProdStrip", FT.PRODUCT_TILES), ("lblProd", FT.PRODUCT_TILES),
-                              ("lblPrice", FT.PRODUCT_TILES), ("btnProd", FT.PRODUCT_TILES)):
-            self.assertIn(f'"{prefix}"', text)
-            for i in range(1, count + 1):
-                self.assertIn(f"{prefix}{i}", names)
-        self.assertIn(f"CAT_TILES As Long = {FT.CAT_TILES}", text)
-        self.assertIn(f"PRODUCT_TILES As Long = {FT.PRODUCT_TILES}", text)
-        for btn in ("btnTypeDineIn", "btnTypeTakeaway", "btnTypeDelivery", "btnPayCash"):
-            self.assertIn(btn, names)
+        for form, cats, prods in (("frmTouchPOS", FT.CAT_TILES, FT.PRODUCT_TILES),
+                                  ("frmCafePOS", FT.CAFE_CAT_TILES, FT.CAFE_PRODUCT_TILES)):
+            own = self.names(form)
+            for prefix, count in (("boxCat", cats), ("imgCat", cats), ("lblCat", cats), ("btnCat", cats),
+                                  ("boxProd", prods), ("imgProd", prods), ("boxProdStrip", prods),
+                                  ("lblProd", prods), ("lblPrice", prods), ("btnProd", prods)):
+                self.assertIn(f'"{prefix}"', text)
+                for i in range(1, count + 1):
+                    self.assertIn(f"{prefix}{i}", own, form)
+                self.assertNotIn(f"{prefix}{count + 1}", own, form)       # TileCount stops at the last one
+            for btn in ("btnTypeDineIn", "btnTypeTakeaway", "btnPayCash", "btnCatUp", "btnCatDown",
+                        "btnProdPrev", "btnProdNext"):
+                self.assertIn(btn, own, form)
+        self.assertIn("btnTypeDelivery", self.names("frmTouchPOS"))
+        item = self.names("frmCafeItem")
+        for i in range(1, FT.ADDON_TILES + 1):
+            self.assertIn(f"btnAdd{i}", item)
+        self.assertIn(f"ADDON_TILES As Long = {FT.ADDON_TILES}", text)
+        for name in ("btnSizeS", "btnSizeM", "btnSizeL", "btnNote1", "btnNote4", "imgItem", "lblItemTotal"):
+            self.assertIn(name, item)
 
     def test_touch_sized_buttons(self):
-        for form in ("frmTouchPOS", "frmTouchPay"):
+        for form in ("frmTouchPOS", "frmTouchPay", "frmCafePOS", "frmCafeItem"):
             for c in FORMS[form].controls:
                 if c.kind == "button" and not c.name.startswith(("btnClose", "btnReprint")):
                     self.assertGreaterEqual(c.h, F.cm(1.15), f"{form}.{c.name}")
@@ -159,9 +181,11 @@ class DataTests(unittest.TestCase):
 
     def test_fields_added_to_existing_tables_can_be_upgraded(self):
         # BuildSchema adds missing fields to an existing back-end: each must be optional or have a default
-        added = {"Settings": ["POSMode", "ImagesFolder"], "Categories": ["ImagePath", "TileColor", "SortOrder"],
-                 "Products": ["ImagePath", "TrackStock"],
-                 "SalesInvoices": ["OrderType", "TableNo", "DeliveryPhone", "DeliveryAddress"]}
+        added = {"Settings": ["POSMode", "ImagesFolder"],
+                 "Categories": ["ImagePath", "TileColor", "SortOrder", "IsAddOn"],
+                 "Products": ["ImagePath", "TrackStock", "SizePriceM", "SizePriceL"],
+                 "SalesInvoices": ["OrderType", "TableNo", "DeliveryPhone", "DeliveryAddress", "OrderName"],
+                 "SalesInvoiceDetails": ["LineNote"]}
         for t, names in added.items():
             fields = {f.name: f for f in table(t).fields}
             for n in names:
@@ -188,10 +212,47 @@ class DataTests(unittest.TestCase):
 
     def test_order_details_are_posted(self):
         sig = body("modSales", "Public Function PostSaleFromCart(")
-        for f in ("OrderType", "TableNo", "DeliveryPhone", "DeliveryAddress"):
+        for f in ("OrderType", "TableNo", "DeliveryPhone", "DeliveryAddress", "OrderName", "LineNote"):
             self.assertIn(f"rs!{f} =", sig)
         self.assertIn("TouchOrderProblem(frm)", body("modPOS", "Public Function SavePOS("))
         self.assertIn('"TestTouchPOS"', read("modTestAll"))
+
+
+class CafeTests(unittest.TestCase):
+
+    def test_sized_drinks_open_the_options_window(self):
+        click = body("modTouchPOS", "Public Sub ProductTileClick(")
+        self.assertIn("If ProductHasSizes(CLng(id)) Then", click)
+        self.assertIn("CafeOpenItem frm, CLng(id)", click)
+        self.assertIn('IsCafe = (frm.Name = "frmCafePOS")', read("modTouchPOS"))
+
+    def test_size_prices_need_no_price_permission(self):
+        post = body("modSales", "Public Function PostSaleFromCart(")
+        self.assertIn("rs!UnitPrice <> Nz(rs!SizePriceM, -1) And rs!UnitPrice <> Nz(rs!SizePriceL, -1)", post)
+        self.assertIn("p.SizePriceM, p.SizePriceL", post)
+
+    def test_add_on_categories_stay_out_of_the_category_tiles(self):
+        text = read("modTouchPOS")
+        self.assertIn("c.IsAddOn = False AND EXISTS", body("modTouchPOS", "Public Sub LoadCategories("))
+        self.assertIn("c.IsAddOn = False AND", body("modTouchPOS", "Public Sub TouchLoad("))
+        self.assertIn("WHERE c.IsAddOn = True", body("modTouchPOS", "Public Sub ItemLoad("))
+        self.assertIn('"   + "', body("modTouchPOS", "Public Sub ItemConfirm("))
+
+    def test_notes_reach_the_cart_and_the_receipt(self):
+        self.assertIn('ALTER TABLE tmpPOSLines ADD COLUMN LineNote TEXT(100)', read("modPOS"))
+        self.assertIn("AND LineNote Is Null", body("modPOS", "Public Sub AddLine("))
+        self.assertIn("d.LineNote", Q.query("qrySalesDocPrint").sql)
+        self.assertIn("h.OrderName", Q.query("qrySalesDocPrint").sql)
+        import reports as RP
+        rcpt = next(m for m in RP.all_reports() if m.name == "rptSalesReceipt")
+        srcs = [c.source for cs in rcpt.controls.values() for c in cs]
+        self.assertIn(RP.PRODUCT_WITH_NOTE, srcs)
+        self.assertTrue(any("OrderTypeText([OrderType],[TableNo],[OrderName])" in s for s in srcs))
+
+    def test_cafe_mode_opens_the_cafe_screen(self):
+        name = body("modTouchPOS", "Public Function SalesScreenName(")
+        self.assertIn('If FormExists("frmCafePOS") Then SalesScreenName = "frmCafePOS"', name)
+        self.assertEqual(F.SCREEN_PERMISSIONS["frmCafePOS"], "SALES_POS")
 
 
 class Static_modTouchPOS(VbaModuleChecks, unittest.TestCase):

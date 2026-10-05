@@ -26,6 +26,9 @@ Public Sub EnsureLocalTables()
             "ProductID LONG, ProductCode TEXT(30), ProductName TEXT(150), Quantity CURRENCY, " & _
             "UnitPrice CURRENCY, LineDiscount CURRENCY, LineTotal CURRENCY, Available CURRENCY)", dbFailOnError
     End If
+    If Not LocalFieldExists("tmpPOSLines", "LineNote") Then         ' café: size and options of the line
+        CurrentDb.Execute "ALTER TABLE tmpPOSLines ADD COLUMN LineNote TEXT(100)", dbFailOnError
+    End If
     If Not LocalTableExists("tmpReturnLines") Then
         CurrentDb.Execute "CREATE TABLE tmpReturnLines (SalesDetailID LONG CONSTRAINT pkReturnLines " & _
             "PRIMARY KEY, ProductID LONG, ProductName TEXT(150), SoldQty CURRENCY, ReturnedQty CURRENCY, " & _
@@ -54,6 +57,22 @@ Public Function HasControl(ByVal frm As Access.Form, ByVal ControlName As String
     On Error Resume Next
     Set ctl = frm.Controls(ControlName)
     HasControl = Not ctl Is Nothing
+End Function
+
+Private Function LocalFieldExists(ByVal TableName As String, ByVal FieldName As String) As Boolean
+    Dim fld As DAO.Field
+    For Each fld In CurrentDb.TableDefs(TableName).Fields
+        If StrComp(fld.Name, FieldName, vbTextCompare) = 0 Then
+            LocalFieldExists = True
+            Exit Function
+        End If
+    Next
+End Function
+
+Public Function CtlText(ByVal frm As Access.Form, ByVal ControlName As String) As String
+    ' Value of an optional control ("" when the screen does not have it).
+    On Error Resume Next
+    CtlText = Nz(frm.Controls(ControlName).Value, "")
 End Function
 
 Private Function LocalTableExists(ByVal TableName As String) As Boolean
@@ -153,7 +172,7 @@ Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty 
     Set p = CurrentDb.OpenRecordset("SELECT ProductCode, ProductName, SellingPrice, CurrentQuantity " & _
                                     "FROM Products WHERE ProductID = " & ProductID, dbOpenSnapshot)
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPOSLines WHERE ProductID = " & ProductID & _
-                                     " AND LineDiscount = 0", dbOpenDynaset)
+                                     " AND LineDiscount = 0 AND LineNote Is Null", dbOpenDynaset)
     If rs.EOF Then
         rs.AddNew
         rs!ProductID = ProductID
@@ -315,8 +334,9 @@ Public Function SavePOS(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) A
             msg = PostSaleFromCart(Nz(frm!cboCustomer.Value, 1), Nz(frm!cboPaymentType.Value, "CASH"), _
                                    frm!cboPaymentMethod.Value, Nz(frm!txtInvoiceDiscount.Value, 0), _
                                    frm!txtTendered.Value, Nz(frm!txtNotes.Value, ""), newID, _
-                                   Nz(frm!txtOrderType.Value, ""), Nz(frm!cboTable.Value, ""), _
-                                   Nz(frm!txtDeliveryPhone.Value, ""), Nz(frm!txtDeliveryAddress.Value, ""))
+                                   CtlText(frm, "txtOrderType"), CtlText(frm, "cboTable"), _
+                                   CtlText(frm, "txtDeliveryPhone"), CtlText(frm, "txtDeliveryAddress"), _
+                                   CtlText(frm, "txtOrderName"))
         End If
     Else
         msg = PostSaleFromCart(Nz(frm!cboCustomer.Value, 1), Nz(frm!cboPaymentType.Value, "CASH"), _

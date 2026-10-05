@@ -27,7 +27,7 @@ Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=30;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=7;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=21;SalesInvoices=33;SalesInvoiceDetails=13;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=30;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=8;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=23;SalesInvoices=34;SalesInvoiceDetails=14;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=11;Roles=3;Permissions=22;RolePermissions=44;Employees=1;Categories=1;Units=8;PaymentMethods=4;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
@@ -688,6 +688,8 @@ Private Sub CreateTable_Categories()
              "In (""BLUE"",""GREEN"",""ORANGE"",""PURPLE"",""RED"",""INDIGO"",""TEAL"",""PINK"",""BROWN"",""GREY"")", "ÇÎÊÑ Çááæä ãä ÇáŞÇÆãÉ", "áæä ÇáÒÑ", ""
     AddField tdf, "SortOrder", "INT", 0, True, "0", _
              "", "", "ÊÑÊíÈ ÇáÚÑÖ", ""
+    AddField tdf, "IsAddOn", "BOOL", 0, False, "False", _
+             "", "", "İÆÉ ÅÖÇİÇÊ", ""
     AddIndex tdf, "PrimaryKey", "CategoryID", True, True, False
     AddIndex tdf, "UX_CategoryName", "CategoryName", False, True, False
     EndTable tdf, "ÇáÊÕäíİÇÊ: ÊÕäíİÇÊ ÇáãäÊÌÇÊ (ÅáßÊÑæäíÇÊ¡ ãæÇÏ ÛĞÇÆíÉ¡ ...).", "", ""
@@ -862,6 +864,10 @@ Private Sub CreateTable_Products()
              "", "", "ÕæÑÉ ÇáãäÊÌ", "áÔÇÔÇÊ ÇááãÓº ãÓÇÑ ßÇãá Ãæ ÇÓã ãáİ İí ãÌáÏ ÇáÕæÑ"
     AddField tdf, "TrackStock", "BOOL", 0, False, "True", _
              "", "", "íÊÇÈÚ ÇáãÎÒæä", ""
+    AddField tdf, "SizePriceM", "MONEY", 0, False, "", _
+             ">=0", "ÇáãÈáÛ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "ÓÚÑ ÇáÍÌã ÇáæÓØ", ""
+    AddField tdf, "SizePriceL", "MONEY", 0, False, "", _
+             ">=0", "ÇáãÈáÛ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "ÓÚÑ ÇáÍÌã ÇáßÈíÑ", ""
     AddIndex tdf, "PrimaryKey", "ProductID", True, True, False
     AddIndex tdf, "UX_ProductCode", "ProductCode", False, True, False
     AddIndex tdf, "UX_Barcode", "Barcode", False, True, True
@@ -938,6 +944,8 @@ Private Sub CreateTable_SalesInvoices()
              "", "", "ÌæÇá ÇáÊæÕíá", ""
     AddField tdf, "DeliveryAddress", "TEXT", 255, False, "", _
              "", "", "ÚäæÇä ÇáÊæÕíá", ""
+    AddField tdf, "OrderName", "TEXT", 50, False, "", _
+             "", "", "ÇÓã ÇáÚãíá Úáì ÇáØáÈ", ""
     AddIndex tdf, "PrimaryKey", "SalesInvoiceID", True, True, False
     AddIndex tdf, "UX_InvoiceNumber", "InvoiceNumber", False, True, False
     AddIndex tdf, "IX_InvoiceDate", "InvoiceDate", False, False, False
@@ -975,6 +983,8 @@ Private Sub CreateTable_SalesInvoiceDetails()
              ">=0", "ÇáãÈáÛ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "ÇáÅÌãÇáí ÔÇãá ÇáÖÑíÈÉ", "NetAmount + Tax"
     AddField tdf, "UnitCost", "MONEY", 0, True, "0", _
              ">=0", "ÇáãÈáÛ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "ÊßáİÉ ÇáæÍÏÉ", "AverageCost áÍÙÉ ÇáÈíÚ"
+    AddField tdf, "LineNote", "TEXT", 100, False, "", _
+             "", "", "ãáÇÍÙÉ ÇáÓØÑ", "ÇáÍÌã æÇáÎíÇÑÇÊ (ÇáßÇİíå)"
     AddIndex tdf, "PrimaryKey", "SalesDetailID", True, True, False
     AddIndex tdf, "UX_SalesInvoiceID_LineNumber", "SalesInvoiceID,LineNumber", False, True, False
     EndTable tdf, "ÊİÇÕíá İæÇÊíÑ ÇáãÈíÚÇÊ: ÃÓØÑ İÇÊæÑÉ ÇáÈíÚ¡ ãÚ ÍİÙ ÊßáİÉ ÇáÕäİ áÍÙÉ ÇáÈíÚ áÍÓÇÈ ÇáÑÈÍ ÈÏŞÉ.", "", ""

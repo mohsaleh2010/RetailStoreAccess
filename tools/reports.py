@@ -99,6 +99,10 @@ def setting(name, prefix=""):
     return f'=Nz(SettingValue("{name}"),"")'
 
 
+# the product name with the line note (café size and options)
+PRODUCT_WITH_NOTE = '=[ProductName] & IIf(Len(Nz([LineNote],""))>0," - " & [LineNote],"")'
+
+
 def receipt() -> ReportModel:
     w = cm(7.4)
     m = ReportModel("rptSalesReceipt", "فاتورة (حراري 80 مم)", w,
@@ -125,7 +129,7 @@ def receipt() -> ReportModel:
     for name, src in [("txtDocNumber", '="رقم: " & [DocNumber]'),
                       ("txtDocDate", '="التاريخ: " & Format([DocDate],"yyyy/mm/dd hh:nn")'),
                       ("txtOriginal", '=IIf(Len(Nz([OriginalNumber],""))>0,"عن الفاتورة: " & [OriginalNumber],'
-                                     'OrderTypeText([OrderType],[TableNo]))'),
+                                     'OrderTypeText([OrderType],[TableNo],[OrderName]))'),
                       ("txtCashier", '="الكاشير: " & [EmployeeName]'),
                       ("txtCustomer", '=IIf([CustomerID]=Nz(SettingValue("DefaultCustomerID"),1),"",'
                                       '"العميل: " & [CustomerName])'),
@@ -142,7 +146,7 @@ def receipt() -> ReportModel:
     assert y + cm(0.55) <= m.heights[H]
 
     D = SEC_DETAIL
-    txt(m, D, "txtProduct", "ProductName", 0, 0, w, cm(0.45), 9, grow=True)
+    txt(m, D, "txtProduct", PRODUCT_WITH_NOTE, 0, 0, w, cm(0.45), 9, grow=True)
     txt(m, D, "txtQtyPrice", '=[Quantity] & " × " & Format([LineTotal]/[Quantity],"#,##0.00")',
         cm(0.2), cm(0.47), cm(5.0), cm(0.42), 8)
     txt(m, D, "txtLineTotal", "LineTotal", cm(5.2), cm(0.47), cm(2.2), cm(0.42), 9, True, align=1,
@@ -214,7 +218,7 @@ def a4() -> ReportModel:
     for name, src in [("txtDocNumber", '="رقم الفاتورة: " & [DocNumber]'),
                       ("txtDocDate", '="التاريخ: " & Format([DocDate],"yyyy/mm/dd hh:nn")'),
                       ("txtOriginal", '=IIf(Len(Nz([OriginalNumber],""))>0,"عن الفاتورة: " & [OriginalNumber],'
-                                     'OrderTypeText([OrderType],[TableNo]))'),
+                                     'OrderTypeText([OrderType],[TableNo],[OrderName]))'),
                       ("txtPaymentType", '="طريقة البيع: " & IIf([PaymentType]="CREDIT","آجل","نقدي")'),
                       ("txtCashier", '="الموظف: " & [EmployeeName]')]:
         txt(m, H, name, src, x2, yy, half, cm(0.45), 9, align=1)
@@ -235,8 +239,8 @@ def a4() -> ReportModel:
     for i, (title, fld, width, fmt) in enumerate(A4_COLUMNS):
         cw = cm(width) if i < len(A4_COLUMNS) - 1 else w - x      # last column absorbs rounding
         lbl(m, H, f"lblCol{i + 1}", title, x, hy + cm(0.1), cw, cm(0.45), 8, True, align=2)
-        txt(m, SEC_DETAIL, f"txtCol{i + 1}", fld, x, cm(0.05), cw, cm(0.5), 8,
-            align=0 if fld == "ProductName" else 2, fmt=fmt, grow=fld == "ProductName")
+        txt(m, SEC_DETAIL, f"txtCol{i + 1}", PRODUCT_WITH_NOTE if fld == "ProductName" else fld, x, cm(0.05),
+            cw, cm(0.5), 8, align=0 if fld == "ProductName" else 2, fmt=fmt, grow=fld == "ProductName")
         x += cw
     assert x == w
 

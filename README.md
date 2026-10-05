@@ -20,8 +20,8 @@
 | 12 | دليل الاستخدام | ✅ تمت الموافقة | [docs/12-User-Guide.md](docs/12-User-Guide.md) |
 | + | طباعة ملصقات الباركود | ✅ بانتظار الموافقة | [docs/13-Barcode-Labels.md](docs/13-Barcode-Labels.md) |
 | + | لوحة التحكم الجديدة والإحصائيات بالرسوم البيانية | ✅ بانتظار الموافقة | [docs/14-Dashboard-Charts.md](docs/14-Dashboard-Charts.md) |
-| + | نقطة بيع المطاعم (شاشة لمس) | ✅ بانتظار الموافقة | [docs/15-Restaurant-POS.md](docs/15-Restaurant-POS.md) |
-| + | نقطة بيع الكافيهات (شاشة لمس) | ⏳ التالية | |
+| + | نقطة بيع المطاعم (شاشة لمس) | ✅ تمت الموافقة | [docs/15-Restaurant-POS.md](docs/15-Restaurant-POS.md) |
+| + | نقطة بيع الكافيهات (شاشة لمس) | ✅ بانتظار الموافقة | [docs/16-Cafe-POS.md](docs/16-Cafe-POS.md) |
 
 ## هيكل المستودع
 

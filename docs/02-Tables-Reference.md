@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **30** | عدد الحقول: **376**
+عدد الجداول: **30** | عدد الحقول: **381**
 
 ## الفهرس
 
@@ -173,6 +173,7 @@
 | 5 | ImagePath | Short Text | 255 |  |  |  |  | صورة التصنيف |
 | 6 | TileColor | Short Text | 10 | ✔ | `"BLUE"` | `In ("BLUE","GREEN","ORANGE","PURPLE","RED","INDIGO","TEAL","PINK","BROWN","GREY")` |  | لون الزر |
 | 7 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | ترتيب العرض |
+| 8 | IsAddOn | Yes/No |  |  | `False` |  |  | فئة إضافات |
 
 - المفتاح الأساسي: `CategoryID`
 - فهرس فريد: `CategoryName`
@@ -295,6 +296,8 @@
 | 19 | UpdatedAt | Date/Time |  |  |  |  |  | آخر تعديل |
 | 20 | ImagePath | Short Text | 255 |  |  |  |  | صورة المنتج – لشاشات اللمس؛ مسار كامل أو اسم ملف في مجلد الصور |
 | 21 | TrackStock | Yes/No |  |  | `True` |  |  | يتابع المخزون |
+| 22 | SizePriceM | Currency |  |  |  | `>=0` |  | سعر الحجم الوسط |
+| 23 | SizePriceL | Currency |  |  |  | `>=0` |  | سعر الحجم الكبير |
 
 - المفتاح الأساسي: `ProductID`
 - فهرس فريد: `ProductCode`
@@ -340,6 +343,7 @@
 | 31 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
 | 32 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
 | 33 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
+| 34 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -367,6 +371,7 @@
 | 11 | Tax | Currency |  | ✔ | `0` | `>=0` |  | الضريبة |
 | 12 | LineTotal | Currency |  | ✔ | `0` | `>=0` |  | الإجمالي شامل الضريبة – NetAmount + Tax |
 | 13 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة – AverageCost لحظة البيع |
+| 14 | LineNote | Short Text | 100 |  |  |  |  | ملاحظة السطر – الحجم والخيارات (الكافيه) |
 
 - المفتاح الأساسي: `SalesDetailID`
 - فهرس فريد: `SalesInvoiceID, LineNumber`

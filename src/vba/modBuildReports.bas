@@ -361,7 +361,7 @@ Private Sub BuildReport_rptSalesReceipt()
     HideSection 2
     HideSection 3
     HideSection 4
-    Set c = RText(0, "txtProduct", "ProductName", 0, 0, 4196, 255, 9, False, 0)
+    Set c = RText(0, "txtProduct", "=[ProductName] & IIf(Len(Nz([LineNote],""""))>0,"" - "" & [LineNote],"""")", 0, 0, 4196, 255, 9, False, 0)
     SetCtl c, "CanGrow", True
     Set c = RText(0, "txtQtyPrice", "=[Quantity] & "" × "" & Format([LineTotal]/[Quantity],""#,##0.00"")", 113, 266, 2835, 238, 8, False, 0)
     Set c = RText(0, "txtLineTotal", "LineTotal", 2948, 266, 1247, 238, 9, True, 1)
@@ -376,7 +376,7 @@ Private Sub BuildReport_rptSalesReceipt()
     Set c = RText(5, "txtTitleEn", "=IIf([DocKind]=""RETURN"",""Credit Note"",IIf([InvoiceSubType]=""STANDARD"",""Tax Invoice"",""Simplified Tax Invoice""))", 0, 1730, 4196, 227, 8, False, 2)
     Set c = RText(5, "txtDocNumber", "=""رقم: "" & [DocNumber]", 0, 1985, 4196, 227, 8, False, 0)
     Set c = RText(5, "txtDocDate", "=""التاريخ: "" & Format([DocDate],""yyyy/mm/dd hh:nn"")", 0, 2212, 4196, 227, 8, False, 0)
-    Set c = RText(5, "txtOriginal", "=IIf(Len(Nz([OriginalNumber],""""))>0,""عن الفاتورة: "" & [OriginalNumber],OrderTypeText([OrderType],[TableNo]))", 0, 2439, 4196, 227, 8, False, 0)
+    Set c = RText(5, "txtOriginal", "=IIf(Len(Nz([OriginalNumber],""""))>0,""عن الفاتورة: "" & [OriginalNumber],OrderTypeText([OrderType],[TableNo],[OrderName]))", 0, 2439, 4196, 227, 8, False, 0)
     Set c = RText(5, "txtCashier", "=""الكاشير: "" & [EmployeeName]", 0, 2666, 4196, 227, 8, False, 0)
     Set c = RText(5, "txtCustomer", "=IIf([CustomerID]=Nz(SettingValue(""DefaultCustomerID""),1),"""",""العميل: "" & [CustomerName])", 0, 2893, 4196, 227, 8, False, 0)
     Set c = RText(5, "txtCustomerVat", "=IIf(Len(Nz([CustomerVAT],""""))>0,""الرقم الضريبي للعميل: "" & [CustomerVAT],"""")", 0, 3120, 4196, 227, 8, False, 0)
@@ -437,7 +437,7 @@ Private Sub BuildReport_rptSalesInvoiceA4()
     HideSection 3
     HideSection 4
     Set c = RText(0, "txtCol1", "LineNumber", 0, 28, 454, 284, 8, False, 2)
-    Set c = RText(0, "txtCol2", "ProductName", 454, 28, 3515, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=[ProductName] & IIf(Len(Nz([LineNote],""""))>0,"" - "" & [LineNote],"""")", 454, 28, 3515, 284, 8, False, 0)
     SetCtl c, "CanGrow", True
     Set c = RText(0, "txtCol3", "Quantity", 3969, 28, 907, 284, 8, False, 2)
     SetCtl c, "Format", "#,##0.###"
@@ -463,7 +463,7 @@ Private Sub BuildReport_rptSalesInvoiceA4()
     Set c = RText(5, "txtTitleEn", "=IIf([DocKind]=""RETURN"",""Credit Note"",IIf([InvoiceSubType]=""STANDARD"",""Tax Invoice"",""Simplified Tax Invoice""))", 5500, 539, 5273, 284, 10, False, 1)
     Set c = RText(5, "txtDocNumber", "=""رقم الفاتورة: "" & [DocNumber]", 5500, 850, 5273, 255, 9, False, 1)
     Set c = RText(5, "txtDocDate", "=""التاريخ: "" & Format([DocDate],""yyyy/mm/dd hh:nn"")", 5500, 1105, 5273, 255, 9, False, 1)
-    Set c = RText(5, "txtOriginal", "=IIf(Len(Nz([OriginalNumber],""""))>0,""عن الفاتورة: "" & [OriginalNumber],OrderTypeText([OrderType],[TableNo]))", 5500, 1360, 5273, 255, 9, False, 1)
+    Set c = RText(5, "txtOriginal", "=IIf(Len(Nz([OriginalNumber],""""))>0,""عن الفاتورة: "" & [OriginalNumber],OrderTypeText([OrderType],[TableNo],[OrderName]))", 5500, 1360, 5273, 255, 9, False, 1)
     Set c = RText(5, "txtPaymentType", "=""طريقة البيع: "" & IIf([PaymentType]=""CREDIT"",""آجل"",""نقدي"")", 5500, 1615, 5273, 255, 9, False, 1)
     Set c = RText(5, "txtCashier", "=""الموظف: "" & [EmployeeName]", 5500, 1870, 5273, 255, 9, False, 1)
     Set c = RBox(5, "boxBuyer", 0, 2183, 10773, 1106)

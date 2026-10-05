@@ -91,6 +91,8 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmLabelSettings": ScreenPermission = "PRODUCTS"
         Case "frmTouchPOS": ScreenPermission = "SALES_POS"
         Case "frmTouchPay": ScreenPermission = "SALES_POS"
+        Case "frmCafePOS": ScreenPermission = "SALES_POS"
+        Case "frmCafeItem": ScreenPermission = "SALES_POS"
     End Select
 End Function
 

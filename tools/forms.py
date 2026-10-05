@@ -154,6 +154,8 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("MinimumQuantity"), Fld("ProductLocation"),
             Fld("IsActive"), Info("lblStockNote", "الكمية تتغير فقط من المشتريات والمبيعات والجرد"),
             Fld("TrackStock", hint="ألغِ العلامة للوجبات والمشروبات التي تُحضَّر عند الطلب: تُباع بلا رصيد"),
+            Fld("SizePriceM", hint="الكافيه: سعر البيع = الصغير؛ سعر الوسط أو الكبير يجعل للمشروب أحجامًا"),
+            Fld("SizePriceL"),
             Fld("ImagePath", hint="صورة الزر في شاشة اللمس: مسار كامل أو اسم ملف في مجلد الصور",
                 button=("btnBrowseImage", "استعراض", 'BrowseFile Me, "ImagePath"')),
             Fld("Notes", span=2),
@@ -239,6 +241,7 @@ DATA_SCREENS: List[DataScreen] = [
         search=["t.CategoryName", "t.Description"], active="t.IsActive", unique=["CategoryName"],
         fields=[Fld("CategoryName", span=2), Fld("Description", span=2), Fld("IsActive"),
                 Fld("SortOrder", hint="ترتيب الزر في شاشة اللمس (الأصغر أولًا)"),
+                Fld("IsAddOn", hint="الكافيه: أصناف هذه الفئة تظهر كإضافات للمشروب (حليب، شوت إضافي...)"),
                 Fld("TileColor", rows=TILE_COLORS),
                 Fld("ImagePath", hint="صورة الزر في شاشة اللمس",
                     button=("btnBrowseImage", "استعراض", 'BrowseFile Me, "ImagePath"'))]),
@@ -341,7 +344,8 @@ SCREEN_PERMISSIONS = {
     "frmReportCenter": "REPORTS", "frmSettings": "SETTINGS", "frmUsers": "USERS", "frmRoles": "USERS",
     "frmBackup": "BACKUP",
     "frmBarcodeLabels": "PRODUCTS", "frmLabelSettings": "PRODUCTS",
-    "frmTouchPOS": "SALES_POS", "frmTouchPay": "SALES_POS",
+    "frmTouchPOS": "SALES_POS", "frmTouchPay": "SALES_POS", "frmCafePOS": "SALES_POS",
+    "frmCafeItem": "SALES_POS",
 }
 
 

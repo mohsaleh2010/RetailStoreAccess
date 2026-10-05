@@ -1,10 +1,14 @@
 Attribute VB_Name = "modTouchPOS"
 '==============================================================================
-' modTouchPOS  -  Retail Store Management System: restaurant touch screen
+' modTouchPOS  -  Retail Store Management System: restaurant and cafÈ touch screens
 '
-'   frmTouchPOS    order type (dine-in / takeaway / delivery), category tiles,
-'                  product tiles with pictures, large cart rows with + / -,
+'   frmTouchPOS    restaurant: order type (dine-in / takeaway / delivery), category
+'                  tiles, product tiles with pictures, large cart rows with + / -,
 '                  cash (frmTouchPay number pad) or card payment.
+'   frmCafePOS     cafÈ: the same, with the customer's name for the cup; a sized
+'                  drink opens frmCafeItem (size, add-ons, notes, quantity).
+'                  Add-ons are products of a category marked IsAddOn: each one is
+'                  its own invoice line, so prices and VAT stay exact.
 '   It reuses the shop point of sale: the cart table tmpPOSLines, AddLine,
 '   RecalcPOS, SavePOS and ResetSaleHeader of modPOS (the same control names),
 '   so prices, VAT, discounts, posting and the ZATCA QR code are identical.
@@ -13,9 +17,10 @@ Attribute VB_Name = "modTouchPOS"
 Option Compare Database
 Option Explicit
 
-Public Const CAT_TILES As Long = 7
-Public Const PRODUCT_TILES As Long = 16
 Private Const DEFAULT_ORDER_TYPE As String = "DINE_IN"
+Private Const CAFE_ORDER_TYPE As String = "TAKEAWAY"
+Private Const CAFE_NOTES As String = "»œÊ‰ ”ﬂ—|”ﬂ— ﬁ·Ì·|À·Ã ﬁ·Ì·|”«Œ‰ Ãœ«"
+Private Const ADDON_TILES As Long = 8
 Private Const CARD_METHOD_ID As Long = 2              ' PaymentMethods: „œÏ / »ÿ«ﬁ…
 
 Private m_catPage As Long
@@ -25,16 +30,24 @@ Private m_catID As Long
 '------------------------------------------------------------------------------
 ' Pure helpers
 '------------------------------------------------------------------------------
-Public Function OrderTypeText(ByVal OrderType As Variant, ByVal TableNo As Variant) As String
+Public Function OrderTypeText(ByVal OrderType As Variant, ByVal TableNo As Variant, _
+                              Optional ByVal OrderName As Variant) As String
+    OrderTypeText = OrderKindText(OrderType, TableNo)
+    If IsMissing(OrderName) Then Exit Function
+    If Len(Nz(OrderName, "")) > 0 Then OrderTypeText = OrderTypeText & IIf(Len(OrderTypeText) > 0, "  -  ", "") & _
+                                                       "«·«”„: " & OrderName
+End Function
+
+Private Function OrderKindText(ByVal OrderType As Variant, ByVal TableNo As Variant) As String
     Select Case Nz(OrderType, "")
         Case "DINE_IN"
-            OrderTypeText = "ÿ·» œ«Œ·Ì" & IIf(Len(Nz(TableNo, "")) > 0, " - ÿ«Ê·… " & Nz(TableNo, ""), "")
+            OrderKindText = "ÿ·» œ«Œ·Ì" & IIf(Len(Nz(TableNo, "")) > 0, " - ÿ«Ê·… " & Nz(TableNo, ""), "")
         Case "TAKEAWAY"
-            OrderTypeText = "ÿ·» ”›—Ì"
+            OrderKindText = "ÿ·» ”›—Ì"
         Case "DELIVERY"
-            OrderTypeText = "ÿ·»  Ê’Ì·"
+            OrderKindText = "ÿ·»  Ê’Ì·"
         Case Else
-            OrderTypeText = ""
+            OrderKindText = ""
     End Select
 End Function
 
@@ -98,8 +111,10 @@ Public Function SalesScreenName() As String
     ' The sales button opens the screen chosen in Settings.POSMode.
     SalesScreenName = "frmPOS"
     Select Case Nz(SettingValue("POSMode"), "RETAIL")
-        Case "RESTAURANT", "CAFE"
+        Case "RESTAURANT"
             If FormExists("frmTouchPOS") Then SalesScreenName = "frmTouchPOS"
+        Case "CAFE"
+            If FormExists("frmCafePOS") Then SalesScreenName = "frmCafePOS"
     End Select
 End Function
 
@@ -118,6 +133,7 @@ Public Sub TouchLoad(ByVal frm As Access.Form)
     m_catPage = 0
     m_prodPage = 0
     m_catID = Nz(DbValue("SELECT TOP 1 c.CategoryID FROM Categories AS c WHERE c.IsActive = True AND " & _
+                         "c.IsAddOn = False AND " & _
                          "EXISTS (SELECT 1 FROM Products AS p WHERE p.CategoryID = c.CategoryID AND p.IsActive = True) " & _
                          "ORDER BY c.SortOrder, c.CategoryName"), 0)
     LoadCategories frm
@@ -126,6 +142,12 @@ Public Sub TouchLoad(ByVal frm As Access.Form)
 End Sub
 
 Public Sub ResetTouchOrder(ByVal frm As Access.Form)
+    If IsCafe(frm) Then
+        frm!txtOrderType.Value = CAFE_ORDER_TYPE
+        frm!txtOrderName.Value = Null
+        ShowCafeOrder frm
+        Exit Sub
+    End If
     frm!txtOrderType.Value = DEFAULT_ORDER_TYPE
     frm!cboTable.Value = Null
     frm!txtDeliveryPhone.Value = Null
@@ -133,8 +155,23 @@ Public Sub ResetTouchOrder(ByVal frm As Access.Form)
     ShowOrderType frm
 End Sub
 
+Private Function IsCafe(ByVal frm As Access.Form) As Boolean
+    IsCafe = (frm.Name = "frmCafePOS")
+End Function
+
+Public Function TileCount(ByVal frm As Access.Form, ByVal Prefix As String) As Long
+    ' Number of tiles of a kind on the screen (btnCat1, btnCat2...): each screen has its own grid.
+    Do While HasControl(frm, Prefix & (TileCount + 1))
+        TileCount = TileCount + 1
+    Loop
+End Function
+
 Public Sub SetOrderType(ByVal frm As Access.Form, ByVal OrderType As String)
     frm!txtOrderType.Value = OrderType
+    If IsCafe(frm) Then
+        ShowCafeOrder frm
+        Exit Sub
+    End If
     If OrderType <> "DELIVERY" Then
         frm!cboCustomer.Value = Nz(SettingValue("DefaultCustomerID"), 1)
         frm!txtDeliveryPhone.Value = Null
@@ -215,18 +252,19 @@ Private Sub ShowPicture(ByVal ctl As Access.Control, ByVal Path As Variant)
 End Sub
 
 Public Sub LoadCategories(ByVal frm As Access.Form)
-    Dim rs As DAO.Recordset, n As Long, i As Long, k As String, sel As Boolean
+    Dim rs As DAO.Recordset, n As Long, i As Long, k As String, sel As Boolean, tiles As Long
+    tiles = TileCount(frm, "btnCat")
     Set rs = CurrentDb.OpenRecordset("SELECT c.CategoryID, c.CategoryName, c.ImagePath, c.TileColor " & _
-        "FROM Categories AS c WHERE c.IsActive = True AND EXISTS (SELECT 1 FROM Products AS p " & _
+        "FROM Categories AS c WHERE c.IsActive = True AND c.IsAddOn = False AND EXISTS (SELECT 1 FROM Products AS p " & _
         "WHERE p.CategoryID = c.CategoryID AND p.IsActive = True) ORDER BY c.SortOrder, c.CategoryName", dbOpenSnapshot)
     If Not rs.EOF Then
         rs.MoveLast
         n = rs.RecordCount
         rs.MoveFirst
     End If
-    If m_catPage > PageCount(n, CAT_TILES) - 1 Then m_catPage = PageCount(n, CAT_TILES) - 1
-    If n > 0 Then rs.Move m_catPage * CAT_TILES
-    For i = 1 To CAT_TILES
+    If m_catPage > PageCount(n, tiles) - 1 Then m_catPage = PageCount(n, tiles) - 1
+    If n > 0 Then rs.Move m_catPage * tiles
+    For i = 1 To tiles
         k = CStr(i)
         If rs.EOF Then
             frm.Controls("boxCat" & k).Visible = False
@@ -253,11 +291,12 @@ Public Sub LoadCategories(ByVal frm As Access.Form)
     Next
     rs.Close
     frm!btnCatUp.Enabled = (m_catPage > 0)
-    frm!btnCatDown.Enabled = (m_catPage < PageCount(n, CAT_TILES) - 1)
+    frm!btnCatDown.Enabled = (m_catPage < PageCount(n, tiles) - 1)
 End Sub
 
 Public Sub LoadProducts(ByVal frm As Access.Form)
-    Dim rs As DAO.Recordset, n As Long, i As Long, k As String, color As Long
+    Dim rs As DAO.Recordset, n As Long, i As Long, k As String, color As Long, tiles As Long
+    tiles = TileCount(frm, "btnProd")
     color = TileColorValue(DbValue("SELECT TileColor FROM Categories WHERE CategoryID = " & m_catID))
     frm!lblCategoryTitle.Caption = Nz(DbValue("SELECT CategoryName FROM Categories WHERE CategoryID = " & m_catID), " ")
     Set rs = CurrentDb.OpenRecordset("SELECT ProductID, ProductName, SellingPrice, ImagePath FROM Products " & _
@@ -267,9 +306,9 @@ Public Sub LoadProducts(ByVal frm As Access.Form)
         n = rs.RecordCount
         rs.MoveFirst
     End If
-    If m_prodPage > PageCount(n, PRODUCT_TILES) - 1 Then m_prodPage = PageCount(n, PRODUCT_TILES) - 1
-    If n > 0 Then rs.Move m_prodPage * PRODUCT_TILES
-    For i = 1 To PRODUCT_TILES
+    If m_prodPage > PageCount(n, tiles) - 1 Then m_prodPage = PageCount(n, tiles) - 1
+    If n > 0 Then rs.Move m_prodPage * tiles
+    For i = 1 To tiles
         k = CStr(i)
         If rs.EOF Then
             frm.Controls("boxProd" & k).Visible = False
@@ -293,10 +332,10 @@ Public Sub LoadProducts(ByVal frm As Access.Form)
         End If
     Next
     rs.Close
-    frm!lblProdPage.Caption = "’›Õ… " & (m_prodPage + 1) & " „‰ " & PageCount(n, PRODUCT_TILES) & _
+    frm!lblProdPage.Caption = "’›Õ… " & (m_prodPage + 1) & " „‰ " & PageCount(n, tiles) & _
                               "   (" & n & " ’‰›)"
     frm!btnProdPrev.Enabled = (m_prodPage > 0)
-    frm!btnProdNext.Enabled = (m_prodPage < PageCount(n, PRODUCT_TILES) - 1)
+    frm!btnProdNext.Enabled = (m_prodPage < PageCount(n, tiles) - 1)
 End Sub
 
 Public Sub CategoryTileClick(ByVal frm As Access.Form, ByVal Index As Long)
@@ -325,6 +364,12 @@ Public Sub ProductTileClick(ByVal frm As Access.Form, ByVal Index As Long)
     Dim id As String
     id = Nz(frm.Controls("btnProd" & Index).Tag, "")
     If Len(id) = 0 Then Exit Sub
+    If IsCafe(frm) Then
+        If ProductHasSizes(CLng(id)) Then                  ' size, add-ons and notes
+            CafeOpenItem frm, CLng(id)
+            Exit Sub
+        End If
+    End If
     AddLine frm, CLng(id), 1                               ' modPOS: same cart as the shop
 End Sub
 
@@ -466,6 +511,244 @@ Public Sub PayCancel(ByVal frm As Access.Form)
     DoCmd.Close acForm, frm.Name
 End Sub
 
+
+'------------------------------------------------------------------------------
+' CafÈ (frmCafePOS + frmCafeItem)
+'------------------------------------------------------------------------------
+Private Sub ShowCafeOrder(ByVal frm As Access.Form)
+    Dim t As String
+    On Error Resume Next
+    t = Nz(frm!txtOrderType.Value, CAFE_ORDER_TYPE)
+    frm!btnTypeDineIn.BackColor = IIf(t = "DINE_IN", CLR_PRIMARY, CLR_SECONDARY)
+    frm!btnTypeDineIn.ForeColor = IIf(t = "DINE_IN", CLR_SURFACE, CLR_TEXT)
+    frm!btnTypeTakeaway.BackColor = IIf(t = "TAKEAWAY", CLR_PRIMARY, CLR_SECONDARY)
+    frm!btnTypeTakeaway.ForeColor = IIf(t = "TAKEAWAY", CLR_SURFACE, CLR_TEXT)
+    frm!lblOrderTitle.Caption = OrderTypeText(t, Null, frm!txtOrderName.Value)
+End Sub
+
+Public Sub OrderNameChanged(ByVal frm As Access.Form)
+    ShowCafeOrder frm
+End Sub
+
+Public Function SizeName(ByVal SizeCode As String) As String
+    Select Case SizeCode
+        Case "M": SizeName = "Ê”ÿ"
+        Case "L": SizeName = "ﬂ»Ì—"
+        Case Else: SizeName = "’€Ì—"
+    End Select
+End Function
+
+Public Function SizePrice(ByVal SizeCode As String, ByVal Small As Variant, ByVal Medium As Variant, _
+                          ByVal Large As Variant) As Variant
+    ' Null when the product has no such size.
+    Select Case SizeCode
+        Case "M": SizePrice = Medium
+        Case "L": SizePrice = Large
+        Case Else: SizePrice = Small
+    End Select
+End Function
+
+Public Function ProductHasSizes(ByVal ProductID As Long) As Boolean
+    ProductHasSizes = Nz(DbValue("SELECT COUNT(*) FROM Products WHERE ProductID = " & ProductID & _
+                                 " AND (SizePriceM Is Not Null OR SizePriceL Is Not Null)"), 0) > 0
+End Function
+
+Public Function ToggleInList(ByVal List As String, ByVal Item As String) As String
+    ' ",a,b," style list: adds the item or removes it.
+    If Len(List) = 0 Then List = ","
+    If InStr(List, "," & Item & ",") > 0 Then
+        ToggleInList = Replace(List, "," & Item & ",", ",")
+    Else
+        ToggleInList = List & Item & ","
+    End If
+End Function
+
+Public Function InList(ByVal List As String, ByVal Item As String) As Boolean
+    InList = InStr(List, "," & Item & ",") > 0
+End Function
+
+Public Function CafeNote(ByVal Index As Long) As String
+    Dim notes As Variant
+    notes = Split(CAFE_NOTES, "|")
+    If Index >= 1 And Index <= UBound(notes) + 1 Then CafeNote = notes(Index - 1)
+End Function
+
+Public Function CafeLineNote(ByVal SizeText As String, ByVal NoteFlags As String) As String
+    ' "ﬂ»Ì—° »œÊ‰ ”ﬂ—° À·Ã ﬁ·Ì·" (size first, then the chosen notes in their order)
+    Dim i As Long, s As String
+    s = SizeText
+    For i = 1 To 4
+        If InList(NoteFlags, CStr(i)) Then s = s & IIf(Len(s) > 0, "° ", "") & CafeNote(i)
+    Next
+    CafeLineNote = s
+End Function
+
+Public Sub AddCartLine(ByVal ProductID As Long, ByVal Qty As Currency, ByVal UnitPrice As Currency, _
+                       ByVal DisplayName As String, ByVal LineNote As String)
+    ' CafÈ lines: the same product with the same size and notes adds to one line.
+    Dim rs As DAO.Recordset, p As DAO.Recordset, crit As String
+    EnsureLocalTables
+    crit = "ProductID = " & ProductID & " AND UnitPrice = " & Str$(UnitPrice) & " AND LineDiscount = 0 AND " & _
+           IIf(Len(LineNote) = 0, "LineNote Is Null", "LineNote = " & SqlText(LineNote)) & _
+           " AND ProductName = " & SqlText(Left$(DisplayName, 150))
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPOSLines WHERE " & crit, dbOpenDynaset)
+    If rs.EOF Then
+        Set p = CurrentDb.OpenRecordset("SELECT ProductCode, CurrentQuantity FROM Products WHERE ProductID = " & _
+                                        ProductID, dbOpenSnapshot)
+        rs.AddNew
+        rs!ProductID = ProductID
+        rs!ProductCode = p!ProductCode
+        rs!ProductName = Left$(DisplayName, 150)
+        rs!Quantity = Qty
+        rs!UnitPrice = UnitPrice
+        rs!LineDiscount = 0
+        rs!Available = p!CurrentQuantity
+        If Len(LineNote) > 0 Then rs!LineNote = Left$(LineNote, 100)
+        p.Close
+    Else
+        rs.Edit
+        rs!Quantity = rs!Quantity + Qty
+    End If
+    rs.Update
+    rs.Close
+End Sub
+
+Private Sub CafeOpenItem(ByVal frm As Access.Form, ByVal ProductID As Long)
+    TempVars.Add "CafeItemID", ProductID
+    TempVars.Add "CafeItemAdded", False
+    DoCmd.OpenForm "frmCafeItem", acNormal, , , , acDialog
+    RecalcPOS frm
+    If Nz(TempVars("CafeItemAdded"), False) Then frm!lblStatus.Caption = " „  «·≈÷«›… ··ÿ·»"
+End Sub
+
+' --- frmCafeItem ---------------------------------------------------------------
+Public Sub ItemLoad(ByVal frm As Access.Form)
+    Dim rs As DAO.Recordset, i As Long, k As String, code As Variant, price As Variant
+    Set rs = CurrentDb.OpenRecordset("SELECT ProductID, ProductName, SellingPrice, SizePriceM, SizePriceL, ImagePath " & _
+                                     "FROM Products WHERE ProductID = " & Nz(TempVars("CafeItemID"), 0), dbOpenSnapshot)
+    If rs.EOF Then
+        rs.Close
+        DoCmd.Close acForm, frm.Name
+        Exit Sub
+    End If
+    frm!txtItemProduct.Value = rs!ProductID
+    frm!lblTitle.Caption = rs!ProductName
+    ShowPicture frm!imgItem, rs!ImagePath
+    For Each code In Array("S", "M", "L")
+        price = SizePrice(CStr(code), rs!SellingPrice, rs!SizePriceM, rs!SizePriceL)
+        With frm.Controls("btnSize" & code)
+            .Visible = Not IsNull(price)
+            If IsNull(price) Then .Tag = "" Else .Tag = Trim$(Str$(price))   ' "." decimals, any locale
+            .Caption = SizeName(CStr(code)) & vbCrLf & Format$(Nz(price, 0), "#,##0.00")
+        End With
+    Next
+    rs.Close
+    frm!txtSize.Value = "S"
+    frm!txtItemQty.Value = 1
+    frm!txtAddOns.Value = ","
+    frm!txtNoteFlags.Value = ","
+    Set rs = CurrentDb.OpenRecordset("SELECT p.ProductID, p.ProductName, p.SellingPrice FROM Products AS p " & _
+        "INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID WHERE c.IsAddOn = True AND c.IsActive = True " & _
+        "AND p.IsActive = True ORDER BY c.SortOrder, p.ProductName", dbOpenSnapshot)
+    For i = 1 To ADDON_TILES
+        k = CStr(i)
+        If rs.EOF Then
+            frm.Controls("btnAdd" & k).Visible = False
+        Else
+            frm.Controls("btnAdd" & k).Caption = rs!ProductName & vbCrLf & "+" & Format$(Nz(rs!SellingPrice, 0), "#,##0.00")
+            frm.Controls("btnAdd" & k).Tag = CStr(rs!ProductID)
+            frm.Controls("btnAdd" & k).Visible = True
+            rs.MoveNext
+        End If
+    Next
+    rs.Close
+    frm!lblCapAddOns.Visible = frm!btnAdd1.Visible
+    For i = 1 To 4
+        frm.Controls("btnNote" & i).Caption = CafeNote(i)
+    Next
+    ItemShow frm
+End Sub
+
+Public Sub ItemSize(ByVal frm As Access.Form, ByVal SizeCode As String)
+    frm!txtSize.Value = SizeCode
+    ItemShow frm
+End Sub
+
+Public Sub ItemToggleAddOn(ByVal frm As Access.Form, ByVal Index As Long)
+    frm!txtAddOns.Value = ToggleInList(Nz(frm!txtAddOns.Value, ","), CStr(frm.Controls("btnAdd" & Index).Tag))
+    ItemShow frm
+End Sub
+
+Public Sub ItemToggleNote(ByVal frm As Access.Form, ByVal Index As Long)
+    frm!txtNoteFlags.Value = ToggleInList(Nz(frm!txtNoteFlags.Value, ","), CStr(Index))
+    ItemShow frm
+End Sub
+
+Public Sub ItemQty(ByVal frm As Access.Form, ByVal Delta As Long)
+    Dim q As Long
+    q = Nz(frm!txtItemQty.Value, 1) + Delta
+    If q < 1 Then q = 1
+    If q > 99 Then q = 99
+    frm!txtItemQty.Value = q
+    ItemShow frm
+End Sub
+
+Private Sub Highlight(ByVal ctl As Access.Control, ByVal IsOn As Boolean)
+    ctl.BackColor = IIf(IsOn, CLR_ACCENT, CLR_SECONDARY)
+    ctl.ForeColor = IIf(IsOn, CLR_SURFACE, CLR_TEXT)
+    ctl.FontBold = IsOn
+End Sub
+
+Private Sub ItemShow(ByVal frm As Access.Form)
+    Dim code As Variant, i As Long, total As Currency, addOns As String
+    For Each code In Array("S", "M", "L")
+        Highlight frm.Controls("btnSize" & code), (frm!txtSize.Value = code)
+    Next
+    total = CCur(Val(Nz(frm.Controls("btnSize" & frm!txtSize.Value).Tag, "0")))
+    addOns = Nz(frm!txtAddOns.Value, ",")
+    For i = 1 To ADDON_TILES
+        With frm.Controls("btnAdd" & i)
+            Highlight frm.Controls("btnAdd" & i), (.Visible And InList(addOns, CStr(.Tag)))
+            If .Visible And InList(addOns, CStr(.Tag)) Then
+                total = total + Nz(DbValue("SELECT SellingPrice FROM Products WHERE ProductID = " & .Tag), 0)
+            End If
+        End With
+    Next
+    For i = 1 To 4
+        Highlight frm.Controls("btnNote" & i), InList(Nz(frm!txtNoteFlags.Value, ","), CStr(i))
+    Next
+    frm!lblItemQty.Caption = CStr(Nz(frm!txtItemQty.Value, 1))
+    frm!lblItemTotal.Caption = "«·≈Ã„«·Ì: " & Format$(total * Nz(frm!txtItemQty.Value, 1), "#,##0.00") & " —.”"
+End Sub
+
+Public Sub ItemConfirm(ByVal frm As Access.Form)
+    ' The drink, then each add-on as its own line with the same quantity.
+    Dim pid As Long, qty As Currency, sizeCode As String, sizeText As String, note As String, drink As Variant
+    Dim i As Long, addOns As String
+    pid = frm!txtItemProduct.Value
+    qty = Nz(frm!txtItemQty.Value, 1)
+    sizeCode = Nz(frm!txtSize.Value, "S")
+    sizeText = SizeName(sizeCode)
+    note = CafeLineNote(sizeText, Nz(frm!txtNoteFlags.Value, ","))
+    drink = DbValue("SELECT ProductName FROM Products WHERE ProductID = " & pid)
+    AddCartLine pid, qty, CCur(Val(frm.Controls("btnSize" & sizeCode).Tag)), drink & " (" & note & ")", note
+    addOns = Nz(frm!txtAddOns.Value, ",")
+    For i = 1 To ADDON_TILES
+        If frm.Controls("btnAdd" & i).Visible And InList(addOns, CStr(frm.Controls("btnAdd" & i).Tag)) Then
+            pid = CLng(frm.Controls("btnAdd" & i).Tag)
+            AddCartLine pid, qty, Nz(DbValue("SELECT SellingPrice FROM Products WHERE ProductID = " & pid), 0), _
+                        "   + " & DbValue("SELECT ProductName FROM Products WHERE ProductID = " & pid), "≈÷«›…"
+        End If
+    Next
+    TempVars.Add "CafeItemAdded", True
+    DoCmd.Close acForm, frm.Name
+End Sub
+
+Public Sub ItemCancel(ByVal frm As Access.Form)
+    TempVars.Add "CafeItemAdded", False
+    DoCmd.Close acForm, frm.Name
+End Sub
+
 '------------------------------------------------------------------------------
 ' In-Access test (RunAllTests). Leaves no data: nothing is saved, the cart is emptied.
 '------------------------------------------------------------------------------
@@ -483,6 +766,8 @@ Public Function TestTouchPOS() As Boolean
     CheckTouch PayAppend(PayAppend(PayAppend("", "5"), "."), "5") = "5.5" And PayAppend("12.34", "9") = "12.34", _
                "·ÊÕ… «·√—ﬁ«„", passed, failed, report
     CheckTouch ImageCandidate("burger.png", "D:\Shop\Images") = "D:\Shop\Images\burger.png", "„”«— «·’Ê—…", _
+               passed, failed, report
+    CheckTouch CafeLineNote("ﬂ»Ì—", ToggleInList(",", "1")) = "ﬂ»Ì—° »œÊ‰ ”ﬂ—", "„·«ÕŸ… ”ÿ— «·ﬂ«›ÌÂ", _
                passed, failed, report
     CheckTouch Not IsNull(DbValue("SELECT POSMode FROM Settings WHERE SettingID = 1")), _
                "ÕﬁÊ· ‘«‘… «··„” „ÊÃÊœ… (BuildSchema)", passed, failed, report
@@ -513,12 +798,28 @@ Public Function TestTouchPOS() As Boolean
                    passed, failed, report
         CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
         DoCmd.Close acForm, "frmTouchPOS", acSaveNo
+        ' cafÈ: the same drink with the same size and notes adds up; other notes make another line
+        AddCartLine CLng(pid), 2, 10, "TEST (ﬂ»Ì—)", "ﬂ»Ì—"
+        AddCartLine CLng(pid), 1, 10, "TEST (ﬂ»Ì—)", "ﬂ»Ì—"
+        AddCartLine CLng(pid), 1, 10, "TEST (ﬂ»Ì—° »œÊ‰ ”ﬂ—)", "ﬂ»Ì—° »œÊ‰ ”ﬂ—"
+        CheckTouch DCount("*", "tmpPOSLines") = 2 And Nz(DMax("Quantity", "tmpPOSLines"), 0) = 3, _
+                   "«·ﬂ«›ÌÂ: ‰›” «·ÕÃ„ Ê«·„·«ÕŸ«  ”ÿ— Ê«Õœ", passed, failed, report
+        CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+        DoCmd.OpenForm "frmCafePOS", acNormal, , , , acHidden
+        Set frm = Forms("frmCafePOS")
+        CheckTouch frm!txtOrderType.Value = "TAKEAWAY" And frm!btnCat1.Visible, "‘«‘… «·ﬂ«›ÌÂ  › Õ »›∆« Â« (”›—Ì)", _
+                   passed, failed, report
+        frm!txtOrderName.Value = "TEST"
+        OrderNameChanged frm
+        CheckTouch InStr(frm!lblOrderTitle.Caption, "TEST") > 0, "«”„ «·⁄„Ì· ⁄·Ï «·ﬂÊ»", passed, failed, report
+        DoCmd.Close acForm, "frmCafePOS", acSaveNo
         CheckTouch DCount("*", "tmpPOSLines") = 0, "·„ ÌıÕ›Ÿ ‘Ì¡", passed, failed, report
     End If
     g_SilentMode = False
     Debug.Print "--- ‰ÃÕ: " & passed & " | ›‘·: " & failed
     If failed = 0 Then
-        TestMsg "Ã„Ì⁄ «Œ »«—«  ‘«‘… «·„ÿ«⁄„ ‰«ÃÕ… (" & passed & " «Œ »«—«).", vbInformation + MSG_RTL, "TestTouchPOS"
+        TestMsg "Ã„Ì⁄ «Œ »«—«  ‘«‘«  «·„ÿ«⁄„ Ê«·ﬂ«›ÌÂ«  ‰«ÃÕ… (" & passed & " «Œ »«—«).", vbInformation + MSG_RTL, _
+                "TestTouchPOS"
         TestTouchPOS = True
     Else
         TestMsg "‰ÃÕ " & passed & " Ê›‘· " & failed & ":" & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _

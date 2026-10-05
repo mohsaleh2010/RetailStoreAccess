@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -593,6 +593,8 @@ Private Sub BuildAllForms()
     BuildForm_frmTouchLines
     BuildForm_frmTouchPOS
     BuildForm_frmTouchPay
+    BuildForm_frmCafePOS
+    BuildForm_frmCafeItem
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -1043,7 +1045,7 @@ End Sub
 Private Sub BuildForm_frmProducts()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmProducts", "المنتجات", "SELECT * FROM Products", 15309, 9780, True, True, True, _
+    StartForm "frmProducts", "المنتجات", "SELECT * FROM Products", 15309, 10347, True, True, True, _
               "KIND=LIST|TABLE=Products|PK=ProductID|LIST=SELECT t.ProductID, t.ProductCode AS [الكود], t.ProductName AS [المنتج], t.CurrentQuantity AS [الكمية] FROM Products AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.ProductName|SEARCH=t.ProductName,t.ProductCode,t.Barcode,t.ProductNameEn|ACTIVE=t.IsActive|SEQ=PRODUCT_CODE:ProductCode|UNIQUE=ProductCode,Barcode"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8EC), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -1067,7 +1069,7 @@ Private Sub BuildForm_frmProducts()
     SetCtlProp c, "DefaultValue", "False"
     c.AfterUpdate = EP
     Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
-    Set c = AddList("lstItems", 227, 3005, 4990, 6491, 4, "0;1134;2778;850", True)
+    Set c = AddList("lstItems", 227, 3005, 4990, 7058, 4, "0;1134;2778;850", True)
     c.AfterUpdate = EP
     Set c = AddText("ProductCode", "ProductCode", 7201, 1701, 2948, 425)
     SetCtlProp c, "ControlTipText", "يُولَّد تلقائيًا إذا تُرك فارغًا"
@@ -1120,17 +1122,25 @@ Private Sub BuildForm_frmProducts()
     SetCtlProp c, "ControlTipText", "ألغِ العلامة للوجبات والمشروبات التي تُحضَّر عند الطلب: تُباع بلا رصيد"
     SetCtlProp c, "StatusBarText", "ألغِ العلامة للوجبات والمشروبات التي تُحضَّر عند الطلب: تُباع بلا رصيد"
     Set c = AddLabel("lblTrackStock", "يتابع المخزون", 5443, 7371, 1701, 425, 10, False, CLR_MUTED, "TrackStock", 0)
-    Set c = AddText("ImagePath", "ImagePath", 12134, 7371, 1644, 425)
+    Set c = AddText("SizePriceM", "SizePriceM", 12134, 7371, 2948, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    SetCtlProp c, "ControlTipText", "الكافيه: سعر البيع = الصغير؛ سعر الوسط أو الكبير يجعل للمشروب أحجامًا"
+    SetCtlProp c, "StatusBarText", "الكافيه: سعر البيع = الصغير؛ سعر الوسط أو الكبير يجعل للمشروب أحجامًا"
+    Set c = AddLabel("lblSizePriceM", "سعر الحجم الوسط", 10376, 7371, 1701, 425, 10, False, CLR_MUTED, "SizePriceM", 0)
+    Set c = AddText("SizePriceL", "SizePriceL", 7201, 7938, 2948, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddLabel("lblSizePriceL", "سعر الحجم الكبير", 5443, 7938, 1701, 425, 10, False, CLR_MUTED, "SizePriceL", 0)
+    Set c = AddText("ImagePath", "ImagePath", 12134, 7938, 1644, 425)
     SetCtlProp c, "ControlTipText", "صورة الزر في شاشة اللمس: مسار كامل أو اسم ملف في مجلد الصور"
     SetCtlProp c, "StatusBarText", "صورة الزر في شاشة اللمس: مسار كامل أو اسم ملف في مجلد الصور"
-    Set c = AddLabel("lblImagePath", "صورة المنتج", 10376, 7371, 1701, 425, 10, False, CLR_MUTED, "ImagePath", 0)
-    Set c = AddButton("btnBrowseImage", "استعراض", 13835, 7371, 1247, 425, "secondary")
+    Set c = AddLabel("lblImagePath", "صورة المنتج", 10376, 7938, 1701, 425, 10, False, CLR_MUTED, "ImagePath", 0)
+    Set c = AddButton("btnBrowseImage", "استعراض", 13835, 7938, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddText("Notes", "Notes", 7201, 7938, 7881, 907)
+    Set c = AddText("Notes", "Notes", 7201, 8505, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
-    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 7938, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 9100, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 8505, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 9667, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -1795,15 +1805,19 @@ Private Sub BuildForm_frmCategories()
     SetCtlProp c, "ControlTipText", "ترتيب الزر في شاشة اللمس (الأصغر أولًا)"
     SetCtlProp c, "StatusBarText", "ترتيب الزر في شاشة اللمس (الأصغر أولًا)"
     Set c = AddLabel("lblSortOrder", "ترتيب العرض", 10376, 3317, 1701, 425, 10, False, CLR_MUTED, "SortOrder", 0)
-    Set c = AddCombo("TileColor", "TileColor", 7201, 3884, 2948, 425, "BLUE;أزرق;GREEN;أخضر;ORANGE;برتقالي;PURPLE;بنفسجي;RED;أحمر;INDIGO;نيلي;TEAL;فيروزي;PINK;وردي;BROWN;بني;GREY;رمادي", 2, "0;3402")
-    Set c = AddLabel("lblTileColor", "لون الزر", 5443, 3884, 1701, 425, 10, False, CLR_MUTED, "TileColor", 0)
-    Set c = AddText("ImagePath", "ImagePath", 12134, 3884, 1644, 425)
+    Set c = AddCheck("IsAddOn", "IsAddOn", 7201, 3969)
+    SetCtlProp c, "ControlTipText", "الكافيه: أصناف هذه الفئة تظهر كإضافات للمشروب (حليب، شوت إضافي...)"
+    SetCtlProp c, "StatusBarText", "الكافيه: أصناف هذه الفئة تظهر كإضافات للمشروب (حليب، شوت إضافي...)"
+    Set c = AddLabel("lblIsAddOn", "فئة إضافات", 5443, 3884, 1701, 425, 10, False, CLR_MUTED, "IsAddOn", 0)
+    Set c = AddCombo("TileColor", "TileColor", 12134, 3884, 2948, 425, "BLUE;أزرق;GREEN;أخضر;ORANGE;برتقالي;PURPLE;بنفسجي;RED;أحمر;INDIGO;نيلي;TEAL;فيروزي;PINK;وردي;BROWN;بني;GREY;رمادي", 2, "0;3402")
+    Set c = AddLabel("lblTileColor", "لون الزر", 10376, 3884, 1701, 425, 10, False, CLR_MUTED, "TileColor", 0)
+    Set c = AddText("ImagePath", "ImagePath", 7201, 4451, 1644, 425)
     SetCtlProp c, "ControlTipText", "صورة الزر في شاشة اللمس"
     SetCtlProp c, "StatusBarText", "صورة الزر في شاشة اللمس"
-    Set c = AddLabel("lblImagePath", "صورة التصنيف", 10376, 3884, 1701, 425, 10, False, CLR_MUTED, "ImagePath", 0)
-    Set c = AddButton("btnBrowseImage", "استعراض", 13835, 3884, 1247, 425, "secondary")
+    Set c = AddLabel("lblImagePath", "صورة التصنيف", 5443, 4451, 1701, 425, 10, False, CLR_MUTED, "ImagePath", 0)
+    Set c = AddButton("btnBrowseImage", "استعراض", 8902, 4451, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddLabel("lblStatus", " ", 5443, 4564, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 5131, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -4587,4 +4601,513 @@ Private Sub BuildForm_frmTouchPay()
     Exit Sub
 EH:
     AbortForm "frmTouchPay", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmCafePOS()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmCafePOS", "نقطة بيع الكافيه", "", 18994, 9299, False, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 18994, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "نقطة بيع الكافيه", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "اختر المشروب: الحجم والإضافات تظهر تلقائيًا  |  نقدي أو بطاقة للدفع", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnClose", "إغلاق", 17463, 170, 1361, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnReprint", "إعادة طباعة آخر فاتورة", 14685, 170, 2665, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddText("txtBarcode", "", 9072, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtQty", "", 9270, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtInvoiceDiscount", "", 9468, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtTendered", "", 9666, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtNotes", "", 9864, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtOrderType", "", 10062, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddCombo("cboPaymentType", "", 10260, 57, 170, 170, "CASH;نقدي;CREDIT;آجل", 2, "0;2835")
+    SetCtlProp c, "Visible", False
+    Set c = AddCombo("cboPaymentMethod", "", 10458, 57, 170, 170, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;2835")
+    SetCtlProp c, "Visible", False
+    Set c = AddCombo("cboCustomer", "", 10656, 57, 170, 170, "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName", 2, "0;5670")
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblChange", " ", 10854, 57, 170, 170, 10, False, CLR_TEXT, "", 0)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblLastInvoice", " ", 11052, 57, 170, 170, 10, False, CLR_TEXT, "", 0)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblCustomerInfo", " ", 11250, 57, 170, 170, 10, False, CLR_TEXT, "", 0)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblOrderTitle", " ", 170, 936, 6237, 340, 13, True, CLR_PRIMARY, "", 3)
+    Set c = AddButton("btnTypeTakeaway", "سفري", 170, 1304, 3090, 737, "secondary")
+    c.FontSize = 16
+    c.OnClick = EP
+    Set c = AddButton("btnTypeDineIn", "محلي", 3317, 1304, 3090, 737, "secondary")
+    c.FontSize = 16
+    c.OnClick = EP
+    Set c = AddText("txtOrderName", "", 170, 2410, 6237, 567)
+    c.FontSize = 16
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblOrderName", "اسم العميل على الكوب (اختياري)", 170, 2098, 6237, 284, 9, False, CLR_MUTED, "txtOrderName", 0)
+    Set c = AddLabel("lblCol2", "الإجمالي", 736, 3090, 1191, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "الكمية", 2550, 3090, 624, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol6", "الصنف", 3797, 3090, 2495, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subLines", "frmTouchLines", 170, 3402, 6237, 3204)
+    Set c = AddRect("boxTotals", 170, 6691, 6237, 1134, CLR_SURFACE)
+    Set c = AddLabel("lblCapSubTotal", "قبل الخصم والضريبة", 4309, 6748, 2041, 255, 10, False, CLR_MUTED, "", 3)
+    Set c = AddLabel("lblSubTotal", "0.00", 2835, 6748, 1418, 255, 11, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapDiscount", "الخصم", 4309, 7032, 2041, 255, 10, False, CLR_MUTED, "", 3)
+    Set c = AddLabel("lblDiscount", "0.00", 2835, 7032, 1418, 255, 11, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapTax", "ضريبة القيمة المضافة", 4309, 7316, 2041, 255, 10, False, CLR_MUTED, "", 3)
+    Set c = AddLabel("lblTax", "0.00", 2835, 7316, 1418, 255, 11, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblItems", " ", 2835, 7598, 3515, 215, 9, False, CLR_MUTED, "", 3)
+    Set c = AddLabel("lblCapTotal", "الإجمالي شامل الضريبة", 283, 6719, 2438, 255, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTotal", "0.00", 283, 7003, 2438, 737, 26, True, CLR_ACCENT, "", 2)
+    Set c = AddLabel("lblStatus", " ", 170, 7882, 6237, 284, 11, True, CLR_MUTED, "", 0)
+    Set c = AddButton("btnPayCash", "نقدي", 3969, 8222, 2438, 907, "primary")
+    c.FontSize = 16
+    c.OnClick = EP
+    Set c = AddButton("btnPayCard", "مدى / بطاقة", 1531, 8222, 2381, 907, "nav")
+    c.FontSize = 16
+    c.OnClick = EP
+    Set c = AddButton("btnCancelOrder", "إلغاء", 170, 8222, 1304, 907, "danger")
+    c.FontSize = 16
+    c.OnClick = EP
+    Set c = AddButton("btnCatDown", "التالية", 6577, 936, 794, 879, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnCatUp", "السابقة", 18030, 936, 794, 879, "secondary")
+    c.OnClick = EP
+    Set c = AddRect("boxCat1", 15920, 936, 1996, 879, CLR_PRIMARY)
+    Set c = AddImage("imgCat1", 17321, 1049, 510, 652)
+    Set c = AddLabel("lblCat1", " ", 15977, 1191, 1316, 397, 12, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnCat1", " ", 15920, 936, 1996, 879, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxCat2", 13811, 936, 1996, 879, CLR_PRIMARY)
+    Set c = AddImage("imgCat2", 15212, 1049, 510, 652)
+    Set c = AddLabel("lblCat2", " ", 13868, 1191, 1316, 397, 12, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnCat2", " ", 13811, 936, 1996, 879, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxCat3", 11702, 936, 1996, 879, CLR_PRIMARY)
+    Set c = AddImage("imgCat3", 13103, 1049, 510, 652)
+    Set c = AddLabel("lblCat3", " ", 11759, 1191, 1316, 397, 12, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnCat3", " ", 11702, 936, 1996, 879, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxCat4", 9593, 936, 1996, 879, CLR_PRIMARY)
+    Set c = AddImage("imgCat4", 10994, 1049, 510, 652)
+    Set c = AddLabel("lblCat4", " ", 9650, 1191, 1316, 397, 12, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnCat4", " ", 9593, 936, 1996, 879, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxCat5", 7484, 936, 1996, 879, CLR_PRIMARY)
+    Set c = AddImage("imgCat5", 8885, 1049, 510, 652)
+    Set c = AddLabel("lblCat5", " ", 7541, 1191, 1316, 397, 12, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnCat5", " ", 7484, 936, 1996, 879, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddLabel("lblCategoryTitle", " ", 6577, 1899, 12247, 340, 14, True, CLR_TEXT, "", 3)
+    Set c = AddRect("boxProd1", 16485, 2296, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip1", 16485, 2296, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd1", 16655, 2466, 1995, 1097)
+    Set c = AddLabel("lblProd1", " ", 16542, 3591, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice1", " ", 16542, 3874, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd1", " ", 16485, 2296, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd2", 14008, 2296, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip2", 14008, 2296, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd2", 14178, 2466, 1995, 1097)
+    Set c = AddLabel("lblProd2", " ", 14065, 3591, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice2", " ", 14065, 3874, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd2", " ", 14008, 2296, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd3", 11531, 2296, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip3", 11531, 2296, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd3", 11701, 2466, 1995, 1097)
+    Set c = AddLabel("lblProd3", " ", 11588, 3591, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice3", " ", 11588, 3874, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd3", " ", 11531, 2296, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd4", 9054, 2296, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip4", 9054, 2296, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd4", 9224, 2466, 1995, 1097)
+    Set c = AddLabel("lblProd4", " ", 9111, 3591, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice4", " ", 9111, 3874, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd4", " ", 9054, 2296, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd5", 6577, 2296, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip5", 6577, 2296, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd5", 6747, 2466, 1995, 1097)
+    Set c = AddLabel("lblProd5", " ", 6634, 3591, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice5", " ", 6634, 3874, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd5", " ", 6577, 2296, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd6", 16485, 4271, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip6", 16485, 4271, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd6", 16655, 4441, 1995, 1097)
+    Set c = AddLabel("lblProd6", " ", 16542, 5566, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice6", " ", 16542, 5849, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd6", " ", 16485, 4271, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd7", 14008, 4271, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip7", 14008, 4271, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd7", 14178, 4441, 1995, 1097)
+    Set c = AddLabel("lblProd7", " ", 14065, 5566, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice7", " ", 14065, 5849, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd7", " ", 14008, 4271, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd8", 11531, 4271, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip8", 11531, 4271, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd8", 11701, 4441, 1995, 1097)
+    Set c = AddLabel("lblProd8", " ", 11588, 5566, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice8", " ", 11588, 5849, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd8", " ", 11531, 4271, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd9", 9054, 4271, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip9", 9054, 4271, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd9", 9224, 4441, 1995, 1097)
+    Set c = AddLabel("lblProd9", " ", 9111, 5566, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice9", " ", 9111, 5849, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd9", " ", 9054, 4271, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd10", 6577, 4271, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip10", 6577, 4271, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd10", 6747, 4441, 1995, 1097)
+    Set c = AddLabel("lblProd10", " ", 6634, 5566, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice10", " ", 6634, 5849, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd10", " ", 6577, 4271, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd11", 16485, 6246, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip11", 16485, 6246, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd11", 16655, 6416, 1995, 1097)
+    Set c = AddLabel("lblProd11", " ", 16542, 7541, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice11", " ", 16542, 7824, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd11", " ", 16485, 6246, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd12", 14008, 6246, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip12", 14008, 6246, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd12", 14178, 6416, 1995, 1097)
+    Set c = AddLabel("lblProd12", " ", 14065, 7541, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice12", " ", 14065, 7824, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd12", " ", 14008, 6246, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd13", 11531, 6246, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip13", 11531, 6246, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd13", 11701, 6416, 1995, 1097)
+    Set c = AddLabel("lblProd13", " ", 11588, 7541, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice13", " ", 11588, 7824, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd13", " ", 11531, 6246, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd14", 9054, 6246, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip14", 9054, 6246, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd14", 9224, 6416, 1995, 1097)
+    Set c = AddLabel("lblProd14", " ", 9111, 7541, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice14", " ", 9111, 7824, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd14", " ", 9054, 6246, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddRect("boxProd15", 6577, 6246, 2335, 1862, CLR_SURFACE)
+    Set c = AddRect("boxProdStrip15", 6577, 6246, 2335, 102, CLR_PRIMARY)
+    Set c = AddImage("imgProd15", 6747, 6416, 1995, 1097)
+    Set c = AddLabel("lblProd15", " ", 6634, 7541, 2222, 284, 12, True, CLR_TEXT, "", 2)
+    Set c = AddLabel("lblPrice15", " ", 6634, 7824, 2222, 255, 11, True, CLR_ACCENT, "", 2)
+    Set c = AddButton("btnProd15", " ", 6577, 6246, 2335, 1862, "secondary")
+    SetCtlProp c, "Transparent", True
+    c.OnClick = EP
+    Set c = AddButton("btnProdNext", "التالي", 6577, 8222, 1701, 907, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblProdPage", " ", 8391, 8477, 8618, 397, 12, False, CLR_MUTED, "", 2)
+    Set c = AddButton("btnProdPrev", "السابق", 17123, 8222, 1701, 907, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnUnload = EP
+    m_frm.OnResize = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    TouchLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not POSUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtOrderName_AfterUpdate()" & vbCrLf
+    s = s & "    OrderNameChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReprint_Click()" & vbCrLf
+    s = s & "    ReprintLast Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTypeTakeaway_Click()" & vbCrLf
+    s = s & "    SetOrderType Me, ""TAKEAWAY""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTypeDineIn_Click()" & vbCrLf
+    s = s & "    SetOrderType Me, ""DINE_IN""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPayCash_Click()" & vbCrLf
+    s = s & "    TouchPayCash Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPayCard_Click()" & vbCrLf
+    s = s & "    TouchPayCard Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCancelOrder_Click()" & vbCrLf
+    s = s & "    NewSale Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCatDown_Click()" & vbCrLf
+    s = s & "    CategoryPage Me, 1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCatUp_Click()" & vbCrLf
+    s = s & "    CategoryPage Me, -1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCat1_Click()" & vbCrLf
+    s = s & "    CategoryTileClick Me, 1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCat2_Click()" & vbCrLf
+    s = s & "    CategoryTileClick Me, 2" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCat3_Click()" & vbCrLf
+    s = s & "    CategoryTileClick Me, 3" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCat4_Click()" & vbCrLf
+    s = s & "    CategoryTileClick Me, 4" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCat5_Click()" & vbCrLf
+    s = s & "    CategoryTileClick Me, 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd1_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd2_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 2" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd3_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 3" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd4_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 4" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd5_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd6_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 6" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd7_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 7" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd8_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 8" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd9_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 9" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd10_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 10" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd11_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 11" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd12_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 12" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd13_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 13" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd14_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 14" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProd15_Click()" & vbCrLf
+    s = s & "    ProductTileClick Me, 15" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProdNext_Click()" & vbCrLf
+    s = s & "    ProductPage Me, 1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnProdPrev_Click()" & vbCrLf
+    s = s & "    ProductPage Me, -1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;btnClose,17463,170,1361,510,1000,0,0,0;btnReprint,14685,170,2665,510,1000,0,0,0;subLines,170,3402,6237,3204,0,0,0,1000;boxTotals,170,6691,6237,1134,0,0,1000,0;lblCapSubTotal,4309,6748,2041,255,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblSubTotal,2835,6748,1418,255,0,0,1000,0;lblCapDiscount,4309,7032,2041,255,0,0,1000,0;lblDiscount,2835,7032,1418,255,0,0,1000,0;lblCapTax,4309,7316,2041,255,0,0,1000,0;lblTax,2835,7316,1418,255,0,0,1000,0;lblItems,2835,7598,3515,215,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblCapTotal,283,6719,2438,255,0,0,1000,0;lblTotal,283,7003,2438,737,0,0,1000,0;lblStatus,170,7882,6237,284,0,0,1000,0;btnPayCash,3969,8222,2438,907,0,0,1000,0;btnPayCard,1531,8222,2381,907,0,0,1000,0;btnCancelOrder,170,8222,1304,907,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnCatUp,18030,936,794,879,1000,0,0,0;boxCat1,15920,936,1996,879,800,200,0,0;imgCat1,17321,1049,510,652,800,200,0,0;lblCat1,15977,1191,1316,397,800,200,0,0;btnCat1,15920,936,1996,879,800,200,0,0;boxCat2,13811,936,1996,879,600,200,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";imgCat2,15212,1049,510,652,600,200,0,0;lblCat2,13868,1191,1316,397,600,200,0,0;btnCat2,13811,936,1996,879,600,200,0,0;boxCat3,11702,936,1996,879,400,200,0,0;imgCat3,13103,1049,510,652,400,200,0,0;lblCat3,11759,1191,1316,397,400,200,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnCat3,11702,936,1996,879,400,200,0,0;boxCat4,9593,936,1996,879,200,200,0,0;imgCat4,10994,1049,510,652,200,200,0,0;lblCat4,9650,1191,1316,397,200,200,0,0;btnCat4,9593,936,1996,879,200,200,0,0;boxCat5,7484,936,1996,879,0,200,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";imgCat5,8885,1049,510,652,0,200,0,0;lblCat5,7541,1191,1316,397,0,200,0,0;btnCat5,7484,936,1996,879,0,200,0,0;lblCategoryTitle,6577,1899,12247,340,0,1000,0,0;boxProd1,16485,2296,2335,1862,800,200,0,333;boxProdStrip1,16485,2296,2335,102,800,200,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd1,16655,2466,1995,1097,800,200,0,333;lblProd1,16542,3591,2222,284,800,200,0,333;lblPrice1,16542,3874,2222,255,800,200,0,333;btnProd1,16485,2296,2335,1862,800,200,0,333;boxProd2,14008,2296,2335,1862,600,200,0,333;boxProdStrip2,14008,2296,2335,102,600,200,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd2,14178,2466,1995,1097,600,200,0,333;lblProd2,14065,3591,2222,284,600,200,0,333;lblPrice2,14065,3874,2222,255,600,200,0,333;btnProd2,14008,2296,2335,1862,600,200,0,333;boxProd3,11531,2296,2335,1862,400,200,0,333;boxProdStrip3,11531,2296,2335,102,400,200,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd3,11701,2466,1995,1097,400,200,0,333;lblProd3,11588,3591,2222,284,400,200,0,333;lblPrice3,11588,3874,2222,255,400,200,0,333;btnProd3,11531,2296,2335,1862,400,200,0,333;boxProd4,9054,2296,2335,1862,200,200,0,333;boxProdStrip4,9054,2296,2335,102,200,200,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd4,9224,2466,1995,1097,200,200,0,333;lblProd4,9111,3591,2222,284,200,200,0,333;lblPrice4,9111,3874,2222,255,200,200,0,333;btnProd4,9054,2296,2335,1862,200,200,0,333;boxProd5,6577,2296,2335,1862,0,200,0,333;boxProdStrip5,6577,2296,2335,102,0,200,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd5,6747,2466,1995,1097,0,200,0,333;lblProd5,6634,3591,2222,284,0,200,0,333;lblPrice5,6634,3874,2222,255,0,200,0,333;btnProd5,6577,2296,2335,1862,0,200,0,333;boxProd6,16485,4271,2335,1862,800,200,333,333;boxProdStrip6,16485,4271,2335,102,800,200,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd6,16655,4441,1995,1097,800,200,333,333;lblProd6,16542,5566,2222,284,800,200,333,333;lblPrice6,16542,5849,2222,255,800,200,333,333;btnProd6,16485,4271,2335,1862,800,200,333,333;boxProd7,14008,4271,2335,1862,600,200,333,333;boxProdStrip7,14008,4271,2335,102,600,200,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd7,14178,4441,1995,1097,600,200,333,333;lblProd7,14065,5566,2222,284,600,200,333,333;lblPrice7,14065,5849,2222,255,600,200,333,333;btnProd7,14008,4271,2335,1862,600,200,333,333;boxProd8,11531,4271,2335,1862,400,200,333,333;boxProdStrip8,11531,4271,2335,102,400,200,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd8,11701,4441,1995,1097,400,200,333,333;lblProd8,11588,5566,2222,284,400,200,333,333;lblPrice8,11588,5849,2222,255,400,200,333,333;btnProd8,11531,4271,2335,1862,400,200,333,333;boxProd9,9054,4271,2335,1862,200,200,333,333;boxProdStrip9,9054,4271,2335,102,200,200,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd9,9224,4441,1995,1097,200,200,333,333;lblProd9,9111,5566,2222,284,200,200,333,333;lblPrice9,9111,5849,2222,255,200,200,333,333;btnProd9,9054,4271,2335,1862,200,200,333,333;boxProd10,6577,4271,2335,1862,0,200,333,333;boxProdStrip10,6577,4271,2335,102,0,200,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd10,6747,4441,1995,1097,0,200,333,333;lblProd10,6634,5566,2222,284,0,200,333,333;lblPrice10,6634,5849,2222,255,0,200,333,333;btnProd10,6577,4271,2335,1862,0,200,333,333;boxProd11,16485,6246,2335,1862,800,200,666,333;boxProdStrip11,16485,6246,2335,102,800,200,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd11,16655,6416,1995,1097,800,200,666,333;lblProd11,16542,7541,2222,284,800,200,666,333;lblPrice11,16542,7824,2222,255,800,200,666,333;btnProd11,16485,6246,2335,1862,800,200,666,333;boxProd12,14008,6246,2335,1862,600,200,666,333;boxProdStrip12,14008,6246,2335,102,600,200,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd12,14178,6416,1995,1097,600,200,666,333;lblProd12,14065,7541,2222,284,600,200,666,333;lblPrice12,14065,7824,2222,255,600,200,666,333;btnProd12,14008,6246,2335,1862,600,200,666,333;boxProd13,11531,6246,2335,1862,400,200,666,333;boxProdStrip13,11531,6246,2335,102,400,200,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd13,11701,6416,1995,1097,400,200,666,333;lblProd13,11588,7541,2222,284,400,200,666,333;lblPrice13,11588,7824,2222,255,400,200,666,333;btnProd13,11531,6246,2335,1862,400,200,666,333;boxProd14,9054,6246,2335,1862,200,200,666,333;boxProdStrip14,9054,6246,2335,102,200,200,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd14,9224,6416,1995,1097,200,200,666,333;lblProd14,9111,7541,2222,284,200,200,666,333;lblPrice14,9111,7824,2222,255,200,200,666,333;btnProd14,9054,6246,2335,1862,200,200,666,333;boxProd15,6577,6246,2335,1862,0,200,666,333;boxProdStrip15,6577,6246,2335,102,0,200,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";imgProd15,6747,6416,1995,1097,0,200,666,333;lblProd15,6634,7541,2222,284,0,200,666,333;lblPrice15,6634,7824,2222,255,0,200,666,333;btnProd15,6577,6246,2335,1862,0,200,666,333;btnProdNext,6577,8222,1701,907,0,0,1000,0;lblProdPage,8391,8477,8618,397,0,1000,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnProdPrev,17123,8222,1701,907,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9299, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmCafePOS", s
+    Exit Sub
+EH:
+    AbortForm "frmCafePOS", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmCafeItem()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmCafeItem", "خيارات المشروب", "", 8845, 7711, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 8845, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "المشروب", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "اختر الحجم والإضافات، ثم «إضافة للطلب»", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtItemProduct", "", 7484, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtSize", "", 7682, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtAddOns", "", 7880, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtNoteFlags", "", 8078, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtItemQty", "", 8276, 57, 170, 170)
+    SetCtlProp c, "Visible", False
+    Set c = AddImage("imgItem", 6464, 992, 2155, 1389)
+    Set c = AddLabel("lblCapSize", "الحجم", 227, 992, 6124, 312, 12, True, CLR_TEXT, "", 3)
+    Set c = AddButton("btnSizeL", "كبير", 227, 1361, 1984, 1021, "secondary")
+    c.FontSize = 14
+    c.OnClick = EP
+    Set c = AddButton("btnSizeM", "وسط", 2296, 1361, 1984, 1021, "secondary")
+    c.FontSize = 14
+    c.OnClick = EP
+    Set c = AddButton("btnSizeS", "صغير", 4365, 1361, 1984, 1021, "secondary")
+    c.FontSize = 14
+    c.OnClick = EP
+    Set c = AddLabel("lblCapAddOns", "الإضافات", 227, 2495, 8391, 312, 12, True, CLR_TEXT, "", 3)
+    Set c = AddButton("btnAdd1", " ", 6605, 2835, 2013, 709, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAdd2", " ", 4479, 2835, 2013, 709, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAdd3", " ", 2353, 2835, 2013, 709, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAdd4", " ", 227, 2835, 2013, 709, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAdd5", " ", 6605, 3629, 2013, 709, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAdd6", " ", 4479, 3629, 2013, 709, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAdd7", " ", 2353, 3629, 2013, 709, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAdd8", " ", 227, 3629, 2013, 709, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblCapNotes", "ملاحظات", 227, 4451, 8391, 312, 12, True, CLR_TEXT, "", 3)
+    Set c = AddButton("btnNote1", " ", 6605, 4791, 2013, 680, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnNote2", " ", 4479, 4791, 2013, 680, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnNote3", " ", 2353, 4791, 2013, 680, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnNote4", " ", 227, 4791, 2013, 680, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnQtyPlus", "+", 227, 5642, 907, 794, "secondary")
+    c.FontSize = 20
+    c.OnClick = EP
+    Set c = AddLabel("lblItemQty", "1", 1191, 5783, 907, 510, 20, True, CLR_TEXT, "", 2)
+    Set c = AddButton("btnQtyMinus", "-", 2155, 5642, 907, 794, "secondary")
+    c.FontSize = 20
+    c.OnClick = EP
+    Set c = AddLabel("lblItemTotal", " ", 3175, 5783, 5443, 510, 18, True, CLR_ACCENT, "", 3)
+    Set c = AddButton("btnItemAdd", "إضافة للطلب", 3459, 6634, 5159, 907, "primary")
+    c.FontSize = 16
+    c.OnClick = EP
+    Set c = AddButton("btnItemCancel", "إلغاء", 227, 6634, 3118, 907, "secondary")
+    c.FontSize = 16
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    ItemLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSizeL_Click()" & vbCrLf
+    s = s & "    ItemSize Me, ""L""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSizeM_Click()" & vbCrLf
+    s = s & "    ItemSize Me, ""M""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSizeS_Click()" & vbCrLf
+    s = s & "    ItemSize Me, ""S""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd1_Click()" & vbCrLf
+    s = s & "    ItemToggleAddOn Me, 1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd2_Click()" & vbCrLf
+    s = s & "    ItemToggleAddOn Me, 2" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd3_Click()" & vbCrLf
+    s = s & "    ItemToggleAddOn Me, 3" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd4_Click()" & vbCrLf
+    s = s & "    ItemToggleAddOn Me, 4" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd5_Click()" & vbCrLf
+    s = s & "    ItemToggleAddOn Me, 5" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd6_Click()" & vbCrLf
+    s = s & "    ItemToggleAddOn Me, 6" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd7_Click()" & vbCrLf
+    s = s & "    ItemToggleAddOn Me, 7" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd8_Click()" & vbCrLf
+    s = s & "    ItemToggleAddOn Me, 8" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNote1_Click()" & vbCrLf
+    s = s & "    ItemToggleNote Me, 1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNote2_Click()" & vbCrLf
+    s = s & "    ItemToggleNote Me, 2" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNote3_Click()" & vbCrLf
+    s = s & "    ItemToggleNote Me, 3" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNote4_Click()" & vbCrLf
+    s = s & "    ItemToggleNote Me, 4" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnQtyPlus_Click()" & vbCrLf
+    s = s & "    ItemQty Me, 1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnQtyMinus_Click()" & vbCrLf
+    s = s & "    ItemQty Me, -1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnItemAdd_Click()" & vbCrLf
+    s = s & "    ItemConfirm Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnItemCancel_Click()" & vbCrLf
+    s = s & "    ItemCancel Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmCafeItem", s
+    Exit Sub
+EH:
+    AbortForm "frmCafeItem", Err.Number, Err.Description
 End Sub

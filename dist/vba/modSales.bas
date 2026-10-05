@@ -250,13 +250,16 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
                                  ByVal Tendered As Variant, ByVal Notes As String, _
                                  ByRef NewInvoiceID As Long, Optional ByVal OrderType As String = "", _
                                  Optional ByVal TableNo As String = "", Optional ByVal DeliveryPhone As String = "", _
-                                 Optional ByVal DeliveryAddress As String = "") As String
-    ' OrderType / TableNo / Delivery*: restaurant and café orders (touch screen), empty for the shop.
+                                 Optional ByVal DeliveryAddress As String = "", _
+                                 Optional ByVal OrderName As String = "") As String
+    ' OrderType / TableNo / Delivery* / OrderName: restaurant and café orders (touch screens).
+    ' A cart line may carry a note (café size and options) and a size price of the product.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim n As Long, i As Long, msg As String, vatRate As Currency, rate As Currency
     Dim productIDs() As Long, costs() As Currency, vatCats() As String
     Dim isCredit As Boolean, tend As Currency, paid As Currency, remaining As Currency, change As Currency
     Dim invoiceID As Long, invNo As String, invDate As Date, subType As String, priceChanged As Boolean
+    Dim lineNotes() As String
 
     On Error GoTo EH
     NewInvoiceID = 0
@@ -266,8 +269,8 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
 
     ' ---- 1. cart -> calculation engine
     Set rs = db.OpenRecordset( _
-        "SELECT t.ProductID, t.Quantity, t.UnitPrice, t.LineDiscount, p.ProductName, " & _
-        "p.VATCategory, p.AverageCost, p.SellingPrice, p.IsActive " & _
+        "SELECT t.ProductID, t.Quantity, t.UnitPrice, t.LineDiscount, t.LineNote, p.ProductName, " & _
+        "p.VATCategory, p.AverageCost, p.SellingPrice, p.SizePriceM, p.SizePriceL, p.IsActive " & _
         "FROM tmpPOSLines AS t LEFT JOIN Products AS p ON t.ProductID = p.ProductID " & _
         "ORDER BY t.LineNo", dbOpenSnapshot)
     CalcReset
@@ -282,12 +285,16 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
             rs.Close
             Exit Function
         End If
-        If rs!UnitPrice <> rs!SellingPrice Then priceChanged = True
+        If rs!UnitPrice <> rs!SellingPrice Then                ' a size price of the product is not a change
+            If rs!UnitPrice <> Nz(rs!SizePriceM, -1) And rs!UnitPrice <> Nz(rs!SizePriceL, -1) Then priceChanged = True
+        End If
         If Nz(rs!VATCategory, "S") = "S" Then rate = vatRate Else rate = 0
         CalcAddLine rs!Quantity, rs!UnitPrice, Nz(rs!LineDiscount, 0), rate
         ReDim Preserve productIDs(0 To n)
         ReDim Preserve costs(0 To n)
         ReDim Preserve vatCats(0 To n)
+        ReDim Preserve lineNotes(0 To n)
+        lineNotes(n) = Nz(rs!LineNote, "")
         productIDs(n) = rs!ProductID
         costs(n) = Nz(rs!AverageCost, 0)
         vatCats(n) = Nz(rs!VATCategory, "S")
@@ -357,6 +364,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     If Len(Trim$(TableNo)) > 0 Then rs!TableNo = Left$(Trim$(TableNo), 10)
     If Len(Trim$(DeliveryPhone)) > 0 Then rs!DeliveryPhone = Left$(Trim$(DeliveryPhone), 20)
     If Len(Trim$(DeliveryAddress)) > 0 Then rs!DeliveryAddress = Left$(Trim$(DeliveryAddress), 255)
+    If Len(Trim$(OrderName)) > 0 Then rs!OrderName = Left$(Trim$(OrderName), 50)
     SetZatcaFields rs, subType, "388", invDate, CalcTotal("TOTAL"), CalcTotal("TAX")
     rs.Update
     rs.Bookmark = rs.LastModified
@@ -378,6 +386,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
         rs!Tax = CalcLine(i, "TAX")
         rs!LineTotal = CalcLine(i, "TOTAL")
         rs!UnitCost = costs(i)
+        If Len(lineNotes(i)) > 0 Then rs!LineNote = Left$(lineNotes(i), 100)
         rs.Update
     Next
     rs.Close

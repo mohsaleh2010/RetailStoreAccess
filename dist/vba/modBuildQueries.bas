@@ -1130,7 +1130,7 @@ Private Sub Q_qrySalesDocPrint()
     s = s & "       h.TotalAmount, h.PaidAmount, h.RemainingAmount, h.AmountTendered, h.ChangeDue," & vbCrLf
     s = s & "       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, d.Quantity, d.UnitPrice," & vbCrLf
     s = s & "       d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal," & vbCrLf
-    s = s & "       h.OrderType, h.TableNo" & vbCrLf
+    s = s & "       h.OrderType, h.TableNo, h.OrderName, d.LineNote" & vbCrLf
     s = s & "FROM ((((SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
     s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
@@ -1142,9 +1142,11 @@ Private Sub Q_qrySalesDocPrint()
     s = s & "       c.BuildingNo, c.PostalCode, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax," & vbCrLf
     s = s & "       r.TotalAmount, r.RefundedAmount, r.TotalAmount - r.RefundedAmount, CCur(0), CCur(0)," & vbCrLf
     s = s & "       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, rd.Quantity, rd.UnitPrice," & vbCrLf
-    s = s & "       rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal, o.OrderType, o.TableNo" & vbCrLf
-    s = s & "FROM (((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)" & vbCrLf
+    s = s & "       rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal, o.OrderType, o.TableNo, o.OrderName," & vbCrLf
+    s = s & "       od.LineNote" & vbCrLf
+    s = s & "FROM ((((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)" & vbCrLf
     s = s & "        INNER JOIN SalesInvoices AS o ON r.SalesInvoiceID = o.SalesInvoiceID)" & vbCrLf
+    s = s & "        INNER JOIN SalesInvoiceDetails AS od ON rd.SalesDetailID = od.SalesDetailID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)" & vbCrLf
     s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
     s = s & "     INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID)" & vbCrLf
