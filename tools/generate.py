@@ -7,7 +7,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
-from schema import TABLES, Table, Field  # noqa: E402
+from schema import TABLES, Table, Field, table  # noqa: E402
 from generate_common import vba_str  # noqa: E402
 import gen_relations  # noqa: E402
 import gen_queries  # noqa: E402
@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -72,12 +72,26 @@ def vba_table_sub(t: Table) -> str:
 
 def vba_seed_sub(t: Table) -> str:
     cols = ", ".join(f"[{c}]" for c in t.seed_columns)
+    upgrade = "True" if t.seed_missing else "False"
     out = [f"Private Sub Seed_{t.name}()",
-           f"    If Not BeginSeed({vba_str(t.name)}) Then Exit Sub"]
+           f"    If Not BeginSeed({vba_str(t.name)}, {upgrade}) Then Exit Sub"]
+    grants = {}
+    if t.name == "Permissions":
+        for role_id, key in table("RolePermissions").seed_rows:
+            grants.setdefault(key, []).append(str(role_id))
     for row in t.seed_rows:
         vals = ", ".join(sql_value(v) for v in row)
         sql = f"INSERT INTO [{t.name}] ({cols}) VALUES ({vals})"
-        out.append(f"    ExecSeed {vba_str(sql)}")
+        if not t.seed_missing:
+            out.append(f"    ExecSeed {vba_str(sql)}")
+            continue
+        where = f"[{t.seed_columns[0]}] = {sql_value(row[0])}"
+        if t.name == "Permissions":
+            # a permission added by an upgrade is granted to its default roles
+            out.append(f"    If SeedRow({vba_str(where)}, {vba_str(sql)}) Then "
+                       f"GrantNewPermission {vba_str(row[0])}, {vba_str(','.join(grants.get(row[0], [])))}")
+        else:
+            out.append(f"    SeedRow {vba_str(where)}, {vba_str(sql)}")
     out.append(f"    EndSeed {vba_str(t.name)}, {len(t.seed_rows)}")
     out.append("End Sub")
     return "\n".join(out)
@@ -121,6 +135,9 @@ Private m_skipped As Long
 Private m_upgrade As Boolean        ' the table exists: only its missing fields are added
 Private m_addedFields As Long
 Private m_seeded As Long
+Private m_seedTable As String
+Private m_seedAdded As Long
+Private m_seedOnlyMissing As Boolean
 Private m_currentStep As String
 Private m_inTrans As Boolean
 
@@ -494,15 +511,17 @@ End Sub
 '------------------------------------------------------------------------------
 ' Seed helpers (lookup data is inserted only into empty tables)
 '------------------------------------------------------------------------------
-Private Function BeginSeed(ByVal TableName As String) As Boolean
+Private Function BeginSeed(ByVal TableName As String, Optional ByVal AddMissing As Boolean = False) As Boolean
+    ' Empty table: all seed rows. Table with data: nothing, or (AddMissing) only the rows
+    ' it does not have yet - new sequences / permissions of a later version.
     Dim rs As DAO.Recordset
     m_currentStep = "seed " & TableName
+    m_seedTable = TableName
+    m_seedAdded = 0
     Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & TableName & "]", dbOpenSnapshot)
-    If rs(0) > 0 Then
-        rs.Close
-        Exit Function
-    End If
+    m_seedOnlyMissing = (rs(0) > 0)
     rs.Close
+    If m_seedOnlyMissing And Not AddMissing Then Exit Function
     DBEngine.Workspaces(0).BeginTrans
     m_inTrans = True
     BeginSeed = True
@@ -510,11 +529,52 @@ End Function
 
 Private Sub ExecSeed(ByVal Sql As String)
     m_db.Execute Sql, dbFailOnError
+    m_seedAdded = m_seedAdded + 1
 End Sub
+
+Private Function SeedRow(ByVal Where As String, ByVal Sql As String) As Boolean
+    ' Inserts the row unless the table already has it. True = inserted.
+    Dim rs As DAO.Recordset
+    If m_seedOnlyMissing Then
+        Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & m_seedTable & "] WHERE " & Where, dbOpenSnapshot)
+        If rs(0) > 0 Then
+            rs.Close
+            Exit Function
+        End If
+        rs.Close
+    End If
+    ExecSeed Sql
+    SeedRow = True
+End Function
+
+Private Sub GrantNewPermission(ByVal PermissionKey As String, ByVal RoleIDs As String)
+    ' Only for a permission added to an existing back-end (a new one is granted by Seed_RolePermissions).
+    Dim ids() As String, i As Long
+    If Not m_seedOnlyMissing Or Len(RoleIDs) = 0 Then Exit Sub
+    ids = Split(RoleIDs, ",")
+    For i = 0 To UBound(ids)
+        If DCountIn("RolePermissions", "[RoleID] = " & ids(i) & " AND [PermissionKey] = '" & PermissionKey & "'") = 0 And _
+           DCountIn("Roles", "[RoleID] = " & ids(i)) > 0 Then
+            m_db.Execute "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (" & ids(i) & _
+                         ", '" & PermissionKey & "')", dbFailOnError
+        End If
+    Next
+End Sub
+
+Private Function DCountIn(ByVal TableName As String, ByVal Where As String) As Long
+    Dim rs As DAO.Recordset
+    Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & TableName & "] WHERE " & Where, dbOpenSnapshot)
+    DCountIn = rs(0)
+    rs.Close
+End Function
 
 Private Sub EndSeed(ByVal TableName As String, ByVal RowCount As Long)
     DBEngine.Workspaces(0).CommitTrans
     m_inTrans = False
+    If m_seedOnlyMissing Then
+        If m_seedAdded > 0 Then LogLine "  * سجلات جديدة: " & TableName & " (" & m_seedAdded & " سجل)"
+        Exit Sub
+    End If
     m_seeded = m_seeded + 1
     LogLine "  * بيانات أساسية: " & TableName & " (" & RowCount & " سجل)"
 End Sub

@@ -26,6 +26,7 @@ ICONS = {
     "customers": 0xE716, "suppliers": 0xE77B, "expenses": 0xE8C7, "stocktake": 0xE8EF,
     "reports": 0xE8A5, "search": 0xE721, "settings": 0xE713, "users": 0xE8D7,
     "backup": 0xE8B7, "logout": 0xE7E8, "home": 0xE80F, "category": 0xE8FD,
+    "treasury": 0xE825,
 }
 
 
@@ -124,6 +125,8 @@ PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Ite
                 "FROM Products ORDER BY ProductName")
 EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName"
 PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder"
+CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
+BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
 ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 
@@ -208,12 +211,18 @@ DATA_SCREENS: List[DataScreen] = [
         list_headers=[("الرقم", 2.0), ("التاريخ", 2.1), ("النوع", 2.6), ("المبلغ", 1.7)],
         search=["t.ExpenseNumber", "t.Description", "x.ExpenseTypeName", "t.SupplierInvoiceRef"],
         seq="EXPENSE:ExpenseNumber", unique=["ExpenseNumber"],
+        extra_buttons=[("btnExpenseTypes", "أنواع المصروفات", 'OpenScreen "frmExpenseTypes"'),
+                       ("btnTreasury", "الخزينة", 'OpenScreen "frmTreasury"')],
         fields=[
             Fld("ExpenseNumber", locked=True, hint="يُولَّد عند الحفظ"), Fld("ExpenseDate"),
-            Fld("ExpenseTypeID", rows=EXPENSE_TYPE_ROWS), Fld("PaymentMethodID", rows=PAYMENT_ROWS),
+            Fld("ExpenseTypeID", rows=EXPENSE_TYPE_ROWS,
+                button=("btnNewType", "نوع جديد", 'AddExpenseType Me, "ExpenseTypeID"')),
+            Fld("PaymentMethodID", rows=PAYMENT_ROWS, hook=True),
             Fld("Amount", hook=True), Fld("Tax", hook=True,
                                          button=("btnCalcVat", "احسب 15%", "CalcExpenseVat Me")),
             Fld("TotalAmount", locked=True), Fld("SupplierInvoiceRef"),
+            Fld("CashBoxID", rows=CASHBOX_ROWS, hint="المصروف النقدي يُخصم من هذا الصندوق (يُختار صندوقك تلقائيًا)"),
+            Info("lblCashNote", "الدفع النقدي يُخصم من الصندوق"),
             Fld("Description", span=2),
         ]),
     DataScreen(
@@ -232,6 +241,9 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("RoleID", rows=ROLE_ROWS, widths="0;4"),
             Fld("JobTitle"), Fld("Mobile"),
             Fld("MaxDiscountPercent", hint="أقصى خصم بدون موافقة (مثال 5%)"), Fld("IsActive"),
+            Fld("CashBoxID", rows=CASHBOX_ROWS,
+                hint="نقدية مبيعات المستخدم وسنداته تدخل هذا الصندوق؛ فارغ = أول صندوق كاشير"),
+            Info("lblCashBoxNote", "المدير المسؤول عن الخزينة: اختر له الخزينة الرئيسية"),
             Fld("MustChangePassword"), Fld("LastLoginAt", locked=True),
             Fld("FailedLoginCount", locked=True), Fld("LockedUntil", locked=True),
             Info("lblPasswordState"),
@@ -261,6 +273,19 @@ DATA_SCREENS: List[DataScreen] = [
         list_order="t.ExpenseTypeName", list_headers=[("النوع", 8.4)],
         search=["t.ExpenseTypeName"], active="t.IsActive", unique=["ExpenseTypeName"],
         fields=[Fld("ExpenseTypeName", span=2), Fld("IsActive")]),
+    DataScreen(
+        "frmCashBoxes", "CashBoxes", "الصناديق", "الخزينة الرئيسية وصناديق الكاشير", "treasury",
+        list_select="t.BoxName AS [الصندوق], IIf(t.BoxType = 'MAIN', 'خزينة', 'كاشير') AS [النوع]",
+        list_from="CashBoxes AS t", list_order="t.BoxType DESC, t.BoxName",
+        list_headers=[("الصندوق", 5.6), ("النوع", 2.8)],
+        search=["t.BoxName", "t.Notes"], active="t.IsActive", unique=["BoxName"],
+        extra_buttons=[("btnTreasury", "الخزينة", 'OpenScreen "frmTreasury"')],
+        fields=[Fld("BoxName", span=2), Fld("BoxType", rows=BOX_TYPES, widths="0;5"),
+                Fld("IsActive"),
+                Fld("OpeningBalance", hint="النقدية الموجودة في الصندوق عند بدء استخدام البرنامج"),
+                Fld("OpeningDate"),
+                Info("lblBoxNote", "الرصيد لا يُكتب يدويًا: يُحسب من المبيعات والسندات والمصروفات"),
+                Fld("Notes", span=2)]),
     DataScreen(
         "frmSettings", "Settings", "الإعدادات", "بيانات المحل الضريبية وإعدادات التشغيل", "settings",
         kind="SINGLE", allow_add=False, allow_delete=False,
@@ -325,6 +350,7 @@ NAV_ITEMS: List[NavItem] = [
     NavItem("Customers", "العملاء", "customers", "frmCustomers", 5),
     NavItem("Suppliers", "الموردون", "suppliers", "frmSuppliers", 5),
     NavItem("Expenses", "المصروفات", "expenses", "frmExpenses", 5),
+    NavItem("Treasury", "الخزينة", "treasury", "frmTreasury", 0),
     NavItem("StockCount", "الجرد", "stocktake", "frmStockCount", 7),
     NavItem("Reports", "التقارير", "reports", "frmReportCenter", 5),
     NavItem("Search", "البحث", "search", "frmSearch", 5),
@@ -351,6 +377,8 @@ SCREEN_PERMISSIONS = {
     "frmBarcodeLabels": "PRODUCTS", "frmLabelSettings": "PRODUCTS",
     "frmTouchPOS": "SALES_POS", "frmTouchPay": "SALES_POS", "frmCafePOS": "SALES_POS",
     "frmCafeItem": "SALES_POS",
+    "frmTreasury": "CASH_CLOSING", "frmCashClosing": "CASH_CLOSING",
+    "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX",
 }
 
 
@@ -431,8 +459,12 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("PRODUCT_MOVEMENT", "حركة منتج", "ProductMovementQuery", "rptProductMovement", "PR"),
     ReportEntry("CUSTOMER_STATEMENT", "كشف حساب عميل", "CustomerStatementQuery", "rptCustomerStatement", "PC"),
     ReportEntry("SUPPLIER_STATEMENT", "كشف حساب مورد", "SupplierStatementQuery", "rptSupplierStatement", "PS"),
-    ReportEntry("EXPENSES", "المصروفات", "ExpensesQuery", "rptExpenses", "P"),
-    ReportEntry("EXPENSES_BY_TYPE", "المصروفات حسب النوع", "ExpensesByTypeQuery", "rptExpensesByType", "P"),
+    ReportEntry("EXPENSES", "المصروفات (تفصيلي)", "ExpensesQuery", "rptExpenses", "Pe"),
+    ReportEntry("EXPENSES_BY_TYPE", "المصروفات (إجمالي حسب النوع)", "ExpensesByTypeQuery", "rptExpensesByType", "P"),
+    ReportEntry("CASH_STATEMENT", "حركة الخزينة / الصندوق (تفصيلي)", "CashStatementQuery", "rptCashStatement", "Pb#"),
+    ReportEntry("CASH_DAILY", "حركة الخزينة اليومية (أول اليوم وآخره)", "CashDailyQuery", "rptCashDaily", "Pb#"),
+    ReportEntry("CASH_BALANCES", "أرصدة الخزينة والصناديق", "CashBoxBalanceQuery", "rptCashBalances", "#"),
+    ReportEntry("CASH_CLOSINGS", "تصفيات يومية الكاشير", "CashClosingsQuery", "rptCashClosings", "Pb#"),
     ReportEntry("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P$"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
@@ -734,7 +766,7 @@ LAUNCH_TILES = [
     ("Customers", "العملاء", (229, 57, 53), False), ("Suppliers", "الموردون", (57, 73, 171), False),
     ("Expenses", "المصروفات", (0, 137, 123), False), ("Reports", "التقارير", (216, 27, 96), False),
     ("Settings", "الإعدادات", (232, 236, 243), True), ("Users", "المستخدمون", (232, 236, 243), True),
-    ("Backup", "النسخ الاحتياطي", (232, 236, 243), True), ("Logout", "تسجيل الخروج", (244, 81, 30), False),
+    ("Treasury", "الخزينة", (0, 121, 107), False), ("Logout", "تسجيل الخروج", (244, 81, 30), False),
 ]
 
 
@@ -758,16 +790,16 @@ def layout_main() -> FormModel:
     for item in NAV_ITEMS:
         name = f"btnNav{item.key}"
         call = (f'OpenScreen "{item.target}", {item.phase}' if item.target else "LogoutUser")
-        button(m, name, item.caption, cm(0.25), y, "nav", w=side_w - cm(0.5), h=cm(0.95),
+        button(m, name, item.caption, cm(0.25), y, "nav", w=side_w - cm(0.5), h=cm(0.88),
                call=call)
         if item.target:
             m.controls[-1].props["Tag"] = item.target       # MainLoad disables what the user may not open
-        icon = m.add(Control("icon", f"ico{item.key}", cm(0.45), y + cm(0.15), cm(0.8),
+        icon = m.add(Control("icon", f"ico{item.key}", cm(0.45), y + cm(0.12), cm(0.8),
                              cm(0.65), {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"),
                                         "FontSize": 13, "ForeColor": Sym("CLR_SIDEBAR_TEXT")},
                              events=["Click"], decorative=True))
         m.code += [f"Private Sub {icon.name}_Click()", f"    {call}", "End Sub"]
-        y += cm(1.0)
+        y += cm(0.95)
 
     cx = side_w + cm(0.8)
     cw = width - cx - cm(0.8)
@@ -946,13 +978,17 @@ def layout_report_center() -> FormModel:
         button(m, name, caption, px + i * cm(3.1), y, "secondary", w=cm(2.9), h=cm(0.75),
                call=f'SetQuickPeriod Me, "{which}"')
     y = cm(6.9)
-    for name, caption, rows in [("cboCustomer", "العميل", CUSTOMER_ROWS),
-                                ("cboSupplier", "المورد", SUPPLIER_ROWS),
-                                ("cboProduct", "المنتج", PRODUCT_ROWS)]:
-        c = m.add(Control("combo", name, px, y, cm(9.0), cm(0.8),
-                          {"RowSource": rows, "ColumnCount": 2, "ColumnWidths": "0;9"}))
+    for i, (name, caption, rows) in enumerate([("cboCustomer", "العميل", CUSTOMER_ROWS),
+                                               ("cboSupplier", "المورد", SUPPLIER_ROWS),
+                                               ("cboProduct", "المنتج", PRODUCT_ROWS),
+                                               ("cboCashBox", "الخزينة / الصندوق", CASHBOX_ROWS),
+                                               ("cboExpenseType", "نوع المصروف", EXPENSE_TYPE_ROWS)]):
+        cx = px if i % 2 == 0 else px + cm(8.5)          # two columns
+        c = m.add(Control("combo", name, cx, y, cm(8.1), cm(0.8),
+                          {"RowSource": rows, "ColumnCount": 2, "ColumnWidths": "0;8"}))
         labelled(m, name, caption, c)
-        y += cm(1.45)
+        if i % 2 == 1 or i == 4:
+            y += cm(1.45)
     button(m, "btnRun", "عرض التقرير", px, y + cm(0.3), "primary", w=cm(5.0), h=cm(1.0),
            call="RunReport Me")
     button(m, "btnPdf", "حفظ PDF", px + cm(5.2), y + cm(0.3), "secondary", w=cm(3.0), h=cm(1.0),
@@ -982,6 +1018,7 @@ def all_forms() -> List[FormModel]:
     from forms_security import security_forms
     from forms_labels import label_forms
     from forms_touch import touch_forms
+    from forms_cash import cash_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
-            + security_forms() + label_forms() + touch_forms())
+            + security_forms() + label_forms() + touch_forms() + cash_forms())

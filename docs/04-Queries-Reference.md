@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **51**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **60**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -52,11 +52,20 @@
 | 44 | [`qrySalesDocPrint`](#qrysalesdocprint) | بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف) |  |
 | 45 | [`qryPurchaseDocPrint`](#qrypurchasedocprint) | بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف) |  |
 | 46 | [`qryVoucherPrint`](#qryvoucherprint) | بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين) |  |
-| 47 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 48 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 49 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 50 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 51 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 47 | [`qryCashMovements`](#qrycashmovements) | كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (−) |  |
+| 48 | [`qryCashBoxTotals`](#qrycashboxtotals) | إجمالي الداخل والخارج لكل صندوق |  |
+| 49 | [`CashBoxBalanceQuery`](#cashboxbalancequery) | أرصدة الخزينة والصناديق الآن |  |
+| 50 | [`CashStatementQuery`](#cashstatementquery) | حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 51 | [`qryCashDays`](#qrycashdays) | مقبوضات ومدفوعات كل يوم داخل الفترة | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 52 | [`CashDailyQuery`](#cashdailyquery) | حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 53 | [`CashClosingsQuery`](#cashclosingsquery) | تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 54 | [`qryCashClosingPrint`](#qrycashclosingprint) | بيانات طباعة تصفية الكاشير |  |
+| 55 | [`qryCashVoucherPrint`](#qrycashvoucherprint) | بيانات طباعة سندات قبض وصرف وتحويل النقدية |  |
+| 56 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 57 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 58 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 59 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 60 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -127,7 +136,21 @@
 | 61 | طباعة الفاتورة الآجلة: سطران | `SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 2 |
 | 62 | طباعة الفاتورة الآجلة: مجموع الأسطر = 460 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 460 |
 | 63 | طباعة الإشعار الدائن: سطر واحد بقيمة 46 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = {ref:CRN1}` | 46 |
-| 64 | فحص السلامة: لا توجد مشكلات | `SELECT COUNT(*) FROM IntegrityCheckQuery` | 0 |
+| 64 | رصيد صندوق الكاشير = 500 + 115 + 1150 + 100 + 200 − 230 − 50 − 15 − 1000 | `SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = {ref:BOXC}` | 770 |
+| 65 | رصيد الخزينة = 10000 − 5000 + 1000 + 2000 − 300 | `SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = {ref:BOXM}` | 7700 |
+| 66 | الصناديق المسجلة بدون حركة رصيدها صفر | `SELECT Sum(Balance) FROM CashBoxBalanceQuery WHERE CashBoxID <= 2` | 0 |
+| 67 | حركة صندوق الكاشير: رصيد أول المدة = 500 + 115 − 50 | `SELECT AmountIn FROM CashStatementQuery WHERE SortKey = 0` | 565 |
+| 68 | حركة صندوق الكاشير: 6 حركات في الفترة | `SELECT COUNT(*) FROM CashStatementQuery WHERE SortKey = 1` | 6 |
+| 69 | حركة صندوق الكاشير: رصيد آخر المدة = 770 | `SELECT Sum(AmountIn) - Sum(AmountOut) FROM CashStatementQuery` | 770 |
+| 70 | حركة الخزينة: التحويل من الكاشير داخل = 1000 | `SELECT AmountIn FROM CashStatementQuery WHERE MoveType = 'TRANSFER_IN'` | 1000 |
+| 71 | يومية صندوق الكاشير يوم التصفية: رصيد أول اليوم = 565 + 1150 + 100 − 230 | `SELECT OpeningBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 1585 |
+| 72 | يومية صندوق الكاشير يوم التصفية: المدفوعات = 15 عجز + 1000 تحويل | `SELECT Payments FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 1015 |
+| 73 | يومية صندوق الكاشير يوم التصفية: رصيد آخر اليوم = 570 | `SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 570 |
+| 74 | يومية صندوق الكاشير: آخر يوم = الرصيد الحالي | `SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:3})` | 770 |
+| 75 | تصفيات الكاشير خلال الفترة: تصفية واحدة بعجز 15 | `SELECT Difference FROM CashClosingsQuery` | -15 |
+| 76 | طباعة سند صرف المصروف: نوع المصروف | `SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V1} AND ExpenseTypeName = 'مصروفات أخرى'` | 1 |
+| 77 | طباعة سند التحويل: الصندوق المستلم | `SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V3} AND ToBoxName = 'TEST الخزينة'` | 1 |
+| 78 | فحص السلامة: لا توجد مشكلات | `SELECT COUNT(*) FROM IntegrityCheckQuery` | 0 |
 
 ## qrySalesDocuments
 
@@ -615,7 +638,7 @@ ORDER BY SortKey, EntryDate
 
 ```sql
 SELECT e.ExpenseID, e.ExpenseNumber, e.ExpenseDate, t.ExpenseTypeName, e.Amount, e.Tax,
-       e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName
+       e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName, e.ExpenseTypeID
 FROM ((Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID)
       INNER JOIN Employees AS em ON e.EmployeeID = em.EmployeeID)
      LEFT JOIN PaymentMethods AS pm ON e.PaymentMethodID = pm.PaymentMethodID
@@ -872,6 +895,211 @@ SELECT 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, 1, s.SupplierName
 FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID)
       INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)
      INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID
+```
+
+## qryCashMovements
+
+كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (−)
+
+```sql
+SELECT h.CashBoxID, h.InvoiceDate AS MoveDate, 'SALE' AS MoveType, 'فاتورة بيع' AS MoveTypeName,
+       h.InvoiceNumber AS DocNumber, c.CustomerName AS PartyName, h.Notes AS Details,
+       h.PaidAmount AS AmountIn, CCur(0) AS AmountOut, h.EmployeeID
+FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
+WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0
+UNION ALL
+SELECT r.CashBoxID, r.ReturnDate, 'SALES_RETURN', 'مرتجع بيع (رد نقدي)', r.ReturnNumber,
+       c.CustomerName, r.Reason, CCur(0), r.RefundedAmount, r.EmployeeID
+FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
+WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0
+UNION ALL
+SELECT p.CashBoxID, p.PaymentDate, 'CUSTOMER_PAYMENT', 'سند قبض من عميل', p.PaymentNumber,
+       c.CustomerName, p.Notes, p.Amount, CCur(0), p.EmployeeID
+FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID
+WHERE p.CashBoxID Is Not Null
+UNION ALL
+SELECT h.CashBoxID, h.InvoiceDate, 'PURCHASE', 'فاتورة شراء', h.InvoiceNumber,
+       s.SupplierName, h.Notes, CCur(0), h.PaidAmount, h.EmployeeID
+FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
+WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0
+UNION ALL
+SELECT r.CashBoxID, r.ReturnDate, 'PURCHASE_RETURN', 'مرتجع شراء (استرداد نقدي)', r.ReturnNumber,
+       s.SupplierName, r.Reason, r.RefundedAmount, CCur(0), r.EmployeeID
+FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID
+WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0
+UNION ALL
+SELECT p.CashBoxID, p.PaymentDate, 'SUPPLIER_PAYMENT', 'سند صرف لمورد', p.PaymentNumber,
+       s.SupplierName, p.Notes, CCur(0), p.Amount, p.EmployeeID
+FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
+WHERE p.CashBoxID Is Not Null
+UNION ALL
+SELECT e.CashBoxID, e.ExpenseDate, 'EXPENSE', 'مصروف', e.ExpenseNumber,
+       t.ExpenseTypeName, e.Description, CCur(0), e.TotalAmount, e.EmployeeID
+FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID
+WHERE e.CashBoxID Is Not Null
+UNION ALL
+SELECT v.CashBoxID, v.VoucherDate, 'CASH_IN',
+       IIf(v.Category = 'OWNER', 'إيداع من المالك', IIf(v.Category = 'OVERAGE', 'زيادة في الصندوق',
+           'سند قبض نقدية')),
+       v.VoucherNumber, v.PartyName, v.Description, v.Amount, CCur(0), v.EmployeeID
+FROM CashVouchers AS v
+WHERE v.VoucherType = 'IN'
+UNION ALL
+SELECT v.CashBoxID, v.VoucherDate, 'CASH_OUT',
+       IIf(v.Category = 'OWNER', 'تسوية مع المالك', IIf(v.Category = 'EXPENSE', 'مصروف (سند صرف)',
+           IIf(v.Category = 'ADVANCE', 'سلفة موظف', IIf(v.Category = 'SHORTAGE', 'عجز في الصندوق',
+           'سند صرف نقدية')))),
+       v.VoucherNumber, v.PartyName, v.Description, CCur(0), v.Amount, v.EmployeeID
+FROM CashVouchers AS v
+WHERE v.VoucherType = 'OUT'
+UNION ALL
+SELECT v.CashBoxID, v.VoucherDate, 'TRANSFER_OUT', 'تحويل إلى صندوق آخر', v.VoucherNumber,
+       b.BoxName, v.Description, CCur(0), v.Amount, v.EmployeeID
+FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.ToCashBoxID = b.CashBoxID
+WHERE v.VoucherType = 'TRANSFER'
+UNION ALL
+SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق آخر', v.VoucherNumber,
+       b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
+FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID
+WHERE v.VoucherType = 'TRANSFER'
+UNION ALL
+SELECT b.CashBoxID, b.OpeningDate, 'OPENING', 'رصيد افتتاحي', '-', b.BoxName, b.Notes,
+       b.OpeningBalance, CCur(0), Null
+FROM CashBoxes AS b
+WHERE b.OpeningBalance <> 0
+```
+
+## qryCashBoxTotals
+
+إجمالي الداخل والخارج لكل صندوق
+
+```sql
+SELECT CashBoxID, Sum(AmountIn) AS BoxIn, Sum(AmountOut) AS BoxOut, Max(MoveDate) AS LastMoveDate
+FROM qryCashMovements
+GROUP BY CashBoxID
+```
+
+## CashBoxBalanceQuery
+
+أرصدة الخزينة والصناديق الآن
+
+```sql
+SELECT b.CashBoxID, b.BoxName, b.BoxType,
+       IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', 'صندوق كاشير') AS BoxTypeName, b.IsActive,
+       CCur(Nz(t.BoxIn, 0)) AS TotalIn, CCur(Nz(t.BoxOut, 0)) AS TotalOut,
+       CCur(Nz(t.BoxIn, 0)) - CCur(Nz(t.BoxOut, 0)) AS Balance, t.LastMoveDate
+FROM CashBoxes AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID
+ORDER BY b.BoxType DESC, b.BoxName
+```
+
+## CashStatementQuery
+
+حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق)
+
+المعاملات: `PeriodStart`, `PeriodEnd`, `CashBoxID`
+
+```sql
+SELECT 1 AS SortKey, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber, m.PartyName, m.Details,
+       b.BoxName, m.AmountIn, m.AmountOut, m.CashBoxID
+FROM qryCashMovements AS m INNER JOIN CashBoxes AS b ON m.CashBoxID = b.CashBoxID
+WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND m.MoveDate >= QDate('PeriodStart') AND m.MoveDate < QDate('PeriodEnd')
+UNION ALL
+SELECT 0, QDate('PeriodStart'), 'BALANCE_FWD', 'رصيد أول المدة', '-', Null, Null, Null,
+       IIf(CCur(Nz(Sum(o.AmountIn), 0)) - CCur(Nz(Sum(o.AmountOut), 0)) > 0, CCur(Nz(Sum(o.AmountIn), 0)) - CCur(Nz(Sum(o.AmountOut), 0)), 0),
+       IIf(CCur(Nz(Sum(o.AmountIn), 0)) - CCur(Nz(Sum(o.AmountOut), 0)) < 0, CCur(Nz(Sum(o.AmountOut), 0)) - CCur(Nz(Sum(o.AmountIn), 0)), 0),
+       QLong('CashBoxID')
+FROM qryCashMovements AS o
+WHERE (QLong('CashBoxID') = 0 OR o.CashBoxID = QLong('CashBoxID')) AND o.MoveDate < QDate('PeriodStart')
+ORDER BY SortKey, MoveDate
+```
+
+## qryCashDays
+
+مقبوضات ومدفوعات كل يوم داخل الفترة
+
+المعاملات: `PeriodStart`, `PeriodEnd`, `CashBoxID`
+
+```sql
+SELECT DateValue(m.MoveDate) AS CashDay, Sum(m.AmountIn) AS Receipts, Sum(m.AmountOut) AS Payments,
+       Count(*) AS MoveCount
+FROM qryCashMovements AS m
+WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND m.MoveDate >= QDate('PeriodStart') AND m.MoveDate < QDate('PeriodEnd')
+GROUP BY DateValue(m.MoveDate)
+```
+
+## CashDailyQuery
+
+حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم
+
+المعاملات: `PeriodStart`, `PeriodEnd`, `CashBoxID`
+
+```sql
+SELECT d.CashDay,
+       (SELECT CCur(Nz(Sum(x.AmountIn - x.AmountOut), 0)) FROM qryCashMovements AS x
+        WHERE (QLong('CashBoxID') = 0 OR x.CashBoxID = QLong('CashBoxID'))
+          AND x.MoveDate < d.CashDay) AS OpeningBalance,
+       d.Receipts, d.Payments,
+       (SELECT CCur(Nz(Sum(y.AmountIn - y.AmountOut), 0)) FROM qryCashMovements AS y
+        WHERE (QLong('CashBoxID') = 0 OR y.CashBoxID = QLong('CashBoxID'))
+          AND y.MoveDate < d.CashDay) + d.Receipts - d.Payments AS ClosingBalance,
+       d.MoveCount
+FROM qryCashDays AS d
+ORDER BY d.CashDay
+```
+
+## CashClosingsQuery
+
+تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق)
+
+المعاملات: `PeriodStart`, `PeriodEnd`, `CashBoxID`
+
+```sql
+SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c.PeriodStart,
+       c.OpeningBalance, c.CashIn, c.CashOut, c.ExpectedBalance, c.CountedAmount, c.Difference,
+       IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك',
+           'يبقى في الصندوق')) AS DestinationName,
+       t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes, c.CashBoxID
+FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)
+      INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)
+     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID
+WHERE (QLong('CashBoxID') = 0 OR c.CashBoxID = QLong('CashBoxID')) AND c.ClosingDate >= QDate('PeriodStart') AND c.ClosingDate < QDate('PeriodEnd')
+ORDER BY c.ClosingDate
+```
+
+## qryCashClosingPrint
+
+بيانات طباعة تصفية الكاشير
+
+```sql
+SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c.PeriodStart,
+       c.OpeningBalance, c.CashIn, c.CashOut, c.ExpectedBalance, c.CountedAmount, c.Difference,
+       IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك',
+           'يبقى في الصندوق')) AS DestinationName,
+       t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes
+FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)
+      INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)
+     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID
+```
+
+## qryCashVoucherPrint
+
+بيانات طباعة سندات قبض وصرف وتحويل النقدية
+
+```sql
+SELECT v.CashVoucherID AS DocID, v.VoucherNumber, v.VoucherDate, v.VoucherType,
+       IIf(v.VoucherType = 'IN', 'سند قبض نقدية', IIf(v.VoucherType = 'OUT', 'سند صرف نقدية',
+           'سند تحويل نقدية')) AS VoucherTitle,
+       IIf(v.Category = 'OWNER', IIf(v.VoucherType = 'IN', 'إيداع من المالك', 'تسوية مع المالك'),
+           IIf(v.Category = 'EXPENSE', 'مصروف', IIf(v.Category = 'ADVANCE', 'سلفة موظف',
+           IIf(v.Category = 'SHORTAGE', 'عجز في الصندوق', IIf(v.Category = 'OVERAGE', 'زيادة في الصندوق',
+           IIf(v.Category = 'TRANSFER', 'تحويل بين الصناديق', 'أخرى')))))) AS CategoryName,
+       b.BoxName, t.BoxName AS ToBoxName, v.Amount, v.PartyName, v.Description,
+       x.ExpenseTypeName, e.EmployeeName
+FROM ((((CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID)
+        INNER JOIN Employees AS e ON v.EmployeeID = e.EmployeeID)
+       LEFT JOIN CashBoxes AS t ON v.ToCashBoxID = t.CashBoxID)
+      LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)
+     LEFT JOIN ExpenseTypes AS x ON ex.ExpenseTypeID = x.ExpenseTypeID
 ```
 
 ## qrySalesInvoiceLineTotals

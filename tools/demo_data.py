@@ -132,6 +132,8 @@ DEMO_MARK = "DEMO"                   # Notes / Description of every demo master 
 # user: None = the administrator who loads the data, else a demo username.
 # ---------------------------------------------------------------------------
 PLAN = [
+    dict(op="cash_in", day=31, hour=8, box="MAIN", category="OWNER", amount="30000.00", party="المالك",
+         text="رأس مال تشغيل (تجريبي)"),
     dict(op="purchase", day=30, hour=9, supplier=1, ref="INV-7781", credit=True, paid=1000,
          lines=[(1, 40), (2, 40), (3, 50), (4, 120), (5, 30)]),
     dict(op="purchase", day=29, hour=10, supplier=2, ref="SP-20451", credit=False,
@@ -150,6 +152,7 @@ PLAN = [
     dict(op="expense", day=16, hour=13, type=4, amount="299.00", tax="44.85", text="الإنترنت والهاتف"),
     dict(op="sale", day=15, hour=17, user="cashier2", lines=[(7, 6), (16, 2), (15, 1)]),
     dict(op="supplier_payment", day=15, hour=18, supplier=1, amount="1500.00"),
+    dict(op="closing", day=15, hour=23, box="CASHIER", short="5.00", keep="100.00"),
     dict(op="purchase_return", day=14, hour=10, invoice=3, lines=[(1, 3)]),
     dict(op="sale", day=12, hour=13, customer=4, credit=True, paid=50, lines=[(5, 2), (9, 1)]),
     dict(op="expense", day=11, hour=9, type=5, amount="150.00", tax="0", text="نقل بضاعة"),
@@ -158,6 +161,8 @@ PLAN = [
     dict(op="sale", day=8, hour=12, customer=2, credit=True, paid=1000,
          lines=[(1, 15), (2, 25), (4, 60), (6, 20)]),
     dict(op="stock_out", day=7, hour=9, product=12, qty=1, text="تالف - عبوة مكسورة"),
+    dict(op="cash_out", day=7, hour=20, box="MAIN", category="OWNER", amount="2000.00", party="المالك",
+         text="مسحوبات المالك (تجريبي)"),
     dict(op="customer_payment", day=6, hour=11, customer=1, amount="300.00"),
     dict(op="expense", day=6, hour=15, type=6, amount="260.00", tax="39.00", text="صيانة ثلاجة العرض"),
     dict(op="sale", day=5, hour=18, user="cashier1", lines=[(8, 4), (10, 2), (12, 3), (17, 2)]),
@@ -166,9 +171,12 @@ PLAN = [
     dict(op="customer_payment", day=2, hour=10, customer=2, amount="600.00"),
     dict(op="stock_count", day=2, hour=21, category=5, actual={19: -1}),
     dict(op="sale", day=1, hour=20, user="cashier2", lines=[(7, 10), (8, 6), (18, 2)]),
+    dict(op="closing", day=1, hour=23, box="CASHIER", short="0", keep="100.00"),
     dict(op="sale", day=0, hour=0, user="cashier1", lines=[(3, 2), (16, 3), (14, 2)]),
 ]
 # sales_return / purchase_return "invoice" = the n-th sale / purchase of the plan (1-based)
+# cash_in / cash_out: a cash voucher of the box type (MAIN / CASHIER) by the administrator
+# closing: cashier closing of the box: counted = book balance - short, all but "keep" goes to the main safe
 # stock_count "actual": product -> difference to the counted quantity (others counted as recorded)
 
 
@@ -203,6 +211,7 @@ class Result:
     purchases_total: D
     count_lines: int
     count_value: D
+    cash_balance: Dict[str, D]
 
 
 def simulate() -> Result:
@@ -265,6 +274,14 @@ def simulate() -> Result:
         elif op == "stock_count":
             actual = {ids["prod"][n]: s.stock(ids["prod"][n]) + d for n, d in step["actual"].items()}
             _, count_lines, count_value = s.stock_count(ids["cat"][step["category"]], actual)
+        elif op in ("cash_in", "cash_out"):
+            s.cash_voucher("IN" if op == "cash_in" else "OUT", s.box_of_type(step["box"]), D(step["amount"]),
+                           step["category"], party=step["party"], text=step["text"])
+        elif op == "closing":
+            box = s.box_of_type(step["box"])
+            counted = s.cash_balance(box) - D(step["short"])
+            transfer = max(D(0), counted - D(step["keep"]))
+            s.cash_closing(box, counted, "MAIN", s.box_of_type("MAIN"), transfer)
         else:
             raise ValueError(op)
     s.user = 1
@@ -278,12 +295,14 @@ def simulate() -> Result:
                           for n, sid in ids["sup"].items()},
         sales_total=sim.dec(s.one("SELECT Sum(TotalAmount) FROM SalesInvoices")),
         purchases_total=sim.dec(s.one("SELECT Sum(TotalAmount) FROM PurchaseInvoices")),
-        count_lines=count_lines, count_value=count_value)
+        count_lines=count_lines, count_value=count_value,
+        cash_balance={kind: s.cash_balance(s.box_of_type(kind)) for kind in ("MAIN", "CASHIER")})
 
 
 # Order in which RemoveDemoData empties the tables (children before parents).
-DOCUMENT_TABLES = ["SalesReturnDetails", "SalesReturns", "CustomerPayments", "SalesInvoiceDetails", "SalesInvoices",
+DOCUMENT_TABLES = ["CashVouchers", "CashClosings", "SalesReturnDetails", "SalesReturns", "CustomerPayments", "SalesInvoiceDetails", "SalesInvoices",
                    "PurchaseReturnDetails", "PurchaseReturns", "SupplierPayments", "PurchaseInvoiceDetails",
                    "PurchaseInvoices", "StockCountDetails", "StockCounts", "InventoryTransactions", "Expenses"]
 DOCUMENT_SEQUENCES = ["SALES_INVOICE", "SALES_RETURN", "PURCHASE_INVOICE", "PURCHASE_RETURN", "CUSTOMER_PAYMENT",
-                      "SUPPLIER_PAYMENT", "EXPENSE", "STOCK_COUNT", "STOCK_ADJUST", "PRODUCT_CODE", "ZATCA_ICV"]
+                      "SUPPLIER_PAYMENT", "EXPENSE", "STOCK_COUNT", "STOCK_ADJUST", "PRODUCT_CODE", "ZATCA_ICV",
+                      "CASH_IN", "CASH_OUT", "CASH_TRANSFER", "CASH_CLOSING"]

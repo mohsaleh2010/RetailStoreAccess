@@ -70,6 +70,9 @@ class Table:
     rule_text: Optional[str] = None
     seed_columns: List[str] = dc_field(default_factory=list)
     seed_rows: List[Tuple] = dc_field(default_factory=list)
+    # True: BuildSchema also adds seed rows that are missing from an existing back-end
+    # (matched by the first seed column), e.g. new sequences and permissions.
+    seed_missing: bool = False
 
 
 # --------------------------------------------------------------------------
@@ -284,7 +287,12 @@ TABLES: List[Table] = [
             ("STOCK_ADJUST", "ADJ-", 1, 6, "حركات المخزون اليدوية"),
             ("PRODUCT_CODE", "P", 1, 5, "أكواد المنتجات"),
             ("ZATCA_ICV", None, 1, 0, "عدّاد ICV لمستندات فاتورة"),
+            ("CASH_IN", "CIN-", 1, 6, "سندات قبض النقدية (الخزينة)"),
+            ("CASH_OUT", "COT-", 1, 6, "سندات صرف النقدية (الخزينة)"),
+            ("CASH_TRANSFER", "TRF-", 1, 6, "التحويل بين الصناديق"),
+            ("CASH_CLOSING", "CLS-", 1, 6, "تصفية يومية الكاشير"),
         ],
+        seed_missing=True,
     ),
 
     Table(
@@ -334,6 +342,8 @@ TABLES: List[Table] = [
             ("INVENTORY_ADJUST", "إضافة وخصم مخزون يدوي", "المخزون", 51),
             ("STOCK_COUNT", "الجرد", "المخزون", 52),
             ("EXPENSES", "المصروفات", "المصروفات", 60),
+            ("CASH_BOX", "الخزينة: سندات القبض والصرف والتحويل والصناديق", "الخزينة", 65),
+            ("CASH_CLOSING", "تصفية يومية الكاشير", "الخزينة", 66),
             ("REPORTS", "التقارير التشغيلية", "التقارير", 70),
             ("REPORTS_PROFIT", "تقارير الأرباح والضريبة", "التقارير", 71),
             ("DASHBOARD_FINANCIAL", "الأرقام المالية في لوحة التحكم", "التقارير", 72),
@@ -341,6 +351,7 @@ TABLES: List[Table] = [
             ("USERS", "المستخدمون والصلاحيات", "النظام", 81),
             ("BACKUP", "النسخ الاحتياطي", "النظام", 82),
         ],
+        seed_missing=True,
     ),
 
     Table(
@@ -377,6 +388,8 @@ TABLES: List[Table] = [
             is_active(),
             memo("Notes", "ملاحظات"),
             created_at(),
+            long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
+                  note="تدخل فيه نقدية مبيعاته وسنداته؛ فارغ = أول صندوق كاشير نشط"),
         ],
         pk=["EmployeeID"],
         indexes=[ux("Username")],
@@ -445,6 +458,26 @@ TABLES: List[Table] = [
             (3, "تحويل بنكي", "42", 3),
             (4, "محفظة إلكترونية", "1", 4),
         ],
+    ),
+
+    Table(
+        "CashBoxes", "الخزينة والصناديق",
+        "الخزينة الرئيسية وصناديق الكاشير. الرصيد لا يُخزَّن: يُحسب من الحركات (qryCashMovements).",
+        [
+            auto("CashBoxID", "رقم الصندوق"),
+            text("BoxName", 50, "اسم الصندوق", required=True),
+            text("BoxType", 10, "النوع", required=True, default='"CASHIER"',
+                 rule='In ("MAIN","CASHIER")', rule_text="MAIN = خزينة رئيسية، CASHIER = صندوق كاشير"),
+            money("OpeningBalance", "الرصيد الافتتاحي"),
+            date_("OpeningDate", "تاريخ الرصيد الافتتاحي"),
+            is_active(),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["CashBoxID"],
+        indexes=[ux("BoxName")],
+        seed_columns=["CashBoxID", "BoxName", "BoxType"],
+        seed_rows=[(1, "الخزينة الرئيسية", "MAIN"), (2, "صندوق الكاشير", "CASHIER")],
     ),
 
     Table(
@@ -572,6 +605,8 @@ TABLES: List[Table] = [
             text("DeliveryPhone", 20, "جوال التوصيل"),
             text("DeliveryAddress", 255, "عنوان التوصيل"),
             text("OrderName", 50, "اسم العميل على الطلب"),
+            long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
+                  note="يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق"),
         ],
         pk=["SalesInvoiceID"],
         indexes=[ux("InvoiceNumber"), ix("InvoiceDate"), ux("InvoiceUUID", ignore_nulls=True),
@@ -627,6 +662,8 @@ TABLES: List[Table] = [
             text("Notes", 255, "ملاحظات"),
             *zatca_fields("381"),
             created_at(),
+            long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
+                  note="الرد النقدي يخرج من هذا الصندوق"),
         ],
         pk=["SalesReturnID"],
         indexes=[ux("ReturnNumber"), ix("ReturnDate"), ux("InvoiceUUID", ignore_nulls=True)],
@@ -679,6 +716,8 @@ TABLES: List[Table] = [
             money("RemainingAmount", "المتبقي", note="يُضاف إلى رصيد المورد"),
             text("Notes", 255, "ملاحظات"),
             created_at(),
+            long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
+                  note="المدفوع نقدًا يخرج من هذا الصندوق"),
         ],
         pk=["PurchaseInvoiceID"],
         indexes=[ux("InvoiceNumber"), ix("InvoiceDate"), ix("SupplierInvoiceNo")],
@@ -727,6 +766,8 @@ TABLES: List[Table] = [
             money("RefundedAmount", "المبلغ المسترد نقدًا"),
             text("Notes", 255, "ملاحظات"),
             created_at(),
+            long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
+                  note="الاسترداد النقدي يدخل هذا الصندوق"),
         ],
         pk=["PurchaseReturnID"],
         indexes=[ux("ReturnNumber"), ix("ReturnDate")],
@@ -772,6 +813,8 @@ TABLES: List[Table] = [
             long_("EmployeeID", "الموظف", required=True, fk="Employees.EmployeeID"),
             text("Notes", 255, "ملاحظات"),
             created_at(),
+            long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
+                  note="المبلغ النقدي يدخل هذا الصندوق"),
         ],
         pk=["PaymentID"],
         indexes=[ux("PaymentNumber"), ix("PaymentDate")],
@@ -793,6 +836,8 @@ TABLES: List[Table] = [
             long_("EmployeeID", "الموظف", required=True, fk="Employees.EmployeeID"),
             text("Notes", 255, "ملاحظات"),
             created_at(),
+            long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
+                  note="المبلغ النقدي يخرج من هذا الصندوق"),
         ],
         pk=["PaymentID"],
         indexes=[ux("PaymentNumber"), ix("PaymentDate")],
@@ -834,11 +879,76 @@ TABLES: List[Table] = [
             text("Description", 255, "الوصف"),
             long_("EmployeeID", "الموظف", required=True, fk="Employees.EmployeeID"),
             created_at(),
+            long_("CashBoxID", "صُرف من صندوق", fk="CashBoxes.CashBoxID",
+                  note="المصروف النقدي يخرج من هذا الصندوق؛ فارغ = لم يُدفع من صندوق"),
         ],
         pk=["ExpenseID"],
         indexes=[ux("ExpenseNumber"), ix("ExpenseDate")],
         rule="[TotalAmount]=[Amount]+[Tax]",
         rule_text="الإجمالي = المبلغ + الضريبة",
+    ),
+
+    # -------------------------------------------------------------- Treasury
+    Table(
+        "CashVouchers", "سندات النقدية",
+        "قبض نقدية لصندوق، أو صرف منه، أو تحويل بين صندوقين (ومنها ترحيل يومية الكاشير).",
+        [
+            auto("CashVoucherID", "رقم داخلي"),
+            text("VoucherNumber", 20, "رقم السند", required=True),
+            datetime_("VoucherDate", "التاريخ", required=True, default="Now()"),
+            text("VoucherType", 10, "نوع السند", required=True,
+                 rule='In ("IN","OUT","TRANSFER")',
+                 rule_text="IN = قبض، OUT = صرف، TRANSFER = تحويل بين صندوقين"),
+            long_("CashBoxID", "الصندوق", required=True, fk="CashBoxes.CashBoxID",
+                  note="القبض يدخله، والصرف والتحويل يخرجان منه"),
+            long_("ToCashBoxID", "إلى صندوق", fk="CashBoxes.CashBoxID", note="للتحويل فقط"),
+            text("Category", 10, "البند", required=True, default='"OTHER"',
+                 rule='In ("OTHER","OWNER","EXPENSE","ADVANCE","SHORTAGE","OVERAGE","TRANSFER")',
+                 rule_text="اختر البند من القائمة"),
+            money("Amount", "المبلغ", rule=">0", rule_text="المبلغ يجب أن يكون أكبر من صفر"),
+            text("PartyName", 100, "المستلم / المسلِّم"),
+            text("Description", 255, "البيان"),
+            long_("ExpenseID", "المصروف المسجَّل", fk="Expenses.ExpenseID",
+                  note="صرف بند مصروف يسجل مصروفًا بنفس المبلغ في المصروفات"),
+            long_("ClosingID", "تصفية الكاشير", fk="CashClosings.ClosingID"),
+            long_("EmployeeID", "الموظف", required=True, fk="Employees.EmployeeID"),
+            created_at(),
+        ],
+        pk=["CashVoucherID"],
+        indexes=[ux("VoucherNumber"), ix("VoucherDate"), ix("CashBoxID")],
+        rule='[VoucherType]<>"TRANSFER" Or ([ToCashBoxID] Is Not Null And [ToCashBoxID]<>[CashBoxID])',
+        rule_text="التحويل يحتاج صندوقًا آخر غير صندوق الصرف",
+    ),
+
+    Table(
+        "CashClosings", "تصفية يومية الكاشير",
+        "جرد نقدية صندوق الكاشير في نهاية الوردية وترحيلها للخزينة الرئيسية أو تسويتها مع المالك.",
+        [
+            auto("ClosingID", "رقم داخلي"),
+            text("ClosingNumber", 20, "رقم التصفية", required=True),
+            datetime_("ClosingDate", "تاريخ التصفية", required=True, default="Now()"),
+            long_("CashBoxID", "الصندوق", required=True, fk="CashBoxes.CashBoxID"),
+            long_("EmployeeID", "أجراها", required=True, fk="Employees.EmployeeID"),
+            datetime_("PeriodStart", "من (آخر تصفية)"),
+            money("OpeningBalance", "رصيد البداية", rule=None),
+            money("CashIn", "المقبوضات"),
+            money("CashOut", "المدفوعات"),
+            money("ExpectedBalance", "الرصيد الدفتري", rule=None),
+            money("CountedAmount", "النقدية الفعلية"),
+            money("Difference", "الفرق", rule=None, note="سالب = عجز، موجب = زيادة"),
+            text("Destination", 10, "الترحيل إلى", required=True, default='"MAIN"',
+                 rule='In ("MAIN","OWNER","KEEP")',
+                 rule_text="MAIN = الخزينة الرئيسية، OWNER = تسوية مع المالك، KEEP = يبقى في الصندوق"),
+            long_("ToCashBoxID", "الخزينة المستلمة", fk="CashBoxes.CashBoxID"),
+            money("TransferAmount", "المبلغ المرحَّل"),
+            money("KeptAmount", "المتبقي في الصندوق (عهدة)"),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["ClosingID"],
+        indexes=[ux("ClosingNumber"), ix("CashBoxID", "ClosingDate")],
+        rule="[TransferAmount]+[KeptAmount]=[CountedAmount]",
+        rule_text="المرحَّل + المتبقي = النقدية الفعلية",
     ),
 
     # ------------------------------------------------------------- Inventory
@@ -1005,7 +1115,7 @@ TABLES: List[Table] = [
 # --------------------------------------------------------------------------
 def _role_permissions():
     perms = [r[0] for r in table("Permissions").seed_rows]
-    cashier = ["SALES_POS", "SALES_VIEW", "CUSTOMERS", "CUSTOMER_PAYMENTS"]
+    cashier = ["SALES_POS", "SALES_VIEW", "CUSTOMERS", "CUSTOMER_PAYMENTS", "CASH_CLOSING"]
     manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK"}
     rows = [(1, p) for p in perms]
     rows += [(2, p) for p in perms if p not in manager_excluded]

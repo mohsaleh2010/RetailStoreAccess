@@ -346,7 +346,7 @@ ORDER BY SortKey, EntryDate""", P + ["SupplierID"]),
     # ============================================================= EXPENSES
     Query("ExpensesQuery", "المصروفات خلال فترة", f"""
 SELECT e.ExpenseID, e.ExpenseNumber, e.ExpenseDate, t.ExpenseTypeName, e.Amount, e.Tax,
-       e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName
+       e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName, e.ExpenseTypeID
 FROM ((Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID)
       INNER JOIN Employees AS em ON e.EmployeeID = em.EmployeeID)
      LEFT JOIN PaymentMethods AS pm ON e.PaymentMethodID = pm.PaymentMethodID
@@ -519,6 +519,159 @@ FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.Suppl
       INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)
      INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID"""),
 
+    # ============================================================= TREASURY
+    Query("qryCashMovements", "كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (−)", f"""
+SELECT h.CashBoxID, h.InvoiceDate AS MoveDate, 'SALE' AS MoveType, 'فاتورة بيع' AS MoveTypeName,
+       h.InvoiceNumber AS DocNumber, c.CustomerName AS PartyName, h.Notes AS Details,
+       h.PaidAmount AS AmountIn, CCur(0) AS AmountOut, h.EmployeeID
+FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
+WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0
+UNION ALL
+SELECT r.CashBoxID, r.ReturnDate, 'SALES_RETURN', 'مرتجع بيع (رد نقدي)', r.ReturnNumber,
+       c.CustomerName, r.Reason, CCur(0), r.RefundedAmount, r.EmployeeID
+FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
+WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0
+UNION ALL
+SELECT p.CashBoxID, p.PaymentDate, 'CUSTOMER_PAYMENT', 'سند قبض من عميل', p.PaymentNumber,
+       c.CustomerName, p.Notes, p.Amount, CCur(0), p.EmployeeID
+FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID
+WHERE p.CashBoxID Is Not Null
+UNION ALL
+SELECT h.CashBoxID, h.InvoiceDate, 'PURCHASE', 'فاتورة شراء', h.InvoiceNumber,
+       s.SupplierName, h.Notes, CCur(0), h.PaidAmount, h.EmployeeID
+FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
+WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0
+UNION ALL
+SELECT r.CashBoxID, r.ReturnDate, 'PURCHASE_RETURN', 'مرتجع شراء (استرداد نقدي)', r.ReturnNumber,
+       s.SupplierName, r.Reason, r.RefundedAmount, CCur(0), r.EmployeeID
+FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID
+WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0
+UNION ALL
+SELECT p.CashBoxID, p.PaymentDate, 'SUPPLIER_PAYMENT', 'سند صرف لمورد', p.PaymentNumber,
+       s.SupplierName, p.Notes, CCur(0), p.Amount, p.EmployeeID
+FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
+WHERE p.CashBoxID Is Not Null
+UNION ALL
+SELECT e.CashBoxID, e.ExpenseDate, 'EXPENSE', 'مصروف', e.ExpenseNumber,
+       t.ExpenseTypeName, e.Description, CCur(0), e.TotalAmount, e.EmployeeID
+FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID
+WHERE e.CashBoxID Is Not Null
+UNION ALL
+SELECT v.CashBoxID, v.VoucherDate, 'CASH_IN',
+       IIf(v.Category = 'OWNER', 'إيداع من المالك', IIf(v.Category = 'OVERAGE', 'زيادة في الصندوق',
+           'سند قبض نقدية')),
+       v.VoucherNumber, v.PartyName, v.Description, v.Amount, CCur(0), v.EmployeeID
+FROM CashVouchers AS v
+WHERE v.VoucherType = 'IN'
+UNION ALL
+SELECT v.CashBoxID, v.VoucherDate, 'CASH_OUT',
+       IIf(v.Category = 'OWNER', 'تسوية مع المالك', IIf(v.Category = 'EXPENSE', 'مصروف (سند صرف)',
+           IIf(v.Category = 'ADVANCE', 'سلفة موظف', IIf(v.Category = 'SHORTAGE', 'عجز في الصندوق',
+           'سند صرف نقدية')))),
+       v.VoucherNumber, v.PartyName, v.Description, CCur(0), v.Amount, v.EmployeeID
+FROM CashVouchers AS v
+WHERE v.VoucherType = 'OUT'
+UNION ALL
+SELECT v.CashBoxID, v.VoucherDate, 'TRANSFER_OUT', 'تحويل إلى صندوق آخر', v.VoucherNumber,
+       b.BoxName, v.Description, CCur(0), v.Amount, v.EmployeeID
+FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.ToCashBoxID = b.CashBoxID
+WHERE v.VoucherType = 'TRANSFER'
+UNION ALL
+SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق آخر', v.VoucherNumber,
+       b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
+FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID
+WHERE v.VoucherType = 'TRANSFER'
+UNION ALL
+SELECT b.CashBoxID, b.OpeningDate, 'OPENING', 'رصيد افتتاحي', '-', b.BoxName, b.Notes,
+       b.OpeningBalance, CCur(0), Null
+FROM CashBoxes AS b
+WHERE b.OpeningBalance <> 0"""),
+
+    Query("qryCashBoxTotals", "إجمالي الداخل والخارج لكل صندوق", """
+SELECT CashBoxID, Sum(AmountIn) AS BoxIn, Sum(AmountOut) AS BoxOut, Max(MoveDate) AS LastMoveDate
+FROM qryCashMovements
+GROUP BY CashBoxID"""),
+
+    Query("CashBoxBalanceQuery", "أرصدة الخزينة والصناديق الآن", f"""
+SELECT b.CashBoxID, b.BoxName, b.BoxType,
+       IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', 'صندوق كاشير') AS BoxTypeName, b.IsActive,
+       {nz("t.BoxIn")} AS TotalIn, {nz("t.BoxOut")} AS TotalOut,
+       {nz("t.BoxIn")} - {nz("t.BoxOut")} AS Balance, t.LastMoveDate
+FROM CashBoxes AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID
+ORDER BY b.BoxType DESC, b.BoxName"""),
+
+    Query("CashStatementQuery", "حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق)", f"""
+SELECT 1 AS SortKey, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber, m.PartyName, m.Details,
+       b.BoxName, m.AmountIn, m.AmountOut, m.CashBoxID
+FROM qryCashMovements AS m INNER JOIN CashBoxes AS b ON m.CashBoxID = b.CashBoxID
+WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND {period("m.MoveDate")}
+UNION ALL
+SELECT 0, QDate('PeriodStart'), 'BALANCE_FWD', 'رصيد أول المدة', '-', Null, Null, Null,
+       IIf({nz("Sum(o.AmountIn)")} - {nz("Sum(o.AmountOut)")} > 0, {nz("Sum(o.AmountIn)")} - {nz("Sum(o.AmountOut)")}, 0),
+       IIf({nz("Sum(o.AmountIn)")} - {nz("Sum(o.AmountOut)")} < 0, {nz("Sum(o.AmountOut)")} - {nz("Sum(o.AmountIn)")}, 0),
+       QLong('CashBoxID')
+FROM qryCashMovements AS o
+WHERE (QLong('CashBoxID') = 0 OR o.CashBoxID = QLong('CashBoxID')) AND o.MoveDate < QDate('PeriodStart')
+ORDER BY SortKey, MoveDate""", P + ["CashBoxID"]),
+
+    Query("qryCashDays", "مقبوضات ومدفوعات كل يوم داخل الفترة", f"""
+SELECT DateValue(m.MoveDate) AS CashDay, Sum(m.AmountIn) AS Receipts, Sum(m.AmountOut) AS Payments,
+       Count(*) AS MoveCount
+FROM qryCashMovements AS m
+WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND {period("m.MoveDate")}
+GROUP BY DateValue(m.MoveDate)""", P + ["CashBoxID"]),
+
+    Query("CashDailyQuery", "حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم", f"""
+SELECT d.CashDay,
+       (SELECT {nz("Sum(x.AmountIn - x.AmountOut)")} FROM qryCashMovements AS x
+        WHERE (QLong('CashBoxID') = 0 OR x.CashBoxID = QLong('CashBoxID'))
+          AND x.MoveDate < d.CashDay) AS OpeningBalance,
+       d.Receipts, d.Payments,
+       (SELECT {nz("Sum(y.AmountIn - y.AmountOut)")} FROM qryCashMovements AS y
+        WHERE (QLong('CashBoxID') = 0 OR y.CashBoxID = QLong('CashBoxID'))
+          AND y.MoveDate < d.CashDay) + d.Receipts - d.Payments AS ClosingBalance,
+       d.MoveCount
+FROM qryCashDays AS d
+ORDER BY d.CashDay""", P + ["CashBoxID"]),
+
+    Query("CashClosingsQuery", "تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق)", f"""
+SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c.PeriodStart,
+       c.OpeningBalance, c.CashIn, c.CashOut, c.ExpectedBalance, c.CountedAmount, c.Difference,
+       IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك',
+           'يبقى في الصندوق')) AS DestinationName,
+       t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes, c.CashBoxID
+FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)
+      INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)
+     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID
+WHERE (QLong('CashBoxID') = 0 OR c.CashBoxID = QLong('CashBoxID')) AND {period("c.ClosingDate")}
+ORDER BY c.ClosingDate""", P + ["CashBoxID"]),
+
+    Query("qryCashClosingPrint", "بيانات طباعة تصفية الكاشير", """
+SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c.PeriodStart,
+       c.OpeningBalance, c.CashIn, c.CashOut, c.ExpectedBalance, c.CountedAmount, c.Difference,
+       IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك',
+           'يبقى في الصندوق')) AS DestinationName,
+       t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes
+FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)
+      INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)
+     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID"""),
+
+    Query("qryCashVoucherPrint", "بيانات طباعة سندات قبض وصرف وتحويل النقدية", """
+SELECT v.CashVoucherID AS DocID, v.VoucherNumber, v.VoucherDate, v.VoucherType,
+       IIf(v.VoucherType = 'IN', 'سند قبض نقدية', IIf(v.VoucherType = 'OUT', 'سند صرف نقدية',
+           'سند تحويل نقدية')) AS VoucherTitle,
+       IIf(v.Category = 'OWNER', IIf(v.VoucherType = 'IN', 'إيداع من المالك', 'تسوية مع المالك'),
+           IIf(v.Category = 'EXPENSE', 'مصروف', IIf(v.Category = 'ADVANCE', 'سلفة موظف',
+           IIf(v.Category = 'SHORTAGE', 'عجز في الصندوق', IIf(v.Category = 'OVERAGE', 'زيادة في الصندوق',
+           IIf(v.Category = 'TRANSFER', 'تحويل بين الصناديق', 'أخرى')))))) AS CategoryName,
+       b.BoxName, t.BoxName AS ToBoxName, v.Amount, v.PartyName, v.Description,
+       x.ExpenseTypeName, e.EmployeeName
+FROM ((((CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID)
+        INNER JOIN Employees AS e ON v.EmployeeID = e.EmployeeID)
+       LEFT JOIN CashBoxes AS t ON v.ToCashBoxID = t.CashBoxID)
+      LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)
+     LEFT JOIN ExpenseTypes AS x ON ex.ExpenseTypeID = x.ExpenseTypeID"""),
+
     # ============================================================ INTEGRITY
     Query("qrySalesInvoiceLineTotals", "مجموع أسطر كل فاتورة بيع", """
 SELECT SalesInvoiceID, Sum(LineTotal) AS LinesTotal
@@ -642,6 +795,11 @@ def _inv_tx(key, day, product, type_id, qty, cost, after, ref_type, ref_key, ref
 
 
 FIXTURE: List[Row] = [
+    # Treasury: main safe 10000 and a cashier box 500 (opening balances 60 days ago)
+    Row("BOXM", "CashBoxes", {"BoxName": "TEST الخزينة", "BoxType": "MAIN", "OpeningBalance": 10000,
+                              "OpeningDate": Day(60)}),
+    Row("BOXC", "CashBoxes", {"BoxName": "TEST صندوق كاشير", "BoxType": "CASHIER", "OpeningBalance": 500,
+                              "OpeningDate": Day(60)}),
     Row("S1", "Suppliers", {"SupplierName": "TEST مورد", "OpeningBalance": 0,
                             "CurrentBalance": 2855, "CreatedAt": Day(120)}),
     Row("C2", "Customers", {"CustomerName": "TEST عميل آجل", "OpeningBalance": 50,
@@ -665,7 +823,7 @@ FIXTURE: List[Row] = [
         "InvoiceNumber": "TEST-PUR-1", "SupplierInvoiceNo": "S-100", "InvoiceDate": Day(50, 9),
         "SupplierID": Ref("S1"), "EmployeeID": 1, "PaymentType": "CREDIT", "PaymentMethodID": 1,
         "SubTotal": 8000, "Discount": 0, "TaxableAmount": 8000, "Tax": 1200, "TotalAmount": 9200,
-        "PaidAmount": 5000, "RemainingAmount": 4200}),
+        "PaidAmount": 5000, "RemainingAmount": 4200, "CashBoxID": Ref("BOXM")}),
     Row("PUR1L1", "PurchaseInvoiceDetails", {
         "PurchaseInvoiceID": Ref("PUR1"), "LineNumber": 1, "ProductID": Ref("P1"), "Quantity": 100,
         "UnitCost": 60, "Discount": 0, "NetAmount": 6000, "VATRate": 0.15, "Tax": 900,
@@ -682,7 +840,7 @@ FIXTURE: List[Row] = [
         "InvoiceNumber": "TEST-INV-0", "InvoiceDate": Day(45, 10), "CustomerID": 1,
         "EmployeeID": 1, "PaymentType": "CASH", "PaymentMethodID": 1, "SubTotal": 100,
         "Discount": 0, "TaxableAmount": 100, "Tax": 15, "TotalAmount": 115, "PaidAmount": 115,
-        "RemainingAmount": 0, "AmountTendered": 115, "ChangeDue": 0}),
+        "RemainingAmount": 0, "AmountTendered": 115, "ChangeDue": 0, "CashBoxID": Ref("BOXC")}),
     Row("INV0L1", "SalesInvoiceDetails", {
         "SalesInvoiceID": Ref("INV0"), "LineNumber": 1, "ProductID": Ref("P2"), "Quantity": 5,
         "UnitPrice": 20, "Discount": 0, "NetAmount": 100, "VATRate": 0.15, "Tax": 15,
@@ -694,7 +852,8 @@ FIXTURE: List[Row] = [
         "InvoiceNumber": "TEST-INV-1", "InvoiceDate": Day(10, 11), "CustomerID": 1,
         "EmployeeID": 1, "PaymentType": "CASH", "PaymentMethodID": 1, "SubTotal": 1000,
         "Discount": 0, "TaxableAmount": 1000, "Tax": 150, "TotalAmount": 1150,
-        "PaidAmount": 1150, "RemainingAmount": 0, "AmountTendered": 1200, "ChangeDue": 50}),
+        "PaidAmount": 1150, "RemainingAmount": 0, "AmountTendered": 1200, "ChangeDue": 50,
+        "CashBoxID": Ref("BOXC")}),
     Row("INV1L1", "SalesInvoiceDetails", {
         "SalesInvoiceID": Ref("INV1"), "LineNumber": 1, "ProductID": Ref("P1"), "Quantity": 10,
         "UnitPrice": 100, "Discount": 0, "NetAmount": 1000, "VATRate": 0.15, "Tax": 150,
@@ -706,7 +865,7 @@ FIXTURE: List[Row] = [
         "InvoiceNumber": "TEST-INV-2", "InvoiceDate": Day(5, 12), "CustomerID": Ref("C2"),
         "EmployeeID": 1, "PaymentType": "CREDIT", "PaymentMethodID": 1, "SubTotal": 400,
         "Discount": 0, "TaxableAmount": 400, "Tax": 60, "TotalAmount": 460, "PaidAmount": 100,
-        "RemainingAmount": 360, "AmountTendered": 100, "ChangeDue": 0}),
+        "RemainingAmount": 360, "AmountTendered": 100, "ChangeDue": 0, "CashBoxID": Ref("BOXC")}),
     Row("INV2L1", "SalesInvoiceDetails", {
         "SalesInvoiceID": Ref("INV2"), "LineNumber": 1, "ProductID": Ref("P1"), "Quantity": 2,
         "UnitPrice": 100, "Discount": 0, "NetAmount": 200, "VATRate": 0.15, "Tax": 30,
@@ -724,7 +883,7 @@ FIXTURE: List[Row] = [
         "Amount": 1000, "PaymentMethodID": 3, "EmployeeID": 1}),
     Row("RCV1", "CustomerPayments", {
         "PaymentNumber": "TEST-RCV-1", "CustomerID": Ref("C2"), "PaymentDate": Day(3, 10),
-        "Amount": 200, "PaymentMethodID": 1, "EmployeeID": 1}),
+        "Amount": 200, "PaymentMethodID": 1, "EmployeeID": 1, "CashBoxID": Ref("BOXC")}),
 
     # C2 returns 2 x P2 (back to stock), credited to the account
     Row("CRN1", "SalesReturns", {
@@ -767,10 +926,43 @@ FIXTURE: List[Row] = [
     Row("EXP1", "Expenses", {
         "ExpenseNumber": "TEST-EXP-1", "ExpenseDate": Day(6), "ExpenseTypeID": 2, "Amount": 200,
         "Tax": 30, "TotalAmount": 230, "PaymentMethodID": 1, "Description": "TEST كهرباء",
-        "EmployeeID": 1}),
+        "EmployeeID": 1, "CashBoxID": Ref("BOXC")}),
     Row("EXP2", "Expenses", {
         "ExpenseNumber": "TEST-EXP-2", "ExpenseDate": Day(40), "ExpenseTypeID": 1, "Amount": 1000,
         "Tax": 0, "TotalAmount": 1000, "PaymentMethodID": 3, "Description": "TEST إيجار",
+        "EmployeeID": 1}),
+
+    # Cash voucher for an expense (35 days ago): 50 out of the cashier box, recorded as an expense
+    Row("EXPV", "Expenses", {
+        "ExpenseNumber": "TEST-EXP-V", "ExpenseDate": Day(35), "ExpenseTypeID": 9, "Amount": 50,
+        "Tax": 0, "TotalAmount": 50, "PaymentMethodID": 1, "Description": "TEST نثريات", "EmployeeID": 1}),
+    Row("V1", "CashVouchers", {
+        "VoucherNumber": "TEST-COT-1", "VoucherDate": Day(35, 12), "VoucherType": "OUT",
+        "CashBoxID": Ref("BOXC"), "Category": "EXPENSE", "Amount": 50, "PartyName": "TEST محل",
+        "ExpenseID": Ref("EXPV"), "EmployeeID": 1}),
+    # Cashier closing 4 days ago: book 500 + 115 + 1150 + 100 - 230 - 50 = 1585, counted 1570
+    # (shortage 15), 1000 moved to the main safe, 570 kept as float
+    Row("CL1", "CashClosings", {
+        "ClosingNumber": "TEST-CLS-1", "ClosingDate": Day(4, 18), "CashBoxID": Ref("BOXC"),
+        "EmployeeID": 1, "OpeningBalance": 0, "CashIn": 1865, "CashOut": 280,
+        "ExpectedBalance": 1585, "CountedAmount": 1570, "Difference": -15, "Destination": "MAIN",
+        "ToCashBoxID": Ref("BOXM"), "TransferAmount": 1000, "KeptAmount": 570}),
+    Row("V2", "CashVouchers", {
+        "VoucherNumber": "TEST-COT-2", "VoucherDate": Day(4, 18), "VoucherType": "OUT",
+        "CashBoxID": Ref("BOXC"), "Category": "SHORTAGE", "Amount": 15, "ClosingID": Ref("CL1"),
+        "EmployeeID": 1}),
+    Row("V3", "CashVouchers", {
+        "VoucherNumber": "TEST-TRF-1", "VoucherDate": Day(4, 18), "VoucherType": "TRANSFER",
+        "CashBoxID": Ref("BOXC"), "ToCashBoxID": Ref("BOXM"), "Category": "TRANSFER", "Amount": 1000,
+        "ClosingID": Ref("CL1"), "EmployeeID": 1}),
+    # Owner puts in 2000, later takes 300
+    Row("V4", "CashVouchers", {
+        "VoucherNumber": "TEST-CIN-1", "VoucherDate": Day(2, 9), "VoucherType": "IN",
+        "CashBoxID": Ref("BOXM"), "Category": "OWNER", "Amount": 2000, "PartyName": "TEST المالك",
+        "EmployeeID": 1}),
+    Row("V5", "CashVouchers", {
+        "VoucherNumber": "TEST-COT-3", "VoucherDate": Day(1, 12), "VoucherType": "OUT",
+        "CashBoxID": Ref("BOXM"), "Category": "OWNER", "Amount": 300, "PartyName": "TEST المالك",
         "EmployeeID": 1}),
 ]
 
@@ -933,6 +1125,41 @@ CHECKS: List[Check] = [
           "SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}", 460),
     Check("طباعة الإشعار الدائن: سطر واحد بقيمة 46",
           "SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = {ref:CRN1}", 46),
+
+    # Treasury
+    Check("رصيد صندوق الكاشير = 500 + 115 + 1150 + 100 + 200 − 230 − 50 − 15 − 1000",
+          "SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = {ref:BOXC}", 770),
+    Check("رصيد الخزينة = 10000 − 5000 + 1000 + 2000 − 300",
+          "SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = {ref:BOXM}", 7700),
+    Check("الصناديق المسجلة بدون حركة رصيدها صفر",
+          "SELECT Sum(Balance) FROM CashBoxBalanceQuery WHERE CashBoxID <= 2", 0),
+    Check("حركة صندوق الكاشير: رصيد أول المدة = 500 + 115 − 50",
+          "SELECT AmountIn FROM CashStatementQuery WHERE SortKey = 0", 565, {"CashBoxID": "BOXC"}),
+    Check("حركة صندوق الكاشير: 6 حركات في الفترة",
+          "SELECT COUNT(*) FROM CashStatementQuery WHERE SortKey = 1", 6, {"CashBoxID": "BOXC"}),
+    Check("حركة صندوق الكاشير: رصيد آخر المدة = 770",
+          "SELECT Sum(AmountIn) - Sum(AmountOut) FROM CashStatementQuery", 770, {"CashBoxID": "BOXC"}),
+    Check("حركة الخزينة: التحويل من الكاشير داخل = 1000",
+          "SELECT AmountIn FROM CashStatementQuery WHERE MoveType = 'TRANSFER_IN'", 1000,
+          {"CashBoxID": "BOXM"}),
+    Check("يومية صندوق الكاشير يوم التصفية: رصيد أول اليوم = 565 + 1150 + 100 − 230",
+          "SELECT OpeningBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:4})", 1585,
+          {"CashBoxID": "BOXC"}),
+    Check("يومية صندوق الكاشير يوم التصفية: المدفوعات = 15 عجز + 1000 تحويل",
+          "SELECT Payments FROM CashDailyQuery WHERE CashDay = DateValue({day:4})", 1015,
+          {"CashBoxID": "BOXC"}),
+    Check("يومية صندوق الكاشير يوم التصفية: رصيد آخر اليوم = 570",
+          "SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:4})", 570,
+          {"CashBoxID": "BOXC"}),
+    Check("يومية صندوق الكاشير: آخر يوم = الرصيد الحالي",
+          "SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:3})", 770,
+          {"CashBoxID": "BOXC"}),
+    Check("تصفيات الكاشير خلال الفترة: تصفية واحدة بعجز 15",
+          "SELECT Difference FROM CashClosingsQuery", -15, {"CashBoxID": "BOXC"}),
+    Check("طباعة سند صرف المصروف: نوع المصروف",
+          "SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V1} AND ExpenseTypeName = 'مصروفات أخرى'", 1),
+    Check("طباعة سند التحويل: الصندوق المستلم",
+          "SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V3} AND ToBoxName = 'TEST الخزينة'", 1),
 
     # Integrity
     Check("فحص السلامة: لا توجد مشكلات",

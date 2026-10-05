@@ -22,7 +22,7 @@ Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,Dashbo" & _
-    "ardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "ardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -313,6 +313,10 @@ End Function
 ' Generated: test fixture, checks and corruption checks
 '------------------------------------------------------------------------------
 Private Sub LoadFixture()
+    Ins "BOXM", "CashBoxes", "CashBoxID", _
+        "INSERT INTO [CashBoxes] ([BoxName], [BoxType], [OpeningBalance], [OpeningDate]) VALUES ('TEST الخزينة', 'MAIN', 10000, " & D(60, 0) & ")"
+    Ins "BOXC", "CashBoxes", "CashBoxID", _
+        "INSERT INTO [CashBoxes] ([BoxName], [BoxType], [OpeningBalance], [OpeningDate]) VALUES ('TEST صندوق كاشير', 'CASHIER', 500, " & D(60, 0) & ")"
     Ins "S1", "Suppliers", "SupplierID", _
         "INSERT INTO [Suppliers] ([SupplierName], [OpeningBalance], [CurrentBalance], [CreatedAt]) VALUES ('TEST مورد', 0, 2855, " & D(120, 0) & ")"
     Ins "C2", "Customers", "CustomerID", _
@@ -328,7 +332,7 @@ Private Sub LoadFixture()
     Ins "T1", "InventoryTransactions", "TransactionID", _
         "INSERT INTO [InventoryTransactions] ([TransactionDate], [ProductID], [TransactionTypeID], [Quantity], [UnitCost], [QuantityAfter], [ReferenceType], [ReferenceID], [ReferenceNumber], [EmployeeID]) VALUES (" & D(60, 8) & ", " & R("P3") & ", 8, 20, 10, 20, 'MANUAL', Null, 'TEST-OPEN', 1)"
     Ins "PUR1", "PurchaseInvoices", "PurchaseInvoiceID", _
-        "INSERT INTO [PurchaseInvoices] ([InvoiceNumber], [SupplierInvoiceNo], [InvoiceDate], [SupplierID], [EmployeeID], [PaymentType], [PaymentMethodID], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [PaidAmount], [RemainingAmount]) VALUES ('TEST-PUR-1', 'S-100', " & D(50, 9) & ", " & R("S1") & ", 1, 'CREDIT', 1, 8000, 0, 8000, 1200, 9200, 5000, 4200)"
+        "INSERT INTO [PurchaseInvoices] ([InvoiceNumber], [SupplierInvoiceNo], [InvoiceDate], [SupplierID], [EmployeeID], [PaymentType], [PaymentMethodID], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [PaidAmount], [RemainingAmount], [CashBoxID]) VALUES ('TEST-PUR-1', 'S-100', " & D(50, 9) & ", " & R("S1") & ", 1, 'CREDIT', 1, 8000, 0, 8000, 1200, 9200, 5000, 4200, " & R("BOXM") & ")"
     Ins "PUR1L1", "PurchaseInvoiceDetails", "PurchaseDetailID", _
         "INSERT INTO [PurchaseInvoiceDetails] ([PurchaseInvoiceID], [LineNumber], [ProductID], [Quantity], [UnitCost], [Discount], [NetAmount], [VATRate], [Tax], [LineTotal]) VALUES (" & R("PUR1") & ", 1, " & R("P1") & ", 100, 60, 0, 6000, 0.15, 900, 6900)"
     Ins "PUR1L2", "PurchaseInvoiceDetails", "PurchaseDetailID", _
@@ -338,19 +342,19 @@ Private Sub LoadFixture()
     Ins "T3", "InventoryTransactions", "TransactionID", _
         "INSERT INTO [InventoryTransactions] ([TransactionDate], [ProductID], [TransactionTypeID], [Quantity], [UnitCost], [QuantityAfter], [ReferenceType], [ReferenceID], [ReferenceNumber], [EmployeeID]) VALUES (" & D(50, 9) & ", " & R("P2") & ", 1, 200, 10, 200, 'PURCHASE', " & R("PUR1") & ", 'TEST-PUR-1', 1)"
     Ins "INV0", "SalesInvoices", "SalesInvoiceID", _
-        "INSERT INTO [SalesInvoices] ([InvoiceNumber], [InvoiceDate], [CustomerID], [EmployeeID], [PaymentType], [PaymentMethodID], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [PaidAmount], [RemainingAmount], [AmountTendered], [ChangeDue]) VALUES ('TEST-INV-0', " & D(45, 10) & ", 1, 1, 'CASH', 1, 100, 0, 100, 15, 115, 115, 0, 115, 0)"
+        "INSERT INTO [SalesInvoices] ([InvoiceNumber], [InvoiceDate], [CustomerID], [EmployeeID], [PaymentType], [PaymentMethodID], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [PaidAmount], [RemainingAmount], [AmountTendered], [ChangeDue], [CashBoxID]) VALUES ('TEST-INV-0', " & D(45, 10) & ", 1, 1, 'CASH', 1, 100, 0, 100, 15, 115, 115, 0, 115, 0, " & R("BOXC") & ")"
     Ins "INV0L1", "SalesInvoiceDetails", "SalesDetailID", _
         "INSERT INTO [SalesInvoiceDetails] ([SalesInvoiceID], [LineNumber], [ProductID], [Quantity], [UnitPrice], [Discount], [NetAmount], [VATRate], [Tax], [LineTotal], [UnitCost]) VALUES (" & R("INV0") & ", 1, " & R("P2") & ", 5, 20, 0, 100, 0.15, 15, 115, 10)"
     Ins "T4", "InventoryTransactions", "TransactionID", _
         "INSERT INTO [InventoryTransactions] ([TransactionDate], [ProductID], [TransactionTypeID], [Quantity], [UnitCost], [QuantityAfter], [ReferenceType], [ReferenceID], [ReferenceNumber], [EmployeeID]) VALUES (" & D(45, 10) & ", " & R("P2") & ", 2, -5, 10, 195, 'SALE', " & R("INV0") & ", 'TEST-INV-0', 1)"
     Ins "INV1", "SalesInvoices", "SalesInvoiceID", _
-        "INSERT INTO [SalesInvoices] ([InvoiceNumber], [InvoiceDate], [CustomerID], [EmployeeID], [PaymentType], [PaymentMethodID], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [PaidAmount], [RemainingAmount], [AmountTendered], [ChangeDue]) VALUES ('TEST-INV-1', " & D(10, 11) & ", 1, 1, 'CASH', 1, 1000, 0, 1000, 150, 1150, 1150, 0, 1200, 50)"
+        "INSERT INTO [SalesInvoices] ([InvoiceNumber], [InvoiceDate], [CustomerID], [EmployeeID], [PaymentType], [PaymentMethodID], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [PaidAmount], [RemainingAmount], [AmountTendered], [ChangeDue], [CashBoxID]) VALUES ('TEST-INV-1', " & D(10, 11) & ", 1, 1, 'CASH', 1, 1000, 0, 1000, 150, 1150, 1150, 0, 1200, 50, " & R("BOXC") & ")"
     Ins "INV1L1", "SalesInvoiceDetails", "SalesDetailID", _
         "INSERT INTO [SalesInvoiceDetails] ([SalesInvoiceID], [LineNumber], [ProductID], [Quantity], [UnitPrice], [Discount], [NetAmount], [VATRate], [Tax], [LineTotal], [UnitCost]) VALUES (" & R("INV1") & ", 1, " & R("P1") & ", 10, 100, 0, 1000, 0.15, 150, 1150, 60)"
     Ins "T5", "InventoryTransactions", "TransactionID", _
         "INSERT INTO [InventoryTransactions] ([TransactionDate], [ProductID], [TransactionTypeID], [Quantity], [UnitCost], [QuantityAfter], [ReferenceType], [ReferenceID], [ReferenceNumber], [EmployeeID]) VALUES (" & D(10, 11) & ", " & R("P1") & ", 2, -10, 60, 90, 'SALE', " & R("INV1") & ", 'TEST-INV-1', 1)"
     Ins "INV2", "SalesInvoices", "SalesInvoiceID", _
-        "INSERT INTO [SalesInvoices] ([InvoiceNumber], [InvoiceDate], [CustomerID], [EmployeeID], [PaymentType], [PaymentMethodID], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [PaidAmount], [RemainingAmount], [AmountTendered], [ChangeDue]) VALUES ('TEST-INV-2', " & D(5, 12) & ", " & R("C2") & ", 1, 'CREDIT', 1, 400, 0, 400, 60, 460, 100, 360, 100, 0)"
+        "INSERT INTO [SalesInvoices] ([InvoiceNumber], [InvoiceDate], [CustomerID], [EmployeeID], [PaymentType], [PaymentMethodID], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [PaidAmount], [RemainingAmount], [AmountTendered], [ChangeDue], [CashBoxID]) VALUES ('TEST-INV-2', " & D(5, 12) & ", " & R("C2") & ", 1, 'CREDIT', 1, 400, 0, 400, 60, 460, 100, 360, 100, 0, " & R("BOXC") & ")"
     Ins "INV2L1", "SalesInvoiceDetails", "SalesDetailID", _
         "INSERT INTO [SalesInvoiceDetails] ([SalesInvoiceID], [LineNumber], [ProductID], [Quantity], [UnitPrice], [Discount], [NetAmount], [VATRate], [Tax], [LineTotal], [UnitCost]) VALUES (" & R("INV2") & ", 1, " & R("P1") & ", 2, 100, 0, 200, 0.15, 30, 230, 60)"
     Ins "INV2L2", "SalesInvoiceDetails", "SalesDetailID", _
@@ -362,7 +366,7 @@ Private Sub LoadFixture()
     Ins "PAY1", "SupplierPayments", "PaymentID", _
         "INSERT INTO [SupplierPayments] ([PaymentNumber], [SupplierID], [PaymentDate], [Amount], [PaymentMethodID], [EmployeeID]) VALUES ('TEST-PAY-1', " & R("S1") & ", " & D(4, 10) & ", 1000, 3, 1)"
     Ins "RCV1", "CustomerPayments", "PaymentID", _
-        "INSERT INTO [CustomerPayments] ([PaymentNumber], [CustomerID], [PaymentDate], [Amount], [PaymentMethodID], [EmployeeID]) VALUES ('TEST-RCV-1', " & R("C2") & ", " & D(3, 10) & ", 200, 1, 1)"
+        "INSERT INTO [CustomerPayments] ([PaymentNumber], [CustomerID], [PaymentDate], [Amount], [PaymentMethodID], [EmployeeID], [CashBoxID]) VALUES ('TEST-RCV-1', " & R("C2") & ", " & D(3, 10) & ", 200, 1, 1, " & R("BOXC") & ")"
     Ins "CRN1", "SalesReturns", "SalesReturnID", _
         "INSERT INTO [SalesReturns] ([ReturnNumber], [ReturnDate], [SalesInvoiceID], [CustomerID], [EmployeeID], [Reason], [RefundType], [SubTotal], [Discount], [TaxableAmount], [Tax], [TotalAmount], [RefundedAmount]) VALUES ('TEST-CRN-1', " & D(2, 13) & ", " & R("INV2") & ", " & R("C2") & ", 1, 'TEST إرجاع العميل', 'CREDIT', 40, 0, 40, 6, 46, 0)"
     Ins "CRN1L1", "SalesReturnDetails", "ReturnDetailID", _
@@ -384,9 +388,23 @@ Private Sub LoadFixture()
     Ins "CNT1L2", "StockCountDetails", "StockCountDetailID", _
         "INSERT INTO [StockCountDetails] ([StockCountID], [ProductID], [SystemQuantity], [ActualQuantity], [Difference], [UnitCost], [DifferenceValue]) VALUES (" & R("CNT1") & ", " & R("P2") & ", 186, Null, 0, 10, 0)"
     Ins "EXP1", "Expenses", "ExpenseID", _
-        "INSERT INTO [Expenses] ([ExpenseNumber], [ExpenseDate], [ExpenseTypeID], [Amount], [Tax], [TotalAmount], [PaymentMethodID], [Description], [EmployeeID]) VALUES ('TEST-EXP-1', " & D(6, 0) & ", 2, 200, 30, 230, 1, 'TEST كهرباء', 1)"
+        "INSERT INTO [Expenses] ([ExpenseNumber], [ExpenseDate], [ExpenseTypeID], [Amount], [Tax], [TotalAmount], [PaymentMethodID], [Description], [EmployeeID], [CashBoxID]) VALUES ('TEST-EXP-1', " & D(6, 0) & ", 2, 200, 30, 230, 1, 'TEST كهرباء', 1, " & R("BOXC") & ")"
     Ins "EXP2", "Expenses", "ExpenseID", _
         "INSERT INTO [Expenses] ([ExpenseNumber], [ExpenseDate], [ExpenseTypeID], [Amount], [Tax], [TotalAmount], [PaymentMethodID], [Description], [EmployeeID]) VALUES ('TEST-EXP-2', " & D(40, 0) & ", 1, 1000, 0, 1000, 3, 'TEST إيجار', 1)"
+    Ins "EXPV", "Expenses", "ExpenseID", _
+        "INSERT INTO [Expenses] ([ExpenseNumber], [ExpenseDate], [ExpenseTypeID], [Amount], [Tax], [TotalAmount], [PaymentMethodID], [Description], [EmployeeID]) VALUES ('TEST-EXP-V', " & D(35, 0) & ", 9, 50, 0, 50, 1, 'TEST نثريات', 1)"
+    Ins "V1", "CashVouchers", "CashVoucherID", _
+        "INSERT INTO [CashVouchers] ([VoucherNumber], [VoucherDate], [VoucherType], [CashBoxID], [Category], [Amount], [PartyName], [ExpenseID], [EmployeeID]) VALUES ('TEST-COT-1', " & D(35, 12) & ", 'OUT', " & R("BOXC") & ", 'EXPENSE', 50, 'TEST محل', " & R("EXPV") & ", 1)"
+    Ins "CL1", "CashClosings", "ClosingID", _
+        "INSERT INTO [CashClosings] ([ClosingNumber], [ClosingDate], [CashBoxID], [EmployeeID], [OpeningBalance], [CashIn], [CashOut], [ExpectedBalance], [CountedAmount], [Difference], [Destination], [ToCashBoxID], [TransferAmount], [KeptAmount]) VALUES ('TEST-CLS-1', " & D(4, 18) & ", " & R("BOXC") & ", 1, 0, 1865, 280, 1585, 1570, -15, 'MAIN', " & R("BOXM") & ", 1000, 570)"
+    Ins "V2", "CashVouchers", "CashVoucherID", _
+        "INSERT INTO [CashVouchers] ([VoucherNumber], [VoucherDate], [VoucherType], [CashBoxID], [Category], [Amount], [ClosingID], [EmployeeID]) VALUES ('TEST-COT-2', " & D(4, 18) & ", 'OUT', " & R("BOXC") & ", 'SHORTAGE', 15, " & R("CL1") & ", 1)"
+    Ins "V3", "CashVouchers", "CashVoucherID", _
+        "INSERT INTO [CashVouchers] ([VoucherNumber], [VoucherDate], [VoucherType], [CashBoxID], [ToCashBoxID], [Category], [Amount], [ClosingID], [EmployeeID]) VALUES ('TEST-TRF-1', " & D(4, 18) & ", 'TRANSFER', " & R("BOXC") & ", " & R("BOXM") & ", 'TRANSFER', 1000, " & R("CL1") & ", 1)"
+    Ins "V4", "CashVouchers", "CashVoucherID", _
+        "INSERT INTO [CashVouchers] ([VoucherNumber], [VoucherDate], [VoucherType], [CashBoxID], [Category], [Amount], [PartyName], [EmployeeID]) VALUES ('TEST-CIN-1', " & D(2, 9) & ", 'IN', " & R("BOXM") & ", 'OWNER', 2000, 'TEST المالك', 1)"
+    Ins "V5", "CashVouchers", "CashVoucherID", _
+        "INSERT INTO [CashVouchers] ([VoucherNumber], [VoucherDate], [VoucherType], [CashBoxID], [Category], [Amount], [PartyName], [EmployeeID]) VALUES ('TEST-COT-3', " & D(1, 12) & ", 'OUT', " & R("BOXM") & ", 'OWNER', 300, 'TEST المالك', 1)"
 End Sub
 
 Private Sub RunChecks()
@@ -524,6 +542,43 @@ Private Sub RunChecks()
         "SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = " & R("INV2"), 460
     Chk "طباعة الإشعار الدائن: سطر واحد بقيمة 46", _
         "SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = " & R("CRN1"), 46
+    Chk "رصيد صندوق الكاشير = 500 + 115 + 1150 + 100 + 200 - 230 - 50 - 15 - 1000", _
+        "SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = " & R("BOXC"), 770
+    Chk "رصيد الخزينة = 10000 - 5000 + 1000 + 2000 - 300", _
+        "SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = " & R("BOXM"), 7700
+    Chk "الصناديق المسجلة بدون حركة رصيدها صفر", _
+        "SELECT Sum(Balance) FROM CashBoxBalanceQuery WHERE CashBoxID <= 2", 0
+    SetQueryParam "CashBoxID", CLng(R("BOXC"))
+    Chk "حركة صندوق الكاشير: رصيد أول المدة = 500 + 115 - 50", _
+        "SELECT AmountIn FROM CashStatementQuery WHERE SortKey = 0", 565
+    SetQueryParam "CashBoxID", CLng(R("BOXC"))
+    Chk "حركة صندوق الكاشير: 6 حركات في الفترة", _
+        "SELECT COUNT(*) FROM CashStatementQuery WHERE SortKey = 1", 6
+    SetQueryParam "CashBoxID", CLng(R("BOXC"))
+    Chk "حركة صندوق الكاشير: رصيد آخر المدة = 770", _
+        "SELECT Sum(AmountIn) - Sum(AmountOut) FROM CashStatementQuery", 770
+    SetQueryParam "CashBoxID", CLng(R("BOXM"))
+    Chk "حركة الخزينة: التحويل من الكاشير داخل = 1000", _
+        "SELECT AmountIn FROM CashStatementQuery WHERE MoveType = 'TRANSFER_IN'", 1000
+    SetQueryParam "CashBoxID", CLng(R("BOXC"))
+    Chk "يومية صندوق الكاشير يوم التصفية: رصيد أول اليوم = 565 + 1150 + 100 - 230", _
+        "SELECT OpeningBalance FROM CashDailyQuery WHERE CashDay = DateValue(" & D(4, 0) & ")", 1585
+    SetQueryParam "CashBoxID", CLng(R("BOXC"))
+    Chk "يومية صندوق الكاشير يوم التصفية: المدفوعات = 15 عجز + 1000 تحويل", _
+        "SELECT Payments FROM CashDailyQuery WHERE CashDay = DateValue(" & D(4, 0) & ")", 1015
+    SetQueryParam "CashBoxID", CLng(R("BOXC"))
+    Chk "يومية صندوق الكاشير يوم التصفية: رصيد آخر اليوم = 570", _
+        "SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue(" & D(4, 0) & ")", 570
+    SetQueryParam "CashBoxID", CLng(R("BOXC"))
+    Chk "يومية صندوق الكاشير: آخر يوم = الرصيد الحالي", _
+        "SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue(" & D(3, 0) & ")", 770
+    SetQueryParam "CashBoxID", CLng(R("BOXC"))
+    Chk "تصفيات الكاشير خلال الفترة: تصفية واحدة بعجز 15", _
+        "SELECT Difference FROM CashClosingsQuery", -15
+    Chk "طباعة سند صرف المصروف: نوع المصروف", _
+        "SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = " & R("V1") & " AND ExpenseTypeName = 'مصروفات أخرى'", 1
+    Chk "طباعة سند التحويل: الصندوق المستلم", _
+        "SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = " & R("V3") & " AND ToBoxName = 'TEST الخزينة'", 1
     Chk "فحص السلامة: لا توجد مشكلات", _
         "SELECT COUNT(*) FROM IntegrityCheckQuery", 0
 End Sub
@@ -590,6 +645,15 @@ Private Sub CreateAllQueries()
     Q_qrySalesDocPrint
     Q_qryPurchaseDocPrint
     Q_qryVoucherPrint
+    Q_qryCashMovements
+    Q_qryCashBoxTotals
+    Q_CashBoxBalanceQuery
+    Q_CashStatementQuery
+    Q_qryCashDays
+    Q_CashDailyQuery
+    Q_CashClosingsQuery
+    Q_qryCashClosingPrint
+    Q_qryCashVoucherPrint
     Q_qrySalesInvoiceLineTotals
     Q_qryPurchaseInvoiceLineTotals
     Q_qrySalesReturnedQty
@@ -996,7 +1060,7 @@ End Sub
 Private Sub Q_ExpensesQuery()
     Dim s As String
     s = "SELECT e.ExpenseID, e.ExpenseNumber, e.ExpenseDate, t.ExpenseTypeName, e.Amount, e.Tax," & vbCrLf
-    s = s & "       e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName" & vbCrLf
+    s = s & "       e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName, e.ExpenseTypeID" & vbCrLf
     s = s & "FROM ((Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID)" & vbCrLf
     s = s & "      INNER JOIN Employees AS em ON e.EmployeeID = em.EmployeeID)" & vbCrLf
     s = s & "     LEFT JOIN PaymentMethods AS pm ON e.PaymentMethodID = pm.PaymentMethodID" & vbCrLf
@@ -1204,6 +1268,185 @@ Private Sub Q_qryVoucherPrint()
     s = s & "      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
     s = s & "     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID" & vbCrLf
     SaveQuery "qryVoucherPrint", "بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين)", s
+End Sub
+
+Private Sub Q_qryCashMovements()
+    Dim s As String
+    s = "SELECT h.CashBoxID, h.InvoiceDate AS MoveDate, 'SALE' AS MoveType, 'فاتورة بيع' AS MoveTypeName," & vbCrLf
+    s = s & "       h.InvoiceNumber AS DocNumber, c.CustomerName AS PartyName, h.Notes AS Details," & vbCrLf
+    s = s & "       h.PaidAmount AS AmountIn, CCur(0) AS AmountOut, h.EmployeeID" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT r.CashBoxID, r.ReturnDate, 'SALES_RETURN', 'مرتجع بيع (رد نقدي)', r.ReturnNumber," & vbCrLf
+    s = s & "       c.CustomerName, r.Reason, CCur(0), r.RefundedAmount, r.EmployeeID" & vbCrLf
+    s = s & "FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT p.CashBoxID, p.PaymentDate, 'CUSTOMER_PAYMENT', 'سند قبض من عميل', p.PaymentNumber," & vbCrLf
+    s = s & "       c.CustomerName, p.Notes, p.Amount, CCur(0), p.EmployeeID" & vbCrLf
+    s = s & "FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE p.CashBoxID Is Not Null" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT h.CashBoxID, h.InvoiceDate, 'PURCHASE', 'فاتورة شراء', h.InvoiceNumber," & vbCrLf
+    s = s & "       s.SupplierName, h.Notes, CCur(0), h.PaidAmount, h.EmployeeID" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT r.CashBoxID, r.ReturnDate, 'PURCHASE_RETURN', 'مرتجع شراء (استرداد نقدي)', r.ReturnNumber," & vbCrLf
+    s = s & "       s.SupplierName, r.Reason, r.RefundedAmount, CCur(0), r.EmployeeID" & vbCrLf
+    s = s & "FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT p.CashBoxID, p.PaymentDate, 'SUPPLIER_PAYMENT', 'سند صرف لمورد', p.PaymentNumber," & vbCrLf
+    s = s & "       s.SupplierName, p.Notes, CCur(0), p.Amount, p.EmployeeID" & vbCrLf
+    s = s & "FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE p.CashBoxID Is Not Null" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT e.CashBoxID, e.ExpenseDate, 'EXPENSE', 'مصروف', e.ExpenseNumber," & vbCrLf
+    s = s & "       t.ExpenseTypeName, e.Description, CCur(0), e.TotalAmount, e.EmployeeID" & vbCrLf
+    s = s & "FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID" & vbCrLf
+    s = s & "WHERE e.CashBoxID Is Not Null" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT v.CashBoxID, v.VoucherDate, 'CASH_IN'," & vbCrLf
+    s = s & "       IIf(v.Category = 'OWNER', 'إيداع من المالك', IIf(v.Category = 'OVERAGE', 'زيادة في الصندوق'," & vbCrLf
+    s = s & "           'سند قبض نقدية'))," & vbCrLf
+    s = s & "       v.VoucherNumber, v.PartyName, v.Description, v.Amount, CCur(0), v.EmployeeID" & vbCrLf
+    s = s & "FROM CashVouchers AS v" & vbCrLf
+    s = s & "WHERE v.VoucherType = 'IN'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT v.CashBoxID, v.VoucherDate, 'CASH_OUT'," & vbCrLf
+    s = s & "       IIf(v.Category = 'OWNER', 'تسوية مع المالك', IIf(v.Category = 'EXPENSE', 'مصروف (سند صرف)'," & vbCrLf
+    s = s & "           IIf(v.Category = 'ADVANCE', 'سلفة موظف', IIf(v.Category = 'SHORTAGE', 'عجز في الصندوق'," & vbCrLf
+    s = s & "           'سند صرف نقدية'))))," & vbCrLf
+    s = s & "       v.VoucherNumber, v.PartyName, v.Description, CCur(0), v.Amount, v.EmployeeID" & vbCrLf
+    s = s & "FROM CashVouchers AS v" & vbCrLf
+    s = s & "WHERE v.VoucherType = 'OUT'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT v.CashBoxID, v.VoucherDate, 'TRANSFER_OUT', 'تحويل إلى صندوق آخر', v.VoucherNumber," & vbCrLf
+    s = s & "       b.BoxName, v.Description, CCur(0), v.Amount, v.EmployeeID" & vbCrLf
+    s = s & "FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.ToCashBoxID = b.CashBoxID" & vbCrLf
+    s = s & "WHERE v.VoucherType = 'TRANSFER'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق آخر', v.VoucherNumber," & vbCrLf
+    s = s & "       b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID" & vbCrLf
+    s = s & "FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID" & vbCrLf
+    s = s & "WHERE v.VoucherType = 'TRANSFER'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT b.CashBoxID, b.OpeningDate, 'OPENING', 'رصيد افتتاحي', '-', b.BoxName, b.Notes," & vbCrLf
+    s = s & "       b.OpeningBalance, CCur(0), Null" & vbCrLf
+    s = s & "FROM CashBoxes AS b" & vbCrLf
+    s = s & "WHERE b.OpeningBalance <> 0" & vbCrLf
+    SaveQuery "qryCashMovements", "كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (-)", s
+End Sub
+
+Private Sub Q_qryCashBoxTotals()
+    Dim s As String
+    s = "SELECT CashBoxID, Sum(AmountIn) AS BoxIn, Sum(AmountOut) AS BoxOut, Max(MoveDate) AS LastMoveDate" & vbCrLf
+    s = s & "FROM qryCashMovements" & vbCrLf
+    s = s & "GROUP BY CashBoxID" & vbCrLf
+    SaveQuery "qryCashBoxTotals", "إجمالي الداخل والخارج لكل صندوق", s
+End Sub
+
+Private Sub Q_CashBoxBalanceQuery()
+    Dim s As String
+    s = "SELECT b.CashBoxID, b.BoxName, b.BoxType," & vbCrLf
+    s = s & "       IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', 'صندوق كاشير') AS BoxTypeName, b.IsActive," & vbCrLf
+    s = s & "       CCur(Nz(t.BoxIn, 0)) AS TotalIn, CCur(Nz(t.BoxOut, 0)) AS TotalOut," & vbCrLf
+    s = s & "       CCur(Nz(t.BoxIn, 0)) - CCur(Nz(t.BoxOut, 0)) AS Balance, t.LastMoveDate" & vbCrLf
+    s = s & "FROM CashBoxes AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID" & vbCrLf
+    s = s & "ORDER BY b.BoxType DESC, b.BoxName" & vbCrLf
+    SaveQuery "CashBoxBalanceQuery", "أرصدة الخزينة والصناديق الآن", s
+End Sub
+
+Private Sub Q_CashStatementQuery()
+    Dim s As String
+    s = "SELECT 1 AS SortKey, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber, m.PartyName, m.Details," & vbCrLf
+    s = s & "       b.BoxName, m.AmountIn, m.AmountOut, m.CashBoxID" & vbCrLf
+    s = s & "FROM qryCashMovements AS m INNER JOIN CashBoxes AS b ON m.CashBoxID = b.CashBoxID" & vbCrLf
+    s = s & "WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND m.MoveDate >= QDate('PeriodStart') AND m.MoveDate < QDate('PeriodEnd')" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 0, QDate('PeriodStart'), 'BALANCE_FWD', 'رصيد أول المدة', '-', Null, Null, Null," & vbCrLf
+    s = s & "       IIf(CCur(Nz(Sum(o.AmountIn), 0)) - CCur(Nz(Sum(o.AmountOut), 0)) > 0, CCur(Nz(Sum(o.AmountIn), 0)) - CCur(Nz(Sum(o.AmountOut), 0)), 0)," & vbCrLf
+    s = s & "       IIf(CCur(Nz(Sum(o.AmountIn), 0)) - CCur(Nz(Sum(o.AmountOut), 0)) < 0, CCur(Nz(Sum(o.AmountOut), 0)) - CCur(Nz(Sum(o.AmountIn), 0)), 0)," & vbCrLf
+    s = s & "       QLong('CashBoxID')" & vbCrLf
+    s = s & "FROM qryCashMovements AS o" & vbCrLf
+    s = s & "WHERE (QLong('CashBoxID') = 0 OR o.CashBoxID = QLong('CashBoxID')) AND o.MoveDate < QDate('PeriodStart')" & vbCrLf
+    s = s & "ORDER BY SortKey, MoveDate" & vbCrLf
+    SaveQuery "CashStatementQuery", "حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق)", s
+End Sub
+
+Private Sub Q_qryCashDays()
+    Dim s As String
+    s = "SELECT DateValue(m.MoveDate) AS CashDay, Sum(m.AmountIn) AS Receipts, Sum(m.AmountOut) AS Payments," & vbCrLf
+    s = s & "       Count(*) AS MoveCount" & vbCrLf
+    s = s & "FROM qryCashMovements AS m" & vbCrLf
+    s = s & "WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND m.MoveDate >= QDate('PeriodStart') AND m.MoveDate < QDate('PeriodEnd')" & vbCrLf
+    s = s & "GROUP BY DateValue(m.MoveDate)" & vbCrLf
+    SaveQuery "qryCashDays", "مقبوضات ومدفوعات كل يوم داخل الفترة", s
+End Sub
+
+Private Sub Q_CashDailyQuery()
+    Dim s As String
+    s = "SELECT d.CashDay," & vbCrLf
+    s = s & "       (SELECT CCur(Nz(Sum(x.AmountIn - x.AmountOut), 0)) FROM qryCashMovements AS x" & vbCrLf
+    s = s & "        WHERE (QLong('CashBoxID') = 0 OR x.CashBoxID = QLong('CashBoxID'))" & vbCrLf
+    s = s & "          AND x.MoveDate < d.CashDay) AS OpeningBalance," & vbCrLf
+    s = s & "       d.Receipts, d.Payments," & vbCrLf
+    s = s & "       (SELECT CCur(Nz(Sum(y.AmountIn - y.AmountOut), 0)) FROM qryCashMovements AS y" & vbCrLf
+    s = s & "        WHERE (QLong('CashBoxID') = 0 OR y.CashBoxID = QLong('CashBoxID'))" & vbCrLf
+    s = s & "          AND y.MoveDate < d.CashDay) + d.Receipts - d.Payments AS ClosingBalance," & vbCrLf
+    s = s & "       d.MoveCount" & vbCrLf
+    s = s & "FROM qryCashDays AS d" & vbCrLf
+    s = s & "ORDER BY d.CashDay" & vbCrLf
+    SaveQuery "CashDailyQuery", "حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم", s
+End Sub
+
+Private Sub Q_CashClosingsQuery()
+    Dim s As String
+    s = "SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c.PeriodStart," & vbCrLf
+    s = s & "       c.OpeningBalance, c.CashIn, c.CashOut, c.ExpectedBalance, c.CountedAmount, c.Difference," & vbCrLf
+    s = s & "       IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك'," & vbCrLf
+    s = s & "           'يبقى في الصندوق')) AS DestinationName," & vbCrLf
+    s = s & "       t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes, c.CashBoxID" & vbCrLf
+    s = s & "FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)" & vbCrLf
+    s = s & "      INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)" & vbCrLf
+    s = s & "     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID" & vbCrLf
+    s = s & "WHERE (QLong('CashBoxID') = 0 OR c.CashBoxID = QLong('CashBoxID')) AND c.ClosingDate >= QDate('PeriodStart') AND c.ClosingDate < QDate('PeriodEnd')" & vbCrLf
+    s = s & "ORDER BY c.ClosingDate" & vbCrLf
+    SaveQuery "CashClosingsQuery", "تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق)", s
+End Sub
+
+Private Sub Q_qryCashClosingPrint()
+    Dim s As String
+    s = "SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c.PeriodStart," & vbCrLf
+    s = s & "       c.OpeningBalance, c.CashIn, c.CashOut, c.ExpectedBalance, c.CountedAmount, c.Difference," & vbCrLf
+    s = s & "       IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك'," & vbCrLf
+    s = s & "           'يبقى في الصندوق')) AS DestinationName," & vbCrLf
+    s = s & "       t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes" & vbCrLf
+    s = s & "FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)" & vbCrLf
+    s = s & "      INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)" & vbCrLf
+    s = s & "     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID" & vbCrLf
+    SaveQuery "qryCashClosingPrint", "بيانات طباعة تصفية الكاشير", s
+End Sub
+
+Private Sub Q_qryCashVoucherPrint()
+    Dim s As String
+    s = "SELECT v.CashVoucherID AS DocID, v.VoucherNumber, v.VoucherDate, v.VoucherType," & vbCrLf
+    s = s & "       IIf(v.VoucherType = 'IN', 'سند قبض نقدية', IIf(v.VoucherType = 'OUT', 'سند صرف نقدية'," & vbCrLf
+    s = s & "           'سند تحويل نقدية')) AS VoucherTitle," & vbCrLf
+    s = s & "       IIf(v.Category = 'OWNER', IIf(v.VoucherType = 'IN', 'إيداع من المالك', 'تسوية مع المالك')," & vbCrLf
+    s = s & "           IIf(v.Category = 'EXPENSE', 'مصروف', IIf(v.Category = 'ADVANCE', 'سلفة موظف'," & vbCrLf
+    s = s & "           IIf(v.Category = 'SHORTAGE', 'عجز في الصندوق', IIf(v.Category = 'OVERAGE', 'زيادة في الصندوق'," & vbCrLf
+    s = s & "           IIf(v.Category = 'TRANSFER', 'تحويل بين الصناديق', 'أخرى')))))) AS CategoryName," & vbCrLf
+    s = s & "       b.BoxName, t.BoxName AS ToBoxName, v.Amount, v.PartyName, v.Description," & vbCrLf
+    s = s & "       x.ExpenseTypeName, e.EmployeeName" & vbCrLf
+    s = s & "FROM ((((CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID)" & vbCrLf
+    s = s & "        INNER JOIN Employees AS e ON v.EmployeeID = e.EmployeeID)" & vbCrLf
+    s = s & "       LEFT JOIN CashBoxes AS t ON v.ToCashBoxID = t.CashBoxID)" & vbCrLf
+    s = s & "      LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)" & vbCrLf
+    s = s & "     LEFT JOIN ExpenseTypes AS x ON ex.ExpenseTypeID = x.ExpenseTypeID" & vbCrLf
+    SaveQuery "qryCashVoucherPrint", "بيانات طباعة سندات قبض وصرف وتحويل النقدية", s
 End Sub
 
 Private Sub Q_qrySalesInvoiceLineTotals()

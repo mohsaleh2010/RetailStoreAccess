@@ -53,6 +53,85 @@ class Store:
         self.c.execute("UPDATE Sequences SET NextValue = NextValue + 1 WHERE SequenceName = ?", (seq,))
         return (prefix or "") + (str(n).zfill(pad) if pad else str(n))
 
+    # ------------------------------------------------------------- cash boxes (modCash)
+    def has_permission(self, key):                                # modCommon.HasPermission
+        return self.one("SELECT COUNT(*) FROM RolePermissions AS rp INNER JOIN Employees AS e "
+                        "ON e.RoleID = rp.RoleID WHERE e.EmployeeID = ? AND rp.PermissionKey = ?",
+                        self.user, key) > 0
+
+    def cash_box(self):                                           # CurrentCashBoxID
+        box = self.one("SELECT e.CashBoxID FROM Employees AS e INNER JOIN CashBoxes AS b "
+                       "ON e.CashBoxID = b.CashBoxID WHERE e.EmployeeID = ? AND b.IsActive = 1", self.user)
+        if box is None and self.has_permission("CASH_BOX"):
+            box = self.one("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive = 1")
+        if box is None:
+            box = self.one("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'CASHIER' AND IsActive = 1")
+        if box is None:
+            box = self.one("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = 1")
+        return box
+
+    def box_for(self, method, amount):                            # CashBoxFor
+        return self.cash_box() if method == 1 and dec(amount) != 0 else None
+
+    def box_of_type(self, kind):
+        return self.one("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = ? AND IsActive = 1", kind)
+
+    def cash_balance(self, box, before=None, inclusive=False) -> D:     # CashBoxBalance
+        sql = "SELECT Sum(AmountIn) - Sum(AmountOut) FROM qryCashMovements WHERE CashBoxID = ?"
+        args = [box]
+        if before is not None:
+            sql += " AND MoveDate " + ("<= ?" if inclusive else "< ?")
+            args.append(before)
+        return dec(self.one(sql, *args))
+
+    def cash_voucher(self, vtype, box, amount, category, party=None, text=None, to_box=None,
+                     expense_type=None, closing=None):                  # PostCashVoucher / InsertVoucher
+        seq = {"IN": "CASH_IN", "OUT": "CASH_OUT"}.get(vtype, "CASH_TRANSFER")
+        no = self.next_number(seq)
+        expense = None
+        if vtype == "OUT" and category == "EXPENSE":
+            expense = self.insert("Expenses", ExpenseNumber=self.next_number("EXPENSE"),
+                                  ExpenseDate=self.now[:10] + " 00:00:00", ExpenseTypeID=expense_type,
+                                  Amount=float(amount), Tax=0, TotalAmount=float(amount), PaymentMethodID=1,
+                                  Description="سند صرف نقدية " + no, EmployeeID=self.user)
+        return self.insert("CashVouchers", VoucherNumber=no, VoucherDate=self.now, VoucherType=vtype,
+                           CashBoxID=box, ToCashBoxID=to_box if vtype == "TRANSFER" else None,
+                           Category="TRANSFER" if vtype == "TRANSFER" else category, Amount=float(amount),
+                           PartyName=party, Description=text, ExpenseID=expense, ClosingID=closing,
+                           EmployeeID=self.user)
+
+    def cash_closing(self, box, counted, destination, to_box, transfer):   # PostCashClosing
+        counted, transfer = dec(counted), dec(transfer)
+        if destination == "KEEP":
+            transfer = D(0)
+        start = self.one("SELECT Max(ClosingDate) FROM CashClosings WHERE CashBoxID = ?", box)
+        opening = self.cash_balance(box, start, True) if start is not None else D(0)
+        after = "" if start is None else " AND MoveDate > ?"
+        args = [box] + ([] if start is None else [start])
+        cash_in = dec(self.one("SELECT Sum(AmountIn) FROM qryCashMovements WHERE CashBoxID = ?" + after, *args))
+        cash_out = dec(self.one("SELECT Sum(AmountOut) FROM qryCashMovements WHERE CashBoxID = ?" + after, *args))
+        expected = opening + cash_in - cash_out
+        diff = counted - expected
+        no = self.next_number("CASH_CLOSING")
+        cid = self.insert("CashClosings", ClosingNumber=no, ClosingDate=self.now, CashBoxID=box, EmployeeID=self.user,
+                          PeriodStart=start, OpeningBalance=float(opening), CashIn=float(cash_in),
+                          CashOut=float(cash_out), ExpectedBalance=float(expected), CountedAmount=float(counted),
+                          Difference=float(diff), Destination=destination,
+                          ToCashBoxID=to_box if destination == "MAIN" and transfer > 0 else None,
+                          TransferAmount=float(transfer), KeptAmount=float(counted - transfer))
+        if diff < 0:
+            self.cash_voucher("OUT", box, -diff, "SHORTAGE", text="عجز تصفية " + no, closing=cid)
+        elif diff > 0:
+            self.cash_voucher("IN", box, diff, "OVERAGE", text="زيادة تصفية " + no, closing=cid)
+        if transfer > 0:
+            if destination == "MAIN":
+                self.cash_voucher("TRANSFER", box, transfer, "TRANSFER", text="ترحيل تصفية " + no, to_box=to_box,
+                                  closing=cid)
+            else:
+                self.cash_voucher("OUT", box, transfer, "OWNER", party="المالك", text="تسوية تصفية " + no,
+                                  closing=cid)
+        return cid, expected
+
     def stock(self, pid) -> D:
         return dec(self.one("SELECT CurrentQuantity FROM Products WHERE ProductID = ?", pid))
 
@@ -91,7 +170,8 @@ class Store:
                           SupplierID=sid, EmployeeID=self.user, PaymentType="CREDIT" if credit else "CASH",
                           PaymentMethodID=1, SubTotal=float(out.subtotal), Discount=float(out.discount),
                           TaxableAmount=float(out.taxable), Tax=float(out.tax), TotalAmount=float(out.total),
-                          PaidAmount=float(paid_amt), RemainingAmount=float(remaining))
+                          PaidAmount=float(paid_amt), RemainingAmount=float(remaining),
+                          CashBoxID=self.box_for(1, paid_amt))
         for i, ((pid, q, c), ln) in enumerate(zip(lines, out.lines)):
             self.insert("PurchaseInvoiceDetails", PurchaseInvoiceID=inv, LineNumber=i + 1, ProductID=pid,
                         Quantity=float(q), UnitCost=float(ln.unit_price), Discount=float(ln.discount),
@@ -128,7 +208,8 @@ class Store:
                           SupplierID=sid, EmployeeID=self.user, Reason="DEMO", RefundType="CASH" if cash_refund
                           else "CREDIT", SubTotal=float(total_sum - tax_sum), Discount=0,
                           TaxableAmount=float(total_sum - tax_sum), Tax=float(tax_sum),
-                          TotalAmount=float(total_sum), RefundedAmount=float(refunded))
+                          TotalAmount=float(total_sum), RefundedAmount=float(refunded),
+                          CashBoxID=self.box_for(1, refunded))
         for detail, pid, qty, r_net, r_tax, r_total, cost in rows:
             self.insert("PurchaseReturnDetails", PurchaseReturnID=ret, PurchaseDetailID=detail, ProductID=pid,
                         Quantity=float(qty), UnitCost=float(cost), Discount=0, NetAmount=float(r_net),
@@ -141,7 +222,7 @@ class Store:
     def payment(self, sid, amount):                                     # PostSupplierPayment
         no = self.next_number("SUPPLIER_PAYMENT")
         self.insert("SupplierPayments", PaymentNumber=no, SupplierID=sid, PaymentDate=self.now,
-                    Amount=float(amount), PaymentMethodID=1, EmployeeID=self.user)
+                    Amount=float(amount), PaymentMethodID=1, EmployeeID=self.user, CashBoxID=self.box_for(1, amount))
         self.adjust("Suppliers", "SupplierID", sid, -dec(amount))
 
     # ------------------------------------------------------------- sales
@@ -173,7 +254,8 @@ class Store:
                           SubTotal=float(out.subtotal), Discount=float(out.discount),
                           TaxableAmount=float(out.taxable), Tax=float(out.tax), TotalAmount=float(out.total),
                           PaidAmount=float(paid_amt), RemainingAmount=float(remaining),
-                          AmountTendered=float(tendered), ChangeDue=float(change))
+                          AmountTendered=float(tendered), ChangeDue=float(change),
+                          CashBoxID=self.box_for(1, paid_amt))
         for i, ((pid, q, _, avg, cat), ln) in enumerate(zip(prods, out.lines)):
             self.insert("SalesInvoiceDetails", SalesInvoiceID=inv, LineNumber=i + 1, ProductID=pid,
                         Quantity=float(q), UnitPrice=float(ln.unit_price), Discount=float(ln.discount),
@@ -209,7 +291,8 @@ class Store:
                           CustomerID=customer, EmployeeID=self.user, Reason="DEMO",
                           RefundType="CASH" if cash_refund else "CREDIT", SubTotal=float(net_sum + disc_sum),
                           Discount=float(disc_sum), TaxableAmount=float(net_sum), Tax=float(tax_sum),
-                          TotalAmount=float(total_sum), RefundedAmount=float(refunded))
+                          TotalAmount=float(total_sum), RefundedAmount=float(refunded),
+                          CashBoxID=self.box_for(1, refunded))
         for detail, pid, qty, unit, disc, r_net, cat, r_tax, r_total, cost in rows:
             self.insert("SalesReturnDetails", SalesReturnID=ret, SalesDetailID=detail, ProductID=pid,
                         Quantity=float(qty), UnitPrice=float(unit), Discount=float(disc), NetAmount=float(r_net),
@@ -223,7 +306,7 @@ class Store:
     def customer_payment(self, cid, amount):                            # PostCustomerPayment
         no = self.next_number("CUSTOMER_PAYMENT")
         self.insert("CustomerPayments", PaymentNumber=no, CustomerID=cid, PaymentDate=self.now,
-                    Amount=float(amount), PaymentMethodID=1, EmployeeID=self.user)
+                    Amount=float(amount), PaymentMethodID=1, EmployeeID=self.user, CashBoxID=self.box_for(1, amount))
         self.adjust("Customers", "CustomerID", cid, -dec(amount))
 
     # ------------------------------------------------------------- inventory
@@ -269,4 +352,5 @@ class Store:
         return self.insert("Expenses", ExpenseNumber=no, ExpenseDate=self.now[:10] + " 00:00:00",
                            ExpenseTypeID=type_id, Amount=float(amount), Tax=float(tax),
                            TotalAmount=float(dec(amount) + dec(tax)), PaymentMethodID=method,
-                           Description=description, EmployeeID=self.user)
+                           Description=description, EmployeeID=self.user,
+                           CashBoxID=self.box_for(method, dec(amount) + dec(tax)))

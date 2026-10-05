@@ -61,6 +61,7 @@ Public Function LoadDemoData() As Boolean
     DemoSteps3
     DemoSteps4
     DemoSteps5
+    DemoSteps6
     ws.CommitTrans
     inTrans = False
     TempVars.Add "UserID", m_adminID
@@ -89,7 +90,7 @@ Private Function DemoBlocker() As String
         Exit Function
     End If
     For Each t In Array("SalesInvoices", "PurchaseInvoices", "InventoryTransactions", "Expenses", _
-                        "CustomerPayments", "SupplierPayments", "StockCounts")
+                        "CustomerPayments", "SupplierPayments", "StockCounts", "CashVouchers", "CashClosings")
         If Nz(DbValue("SELECT COUNT(*) FROM [" & t & "]"), 0) > 0 Then
             DemoBlocker = "ÊæÌÏ ÈíÇäÇÊ ÝÚáíÉ (" & t & ")." & vbCrLf & _
                           "ÇáÈíÇäÇÊ ÇáÊÌÑíÈíÉ ÊõÏÎá Ýí ÞÇÚÏÉ ÈÏæä ãÓÊäÏÇÊ ÝÞØ (äÓÎÉ ááÊÏÑíÈ)."
@@ -164,7 +165,12 @@ Private Sub DemoMasters()
 End Sub
 
 Private Sub DemoSteps1()
-    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency
+    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency, counted As Currency
+    ' --- cash_in (day -31)
+    when = DemoWhen(31, 8)
+    SetDemoUser ""
+    Check PostCashVoucher("IN", BoxOfType("MAIN"), Null, "OWNER", 30000.00, "ÇáãÇáß", "ÑÃÓ ãÇá ÊÔÛíá (ÊÌÑíÈí)", Null, id), "ÓäÏ äÞÏíÉ"
+    MoveDoc "CASH_VOUCHER", id, when
     ' --- purchase (day -30)
     when = DemoWhen(30, 9)
     SetDemoUser ""
@@ -194,7 +200,7 @@ Private Sub DemoSteps1()
     ' --- expense (day -28)
     when = DemoWhen(28, 9)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 1, 4500.00, 0.00, 4500.00, 1, " & SqlText("ÅíÌÇÑ ÇáãÍá ááÔåÑ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 1, 4500.00, 0.00, 4500.00, 1, " & SqlText("ÅíÌÇÑ ÇáãÍá ááÔåÑ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
     ' --- purchase (day -27)
     when = DemoWhen(27, 11)
     SetDemoUser ""
@@ -218,6 +224,10 @@ Private Sub DemoSteps1()
     CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
     MoveDoc "PURCHASE", id, when
     m_purchases(4) = id
+End Sub
+
+Private Sub DemoSteps2()
+    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency, counted As Currency
     ' --- purchase (day -22)
     when = DemoWhen(22, 10)
     SetDemoUser ""
@@ -229,10 +239,6 @@ Private Sub DemoSteps1()
     CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
     MoveDoc "PURCHASE", id, when
     m_purchases(5) = id
-End Sub
-
-Private Sub DemoSteps2()
-    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency
     ' --- sale (day -20)
     when = DemoWhen(20, 10)
     SetDemoUser "cashier1"
@@ -247,11 +253,11 @@ Private Sub DemoSteps2()
     ' --- expense (day -20)
     when = DemoWhen(20, 12)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 2, 380.00, 57.00, 437.00, 1, " & SqlText("ÝÇÊæÑÉ ÇáßåÑÈÇÁ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 2, 380.00, 57.00, 437.00, 1, " & SqlText("ÝÇÊæÑÉ ÇáßåÑÈÇÁ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
     ' --- expense (day -19)
     when = DemoWhen(19, 12)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 3, 120.00, 18.00, 138.00, 1, " & SqlText("ÝÇÊæÑÉ ÇáãíÇå") & ", " & CurrentUserID() & ", " & SqlDate(when) & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 3, 120.00, 18.00, 138.00, 1, " & SqlText("ÝÇÊæÑÉ ÇáãíÇå") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
     ' --- sale (day -18)
     when = DemoWhen(18, 11)
     SetDemoUser ""
@@ -266,7 +272,11 @@ Private Sub DemoSteps2()
     ' --- expense (day -16)
     when = DemoWhen(16, 13)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 4, 299.00, 44.85, 343.85, 1, " & SqlText("ÇáÅäÊÑäÊ æÇáåÇÊÝ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 4, 299.00, 44.85, 343.85, 1, " & SqlText("ÇáÅäÊÑäÊ æÇáåÇÊÝ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
+End Sub
+
+Private Sub DemoSteps3()
+    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency, counted As Currency
     ' --- sale (day -15)
     when = DemoWhen(15, 17)
     SetDemoUser "cashier2"
@@ -278,15 +288,17 @@ Private Sub DemoSteps2()
     CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
     MoveDoc "SALE", id, when
     m_sales(3) = id
-End Sub
-
-Private Sub DemoSteps3()
-    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency
     ' --- supplier_payment (day -15)
     when = DemoWhen(15, 18)
     SetDemoUser ""
     Check PostSupplierPayment(SupplierIDOf("ãÄÓÓÉ ÇáæÝÑÉ ááãæÇÏ ÇáÛÐÇÆíÉ"), 1500.00, 1, "ÏÝÚÉ ãä ÇáÍÓÇÈ", id), "ÓäÏ ÕÑÝ"
     MoveDoc "SUPPLIER_PAYMENT", id, when
+    ' --- closing (day -15)
+    when = DemoWhen(15, 23)
+    SetDemoUser ""
+    counted = CashBoxBalance(BoxOfType("CASHIER")) - 5.00
+    Check PostCashClosing(BoxOfType("CASHIER"), counted, "MAIN", BoxOfType("MAIN"), IIf(counted > 100.00, counted - 100.00, 0), "ÊÕÝíÉ ÊÌÑíÈíÉ", id), "ÊÕÝíÉ ÇáßÇÔíÑ"
+    MoveDoc "CASH_CLOSING", id, when
     ' --- purchase_return (day -14)
     when = DemoWhen(14, 10)
     SetDemoUser ""
@@ -308,7 +320,11 @@ Private Sub DemoSteps3()
     ' --- expense (day -11)
     when = DemoWhen(11, 9)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 5, 150.00, 0.00, 150.00, 1, " & SqlText("äÞá ÈÖÇÚÉ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 5, 150.00, 0.00, 150.00, 1, " & SqlText("äÞá ÈÖÇÚÉ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
+End Sub
+
+Private Sub DemoSteps4()
+    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency, counted As Currency
     ' --- sale (day -10)
     when = DemoWhen(10, 19)
     SetDemoUser ""
@@ -325,10 +341,6 @@ Private Sub DemoSteps3()
     SetDemoUser ""
     Check PostSupplierPayment(SupplierIDOf("ãÄÓÓÉ ÇáäÞÇÁ ááãäÙÝÇÊ"), 800.00, 1, "ÏÝÚÉ ãä ÇáÍÓÇÈ", id), "ÓäÏ ÕÑÝ"
     MoveDoc "SUPPLIER_PAYMENT", id, when
-End Sub
-
-Private Sub DemoSteps4()
-    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency
     ' --- sale (day -8)
     when = DemoWhen(8, 12)
     SetDemoUser ""
@@ -346,15 +358,24 @@ Private Sub DemoSteps4()
     SetDemoUser ""
     Check PostManualStock(ProductIDOf("6281000000120"), TT_STOCK_OUT, 1, Null, "ÊÇáÝ - ÚÈæÉ ãßÓæÑÉ", refNo), "ÎÕã ãÎÒæä"
     MoveManual refNo, when
+    ' --- cash_out (day -7)
+    when = DemoWhen(7, 20)
+    SetDemoUser ""
+    Check PostCashVoucher("OUT", BoxOfType("MAIN"), Null, "OWNER", 2000.00, "ÇáãÇáß", "ãÓÍæÈÇÊ ÇáãÇáß (ÊÌÑíÈí)", Null, id), "ÓäÏ äÞÏíÉ"
+    MoveDoc "CASH_VOUCHER", id, when
     ' --- customer_payment (day -6)
     when = DemoWhen(6, 11)
     SetDemoUser ""
     Check PostCustomerPayment(CustomerIDOf("ãØÚã ÇáÏíÑÉ"), 300.00, 1, "ÏÝÚÉ ãä ÇáÍÓÇÈ", id), "ÓäÏ ÞÈÖ"
     MoveDoc "CUSTOMER_PAYMENT", id, when
+End Sub
+
+Private Sub DemoSteps5()
+    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency, counted As Currency
     ' --- expense (day -6)
     when = DemoWhen(6, 15)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 6, 260.00, 39.00, 299.00, 1, " & SqlText("ÕíÇäÉ ËáÇÌÉ ÇáÚÑÖ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 6, 260.00, 39.00, 299.00, 1, " & SqlText("ÕíÇäÉ ËáÇÌÉ ÇáÚÑÖ") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
     ' --- sale (day -5)
     when = DemoWhen(5, 18)
     SetDemoUser "cashier1"
@@ -375,10 +396,6 @@ Private Sub DemoSteps4()
     Check PostSalesReturn(m_sales(6), "ÊáÝ Ýí ÇáÊÛáíÝ (ÊÌÑíÈí)", "CREDIT", Null, id), "ãÑÊÌÚ ãÈíÚÇÊ"
     CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError
     MoveDoc "SALES_RETURN", id, when
-End Sub
-
-Private Sub DemoSteps5()
-    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency
     ' --- sale (day -3)
     when = DemoWhen(3, 16)
     SetDemoUser ""
@@ -402,6 +419,10 @@ Private Sub DemoSteps5()
     CurrentDb.Execute "UPDATE StockCountDetails SET ActualQuantity = SystemQuantity + (-1) WHERE StockCountID = " & id & " AND ProductID = " & ProductIDOf("6281000000199"), dbFailOnError
     Check PostStockCount(id, False, adjusted, netValue), "ÊÑÍíá ÇáÌÑÏ"
     MoveDoc "STOCK_COUNT", id, when
+End Sub
+
+Private Sub DemoSteps6()
+    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency, counted As Currency
     ' --- sale (day -1)
     when = DemoWhen(1, 20)
     SetDemoUser "cashier2"
@@ -413,6 +434,12 @@ Private Sub DemoSteps5()
     CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
     MoveDoc "SALE", id, when
     m_sales(9) = id
+    ' --- closing (day -1)
+    when = DemoWhen(1, 23)
+    SetDemoUser ""
+    counted = CashBoxBalance(BoxOfType("CASHIER")) - 0.00
+    Check PostCashClosing(BoxOfType("CASHIER"), counted, "MAIN", BoxOfType("MAIN"), IIf(counted > 100.00, counted - 100.00, 0), "ÊÕÝíÉ ÊÌÑíÈíÉ", id), "ÊÕÝíÉ ÇáßÇÔíÑ"
+    MoveDoc "CASH_CLOSING", id, when
     ' --- sale (day -0)
     when = DemoWhen(0, 0)
     SetDemoUser "cashier1"
@@ -465,6 +492,10 @@ Private Function CategoryIDOf(ByVal CategoryName As String) As Long
     CategoryIDOf = DbValue("SELECT CategoryID FROM Categories WHERE CategoryName = " & SqlText(CategoryName))
 End Function
 
+Private Function BoxOfType(ByVal BoxType As String) As Long
+    BoxOfType = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True AND BoxType = " & SqlText(BoxType)), 0)
+End Function
+
 Private Function UserIDOf(ByVal Username As String) As Long
     UserIDOf = DbValue("SELECT EmployeeID FROM Employees WHERE Username = " & SqlText(Username))
 End Function
@@ -499,6 +530,8 @@ Private Sub MoveDoc(ByVal Kind As String, ByVal DocID As Long, ByVal When As Dat
         Case "CUSTOMER_PAYMENT": tbl = "CustomerPayments": key = "PaymentID": fld = "PaymentDate"
         Case "SUPPLIER_PAYMENT": tbl = "SupplierPayments": key = "PaymentID": fld = "PaymentDate"
         Case "STOCK_COUNT":      tbl = "StockCounts": key = "StockCountID": fld = "CountDate"
+        Case "CASH_VOUCHER":     tbl = "CashVouchers": key = "CashVoucherID": fld = "VoucherDate"
+        Case "CASH_CLOSING":     tbl = "CashClosings": key = "ClosingID": fld = "ClosingDate"
     End Select
     If Kind = "STOCK_COUNT" Then
         CurrentDb.Execute "UPDATE StockCounts SET CountDate = " & SqlDate(When) & ", PostedAt = " & SqlDate(When) & _
@@ -506,6 +539,10 @@ Private Sub MoveDoc(ByVal Kind As String, ByVal DocID As Long, ByVal When As Dat
     Else
         CurrentDb.Execute "UPDATE " & tbl & " SET " & fld & " = " & SqlDate(When) & ", CreatedAt = " & SqlDate(When) & _
                           " WHERE " & key & " = " & DocID, dbFailOnError
+    End If
+    If Kind = "CASH_CLOSING" Then          ' the shortage / transfer vouchers of the closing
+        CurrentDb.Execute "UPDATE CashVouchers SET VoucherDate = " & SqlDate(When) & ", CreatedAt = " & SqlDate(When) & _
+                          " WHERE ClosingID = " & DocID, dbFailOnError
     End If
     Select Case Kind
         Case "SALE", "SALES_RETURN", "PURCHASE", "PURCHASE_RETURN", "STOCK_COUNT"
@@ -586,6 +623,8 @@ Public Function VerifyDemoData() As Boolean
     Expect Nz(DbValue("SELECT CurrentBalance FROM Suppliers WHERE SupplierName = " & SqlText("ãÄÓÓÉ ÇáäÞÇÁ ááãäÙÝÇÊ")), -1) = CCur(601.27), "ÑÕíÏ ãÄÓÓÉ ÇáäÞÇÁ ááãäÙÝÇÊ = 601.27"
     Expect Nz(DbValue("SELECT CurrentBalance FROM Suppliers WHERE SupplierName = " & SqlText("ÔÑßÉ ÇáÚäÇíÉ ÇáÐåÈíÉ")), -1) = CCur(258.43), "ÑÕíÏ ÔÑßÉ ÇáÚäÇíÉ ÇáÐåÈíÉ = 258.43"
     Expect Nz(DbValue("SELECT CurrentBalance FROM Suppliers WHERE SupplierName = " & SqlText("ãÄÓÓÉ ÇáÈíÊ ÇáÚÕÑí ááÃÏæÇÊ")), -1) = CCur(0.00), "ÑÕíÏ ãÄÓÓÉ ÇáÈíÊ ÇáÚÕÑí ááÃÏæÇÊ = 0.00"
+    Expect CashBoxBalance(BoxOfType("MAIN")) = CCur(17705.40), "ÑÕíÏ ÇáÎÒíäÉ ÇáÑÆíÓíÉ = 17705.40"
+    Expect CashBoxBalance(BoxOfType("CASHIER")) = CCur(194.30), "ÑÕíÏ ÕäÏæÞ ÇáßÇÔíÑ = 194.30"
     Expect DbValue("SELECT COUNT(*) FROM LowStockQuery AS l INNER JOIN Products AS p ON l.ProductID = p.ProductID " & _
                    "WHERE p.Notes = '" & DEMO_MARK & "'") = 4, "4 ãäÊÌÇÊ ãäÎÝÖÉ ÇáãÎÒæä (ááÊäÈíå æÇáÊÞÑíÑ)"
     If Nz(SettingValue("SlowMovingDays"), 90) = 90 Then
@@ -640,7 +679,7 @@ Public Function RemoveDemoData() As Boolean
         Exit Function
     End If
     For Each t In Array("SalesInvoices", "SalesReturns", "PurchaseInvoices", "PurchaseReturns", "CustomerPayments", _
-                        "SupplierPayments", "Expenses")
+                        "SupplierPayments", "Expenses", "CashVouchers", "CashClosings")
         later = later + Nz(DbValue("SELECT COUNT(*) FROM [" & t & "] WHERE CreatedAt > " & SqlDate(loaded)), 0)
     Next
     later = later + Nz(DbValue("SELECT COUNT(*) FROM StockCounts WHERE CountDate > " & SqlDate(loaded)), 0)
@@ -662,6 +701,8 @@ Public Function RemoveDemoData() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
+    db.Execute "DELETE FROM CashVouchers", dbFailOnError
+    db.Execute "DELETE FROM CashClosings", dbFailOnError
     db.Execute "DELETE FROM SalesReturnDetails", dbFailOnError
     db.Execute "DELETE FROM SalesReturns", dbFailOnError
     db.Execute "DELETE FROM CustomerPayments", dbFailOnError
@@ -695,6 +736,10 @@ Public Function RemoveDemoData() As Boolean
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'STOCK_COUNT'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'STOCK_ADJUST'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'ZATCA_ICV'", dbFailOnError
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_IN'", dbFailOnError
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_OUT'", dbFailOnError
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_TRANSFER'", dbFailOnError
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_CLOSING'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PRODUCT_CODE' AND (SELECT COUNT(*) FROM Products) = 0", dbFailOnError
     ws.CommitTrans
     inTrans = False

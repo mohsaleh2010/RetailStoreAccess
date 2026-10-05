@@ -41,6 +41,7 @@ class ListSpec:
     sorts: List[Tuple[str, bool]]
     landscape: bool = False
     no_data: str = NO_DATA
+    summary: List[Tuple[str, str]] = None   # (caption, expression) rows in the report footer
 
 
 @dataclass
@@ -148,6 +149,35 @@ LIST_SPECS: List[ListSpec] = [
         Col("بدون ضريبة", "AmountExVAT", 3.4, MONEY, True), Col("الضريبة", "InputVAT", 3.2, MONEY, True),
         Col("الإجمالي", "AmountTotal", 4.0, MONEY, True)],
         [("AmountTotal", True)]),
+    ListSpec("CASH_STATEMENT", [
+        Col("التاريخ", "=GDate([MoveDate],True)", 3.0), Col("الحركة", "MoveTypeName", 3.8),
+        Col("المستند", "DocNumber", 2.6), Col("الجهة", "PartyName", 4.0, grow=True),
+        Col("البيان", "Details", 3.8, grow=True), Col("الصندوق", "BoxName", 2.8),
+        Col("مقبوض", "AmountIn", 2.4, MONEY), Col("مدفوع", "AmountOut", 2.4, MONEY),
+        Col("الرصيد", "=[AmountIn]-[AmountOut]", 2.6, MONEY, running=True)],
+        [("SortKey", False), ("MoveDate", False)], landscape=True,
+        no_data="لا توجد حركة نقدية للاختيارات المحددة.",
+        summary=[("رصيد أول المدة", "=Sum(IIf([SortKey]=0,[AmountIn]-[AmountOut],0))"),
+                 ("المقبوضات", "=Sum(IIf([SortKey]=1,[AmountIn],0))"),
+                 ("المدفوعات والمصروفات", "=Sum(IIf([SortKey]=1,[AmountOut],0))"),
+                 ("رصيد آخر المدة", "=Sum([AmountIn]-[AmountOut])")]),
+    ListSpec("CASH_DAILY", [
+        Col("اليوم", "=GDate([CashDay])", 3.0), Col("رصيد أول اليوم", "OpeningBalance", 3.4, MONEY),
+        Col("المقبوضات", "Receipts", 3.4, MONEY, True), Col("المدفوعات", "Payments", 3.4, MONEY, True),
+        Col("رصيد آخر اليوم", "ClosingBalance", 3.6, MONEY), Col("الحركات", "MoveCount", 2.2, INT, True)],
+        [("CashDay", False)], no_data="لا توجد حركة نقدية في هذه الفترة."),
+    ListSpec("CASH_BALANCES", [
+        Col("الصندوق", "BoxName", 5.0, grow=True), Col("النوع", "BoxTypeName", 2.6),
+        Col("إجمالي الداخل", "TotalIn", 2.9, MONEY, True), Col("إجمالي الخارج", "TotalOut", 2.9, MONEY, True),
+        Col("الرصيد", "Balance", 3.0, MONEY, True), Col("آخر حركة", "=GDate([LastMoveDate])", 2.6)],
+        [("BoxType", True), ("BoxName", False)]),
+    ListSpec("CASH_CLOSINGS", [
+        Col("الرقم", "ClosingNumber", 2.4), Col("التاريخ", "=GDate([ClosingDate],True)", 2.9),
+        Col("الصندوق", "BoxName", 3.0), Col("أجراها", "EmployeeName", 2.8),
+        Col("الدفتري", "ExpectedBalance", 2.6, MONEY, True), Col("الفعلي", "CountedAmount", 2.6, MONEY, True),
+        Col("الفرق", "Difference", 2.2, MONEY, True), Col("الترحيل", "DestinationName", 3.0),
+        Col("المرحَّل", "TransferAmount", 2.6, MONEY, True), Col("المتبقي", "KeptAmount", 3.3, MONEY, True)],
+        [("ClosingDate", False)], landscape=True, no_data="لا توجد تصفيات في هذه الفترة."),
     ListSpec("SLOW_MOVING", [
         Col("الكود", "ProductCode", 2.2), Col("المنتج", "ProductName", 5.0, grow=True),
         Col("التصنيف", "CategoryName", 2.5), Col("الكمية", "CurrentQuantity", 1.8, QTY, True),
@@ -230,8 +260,10 @@ def page_footer(m: ReportModel, w: int):
 def list_report(spec: ListSpec) -> ReportModel:
     e = entry(spec.key)
     w = cm(LANDSCAPE_W if spec.landscape else PORTRAIT_W)
+    summary = spec.summary or []
     m = ReportModel(e.report, e.title, w,
-                    {SEC_PAGE_HEADER: cm(2.95), SEC_DETAIL: cm(0.56), SEC_RPT_FOOTER: cm(0.8),
+                    {SEC_PAGE_HEADER: cm(2.95), SEC_DETAIL: cm(0.56),
+                     SEC_RPT_FOOTER: cm(0.8) + cm(0.65) * len(summary) + (cm(0.2) if summary else 0),
                      SEC_PAGE_FOOTER: cm(0.6)},
                     record_source=e.query, group="", sorts=list(spec.sorts), landscape=spec.landscape,
                     page_setup=True, no_data=spec.no_data)
@@ -258,6 +290,11 @@ def list_report(spec: ListSpec) -> ReportModel:
     count_w = first_total if first_total else w
     txt(m, SEC_RPT_FOOTER, "txtCount", '="الإجمالي (" & Count(*) & " سجل)"', 0, cm(0.15), count_w, cm(0.5),
         8, True)
+    for i, (caption, expr) in enumerate(summary):
+        y = cm(0.95) + i * cm(0.65)
+        lbl(m, SEC_RPT_FOOTER, f"lblSum{i + 1}", caption, w - cm(10.0), y, cm(5.5), cm(0.55), 11, True)
+        txt(m, SEC_RPT_FOOTER, f"txtSum{i + 1}", expr, w - cm(4.5), y, cm(4.5), cm(0.55), 11, True, align=2,
+            fmt=MONEY)
     page_footer(m, w)
     m.events.append('SetSecProp 0, "AlternateBackColor", 15921906')     # light grey rows
     return m

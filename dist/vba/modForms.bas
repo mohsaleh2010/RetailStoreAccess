@@ -420,8 +420,21 @@ Private Function ValidatePartner(ByVal frm As Access.Form) As Boolean
 End Function
 
 Private Function ValidateExpense(ByVal frm As Access.Form) As Boolean
+    If Not frm.NewRecord Then
+        If Nz(DbValue("SELECT COUNT(*) FROM CashVouchers WHERE ExpenseID = " & Nz(frm!ExpenseID.Value, 0)), 0) > 0 Then
+            ShowWarning "Â–« «·„’—Ê› „”Ã· „‰ ”‰œ ’—› ‰ﬁœÌ… ›Ì «·Œ“Ì‰… Ê·« Ìı⁄œÛ¯· „‰ Â‰«." & vbCrLf & _
+                        "·· ’ÕÌÕ ”Ã¯· ”‰œ ﬁ»÷ ‰ﬁœÌ… »«·„»·€ À„ ”‰œ ’—› ÃœÌœ."
+            Exit Function
+        End If
+    End If
     frm!TotalAmount.Value = Nz(frm!Amount.Value, 0) + Nz(frm!Tax.Value, 0)
     If IsNull(frm!EmployeeID.Value) Then frm!EmployeeID.Value = CurrentUserID()
+    ' a cash expense leaves a cash box (modCash); other payment methods do not
+    If Nz(frm!PaymentMethodID.Value, 0) = CASH_METHOD_ID Then
+        If IsNull(frm!CashBoxID.Value) Then frm!CashBoxID.Value = CurrentCashBoxID()
+    Else
+        frm!CashBoxID.Value = Null
+    End If
     If frm!ExpenseDate.Value > Date Then
         If Not AskYesNo(" «—ÌŒ «·„’—Ê› ›Ì «·„” ﬁ»·. Â·  —Ìœ «·Õ›Ÿ ⁄·Ï √Ì Õ«·ø") Then
             SafeFocus frm!ExpenseDate
@@ -483,6 +496,13 @@ Public Sub FieldChanged(ByVal frm As Access.Form, ByVal FieldName As String)
             UpdatePriceInfo frm
         Case "Expenses"
             frm!TotalAmount.Value = Nz(frm!Amount.Value, 0) + Nz(frm!Tax.Value, 0)
+            If FieldName = "PaymentMethodID" Then
+                If Nz(frm!PaymentMethodID.Value, 0) = CASH_METHOD_ID Then
+                    If IsNull(frm!CashBoxID.Value) Then frm!CashBoxID.Value = CurrentCashBoxID()
+                Else
+                    frm!CashBoxID.Value = Null
+                End If
+            End If
     End Select
 End Sub
 

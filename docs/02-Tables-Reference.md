@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **30** | عدد الحقول: **382**
+عدد الجداول: **33** | عدد الحقول: **430**
 
 ## الفهرس
 
@@ -15,27 +15,30 @@
 7. [`Categories`](#categories) – التصنيفات
 8. [`Units`](#units) – وحدات القياس
 9. [`PaymentMethods`](#paymentmethods) – طرق الدفع
-10. [`Suppliers`](#suppliers) – الموردون
-11. [`Customers`](#customers) – العملاء
-12. [`Products`](#products) – المنتجات
-13. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
-14. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
-15. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
-16. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
-17. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
-18. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
-19. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
-20. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
-21. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
-22. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
-23. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-24. [`Expenses`](#expenses) – المصروفات
-25. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-26. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-27. [`StockCounts`](#stockcounts) – جلسات الجرد
-28. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-29. [`AuditLog`](#auditlog) – سجل العمليات
-30. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+10. [`CashBoxes`](#cashboxes) – الخزينة والصناديق
+11. [`Suppliers`](#suppliers) – الموردون
+12. [`Customers`](#customers) – العملاء
+13. [`Products`](#products) – المنتجات
+14. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
+15. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
+16. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
+17. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
+18. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
+19. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
+20. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
+21. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
+22. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
+23. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
+24. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+25. [`Expenses`](#expenses) – المصروفات
+26. [`CashVouchers`](#cashvouchers) – سندات النقدية
+27. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+28. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+29. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+30. [`StockCounts`](#stockcounts) – جلسات الجرد
+31. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+32. [`AuditLog`](#auditlog) – سجل العمليات
+33. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -91,7 +94,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 11 سجل
+- بيانات أساسية: 15 سجل
 
 ## Roles
 
@@ -120,7 +123,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 22 سجل
+- بيانات أساسية: 24 سجل
 
 ## RolePermissions
 
@@ -132,7 +135,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 44 سجل
+- بيانات أساسية: 49 سجل
 
 ## Employees
 
@@ -156,6 +159,7 @@
 | 14 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
 | 15 | Notes | Long Text |  |  |  |  |  | ملاحظات |
 | 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 17 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – تدخل فيه نقدية مبيعاته وسنداته؛ فارغ = أول صندوق كاشير نشط |
 
 - المفتاح الأساسي: `EmployeeID`
 - فهرس فريد: `Username`
@@ -210,6 +214,25 @@
 - المفتاح الأساسي: `PaymentMethodID`
 - فهرس فريد: `MethodName`
 - بيانات أساسية: 4 سجل
+
+## CashBoxes
+
+**الخزينة والصناديق** – الخزينة الرئيسية وصناديق الكاشير. الرصيد لا يُخزَّن: يُحسب من الحركات (qryCashMovements).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **CashBoxID** 🔑 | AutoNumber |  |  |  |  |  | رقم الصندوق |
+| 2 | BoxName | Short Text | 50 | ✔ |  |  |  | اسم الصندوق |
+| 3 | BoxType | Short Text | 10 | ✔ | `"CASHIER"` | `In ("MAIN","CASHIER")` |  | النوع |
+| 4 | OpeningBalance | Currency |  | ✔ | `0` | `>=0` |  | الرصيد الافتتاحي |
+| 5 | OpeningDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الرصيد الافتتاحي |
+| 6 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 7 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `CashBoxID`
+- فهرس فريد: `BoxName`
+- بيانات أساسية: 2 سجل
 
 ## Suppliers
 
@@ -345,6 +368,7 @@
 | 32 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
 | 33 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
 | 34 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
+| 35 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -411,6 +435,7 @@
 | 26 | ZatcaResponse | Long Text |  |  |  |  |  | رد الهيئة |
 | 27 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
 | 28 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 29 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -464,6 +489,7 @@
 | 15 | RemainingAmount | Currency |  | ✔ | `0` | `>=0` |  | المتبقي – يُضاف إلى رصيد المورد |
 | 16 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 17 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 18 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المدفوع نقدًا يخرج من هذا الصندوق |
 
 - المفتاح الأساسي: `PurchaseInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -515,6 +541,7 @@
 | 15 | RefundedAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ المسترد نقدًا |
 | 16 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 17 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 18 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الاسترداد النقدي يدخل هذا الصندوق |
 
 - المفتاح الأساسي: `PurchaseReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -557,6 +584,7 @@
 | 8 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
 | 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 11 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المبلغ النقدي يدخل هذا الصندوق |
 
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
@@ -578,6 +606,7 @@
 | 8 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
 | 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 11 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المبلغ النقدي يخرج من هذا الصندوق |
 
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
@@ -615,11 +644,69 @@
 | 10 | Description | Short Text | 255 |  |  |  |  | الوصف |
 | 11 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
 | 12 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 13 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صُرف من صندوق – المصروف النقدي يخرج من هذا الصندوق؛ فارغ = لم يُدفع من صندوق |
 
 - المفتاح الأساسي: `ExpenseID`
 - فهرس فريد: `ExpenseNumber`
 - فهرس عادي: `ExpenseDate`
 - قاعدة تحقق على مستوى الجدول: `[TotalAmount]=[Amount]+[Tax]` – الإجمالي = المبلغ + الضريبة
+
+## CashVouchers
+
+**سندات النقدية** – قبض نقدية لصندوق، أو صرف منه، أو تحويل بين صندوقين (ومنها ترحيل يومية الكاشير).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **CashVoucherID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | VoucherNumber | Short Text | 20 | ✔ |  |  |  | رقم السند |
+| 3 | VoucherDate | Date/Time |  | ✔ | `Now()` |  |  | التاريخ |
+| 4 | VoucherType | Short Text | 10 | ✔ |  | `In ("IN","OUT","TRANSFER")` |  | نوع السند |
+| 5 | CashBoxID | Number (Long) |  | ✔ |  |  | `CashBoxes.CashBoxID` | الصندوق – القبض يدخله، والصرف والتحويل يخرجان منه |
+| 6 | ToCashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | إلى صندوق – للتحويل فقط |
+| 7 | Category | Short Text | 10 | ✔ | `"OTHER"` | `In ("OTHER","OWNER","EXPENSE","ADVANCE","SHORTAGE","OVERAGE","TRANSFER")` |  | البند |
+| 8 | Amount | Currency |  | ✔ | `0` | `>0` |  | المبلغ |
+| 9 | PartyName | Short Text | 100 |  |  |  |  | المستلم / المسلِّم |
+| 10 | Description | Short Text | 255 |  |  |  |  | البيان |
+| 11 | ExpenseID | Number (Long) |  |  |  |  | `Expenses.ExpenseID` | المصروف المسجَّل – صرف بند مصروف يسجل مصروفًا بنفس المبلغ في المصروفات |
+| 12 | ClosingID | Number (Long) |  |  |  |  | `CashClosings.ClosingID` | تصفية الكاشير |
+| 13 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 14 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `CashVoucherID`
+- فهرس فريد: `VoucherNumber`
+- فهرس عادي: `VoucherDate`
+- فهرس عادي: `CashBoxID`
+- قاعدة تحقق على مستوى الجدول: `[VoucherType]<>"TRANSFER" Or ([ToCashBoxID] Is Not Null And [ToCashBoxID]<>[CashBoxID])` – التحويل يحتاج صندوقًا آخر غير صندوق الصرف
+
+## CashClosings
+
+**تصفية يومية الكاشير** – جرد نقدية صندوق الكاشير في نهاية الوردية وترحيلها للخزينة الرئيسية أو تسويتها مع المالك.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ClosingID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | ClosingNumber | Short Text | 20 | ✔ |  |  |  | رقم التصفية |
+| 3 | ClosingDate | Date/Time |  | ✔ | `Now()` |  |  | تاريخ التصفية |
+| 4 | CashBoxID | Number (Long) |  | ✔ |  |  | `CashBoxes.CashBoxID` | الصندوق |
+| 5 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أجراها |
+| 6 | PeriodStart | Date/Time |  |  |  |  |  | من (آخر تصفية) |
+| 7 | OpeningBalance | Currency |  | ✔ | `0` |  |  | رصيد البداية |
+| 8 | CashIn | Currency |  | ✔ | `0` | `>=0` |  | المقبوضات |
+| 9 | CashOut | Currency |  | ✔ | `0` | `>=0` |  | المدفوعات |
+| 10 | ExpectedBalance | Currency |  | ✔ | `0` |  |  | الرصيد الدفتري |
+| 11 | CountedAmount | Currency |  | ✔ | `0` | `>=0` |  | النقدية الفعلية |
+| 12 | Difference | Currency |  | ✔ | `0` |  |  | الفرق – سالب = عجز، موجب = زيادة |
+| 13 | Destination | Short Text | 10 | ✔ | `"MAIN"` | `In ("MAIN","OWNER","KEEP")` |  | الترحيل إلى |
+| 14 | ToCashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | الخزينة المستلمة |
+| 15 | TransferAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ المرحَّل |
+| 16 | KeptAmount | Currency |  | ✔ | `0` | `>=0` |  | المتبقي في الصندوق (عهدة) |
+| 17 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 18 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `ClosingID`
+- فهرس فريد: `ClosingNumber`
+- فهرس عادي: `CashBoxID, ClosingDate`
+- قاعدة تحقق على مستوى الجدول: `[TransferAmount]+[KeptAmount]=[CountedAmount]` – المرحَّل + المتبقي = النقدية الفعلية
 
 ## TransactionTypes
 

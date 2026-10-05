@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=8;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=23;SalesInvoices=34;SalesInvoiceDetails=14;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=11;Roles=3;Permissions=22;RolePermissions=44;Employees=1;Categories=1;Units=8;PaymentMethods=4;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=17;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=15;Roles=3;Permissions=24;RolePermissions=49;Employees=1;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -38,6 +38,9 @@ Private m_skipped As Long
 Private m_upgrade As Boolean        ' the table exists: only its missing fields are added
 Private m_addedFields As Long
 Private m_seeded As Long
+Private m_seedTable As String
+Private m_seedAdded As Long
+Private m_seedOnlyMissing As Boolean
 Private m_currentStep As String
 Private m_inTrans As Boolean
 
@@ -411,15 +414,17 @@ End Sub
 '------------------------------------------------------------------------------
 ' Seed helpers (lookup data is inserted only into empty tables)
 '------------------------------------------------------------------------------
-Private Function BeginSeed(ByVal TableName As String) As Boolean
+Private Function BeginSeed(ByVal TableName As String, Optional ByVal AddMissing As Boolean = False) As Boolean
+    ' Empty table: all seed rows. Table with data: nothing, or (AddMissing) only the rows
+    ' it does not have yet - new sequences / permissions of a later version.
     Dim rs As DAO.Recordset
     m_currentStep = "seed " & TableName
+    m_seedTable = TableName
+    m_seedAdded = 0
     Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & TableName & "]", dbOpenSnapshot)
-    If rs(0) > 0 Then
-        rs.Close
-        Exit Function
-    End If
+    m_seedOnlyMissing = (rs(0) > 0)
     rs.Close
+    If m_seedOnlyMissing And Not AddMissing Then Exit Function
     DBEngine.Workspaces(0).BeginTrans
     m_inTrans = True
     BeginSeed = True
@@ -427,11 +432,52 @@ End Function
 
 Private Sub ExecSeed(ByVal Sql As String)
     m_db.Execute Sql, dbFailOnError
+    m_seedAdded = m_seedAdded + 1
 End Sub
+
+Private Function SeedRow(ByVal Where As String, ByVal Sql As String) As Boolean
+    ' Inserts the row unless the table already has it. True = inserted.
+    Dim rs As DAO.Recordset
+    If m_seedOnlyMissing Then
+        Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & m_seedTable & "] WHERE " & Where, dbOpenSnapshot)
+        If rs(0) > 0 Then
+            rs.Close
+            Exit Function
+        End If
+        rs.Close
+    End If
+    ExecSeed Sql
+    SeedRow = True
+End Function
+
+Private Sub GrantNewPermission(ByVal PermissionKey As String, ByVal RoleIDs As String)
+    ' Only for a permission added to an existing back-end (a new one is granted by Seed_RolePermissions).
+    Dim ids() As String, i As Long
+    If Not m_seedOnlyMissing Or Len(RoleIDs) = 0 Then Exit Sub
+    ids = Split(RoleIDs, ",")
+    For i = 0 To UBound(ids)
+        If DCountIn("RolePermissions", "[RoleID] = " & ids(i) & " AND [PermissionKey] = '" & PermissionKey & "'") = 0 And _
+           DCountIn("Roles", "[RoleID] = " & ids(i)) > 0 Then
+            m_db.Execute "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (" & ids(i) & _
+                         ", '" & PermissionKey & "')", dbFailOnError
+        End If
+    Next
+End Sub
+
+Private Function DCountIn(ByVal TableName As String, ByVal Where As String) As Long
+    Dim rs As DAO.Recordset
+    Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & TableName & "] WHERE " & Where, dbOpenSnapshot)
+    DCountIn = rs(0)
+    rs.Close
+End Function
 
 Private Sub EndSeed(ByVal TableName As String, ByVal RowCount As Long)
     DBEngine.Workspaces(0).CommitTrans
     m_inTrans = False
+    If m_seedOnlyMissing Then
+        If m_seedAdded > 0 Then LogLine "  * سجلات جديدة: " & TableName & " (" & m_seedAdded & " سجل)"
+        Exit Sub
+    End If
     m_seeded = m_seeded + 1
     LogLine "  * بيانات أساسية: " & TableName & " (" & RowCount & " سجل)"
 End Sub
@@ -482,6 +528,7 @@ Private Sub CreateAllTables()
     CreateTable_Categories
     CreateTable_Units
     CreateTable_PaymentMethods
+    CreateTable_CashBoxes
     CreateTable_Suppliers
     CreateTable_Customers
     CreateTable_Products
@@ -497,6 +544,8 @@ Private Sub CreateAllTables()
     CreateTable_SupplierPayments
     CreateTable_ExpenseTypes
     CreateTable_Expenses
+    CreateTable_CashVouchers
+    CreateTable_CashClosings
     CreateTable_TransactionTypes
     CreateTable_InventoryTransactions
     CreateTable_StockCounts
@@ -668,6 +717,8 @@ Private Sub CreateTable_Employees()
              "", "", "ملاحظات", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "صندوق النقدية", "تدخل فيه نقدية مبيعاته وسنداته؛ فارغ = أول صندوق كاشير نشط"
     AddIndex tdf, "PrimaryKey", "EmployeeID", True, True, False
     AddIndex tdf, "UX_Username", "Username", False, True, False
     EndTable tdf, "الموظفون والمستخدمون: كل موظف هو مستخدم للنظام؛ لا يُحذف بل يُعطَّل للحفاظ على سجل عملياته.", "", ""
@@ -729,6 +780,30 @@ Private Sub CreateTable_PaymentMethods()
     AddIndex tdf, "PrimaryKey", "PaymentMethodID", True, True, False
     AddIndex tdf, "UX_MethodName", "MethodName", False, True, False
     EndTable tdf, "طرق الدفع: طرق دفع المبالغ المسددة مع رمزها في فاتورة الهيئة (UNTDID 4461).", "", ""
+End Sub
+
+Private Sub CreateTable_CashBoxes()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "CashBoxes") Then Exit Sub
+    AddField tdf, "CashBoxID", "AUTO", 0, False, "", _
+             "", "", "رقم الصندوق", ""
+    AddField tdf, "BoxName", "TEXT", 50, True, "", _
+             "", "", "اسم الصندوق", ""
+    AddField tdf, "BoxType", "TEXT", 10, True, """CASHIER""", _
+             "In (""MAIN"",""CASHIER"")", "MAIN = خزينة رئيسية، CASHIER = صندوق كاشير", "النوع", ""
+    AddField tdf, "OpeningBalance", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "الرصيد الافتتاحي", ""
+    AddField tdf, "OpeningDate", "DATE", 0, True, "Date()", _
+             "", "", "تاريخ الرصيد الافتتاحي", ""
+    AddField tdf, "IsActive", "BOOL", 0, False, "True", _
+             "", "", "نشط", ""
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "ملاحظات", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "CashBoxID", True, True, False
+    AddIndex tdf, "UX_BoxName", "BoxName", False, True, False
+    EndTable tdf, "الخزينة والصناديق: الخزينة الرئيسية وصناديق الكاشير. الرصيد لا يُخزَّن: يُحسب من الحركات (qryCashMovements).", "", ""
 End Sub
 
 Private Sub CreateTable_Suppliers()
@@ -948,6 +1023,8 @@ Private Sub CreateTable_SalesInvoices()
              "", "", "عنوان التوصيل", ""
     AddField tdf, "OrderName", "TEXT", 50, False, "", _
              "", "", "اسم العميل على الطلب", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "صندوق النقدية", "يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق"
     AddIndex tdf, "PrimaryKey", "SalesInvoiceID", True, True, False
     AddIndex tdf, "UX_InvoiceNumber", "InvoiceNumber", False, True, False
     AddIndex tdf, "IX_InvoiceDate", "InvoiceDate", False, False, False
@@ -1051,6 +1128,8 @@ Private Sub CreateTable_SalesReturns()
              "", "", "مسار ملف XML الموقّع", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "صندوق النقدية", "الرد النقدي يخرج من هذا الصندوق"
     AddIndex tdf, "PrimaryKey", "SalesReturnID", True, True, False
     AddIndex tdf, "UX_ReturnNumber", "ReturnNumber", False, True, False
     AddIndex tdf, "IX_ReturnDate", "ReturnDate", False, False, False
@@ -1130,6 +1209,8 @@ Private Sub CreateTable_PurchaseInvoices()
              "", "", "ملاحظات", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "صندوق النقدية", "المدفوع نقدًا يخرج من هذا الصندوق"
     AddIndex tdf, "PrimaryKey", "PurchaseInvoiceID", True, True, False
     AddIndex tdf, "UX_InvoiceNumber", "InvoiceNumber", False, True, False
     AddIndex tdf, "IX_InvoiceDate", "InvoiceDate", False, False, False
@@ -1204,6 +1285,8 @@ Private Sub CreateTable_PurchaseReturns()
              "", "", "ملاحظات", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "صندوق النقدية", "الاسترداد النقدي يدخل هذا الصندوق"
     AddIndex tdf, "PrimaryKey", "PurchaseReturnID", True, True, False
     AddIndex tdf, "UX_ReturnNumber", "ReturnNumber", False, True, False
     AddIndex tdf, "IX_ReturnDate", "ReturnDate", False, False, False
@@ -1262,6 +1345,8 @@ Private Sub CreateTable_CustomerPayments()
              "", "", "ملاحظات", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "صندوق النقدية", "المبلغ النقدي يدخل هذا الصندوق"
     AddIndex tdf, "PrimaryKey", "PaymentID", True, True, False
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
@@ -1291,6 +1376,8 @@ Private Sub CreateTable_SupplierPayments()
              "", "", "ملاحظات", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "صندوق النقدية", "المبلغ النقدي يخرج من هذا الصندوق"
     AddIndex tdf, "PrimaryKey", "PaymentID", True, True, False
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
@@ -1338,10 +1425,95 @@ Private Sub CreateTable_Expenses()
              "", "", "الموظف", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "صُرف من صندوق", "المصروف النقدي يخرج من هذا الصندوق؛ فارغ = لم يُدفع من صندوق"
     AddIndex tdf, "PrimaryKey", "ExpenseID", True, True, False
     AddIndex tdf, "UX_ExpenseNumber", "ExpenseNumber", False, True, False
     AddIndex tdf, "IX_ExpenseDate", "ExpenseDate", False, False, False
     EndTable tdf, "المصروفات: مصروفات المحل التشغيلية؛ المبلغ بدون ضريبة والضريبة منفصلة (ضريبة مدخلات).", "[TotalAmount]=[Amount]+[Tax]", "الإجمالي = المبلغ + الضريبة"
+End Sub
+
+Private Sub CreateTable_CashVouchers()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "CashVouchers") Then Exit Sub
+    AddField tdf, "CashVoucherID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "VoucherNumber", "TEXT", 20, True, "", _
+             "", "", "رقم السند", ""
+    AddField tdf, "VoucherDate", "DATETIME", 0, True, "Now()", _
+             "", "", "التاريخ", ""
+    AddField tdf, "VoucherType", "TEXT", 10, True, "", _
+             "In (""IN"",""OUT"",""TRANSFER"")", "IN = قبض، OUT = صرف، TRANSFER = تحويل بين صندوقين", "نوع السند", ""
+    AddField tdf, "CashBoxID", "LONG", 0, True, "", _
+             "", "", "الصندوق", "القبض يدخله، والصرف والتحويل يخرجان منه"
+    AddField tdf, "ToCashBoxID", "LONG", 0, False, "", _
+             "", "", "إلى صندوق", "للتحويل فقط"
+    AddField tdf, "Category", "TEXT", 10, True, """OTHER""", _
+             "In (""OTHER"",""OWNER"",""EXPENSE"",""ADVANCE"",""SHORTAGE"",""OVERAGE"",""TRANSFER"")", "اختر البند من القائمة", "البند", ""
+    AddField tdf, "Amount", "MONEY", 0, True, "0", _
+             ">0", "المبلغ يجب أن يكون أكبر من صفر", "المبلغ", ""
+    AddField tdf, "PartyName", "TEXT", 100, False, "", _
+             "", "", "المستلم / المسلِّم", ""
+    AddField tdf, "Description", "TEXT", 255, False, "", _
+             "", "", "البيان", ""
+    AddField tdf, "ExpenseID", "LONG", 0, False, "", _
+             "", "", "المصروف المسجَّل", "صرف بند مصروف يسجل مصروفًا بنفس المبلغ في المصروفات"
+    AddField tdf, "ClosingID", "LONG", 0, False, "", _
+             "", "", "تصفية الكاشير", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "الموظف", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "CashVoucherID", True, True, False
+    AddIndex tdf, "UX_VoucherNumber", "VoucherNumber", False, True, False
+    AddIndex tdf, "IX_VoucherDate", "VoucherDate", False, False, False
+    AddIndex tdf, "IX_CashBoxID", "CashBoxID", False, False, False
+    EndTable tdf, "سندات النقدية: قبض نقدية لصندوق، أو صرف منه، أو تحويل بين صندوقين (ومنها ترحيل يومية الكاشير).", "[VoucherType]<>""TRANSFER"" Or ([ToCashBoxID] Is Not Null And [ToCashBoxID]<>[CashBoxID])", "التحويل يحتاج صندوقًا آخر غير صندوق الصرف"
+End Sub
+
+Private Sub CreateTable_CashClosings()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "CashClosings") Then Exit Sub
+    AddField tdf, "ClosingID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "ClosingNumber", "TEXT", 20, True, "", _
+             "", "", "رقم التصفية", ""
+    AddField tdf, "ClosingDate", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ التصفية", ""
+    AddField tdf, "CashBoxID", "LONG", 0, True, "", _
+             "", "", "الصندوق", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "أجراها", ""
+    AddField tdf, "PeriodStart", "DATETIME", 0, False, "", _
+             "", "", "من (آخر تصفية)", ""
+    AddField tdf, "OpeningBalance", "MONEY", 0, True, "0", _
+             "", "", "رصيد البداية", ""
+    AddField tdf, "CashIn", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "المقبوضات", ""
+    AddField tdf, "CashOut", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "المدفوعات", ""
+    AddField tdf, "ExpectedBalance", "MONEY", 0, True, "0", _
+             "", "", "الرصيد الدفتري", ""
+    AddField tdf, "CountedAmount", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "النقدية الفعلية", ""
+    AddField tdf, "Difference", "MONEY", 0, True, "0", _
+             "", "", "الفرق", "سالب = عجز، موجب = زيادة"
+    AddField tdf, "Destination", "TEXT", 10, True, """MAIN""", _
+             "In (""MAIN"",""OWNER"",""KEEP"")", "MAIN = الخزينة الرئيسية، OWNER = تسوية مع المالك، KEEP = يبقى في الصندوق", "الترحيل إلى", ""
+    AddField tdf, "ToCashBoxID", "LONG", 0, False, "", _
+             "", "", "الخزينة المستلمة", ""
+    AddField tdf, "TransferAmount", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "المبلغ المرحَّل", ""
+    AddField tdf, "KeptAmount", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "المتبقي في الصندوق (عهدة)", ""
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "ملاحظات", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "ClosingID", True, True, False
+    AddIndex tdf, "UX_ClosingNumber", "ClosingNumber", False, True, False
+    AddIndex tdf, "IX_CashBoxID_ClosingDate", "CashBoxID,ClosingDate", False, False, False
+    EndTable tdf, "تصفية يومية الكاشير: جرد نقدية صندوق الكاشير في نهاية الوردية وترحيلها للخزينة الرئيسية أو تسويتها مع المالك.", "[TransferAmount]+[KeptAmount]=[CountedAmount]", "المرحَّل + المتبقي = النقدية الفعلية"
 End Sub
 
 Private Sub CreateTable_TransactionTypes()
@@ -1532,6 +1704,7 @@ Private Sub SeedAll()
     Seed_Categories
     Seed_Units
     Seed_PaymentMethods
+    Seed_CashBoxes
     Seed_Customers
     Seed_ExpenseTypes
     Seed_TransactionTypes
@@ -1539,29 +1712,33 @@ Private Sub SeedAll()
 End Sub
 
 Private Sub Seed_Settings()
-    If Not BeginSeed("Settings") Then Exit Sub
+    If Not BeginSeed("Settings", False) Then Exit Sub
     ExecSeed "INSERT INTO [Settings] ([SettingID], [StoreName], [CountryCode], [VATRate], [PricesIncludeVAT], [AllowNegativeStock], [CurrencyCode], [DefaultCustomerID], [ZatcaPhase], [LastInvoiceHash], [BackupKeepCount], [SlowMovingDays], [ReceiptFooter]) VALUES (1, 'اسم المحل', 'SA', 0.15, True, False, 'SAR', 1, 1, 'NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==', 30, 90, 'شكرًا لزيارتكم')"
     EndSeed "Settings", 1
 End Sub
 
 Private Sub Seed_Sequences()
-    If Not BeginSeed("Sequences") Then Exit Sub
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_INVOICE', 'INV-', 1, 6, 'فواتير المبيعات')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_RETURN', 'CRN-', 1, 6, 'مرتجعات المبيعات (إشعار دائن)')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_INVOICE', 'PUR-', 1, 6, 'فواتير المشتريات')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_RETURN', 'PRT-', 1, 6, 'مرتجعات المشتريات')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CUSTOMER_PAYMENT', 'RCV-', 1, 6, 'سندات القبض من العملاء')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SUPPLIER_PAYMENT', 'PAY-', 1, 6, 'سندات الصرف للموردين')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('EXPENSE', 'EXP-', 1, 6, 'المصروفات')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_COUNT', 'CNT-', 1, 5, 'جلسات الجرد')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_ADJUST', 'ADJ-', 1, 6, 'حركات المخزون اليدوية')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PRODUCT_CODE', 'P', 1, 5, 'أكواد المنتجات')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ZATCA_ICV', Null, 1, 0, 'عدّاد ICV لمستندات فاتورة')"
-    EndSeed "Sequences", 11
+    If Not BeginSeed("Sequences", True) Then Exit Sub
+    SeedRow "[SequenceName] = 'SALES_INVOICE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_INVOICE', 'INV-', 1, 6, 'فواتير المبيعات')"
+    SeedRow "[SequenceName] = 'SALES_RETURN'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_RETURN', 'CRN-', 1, 6, 'مرتجعات المبيعات (إشعار دائن)')"
+    SeedRow "[SequenceName] = 'PURCHASE_INVOICE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_INVOICE', 'PUR-', 1, 6, 'فواتير المشتريات')"
+    SeedRow "[SequenceName] = 'PURCHASE_RETURN'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_RETURN', 'PRT-', 1, 6, 'مرتجعات المشتريات')"
+    SeedRow "[SequenceName] = 'CUSTOMER_PAYMENT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CUSTOMER_PAYMENT', 'RCV-', 1, 6, 'سندات القبض من العملاء')"
+    SeedRow "[SequenceName] = 'SUPPLIER_PAYMENT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SUPPLIER_PAYMENT', 'PAY-', 1, 6, 'سندات الصرف للموردين')"
+    SeedRow "[SequenceName] = 'EXPENSE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('EXPENSE', 'EXP-', 1, 6, 'المصروفات')"
+    SeedRow "[SequenceName] = 'STOCK_COUNT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_COUNT', 'CNT-', 1, 5, 'جلسات الجرد')"
+    SeedRow "[SequenceName] = 'STOCK_ADJUST'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_ADJUST', 'ADJ-', 1, 6, 'حركات المخزون اليدوية')"
+    SeedRow "[SequenceName] = 'PRODUCT_CODE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PRODUCT_CODE', 'P', 1, 5, 'أكواد المنتجات')"
+    SeedRow "[SequenceName] = 'ZATCA_ICV'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ZATCA_ICV', Null, 1, 0, 'عدّاد ICV لمستندات فاتورة')"
+    SeedRow "[SequenceName] = 'CASH_IN'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_IN', 'CIN-', 1, 6, 'سندات قبض النقدية (الخزينة)')"
+    SeedRow "[SequenceName] = 'CASH_OUT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_OUT', 'COT-', 1, 6, 'سندات صرف النقدية (الخزينة)')"
+    SeedRow "[SequenceName] = 'CASH_TRANSFER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_TRANSFER', 'TRF-', 1, 6, 'التحويل بين الصناديق')"
+    SeedRow "[SequenceName] = 'CASH_CLOSING'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_CLOSING', 'CLS-', 1, 6, 'تصفية يومية الكاشير')"
+    EndSeed "Sequences", 15
 End Sub
 
 Private Sub Seed_Roles()
-    If Not BeginSeed("Roles") Then Exit Sub
+    If Not BeginSeed("Roles", False) Then Exit Sub
     ExecSeed "INSERT INTO [Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (1, 'ADMIN', 'مدير النظام', 'جميع الصلاحيات')"
     ExecSeed "INSERT INTO [Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (2, 'MANAGER', 'مدير', 'المبيعات والمشتريات والمخزون والتقارير')"
     ExecSeed "INSERT INTO [Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (3, 'CASHIER', 'كاشير', 'المبيعات والعملاء فقط')"
@@ -1569,34 +1746,36 @@ Private Sub Seed_Roles()
 End Sub
 
 Private Sub Seed_Permissions()
-    If Not BeginSeed("Permissions") Then Exit Sub
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_POS', 'نقطة البيع', 'المبيعات', 10)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_VIEW', 'عرض وإعادة طباعة الفواتير', 'المبيعات', 11)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_RETURN', 'مرتجعات المبيعات', 'المبيعات', 12)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PRICE_OVERRIDE', 'تعديل سعر البيع في الفاتورة', 'المبيعات', 13)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DISCOUNT_OVERRIDE', 'خصم أعلى من الحد المسموح', 'المبيعات', 14)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('ALLOW_NEGATIVE_STOCK', 'البيع بكمية أكبر من المتوفر', 'المبيعات', 15)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMERS', 'إدارة العملاء', 'العملاء', 20)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMER_PAYMENTS', 'سندات القبض', 'العملاء', 21)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASES', 'فواتير المشتريات', 'المشتريات', 30)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASE_RETURN', 'مرتجعات المشتريات', 'المشتريات', 31)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SUPPLIERS', 'إدارة الموردين', 'الموردون', 40)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SUPPLIER_PAYMENTS', 'سندات الصرف', 'الموردون', 41)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PRODUCTS', 'إدارة المنتجات والأسعار', 'المخزون', 50)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('INVENTORY_ADJUST', 'إضافة وخصم مخزون يدوي', 'المخزون', 51)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('STOCK_COUNT', 'الجرد', 'المخزون', 52)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EXPENSES', 'المصروفات', 'المصروفات', 60)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', 'التقارير التشغيلية', 'التقارير', 70)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', 'تقارير الأرباح والضريبة', 'التقارير', 71)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', 'الأرقام المالية في لوحة التحكم', 'التقارير', 72)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', 'إعدادات المحل', 'النظام', 80)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', 'المستخدمون والصلاحيات', 'النظام', 81)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', 'النسخ الاحتياطي', 'النظام', 82)"
-    EndSeed "Permissions", 22
+    If Not BeginSeed("Permissions", True) Then Exit Sub
+    If SeedRow("[PermissionKey] = 'SALES_POS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_POS', 'نقطة البيع', 'المبيعات', 10)") Then GrantNewPermission "SALES_POS", "1,2,3"
+    If SeedRow("[PermissionKey] = 'SALES_VIEW'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_VIEW', 'عرض وإعادة طباعة الفواتير', 'المبيعات', 11)") Then GrantNewPermission "SALES_VIEW", "1,2,3"
+    If SeedRow("[PermissionKey] = 'SALES_RETURN'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_RETURN', 'مرتجعات المبيعات', 'المبيعات', 12)") Then GrantNewPermission "SALES_RETURN", "1,2"
+    If SeedRow("[PermissionKey] = 'PRICE_OVERRIDE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PRICE_OVERRIDE', 'تعديل سعر البيع في الفاتورة', 'المبيعات', 13)") Then GrantNewPermission "PRICE_OVERRIDE", "1,2"
+    If SeedRow("[PermissionKey] = 'DISCOUNT_OVERRIDE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DISCOUNT_OVERRIDE', 'خصم أعلى من الحد المسموح', 'المبيعات', 14)") Then GrantNewPermission "DISCOUNT_OVERRIDE", "1,2"
+    If SeedRow("[PermissionKey] = 'ALLOW_NEGATIVE_STOCK'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('ALLOW_NEGATIVE_STOCK', 'البيع بكمية أكبر من المتوفر', 'المبيعات', 15)") Then GrantNewPermission "ALLOW_NEGATIVE_STOCK", "1"
+    If SeedRow("[PermissionKey] = 'CUSTOMERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMERS', 'إدارة العملاء', 'العملاء', 20)") Then GrantNewPermission "CUSTOMERS", "1,2,3"
+    If SeedRow("[PermissionKey] = 'CUSTOMER_PAYMENTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMER_PAYMENTS', 'سندات القبض', 'العملاء', 21)") Then GrantNewPermission "CUSTOMER_PAYMENTS", "1,2,3"
+    If SeedRow("[PermissionKey] = 'PURCHASES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASES', 'فواتير المشتريات', 'المشتريات', 30)") Then GrantNewPermission "PURCHASES", "1,2"
+    If SeedRow("[PermissionKey] = 'PURCHASE_RETURN'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASE_RETURN', 'مرتجعات المشتريات', 'المشتريات', 31)") Then GrantNewPermission "PURCHASE_RETURN", "1,2"
+    If SeedRow("[PermissionKey] = 'SUPPLIERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SUPPLIERS', 'إدارة الموردين', 'الموردون', 40)") Then GrantNewPermission "SUPPLIERS", "1,2"
+    If SeedRow("[PermissionKey] = 'SUPPLIER_PAYMENTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SUPPLIER_PAYMENTS', 'سندات الصرف', 'الموردون', 41)") Then GrantNewPermission "SUPPLIER_PAYMENTS", "1,2"
+    If SeedRow("[PermissionKey] = 'PRODUCTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PRODUCTS', 'إدارة المنتجات والأسعار', 'المخزون', 50)") Then GrantNewPermission "PRODUCTS", "1,2"
+    If SeedRow("[PermissionKey] = 'INVENTORY_ADJUST'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('INVENTORY_ADJUST', 'إضافة وخصم مخزون يدوي', 'المخزون', 51)") Then GrantNewPermission "INVENTORY_ADJUST", "1,2"
+    If SeedRow("[PermissionKey] = 'STOCK_COUNT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('STOCK_COUNT', 'الجرد', 'المخزون', 52)") Then GrantNewPermission "STOCK_COUNT", "1,2"
+    If SeedRow("[PermissionKey] = 'EXPENSES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EXPENSES', 'المصروفات', 'المصروفات', 60)") Then GrantNewPermission "EXPENSES", "1,2"
+    If SeedRow("[PermissionKey] = 'CASH_BOX'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_BOX', 'الخزينة: سندات القبض والصرف والتحويل والصناديق', 'الخزينة', 65)") Then GrantNewPermission "CASH_BOX", "1,2"
+    If SeedRow("[PermissionKey] = 'CASH_CLOSING'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_CLOSING', 'تصفية يومية الكاشير', 'الخزينة', 66)") Then GrantNewPermission "CASH_CLOSING", "1,2,3"
+    If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', 'التقارير التشغيلية', 'التقارير', 70)") Then GrantNewPermission "REPORTS", "1,2"
+    If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', 'تقارير الأرباح والضريبة', 'التقارير', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
+    If SeedRow("[PermissionKey] = 'DASHBOARD_FINANCIAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', 'الأرقام المالية في لوحة التحكم', 'التقارير', 72)") Then GrantNewPermission "DASHBOARD_FINANCIAL", "1,2"
+    If SeedRow("[PermissionKey] = 'SETTINGS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', 'إعدادات المحل', 'النظام', 80)") Then GrantNewPermission "SETTINGS", "1"
+    If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', 'المستخدمون والصلاحيات', 'النظام', 81)") Then GrantNewPermission "USERS", "1"
+    If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', 'النسخ الاحتياطي', 'النظام', 82)") Then GrantNewPermission "BACKUP", "1"
+    EndSeed "Permissions", 24
 End Sub
 
 Private Sub Seed_RolePermissions()
-    If Not BeginSeed("RolePermissions") Then Exit Sub
+    If Not BeginSeed("RolePermissions", False) Then Exit Sub
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'SALES_POS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'SALES_VIEW')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'SALES_RETURN')"
@@ -1613,6 +1792,8 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'INVENTORY_ADJUST')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'STOCK_COUNT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'EXPENSES')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_BOX')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'DASHBOARD_FINANCIAL')"
@@ -1634,6 +1815,8 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'INVENTORY_ADJUST')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'STOCK_COUNT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'EXPENSES')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_BOX')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'DASHBOARD_FINANCIAL')"
@@ -1641,23 +1824,24 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'SALES_VIEW')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
-    EndSeed "RolePermissions", 44
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
+    EndSeed "RolePermissions", 49
 End Sub
 
 Private Sub Seed_Employees()
-    If Not BeginSeed("Employees") Then Exit Sub
+    If Not BeginSeed("Employees", False) Then Exit Sub
     ExecSeed "INSERT INTO [Employees] ([EmployeeID], [EmployeeName], [JobTitle], [Username], [RoleID], [MaxDiscountPercent], [MustChangePassword], [IsActive]) VALUES (1, 'مدير النظام', 'مدير النظام', 'admin', 1, 1, True, True)"
     EndSeed "Employees", 1
 End Sub
 
 Private Sub Seed_Categories()
-    If Not BeginSeed("Categories") Then Exit Sub
+    If Not BeginSeed("Categories", False) Then Exit Sub
     ExecSeed "INSERT INTO [Categories] ([CategoryID], [CategoryName], [Description]) VALUES (1, 'عام', 'تصنيف افتراضي')"
     EndSeed "Categories", 1
 End Sub
 
 Private Sub Seed_Units()
-    If Not BeginSeed("Units") Then Exit Sub
+    If Not BeginSeed("Units", False) Then Exit Sub
     ExecSeed "INSERT INTO [Units] ([UnitID], [UnitName], [ZatcaUnitCode]) VALUES (1, 'حبة', 'PCE')"
     ExecSeed "INSERT INTO [Units] ([UnitID], [UnitName], [ZatcaUnitCode]) VALUES (2, 'علبة', 'BX')"
     ExecSeed "INSERT INTO [Units] ([UnitID], [UnitName], [ZatcaUnitCode]) VALUES (3, 'كرتون', 'CT')"
@@ -1670,7 +1854,7 @@ Private Sub Seed_Units()
 End Sub
 
 Private Sub Seed_PaymentMethods()
-    If Not BeginSeed("PaymentMethods") Then Exit Sub
+    If Not BeginSeed("PaymentMethods", False) Then Exit Sub
     ExecSeed "INSERT INTO [PaymentMethods] ([PaymentMethodID], [MethodName], [ZatcaCode], [SortOrder]) VALUES (1, 'نقدي', '10', 1)"
     ExecSeed "INSERT INTO [PaymentMethods] ([PaymentMethodID], [MethodName], [ZatcaCode], [SortOrder]) VALUES (2, 'مدى / بطاقة', '48', 2)"
     ExecSeed "INSERT INTO [PaymentMethods] ([PaymentMethodID], [MethodName], [ZatcaCode], [SortOrder]) VALUES (3, 'تحويل بنكي', '42', 3)"
@@ -1678,14 +1862,21 @@ Private Sub Seed_PaymentMethods()
     EndSeed "PaymentMethods", 4
 End Sub
 
+Private Sub Seed_CashBoxes()
+    If Not BeginSeed("CashBoxes", False) Then Exit Sub
+    ExecSeed "INSERT INTO [CashBoxes] ([CashBoxID], [BoxName], [BoxType]) VALUES (1, 'الخزينة الرئيسية', 'MAIN')"
+    ExecSeed "INSERT INTO [CashBoxes] ([CashBoxID], [BoxName], [BoxType]) VALUES (2, 'صندوق الكاشير', 'CASHIER')"
+    EndSeed "CashBoxes", 2
+End Sub
+
 Private Sub Seed_Customers()
-    If Not BeginSeed("Customers") Then Exit Sub
+    If Not BeginSeed("Customers", False) Then Exit Sub
     ExecSeed "INSERT INTO [Customers] ([CustomerID], [CustomerName], [AllowCredit], [IsSystem]) VALUES (1, 'عميل نقدي', False, True)"
     EndSeed "Customers", 1
 End Sub
 
 Private Sub Seed_ExpenseTypes()
-    If Not BeginSeed("ExpenseTypes") Then Exit Sub
+    If Not BeginSeed("ExpenseTypes", False) Then Exit Sub
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (1, 'الإيجار')"
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (2, 'الكهرباء')"
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (3, 'المياه')"
@@ -1699,7 +1890,7 @@ Private Sub Seed_ExpenseTypes()
 End Sub
 
 Private Sub Seed_TransactionTypes()
-    If Not BeginSeed("TransactionTypes") Then Exit Sub
+    If Not BeginSeed("TransactionTypes", False) Then Exit Sub
     ExecSeed "INSERT INTO [TransactionTypes] ([TransactionTypeID], [TypeCode], [TypeName], [Direction], [IsManual]) VALUES (1, 'PURCHASE', 'شراء', 1, False)"
     ExecSeed "INSERT INTO [TransactionTypes] ([TransactionTypeID], [TypeCode], [TypeName], [Direction], [IsManual]) VALUES (2, 'SALE', 'بيع', -1, False)"
     ExecSeed "INSERT INTO [TransactionTypes] ([TransactionTypeID], [TypeCode], [TypeName], [Direction], [IsManual]) VALUES (3, 'PURCHASE_RETURN', 'مرتجع شراء', -1, False)"
@@ -1712,7 +1903,7 @@ Private Sub Seed_TransactionTypes()
 End Sub
 
 Private Sub Seed_LabelSettings()
-    If Not BeginSeed("LabelSettings") Then Exit Sub
+    If Not BeginSeed("LabelSettings", False) Then Exit Sub
     ExecSeed "INSERT INTO [LabelSettings] ([LabelSettingID]) VALUES (1)"
     EndSeed "LabelSettings", 1
 End Sub

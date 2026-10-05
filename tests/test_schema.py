@@ -154,7 +154,7 @@ class SchemaStructureTests(unittest.TestCase):
             self.assertTrue(field(tname, fname).on_delete_cascade, f"{tname}.{fname}")
 
     def test_money_amounts_cannot_be_negative_except_balances(self):
-        allowed_negative = {"OpeningBalance", "CurrentBalance", "DifferenceValue"}
+        allowed_negative = {"OpeningBalance", "CurrentBalance", "DifferenceValue", "ExpectedBalance", "Difference"}
         for t in TABLES:
             for f in t.fields:
                 if f.kind == "MONEY" and f.name not in allowed_negative:
@@ -206,7 +206,7 @@ class SeedDataTests(unittest.TestCase):
         all_perms = {r[0] for r in table("Permissions").seed_rows}
         self.assertEqual({p for r, p in rp if r == 1}, all_perms)
         cashier = {p for r, p in rp if r == 3}
-        self.assertEqual(cashier, {"SALES_POS", "SALES_VIEW", "CUSTOMERS", "CUSTOMER_PAYMENTS"})
+        self.assertEqual(cashier, {"SALES_POS", "SALES_VIEW", "CUSTOMERS", "CUSTOMER_PAYMENTS", "CASH_CLOSING"})
         manager = {p for r, p in rp if r == 2}
         for p in ("SALES_POS", "PURCHASES", "REPORTS", "STOCK_COUNT"):
             self.assertIn(p, manager)

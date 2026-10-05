@@ -126,6 +126,9 @@ End Sub
 '                 D = filter DateColumn by the period
 '                 C / S / R = customer / supplier / product required
 '                 c / s / r = optional filter on CustomerID / SupplierID / ProductID
+'                 b = optional cash box (query parameter CashBoxID, 0 = all boxes)
+'                 e = optional filter on ExpenseTypeID
+'                 # = treasury report: needs the CASH_BOX permission
 '                 $ = shows cost / profit: needs the REPORTS_PROFIT permission
 '------------------------------------------------------------------------------
 Public Sub ReportCenterLoad(ByVal frm As Access.Form)
@@ -161,13 +164,16 @@ Public Sub ReportSelected(ByVal frm As Access.Form)
     frm!cboCustomer.Enabled = HasNeed(needs, "C") Or HasNeed(needs, "c")
     frm!cboSupplier.Enabled = HasNeed(needs, "S") Or HasNeed(needs, "s")
     frm!cboProduct.Enabled = HasNeed(needs, "R") Or HasNeed(needs, "r")
+    frm!cboCashBox.Enabled = HasNeed(needs, "b")
+    frm!cboExpenseType.Enabled = HasNeed(needs, "e")
     frm!btnRun.Enabled = Not IsEmpty(r)
 
     If dated Then hint = "حدد الفترة"
     If HasNeed(needs, "C") Then hint = hint & IIf(Len(hint) > 0, " و", "") & "اختر العميل"
     If HasNeed(needs, "S") Then hint = hint & IIf(Len(hint) > 0, " و", "") & "اختر المورد"
     If HasNeed(needs, "R") Then hint = hint & IIf(Len(hint) > 0, " و", "") & "اختر المنتج"
-    If HasNeed(needs, "c") Or HasNeed(needs, "s") Or HasNeed(needs, "r") Then
+    If HasNeed(needs, "c") Or HasNeed(needs, "s") Or HasNeed(needs, "r") Or HasNeed(needs, "b") Or _
+       HasNeed(needs, "e") Then
         hint = hint & IIf(Len(hint) > 0, "، ", "") & "ويمكنك التصفية حسب الاختيار (اختياري)"
     End If
     If Len(hint) = 0 And Not IsEmpty(r) Then hint = "لا يحتاج هذا التقرير أي اختيارات"
@@ -236,6 +242,10 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
         ShowWarning "هذا التقرير يعرض التكلفة والأرباح ويحتاج صلاحية «تقارير الأرباح والضريبة»."
         Exit Function
     End If
+    If HasNeed(needs, "#") And Not HasPermission("CASH_BOX") Then
+        ShowWarning "تقارير الخزينة تحتاج صلاحية «الخزينة»."
+        Exit Function
+    End If
 
     If HasNeed(needs, "P") Or HasNeed(needs, "D") Then
         If Not IsDate(frm!txtFrom.Value) Or Not IsDate(frm!txtTo.Value) Then
@@ -262,9 +272,14 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
     If HasNeed(needs, "c") Then AddFilter where, frm!cboCustomer, "CustomerID"
     If HasNeed(needs, "s") Then AddFilter where, frm!cboSupplier, "SupplierID"
     If HasNeed(needs, "r") Then AddFilter where, frm!cboProduct, "ProductID"
+    If HasNeed(needs, "e") Then AddFilter where, frm!cboExpenseType, "ExpenseTypeID"
+    If HasNeed(needs, "b") Then SetQueryParam "CashBoxID", CLng(Nz(frm!cboCashBox.Value, 0))   ' 0 = all boxes
     AddCriteria criteria, frm!cboCustomer, HasNeed(needs, "C") Or HasNeed(needs, "c"), "العميل"
     AddCriteria criteria, frm!cboSupplier, HasNeed(needs, "S") Or HasNeed(needs, "s"), "المورد"
     AddCriteria criteria, frm!cboProduct, HasNeed(needs, "R") Or HasNeed(needs, "r"), "المنتج"
+    AddCriteria criteria, frm!cboCashBox, HasNeed(needs, "b"), "الصندوق"
+    AddCriteria criteria, frm!cboExpenseType, HasNeed(needs, "e"), "نوع المصروف"
+    If HasNeed(needs, "b") And IsNull(frm!cboCashBox.Value) Then criteria = criteria & "    كل الصناديق"
     PrepareReport = True
 End Function
 

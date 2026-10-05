@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=8;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=23;SalesInvoices=34;SalesInvoiceDetails=14;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=11;Roles=3;Permissions=22;RolePermissions=44;Employees=1;Categories=1;Units=8;PaymentMethods=4;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=17;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=15;Roles=3;Permissions=24;RolePermissions=49;Employees=1;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -38,6 +38,9 @@ Private m_skipped As Long
 Private m_upgrade As Boolean        ' the table exists: only its missing fields are added
 Private m_addedFields As Long
 Private m_seeded As Long
+Private m_seedTable As String
+Private m_seedAdded As Long
+Private m_seedOnlyMissing As Boolean
 Private m_currentStep As String
 Private m_inTrans As Boolean
 
@@ -411,15 +414,17 @@ End Sub
 '------------------------------------------------------------------------------
 ' Seed helpers (lookup data is inserted only into empty tables)
 '------------------------------------------------------------------------------
-Private Function BeginSeed(ByVal TableName As String) As Boolean
+Private Function BeginSeed(ByVal TableName As String, Optional ByVal AddMissing As Boolean = False) As Boolean
+    ' Empty table: all seed rows. Table with data: nothing, or (AddMissing) only the rows
+    ' it does not have yet - new sequences / permissions of a later version.
     Dim rs As DAO.Recordset
     m_currentStep = "seed " & TableName
+    m_seedTable = TableName
+    m_seedAdded = 0
     Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & TableName & "]", dbOpenSnapshot)
-    If rs(0) > 0 Then
-        rs.Close
-        Exit Function
-    End If
+    m_seedOnlyMissing = (rs(0) > 0)
     rs.Close
+    If m_seedOnlyMissing And Not AddMissing Then Exit Function
     DBEngine.Workspaces(0).BeginTrans
     m_inTrans = True
     BeginSeed = True
@@ -427,11 +432,52 @@ End Function
 
 Private Sub ExecSeed(ByVal Sql As String)
     m_db.Execute Sql, dbFailOnError
+    m_seedAdded = m_seedAdded + 1
 End Sub
+
+Private Function SeedRow(ByVal Where As String, ByVal Sql As String) As Boolean
+    ' Inserts the row unless the table already has it. True = inserted.
+    Dim rs As DAO.Recordset
+    If m_seedOnlyMissing Then
+        Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & m_seedTable & "] WHERE " & Where, dbOpenSnapshot)
+        If rs(0) > 0 Then
+            rs.Close
+            Exit Function
+        End If
+        rs.Close
+    End If
+    ExecSeed Sql
+    SeedRow = True
+End Function
+
+Private Sub GrantNewPermission(ByVal PermissionKey As String, ByVal RoleIDs As String)
+    ' Only for a permission added to an existing back-end (a new one is granted by Seed_RolePermissions).
+    Dim ids() As String, i As Long
+    If Not m_seedOnlyMissing Or Len(RoleIDs) = 0 Then Exit Sub
+    ids = Split(RoleIDs, ",")
+    For i = 0 To UBound(ids)
+        If DCountIn("RolePermissions", "[RoleID] = " & ids(i) & " AND [PermissionKey] = '" & PermissionKey & "'") = 0 And _
+           DCountIn("Roles", "[RoleID] = " & ids(i)) > 0 Then
+            m_db.Execute "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (" & ids(i) & _
+                         ", '" & PermissionKey & "')", dbFailOnError
+        End If
+    Next
+End Sub
+
+Private Function DCountIn(ByVal TableName As String, ByVal Where As String) As Long
+    Dim rs As DAO.Recordset
+    Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & TableName & "] WHERE " & Where, dbOpenSnapshot)
+    DCountIn = rs(0)
+    rs.Close
+End Function
 
 Private Sub EndSeed(ByVal TableName As String, ByVal RowCount As Long)
     DBEngine.Workspaces(0).CommitTrans
     m_inTrans = False
+    If m_seedOnlyMissing Then
+        If m_seedAdded > 0 Then LogLine "  * ”Ã·«  ÃœÌœ…: " & TableName & " (" & m_seedAdded & " ”Ã·)"
+        Exit Sub
+    End If
     m_seeded = m_seeded + 1
     LogLine "  * »Ì«‰«  √”«”Ì…: " & TableName & " (" & RowCount & " ”Ã·)"
 End Sub
@@ -482,6 +528,7 @@ Private Sub CreateAllTables()
     CreateTable_Categories
     CreateTable_Units
     CreateTable_PaymentMethods
+    CreateTable_CashBoxes
     CreateTable_Suppliers
     CreateTable_Customers
     CreateTable_Products
@@ -497,6 +544,8 @@ Private Sub CreateAllTables()
     CreateTable_SupplierPayments
     CreateTable_ExpenseTypes
     CreateTable_Expenses
+    CreateTable_CashVouchers
+    CreateTable_CashClosings
     CreateTable_TransactionTypes
     CreateTable_InventoryTransactions
     CreateTable_StockCounts
@@ -668,6 +717,8 @@ Private Sub CreateTable_Employees()
              "", "", "„·«ÕŸ« ", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "’‰œÊﬁ «·‰ﬁœÌ…", " œŒ· ›ÌÂ ‰ﬁœÌ… „»Ì⁄« Â Ê”‰œ« Â∫ ›«—€ = √Ê· ’‰œÊﬁ ﬂ«‘Ì— ‰‘ÿ"
     AddIndex tdf, "PrimaryKey", "EmployeeID", True, True, False
     AddIndex tdf, "UX_Username", "Username", False, True, False
     EndTable tdf, "«·„ÊŸ›Ê‰ Ê«·„” Œœ„Ê‰: ﬂ· „ÊŸ› ÂÊ „” Œœ„ ··‰Ÿ«„∫ ·« ÌıÕ–› »· Ìı⁄ÿÛ¯· ··Õ›«Ÿ ⁄·Ï ”Ã· ⁄„·Ì« Â.", "", ""
@@ -729,6 +780,30 @@ Private Sub CreateTable_PaymentMethods()
     AddIndex tdf, "PrimaryKey", "PaymentMethodID", True, True, False
     AddIndex tdf, "UX_MethodName", "MethodName", False, True, False
     EndTable tdf, "ÿ—ﬁ «·œ›⁄: ÿ—ﬁ œ›⁄ «·„»«·€ «·„”œœ… „⁄ —„“Â« ›Ì ›« Ê—… «·ÂÌ∆… (UNTDID 4461).", "", ""
+End Sub
+
+Private Sub CreateTable_CashBoxes()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "CashBoxes") Then Exit Sub
+    AddField tdf, "CashBoxID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ «·’‰œÊﬁ", ""
+    AddField tdf, "BoxName", "TEXT", 50, True, "", _
+             "", "", "«”„ «·’‰œÊﬁ", ""
+    AddField tdf, "BoxType", "TEXT", 10, True, """CASHIER""", _
+             "In (""MAIN"",""CASHIER"")", "MAIN = Œ“Ì‰… —∆Ì”Ì…° CASHIER = ’‰œÊﬁ ﬂ«‘Ì—", "«·‰Ê⁄", ""
+    AddField tdf, "OpeningBalance", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "«·—’Ìœ «·«›  «ÕÌ", ""
+    AddField tdf, "OpeningDate", "DATE", 0, True, "Date()", _
+             "", "", " «—ÌŒ «·—’Ìœ «·«›  «ÕÌ", ""
+    AddField tdf, "IsActive", "BOOL", 0, False, "True", _
+             "", "", "‰‘ÿ", ""
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "„·«ÕŸ« ", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "CashBoxID", True, True, False
+    AddIndex tdf, "UX_BoxName", "BoxName", False, True, False
+    EndTable tdf, "«·Œ“Ì‰… Ê«·’‰«œÌﬁ: «·Œ“Ì‰… «·—∆Ì”Ì… Ê’‰«œÌﬁ «·ﬂ«‘Ì—. «·—’Ìœ ·« ÌıŒ“Û¯‰: ÌıÕ”» „‰ «·Õ—ﬂ«  (qryCashMovements).", "", ""
 End Sub
 
 Private Sub CreateTable_Suppliers()
@@ -948,6 +1023,8 @@ Private Sub CreateTable_SalesInvoices()
              "", "", "⁄‰Ê«‰ «· Ê’Ì·", ""
     AddField tdf, "OrderName", "TEXT", 50, False, "", _
              "", "", "«”„ «·⁄„Ì· ⁄·Ï «·ÿ·»", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "Ìı„·√ ⁄‰œ «·œ›⁄ «·‰ﬁœÌ: «·„»·€ «·„œ›Ê⁄ ÌœŒ· Â–« «·’‰œÊﬁ"
     AddIndex tdf, "PrimaryKey", "SalesInvoiceID", True, True, False
     AddIndex tdf, "UX_InvoiceNumber", "InvoiceNumber", False, True, False
     AddIndex tdf, "IX_InvoiceDate", "InvoiceDate", False, False, False
@@ -1051,6 +1128,8 @@ Private Sub CreateTable_SalesReturns()
              "", "", "„”«— „·› XML «·„Êﬁ¯⁄", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·—œ «·‰ﬁœÌ ÌŒ—Ã „‰ Â–« «·’‰œÊﬁ"
     AddIndex tdf, "PrimaryKey", "SalesReturnID", True, True, False
     AddIndex tdf, "UX_ReturnNumber", "ReturnNumber", False, True, False
     AddIndex tdf, "IX_ReturnDate", "ReturnDate", False, False, False
@@ -1130,6 +1209,8 @@ Private Sub CreateTable_PurchaseInvoices()
              "", "", "„·«ÕŸ« ", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·„œ›Ê⁄ ‰ﬁœ« ÌŒ—Ã „‰ Â–« «·’‰œÊﬁ"
     AddIndex tdf, "PrimaryKey", "PurchaseInvoiceID", True, True, False
     AddIndex tdf, "UX_InvoiceNumber", "InvoiceNumber", False, True, False
     AddIndex tdf, "IX_InvoiceDate", "InvoiceDate", False, False, False
@@ -1204,6 +1285,8 @@ Private Sub CreateTable_PurchaseReturns()
              "", "", "„·«ÕŸ« ", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·«” —œ«œ «·‰ﬁœÌ ÌœŒ· Â–« «·’‰œÊﬁ"
     AddIndex tdf, "PrimaryKey", "PurchaseReturnID", True, True, False
     AddIndex tdf, "UX_ReturnNumber", "ReturnNumber", False, True, False
     AddIndex tdf, "IX_ReturnDate", "ReturnDate", False, False, False
@@ -1262,6 +1345,8 @@ Private Sub CreateTable_CustomerPayments()
              "", "", "„·«ÕŸ« ", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·„»·€ «·‰ﬁœÌ ÌœŒ· Â–« «·’‰œÊﬁ"
     AddIndex tdf, "PrimaryKey", "PaymentID", True, True, False
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
@@ -1291,6 +1376,8 @@ Private Sub CreateTable_SupplierPayments()
              "", "", "„·«ÕŸ« ", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·„»·€ «·‰ﬁœÌ ÌŒ—Ã „‰ Â–« «·’‰œÊﬁ"
     AddIndex tdf, "PrimaryKey", "PaymentID", True, True, False
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
@@ -1338,10 +1425,95 @@ Private Sub CreateTable_Expenses()
              "", "", "«·„ÊŸ›", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "’ı—› „‰ ’‰œÊﬁ", "«·„’—Ê› «·‰ﬁœÌ ÌŒ—Ã „‰ Â–« «·’‰œÊﬁ∫ ›«—€ = ·„ Ìıœ›⁄ „‰ ’‰œÊﬁ"
     AddIndex tdf, "PrimaryKey", "ExpenseID", True, True, False
     AddIndex tdf, "UX_ExpenseNumber", "ExpenseNumber", False, True, False
     AddIndex tdf, "IX_ExpenseDate", "ExpenseDate", False, False, False
     EndTable tdf, "«·„’—Ê›« : „’—Ê›«  «·„Õ· «· ‘€Ì·Ì…∫ «·„»·€ »œÊ‰ ÷—Ì»… Ê«·÷—Ì»… „‰›’·… (÷—Ì»… „œŒ·« ).", "[TotalAmount]=[Amount]+[Tax]", "«·≈Ã„«·Ì = «·„»·€ + «·÷—Ì»…"
+End Sub
+
+Private Sub CreateTable_CashVouchers()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "CashVouchers") Then Exit Sub
+    AddField tdf, "CashVoucherID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ œ«Œ·Ì", ""
+    AddField tdf, "VoucherNumber", "TEXT", 20, True, "", _
+             "", "", "—ﬁ„ «·”‰œ", ""
+    AddField tdf, "VoucherDate", "DATETIME", 0, True, "Now()", _
+             "", "", "«· «—ÌŒ", ""
+    AddField tdf, "VoucherType", "TEXT", 10, True, "", _
+             "In (""IN"",""OUT"",""TRANSFER"")", "IN = ﬁ»÷° OUT = ’—›° TRANSFER =  ÕÊÌ· »Ì‰ ’‰œÊﬁÌ‰", "‰Ê⁄ «·”‰œ", ""
+    AddField tdf, "CashBoxID", "LONG", 0, True, "", _
+             "", "", "«·’‰œÊﬁ", "«·ﬁ»÷ ÌœŒ·Â° Ê«·’—› Ê«· ÕÊÌ· ÌŒ—Ã«‰ „‰Â"
+    AddField tdf, "ToCashBoxID", "LONG", 0, False, "", _
+             "", "", "≈·Ï ’‰œÊﬁ", "·· ÕÊÌ· ›ﬁÿ"
+    AddField tdf, "Category", "TEXT", 10, True, """OTHER""", _
+             "In (""OTHER"",""OWNER"",""EXPENSE"",""ADVANCE"",""SHORTAGE"",""OVERAGE"",""TRANSFER"")", "«Œ — «·»‰œ „‰ «·ﬁ«∆„…", "«·»‰œ", ""
+    AddField tdf, "Amount", "MONEY", 0, True, "0", _
+             ">0", "«·„»·€ ÌÃ» √‰ ÌﬂÊ‰ √ﬂ»— „‰ ’›—", "«·„»·€", ""
+    AddField tdf, "PartyName", "TEXT", 100, False, "", _
+             "", "", "«·„” ·„ / «·„”·ˆ¯„", ""
+    AddField tdf, "Description", "TEXT", 255, False, "", _
+             "", "", "«·»Ì«‰", ""
+    AddField tdf, "ExpenseID", "LONG", 0, False, "", _
+             "", "", "«·„’—Ê› «·„”ÃÛ¯·", "’—› »‰œ „’—Ê› Ì”Ã· „’—Ê›« »‰›” «·„»·€ ›Ì «·„’—Ê›« "
+    AddField tdf, "ClosingID", "LONG", 0, False, "", _
+             "", "", " ’›Ì… «·ﬂ«‘Ì—", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "«·„ÊŸ›", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "CashVoucherID", True, True, False
+    AddIndex tdf, "UX_VoucherNumber", "VoucherNumber", False, True, False
+    AddIndex tdf, "IX_VoucherDate", "VoucherDate", False, False, False
+    AddIndex tdf, "IX_CashBoxID", "CashBoxID", False, False, False
+    EndTable tdf, "”‰œ«  «·‰ﬁœÌ…: ﬁ»÷ ‰ﬁœÌ… ·’‰œÊﬁ° √Ê ’—› „‰Â° √Ê  ÕÊÌ· »Ì‰ ’‰œÊﬁÌ‰ (Ê„‰Â«  —ÕÌ· ÌÊ„Ì… «·ﬂ«‘Ì—).", "[VoucherType]<>""TRANSFER"" Or ([ToCashBoxID] Is Not Null And [ToCashBoxID]<>[CashBoxID])", "«· ÕÊÌ· ÌÕ «Ã ’‰œÊﬁ« ¬Œ— €Ì— ’‰œÊﬁ «·’—›"
+End Sub
+
+Private Sub CreateTable_CashClosings()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "CashClosings") Then Exit Sub
+    AddField tdf, "ClosingID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ œ«Œ·Ì", ""
+    AddField tdf, "ClosingNumber", "TEXT", 20, True, "", _
+             "", "", "—ﬁ„ «· ’›Ì…", ""
+    AddField tdf, "ClosingDate", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «· ’›Ì…", ""
+    AddField tdf, "CashBoxID", "LONG", 0, True, "", _
+             "", "", "«·’‰œÊﬁ", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "√Ã—«Â«", ""
+    AddField tdf, "PeriodStart", "DATETIME", 0, False, "", _
+             "", "", "„‰ (¬Œ—  ’›Ì…)", ""
+    AddField tdf, "OpeningBalance", "MONEY", 0, True, "0", _
+             "", "", "—’Ìœ «·»œ«Ì…", ""
+    AddField tdf, "CashIn", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "«·„ﬁ»Ê÷« ", ""
+    AddField tdf, "CashOut", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "«·„œ›Ê⁄« ", ""
+    AddField tdf, "ExpectedBalance", "MONEY", 0, True, "0", _
+             "", "", "«·—’Ìœ «·œ› —Ì", ""
+    AddField tdf, "CountedAmount", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "«·‰ﬁœÌ… «·›⁄·Ì…", ""
+    AddField tdf, "Difference", "MONEY", 0, True, "0", _
+             "", "", "«·›—ﬁ", "”«·» = ⁄Ã“° „ÊÃ» = “Ì«œ…"
+    AddField tdf, "Destination", "TEXT", 10, True, """MAIN""", _
+             "In (""MAIN"",""OWNER"",""KEEP"")", "MAIN = «·Œ“Ì‰… «·—∆Ì”Ì…° OWNER =  ”ÊÌ… „⁄ «·„«·ﬂ° KEEP = Ì»ﬁÏ ›Ì «·’‰œÊﬁ", "«· —ÕÌ· ≈·Ï", ""
+    AddField tdf, "ToCashBoxID", "LONG", 0, False, "", _
+             "", "", "«·Œ“Ì‰… «·„” ·„…", ""
+    AddField tdf, "TransferAmount", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "«·„»·€ «·„—ÕÛ¯·", ""
+    AddField tdf, "KeptAmount", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "«·„ »ﬁÌ ›Ì «·’‰œÊﬁ (⁄Âœ…)", ""
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "„·«ÕŸ« ", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "ClosingID", True, True, False
+    AddIndex tdf, "UX_ClosingNumber", "ClosingNumber", False, True, False
+    AddIndex tdf, "IX_CashBoxID_ClosingDate", "CashBoxID,ClosingDate", False, False, False
+    EndTable tdf, " ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—: Ã—œ ‰ﬁœÌ… ’‰œÊﬁ «·ﬂ«‘Ì— ›Ì ‰Â«Ì… «·Ê—œÌ… Ê —ÕÌ·Â« ··Œ“Ì‰… «·—∆Ì”Ì… √Ê  ”ÊÌ Â« „⁄ «·„«·ﬂ.", "[TransferAmount]+[KeptAmount]=[CountedAmount]", "«·„—ÕÛ¯· + «·„ »ﬁÌ = «·‰ﬁœÌ… «·›⁄·Ì…"
 End Sub
 
 Private Sub CreateTable_TransactionTypes()
@@ -1532,6 +1704,7 @@ Private Sub SeedAll()
     Seed_Categories
     Seed_Units
     Seed_PaymentMethods
+    Seed_CashBoxes
     Seed_Customers
     Seed_ExpenseTypes
     Seed_TransactionTypes
@@ -1539,29 +1712,33 @@ Private Sub SeedAll()
 End Sub
 
 Private Sub Seed_Settings()
-    If Not BeginSeed("Settings") Then Exit Sub
+    If Not BeginSeed("Settings", False) Then Exit Sub
     ExecSeed "INSERT INTO [Settings] ([SettingID], [StoreName], [CountryCode], [VATRate], [PricesIncludeVAT], [AllowNegativeStock], [CurrencyCode], [DefaultCustomerID], [ZatcaPhase], [LastInvoiceHash], [BackupKeepCount], [SlowMovingDays], [ReceiptFooter]) VALUES (1, '«”„ «·„Õ·', 'SA', 0.15, True, False, 'SAR', 1, 1, 'NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==', 30, 90, '‘ﬂ—« ·“Ì«— ﬂ„')"
     EndSeed "Settings", 1
 End Sub
 
 Private Sub Seed_Sequences()
-    If Not BeginSeed("Sequences") Then Exit Sub
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_INVOICE', 'INV-', 1, 6, '›Ê« Ì— «·„»Ì⁄« ')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_RETURN', 'CRN-', 1, 6, '„— Ã⁄«  «·„»Ì⁄«  (≈‘⁄«— œ«∆‰)')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_INVOICE', 'PUR-', 1, 6, '›Ê« Ì— «·„‘ —Ì« ')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_RETURN', 'PRT-', 1, 6, '„— Ã⁄«  «·„‘ —Ì« ')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CUSTOMER_PAYMENT', 'RCV-', 1, 6, '”‰œ«  «·ﬁ»÷ „‰ «·⁄„·«¡')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SUPPLIER_PAYMENT', 'PAY-', 1, 6, '”‰œ«  «·’—› ··„Ê—œÌ‰')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('EXPENSE', 'EXP-', 1, 6, '«·„’—Ê›« ')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_COUNT', 'CNT-', 1, 5, 'Ã·”«  «·Ã—œ')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_ADJUST', 'ADJ-', 1, 6, 'Õ—ﬂ«  «·„Œ“Ê‰ «·ÌœÊÌ…')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PRODUCT_CODE', 'P', 1, 5, '√ﬂÊ«œ «·„‰ Ã« ')"
-    ExecSeed "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ZATCA_ICV', Null, 1, 0, '⁄œ¯«œ ICV ·„” ‰œ«  ›« Ê—…')"
-    EndSeed "Sequences", 11
+    If Not BeginSeed("Sequences", True) Then Exit Sub
+    SeedRow "[SequenceName] = 'SALES_INVOICE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_INVOICE', 'INV-', 1, 6, '›Ê« Ì— «·„»Ì⁄« ')"
+    SeedRow "[SequenceName] = 'SALES_RETURN'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_RETURN', 'CRN-', 1, 6, '„— Ã⁄«  «·„»Ì⁄«  (≈‘⁄«— œ«∆‰)')"
+    SeedRow "[SequenceName] = 'PURCHASE_INVOICE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_INVOICE', 'PUR-', 1, 6, '›Ê« Ì— «·„‘ —Ì« ')"
+    SeedRow "[SequenceName] = 'PURCHASE_RETURN'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_RETURN', 'PRT-', 1, 6, '„— Ã⁄«  «·„‘ —Ì« ')"
+    SeedRow "[SequenceName] = 'CUSTOMER_PAYMENT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CUSTOMER_PAYMENT', 'RCV-', 1, 6, '”‰œ«  «·ﬁ»÷ „‰ «·⁄„·«¡')"
+    SeedRow "[SequenceName] = 'SUPPLIER_PAYMENT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SUPPLIER_PAYMENT', 'PAY-', 1, 6, '”‰œ«  «·’—› ··„Ê—œÌ‰')"
+    SeedRow "[SequenceName] = 'EXPENSE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('EXPENSE', 'EXP-', 1, 6, '«·„’—Ê›« ')"
+    SeedRow "[SequenceName] = 'STOCK_COUNT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_COUNT', 'CNT-', 1, 5, 'Ã·”«  «·Ã—œ')"
+    SeedRow "[SequenceName] = 'STOCK_ADJUST'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('STOCK_ADJUST', 'ADJ-', 1, 6, 'Õ—ﬂ«  «·„Œ“Ê‰ «·ÌœÊÌ…')"
+    SeedRow "[SequenceName] = 'PRODUCT_CODE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PRODUCT_CODE', 'P', 1, 5, '√ﬂÊ«œ «·„‰ Ã« ')"
+    SeedRow "[SequenceName] = 'ZATCA_ICV'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ZATCA_ICV', Null, 1, 0, '⁄œ¯«œ ICV ·„” ‰œ«  ›« Ê—…')"
+    SeedRow "[SequenceName] = 'CASH_IN'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_IN', 'CIN-', 1, 6, '”‰œ«  ﬁ»÷ «·‰ﬁœÌ… («·Œ“Ì‰…)')"
+    SeedRow "[SequenceName] = 'CASH_OUT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_OUT', 'COT-', 1, 6, '”‰œ«  ’—› «·‰ﬁœÌ… («·Œ“Ì‰…)')"
+    SeedRow "[SequenceName] = 'CASH_TRANSFER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_TRANSFER', 'TRF-', 1, 6, '«· ÕÊÌ· »Ì‰ «·’‰«œÌﬁ')"
+    SeedRow "[SequenceName] = 'CASH_CLOSING'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_CLOSING', 'CLS-', 1, 6, ' ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—')"
+    EndSeed "Sequences", 15
 End Sub
 
 Private Sub Seed_Roles()
-    If Not BeginSeed("Roles") Then Exit Sub
+    If Not BeginSeed("Roles", False) Then Exit Sub
     ExecSeed "INSERT INTO [Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (1, 'ADMIN', '„œÌ— «·‰Ÿ«„', 'Ã„Ì⁄ «·’·«ÕÌ« ')"
     ExecSeed "INSERT INTO [Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (2, 'MANAGER', '„œÌ—', '«·„»Ì⁄«  Ê«·„‘ —Ì«  Ê«·„Œ“Ê‰ Ê«· ﬁ«—Ì—')"
     ExecSeed "INSERT INTO [Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (3, 'CASHIER', 'ﬂ«‘Ì—', '«·„»Ì⁄«  Ê«·⁄„·«¡ ›ﬁÿ')"
@@ -1569,34 +1746,36 @@ Private Sub Seed_Roles()
 End Sub
 
 Private Sub Seed_Permissions()
-    If Not BeginSeed("Permissions") Then Exit Sub
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_POS', '‰ﬁÿ… «·»Ì⁄', '«·„»Ì⁄« ', 10)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_VIEW', '⁄—÷ Ê≈⁄«œ… ÿ»«⁄… «·›Ê« Ì—', '«·„»Ì⁄« ', 11)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_RETURN', '„— Ã⁄«  «·„»Ì⁄« ', '«·„»Ì⁄« ', 12)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PRICE_OVERRIDE', ' ⁄œÌ· ”⁄— «·»Ì⁄ ›Ì «·›« Ê—…', '«·„»Ì⁄« ', 13)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DISCOUNT_OVERRIDE', 'Œ’„ √⁄·Ï „‰ «·Õœ «·„”„ÊÕ', '«·„»Ì⁄« ', 14)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('ALLOW_NEGATIVE_STOCK', '«·»Ì⁄ »ﬂ„Ì… √ﬂ»— „‰ «·„ Ê›—', '«·„»Ì⁄« ', 15)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMERS', '≈œ«—… «·⁄„·«¡', '«·⁄„·«¡', 20)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMER_PAYMENTS', '”‰œ«  «·ﬁ»÷', '«·⁄„·«¡', 21)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASES', '›Ê« Ì— «·„‘ —Ì« ', '«·„‘ —Ì« ', 30)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASE_RETURN', '„— Ã⁄«  «·„‘ —Ì« ', '«·„‘ —Ì« ', 31)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SUPPLIERS', '≈œ«—… «·„Ê—œÌ‰', '«·„Ê—œÊ‰', 40)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SUPPLIER_PAYMENTS', '”‰œ«  «·’—›', '«·„Ê—œÊ‰', 41)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PRODUCTS', '≈œ«—… «·„‰ Ã«  Ê«·√”⁄«—', '«·„Œ“Ê‰', 50)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('INVENTORY_ADJUST', '≈÷«›… ÊŒ’„ „Œ“Ê‰ ÌœÊÌ', '«·„Œ“Ê‰', 51)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('STOCK_COUNT', '«·Ã—œ', '«·„Œ“Ê‰', 52)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EXPENSES', '«·„’—Ê›« ', '«·„’—Ê›« ', 60)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', '«· ﬁ«—Ì— «· ‘€Ì·Ì…', '«· ﬁ«—Ì—', 70)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', ' ﬁ«—Ì— «·√—»«Õ Ê«·÷—Ì»…', '«· ﬁ«—Ì—', 71)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', '«·√—ﬁ«„ «·„«·Ì… ›Ì ·ÊÕ… «· Õﬂ„', '«· ﬁ«—Ì—', 72)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 80)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', '«·„” Œœ„Ê‰ Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 81)"
-    ExecSeed "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 82)"
-    EndSeed "Permissions", 22
+    If Not BeginSeed("Permissions", True) Then Exit Sub
+    If SeedRow("[PermissionKey] = 'SALES_POS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_POS', '‰ﬁÿ… «·»Ì⁄', '«·„»Ì⁄« ', 10)") Then GrantNewPermission "SALES_POS", "1,2,3"
+    If SeedRow("[PermissionKey] = 'SALES_VIEW'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_VIEW', '⁄—÷ Ê≈⁄«œ… ÿ»«⁄… «·›Ê« Ì—', '«·„»Ì⁄« ', 11)") Then GrantNewPermission "SALES_VIEW", "1,2,3"
+    If SeedRow("[PermissionKey] = 'SALES_RETURN'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_RETURN', '„— Ã⁄«  «·„»Ì⁄« ', '«·„»Ì⁄« ', 12)") Then GrantNewPermission "SALES_RETURN", "1,2"
+    If SeedRow("[PermissionKey] = 'PRICE_OVERRIDE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PRICE_OVERRIDE', ' ⁄œÌ· ”⁄— «·»Ì⁄ ›Ì «·›« Ê—…', '«·„»Ì⁄« ', 13)") Then GrantNewPermission "PRICE_OVERRIDE", "1,2"
+    If SeedRow("[PermissionKey] = 'DISCOUNT_OVERRIDE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DISCOUNT_OVERRIDE', 'Œ’„ √⁄·Ï „‰ «·Õœ «·„”„ÊÕ', '«·„»Ì⁄« ', 14)") Then GrantNewPermission "DISCOUNT_OVERRIDE", "1,2"
+    If SeedRow("[PermissionKey] = 'ALLOW_NEGATIVE_STOCK'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('ALLOW_NEGATIVE_STOCK', '«·»Ì⁄ »ﬂ„Ì… √ﬂ»— „‰ «·„ Ê›—', '«·„»Ì⁄« ', 15)") Then GrantNewPermission "ALLOW_NEGATIVE_STOCK", "1"
+    If SeedRow("[PermissionKey] = 'CUSTOMERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMERS', '≈œ«—… «·⁄„·«¡', '«·⁄„·«¡', 20)") Then GrantNewPermission "CUSTOMERS", "1,2,3"
+    If SeedRow("[PermissionKey] = 'CUSTOMER_PAYMENTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMER_PAYMENTS', '”‰œ«  «·ﬁ»÷', '«·⁄„·«¡', 21)") Then GrantNewPermission "CUSTOMER_PAYMENTS", "1,2,3"
+    If SeedRow("[PermissionKey] = 'PURCHASES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASES', '›Ê« Ì— «·„‘ —Ì« ', '«·„‘ —Ì« ', 30)") Then GrantNewPermission "PURCHASES", "1,2"
+    If SeedRow("[PermissionKey] = 'PURCHASE_RETURN'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASE_RETURN', '„— Ã⁄«  «·„‘ —Ì« ', '«·„‘ —Ì« ', 31)") Then GrantNewPermission "PURCHASE_RETURN", "1,2"
+    If SeedRow("[PermissionKey] = 'SUPPLIERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SUPPLIERS', '≈œ«—… «·„Ê—œÌ‰', '«·„Ê—œÊ‰', 40)") Then GrantNewPermission "SUPPLIERS", "1,2"
+    If SeedRow("[PermissionKey] = 'SUPPLIER_PAYMENTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SUPPLIER_PAYMENTS', '”‰œ«  «·’—›', '«·„Ê—œÊ‰', 41)") Then GrantNewPermission "SUPPLIER_PAYMENTS", "1,2"
+    If SeedRow("[PermissionKey] = 'PRODUCTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PRODUCTS', '≈œ«—… «·„‰ Ã«  Ê«·√”⁄«—', '«·„Œ“Ê‰', 50)") Then GrantNewPermission "PRODUCTS", "1,2"
+    If SeedRow("[PermissionKey] = 'INVENTORY_ADJUST'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('INVENTORY_ADJUST', '≈÷«›… ÊŒ’„ „Œ“Ê‰ ÌœÊÌ', '«·„Œ“Ê‰', 51)") Then GrantNewPermission "INVENTORY_ADJUST", "1,2"
+    If SeedRow("[PermissionKey] = 'STOCK_COUNT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('STOCK_COUNT', '«·Ã—œ', '«·„Œ“Ê‰', 52)") Then GrantNewPermission "STOCK_COUNT", "1,2"
+    If SeedRow("[PermissionKey] = 'EXPENSES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EXPENSES', '«·„’—Ê›« ', '«·„’—Ê›« ', 60)") Then GrantNewPermission "EXPENSES", "1,2"
+    If SeedRow("[PermissionKey] = 'CASH_BOX'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_BOX', '«·Œ“Ì‰…: ”‰œ«  «·ﬁ»÷ Ê«·’—› Ê«· ÕÊÌ· Ê«·’‰«œÌﬁ', '«·Œ“Ì‰…', 65)") Then GrantNewPermission "CASH_BOX", "1,2"
+    If SeedRow("[PermissionKey] = 'CASH_CLOSING'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_CLOSING', ' ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—', '«·Œ“Ì‰…', 66)") Then GrantNewPermission "CASH_CLOSING", "1,2,3"
+    If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', '«· ﬁ«—Ì— «· ‘€Ì·Ì…', '«· ﬁ«—Ì—', 70)") Then GrantNewPermission "REPORTS", "1,2"
+    If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', ' ﬁ«—Ì— «·√—»«Õ Ê«·÷—Ì»…', '«· ﬁ«—Ì—', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
+    If SeedRow("[PermissionKey] = 'DASHBOARD_FINANCIAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', '«·√—ﬁ«„ «·„«·Ì… ›Ì ·ÊÕ… «· Õﬂ„', '«· ﬁ«—Ì—', 72)") Then GrantNewPermission "DASHBOARD_FINANCIAL", "1,2"
+    If SeedRow("[PermissionKey] = 'SETTINGS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 80)") Then GrantNewPermission "SETTINGS", "1"
+    If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', '«·„” Œœ„Ê‰ Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 81)") Then GrantNewPermission "USERS", "1"
+    If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 82)") Then GrantNewPermission "BACKUP", "1"
+    EndSeed "Permissions", 24
 End Sub
 
 Private Sub Seed_RolePermissions()
-    If Not BeginSeed("RolePermissions") Then Exit Sub
+    If Not BeginSeed("RolePermissions", False) Then Exit Sub
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'SALES_POS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'SALES_VIEW')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'SALES_RETURN')"
@@ -1613,6 +1792,8 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'INVENTORY_ADJUST')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'STOCK_COUNT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'EXPENSES')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_BOX')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'DASHBOARD_FINANCIAL')"
@@ -1634,6 +1815,8 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'INVENTORY_ADJUST')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'STOCK_COUNT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'EXPENSES')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_BOX')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'DASHBOARD_FINANCIAL')"
@@ -1641,23 +1824,24 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'SALES_VIEW')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
-    EndSeed "RolePermissions", 44
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
+    EndSeed "RolePermissions", 49
 End Sub
 
 Private Sub Seed_Employees()
-    If Not BeginSeed("Employees") Then Exit Sub
+    If Not BeginSeed("Employees", False) Then Exit Sub
     ExecSeed "INSERT INTO [Employees] ([EmployeeID], [EmployeeName], [JobTitle], [Username], [RoleID], [MaxDiscountPercent], [MustChangePassword], [IsActive]) VALUES (1, '„œÌ— «·‰Ÿ«„', '„œÌ— «·‰Ÿ«„', 'admin', 1, 1, True, True)"
     EndSeed "Employees", 1
 End Sub
 
 Private Sub Seed_Categories()
-    If Not BeginSeed("Categories") Then Exit Sub
+    If Not BeginSeed("Categories", False) Then Exit Sub
     ExecSeed "INSERT INTO [Categories] ([CategoryID], [CategoryName], [Description]) VALUES (1, '⁄«„', ' ’‰Ì› «› —«÷Ì')"
     EndSeed "Categories", 1
 End Sub
 
 Private Sub Seed_Units()
-    If Not BeginSeed("Units") Then Exit Sub
+    If Not BeginSeed("Units", False) Then Exit Sub
     ExecSeed "INSERT INTO [Units] ([UnitID], [UnitName], [ZatcaUnitCode]) VALUES (1, 'Õ»…', 'PCE')"
     ExecSeed "INSERT INTO [Units] ([UnitID], [UnitName], [ZatcaUnitCode]) VALUES (2, '⁄·»…', 'BX')"
     ExecSeed "INSERT INTO [Units] ([UnitID], [UnitName], [ZatcaUnitCode]) VALUES (3, 'ﬂ— Ê‰', 'CT')"
@@ -1670,7 +1854,7 @@ Private Sub Seed_Units()
 End Sub
 
 Private Sub Seed_PaymentMethods()
-    If Not BeginSeed("PaymentMethods") Then Exit Sub
+    If Not BeginSeed("PaymentMethods", False) Then Exit Sub
     ExecSeed "INSERT INTO [PaymentMethods] ([PaymentMethodID], [MethodName], [ZatcaCode], [SortOrder]) VALUES (1, '‰ﬁœÌ', '10', 1)"
     ExecSeed "INSERT INTO [PaymentMethods] ([PaymentMethodID], [MethodName], [ZatcaCode], [SortOrder]) VALUES (2, '„œÏ / »ÿ«ﬁ…', '48', 2)"
     ExecSeed "INSERT INTO [PaymentMethods] ([PaymentMethodID], [MethodName], [ZatcaCode], [SortOrder]) VALUES (3, ' ÕÊÌ· »‰ﬂÌ', '42', 3)"
@@ -1678,14 +1862,21 @@ Private Sub Seed_PaymentMethods()
     EndSeed "PaymentMethods", 4
 End Sub
 
+Private Sub Seed_CashBoxes()
+    If Not BeginSeed("CashBoxes", False) Then Exit Sub
+    ExecSeed "INSERT INTO [CashBoxes] ([CashBoxID], [BoxName], [BoxType]) VALUES (1, '«·Œ“Ì‰… «·—∆Ì”Ì…', 'MAIN')"
+    ExecSeed "INSERT INTO [CashBoxes] ([CashBoxID], [BoxName], [BoxType]) VALUES (2, '’‰œÊﬁ «·ﬂ«‘Ì—', 'CASHIER')"
+    EndSeed "CashBoxes", 2
+End Sub
+
 Private Sub Seed_Customers()
-    If Not BeginSeed("Customers") Then Exit Sub
+    If Not BeginSeed("Customers", False) Then Exit Sub
     ExecSeed "INSERT INTO [Customers] ([CustomerID], [CustomerName], [AllowCredit], [IsSystem]) VALUES (1, '⁄„Ì· ‰ﬁœÌ', False, True)"
     EndSeed "Customers", 1
 End Sub
 
 Private Sub Seed_ExpenseTypes()
-    If Not BeginSeed("ExpenseTypes") Then Exit Sub
+    If Not BeginSeed("ExpenseTypes", False) Then Exit Sub
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (1, '«·≈ÌÃ«—')"
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (2, '«·ﬂÂ—»«¡')"
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (3, '«·„Ì«Â')"
@@ -1699,7 +1890,7 @@ Private Sub Seed_ExpenseTypes()
 End Sub
 
 Private Sub Seed_TransactionTypes()
-    If Not BeginSeed("TransactionTypes") Then Exit Sub
+    If Not BeginSeed("TransactionTypes", False) Then Exit Sub
     ExecSeed "INSERT INTO [TransactionTypes] ([TransactionTypeID], [TypeCode], [TypeName], [Direction], [IsManual]) VALUES (1, 'PURCHASE', '‘—«¡', 1, False)"
     ExecSeed "INSERT INTO [TransactionTypes] ([TransactionTypeID], [TypeCode], [TypeName], [Direction], [IsManual]) VALUES (2, 'SALE', '»Ì⁄', -1, False)"
     ExecSeed "INSERT INTO [TransactionTypes] ([TransactionTypeID], [TypeCode], [TypeName], [Direction], [IsManual]) VALUES (3, 'PURCHASE_RETURN', '„— Ã⁄ ‘—«¡', -1, False)"
@@ -1712,7 +1903,7 @@ Private Sub Seed_TransactionTypes()
 End Sub
 
 Private Sub Seed_LabelSettings()
-    If Not BeginSeed("LabelSettings") Then Exit Sub
+    If Not BeginSeed("LabelSettings", False) Then Exit Sub
     ExecSeed "INSERT INTO [LabelSettings] ([LabelSettingID]) VALUES (1)"
     EndSeed "LabelSettings", 1
 End Sub

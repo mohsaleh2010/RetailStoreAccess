@@ -59,7 +59,7 @@ Public Function SearchColumnWidths(ByVal Kind As String) As String
 End Function
 
 Public Function ReportCount() As Long
-    ReportCount = 22
+    ReportCount = 26
 End Function
 
 Public Function ScreenPermission(ByVal FormName As String) As String
@@ -93,6 +93,10 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmTouchPay": ScreenPermission = "SALES_POS"
         Case "frmCafePOS": ScreenPermission = "SALES_POS"
         Case "frmCafeItem": ScreenPermission = "SALES_POS"
+        Case "frmTreasury": ScreenPermission = "CASH_CLOSING"
+        Case "frmCashClosing": ScreenPermission = "CASH_CLOSING"
+        Case "frmCashVoucher": ScreenPermission = "CASH_BOX"
+        Case "frmCashBoxes": ScreenPermission = "CASH_BOX"
     End Select
 End Function
 
@@ -112,14 +116,18 @@ Public Function ReportRow(ByVal Index As Long) As Variant
         Case 11: ReportRow = Array("PRODUCT_MOVEMENT", "حركة منتج", "ProductMovementQuery", "rptProductMovement", "PR", "")
         Case 12: ReportRow = Array("CUSTOMER_STATEMENT", "كشف حساب عميل", "CustomerStatementQuery", "rptCustomerStatement", "PC", "")
         Case 13: ReportRow = Array("SUPPLIER_STATEMENT", "كشف حساب مورد", "SupplierStatementQuery", "rptSupplierStatement", "PS", "")
-        Case 14: ReportRow = Array("EXPENSES", "المصروفات", "ExpensesQuery", "rptExpenses", "P", "")
-        Case 15: ReportRow = Array("EXPENSES_BY_TYPE", "المصروفات حسب النوع", "ExpensesByTypeQuery", "rptExpensesByType", "P", "")
-        Case 16: ReportRow = Array("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P$", "")
-        Case 17: ReportRow = Array("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving", "", "")
-        Case 18: ReportRow = Array("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory", "", "")
-        Case 19: ReportRow = Array("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$", "")
-        Case 20: ReportRow = Array("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
-        Case 21: ReportRow = Array("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
-        Case 22: ReportRow = Array("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
+        Case 14: ReportRow = Array("EXPENSES", "المصروفات (تفصيلي)", "ExpensesQuery", "rptExpenses", "Pe", "")
+        Case 15: ReportRow = Array("EXPENSES_BY_TYPE", "المصروفات (إجمالي حسب النوع)", "ExpensesByTypeQuery", "rptExpensesByType", "P", "")
+        Case 16: ReportRow = Array("CASH_STATEMENT", "حركة الخزينة / الصندوق (تفصيلي)", "CashStatementQuery", "rptCashStatement", "Pb#", "")
+        Case 17: ReportRow = Array("CASH_DAILY", "حركة الخزينة اليومية (أول اليوم وآخره)", "CashDailyQuery", "rptCashDaily", "Pb#", "")
+        Case 18: ReportRow = Array("CASH_BALANCES", "أرصدة الخزينة والصناديق", "CashBoxBalanceQuery", "rptCashBalances", "#", "")
+        Case 19: ReportRow = Array("CASH_CLOSINGS", "تصفيات يومية الكاشير", "CashClosingsQuery", "rptCashClosings", "Pb#", "")
+        Case 20: ReportRow = Array("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P$", "")
+        Case 21: ReportRow = Array("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving", "", "")
+        Case 22: ReportRow = Array("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory", "", "")
+        Case 23: ReportRow = Array("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$", "")
+        Case 24: ReportRow = Array("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
+        Case 25: ReportRow = Array("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
+        Case 26: ReportRow = Array("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
     End Select
 End Function

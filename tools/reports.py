@@ -269,4 +269,5 @@ def sales_reports() -> List[ReportModel]:
 def all_reports() -> List[ReportModel]:
     from reports_docs import document_reports
     from reports_catalog import catalog_reports
-    return sales_reports() + document_reports() + catalog_reports()
+    from reports_cash import cash_reports
+    return sales_reports() + document_reports() + cash_reports() + catalog_reports()

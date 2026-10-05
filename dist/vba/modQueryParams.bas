@@ -18,6 +18,7 @@ Attribute VB_Name = "modQueryParams"
 '     CustomerID   customer for CustomerStatementQuery
 '     SupplierID   supplier for SupplierStatementQuery
 '     ProductID    product for ProductMovementQuery
+'     CashBoxID    cash box for the treasury queries (0 = all boxes)
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -36,7 +37,7 @@ End Sub
 
 Public Sub ClearQueryParams()
     Dim names As Variant, i As Long
-    names = Array("PeriodStart", "PeriodEnd", "CustomerID", "SupplierID", "ProductID")
+    names = Array("PeriodStart", "PeriodEnd", "CustomerID", "SupplierID", "ProductID", "CashBoxID")
     On Error Resume Next
     For i = LBound(names) To UBound(names)
         TempVars.Remove names(i)

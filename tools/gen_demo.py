@@ -94,10 +94,10 @@ def step_lines(step, sale_no, purchase_no):
     elif op == "expense":
         total = money(D(step["amount"]) + D(step["tax"]))
         out.append(f'    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, '
-                   f'TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt) VALUES (" & '
+                   f'TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & '
                    f'SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", {step["type"]}, '
                    f'{money(step["amount"])}, {money(step["tax"])}, {total}, 1, " & SqlText({vba_str(step["text"])}) & '
-                   f'", " & CurrentUserID() & ", " & SqlDate(when) & ")", dbFailOnError')
+                   f'", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError')
     elif op == "stock_out":
         out.append(f'    Check PostManualStock(ProductIDOf({product_literal(step["product"])}), TT_STOCK_OUT, {step["qty"]}, '
                    f'Null, {vba_str(step["text"])}, refNo), "خصم مخزون"')
@@ -111,6 +111,17 @@ def step_lines(step, sale_no, purchase_no):
                        f'dbFailOnError')
         out.append('    Check PostStockCount(id, False, adjusted, netValue), "ترحيل الجرد"')
         out.append('    MoveDoc "STOCK_COUNT", id, when')
+    elif op in ("cash_in", "cash_out"):
+        kind = "IN" if op == "cash_in" else "OUT"
+        out.append(f'    Check PostCashVoucher("{kind}", BoxOfType({vba_str(step["box"])}), Null, {vba_str(step["category"])}, '
+                   f'{money(step["amount"])}, {vba_str(step["party"])}, {vba_str(step["text"])}, Null, id), "سند نقدية"')
+        out.append('    MoveDoc "CASH_VOUCHER", id, when')
+    elif op == "closing":
+        keep = money(step["keep"])
+        out.append(f'    counted = CashBoxBalance(BoxOfType({vba_str(step["box"])})) - {money(step["short"])}')
+        out.append(f'    Check PostCashClosing(BoxOfType({vba_str(step["box"])}), counted, "MAIN", BoxOfType("MAIN"), '
+                   f'IIf(counted > {keep}, counted - {keep}, 0), "تصفية تجريبية", id), "تصفية الكاشير"')
+        out.append('    MoveDoc "CASH_CLOSING", id, when')
     else:
         raise ValueError(op)
     return out
@@ -133,7 +144,7 @@ def steps_procs():
         calls.append(f"    {name}")
         procs.append("\n".join([f"Private Sub {name}()",
                                 "    Dim when As Date, id As Long, refNo As String, adjusted As Long, "
-                                "netValue As Currency"] + body + ["End Sub"]))
+                                "netValue As Currency, counted As Currency"] + body + ["End Sub"]))
     return "\n".join(calls), "\n\n".join(procs), sale_no, purchase_no
 
 
@@ -183,6 +194,9 @@ def verify_lines(r):
         bal = money(r.supplier_balance[n])
         out.append(f"    Expect Nz(DbValue(\"SELECT CurrentBalance FROM Suppliers WHERE SupplierName = \" & "
                    f"SqlText({vba_str(s.name)})), -1) = CCur({bal}), {vba_str(f'رصيد {s.name} = {bal}')}")
+    for kind, caption in (("MAIN", "الخزينة الرئيسية"), ("CASHIER", "صندوق الكاشير")):
+        bal = money(r.cash_balance[kind])
+        out.append(f"    Expect CashBoxBalance(BoxOfType(\"{kind}\")) = CCur({bal}), {vba_str(f'رصيد {caption} = {bal}')}")
     return "\n".join(out)
 
 
@@ -273,7 +287,7 @@ Private Function DemoBlocker() As String
         Exit Function
     End If
     For Each t In Array("SalesInvoices", "PurchaseInvoices", "InventoryTransactions", "Expenses", _
-                        "CustomerPayments", "SupplierPayments", "StockCounts")
+                        "CustomerPayments", "SupplierPayments", "StockCounts", "CashVouchers", "CashClosings")
         If Nz(DbValue("SELECT COUNT(*) FROM [" & t & "]"), 0) > 0 Then
             DemoBlocker = "توجد بيانات فعلية (" & t & ")." & vbCrLf & _
                           "البيانات التجريبية تُدخل في قاعدة بدون مستندات فقط (نسخة للتدريب)."
@@ -343,6 +357,10 @@ Private Function CategoryIDOf(ByVal CategoryName As String) As Long
     CategoryIDOf = DbValue("SELECT CategoryID FROM Categories WHERE CategoryName = " & SqlText(CategoryName))
 End Function
 
+Private Function BoxOfType(ByVal BoxType As String) As Long
+    BoxOfType = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True AND BoxType = " & SqlText(BoxType)), 0)
+End Function
+
 Private Function UserIDOf(ByVal Username As String) As Long
     UserIDOf = DbValue("SELECT EmployeeID FROM Employees WHERE Username = " & SqlText(Username))
 End Function
@@ -377,6 +395,8 @@ Private Sub MoveDoc(ByVal Kind As String, ByVal DocID As Long, ByVal When As Dat
         Case "CUSTOMER_PAYMENT": tbl = "CustomerPayments": key = "PaymentID": fld = "PaymentDate"
         Case "SUPPLIER_PAYMENT": tbl = "SupplierPayments": key = "PaymentID": fld = "PaymentDate"
         Case "STOCK_COUNT":      tbl = "StockCounts": key = "StockCountID": fld = "CountDate"
+        Case "CASH_VOUCHER":     tbl = "CashVouchers": key = "CashVoucherID": fld = "VoucherDate"
+        Case "CASH_CLOSING":     tbl = "CashClosings": key = "ClosingID": fld = "ClosingDate"
     End Select
     If Kind = "STOCK_COUNT" Then
         CurrentDb.Execute "UPDATE StockCounts SET CountDate = " & SqlDate(When) & ", PostedAt = " & SqlDate(When) & _
@@ -384,6 +404,10 @@ Private Sub MoveDoc(ByVal Kind As String, ByVal DocID As Long, ByVal When As Dat
     Else
         CurrentDb.Execute "UPDATE " & tbl & " SET " & fld & " = " & SqlDate(When) & ", CreatedAt = " & SqlDate(When) & _
                           " WHERE " & key & " = " & DocID, dbFailOnError
+    End If
+    If Kind = "CASH_CLOSING" Then          ' the shortage / transfer vouchers of the closing
+        CurrentDb.Execute "UPDATE CashVouchers SET VoucherDate = " & SqlDate(When) & ", CreatedAt = " & SqlDate(When) & _
+                          " WHERE ClosingID = " & DocID, dbFailOnError
     End If
     Select Case Kind
         Case "SALE", "SALES_RETURN", "PURCHASE", "PURCHASE_RETURN", "STOCK_COUNT"
@@ -484,7 +508,7 @@ Public Function RemoveDemoData() As Boolean
         Exit Function
     End If
     For Each t In Array("SalesInvoices", "SalesReturns", "PurchaseInvoices", "PurchaseReturns", "CustomerPayments", _
-                        "SupplierPayments", "Expenses")
+                        "SupplierPayments", "Expenses", "CashVouchers", "CashClosings")
         later = later + Nz(DbValue("SELECT COUNT(*) FROM [" & t & "] WHERE CreatedAt > " & SqlDate(loaded)), 0)
     Next
     later = later + Nz(DbValue("SELECT COUNT(*) FROM StockCounts WHERE CountDate > " & SqlDate(loaded)), 0)

@@ -359,6 +359,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     rs!RemainingAmount = remaining
     rs!AmountTendered = tend
     rs!ChangeDue = change
+    rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), paid)      ' modCash
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     If Len(OrderType) > 0 Then rs!OrderType = OrderType
     If Len(Trim$(TableNo)) > 0 Then rs!TableNo = Left$(Trim$(TableNo), 10)
@@ -511,6 +512,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     rs!Tax = sumTax
     rs!TotalAmount = sumTotal
     rs!RefundedAmount = refunded
+    rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), refunded)      ' modCash
     SetZatcaFields rs, subType, "381", retDate, sumTotal, sumTax
     rs.Update
     rs.Bookmark = rs.LastModified
@@ -594,6 +596,7 @@ Public Function PostCustomerPayment(ByVal CustomerID As Long, ByVal Amount As Cu
     rs!PaymentDate = Now
     rs!Amount = Amount
     rs!PaymentMethodID = PaymentMethodID
+    rs!CashBoxID = CashBoxFor(PaymentMethodID, Amount)
     rs!EmployeeID = CurrentUserID()
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     rs.Update
