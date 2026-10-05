@@ -51,7 +51,7 @@ class RelationDefinitionTests(unittest.TestCase):
 
     def test_every_table_except_roots_is_connected(self):
         connected = {r.parent for r in self.rels} | {r.child for r in self.rels}
-        self.assertEqual({t.name for t in TABLES} - connected, {"Sequences"})
+        self.assertEqual({t.name for t in TABLES} - connected, {"Sequences", "LabelSettings"})
 
     def test_attribute_values(self):
         by_name = {r.name: r for r in self.rels}

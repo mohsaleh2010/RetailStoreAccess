@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=28;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=4;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=19;SalesInvoices=29;SalesInvoiceDetails=13;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=11;Roles=3;Permissions=22;RolePermissions=44;Employees=1;Categories=1;Units=8;PaymentMethods=4;Customers=1;ExpenseTypes=9;TransactionTypes=8"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=28;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=4;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=19;SalesInvoices=29;SalesInvoiceDetails=13;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=11;Roles=3;Permissions=22;RolePermissions=44;Employees=1;Categories=1;Units=8;PaymentMethods=4;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -459,6 +459,7 @@ Private Sub CreateAllTables()
     CreateTable_StockCounts
     CreateTable_StockCountDetails
     CreateTable_AuditLog
+    CreateTable_LabelSettings
 End Sub
 
 Private Sub CreateTable_Settings()
@@ -1396,6 +1397,51 @@ Private Sub CreateTable_AuditLog()
     EndTable tdf, "سجل العمليات: يسجل الدخول والخروج والعمليات الحساسة (تجاوز المخزون، تعديل الأسعار، النسخ الاحتياطي).", "", ""
 End Sub
 
+Private Sub CreateTable_LabelSettings()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "LabelSettings") Then Exit Sub
+    AddField tdf, "LabelSettingID", "LONG", 0, True, "1", _
+             "=1", "يسمح بسجل إعدادات واحد فقط", "رقم الإعداد", ""
+    AddField tdf, "PrinterName", "TEXT", 255, False, "", _
+             "", "", "طابعة الملصقات", "فارغ = الطابعة الافتراضية"
+    AddField tdf, "LabelWidth", "QTY", 0, True, "38", _
+             "Between 15 And 210", "عرض الملصق من 15 إلى 210 مم", "عرض الملصق (مم)", ""
+    AddField tdf, "LabelHeight", "QTY", 0, True, "25", _
+             "Between 10 And 297", "ارتفاع الملصق من 10 إلى 297 مم", "ارتفاع الملصق (مم)", ""
+    AddField tdf, "LabelsAcross", "BYTE", 0, True, "1", _
+             "Between 1 And 10", "من 1 إلى 10 ملصقات في الصف", "عدد الملصقات في الصف", ""
+    AddField tdf, "ColumnGap", "QTY", 0, True, "2", _
+             "Between 0 And 50", "من 0 إلى 50 مم", "المسافة بين الأعمدة (مم)", ""
+    AddField tdf, "RowGap", "QTY", 0, True, "0", _
+             "Between 0 And 50", "من 0 إلى 50 مم", "المسافة بين الصفوف (مم)", ""
+    AddField tdf, "MarginTop", "QTY", 0, True, "0", _
+             "Between 0 And 50", "من 0 إلى 50 مم", "الهامش العلوي (مم)", ""
+    AddField tdf, "MarginBottom", "QTY", 0, True, "0", _
+             "Between 0 And 50", "من 0 إلى 50 مم", "الهامش السفلي (مم)", ""
+    AddField tdf, "MarginLeft", "QTY", 0, True, "0", _
+             "Between 0 And 50", "من 0 إلى 50 مم", "الهامش الأيسر (مم)", ""
+    AddField tdf, "MarginRight", "QTY", 0, True, "0", _
+             "Between 0 And 50", "من 0 إلى 50 مم", "الهامش الأيمن (مم)", ""
+    AddField tdf, "BarHeight", "QTY", 0, True, "10", _
+             "Between 3 And 100", "ارتفاع الباركود من 3 إلى 100 مم", "ارتفاع الباركود (مم)", ""
+    AddField tdf, "BarWidth", "QTY", 0, True, "0.25", _
+             "Between 0.1 And 1", "عرض أرفع خط من 0.1 إلى 1 مم (المعتاد 0.25 - 0.33)", "عرض أرفع خط (مم)", ""
+    AddField tdf, "TopLine1", "TEXT", 10, True, """STORE""", _
+             "In (""NONE"",""STORE"",""NAME"",""PRICE"",""CODE"",""BARCODE"")", "اختر من القائمة", "السطر الأول أعلى الباركود", ""
+    AddField tdf, "TopLine2", "TEXT", 10, True, """NAME""", _
+             "In (""NONE"",""STORE"",""NAME"",""PRICE"",""CODE"",""BARCODE"")", "اختر من القائمة", "السطر الثاني أعلى الباركود", ""
+    AddField tdf, "BottomLine1", "TEXT", 10, True, """BARCODE""", _
+             "In (""NONE"",""STORE"",""NAME"",""PRICE"",""CODE"",""BARCODE"")", "اختر من القائمة", "السطر الأول أسفل الباركود", ""
+    AddField tdf, "BottomLine2", "TEXT", 10, True, """PRICE""", _
+             "In (""NONE"",""STORE"",""NAME"",""PRICE"",""CODE"",""BARCODE"")", "اختر من القائمة", "السطر الثاني أسفل الباركود", ""
+    AddField tdf, "ShortName", "TEXT", 30, False, "", _
+             "", "", "الاسم المختصر للمحل", "يُطبع إذا اخترت «الاسم المختصر»"
+    AddField tdf, "FontSize", "BYTE", 0, True, "7", _
+             "Between 5 And 16", "حجم الخط من 5 إلى 16", "حجم الخط", ""
+    AddIndex tdf, "PrimaryKey", "LabelSettingID", True, True, False
+    EndTable tdf, "إعدادات ملصقات الباركود: سجل واحد: مقاس الملصق والورق والهوامش، وحجم الباركود، والنصوص أعلاه وأسفله.", "", ""
+End Sub
+
 '------------------------------------------------------------------------------
 ' Generated: lookup / initial data
 '------------------------------------------------------------------------------
@@ -1412,6 +1458,7 @@ Private Sub SeedAll()
     Seed_Customers
     Seed_ExpenseTypes
     Seed_TransactionTypes
+    Seed_LabelSettings
 End Sub
 
 Private Sub Seed_Settings()
@@ -1585,4 +1632,10 @@ Private Sub Seed_TransactionTypes()
     ExecSeed "INSERT INTO [TransactionTypes] ([TransactionTypeID], [TypeCode], [TypeName], [Direction], [IsManual]) VALUES (7, 'ADJUSTMENT', 'تسوية جرد', 0, False)"
     ExecSeed "INSERT INTO [TransactionTypes] ([TransactionTypeID], [TypeCode], [TypeName], [Direction], [IsManual]) VALUES (8, 'OPENING', 'رصيد افتتاحي', 1, True)"
     EndSeed "TransactionTypes", 8
+End Sub
+
+Private Sub Seed_LabelSettings()
+    If Not BeginSeed("LabelSettings") Then Exit Sub
+    ExecSeed "INSERT INTO [LabelSettings] ([LabelSettingID]) VALUES (1)"
+    EndSeed "LabelSettings", 1
 End Sub

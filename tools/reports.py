@@ -39,6 +39,7 @@ class ReportModel:
     landscape: bool = False
     page_setup: bool = False                              # A4 margins (list reports)
     no_data: str = ""                                     # message instead of an empty report
+    prepare: List[str] = field(default_factory=list)     # procedures run first (Application.Run)
 
     def __post_init__(self):
         for sec in self.heights:

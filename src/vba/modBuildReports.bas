@@ -26,7 +26,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -41,6 +41,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptPurchaseDocument
     BuildReport_rptVoucher
     BuildReport_rptStockCount
+    BuildReport_rptBarcodeLabels
     BuildReport_rptDailySales
     BuildReport_rptMonthlySales
     BuildReport_rptSalesByPeriod
@@ -711,6 +712,47 @@ Private Sub BuildReport_rptStockCount()
     Exit Sub
 EH:
     AbortReport "rptStockCount", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptBarcodeLabels()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    Application.Run "EnsureLabelTables"
+    StartReport "rptBarcodeLabels", "ملصقات الباركود", "SELECT q.LineNo, n.N, p.ProductName, p.ProductCode, p.Barcode, p.SellingPrice FROM tmpLabelQueue AS q, tmpLabelNumbers AS n, Products AS p WHERE p.ProductID = q.ProductID AND n.N <= q.Copies", 2155, "", "LineNo,N", False, False
+    SetSection 0, 1418
+    HideSection 1
+    HideSection 2
+    HideSection 3
+    HideSection 4
+    Set c = RText(0, "txtTop1", "=""المتجر""", 57, 57, 2041, 227, 7, False, 2)
+    Set c = RText(0, "txtTop2", "=[ProductName]", 57, 284, 2041, 227, 7, False, 2)
+    Set c = RBox(0, "boxBar", 57, 539, 2041, 510)
+    SetCtl c, "BorderStyle", 0
+    SetCtl c, "BackStyle", 0
+    Set c = RText(0, "txtBottom1", "=LabelCode([Barcode],[ProductCode])", 57, 907, 2041, 227, 7, False, 2)
+    Set c = RText(0, "txtBottom2", "=LabelPrice([SellingPrice])", 57, 1134, 2041, 227, 7, True, 2)
+    Set c = RText(0, "txtCode", "=LabelCode([Barcode],[ProductCode])", 0, 0, 57, 57, 6, False, 0)
+    SetCtl c, "Visible", False
+    m_rpt.OnNoData = EP
+    m_rpt.Section(0).Name = "secLabel"
+    m_rpt.Section(0).OnPrint = EP
+    m_rpt.OnOpen = EP
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""قائمة الملصقات فارغة.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Report_Open(Cancel As Integer)" & vbCrLf
+    s = s & "    LabelReportOpen" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub secLabel_Print(Cancel As Integer, PrintCount As Integer)" & vbCrLf
+    s = s & "    If Me.HasData = 0 Then Exit Sub" & vbCrLf
+    s = s & "    DrawBarcode Me, Nz(Me!txtCode.Value, """"), Me!boxBar.Left, Me!boxBar.Top, Me!boxBar.Width, _" & vbCrLf
+    s = s & "                Me!boxBar.Height, LabelBarWidth()" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptBarcodeLabels", s
+    Exit Sub
+EH:
+    AbortReport "rptBarcodeLabels", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptDailySales()

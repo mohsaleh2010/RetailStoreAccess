@@ -128,6 +128,9 @@ ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 
 
+LABEL_LINES = ("NONE;بدون;STORE;الاسم المختصر للمحل;NAME;اسم المنتج;PRICE;السعر;CODE;كود المنتج;"
+               "BARCODE;رقم الباركود")
+
 DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmProducts", "Products", "المنتجات", "إضافة وتعديل الأصناف والأسعار", "products",
@@ -247,7 +250,8 @@ DATA_SCREENS: List[DataScreen] = [
         record_source="SELECT * FROM Settings WHERE SettingID = 1",
         extra_buttons=[("btnCategories", "التصنيفات", 'OpenScreen "frmCategories"'),
                        ("btnUnits", "الوحدات", 'OpenScreen "frmUnits"'),
-                       ("btnExpenseTypes", "أنواع المصروفات", 'OpenScreen "frmExpenseTypes"')],
+                       ("btnExpenseTypes", "أنواع المصروفات", 'OpenScreen "frmExpenseTypes"'),
+                       ("btnLabelSettings", "ملصقات الباركود", 'OpenScreen "frmLabelSettings"')],
         fields=[
             Fld("StoreName"), Fld("StoreNameEn"),
             Fld("VATNumber", hint="15 رقمًا يبدأ وينتهي بـ 3"), Fld("CRNumber"),
@@ -259,6 +263,24 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("BackupKeepCount"),
             Fld("LogoPath", button=("btnBrowseLogo", "استعراض", 'BrowseFile Me, "LogoPath"')),
             Fld("ReceiptFooter"),
+        ]),
+    DataScreen(
+        "frmLabelSettings", "LabelSettings", "إعدادات ملصقات الباركود",
+        "مقاس الملصق والورق والهوامش، وحجم الباركود، والنصوص أعلاه وأسفله", "settings",
+        kind="SINGLE", allow_add=False, allow_delete=False,
+        record_source="SELECT * FROM LabelSettings WHERE LabelSettingID = 1",
+        fields=[
+            Info("lblInfoPaper", "الملصق والورق (بالمليمتر). مقاس ورق الطابعة نفسه يُضبط من إعدادات الطابعة في Windows"),
+            Fld("PrinterName", rows="PRINTERS", hint="اتركه فارغًا للطباعة على الطابعة الافتراضية"),
+            Fld("LabelsAcross", hint="1 لطابعة الملصقات، وأكثر لورق A4 فيه أعمدة ملصقات"),
+            Fld("LabelWidth", hint="مثال: 38 أو 40 أو 50"), Fld("LabelHeight", hint="مثال: 25 أو 30"),
+            Fld("ColumnGap"), Fld("RowGap"),
+            Fld("MarginTop"), Fld("MarginBottom"), Fld("MarginRight"), Fld("MarginLeft"),
+            Info("lblInfoBar", "الباركود والنصوص"),
+            Fld("BarHeight"), Fld("BarWidth", hint="0.25 مناسب لطابعات 203 نقطة/بوصة، وكبّره إذا صعبت القراءة"),
+            Fld("TopLine1", rows=LABEL_LINES), Fld("TopLine2", rows=LABEL_LINES),
+            Fld("BottomLine1", rows=LABEL_LINES), Fld("BottomLine2", rows=LABEL_LINES),
+            Fld("ShortName", hint="مثال: النخبة. فارغ = اسم المحل من الإعدادات"), Fld("FontSize"),
         ]),
 ]
 
@@ -303,6 +325,7 @@ SCREEN_PERMISSIONS = {
     "frmStockCount": "STOCK_COUNT", "frmExpenses": "EXPENSES", "frmExpenseTypes": "EXPENSES",
     "frmReportCenter": "REPORTS", "frmSettings": "SETTINGS", "frmUsers": "USERS", "frmRoles": "USERS",
     "frmBackup": "BACKUP",
+    "frmBarcodeLabels": "PRODUCTS", "frmLabelSettings": "PRODUCTS",
 }
 
 
@@ -493,10 +516,16 @@ def input_control(m: FormModel, screen: DataScreen, fld: Fld, x, y, w, h, multil
     if f.kind == "BOOL":
         c = Control("check", fld.field, x, y + cm(0.15), cm(0.5), cm(0.5), props,
                     source=fld.field)
+    elif fld.rows == "PRINTERS":                 # filled when the screen opens (modLabels)
+        props.update({"RowSource": "", "RowSourceType": "Value List", "ColumnCount": 1,
+                      "ColumnWidths": fld.widths or "8"})
+        c = Control("combo", fld.field, x, y, w, h, props, source=fld.field)
     elif fld.rows:
         props["RowSource"] = fld.rows
         props["ColumnCount"] = 2
         props["ColumnWidths"] = fld.widths or "0;6"
+        if not fld.rows.lstrip().upper().startswith("SELECT"):
+            props["RowSourceType"] = "Value List"
         c = Control("combo", fld.field, x, y, w, h, props, source=fld.field)
     else:
         if f.kind in ("MONEY",):
@@ -873,6 +902,7 @@ def all_forms() -> List[FormModel]:
     from forms_sales import sales_forms
     from forms_purchases import purchase_forms
     from forms_security import security_forms
+    from forms_labels import label_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
-            + security_forms())
+            + security_forms() + label_forms())

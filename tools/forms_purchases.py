@@ -145,6 +145,8 @@ def layout_purchase_invoice(line_heads) -> FormModel:
     labelled(m, "txtPaid", "المدفوع للمورد الآن", c)
     m.add(Control("label", "lblRemaining", x2, cm(14.05), half, cm(0.8),
                   {"Caption": " ", "FontSize": 12, "FontBold": True, "ForeColor": Sym("CLR_WARNING")}))
+    button(m, "btnLabels", "طباعة الباركود", px, cm(14.9), "secondary", w=cm(4.0), h=cm(1.1),
+           call="LabelsFromPurchaseScreen Me")
     button(m, "btnClose", "إغلاق", px + pw - cm(3.0), cm(14.9), "secondary", w=cm(3.0), h=cm(1.1),
            call="DoCmd.Close acForm, Me.Name")
     fit_window(m, split_x=cm(21.8), bottom_y=cm(13.4), stretch_w=("subLines", "lblStatus", "cboProduct"),
@@ -295,7 +297,8 @@ def layout_purchase_view() -> FormModel:
             ("btnReturn", "مرتجع", "secondary", 2.6,
              'OpenScreen "frmPurchaseReturn", 7, Me!txtInvoiceID.Value'),
             ("btnPayment", "سند صرف", "secondary", 2.8,
-             'OpenScreen "frmSupplierPayment", 7, Me!txtSupplierID.Value')]:
+             'OpenScreen "frmSupplierPayment", 7, Me!txtSupplierID.Value'),
+            ("btnLabels", "طباعة الباركود", "secondary", 3.4, "LabelsForPurchase Me!txtInvoiceID.Value, Me")]:
         button(m, name, caption, bx, cm(13.9), style, w=cm(w), h=cm(1.0), call=call)
         bx += cm(w) + cm(0.2)
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(13.9), "secondary", w=cm(2.6),
@@ -335,7 +338,9 @@ def layout_inventory() -> FormModel:
             ("btnLowReport", "تقرير النواقص", "secondary", 3.4,
              'OpenReportOrQuery "rptLowStock", "LowStockQuery", ""'),
             ("btnStockReport", "تقرير المخزون", "secondary", 3.4,
-             'OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", ""')]:
+             'OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", ""'),
+            ("btnLabels", "طباعة باركود", "secondary", 3.4,
+             'OpenScreen "frmBarcodeLabels", 0, Me!lstProducts.Value')]:
         button(m, name, caption, bx, cm(16.6), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
 

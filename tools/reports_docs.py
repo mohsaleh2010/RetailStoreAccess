@@ -161,5 +161,38 @@ def stock_count_sheet() -> ReportModel:
     return m
 
 
+LABEL_SQL = ("SELECT q.LineNo, n.N, p.ProductName, p.ProductCode, p.Barcode, p.SellingPrice "
+             "FROM tmpLabelQueue AS q, tmpLabelNumbers AS n, Products AS p "
+             "WHERE p.ProductID = q.ProductID AND n.N <= q.Copies")
+
+
+def barcode_labels() -> ReportModel:
+    """One label per row (copies via tmpLabelNumbers). The size, columns, margins, printer and text
+    lines come from LabelSettings: modLabels.ApplyLabelLayout rewrites this design before printing."""
+    w, h = cm(3.8), cm(2.5)
+    m = ReportModel("rptBarcodeLabels", "ملصقات الباركود", w, {SEC_DETAIL: h},
+                    record_source=LABEL_SQL, group="", sorts=[("LineNo", False), ("N", False)],
+                    no_data="قائمة الملصقات فارغة.", prepare=["EnsureLabelTables"])
+    D = SEC_DETAIL
+    pad, line = cm(0.1), cm(0.4)
+    txt(m, D, "txtTop1", '="المتجر"', pad, pad, w - 2 * pad, line, 7, align=2)
+    txt(m, D, "txtTop2", "=[ProductName]", pad, pad + line, w - 2 * pad, line, 7, align=2)
+    m.add(D, Control("rect", "boxBar", pad, pad + 2 * line + cm(0.05), w - 2 * pad, cm(0.9),
+                     {"BorderStyle": 0, "BackStyle": 0}, decorative=True))
+    txt(m, D, "txtBottom1", "=LabelCode([Barcode],[ProductCode])", pad, h - pad - 2 * line, w - 2 * pad, line,
+        7, align=2)
+    txt(m, D, "txtBottom2", "=LabelPrice([SellingPrice])", pad, h - pad - line, w - 2 * pad, line, 7, True,
+        align=2)
+    txt(m, D, "txtCode", "=LabelCode([Barcode],[ProductCode])", 0, 0, cm(0.1), cm(0.1), 6, visible=False)
+    m.events += ['m_rpt.Section(0).Name = "secLabel"', "m_rpt.Section(0).OnPrint = EP", "m_rpt.OnOpen = EP"]
+    m.code += ["Private Sub Report_Open(Cancel As Integer)", "    LabelReportOpen", "End Sub",
+               "Private Sub secLabel_Print(Cancel As Integer, PrintCount As Integer)",
+               "    If Me.HasData = 0 Then Exit Sub",
+               '    DrawBarcode Me, Nz(Me!txtCode.Value, ""), Me!boxBar.Left, Me!boxBar.Top, Me!boxBar.Width, _',
+               "                Me!boxBar.Height, LabelBarWidth()",
+               "End Sub"]
+    return m
+
+
 def document_reports() -> List[ReportModel]:
-    return [purchase_document(), voucher(), stock_count_sheet()]
+    return [purchase_document(), voucher(), stock_count_sheet(), barcode_labels()]

@@ -27,7 +27,8 @@ import vba_harness as H
 
 MODELS = RP.all_reports()
 ACCESS_FUNCTIONS = {"Nz", "IIf", "Format", "Sum", "Count", "Len", "IsNull", "Trim"}
-PROJECT_FUNCTIONS = {"SettingValue", "GDate", "ReportCriteria", "ReportPrintedAt", "AmountInWords"}
+PROJECT_FUNCTIONS = {"SettingValue", "GDate", "ReportCriteria", "ReportPrintedAt", "AmountInWords",
+                     "LabelCode", "LabelPrice"}
 REPORT_PROPERTIES = {"Page", "Pages"}
 
 
@@ -121,9 +122,15 @@ class SourceTests(unittest.TestCase):
         db.load_fixture()
         db.params.update({"CustomerID": db.ids["C2"], "SupplierID": db.ids["S1"], "ProductID": db.ids["P1"]})
         cls.columns = {}
+        # local front-end tables of the label report (modLabels.EnsureLabelTables)
+        db.con.execute("CREATE TABLE tmpLabelQueue (LineNo INTEGER PRIMARY KEY, ProductID INTEGER, "
+                       "ProductName TEXT, LabelCode TEXT, Price NUMERIC, Copies INTEGER)")
+        db.con.execute("CREATE TABLE tmpLabelNumbers (N INTEGER PRIMARY KEY)")
         for m in MODELS:
             if m.record_source not in cls.columns:
-                cur = db.con.execute(f'SELECT * FROM "{m.record_source}"')
+                src = m.record_source
+                sql = f"SELECT * FROM ({src})" if src.upper().startswith("SELECT ") else f'SELECT * FROM "{src}"'
+                cur = db.con.execute(sql)
                 cls.columns[m.record_source] = {d[0] for d in cur.description}
 
     def test_fields_exist_in_record_source(self):
@@ -143,7 +150,7 @@ class SourceTests(unittest.TestCase):
 
     def test_functions_exist(self):
         public = set()
-        for name in ("modCommon", "modReports"):
+        for name in ("modCommon", "modReports", "modLabels"):
             public |= set(re.findall(r"^Public Function (\w+)\(", read(name), re.M))
         self.assertTrue(PROJECT_FUNCTIONS <= public, PROJECT_FUNCTIONS - public)
         for m in MODELS:

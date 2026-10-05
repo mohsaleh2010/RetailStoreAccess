@@ -5,7 +5,7 @@ Attribute VB_Name = "modTestAll"
 '   RunAllTests   runs every in-Access test in order and shows ONE summary:
 '                 VerifySchema, TestRelationships, TestQueries (empty database
 '                 only), TestForms, TestSales, TestPurchases, TestReports,
-'                 TestDashboard, TestSecurity, and VerifyDemoData right after the
+'                 TestDashboard, TestSecurity, TestLabels, and VerifyDemoData right after the
 '                 demo data was loaded. Each test leaves no data behind.
 '                 The summary is also written to the Immediate window (Ctrl+G).
 '==============================================================================
@@ -22,7 +22,7 @@ Public Function RunAllTests() As Boolean
     g_CollectTests = True
     DoCmd.Hourglass True
     names = Array("VerifySchema", "TestRelationships", "TestQueries", "TestForms", "TestSales", "TestPurchases", _
-                  "TestReports", "TestDashboard", "TestSecurity", "VerifyDemoData")
+                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "VerifyDemoData")
     For i = LBound(names) To UBound(names)
         If SkipReason(CStr(names(i))) <> "" Then
             lines = lines & "[--] " & names(i) & ": " & SkipReason(CStr(names(i))) & vbCrLf

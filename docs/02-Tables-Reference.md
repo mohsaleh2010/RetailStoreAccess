@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **29** | عدد الحقول: **346**
+عدد الجداول: **30** | عدد الحقول: **365**
 
 ## الفهرس
 
@@ -35,6 +35,7 @@
 27. [`StockCounts`](#stockcounts) – جلسات الجرد
 28. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
 29. [`AuditLog`](#auditlog) – سجل العمليات
+30. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -699,3 +700,32 @@
 - المفتاح الأساسي: `LogID`
 - فهرس عادي: `LogDate`
 - فهرس عادي: `ActionType`
+
+## LabelSettings
+
+**إعدادات ملصقات الباركود** – سجل واحد: مقاس الملصق والورق والهوامش، وحجم الباركود، والنصوص أعلاه وأسفله.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **LabelSettingID** 🔑 | Number (Long) |  | ✔ | `1` | `=1` |  | رقم الإعداد |
+| 2 | PrinterName | Short Text | 255 |  |  |  |  | طابعة الملصقات – فارغ = الطابعة الافتراضية |
+| 3 | LabelWidth | Currency (كمية) |  | ✔ | `38` | `Between 15 And 210` |  | عرض الملصق (مم) |
+| 4 | LabelHeight | Currency (كمية) |  | ✔ | `25` | `Between 10 And 297` |  | ارتفاع الملصق (مم) |
+| 5 | LabelsAcross | Number (Byte) |  | ✔ | `1` | `Between 1 And 10` |  | عدد الملصقات في الصف |
+| 6 | ColumnGap | Currency (كمية) |  | ✔ | `2` | `Between 0 And 50` |  | المسافة بين الأعمدة (مم) |
+| 7 | RowGap | Currency (كمية) |  | ✔ | `0` | `Between 0 And 50` |  | المسافة بين الصفوف (مم) |
+| 8 | MarginTop | Currency (كمية) |  | ✔ | `0` | `Between 0 And 50` |  | الهامش العلوي (مم) |
+| 9 | MarginBottom | Currency (كمية) |  | ✔ | `0` | `Between 0 And 50` |  | الهامش السفلي (مم) |
+| 10 | MarginLeft | Currency (كمية) |  | ✔ | `0` | `Between 0 And 50` |  | الهامش الأيسر (مم) |
+| 11 | MarginRight | Currency (كمية) |  | ✔ | `0` | `Between 0 And 50` |  | الهامش الأيمن (مم) |
+| 12 | BarHeight | Currency (كمية) |  | ✔ | `10` | `Between 3 And 100` |  | ارتفاع الباركود (مم) |
+| 13 | BarWidth | Currency (كمية) |  | ✔ | `0.25` | `Between 0.1 And 1` |  | عرض أرفع خط (مم) |
+| 14 | TopLine1 | Short Text | 10 | ✔ | `"STORE"` | `In ("NONE","STORE","NAME","PRICE","CODE","BARCODE")` |  | السطر الأول أعلى الباركود |
+| 15 | TopLine2 | Short Text | 10 | ✔ | `"NAME"` | `In ("NONE","STORE","NAME","PRICE","CODE","BARCODE")` |  | السطر الثاني أعلى الباركود |
+| 16 | BottomLine1 | Short Text | 10 | ✔ | `"BARCODE"` | `In ("NONE","STORE","NAME","PRICE","CODE","BARCODE")` |  | السطر الأول أسفل الباركود |
+| 17 | BottomLine2 | Short Text | 10 | ✔ | `"PRICE"` | `In ("NONE","STORE","NAME","PRICE","CODE","BARCODE")` |  | السطر الثاني أسفل الباركود |
+| 18 | ShortName | Short Text | 30 |  |  |  |  | الاسم المختصر للمحل – يُطبع إذا اخترت «الاسم المختصر» |
+| 19 | FontSize | Number (Byte) |  | ✔ | `7` | `Between 5 And 16` |  | حجم الخط |
+
+- المفتاح الأساسي: `LabelSettingID`
+- بيانات أساسية: 1 سجل

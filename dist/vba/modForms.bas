@@ -18,6 +18,7 @@ Private Const ERR_RELATED_RECORDS As Long = 3200
 '------------------------------------------------------------------------------
 Public Sub FormLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
+    If TagValue(frm, "TABLE") = "LabelSettings" Then LabelSettingsLoad frm      ' printer list (modLabels)
     If TagValue(frm, "KIND") = "LIST" Then RefreshList frm
     If Not IsNull(frm.OpenArgs) Then
         GoToRecord frm, frm.OpenArgs

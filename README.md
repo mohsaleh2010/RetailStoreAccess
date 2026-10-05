@@ -18,6 +18,7 @@
 | 10 | المستخدمون والصلاحيات والنسخ الاحتياطي | ✅ تمت الموافقة | [docs/10-Security.md](docs/10-Security.md) |
 | 11 | الاختبار الشامل والبيانات التجريبية | ✅ تمت الموافقة | [docs/11-Testing-Demo.md](docs/11-Testing-Demo.md) |
 | 12 | دليل الاستخدام | ✅ تمت الموافقة | [docs/12-User-Guide.md](docs/12-User-Guide.md) |
+| + | طباعة ملصقات الباركود | ✅ بانتظار الموافقة | [docs/13-Barcode-Labels.md](docs/13-Barcode-Labels.md) |
 
 ## هيكل المستودع
 
@@ -32,6 +33,7 @@
 | `tools/forms.py` | تعريف الشاشات وتخطيطها، قوالب البحث، قائمة التقارير |
 | `tools/forms_sales.py`, `tools/reports.py` | شاشات المبيعات، وتقارير الفاتورة |
 | `tools/reports_catalog.py`, `tools/reports_docs.py`, `tools/tafqeet.py` | التقارير المنسقة لمركز التقارير، والمستندات، ومرجع المبلغ بالحروف |
+| `tools/forms_labels.py`, `tools/barcode_reference.py` | شاشة ملصقات الباركود، ومرجع ترميز EAN-13 و Code 128 |
 | `tools/demo_data.py`, `tools/sim.py` | البيانات التجريبية وخطتها، وإعادة تنفيذ دوال الحفظ بـ Python للتحقق |
 | `tools/forms_security.py`, `tools/security_reference.py` | شاشات الدخول والمستخدمين والصلاحيات والنسخ، ومرجع SHA-256 والنسخ |
 | `dist/tools/EnableShiftKey.vbs` | إعادة تفعيل مفتاح Shift إذا تعذر دخول المدير |
@@ -55,6 +57,7 @@
 | 8 | `modDashboard` (دائمة) | `BuildQueries`, `BuildForms` | `TestDashboard` |
 | 9 | `modSecurity`, `modSecurityScreens`, `modBackup` (دائمة) ثم `modTestSecurity` | `BuildForms`, `BuildReports` | `TestSecurity` |
 | 10 | `modTestAll`, `modDemoData` | `LoadDemoData` (اختياري، للتدريب) | **`RunAllTests`** (كل الاختبارات) |
+| 11 | `modLabels` (دائمة) | `BuildSchema`, `BuildForms`, `BuildReports` | `TestLabels` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

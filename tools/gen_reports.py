@@ -336,6 +336,7 @@ def report_sub(m: RP.ReportModel) -> str:
     lines = [f"Private Sub BuildReport_{m.name}()",
              "    Dim c As Access.Control, s As String",
              "    On Error GoTo EH",
+             *[f"    Application.Run {vba_str(p)}" for p in m.prepare],
              f"    StartReport {vba_str(m.name)}, {vba_str(m.caption)}, {vba_str(m.record_source)}, {m.width}, "
              f"{vba_str(m.group)}, {vba_str(sort_spec(m))}, {lit(m.landscape)}, {lit(m.page_setup)}"]
     for sec in SECTION_ORDER:
