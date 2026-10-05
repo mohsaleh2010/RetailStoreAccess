@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **30** | عدد الحقول: **365**
+عدد الجداول: **30** | عدد الحقول: **376**
 
 ## الفهرس
 
@@ -71,6 +71,8 @@
 | 26 | ReceiptFooter | Short Text | 255 |  |  |  |  | تذييل الفاتورة |
 | 27 | LogoPath | Short Text | 255 |  |  |  |  | مسار الشعار |
 | 28 | UpdatedAt | Date/Time |  |  |  |  |  | آخر تعديل |
+| 29 | POSMode | Short Text | 10 | ✔ | `"RETAIL"` | `In ("RETAIL","RESTAURANT","CAFE")` |  | شاشة البيع – RETAIL = المحلات (باركود)، RESTAURANT = المطاعم (لمس)، CAFE = الكافيهات (لمس) |
+| 30 | ImagesFolder | Short Text | 255 |  |  |  |  | مجلد صور المنتجات – المسارات النسبية للصور تُقرأ منه؛ فارغ = مجلد Images بجانب ملف البيانات |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -168,6 +170,9 @@
 | 2 | CategoryName | Short Text | 100 | ✔ |  |  |  | اسم التصنيف |
 | 3 | Description | Short Text | 255 |  |  |  |  | الوصف |
 | 4 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 5 | ImagePath | Short Text | 255 |  |  |  |  | صورة التصنيف |
+| 6 | TileColor | Short Text | 10 | ✔ | `"BLUE"` | `In ("BLUE","GREEN","ORANGE","PURPLE","RED","INDIGO","TEAL","PINK","BROWN","GREY")` |  | لون الزر |
+| 7 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | ترتيب العرض |
 
 - المفتاح الأساسي: `CategoryID`
 - فهرس فريد: `CategoryName`
@@ -288,6 +293,8 @@
 | 17 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
 | 18 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 19 | UpdatedAt | Date/Time |  |  |  |  |  | آخر تعديل |
+| 20 | ImagePath | Short Text | 255 |  |  |  |  | صورة المنتج – لشاشات اللمس؛ مسار كامل أو اسم ملف في مجلد الصور |
+| 21 | TrackStock | Yes/No |  |  | `True` |  |  | يتابع المخزون |
 
 - المفتاح الأساسي: `ProductID`
 - فهرس فريد: `ProductCode`
@@ -329,6 +336,10 @@
 | 27 | ZatcaResponse | Long Text |  |  |  |  |  | رد الهيئة |
 | 28 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
 | 29 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 30 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
+| 31 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
+| 32 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
+| 33 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`

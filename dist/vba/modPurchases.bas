@@ -432,6 +432,10 @@ Public Function PostManualStock(ByVal ProductID As Long, ByVal TransactionTypeID
         PostManualStock = "ÇÎÊÑ ÇáãäÊÌ."
         Exit Function
     End If
+    If Not ProductTracksStock(ProductID) Then
+        PostManualStock = "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä (íõÍÖóøÑ ÚäÏ ÇáØáÈ)¡ İáÇ ÊõÓÌóøá áå ÍÑßÇÊ ãÎÒæä."
+        Exit Function
+    End If
     If Qty <= 0 Then
         PostManualStock = "ÇáßãíÉ íÌÈ Ãä Êßæä ÃßÈÑ ãä ÕİÑ."
         Exit Function
@@ -506,7 +510,7 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
         CreateStockCount = "íæÌÏ ÌÑÏ ãİÊæÍ (" & openNo & "). ÑÍøáå Ãæ ÃáÛå ŞÈá ÈÏÁ ÌÑÏ ÌÏíÏ."
         Exit Function
     End If
-    scope = "IsActive = True"
+    scope = "IsActive = True AND TrackStock = True"
     If Not IsNull(CategoryID) Then scope = scope & " AND CategoryID = " & CLng(CategoryID)
     If Nz(DbValue("SELECT COUNT(*) FROM Products WHERE " & scope), 0) = 0 Then
         CreateStockCount = "áÇ ÊæÌÏ ãäÊÌÇÊ äÔØÉ ááÌÑÏ İí åĞÇ ÇáÇÎÊíÇÑ."

@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -118,6 +118,8 @@ Private m_pending As Collection
 Private m_log As String
 Private m_created As Long
 Private m_skipped As Long
+Private m_upgrade As Boolean        ' the table exists: only its missing fields are added
+Private m_addedFields As Long
 Private m_seeded As Long
 Private m_currentStep As String
 Private m_inTrans As Boolean
@@ -133,7 +135,7 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
         Exit Function
     End If
 
-    m_log = "": m_created = 0: m_skipped = 0: m_seeded = 0
+    m_log = "": m_created = 0: m_skipped = 0: m_seeded = 0: m_addedFields = 0
     LogLine "=== BuildSchema " & SCHEMA_VERSION & "  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
 
     m_currentStep = "open back-end"
@@ -159,6 +161,7 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     MsgBox "تم بناء الجداول بنجاح." & vbCrLf & vbCrLf & _
            "جداول جديدة: " & m_created & vbCrLf & _
            "جداول موجودة مسبقًا: " & m_skipped & vbCrLf & _
+           "حقول جديدة أُضيفت لجداول موجودة: " & m_addedFields & vbCrLf & _
            "جداول تمت تعبئة بياناتها الأساسية: " & m_seeded & vbCrLf & vbCrLf & _
            "التفاصيل في نافذة Immediate (Ctrl+G)." & vbCrLf & _
            "الخطوة التالية: شغّل VerifySchema", vbInformation + MSG_RTL, "BuildSchema"
@@ -337,23 +340,41 @@ End Sub
 ' Table building helpers
 '------------------------------------------------------------------------------
 Private Function BeginTable(ByRef tdf As DAO.TableDef, ByVal TableName As String) As Boolean
+    ' A table that exists already is upgraded: its missing fields are added, nothing is removed.
     m_currentStep = "create table " & TableName
-    If TableExistsIn(m_db, TableName) Then
-        LogLine "  = موجود مسبقًا: " & TableName
-        m_skipped = m_skipped + 1
-        Exit Function
-    End If
-    Set tdf = m_db.CreateTableDef(TableName)
     Set m_pending = New Collection
     BeginTable = True
+    m_upgrade = TableExistsIn(m_db, TableName)
+    If m_upgrade Then
+        LogLine "  = موجود مسبقًا: " & TableName
+        m_skipped = m_skipped + 1
+        Set tdf = m_db.TableDefs(TableName)
+    Else
+        Set tdf = m_db.CreateTableDef(TableName)
+    End If
+End Function
+
+Private Function FieldExistsIn(ByVal tdf As DAO.TableDef, ByVal FieldName As String) As Boolean
+    Dim fld As DAO.Field
+    For Each fld In tdf.Fields
+        If StrComp(fld.Name, FieldName, vbTextCompare) = 0 Then
+            FieldExistsIn = True
+            Exit Function
+        End If
+    Next
 End Function
 
 Private Sub AddField(ByVal tdf As DAO.TableDef, ByVal FieldName As String, ByVal Kind As String, _
                      ByVal Size As Long, ByVal IsRequired As Boolean, ByVal DefaultValue As String, _
                      ByVal ValidationRule As String, ByVal ValidationText As String, _
                      ByVal Caption As String, ByVal Description As String)
-    Dim fld As DAO.Field
+    Dim fld As DAO.Field, requiredLater As Boolean
     m_currentStep = "field " & tdf.Name & "." & FieldName
+    If m_upgrade Then
+        If FieldExistsIn(tdf, FieldName) Then Exit Sub
+        requiredLater = IsRequired                 ' existing rows get the default value first
+        IsRequired = False
+    End If
 
     Select Case Kind
         Case "AUTO"
@@ -380,6 +401,14 @@ Private Sub AddField(ByVal tdf As DAO.TableDef, ByVal FieldName As String, ByVal
         fld.ValidationText = ValidationText
     End If
     tdf.Fields.Append fld
+    If m_upgrade Then
+        If Len(DefaultValue) > 0 Then
+            m_db.Execute "UPDATE [" & tdf.Name & "] SET [" & FieldName & "] = " & DefaultValue, dbFailOnError
+        End If
+        If requiredLater Then tdf.Fields(FieldName).Required = True
+        m_addedFields = m_addedFields + 1
+        LogLine "  + حقل جديد: " & tdf.Name & "." & FieldName
+    End If
 
     ' Properties that can only be set after the table is saved
     If Len(Caption) > 0 Then AddPending FieldName, "Caption", dbText, Caption
@@ -398,6 +427,11 @@ Private Sub AddIndex(ByVal tdf As DAO.TableDef, ByVal IndexName As String, ByVal
                      ByVal IsPrimary As Boolean, ByVal IsUnique As Boolean, ByVal IgnoreNulls As Boolean)
     Dim idx As DAO.Index, fieldName As Variant
     m_currentStep = "index " & tdf.Name & "." & IndexName
+    If m_upgrade Then
+        For Each idx In tdf.Indexes
+            If StrComp(idx.Name, IndexName, vbTextCompare) = 0 Then Exit Sub
+        Next
+    End If
     Set idx = tdf.CreateIndex(IndexName)
     For Each fieldName In Split(FieldList, ",")
         idx.Fields.Append idx.CreateField(CStr(fieldName))
@@ -412,6 +446,15 @@ Private Sub EndTable(ByVal tdf As DAO.TableDef, ByVal Description As String, _
                      ByVal TableRule As String, ByVal TableRuleText As String)
     Dim item As Variant, saved As DAO.TableDef
     m_currentStep = "save table " & tdf.Name
+    If m_upgrade Then                              ' existing table: properties of the new fields only
+        For Each item In m_pending
+            m_currentStep = "property " & tdf.Name & "." & item(0) & "." & item(1)
+            SetProp tdf.Fields(item(0)), item(1), item(2), item(3)
+        Next
+        Set m_pending = Nothing
+        m_upgrade = False
+        Exit Sub
+    End If
     If Len(TableRule) > 0 Then
         tdf.ValidationRule = TableRule
         tdf.ValidationText = TableRuleText

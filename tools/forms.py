@@ -128,6 +128,10 @@ ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 
 
+TILE_COLORS = ("BLUE;أزرق;GREEN;أخضر;ORANGE;برتقالي;PURPLE;بنفسجي;RED;أحمر;INDIGO;نيلي;TEAL;فيروزي;"
+               "PINK;وردي;BROWN;بني;GREY;رمادي")
+POS_MODES = "RETAIL;المحلات (باركود);RESTAURANT;المطاعم (شاشة لمس);CAFE;الكافيهات (شاشة لمس)"
+
 LABEL_LINES = ("NONE;بدون;STORE;الاسم المختصر للمحل;NAME;اسم المنتج;PRICE;السعر;CODE;كود المنتج;"
                "BARCODE;رقم الباركود")
 
@@ -149,6 +153,9 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("AverageCost", locked=True), Fld("CurrentQuantity", locked=True),
             Fld("MinimumQuantity"), Fld("ProductLocation"),
             Fld("IsActive"), Info("lblStockNote", "الكمية تتغير فقط من المشتريات والمبيعات والجرد"),
+            Fld("TrackStock", hint="ألغِ العلامة للوجبات والمشروبات التي تُحضَّر عند الطلب: تُباع بلا رصيد"),
+            Fld("ImagePath", hint="صورة الزر في شاشة اللمس: مسار كامل أو اسم ملف في مجلد الصور",
+                button=("btnBrowseImage", "استعراض", 'BrowseFile Me, "ImagePath"')),
             Fld("Notes", span=2),
         ]),
     DataScreen(
@@ -230,7 +237,11 @@ DATA_SCREENS: List[DataScreen] = [
         list_select="t.CategoryName AS [التصنيف]", list_from="Categories AS t",
         list_order="t.CategoryName", list_headers=[("التصنيف", 8.4)],
         search=["t.CategoryName", "t.Description"], active="t.IsActive", unique=["CategoryName"],
-        fields=[Fld("CategoryName", span=2), Fld("Description", span=2), Fld("IsActive")]),
+        fields=[Fld("CategoryName", span=2), Fld("Description", span=2), Fld("IsActive"),
+                Fld("SortOrder", hint="ترتيب الزر في شاشة اللمس (الأصغر أولًا)"),
+                Fld("TileColor", rows=TILE_COLORS),
+                Fld("ImagePath", hint="صورة الزر في شاشة اللمس",
+                    button=("btnBrowseImage", "استعراض", 'BrowseFile Me, "ImagePath"'))]),
     DataScreen(
         "frmUnits", "Units", "وحدات القياس", "وحدات بيع المنتجات", "category",
         list_select="t.UnitName AS [الوحدة], t.ZatcaUnitCode AS [الرمز]", list_from="Units AS t",
@@ -263,6 +274,10 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("BackupKeepCount"),
             Fld("LogoPath", button=("btnBrowseLogo", "استعراض", 'BrowseFile Me, "LogoPath"')),
             Fld("ReceiptFooter"),
+            Fld("POSMode", rows=POS_MODES, widths="0;6",
+                hint="الشاشة التي يفتحها زر المبيعات"),
+            Fld("ImagesFolder", hint="فارغ = مجلد Images بجانب ملف البيانات",
+                button=("btnBrowseImages", "استعراض", 'BrowseFolder Me, "ImagesFolder"')),
         ]),
     DataScreen(
         "frmLabelSettings", "LabelSettings", "إعدادات ملصقات الباركود",
@@ -326,6 +341,7 @@ SCREEN_PERMISSIONS = {
     "frmReportCenter": "REPORTS", "frmSettings": "SETTINGS", "frmUsers": "USERS", "frmRoles": "USERS",
     "frmBackup": "BACKUP",
     "frmBarcodeLabels": "PRODUCTS", "frmLabelSettings": "PRODUCTS",
+    "frmTouchPOS": "SALES_POS", "frmTouchPay": "SALES_POS",
 }
 
 
@@ -956,6 +972,7 @@ def all_forms() -> List[FormModel]:
     from forms_purchases import purchase_forms
     from forms_security import security_forms
     from forms_labels import label_forms
+    from forms_touch import touch_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
-            + security_forms() + label_forms())
+            + security_forms() + label_forms() + touch_forms())

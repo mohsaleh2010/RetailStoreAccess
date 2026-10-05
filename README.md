@@ -20,6 +20,8 @@
 | 12 | دليل الاستخدام | ✅ تمت الموافقة | [docs/12-User-Guide.md](docs/12-User-Guide.md) |
 | + | طباعة ملصقات الباركود | ✅ بانتظار الموافقة | [docs/13-Barcode-Labels.md](docs/13-Barcode-Labels.md) |
 | + | لوحة التحكم الجديدة والإحصائيات بالرسوم البيانية | ✅ بانتظار الموافقة | [docs/14-Dashboard-Charts.md](docs/14-Dashboard-Charts.md) |
+| + | نقطة بيع المطاعم (شاشة لمس) | ✅ بانتظار الموافقة | [docs/15-Restaurant-POS.md](docs/15-Restaurant-POS.md) |
+| + | نقطة بيع الكافيهات (شاشة لمس) | ⏳ التالية | |
 
 ## هيكل المستودع
 
@@ -60,6 +62,7 @@
 | 10 | `modTestAll`, `modDemoData` | `LoadDemoData` (اختياري، للتدريب) | **`RunAllTests`** (كل الاختبارات) |
 | 11 | `modLabels` (دائمة) | `BuildSchema`, `BuildForms`, `BuildReports` | `TestLabels` |
 | 12 | `modCharts` (دائمة) | `BuildQueries`, `BuildForms`, `BuildReports` | `TestDashboard`, `TestReports` |
+| 13 | `modTouchPOS` (دائمة) | `BuildSchema` (يضيف الحقول الناقصة), `BuildQueries`, `BuildForms`, `BuildReports` | `TestTouchPOS` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

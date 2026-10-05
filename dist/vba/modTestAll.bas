@@ -22,7 +22,7 @@ Public Function RunAllTests() As Boolean
     g_CollectTests = True
     DoCmd.Hourglass True
     names = Array("VerifySchema", "TestRelationships", "TestQueries", "TestForms", "TestSales", "TestPurchases", _
-                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "VerifyDemoData")
+                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "TestTouchPOS", "VerifyDemoData")
     For i = LBound(names) To UBound(names)
         If SkipReason(CStr(names(i))) <> "" Then
             lines = lines & "[--] " & names(i) & ": " & SkipReason(CStr(names(i))) & vbCrLf

@@ -28,7 +28,7 @@ import vba_harness as H
 MODELS = RP.all_reports()
 ACCESS_FUNCTIONS = {"Nz", "IIf", "Format", "Sum", "Count", "Len", "IsNull", "Trim"}
 PROJECT_FUNCTIONS = {"SettingValue", "GDate", "ReportCriteria", "ReportPrintedAt", "AmountInWords",
-                     "LabelCode", "LabelPrice"}
+                     "LabelCode", "LabelPrice", "OrderTypeText"}
 REPORT_PROPERTIES = {"Page", "Pages"}
 
 
@@ -161,7 +161,7 @@ class SourceTests(unittest.TestCase):
 
     def test_functions_exist(self):
         public = set()
-        for name in ("modCommon", "modReports", "modLabels"):
+        for name in ("modCommon", "modReports", "modLabels", "modTouchPOS"):
             public |= set(re.findall(r"^Public Function (\w+)\(", read(name), re.M))
         self.assertTrue(PROJECT_FUNCTIONS <= public, PROJECT_FUNCTIONS - public)
         for m in MODELS:

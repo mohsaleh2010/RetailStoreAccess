@@ -124,7 +124,8 @@ def receipt() -> ReportModel:
     y += cm(1.0)
     for name, src in [("txtDocNumber", '="رقم: " & [DocNumber]'),
                       ("txtDocDate", '="التاريخ: " & Format([DocDate],"yyyy/mm/dd hh:nn")'),
-                      ("txtOriginal", '=IIf(Len(Nz([OriginalNumber],""))>0,"عن الفاتورة: " & [OriginalNumber],"")'),
+                      ("txtOriginal", '=IIf(Len(Nz([OriginalNumber],""))>0,"عن الفاتورة: " & [OriginalNumber],'
+                                     'OrderTypeText([OrderType],[TableNo]))'),
                       ("txtCashier", '="الكاشير: " & [EmployeeName]'),
                       ("txtCustomer", '=IIf([CustomerID]=Nz(SettingValue("DefaultCustomerID"),1),"",'
                                       '"العميل: " & [CustomerName])'),
@@ -212,7 +213,8 @@ def a4() -> ReportModel:
     yy = cm(1.5)
     for name, src in [("txtDocNumber", '="رقم الفاتورة: " & [DocNumber]'),
                       ("txtDocDate", '="التاريخ: " & Format([DocDate],"yyyy/mm/dd hh:nn")'),
-                      ("txtOriginal", '=IIf(Len(Nz([OriginalNumber],""))>0,"عن الفاتورة: " & [OriginalNumber],"")'),
+                      ("txtOriginal", '=IIf(Len(Nz([OriginalNumber],""))>0,"عن الفاتورة: " & [OriginalNumber],'
+                                     'OrderTypeText([OrderType],[TableNo]))'),
                       ("txtPaymentType", '="طريقة البيع: " & IIf([PaymentType]="CREDIT","آجل","نقدي")'),
                       ("txtCashier", '="الموظف: " & [EmployeeName]')]:
         txt(m, H, name, src, x2, yy, half, cm(0.45), 9, align=1)

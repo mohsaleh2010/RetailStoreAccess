@@ -432,6 +432,10 @@ Public Function PostManualStock(ByVal ProductID As Long, ByVal TransactionTypeID
         PostManualStock = "اختر المنتج."
         Exit Function
     End If
+    If Not ProductTracksStock(ProductID) Then
+        PostManualStock = "هذا الصنف لا يتابع المخزون (يُحضَّر عند الطلب)، فلا تُسجَّل له حركات مخزون."
+        Exit Function
+    End If
     If Qty <= 0 Then
         PostManualStock = "الكمية يجب أن تكون أكبر من صفر."
         Exit Function
@@ -506,7 +510,7 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
         CreateStockCount = "يوجد جرد مفتوح (" & openNo & "). رحّله أو ألغه قبل بدء جرد جديد."
         Exit Function
     End If
-    scope = "IsActive = True"
+    scope = "IsActive = True AND TrackStock = True"
     If Not IsNull(CategoryID) Then scope = scope & " AND CategoryID = " & CLng(CategoryID)
     If Nz(DbValue("SELECT COUNT(*) FROM Products WHERE " & scope), 0) = 0 Then
         CreateStockCount = "لا توجد منتجات نشطة للجرد في هذا الاختيار."

@@ -248,7 +248,10 @@ End Function
 Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As String, _
                                  ByVal PaymentMethodID As Variant, ByVal InvoiceDiscount As Currency, _
                                  ByVal Tendered As Variant, ByVal Notes As String, _
-                                 ByRef NewInvoiceID As Long) As String
+                                 ByRef NewInvoiceID As Long, Optional ByVal OrderType As String = "", _
+                                 Optional ByVal TableNo As String = "", Optional ByVal DeliveryPhone As String = "", _
+                                 Optional ByVal DeliveryAddress As String = "") As String
+    ' OrderType / TableNo / Delivery*: restaurant and café orders (touch screen), empty for the shop.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim n As Long, i As Long, msg As String, vatRate As Currency, rate As Currency
     Dim productIDs() As Long, costs() As Currency, vatCats() As String
@@ -350,6 +353,10 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     rs!AmountTendered = tend
     rs!ChangeDue = change
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
+    If Len(OrderType) > 0 Then rs!OrderType = OrderType
+    If Len(Trim$(TableNo)) > 0 Then rs!TableNo = Left$(Trim$(TableNo), 10)
+    If Len(Trim$(DeliveryPhone)) > 0 Then rs!DeliveryPhone = Left$(Trim$(DeliveryPhone), 20)
+    If Len(Trim$(DeliveryAddress)) > 0 Then rs!DeliveryAddress = Left$(Trim$(DeliveryAddress), 255)
     SetZatcaFields rs, subType, "388", invDate, CalcTotal("TOTAL"), CalcTotal("TAX")
     rs.Update
     rs.Bookmark = rs.LastModified
@@ -606,7 +613,9 @@ Public Sub ApplyStockMovement(ByVal db As DAO.Database, ByVal ProductID As Long,
                               Optional ByVal RecalcAverage As Boolean = False)
     ' Qty is signed (+ in, - out). RecalcAverage: goods coming in (purchase, opening, stock in,
     ' sales return) or going back to the supplier at their purchase cost update the average cost.
+    ' A product that does not track stock (a dish made to order) has no stock movements.
     Dim rs As DAO.Recordset, curQty As Currency, newQty As Currency
+    If Not ProductTracksStock(ProductID) Then Exit Sub
     Set rs = db.OpenRecordset("SELECT ProductID, CurrentQuantity, AverageCost, PurchasePrice, UpdatedAt " & _
                               "FROM Products WHERE ProductID = " & ProductID, dbOpenDynaset)
     rs.Edit
@@ -679,6 +688,10 @@ Private Function CheckStock(ByRef ProductIDs() As Long, ByVal n As Long) As Stri
     CheckStock = CheckStockAvailable(ProductIDs, qtys, n, "البيع")
 End Function
 
+Public Function ProductTracksStock(ByVal ProductID As Long) As Boolean
+    ProductTracksStock = Nz(DbValue("SELECT TrackStock FROM Products WHERE ProductID = " & ProductID), True)
+End Function
+
 Public Function CheckStockAvailable(ByRef ProductIDs() As Long, ByRef Qtys() As Currency, ByVal n As Long, _
                                     ByVal Operation As String) As String
     ' Sums the quantities per product and compares them with the stock. Taking out more than
@@ -693,6 +706,7 @@ Public Function CheckStockAvailable(ByRef ProductIDs() As Long, ByRef Qtys() As 
             End If
         Next
         available = Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & ProductIDs(i)), 0)
+        If Not ProductTracksStock(ProductIDs(i)) Then need = 0      ' made to order: no stock limit
         If need > available Then
             shortList = shortList & vbCrLf & "- " & DbValue("SELECT ProductName FROM Products WHERE ProductID = " & _
                         ProductIDs(i)) & ": المطلوب " & need & " والمتوفر " & available

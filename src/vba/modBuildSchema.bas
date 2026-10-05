@@ -27,7 +27,7 @@ Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=28;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=4;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=19;SalesInvoices=29;SalesInvoiceDetails=13;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=30;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=7;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=21;SalesInvoices=33;SalesInvoiceDetails=13;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=11;Roles=3;Permissions=22;RolePermissions=44;Employees=1;Categories=1;Units=8;PaymentMethods=4;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
@@ -35,6 +35,8 @@ Private m_pending As Collection
 Private m_log As String
 Private m_created As Long
 Private m_skipped As Long
+Private m_upgrade As Boolean        ' the table exists: only its missing fields are added
+Private m_addedFields As Long
 Private m_seeded As Long
 Private m_currentStep As String
 Private m_inTrans As Boolean
@@ -50,7 +52,7 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
         Exit Function
     End If
 
-    m_log = "": m_created = 0: m_skipped = 0: m_seeded = 0
+    m_log = "": m_created = 0: m_skipped = 0: m_seeded = 0: m_addedFields = 0
     LogLine "=== BuildSchema " & SCHEMA_VERSION & "  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
 
     m_currentStep = "open back-end"
@@ -76,6 +78,7 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     MsgBox "تم بناء الجداول بنجاح." & vbCrLf & vbCrLf & _
            "جداول جديدة: " & m_created & vbCrLf & _
            "جداول موجودة مسبقًا: " & m_skipped & vbCrLf & _
+           "حقول جديدة أُضيفت لجداول موجودة: " & m_addedFields & vbCrLf & _
            "جداول تمت تعبئة بياناتها الأساسية: " & m_seeded & vbCrLf & vbCrLf & _
            "التفاصيل في نافذة Immediate (Ctrl+G)." & vbCrLf & _
            "الخطوة التالية: شغّل VerifySchema", vbInformation + MSG_RTL, "BuildSchema"
@@ -254,23 +257,41 @@ End Sub
 ' Table building helpers
 '------------------------------------------------------------------------------
 Private Function BeginTable(ByRef tdf As DAO.TableDef, ByVal TableName As String) As Boolean
+    ' A table that exists already is upgraded: its missing fields are added, nothing is removed.
     m_currentStep = "create table " & TableName
-    If TableExistsIn(m_db, TableName) Then
-        LogLine "  = موجود مسبقًا: " & TableName
-        m_skipped = m_skipped + 1
-        Exit Function
-    End If
-    Set tdf = m_db.CreateTableDef(TableName)
     Set m_pending = New Collection
     BeginTable = True
+    m_upgrade = TableExistsIn(m_db, TableName)
+    If m_upgrade Then
+        LogLine "  = موجود مسبقًا: " & TableName
+        m_skipped = m_skipped + 1
+        Set tdf = m_db.TableDefs(TableName)
+    Else
+        Set tdf = m_db.CreateTableDef(TableName)
+    End If
+End Function
+
+Private Function FieldExistsIn(ByVal tdf As DAO.TableDef, ByVal FieldName As String) As Boolean
+    Dim fld As DAO.Field
+    For Each fld In tdf.Fields
+        If StrComp(fld.Name, FieldName, vbTextCompare) = 0 Then
+            FieldExistsIn = True
+            Exit Function
+        End If
+    Next
 End Function
 
 Private Sub AddField(ByVal tdf As DAO.TableDef, ByVal FieldName As String, ByVal Kind As String, _
                      ByVal Size As Long, ByVal IsRequired As Boolean, ByVal DefaultValue As String, _
                      ByVal ValidationRule As String, ByVal ValidationText As String, _
                      ByVal Caption As String, ByVal Description As String)
-    Dim fld As DAO.Field
+    Dim fld As DAO.Field, requiredLater As Boolean
     m_currentStep = "field " & tdf.Name & "." & FieldName
+    If m_upgrade Then
+        If FieldExistsIn(tdf, FieldName) Then Exit Sub
+        requiredLater = IsRequired                 ' existing rows get the default value first
+        IsRequired = False
+    End If
 
     Select Case Kind
         Case "AUTO"
@@ -297,6 +318,14 @@ Private Sub AddField(ByVal tdf As DAO.TableDef, ByVal FieldName As String, ByVal
         fld.ValidationText = ValidationText
     End If
     tdf.Fields.Append fld
+    If m_upgrade Then
+        If Len(DefaultValue) > 0 Then
+            m_db.Execute "UPDATE [" & tdf.Name & "] SET [" & FieldName & "] = " & DefaultValue, dbFailOnError
+        End If
+        If requiredLater Then tdf.Fields(FieldName).Required = True
+        m_addedFields = m_addedFields + 1
+        LogLine "  + حقل جديد: " & tdf.Name & "." & FieldName
+    End If
 
     ' Properties that can only be set after the table is saved
     If Len(Caption) > 0 Then AddPending FieldName, "Caption", dbText, Caption
@@ -315,6 +344,11 @@ Private Sub AddIndex(ByVal tdf As DAO.TableDef, ByVal IndexName As String, ByVal
                      ByVal IsPrimary As Boolean, ByVal IsUnique As Boolean, ByVal IgnoreNulls As Boolean)
     Dim idx As DAO.Index, fieldName As Variant
     m_currentStep = "index " & tdf.Name & "." & IndexName
+    If m_upgrade Then
+        For Each idx In tdf.Indexes
+            If StrComp(idx.Name, IndexName, vbTextCompare) = 0 Then Exit Sub
+        Next
+    End If
     Set idx = tdf.CreateIndex(IndexName)
     For Each fieldName In Split(FieldList, ",")
         idx.Fields.Append idx.CreateField(CStr(fieldName))
@@ -329,6 +363,15 @@ Private Sub EndTable(ByVal tdf As DAO.TableDef, ByVal Description As String, _
                      ByVal TableRule As String, ByVal TableRuleText As String)
     Dim item As Variant, saved As DAO.TableDef
     m_currentStep = "save table " & tdf.Name
+    If m_upgrade Then                              ' existing table: properties of the new fields only
+        For Each item In m_pending
+            m_currentStep = "property " & tdf.Name & "." & item(0) & "." & item(1)
+            SetProp tdf.Fields(item(0)), item(1), item(2), item(3)
+        Next
+        Set m_pending = Nothing
+        m_upgrade = False
+        Exit Sub
+    End If
     If Len(TableRule) > 0 Then
         tdf.ValidationRule = TableRule
         tdf.ValidationText = TableRuleText
@@ -521,6 +564,10 @@ Private Sub CreateTable_Settings()
              "", "", "مسار الشعار", ""
     AddField tdf, "UpdatedAt", "DATETIME", 0, False, "", _
              "", "", "آخر تعديل", ""
+    AddField tdf, "POSMode", "TEXT", 10, True, """RETAIL""", _
+             "In (""RETAIL"",""RESTAURANT"",""CAFE"")", "اختر شاشة البيع من القائمة", "شاشة البيع", "RETAIL = المحلات (باركود)، RESTAURANT = المطاعم (لمس)، CAFE = الكافيهات (لمس)"
+    AddField tdf, "ImagesFolder", "TEXT", 255, False, "", _
+             "", "", "مجلد صور المنتجات", "المسارات النسبية للصور تُقرأ منه؛ فارغ = مجلد Images بجانب ملف البيانات"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
     EndTable tdf, "إعدادات المحل: سجل واحد فقط يحتوي بيانات المحل الضريبية وإعدادات التشغيل.", "", ""
 End Sub
@@ -635,6 +682,12 @@ Private Sub CreateTable_Categories()
              "", "", "الوصف", ""
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
              "", "", "نشط", ""
+    AddField tdf, "ImagePath", "TEXT", 255, False, "", _
+             "", "", "صورة التصنيف", ""
+    AddField tdf, "TileColor", "TEXT", 10, True, """BLUE""", _
+             "In (""BLUE"",""GREEN"",""ORANGE"",""PURPLE"",""RED"",""INDIGO"",""TEAL"",""PINK"",""BROWN"",""GREY"")", "اختر اللون من القائمة", "لون الزر", ""
+    AddField tdf, "SortOrder", "INT", 0, True, "0", _
+             "", "", "ترتيب العرض", ""
     AddIndex tdf, "PrimaryKey", "CategoryID", True, True, False
     AddIndex tdf, "UX_CategoryName", "CategoryName", False, True, False
     EndTable tdf, "التصنيفات: تصنيفات المنتجات (إلكترونيات، مواد غذائية، ...).", "", ""
@@ -805,6 +858,10 @@ Private Sub CreateTable_Products()
              "", "", "تاريخ الإنشاء", ""
     AddField tdf, "UpdatedAt", "DATETIME", 0, False, "", _
              "", "", "آخر تعديل", ""
+    AddField tdf, "ImagePath", "TEXT", 255, False, "", _
+             "", "", "صورة المنتج", "لشاشات اللمس؛ مسار كامل أو اسم ملف في مجلد الصور"
+    AddField tdf, "TrackStock", "BOOL", 0, False, "True", _
+             "", "", "يتابع المخزون", ""
     AddIndex tdf, "PrimaryKey", "ProductID", True, True, False
     AddIndex tdf, "UX_ProductCode", "ProductCode", False, True, False
     AddIndex tdf, "UX_Barcode", "Barcode", False, True, True
@@ -873,6 +930,14 @@ Private Sub CreateTable_SalesInvoices()
              "", "", "مسار ملف XML الموقّع", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "OrderType", "TEXT", 10, False, "", _
+             "Is Null Or In (""DINE_IN"",""TAKEAWAY"",""DELIVERY"")", "نوع الطلب: داخلي أو سفري أو توصيل", "نوع الطلب", ""
+    AddField tdf, "TableNo", "TEXT", 10, False, "", _
+             "", "", "رقم الطاولة", ""
+    AddField tdf, "DeliveryPhone", "TEXT", 20, False, "", _
+             "", "", "جوال التوصيل", ""
+    AddField tdf, "DeliveryAddress", "TEXT", 255, False, "", _
+             "", "", "عنوان التوصيل", ""
     AddIndex tdf, "PrimaryKey", "SalesInvoiceID", True, True, False
     AddIndex tdf, "UX_InvoiceNumber", "InvoiceNumber", False, True, False
     AddIndex tdf, "IX_InvoiceDate", "InvoiceDate", False, False, False

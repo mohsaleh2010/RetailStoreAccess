@@ -49,6 +49,13 @@ Public Sub EnsureLocalTables()
     End If
 End Sub
 
+Public Function HasControl(ByVal frm As Access.Form, ByVal ControlName As String) As Boolean
+    Dim ctl As Access.Control
+    On Error Resume Next
+    Set ctl = frm.Controls(ControlName)
+    HasControl = Not ctl Is Nothing
+End Function
+
 Private Function LocalTableExists(ByVal TableName As String) As Boolean
     Dim tdf As DAO.TableDef
     For Each tdf In CurrentDb.TableDefs
@@ -84,6 +91,7 @@ Public Sub ResetSaleHeader(ByVal frm As Access.Form)
     frm!txtNotes.Value = Null
     frm!txtQty.Value = 1
     CustomerChanged frm
+    If HasControl(frm, "txtOrderType") Then ResetTouchOrder frm      ' modTouchPOS
 End Sub
 
 Public Sub POSKeyDown(ByVal frm As Access.Form, ByRef KeyCode As Integer, ByVal Shift As Integer)
@@ -163,7 +171,7 @@ Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty 
     rs.Update
     rs.Close
     RecalcPOS frm
-    If total > p!CurrentQuantity Then
+    If total > p!CurrentQuantity And ProductTracksStock(ProductID) Then
         SetPOSStatus frm, "ÊäÈíå: ÇáßãíÉ ÇáãÊæÝÑÉ ãä «" & p!ProductName & "» åí " & p!CurrentQuantity, CLR_WARNING
     Else
         SetPOSStatus frm, "ÊãÊ ÅÖÇÝÉ: " & p!ProductName & "  (" & total & ")", CLR_SUCCESS
@@ -301,9 +309,20 @@ End Sub
 Public Function SavePOS(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) As Boolean
     Dim msg As String, newID As Long, invNo As String, change As Currency
     If frm!subLines.Form.Dirty Then frm!subLines.Form.Dirty = False
-    msg = PostSaleFromCart(Nz(frm!cboCustomer.Value, 1), Nz(frm!cboPaymentType.Value, "CASH"), _
-                           frm!cboPaymentMethod.Value, Nz(frm!txtInvoiceDiscount.Value, 0), _
-                           frm!txtTendered.Value, Nz(frm!txtNotes.Value, ""), newID)
+    If HasControl(frm, "txtOrderType") Then          ' restaurant / café touch screen
+        msg = TouchOrderProblem(frm)
+        If Len(msg) = 0 Then
+            msg = PostSaleFromCart(Nz(frm!cboCustomer.Value, 1), Nz(frm!cboPaymentType.Value, "CASH"), _
+                                   frm!cboPaymentMethod.Value, Nz(frm!txtInvoiceDiscount.Value, 0), _
+                                   frm!txtTendered.Value, Nz(frm!txtNotes.Value, ""), newID, _
+                                   Nz(frm!txtOrderType.Value, ""), Nz(frm!cboTable.Value, ""), _
+                                   Nz(frm!txtDeliveryPhone.Value, ""), Nz(frm!txtDeliveryAddress.Value, ""))
+        End If
+    Else
+        msg = PostSaleFromCart(Nz(frm!cboCustomer.Value, 1), Nz(frm!cboPaymentType.Value, "CASH"), _
+                               frm!cboPaymentMethod.Value, Nz(frm!txtInvoiceDiscount.Value, 0), _
+                               frm!txtTendered.Value, Nz(frm!txtNotes.Value, ""), newID)
+    End If
     If Len(msg) > 0 Then
         SetPOSStatus frm, msg, CLR_DANGER
         ShowWarning msg

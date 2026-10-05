@@ -194,7 +194,7 @@ SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName,
        s.SupplierName, s.Mobile AS SupplierMobile
 FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
-WHERE p.IsActive = True AND p.CurrentQuantity <= p.MinimumQuantity
+WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity
 ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName"""),
 
     Query("ProductMovementQuery", "حركة منتج خلال فترة مع رصيد أول المدة (الرصيد التراكمي في التقرير)", f"""
@@ -450,7 +450,8 @@ SELECT 'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumbe
        h.SubTotal AS DocSubTotal, h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax,
        h.TotalAmount, h.PaidAmount, h.RemainingAmount, h.AmountTendered, h.ChangeDue,
        d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, d.Quantity, d.UnitPrice,
-       d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal
+       d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal,
+       h.OrderType, h.TableNo
 FROM ((((SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID)
        INNER JOIN Products AS p ON d.ProductID = p.ProductID)
       INNER JOIN Units AS u ON p.UnitID = u.UnitID)
@@ -462,7 +463,7 @@ SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, o.InvoiceNumber,
        c.BuildingNo, c.PostalCode, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax,
        r.TotalAmount, r.RefundedAmount, r.TotalAmount - r.RefundedAmount, CCur(0), CCur(0),
        rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, rd.Quantity, rd.UnitPrice,
-       rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal
+       rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal, o.OrderType, o.TableNo
 FROM (((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)
         INNER JOIN SalesInvoices AS o ON r.SalesInvoiceID = o.SalesInvoiceID)
        INNER JOIN Products AS p ON rd.ProductID = p.ProductID)

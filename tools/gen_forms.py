@@ -57,6 +57,8 @@ def control_lines(c: F.Control):
     out = []
     if c.kind == "rect":
         out.append(f"    Set c = AddRect({vba_str(c.name)}, {c.x}, {c.y}, {c.w}, {c.h}, {lit(p['BackColor'])})")
+    elif c.kind == "image":
+        out.append(f"    Set c = AddImage({vba_str(c.name)}, {c.x}, {c.y}, {c.w}, {c.h})")
     elif c.kind in ("label", "icon"):
         func = "AddLabel" if c.kind == "label" else "AddIcon"
         out.append(f"    Set c = {func}({vba_str(c.name)}, {lit(p.get('Caption', ' '))}, {c.x}, {c.y}, "
@@ -441,6 +443,18 @@ Private Function AddList(ByVal CtlName As String, ByVal L As Long, ByVal T As Lo
     c.ColumnHeads = ColumnHeads
     c.BoundColumn = 1
     Set AddList = c
+End Function
+
+Private Function AddImage(ByVal CtlName As String, ByVal L As Long, ByVal T As Long, ByVal W As Long, _
+                          ByVal H As Long) As Access.Control
+    ' Picture loaded at run time (product / category images on the touch screens), scaled to fit.
+    Dim c As Access.Control
+    Set c = NewCtl(acImage, CtlName, L, T, W, H)
+    c.SizeMode = 3                                   ' acOLESizeZoom
+    c.BorderStyle = 0
+    c.BackStyle = 0
+    c.PictureType = 1                                ' linked
+    Set AddImage = c
 End Function
 
 Private Function AddSubform(ByVal CtlName As String, ByVal SourceObject As String, ByVal L As Long, _

@@ -115,6 +115,7 @@ End Sub
 Public Function OpenScreen(ByVal FormName As String, Optional ByVal PhaseNo As Integer = 0, _
                            Optional ByVal RecordID As Variant) As Boolean
     If IsMissing(RecordID) Then RecordID = Null
+    If FormName = "frmPOS" Then FormName = SalesScreenName()   ' shop, restaurant or café (Settings.POSMode)
     If Not FormExists(FormName) Then
         If PhaseNo > 0 Then
             ShowInfo "هذه الشاشة ستكون متاحة بعد تنفيذ المرحلة " & PhaseNo & "."
