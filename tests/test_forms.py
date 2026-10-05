@@ -390,3 +390,48 @@ class FormRecordAccessTests(unittest.TestCase):
                 lines = fh.readlines()
             for n, line in enumerate(lines, 1):
                 self.assertIsNone(bad.search(line), f"{os.path.basename(path)}:{n}: {line.strip()}")
+
+
+class WindowFitTests(unittest.TestCase):
+    """Replays modForms.FitControls for several window sizes on every screen that has a fit spec."""
+
+    @staticmethod
+    def placed(m, dw, dh):
+        out = []
+        for c in m.controls:
+            mx, mw, my, mh = m.fit.get(c.name, (0, 0, 0, 0))
+            out.append(F.Control(c.kind, c.name, c.x + dw * mx // 1000, c.y + dh * my // 1000,
+                                 c.w + dw * mw // 1000, c.h + dh * mh // 1000, decorative=c.decorative))
+        return out
+
+    def test_big_screens_fit_a_laptop_and_have_a_fit_spec(self):
+        for m in MODELS:
+            if not m.popup and m.height > F.cm(2):
+                self.assertTrue(m.fit, m.name)
+                self.assertLessEqual(m.height, F.cm(17.0), m.name)
+
+    def test_no_overlap_and_inside_window_at_any_size(self):
+        for m in MODELS:
+            if not m.fit:
+                continue
+            min_dh = gen_forms.fit_min_dh(m)
+            self.assertLessEqual(min_dh, 0, m.name)
+            for dw in (0, F.cm(5), F.cm(20)):
+                for dh in (min_dh, 0, F.cm(4), F.cm(15)):
+                    ctls = self.placed(m, dw, dh)
+                    for c in ctls:
+                        with self.subTest(form=m.name, control=c.name, dw=dw, dh=dh):
+                            self.assertGreaterEqual(c.h, 1)
+                            self.assertLessEqual(c.x + c.w, m.width + dw)
+                            self.assertLessEqual(c.y + c.h, m.height + dh)
+                    solid = [c for c in ctls if not c.decorative]
+                    for i, a in enumerate(solid):
+                        for b in solid[i + 1:]:
+                            self.assertFalse(overlaps(a, b), f"{m.name} dw={dw} dh={dh}: {a.name} / {b.name}")
+
+    def test_spec_names_exist_and_line_lengths(self):
+        for m in MODELS:
+            names = {c.name for c in m.controls}
+            self.assertTrue(set(m.fit) <= names, m.name)
+            for line in gen_forms.fit_code_lines(m) if m.fit else []:
+                self.assertLess(len(line), 1000)

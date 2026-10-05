@@ -112,8 +112,22 @@ Public Function OpenScreen(ByVal FormName As String, Optional ByVal PhaseNo As I
     If Not CanOpenScreen(FormName) Then Exit Function          ' permission of the user's role
     If IsFormOpen(FormName) Then DoCmd.Close acForm, FormName
     DoCmd.OpenForm FormName, acNormal, , , , acWindowNormal, RecordID
+    MaximizeScreen FormName
     OpenScreen = True
 End Function
+
+Public Sub MaximizeScreen(ByVal FormName As String)
+    ' Full-window screens (not the pop-up dialogs); Form_Resize then fits the controls.
+    Dim frm As Access.Form
+    On Error Resume Next
+    If g_SilentMode Then Exit Sub
+    Set frm = Forms(FormName)
+    If frm Is Nothing Then Exit Sub
+    If Not frm.PopUp Then
+        DoCmd.SelectObject acForm, FormName
+        DoCmd.Maximize
+    End If
+End Sub
 
 Public Sub ExitApplication()
     If AskYesNo("هل تريد الخروج من النظام؟") Then

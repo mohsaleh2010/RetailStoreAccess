@@ -77,6 +77,7 @@ Public Function DoLogin(ByVal frm As Access.Form) As Boolean
         End If
     End If
     DoCmd.OpenForm "frmMain"
+    MaximizeScreen "frmMain"
 End Function
 
 Public Sub LoginExit()

@@ -4,7 +4,7 @@ Layout conventions are the same as forms.py (twips, x from the start edge)."""
 
 from typing import List, Tuple
 
-from forms import Control, FormModel, Sym, button, cm, labelled, title_band, CATEGORY_ROWS
+from forms import Control, FormModel, Sym, button, cm, fit_window, labelled, shrink_area, title_band, CATEGORY_ROWS
 from forms_sales import LOCKED, PAYMENT_ROWS, PAYMENT_TYPES, grid_row, header_labels
 
 PURCHASE_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, PurchasePrice "
@@ -61,7 +61,7 @@ def layout_purchase_lines() -> Tuple[FormModel, list]:
 
 
 def layout_purchase_invoice(line_heads) -> FormModel:
-    width, height = cm(33.5), cm(18.6)
+    width, height = cm(33.5), cm(16.3)
     m = FormModel("frmPurchaseInvoice", "فاتورة مشتريات", width, height, popup=False, allow_add=False)
     title_band(m, "فاتورة مشتريات",
                "التكلفة بدون ضريبة  |  F9 حفظ  |  F5 فاتورة جديدة  |  F4 بحث بالاسم  |  F2 الباركود",
@@ -79,9 +79,9 @@ def layout_purchase_invoice(line_heads) -> FormModel:
     labelled(m, "cboProduct", "أو ابحث باسم المنتج (F4)", p)
 
     header_labels(m, cm(0.4), cm(3.6), PURCHASE_TITLES, line_heads)
-    m.add(Control("subform", "subLines", cm(0.4), cm(4.25), cm(21.2), cm(11.0),
+    m.add(Control("subform", "subLines", cm(0.4), cm(4.25), cm(21.2), cm(9.3),
                   {"SourceObject": "frmPurchaseLines"}))
-    m.add(Control("label", "lblStatus", cm(0.4), cm(15.45), cm(21.2), cm(0.7),
+    m.add(Control("label", "lblStatus", cm(0.4), cm(13.75), cm(21.2), cm(0.7),
                   {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_MUTED")}))
     bx = cm(0.4)
     for name, caption, style, w, call in [
@@ -92,7 +92,7 @@ def layout_purchase_invoice(line_heads) -> FormModel:
              'OpenScreen "frmSupplierPayment", 7, Me!cboSupplier.Value'),
             ("btnNewProduct", "منتج جديد", "secondary", 2.8, 'OpenScreen "frmProducts"'),
             ("btnLastInvoice", "آخر فاتورة", "secondary", 2.8, "PurShowLast Me")]:
-        button(m, name, caption, bx, cm(16.6), style, w=cm(w), h=cm(1.1), call=call)
+        button(m, name, caption, bx, cm(14.9), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
 
     px, pw, half = cm(22.0), cm(11.1), cm(5.35)
@@ -121,9 +121,9 @@ def layout_purchase_invoice(line_heads) -> FormModel:
     c = m.add(Control("text", "txtNotes", px, cm(8.65), pw, cm(0.8), {}))
     labelled(m, "txtNotes", "ملاحظات", c)
 
-    m.add(Control("rect", "boxTotals", px, cm(9.7), pw, cm(4.4), {"BackColor": Sym("CLR_SURFACE")},
+    m.add(Control("rect", "boxTotals", px, cm(9.6), pw, cm(3.75), {"BackColor": Sym("CLR_SURFACE")},
                   decorative=True))
-    ty = cm(9.85)
+    ty = cm(9.7)
     for name, caption in [("SubTotal", "المجموع قبل الخصم والضريبة"), ("Discount", "الخصم"),
                           ("Tax", "ضريبة المدخلات")]:
         m.add(Control("label", f"lblCap{name}", px + cm(0.3), ty, cm(6.5), cm(0.6),
@@ -131,22 +131,24 @@ def layout_purchase_invoice(line_heads) -> FormModel:
         m.add(Control("label", f"lbl{name}", px + cm(6.9), ty, cm(3.9), cm(0.6),
                       {"Caption": "0.00", "FontSize": 12, "FontBold": True, "TextAlign": 3,
                        "ForeColor": Sym("CLR_TEXT")}))
-        ty += cm(0.7)
-    m.add(Control("label", "lblCapTotal", px + cm(0.3), cm(12.0), cm(5.0), cm(0.6),
+        ty += cm(0.6)
+    m.add(Control("label", "lblCapTotal", px + cm(0.3), cm(11.65), cm(5.0), cm(0.6),
                   {"Caption": "الإجمالي شامل الضريبة", "FontSize": 12, "FontBold": True,
                    "ForeColor": Sym("CLR_PRIMARY")}))
-    m.add(Control("label", "lblTotal", px + cm(5.4), cm(11.85), cm(5.4), cm(1.1),
+    m.add(Control("label", "lblTotal", px + cm(5.4), cm(11.5), cm(5.4), cm(1.0),
                   {"Caption": "0.00", "FontSize": 24, "FontBold": True, "TextAlign": 3,
                    "ForeColor": Sym("CLR_ACCENT")}))
-    m.add(Control("label", "lblItems", px + cm(0.3), cm(13.2), cm(10.5), cm(0.6),
+    m.add(Control("label", "lblItems", px + cm(0.3), cm(12.65), cm(10.5), cm(0.6),
                   {"Caption": " ", "FontSize": 10, "TextAlign": 2, "ForeColor": Sym("CLR_MUTED")}))
-    c = m.add(Control("text", "txtPaid", px, cm(15.0), half, cm(0.9),
+    c = m.add(Control("text", "txtPaid", px, cm(14.0), half, cm(0.9),
                       {"FontSize": 13, "Format": "#,##0.00"}, events=["AfterUpdate"]))
     labelled(m, "txtPaid", "المدفوع للمورد الآن", c)
-    m.add(Control("label", "lblRemaining", x2, cm(15.05), half, cm(0.8),
+    m.add(Control("label", "lblRemaining", x2, cm(14.05), half, cm(0.8),
                   {"Caption": " ", "FontSize": 12, "FontBold": True, "ForeColor": Sym("CLR_WARNING")}))
-    button(m, "btnClose", "إغلاق", px + pw - cm(3.0), cm(16.6), "secondary", w=cm(3.0), h=cm(1.1),
+    button(m, "btnClose", "إغلاق", px + pw - cm(3.0), cm(14.9), "secondary", w=cm(3.0), h=cm(1.1),
            call="DoCmd.Close acForm, Me.Name")
+    fit_window(m, split_x=cm(21.8), bottom_y=cm(13.4), stretch_w=("subLines", "lblStatus", "cboProduct"),
+               stretch_h=("subLines",))
 
     m.form_events = ["Load", "KeyDown", "Unload"]
     m.code = ([
@@ -377,6 +379,9 @@ def layout_inventory() -> FormModel:
                '    OpenScreen "frmProducts", 0, Me!lstProducts.Value', "End Sub",
                "Private Sub cboMoveType_AfterUpdate()", "    InventoryMoveTypeChanged Me", "End Sub"]
               + m.code)
+    shrink_area(m, ("lstProducts", "lstMoves"), cm(2.1))
+    fit_window(m, split_x=cm(21.2), bottom_y=cm(13.4), stretch_w=("lstProducts", "lblInvTotals"),
+               stretch_h=("lstProducts", "lstMoves"))
     return m
 
 
@@ -449,6 +454,9 @@ def layout_stock_count(line_heads) -> FormModel:
                "    CountBarcodeKeyDown Me, KeyCode", "End Sub",
                "Private Sub chkDiffOnly_AfterUpdate()", "    CountFilterChanged Me", "End Sub"]
               + m.code)
+    shrink_area(m, ("subCountLines",), cm(2.1))
+    fit_window(m, split_x=cm(29.0), bottom_y=cm(13.3),
+               stretch_w=("subCountLines", "lblCountSummary", "lblCountInfo"), stretch_h=("subCountLines",))
     return m
 
 

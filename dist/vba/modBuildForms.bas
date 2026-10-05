@@ -580,10 +580,10 @@ End Sub
 Private Sub BuildForm_frmMain()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmMain", "‰Ÿ«„ ≈œ«—… «·„Õ·", "", 18994, 10773, False, False, False, _
+    StartForm "frmMain", "‰Ÿ«„ ≈œ«—… «·„Õ·", "", 18994, 9526, False, False, False, _
               ""
     SetFormProp "TimerInterval", 300000
-    Set c = AddRect("boxSidebar", 0, 0, 3515, 10773, CLR_PRIMARY)
+    Set c = AddRect("boxSidebar", 0, 0, 3515, 9526, CLR_PRIMARY)
     Set c = AddIcon("icoApp", ChrW(&HE80F), 227, 255, 567, 567, 22, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblAppTitle", "‰Ÿ«„ ≈œ«—… «·„Õ·", 850, 227, 2551, 425, 15, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblStoreName", " ", 850, 652, 2551, 312, 9, False, CLR_SIDEBAR_TEXT, "", 0)
@@ -592,69 +592,69 @@ Private Sub BuildForm_frmMain()
     c.OnClick = EP
     Set c = AddIcon("icoSales", ChrW(&HE7BF), 255, 1389, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavPurchases", "«·„‘ —Ì« ", 142, 1899, 3231, 539, "nav")
+    Set c = AddButton("btnNavPurchases", "«·„‘ —Ì« ", 142, 1871, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmPurchaseInvoice"
     c.OnClick = EP
-    Set c = AddIcon("icoPurchases", ChrW(&HE896), 255, 1984, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoPurchases", ChrW(&HE896), 255, 1956, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavInventory", "«·„Œ“Ê‰", 142, 2494, 3231, 539, "nav")
+    Set c = AddButton("btnNavInventory", "«·„Œ“Ê‰", 142, 2438, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmInventory"
     c.OnClick = EP
-    Set c = AddIcon("icoInventory", ChrW(&HE7B8), 255, 2579, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoInventory", ChrW(&HE7B8), 255, 2523, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavProducts", "«·„‰ Ã« ", 142, 3089, 3231, 539, "nav")
+    Set c = AddButton("btnNavProducts", "«·„‰ Ã« ", 142, 3005, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmProducts"
     c.OnClick = EP
-    Set c = AddIcon("icoProducts", ChrW(&HE8EC), 255, 3174, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoProducts", ChrW(&HE8EC), 255, 3090, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavCustomers", "«·⁄„·«¡", 142, 3684, 3231, 539, "nav")
+    Set c = AddButton("btnNavCustomers", "«·⁄„·«¡", 142, 3572, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmCustomers"
     c.OnClick = EP
-    Set c = AddIcon("icoCustomers", ChrW(&HE716), 255, 3769, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoCustomers", ChrW(&HE716), 255, 3657, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavSuppliers", "«·„Ê—œÊ‰", 142, 4279, 3231, 539, "nav")
+    Set c = AddButton("btnNavSuppliers", "«·„Ê—œÊ‰", 142, 4139, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmSuppliers"
     c.OnClick = EP
-    Set c = AddIcon("icoSuppliers", ChrW(&HE77B), 255, 4364, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoSuppliers", ChrW(&HE77B), 255, 4224, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavExpenses", "«·„’—Ê›« ", 142, 4874, 3231, 539, "nav")
+    Set c = AddButton("btnNavExpenses", "«·„’—Ê›« ", 142, 4706, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmExpenses"
     c.OnClick = EP
-    Set c = AddIcon("icoExpenses", ChrW(&HE8C7), 255, 4959, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoExpenses", ChrW(&HE8C7), 255, 4791, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavStockCount", "«·Ã—œ", 142, 5469, 3231, 539, "nav")
+    Set c = AddButton("btnNavStockCount", "«·Ã—œ", 142, 5273, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmStockCount"
     c.OnClick = EP
-    Set c = AddIcon("icoStockCount", ChrW(&HE8EF), 255, 5554, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoStockCount", ChrW(&HE8EF), 255, 5358, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavReports", "«· ﬁ«—Ì—", 142, 6064, 3231, 539, "nav")
+    Set c = AddButton("btnNavReports", "«· ﬁ«—Ì—", 142, 5840, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmReportCenter"
     c.OnClick = EP
-    Set c = AddIcon("icoReports", ChrW(&HE8A5), 255, 6149, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoReports", ChrW(&HE8A5), 255, 5925, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavSearch", "«·»ÕÀ", 142, 6659, 3231, 539, "nav")
+    Set c = AddButton("btnNavSearch", "«·»ÕÀ", 142, 6407, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmSearch"
     c.OnClick = EP
-    Set c = AddIcon("icoSearch", ChrW(&HE721), 255, 6744, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoSearch", ChrW(&HE721), 255, 6492, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavSettings", "«·≈⁄œ«œ« ", 142, 7254, 3231, 539, "nav")
+    Set c = AddButton("btnNavSettings", "«·≈⁄œ«œ« ", 142, 6974, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmSettings"
     c.OnClick = EP
-    Set c = AddIcon("icoSettings", ChrW(&HE713), 255, 7339, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoSettings", ChrW(&HE713), 255, 7059, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavUsers", "«·„” Œœ„Ê‰", 142, 7849, 3231, 539, "nav")
+    Set c = AddButton("btnNavUsers", "«·„” Œœ„Ê‰", 142, 7541, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmUsers"
     c.OnClick = EP
-    Set c = AddIcon("icoUsers", ChrW(&HE8D7), 255, 7934, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoUsers", ChrW(&HE8D7), 255, 7626, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavBackup", "‰”Œ… «Õ Ì«ÿÌ…", 142, 8444, 3231, 539, "nav")
+    Set c = AddButton("btnNavBackup", "‰”Œ… «Õ Ì«ÿÌ…", 142, 8108, 3231, 539, "nav")
     SetCtlProp c, "Tag", "frmBackup"
     c.OnClick = EP
-    Set c = AddIcon("icoBackup", ChrW(&HE8B7), 255, 8529, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoBackup", ChrW(&HE8B7), 255, 8193, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavLogout", " ”ÃÌ· «·Œ—ÊÃ", 142, 9039, 3231, 539, "nav")
+    Set c = AddButton("btnNavLogout", " ”ÃÌ· «·Œ—ÊÃ", 142, 8675, 3231, 539, "nav")
     c.OnClick = EP
-    Set c = AddIcon("icoLogout", ChrW(&HE7E8), 255, 9124, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoLogout", ChrW(&HE7E8), 255, 8760, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddLabel("lblWelcome", "·ÊÕ… «· Õﬂ„", 3969, 340, 7938, 539, 20, True, CLR_TEXT, "", 0)
     Set c = AddLabel("lblToday", " ", 3969, 907, 5670, 340, 11, False, CLR_MUTED, "", 0)
@@ -713,19 +713,20 @@ Private Sub BuildForm_frmMain()
     c.OnClick = EP
     Set c = AddLabel("lblTileSub8", " ", 15236, 3998, 3132, 284, 9, False, CLR_MUTED, "", 0)
     Set c = AddLabel("lblCapRecentSales", "›Ê« Ì— «·ÌÊ„ (‰ﬁ— „“œÊÃ ··⁄—÷)", 3969, 4564, 4705, 340, 10, True, CLR_TEXT, "", 0)
-    Set c = AddList("lstRecentSales", 3969, 4933, 4705, 4990, 5, "0;1247;737;1588;1077", True)
+    Set c = AddList("lstRecentSales", 3969, 4933, 4705, 3743, 5, "0;1247;737;1588;1077", True)
     c.OnDblClick = EP
     Set c = AddLabel("lblCapLowStock", "„‰Œ›÷… «·„Œ“Ê‰ (‰ﬁ— „“œÊÃ ··„‰ Ã)", 8901, 4564, 4705, 340, 10, True, CLR_TEXT, "", 0)
-    Set c = AddList("lstLowStock", 8901, 4933, 4705, 4990, 4, "0;2608;1021;1021", True)
+    Set c = AddList("lstLowStock", 8901, 4933, 4705, 3743, 4, "0;2608;1021;1021", True)
     c.OnDblClick = EP
     Set c = AddLabel("lblCapTopProducts", "«·√ﬂÀ— „»Ì⁄« Â–« «·‘Â—", 13833, 4564, 4705, 340, 10, True, CLR_TEXT, "", 0)
-    Set c = AddList("lstTopProducts", 13833, 4933, 4705, 4990, 4, "0;2381;1021;1247", True)
+    Set c = AddList("lstTopProducts", 13833, 4933, 4705, 3743, 4, "0;2381;1021;1247", True)
     c.OnDblClick = EP
-    Set c = AddLabel("lblIntegrity", " ", 3969, 10093, 14571, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblIntegrity", " ", 3969, 8846, 14571, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnOpen = EP
     m_frm.OnLoad = EP
     m_frm.OnActivate = EP
     m_frm.OnTimer = EP
+    m_frm.OnResize = EP
     s = ""
     s = s & "Private Sub Form_Open(Cancel As Integer)" & vbCrLf
     s = s & "    Cancel = Not MainOpen(Me)" & vbCrLf
@@ -885,6 +886,18 @@ Private Sub BuildForm_frmMain()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub lstTopProducts_DblClick(Cancel As Integer)" & vbCrLf
     s = s & "    OpenScreen ""frmProducts"", 0, Me!lstTopProducts.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxSidebar,0,0,3515,9526,0,0,0,1000;lblUser,13437,907,5103,340,1000,0,0,0;btnRefresh,17179,340,1361,454,1000,0,0,0;btnChangePassword,11964,340,1531,454,1000,0,0,0;lblUpdated,13550,425,3515,312,1000,0,0,0;boxTile1,3969,1418,3472,1389,0,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle1,4139,1503,3132,340,0,250,0,0;lblTileValue1,4139,1843,3132,567,0,250,0,0;lblTileSub1,4139,2439,3132,284,0,250,0,0;boxTile2,7668,1418,3472,1389,250,250,0,0;lblTileTitle2,7838,1503,3132,340,250,250,0,0;lblTileValue2,7838,1843,3132,567,250,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub2,7838,2439,3132,284,250,250,0,0;boxTile3,11367,1418,3472,1389,500,250,0,0;lblTileTitle3,11537,1503,3132,340,500,250,0,0;lblTileValue3,11537,1843,3132,567,500,250,0,0;lblTileSub3,11537,2439,3132,284,500,250,0,0;boxTile4,15066,1418,3472,1389,750,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle4,15236,1503,3132,340,750,250,0,0;lblTileValue4,15236,1843,3132,567,750,250,0,0;lblTileSub4,15236,2439,3132,284,750,250,0,0;boxTile5,3969,2977,3472,1389,0,250,0,0;lblTileTitle5,4139,3062,3132,340,0,250,0,0;lblTileValue5,4139,3402,3132,567,0,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub5,4139,3998,3132,284,0,250,0,0;boxTile6,7668,2977,3472,1389,250,250,0,0;lblTileTitle6,7838,3062,3132,340,250,250,0,0;lblTileValue6,7838,3402,3132,567,250,250,0,0;lblTileSub6,7838,3998,3132,284,250,250,0,0;boxTile7,11367,2977,3472,1389,500,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle7,11537,3062,3132,340,500,250,0,0;lblTileValue7,11537,3402,3132,567,500,250,0,0;lblTileSub7,11537,3998,3132,284,500,250,0,0;boxTile8,15066,2977,3472,1389,750,250,0,0;lblTileTitle8,15236,3062,3132,340,750,250,0,0;lblTileValue8,15236,3402,3132,567,750,250,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub8,15236,3998,3132,284,750,250,0,0;lblCapRecentSales,3969,4564,4705,340,0,333,0,0;lstRecentSales,3969,4933,4705,3743,0,333,0,1000;lblCapLowStock,8901,4564,4705,340,333,333,0,0;lstLowStock,8901,4933,4705,3743,333,333,0,1000;lblCapTopProducts,13833,4564,4705,340,666,333,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lstTopProducts,13833,4933,4705,3743,666,333,0,1000;lblIntegrity,3969,8846,14571,340,0,1000,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9526, -142, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmMain", s
     Exit Sub
@@ -2011,7 +2024,7 @@ End Sub
 Private Sub BuildForm_frmSearch()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmSearch", "«·»ÕÀ «·„ ﬁœ„", "", 15309, 9639, False, False, True, _
+    StartForm "frmSearch", "«·»ÕÀ «·„ ﬁœ„", "", 15309, 8675, False, False, True, _
               ""
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE721), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -2036,10 +2049,11 @@ Private Sub BuildForm_frmSearch()
     c.OnClick = EP
     Set c = AddButton("btnClose", "—ÃÊ⁄", 14175, 1372, 907, 482, "secondary")
     c.OnClick = EP
-    Set c = AddList("lstResults", 227, 2098, 14855, 6861, 6, "", True)
+    Set c = AddList("lstResults", 227, 2098, 14855, 5897, 6, "", True)
     c.OnDblClick = EP
-    Set c = AddLabel("lblCount", " ", 227, 9100, 14855, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 227, 8136, 14855, 340, 10, False, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
+    m_frm.OnResize = EP
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    SearchLoad Me" & vbCrLf
@@ -2062,6 +2076,11 @@ Private Sub BuildForm_frmSearch()
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnSearch,11794,1372,1361,482,1000,0,0,0;btnClear,13268,1372,907,482,1000,0,0,0;btnClose,14175,1372,907,482,1000,0,0,0;lstResults,227,2098,14855,5897,0,1000,0,1000;lblCount,227,8136,14855,340,0,1000,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 15309, 8675, -4422, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     FinishForm "frmSearch", s
     Exit Sub
 EH:
@@ -2071,13 +2090,13 @@ End Sub
 Private Sub BuildForm_frmReportCenter()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmReportCenter", "«· ﬁ«—Ì—", "", 15309, 9639, False, False, True, _
+    StartForm "frmReportCenter", "«· ﬁ«—Ì—", "", 15309, 8675, False, False, True, _
               ""
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8A5), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "„—ﬂ“ «· ﬁ«—Ì—", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", "«Œ — «· ﬁ—Ì— À„ Õœœ «·› —… √Ê «·⁄„Ì· √Ê «·„‰ Ã", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddList("lstReports", 227, 1077, 5103, 8278, 2, "0;4876", False)
+    Set c = AddList("lstReports", 227, 1077, 5103, 7314, 2, "0;4876", False)
     c.RowSourceType = "Value List"
     c.FontSize = 11
     c.AfterUpdate = EP
@@ -2114,6 +2133,7 @@ Private Sub BuildForm_frmReportCenter()
     c.OnClick = EP
     Set c = AddLabel("lblPhaseNote", "Ìı⁄—÷ «· ﬁ—Ì— ··„⁄«Ì‰… Ê„‰Â« «·ÿ»«⁄…. ´Õ›Ÿ PDFª Ê´ ’œÌ— Excelª ÌÕ›Ÿ«‰ «·„·› ›Ì „Ã·œ Reports »Ã«‰» „·› «·»—‰«„Ã.", 5670, 7342, 9412, 567, 9, False, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
+    m_frm.OnResize = EP
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    ReportCenterLoad Me" & vbCrLf
@@ -2147,6 +2167,11 @@ Private Sub BuildForm_frmReportCenter()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;lstReports,227,1077,5103,7314,0,0,0,1000;lblReportTitle,5670,1077,9412,482,0,1000,0,0;lblNeeds,5670,1588,9412,340,0,1000,0,0;btnClose,13948,6548,1134,567,1000,0,0,0;lblPhaseNote,5670,7342,9412,567,0,1000,0,0""" & vbCrLf
+    s = s & "    FitControls Me, 15309, 8675, -709, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmReportCenter", s
     Exit Sub
@@ -2215,7 +2240,7 @@ End Sub
 Private Sub BuildForm_frmPOS()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmPOS", "‰ﬁÿ… «·»Ì⁄", "", 18994, 10546, False, False, True, _
+    StartForm "frmPOS", "‰ﬁÿ… «·»Ì⁄", "", 18994, 8675, False, False, True, _
               ""
     Set c = AddRect("boxTitle", 0, 0, 18994, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -2241,19 +2266,19 @@ Private Sub BuildForm_frmPOS()
     Set c = AddLabel("lblCol5", "Œ’„ «·”ÿ—", 7907, 2041, 1247, 312, 9, True, CLR_MUTED, "", 2)
     Set c = AddLabel("lblCol6", "«·≈Ã„«·Ì", 9182, 2041, 1588, 312, 9, True, CLR_MUTED, "", 2)
     Set c = AddLabel("lblCol7", "«·„ Ê›—", 10798, 2041, 907, 312, 9, True, CLR_MUTED, "", 2)
-    Set c = AddSubform("subLines", "frmPOSLines", 227, 2410, 12020, 6237)
-    Set c = AddLabel("lblStatus", " ", 227, 8760, 12020, 397, 11, True, CLR_MUTED, "", 0)
-    Set c = AddButton("btnSave", "Õ›Ÿ (F9)", 227, 9412, 1928, 624, "primary")
+    Set c = AddSubform("subLines", "frmPOSLines", 227, 2410, 12020, 4706)
+    Set c = AddLabel("lblStatus", " ", 227, 7229, 12020, 397, 11, True, CLR_MUTED, "", 0)
+    Set c = AddButton("btnSave", "Õ›Ÿ (F9)", 227, 7881, 1928, 624, "primary")
     c.OnClick = EP
-    Set c = AddButton("btnSavePrint", "Õ›Ÿ Êÿ»«⁄… (F12)", 2268, 9412, 2381, 624, "primary")
+    Set c = AddButton("btnSavePrint", "Õ›Ÿ Êÿ»«⁄… (F12)", 2268, 7881, 2381, 624, "primary")
     c.OnClick = EP
-    Set c = AddButton("btnNewSale", "›« Ê—… ÃœÌœ… (F5)", 4762, 9412, 2155, 624, "secondary")
+    Set c = AddButton("btnNewSale", "›« Ê—… ÃœÌœ… (F5)", 4762, 7881, 2155, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnReturn", "„— Ã⁄", 7030, 9412, 1474, 624, "secondary")
+    Set c = AddButton("btnReturn", "„— Ã⁄", 7030, 7881, 1474, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnPayment", "”‰œ ﬁ»÷", 8617, 9412, 1474, 624, "secondary")
+    Set c = AddButton("btnPayment", "”‰œ ﬁ»÷", 8617, 7881, 1474, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnReprint", "≈⁄«œ… ÿ»«⁄…", 10204, 9412, 1588, 624, "secondary")
+    Set c = AddButton("btnReprint", "≈⁄«œ… ÿ»«⁄…", 10204, 7881, 1588, 624, "secondary")
     c.OnClick = EP
     Set c = AddCombo("cboCustomer", "", 12474, 1304, 6294, 454, "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName", 2, "0;5670")
     c.AfterUpdate = EP
@@ -2271,29 +2296,30 @@ Private Sub BuildForm_frmPOS()
     Set c = AddLabel("lblInvoiceDiscount", "Œ’„ ⁄·Ï «·›« Ê—…", 12474, 2948, 3033, 284, 9, False, CLR_MUTED, "txtInvoiceDiscount", 0)
     Set c = AddText("txtNotes", "", 15735, 3260, 3033, 454)
     Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 15735, 2948, 3033, 284, 9, False, CLR_MUTED, "txtNotes", 0)
-    Set c = AddRect("boxTotals", 12474, 3884, 6294, 3289, CLR_SURFACE)
-    Set c = AddLabel("lblCapSubTotal", "«·„Ã„Ê⁄ ﬁ»· «·Œ’„ Ê«·÷—Ì»…", 12644, 3969, 3686, 340, 11, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblSubTotal", "0.00", 16386, 3969, 2211, 340, 12, True, CLR_TEXT, "", 3)
-    Set c = AddLabel("lblCapDiscount", "«·Œ’„", 12644, 4366, 3686, 340, 11, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblDiscount", "0.00", 16386, 4366, 2211, 340, 12, True, CLR_TEXT, "", 3)
-    Set c = AddLabel("lblCapTax", "÷—Ì»… «·ﬁÌ„… «·„÷«›…", 12644, 4763, 3686, 340, 11, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblTax", "0.00", 16386, 4763, 2211, 340, 12, True, CLR_TEXT, "", 3)
-    Set c = AddLabel("lblCapTotal", "«·≈Ã„«·Ì ‘«„· «·÷—Ì»…", 12644, 5245, 5954, 340, 12, True, CLR_PRIMARY, "", 0)
-    Set c = AddLabel("lblTotal", "0.00", 12644, 5613, 5954, 964, 34, True, CLR_ACCENT, "", 2)
-    Set c = AddLabel("lblItems", " ", 12644, 6662, 5954, 340, 10, False, CLR_MUTED, "", 2)
-    Set c = AddText("txtTendered", "", 12474, 7598, 6294, 567)
+    Set c = AddRect("boxTotals", 12474, 3884, 6294, 2665, CLR_SURFACE)
+    Set c = AddLabel("lblCapSubTotal", "«·„Ã„Ê⁄ ﬁ»· «·Œ’„ Ê«·÷—Ì»…", 12644, 3941, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblSubTotal", "0.00", 16386, 3941, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapDiscount", "«·Œ’„", 12644, 4281, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblDiscount", "0.00", 16386, 4281, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapTax", "÷—Ì»… «·ﬁÌ„… «·„÷«›…", 12644, 4621, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTax", "0.00", 16386, 4621, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapTotal", "«·≈Ã„«·Ì ‘«„· «·÷—Ì»…", 12644, 4990, 5954, 340, 12, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTotal", "0.00", 12644, 5330, 5954, 822, 34, True, CLR_ACCENT, "", 2)
+    Set c = AddLabel("lblItems", " ", 12644, 6180, 5954, 312, 10, False, CLR_MUTED, "", 2)
+    Set c = AddText("txtTendered", "", 12474, 6889, 6294, 567)
     c.FontSize = 16
     SetCtlProp c, "Format", "#,##0.00"
     c.AfterUpdate = EP
-    Set c = AddLabel("lblTendered", "«·„»·€ «·„œ›Ê⁄ (F8) - « —ﬂÂ ›«—€« ≈–« œ›⁄ «·„»·€ »«·÷»ÿ", 12474, 7286, 6294, 284, 9, False, CLR_MUTED, "txtTendered", 0)
-    Set c = AddLabel("lblChange", " ", 12474, 8250, 6294, 454, 14, True, CLR_SUCCESS, "", 2)
-    Set c = AddLabel("lblLastInvoiceCap", "¬Œ— ›« Ê—…:", 12474, 8817, 1701, 312, 9, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblLastInvoice", " ", 14232, 8817, 2835, 312, 9, False, CLR_MUTED, "", 0)
-    Set c = AddButton("btnClose", "≈€·«ﬁ", 17067, 9412, 1701, 624, "secondary")
+    Set c = AddLabel("lblTendered", "«·„»·€ «·„œ›Ê⁄ (F8) - « —ﬂÂ ›«—€« ≈–« œ›⁄ «·„»·€ »«·÷»ÿ", 12474, 6577, 6294, 284, 9, False, CLR_MUTED, "txtTendered", 0)
+    Set c = AddLabel("lblChange", " ", 12474, 7484, 6294, 369, 14, True, CLR_SUCCESS, "", 2)
+    Set c = AddLabel("lblLastInvoiceCap", "¬Œ— ›« Ê—…:", 12474, 7995, 1701, 312, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblLastInvoice", " ", 14232, 7995, 2778, 312, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 17067, 7881, 1701, 624, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
     m_frm.OnKeyDown = EP
     m_frm.OnUnload = EP
+    m_frm.OnResize = EP
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    POSLoad Me" & vbCrLf
@@ -2345,6 +2371,17 @@ Private Sub BuildForm_frmPOS()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;cboProduct,6237,1304,6010,567,0,1000,0,0;subLines,227,2410,12020,4706,0,1000,0,1000;lblStatus,227,7229,12020,397,0,1000,1000,0;btnSave,227,7881,1928,624,0,0,1000,0;btnSavePrint,2268,7881,2381,624,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnNewSale,4762,7881,2155,624,0,0,1000,0;btnReturn,7030,7881,1474,624,0,0,1000,0;btnPayment,8617,7881,1474,624,0,0,1000,0;btnReprint,10204,7881,1588,624,0,0,1000,0;cboCustomer,12474,1304,6294,454,1000,0,0,0;lblCustomer,12474,992,6294,284,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblCustomerInfo,12474,1786,6294,284,1000,0,0,0;cboPaymentType,12474,2438,3033,454,1000,0,0,0;lblPaymentType,12474,2126,3033,284,1000,0,0,0;cboPaymentMethod,15735,2438,3033,454,1000,0,0,0;lblPaymentMethod,15735,2126,3033,284,1000,0,0,0;txtInvoiceDiscount,12474,3260,3033,454,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblInvoiceDiscount,12474,2948,3033,284,1000,0,0,0;txtNotes,15735,3260,3033,454,1000,0,0,0;lblNotes,15735,2948,3033,284,1000,0,0,0;boxTotals,12474,3884,6294,2665,1000,0,0,0;lblCapSubTotal,12644,3941,3686,340,1000,0,0,0;lblSubTotal,16386,3941,2211,340,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblCapDiscount,12644,4281,3686,340,1000,0,0,0;lblDiscount,16386,4281,2211,340,1000,0,0,0;lblCapTax,12644,4621,3686,340,1000,0,0,0;lblTax,16386,4621,2211,340,1000,0,0,0;lblCapTotal,12644,4990,5954,340,1000,0,0,0;lblTotal,12644,5330,5954,822,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblItems,12644,6180,5954,312,1000,0,0,0;txtTendered,12474,6889,6294,567,1000,0,1000,0;lblTendered,12474,6577,6294,284,1000,0,1000,0;lblChange,12474,7484,6294,369,1000,0,1000,0;lblLastInvoiceCap,12474,7995,1701,312,1000,0,1000,0;lblLastInvoice,14232,7995,2778,312,1000,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnClose,17067,7881,1701,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 18994, 8675, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmPOS", s
     Exit Sub
@@ -2639,7 +2676,7 @@ End Sub
 Private Sub BuildForm_frmPurchaseInvoice()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmPurchaseInvoice", "›« Ê—… „‘ —Ì« ", "", 18994, 10546, False, False, True, _
+    StartForm "frmPurchaseInvoice", "›« Ê—… „‘ —Ì« ", "", 18994, 9242, False, False, True, _
               ""
     Set c = AddRect("boxTitle", 0, 0, 18994, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE896), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -2666,19 +2703,19 @@ Private Sub BuildForm_frmPurchaseInvoice()
     Set c = AddLabel("lblCol6", "«·≈Ã„«·Ì", 7538, 2041, 1418, 312, 9, True, CLR_MUTED, "", 2)
     Set c = AddLabel("lblCol7", "”⁄— «·»Ì⁄", 8984, 2041, 1247, 312, 9, True, CLR_MUTED, "", 2)
     Set c = AddLabel("lblCol8", "”⁄— »Ì⁄ ÃœÌœ", 10259, 2041, 1361, 312, 9, True, CLR_MUTED, "", 2)
-    Set c = AddSubform("subLines", "frmPurchaseLines", 227, 2410, 12020, 6237)
-    Set c = AddLabel("lblStatus", " ", 227, 8760, 12020, 397, 11, True, CLR_MUTED, "", 0)
-    Set c = AddButton("btnSave", "Õ›Ÿ (F9)", 227, 9412, 1814, 624, "primary")
+    Set c = AddSubform("subLines", "frmPurchaseLines", 227, 2410, 12020, 5273)
+    Set c = AddLabel("lblStatus", " ", 227, 7796, 12020, 397, 11, True, CLR_MUTED, "", 0)
+    Set c = AddButton("btnSave", "Õ›Ÿ (F9)", 227, 8448, 1814, 624, "primary")
     c.OnClick = EP
-    Set c = AddButton("btnNewInvoice", "›« Ê—… ÃœÌœ… (F5)", 2154, 9412, 2155, 624, "secondary")
+    Set c = AddButton("btnNewInvoice", "›« Ê—… ÃœÌœ… (F5)", 2154, 8448, 2155, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnReturn", "„— Ã⁄ „‘ —Ì« ", 4422, 9412, 1928, 624, "secondary")
+    Set c = AddButton("btnReturn", "„— Ã⁄ „‘ —Ì« ", 4422, 8448, 1928, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnPayment", "”‰œ ’—›", 6463, 9412, 1474, 624, "secondary")
+    Set c = AddButton("btnPayment", "”‰œ ’—›", 6463, 8448, 1474, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnNewProduct", "„‰ Ã ÃœÌœ", 8050, 9412, 1588, 624, "secondary")
+    Set c = AddButton("btnNewProduct", "„‰ Ã ÃœÌœ", 8050, 8448, 1588, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnLastInvoice", "¬Œ— ›« Ê—…", 9751, 9412, 1588, 624, "secondary")
+    Set c = AddButton("btnLastInvoice", "¬Œ— ›« Ê—…", 9751, 8448, 1588, 624, "secondary")
     c.OnClick = EP
     Set c = AddCombo("cboSupplier", "", 12474, 1304, 6294, 454, "SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName", 2, "0;5670")
     c.AfterUpdate = EP
@@ -2703,27 +2740,28 @@ Private Sub BuildForm_frmPurchaseInvoice()
     Set c = AddLabel("lblChargeVAT", "«·„Ê—œ ÌÕ ”» «·÷—Ì»…", 16104, 4082, 2664, 454, 10, False, CLR_TEXT, "chkChargeVAT", 0)
     Set c = AddText("txtNotes", "", 12474, 4905, 6294, 454)
     Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 12474, 4593, 6294, 284, 9, False, CLR_MUTED, "txtNotes", 0)
-    Set c = AddRect("boxTotals", 12474, 5500, 6294, 2495, CLR_SURFACE)
-    Set c = AddLabel("lblCapSubTotal", "«·„Ã„Ê⁄ ﬁ»· «·Œ’„ Ê«·÷—Ì»…", 12644, 5585, 3686, 340, 11, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblSubTotal", "0.00", 16386, 5585, 2211, 340, 12, True, CLR_TEXT, "", 3)
-    Set c = AddLabel("lblCapDiscount", "«·Œ’„", 12644, 5982, 3686, 340, 11, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblDiscount", "0.00", 16386, 5982, 2211, 340, 12, True, CLR_TEXT, "", 3)
-    Set c = AddLabel("lblCapTax", "÷—Ì»… «·„œŒ·« ", 12644, 6379, 3686, 340, 11, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblTax", "0.00", 16386, 6379, 2211, 340, 12, True, CLR_TEXT, "", 3)
-    Set c = AddLabel("lblCapTotal", "«·≈Ã„«·Ì ‘«„· «·÷—Ì»…", 12644, 6804, 2835, 340, 12, True, CLR_PRIMARY, "", 0)
-    Set c = AddLabel("lblTotal", "0.00", 15536, 6719, 3062, 624, 24, True, CLR_ACCENT, "", 3)
-    Set c = AddLabel("lblItems", " ", 12644, 7484, 5954, 340, 10, False, CLR_MUTED, "", 2)
-    Set c = AddText("txtPaid", "", 12474, 8505, 3033, 510)
+    Set c = AddRect("boxTotals", 12474, 5443, 6294, 2126, CLR_SURFACE)
+    Set c = AddLabel("lblCapSubTotal", "«·„Ã„Ê⁄ ﬁ»· «·Œ’„ Ê«·÷—Ì»…", 12644, 5500, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblSubTotal", "0.00", 16386, 5500, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapDiscount", "«·Œ’„", 12644, 5840, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblDiscount", "0.00", 16386, 5840, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapTax", "÷—Ì»… «·„œŒ·« ", 12644, 6180, 3686, 340, 11, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTax", "0.00", 16386, 6180, 2211, 340, 12, True, CLR_TEXT, "", 3)
+    Set c = AddLabel("lblCapTotal", "«·≈Ã„«·Ì ‘«„· «·÷—Ì»…", 12644, 6606, 2835, 340, 12, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTotal", "0.00", 15536, 6520, 3062, 567, 24, True, CLR_ACCENT, "", 3)
+    Set c = AddLabel("lblItems", " ", 12644, 7173, 5954, 340, 10, False, CLR_MUTED, "", 2)
+    Set c = AddText("txtPaid", "", 12474, 7938, 3033, 510)
     c.FontSize = 13
     SetCtlProp c, "Format", "#,##0.00"
     c.AfterUpdate = EP
-    Set c = AddLabel("lblPaid", "«·„œ›Ê⁄ ··„Ê—œ «·¬‰", 12474, 8193, 3033, 284, 9, False, CLR_MUTED, "txtPaid", 0)
-    Set c = AddLabel("lblRemaining", " ", 15735, 8533, 3033, 454, 12, True, CLR_WARNING, "", 0)
-    Set c = AddButton("btnClose", "≈€·«ﬁ", 17067, 9412, 1701, 624, "secondary")
+    Set c = AddLabel("lblPaid", "«·„œ›Ê⁄ ··„Ê—œ «·¬‰", 12474, 7626, 3033, 284, 9, False, CLR_MUTED, "txtPaid", 0)
+    Set c = AddLabel("lblRemaining", " ", 15735, 7966, 3033, 454, 12, True, CLR_WARNING, "", 0)
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 17067, 8448, 1701, 624, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
     m_frm.OnKeyDown = EP
     m_frm.OnUnload = EP
+    m_frm.OnResize = EP
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    PurchaseLoad Me" & vbCrLf
@@ -2775,6 +2813,17 @@ Private Sub BuildForm_frmPurchaseInvoice()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;cboProduct,6237,1304,6010,567,0,1000,0,0;subLines,227,2410,12020,5273,0,1000,0,1000;lblStatus,227,7796,12020,397,0,1000,1000,0;btnSave,227,8448,1814,624,0,0,1000,0;btnNewInvoice,2154,8448,2155,624,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnReturn,4422,8448,1928,624,0,0,1000,0;btnPayment,6463,8448,1474,624,0,0,1000,0;btnNewProduct,8050,8448,1588,624,0,0,1000,0;btnLastInvoice,9751,8448,1588,624,0,0,1000,0;cboSupplier,12474,1304,6294,454,1000,0,0,0;lblSupplier,12474,992,6294,284,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblSupplierInfo,12474,1786,6294,284,1000,0,0,0;txtSupplierInvoiceNo,12474,2438,3033,454,1000,0,0,0;lblSupplierInvoiceNo,12474,2126,3033,284,1000,0,0,0;txtInvoiceDate,15735,2438,3033,454,1000,0,0,0;lblInvoiceDate,15735,2126,3033,284,1000,0,0,0;cboPaymentType,12474,3260,3033,454,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblPaymentType,12474,2948,3033,284,1000,0,0,0;cboPaymentMethod,15735,3260,3033,454,1000,0,0,0;lblPaymentMethod,15735,2948,3033,284,1000,0,0,0;txtInvoiceDiscount,12474,4082,3033,454,1000,0,0,0;lblInvoiceDiscount,12474,3770,3033,284,1000,0,0,0;chkChargeVAT,15735,4167,284,284,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblChargeVAT,16104,4082,2664,454,1000,0,0,0;txtNotes,12474,4905,6294,454,1000,0,0,0;lblNotes,12474,4593,6294,284,1000,0,0,0;boxTotals,12474,5443,6294,2126,1000,0,0,0;lblCapSubTotal,12644,5500,3686,340,1000,0,0,0;lblSubTotal,16386,5500,2211,340,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblCapDiscount,12644,5840,3686,340,1000,0,0,0;lblDiscount,16386,5840,2211,340,1000,0,0,0;lblCapTax,12644,6180,3686,340,1000,0,0,0;lblTax,16386,6180,2211,340,1000,0,0,0;lblCapTotal,12644,6606,2835,340,1000,0,0,0;lblTotal,15536,6520,3062,567,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblItems,12644,7173,5954,340,1000,0,0,0;txtPaid,12474,7938,3033,510,1000,0,1000,0;lblPaid,12474,7626,3033,284,1000,0,1000,0;lblRemaining,15735,7966,3033,454,1000,0,1000,0;btnClose,17067,8448,1701,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9242, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmPurchaseInvoice", s
     Exit Sub
@@ -3011,7 +3060,7 @@ End Sub
 Private Sub BuildForm_frmInventory()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmInventory", "«·„Œ“Ê‰", "", 18994, 10546, False, False, True, _
+    StartForm "frmInventory", "«·„Œ“Ê‰", "", 18994, 9355, False, False, True, _
               ""
     Set c = AddRect("boxTitle", 0, 0, 18994, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE7B8), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -3028,17 +3077,17 @@ Private Sub BuildForm_frmInventory()
     Set c = AddLabel("lblLowOnly", "„‰Œ›÷… «·„Œ“Ê‰ ›ﬁÿ", 7513, 1304, 2239, 454, 10, False, CLR_TEXT, "chkLowOnly", 0)
     Set c = AddButton("btnRefresh", " ÕœÌÀ", 9866, 1287, 1134, 482, "secondary")
     c.OnClick = EP
-    Set c = AddList("lstProducts", 227, 1984, 11680, 6804, 8, "0;1361;3686;1701;1134;1134;1247;1304", True)
+    Set c = AddList("lstProducts", 227, 1984, 11680, 5613, 8, "0;1361;3686;1701;1134;1134;1247;1304", True)
     c.AfterUpdate = EP
     c.OnDblClick = EP
-    Set c = AddLabel("lblInvTotals", " ", 227, 8902, 11680, 340, 10, True, CLR_MUTED, "", 0)
-    Set c = AddButton("btnStockCount", "«·Ã—œ", 227, 9412, 1474, 624, "secondary")
+    Set c = AddLabel("lblInvTotals", " ", 227, 7711, 11680, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddButton("btnStockCount", "«·Ã—œ", 227, 8221, 1474, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnPurchase", "›« Ê—… „‘ —Ì« ", 1814, 9412, 2041, 624, "secondary")
+    Set c = AddButton("btnPurchase", "›« Ê—… „‘ —Ì« ", 1814, 8221, 2041, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnLowReport", " ﬁ—Ì— «·‰Ê«ﬁ’", 3968, 9412, 1928, 624, "secondary")
+    Set c = AddButton("btnLowReport", " ﬁ—Ì— «·‰Ê«ﬁ’", 3968, 8221, 1928, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnStockReport", " ﬁ—Ì— «·„Œ“Ê‰", 6009, 9412, 1928, 624, "secondary")
+    Set c = AddButton("btnStockReport", " ﬁ—Ì— «·„Œ“Ê‰", 6009, 8221, 1928, 624, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblProductName", "«Œ — „‰ Ã« „‰ «·ﬁ«∆„…", 12134, 1304, 6634, 454, 14, True, CLR_PRIMARY, "", 0)
     Set c = AddLabel("lblProductStock", " ", 12134, 1786, 6634, 340, 10, False, CLR_TEXT, "", 0)
@@ -3057,10 +3106,11 @@ Private Sub BuildForm_frmInventory()
     Set c = AddButton("btnPostMove", "Õ›Ÿ «·Õ—ﬂ…", 17180, 3782, 1588, 482, "primary")
     c.OnClick = EP
     Set c = AddLabel("lblMovesCap", "¬Œ— Õ—ﬂ«  «·„‰ Ã", 12134, 4451, 6634, 340, 11, True, CLR_MUTED, "", 0)
-    Set c = AddList("lstMoves", 12134, 4820, 6634, 4423, 5, "1474;1474;1021;1134;1361", True)
-    Set c = AddButton("btnClose", "≈€·«ﬁ", 17067, 9412, 1701, 624, "secondary")
+    Set c = AddList("lstMoves", 12134, 4820, 6634, 3232, 5, "1474;1474;1021;1134;1361", True)
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 17067, 8221, 1701, 624, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
+    m_frm.OnResize = EP
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    InventoryLoad Me" & vbCrLf
@@ -3103,6 +3153,14 @@ Private Sub BuildForm_frmInventory()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;lstProducts,227,1984,11680,5613,0,1000,0,1000;lblInvTotals,227,7711,11680,340,0,1000,1000,0;btnStockCount,227,8221,1474,624,0,0,1000,0;btnPurchase,1814,8221,2041,624,0,0,1000,0;btnLowReport,3968,8221,1928,624,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnStockReport,6009,8221,1928,624,0,0,1000,0;lblProductName,12134,1304,6634,454,1000,0,0,0;lblProductStock,12134,1786,6634,340,1000,0,0,0;lblManualCap,12134,2268,6634,340,1000,0,0,0;cboMoveType,12134,2977,3175,454,1000,0,0,0;lblMoveType,12134,2665,3175,284,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";txtMoveQty,15479,2977,1531,454,1000,0,0,0;lblMoveQty,15479,2665,1531,284,1000,0,0,0;txtMoveCost,17180,2977,1588,454,1000,0,0,0;lblMoveCost,17180,2665,1588,284,1000,0,0,0;txtMoveNotes,12134,3799,4876,454,1000,0,0,0;lblMoveNotes,12134,3487,4876,284,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnPostMove,17180,3782,1588,482,1000,0,0,0;lblMovesCap,12134,4451,6634,340,1000,0,0,0;lstMoves,12134,4820,6634,3232,1000,0,0,1000;btnClose,17067,8221,1701,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9355, -1757, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmInventory", s
     Exit Sub
@@ -3159,7 +3217,7 @@ End Sub
 Private Sub BuildForm_frmStockCount()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmStockCount", "«·Ã—œ", "", 18994, 10546, False, False, True, _
+    StartForm "frmStockCount", "«·Ã—œ", "", 18994, 9355, False, False, True, _
               ""
     Set c = AddRect("boxTitle", 0, 0, 18994, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8EF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -3189,17 +3247,18 @@ Private Sub BuildForm_frmStockCount()
     Set c = AddLabel("lblCol5", "«·›—ﬁ", 10119, 2778, 1701, 312, 9, True, CLR_MUTED, "", 2)
     Set c = AddLabel("lblCol6", "ﬁÌ„… «·›—ﬁ", 11848, 2778, 1814, 312, 9, True, CLR_MUTED, "", 2)
     Set c = AddLabel("lblCol7", "„·«ÕŸ« ", 13690, 2778, 4196, 312, 9, True, CLR_MUTED, "", 2)
-    Set c = AddSubform("subCountLines", "frmStockCountLines", 227, 3118, 18541, 5585)
-    Set c = AddLabel("lblCountSummary", " ", 227, 8817, 18541, 397, 11, True, CLR_MUTED, "", 0)
-    Set c = AddButton("btnPostCount", " —ÕÌ· «·Ã—œ", 227, 9412, 1928, 624, "primary")
+    Set c = AddSubform("subCountLines", "frmStockCountLines", 227, 3118, 18541, 4394)
+    Set c = AddLabel("lblCountSummary", " ", 227, 7626, 18541, 397, 11, True, CLR_MUTED, "", 0)
+    Set c = AddButton("btnPostCount", " —ÕÌ· «·Ã—œ", 227, 8221, 1928, 624, "primary")
     c.OnClick = EP
-    Set c = AddButton("btnCancelCount", "≈·€«¡ «·Ã—œ", 2268, 9412, 1701, 624, "danger")
+    Set c = AddButton("btnCancelCount", "≈·€«¡ «·Ã—œ", 2268, 8221, 1701, 624, "danger")
     c.OnClick = EP
-    Set c = AddButton("btnCountReport", "ÿ»«⁄… «·Ã—œ", 4082, 9412, 1928, 624, "secondary")
+    Set c = AddButton("btnCountReport", "ÿ»«⁄… «·Ã—œ", 4082, 8221, 1928, 624, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnClose", "≈€·«ﬁ", 17066, 9412, 1701, 624, "secondary")
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 17066, 8221, 1701, 624, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
+    m_frm.OnResize = EP
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    StockCountLoad Me" & vbCrLf
@@ -3230,6 +3289,12 @@ Private Sub BuildForm_frmStockCount()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;lblCountInfo,10376,1304,8391,454,0,1000,0,0;subCountLines,227,3118,18541,4394,0,1000,0,1000;lblCountSummary,227,7626,18541,397,0,1000,1000,0;btnPostCount,227,8221,1928,624,0,0,1000,0;btnCancelCount,2268,8221,1701,624,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnCountReport,4082,8221,1928,624,0,0,1000,0;btnClose,17066,8221,1701,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9355, -2919, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmStockCount", s
     Exit Sub

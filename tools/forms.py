@@ -412,6 +412,8 @@ class FormModel:
     form_events: List[str] = field(default_factory=list)
     code: List[str] = field(default_factory=list)       # module lines
     form_props: Dict[str, object] = field(default_factory=dict)   # extra form properties
+    # window fitting (FitControls): name -> (mx, mw, my, mh) in 1/1000 of the extra width/height
+    fit: Dict[str, tuple] = field(default_factory=dict)
 
     def add(self, c: Control) -> Control:
         self.controls.append(c)
@@ -419,6 +421,41 @@ class FormModel:
 
 
 BUTTON_W, BUTTON_H, GAP = cm(2.4), cm(0.85), cm(0.2)
+
+
+def shrink_area(m: FormModel, names, k: int):
+    """Make the named list/grid controls k twips shorter and move everything below them up.
+    The screens are designed at their smallest size; fit_window grows them with the window."""
+    bottom = min(c.y + c.h for c in m.controls if c.name in names)
+    for c in m.controls:
+        if c.name in names:
+            c.h -= k
+        elif c.y >= bottom:
+            c.y -= k
+    m.height -= k
+    for c in m.controls:                        # full-height backgrounds (side bar)
+        if c.y == 0 and c.h > m.height:
+            c.h = m.height
+
+
+def fit_window(m: FormModel, split_x=None, bottom_y=None, stretch_w=(), stretch_h=(), extra=None):
+    """How each control follows a window larger than the design (modForms.FitControls):
+    controls right of split_x move with the right edge, controls below bottom_y move with the
+    bottom edge, stretch_w / stretch_h grow; extra gives (mx, mw, my, mh) per mille directly."""
+    for c in m.controls:
+        mx = mw = my = mh = 0
+        if c.name == "boxTitle" or c.name in stretch_w:
+            mw = 1000
+        elif split_x is not None and c.x >= split_x:
+            mx = 1000
+        if c.name in stretch_h:
+            mh = 1000
+        elif bottom_y is not None and c.y >= bottom_y:
+            my = 1000
+        if extra and c.name in extra:
+            mx, mw, my, mh = extra[c.name]
+        if mx or mw or my or mh:
+            m.fit[c.name] = (mx, mw, my, mh)
 
 
 def title_band(m: FormModel, title: str, subtitle: str, icon: str):
@@ -660,7 +697,7 @@ def layout_main() -> FormModel:
                                         "FontSize": 13, "ForeColor": Sym("CLR_SIDEBAR_TEXT")},
                              events=["Click"], decorative=True))
         m.code += [f"Private Sub {icon.name}_Click()", f"    {call}", "End Sub"]
-        y += cm(1.05)
+        y += cm(1.0)
 
     cx = side_w + cm(0.8)
     cw = width - cx - cm(0.8)
@@ -719,6 +756,16 @@ def layout_main() -> FormModel:
               "Private Sub Form_Load()", "    MainLoad Me", "End Sub",
               "Private Sub Form_Activate()", "    DashboardActivate Me", "End Sub",
               "Private Sub Form_Timer()", "    DashboardRefresh Me", "End Sub"] + m.code
+    shrink_area(m, ("lstRecentSales", "lstLowStock", "lstTopProducts"), cm(2.2))
+    extra = {"boxSidebar": (0, 0, 0, 1000), "lblIntegrity": (0, 1000, 1000, 0)}
+    for n in range(1, 9):                       # 4 tile columns share the extra width
+        col = ((n - 1) % 4) * 250
+        for part in ("boxTile", "lblTileTitle", "lblTileValue", "lblTileSub"):
+            extra[f"{part}{n}"] = (col, 250, 0, 0)
+    for i, name in enumerate(("RecentSales", "LowStock", "TopProducts")):
+        extra["lst" + name] = (i * 333, 333, 0, 1000)
+        extra["lblCap" + name] = (i * 333, 333, 0, 0)
+    fit_window(m, split_x=cm(21.0), extra=extra)
     return m
 
 
@@ -760,6 +807,9 @@ def layout_search() -> FormModel:
                "Private Sub txtText_AfterUpdate()", "    RunSearch Me", "End Sub",
                "Private Sub lstResults_DblClick(Cancel As Integer)", "    SearchOpen Me", "End Sub"]
               + m.code)
+    shrink_area(m, ("lstResults",), cm(1.7))
+    fit_window(m, split_x=cm(20.7), bottom_y=cm(14.0), stretch_w=("lstResults", "lblCount"),
+               stretch_h=("lstResults",))
     return m
 
 
@@ -813,6 +863,9 @@ def layout_report_center() -> FormModel:
                "Private Sub lstReports_AfterUpdate()", "    ReportSelected Me", "End Sub",
                "Private Sub lstReports_DblClick(Cancel As Integer)", "    RunReport Me", "End Sub"]
               + m.code)
+    shrink_area(m, ("lstReports",), cm(1.7))
+    fit_window(m, split_x=cm(24.5), stretch_w=("lblReportTitle", "lblNeeds", "lblPhaseNote"),
+               stretch_h=("lstReports",))
     return m
 
 

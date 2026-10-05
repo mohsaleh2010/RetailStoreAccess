@@ -26,6 +26,38 @@ Public Sub FormLoad(ByVal frm As Access.Form)
     End If
 End Sub
 
+Public Sub FitControls(ByVal frm As Access.Form, ByVal DesignW As Long, ByVal DesignH As Long, _
+                       ByVal MinDH As Long, ByVal Mirror As Boolean, ByVal Spec As String)
+    ' Form_Resize of the large screens: the screen is designed at its smallest size; extra window
+    ' width/height goes to the lists and grids, and the buttons follow the window edges.
+    ' Spec: "name,Left,Top,Width,Height,mx,mw,my,mh;..." (m* = share of the extra size, per mille)
+    Dim dw As Long, dh As Long, newW As Long, newH As Long, items As Variant, f As Variant, i As Long
+    Dim L As Long, T As Long, W As Long, H As Long
+    On Error Resume Next                         ' resizing must never interrupt the user
+    dw = frm.InsideWidth - DesignW
+    If dw < 0 Then dw = 0
+    dh = frm.InsideHeight - DesignH
+    If dh < MinDH Then dh = MinDH
+    newW = DesignW + dw
+    newH = DesignH + dh
+    If newW > frm.Width Then frm.Width = newW    ' grow first, so the controls fit while moving
+    If newH > frm.Section(0).Height Then frm.Section(0).Height = newH
+    items = Split(Spec, ";")
+    For i = LBound(items) To UBound(items)
+        f = Split(items(i), ",")
+        If UBound(f) = 8 Then
+            W = CLng(f(3)) + dw * CLng(f(6)) \ 1000
+            H = CLng(f(4)) + dh * CLng(f(8)) \ 1000
+            L = CLng(f(1)) + dw * CLng(f(5)) \ 1000
+            T = CLng(f(2)) + dh * CLng(f(7)) \ 1000
+            If Mirror Then L = newW - L - W
+            frm.Controls(CStr(f(0))).Move L, T, W, H
+        End If
+    Next
+    frm.Width = newW                             ' then shrink to the new size
+    frm.Section(0).Height = newH
+End Sub
+
 Public Sub FormCurrent(ByVal frm As Access.Form)
     Dim pk As String
     pk = TagValue(frm, "PK")

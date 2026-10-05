@@ -3,7 +3,7 @@ Layout conventions are the same as forms.py (twips, x from the start edge)."""
 
 from typing import List, Tuple
 
-from forms import (Control, FormModel, Sym, ICONS, button, cm, labelled, title_band,
+from forms import (Control, FormModel, Sym, ICONS, button, cm, fit_window, labelled, title_band,
                    CUSTOMER_ROWS)
 
 PAYMENT_TYPES = "CASH;نقدي;CREDIT;آجل"
@@ -74,7 +74,7 @@ def layout_pos_lines() -> Tuple[FormModel, list]:
 
 
 def layout_pos(line_heads) -> FormModel:
-    width, height = cm(33.5), cm(18.6)
+    width, height = cm(33.5), cm(15.3)
     m = FormModel("frmPOS", "نقطة البيع", width, height, popup=False, allow_add=False)
     title_band(m, "نقطة البيع",
                "F9 حفظ  |  F12 حفظ وطباعة  |  F5 فاتورة جديدة  |  F4 بحث بالاسم  |  F8 المبلغ المدفوع  |  F2 الباركود",
@@ -93,11 +93,11 @@ def layout_pos(line_heads) -> FormModel:
 
     sub_x, sub_y = cm(0.4), cm(4.25)
     header_labels(m, sub_x, cm(3.6), POS_COLUMNS_TITLES, line_heads)
-    m.add(Control("subform", "subLines", sub_x, sub_y, cm(21.2), cm(11.0),
+    m.add(Control("subform", "subLines", sub_x, sub_y, cm(21.2), cm(8.3),
                   {"SourceObject": "frmPOSLines"}))
-    m.add(Control("label", "lblStatus", cm(0.4), cm(15.45), cm(21.2), cm(0.7),
+    m.add(Control("label", "lblStatus", cm(0.4), cm(12.75), cm(21.2), cm(0.7),
                   {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_MUTED")}))
-    bx, by, bh = cm(0.4), cm(16.6), cm(1.1)
+    bx, by, bh = cm(0.4), cm(13.9), cm(1.1)
     for name, caption, style, w, call in [
             ("btnSave", "حفظ (F9)", "primary", 3.4, "SavePOS Me, False"),
             ("btnSavePrint", "حفظ وطباعة (F12)", "primary", 4.2, "SavePOS Me, True"),
@@ -131,9 +131,9 @@ def layout_pos(line_heads) -> FormModel:
     c = m.add(Control("text", "txtNotes", px + pw - half, cm(5.75), half, cm(0.8), {}))
     labelled(m, "txtNotes", "ملاحظات", c)
 
-    m.add(Control("rect", "boxTotals", px, cm(6.85), pw, cm(5.8), {"BackColor": Sym("CLR_SURFACE")},
+    m.add(Control("rect", "boxTotals", px, cm(6.85), pw, cm(4.7), {"BackColor": Sym("CLR_SURFACE")},
                   decorative=True))
-    ty = cm(7.0)
+    ty = cm(6.95)
     for name, caption in [("SubTotal", "المجموع قبل الخصم والضريبة"), ("Discount", "الخصم"),
                           ("Tax", "ضريبة القيمة المضافة")]:
         m.add(Control("label", f"lblCap{name}", px + cm(0.3), ty, cm(6.5), cm(0.6),
@@ -141,27 +141,29 @@ def layout_pos(line_heads) -> FormModel:
         m.add(Control("label", f"lbl{name}", px + cm(6.9), ty, cm(3.9), cm(0.6),
                       {"Caption": "0.00", "FontSize": 12, "FontBold": True, "TextAlign": 3,
                        "ForeColor": Sym("CLR_TEXT")}))
-        ty += cm(0.7)
-    m.add(Control("label", "lblCapTotal", px + cm(0.3), cm(9.25), cm(10.5), cm(0.6),
+        ty += cm(0.6)
+    m.add(Control("label", "lblCapTotal", px + cm(0.3), cm(8.8), cm(10.5), cm(0.6),
                   {"Caption": "الإجمالي شامل الضريبة", "FontSize": 12, "FontBold": True,
                    "ForeColor": Sym("CLR_PRIMARY")}))
-    m.add(Control("label", "lblTotal", px + cm(0.3), cm(9.9), cm(10.5), cm(1.7),
+    m.add(Control("label", "lblTotal", px + cm(0.3), cm(9.4), cm(10.5), cm(1.45),
                   {"Caption": "0.00", "FontSize": 34, "FontBold": True, "TextAlign": 2,
                    "ForeColor": Sym("CLR_ACCENT")}))
-    m.add(Control("label", "lblItems", px + cm(0.3), cm(11.75), cm(10.5), cm(0.6),
+    m.add(Control("label", "lblItems", px + cm(0.3), cm(10.9), cm(10.5), cm(0.55),
                   {"Caption": " ", "FontSize": 10, "TextAlign": 2, "ForeColor": Sym("CLR_MUTED")}))
-    c = m.add(Control("text", "txtTendered", px, cm(13.4), pw, cm(1.0),
+    c = m.add(Control("text", "txtTendered", px, cm(12.15), pw, cm(1.0),
                       {"FontSize": 16, "Format": "#,##0.00"}, events=["AfterUpdate"]))
     labelled(m, "txtTendered", "المبلغ المدفوع (F8) - اتركه فارغًا إذا دفع المبلغ بالضبط", c)
-    m.add(Control("label", "lblChange", px, cm(14.55), pw, cm(0.8),
+    m.add(Control("label", "lblChange", px, cm(13.2), pw, cm(0.65),
                   {"Caption": " ", "FontSize": 14, "FontBold": True, "TextAlign": 2,
                    "ForeColor": Sym("CLR_SUCCESS")}))
-    m.add(Control("label", "lblLastInvoiceCap", px, cm(15.55), cm(3.0), cm(0.55),
+    m.add(Control("label", "lblLastInvoiceCap", px, cm(14.1), cm(3.0), cm(0.55),
                   {"Caption": "آخر فاتورة:", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
-    m.add(Control("label", "lblLastInvoice", px + cm(3.1), cm(15.55), cm(5.0), cm(0.55),
+    m.add(Control("label", "lblLastInvoice", px + cm(3.1), cm(14.1), cm(4.9), cm(0.55),
                   {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
-    button(m, "btnClose", "إغلاق", px + pw - cm(3.0), cm(16.6), "secondary", w=cm(3.0), h=cm(1.1),
+    button(m, "btnClose", "إغلاق", px + pw - cm(3.0), cm(13.9), "secondary", w=cm(3.0), h=cm(1.1),
            call="DoCmd.Close acForm, Me.Name")
+    fit_window(m, split_x=cm(21.8), bottom_y=cm(11.6), stretch_w=("subLines", "lblStatus", "cboProduct"),
+               stretch_h=("subLines",))
 
     m.form_events = ["Load", "KeyDown", "Unload"]
     m.code = ([

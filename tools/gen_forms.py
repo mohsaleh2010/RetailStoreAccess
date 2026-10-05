@@ -9,7 +9,7 @@ EVENT_PROPERTY = {
     "Load": "OnLoad", "Open": "OnOpen", "Current": "OnCurrent", "BeforeUpdate": "BeforeUpdate",
     "AfterUpdate": "AfterUpdate", "Error": "OnError", "KeyDown": "OnKeyDown",
     "Unload": "OnUnload", "Click": "OnClick", "DblClick": "OnDblClick", "Change": "OnChange",
-    "Activate": "OnActivate", "Timer": "OnTimer",
+    "Activate": "OnActivate", "Timer": "OnTimer", "Resize": "OnResize",
 }
 
 HELPER_PROPS = {"Caption", "FontSize", "FontBold", "ForeColor", "BackColor", "TextAlign",
@@ -102,6 +102,48 @@ def control_lines(c: F.Control):
     return out
 
 
+def fit_spec(m: F.FormModel) -> list:
+    by_name = {c.name: c for c in m.controls}
+    return [f"{n},{by_name[n].x},{by_name[n].y},{by_name[n].w},{by_name[n].h},{mx},{mw},{my},{mh}"
+            for n, (mx, mw, my, mh) in m.fit.items()]
+
+
+def fit_min_dh(m: F.FormModel) -> int:
+    """How far below its design height the window may squeeze the screen (<= 0): the stretched
+    lists keep 2.5 cm, and controls following the bottom edge must not reach the ones above."""
+    limit = None
+    moving = {n for n, (mx, mw, my, mh) in m.fit.items() if my and not mh}
+    fixed = [c for c in m.controls if c.name not in m.fit or not (m.fit[c.name][2] or m.fit[c.name][3])]
+    for c in m.controls:
+        f = m.fit.get(c.name)
+        if f and f[3]:
+            room = c.h - F.cm(2.5)
+            limit = room if limit is None else min(limit, room)
+        if c.name in moving:
+            for t in fixed:
+                if t.y + t.h <= c.y:
+                    gap = c.y - (t.y + t.h)
+                    limit = gap if limit is None else min(limit, gap)
+    # controls that stay where they are must still fit in the window
+    room = m.height - max(t.y + t.h for t in fixed)
+    limit = room if limit is None else min(limit, room)
+    return -max(0, limit - F.cm(0.1))
+
+
+def fit_code_lines(m: F.FormModel) -> list:
+    """Form_Resize: lists and grids grow with the window, buttons follow its edges."""
+    items = fit_spec(m)
+    code = ["Private Sub Form_Resize()", "    Dim spec As String"]
+    for i in range(0, len(items), 6):
+        chunk = ";".join(items[i:i + 6])
+        code.append(f'    spec = "{chunk}"' if i == 0 else f'    spec = spec & ";{chunk}"')
+    lines = [f"    s = s & {vba_str(line)} & vbCrLf" for line in code]
+    lines.append(f'    s = s & "    FitControls Me, {m.width}, {m.height}, {fit_min_dh(m)}, " & '
+                 'IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf')
+    lines.append('    s = s & "End Sub" & vbCrLf')
+    return lines
+
+
 def form_sub(m: F.FormModel):
     lines = [f"Private Sub BuildForm_{m.name}()",
              "    Dim c As Access.Control, s As String",
@@ -113,11 +155,13 @@ def form_sub(m: F.FormModel):
         lines.append(f"    SetFormProp {vba_str(key)}, {lit(value)}")
     for c in m.controls:
         lines += control_lines(c)
-    for ev in m.form_events:
+    for ev in m.form_events + (["Resize"] if m.fit else []):
         lines.append(f"    m_frm.{EVENT_PROPERTY[ev]} = EP")
     lines.append('    s = ""')
     for code_line in m.code:
         lines.append(f"    s = s & {vba_str(code_line)} & vbCrLf")
+    if m.fit:
+        lines += fit_code_lines(m)
     lines += [f"    FinishForm {vba_str(m.name)}, s", "    Exit Sub", "EH:",
               f"    AbortForm {vba_str(m.name)}, Err.Number, Err.Description", "End Sub"]
     return "\n".join(lines)
