@@ -132,6 +132,9 @@ TILE_COLORS = ("BLUE;أزرق;GREEN;أخضر;ORANGE;برتقالي;PURPLE;بنف
                "PINK;وردي;BROWN;بني;GREY;رمادي")
 POS_MODES = "RETAIL;المحلات (باركود);RESTAURANT;المطاعم (شاشة لمس);CAFE;الكافيهات (شاشة لمس)"
 
+INVOICE_PRINT_MODES = ("DIRECT;طباعة مباشرة بدون معاينة;PREVIEW;عرض معاينة الطباعة;"
+                       "NONE;بدون طباعة")
+
 LABEL_LINES = ("NONE;بدون;STORE;الاسم المختصر للمحل;NAME;اسم المنتج;PRICE;السعر;CODE;كود المنتج;"
                "BARCODE;رقم الباركود")
 
@@ -281,6 +284,8 @@ DATA_SCREENS: List[DataScreen] = [
                 hint="الشاشة التي يفتحها زر المبيعات"),
             Fld("ImagesFolder", hint="فارغ = مجلد Images بجانب ملف البيانات",
                 button=("btnBrowseImages", "استعراض", 'BrowseFolder Me, "ImagesFolder"')),
+            Fld("InvoicePrintMode", rows=INVOICE_PRINT_MODES, widths="0;6",
+                hint="عند حفظ فاتورة البيع أو المرتجع"),
         ]),
     DataScreen(
         "frmLabelSettings", "LabelSettings", "إعدادات ملصقات الباركود",

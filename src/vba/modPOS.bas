@@ -15,6 +15,7 @@ Option Compare Database
 Option Explicit
 
 ' 2 = acViewPreview shows the invoice first; 0 = acViewNormal prints immediately.
+' After saving, Settings.InvoicePrintMode decides (SavePrintView): DIRECT, PREVIEW or NONE.
 Public Const POS_PRINT_VIEW As Integer = 2
 
 '------------------------------------------------------------------------------
@@ -356,7 +357,7 @@ Public Function SavePOS(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) A
     SetPOSStatus frm, "تم حفظ الفاتورة " & invNo & IIf(change > 0, "  -  الباقي للعميل: " & _
                  Format$(change, "#,##0.00"), ""), CLR_SUCCESS
     frm!lblLastInvoice.Caption = invNo
-    If PrintAfter Then PrintSalesDocument "SALE", newID
+    If PrintAfter Then PrintAfterSave "SALE", newID
     SafeFocus frm!txtBarcode
     SavePOS = True
 End Function
@@ -386,7 +387,7 @@ Public Sub ReprintLast(ByVal frm As Access.Form)
     If IsNull(id) Then
         ShowInfo "لا توجد فاتورة سابقة."
     Else
-        PrintSalesDocument "SALE", CLng(id)
+        PrintSalesDocument "SALE", CLng(id), False, ReprintView()
     End If
 End Sub
 
@@ -506,7 +507,7 @@ Public Function SaveReturn(ByVal frm As Access.Form, ByVal PrintAfter As Boolean
     retNo = DLookup("ReturnNumber", "SalesReturns", "SalesReturnID = " & newID)
     ShowInfo "تم حفظ المرتجع " & retNo & "  بقيمة " & Format$(DLookup("TotalAmount", "SalesReturns", _
              "SalesReturnID = " & newID), "#,##0.00")
-    If PrintAfter Then PrintSalesDocument "RETURN", newID
+    If PrintAfter Then PrintAfterSave "RETURN", newID
     LoadInvoiceForReturn frm, frm!txtInvoiceID.Value
     frm!txtReason.Value = Null
     SaveReturn = True
@@ -588,7 +589,31 @@ End Sub
 '==============================================================================
 ' Printing
 '==============================================================================
-Public Sub PrintSalesDocument(ByVal DocKind As String, ByVal DocID As Long, Optional ByVal ForceA4 As Boolean = False)
+Public Function SavePrintView() As Integer
+    ' Settings.InvoicePrintMode: what saving a sales invoice / return does.
+    '   DIRECT  = print straight to the printer (no preview)
+    '   PREVIEW = open the print preview
+    '   NONE    = do not print (reprint later from the screen)  -> returns -1
+    Select Case Nz(SettingValue("InvoicePrintMode"), "PREVIEW")
+        Case "DIRECT": SavePrintView = acViewNormal
+        Case "NONE": SavePrintView = -1
+        Case Else: SavePrintView = POS_PRINT_VIEW
+    End Select
+End Function
+
+Public Function ReprintView() As Integer
+    ' A reprint the user asked for always prints: directly when the setting says so, else preview.
+    If SavePrintView() = acViewNormal Then ReprintView = acViewNormal Else ReprintView = POS_PRINT_VIEW
+End Function
+
+Public Sub PrintAfterSave(ByVal DocKind As String, ByVal DocID As Long)
+    Dim v As Integer
+    v = SavePrintView()
+    If v >= 0 Then PrintSalesDocument DocKind, DocID, False, v
+End Sub
+
+Public Sub PrintSalesDocument(ByVal DocKind As String, ByVal DocID As Long, Optional ByVal ForceA4 As Boolean = False, _
+                              Optional ByVal PrintView As Integer = POS_PRINT_VIEW)
     Dim rpt As String, subType As String
     If DocKind = "SALE" Then
         subType = Nz(DLookup("InvoiceSubType", "SalesInvoices", "SalesInvoiceID = " & DocID), "SIMPLIFIED")
@@ -601,7 +626,13 @@ Public Sub PrintSalesDocument(ByVal DocKind As String, ByVal DocID As Long, Opti
         ShowWarning "تقرير الطباعة غير موجود: " & rpt & vbCrLf & "شغّل BuildReports."
         Exit Sub
     End If
-    DoCmd.OpenReport rpt, POS_PRINT_VIEW, , "[DocKind] = '" & DocKind & "' AND [DocID] = " & DocID
+    On Error GoTo PrintFailed
+    DoCmd.OpenReport rpt, PrintView, , "[DocKind] = '" & DocKind & "' AND [DocID] = " & DocID
+    Exit Sub
+PrintFailed:
+    ' 2501 = printing cancelled by the user. The document is saved either way.
+    If Err.Number <> 2501 Then ShowWarning "تم الحفظ لكن تعذّرت الطباعة: " & Err.Description & vbCrLf & _
+        "تأكد من الطابعة الافتراضية، ويمكنك إعادة الطباعة لاحقًا."
 End Sub
 
 Public Sub DrawDocumentQR(ByVal rpt As Access.Report, ByVal DocKind As Variant, ByVal DocID As Variant, _

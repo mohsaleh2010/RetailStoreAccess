@@ -2073,7 +2073,7 @@ End Sub
 Private Sub BuildForm_frmSettings()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmSettings", "«·≈⁄œ«œ« ", "SELECT * FROM Settings WHERE SettingID = 1", 15309, 8731, True, False, True, _
+    StartForm "frmSettings", "«·≈⁄œ«œ« ", "SELECT * FROM Settings WHERE SettingID = 1", 15309, 9298, True, False, True, _
               "KIND=SINGLE|TABLE=Settings|PK=SettingID"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -2150,7 +2150,11 @@ Private Sub BuildForm_frmSettings()
     Set c = AddLabel("lblImagesFolder", "„Ã·œ ’Ê— «·„‰ Ã« ", 7768, 7371, 2268, 425, 10, False, CLR_MUTED, "ImagesFolder", 0)
     Set c = AddButton("btnBrowseImages", "«” ⁄—«÷", 13835, 7371, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddLabel("lblStatus", " ", 227, 8051, 14855, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddCombo("InvoicePrintMode", "InvoicePrintMode", 2552, 7938, 4989, 425, "DIRECT;ÿ»«⁄… „»«‘—… »œÊ‰ „⁄«Ì‰…;PREVIEW;⁄—÷ „⁄«Ì‰… «·ÿ»«⁄…;NONE;»œÊ‰ ÿ»«⁄…", 2, "0;3402")
+    SetCtlProp c, "ControlTipText", "⁄‰œ Õ›Ÿ ›« Ê—… «·»Ì⁄ √Ê «·„— Ã⁄"
+    SetCtlProp c, "StatusBarText", "⁄‰œ Õ›Ÿ ›« Ê—… «·»Ì⁄ √Ê «·„— Ã⁄"
+    Set c = AddLabel("lblInvoicePrintMode", "«·ÿ»«⁄… ⁄‰œ Õ›Ÿ «·›« Ê—…", 227, 7938, 2268, 425, 10, False, CLR_MUTED, "InvoicePrintMode", 0)
+    Set c = AddLabel("lblStatus", " ", 227, 8618, 14855, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP

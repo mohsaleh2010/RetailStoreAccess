@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **30** | عدد الحقول: **381**
+عدد الجداول: **30** | عدد الحقول: **382**
 
 ## الفهرس
 
@@ -73,6 +73,7 @@
 | 28 | UpdatedAt | Date/Time |  |  |  |  |  | آخر تعديل |
 | 29 | POSMode | Short Text | 10 | ✔ | `"RETAIL"` | `In ("RETAIL","RESTAURANT","CAFE")` |  | شاشة البيع – RETAIL = المحلات (باركود)، RESTAURANT = المطاعم (لمس)، CAFE = الكافيهات (لمس) |
 | 30 | ImagesFolder | Short Text | 255 |  |  |  |  | مجلد صور المنتجات – المسارات النسبية للصور تُقرأ منه؛ فارغ = مجلد Images بجانب ملف البيانات |
+| 31 | InvoicePrintMode | Short Text | 10 | ✔ | `"PREVIEW"` | `In ("DIRECT","PREVIEW","NONE")` |  | الطباعة عند حفظ الفاتورة – DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل

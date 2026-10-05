@@ -27,7 +27,7 @@ Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=30;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=8;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=23;SalesInvoices=34;SalesInvoiceDetails=14;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=16;Categories=8;Units=4;PaymentMethods=5;Suppliers=15;Customers=21;Products=23;SalesInvoices=34;SalesInvoiceDetails=14;SalesReturns=28;SalesReturnDetails=14;PurchaseInvoices=17;PurchaseInvoiceDetails=11;PurchaseReturns=17;PurchaseReturnDetails=11;CustomerPayments=10;SupplierPayments=10;ExpenseTypes=3;Expenses=12;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=11;Roles=3;Permissions=22;RolePermissions=44;Employees=1;Categories=1;Units=8;PaymentMethods=4;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
@@ -568,6 +568,8 @@ Private Sub CreateTable_Settings()
              "In (""RETAIL"",""RESTAURANT"",""CAFE"")", "«Œ — ‘«‘… «·»Ì⁄ „‰ «·ﬁ«∆„…", "‘«‘… «·»Ì⁄", "RETAIL = «·„Õ·«  (»«—ﬂÊœ)° RESTAURANT = «·„ÿ«⁄„ (·„”)° CAFE = «·ﬂ«›ÌÂ«  (·„”)"
     AddField tdf, "ImagesFolder", "TEXT", 255, False, "", _
              "", "", "„Ã·œ ’Ê— «·„‰ Ã« ", "«·„”«—«  «·‰”»Ì… ··’Ê—  ıﬁ—√ „‰Â∫ ›«—€ = „Ã·œ Images »Ã«‰» „·› «·»Ì«‰« "
+    AddField tdf, "InvoicePrintMode", "TEXT", 10, True, """PREVIEW""", _
+             "In (""DIRECT"",""PREVIEW"",""NONE"")", "«Œ — ÿ—Ìﬁ… «·ÿ»«⁄… „‰ «·ﬁ«∆„…", "«·ÿ»«⁄… ⁄‰œ Õ›Ÿ «·›« Ê—…", "DIRECT = ÿ»«⁄… „»«‘—… »œÊ‰ „⁄«Ì‰…° PREVIEW = ⁄—÷ «·„⁄«Ì‰…° NONE = »œÊ‰ ÿ»«⁄…"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
     EndTable tdf, "≈⁄œ«œ«  «·„Õ·: ”Ã· Ê«Õœ ›ﬁÿ ÌÕ ÊÌ »Ì«‰«  «·„Õ· «·÷—Ì»Ì… Ê≈⁄œ«œ«  «· ‘€Ì·.", "", ""
 End Sub
