@@ -15,6 +15,13 @@ Option Compare Database
 Option Explicit
 
 Private Const PROP_DEV_MODE As String = "RS_DeveloperMode"
+Private Const SW_MAXIMIZE As Long = 3
+
+#If VBA7 Then
+Private Declare PtrSafe Function ShowWindow Lib "user32" (ByVal hWnd As LongPtr, ByVal nCmdShow As Long) As Long
+#Else
+Private Declare Function ShowWindow Lib "user32" (ByVal hWnd As Long, ByVal nCmdShow As Long) As Long
+#End If
 
 '------------------------------------------------------------------------------
 ' Called by frmMain when it opens
@@ -24,7 +31,14 @@ Public Sub AppStartup()
     On Error Resume Next
     Application.SetOption "Use Hijri Calendar", False
     On Error GoTo 0
+    MaximizeAccessWindow
     If Not IsDeveloperMode() Then HideAccessUI
+End Sub
+
+Public Sub MaximizeAccessWindow()
+    ' The program fills the whole screen: the Access window itself is maximised.
+    On Error Resume Next
+    ShowWindow Application.hWndAccessApp, SW_MAXIMIZE
 End Sub
 
 Public Function IsDeveloperMode() As Boolean

@@ -21,6 +21,7 @@ Public Sub LoginLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     If Not g_SilentMode Then                 ' (tests open every screen while logged in)
         On Error Resume Next
+        MaximizeAccessWindow                 ' full screen from the first window
         If Not IsDeveloperMode() Then HideAccessUI
         TempVars.Remove "UserID"
         On Error GoTo 0
