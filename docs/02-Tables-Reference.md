@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **37** | عدد الحقول: **458**
+عدد الجداول: **40** | عدد الحقول: **481**
 
 ## الفهرس
 
@@ -12,37 +12,40 @@
 4. [`Permissions`](#permissions) – الصلاحيات
 5. [`RolePermissions`](#rolepermissions) – صلاحيات الأدوار
 6. [`Employees`](#employees) – الموظفون والمستخدمون
-7. [`Categories`](#categories) – التصنيفات
-8. [`Units`](#units) – وحدات القياس
-9. [`PaymentMethods`](#paymentmethods) – طرق الدفع
-10. [`CashBoxes`](#cashboxes) – الخزينة والصناديق
-11. [`Suppliers`](#suppliers) – الموردون
-12. [`Customers`](#customers) – العملاء
-13. [`Products`](#products) – المنتجات
-14. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
-15. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
-16. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
-17. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
-18. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
-19. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
-20. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
-21. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
-22. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
-23. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
-24. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-25. [`Expenses`](#expenses) – المصروفات
-26. [`CashVouchers`](#cashvouchers) – سندات النقدية
-27. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-28. [`Accounts`](#accounts) – دليل الحسابات
-29. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-30. [`JournalEntries`](#journalentries) – قيود اليومية
-31. [`JournalLines`](#journallines) – أسطر القيود
-32. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-33. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-34. [`StockCounts`](#stockcounts) – جلسات الجرد
-35. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-36. [`AuditLog`](#auditlog) – سجل العمليات
-37. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+7. [`Screens`](#screens) – الشاشات
+8. [`UserScreens`](#userscreens) – صلاحيات الشاشات للمستخدم
+9. [`Activations`](#activations) – تفعيل البرنامج
+10. [`Categories`](#categories) – التصنيفات
+11. [`Units`](#units) – وحدات القياس
+12. [`PaymentMethods`](#paymentmethods) – طرق الدفع
+13. [`CashBoxes`](#cashboxes) – الخزينة والصناديق
+14. [`Suppliers`](#suppliers) – الموردون
+15. [`Customers`](#customers) – العملاء
+16. [`Products`](#products) – المنتجات
+17. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
+18. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
+19. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
+20. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
+21. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
+22. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
+23. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
+24. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
+25. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
+26. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
+27. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+28. [`Expenses`](#expenses) – المصروفات
+29. [`CashVouchers`](#cashvouchers) – سندات النقدية
+30. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+31. [`Accounts`](#accounts) – دليل الحسابات
+32. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+33. [`JournalEntries`](#journalentries) – قيود اليومية
+34. [`JournalLines`](#journallines) – أسطر القيود
+35. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+36. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+37. [`StockCounts`](#stockcounts) – جلسات الجرد
+38. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+39. [`AuditLog`](#auditlog) – سجل العمليات
+40. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -81,6 +84,7 @@
 | 29 | POSMode | Short Text | 10 | ✔ | `"RETAIL"` | `In ("RETAIL","RESTAURANT","CAFE")` |  | شاشة البيع – RETAIL = المحلات (باركود)، RESTAURANT = المطاعم (لمس)، CAFE = الكافيهات (لمس) |
 | 30 | ImagesFolder | Short Text | 255 |  |  |  |  | مجلد صور المنتجات – المسارات النسبية للصور تُقرأ منه؛ فارغ = مجلد Images بجانب ملف البيانات |
 | 31 | InvoicePrintMode | Short Text | 10 | ✔ | `"PREVIEW"` | `In ("DIRECT","PREVIEW","NONE")` |  | الطباعة عند حفظ الفاتورة – DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة |
+| 32 | AllowAdminCompanyName | Yes/No |  |  | `False` |  |  | السماح لمدير النظام بتغيير اسم المحل |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -164,10 +168,61 @@
 | 15 | Notes | Long Text |  |  |  |  |  | ملاحظات |
 | 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 17 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – تدخل فيه نقدية مبيعاته وسنداته؛ فارغ = أول صندوق كاشير نشط |
+| 18 | IsDeveloper | Yes/No |  |  | `False` |  |  | المبرمج |
+| 19 | CustomScreens | Yes/No |  |  | `False` |  |  | صلاحيات شاشات خاصة |
 
 - المفتاح الأساسي: `EmployeeID`
 - فهرس فريد: `Username`
 - بيانات أساسية: 1 سجل
+
+## Screens
+
+**الشاشات** – كل شاشة في البرنامج، وما ينطبق عليها من إضافة وتعديل وحذف، وصلاحية الدور التي تفتحها.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ScreenName** 🔑 | Short Text | 64 | ✔ |  |  |  | اسم الشاشة في Access |
+| 2 | ScreenTitle | Short Text | 100 | ✔ |  |  |  | الشاشة |
+| 3 | ModuleName | Short Text | 50 |  |  |  |  | القسم |
+| 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 5 | PermissionKey | Short Text | 50 |  |  |  |  | صلاحية الدور – فارغ = متاحة لكل المستخدمين؛ تُستخدم للمستخدم الذي ليست له صلاحيات شاشات خاصة |
+| 6 | HasAdd | Yes/No |  |  | `False` |  |  | فيها إضافة / حفظ مستند |
+| 7 | HasEdit | Yes/No |  |  | `False` |  |  | فيها تعديل |
+| 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
+
+- المفتاح الأساسي: `ScreenName`
+- بيانات أساسية: 34 سجل
+
+## UserScreens
+
+**صلاحيات الشاشات للمستخدم** – للمستخدم الذي فُعّلت له «صلاحيات شاشات خاصة»: الشاشات التي يفتحها، والإضافة والتعديل والحذف في كل شاشة.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **EmployeeID** 🔑 | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | المستخدم |
+| 2 | **ScreenName** 🔑 | Short Text | 64 | ✔ |  |  | `Screens.ScreenName` | الشاشة |
+| 3 | CanOpen | Yes/No |  |  | `False` |  |  | فتح |
+| 4 | CanAdd | Yes/No |  |  | `False` |  |  | إضافة |
+| 5 | CanEdit | Yes/No |  |  | `False` |  |  | تعديل |
+| 6 | CanDelete | Yes/No |  |  | `False` |  |  | حذف |
+
+- المفتاح الأساسي: `EmployeeID, ScreenName`
+
+## Activations
+
+**تفعيل البرنامج** – الأجهزة المفعّل عليها البرنامج: رقم الجهاز وكود التفعيل الصادر من المبرمج.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ActivationID** 🔑 | AutoNumber |  |  |  |  |  | رقم التفعيل |
+| 2 | MachineID | Short Text | 24 | ✔ |  |  |  | رقم الجهاز – بصمة لوحة الأم والمعالج وقرص النظام (modActivation.MachineID) |
+| 3 | ActivationCode | Short Text | 30 | ✔ |  |  |  | كود التفعيل |
+| 4 | ComputerName | Short Text | 64 |  |  |  |  | اسم الجهاز |
+| 5 | ActivatedAt | Date/Time |  |  | `Now()` |  |  | تاريخ التفعيل |
+| 6 | EmployeeID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | فعّله |
+
+- المفتاح الأساسي: `ActivationID`
+- فهرس فريد: `MachineID`
 
 ## Categories
 

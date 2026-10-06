@@ -237,7 +237,8 @@ DATA_SCREENS: List[DataScreen] = [
         allow_delete=False,
         extra_buttons=[("btnSetPassword", "كلمة المرور", 'OpenScreen "frmChangePassword", 10, Me!EmployeeID'),
                        ("btnUnlock", "فك القفل", "UnlockUser Me"),
-                       ("btnRoles", "الصلاحيات", 'OpenScreen "frmRoles", 10')],
+                       ("btnRoles", "صلاحيات الأدوار", 'OpenScreen "frmRoles", 10'),
+                       ("btnUserScreens", "صلاحيات الشاشات", 'OpenScreen "frmUserScreens", 10')],
         fields=[
             Fld("EmployeeName", span=2), Fld("Username", hint="بدون مسافات، 3 أحرف على الأقل"),
             Fld("RoleID", rows=ROLE_ROWS, widths="0;4"),
@@ -307,7 +308,8 @@ DATA_SCREENS: List[DataScreen] = [
         extra_buttons=[("btnCategories", "التصنيفات", 'OpenScreen "frmCategories"'),
                        ("btnUnits", "الوحدات", 'OpenScreen "frmUnits"'),
                        ("btnExpenseTypes", "أنواع المصروفات", 'OpenScreen "frmExpenseTypes"'),
-                       ("btnLabelSettings", "ملصقات الباركود", 'OpenScreen "frmLabelSettings"')],
+                       ("btnLabelSettings", "ملصقات الباركود", 'OpenScreen "frmLabelSettings"'),
+                       ("btnActivation", "تفعيل البرنامج", 'OpenScreen "frmActivation", 10')],
         fields=[
             Fld("StoreName"), Fld("StoreNameEn"),
             Fld("VATNumber", hint="15 رقمًا يبدأ وينتهي بـ 3"), Fld("CRNumber"),
@@ -325,6 +327,8 @@ DATA_SCREENS: List[DataScreen] = [
                 button=("btnBrowseImages", "استعراض", 'BrowseFolder Me, "ImagesFolder"')),
             Fld("InvoicePrintMode", rows=INVOICE_PRINT_MODES, widths="0;6",
                 hint="عند حفظ فاتورة البيع أو المرتجع"),
+            Info("lblStoreNameNote"),
+            Fld("AllowAdminCompanyName", hint="يظهر للمبرمج فقط"),
         ]),
     DataScreen(
         "frmLabelSettings", "LabelSettings", "إعدادات ملصقات الباركود",
@@ -388,6 +392,7 @@ SCREEN_PERMISSIONS = {
     "frmProducts": "PRODUCTS", "frmCategories": "PRODUCTS", "frmUnits": "PRODUCTS", "frmInventory": "PRODUCTS",
     "frmStockCount": "STOCK_COUNT", "frmExpenses": "EXPENSES", "frmExpenseTypes": "EXPENSES",
     "frmReportCenter": "REPORTS", "frmSettings": "SETTINGS", "frmUsers": "USERS", "frmRoles": "USERS",
+    "frmUserScreens": "USERS", "frmActivation": "",
     "frmBackup": "BACKUP",
     "frmBarcodeLabels": "PRODUCTS", "frmLabelSettings": "PRODUCTS",
     "frmTouchPOS": "SALES_POS", "frmTouchPay": "SALES_POS", "frmCafePOS": "SALES_POS",

@@ -113,6 +113,118 @@ def layout_roles(heads) -> FormModel:
     return m
 
 
+# ------------------------------------------------------------- screens of a user
+USER_ROWS = ("SELECT e.EmployeeID, e.EmployeeName & '  (' & e.Username & ')', r.RoleName FROM Employees AS e "
+             "INNER JOIN Roles AS r ON e.RoleID = r.RoleID WHERE e.IsDeveloper = False ORDER BY e.EmployeeName")
+USER_SCREEN_TITLES = ["فتح", "الشاشة", "القسم", "إضافة / حفظ", "تعديل", "حذف", "ما ينطبق عليها"]
+USER_SCREEN_CHECKS = ("CanOpen", "CanAdd", "CanEdit", "CanDelete")
+
+
+def layout_user_screen_lines() -> Tuple[FormModel, list]:
+    row_h = cm(0.7)
+    m = FormModel("frmUserScreenLines", "شاشات المستخدم", cm(19.6), row_h, popup=False,
+                  record_source="SELECT * FROM tmpUserScreens ORDER BY SortOrder", allow_add=False)
+    m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0}
+    heads = grid_row(m, [
+        ("CanOpen", "CanOpen", 1.3, {"_kind": "check"}, ["AfterUpdate"]),
+        ("ScreenTitle", "ScreenTitle", 5.6, dict(LOCKED), []),
+        ("ModuleName", "ModuleName", 2.4, dict(LOCKED), []),
+        ("CanAdd", "CanAdd", 1.9, {"_kind": "check"}, ["AfterUpdate"]),
+        ("CanEdit", "CanEdit", 1.4, {"_kind": "check"}, ["AfterUpdate"]),
+        ("CanDelete", "CanDelete", 1.4, {"_kind": "check"}, ["AfterUpdate"]),
+        ("ActionsNote", "ActionsNote", 5.25, {**LOCKED, "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}, []),
+    ], row_h)
+    m.code = []
+    for f in USER_SCREEN_CHECKS:
+        m.code += [f"Private Sub {f}_AfterUpdate()", f'    UserScreenLineChanged Me, "{f}"', "End Sub"]
+    return m, heads
+
+
+def layout_user_screens(heads) -> FormModel:
+    width, height = cm(20.4), cm(17.4)
+    m = FormModel("frmUserScreens", "صلاحيات الشاشات", width, height, popup=True, allow_add=False)
+    title_band(m, "صلاحيات الشاشات", "الشاشات التي يفتحها كل مستخدم، والإضافة والتعديل والحذف في كل شاشة",
+               "users")
+    c = m.add(Control("combo", "cboUser", cm(0.4), cm(2.3), cm(8.0), cm(0.8),
+                      {"RowSource": USER_ROWS, "ColumnCount": 3, "ColumnWidths": "0;6;2.5"},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboUser", "المستخدم", c)
+    m.add(Control("label", "lblUserInfo", cm(8.7), cm(2.35), width - cm(9.1), cm(0.7),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+    m.add(Control("check", "chkCustom", cm(0.4), cm(3.45), cm(0.5), cm(0.5), {}, events=["AfterUpdate"]))
+    m.add(Control("label", "lblCustom", cm(1.05), cm(3.3), width - cm(1.45), cm(0.8),
+                  {"Caption": "صلاحيات شاشات خاصة بهذا المستخدم (بدل صلاحيات دوره)", "FontSize": 10,
+                   "FontBold": True, "ForeColor": Sym("CLR_TEXT")}, parent="chkCustom"))
+    header_labels(m, cm(0.4), cm(4.3), USER_SCREEN_TITLES, heads)
+    m.add(Control("subform", "subScreens", cm(0.4), cm(4.9), cm(19.6), cm(9.6),
+                  {"SourceObject": "frmUserScreenLines"}))
+    m.add(Control("label", "lblNote", cm(0.4), cm(14.6), width - cm(0.8), cm(1.0),
+                  {"Caption": " ", "FontSize": 9, "FontBold": True, "ForeColor": Sym("CLR_WARNING")}))
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnSaveScreens", "حفظ", "primary", 2.8, "SaveUserScreens Me"),
+            ("btnFromRole", "من صلاحيات الدور", "secondary", 3.8, "UserScreensFromRole Me"),
+            ("btnAll", "كل الشاشات", "secondary", 3.0, "UserScreensAll Me, True"),
+            ("btnNone", "إلغاء الكل", "secondary", 2.8, "UserScreensAll Me, False")]:
+        button(m, name, caption, bx, cm(15.9), style, w=cm(w), h=cm(1.0), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(15.9), "secondary", w=cm(2.6), h=cm(1.0),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    UserScreensLoad Me", "End Sub",
+               "Private Sub cboUser_AfterUpdate()", "    UserScreensPicked Me", "End Sub",
+               "Private Sub chkCustom_AfterUpdate()", "    UserScreensCustomChanged Me", "End Sub"] + m.code)
+    return m
+
+
+# ------------------------------------------------------------- activation
+def layout_activation() -> FormModel:
+    width, height = cm(19.0), cm(17.6)
+    m = FormModel("frmActivation", "تفعيل البرنامج", width, height, popup=True, allow_add=False)
+    title_band(m, "تفعيل البرنامج", "يعمل البرنامج على الأجهزة المفعّلة فقط بكود من المبرمج", "settings")
+    m.add(Control("label", "lblState", cm(0.4), cm(1.85), width - cm(0.8), cm(0.8),
+                  {"Caption": " ", "FontSize": 13, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    c = m.add(Control("text", "txtMachineID", cm(0.4), cm(3.4), cm(9.0), cm(0.9),
+                      {"FontSize": 14, "FontBold": True, "Locked": True, "TextAlign": 2}))
+    labelled(m, "txtMachineID", "رقم هذا الجهاز (أرسله للمبرمج)", c)
+    button(m, "btnCopyID", "نسخ الرقم", cm(9.6), cm(3.4), "secondary", w=cm(3.0), h=cm(0.9),
+           call="CopyMachineID Me")
+    c = m.add(Control("text", "txtCode", cm(0.4), cm(5.0), cm(9.0), cm(0.9),
+                      {"FontSize": 14, "TextAlign": 2}))
+    labelled(m, "txtCode", "كود التفعيل", c)
+    button(m, "btnActivate", "تفعيل هذا الجهاز", cm(9.6), cm(5.0), "primary", w=cm(4.4), h=cm(0.9),
+           call="ActivateThisMachine Me")
+    m.add(Control("label", "lblListCap", cm(0.4), cm(6.3), cm(12.0), cm(0.6),
+                  {"Caption": "الأجهزة المفعّلة", "FontSize": 10, "FontBold": True,
+                   "ForeColor": Sym("CLR_MUTED")}))
+    m.add(Control("list", "lstMachines", cm(0.4), cm(6.95), width - cm(0.8), cm(3.6),
+                  {"RowSourceType": "Table/Query", "ColumnCount": 4, "ColumnWidths": "0;5;5.5;4",
+                   "ColumnHeads": True,
+                   "RowSource": "SELECT ActivationID, ComputerName AS [الجهاز], MachineID AS [رقم الجهاز], "
+                                "ActivatedAt AS [تاريخ التفعيل] FROM Activations ORDER BY ActivatedAt"}))
+    button(m, "btnRemove", "إلغاء تفعيل الجهاز المحدد", cm(0.4), cm(10.75), "danger", w=cm(5.6), h=cm(0.9),
+           call="RemoveSelectedActivation Me")
+    # the programmer only: codes for the computers of customers, and the shop name permission
+    m.add(Control("rect", "boxDeveloper", cm(0.4), cm(11.95), width - cm(0.8), cm(3.75),
+                  {"BackColor": Sym("CLR_SURFACE"), "BorderColor": Sym("CLR_BORDER")}, decorative=True))
+    m.add(Control("label", "lblDevCap", cm(0.7), cm(12.1), width - cm(1.4), cm(0.6),
+                  {"Caption": "للمبرمج: توليد كود تفعيل لجهاز عميل", "FontSize": 10, "FontBold": True,
+                   "ForeColor": Sym("CLR_PRIMARY")}))
+    c = m.add(Control("text", "txtForMachine", cm(0.7), cm(13.35), cm(7.4), cm(0.85),
+                      {"FontSize": 12, "TextAlign": 2}))
+    labelled(m, "txtForMachine", "رقم جهاز العميل", c)
+    button(m, "btnGenerate", "توليد الكود", cm(8.3), cm(13.35), "primary", w=cm(3.0), h=cm(0.85),
+           call="GenerateActivationCode Me")
+    c = m.add(Control("text", "txtGenerated", cm(11.5), cm(13.35), cm(6.8), cm(0.85),
+                      {"FontSize": 12, "FontBold": True, "Locked": True, "TextAlign": 2}))
+    labelled(m, "txtGenerated", "كود التفعيل", c)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(16.2), "secondary", w=cm(2.6), h=cm(1.0),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = ["Private Sub Form_Load()", "    ActivationLoad Me", "End Sub"] + m.code
+    return m
+
+
 def layout_backup() -> FormModel:
     width, height = cm(20.0), cm(14.8)
     m = FormModel("frmBackup", "النسخ الاحتياطي", width, height, popup=True, allow_add=False)
@@ -150,4 +262,6 @@ def layout_backup() -> FormModel:
 
 def security_forms() -> List[FormModel]:
     lines, heads = layout_role_lines()
-    return [layout_login(), layout_change_password(), lines, layout_roles(heads), layout_backup()]
+    screen_lines, screen_heads = layout_user_screen_lines()
+    return [layout_login(), layout_change_password(), lines, layout_roles(heads),
+            screen_lines, layout_user_screens(screen_heads), layout_activation(), layout_backup()]

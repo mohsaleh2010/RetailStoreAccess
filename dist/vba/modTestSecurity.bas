@@ -11,6 +11,8 @@ Attribute VB_Name = "modTestSecurity"
 '                     inactive user, user without password, cashier permissions,
 '                     role permission changes, the last administrator
 '                  3) a real backup into a temporary folder, verified and deleted
+'                  4) screens of a user (frmUserScreens), the programmer and the
+'                     activation of a made-up computer, rolled back
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -33,6 +35,8 @@ Public Function TestSecurity() As Boolean
     TestUsers
     TempVars.Add "UserID", savedUser
     TestBackupFile
+    TestScreens
+    TempVars.Add "UserID", savedUser
 
     g_SilentMode = False
     Debug.Print "--- äÌÍ: " & m_passed & " | İÔá: " & m_failed
@@ -182,6 +186,89 @@ Private Sub TestBackupFile()
     Exit Sub
 EH:
     Fail "ÇáäÓÎ ÇáÇÍÊíÇØí: ÎØÃ " & Err.Number & ": " & Err.Description
+End Sub
+
+'------------------------------------------------------------------------------
+' 4) screens of a user, the programmer and activation, rolled back at the end
+'------------------------------------------------------------------------------
+Private Sub TestScreens()
+    Dim ws As DAO.Workspace, db As DAO.Database, inTrans As Boolean, uid As Long, dev As Long, adminID As Long
+    Dim msg As String, mid As String
+    On Error GoTo EH
+    Set db = CurrentDb
+    adminID = CurrentUserID()
+    EnsureLocalTables
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    db.Execute "INSERT INTO Employees (EmployeeName, Username, RoleID, MaxDiscountPercent, IsActive) " & _
+               "VALUES ('TEST ÔÇÔÇÊ', 'test_screens', 3, 0, True)", dbFailOnError
+    uid = DbValue("SELECT EmployeeID FROM Employees WHERE Username = 'test_screens'")
+    db.Execute "INSERT INTO Employees (EmployeeName, Username, RoleID, MaxDiscountPercent, IsActive, IsDeveloper) " & _
+               "VALUES ('TEST ãÈÑãÌ', 'test_dev', 3, 0, True, True)", dbFailOnError
+    dev = DbValue("SELECT EmployeeID FROM Employees WHERE Username = 'test_dev'")
+
+    ' --- the grid starts from the role; then own screens: no customers, products without add / delete
+    FillUserScreens uid, True
+    Call Record(DbValue("SELECT CanOpen AND CanAdd FROM tmpUserScreens WHERE ScreenName = 'frmPOS'") And _
+                Not DbValue("SELECT CanOpen FROM tmpUserScreens WHERE ScreenName = 'frmSettings'"), _
+                "ÔÇÔÇÊ ÇáãÓÊÎÏã ÊÈÏÃ ãä ÕáÇÍíÇÊ ÏæÑå")
+    db.Execute "UPDATE tmpUserScreens SET CanOpen = False, CanAdd = False, CanEdit = False, CanDelete = False " & _
+               "WHERE ScreenName = 'frmCustomers'", dbFailOnError
+    db.Execute "UPDATE tmpUserScreens SET CanOpen = True, CanAdd = False, CanEdit = True, CanDelete = False " & _
+               "WHERE ScreenName = 'frmProducts'", dbFailOnError
+    msg = SaveUserScreensFor(uid, True)
+    Call Record(Len(msg) = 0 And UsesCustomScreens(uid), "ÍİÙ ÔÇÔÇÊ ÎÇÕÉ ááãÓÊÎÏã " & msg)
+    TempVars.Add "UserID", uid
+    Call Record(Not CanOpenScreen("frmCustomers", True) And CanOpenScreen("frmProducts", True) And _
+                CanOpenScreen("frmPOS", True), "íİÊÍ ÇáÔÇÔÇÊ ÇáãÍÏÏÉ áå İŞØ")
+    Call Record(Not HasPermission("CUSTOMERS") And HasPermission("PRODUCTS") And HasPermission("SALES_POS") And _
+                Not HasPermission("REPORTS_PROFIT"), "ÕáÇÍíÇÊ ÇáÔÇÔÇÊ ÊÊÈÚ ÇÎÊíÇÑå¡ æÇáÕáÇÍíÇÊ ÇáÎÇÕÉ ãä ÏæÑå")
+    Call Record(Not CanScreenAction("frmProducts", "ADD", True) And CanScreenAction("frmProducts", "EDIT", True) And _
+                Not CanScreenAction("frmProducts", "DELETE", True), "ÇáãäÊÌÇÊ: ÊÚÏíá ÈÏæä ÅÖÇİÉ Ãæ ÍĞİ")
+    Call Record(CanScreenAction("frmPOS", "ADD", True) And CanScreenAction("frmSalesInvoice", "EDIT", True), _
+                "ÇáÅÌÑÇÁ ÛíÑ ÇáãæÌæÏ İí ÇáÔÇÔÉ áÇ íãäÚ ÔíÆğÇ")
+    Call Record(Len(SaveUserScreensFor(uid, False)) > 0, "ÇáãÓÊÎÏã áÇ íÛíÑ ÕáÇÍíÇÊå")
+    TempVars.Add "UserID", adminID
+    Call Record(Len(SaveUserScreensFor(adminID, True)) > 0, "ÔÇÔÇÊ ãÏíÑ ÇáäÙÇã áÇ ÊõŞíóøÏ")
+    msg = SaveUserScreensFor(uid, False)
+    TempVars.Add "UserID", uid
+    Call Record(Len(msg) = 0 And CanOpenScreen("frmCustomers", True) And _
+                DbValue("SELECT COUNT(*) FROM UserScreens WHERE EmployeeID = " & uid) = 0, "ÇáÑÌæÚ áÕáÇÍíÇÊ ÇáÏæÑ " & msg)
+
+    ' --- the programmer, and the shop name
+    TempVars.Add "UserID", dev
+    Call Record(IsDeveloper() And HasPermission("USERS") And HasPermission("REPORTS_PROFIT") And _
+                CanOpenScreen("frmBackup", True) And CanChangeStoreName(), "ÇáãÈÑãÌ íãáß ßá ÇáÕáÇÍíÇÊ æíÛíÑ ÇÓã ÇáãÍá")
+    TempVars.Add "UserID", adminID
+    db.Execute "UPDATE Settings SET AllowAdminCompanyName = False", dbFailOnError
+    Call Record(Not IsDeveloper() And Not CanChangeStoreName(), "ãÏíÑ ÇáäÙÇã áÇ íÛíÑ ÇÓã ÇáãÍá ÈÏæä ÅĞä ÇáãÈÑãÌ")
+    db.Execute "UPDATE Settings SET AllowAdminCompanyName = True", dbFailOnError
+    Call Record(CanChangeStoreName(), "ÈÅĞä ÇáãÈÑãÌ íÛíÑ ãÏíÑ ÇáäÙÇã ÇÓã ÇáãÍá")
+
+    ' --- activation of a made-up computer
+    mid = "1A2B-3C4D-5E6F-7A8B"
+    Call Record(ActivationCodeFor(mid) = "7AAE2-F50AF-20481-9EBAB", "ßæÏ ÇáÊİÚíá íØÇÈŞ ÇáãÑÌÚ (tools/activation_reference.py)")
+    Call Record(Len(SaveActivation(mid, "11111-22222-33333-44444", "TEST-PC")) > 0, "ÑİÖ ßæÏ ÊİÚíá ÎÇØÆ")
+    Call Record(Not IsValidCode("1A2B-3C4D-5E6F-7A8C", ActivationCodeFor(mid)), "ÇáßæÏ áÇ íÕáÍ áÌåÇÒ ÂÎÑ")
+    msg = SaveActivation(mid, LCase$(ActivationCodeFor(mid)), "TEST-PC")
+    Call Record(Len(msg) = 0 And DbValue("SELECT COUNT(*) FROM Activations WHERE MachineID = '" & mid & "'") = 1, _
+                "ÊİÚíá ÌåÇÒ ÈÇáßæÏ ÇáÕÍíÍ " & msg)
+    TempVars.Add "UserID", uid
+    Call Record(Len(SaveActivation(mid, ActivationCodeFor(mid), "TEST-PC")) > 0, "ÇáÊİÚíá áãÏíÑ ÇáäÙÇã İŞØ")
+    Call Record(MachineID() Like "????-????-????-????", "ÑŞã åĞÇ ÇáÌåÇÒ " & MachineID())
+
+    ws.Rollback
+    inTrans = False
+    TempVars.Add "UserID", adminID
+    Call Record(DCount("*", "Employees", "Username = 'test_screens' OR Username = 'test_dev'") = 0 And _
+                DCount("*", "Activations", "MachineID = '" & mid & "'") = 0, "ÇáÊÑÇÌÚ Úä ÈíÇäÇÊ ÇÎÊÈÇÑ ÇáÔÇÔÇÊ æÇáÊİÚíá")
+    Exit Sub
+EH:
+    Fail "ÇáÔÇÔÇÊ æÇáÊİÚíá: ÎØÃ " & Err.Number & ": " & Err.Description
+    On Error Resume Next
+    If inTrans Then ws.Rollback
+    TempVars.Add "UserID", adminID
 End Sub
 
 Private Sub Record(ByVal Passed As Boolean, ByVal Label As String)

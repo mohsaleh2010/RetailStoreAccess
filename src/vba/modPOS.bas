@@ -40,6 +40,12 @@ Public Sub EnsureLocalTables()
         CurrentDb.Execute "CREATE TABLE tmpRolePermissions (PermissionKey TEXT(50) CONSTRAINT pkRolePerm PRIMARY KEY, " & _
             "PermissionName TEXT(100), ModuleName TEXT(50), SortOrder INTEGER, Granted BIT)", dbFailOnError
     End If
+    ' the screens of the user being edited in frmUserScreens
+    If Not LocalTableExists("tmpUserScreens") Then
+        CurrentDb.Execute "CREATE TABLE tmpUserScreens (ScreenName TEXT(64) CONSTRAINT pkUserScreens PRIMARY KEY, " & _
+            "ScreenTitle TEXT(100), ModuleName TEXT(50), SortOrder INTEGER, HasAdd BIT, HasEdit BIT, HasDelete BIT, " & _
+            "CanOpen BIT, CanAdd BIT, CanEdit BIT, CanDelete BIT, ActionsNote TEXT(60))", dbFailOnError
+    End If
     ' Phase 7: purchase invoice lines and purchase return lines
     If Not LocalTableExists("tmpPurchaseLines") Then
         CurrentDb.Execute "CREATE TABLE tmpPurchaseLines (LineNo COUNTER CONSTRAINT pkPurchaseLines PRIMARY KEY, " & _
@@ -332,6 +338,7 @@ End Sub
 
 Public Function SavePOS(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) As Boolean
     Dim msg As String, newID As Long, invNo As String, change As Currency
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If frm!subLines.Form.Dirty Then frm!subLines.Form.Dirty = False
     If HasControl(frm, "txtOrderType") Then          ' restaurant / café touch screen
         msg = TouchOrderProblem(frm)
@@ -497,6 +504,7 @@ End Sub
 
 Public Function SaveReturn(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) As Boolean
     Dim msg As String, newID As Long, retNo As String
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If IsNull(frm!txtInvoiceID.Value) Then
         ShowWarning "اختر الفاتورة الأصلية أولًا."
         Exit Function
@@ -537,6 +545,7 @@ End Sub
 
 Public Function SavePayment(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
     Dim msg As String, newID As Long
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If IsNull(frm!cboCustomer.Value) Then
         ShowWarning "اختر العميل."
         Exit Function

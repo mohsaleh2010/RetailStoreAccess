@@ -63,6 +63,8 @@ TEMPLATE = r'''Attribute VB_Name = "modTestSecurity"
 '                     inactive user, user without password, cashier permissions,
 '                     role permission changes, the last administrator
 '                  3) a real backup into a temporary folder, verified and deleted
+'                  4) screens of a user (frmUserScreens), the programmer and the
+'                     activation of a made-up computer, rolled back
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -85,6 +87,8 @@ Public Function TestSecurity() As Boolean
     TestUsers
     TempVars.Add "UserID", savedUser
     TestBackupFile
+    TestScreens
+    TempVars.Add "UserID", savedUser
 
     g_SilentMode = False
     Debug.Print "--- نجح: " & m_passed & " | فشل: " & m_failed
@@ -223,6 +227,89 @@ EH:
     Fail "النسخ الاحتياطي: خطأ " & Err.Number & ": " & Err.Description
 End Sub
 
+'------------------------------------------------------------------------------
+' 4) screens of a user, the programmer and activation, rolled back at the end
+'------------------------------------------------------------------------------
+Private Sub TestScreens()
+    Dim ws As DAO.Workspace, db As DAO.Database, inTrans As Boolean, uid As Long, dev As Long, adminID As Long
+    Dim msg As String, mid As String
+    On Error GoTo EH
+    Set db = CurrentDb
+    adminID = CurrentUserID()
+    EnsureLocalTables
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    db.Execute "INSERT INTO Employees (EmployeeName, Username, RoleID, MaxDiscountPercent, IsActive) " & _
+               "VALUES ('TEST شاشات', 'test_screens', 3, 0, True)", dbFailOnError
+    uid = DbValue("SELECT EmployeeID FROM Employees WHERE Username = 'test_screens'")
+    db.Execute "INSERT INTO Employees (EmployeeName, Username, RoleID, MaxDiscountPercent, IsActive, IsDeveloper) " & _
+               "VALUES ('TEST مبرمج', 'test_dev', 3, 0, True, True)", dbFailOnError
+    dev = DbValue("SELECT EmployeeID FROM Employees WHERE Username = 'test_dev'")
+
+    ' --- the grid starts from the role; then own screens: no customers, products without add / delete
+    FillUserScreens uid, True
+    Call Record(DbValue("SELECT CanOpen AND CanAdd FROM tmpUserScreens WHERE ScreenName = 'frmPOS'") And _
+                Not DbValue("SELECT CanOpen FROM tmpUserScreens WHERE ScreenName = 'frmSettings'"), _
+                "شاشات المستخدم تبدأ من صلاحيات دوره")
+    db.Execute "UPDATE tmpUserScreens SET CanOpen = False, CanAdd = False, CanEdit = False, CanDelete = False " & _
+               "WHERE ScreenName = 'frmCustomers'", dbFailOnError
+    db.Execute "UPDATE tmpUserScreens SET CanOpen = True, CanAdd = False, CanEdit = True, CanDelete = False " & _
+               "WHERE ScreenName = 'frmProducts'", dbFailOnError
+    msg = SaveUserScreensFor(uid, True)
+    Call Record(Len(msg) = 0 And UsesCustomScreens(uid), "حفظ شاشات خاصة للمستخدم " & msg)
+    TempVars.Add "UserID", uid
+    Call Record(Not CanOpenScreen("frmCustomers", True) And CanOpenScreen("frmProducts", True) And _
+                CanOpenScreen("frmPOS", True), "يفتح الشاشات المحددة له فقط")
+    Call Record(Not HasPermission("CUSTOMERS") And HasPermission("PRODUCTS") And HasPermission("SALES_POS") And _
+                Not HasPermission("REPORTS_PROFIT"), "صلاحيات الشاشات تتبع اختياره، والصلاحيات الخاصة من دوره")
+    Call Record(Not CanScreenAction("frmProducts", "ADD", True) And CanScreenAction("frmProducts", "EDIT", True) And _
+                Not CanScreenAction("frmProducts", "DELETE", True), "المنتجات: تعديل بدون إضافة أو حذف")
+    Call Record(CanScreenAction("frmPOS", "ADD", True) And CanScreenAction("frmSalesInvoice", "EDIT", True), _
+                "الإجراء غير الموجود في الشاشة لا يمنع شيئًا")
+    Call Record(Len(SaveUserScreensFor(uid, False)) > 0, "المستخدم لا يغير صلاحياته")
+    TempVars.Add "UserID", adminID
+    Call Record(Len(SaveUserScreensFor(adminID, True)) > 0, "شاشات مدير النظام لا تُقيَّد")
+    msg = SaveUserScreensFor(uid, False)
+    TempVars.Add "UserID", uid
+    Call Record(Len(msg) = 0 And CanOpenScreen("frmCustomers", True) And _
+                DbValue("SELECT COUNT(*) FROM UserScreens WHERE EmployeeID = " & uid) = 0, "الرجوع لصلاحيات الدور " & msg)
+
+    ' --- the programmer, and the shop name
+    TempVars.Add "UserID", dev
+    Call Record(IsDeveloper() And HasPermission("USERS") And HasPermission("REPORTS_PROFIT") And _
+                CanOpenScreen("frmBackup", True) And CanChangeStoreName(), "المبرمج يملك كل الصلاحيات ويغير اسم المحل")
+    TempVars.Add "UserID", adminID
+    db.Execute "UPDATE Settings SET AllowAdminCompanyName = False", dbFailOnError
+    Call Record(Not IsDeveloper() And Not CanChangeStoreName(), "مدير النظام لا يغير اسم المحل بدون إذن المبرمج")
+    db.Execute "UPDATE Settings SET AllowAdminCompanyName = True", dbFailOnError
+    Call Record(CanChangeStoreName(), "بإذن المبرمج يغير مدير النظام اسم المحل")
+
+    ' --- activation of a made-up computer
+    mid = "@@MID@@"
+    Call Record(ActivationCodeFor(mid) = "@@CODE@@", "كود التفعيل يطابق المرجع (tools/activation_reference.py)")
+    Call Record(Len(SaveActivation(mid, "11111-22222-33333-44444", "TEST-PC")) > 0, "رفض كود تفعيل خاطئ")
+    Call Record(Not IsValidCode("1A2B-3C4D-5E6F-7A8C", ActivationCodeFor(mid)), "الكود لا يصلح لجهاز آخر")
+    msg = SaveActivation(mid, LCase$(ActivationCodeFor(mid)), "TEST-PC")
+    Call Record(Len(msg) = 0 And DbValue("SELECT COUNT(*) FROM Activations WHERE MachineID = '" & mid & "'") = 1, _
+                "تفعيل جهاز بالكود الصحيح " & msg)
+    TempVars.Add "UserID", uid
+    Call Record(Len(SaveActivation(mid, ActivationCodeFor(mid), "TEST-PC")) > 0, "التفعيل لمدير النظام فقط")
+    Call Record(MachineID() Like "????-????-????-????", "رقم هذا الجهاز " & MachineID())
+
+    ws.Rollback
+    inTrans = False
+    TempVars.Add "UserID", adminID
+    Call Record(DCount("*", "Employees", "Username = 'test_screens' OR Username = 'test_dev'") = 0 And _
+                DCount("*", "Activations", "MachineID = '" & mid & "'") = 0, "التراجع عن بيانات اختبار الشاشات والتفعيل")
+    Exit Sub
+EH:
+    Fail "الشاشات والتفعيل: خطأ " & Err.Number & ": " & Err.Description
+    On Error Resume Next
+    If inTrans Then ws.Rollback
+    TempVars.Add "UserID", adminID
+End Sub
+
 Private Sub Record(ByVal Passed As Boolean, ByVal Label As String)
     If Passed Then
         m_passed = m_passed + 1
@@ -241,6 +328,9 @@ End Sub
 
 
 def build_test_security_vba() -> str:
-    text = TEMPLATE.replace("@@VECTORS@@", vector_lines())
+    import activation_reference as A
+    mid = "1A2B-3C4D-5E6F-7A8B"
+    text = TEMPLATE.replace("@@VECTORS@@", vector_lines()).replace("@@MID@@", mid) \
+        .replace("@@CODE@@", A.activation_code(mid, A.vba_secret()))
     assert not re.search(r"@@[A-Z_]+@@", text)
     return text

@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=17;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=5;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=16;Roles=3;Permissions=25;RolePermissions=51;Employees=1;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=22;JournalSourceTypes=13;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=32;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=5;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=16;Roles=3;Permissions=25;RolePermissions=51;Employees=1;Screens=34;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=22;JournalSourceTypes=13;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -69,6 +69,8 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
 
     CreateAllTables
     SeedAll
+    m_currentStep = "developer user"
+    EnsureDeveloperUser
 
     m_db.Close
     Set m_db = Nothing
@@ -464,6 +466,36 @@ Private Sub GrantNewPermission(ByVal PermissionKey As String, ByVal RoleIDs As S
     Next
 End Sub
 
+Private Sub EnsureDeveloperUser()
+    ' The programmer: above the administrator, every permission, hidden from the users screen.
+    ' Created only with the password typed now: there is never a programmer account without one.
+    ' (PasswordHash / NewSalt of modSecurity through Application.Run: no compile-time dependency.)
+    Dim pwd As String, salt As String
+    If DCountIn("Employees", "[IsDeveloper] = True") > 0 Then Exit Sub
+    If DCountIn("Employees", "[Username] = 'developer'") > 0 Then
+        LogLine "تنبيه: يوجد مستخدم باسم developer وليس هو المبرمج؛ لم يُنشأ حساب المبرمج."
+        Exit Sub
+    End If
+    Do
+        pwd = InputBox("إنشاء حساب المبرمج (اسم المستخدم: developer)." & vbCrLf & vbCrLf & _
+                       "اكتب كلمة مرور له (6 أحرف على الأقل) واحتفظ بها. لا تعطها لأحد." & vbCrLf & vbCrLf & _
+                       "إلغاء = لا يُنشأ الآن، ويُطلب في التشغيل التالي لـ BuildSchema.", "حساب المبرمج")
+        If Len(pwd) = 0 Then
+            LogLine "لم يُنشأ حساب المبرمج: لم تُكتب كلمة مرور."
+            Exit Sub
+        End If
+        If Len(pwd) >= 6 And pwd = Trim$(pwd) And pwd <> "developer" Then Exit Do
+        MsgBox "كلمة المرور 6 أحرف على الأقل، بدون مسافة في أولها أو آخرها، ولا تساوي اسم المستخدم.", _
+               vbExclamation + MSG_RTL, "حساب المبرمج"
+    Loop
+    salt = Application.Run("NewSalt")
+    m_db.Execute "INSERT INTO [Employees] ([EmployeeName], [JobTitle], [Username], [RoleID], [MaxDiscountPercent], " & _
+                 "[MustChangePassword], [IsActive], [IsDeveloper], [PasswordSalt], [PasswordHash]) VALUES " & _
+                 "('المبرمج', 'المبرمج', 'developer', 1, 1, False, True, True, '" & salt & "', '" & _
+                 Application.Run("PasswordHash", pwd, salt) & "')", dbFailOnError
+    LogLine "تم إنشاء حساب المبرمج: developer"
+End Sub
+
 Private Function DCountIn(ByVal TableName As String, ByVal Where As String) As Long
     Dim rs As DAO.Recordset
     Set rs = m_db.OpenRecordset("SELECT COUNT(*) FROM [" & TableName & "] WHERE " & Where, dbOpenSnapshot)
@@ -525,6 +557,9 @@ Private Sub CreateAllTables()
     CreateTable_Permissions
     CreateTable_RolePermissions
     CreateTable_Employees
+    CreateTable_Screens
+    CreateTable_UserScreens
+    CreateTable_Activations
     CreateTable_Categories
     CreateTable_Units
     CreateTable_PaymentMethods
@@ -623,6 +658,8 @@ Private Sub CreateTable_Settings()
              "", "", "مجلد صور المنتجات", "المسارات النسبية للصور تُقرأ منه؛ فارغ = مجلد Images بجانب ملف البيانات"
     AddField tdf, "InvoicePrintMode", "TEXT", 10, True, """PREVIEW""", _
              "In (""DIRECT"",""PREVIEW"",""NONE"")", "اختر طريقة الطباعة من القائمة", "الطباعة عند حفظ الفاتورة", "DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة"
+    AddField tdf, "AllowAdminCompanyName", "BOOL", 0, False, "False", _
+             "", "", "السماح لمدير النظام بتغيير اسم المحل", ""
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
     EndTable tdf, "إعدادات المحل: سجل واحد فقط يحتوي بيانات المحل الضريبية وإعدادات التشغيل.", "", ""
 End Sub
@@ -723,9 +760,75 @@ Private Sub CreateTable_Employees()
              "", "", "تاريخ الإنشاء", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
              "", "", "صندوق النقدية", "تدخل فيه نقدية مبيعاته وسنداته؛ فارغ = أول صندوق كاشير نشط"
+    AddField tdf, "IsDeveloper", "BOOL", 0, False, "False", _
+             "", "", "المبرمج", ""
+    AddField tdf, "CustomScreens", "BOOL", 0, False, "False", _
+             "", "", "صلاحيات شاشات خاصة", ""
     AddIndex tdf, "PrimaryKey", "EmployeeID", True, True, False
     AddIndex tdf, "UX_Username", "Username", False, True, False
     EndTable tdf, "الموظفون والمستخدمون: كل موظف هو مستخدم للنظام؛ لا يُحذف بل يُعطَّل للحفاظ على سجل عملياته.", "", ""
+End Sub
+
+Private Sub CreateTable_Screens()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "Screens") Then Exit Sub
+    AddField tdf, "ScreenName", "TEXT", 64, True, "", _
+             "", "", "اسم الشاشة في Access", ""
+    AddField tdf, "ScreenTitle", "TEXT", 100, True, "", _
+             "", "", "الشاشة", ""
+    AddField tdf, "ModuleName", "TEXT", 50, False, "", _
+             "", "", "القسم", ""
+    AddField tdf, "SortOrder", "INT", 0, True, "0", _
+             "", "", "الترتيب", ""
+    AddField tdf, "PermissionKey", "TEXT", 50, False, "", _
+             "", "", "صلاحية الدور", "فارغ = متاحة لكل المستخدمين؛ تُستخدم للمستخدم الذي ليست له صلاحيات شاشات خاصة"
+    AddField tdf, "HasAdd", "BOOL", 0, False, "False", _
+             "", "", "فيها إضافة / حفظ مستند", ""
+    AddField tdf, "HasEdit", "BOOL", 0, False, "False", _
+             "", "", "فيها تعديل", ""
+    AddField tdf, "HasDelete", "BOOL", 0, False, "False", _
+             "", "", "فيها حذف", ""
+    AddIndex tdf, "PrimaryKey", "ScreenName", True, True, False
+    EndTable tdf, "الشاشات: كل شاشة في البرنامج، وما ينطبق عليها من إضافة وتعديل وحذف، وصلاحية الدور التي تفتحها.", "", ""
+End Sub
+
+Private Sub CreateTable_UserScreens()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "UserScreens") Then Exit Sub
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "المستخدم", ""
+    AddField tdf, "ScreenName", "TEXT", 64, True, "", _
+             "", "", "الشاشة", ""
+    AddField tdf, "CanOpen", "BOOL", 0, False, "False", _
+             "", "", "فتح", ""
+    AddField tdf, "CanAdd", "BOOL", 0, False, "False", _
+             "", "", "إضافة", ""
+    AddField tdf, "CanEdit", "BOOL", 0, False, "False", _
+             "", "", "تعديل", ""
+    AddField tdf, "CanDelete", "BOOL", 0, False, "False", _
+             "", "", "حذف", ""
+    AddIndex tdf, "PrimaryKey", "EmployeeID,ScreenName", True, True, False
+    EndTable tdf, "صلاحيات الشاشات للمستخدم: للمستخدم الذي فُعّلت له «صلاحيات شاشات خاصة»: الشاشات التي يفتحها، والإضافة والتعديل والحذف في كل شاشة.", "", ""
+End Sub
+
+Private Sub CreateTable_Activations()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "Activations") Then Exit Sub
+    AddField tdf, "ActivationID", "AUTO", 0, False, "", _
+             "", "", "رقم التفعيل", ""
+    AddField tdf, "MachineID", "TEXT", 24, True, "", _
+             "", "", "رقم الجهاز", "بصمة لوحة الأم والمعالج وقرص النظام (modActivation.MachineID)"
+    AddField tdf, "ActivationCode", "TEXT", 30, True, "", _
+             "", "", "كود التفعيل", ""
+    AddField tdf, "ComputerName", "TEXT", 64, False, "", _
+             "", "", "اسم الجهاز", ""
+    AddField tdf, "ActivatedAt", "DATETIME", 0, False, "Now()", _
+             "", "", "تاريخ التفعيل", ""
+    AddField tdf, "EmployeeID", "LONG", 0, False, "", _
+             "", "", "فعّله", ""
+    AddIndex tdf, "PrimaryKey", "ActivationID", True, True, False
+    AddIndex tdf, "UX_MachineID", "MachineID", False, True, False
+    EndTable tdf, "تفعيل البرنامج: الأجهزة المفعّل عليها البرنامج: رقم الجهاز وكود التفعيل الصادر من المبرمج.", "", ""
 End Sub
 
 Private Sub CreateTable_Categories()
@@ -1794,6 +1897,7 @@ Private Sub SeedAll()
     Seed_Permissions
     Seed_RolePermissions
     Seed_Employees
+    Seed_Screens
     Seed_Categories
     Seed_Units
     Seed_PaymentMethods
@@ -1931,6 +2035,45 @@ Private Sub Seed_Employees()
     If Not BeginSeed("Employees", False) Then Exit Sub
     ExecSeed "INSERT INTO [Employees] ([EmployeeID], [EmployeeName], [JobTitle], [Username], [RoleID], [MaxDiscountPercent], [MustChangePassword], [IsActive]) VALUES (1, 'مدير النظام', 'مدير النظام', 'admin', 1, 1, True, True)"
     EndSeed "Employees", 1
+End Sub
+
+Private Sub Seed_Screens()
+    If Not BeginSeed("Screens", True) Then Exit Sub
+    SeedRow "[ScreenName] = 'frmPOS'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPOS', 'نقطة البيع (المحلات)', 'المبيعات', 10, 'SALES_POS', True, False, False)"
+    SeedRow "[ScreenName] = 'frmTouchPOS'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmTouchPOS', 'نقطة البيع (المطاعم)', 'المبيعات', 20, 'SALES_POS', True, False, False)"
+    SeedRow "[ScreenName] = 'frmCafePOS'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCafePOS', 'نقطة البيع (الكافيهات)', 'المبيعات', 30, 'SALES_POS', True, False, False)"
+    SeedRow "[ScreenName] = 'frmSalesInvoice'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSalesInvoice', 'عرض الفواتير وإعادة طباعتها', 'المبيعات', 40, 'SALES_VIEW', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSalesReturn'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSalesReturn', 'مرتجعات المبيعات', 'المبيعات', 50, 'SALES_RETURN', True, False, False)"
+    SeedRow "[ScreenName] = 'frmCustomers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCustomers', 'العملاء', 'العملاء', 60, 'CUSTOMERS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmCustomerPayment'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCustomerPayment', 'سندات القبض من العملاء', 'العملاء', 70, 'CUSTOMER_PAYMENTS', True, False, False)"
+    SeedRow "[ScreenName] = 'frmPurchaseInvoice'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPurchaseInvoice', 'فواتير المشتريات', 'المشتريات', 80, 'PURCHASES', True, False, False)"
+    SeedRow "[ScreenName] = 'frmPurchaseView'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPurchaseView', 'عرض فواتير المشتريات', 'المشتريات', 90, 'PURCHASES', False, False, False)"
+    SeedRow "[ScreenName] = 'frmPurchaseReturn'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPurchaseReturn', 'مرتجعات المشتريات', 'المشتريات', 100, 'PURCHASE_RETURN', True, False, False)"
+    SeedRow "[ScreenName] = 'frmSuppliers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSuppliers', 'الموردون', 'الموردون', 110, 'SUPPLIERS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmSupplierPayment'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSupplierPayment', 'سندات الصرف للموردين', 'الموردون', 120, 'SUPPLIER_PAYMENTS', True, False, False)"
+    SeedRow "[ScreenName] = 'frmProducts'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmProducts', 'المنتجات والأسعار', 'المخزون', 130, 'PRODUCTS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmCategories'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCategories', 'التصنيفات', 'المخزون', 140, 'PRODUCTS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmUnits'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUnits', 'الوحدات', 'المخزون', 150, 'PRODUCTS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmInventory'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmInventory', 'المخزون والحركات اليدوية', 'المخزون', 160, 'PRODUCTS', True, False, False)"
+    SeedRow "[ScreenName] = 'frmStockCount'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmStockCount', 'الجرد', 'المخزون', 170, 'STOCK_COUNT', True, False, False)"
+    SeedRow "[ScreenName] = 'frmBarcodeLabels'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBarcodeLabels', 'ملصقات الباركود', 'المخزون', 180, 'PRODUCTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmLabelSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmLabelSettings', 'إعدادات الملصقات', 'المخزون', 190, 'PRODUCTS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmExpenses'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmExpenses', 'المصروفات', 'المصروفات', 200, 'EXPENSES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmExpenseTypes'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmExpenseTypes', 'أنواع المصروفات', 'المصروفات', 210, 'EXPENSES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmTreasury'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmTreasury', 'الخزينة', 'الخزينة', 220, 'CASH_CLOSING', False, False, False)"
+    SeedRow "[ScreenName] = 'frmCashVoucher'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashVoucher', 'سندات النقدية والتحويل', 'الخزينة', 230, 'CASH_BOX', True, False, False)"
+    SeedRow "[ScreenName] = 'frmCashClosing'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashClosing', 'تصفية يومية الكاشير', 'الخزينة', 240, 'CASH_CLOSING', True, False, False)"
+    SeedRow "[ScreenName] = 'frmCashBoxes'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashBoxes', 'الصناديق', 'الخزينة', 250, 'CASH_BOX', True, True, True)"
+    SeedRow "[ScreenName] = 'frmJournal'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmJournal', 'قيود اليومية', 'الحسابات', 260, 'JOURNAL', False, False, False)"
+    SeedRow "[ScreenName] = 'frmAccounts'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAccounts', 'دليل الحسابات', 'الحسابات', 270, 'JOURNAL', True, True, True)"
+    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 280, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 290, Null, False, False, False)"
+    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 300, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 310, 'USERS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 320, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 330, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 340, 'BACKUP', False, False, False)"
+    EndSeed "Screens", 34
 End Sub
 
 Private Sub Seed_Categories()

@@ -110,13 +110,31 @@ Public Function CurrentUserName() As String
 End Function
 
 Public Function HasPermission(ByVal PermissionKey As String) As Boolean
-    ' True when the role of the current user has the permission (table RolePermissions).
-    Dim roleID As Variant
+    ' True when the current user may do it:
+    '   the programmer (Employees.IsDeveloper): always;
+    '   a user with his own screen permissions (Employees.CustomScreens), for a permission that
+    '   opens screens (Screens.PermissionKey): one of those screens is granted to him (UserScreens);
+    '   otherwise: the role of the user has the permission (table RolePermissions).
+    Dim roleID As Variant, uid As Long, key As String
     ' DbValue reads through CurrentDb, so it also sees changes made inside an open transaction.
-    roleID = DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & CurrentUserID() & " AND IsActive = True")
+    uid = CurrentUserID()
+    roleID = DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & uid & " AND IsActive = True")
     If IsNull(roleID) Then Exit Function
+    If Nz(DbValue("SELECT IsDeveloper FROM Employees WHERE EmployeeID = " & uid), False) Then
+        HasPermission = True
+        Exit Function
+    End If
+    key = SqlText(PermissionKey)
+    If roleID <> ADMIN_ROLE_ID And Nz(DbValue("SELECT CustomScreens FROM Employees WHERE EmployeeID = " & uid), False) Then
+        If Nz(DbValue("SELECT COUNT(*) FROM Screens WHERE PermissionKey = " & key), 0) > 0 Then
+            HasPermission = Nz(DbValue("SELECT COUNT(*) FROM UserScreens AS u INNER JOIN Screens AS s ON " & _
+                "u.ScreenName = s.ScreenName WHERE u.EmployeeID = " & uid & " AND u.CanOpen = True AND " & _
+                "s.PermissionKey = " & key), 0) > 0
+            Exit Function
+        End If
+    End If
     HasPermission = Nz(DbValue("SELECT COUNT(*) FROM RolePermissions WHERE RoleID = " & roleID & _
-                               " AND PermissionKey = " & SqlText(PermissionKey)), 0) > 0
+                               " AND PermissionKey = " & key), 0) > 0
 End Function
 
 '------------------------------------------------------------------------------

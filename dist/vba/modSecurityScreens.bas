@@ -4,10 +4,12 @@ Attribute VB_Name = "modSecurityScreens"
 '
 ' Behaviour of the screens:
 '   frmLogin            login (start-up form in user mode)
-'   frmMain             MainOpen: nobody logged in -> login; nav buttons follow permissions
+'   frmMain             MainOpen: nobody logged in, or this computer is not activated -> login;
+'                       nav buttons follow permissions
 '   frmChangePassword   own password, forced change, or set by the administrator
 '   frmUsers            users (data screen; extra buttons and status line here)
 '   frmRoles            permissions of each role (lines in local table tmpRolePermissions)
+'   frmUserScreens      screens of one user, with add / edit / delete in each (tmpUserScreens)
 '   frmBackup           backup / restore
 ' Logic is in modSecurity and modBackup.
 '==============================================================================
@@ -77,6 +79,17 @@ Public Function DoLogin(ByVal frm As Access.Form) As Boolean
             Exit Function
         End If
     End If
+    If Not IsDeveloper() And Not IsActivated() Then  ' copy protection (modActivation)
+        If IsAdministrator() Then
+            DoCmd.OpenForm "frmActivation", acNormal, , , , acDialog, "LOGIN"
+        Else
+            ShowWarning "«·»—‰«„Ã €Ì— „›⁄¯· ⁄·Ï Â–« «·ÃÂ«“." & vbCrLf & "ÌÃ» √‰ Ì›⁄¯·Â „œÌ— «·‰Ÿ«„ ﬁ»· «·«” Œœ«„."
+        End If
+        If Not IsActivated() Then
+            LogoutUser False
+            Exit Function
+        End If
+    End If
     DoCmd.OpenForm "frmMain"
     MaximizeScreen "frmMain"
 End Function
@@ -87,7 +100,9 @@ End Sub
 
 Public Function MainOpen(ByVal frm As Access.Form) As Boolean
     ' frmMain opens only for a logged-in user (tests run as the administrator).
-    If CurrentUserID() > 0 Or g_SilentMode Then
+    If g_SilentMode Then
+        MainOpen = True
+    ElseIf CurrentUserID() > 0 And (IsDeveloper() Or IsActivated()) Then
         MainOpen = True
     Else
         DoCmd.OpenForm "frmLogin"
@@ -242,7 +257,7 @@ Public Sub RolePicked(ByVal frm As Access.Form)
         "ON p.PermissionKey = r.PermissionKey", dbFailOnError
     frm!subPermissions.Form.Requery
     frm!lblRoleInfo.Caption = Nz(DLookup("Description", "Roles", "RoleID = " & roleID), " ") & "   (" & _
-        DCount("*", "Employees", "RoleID = " & roleID & " AND IsActive = True") & " „” Œœ„)"
+        DCount("*", "Employees", "RoleID = " & roleID & " AND IsActive = True AND IsDeveloper = False") & " „” Œœ„)"
     locked = (roleID = ADMIN_ROLE_ID)
     frm!subPermissions.Form.AllowEdits = Not locked
     SafeFocus frm!cboRole
@@ -259,6 +274,7 @@ End Sub
 
 Public Function SaveRolePermissions(ByVal frm As Access.Form) As Boolean
     Dim rs As DAO.Recordset, keys As String, msg As String
+    If Not CanScreenAction(frm.Name, "EDIT") Then Exit Function      ' frmUserScreens
     If frm!subPermissions.Form.Dirty Then frm!subPermissions.Form.Dirty = False
     Set rs = CurrentDb.OpenRecordset("SELECT PermissionKey FROM tmpRolePermissions WHERE Granted = True", dbOpenSnapshot)
     Do Until rs.EOF
@@ -308,6 +324,174 @@ Public Function SaveRolePermissionSet(ByVal RoleID As Long, ByVal KeyList As Str
     Exit Function
 EH:
     SaveRolePermissionSet = " ⁄–— «·Õ›Ÿ: " & Err.Description
+    If inTrans Then ws.Rollback
+End Function
+
+'==============================================================================
+' Screens of a user (frmUserScreens + frmUserScreenLines on the local table tmpUserScreens)
+' A user with "’·«ÕÌ«  ‘«‘«  Œ«’…" (Employees.CustomScreens) opens only the screens of his
+' rows in UserScreens, with the add / edit / delete chosen there; any other user follows his role.
+'==============================================================================
+Public Sub UserScreensLoad(ByVal frm As Access.Form)
+    EnsureLocalTables
+    frm!cboUser.Value = Nz(DbValue("SELECT TOP 1 EmployeeID FROM Employees WHERE IsDeveloper = False AND RoleID <> " & _
+                                   ADMIN_ROLE_ID & " ORDER BY EmployeeName, EmployeeID"), frm!cboUser.ItemData(0))
+    UserScreensPicked frm
+End Sub
+
+Public Sub UserScreensPicked(ByVal frm As Access.Form)
+    Dim uid As Long, custom As Boolean
+    uid = Nz(frm!cboUser.Value, 0)
+    custom = UsesCustomScreens(uid)
+    FillUserScreens uid, Not custom
+    frm!chkCustom.Value = custom
+    ShowUserScreensState frm
+End Sub
+
+Public Sub UserScreensCustomChanged(ByVal frm As Access.Form)
+    ' switched on: the grid starts from what the user has now; switched off: back to the role
+    If Not Nz(frm!chkCustom.Value, False) Then FillUserScreens Nz(frm!cboUser.Value, 0), True
+    ShowUserScreensState frm
+End Sub
+
+Public Sub UserScreensFromRole(ByVal frm As Access.Form)
+    FillUserScreens Nz(frm!cboUser.Value, 0), True
+    ShowUserScreensState frm
+End Sub
+
+Public Sub UserScreensAll(ByVal frm As Access.Form, ByVal Granted As Boolean)
+    Dim g As String
+    g = IIf(Granted, "True", "False")
+    CurrentDb.Execute "UPDATE tmpUserScreens SET CanOpen = " & g & ", CanAdd = " & g & " AND HasAdd, CanEdit = " & g & _
+                      " AND HasEdit, CanDelete = " & g & " AND HasDelete", dbFailOnError
+    frm!subScreens.Form.Requery
+End Sub
+
+Public Sub UserScreenLineChanged(ByVal sf As Access.Form, ByVal FieldName As String)
+    ' An action the screen does not have stays off; an action opens the screen; closing the screen
+    ' removes its actions.
+    If FieldName = "CanOpen" Then
+        If Not Nz(sf!CanOpen.Value, False) Then
+            sf!CanAdd.Value = False
+            sf!CanEdit.Value = False
+            sf!CanDelete.Value = False
+        End If
+    ElseIf Nz(sf(FieldName).Value, False) Then
+        If Not Nz(sf("Has" & Mid$(FieldName, 4)).Value, False) Then
+            sf(FieldName).Value = False
+            ShowInfo "Â–« «·≈Ã—«¡ €Ì— „ÊÃÊœ ›Ì ‘«‘… ´" & sf!ScreenTitle.Value & "ª."
+        Else
+            sf!CanOpen.Value = True
+        End If
+    End If
+    sf.Dirty = False
+End Sub
+
+Public Sub FillUserScreens(ByVal EmployeeID As Long, ByVal FromRole As Boolean)
+    ' tmpUserScreens: every screen with what the user may do there - his own rows (UserScreens), or
+    ' what his role gives (the role permission of the screen, and every action of an opened screen).
+    Dim db As DAO.Database, roleID As Long
+    Set db = CurrentDb
+    roleID = Nz(DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & EmployeeID), 0)
+    db.Execute "DELETE FROM tmpUserScreens", dbFailOnError
+    db.Execute "INSERT INTO tmpUserScreens (ScreenName, ScreenTitle, ModuleName, SortOrder, HasAdd, HasEdit, " & _
+        "HasDelete, CanOpen, CanAdd, CanEdit, CanDelete) SELECT ScreenName, ScreenTitle, ModuleName, SortOrder, " & _
+        "HasAdd, HasEdit, HasDelete, False, False, False, False FROM Screens", dbFailOnError
+    If Not FromRole Then
+        db.Execute "UPDATE tmpUserScreens AS t INNER JOIN UserScreens AS u ON t.ScreenName = u.ScreenName " & _
+            "SET t.CanOpen = u.CanOpen, t.CanAdd = u.CanAdd AND t.HasAdd, t.CanEdit = u.CanEdit AND t.HasEdit, " & _
+            "t.CanDelete = u.CanDelete AND t.HasDelete WHERE u.EmployeeID = " & EmployeeID, dbFailOnError
+    Else
+        If roleID = ADMIN_ROLE_ID Then
+            db.Execute "UPDATE tmpUserScreens SET CanOpen = True", dbFailOnError
+        Else
+            db.Execute "UPDATE tmpUserScreens AS t INNER JOIN Screens AS s ON t.ScreenName = s.ScreenName " & _
+                "SET t.CanOpen = True WHERE s.PermissionKey Is Null OR s.PermissionKey IN " & _
+                "(SELECT PermissionKey FROM RolePermissions WHERE RoleID = " & roleID & ")", dbFailOnError
+        End If
+        db.Execute "UPDATE tmpUserScreens SET CanAdd = CanOpen AND HasAdd, CanEdit = CanOpen AND HasEdit, " & _
+                   "CanDelete = CanOpen AND HasDelete", dbFailOnError
+    End If
+    db.Execute "UPDATE tmpUserScreens SET ActionsNote = IIf(HasAdd Or HasEdit Or HasDelete, Mid(IIf(HasAdd, " & _
+        "'° ≈÷«›…', '') & IIf(HasEdit, '°  ⁄œÌ·', '') & IIf(HasDelete, '° Õ–›', ''), 3), '› Õ Ê⁄—÷ ›ﬁÿ')", dbFailOnError
+End Sub
+
+Private Sub ShowUserScreensState(ByVal frm As Access.Form)
+    Dim uid As Long, isAdmin As Boolean, custom As Boolean
+    uid = Nz(frm!cboUser.Value, 0)
+    isAdmin = (Nz(DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & uid), 0) = ADMIN_ROLE_ID)
+    custom = Nz(frm!chkCustom.Value, False) And Not isAdmin
+    SafeFocus frm!cboUser                         ' a button that has the focus cannot be disabled
+    frm!subScreens.Form.Requery
+    frm!subScreens.Form.AllowEdits = custom
+    frm!chkCustom.Enabled = Not isAdmin
+    frm!btnFromRole.Enabled = custom
+    frm!btnAll.Enabled = custom
+    frm!btnNone.Enabled = custom
+    frm!btnSaveScreens.Enabled = Not isAdmin
+    frm!lblUserInfo.Caption = "«·œÊ—: " & Nz(DbValue("SELECT r.RoleName FROM Employees AS e INNER JOIN Roles AS r " & _
+                              "ON e.RoleID = r.RoleID WHERE e.EmployeeID = " & uid), "-")
+    If isAdmin Then
+        frm!lblNote.Caption = "„œÌ— «·‰Ÿ«„ Ì› Õ ﬂ· «·‘«‘«  »ﬂ· «·’·«ÕÌ«  œ«∆„«."
+    ElseIf custom Then
+        frm!lblNote.Caption = "Õœœ «·‘«‘«  Ê«·≈Ã—«¡«  À„ «÷€ÿ ´Õ›Ÿª. «·’·«ÕÌ«  «·Œ«’… ( ﬁ«—Ì— «·√—»«Õ°  ⁄œÌ· «·”⁄—° " & _
+                              "«·Œ’„...)  »ﬁÏ „‰ œÊ— «·„” Œœ„ ›Ì ‘«‘… «·√œÊ«—."
+    Else
+        frm!lblNote.Caption = "«·„” Œœ„ Ì »⁄ ’·«ÕÌ«  œÊ—Â ﬂ„« ›Ì «·ﬁ«∆„…. ›⁄¯· ´’·«ÕÌ«  ‘«‘«  Œ«’…ª · ÕœÌœ ‘«‘« Â ÊÕœÂ."
+    End If
+End Sub
+
+Public Function SaveUserScreens(ByVal frm As Access.Form) As Boolean
+    Dim msg As String
+    If Not CanScreenAction(frm.Name, "EDIT") Then Exit Function      ' frmUserScreens
+    If frm!subScreens.Form.Dirty Then frm!subScreens.Form.Dirty = False
+    msg = SaveUserScreensFor(Nz(frm!cboUser.Value, 0), Nz(frm!chkCustom.Value, False))
+    If Len(msg) > 0 Then
+        ShowWarning msg
+        Exit Function
+    End If
+    ShowUserScreensState frm
+    ShowInfo " „ Õ›Ÿ ’·«ÕÌ«  «·‘«‘« .  ”—Ì „‰ «·œŒÊ· «· «·Ì ··„” Œœ„."
+    SaveUserScreens = True
+End Function
+
+Public Function SaveUserScreensFor(ByVal EmployeeID As Long, ByVal Custom As Boolean) As String
+    ' Saves the grid (tmpUserScreens) for the user; Custom = False: back to the screens of his role.
+    Dim ws As DAO.Workspace, db As DAO.Database, inTrans As Boolean, roleID As Variant
+    On Error GoTo EH
+    If Not HasPermission("USERS") Then
+        SaveUserScreensFor = "·«  „·ﬂ ’·«ÕÌ… ≈œ«—… «·„” Œœ„Ì‰."
+        Exit Function
+    End If
+    roleID = DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & EmployeeID & " AND IsDeveloper = False")
+    If IsNull(roleID) Then
+        SaveUserScreensFor = "«Œ — «·„” Œœ„."
+    ElseIf roleID = ADMIN_ROLE_ID Then
+        SaveUserScreensFor = "„œÌ— «·‰Ÿ«„ Ì› Õ ﬂ· «·‘«‘«  »ﬂ· «·’·«ÕÌ«  œ«∆„«."
+    ElseIf EmployeeID = CurrentUserID() Then
+        SaveUserScreensFor = "·« Ì„ﬂ‰ﬂ  €ÌÌ— ’·«ÕÌ« ﬂ »‰›”ﬂ."
+    ElseIf Custom And Nz(DbValue("SELECT COUNT(*) FROM tmpUserScreens WHERE CanOpen = True"), 0) = 0 Then
+        SaveUserScreensFor = "«Œ — ‘«‘… Ê«Õœ… ⁄·Ï «·√ﬁ·° √Ê √·€ˆ ´’·«ÕÌ«  ‘«‘«  Œ«’…ª."
+    End If
+    If Len(SaveUserScreensFor) > 0 Then Exit Function
+    Set db = CurrentDb
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    db.Execute "DELETE FROM UserScreens WHERE EmployeeID = " & EmployeeID, dbFailOnError
+    If Custom Then
+        db.Execute "INSERT INTO UserScreens (EmployeeID, ScreenName, CanOpen, CanAdd, CanEdit, CanDelete) SELECT " & _
+            EmployeeID & ", ScreenName, CanOpen, CanOpen AND CanAdd AND HasAdd, CanOpen AND CanEdit AND HasEdit, " & _
+            "CanOpen AND CanDelete AND HasDelete FROM tmpUserScreens", dbFailOnError
+    End If
+    db.Execute "UPDATE Employees SET CustomScreens = " & IIf(Custom, "True", "False") & " WHERE EmployeeID = " & _
+               EmployeeID, dbFailOnError
+    ws.CommitTrans
+    inTrans = False
+    LogAction "USER_SCREENS", "Employees", CStr(EmployeeID), IIf(Custom, "custom", "role")
+    Exit Function
+EH:
+    SaveUserScreensFor = " ⁄–— «·Õ›Ÿ: " & Err.Description
     If inTrans Then ws.Rollback
 End Function
 

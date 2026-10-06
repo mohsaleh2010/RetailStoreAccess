@@ -86,6 +86,7 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmSettings": ScreenPermission = "SETTINGS"
         Case "frmUsers": ScreenPermission = "USERS"
         Case "frmRoles": ScreenPermission = "USERS"
+        Case "frmUserScreens": ScreenPermission = "USERS"
         Case "frmBackup": ScreenPermission = "BACKUP"
         Case "frmBarcodeLabels": ScreenPermission = "PRODUCTS"
         Case "frmLabelSettings": ScreenPermission = "PRODUCTS"

@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -166,6 +166,8 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
 
     CreateAllTables
     SeedAll
+    m_currentStep = "developer user"
+    EnsureDeveloperUser
 
     m_db.Close
     Set m_db = Nothing
@@ -559,6 +561,36 @@ Private Sub GrantNewPermission(ByVal PermissionKey As String, ByVal RoleIDs As S
                          ", '" & PermissionKey & "')", dbFailOnError
         End If
     Next
+End Sub
+
+Private Sub EnsureDeveloperUser()
+    ' The programmer: above the administrator, every permission, hidden from the users screen.
+    ' Created only with the password typed now: there is never a programmer account without one.
+    ' (PasswordHash / NewSalt of modSecurity through Application.Run: no compile-time dependency.)
+    Dim pwd As String, salt As String
+    If DCountIn("Employees", "[IsDeveloper] = True") > 0 Then Exit Sub
+    If DCountIn("Employees", "[Username] = 'developer'") > 0 Then
+        LogLine "تنبيه: يوجد مستخدم باسم developer وليس هو المبرمج؛ لم يُنشأ حساب المبرمج."
+        Exit Sub
+    End If
+    Do
+        pwd = InputBox("إنشاء حساب المبرمج (اسم المستخدم: developer)." & vbCrLf & vbCrLf & _
+                       "اكتب كلمة مرور له (6 أحرف على الأقل) واحتفظ بها. لا تعطها لأحد." & vbCrLf & vbCrLf & _
+                       "إلغاء = لا يُنشأ الآن، ويُطلب في التشغيل التالي لـ BuildSchema.", "حساب المبرمج")
+        If Len(pwd) = 0 Then
+            LogLine "لم يُنشأ حساب المبرمج: لم تُكتب كلمة مرور."
+            Exit Sub
+        End If
+        If Len(pwd) >= 6 And pwd = Trim$(pwd) And pwd <> "developer" Then Exit Do
+        MsgBox "كلمة المرور 6 أحرف على الأقل، بدون مسافة في أولها أو آخرها، ولا تساوي اسم المستخدم.", _
+               vbExclamation + MSG_RTL, "حساب المبرمج"
+    Loop
+    salt = Application.Run("NewSalt")
+    m_db.Execute "INSERT INTO [Employees] ([EmployeeName], [JobTitle], [Username], [RoleID], [MaxDiscountPercent], " & _
+                 "[MustChangePassword], [IsActive], [IsDeveloper], [PasswordSalt], [PasswordHash]) VALUES " & _
+                 "('المبرمج', 'المبرمج', 'developer', 1, 1, False, True, True, '" & salt & "', '" & _
+                 Application.Run("PasswordHash", pwd, salt) & "')", dbFailOnError
+    LogLine "تم إنشاء حساب المبرمج: developer"
 End Sub
 
 Private Function DCountIn(ByVal TableName As String, ByVal Where As String) As Long

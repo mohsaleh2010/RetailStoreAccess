@@ -9,7 +9,13 @@ Attribute VB_Name = "modSecurity"
 '                              locks the account for LOCK_MINUTES after MAX_FAILED.
 '   SetUserPassword            stores a new salt + hash (never the password itself).
 '   ChangeOwnPassword          for the logged-in user.
-'   CanOpenScreen              screen-level permission (map in modAppData).
+'   CanOpenScreen              may the user open a screen: the programmer always; a user with his
+'                              own screen permissions (frmUserScreens): table UserScreens;
+'                              otherwise the role permission of the screen (map in modAppData).
+'   CanScreenAction            add / edit / delete in a screen (only limited for a user with his
+'                              own screen permissions).
+'   IsDeveloper                the programmer: above the administrator, never limited, hidden
+'                              from the users screen, decides if the administrator may rename the shop.
 '   ValidateEmployee           rules of the users screen (called by modForms).
 ' The logged-in user is TempVars("UserID"); 0 / missing = nobody.
 '==============================================================================
@@ -331,11 +337,43 @@ Public Function IsAdministrator() As Boolean
                                   " AND IsActive = True"), 0) = ADMIN_ROLE_ID)
 End Function
 
+Public Function IsDeveloper() As Boolean
+    IsDeveloper = Nz(DbValue("SELECT IsDeveloper FROM Employees WHERE EmployeeID = " & CurrentUserID() & _
+                             " AND IsActive = True"), False)
+End Function
+
 '==============================================================================
 ' Screen permissions
 '==============================================================================
+Public Function UsesCustomScreens(Optional ByVal EmployeeID As Long = -1) As Boolean
+    ' A user whose screens are set one by one in frmUserScreens (never an administrator or the programmer).
+    If EmployeeID = -1 Then EmployeeID = CurrentUserID()
+    UsesCustomScreens = Nz(DbValue("SELECT CustomScreens FROM Employees WHERE EmployeeID = " & EmployeeID & _
+        " AND IsActive = True AND IsDeveloper = False AND RoleID <> " & ADMIN_ROLE_ID), False)
+End Function
+
+Private Function ScreenTitle(ByVal FormName As String) As Variant
+    ScreenTitle = DbValue("SELECT ScreenTitle FROM Screens WHERE ScreenName = " & SqlText(FormName))
+End Function
+
 Public Function CanOpenScreen(ByVal FormName As String, Optional ByVal Quiet As Boolean = False) As Boolean
-    Dim key As String
+    Dim key As String, title As Variant
+    If FormName = "frmActivation" Then                  ' the activation of this computer: administrators
+        CanOpenScreen = IsAdministrator()
+        If Not CanOpenScreen And Not Quiet Then ShowWarning "تفعيل البرنامج لمدير النظام فقط."
+        Exit Function
+    End If
+    If IsDeveloper() Then
+        CanOpenScreen = True
+        Exit Function
+    End If
+    title = ScreenTitle(FormName)
+    If Not IsNull(title) And UsesCustomScreens() Then
+        CanOpenScreen = Nz(DbValue("SELECT CanOpen FROM UserScreens WHERE EmployeeID = " & CurrentUserID() & _
+                                   " AND ScreenName = " & SqlText(FormName)), False)
+        If Not CanOpenScreen And Not Quiet Then ShowWarning "لا تملك صلاحية فتح شاشة «" & title & "». راجع مدير النظام."
+        Exit Function
+    End If
     key = ScreenPermission(FormName)
     If Len(key) = 0 Then
         CanOpenScreen = True
@@ -345,6 +383,33 @@ Public Function CanOpenScreen(ByVal FormName As String, Optional ByVal Quiet As 
         ShowWarning "لا تملك صلاحية «" & Nz(DLookup("PermissionName", "Permissions", "PermissionKey = " & _
                     SqlText(key)), key) & "». راجع مدير النظام."
     End If
+End Function
+
+Public Function CanScreenAction(ByVal FormName As String, ByVal Action As String, _
+                                Optional ByVal Quiet As Boolean = False) As Boolean
+    ' Action: "ADD" (a new record, or saving a new document), "EDIT" or "DELETE".
+    ' Only a user with his own screen permissions is limited, and only in a screen that has the action.
+    Dim word As String, verb As String, title As Variant
+    CanScreenAction = True
+    If Not UsesCustomScreens() Then Exit Function
+    Select Case UCase$(Action)
+        Case "ADD": word = "Add": verb = "الإضافة والحفظ"
+        Case "EDIT": word = "Edit": verb = "التعديل"
+        Case "DELETE": word = "Delete": verb = "الحذف"
+        Case Else: Exit Function
+    End Select
+    title = ScreenTitle(FormName)
+    If IsNull(title) Then Exit Function
+    If Not Nz(DbValue("SELECT Has" & word & " FROM Screens WHERE ScreenName = " & SqlText(FormName)), False) Then Exit Function
+    CanScreenAction = Nz(DbValue("SELECT CanOpen AND Can" & word & " FROM UserScreens WHERE EmployeeID = " & _
+                                 CurrentUserID() & " AND ScreenName = " & SqlText(FormName)), False)
+    If Not CanScreenAction And Not Quiet Then ShowWarning "لا تملك صلاحية " & verb & " في شاشة «" & title & "». راجع مدير النظام."
+End Function
+
+Public Function CanChangeStoreName() As Boolean
+    ' The shop name (invoices, QR code): the programmer, or an administrator when the programmer allows it.
+    CanChangeStoreName = IsDeveloper()
+    If Not CanChangeStoreName And IsAdministrator() Then CanChangeStoreName = Nz(SettingValue("AllowAdminCompanyName"), False)
 End Function
 
 '==============================================================================
@@ -374,8 +439,8 @@ Public Function ValidateEmployee(ByVal frm As Access.Form) As Boolean
         wasAdmin = (Nz(frm!RoleID.OldValue, 0) = ADMIN_ROLE_ID And Nz(frm!IsActive.OldValue, False))
         staysAdmin = (frm!RoleID.Value = ADMIN_ROLE_ID And frm!IsActive.Value)
         If wasAdmin And Not staysAdmin Then
-            If Nz(DCount("*", "Employees", "RoleID = " & ADMIN_ROLE_ID & " AND IsActive = True AND EmployeeID <> " & _
-                         id), 0) = 0 Then
+            If Nz(DCount("*", "Employees", "RoleID = " & ADMIN_ROLE_ID & " AND IsActive = True AND IsDeveloper = False " & _
+                         "AND EmployeeID <> " & id), 0) = 0 Then
                 ShowWarning "يجب أن يبقى مدير نظام نشط واحد على الأقل."
                 Exit Function
             End If

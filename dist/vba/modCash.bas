@@ -507,6 +507,7 @@ End Function
 
 Public Function SaveCashVoucher(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
     Dim msg As String, newID As Long, kind As String
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     kind = Nz(frm!cboVoucherType.Value, "")
     msg = PostCashVoucher(kind, Nz(frm!cboBox.Value, 0), frm!cboToBox.Value, Nz(frm!cboCategory.Value, ""), _
                           Nz(frm!txtAmount.Value, 0), Nz(frm!txtParty.Value, ""), Nz(frm!txtDescription.Value, ""), _
@@ -639,6 +640,7 @@ End Sub
 
 Public Function SaveCashClosing(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
     Dim msg As String, newID As Long
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If IsNull(frm!txtCounted.Value) Then
         ShowWarning "√œŒ· «·‰ﬁœÌ… «·›⁄·Ì… «·„ÊÃÊœ… ›Ì «·’‰œÊﬁ."
         SafeFocus frm!txtCounted

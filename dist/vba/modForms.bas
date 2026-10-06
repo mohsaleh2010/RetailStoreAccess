@@ -12,6 +12,7 @@ Option Compare Database
 Option Explicit
 
 Private Const ERR_RELATED_RECORDS As Long = 3200
+Private m_editable As Object        ' form name -> "|ctl|ctl|": bound controls the user normally types in
 
 '------------------------------------------------------------------------------
 ' Form events
@@ -19,6 +20,14 @@ Private Const ERR_RELATED_RECORDS As Long = 3200
 Public Sub FormLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     If TagValue(frm, "TABLE") = "LabelSettings" Then LabelSettingsLoad frm      ' printer list (modLabels)
+    If TagValue(frm, "TABLE") = "Employees" And Not IsDeveloper() Then
+        frm.RecordSource = "SELECT * FROM Employees WHERE IsDeveloper = False"  ' the programmer stays hidden
+    End If
+    If TagValue(frm, "TABLE") = "Settings" Then SettingsScreenLoad frm
+    If Not CanScreenAction(frm.Name, "ADD", True) Then
+        frm.AllowAdditions = False
+        If ControlExists(frm, "btnNew") Then SetEnabled frm!btnNew, False
+    End If
     If TagValue(frm, "KIND") = "LIST" Then RefreshList frm
     If Not IsNull(frm.OpenArgs) Then
         GoToRecord frm, frm.OpenArgs
@@ -74,7 +83,10 @@ Public Sub FormCurrent(ByVal frm As Access.Form)
     Else
         SetStatus frm, "", CLR_MUTED
     End If
-    If ControlExists(frm, "btnDelete") Then SetEnabled frm!btnDelete, Not frm.NewRecord
+    If ControlExists(frm, "btnDelete") Then
+        SetEnabled frm!btnDelete, Not frm.NewRecord And CanScreenAction(frm.Name, "DELETE", True)
+    End If
+    LockForActions frm
 
     Select Case TagValue(frm, "TABLE")
         Case "Products": UpdatePriceInfo frm
@@ -84,6 +96,7 @@ Public Sub FormCurrent(ByVal frm As Access.Form)
 End Sub
 
 Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
+    If Not CanScreenAction(frm.Name, IIf(frm.NewRecord, "ADD", "EDIT")) Then Exit Function
     If Not CheckRequired(frm) Then Exit Function
     Select Case TagValue(frm, "TABLE")
         Case "Products"
@@ -211,6 +224,7 @@ Private Sub DeleteRecord(ByVal frm As Access.Form)
         frm.Undo
         Exit Sub
     End If
+    If Not CanScreenAction(frm.Name, "DELETE") Then Exit Sub
     table = TagValue(frm, "TABLE")
     pk = TagValue(frm, "PK")
     id = frm(pk).Value
@@ -276,6 +290,9 @@ Public Sub RefreshList(ByVal frm As Access.Form)
         Next
     End If
 
+    If TagValue(frm, "TABLE") = "Employees" And Not IsDeveloper() Then
+        searchCond = "t.IsDeveloper = False AND (" & searchCond & ")"        ' the programmer stays hidden
+    End If
     sql = Replace(TagValue(frm, "LIST"), "{ACTIVE}", activeCond)
     sql = Replace(sql, "{SEARCH}", searchCond)
     frm!lstItems.RowSource = sql
@@ -444,7 +461,29 @@ Private Function ValidateExpense(ByVal frm As Access.Form) As Boolean
     ValidateExpense = True
 End Function
 
+Public Sub SettingsScreenLoad(ByVal frm As Access.Form)
+    ' The shop name: the programmer, or an administrator when the programmer allows it.
+    ' The permission itself (AllowAdminCompanyName) is shown to the programmer only.
+    Dim allowed As Boolean
+    allowed = CanChangeStoreName()
+    frm!StoreName.Locked = Not allowed
+    frm!StoreNameEn.Locked = Not allowed
+    If ControlExists(frm, "lblStoreNameNote") Then
+        frm!lblStoreNameNote.Caption = IIf(allowed, " ", " €ÌÌ— «”„ «·„Õ· Ì „ ⁄‰ ÿ—Ìﬁ «·„»—„Ã.")
+    End If
+    frm!AllowAdminCompanyName.Visible = IsDeveloper()
+End Sub
+
 Private Function ValidateSettings(ByVal frm As Access.Form) As Boolean
+    If Not CanChangeStoreName() And (Nz(frm!StoreName.Value, "") <> Nz(frm!StoreName.OldValue, "") Or _
+                                     Nz(frm!StoreNameEn.Value, "") <> Nz(frm!StoreNameEn.OldValue, "")) Then
+        ShowWarning " €ÌÌ— «”„ «·„Õ· Ì „ ⁄‰ ÿ—Ìﬁ «·„»—„Ã."
+        Exit Function
+    End If
+    If Not IsDeveloper() And Nz(frm!AllowAdminCompanyName.Value, False) <> Nz(frm!AllowAdminCompanyName.OldValue, False) Then
+        ShowWarning "Â–« «·ŒÌ«— ··„»—„Ã ›ﬁÿ."
+        Exit Function
+    End If
     If Len(Nz(frm!VATNumber.Value, "")) = 0 Then
         If Not AskYesNo("·„ ÌıœŒ· «·—ﬁ„ «·÷—Ì»Ì° Ê·‰  ﬂÊ‰ «·›Ê« Ì— ›Ê« Ì— ÷—Ì»Ì… ‰Ÿ«„Ì…." & vbCrLf & _
                         "Â·  —Ìœ «·Õ›Ÿ ⁄·Ï √Ì Õ«·ø") Then
@@ -585,6 +624,27 @@ Private Function FieldIsRequired(ByVal frm As Access.Form, ByVal FieldName As St
     If (fld.Attributes And dbAutoIncrField) <> 0 Then Exit Function
     FieldIsRequired = fld.Required
 End Function
+
+Private Sub LockForActions(ByVal frm As Access.Form)
+    ' A user with his own screen permissions and no "edit" in this screen sees the saved records
+    ' read-only; a new record (when he may add) stays open for typing.
+    Dim ctl As Access.Control, names As String, part As Variant, readOnly As Boolean
+    If Not UsesCustomScreens() Then Exit Sub
+    If m_editable Is Nothing Then Set m_editable = CreateObject("Scripting.Dictionary")
+    If Not m_editable.Exists(frm.Name) Then
+        names = "|"
+        For Each ctl In frm.Controls
+            If Len(BoundField(ctl)) > 0 Then
+                If Not ctl.Locked Then names = names & ctl.Name & "|"
+            End If
+        Next
+        m_editable(frm.Name) = names
+    End If
+    readOnly = Not frm.NewRecord And Not CanScreenAction(frm.Name, "EDIT", True)
+    For Each part In Split(m_editable(frm.Name), "|")
+        If Len(part) > 0 Then frm.Controls(CStr(part)).Locked = readOnly
+    Next
+End Sub
 
 Private Function BoundField(ByVal ctl As Access.Control) As String
     ' Name of the table field bound to the control, "" for unbound/calculated controls.

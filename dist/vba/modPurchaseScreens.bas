@@ -240,6 +240,7 @@ End Sub
 
 Public Function SavePurchase(ByVal frm As Access.Form) As Boolean
     Dim msg As String, newID As Long, invNo As String, paidNow As Variant
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If frm!subLines.Form.Dirty Then frm!subLines.Form.Dirty = False
     If IsNull(frm!cboSupplier.Value) Then
         ShowWarning "«Œ — «·„Ê—œ."
@@ -407,6 +408,7 @@ End Sub
 
 Public Function SavePurchaseReturn(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
     Dim msg As String, newID As Long
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If IsNull(frm!txtInvoiceID.Value) Then
         ShowWarning "«Œ — ›« Ê—… «·‘—«¡ √Ê·«."
         Exit Function
@@ -446,6 +448,7 @@ End Sub
 
 Public Function SaveSupplierPayment(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
     Dim msg As String, newID As Long
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If IsNull(frm!cboSupplier.Value) Then
         ShowWarning "«Œ — «·„Ê—œ."
         Exit Function
@@ -578,6 +581,7 @@ End Sub
 
 Public Function PostInventoryMove(ByVal frm As Access.Form) As Boolean
     Dim msg As String, refNo As String
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If IsNull(frm!lstProducts.Value) Then
         ShowWarning "«Œ — «·„‰ Ã „‰ «·ﬁ«∆„… √Ê·«."
         Exit Function
@@ -664,6 +668,7 @@ End Sub
 
 Public Function NewStockCount(ByVal frm As Access.Form) As Boolean
     Dim msg As String, newID As Long
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If Not AskYesNo("»œ¡ Ã—œ ÃœÌœ " & IIf(IsNull(frm!cboCategory.Value), "·ﬂ· «·„‰ Ã«  «·‰‘ÿ…", _
                     "· ’‰Ì› ´" & frm!cboCategory.Column(1) & "ª") & "ø" & vbCrLf & _
                     "Ìı›÷Û¯· «·Ã—œ Ê«·„Õ· „€·ﬁ √Ê »⁄œ ¬Œ— ›« Ê—…° À„ «· —ÕÌ· „»«‘—….") Then Exit Function
@@ -772,6 +777,7 @@ End Sub
 
 Public Function PostCountScreen(ByVal frm As Access.Form) As Boolean
     Dim msg As String, id As Long, uncounted As Long, lines As Long, value As Currency
+    If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     id = Nz(frm!cboCount.Value, 0)
     If frm!subCountLines.Form.Dirty Then frm!subCountLines.Form.Dirty = False
     uncounted = Nz(DbValue("SELECT COUNT(*) FROM StockCountDetails WHERE StockCountID = " & id & _

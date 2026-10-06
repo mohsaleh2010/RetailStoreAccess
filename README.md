@@ -24,6 +24,7 @@
 | + | نقطة بيع الكافيهات (شاشة لمس) | ✅ بانتظار الموافقة | [docs/16-Cafe-POS.md](docs/16-Cafe-POS.md) |
 | + | الخزينة والصناديق وتصفية الكاشير وتقارير المصروفات | ✅ بانتظار الموافقة | [docs/17-Treasury.md](docs/17-Treasury.md) |
 | + | قيود اليومية ودليل الحسابات وميزان المراجعة | ✅ بانتظار الموافقة | [docs/18-Journal.md](docs/18-Journal.md) |
+| + | صلاحيات الشاشات لكل مستخدم، وحساب المبرمج، وتفعيل البرنامج على جهاز محدد | ✅ بانتظار الموافقة | [docs/19-Permissions-Activation.md](docs/19-Permissions-Activation.md) |
 
 ## هيكل المستودع
 
@@ -90,6 +91,7 @@
 | 13 | `modTouchPOS` (دائمة) | `BuildSchema` (يضيف الحقول الناقصة), `BuildQueries`, `BuildForms`, `BuildReports` | `TestTouchPOS` |
 | 14 | `modCash` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestCash` |
 | 15 | `modJournal` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal` |
+| 16 | `modActivation` (دائمة) | `BuildSchema` (يطلب كلمة مرور المبرمج), `BuildRelations`, `BuildForms` | `TestSecurity` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

@@ -252,6 +252,7 @@ TABLES: List[Table] = [
             text("InvoicePrintMode", 10, "الطباعة عند حفظ الفاتورة", required=True, default='"PREVIEW"',
                  rule='In ("DIRECT","PREVIEW","NONE")', rule_text="اختر طريقة الطباعة من القائمة",
                  note="DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة"),
+            bool_("AllowAdminCompanyName", "السماح لمدير النظام بتغيير اسم المحل", "False"),
         ],
         pk=["SettingID"],
         seed_columns=["SettingID", "StoreName", "CountryCode", "VATRate", "PricesIncludeVAT",
@@ -392,12 +393,65 @@ TABLES: List[Table] = [
             created_at(),
             long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
                   note="تدخل فيه نقدية مبيعاته وسنداته؛ فارغ = أول صندوق كاشير نشط"),
+            bool_("IsDeveloper", "المبرمج", "False"),
+            bool_("CustomScreens", "صلاحيات شاشات خاصة", "False"),
         ],
         pk=["EmployeeID"],
         indexes=[ux("Username")],
         seed_columns=["EmployeeID", "EmployeeName", "JobTitle", "Username", "RoleID",
                       "MaxDiscountPercent", "MustChangePassword", "IsActive"],
         seed_rows=[(1, "مدير النظام", "مدير النظام", "admin", 1, 1, True, True)],
+    ),
+
+    Table(
+        "Screens", "الشاشات",
+        "كل شاشة في البرنامج، وما ينطبق عليها من إضافة وتعديل وحذف، وصلاحية الدور التي تفتحها.",
+        [
+            text("ScreenName", 64, "اسم الشاشة في Access", required=True),
+            text("ScreenTitle", 100, "الشاشة", required=True),
+            text("ModuleName", 50, "القسم"),
+            int_("SortOrder", "الترتيب", required=True, default="0"),
+            text("PermissionKey", 50, "صلاحية الدور",
+                 note="فارغ = متاحة لكل المستخدمين؛ تُستخدم للمستخدم الذي ليست له صلاحيات شاشات خاصة"),
+            bool_("HasAdd", "فيها إضافة / حفظ مستند", "False"),
+            bool_("HasEdit", "فيها تعديل", "False"),
+            bool_("HasDelete", "فيها حذف", "False"),
+        ],
+        pk=["ScreenName"],
+        seed_columns=["ScreenName", "ScreenTitle", "ModuleName", "SortOrder", "PermissionKey",
+                      "HasAdd", "HasEdit", "HasDelete"],
+        seed_rows=[],   # filled below from SCREEN_LIST
+        seed_missing=True,
+    ),
+
+    Table(
+        "UserScreens", "صلاحيات الشاشات للمستخدم",
+        "للمستخدم الذي فُعّلت له «صلاحيات شاشات خاصة»: الشاشات التي يفتحها، والإضافة والتعديل والحذف في كل شاشة.",
+        [
+            long_("EmployeeID", "المستخدم", required=True, fk="Employees.EmployeeID"),
+            text("ScreenName", 64, "الشاشة", required=True),
+            bool_("CanOpen", "فتح", "False"),
+            bool_("CanAdd", "إضافة", "False"),
+            bool_("CanEdit", "تعديل", "False"),
+            bool_("CanDelete", "حذف", "False"),
+        ],
+        pk=["EmployeeID", "ScreenName"],
+    ),
+
+    Table(
+        "Activations", "تفعيل البرنامج",
+        "الأجهزة المفعّل عليها البرنامج: رقم الجهاز وكود التفعيل الصادر من المبرمج.",
+        [
+            auto("ActivationID", "رقم التفعيل"),
+            text("MachineID", 24, "رقم الجهاز", required=True,
+                 note="بصمة لوحة الأم والمعالج وقرص النظام (modActivation.MachineID)"),
+            text("ActivationCode", 30, "كود التفعيل", required=True),
+            text("ComputerName", 64, "اسم الجهاز"),
+            datetime_("ActivatedAt", "تاريخ التفعيل", default="Now()"),
+            long_("EmployeeID", "فعّله", fk="Employees.EmployeeID"),
+        ],
+        pk=["ActivationID"],
+        indexes=[ux("MachineID")],
     ),
 
     # ----------------------------------------------------------- Master data
@@ -1230,6 +1284,48 @@ def _role_permissions():
     return rows
 
 
+# --------------------------------------------------------------------------
+# Screens of the permissions screen: (form, title, section, role permission, add, edit, delete)
+# add = a new record or saving a new document; documents are never edited or deleted after saving.
+# --------------------------------------------------------------------------
+SCREEN_LIST = [
+    ("frmPOS", "نقطة البيع (المحلات)", "المبيعات", "SALES_POS", True, False, False),
+    ("frmTouchPOS", "نقطة البيع (المطاعم)", "المبيعات", "SALES_POS", True, False, False),
+    ("frmCafePOS", "نقطة البيع (الكافيهات)", "المبيعات", "SALES_POS", True, False, False),
+    ("frmSalesInvoice", "عرض الفواتير وإعادة طباعتها", "المبيعات", "SALES_VIEW", False, False, False),
+    ("frmSalesReturn", "مرتجعات المبيعات", "المبيعات", "SALES_RETURN", True, False, False),
+    ("frmCustomers", "العملاء", "العملاء", "CUSTOMERS", True, True, True),
+    ("frmCustomerPayment", "سندات القبض من العملاء", "العملاء", "CUSTOMER_PAYMENTS", True, False, False),
+    ("frmPurchaseInvoice", "فواتير المشتريات", "المشتريات", "PURCHASES", True, False, False),
+    ("frmPurchaseView", "عرض فواتير المشتريات", "المشتريات", "PURCHASES", False, False, False),
+    ("frmPurchaseReturn", "مرتجعات المشتريات", "المشتريات", "PURCHASE_RETURN", True, False, False),
+    ("frmSuppliers", "الموردون", "الموردون", "SUPPLIERS", True, True, True),
+    ("frmSupplierPayment", "سندات الصرف للموردين", "الموردون", "SUPPLIER_PAYMENTS", True, False, False),
+    ("frmProducts", "المنتجات والأسعار", "المخزون", "PRODUCTS", True, True, True),
+    ("frmCategories", "التصنيفات", "المخزون", "PRODUCTS", True, True, True),
+    ("frmUnits", "الوحدات", "المخزون", "PRODUCTS", True, True, True),
+    ("frmInventory", "المخزون والحركات اليدوية", "المخزون", "PRODUCTS", True, False, False),
+    ("frmStockCount", "الجرد", "المخزون", "STOCK_COUNT", True, False, False),
+    ("frmBarcodeLabels", "ملصقات الباركود", "المخزون", "PRODUCTS", False, False, False),
+    ("frmLabelSettings", "إعدادات الملصقات", "المخزون", "PRODUCTS", False, True, False),
+    ("frmExpenses", "المصروفات", "المصروفات", "EXPENSES", True, True, True),
+    ("frmExpenseTypes", "أنواع المصروفات", "المصروفات", "EXPENSES", True, True, True),
+    ("frmTreasury", "الخزينة", "الخزينة", "CASH_CLOSING", False, False, False),
+    ("frmCashVoucher", "سندات النقدية والتحويل", "الخزينة", "CASH_BOX", True, False, False),
+    ("frmCashClosing", "تصفية يومية الكاشير", "الخزينة", "CASH_CLOSING", True, False, False),
+    ("frmCashBoxes", "الصناديق", "الخزينة", "CASH_BOX", True, True, True),
+    ("frmJournal", "قيود اليومية", "الحسابات", "JOURNAL", False, False, False),
+    ("frmAccounts", "دليل الحسابات", "الحسابات", "JOURNAL", True, True, True),
+    ("frmReportCenter", "التقارير", "التقارير", "REPORTS", False, False, False),
+    ("frmSearch", "البحث", "النظام", None, False, False, False),
+    ("frmSettings", "إعدادات المحل", "النظام", "SETTINGS", False, True, False),
+    ("frmUsers", "المستخدمون", "النظام", "USERS", True, True, False),
+    ("frmRoles", "الأدوار والصلاحيات", "النظام", "USERS", False, True, False),
+    ("frmUserScreens", "صلاحيات الشاشات للمستخدمين", "النظام", "USERS", False, True, False),
+    ("frmBackup", "النسخ الاحتياطي", "النظام", "BACKUP", False, False, False),
+]
+
+
 def table(name: str) -> Table:
     for t in TABLES:
         if t.name == name:
@@ -1238,6 +1334,10 @@ def table(name: str) -> Table:
 
 
 table("RolePermissions").seed_rows = _role_permissions()
+table("Screens").seed_rows = [(name, title, module, 10 * (i + 1), key, add, edit, delete)
+                              for i, (name, title, module, key, add, edit, delete) in enumerate(SCREEN_LIST)]
+# ScreenName in UserScreens points to Screens (text key)
+table("UserScreens").fields[1].fk = "Screens.ScreenName"
 # PermissionKey in RolePermissions points to Permissions (text key)
 table("RolePermissions").fields[1].fk = "Permissions.PermissionKey"
 table("RolePermissions").fields[1].on_delete_cascade = True

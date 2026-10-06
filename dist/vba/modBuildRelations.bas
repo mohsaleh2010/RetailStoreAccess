@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 70
+Private Const EXPECTED_RELATION_COUNT As Long = 73
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -382,6 +382,9 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_RolePermissions_PermissionKey", "Permissions", "PermissionKey", "RolePermissions", "PermissionKey", 4352&)
     c.Add Array("FK_Employees_RoleID", "Roles", "RoleID", "Employees", "RoleID", 0&)
     c.Add Array("FK_Employees_CashBoxID", "CashBoxes", "CashBoxID", "Employees", "CashBoxID", 0&)
+    c.Add Array("FK_UserScreens_EmployeeID", "Employees", "EmployeeID", "UserScreens", "EmployeeID", 0&)
+    c.Add Array("FK_UserScreens_ScreenName", "Screens", "ScreenName", "UserScreens", "ScreenName", 256&)
+    c.Add Array("FK_Activations_EmployeeID", "Employees", "EmployeeID", "Activations", "EmployeeID", 0&)
     c.Add Array("FK_Products_CategoryID", "Categories", "CategoryID", "Products", "CategoryID", 0&)
     c.Add Array("FK_Products_UnitID", "Units", "UnitID", "Products", "UnitID", 0&)
     c.Add Array("FK_Products_SupplierID", "Suppliers", "SupplierID", "Products", "SupplierID", 0&)
