@@ -233,8 +233,9 @@ Public Function LabelSetting(ByVal FieldName As String) As Variant
 End Function
 
 Private Function LabelTableExists(ByVal TableName As String) As Boolean
-    Dim tdf As DAO.TableDef
-    For Each tdf In CurrentDb.TableDefs
+    Dim db As DAO.Database, tdf As DAO.TableDef
+    Set db = CurrentDb
+    For Each tdf In db.TableDefs
         If StrComp(tdf.Name, TableName, vbTextCompare) = 0 And Len(tdf.Connect) = 0 Then
             LabelTableExists = True
             Exit Function

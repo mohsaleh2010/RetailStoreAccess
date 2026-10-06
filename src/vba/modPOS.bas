@@ -61,8 +61,11 @@ Public Function HasControl(ByVal frm As Access.Form, ByVal ControlName As String
 End Function
 
 Private Function LocalFieldExists(ByVal TableName As String, ByVal FieldName As String) As Boolean
-    Dim fld As DAO.Field
-    For Each fld In CurrentDb.TableDefs(TableName).Fields
+    ' Keep CurrentDb in a variable: a chained CurrentDb.TableDefs(...).Fields is released
+    ' while it is being read (error 3420 "Object invalid or no longer set").
+    Dim db As DAO.Database, fld As DAO.Field
+    Set db = CurrentDb
+    For Each fld In db.TableDefs(TableName).Fields
         If StrComp(fld.Name, FieldName, vbTextCompare) = 0 Then
             LocalFieldExists = True
             Exit Function
@@ -77,8 +80,9 @@ Public Function CtlText(ByVal frm As Access.Form, ByVal ControlName As String) A
 End Function
 
 Private Function LocalTableExists(ByVal TableName As String) As Boolean
-    Dim tdf As DAO.TableDef
-    For Each tdf In CurrentDb.TableDefs
+    Dim db As DAO.Database, tdf As DAO.TableDef
+    Set db = CurrentDb
+    For Each tdf In db.TableDefs
         If StrComp(tdf.Name, TableName, vbTextCompare) = 0 And Len(tdf.Connect) = 0 Then
             LocalTableExists = True
             Exit Function

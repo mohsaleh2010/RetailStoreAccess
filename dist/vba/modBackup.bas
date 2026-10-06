@@ -57,9 +57,10 @@ End Function
 '------------------------------------------------------------------------------
 Public Function BackendFilePath() As String
     ' The back-end file of the linked tables, or this file when the tables are local.
-    Dim cn As String, p As Long
+    Dim db As DAO.Database, cn As String, p As Long
     On Error Resume Next
-    cn = CurrentDb.TableDefs("Settings").Connect
+    Set db = CurrentDb
+    cn = db.TableDefs("Settings").Connect
     On Error GoTo 0
     p = InStr(1, cn, ";DATABASE=", vbTextCompare)
     If p > 0 Then

@@ -527,8 +527,9 @@ Private Sub CleanUpTestData(ByVal LastLogID As Long)
 End Sub
 
 Private Function QueryExists(ByVal QueryName As String) As Boolean
-    Dim qdf As DAO.QueryDef
-    For Each qdf In CurrentDb.QueryDefs
+    Dim db As DAO.Database, qdf As DAO.QueryDef
+    Set db = CurrentDb
+    For Each qdf In db.QueryDefs
         If StrComp(qdf.Name, QueryName, vbTextCompare) = 0 Then
             QueryExists = True
             Exit Function

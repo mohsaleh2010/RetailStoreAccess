@@ -41,6 +41,17 @@ class BuildFrontEndTests(unittest.TestCase):
         self.assertEqual(self.text.count('Compile "'), 2)
         self.assertIn("app.IsCompiled", self.text)
 
+    def test_no_chained_currentdb_collections(self):
+        # CurrentDb.TableDefs(...).Fields / For Each x In CurrentDb.TableDefs: the temporary
+        # database object is released while it is read - error 3420 on a fresh front-end.
+        bad = re.compile(r"CurrentDb(?:\(\))?\.(?:TableDefs|QueryDefs|Relations|Containers)\b")
+        folder = os.path.join(ROOT, "dist", "vba")
+        for name in os.listdir(folder):
+            with open(os.path.join(folder, name), encoding="cp1256") as fh:
+                for no, line in enumerate(fh, 1):
+                    code = line.split("'", 1)[0]
+                    self.assertIsNone(bad.search(code), f"{name}:{no}: {line.strip()}")
+
     def test_ascii_crlf(self):
         self.assertNotIn(b"\n", self.raw.replace(b"\r\n", b""))
 
