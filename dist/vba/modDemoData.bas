@@ -637,7 +637,7 @@ Public Function VerifyDemoData() As Boolean
     Expect DbValue("SELECT COUNT(*) FROM StockCounts WHERE Status = 'POSTED'") = 1, "Ã—œ „ı—Õ¯· Ê«Õœ"
     Expect DbValue("SELECT COUNT(*) FROM IntegrityCheckQuery") = 0, "›Õ’ ”·«„… «·»Ì«‰« : ·«  ÊÃœ √Ì „‘ﬂ·…"
     n = Nz(DbValue("SELECT COUNT(*) FROM JournalEntries"), 0)
-    Expect n = 35, "35 ﬁÌœ ÌÊ„Ì… («·›⁄·Ì: " & n & ")"
+    Expect n = 34, "34 ﬁÌœ ÌÊ„Ì… («·›⁄·Ì: " & n & ")"
     ExpectJournal "SALE", 10, CCur(-2289.51)
     ExpectJournal "SALES_RETURN", 1, CCur(22.00)
     ExpectJournal "PURCHASE", 5, CCur(8115.50)
@@ -645,7 +645,7 @@ Public Function VerifyDemoData() As Boolean
     ExpectJournal "CUSTOMER_PAYMENT", 2, CCur(0.00)
     ExpectJournal "SUPPLIER_PAYMENT", 2, CCur(0.00)
     ExpectJournal "EXPENSE", 6, CCur(0.00)
-    ExpectJournal "CASH_VOUCHER", 6, CCur(0.00)
+    ExpectJournal "CASH_VOUCHER", 5, CCur(0.00)
     ExpectJournal "STOCK_MOVE", 1, CCur(-5.30)
     ExpectJournal "STOCK_COUNT", 1, CCur(-8.93)
     ExpectJournal "BOX_OPENING", 0, CCur(0.00)

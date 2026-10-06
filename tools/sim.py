@@ -29,6 +29,12 @@ def dec(v) -> D:
     return D(str(v if v is not None else 0))
 
 
+def cur(v) -> D:
+    """A sum read back from SQLite as Access Currency (4 decimals): SQLite adds REALs, so a
+    sum like 58.4 + 267.4 - ... can come back as 3e-14 instead of 0."""
+    return dec(v).quantize(D("0.0001"))
+
+
 class Store:
 
     def __init__(self, con, now: str = "2026-10-03 12:00:00", vat_registered: bool = True):
@@ -82,7 +88,7 @@ class Store:
         if before is not None:
             sql += " AND MoveDate " + ("<= ?" if inclusive else "< ?")
             args.append(before)
-        return dec(self.one(sql, *args))
+        return cur(self.one(sql, *args))
 
     def cash_voucher(self, vtype, box, amount, category, party=None, text=None, to_box=None,
                      expense_type=None, closing=None):                  # PostCashVoucher / InsertVoucher
@@ -108,8 +114,8 @@ class Store:
         opening = self.cash_balance(box, start, True) if start is not None else D(0)
         after = "" if start is None else " AND MoveDate > ?"
         args = [box] + ([] if start is None else [start])
-        cash_in = dec(self.one("SELECT Sum(AmountIn) FROM qryCashMovements WHERE CashBoxID = ?" + after, *args))
-        cash_out = dec(self.one("SELECT Sum(AmountOut) FROM qryCashMovements WHERE CashBoxID = ?" + after, *args))
+        cash_in = cur(self.one("SELECT Sum(AmountIn) FROM qryCashMovements WHERE CashBoxID = ?" + after, *args))
+        cash_out = cur(self.one("SELECT Sum(AmountOut) FROM qryCashMovements WHERE CashBoxID = ?" + after, *args))
         expected = opening + cash_in - cash_out
         diff = counted - expected
         no = self.next_number("CASH_CLOSING")

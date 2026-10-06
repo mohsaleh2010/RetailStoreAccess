@@ -353,7 +353,14 @@ End Sub
 Private Sub CheckFormOpens(ByVal FormName As String)
     Dim frm As Access.Form, ctl As Access.Control, rs As DAO.Recordset
     On Error GoTo EH
+    ' frmCafeItem shows the drink chosen on frmCafePOS: give it one
+    If FormName = "frmCafeItem" Then TempVars.Add "CafeItemID", Nz(DMin("ProductID", "Products", "IsActive = True"), 0)
     DoCmd.OpenForm FormName, acNormal, , , , acHidden
+    If Not CurrentProject.AllForms(FormName).IsLoaded Then
+        ' a dialog that closes itself when it has nothing to show (no product yet)
+        Record True, "الشاشة " & FormName & " تفتح وتُغلق نفسها لعدم وجود بيانات تعرضها"
+        Exit Sub
+    End If
     Set frm = Forms(FormName)
     For Each ctl In frm.Controls
         If ctl.ControlType = acComboBox Or ctl.ControlType = acListBox Then

@@ -52,6 +52,33 @@ class BuildFrontEndTests(unittest.TestCase):
                     code = line.split("'", 1)[0]
                     self.assertIsNone(bad.search(code), f"{name}:{no}: {line.strip()}")
 
+    def test_totalled_reports_have_no_subqueries(self):
+        # A report with totals wraps its record source in a GROUP BY; Access then refuses a
+        # subquery in the column list of it or of the queries it reads (error 3612, rptCashDaily).
+        # A subquery in WHERE (SlowMovingProductsQuery) is accepted.
+        import sys
+        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        import forms as F
+        import queries as Q
+        import reports_catalog as R
+        by_name = {q.name: q for q in Q.QUERIES}
+        entries = {r.key: r for r in F.REPORTS}
+
+        def chain(name, seen):
+            if name in seen or name not in by_name:
+                return seen
+            seen.add(name)
+            for other in re.findall(r"\b(?:qry\w+|\w+Query)\b", by_name[name].sql):
+                chain(other, seen)
+            return seen
+
+        for spec in R.LIST_SPECS:
+            if not (any(c.total or c.running for c in spec.cols) or spec.summary):
+                continue
+            for name in chain(entries[spec.key].query, set()):
+                columns = re.split(r"\bFROM\b", by_name[name].sql, maxsplit=1)[0]
+                self.assertNotRegex(columns, r"\(\s*SELECT", f"{spec.key}: {name}")
+
     def test_ascii_crlf(self):
         self.assertNotIn(b"\n", self.raw.replace(b"\r\n", b""))
 

@@ -777,17 +777,18 @@ FROM qryCashMovements AS m
 WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND {period("m.MoveDate")}
 GROUP BY DateValue(m.MoveDate)""", P + ["CashBoxID"]),
 
+    Query("qryCashDayOpening", "رصيد أول كل يوم من أيام الحركة (كل الحركات قبل ذلك اليوم)", """
+SELECT d.CashDay, Sum(x.AmountIn - x.AmountOut) AS DayOpening
+FROM qryCashDays AS d, qryCashMovements AS x
+WHERE (QLong('CashBoxID') = 0 OR x.CashBoxID = QLong('CashBoxID')) AND x.MoveDate < d.CashDay
+GROUP BY d.CashDay""", P + ["CashBoxID"]),
+
+    # No subqueries here: a report that totals its columns wraps its record source in a
+    # GROUP BY, and Access refuses subqueries in it (error 3612).
     Query("CashDailyQuery", "حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم", f"""
-SELECT d.CashDay,
-       (SELECT {nz("Sum(x.AmountIn - x.AmountOut)")} FROM qryCashMovements AS x
-        WHERE (QLong('CashBoxID') = 0 OR x.CashBoxID = QLong('CashBoxID'))
-          AND x.MoveDate < d.CashDay) AS OpeningBalance,
-       d.Receipts, d.Payments,
-       (SELECT {nz("Sum(y.AmountIn - y.AmountOut)")} FROM qryCashMovements AS y
-        WHERE (QLong('CashBoxID') = 0 OR y.CashBoxID = QLong('CashBoxID'))
-          AND y.MoveDate < d.CashDay) + d.Receipts - d.Payments AS ClosingBalance,
-       d.MoveCount
-FROM qryCashDays AS d
+SELECT d.CashDay, {nz("o.DayOpening")} AS OpeningBalance, d.Receipts, d.Payments,
+       {nz("o.DayOpening")} + d.Receipts - d.Payments AS ClosingBalance, d.MoveCount
+FROM qryCashDays AS d LEFT JOIN qryCashDayOpening AS o ON d.CashDay = o.CashDay
 ORDER BY d.CashDay""", P + ["CashBoxID"]),
 
     Query("CashClosingsQuery", "تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق)", f"""

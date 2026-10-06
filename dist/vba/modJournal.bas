@@ -57,7 +57,9 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
     Set rs = db.OpenRecordset("SELECT EntryID, SourceType, SourceID, Signature, EntryDate, TotalDebit " & _
                               "FROM JournalEntries", dbOpenSnapshot)
     Do Until rs.EOF
-        existing(rs!SourceType & "|" & rs!SourceID) = Array(rs!EntryID, rs!Signature, rs!EntryDate, rs!TotalDebit)
+        ' .Value: Array(rs!EntryID) would keep the Field objects, invalid once rs is closed (error 3420)
+        existing(rs!SourceType & "|" & rs!SourceID) = Array(rs!EntryID.Value, rs!Signature.Value, _
+                                                            rs!EntryDate.Value, rs!TotalDebit.Value)
         rs.MoveNext
     Loop
     rs.Close

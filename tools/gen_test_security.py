@@ -111,11 +111,12 @@ End Sub
 '------------------------------------------------------------------------------
 Private Sub TestUsers()
     Dim ws As DAO.Workspace, db As DAO.Database, inTrans As Boolean, uid As Long, id As Long
-    Dim msg As String, i As Long, adminID As Long
+    Dim msg As String, i As Long, adminID As Long, cashierPerms As Long
     On Error GoTo EH
     Set db = CurrentDb
     adminID = CurrentUserID()
     Set ws = DBEngine.Workspaces(0)
+    cashierPerms = DCount("*", "RolePermissions", "RoleID = 3")      ' restored by the rollback
     ws.BeginTrans
     inTrans = True
 
@@ -192,7 +193,7 @@ Private Sub TestUsers()
     inTrans = False
     TempVars.Add "UserID", adminID
     Call Record(DCount("*", "Employees", "Username = 'test_cashier'") = 0 And _
-                DCount("*", "RolePermissions", "RoleID = 3") = 4, "التراجع عن كل بيانات الاختبار")
+                DCount("*", "RolePermissions", "RoleID = 3") = cashierPerms, "التراجع عن كل بيانات الاختبار")
     Exit Sub
 EH:
     Fail "خطأ غير متوقع " & Err.Number & ": " & Err.Description
