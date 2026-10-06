@@ -78,7 +78,7 @@ End Function
 Public Sub TestMsg(ByVal Text As String, ByVal Style As Long, Optional ByVal Title As String = "")
     ' The final message of an in-Access test (TestSales, TestForms, ...).
     If g_CollectTests Then
-        g_TestSummary = g_TestSummary & "- " & Title & ": " & Replace(Left$(Text, 700), vbCrLf, " | ") & vbCrLf
+        g_TestSummary = g_TestSummary & "- " & Title & ": " & Replace(Left$(Text, 3000), vbCrLf, " | ") & vbCrLf
     Else
         MsgBox Text, Style, Title
     End If

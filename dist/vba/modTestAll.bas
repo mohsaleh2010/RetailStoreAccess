@@ -47,13 +47,28 @@ Public Function RunAllTests() As Boolean
     g_CollectTests = False
     DoCmd.Hourglass False
     Debug.Print "=== RunAllTests ===" & vbCrLf & lines & vbCrLf & g_TestSummary
+    WriteTestLog "=== RunAllTests " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ===" & vbCrLf & lines & vbCrLf & _
+                 g_TestSummary
     MsgBox IIf(failed = 0, "ﬂ· «·«Œ »«—«  ‰«ÃÕ….", "ÌÊÃœ " & failed & " «Œ »«— ›«‘·.") & vbCrLf & _
            "‰«ÃÕ: " & passed & "   ›«‘·: " & failed & "   „ ŒÿÏ: " & skipped & "   «·„œ…: " & _
            Format$(Timer - started, "0") & " À" & vbCrLf & vbCrLf & lines & vbCrLf & _
-           "«· ›«’Ì· ›Ì ‰«›–… Immediate (Ctrl+G).", IIf(failed = 0, vbInformation, vbExclamation) + MSG_RTL, _
+           "«· ›«’Ì· ›Ì ‰«›–… Immediate (Ctrl+G) Ê›Ì «·„·› RunAllTests.log »Ã«‰» «·»—‰«„Ã.", IIf(failed = 0, vbInformation, vbExclamation) + MSG_RTL, _
            "RunAllTests"
     RunAllTests = (failed = 0)
 End Function
+
+Private Sub WriteTestLog(ByVal Text As String)
+    ' RunAllTests.log next to the front-end (UTF-8), to send when a test fails.
+    Dim st As Object
+    On Error Resume Next
+    Set st = CreateObject("ADODB.Stream")
+    st.Type = 2                                  ' adTypeText
+    st.Charset = "utf-8"
+    st.Open
+    st.WriteText Text
+    st.SaveToFile CurrentProject.Path & "\RunAllTests.log", 2      ' adSaveCreateOverWrite
+    st.Close
+End Sub
 
 Private Function SkipReason(ByVal TestName As String) As String
     Dim loaded As Variant

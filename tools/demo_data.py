@@ -214,10 +214,12 @@ class Result:
     cash_balance: Dict[str, D]
     journal_entries: int
     journal_stock: D
+    journal_by_type: Dict[str, tuple]          # SourceType -> (entries, stock account 1400)
 
 
 def simulate() -> Result:
     import sim
+    from schema import table
     db, day = _mirror()
     c = db.con
     s = sim.Store(c)
@@ -301,7 +303,12 @@ def simulate() -> Result:
         count_lines=count_lines, count_value=count_value,
         cash_balance={kind: s.cash_balance(s.box_of_type(kind)) for kind in ("MAIN", "CASHIER")},
         journal_entries=s.one("SELECT COUNT(*) FROM JournalEntries"),
-        journal_stock=sim.dec(round(s.one("SELECT Sum(Debit) - Sum(Credit) FROM JournalLines WHERE AccountCode = 1400"), 2)))
+        journal_stock=sim.dec(round(s.one("SELECT Sum(Debit) - Sum(Credit) FROM JournalLines WHERE AccountCode = 1400"), 2)),
+        journal_by_type={kind: (s.one("SELECT COUNT(*) FROM JournalEntries WHERE SourceType = ?", kind),
+                                sim.dec(round(s.one("SELECT Sum(l.Debit) - Sum(l.Credit) FROM JournalLines AS l "
+                                                    "INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID "
+                                                    "WHERE e.SourceType = ? AND l.AccountCode = 1400", kind) or 0, 2)))
+                         for kind, *_ in table("JournalSourceTypes").seed_rows})
 
 
 # Order in which RemoveDemoData empties the tables (children before parents).

@@ -576,6 +576,7 @@ End Sub
 ' Verify
 '==============================================================================
 Public Function VerifyDemoData() As Boolean
+    Dim n As Long
     m_passed = 0: m_failed = 0: m_report = ""
     Debug.Print "=== VerifyDemoData  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     Calendar = vbCalGreg
@@ -635,10 +636,25 @@ Public Function VerifyDemoData() As Boolean
     End If
     Expect DbValue("SELECT COUNT(*) FROM StockCounts WHERE Status = 'POSTED'") = 1, "جرد مُرحّل واحد"
     Expect DbValue("SELECT COUNT(*) FROM IntegrityCheckQuery") = 0, "فحص سلامة البيانات: لا توجد أي مشكلة"
-    Expect DbValue("SELECT COUNT(*) FROM JournalEntries") = 35, "35 قيد يومية متوازن"
+    n = Nz(DbValue("SELECT COUNT(*) FROM JournalEntries"), 0)
+    Expect n = 35, "35 قيد يومية (الفعلي: " & n & ")"
+    ExpectJournal "SALE", 10, CCur(-2289.51)
+    ExpectJournal "SALES_RETURN", 1, CCur(22.00)
+    ExpectJournal "PURCHASE", 5, CCur(8115.50)
+    ExpectJournal "PURCHASE_RETURN", 1, CCur(-34.50)
+    ExpectJournal "CUSTOMER_PAYMENT", 2, CCur(0.00)
+    ExpectJournal "SUPPLIER_PAYMENT", 2, CCur(0.00)
+    ExpectJournal "EXPENSE", 6, CCur(0.00)
+    ExpectJournal "CASH_VOUCHER", 6, CCur(0.00)
+    ExpectJournal "STOCK_MOVE", 1, CCur(-5.30)
+    ExpectJournal "STOCK_COUNT", 1, CCur(-8.93)
+    ExpectJournal "BOX_OPENING", 0, CCur(0.00)
+    ExpectJournal "CUSTOMER_OPENING", 0, CCur(0.00)
+    ExpectJournal "SUPPLIER_OPENING", 0, CCur(0.00)
     Expect DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit") = 0, "كل القيود متوازنة"
     Expect AccountBalance(1300) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Customers"), 0), "حساب ذمم العملاء = أرصدة العملاء"
-    Expect AccountBalance(1400) = CCur(5799.27), "حساب المخزون في القيود = 5799.27"
+    Expect Round(AccountBalance(1400), 2) = CCur(5799.27), "حساب المخزون في القيود = 5799.27 (الفعلي: " & _
+           Format$(AccountBalance(1400), "0.00##") & ")"
     Debug.Print "--- نجح: " & m_passed & " | فشل: " & m_failed
     If m_failed = 0 Then
         TestMsg "البيانات التجريبية مطابقة تمامًا للنتائج المحسوبة مسبقًا (" & m_passed & " فحصًا)." & vbCrLf & _
@@ -654,6 +670,16 @@ End Function
 Private Function ProductValue(ByVal Barcode As String, ByVal FieldName As String) As Currency
     ProductValue = Nz(DbValue("SELECT " & FieldName & " FROM Products WHERE Barcode = " & SqlText(Barcode)), -1)
 End Function
+
+Private Sub ExpectJournal(ByVal Kind As String, ByVal Entries As Long, ByVal Stock As Currency)
+    ' Entries of one kind of operation and their effect on the stock account 1400.
+    Dim n As Long, v As Currency
+    n = Nz(DbValue("SELECT COUNT(*) FROM JournalEntries WHERE SourceType = '" & Kind & "'"), 0)
+    v = Nz(DbValue("SELECT Sum(l.Debit) - Sum(l.Credit) FROM JournalLines AS l INNER JOIN JournalEntries AS e " & _
+                   "ON l.EntryID = e.EntryID WHERE e.SourceType = '" & Kind & "' AND l.AccountCode = 1400"), 0)
+    Expect n = Entries And Round(v, 2) = Stock, "قيود " & Kind & ": " & Entries & " قيد، المخزون " & _
+           Format$(Stock, "0.00") & " (الفعلي: " & n & " قيد، " & Format$(v, "0.00##") & ")"
+End Sub
 
 Private Sub Expect(ByVal Passed As Boolean, ByVal Label As String)
     If Passed Then
