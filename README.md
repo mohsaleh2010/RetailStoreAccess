@@ -41,6 +41,7 @@
 | `tools/forms_labels.py`, `tools/barcode_reference.py` | شاشة ملصقات الباركود، ومرجع ترميز EAN-13 و Code 128 |
 | `tools/demo_data.py`, `tools/sim.py` | البيانات التجريبية وخطتها، وإعادة تنفيذ دوال الحفظ بـ Python للتحقق |
 | `tools/forms_security.py`, `tools/security_reference.py` | شاشات الدخول والمستخدمين والصلاحيات والنسخ، ومرجع SHA-256 والنسخ |
+| `dist/tools/BuildFrontEnd.vbs` | **بناء ملف الواجهة `RetailStore_FE.accdb` جاهزًا بنقرة مزدوجة**: يستورد كل الوحدات ويترجمها ويشغّل أوامر البناء |
 | `dist/tools/EnableShiftKey.vbs` | إعادة تفعيل مفتاح Shift إذا تعذر دخول المدير |
 | `tools/forms_purchases.py`, `tools/purchases_reference.py` | شاشات المشتريات والمخزون والجرد، وسيناريو المرحلة 7 بنتائجه المتوقعة |
 | `tools/pricing.py`, `tools/zatca_reference.py`, `tools/qr_reference.py` | المراجع الحسابية: الفاتورة، حمولة QR للهيئة، مولّد QR |
@@ -48,7 +49,29 @@
 | `tools/generate.py` | يولّد الكود والمرجع: `python3 tools/generate.py` |
 | `tests/` | الاختبارات الآلية: `python3 -m unittest discover -s tests -v` |
 
-## ترتيب التثبيت في Access
+## الطريقة الأسرع: بناء ملف الواجهة تلقائيًا
+على جهاز Windows عليه Microsoft Access 2010 أو أحدث:
+1. حمّل المستودع كاملًا (Code ← Download ZIP) وفك الضغط.
+2. انقر نقرًا مزدوجًا على `dist\tools\BuildFrontEnd.vbs` واختر مكان الملف، والافتراضي `dist\RetailStore_FE.accdb`.
+3. السكربت يقوم بما يلي:
+   - ينشئ ملفًا جديدًا ويستورد **كل** الوحدات من `dist\vba`.
+   - يترجمها بأمر Debug ← Compile.
+   - يشغّل `BuildSchema` ← `BuildRelationships` ← `BuildQueries` ← `BuildForms` ← `BuildReports`، ثم يترجم مرة ثانية.
+   - ينشئ ملف البيانات `RetailStore_BE.accdb` بجانب الواجهة، أو يحدّثه إن كان موجودًا مع الحفاظ على بياناته.
+   - بعد كل خطوة يعرض Access رسالة: اضغط **موافق**.
+4. في النهاية يسألك:
+   - هل تريد تحميل البيانات التجريبية (للتدريب فقط)؟
+   - هل تريد تشغيل كل الاختبارات؟
+   - هل تريد التحويل إلى وضع المستخدم النهائي؟
+5. كل خطوة تُكتب في `BuildFrontEnd.log` بجانب الملف. إذا فشلت خطوة، أرسل لي هذا الملف ونص الرسالة.
+
+> **شرط اللغة العربية:** في إعدادات Windows يجب أن تكون «لغة البرامج غير الداعمة لـ Unicode» العربية.
+>
+> **عند التحديث لاحقًا:** شغّل السكربت مرة أخرى ووافق على استبدال الواجهة. ملف البيانات لا يُحذف.
+>
+> **أول دخول:** `admin` بدون كلمة مرور.
+
+## ترتيب التثبيت في Access (يدويًا)
 
 | # | الملف المستورد | الأمر في نافذة Immediate | الفحص |
 |---|---|---|---|
