@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **40** | عدد الحقول: **481**
+عدد الجداول: **42** | عدد الحقول: **507**
 
 ## الفهرس
 
@@ -36,16 +36,18 @@
 28. [`Expenses`](#expenses) – المصروفات
 29. [`CashVouchers`](#cashvouchers) – سندات النقدية
 30. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-31. [`Accounts`](#accounts) – دليل الحسابات
+31. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
 32. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
 33. [`JournalEntries`](#journalentries) – قيود اليومية
 34. [`JournalLines`](#journallines) – أسطر القيود
-35. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-36. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-37. [`StockCounts`](#stockcounts) – جلسات الجرد
-38. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-39. [`AuditLog`](#auditlog) – سجل العمليات
-40. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+35. [`ManualEntries`](#manualentries) – القيود اليدوية
+36. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+37. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+38. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+39. [`StockCounts`](#stockcounts) – جلسات الجرد
+40. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+41. [`AuditLog`](#auditlog) – سجل العمليات
+42. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -102,7 +104,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 16 سجل
+- بيانات أساسية: 17 سجل
 
 ## Roles
 
@@ -131,7 +133,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 25 سجل
+- بيانات أساسية: 26 سجل
 
 ## RolePermissions
 
@@ -143,7 +145,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 51 سجل
+- بيانات أساسية: 53 سجل
 
 ## Employees
 
@@ -191,7 +193,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 34 سجل
+- بيانات أساسية: 35 سجل
 
 ## UserScreens
 
@@ -769,18 +771,29 @@
 
 ## Accounts
 
-**دليل الحسابات** – الحسابات التي تُرحَّل إليها القيود. حسابات الصناديق (110000 + رقم الصندوق) وأنواع المصروفات (530000 + رقم النوع) تُنشأ تلقائيًا.
+**دليل الحسابات (شجرة الحسابات)** – شجرة من خمسة مستويات على الأكثر: الحسابات الرئيسية (تجميعية) والحسابات الفرعية التي تُرحَّل إليها القيود. حسابات الصناديق (110000 + رقم الصندوق) وأنواع المصروفات (530000 + رقم النوع) تُنشأ تلقائيًا.
 
 | # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
 |---|---|---|---|---|---|---|---|---|
 | 1 | **AccountCode** 🔑 | Number (Long) |  | ✔ |  | `>0` |  | رقم الحساب |
 | 2 | AccountName | Short Text | 100 | ✔ |  |  |  | اسم الحساب |
 | 3 | AccountType | Short Text | 10 | ✔ |  | `In ("ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE")` |  | نوع الحساب |
-| 4 | ParentCode | Number (Long) |  |  |  |  |  | الحساب الرئيسي |
+| 4 | ParentCode | Number (Long) |  |  |  |  |  | الحساب الرئيسي – فارغ للحسابات الخمسة في المستوى الأول فقط |
 | 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 6 | IsPosting | Yes/No |  |  | `True` |  |  | حساب فرعي (يقبل القيود) |
+| 7 | IsSystem | Yes/No |  |  | `False` |  |  | حساب أساسي في النظام |
+| 8 | AccountLevel | Number (Byte) |  | ✔ | `1` |  |  | المستوى |
+| 9 | TreeKey | Short Text | 60 |  |  |  |  | مفتاح الترتيب في الشجرة – يحسبه البرنامج (modAccounts.RebuildAccountTree): رقم كل مستوى بعشر خانات |
+| 10 | Level1Code | Number (Long) |  |  |  |  |  | حساب المستوى 1 |
+| 11 | Level2Code | Number (Long) |  |  |  |  |  | حساب المستوى 2 |
+| 12 | Level3Code | Number (Long) |  |  |  |  |  | حساب المستوى 3 |
+| 13 | Level4Code | Number (Long) |  |  |  |  |  | حساب المستوى 4 |
+| 14 | Level5Code | Number (Long) |  |  |  |  |  | حساب المستوى 5 |
 
 - المفتاح الأساسي: `AccountCode`
-- بيانات أساسية: 22 سجل
+- فهرس عادي: `ParentCode`
+- فهرس عادي: `TreeKey`
+- بيانات أساسية: 75 سجل
 
 ## JournalSourceTypes
 
@@ -793,7 +806,7 @@
 | 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 13 سجل
+- بيانات أساسية: 14 سجل
 
 ## JournalEntries
 
@@ -838,6 +851,46 @@
 - المفتاح الأساسي: `JournalLineID`
 - فهرس فريد: `EntryID, LineNumber`
 - فهرس عادي: `AccountCode`
+
+## ManualEntries
+
+**القيود اليدوية** – قيد يكتبه المحاسب بنفسه (مستحقات، تسويات، رأس المال، أرصدة افتتاحية...). يُرحَّل لليومية كأي عملية أخرى (SourceType = MANUAL)، ويُعدَّل أو يُحذف فيتبعه قيده.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ManualEntryID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | EntryNumber | Short Text | 20 | ✔ |  |  |  | رقم القيد اليدوي |
+| 3 | EntryDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ القيد |
+| 4 | Description | Short Text | 255 | ✔ |  |  |  | البيان |
+| 5 | Reference | Short Text | 50 |  |  |  |  | المرجع – رقم مستند خارجي: فاتورة، عقد، كشف بنك... |
+| 6 | ReversalOfID | Number (Long) |  |  |  |  |  | عكس القيد – القيد اليدوي الذي يعكسه هذا القيد |
+| 7 | TotalAmount | Currency |  | ✔ | `0` | `>=0` |  | إجمالي القيد |
+| 8 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أدخله |
+| 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 10 | UpdatedAt | Date/Time |  |  |  |  |  | آخر تعديل |
+
+- المفتاح الأساسي: `ManualEntryID`
+- فهرس فريد: `EntryNumber`
+- فهرس عادي: `EntryDate`
+
+## ManualEntryLines
+
+**أسطر القيود اليدوية** – الطرف المدين والطرف الدائن للقيد اليدوي؛ كل سطر مدين أو دائن فقط.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ManualLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر الداخلي |
+| 2 | ManualEntryID | Number (Long) |  | ✔ |  |  | `ManualEntries.ManualEntryID` | القيد اليدوي |
+| 3 | LineNumber | Number (Integer) |  | ✔ |  |  |  | رقم السطر |
+| 4 | AccountCode | Number (Long) |  | ✔ |  |  | `Accounts.AccountCode` | الحساب |
+| 5 | Debit | Currency |  | ✔ | `0` | `>=0` |  | مدين |
+| 6 | Credit | Currency |  | ✔ | `0` | `>=0` |  | دائن |
+| 7 | LineText | Short Text | 150 |  |  |  |  | بيان السطر |
+
+- المفتاح الأساسي: `ManualLineID`
+- فهرس فريد: `ManualEntryID, LineNumber`
+- فهرس عادي: `AccountCode`
+- قاعدة تحقق على مستوى الجدول: `([Debit]=0 Or [Credit]=0) And [Debit]+[Credit]>0` – كل سطر مدين أو دائن فقط، وبمبلغ أكبر من صفر
 
 ## TransactionTypes
 

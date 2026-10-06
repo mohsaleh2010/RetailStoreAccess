@@ -138,17 +138,41 @@ class Store:
                                   closing=cid)
         return cid, expected
 
+    # ------------------------------------------------------------- account tree (modAccounts)
+    def rebuild_account_tree(self, max_levels=5):
+        """Same steps as RebuildAccountTree: returns the accounts that cannot be placed."""
+        c = self.c
+        parents = {code: parent or 0 for code, parent in c.execute("SELECT AccountCode, ParentCode FROM Accounts")}
+        problems = []
+        for code in parents:
+            chain, k = [], code
+            while k and len(chain) < max_levels + 1:
+                chain.append(k)
+                k = parents[k]
+                if k and k not in parents:
+                    k = 0
+            if len(chain) > max_levels:
+                problems.append(code)
+                continue
+            chain.reverse()                                   # level 1 first
+            levels = chain + [None] * (max_levels - len(chain))
+            c.execute("UPDATE Accounts SET AccountLevel = ?, TreeKey = ?, Level1Code = ?, Level2Code = ?, "
+                      "Level3Code = ?, Level4Code = ?, Level5Code = ? WHERE AccountCode = ?",
+                      [len(chain), "".join(f"{a:010d}" for a in chain)] + levels + [code])
+        return problems
+
     # ------------------------------------------------------------- journal (modJournal.SyncJournal)
     def sync_journal(self):
         """Same steps as SyncJournal: returns (added, updated, removed)."""
         import queries as Q
         c = self.c
-        c.execute("INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode) "
-                  "SELECT 110000 + b.CashBoxID, b.BoxName, 'ASSET', 1100 FROM CashBoxes AS b "
+        c.execute("INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) "
+                  "SELECT 110000 + b.CashBoxID, b.BoxName, 'ASSET', 1100, 1, 1 FROM CashBoxes AS b "
                   "WHERE 110000 + b.CashBoxID NOT IN (SELECT AccountCode FROM Accounts)")
-        c.execute("INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode) "
-                  "SELECT 530000 + t.ExpenseTypeID, t.ExpenseTypeName, 'EXPENSE', 5300 FROM ExpenseTypes AS t "
+        c.execute("INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) "
+                  "SELECT 530000 + t.ExpenseTypeID, t.ExpenseTypeName, 'EXPENSE', 5300, 1, 1 FROM ExpenseTypes AS t "
                   "WHERE 530000 + t.ExpenseTypeID NOT IN (SELECT AccountCode FROM Accounts)")
+        self.rebuild_account_tree()
         kinds = dict(c.execute("SELECT SourceType, TypeName FROM JournalSourceTypes").fetchall())
         existing = {(t, i): (eid, dec(sig), when, dec(debit)) for eid, t, i, sig, when, debit in c.execute(
             "SELECT EntryID, SourceType, SourceID, Signature, EntryDate, TotalDebit FROM JournalEntries").fetchall()}

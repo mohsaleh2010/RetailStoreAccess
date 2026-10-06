@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **78**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **83**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -74,16 +74,21 @@
 | 66 | [`qryJournalCashVoucher`](#qryjournalcashvoucher) | أسطر قيود سندات النقدية (قبض وصرف وتحويل) |  |
 | 67 | [`qryJournalStock`](#qryjournalstock) | أسطر قيود حركات المخزون اليدوية وتسويات الجرد |  |
 | 68 | [`qryJournalOpening`](#qryjournalopening) | أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين |  |
-| 69 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 70 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 71 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 72 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 73 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 74 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 75 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 76 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 77 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 78 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 69 | [`qryManualEntryLines`](#qrymanualentrylines) | أسطر القيود اليدوية مع رأس كل قيد |  |
+| 70 | [`qryJournalManual`](#qryjournalmanual) | أسطر القيود اليدوية |  |
+| 71 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 72 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 73 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 74 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 75 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 76 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 77 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 78 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 79 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 80 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 81 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 82 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 83 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -187,8 +192,10 @@
 | 94 | الخزينة من القيود = رصيدها (7700) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalExpense UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalCashVoucher UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 110000 + {ref:BOXM}` | 7700 |
 | 95 | ضريبة المخرجات من القيود = 15 + 150 + 60 − 6 | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn) AS x WHERE AccountCode = 2200` | -219 |
 | 96 | مصروف سند النقدية لا يُقيَّد مرتين | `SELECT COUNT(*) FROM qryJournalExpense WHERE SourceID = {ref:EXPV}` | 0 |
-| 97 | سند صرف المصروف يُقيَّد على حساب نوع المصروف | `SELECT Debit FROM qryJournalCashVoucher WHERE SourceID = {ref:V1} AND AccountCode = 530009` | 50 |
-| 98 | فحص السلامة: لا توجد مشكلات | `SELECT COUNT(*) FROM IntegrityCheckQuery` | 0 |
+| 97 | القيد اليدوي: 3 أسطر متوازنة (3000) | `SELECT COUNT(*) FROM qryJournalManual WHERE SourceID = {ref:MJ1} AND SourceType = 'MANUAL'` | 3 |
+| 98 | قيود Manual: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalManual GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 99 | سند صرف المصروف يُقيَّد على حساب نوع المصروف | `SELECT Debit FROM qryJournalCashVoucher WHERE SourceID = {ref:V1} AND AccountCode = 530009` | 50 |
+| 100 | فحص السلامة: لا توجد مشكلات | `SELECT COUNT(*) FROM IntegrityCheckQuery` | 0 |
 
 ## qrySalesDocuments
 
@@ -1404,6 +1411,26 @@ FROM Suppliers AS s
 WHERE s.OpeningBalance <> 0
 ```
 
+## qryManualEntryLines
+
+أسطر القيود اليدوية مع رأس كل قيد
+
+```sql
+SELECT h.ManualEntryID, h.EntryNumber, h.EntryDate, h.Description, l.LineNumber AS LineNo,
+       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote
+FROM ManualEntries AS h INNER JOIN ManualEntryLines AS l ON h.ManualEntryID = l.ManualEntryID
+```
+
+## qryJournalManual
+
+أسطر القيود اليدوية
+
+```sql
+SELECT 'MANUAL' AS SourceType, m.ManualEntryID AS SourceID, m.EntryNumber AS SourceNumber, m.EntryDate AS SourceDate, m.Description AS Party, m.LineNo AS LineOrder, m.LineAccount AS AccountCode, m.LineDebit AS Debit, m.LineCredit AS Credit, m.LineNote AS LineText
+FROM qryManualEntryLines AS m
+WHERE m.LineDebit + m.LineCredit <> 0
+```
+
 ## JournalLinesQuery
 
 قيود اليومية خلال فترة بأسطرها
@@ -1473,6 +1500,69 @@ FROM (Accounts AS a LEFT JOIN qryTrialBefore AS b ON a.AccountCode = b.AccountCo
      LEFT JOIN qryTrialPeriod AS p ON a.AccountCode = p.AccountCode
 WHERE b.AccountCode Is Not Null OR p.AccountCode Is Not Null
 ORDER BY a.AccountCode
+```
+
+## qryTreeRollup
+
+أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT d.Level1Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit,
+       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing
+FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode
+WHERE d.Level1Code Is Not Null
+GROUP BY d.Level1Code
+UNION ALL
+SELECT d.Level2Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit,
+       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing
+FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode
+WHERE d.Level2Code Is Not Null
+GROUP BY d.Level2Code
+UNION ALL
+SELECT d.Level3Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit,
+       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing
+FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode
+WHERE d.Level3Code Is Not Null
+GROUP BY d.Level3Code
+UNION ALL
+SELECT d.Level4Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit,
+       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing
+FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode
+WHERE d.Level4Code Is Not Null
+GROUP BY d.Level4Code
+UNION ALL
+SELECT d.Level5Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit,
+       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing
+FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode
+WHERE d.Level5Code Is Not Null
+GROUP BY d.Level5Code
+```
+
+## TrialBalanceTreeQuery
+
+ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT a.AccountCode, a.AccountName, IIf(a.AccountType = 'ASSET', 'أصول', IIf(a.AccountType = 'LIABILITY', 'خصوم', IIf(a.AccountType = 'EQUITY', 'حقوق ملكية', IIf(a.AccountType = 'REVENUE', 'إيرادات', 'مصروفات')))) AS TypeName, a.AccountLevel, a.TreeKey, a.IsPosting,
+       r.SumOpening AS OpeningBalance, r.SumDebit AS PeriodDebit, r.SumCredit AS PeriodCredit,
+       r.SumClosing AS ClosingBalance
+FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode
+ORDER BY a.TreeKey
+```
+
+## AccountTreeQuery
+
+شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود
+
+```sql
+SELECT a.AccountCode, a.AccountName, IIf(a.AccountType = 'ASSET', 'أصول', IIf(a.AccountType = 'LIABILITY', 'خصوم', IIf(a.AccountType = 'EQUITY', 'حقوق ملكية', IIf(a.AccountType = 'REVENUE', 'إيرادات', 'مصروفات')))) AS TypeName, a.AccountLevel, a.TreeKey,
+       a.ParentCode, IIf(a.IsPosting, 'فرعي', 'رئيسي') AS KindName, a.IsPosting, a.IsActive
+FROM Accounts AS a
+ORDER BY a.TreeKey
 ```
 
 ## qrySalesInvoiceLineTotals

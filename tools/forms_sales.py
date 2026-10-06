@@ -27,6 +27,8 @@ def grid_row(m: FormModel, columns: List[Tuple[str, str, float, dict, list]], ro
                         events=events, source=fld)
         elif kind == "button":
             c = Control("button", name, x, cm(0.03), w, row_h - cm(0.06), props, events=events)
+        elif kind == "combo":
+            c = Control("combo", name, x, 0, w, row_h, props, events=events, source=fld)
         else:
             c = Control("text", name, x, 0, w, row_h, props, events=events, source=fld)
         m.add(c)

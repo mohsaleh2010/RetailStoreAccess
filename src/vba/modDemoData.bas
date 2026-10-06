@@ -651,6 +651,7 @@ Public Function VerifyDemoData() As Boolean
     ExpectJournal "BOX_OPENING", 0, CCur(0.00)
     ExpectJournal "CUSTOMER_OPENING", 0, CCur(0.00)
     ExpectJournal "SUPPLIER_OPENING", 0, CCur(0.00)
+    ExpectJournal "MANUAL", 0, CCur(0.00)
     Expect DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit") = 0, "كل القيود متوازنة"
     Expect AccountBalance(1300) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Customers"), 0), "حساب ذمم العملاء = أرصدة العملاء"
     Expect Round(AccountBalance(1400), 2) = CCur(5799.27), "حساب المخزون في القيود = 5799.27 (الفعلي: " & _

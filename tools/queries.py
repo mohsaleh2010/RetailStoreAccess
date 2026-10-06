@@ -59,7 +59,7 @@ def jquery(branches):
 ZERO = "CCur(0)"
 JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournalPurchase", "qryJournalPurchaseReturn",
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
-                          "qryJournalOpening"]
+                          "qryJournalOpening", "qryJournalManual"]
 
 
 def _sale():
@@ -169,6 +169,30 @@ def _stock():
               "'المخزون'", "qryStockCountValue AS k", "k.CountValue <> 0"),
         jline(*kc, 2, 5200, "IIf(k.CountValue < 0, -k.CountValue, 0)", "IIf(k.CountValue > 0, k.CountValue, 0)",
               "'فروقات الجرد'", "qryStockCountValue AS k", "k.CountValue <> 0")])
+
+
+def _manual():
+    k = ("'MANUAL'", "m.ManualEntryID", "m.EntryNumber", "m.EntryDate", "m.Description")
+    return jline(*k, "m.LineNo", "m.LineAccount", "m.LineDebit", "m.LineCredit", "m.LineNote",
+                 "qryManualEntryLines AS m", "m.LineDebit + m.LineCredit <> 0")
+
+
+def _tree_rollup():
+    # each account appears once, in the LevelNCode of its own level; the lines of its
+    # sub-accounts carry the same code in that column - so every level is summed once
+    parts = []
+    for n in range(1, 6):
+        parts.append(f"""SELECT d.Level{n}Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit,
+       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing
+FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode
+WHERE d.Level{n}Code Is Not Null
+GROUP BY d.Level{n}Code""")
+    return "\nUNION ALL\n".join(parts)
+
+
+ACCOUNT_TYPE_NAME = ("IIf(a.AccountType = 'ASSET', 'أصول', IIf(a.AccountType = 'LIABILITY', 'خصوم', "
+                     "IIf(a.AccountType = 'EQUITY', 'حقوق ملكية', IIf(a.AccountType = 'REVENUE', 'إيرادات', "
+                     "'مصروفات'))))")
 
 
 def _opening():
@@ -856,6 +880,11 @@ GROUP BY ReferenceID"""),
     Query("qryJournalCashVoucher", "أسطر قيود سندات النقدية (قبض وصرف وتحويل)", _cash_voucher()),
     Query("qryJournalStock", "أسطر قيود حركات المخزون اليدوية وتسويات الجرد", _stock()),
     Query("qryJournalOpening", "أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين", _opening()),
+    Query("qryManualEntryLines", "أسطر القيود اليدوية مع رأس كل قيد", """
+SELECT h.ManualEntryID, h.EntryNumber, h.EntryDate, h.Description, l.LineNumber AS LineNo,
+       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote
+FROM ManualEntries AS h INNER JOIN ManualEntryLines AS l ON h.ManualEntryID = l.ManualEntryID"""),
+    Query("qryJournalManual", "أسطر القيود اليدوية", _manual()),
 
     Query("JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", f"""
 SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber,
@@ -894,6 +923,21 @@ FROM (Accounts AS a LEFT JOIN qryTrialBefore AS b ON a.AccountCode = b.AccountCo
      LEFT JOIN qryTrialPeriod AS p ON a.AccountCode = p.AccountCode
 WHERE b.AccountCode Is Not Null OR p.AccountCode Is Not Null
 ORDER BY a.AccountCode""", P),
+
+    Query("qryTreeRollup", "أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات", _tree_rollup(), P),
+
+    Query("TrialBalanceTreeQuery", "ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة", f"""
+SELECT a.AccountCode, a.AccountName, {ACCOUNT_TYPE_NAME} AS TypeName, a.AccountLevel, a.TreeKey, a.IsPosting,
+       r.SumOpening AS OpeningBalance, r.SumDebit AS PeriodDebit, r.SumCredit AS PeriodCredit,
+       r.SumClosing AS ClosingBalance
+FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode
+ORDER BY a.TreeKey""", P),
+
+    Query("AccountTreeQuery", "شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود", f"""
+SELECT a.AccountCode, a.AccountName, {ACCOUNT_TYPE_NAME} AS TypeName, a.AccountLevel, a.TreeKey,
+       a.ParentCode, IIf(a.IsPosting, 'فرعي', 'رئيسي') AS KindName, a.IsPosting, a.IsActive
+FROM Accounts AS a
+ORDER BY a.TreeKey"""),
 
     # ============================================================ INTEGRITY
     Query("qrySalesInvoiceLineTotals", "مجموع أسطر كل فاتورة بيع", """
@@ -1187,6 +1231,16 @@ FIXTURE: List[Row] = [
         "VoucherNumber": "TEST-COT-3", "VoucherDate": Day(1, 12), "VoucherType": "OUT",
         "CashBoxID": Ref("BOXM"), "Category": "OWNER", "Amount": 300, "PartyName": "TEST المالك",
         "EmployeeID": 1}),
+    # Manual entry 3 days ago: salaries of the month accrued (3000 = 2500 to pay + 500 social insurance)
+    Row("MJ1", "ManualEntries", {
+        "EntryNumber": "TEST-MJ-1", "EntryDate": Day(3), "Description": "TEST رواتب الشهر المستحقة",
+        "TotalAmount": 3000, "EmployeeID": 1}),
+    Row("MJ1A", "ManualEntryLines", {"ManualEntryID": Ref("MJ1"), "LineNumber": 1, "AccountCode": 5500,
+                                     "Debit": 3000, "Credit": 0}),
+    Row("MJ1B", "ManualEntryLines", {"ManualEntryID": Ref("MJ1"), "LineNumber": 2, "AccountCode": 2310,
+                                     "Debit": 0, "Credit": 2500, "LineText": "TEST صافي الرواتب"}),
+    Row("MJ1C", "ManualEntryLines", {"ManualEntryID": Ref("MJ1"), "LineNumber": 3, "AccountCode": 2320,
+                                     "Debit": 0, "Credit": 500}),
 ]
 
 # Test period: the last 30 days including today
@@ -1432,6 +1486,11 @@ CHECKS: List[Check] = [
           'SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn) AS x WHERE AccountCode = 2200', -219),
     Check("مصروف سند النقدية لا يُقيَّد مرتين",
           "SELECT COUNT(*) FROM qryJournalExpense WHERE SourceID = {ref:EXPV}", 0),
+    Check("القيد اليدوي: 3 أسطر متوازنة (3000)",
+          "SELECT COUNT(*) FROM qryJournalManual WHERE SourceID = {ref:MJ1} AND SourceType = 'MANUAL'", 3),
+    Check("قيود Manual: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalManual GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
     Check("سند صرف المصروف يُقيَّد على حساب نوع المصروف",
           "SELECT Debit FROM qryJournalCashVoucher WHERE SourceID = {ref:V1} AND AccountCode = 530009", 50),
 

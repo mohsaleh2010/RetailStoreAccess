@@ -26,7 +26,7 @@ import tafqeet as T
 import vba_harness as H
 
 MODELS = RP.all_reports()
-ACCESS_FUNCTIONS = {"Nz", "IIf", "Format", "Sum", "Count", "Len", "IsNull", "Trim"}
+ACCESS_FUNCTIONS = {"Nz", "IIf", "Format", "Sum", "Count", "Len", "IsNull", "Trim", "Space"}
 PROJECT_FUNCTIONS = {"SettingValue", "GDate", "ReportCriteria", "ReportPrintedAt", "AmountInWords",
                      "LabelCode", "LabelPrice", "OrderTypeText"}
 REPORT_PROPERTIES = {"Page", "Pages"}

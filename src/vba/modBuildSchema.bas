@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=32;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=5;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=16;Roles=3;Permissions=25;RolePermissions=51;Employees=1;Screens=34;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=22;JournalSourceTypes=13;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=32;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;ManualEntries=10;ManualEntryLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=17;Roles=3;Permissions=26;RolePermissions=53;Employees=1;Screens=35;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=75;JournalSourceTypes=14;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -71,12 +71,18 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     SeedAll
     m_currentStep = "developer user"
     EnsureDeveloperUser
+    m_currentStep = "account tree"
+    UpgradeAccountTree
 
     m_db.Close
     Set m_db = Nothing
 
     m_currentStep = "link tables"
     LinkBackEnd BackEndPath
+    On Error Resume Next                     ' modAccounts may not be imported yet (manual installs)
+    Application.Run "RebuildAccountTree"     ' levels and order of the account tree
+    Err.Clear
+    On Error GoTo EH
 
     LogLine "--- جداول جديدة: " & m_created & " | موجودة مسبقًا: " & m_skipped & _
             " | جداول تمت تعبئتها: " & m_seeded
@@ -585,6 +591,8 @@ Private Sub CreateAllTables()
     CreateTable_JournalSourceTypes
     CreateTable_JournalEntries
     CreateTable_JournalLines
+    CreateTable_ManualEntries
+    CreateTable_ManualEntryLines
     CreateTable_TransactionTypes
     CreateTable_InventoryTransactions
     CreateTable_StockCounts
@@ -1633,11 +1641,31 @@ Private Sub CreateTable_Accounts()
     AddField tdf, "AccountType", "TEXT", 10, True, "", _
              "In (""ASSET"",""LIABILITY"",""EQUITY"",""REVENUE"",""EXPENSE"")", "أصول، خصوم، حقوق ملكية، إيرادات، مصروفات", "نوع الحساب", ""
     AddField tdf, "ParentCode", "LONG", 0, False, "", _
-             "", "", "الحساب الرئيسي", ""
+             "", "", "الحساب الرئيسي", "فارغ للحسابات الخمسة في المستوى الأول فقط"
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
              "", "", "نشط", ""
+    AddField tdf, "IsPosting", "BOOL", 0, False, "True", _
+             "", "", "حساب فرعي (يقبل القيود)", ""
+    AddField tdf, "IsSystem", "BOOL", 0, False, "False", _
+             "", "", "حساب أساسي في النظام", ""
+    AddField tdf, "AccountLevel", "BYTE", 0, True, "1", _
+             "", "", "المستوى", ""
+    AddField tdf, "TreeKey", "TEXT", 60, False, "", _
+             "", "", "مفتاح الترتيب في الشجرة", "يحسبه البرنامج (modAccounts.RebuildAccountTree): رقم كل مستوى بعشر خانات"
+    AddField tdf, "Level1Code", "LONG", 0, False, "", _
+             "", "", "حساب المستوى 1", ""
+    AddField tdf, "Level2Code", "LONG", 0, False, "", _
+             "", "", "حساب المستوى 2", ""
+    AddField tdf, "Level3Code", "LONG", 0, False, "", _
+             "", "", "حساب المستوى 3", ""
+    AddField tdf, "Level4Code", "LONG", 0, False, "", _
+             "", "", "حساب المستوى 4", ""
+    AddField tdf, "Level5Code", "LONG", 0, False, "", _
+             "", "", "حساب المستوى 5", ""
     AddIndex tdf, "PrimaryKey", "AccountCode", True, True, False
-    EndTable tdf, "دليل الحسابات: الحسابات التي تُرحَّل إليها القيود. حسابات الصناديق (110000 + رقم الصندوق) وأنواع المصروفات (530000 + رقم النوع) تُنشأ تلقائيًا.", "", ""
+    AddIndex tdf, "IX_ParentCode", "ParentCode", False, False, False
+    AddIndex tdf, "IX_TreeKey", "TreeKey", False, False, False
+    EndTable tdf, "دليل الحسابات (شجرة الحسابات): شجرة من خمسة مستويات على الأكثر: الحسابات الرئيسية (تجميعية) والحسابات الفرعية التي تُرحَّل إليها القيود. حسابات الصناديق (110000 + رقم الصندوق) وأنواع المصروفات (530000 + رقم النوع) تُنشأ تلقائيًا.", "", ""
 End Sub
 
 Private Sub CreateTable_JournalSourceTypes()
@@ -1710,6 +1738,58 @@ Private Sub CreateTable_JournalLines()
     AddIndex tdf, "UX_EntryID_LineNumber", "EntryID,LineNumber", False, True, False
     AddIndex tdf, "IX_AccountCode", "AccountCode", False, False, False
     EndTable tdf, "أسطر القيود: الطرف المدين والطرف الدائن لكل قيد.", "", ""
+End Sub
+
+Private Sub CreateTable_ManualEntries()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "ManualEntries") Then Exit Sub
+    AddField tdf, "ManualEntryID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "EntryNumber", "TEXT", 20, True, "", _
+             "", "", "رقم القيد اليدوي", ""
+    AddField tdf, "EntryDate", "DATE", 0, True, "Date()", _
+             "", "", "تاريخ القيد", ""
+    AddField tdf, "Description", "TEXT", 255, True, "", _
+             "", "", "البيان", ""
+    AddField tdf, "Reference", "TEXT", 50, False, "", _
+             "", "", "المرجع", "رقم مستند خارجي: فاتورة، عقد، كشف بنك..."
+    AddField tdf, "ReversalOfID", "LONG", 0, False, "", _
+             "", "", "عكس القيد", "القيد اليدوي الذي يعكسه هذا القيد"
+    AddField tdf, "TotalAmount", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "إجمالي القيد", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "أدخله", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "UpdatedAt", "DATETIME", 0, False, "", _
+             "", "", "آخر تعديل", ""
+    AddIndex tdf, "PrimaryKey", "ManualEntryID", True, True, False
+    AddIndex tdf, "UX_EntryNumber", "EntryNumber", False, True, False
+    AddIndex tdf, "IX_EntryDate", "EntryDate", False, False, False
+    EndTable tdf, "القيود اليدوية: قيد يكتبه المحاسب بنفسه (مستحقات، تسويات، رأس المال، أرصدة افتتاحية...). يُرحَّل لليومية كأي عملية أخرى (SourceType = MANUAL)، ويُعدَّل أو يُحذف فيتبعه قيده.", "", ""
+End Sub
+
+Private Sub CreateTable_ManualEntryLines()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "ManualEntryLines") Then Exit Sub
+    AddField tdf, "ManualLineID", "AUTO", 0, False, "", _
+             "", "", "رقم السطر الداخلي", ""
+    AddField tdf, "ManualEntryID", "LONG", 0, True, "", _
+             "", "", "القيد اليدوي", ""
+    AddField tdf, "LineNumber", "INT", 0, True, "", _
+             "", "", "رقم السطر", ""
+    AddField tdf, "AccountCode", "LONG", 0, True, "", _
+             "", "", "الحساب", ""
+    AddField tdf, "Debit", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "مدين", ""
+    AddField tdf, "Credit", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "دائن", ""
+    AddField tdf, "LineText", "TEXT", 150, False, "", _
+             "", "", "بيان السطر", ""
+    AddIndex tdf, "PrimaryKey", "ManualLineID", True, True, False
+    AddIndex tdf, "UX_ManualEntryID_LineNumber", "ManualEntryID,LineNumber", False, True, False
+    AddIndex tdf, "IX_AccountCode", "AccountCode", False, False, False
+    EndTable tdf, "أسطر القيود اليدوية: الطرف المدين والطرف الدائن للقيد اليدوي؛ كل سطر مدين أو دائن فقط.", "([Debit]=0 Or [Credit]=0) And [Debit]+[Credit]>0", "كل سطر مدين أو دائن فقط، وبمبلغ أكبر من صفر"
 End Sub
 
 Private Sub CreateTable_TransactionTypes()
@@ -1934,7 +2014,8 @@ Private Sub Seed_Sequences()
     SeedRow "[SequenceName] = 'CASH_TRANSFER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_TRANSFER', 'TRF-', 1, 6, 'التحويل بين الصناديق')"
     SeedRow "[SequenceName] = 'CASH_CLOSING'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_CLOSING', 'CLS-', 1, 6, 'تصفية يومية الكاشير')"
     SeedRow "[SequenceName] = 'JOURNAL'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('JOURNAL', 'JV-', 1, 6, 'قيود اليومية')"
-    EndSeed "Sequences", 16
+    SeedRow "[SequenceName] = 'MANUAL_ENTRY'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('MANUAL_ENTRY', 'MJ-', 1, 6, 'القيود اليدوية')"
+    EndSeed "Sequences", 17
 End Sub
 
 Private Sub Seed_Roles()
@@ -1966,13 +2047,14 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'CASH_BOX'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_BOX', 'الخزينة: سندات القبض والصرف والتحويل والصناديق', 'الخزينة', 65)") Then GrantNewPermission "CASH_BOX", "1,2"
     If SeedRow("[PermissionKey] = 'CASH_CLOSING'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_CLOSING', 'تصفية يومية الكاشير', 'الخزينة', 66)") Then GrantNewPermission "CASH_CLOSING", "1,2,3"
     If SeedRow("[PermissionKey] = 'JOURNAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('JOURNAL', 'قيود اليومية ودليل الحسابات وميزان المراجعة', 'الحسابات', 75)") Then GrantNewPermission "JOURNAL", "1,2"
+    If SeedRow("[PermissionKey] = 'MANUAL_ENTRY'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('MANUAL_ENTRY', 'القيود اليدوية: إضافة وتعديل وحذف', 'الحسابات', 76)") Then GrantNewPermission "MANUAL_ENTRY", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', 'التقارير التشغيلية', 'التقارير', 70)") Then GrantNewPermission "REPORTS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', 'تقارير الأرباح والضريبة', 'التقارير', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
     If SeedRow("[PermissionKey] = 'DASHBOARD_FINANCIAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', 'الأرقام المالية في لوحة التحكم', 'التقارير', 72)") Then GrantNewPermission "DASHBOARD_FINANCIAL", "1,2"
     If SeedRow("[PermissionKey] = 'SETTINGS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', 'إعدادات المحل', 'النظام', 80)") Then GrantNewPermission "SETTINGS", "1"
     If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', 'المستخدمون والصلاحيات', 'النظام', 81)") Then GrantNewPermission "USERS", "1"
     If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', 'النسخ الاحتياطي', 'النظام', 82)") Then GrantNewPermission "BACKUP", "1"
-    EndSeed "Permissions", 25
+    EndSeed "Permissions", 26
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -1996,6 +2078,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_BOX')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'JOURNAL')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'MANUAL_ENTRY')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'DASHBOARD_FINANCIAL')"
@@ -2020,6 +2103,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_BOX')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'JOURNAL')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'MANUAL_ENTRY')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'DASHBOARD_FINANCIAL')"
@@ -2028,7 +2112,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 51
+    EndSeed "RolePermissions", 53
 End Sub
 
 Private Sub Seed_Employees()
@@ -2066,14 +2150,15 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmCashBoxes'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashBoxes', 'الصناديق', 'الخزينة', 250, 'CASH_BOX', True, True, True)"
     SeedRow "[ScreenName] = 'frmJournal'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmJournal', 'قيود اليومية', 'الحسابات', 260, 'JOURNAL', False, False, False)"
     SeedRow "[ScreenName] = 'frmAccounts'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAccounts', 'دليل الحسابات', 'الحسابات', 270, 'JOURNAL', True, True, True)"
-    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 280, 'REPORTS', False, False, False)"
-    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 290, Null, False, False, False)"
-    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 300, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 310, 'USERS', True, True, False)"
-    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 320, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 330, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 340, 'BACKUP', False, False, False)"
-    EndSeed "Screens", 34
+    SeedRow "[ScreenName] = 'frmManualEntry'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmManualEntry', 'القيود اليدوية', 'الحسابات', 280, 'MANUAL_ENTRY', True, True, True)"
+    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 290, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 300, Null, False, False, False)"
+    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 310, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 320, 'USERS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 330, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 340, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 350, 'BACKUP', False, False, False)"
+    EndSeed "Screens", 35
 End Sub
 
 Private Sub Seed_Categories()
@@ -2133,29 +2218,82 @@ End Sub
 
 Private Sub Seed_Accounts()
     If Not BeginSeed("Accounts", True) Then Exit Sub
-    SeedRow "[AccountCode] = 1100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1100, 'النقدية بالخزينة والصناديق', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 110001", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (110001, 'الخزينة الرئيسية', 'ASSET', 1100)"
-    SeedRow "[AccountCode] = 110002", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (110002, 'صندوق الكاشير', 'ASSET', 1100)"
-    SeedRow "[AccountCode] = 1190", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1190, 'نقدية غير موزعة على صندوق', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1200, 'البنك والشبكة (مدى والتحويلات)', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1300, 'ذمم العملاء', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1400, 'المخزون', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1500, 'ضريبة القيمة المضافة - مدخلات', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1600, 'سلف الموظفين', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 2100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (2100, 'ذمم الموردين', 'LIABILITY', Null)"
-    SeedRow "[AccountCode] = 2200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (2200, 'ضريبة القيمة المضافة - مخرجات', 'LIABILITY', Null)"
-    SeedRow "[AccountCode] = 3100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (3100, 'جاري المالك', 'EQUITY', Null)"
-    SeedRow "[AccountCode] = 3900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (3900, 'أرصدة افتتاحية', 'EQUITY', Null)"
-    SeedRow "[AccountCode] = 4100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4100, 'المبيعات', 'REVENUE', Null)"
-    SeedRow "[AccountCode] = 4110", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4110, 'مردودات المبيعات', 'REVENUE', Null)"
-    SeedRow "[AccountCode] = 4200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4200, 'إيرادات أخرى', 'REVENUE', Null)"
-    SeedRow "[AccountCode] = 4300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4300, 'زيادة الصناديق', 'REVENUE', Null)"
-    SeedRow "[AccountCode] = 5100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5100, 'تكلفة البضاعة المباعة', 'EXPENSE', Null)"
-    SeedRow "[AccountCode] = 5200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5200, 'فروقات وتسويات المخزون', 'EXPENSE', Null)"
-    SeedRow "[AccountCode] = 5300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5300, 'المصروفات التشغيلية', 'EXPENSE', Null)"
-    SeedRow "[AccountCode] = 5400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5400, 'عجز الصناديق', 'EXPENSE', Null)"
-    SeedRow "[AccountCode] = 5900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5900, 'مصروفات أخرى', 'EXPENSE', Null)"
-    EndSeed "Accounts", 22
+    SeedRow "[AccountCode] = 1", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1, 'الأصول', 'ASSET', Null, False, True)"
+    SeedRow "[AccountCode] = 11", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (11, 'الأصول المتداولة', 'ASSET', 1, False, True)"
+    SeedRow "[AccountCode] = 1100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1100, 'النقدية بالخزينة والصناديق', 'ASSET', 11, False, True)"
+    SeedRow "[AccountCode] = 110001", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (110001, 'الخزينة الرئيسية', 'ASSET', 1100, True, True)"
+    SeedRow "[AccountCode] = 110002", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (110002, 'صندوق الكاشير', 'ASSET', 1100, True, True)"
+    SeedRow "[AccountCode] = 1190", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1190, 'نقدية غير موزعة على صندوق', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1200, 'البنك والشبكة (مدى والتحويلات)', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1250", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1250, 'شيكات تحت التحصيل', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1300, 'ذمم العملاء', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1310", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1310, 'أوراق القبض', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1350", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1350, 'مخصص الديون المشكوك في تحصيلها', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1400, 'المخزون', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1500, 'ضريبة القيمة المضافة - مدخلات', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1600, 'سلف الموظفين', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1610", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1610, 'العهد النقدية', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1650", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1650, 'مصروفات مدفوعة مقدمًا', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1660", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1660, 'إيرادات مستحقة', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1690", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1690, 'تأمينات لدى الغير', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 12", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (12, 'الأصول غير المتداولة', 'ASSET', 1, False, True)"
+    SeedRow "[AccountCode] = 1710", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1710, 'الأثاث والتجهيزات', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1720", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1720, 'الأجهزة والحاسبات وأنظمة نقاط البيع', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1730", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1730, 'السيارات ووسائل النقل', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1740", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1740, 'الديكورات وتحسينات المحل', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1790", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1790, 'مجمع إهلاك الأصول الثابتة', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1800", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1800, 'البرامج والتراخيص', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 2", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2, 'الخصوم', 'LIABILITY', Null, False, True)"
+    SeedRow "[AccountCode] = 21", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (21, 'الخصوم المتداولة', 'LIABILITY', 2, False, True)"
+    SeedRow "[AccountCode] = 2100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2100, 'ذمم الموردين', 'LIABILITY', 21, True, True)"
+    SeedRow "[AccountCode] = 2110", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2110, 'أوراق الدفع', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2200, 'ضريبة القيمة المضافة - مخرجات', 'LIABILITY', 21, True, True)"
+    SeedRow "[AccountCode] = 2250", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2250, 'ضريبة القيمة المضافة - التسوية والسداد', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2300, 'مصروفات مستحقة', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2310", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2310, 'رواتب وأجور مستحقة', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2320", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2320, 'التأمينات الاجتماعية المستحقة', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2400, 'دفعات مقدمة من العملاء', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2500, 'قروض قصيرة الأجل', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2600, 'الزكاة المستحقة', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 22", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (22, 'الخصوم غير المتداولة', 'LIABILITY', 2, False, True)"
+    SeedRow "[AccountCode] = 2700", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2700, 'قروض طويلة الأجل', 'LIABILITY', 22, True, False)"
+    SeedRow "[AccountCode] = 2800", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2800, 'مخصص مكافأة نهاية الخدمة', 'LIABILITY', 22, True, False)"
+    SeedRow "[AccountCode] = 3", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3, 'حقوق الملكية', 'EQUITY', Null, False, True)"
+    SeedRow "[AccountCode] = 31", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (31, 'رأس المال وجاري المالك', 'EQUITY', 3, False, True)"
+    SeedRow "[AccountCode] = 3200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3200, 'رأس المال', 'EQUITY', 31, True, False)"
+    SeedRow "[AccountCode] = 3100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3100, 'جاري المالك', 'EQUITY', 31, True, True)"
+    SeedRow "[AccountCode] = 3900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3900, 'أرصدة افتتاحية', 'EQUITY', 31, True, True)"
+    SeedRow "[AccountCode] = 32", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (32, 'الأرباح المحتجزة ونتائج الأعمال', 'EQUITY', 3, False, True)"
+    SeedRow "[AccountCode] = 3300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3300, 'الأرباح المحتجزة', 'EQUITY', 32, True, False)"
+    SeedRow "[AccountCode] = 3400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3400, 'صافي ربح (خسارة) العام', 'EQUITY', 32, True, False)"
+    SeedRow "[AccountCode] = 4", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4, 'الإيرادات', 'REVENUE', Null, False, True)"
+    SeedRow "[AccountCode] = 41", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (41, 'إيرادات النشاط', 'REVENUE', 4, False, True)"
+    SeedRow "[AccountCode] = 4100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4100, 'المبيعات', 'REVENUE', 41, True, True)"
+    SeedRow "[AccountCode] = 4110", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4110, 'مردودات المبيعات', 'REVENUE', 41, True, True)"
+    SeedRow "[AccountCode] = 4120", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4120, 'الخصم المسموح به', 'REVENUE', 41, True, False)"
+    SeedRow "[AccountCode] = 42", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (42, 'إيرادات أخرى', 'REVENUE', 4, False, True)"
+    SeedRow "[AccountCode] = 4200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4200, 'إيرادات متنوعة', 'REVENUE', 42, True, True)"
+    SeedRow "[AccountCode] = 4300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4300, 'زيادة الصناديق', 'REVENUE', 42, True, True)"
+    SeedRow "[AccountCode] = 4400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4400, 'الخصم المكتسب', 'REVENUE', 42, True, False)"
+    SeedRow "[AccountCode] = 5", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5, 'المصروفات', 'EXPENSE', Null, False, True)"
+    SeedRow "[AccountCode] = 51", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (51, 'تكلفة المبيعات', 'EXPENSE', 5, False, True)"
+    SeedRow "[AccountCode] = 5100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5100, 'تكلفة البضاعة المباعة', 'EXPENSE', 51, True, True)"
+    SeedRow "[AccountCode] = 5200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5200, 'فروقات وتسويات المخزون', 'EXPENSE', 51, True, True)"
+    SeedRow "[AccountCode] = 52", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (52, 'المصروفات التشغيلية والإدارية', 'EXPENSE', 5, False, True)"
+    SeedRow "[AccountCode] = 5300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5300, 'المصروفات حسب النوع', 'EXPENSE', 52, False, True)"
+    SeedRow "[AccountCode] = 5500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5500, 'الرواتب والأجور', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5510", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5510, 'البدلات والحوافز', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5520", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5520, 'التأمينات الاجتماعية', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5600, 'إهلاك الأصول الثابتة', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5610", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5610, 'عمولات البنوك ونقاط البيع', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5620", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5620, 'الرسوم الحكومية والتراخيص', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5630", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5630, 'الدعاية والإعلان', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 53", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (53, 'مصروفات أخرى', 'EXPENSE', 5, False, True)"
+    SeedRow "[AccountCode] = 5400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5400, 'عجز الصناديق', 'EXPENSE', 53, True, True)"
+    SeedRow "[AccountCode] = 5700", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5700, 'الديون المعدومة', 'EXPENSE', 53, True, False)"
+    SeedRow "[AccountCode] = 5800", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5800, 'الزكاة', 'EXPENSE', 53, True, False)"
+    SeedRow "[AccountCode] = 5900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5900, 'مصروفات متنوعة', 'EXPENSE', 53, True, True)"
+    EndSeed "Accounts", 75
 End Sub
 
 Private Sub Seed_JournalSourceTypes()
@@ -2173,7 +2311,8 @@ Private Sub Seed_JournalSourceTypes()
     SeedRow "[SourceType] = 'BOX_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('BOX_OPENING', 'رصيد افتتاحي لصندوق', 11)"
     SeedRow "[SourceType] = 'CUSTOMER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CUSTOMER_OPENING', 'رصيد افتتاحي لعميل', 12)"
     SeedRow "[SourceType] = 'SUPPLIER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SUPPLIER_OPENING', 'رصيد افتتاحي لمورد', 13)"
-    EndSeed "JournalSourceTypes", 13
+    SeedRow "[SourceType] = 'MANUAL'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('MANUAL', 'قيد يدوي', 14)"
+    EndSeed "JournalSourceTypes", 14
 End Sub
 
 Private Sub Seed_TransactionTypes()
@@ -2193,4 +2332,80 @@ Private Sub Seed_LabelSettings()
     If Not BeginSeed("LabelSettings", False) Then Exit Sub
     ExecSeed "INSERT INTO [LabelSettings] ([LabelSettingID]) VALUES (1)"
     EndSeed "LabelSettings", 1
+End Sub
+
+Private Sub UpgradeAccountTree()
+    ' accounts of an older back-end without a parent go to their place in the tree
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1 WHERE [AccountCode] = 11 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1100 WHERE [AccountCode] = 110001 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1100 WHERE [AccountCode] = 110002 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1190 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1250 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1310 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1350 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1500 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1600 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1610 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1650 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1660 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1690 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1 WHERE [AccountCode] = 12 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1710 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1720 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1730 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1740 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1790 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1800 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 2 WHERE [AccountCode] = 21 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2110 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2250 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2310 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2320 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2500 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2600 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 2 WHERE [AccountCode] = 22 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 22 WHERE [AccountCode] = 2700 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 22 WHERE [AccountCode] = 2800 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 3 WHERE [AccountCode] = 31 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 31 WHERE [AccountCode] = 3200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 31 WHERE [AccountCode] = 3100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 31 WHERE [AccountCode] = 3900 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 3 WHERE [AccountCode] = 32 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 32 WHERE [AccountCode] = 3300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 32 WHERE [AccountCode] = 3400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 4 WHERE [AccountCode] = 41 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 41 WHERE [AccountCode] = 4100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 41 WHERE [AccountCode] = 4110 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 41 WHERE [AccountCode] = 4120 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 4 WHERE [AccountCode] = 42 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 42 WHERE [AccountCode] = 4200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 42 WHERE [AccountCode] = 4300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 42 WHERE [AccountCode] = 4400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 5 WHERE [AccountCode] = 51 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 51 WHERE [AccountCode] = 5100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 51 WHERE [AccountCode] = 5200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 5 WHERE [AccountCode] = 52 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5500 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5510 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5520 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5600 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5610 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5620 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5630 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 5 WHERE [AccountCode] = 53 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5700 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5800 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5900 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [IsPosting] = False WHERE [AccountCode] IN (1, 11, 1100, 12, 2, 21, 22, 3, 31, 32, 4, 41, 42, 5, 51, 52, 5300, 53)", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN (1, 11, 1100, 110001, 110002, 1190, 1200, 1300, 1400, 1500, 1600, 12, 2, 21, 2100, 2200, 22, 3, 31, 3100, 3900, 32, 4, 41, 4100, 4110, 42, 4200, 4300, 5, 51, 5100, 5200, 52, 5300, 53, 5400, 5900) OR [AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError
 End Sub

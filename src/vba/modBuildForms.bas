@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -613,6 +613,8 @@ Private Sub BuildAllForms()
     BuildForm_frmCashClosing
     BuildForm_frmJournal
     BuildForm_frmJournalEntry
+    BuildForm_frmManualLines
+    BuildForm_frmManualEntry
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -2259,11 +2261,11 @@ Private Sub BuildForm_frmAccounts()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmAccounts", "دليل الحسابات", "SELECT * FROM Accounts", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=Accounts|PK=AccountCode|LIST=SELECT t.AccountCode, t.AccountCode AS [الرقم], t.AccountName AS [الحساب] FROM Accounts AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.AccountCode|SEARCH=t.AccountName|ACTIVE=t.IsActive|UNIQUE=AccountCode"
+              "KIND=LIST|TABLE=Accounts|PK=AccountCode|LIST=SELECT t.AccountCode, t.AccountCode AS [الرقم], Space((t.AccountLevel - 1) * 3) & t.AccountName AS [الحساب], IIf(t.IsPosting, 'فرعي', 'رئيسي') AS [النوع] FROM Accounts AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.TreeKey|SEARCH=t.AccountName|ACTIVE=t.IsActive|UNIQUE=AccountCode"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "دليل الحسابات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
-    Set c = AddLabel("lblSubtitle", "الحسابات التي تُرحَّل إليها القيود الآلية", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblSubtitle", "شجرة الحسابات: الحسابات الرئيسية والفرعية", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
     Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
@@ -2273,6 +2275,8 @@ Private Sub BuildForm_frmAccounts()
     Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
     c.OnClick = EP
     Set c = AddButton("btnJournal", "قيود اليومية", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnManual", "قيد يدوي", 7937, 1021, 1701, 482, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
@@ -2284,22 +2288,39 @@ Private Sub BuildForm_frmAccounts()
     SetCtlProp c, "DefaultValue", "False"
     c.AfterUpdate = EP
     Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
-    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 3, "0;1134;3629", True)
+    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 4, "0;1021;3062;680", True)
     c.AfterUpdate = EP
     Set c = AddText("AccountCode", "AccountCode", 7201, 1701, 2948, 425)
-    SetCtlProp c, "ControlTipText", "الصناديق 110000 + رقم الصندوق، وأنواع المصروفات 530000 + رقم النوع"
-    SetCtlProp c, "StatusBarText", "الصناديق 110000 + رقم الصندوق، وأنواع المصروفات 530000 + رقم النوع"
+    SetCtlProp c, "ControlTipText", "رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ"
+    SetCtlProp c, "StatusBarText", "رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ"
     Set c = AddLabel("lblAccountCode", "رقم الحساب *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "AccountCode", 0)
-    Set c = AddCombo("AccountType", "AccountType", 12134, 1701, 2948, 425, "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات", 2, "0;2835")
-    Set c = AddLabel("lblAccountType", "نوع الحساب *", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "AccountType", 0)
+    Set c = AddCombo("ParentCode", "ParentCode", 12134, 1701, 2948, 425, "SELECT AccountCode, Space((AccountLevel - 1) * 3) & AccountName AS Account FROM Accounts WHERE IsPosting = False ORDER BY TreeKey", 2, "0;3969")
+    SetCtlProp c, "ControlTipText", "الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا)"
+    SetCtlProp c, "StatusBarText", "الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا)"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblParentCode", "الحساب الرئيسي", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "ParentCode", 0)
     Set c = AddText("AccountName", "AccountName", 7201, 2268, 7881, 425)
     Set c = AddLabel("lblAccountName", "اسم الحساب *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "AccountName", 0)
-    Set c = AddCombo("ParentCode", "ParentCode", 7201, 2835, 2948, 425, "SELECT AccountCode, AccountName FROM Accounts ORDER BY AccountCode", 2, "1134;3402")
-    Set c = AddLabel("lblParentCode", "الحساب الرئيسي", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "ParentCode", 0)
-    Set c = AddCheck("IsActive", "IsActive", 12134, 2920)
-    Set c = AddLabel("lblIsActive", "نشط", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblAccountNote", "القيود آلية: تُنشأ من العمليات وتُحدَّث معها، ولا تُكتب يدويًا", 5443, 3402, 9639, 425, 10, True, CLR_ACCENT, "", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 4082, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddCombo("AccountType", "AccountType", 7201, 2835, 2948, 425, "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات", 2, "0;2835")
+    Set c = AddLabel("lblAccountType", "نوع الحساب *", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "AccountType", 0)
+    Set c = AddCheck("IsPosting", "IsPosting", 12134, 2920)
+    SetCtlProp c, "ControlTipText", "فرعي = تُكتب عليه القيود؛ رئيسي = يجمع حساباته التابعة فقط"
+    SetCtlProp c, "StatusBarText", "فرعي = تُكتب عليه القيود؛ رئيسي = يجمع حساباته التابعة فقط"
+    Set c = AddLabel("lblIsPosting", "حساب فرعي (يقبل القيود)", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "IsPosting", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 3487)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddCheck("IsSystem", "IsSystem", 12134, 3487)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddLabel("lblIsSystem", "حساب أساسي في النظام", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "IsSystem", 0)
+    Set c = AddText("AccountLevel", "AccountLevel", 7201, 3969, 2948, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddLabel("lblAccountLevel", "المستوى", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "AccountLevel", 0)
+    Set c = AddLabel("lblAccountNote", "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي».", 10376, 3969, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 4649, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -2344,6 +2365,9 @@ Private Sub BuildForm_frmAccounts()
     s = s & "Private Sub btnJournal_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmJournal""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnManual_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmManualEntry""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -2355,6 +2379,9 @@ Private Sub BuildForm_frmAccounts()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
     s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub ParentCode_AfterUpdate()" & vbCrLf
+    s = s & "    FieldChanged Me, ""ParentCode""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmAccounts", s
     Exit Sub
@@ -5929,6 +5956,8 @@ Private Sub BuildForm_frmJournal()
     c.OnClick = EP
     Set c = AddButton("btnAccounts", "دليل الحسابات", 9524, 7881, 1701, 510, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnManual", "قيد يدوي", 11338, 7881, 1361, 510, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "رجوع", 13721, 7881, 1361, 510, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSync", " ", 227, 8505, 14855, 312, 9, False, CLR_MUTED, "", 0)
@@ -5983,6 +6012,9 @@ Private Sub BuildForm_frmJournal()
     s = s & "Private Sub btnAccounts_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmAccounts""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnManual_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmManualEntry""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -5990,7 +6022,7 @@ Private Sub BuildForm_frmJournal()
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,13665,1304,1418,454,1000,0,0,0;lstEntries,227,1928,14855,2665,0,1000,0,1000;lblTotals,227,4649,14855,340,0,1000,1000,0;lblLinesCap,227,5046,6804,312,0,0,1000,0;lstLines,227,5386,14855,2325,0,1000,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnOpenEntry,227,7881,1588,510,0,0,1000,0;btnOpenSource,1928,7881,2041,510,0,0,1000,0;btnSync,4082,7881,1701,510,0,0,1000,0;btnPrint,5896,7881,1701,510,0,0,1000,0;btnTrial,7710,7881,1701,510,0,0,1000,0;btnAccounts,9524,7881,1701,510,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnClose,13721,7881,1361,510,1000,0,1000,0;lblSync,227,8505,14855,312,0,1000,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnManual,11338,7881,1361,510,0,0,1000,0;btnClose,13721,7881,1361,510,1000,0,1000,0;lblSync,227,8505,14855,312,0,1000,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 15309, 9015, -1190, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmJournal", s
@@ -6038,4 +6070,153 @@ Private Sub BuildForm_frmJournalEntry()
     Exit Sub
 EH:
     AbortForm "frmJournalEntry", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmManualLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmManualLines", "أسطر القيد اليدوي", "SELECT * FROM tmpManualLines ORDER BY LineNo", 14855, 425, False, True, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    Set c = AddText("LineNo", "LineNo", 28, 0, 510, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddCombo("AccountCode", "AccountCode", 566, 0, 5273, 425, "SELECT AccountCode, AccountCode & '  ' & AccountName AS Account FROM Accounts WHERE IsPosting = True AND IsActive = True ORDER BY TreeKey", 2, "0;5103")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddText("Debit", "Debit", 5867, 0, 1701, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddText("Credit", "Credit", 7596, 0, 1701, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddText("LineText", "LineText", 9325, 0, 4933, 425)
+    c.AfterUpdate = EP
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 14286, 17, 454, 391, "danger")
+    SetCtlProp c, "FontName", ICON_FONT
+    c.OnClick = EP
+    s = ""
+    s = s & "Private Sub AccountCode_AfterUpdate()" & vbCrLf
+    s = s & "    ManualLineChanged Me, ""AccountCode""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Debit_AfterUpdate()" & vbCrLf
+    s = s & "    ManualLineChanged Me, ""Debit""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Credit_AfterUpdate()" & vbCrLf
+    s = s & "    ManualLineChanged Me, ""Credit""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub LineText_AfterUpdate()" & vbCrLf
+    s = s & "    ManualLineChanged Me, ""LineText""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    ManualRemoveLine Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmManualLines", s
+    Exit Sub
+EH:
+    AbortForm "frmManualLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmManualEntry()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmManualEntry", "القيود اليدوية", "", 15309, 9639, False, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "القيود اليدوية", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "قيد يكتبه المحاسب: المدين = الدائن، ويُرحَّل لقيود اليومية عند الحفظ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboFind", "", 227, 1304, 6804, 454, "SELECT ManualEntryID, EntryNumber, EntryDate, Description FROM ManualEntries ORDER BY EntryDate DESC, ManualEntryID DESC", 4, "0;1474;1474;4536")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblFind", "فتح قيد محفوظ", 227, 992, 6804, 284, 9, False, CLR_MUTED, "cboFind", 0)
+    Set c = AddText("txtEntryID", "", 7144, 1304, 284, 454)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtReversalOf", "", 7541, 1304, 284, 454)
+    SetCtlProp c, "Visible", False
+    Set c = AddText("txtNumber", "", 227, 2098, 1814, 454)
+    c.FontBold = True
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddLabel("lblNumber", "رقم القيد", 227, 1786, 1814, 284, 9, False, CLR_MUTED, "txtNumber", 0)
+    Set c = AddText("txtDate", "", 2155, 2098, 1814, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblDate", "التاريخ", 2155, 1786, 1814, 284, 9, False, CLR_MUTED, "txtDate", 0)
+    Set c = AddText("txtReference", "", 4082, 2098, 2381, 454)
+    Set c = AddLabel("lblReference", "المرجع (اختياري)", 4082, 1786, 2381, 284, 9, False, CLR_MUTED, "txtReference", 0)
+    Set c = AddText("txtDescription", "", 6577, 2098, 8505, 454)
+    Set c = AddLabel("lblDescription", "البيان", 6577, 1786, 8505, 284, 9, False, CLR_MUTED, "txtDescription", 0)
+    Set c = AddLabel("lblCol1", "#", 255, 2750, 510, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "الحساب", 793, 2750, 5273, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "مدين", 6094, 2750, 1701, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "دائن", 7823, 2750, 1701, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol5", "بيان السطر", 9552, 2750, 4933, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subLines", "frmManualLines", 227, 3090, 14855, 4309)
+    Set c = AddLabel("lblTotals", " ", 227, 7513, 14855, 369, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblStatus", " ", 227, 7910, 14855, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnNew", "قيد جديد", 227, 8732, 1474, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "حفظ القيد", 1814, 8732, 1588, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnReverse", "قيد عكسي", 3515, 8732, 1474, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrint", "طباعة", 5102, 8732, 1247, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnInJournal", "عرض في اليومية", 6462, 8732, 1814, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAccounts", "دليل الحسابات", 8389, 8732, 1701, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف القيد", 10203, 8732, 1474, 510, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "رجوع", 13721, 8732, 1361, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnResize = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    ManualEntryLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboFind_AfterUpdate()" & vbCrLf
+    s = s & "    ManualFindPicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    ManualNew Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    SaveManualEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReverse_Click()" & vbCrLf
+    s = s & "    ReverseManualEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintManualEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnInJournal_Click()" & vbCrLf
+    s = s & "    ManualOpenInJournal Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAccounts_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAccounts""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    DeleteManualEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;txtDescription,6577,2098,8505,454,0,1000,0,0;subLines,227,3090,14855,4309,0,1000,0,1000;lblTotals,227,7513,14855,369,0,1000,1000,0;lblStatus,227,7910,14855,340,0,1000,1000,0;btnNew,227,8732,1474,510,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnSave,1814,8732,1588,510,0,0,1000,0;btnReverse,3515,8732,1474,510,0,0,1000,0;btnPrint,5102,8732,1247,510,0,0,1000,0;btnInJournal,6462,8732,1814,510,0,0,1000,0;btnAccounts,8389,8732,1701,510,0,0,1000,0;btnDelete,10203,8732,1474,510,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnClose,13721,8732,1361,510,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 15309, 9639, -2834, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmManualEntry", s
+    Exit Sub
+EH:
+    AbortForm "frmManualEntry", Err.Number, Err.Description
 End Sub

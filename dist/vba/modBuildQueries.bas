@@ -23,7 +23,7 @@ Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,Dashbo" & _
     "ardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPa" & _
-    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryTreeRollup,TrialBalanceTreeQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -406,6 +406,14 @@ Private Sub LoadFixture()
         "INSERT INTO [CashVouchers] ([VoucherNumber], [VoucherDate], [VoucherType], [CashBoxID], [Category], [Amount], [PartyName], [EmployeeID]) VALUES ('TEST-CIN-1', " & D(2, 9) & ", 'IN', " & R("BOXM") & ", 'OWNER', 2000, 'TEST «·„«·ﬂ', 1)"
     Ins "V5", "CashVouchers", "CashVoucherID", _
         "INSERT INTO [CashVouchers] ([VoucherNumber], [VoucherDate], [VoucherType], [CashBoxID], [Category], [Amount], [PartyName], [EmployeeID]) VALUES ('TEST-COT-3', " & D(1, 12) & ", 'OUT', " & R("BOXM") & ", 'OWNER', 300, 'TEST «·„«·ﬂ', 1)"
+    Ins "MJ1", "ManualEntries", "ManualEntryID", _
+        "INSERT INTO [ManualEntries] ([EntryNumber], [EntryDate], [Description], [TotalAmount], [EmployeeID]) VALUES ('TEST-MJ-1', " & D(3, 0) & ", 'TEST —Ê« » «·‘Â— «·„” Õﬁ…', 3000, 1)"
+    Ins "MJ1A", "ManualEntryLines", "ManualLineID", _
+        "INSERT INTO [ManualEntryLines] ([ManualEntryID], [LineNumber], [AccountCode], [Debit], [Credit]) VALUES (" & R("MJ1") & ", 1, 5500, 3000, 0)"
+    Ins "MJ1B", "ManualEntryLines", "ManualLineID", _
+        "INSERT INTO [ManualEntryLines] ([ManualEntryID], [LineNumber], [AccountCode], [Debit], [Credit], [LineText]) VALUES (" & R("MJ1") & ", 2, 2310, 0, 2500, 'TEST ’«›Ì «·—Ê« »')"
+    Ins "MJ1C", "ManualEntryLines", "ManualLineID", _
+        "INSERT INTO [ManualEntryLines] ([ManualEntryID], [LineNumber], [AccountCode], [Debit], [Credit]) VALUES (" & R("MJ1") & ", 3, 2320, 0, 500)"
 End Sub
 
 Private Sub RunChecks()
@@ -618,6 +626,10 @@ Private Sub RunChecks()
         "SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn) AS x WHERE AccountCode = 2200", -219
     Chk "„’—Ê› ”‰œ «·‰ﬁœÌ… ·« ÌıﬁÌÛ¯œ „— Ì‰", _
         "SELECT COUNT(*) FROM qryJournalExpense WHERE SourceID = " & R("EXPV"), 0
+    Chk "«·ﬁÌœ «·ÌœÊÌ: 3 √”ÿ— „ Ê«“‰… (3000)", _
+        "SELECT COUNT(*) FROM qryJournalManual WHERE SourceID = " & R("MJ1") & " AND SourceType = 'MANUAL'", 3
+    Chk "ﬁÌÊœ Manual: ﬂ· ﬁÌœ „ Ê«“‰", _
+        "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalManual GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0
     Chk "”‰œ ’—› «·„’—Ê› ÌıﬁÌÛ¯œ ⁄·Ï Õ”«» ‰Ê⁄ «·„’—Ê›", _
         "SELECT Debit FROM qryJournalCashVoucher WHERE SourceID = " & R("V1") & " AND AccountCode = 530009", 50
     Chk "›Õ’ «·”·«„…: ·«  ÊÃœ „‘ﬂ·« ", _
@@ -708,11 +720,16 @@ Private Sub CreateAllQueries()
     Q_qryJournalCashVoucher
     Q_qryJournalStock
     Q_qryJournalOpening
+    Q_qryManualEntryLines
+    Q_qryJournalManual
     Q_JournalLinesQuery
     Q_qryJournalEntryPrint
     Q_qryTrialBefore
     Q_qryTrialPeriod
     Q_TrialBalanceQuery
+    Q_qryTreeRollup
+    Q_TrialBalanceTreeQuery
+    Q_AccountTreeQuery
     Q_qrySalesInvoiceLineTotals
     Q_qryPurchaseInvoiceLineTotals
     Q_qrySalesReturnedQty
@@ -1744,6 +1761,22 @@ Private Sub Q_qryJournalOpening()
     SaveQuery "qryJournalOpening", "√”ÿ— ﬁÌÊœ «·√—’œ… «·«›  «ÕÌ… ··’‰«œÌﬁ Ê«·⁄„·«¡ Ê«·„Ê—œÌ‰", s
 End Sub
 
+Private Sub Q_qryManualEntryLines()
+    Dim s As String
+    s = "SELECT h.ManualEntryID, h.EntryNumber, h.EntryDate, h.Description, l.LineNumber AS LineNo," & vbCrLf
+    s = s & "       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote" & vbCrLf
+    s = s & "FROM ManualEntries AS h INNER JOIN ManualEntryLines AS l ON h.ManualEntryID = l.ManualEntryID" & vbCrLf
+    SaveQuery "qryManualEntryLines", "√”ÿ— «·ﬁÌÊœ «·ÌœÊÌ… „⁄ —√” ﬂ· ﬁÌœ", s
+End Sub
+
+Private Sub Q_qryJournalManual()
+    Dim s As String
+    s = "SELECT 'MANUAL' AS SourceType, m.ManualEntryID AS SourceID, m.EntryNumber AS SourceNumber, m.EntryDate AS SourceDate, m.Description AS Party, m.LineNo AS LineOrder, m.LineAccount AS AccountCode, m.LineDebit AS Debit, m.LineCredit AS Credit, m.LineNote AS LineText" & vbCrLf
+    s = s & "FROM qryManualEntryLines AS m" & vbCrLf
+    s = s & "WHERE m.LineDebit + m.LineCredit <> 0" & vbCrLf
+    SaveQuery "qryJournalManual", "√”ÿ— «·ﬁÌÊœ «·ÌœÊÌ…", s
+End Sub
+
 Private Sub Q_JournalLinesQuery()
     Dim s As String
     s = "SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber," & vbCrLf
@@ -1795,6 +1828,59 @@ Private Sub Q_TrialBalanceQuery()
     s = s & "WHERE b.AccountCode Is Not Null OR p.AccountCode Is Not Null" & vbCrLf
     s = s & "ORDER BY a.AccountCode" & vbCrLf
     SaveQuery "TrialBalanceQuery", "„Ì“«‰ «·„—«Ã⁄…: —’Ìœ √Ê· «·„œ… ÊÕ—ﬂ… «·› —… Ê«·—’Ìœ «·Œ «„Ì («·„œÌ‰ „ÊÃ»)", s
+End Sub
+
+Private Sub Q_qryTreeRollup()
+    Dim s As String
+    s = "SELECT d.Level1Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit," & vbCrLf
+    s = s & "       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing" & vbCrLf
+    s = s & "FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode" & vbCrLf
+    s = s & "WHERE d.Level1Code Is Not Null" & vbCrLf
+    s = s & "GROUP BY d.Level1Code" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT d.Level2Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit," & vbCrLf
+    s = s & "       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing" & vbCrLf
+    s = s & "FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode" & vbCrLf
+    s = s & "WHERE d.Level2Code Is Not Null" & vbCrLf
+    s = s & "GROUP BY d.Level2Code" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT d.Level3Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit," & vbCrLf
+    s = s & "       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing" & vbCrLf
+    s = s & "FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode" & vbCrLf
+    s = s & "WHERE d.Level3Code Is Not Null" & vbCrLf
+    s = s & "GROUP BY d.Level3Code" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT d.Level4Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit," & vbCrLf
+    s = s & "       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing" & vbCrLf
+    s = s & "FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode" & vbCrLf
+    s = s & "WHERE d.Level4Code Is Not Null" & vbCrLf
+    s = s & "GROUP BY d.Level4Code" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT d.Level5Code AS TreeCode, Sum(t.OpeningBalance) AS SumOpening, Sum(t.PeriodDebit) AS SumDebit," & vbCrLf
+    s = s & "       Sum(t.PeriodCredit) AS SumCredit, Sum(t.ClosingBalance) AS SumClosing" & vbCrLf
+    s = s & "FROM TrialBalanceQuery AS t INNER JOIN Accounts AS d ON t.AccountCode = d.AccountCode" & vbCrLf
+    s = s & "WHERE d.Level5Code Is Not Null" & vbCrLf
+    s = s & "GROUP BY d.Level5Code" & vbCrLf
+    SaveQuery "qryTreeRollup", "√—’œ… „Ì“«‰ «·„—«Ã⁄… „Ã„¯⁄… ⁄·Ï ﬂ· „” ÊÏ „‰ ‘Ã—… «·Õ”«»« ", s
+End Sub
+
+Private Sub Q_TrialBalanceTreeQuery()
+    Dim s As String
+    s = "SELECT a.AccountCode, a.AccountName, IIf(a.AccountType = 'ASSET', '√’Ê·', IIf(a.AccountType = 'LIABILITY', 'Œ’Ê„', IIf(a.AccountType = 'EQUITY', 'ÕﬁÊﬁ „·ﬂÌ…', IIf(a.AccountType = 'REVENUE', '≈Ì—«œ« ', '„’—Ê›« ')))) AS TypeName, a.AccountLevel, a.TreeKey, a.IsPosting," & vbCrLf
+    s = s & "       r.SumOpening AS OpeningBalance, r.SumDebit AS PeriodDebit, r.SumCredit AS PeriodCredit," & vbCrLf
+    s = s & "       r.SumClosing AS ClosingBalance" & vbCrLf
+    s = s & "FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode" & vbCrLf
+    s = s & "ORDER BY a.TreeKey" & vbCrLf
+    SaveQuery "TrialBalanceTreeQuery", "„Ì“«‰ «·„—«Ã⁄… »«·„” ÊÌ« : ﬂ· Õ”«» —∆Ì”Ì »„Ã„Ê⁄ Õ”«»« Â «· «»⁄…", s
+End Sub
+
+Private Sub Q_AccountTreeQuery()
+    Dim s As String
+    s = "SELECT a.AccountCode, a.AccountName, IIf(a.AccountType = 'ASSET', '√’Ê·', IIf(a.AccountType = 'LIABILITY', 'Œ’Ê„', IIf(a.AccountType = 'EQUITY', 'ÕﬁÊﬁ „·ﬂÌ…', IIf(a.AccountType = 'REVENUE', '≈Ì—«œ« ', '„’—Ê›« ')))) AS TypeName, a.AccountLevel, a.TreeKey," & vbCrLf
+    s = s & "       a.ParentCode, IIf(a.IsPosting, '›—⁄Ì', '—∆Ì”Ì') AS KindName, a.IsPosting, a.IsActive" & vbCrLf
+    s = s & "FROM Accounts AS a" & vbCrLf
+    s = s & "ORDER BY a.TreeKey" & vbCrLf
+    SaveQuery "AccountTreeQuery", "‘Ã—… «·Õ”«»« : ﬂ· Õ”«» »„” Ê«Â Ê‰Ê⁄Â ÊÂ· Ìﬁ»· «·ﬁÌÊœ", s
 End Sub
 
 Private Sub Q_qrySalesInvoiceLineTotals()

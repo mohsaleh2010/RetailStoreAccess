@@ -192,6 +192,20 @@ LIST_SPECS: List[ListSpec] = [
         Col("دائن الفترة", "PeriodCredit", 2.8, MONEY, True), Col("الرصيد الختامي", "ClosingBalance", 3.0, MONEY, True)],
         [("AccountCode", False)], no_data="لا توجد قيود.",
         summary=[("مجموع الأرصدة (صفر = متوازن)", "=Sum([ClosingBalance])")]),
+    ListSpec("TRIAL_BALANCE_TREE", [
+        Col("الحساب", "AccountCode", 2.0), Col("اسم الحساب", "=Space(([AccountLevel]-1)*3) & [AccountName]", 6.4,
+                                               grow=True),
+        Col("رصيد أول المدة", "OpeningBalance", 2.7, MONEY), Col("مدين الفترة", "PeriodDebit", 2.7, MONEY),
+        Col("دائن الفترة", "PeriodCredit", 2.7, MONEY), Col("الرصيد الختامي", "ClosingBalance", 2.9, MONEY)],
+        [("TreeKey", False)], no_data="لا توجد قيود.",
+        summary=[("مدين الفترة (المستوى الأول)", "=Sum(IIf([AccountLevel]=1,[PeriodDebit],0))"),
+                 ("دائن الفترة (المستوى الأول)", "=Sum(IIf([AccountLevel]=1,[PeriodCredit],0))"),
+                 ("مجموع أرصدة المستوى الأول (صفر = متوازن)", "=Sum(IIf([AccountLevel]=1,[ClosingBalance],0))")]),
+    ListSpec("ACCOUNT_TREE", [
+        Col("رقم الحساب", "AccountCode", 2.4), Col("الحساب", "=Space(([AccountLevel]-1)*3) & [AccountName]", 8.0,
+                                                  grow=True),
+        Col("المستوى", "AccountLevel", 1.6, INT), Col("النوع", "TypeName", 2.4), Col("رئيسي / فرعي", "KindName", 2.4)],
+        [("TreeKey", False)], no_data="لا توجد حسابات."),
     ListSpec("SLOW_MOVING", [
         Col("الكود", "ProductCode", 2.2), Col("المنتج", "ProductName", 5.0, grow=True),
         Col("التصنيف", "CategoryName", 2.5), Col("الكمية", "CurrentQuantity", 1.8, QTY, True),

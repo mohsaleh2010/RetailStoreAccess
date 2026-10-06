@@ -24,6 +24,7 @@ Public Sub FormLoad(ByVal frm As Access.Form)
         frm.RecordSource = "SELECT * FROM Employees WHERE IsDeveloper = False"  ' the programmer stays hidden
     End If
     If TagValue(frm, "TABLE") = "Settings" Then SettingsScreenLoad frm
+    If TagValue(frm, "TABLE") = "Accounts" Then RebuildAccountTree                    ' tree order (modAccounts)
     If Not CanScreenAction(frm.Name, "ADD", True) Then
         frm.AllowAdditions = False
         If ControlExists(frm, "btnNew") Then SetEnabled frm!btnNew, False
@@ -109,6 +110,8 @@ Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
             If Not ValidateSettings(frm) Then Exit Function
         Case "Employees"
             If Not ValidateEmployee(frm) Then Exit Function        ' modSecurity
+        Case "Accounts"
+            If Not ValidateAccount(frm) Then Exit Function         ' modAccounts
     End Select
     If Not CheckUnique(frm) Then Exit Function
     If Not AssignSequence(frm) Then Exit Function      ' last: a refused save wastes no number
@@ -120,6 +123,7 @@ Public Sub FormAfterUpdate(ByVal frm As Access.Form)
     Dim pk As String
     pk = TagValue(frm, "PK")
     LogAction "SAVE", TagValue(frm, "TABLE"), CStr(Nz(frm(pk).Value, ""))
+    If TagValue(frm, "TABLE") = "Accounts" Then RebuildAccountTree                    ' level and place in the tree
     RefreshList frm
     SetStatus frm, "تم الحفظ", CLR_SUCCESS
 End Sub
@@ -228,6 +232,12 @@ Private Sub DeleteRecord(ByVal frm As Access.Form)
     table = TagValue(frm, "TABLE")
     pk = TagValue(frm, "PK")
     id = frm(pk).Value
+    If table = "Accounts" Then
+        If Len(AccountDeleteProblem(CLng(id))) > 0 Then
+            ShowWarning AccountDeleteProblem(CLng(id))
+            Exit Sub
+        End If
+    End If
     If HasRecordField(frm, "IsSystem") Then
         If Nz(frm("IsSystem").Value, False) Then
             ShowWarning "هذا سجل أساسي في النظام ولا يمكن حذفه."
@@ -531,6 +541,8 @@ End Sub
 '------------------------------------------------------------------------------
 Public Sub FieldChanged(ByVal frm As Access.Form, ByVal FieldName As String)
     Select Case TagValue(frm, "TABLE")
+        Case "Accounts"
+            If FieldName = "ParentCode" Then AccountParentChanged frm   ' modAccounts
         Case "Products"
             UpdatePriceInfo frm
         Case "Expenses"

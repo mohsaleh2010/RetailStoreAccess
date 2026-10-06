@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -168,12 +168,18 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     SeedAll
     m_currentStep = "developer user"
     EnsureDeveloperUser
+    m_currentStep = "account tree"
+    UpgradeAccountTree
 
     m_db.Close
     Set m_db = Nothing
 
     m_currentStep = "link tables"
     LinkBackEnd BackEndPath
+    On Error Resume Next                     ' modAccounts may not be imported yet (manual installs)
+    Application.Run "RebuildAccountTree"     ' levels and order of the account tree
+    Err.Clear
+    On Error GoTo EH
 
     LogLine "--- جداول جديدة: " & m_created & " | موجودة مسبقًا: " & m_skipped & _
             " | جداول تمت تعبئتها: " & m_seeded
@@ -649,6 +655,26 @@ End Sub
 '''
 
 
+def account_upgrade_sub() -> str:
+    """An older back-end has the accounts without parents: place them in the tree, mark the main
+    accounts (no entries) and the accounts the automatic entries use. Safe to run every time."""
+    from schema import ACCOUNT_TREE
+    out = ["Private Sub UpgradeAccountTree()",
+           "    ' accounts of an older back-end without a parent go to their place in the tree"]
+    for code, name, kind, parent, posting, system in ACCOUNT_TREE:
+        if parent is not None:
+            out.append(f'    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = {parent} WHERE [AccountCode] = {code} '
+                       f'AND [ParentCode] Is Null", dbFailOnError')
+    headers = ", ".join(str(r[0]) for r in ACCOUNT_TREE if not r[4])
+    system = ", ".join(str(r[0]) for r in ACCOUNT_TREE if r[5])
+    out.append(f'    m_db.Execute "UPDATE [Accounts] SET [IsPosting] = False WHERE [AccountCode] IN ({headers})", '
+               f'dbFailOnError')
+    out.append(f'    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN ({system}) OR '
+               f'[AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError')
+    out.append("End Sub")
+    return "\n".join(out)
+
+
 def build_vba() -> str:
     names = ",".join(t.name for t in TABLES)
     field_counts = ";".join(f"{t.name}={len(t.fields)}" for t in TABLES)
@@ -671,6 +697,7 @@ def build_vba() -> str:
                  "\n".join(f"    Seed_{t.name}" for t in seeded) + "\nEnd Sub\n")
     for t in seeded:
         parts.append(vba_seed_sub(t) + "\n")
+    parts.append(account_upgrade_sub() + "\n")
     return "\n".join(parts)
 
 

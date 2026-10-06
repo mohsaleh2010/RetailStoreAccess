@@ -128,7 +128,9 @@ PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY 
 CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
 ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
-ACCOUNT_ROWS = "SELECT AccountCode, AccountName FROM Accounts ORDER BY AccountCode"
+# main (summary) accounts only: a sub-account always hangs under a main account
+ACCOUNT_ROWS = ("SELECT AccountCode, Space((AccountLevel - 1) * 3) & AccountName AS Account FROM Accounts "
+                "WHERE IsPosting = False ORDER BY TreeKey")
 ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 
@@ -290,17 +292,23 @@ DATA_SCREENS: List[DataScreen] = [
                 Info("lblBoxNote", "الرصيد لا يُكتب يدويًا: يُحسب من المبيعات والسندات والمصروفات"),
                 Fld("Notes", span=2)]),
     DataScreen(
-        "frmAccounts", "Accounts", "دليل الحسابات", "الحسابات التي تُرحَّل إليها القيود الآلية", "journal",
-        list_select="t.AccountCode AS [الرقم], t.AccountName AS [الحساب]",
-        list_from="Accounts AS t", list_order="t.AccountCode",
-        list_headers=[("الرقم", 2.0), ("الحساب", 6.4)],
+        "frmAccounts", "Accounts", "دليل الحسابات", "شجرة الحسابات: الحسابات الرئيسية والفرعية", "journal",
+        list_select="t.AccountCode AS [الرقم], Space((t.AccountLevel - 1) * 3) & t.AccountName AS [الحساب], "
+                    "IIf(t.IsPosting, 'فرعي', 'رئيسي') AS [النوع]",
+        list_from="Accounts AS t", list_order="t.TreeKey",
+        list_headers=[("الرقم", 1.8), ("الحساب", 5.4), ("النوع", 1.2)],
         search=["t.AccountName"], active="t.IsActive", unique=["AccountCode"],
-        extra_buttons=[("btnJournal", "قيود اليومية", 'OpenScreen "frmJournal"')],
-        fields=[Fld("AccountCode", hint="الصناديق 110000 + رقم الصندوق، وأنواع المصروفات 530000 + رقم النوع"),
+        extra_buttons=[("btnJournal", "قيود اليومية", 'OpenScreen "frmJournal"'),
+                       ("btnManual", "قيد يدوي", 'OpenScreen "frmManualEntry"')],
+        fields=[Fld("AccountCode", hint="رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ"),
+                Fld("ParentCode", rows=ACCOUNT_ROWS, widths="0;7", hook=True,
+                    hint="الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا)"),
+                Fld("AccountName", span=2),
                 Fld("AccountType", rows=ACCOUNT_TYPES, widths="0;5"),
-                Fld("AccountName", span=2), Fld("ParentCode", rows=ACCOUNT_ROWS, widths="2;6"),
-                Fld("IsActive"),
-                Info("lblAccountNote", "القيود آلية: تُنشأ من العمليات وتُحدَّث معها، ولا تُكتب يدويًا")]),
+                Fld("IsPosting", hint="فرعي = تُكتب عليه القيود؛ رئيسي = يجمع حساباته التابعة فقط"),
+                Fld("IsActive"), Fld("IsSystem", locked=True), Fld("AccountLevel", locked=True),
+                Info("lblAccountNote", "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. "
+                                       "القيود اليدوية من زر «قيد يدوي».")]),
     DataScreen(
         "frmSettings", "Settings", "الإعدادات", "بيانات المحل الضريبية وإعدادات التشغيل", "settings",
         kind="SINGLE", allow_add=False, allow_delete=False,
@@ -400,6 +408,7 @@ SCREEN_PERMISSIONS = {
     "frmTreasury": "CASH_CLOSING", "frmCashClosing": "CASH_CLOSING",
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
+    "frmManualEntry": "MANUAL_ENTRY",
 }
 
 
@@ -489,6 +498,9 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P$"),
     ReportEntry("JOURNAL", "قيود اليومية", "JournalLinesQuery", "rptJournal", "PJ"),
     ReportEntry("TRIAL_BALANCE", "ميزان المراجعة", "TrialBalanceQuery", "rptTrialBalance", "PJ"),
+    ReportEntry("TRIAL_BALANCE_TREE", "ميزان المراجعة بالمستويات", "TrialBalanceTreeQuery", "rptTrialBalanceTree",
+                "PJ"),
+    ReportEntry("ACCOUNT_TREE", "دليل الحسابات (شجرة الحسابات)", "AccountTreeQuery", "rptAccountTree", "J"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
     ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),

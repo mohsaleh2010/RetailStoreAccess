@@ -40,6 +40,11 @@ Public Sub EnsureLocalTables()
         CurrentDb.Execute "CREATE TABLE tmpRolePermissions (PermissionKey TEXT(50) CONSTRAINT pkRolePerm PRIMARY KEY, " & _
             "PermissionName TEXT(100), ModuleName TEXT(50), SortOrder INTEGER, Granted BIT)", dbFailOnError
     End If
+    ' lines of the manual journal entry being written (frmManualEntry)
+    If Not LocalTableExists("tmpManualLines") Then
+        CurrentDb.Execute "CREATE TABLE tmpManualLines (LineNo COUNTER CONSTRAINT pkManualLines PRIMARY KEY, " & _
+            "AccountCode LONG, Debit CURRENCY, Credit CURRENCY, LineText TEXT(150))", dbFailOnError
+    End If
     ' the screens of the user being edited in frmUserScreens
     If Not LocalTableExists("tmpUserScreens") Then
         CurrentDb.Execute "CREATE TABLE tmpUserScreens (ScreenName TEXT(64) CONSTRAINT pkUserScreens PRIMARY KEY, " & _

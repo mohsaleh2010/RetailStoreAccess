@@ -19,18 +19,20 @@ Option Explicit
 
 Private Const SOURCE_QUERIES As String = "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase," & _
     "qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock," & _
-    "qryJournalOpening"
+    "qryJournalOpening,qryJournalManual"
 
 '==============================================================================
 ' Accounts and synchronisation
 '==============================================================================
 Public Sub EnsureAccounts()
-    CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode) " & _
-        "SELECT 110000 + b.CashBoxID, b.BoxName, 'ASSET', 1100 FROM CashBoxes AS b " & _
+    ' a sub-account for each cash box and each expense type, then the levels of the tree (modAccounts)
+    CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
+        "SELECT 110000 + b.CashBoxID, b.BoxName, 'ASSET', 1100, True, True FROM CashBoxes AS b " & _
         "WHERE 110000 + b.CashBoxID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode) " & _
-        "SELECT 530000 + t.ExpenseTypeID, t.ExpenseTypeName, 'EXPENSE', 5300 FROM ExpenseTypes AS t " & _
+    CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
+        "SELECT 530000 + t.ExpenseTypeID, t.ExpenseTypeName, 'EXPENSE', 5300, True, True FROM ExpenseTypes AS t " & _
         "WHERE 530000 + t.ExpenseTypeID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
+    RebuildAccountTree
 End Sub
 
 Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated As Long, _
@@ -191,6 +193,7 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "BOX_OPENING":      OpenScreen "frmCashBoxes", 0, id
         Case "CUSTOMER_OPENING": OpenScreen "frmCustomers", 0, id
         Case "SUPPLIER_OPENING": OpenScreen "frmSuppliers", 0, id
+        Case "MANUAL":           OpenScreen "frmManualEntry", 0, id
         Case Else:               ShowWarning "«·ﬁÌœ €Ì— „ÊÃÊœ."
     End Select
 End Sub
@@ -355,6 +358,7 @@ End Sub
 Public Function TestJournal() As Boolean
     Dim passed As Long, failed As Long, report As String, msg As String
     Dim added As Long, updated As Long, removed As Long, ws As DAO.Workspace, inTrans As Boolean, id As Long
+    Dim manualID As Long, jv As Variant, number As String
     Calendar = vbCalGreg
     EnsureTestUser
     g_SilentMode = True
@@ -377,6 +381,18 @@ Public Function TestJournal() As Boolean
     CheckJournal -AccountBalance(2100) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Suppliers"), 0), _
                  "Õ”«» –„„ «·„Ê—œÌ‰ = √—’œ… «·„Ê—œÌ‰", passed, failed, report
 
+    ' the account tree
+    msg = RebuildAccountTree()
+    CheckJournal Len(msg) = 0 And Nz(DbValue("SELECT COUNT(*) FROM Accounts WHERE AccountLevel Is Null OR " & _
+                 "TreeKey Is Null OR Level1Code Is Null"), 0) = 0, "‘Ã—… «·Õ”«»« : ·ﬂ· Õ”«» „” Ê«Â Ê„ﬂ«‰Â " & msg, _
+                 passed, failed, report
+    CheckJournal Nz(DbValue("SELECT COUNT(*) FROM Accounts AS a INNER JOIN Accounts AS p ON a.ParentCode = " & _
+                            "p.AccountCode WHERE p.IsPosting = True OR p.AccountType <> a.AccountType"), 0) = 0, _
+                 "ﬂ· Õ”«» Ì »⁄ Õ”«»« —∆Ì”Ì« „‰ ‰Ê⁄Â", passed, failed, report
+    CheckJournal Nz(DbValue("SELECT COUNT(*) FROM JournalLines AS l INNER JOIN Accounts AS a ON l.AccountCode = " & _
+                            "a.AccountCode WHERE a.IsPosting = False"), 0) = 0, "·« ﬁÌÊœ ⁄·Ï «·Õ”«»«  «·—∆Ì”Ì…", _
+                 passed, failed, report
+
     ' a new, changed and deleted operation, rolled back
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
@@ -398,6 +414,41 @@ Public Function TestJournal() As Boolean
     msg = SyncJournal(added, updated, removed)
     CheckJournal removed = 1 And Nz(DbValue("SELECT COUNT(*) FROM JournalEntries WHERE EntryID = " & id), 0) = 0, _
                  "Õ–› «·„’—Ê› ÌÕ–› ﬁÌœÂ", passed, failed, report
+
+    ' a manual entry: refused when unbalanced or on a main account; saved, changed and deleted
+    EnsureLocalTables
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (5500, 1000, 0)", dbFailOnError
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (2310, 0, 900)", dbFailOnError
+    CheckJournal Len(PostManualEntry(0, Date, "TEST-MJ", "", Null, manualID)) > 0 And manualID = 0, _
+                 "ﬁÌœ ÌœÊÌ €Ì— „ Ê«“‰ Ìı—›÷", passed, failed, report
+    CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 1000 WHERE AccountCode = 2310", dbFailOnError
+    CurrentDb.Execute "UPDATE tmpManualLines SET AccountCode = 52 WHERE AccountCode = 5500", dbFailOnError
+    CheckJournal Len(PostManualEntry(0, Date, "TEST-MJ", "", Null, manualID)) > 0 And manualID = 0, _
+                 "ﬁÌœ ÌœÊÌ ⁄·Ï Õ”«» —∆Ì”Ì Ìı—›÷", passed, failed, report
+    CurrentDb.Execute "UPDATE tmpManualLines SET AccountCode = 5500 WHERE AccountCode = 52", dbFailOnError
+    msg = PostManualEntry(0, Date, "TEST-MJ", "TEST-REF", Null, manualID)
+    CheckJournal Len(msg) = 0 And manualID > 0 And _
+                 Nz(DbValue("SELECT COUNT(*) FROM ManualEntryLines WHERE ManualEntryID = " & manualID), 0) = 2, _
+                 "Õ›Ÿ ﬁÌœ ÌœÊÌ „ Ê«“‰ " & msg, passed, failed, report
+    msg = SyncJournal(added, updated, removed)
+    jv = JournalEntryOfManual(manualID)
+    CheckJournal added = 1 And Not IsNull(jv) And Nz(DbValue("SELECT TotalDebit FROM JournalEntries WHERE EntryID = " & _
+                 Nz(jv, 0)), 0) = 1000, "«·ﬁÌœ «·ÌœÊÌ Ì’»Õ ﬁÌœ ÌÊ„Ì… „—»Êÿ« »Â", passed, failed, report
+    number = Nz(DbValue("SELECT EntryNumber FROM JournalEntries WHERE EntryID = " & Nz(jv, 0)), "")
+    CurrentDb.Execute "UPDATE tmpManualLines SET Debit = 1200 WHERE AccountCode = 5500", dbFailOnError
+    CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 1200 WHERE AccountCode = 2310", dbFailOnError
+    msg = PostManualEntry(manualID, Date, "TEST-MJ", "", Null, id)
+    msg = msg & SyncJournal(added, updated, removed)
+    CheckJournal Len(msg) = 0 And updated = 1 And id = manualID And _
+                 Nz(DbValue("SELECT EntryNumber FROM JournalEntries WHERE EntryID = " & Nz(jv, 0)), "") = number And _
+                 Nz(DbValue("SELECT TotalDebit FROM JournalEntries WHERE EntryID = " & Nz(jv, 0)), 0) = 1200, _
+                 " ⁄œÌ· «·ﬁÌœ «·ÌœÊÌ ÌÕœ¯À ﬁÌœÂ »‰›” «·—ﬁ„ " & msg, passed, failed, report
+    msg = RemoveManualEntry(manualID)
+    msg = msg & SyncJournal(added, updated, removed)
+    CheckJournal Len(msg) = 0 And removed = 1 And IsNull(JournalEntryOfManual(manualID)), _
+                 "Õ–› «·ﬁÌœ «·ÌœÊÌ ÌÕ–› ﬁÌœÂ", passed, failed, report
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
     ws.Rollback
     inTrans = False
     GoTo Done

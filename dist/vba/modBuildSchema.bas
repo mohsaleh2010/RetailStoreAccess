@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=32;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=5;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=16;Roles=3;Permissions=25;RolePermissions=51;Employees=1;Screens=34;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=22;JournalSourceTypes=13;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=32;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;ManualEntries=10;ManualEntryLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=17;Roles=3;Permissions=26;RolePermissions=53;Employees=1;Screens=35;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=75;JournalSourceTypes=14;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -71,12 +71,18 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     SeedAll
     m_currentStep = "developer user"
     EnsureDeveloperUser
+    m_currentStep = "account tree"
+    UpgradeAccountTree
 
     m_db.Close
     Set m_db = Nothing
 
     m_currentStep = "link tables"
     LinkBackEnd BackEndPath
+    On Error Resume Next                     ' modAccounts may not be imported yet (manual installs)
+    Application.Run "RebuildAccountTree"     ' levels and order of the account tree
+    Err.Clear
+    On Error GoTo EH
 
     LogLine "--- Ãœ«Ê· ÃœÌœ…: " & m_created & " | „ÊÃÊœ… „”»ﬁ«: " & m_skipped & _
             " | Ãœ«Ê·  „   ⁄»∆ Â«: " & m_seeded
@@ -585,6 +591,8 @@ Private Sub CreateAllTables()
     CreateTable_JournalSourceTypes
     CreateTable_JournalEntries
     CreateTable_JournalLines
+    CreateTable_ManualEntries
+    CreateTable_ManualEntryLines
     CreateTable_TransactionTypes
     CreateTable_InventoryTransactions
     CreateTable_StockCounts
@@ -1633,11 +1641,31 @@ Private Sub CreateTable_Accounts()
     AddField tdf, "AccountType", "TEXT", 10, True, "", _
              "In (""ASSET"",""LIABILITY"",""EQUITY"",""REVENUE"",""EXPENSE"")", "√’Ê·° Œ’Ê„° ÕﬁÊﬁ „·ﬂÌ…° ≈Ì—«œ« ° „’—Ê›« ", "‰Ê⁄ «·Õ”«»", ""
     AddField tdf, "ParentCode", "LONG", 0, False, "", _
-             "", "", "«·Õ”«» «·—∆Ì”Ì", ""
+             "", "", "«·Õ”«» «·—∆Ì”Ì", "›«—€ ··Õ”«»«  «·Œ„”… ›Ì «·„” ÊÏ «·√Ê· ›ﬁÿ"
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
              "", "", "‰‘ÿ", ""
+    AddField tdf, "IsPosting", "BOOL", 0, False, "True", _
+             "", "", "Õ”«» ›—⁄Ì (Ìﬁ»· «·ﬁÌÊœ)", ""
+    AddField tdf, "IsSystem", "BOOL", 0, False, "False", _
+             "", "", "Õ”«» √”«”Ì ›Ì «·‰Ÿ«„", ""
+    AddField tdf, "AccountLevel", "BYTE", 0, True, "1", _
+             "", "", "«·„” ÊÏ", ""
+    AddField tdf, "TreeKey", "TEXT", 60, False, "", _
+             "", "", "„› «Õ «· — Ì» ›Ì «·‘Ã—…", "ÌÕ”»Â «·»—‰«„Ã (modAccounts.RebuildAccountTree): —ﬁ„ ﬂ· „” ÊÏ »⁄‘— Œ«‰« "
+    AddField tdf, "Level1Code", "LONG", 0, False, "", _
+             "", "", "Õ”«» «·„” ÊÏ 1", ""
+    AddField tdf, "Level2Code", "LONG", 0, False, "", _
+             "", "", "Õ”«» «·„” ÊÏ 2", ""
+    AddField tdf, "Level3Code", "LONG", 0, False, "", _
+             "", "", "Õ”«» «·„” ÊÏ 3", ""
+    AddField tdf, "Level4Code", "LONG", 0, False, "", _
+             "", "", "Õ”«» «·„” ÊÏ 4", ""
+    AddField tdf, "Level5Code", "LONG", 0, False, "", _
+             "", "", "Õ”«» «·„” ÊÏ 5", ""
     AddIndex tdf, "PrimaryKey", "AccountCode", True, True, False
-    EndTable tdf, "œ·Ì· «·Õ”«»« : «·Õ”«»«  «· Ì  ı—ÕÛ¯· ≈·ÌÂ« «·ﬁÌÊœ. Õ”«»«  «·’‰«œÌﬁ (110000 + —ﬁ„ «·’‰œÊﬁ) Ê√‰Ê«⁄ «·„’—Ê›«  (530000 + —ﬁ„ «·‰Ê⁄)  ı‰‘√  ·ﬁ«∆Ì«.", "", ""
+    AddIndex tdf, "IX_ParentCode", "ParentCode", False, False, False
+    AddIndex tdf, "IX_TreeKey", "TreeKey", False, False, False
+    EndTable tdf, "œ·Ì· «·Õ”«»«  (‘Ã—… «·Õ”«»« ): ‘Ã—… „‰ Œ„”… „” ÊÌ«  ⁄·Ï «·√ﬂÀ—: «·Õ”«»«  «·—∆Ì”Ì… ( Ã„Ì⁄Ì…) Ê«·Õ”«»«  «·›—⁄Ì… «· Ì  ı—ÕÛ¯· ≈·ÌÂ« «·ﬁÌÊœ. Õ”«»«  «·’‰«œÌﬁ (110000 + —ﬁ„ «·’‰œÊﬁ) Ê√‰Ê«⁄ «·„’—Ê›«  (530000 + —ﬁ„ «·‰Ê⁄)  ı‰‘√  ·ﬁ«∆Ì«.", "", ""
 End Sub
 
 Private Sub CreateTable_JournalSourceTypes()
@@ -1710,6 +1738,58 @@ Private Sub CreateTable_JournalLines()
     AddIndex tdf, "UX_EntryID_LineNumber", "EntryID,LineNumber", False, True, False
     AddIndex tdf, "IX_AccountCode", "AccountCode", False, False, False
     EndTable tdf, "√”ÿ— «·ﬁÌÊœ: «·ÿ—› «·„œÌ‰ Ê«·ÿ—› «·œ«∆‰ ·ﬂ· ﬁÌœ.", "", ""
+End Sub
+
+Private Sub CreateTable_ManualEntries()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "ManualEntries") Then Exit Sub
+    AddField tdf, "ManualEntryID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ œ«Œ·Ì", ""
+    AddField tdf, "EntryNumber", "TEXT", 20, True, "", _
+             "", "", "—ﬁ„ «·ﬁÌœ «·ÌœÊÌ", ""
+    AddField tdf, "EntryDate", "DATE", 0, True, "Date()", _
+             "", "", " «—ÌŒ «·ﬁÌœ", ""
+    AddField tdf, "Description", "TEXT", 255, True, "", _
+             "", "", "«·»Ì«‰", ""
+    AddField tdf, "Reference", "TEXT", 50, False, "", _
+             "", "", "«·„—Ã⁄", "—ﬁ„ „” ‰œ Œ«—ÃÌ: ›« Ê—…° ⁄ﬁœ° ﬂ‘› »‰ﬂ..."
+    AddField tdf, "ReversalOfID", "LONG", 0, False, "", _
+             "", "", "⁄ﬂ” «·ﬁÌœ", "«·ﬁÌœ «·ÌœÊÌ «·–Ì Ì⁄ﬂ”Â Â–« «·ﬁÌœ"
+    AddField tdf, "TotalAmount", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "≈Ã„«·Ì «·ﬁÌœ", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "√œŒ·Â", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddField tdf, "UpdatedAt", "DATETIME", 0, False, "", _
+             "", "", "¬Œ—  ⁄œÌ·", ""
+    AddIndex tdf, "PrimaryKey", "ManualEntryID", True, True, False
+    AddIndex tdf, "UX_EntryNumber", "EntryNumber", False, True, False
+    AddIndex tdf, "IX_EntryDate", "EntryDate", False, False, False
+    EndTable tdf, "«·ﬁÌÊœ «·ÌœÊÌ…: ﬁÌœ Ìﬂ »Â «·„Õ«”» »‰›”Â („” Õﬁ« °  ”ÊÌ« ° —√” «·„«·° √—’œ… «›  «ÕÌ…...). Ìı—ÕÛ¯· ··ÌÊ„Ì… ﬂ√Ì ⁄„·Ì… √Œ—Ï (SourceType = MANUAL)° ÊÌı⁄œÛ¯· √Ê ÌıÕ–› ›Ì »⁄Â ﬁÌœÂ.", "", ""
+End Sub
+
+Private Sub CreateTable_ManualEntryLines()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "ManualEntryLines") Then Exit Sub
+    AddField tdf, "ManualLineID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ «·”ÿ— «·œ«Œ·Ì", ""
+    AddField tdf, "ManualEntryID", "LONG", 0, True, "", _
+             "", "", "«·ﬁÌœ «·ÌœÊÌ", ""
+    AddField tdf, "LineNumber", "INT", 0, True, "", _
+             "", "", "—ﬁ„ «·”ÿ—", ""
+    AddField tdf, "AccountCode", "LONG", 0, True, "", _
+             "", "", "«·Õ”«»", ""
+    AddField tdf, "Debit", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "„œÌ‰", ""
+    AddField tdf, "Credit", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "œ«∆‰", ""
+    AddField tdf, "LineText", "TEXT", 150, False, "", _
+             "", "", "»Ì«‰ «·”ÿ—", ""
+    AddIndex tdf, "PrimaryKey", "ManualLineID", True, True, False
+    AddIndex tdf, "UX_ManualEntryID_LineNumber", "ManualEntryID,LineNumber", False, True, False
+    AddIndex tdf, "IX_AccountCode", "AccountCode", False, False, False
+    EndTable tdf, "√”ÿ— «·ﬁÌÊœ «·ÌœÊÌ…: «·ÿ—› «·„œÌ‰ Ê«·ÿ—› «·œ«∆‰ ··ﬁÌœ «·ÌœÊÌ∫ ﬂ· ”ÿ— „œÌ‰ √Ê œ«∆‰ ›ﬁÿ.", "([Debit]=0 Or [Credit]=0) And [Debit]+[Credit]>0", "ﬂ· ”ÿ— „œÌ‰ √Ê œ«∆‰ ›ﬁÿ° Ê»„»·€ √ﬂ»— „‰ ’›—"
 End Sub
 
 Private Sub CreateTable_TransactionTypes()
@@ -1934,7 +2014,8 @@ Private Sub Seed_Sequences()
     SeedRow "[SequenceName] = 'CASH_TRANSFER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_TRANSFER', 'TRF-', 1, 6, '«· ÕÊÌ· »Ì‰ «·’‰«œÌﬁ')"
     SeedRow "[SequenceName] = 'CASH_CLOSING'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_CLOSING', 'CLS-', 1, 6, ' ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—')"
     SeedRow "[SequenceName] = 'JOURNAL'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('JOURNAL', 'JV-', 1, 6, 'ﬁÌÊœ «·ÌÊ„Ì…')"
-    EndSeed "Sequences", 16
+    SeedRow "[SequenceName] = 'MANUAL_ENTRY'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('MANUAL_ENTRY', 'MJ-', 1, 6, '«·ﬁÌÊœ «·ÌœÊÌ…')"
+    EndSeed "Sequences", 17
 End Sub
 
 Private Sub Seed_Roles()
@@ -1966,13 +2047,14 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'CASH_BOX'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_BOX', '«·Œ“Ì‰…: ”‰œ«  «·ﬁ»÷ Ê«·’—› Ê«· ÕÊÌ· Ê«·’‰«œÌﬁ', '«·Œ“Ì‰…', 65)") Then GrantNewPermission "CASH_BOX", "1,2"
     If SeedRow("[PermissionKey] = 'CASH_CLOSING'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_CLOSING', ' ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—', '«·Œ“Ì‰…', 66)") Then GrantNewPermission "CASH_CLOSING", "1,2,3"
     If SeedRow("[PermissionKey] = 'JOURNAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('JOURNAL', 'ﬁÌÊœ «·ÌÊ„Ì… Êœ·Ì· «·Õ”«»«  Ê„Ì“«‰ «·„—«Ã⁄…', '«·Õ”«»« ', 75)") Then GrantNewPermission "JOURNAL", "1,2"
+    If SeedRow("[PermissionKey] = 'MANUAL_ENTRY'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('MANUAL_ENTRY', '«·ﬁÌÊœ «·ÌœÊÌ…: ≈÷«›… Ê ⁄œÌ· ÊÕ–›', '«·Õ”«»« ', 76)") Then GrantNewPermission "MANUAL_ENTRY", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', '«· ﬁ«—Ì— «· ‘€Ì·Ì…', '«· ﬁ«—Ì—', 70)") Then GrantNewPermission "REPORTS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', ' ﬁ«—Ì— «·√—»«Õ Ê«·÷—Ì»…', '«· ﬁ«—Ì—', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
     If SeedRow("[PermissionKey] = 'DASHBOARD_FINANCIAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', '«·√—ﬁ«„ «·„«·Ì… ›Ì ·ÊÕ… «· Õﬂ„', '«· ﬁ«—Ì—', 72)") Then GrantNewPermission "DASHBOARD_FINANCIAL", "1,2"
     If SeedRow("[PermissionKey] = 'SETTINGS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 80)") Then GrantNewPermission "SETTINGS", "1"
     If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', '«·„” Œœ„Ê‰ Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 81)") Then GrantNewPermission "USERS", "1"
     If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 82)") Then GrantNewPermission "BACKUP", "1"
-    EndSeed "Permissions", 25
+    EndSeed "Permissions", 26
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -1996,6 +2078,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_BOX')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'JOURNAL')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'MANUAL_ENTRY')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'DASHBOARD_FINANCIAL')"
@@ -2020,6 +2103,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_BOX')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'JOURNAL')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'MANUAL_ENTRY')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'DASHBOARD_FINANCIAL')"
@@ -2028,7 +2112,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 51
+    EndSeed "RolePermissions", 53
 End Sub
 
 Private Sub Seed_Employees()
@@ -2066,14 +2150,15 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmCashBoxes'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashBoxes', '«·’‰«œÌﬁ', '«·Œ“Ì‰…', 250, 'CASH_BOX', True, True, True)"
     SeedRow "[ScreenName] = 'frmJournal'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmJournal', 'ﬁÌÊœ «·ÌÊ„Ì…', '«·Õ”«»« ', 260, 'JOURNAL', False, False, False)"
     SeedRow "[ScreenName] = 'frmAccounts'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAccounts', 'œ·Ì· «·Õ”«»« ', '«·Õ”«»« ', 270, 'JOURNAL', True, True, True)"
-    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', '«· ﬁ«—Ì—', '«· ﬁ«—Ì—', 280, 'REPORTS', False, False, False)"
-    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', '«·»ÕÀ', '«·‰Ÿ«„', 290, Null, False, False, False)"
-    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 300, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', '«·„” Œœ„Ê‰', '«·‰Ÿ«„', 310, 'USERS', True, True, False)"
-    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', '«·√œÊ«— Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 320, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', '’·«ÕÌ«  «·‘«‘«  ··„” Œœ„Ì‰', '«·‰Ÿ«„', 330, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 340, 'BACKUP', False, False, False)"
-    EndSeed "Screens", 34
+    SeedRow "[ScreenName] = 'frmManualEntry'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmManualEntry', '«·ﬁÌÊœ «·ÌœÊÌ…', '«·Õ”«»« ', 280, 'MANUAL_ENTRY', True, True, True)"
+    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', '«· ﬁ«—Ì—', '«· ﬁ«—Ì—', 290, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', '«·»ÕÀ', '«·‰Ÿ«„', 300, Null, False, False, False)"
+    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 310, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', '«·„” Œœ„Ê‰', '«·‰Ÿ«„', 320, 'USERS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', '«·√œÊ«— Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 330, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', '’·«ÕÌ«  «·‘«‘«  ··„” Œœ„Ì‰', '«·‰Ÿ«„', 340, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 350, 'BACKUP', False, False, False)"
+    EndSeed "Screens", 35
 End Sub
 
 Private Sub Seed_Categories()
@@ -2133,29 +2218,82 @@ End Sub
 
 Private Sub Seed_Accounts()
     If Not BeginSeed("Accounts", True) Then Exit Sub
-    SeedRow "[AccountCode] = 1100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1100, '«·‰ﬁœÌ… »«·Œ“Ì‰… Ê«·’‰«œÌﬁ', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 110001", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (110001, '«·Œ“Ì‰… «·—∆Ì”Ì…', 'ASSET', 1100)"
-    SeedRow "[AccountCode] = 110002", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (110002, '’‰œÊﬁ «·ﬂ«‘Ì—', 'ASSET', 1100)"
-    SeedRow "[AccountCode] = 1190", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1190, '‰ﬁœÌ… €Ì— „Ê“⁄… ⁄·Ï ’‰œÊﬁ', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1200, '«·»‰ﬂ Ê«·‘»ﬂ… („œÏ Ê«· ÕÊÌ·« )', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1300, '–„„ «·⁄„·«¡', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1400, '«·„Œ“Ê‰', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1500, '÷—Ì»… «·ﬁÌ„… «·„÷«›… - „œŒ·« ', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 1600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1600, '”·› «·„ÊŸ›Ì‰', 'ASSET', Null)"
-    SeedRow "[AccountCode] = 2100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (2100, '–„„ «·„Ê—œÌ‰', 'LIABILITY', Null)"
-    SeedRow "[AccountCode] = 2200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (2200, '÷—Ì»… «·ﬁÌ„… «·„÷«›… - „Œ—Ã« ', 'LIABILITY', Null)"
-    SeedRow "[AccountCode] = 3100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (3100, 'Ã«—Ì «·„«·ﬂ', 'EQUITY', Null)"
-    SeedRow "[AccountCode] = 3900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (3900, '√—’œ… «›  «ÕÌ…', 'EQUITY', Null)"
-    SeedRow "[AccountCode] = 4100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4100, '«·„»Ì⁄« ', 'REVENUE', Null)"
-    SeedRow "[AccountCode] = 4110", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4110, '„—œÊœ«  «·„»Ì⁄« ', 'REVENUE', Null)"
-    SeedRow "[AccountCode] = 4200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4200, '≈Ì—«œ«  √Œ—Ï', 'REVENUE', Null)"
-    SeedRow "[AccountCode] = 4300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4300, '“Ì«œ… «·’‰«œÌﬁ', 'REVENUE', Null)"
-    SeedRow "[AccountCode] = 5100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5100, ' ﬂ·›… «·»÷«⁄… «·„»«⁄…', 'EXPENSE', Null)"
-    SeedRow "[AccountCode] = 5200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5200, '›—Êﬁ«  Ê ”ÊÌ«  «·„Œ“Ê‰', 'EXPENSE', Null)"
-    SeedRow "[AccountCode] = 5300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5300, '«·„’—Ê›«  «· ‘€Ì·Ì…', 'EXPENSE', Null)"
-    SeedRow "[AccountCode] = 5400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5400, '⁄Ã“ «·’‰«œÌﬁ', 'EXPENSE', Null)"
-    SeedRow "[AccountCode] = 5900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5900, '„’—Ê›«  √Œ—Ï', 'EXPENSE', Null)"
-    EndSeed "Accounts", 22
+    SeedRow "[AccountCode] = 1", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1, '«·√’Ê·', 'ASSET', Null, False, True)"
+    SeedRow "[AccountCode] = 11", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (11, '«·√’Ê· «·„ œ«Ê·…', 'ASSET', 1, False, True)"
+    SeedRow "[AccountCode] = 1100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1100, '«·‰ﬁœÌ… »«·Œ“Ì‰… Ê«·’‰«œÌﬁ', 'ASSET', 11, False, True)"
+    SeedRow "[AccountCode] = 110001", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (110001, '«·Œ“Ì‰… «·—∆Ì”Ì…', 'ASSET', 1100, True, True)"
+    SeedRow "[AccountCode] = 110002", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (110002, '’‰œÊﬁ «·ﬂ«‘Ì—', 'ASSET', 1100, True, True)"
+    SeedRow "[AccountCode] = 1190", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1190, '‰ﬁœÌ… €Ì— „Ê“⁄… ⁄·Ï ’‰œÊﬁ', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1200, '«·»‰ﬂ Ê«·‘»ﬂ… („œÏ Ê«· ÕÊÌ·« )', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1250", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1250, '‘Ìﬂ«   Õ  «· Õ’Ì·', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1300, '–„„ «·⁄„·«¡', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1310", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1310, '√Ê—«ﬁ «·ﬁ»÷', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1350", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1350, '„Œ’’ «·œÌÊ‰ «·„‘ﬂÊﬂ ›Ì  Õ’Ì·Â«', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1400, '«·„Œ“Ê‰', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1500, '÷—Ì»… «·ﬁÌ„… «·„÷«›… - „œŒ·« ', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1600, '”·› «·„ÊŸ›Ì‰', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1610", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1610, '«·⁄Âœ «·‰ﬁœÌ…', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1650", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1650, '„’—Ê›«  „œ›Ê⁄… „ﬁœ„«', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1660", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1660, '≈Ì—«œ«  „” Õﬁ…', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 1690", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1690, ' √„Ì‰«  ·œÏ «·€Ì—', 'ASSET', 11, True, False)"
+    SeedRow "[AccountCode] = 12", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (12, '«·√’Ê· €Ì— «·„ œ«Ê·…', 'ASSET', 1, False, True)"
+    SeedRow "[AccountCode] = 1710", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1710, '«·√À«À Ê«· ÃÂÌ“« ', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1720", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1720, '«·√ÃÂ“… Ê«·Õ«”»«  Ê√‰Ÿ„… ‰ﬁ«ÿ «·»Ì⁄', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1730", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1730, '«·”Ì«—«  ÊÊ”«∆· «·‰ﬁ·', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1740", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1740, '«·œÌﬂÊ—«  Ê Õ”Ì‰«  «·„Õ·', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1790", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1790, '„Ã„⁄ ≈Â·«ﬂ «·√’Ê· «·À«» …', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 1800", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1800, '«·»—«„Ã Ê«· —«ŒÌ’', 'ASSET', 12, True, False)"
+    SeedRow "[AccountCode] = 2", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2, '«·Œ’Ê„', 'LIABILITY', Null, False, True)"
+    SeedRow "[AccountCode] = 21", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (21, '«·Œ’Ê„ «·„ œ«Ê·…', 'LIABILITY', 2, False, True)"
+    SeedRow "[AccountCode] = 2100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2100, '–„„ «·„Ê—œÌ‰', 'LIABILITY', 21, True, True)"
+    SeedRow "[AccountCode] = 2110", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2110, '√Ê—«ﬁ «·œ›⁄', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2200, '÷—Ì»… «·ﬁÌ„… «·„÷«›… - „Œ—Ã« ', 'LIABILITY', 21, True, True)"
+    SeedRow "[AccountCode] = 2250", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2250, '÷—Ì»… «·ﬁÌ„… «·„÷«›… - «· ”ÊÌ… Ê«·”œ«œ', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2300, '„’—Ê›«  „” Õﬁ…', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2310", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2310, '—Ê« » Ê√ÃÊ— „” Õﬁ…', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2320", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2320, '«· √„Ì‰«  «·«Ã „«⁄Ì… «·„” Õﬁ…', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2400, 'œ›⁄«  „ﬁœ„… „‰ «·⁄„·«¡', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2500, 'ﬁ—Ê÷ ﬁ’Ì—… «·√Ã·', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 2600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2600, '«·“ﬂ«… «·„” Õﬁ…', 'LIABILITY', 21, True, False)"
+    SeedRow "[AccountCode] = 22", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (22, '«·Œ’Ê„ €Ì— «·„ œ«Ê·…', 'LIABILITY', 2, False, True)"
+    SeedRow "[AccountCode] = 2700", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2700, 'ﬁ—Ê÷ ÿÊÌ·… «·√Ã·', 'LIABILITY', 22, True, False)"
+    SeedRow "[AccountCode] = 2800", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (2800, '„Œ’’ „ﬂ«›√… ‰Â«Ì… «·Œœ„…', 'LIABILITY', 22, True, False)"
+    SeedRow "[AccountCode] = 3", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3, 'ÕﬁÊﬁ «·„·ﬂÌ…', 'EQUITY', Null, False, True)"
+    SeedRow "[AccountCode] = 31", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (31, '—√” «·„«· ÊÃ«—Ì «·„«·ﬂ', 'EQUITY', 3, False, True)"
+    SeedRow "[AccountCode] = 3200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3200, '—√” «·„«·', 'EQUITY', 31, True, False)"
+    SeedRow "[AccountCode] = 3100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3100, 'Ã«—Ì «·„«·ﬂ', 'EQUITY', 31, True, True)"
+    SeedRow "[AccountCode] = 3900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3900, '√—’œ… «›  «ÕÌ…', 'EQUITY', 31, True, True)"
+    SeedRow "[AccountCode] = 32", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (32, '«·√—»«Õ «·„Õ Ã“… Ê‰ «∆Ã «·√⁄„«·', 'EQUITY', 3, False, True)"
+    SeedRow "[AccountCode] = 3300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3300, '«·√—»«Õ «·„Õ Ã“…', 'EQUITY', 32, True, False)"
+    SeedRow "[AccountCode] = 3400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3400, '’«›Ì —»Õ (Œ”«—…) «·⁄«„', 'EQUITY', 32, True, False)"
+    SeedRow "[AccountCode] = 4", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4, '«·≈Ì—«œ« ', 'REVENUE', Null, False, True)"
+    SeedRow "[AccountCode] = 41", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (41, '≈Ì—«œ«  «·‰‘«ÿ', 'REVENUE', 4, False, True)"
+    SeedRow "[AccountCode] = 4100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4100, '«·„»Ì⁄« ', 'REVENUE', 41, True, True)"
+    SeedRow "[AccountCode] = 4110", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4110, '„—œÊœ«  «·„»Ì⁄« ', 'REVENUE', 41, True, True)"
+    SeedRow "[AccountCode] = 4120", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4120, '«·Œ’„ «·„”„ÊÕ »Â', 'REVENUE', 41, True, False)"
+    SeedRow "[AccountCode] = 42", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (42, '≈Ì—«œ«  √Œ—Ï', 'REVENUE', 4, False, True)"
+    SeedRow "[AccountCode] = 4200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4200, '≈Ì—«œ«  „ ‰Ê⁄…', 'REVENUE', 42, True, True)"
+    SeedRow "[AccountCode] = 4300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4300, '“Ì«œ… «·’‰«œÌﬁ', 'REVENUE', 42, True, True)"
+    SeedRow "[AccountCode] = 4400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4400, '«·Œ’„ «·„ﬂ ”»', 'REVENUE', 42, True, False)"
+    SeedRow "[AccountCode] = 5", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5, '«·„’—Ê›« ', 'EXPENSE', Null, False, True)"
+    SeedRow "[AccountCode] = 51", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (51, ' ﬂ·›… «·„»Ì⁄« ', 'EXPENSE', 5, False, True)"
+    SeedRow "[AccountCode] = 5100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5100, ' ﬂ·›… «·»÷«⁄… «·„»«⁄…', 'EXPENSE', 51, True, True)"
+    SeedRow "[AccountCode] = 5200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5200, '›—Êﬁ«  Ê ”ÊÌ«  «·„Œ“Ê‰', 'EXPENSE', 51, True, True)"
+    SeedRow "[AccountCode] = 52", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (52, '«·„’—Ê›«  «· ‘€Ì·Ì… Ê«·≈œ«—Ì…', 'EXPENSE', 5, False, True)"
+    SeedRow "[AccountCode] = 5300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5300, '«·„’—Ê›«  Õ”» «·‰Ê⁄', 'EXPENSE', 52, False, True)"
+    SeedRow "[AccountCode] = 5500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5500, '«·—Ê« » Ê«·√ÃÊ—', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5510", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5510, '«·»œ·«  Ê«·ÕÊ«›“', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5520", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5520, '«· √„Ì‰«  «·«Ã „«⁄Ì…', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5600, '≈Â·«ﬂ «·√’Ê· «·À«» …', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5610", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5610, '⁄„Ê·«  «·»‰Êﬂ Ê‰ﬁ«ÿ «·»Ì⁄', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5620", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5620, '«·—”Ê„ «·ÕﬂÊ„Ì… Ê«· —«ŒÌ’', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5630", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5630, '«·œ⁄«Ì… Ê«·≈⁄·«‰', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 53", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (53, '„’—Ê›«  √Œ—Ï', 'EXPENSE', 5, False, True)"
+    SeedRow "[AccountCode] = 5400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5400, '⁄Ã“ «·’‰«œÌﬁ', 'EXPENSE', 53, True, True)"
+    SeedRow "[AccountCode] = 5700", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5700, '«·œÌÊ‰ «·„⁄œÊ„…', 'EXPENSE', 53, True, False)"
+    SeedRow "[AccountCode] = 5800", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5800, '«·“ﬂ«…', 'EXPENSE', 53, True, False)"
+    SeedRow "[AccountCode] = 5900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5900, '„’—Ê›«  „ ‰Ê⁄…', 'EXPENSE', 53, True, True)"
+    EndSeed "Accounts", 75
 End Sub
 
 Private Sub Seed_JournalSourceTypes()
@@ -2173,7 +2311,8 @@ Private Sub Seed_JournalSourceTypes()
     SeedRow "[SourceType] = 'BOX_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('BOX_OPENING', '—’Ìœ «›  «ÕÌ ·’‰œÊﬁ', 11)"
     SeedRow "[SourceType] = 'CUSTOMER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CUSTOMER_OPENING', '—’Ìœ «›  «ÕÌ ·⁄„Ì·', 12)"
     SeedRow "[SourceType] = 'SUPPLIER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SUPPLIER_OPENING', '—’Ìœ «›  «ÕÌ ·„Ê—œ', 13)"
-    EndSeed "JournalSourceTypes", 13
+    SeedRow "[SourceType] = 'MANUAL'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('MANUAL', 'ﬁÌœ ÌœÊÌ', 14)"
+    EndSeed "JournalSourceTypes", 14
 End Sub
 
 Private Sub Seed_TransactionTypes()
@@ -2193,4 +2332,80 @@ Private Sub Seed_LabelSettings()
     If Not BeginSeed("LabelSettings", False) Then Exit Sub
     ExecSeed "INSERT INTO [LabelSettings] ([LabelSettingID]) VALUES (1)"
     EndSeed "LabelSettings", 1
+End Sub
+
+Private Sub UpgradeAccountTree()
+    ' accounts of an older back-end without a parent go to their place in the tree
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1 WHERE [AccountCode] = 11 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1100 WHERE [AccountCode] = 110001 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1100 WHERE [AccountCode] = 110002 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1190 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1250 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1310 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1350 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1500 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1600 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1610 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1650 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1660 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1690 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1 WHERE [AccountCode] = 12 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1710 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1720 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1730 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1740 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1790 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 12 WHERE [AccountCode] = 1800 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 2 WHERE [AccountCode] = 21 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2110 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2250 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2310 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2320 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2500 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 21 WHERE [AccountCode] = 2600 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 2 WHERE [AccountCode] = 22 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 22 WHERE [AccountCode] = 2700 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 22 WHERE [AccountCode] = 2800 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 3 WHERE [AccountCode] = 31 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 31 WHERE [AccountCode] = 3200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 31 WHERE [AccountCode] = 3100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 31 WHERE [AccountCode] = 3900 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 3 WHERE [AccountCode] = 32 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 32 WHERE [AccountCode] = 3300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 32 WHERE [AccountCode] = 3400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 4 WHERE [AccountCode] = 41 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 41 WHERE [AccountCode] = 4100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 41 WHERE [AccountCode] = 4110 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 41 WHERE [AccountCode] = 4120 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 4 WHERE [AccountCode] = 42 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 42 WHERE [AccountCode] = 4200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 42 WHERE [AccountCode] = 4300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 42 WHERE [AccountCode] = 4400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 5 WHERE [AccountCode] = 51 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 51 WHERE [AccountCode] = 5100 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 51 WHERE [AccountCode] = 5200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 5 WHERE [AccountCode] = 52 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5300 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5500 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5510 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5520 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5600 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5610 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5620 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 52 WHERE [AccountCode] = 5630 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 5 WHERE [AccountCode] = 53 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5400 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5700 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5800 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5900 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [IsPosting] = False WHERE [AccountCode] IN (1, 11, 1100, 12, 2, 21, 22, 3, 31, 32, 4, 41, 42, 5, 51, 52, 5300, 53)", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN (1, 11, 1100, 110001, 110002, 1190, 1200, 1300, 1400, 1500, 1600, 12, 2, 21, 2100, 2200, 22, 3, 31, 3100, 3900, 32, 4, 41, 4100, 4110, 42, 4200, 4300, 5, 51, 5100, 5200, 52, 5300, 53, 5400, 5900) OR [AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError
 End Sub

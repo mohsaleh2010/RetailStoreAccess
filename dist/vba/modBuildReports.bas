@@ -26,7 +26,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -66,6 +66,8 @@ Public Function BuildReports() As Boolean
     BuildReport_rptCashClosings
     BuildReport_rptJournal
     BuildReport_rptTrialBalance
+    BuildReport_rptTrialBalanceTree
+    BuildReport_rptAccountTree
     BuildReport_rptSlowMoving
     BuildReport_rptStockByCategory
     BuildReport_rptCustomerBalances
@@ -2211,6 +2213,108 @@ Private Sub BuildReport_rptTrialBalance()
     Exit Sub
 EH:
     AbortReport "rptTrialBalance", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptTrialBalanceTree()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptTrialBalanceTree", "„Ì“«‰ «·„—«Ã⁄… »«·„” ÊÌ« ", "TrialBalanceTreeQuery", 10773, "", "TreeKey", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 1674
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "„Ì“«‰ «·„—«Ã⁄… »«·„” ÊÌ« ", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "«·Õ”«»", 0, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "«”„ «·Õ”«»", 1134, 1292, 3629, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "—’Ìœ √Ê· «·„œ…", 4763, 1292, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "„œÌ‰ «·› —…", 6294, 1292, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "œ«∆‰ «·› —…", 7825, 1292, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "«·—’Ìœ «·Œ «„Ì", 9356, 1292, 1417, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""«·≈Ã„«·Ì ("" & Count(*) & "" ”Ã·)""", 0, 85, 10773, 284, 8, True, 0)
+    Set c = RLabel(2, "lblSum1", "„œÌ‰ «·› —… («·„” ÊÏ «·√Ê·)", 5103, 539, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum1", "=Sum(IIf([AccountLevel]=1,[PeriodDebit],0))", 8221, 539, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(2, "lblSum2", "œ«∆‰ «·› —… («·„” ÊÏ «·√Ê·)", 5103, 908, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum2", "=Sum(IIf([AccountLevel]=1,[PeriodCredit],0))", 8221, 908, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(2, "lblSum3", "„Ã„Ê⁄ √—’œ… «·„” ÊÏ «·√Ê· (’›— = „ Ê«“‰)", 5103, 1277, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum3", "=Sum(IIf([AccountLevel]=1,[ClosingBalance],0))", 8221, 1277, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol1", "AccountCode", 0, 17, 1134, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=Space(([AccountLevel]-1)*3) & [AccountName]", 1134, 17, 3629, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol3", "OpeningBalance", 4763, 17, 1531, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol4", "PeriodDebit", 6294, 17, 1531, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol5", "PeriodCredit", 7825, 17, 1531, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol6", "ClosingBalance", 9356, 17, 1417, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""·«  ÊÃœ ﬁÌÊœ.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptTrialBalanceTree", s
+    Exit Sub
+EH:
+    AbortReport "rptTrialBalanceTree", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptAccountTree()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptAccountTree", "œ·Ì· «·Õ”«»«  (‘Ã—… «·Õ”«»« )", "AccountTreeQuery", 10773, "", "TreeKey", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "œ·Ì· «·Õ”«»«  (‘Ã—… «·Õ”«»« )", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "—ﬁ„ «·Õ”«»", 0, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "«·Õ”«»", 1361, 1292, 4536, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "«·„” ÊÏ", 5897, 1292, 907, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "«·‰Ê⁄", 6804, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "—∆Ì”Ì / ›—⁄Ì", 8165, 1292, 2608, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""«·≈Ã„«·Ì ("" & Count(*) & "" ”Ã·)""", 0, 85, 10773, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "AccountCode", 0, 17, 1361, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=Space(([AccountLevel]-1)*3) & [AccountName]", 1361, 17, 4536, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol3", "AccountLevel", 5897, 17, 907, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0"
+    Set c = RText(0, "txtCol4", "TypeName", 6804, 17, 1361, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "KindName", 8165, 17, 2608, 284, 8, False, 0)
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""·«  ÊÃœ Õ”«»« .""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptAccountTree", s
+    Exit Sub
+EH:
+    AbortReport "rptAccountTree", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptSlowMoving()
