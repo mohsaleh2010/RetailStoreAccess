@@ -291,6 +291,7 @@ TABLES: List[Table] = [
             ("CASH_OUT", "COT-", 1, 6, "سندات صرف النقدية (الخزينة)"),
             ("CASH_TRANSFER", "TRF-", 1, 6, "التحويل بين الصناديق"),
             ("CASH_CLOSING", "CLS-", 1, 6, "تصفية يومية الكاشير"),
+            ("JOURNAL", "JV-", 1, 6, "قيود اليومية"),
         ],
         seed_missing=True,
     ),
@@ -344,6 +345,7 @@ TABLES: List[Table] = [
             ("EXPENSES", "المصروفات", "المصروفات", 60),
             ("CASH_BOX", "الخزينة: سندات القبض والصرف والتحويل والصناديق", "الخزينة", 65),
             ("CASH_CLOSING", "تصفية يومية الكاشير", "الخزينة", 66),
+            ("JOURNAL", "قيود اليومية ودليل الحسابات وميزان المراجعة", "الحسابات", 75),
             ("REPORTS", "التقارير التشغيلية", "التقارير", 70),
             ("REPORTS_PROFIT", "تقارير الأرباح والضريبة", "التقارير", 71),
             ("DASHBOARD_FINANCIAL", "الأرقام المالية في لوحة التحكم", "التقارير", 72),
@@ -951,6 +953,111 @@ TABLES: List[Table] = [
         rule_text="المرحَّل + المتبقي = النقدية الفعلية",
     ),
 
+    # ------------------------------------------------------------ Accounting
+    Table(
+        "Accounts", "دليل الحسابات",
+        "الحسابات التي تُرحَّل إليها القيود. حسابات الصناديق (110000 + رقم الصندوق) وأنواع المصروفات "
+        "(530000 + رقم النوع) تُنشأ تلقائيًا.",
+        [
+            long_("AccountCode", "رقم الحساب", required=True, rule=">0", rule_text="رقم الحساب أكبر من صفر"),
+            text("AccountName", 100, "اسم الحساب", required=True),
+            text("AccountType", 10, "نوع الحساب", required=True,
+                 rule='In ("ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE")',
+                 rule_text="أصول، خصوم، حقوق ملكية، إيرادات، مصروفات"),
+            long_("ParentCode", "الحساب الرئيسي"),
+            is_active(),
+        ],
+        pk=["AccountCode"],
+        seed_columns=["AccountCode", "AccountName", "AccountType", "ParentCode"],
+        seed_rows=[
+            (1100, "النقدية بالخزينة والصناديق", "ASSET", None),
+            (110001, "الخزينة الرئيسية", "ASSET", 1100),
+            (110002, "صندوق الكاشير", "ASSET", 1100),
+            (1190, "نقدية غير موزعة على صندوق", "ASSET", None),
+            (1200, "البنك والشبكة (مدى والتحويلات)", "ASSET", None),
+            (1300, "ذمم العملاء", "ASSET", None),
+            (1400, "المخزون", "ASSET", None),
+            (1500, "ضريبة القيمة المضافة - مدخلات", "ASSET", None),
+            (1600, "سلف الموظفين", "ASSET", None),
+            (2100, "ذمم الموردين", "LIABILITY", None),
+            (2200, "ضريبة القيمة المضافة - مخرجات", "LIABILITY", None),
+            (3100, "جاري المالك", "EQUITY", None),
+            (3900, "أرصدة افتتاحية", "EQUITY", None),
+            (4100, "المبيعات", "REVENUE", None),
+            (4110, "مردودات المبيعات", "REVENUE", None),
+            (4200, "إيرادات أخرى", "REVENUE", None),
+            (4300, "زيادة الصناديق", "REVENUE", None),
+            (5100, "تكلفة البضاعة المباعة", "EXPENSE", None),
+            (5200, "فروقات وتسويات المخزون", "EXPENSE", None),
+            (5300, "المصروفات التشغيلية", "EXPENSE", None),
+            (5400, "عجز الصناديق", "EXPENSE", None),
+            (5900, "مصروفات أخرى", "EXPENSE", None),
+        ],
+        seed_missing=True,
+    ),
+
+    Table(
+        "JournalSourceTypes", "أنواع مصادر القيود",
+        "أنواع العمليات التي يُنشأ عنها قيد آلي، ومنها يُعرف أصل القيد.",
+        [
+            text("SourceType", 20, "نوع العملية", required=True),
+            text("TypeName", 50, "الاسم", required=True),
+            int_("SortOrder", "الترتيب", required=True, default="0"),
+        ],
+        pk=["SourceType"],
+        seed_columns=["SourceType", "TypeName", "SortOrder"],
+        seed_rows=[
+            ("SALE", "فاتورة بيع", 1), ("SALES_RETURN", "مرتجع بيع", 2),
+            ("PURCHASE", "فاتورة شراء", 3), ("PURCHASE_RETURN", "مرتجع شراء", 4),
+            ("CUSTOMER_PAYMENT", "سند قبض من عميل", 5), ("SUPPLIER_PAYMENT", "سند صرف لمورد", 6),
+            ("EXPENSE", "مصروف", 7), ("CASH_VOUCHER", "سند نقدية", 8),
+            ("STOCK_MOVE", "حركة مخزون يدوية", 9), ("STOCK_COUNT", "تسوية جرد", 10),
+            ("BOX_OPENING", "رصيد افتتاحي لصندوق", 11), ("CUSTOMER_OPENING", "رصيد افتتاحي لعميل", 12),
+            ("SUPPLIER_OPENING", "رصيد افتتاحي لمورد", 13),
+        ],
+        seed_missing=True,
+    ),
+
+    Table(
+        "JournalEntries", "قيود اليومية",
+        "قيد آلي لكل عملية، مربوط بأصلها (SourceType + SourceID). يُحدَّث إذا تغيرت العملية.",
+        [
+            auto("EntryID", "رقم داخلي"),
+            text("EntryNumber", 20, "رقم القيد", required=True),
+            datetime_("EntryDate", "تاريخ القيد", required=True),
+            text("SourceType", 20, "نوع العملية", required=True),
+            long_("SourceID", "رقم العملية الداخلي", required=True),
+            text("SourceNumber", 20, "رقم مستند العملية"),
+            text("Description", 255, "البيان"),
+            money("TotalDebit", "إجمالي المدين"),
+            money("TotalCredit", "إجمالي الدائن"),
+            int_("LineCount", "عدد الأسطر", required=True, default="0"),
+            money("Signature", "بصمة القيد", note="تكشف تغيّر العملية بعد إنشاء القيد"),
+            datetime_("UpdatedAt", "آخر تحديث"),
+            created_at(),
+        ],
+        pk=["EntryID"],
+        indexes=[ux("EntryNumber"), ux("SourceType", "SourceID"), ix("EntryDate")],
+        rule="[TotalDebit]=[TotalCredit]",
+        rule_text="القيد غير متوازن: المدين يجب أن يساوي الدائن",
+    ),
+
+    Table(
+        "JournalLines", "أسطر القيود",
+        "الطرف المدين والطرف الدائن لكل قيد.",
+        [
+            auto("JournalLineID", "رقم السطر الداخلي"),
+            long_("EntryID", "القيد", required=True, fk="JournalEntries.EntryID", cascade=True),
+            int_("LineNumber", "رقم السطر", required=True),
+            long_("AccountCode", "الحساب", required=True, fk="Accounts.AccountCode"),
+            money("Debit", "مدين"),
+            money("Credit", "دائن"),
+            text("LineText", 255, "البيان"),
+        ],
+        pk=["JournalLineID"],
+        indexes=[ux("EntryID", "LineNumber"), ix("AccountCode")],
+    ),
+
     # ------------------------------------------------------------- Inventory
     Table(
         "TransactionTypes", "أنواع حركات المخزون",
@@ -1134,3 +1241,5 @@ table("RolePermissions").seed_rows = _role_permissions()
 # PermissionKey in RolePermissions points to Permissions (text key)
 table("RolePermissions").fields[1].fk = "Permissions.PermissionKey"
 table("RolePermissions").fields[1].on_delete_cascade = True
+# the kind of operation of an entry points to JournalSourceTypes (text key)
+table("JournalEntries").fields[3].fk = "JournalSourceTypes.SourceType"

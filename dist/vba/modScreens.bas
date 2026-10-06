@@ -129,6 +129,8 @@ End Sub
 '                 b = optional cash box (query parameter CashBoxID, 0 = all boxes)
 '                 e = optional filter on ExpenseTypeID
 '                 # = treasury report: needs the CASH_BOX permission
+'                 J = accounting report: needs the JOURNAL permission; the entries are
+'                     brought up to date first (SyncJournal)
 '                 $ = shows cost / profit: needs the REPORTS_PROFIT permission
 '------------------------------------------------------------------------------
 Public Sub ReportCenterLoad(ByVal frm As Access.Form)
@@ -229,7 +231,7 @@ End Sub
 Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByRef where As String, _
                                ByRef criteria As String) As Boolean
     ' Checks the choices, sets the query parameters and builds the filter and the criteria line.
-    Dim needs As String, fromDate As Date, toDate As Date
+    Dim needs As String, fromDate As Date, toDate As Date, msg As String
     r = SelectedReport(frm)
     If IsEmpty(r) Then
         ShowWarning "ÇÎÊÑ ÊÞÑíÑðÇ ãä ÇáÞÇÆãÉ ÃæáðÇ."
@@ -245,6 +247,14 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
     If HasNeed(needs, "#") And Not HasPermission("CASH_BOX") Then
         ShowWarning "ÊÞÇÑíÑ ÇáÎÒíäÉ ÊÍÊÇÌ ÕáÇÍíÉ «ÇáÎÒíäÉ»."
         Exit Function
+    End If
+    If HasNeed(needs, "J") Then
+        If Not HasPermission("JOURNAL") Then
+            ShowWarning "ÇáÊÞÇÑíÑ ÇáãÍÇÓÈíÉ ÊÍÊÇÌ ÕáÇÍíÉ «ÞíæÏ ÇáíæãíÉ»."
+            Exit Function
+        End If
+        msg = SyncJournal()
+        If Len(msg) > 0 Then ShowWarning msg
     End If
 
     If HasNeed(needs, "P") Or HasNeed(needs, "D") Then

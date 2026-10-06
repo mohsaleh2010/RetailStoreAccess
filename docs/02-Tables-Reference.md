@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **33** | عدد الحقول: **430**
+عدد الجداول: **37** | عدد الحقول: **458**
 
 ## الفهرس
 
@@ -33,12 +33,16 @@
 25. [`Expenses`](#expenses) – المصروفات
 26. [`CashVouchers`](#cashvouchers) – سندات النقدية
 27. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-28. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-29. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-30. [`StockCounts`](#stockcounts) – جلسات الجرد
-31. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-32. [`AuditLog`](#auditlog) – سجل العمليات
-33. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+28. [`Accounts`](#accounts) – دليل الحسابات
+29. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+30. [`JournalEntries`](#journalentries) – قيود اليومية
+31. [`JournalLines`](#journallines) – أسطر القيود
+32. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+33. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+34. [`StockCounts`](#stockcounts) – جلسات الجرد
+35. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+36. [`AuditLog`](#auditlog) – سجل العمليات
+37. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -94,7 +98,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 15 سجل
+- بيانات أساسية: 16 سجل
 
 ## Roles
 
@@ -123,7 +127,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 24 سجل
+- بيانات أساسية: 25 سجل
 
 ## RolePermissions
 
@@ -135,7 +139,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 49 سجل
+- بيانات أساسية: 51 سجل
 
 ## Employees
 
@@ -707,6 +711,78 @@
 - فهرس فريد: `ClosingNumber`
 - فهرس عادي: `CashBoxID, ClosingDate`
 - قاعدة تحقق على مستوى الجدول: `[TransferAmount]+[KeptAmount]=[CountedAmount]` – المرحَّل + المتبقي = النقدية الفعلية
+
+## Accounts
+
+**دليل الحسابات** – الحسابات التي تُرحَّل إليها القيود. حسابات الصناديق (110000 + رقم الصندوق) وأنواع المصروفات (530000 + رقم النوع) تُنشأ تلقائيًا.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **AccountCode** 🔑 | Number (Long) |  | ✔ |  | `>0` |  | رقم الحساب |
+| 2 | AccountName | Short Text | 100 | ✔ |  |  |  | اسم الحساب |
+| 3 | AccountType | Short Text | 10 | ✔ |  | `In ("ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE")` |  | نوع الحساب |
+| 4 | ParentCode | Number (Long) |  |  |  |  |  | الحساب الرئيسي |
+| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+
+- المفتاح الأساسي: `AccountCode`
+- بيانات أساسية: 22 سجل
+
+## JournalSourceTypes
+
+**أنواع مصادر القيود** – أنواع العمليات التي يُنشأ عنها قيد آلي، ومنها يُعرف أصل القيد.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **SourceType** 🔑 | Short Text | 20 | ✔ |  |  |  | نوع العملية |
+| 2 | TypeName | Short Text | 50 | ✔ |  |  |  | الاسم |
+| 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+
+- المفتاح الأساسي: `SourceType`
+- بيانات أساسية: 13 سجل
+
+## JournalEntries
+
+**قيود اليومية** – قيد آلي لكل عملية، مربوط بأصلها (SourceType + SourceID). يُحدَّث إذا تغيرت العملية.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **EntryID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | EntryNumber | Short Text | 20 | ✔ |  |  |  | رقم القيد |
+| 3 | EntryDate | Date/Time |  | ✔ |  |  |  | تاريخ القيد |
+| 4 | SourceType | Short Text | 20 | ✔ |  |  | `JournalSourceTypes.SourceType` | نوع العملية |
+| 5 | SourceID | Number (Long) |  | ✔ |  |  |  | رقم العملية الداخلي |
+| 6 | SourceNumber | Short Text | 20 |  |  |  |  | رقم مستند العملية |
+| 7 | Description | Short Text | 255 |  |  |  |  | البيان |
+| 8 | TotalDebit | Currency |  | ✔ | `0` | `>=0` |  | إجمالي المدين |
+| 9 | TotalCredit | Currency |  | ✔ | `0` | `>=0` |  | إجمالي الدائن |
+| 10 | LineCount | Number (Integer) |  | ✔ | `0` |  |  | عدد الأسطر |
+| 11 | Signature | Currency |  | ✔ | `0` | `>=0` |  | بصمة القيد – تكشف تغيّر العملية بعد إنشاء القيد |
+| 12 | UpdatedAt | Date/Time |  |  |  |  |  | آخر تحديث |
+| 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `EntryID`
+- فهرس فريد: `EntryNumber`
+- فهرس فريد: `SourceType, SourceID`
+- فهرس عادي: `EntryDate`
+- قاعدة تحقق على مستوى الجدول: `[TotalDebit]=[TotalCredit]` – القيد غير متوازن: المدين يجب أن يساوي الدائن
+
+## JournalLines
+
+**أسطر القيود** – الطرف المدين والطرف الدائن لكل قيد.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **JournalLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر الداخلي |
+| 2 | EntryID | Number (Long) |  | ✔ |  |  | `JournalEntries.EntryID` | القيد |
+| 3 | LineNumber | Number (Integer) |  | ✔ |  |  |  | رقم السطر |
+| 4 | AccountCode | Number (Long) |  | ✔ |  |  | `Accounts.AccountCode` | الحساب |
+| 5 | Debit | Currency |  | ✔ | `0` | `>=0` |  | مدين |
+| 6 | Credit | Currency |  | ✔ | `0` | `>=0` |  | دائن |
+| 7 | LineText | Short Text | 255 |  |  |  |  | البيان |
+
+- المفتاح الأساسي: `JournalLineID`
+- فهرس فريد: `EntryID, LineNumber`
+- فهرس عادي: `AccountCode`
 
 ## TransactionTypes
 

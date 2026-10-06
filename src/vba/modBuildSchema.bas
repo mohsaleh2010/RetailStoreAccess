@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=17;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=15;Roles=3;Permissions=24;RolePermissions=49;Employees=1;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=17;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=5;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=16;Roles=3;Permissions=25;RolePermissions=51;Employees=1;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=22;JournalSourceTypes=13;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -546,6 +546,10 @@ Private Sub CreateAllTables()
     CreateTable_Expenses
     CreateTable_CashVouchers
     CreateTable_CashClosings
+    CreateTable_Accounts
+    CreateTable_JournalSourceTypes
+    CreateTable_JournalEntries
+    CreateTable_JournalLines
     CreateTable_TransactionTypes
     CreateTable_InventoryTransactions
     CreateTable_StockCounts
@@ -1516,6 +1520,95 @@ Private Sub CreateTable_CashClosings()
     EndTable tdf, "تصفية يومية الكاشير: جرد نقدية صندوق الكاشير في نهاية الوردية وترحيلها للخزينة الرئيسية أو تسويتها مع المالك.", "[TransferAmount]+[KeptAmount]=[CountedAmount]", "المرحَّل + المتبقي = النقدية الفعلية"
 End Sub
 
+Private Sub CreateTable_Accounts()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "Accounts") Then Exit Sub
+    AddField tdf, "AccountCode", "LONG", 0, True, "", _
+             ">0", "رقم الحساب أكبر من صفر", "رقم الحساب", ""
+    AddField tdf, "AccountName", "TEXT", 100, True, "", _
+             "", "", "اسم الحساب", ""
+    AddField tdf, "AccountType", "TEXT", 10, True, "", _
+             "In (""ASSET"",""LIABILITY"",""EQUITY"",""REVENUE"",""EXPENSE"")", "أصول، خصوم، حقوق ملكية، إيرادات، مصروفات", "نوع الحساب", ""
+    AddField tdf, "ParentCode", "LONG", 0, False, "", _
+             "", "", "الحساب الرئيسي", ""
+    AddField tdf, "IsActive", "BOOL", 0, False, "True", _
+             "", "", "نشط", ""
+    AddIndex tdf, "PrimaryKey", "AccountCode", True, True, False
+    EndTable tdf, "دليل الحسابات: الحسابات التي تُرحَّل إليها القيود. حسابات الصناديق (110000 + رقم الصندوق) وأنواع المصروفات (530000 + رقم النوع) تُنشأ تلقائيًا.", "", ""
+End Sub
+
+Private Sub CreateTable_JournalSourceTypes()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "JournalSourceTypes") Then Exit Sub
+    AddField tdf, "SourceType", "TEXT", 20, True, "", _
+             "", "", "نوع العملية", ""
+    AddField tdf, "TypeName", "TEXT", 50, True, "", _
+             "", "", "الاسم", ""
+    AddField tdf, "SortOrder", "INT", 0, True, "0", _
+             "", "", "الترتيب", ""
+    AddIndex tdf, "PrimaryKey", "SourceType", True, True, False
+    EndTable tdf, "أنواع مصادر القيود: أنواع العمليات التي يُنشأ عنها قيد آلي، ومنها يُعرف أصل القيد.", "", ""
+End Sub
+
+Private Sub CreateTable_JournalEntries()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "JournalEntries") Then Exit Sub
+    AddField tdf, "EntryID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "EntryNumber", "TEXT", 20, True, "", _
+             "", "", "رقم القيد", ""
+    AddField tdf, "EntryDate", "DATETIME", 0, True, "", _
+             "", "", "تاريخ القيد", ""
+    AddField tdf, "SourceType", "TEXT", 20, True, "", _
+             "", "", "نوع العملية", ""
+    AddField tdf, "SourceID", "LONG", 0, True, "", _
+             "", "", "رقم العملية الداخلي", ""
+    AddField tdf, "SourceNumber", "TEXT", 20, False, "", _
+             "", "", "رقم مستند العملية", ""
+    AddField tdf, "Description", "TEXT", 255, False, "", _
+             "", "", "البيان", ""
+    AddField tdf, "TotalDebit", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "إجمالي المدين", ""
+    AddField tdf, "TotalCredit", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "إجمالي الدائن", ""
+    AddField tdf, "LineCount", "INT", 0, True, "0", _
+             "", "", "عدد الأسطر", ""
+    AddField tdf, "Signature", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "بصمة القيد", "تكشف تغيّر العملية بعد إنشاء القيد"
+    AddField tdf, "UpdatedAt", "DATETIME", 0, False, "", _
+             "", "", "آخر تحديث", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "EntryID", True, True, False
+    AddIndex tdf, "UX_EntryNumber", "EntryNumber", False, True, False
+    AddIndex tdf, "UX_SourceType_SourceID", "SourceType,SourceID", False, True, False
+    AddIndex tdf, "IX_EntryDate", "EntryDate", False, False, False
+    EndTable tdf, "قيود اليومية: قيد آلي لكل عملية، مربوط بأصلها (SourceType + SourceID). يُحدَّث إذا تغيرت العملية.", "[TotalDebit]=[TotalCredit]", "القيد غير متوازن: المدين يجب أن يساوي الدائن"
+End Sub
+
+Private Sub CreateTable_JournalLines()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "JournalLines") Then Exit Sub
+    AddField tdf, "JournalLineID", "AUTO", 0, False, "", _
+             "", "", "رقم السطر الداخلي", ""
+    AddField tdf, "EntryID", "LONG", 0, True, "", _
+             "", "", "القيد", ""
+    AddField tdf, "LineNumber", "INT", 0, True, "", _
+             "", "", "رقم السطر", ""
+    AddField tdf, "AccountCode", "LONG", 0, True, "", _
+             "", "", "الحساب", ""
+    AddField tdf, "Debit", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "مدين", ""
+    AddField tdf, "Credit", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "دائن", ""
+    AddField tdf, "LineText", "TEXT", 255, False, "", _
+             "", "", "البيان", ""
+    AddIndex tdf, "PrimaryKey", "JournalLineID", True, True, False
+    AddIndex tdf, "UX_EntryID_LineNumber", "EntryID,LineNumber", False, True, False
+    AddIndex tdf, "IX_AccountCode", "AccountCode", False, False, False
+    EndTable tdf, "أسطر القيود: الطرف المدين والطرف الدائن لكل قيد.", "", ""
+End Sub
+
 Private Sub CreateTable_TransactionTypes()
     Dim tdf As DAO.TableDef
     If Not BeginTable(tdf, "TransactionTypes") Then Exit Sub
@@ -1707,6 +1800,8 @@ Private Sub SeedAll()
     Seed_CashBoxes
     Seed_Customers
     Seed_ExpenseTypes
+    Seed_Accounts
+    Seed_JournalSourceTypes
     Seed_TransactionTypes
     Seed_LabelSettings
 End Sub
@@ -1734,7 +1829,8 @@ Private Sub Seed_Sequences()
     SeedRow "[SequenceName] = 'CASH_OUT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_OUT', 'COT-', 1, 6, 'سندات صرف النقدية (الخزينة)')"
     SeedRow "[SequenceName] = 'CASH_TRANSFER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_TRANSFER', 'TRF-', 1, 6, 'التحويل بين الصناديق')"
     SeedRow "[SequenceName] = 'CASH_CLOSING'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_CLOSING', 'CLS-', 1, 6, 'تصفية يومية الكاشير')"
-    EndSeed "Sequences", 15
+    SeedRow "[SequenceName] = 'JOURNAL'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('JOURNAL', 'JV-', 1, 6, 'قيود اليومية')"
+    EndSeed "Sequences", 16
 End Sub
 
 Private Sub Seed_Roles()
@@ -1765,13 +1861,14 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'EXPENSES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EXPENSES', 'المصروفات', 'المصروفات', 60)") Then GrantNewPermission "EXPENSES", "1,2"
     If SeedRow("[PermissionKey] = 'CASH_BOX'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_BOX', 'الخزينة: سندات القبض والصرف والتحويل والصناديق', 'الخزينة', 65)") Then GrantNewPermission "CASH_BOX", "1,2"
     If SeedRow("[PermissionKey] = 'CASH_CLOSING'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_CLOSING', 'تصفية يومية الكاشير', 'الخزينة', 66)") Then GrantNewPermission "CASH_CLOSING", "1,2,3"
+    If SeedRow("[PermissionKey] = 'JOURNAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('JOURNAL', 'قيود اليومية ودليل الحسابات وميزان المراجعة', 'الحسابات', 75)") Then GrantNewPermission "JOURNAL", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', 'التقارير التشغيلية', 'التقارير', 70)") Then GrantNewPermission "REPORTS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', 'تقارير الأرباح والضريبة', 'التقارير', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
     If SeedRow("[PermissionKey] = 'DASHBOARD_FINANCIAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', 'الأرقام المالية في لوحة التحكم', 'التقارير', 72)") Then GrantNewPermission "DASHBOARD_FINANCIAL", "1,2"
     If SeedRow("[PermissionKey] = 'SETTINGS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', 'إعدادات المحل', 'النظام', 80)") Then GrantNewPermission "SETTINGS", "1"
     If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', 'المستخدمون والصلاحيات', 'النظام', 81)") Then GrantNewPermission "USERS", "1"
     If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', 'النسخ الاحتياطي', 'النظام', 82)") Then GrantNewPermission "BACKUP", "1"
-    EndSeed "Permissions", 24
+    EndSeed "Permissions", 25
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -1794,6 +1891,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'EXPENSES')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_BOX')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_CLOSING')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'JOURNAL')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'DASHBOARD_FINANCIAL')"
@@ -1817,6 +1915,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'EXPENSES')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_BOX')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_CLOSING')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'JOURNAL')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'DASHBOARD_FINANCIAL')"
@@ -1825,7 +1924,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 49
+    EndSeed "RolePermissions", 51
 End Sub
 
 Private Sub Seed_Employees()
@@ -1887,6 +1986,51 @@ Private Sub Seed_ExpenseTypes()
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (8, 'المستلزمات')"
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (9, 'مصروفات أخرى')"
     EndSeed "ExpenseTypes", 9
+End Sub
+
+Private Sub Seed_Accounts()
+    If Not BeginSeed("Accounts", True) Then Exit Sub
+    SeedRow "[AccountCode] = 1100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1100, 'النقدية بالخزينة والصناديق', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 110001", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (110001, 'الخزينة الرئيسية', 'ASSET', 1100)"
+    SeedRow "[AccountCode] = 110002", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (110002, 'صندوق الكاشير', 'ASSET', 1100)"
+    SeedRow "[AccountCode] = 1190", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1190, 'نقدية غير موزعة على صندوق', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1200, 'البنك والشبكة (مدى والتحويلات)', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1300, 'ذمم العملاء', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1400, 'المخزون', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1500, 'ضريبة القيمة المضافة - مدخلات', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1600, 'سلف الموظفين', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 2100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (2100, 'ذمم الموردين', 'LIABILITY', Null)"
+    SeedRow "[AccountCode] = 2200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (2200, 'ضريبة القيمة المضافة - مخرجات', 'LIABILITY', Null)"
+    SeedRow "[AccountCode] = 3100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (3100, 'جاري المالك', 'EQUITY', Null)"
+    SeedRow "[AccountCode] = 3900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (3900, 'أرصدة افتتاحية', 'EQUITY', Null)"
+    SeedRow "[AccountCode] = 4100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4100, 'المبيعات', 'REVENUE', Null)"
+    SeedRow "[AccountCode] = 4110", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4110, 'مردودات المبيعات', 'REVENUE', Null)"
+    SeedRow "[AccountCode] = 4200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4200, 'إيرادات أخرى', 'REVENUE', Null)"
+    SeedRow "[AccountCode] = 4300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4300, 'زيادة الصناديق', 'REVENUE', Null)"
+    SeedRow "[AccountCode] = 5100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5100, 'تكلفة البضاعة المباعة', 'EXPENSE', Null)"
+    SeedRow "[AccountCode] = 5200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5200, 'فروقات وتسويات المخزون', 'EXPENSE', Null)"
+    SeedRow "[AccountCode] = 5300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5300, 'المصروفات التشغيلية', 'EXPENSE', Null)"
+    SeedRow "[AccountCode] = 5400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5400, 'عجز الصناديق', 'EXPENSE', Null)"
+    SeedRow "[AccountCode] = 5900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5900, 'مصروفات أخرى', 'EXPENSE', Null)"
+    EndSeed "Accounts", 22
+End Sub
+
+Private Sub Seed_JournalSourceTypes()
+    If Not BeginSeed("JournalSourceTypes", True) Then Exit Sub
+    SeedRow "[SourceType] = 'SALE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SALE', 'فاتورة بيع', 1)"
+    SeedRow "[SourceType] = 'SALES_RETURN'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SALES_RETURN', 'مرتجع بيع', 2)"
+    SeedRow "[SourceType] = 'PURCHASE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('PURCHASE', 'فاتورة شراء', 3)"
+    SeedRow "[SourceType] = 'PURCHASE_RETURN'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('PURCHASE_RETURN', 'مرتجع شراء', 4)"
+    SeedRow "[SourceType] = 'CUSTOMER_PAYMENT'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CUSTOMER_PAYMENT', 'سند قبض من عميل', 5)"
+    SeedRow "[SourceType] = 'SUPPLIER_PAYMENT'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SUPPLIER_PAYMENT', 'سند صرف لمورد', 6)"
+    SeedRow "[SourceType] = 'EXPENSE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('EXPENSE', 'مصروف', 7)"
+    SeedRow "[SourceType] = 'CASH_VOUCHER'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CASH_VOUCHER', 'سند نقدية', 8)"
+    SeedRow "[SourceType] = 'STOCK_MOVE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('STOCK_MOVE', 'حركة مخزون يدوية', 9)"
+    SeedRow "[SourceType] = 'STOCK_COUNT'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('STOCK_COUNT', 'تسوية جرد', 10)"
+    SeedRow "[SourceType] = 'BOX_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('BOX_OPENING', 'رصيد افتتاحي لصندوق', 11)"
+    SeedRow "[SourceType] = 'CUSTOMER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CUSTOMER_OPENING', 'رصيد افتتاحي لعميل', 12)"
+    SeedRow "[SourceType] = 'SUPPLIER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SUPPLIER_OPENING', 'رصيد افتتاحي لمورد', 13)"
+    EndSeed "JournalSourceTypes", 13
 End Sub
 
 Private Sub Seed_TransactionTypes()

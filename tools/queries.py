@@ -33,6 +33,162 @@ def nz(expr):
 
 P = ["PeriodStart", "PeriodEnd"]
 
+
+# --------------------------------------------------------------------------
+# Journal entries: one query per kind of operation gives the lines of its entry
+# (SourceType, SourceID, SourceNumber, SourceDate, LineOrder, AccountCode, Debit, Credit, LineText).
+# modJournal.SyncJournal creates / refreshes one entry per (SourceType, SourceID).
+# --------------------------------------------------------------------------
+def cash_account(a):
+    """The cash box of a document (110000 + box), else 1190 (cash without a box) or 1200 (bank / card)."""
+    return (f"IIf({a}.CashBoxID Is Null, IIf({a}.PaymentMethodID Is Null Or {a}.PaymentMethodID = 1, 1190, 1200), "
+            f"110000 + {a}.CashBoxID)")
+
+
+def jline(stype, key, number, when, party, order, account, debit, credit, text, source, where):
+    """party: the customer / supplier / payee of the operation (the entry description)."""
+    return (f"SELECT {stype} AS SourceType, {key} AS SourceID, {number} AS SourceNumber, {when} AS SourceDate, "
+            f"{party} AS Party, {order} AS LineOrder, {account} AS AccountCode, {debit} AS Debit, "
+            f"{credit} AS Credit, {text} AS LineText\nFROM {source}\nWHERE {where}")
+
+
+def jquery(branches):
+    return "\nUNION ALL\n".join(branches)
+
+
+ZERO = "CCur(0)"
+JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournalPurchase", "qryJournalPurchaseReturn",
+                          "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
+                          "qryJournalOpening"]
+
+
+def _sale():
+    src = "SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID"
+    cost = f"({src}) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID"
+    k = ("'SALE'", "h.SalesInvoiceID", "h.InvoiceNumber", "h.InvoiceDate", "c.CustomerName")
+    return jquery([
+        jline(*k, 1, cash_account("h"), "h.PaidAmount", ZERO, "c.CustomerName", src, "h.PaidAmount <> 0"),
+        jline(*k, 2, 1300, "h.RemainingAmount", ZERO, "c.CustomerName", src, "h.RemainingAmount <> 0"),
+        jline(*k, 3, 4100, ZERO, "h.TaxableAmount", "'المبيعات'", src, "h.TaxableAmount <> 0"),
+        jline(*k, 4, 2200, ZERO, "h.Tax", "'ضريبة المخرجات'", src, "h.Tax <> 0"),
+        jline(*k, 5, 5100, "k.SaleCost", ZERO, "'تكلفة البضاعة المباعة'", cost, "k.SaleCost <> 0"),
+        jline(*k, 6, 1400, ZERO, "k.SaleCost", "'المخزون'", cost, "k.SaleCost <> 0")])
+
+
+def _sales_return():
+    src = "SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID"
+    cost = f"({src}) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID"
+    k = ("'SALES_RETURN'", "r.SalesReturnID", "r.ReturnNumber", "r.ReturnDate", "c.CustomerName")
+    return jquery([
+        jline(*k, 1, 4110, "r.TaxableAmount", ZERO, "'مردودات المبيعات'", src, "r.TaxableAmount <> 0"),
+        jline(*k, 2, 2200, "r.Tax", ZERO, "'ضريبة المخرجات'", src, "r.Tax <> 0"),
+        jline(*k, 3, cash_account("r"), ZERO, "r.RefundedAmount", "c.CustomerName", src, "r.RefundedAmount <> 0"),
+        jline(*k, 4, 1300, ZERO, "r.TotalAmount - r.RefundedAmount", "c.CustomerName", src,
+              "r.TotalAmount - r.RefundedAmount <> 0"),
+        jline(*k, 5, 1400, "k.ReturnCost", ZERO, "'المخزون'", cost, "k.ReturnCost <> 0"),
+        jline(*k, 6, 5100, ZERO, "k.ReturnCost", "'تكلفة البضاعة المباعة'", cost, "k.ReturnCost <> 0")])
+
+
+def _purchase():
+    src = "PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID"
+    k = ("'PURCHASE'", "h.PurchaseInvoiceID", "h.InvoiceNumber", "h.InvoiceDate", "s.SupplierName")
+    return jquery([
+        jline(*k, 1, 1400, "h.TaxableAmount", ZERO, "'المخزون'", src, "h.TaxableAmount <> 0"),
+        jline(*k, 2, 1500, "h.Tax", ZERO, "'ضريبة المدخلات'", src, "h.Tax <> 0"),
+        jline(*k, 3, cash_account("h"), ZERO, "h.PaidAmount", "s.SupplierName", src, "h.PaidAmount <> 0"),
+        jline(*k, 4, 2100, ZERO, "h.RemainingAmount", "s.SupplierName", src, "h.RemainingAmount <> 0")])
+
+
+def _purchase_return():
+    src = "PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID"
+    k = ("'PURCHASE_RETURN'", "r.PurchaseReturnID", "r.ReturnNumber", "r.ReturnDate", "s.SupplierName")
+    return jquery([
+        jline(*k, 1, cash_account("r"), "r.RefundedAmount", ZERO, "s.SupplierName", src, "r.RefundedAmount <> 0"),
+        jline(*k, 2, 2100, "r.TotalAmount - r.RefundedAmount", ZERO, "s.SupplierName", src,
+              "r.TotalAmount - r.RefundedAmount <> 0"),
+        jline(*k, 3, 1400, ZERO, "r.TaxableAmount", "'المخزون'", src, "r.TaxableAmount <> 0"),
+        jline(*k, 4, 1500, ZERO, "r.Tax", "'ضريبة المدخلات'", src, "r.Tax <> 0")])
+
+
+def _payments():
+    cs = "CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID"
+    ss = "SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID"
+    kc = ("'CUSTOMER_PAYMENT'", "p.PaymentID", "p.PaymentNumber", "p.PaymentDate", "c.CustomerName")
+    ks = ("'SUPPLIER_PAYMENT'", "p.PaymentID", "p.PaymentNumber", "p.PaymentDate", "s.SupplierName")
+    return jquery([
+        jline(*kc, 1, cash_account("p"), "p.Amount", ZERO, "c.CustomerName", cs, "p.Amount <> 0"),
+        jline(*kc, 2, 1300, ZERO, "p.Amount", "c.CustomerName", cs, "p.Amount <> 0"),
+        jline(*ks, 1, 2100, "p.Amount", ZERO, "s.SupplierName", ss, "p.Amount <> 0"),
+        jline(*ks, 2, cash_account("p"), ZERO, "p.Amount", "s.SupplierName", ss, "p.Amount <> 0")])
+
+
+def _expense():
+    # an expense recorded by a cash voucher is booked by the voucher's entry
+    src = ("(Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) "
+           "LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID")
+    k = ("'EXPENSE'", "e.ExpenseID", "e.ExpenseNumber", "e.ExpenseDate", "t.ExpenseTypeName")
+    return jquery([
+        jline(*k, 1, "530000 + e.ExpenseTypeID", "e.Amount", ZERO, "t.ExpenseTypeName", src,
+              "v.CashVoucherID Is Null AND e.Amount <> 0"),
+        jline(*k, 2, 1500, "e.Tax", ZERO, "'ضريبة المدخلات'", src, "v.CashVoucherID Is Null AND e.Tax <> 0"),
+        jline(*k, 3, cash_account("e"), ZERO, "e.TotalAmount", "e.Description", src,
+              "v.CashVoucherID Is Null AND e.TotalAmount <> 0")])
+
+
+def _cash_voucher():
+    k = ("'CASH_VOUCHER'", "v.CashVoucherID", "v.VoucherNumber", "v.VoucherDate",
+         "IIf(v.PartyName Is Null, v.Description, v.PartyName)")
+    out_src = "CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID"
+    out_account = ("IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', "
+                   "5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, "
+                   "5900))))")
+    return jquery([
+        jline(*k, 1, "110000 + v.CashBoxID", "v.Amount", ZERO, "v.PartyName", "CashVouchers AS v",
+              "v.VoucherType = 'IN'"),
+        jline(*k, 2, "IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, 4200))", ZERO, "v.Amount",
+              "v.Description", "CashVouchers AS v", "v.VoucherType = 'IN'"),
+        jline(*k, 1, out_account, "v.Amount", ZERO, "v.Description", out_src, "v.VoucherType = 'OUT'"),
+        jline(*k, 2, "110000 + v.CashBoxID", ZERO, "v.Amount", "v.PartyName", out_src, "v.VoucherType = 'OUT'"),
+        jline(*k, 1, "110000 + v.ToCashBoxID", "v.Amount", ZERO, "v.Description", "CashVouchers AS v",
+              "v.VoucherType = 'TRANSFER'"),
+        jline(*k, 2, "110000 + v.CashBoxID", ZERO, "v.Amount", "v.Description", "CashVouchers AS v",
+              "v.VoucherType = 'TRANSFER'")])
+
+
+def _stock():
+    val = "i.Quantity * i.UnitCost"
+    km = ("'STOCK_MOVE'", "i.TransactionID", "i.ReferenceNumber", "i.TransactionDate", "p.ProductName")
+    kc = ("'STOCK_COUNT'", "k.StockCountID", "k.CountNumber", "k.CountDate", "'تسوية الجرد'")
+    moves = "InventoryTransactions AS i INNER JOIN Products AS p ON i.ProductID = p.ProductID"
+    manual = "i.ReferenceType = 'MANUAL' AND " + val + " <> 0"
+    other = "IIf(i.TransactionTypeID = 8, 3900, 5200)"          # 8 = opening stock
+    return jquery([
+        jline(*km, 1, 1400, f"IIf({val} > 0, {val}, 0)", f"IIf({val} < 0, -{val}, 0)", "i.Notes", moves, manual),
+        jline(*km, 2, other, f"IIf({val} < 0, -{val}, 0)", f"IIf({val} > 0, {val}, 0)", "i.Notes", moves, manual),
+        jline(*kc, 1, 1400, "IIf(k.CountValue > 0, k.CountValue, 0)", "IIf(k.CountValue < 0, -k.CountValue, 0)",
+              "'المخزون'", "qryStockCountValue AS k", "k.CountValue <> 0"),
+        jline(*kc, 2, 5200, "IIf(k.CountValue < 0, -k.CountValue, 0)", "IIf(k.CountValue > 0, k.CountValue, 0)",
+              "'فروقات الجرد'", "qryStockCountValue AS k", "k.CountValue <> 0")])
+
+
+def _opening():
+    kb = ("'BOX_OPENING'", "b.CashBoxID", "b.BoxName", "b.OpeningDate", "b.BoxName")
+    kc = ("'CUSTOMER_OPENING'", "c.CustomerID", "c.CustomerName", "c.CreatedAt", "c.CustomerName")
+    ks = ("'SUPPLIER_OPENING'", "s.SupplierID", "s.SupplierName", "s.CreatedAt", "s.SupplierName")
+    pos, neg = "IIf({0}.OpeningBalance > 0, {0}.OpeningBalance, 0)", "IIf({0}.OpeningBalance < 0, -{0}.OpeningBalance, 0)"
+    return jquery([
+        jline(*kb, 1, "110000 + b.CashBoxID", "b.OpeningBalance", ZERO, "b.BoxName", "CashBoxes AS b",
+              "b.OpeningBalance <> 0"),
+        jline(*kb, 2, 3900, ZERO, "b.OpeningBalance", "'رصيد افتتاحي'", "CashBoxes AS b", "b.OpeningBalance <> 0"),
+        jline(*kc, 1, 1300, pos.format("c"), neg.format("c"), "c.CustomerName", "Customers AS c",
+              "c.OpeningBalance <> 0"),
+        jline(*kc, 2, 3900, neg.format("c"), pos.format("c"), "'رصيد افتتاحي'", "Customers AS c",
+              "c.OpeningBalance <> 0"),
+        jline(*ks, 1, 2100, neg.format("s"), pos.format("s"), "s.SupplierName", "Suppliers AS s",
+              "s.OpeningBalance <> 0"),
+        jline(*ks, 2, 3900, pos.format("s"), neg.format("s"), "'رصيد افتتاحي'", "Suppliers AS s",
+              "s.OpeningBalance <> 0")])
+
 QUERIES: List[Query] = [
 
     # ================================================================ SALES
@@ -672,6 +828,72 @@ FROM ((((CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxI
       LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)
      LEFT JOIN ExpenseTypes AS x ON ex.ExpenseTypeID = x.ExpenseTypeID"""),
 
+    # ============================================================ JOURNAL
+    Query("qrySaleCost", "تكلفة كل فاتورة بيع", """
+SELECT SalesInvoiceID, Sum(Quantity * UnitCost) AS SaleCost
+FROM SalesInvoiceDetails
+GROUP BY SalesInvoiceID"""),
+
+    Query("qryReturnCost", "تكلفة ما عاد للمخزون من كل مرتجع بيع", """
+SELECT SalesReturnID, Sum(IIf(ReturnToStock, Quantity * UnitCost, 0)) AS ReturnCost
+FROM SalesReturnDetails
+GROUP BY SalesReturnID"""),
+
+    Query("qryStockCountValue", "قيمة فروقات كل جرد مُرحّل", """
+SELECT ReferenceID AS StockCountID, Max(ReferenceNumber) AS CountNumber, Max(TransactionDate) AS CountDate,
+       Sum(Quantity * UnitCost) AS CountValue
+FROM InventoryTransactions
+WHERE ReferenceType = 'STOCK_COUNT'
+GROUP BY ReferenceID"""),
+
+    Query("qryJournalSale", "أسطر قيود فواتير البيع", _sale()),
+    Query("qryJournalSalesReturn", "أسطر قيود مرتجعات البيع", _sales_return()),
+    Query("qryJournalPurchase", "أسطر قيود فواتير الشراء", _purchase()),
+    Query("qryJournalPurchaseReturn", "أسطر قيود مرتجعات الشراء", _purchase_return()),
+    Query("qryJournalPayments", "أسطر قيود سندات القبض من العملاء والصرف للموردين", _payments()),
+    Query("qryJournalExpense", "أسطر قيود المصروفات (عدا المسجلة بسند نقدية)", _expense()),
+    Query("qryJournalCashVoucher", "أسطر قيود سندات النقدية (قبض وصرف وتحويل)", _cash_voucher()),
+    Query("qryJournalStock", "أسطر قيود حركات المخزون اليدوية وتسويات الجرد", _stock()),
+    Query("qryJournalOpening", "أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين", _opening()),
+
+    Query("JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", f"""
+SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber,
+       e.Description, l.LineNumber, l.AccountCode, a.AccountName, l.LineText, l.Debit, l.Credit
+FROM ((JournalEntries AS e INNER JOIN JournalSourceTypes AS t ON e.SourceType = t.SourceType)
+      INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)
+     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode
+WHERE {period("e.EntryDate")}
+ORDER BY e.EntryDate, e.EntryNumber, l.LineNumber""", P),
+
+    Query("qryJournalEntryPrint", "بيانات طباعة قيد", """
+SELECT e.EntryID, e.EntryNumber, e.EntryDate, t.TypeName, e.SourceNumber, e.Description, e.TotalDebit,
+       l.LineNumber, l.AccountCode, a.AccountName, l.LineText, l.Debit, l.Credit
+FROM ((JournalEntries AS e INNER JOIN JournalSourceTypes AS t ON e.SourceType = t.SourceType)
+      INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)
+     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode"""),
+
+    Query("qryTrialBefore", "مجموع الحسابات قبل الفترة", """
+SELECT l.AccountCode, Sum(l.Debit) AS DebitBefore, Sum(l.Credit) AS CreditBefore
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate < QDate('PeriodStart')
+GROUP BY l.AccountCode""", ["PeriodStart"]),
+
+    Query("qryTrialPeriod", "حركة الحسابات خلال الفترة", f"""
+SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE {period("e.EntryDate")}
+GROUP BY l.AccountCode""", P),
+
+    Query("TrialBalanceQuery", "ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب)", f"""
+SELECT a.AccountCode, a.AccountName, a.AccountType,
+       {nz("b.DebitBefore")} - {nz("b.CreditBefore")} AS OpeningBalance,
+       {nz("p.SumDebit")} AS PeriodDebit, {nz("p.SumCredit")} AS PeriodCredit,
+       {nz("b.DebitBefore")} - {nz("b.CreditBefore")} + {nz("p.SumDebit")} - {nz("p.SumCredit")} AS ClosingBalance
+FROM (Accounts AS a LEFT JOIN qryTrialBefore AS b ON a.AccountCode = b.AccountCode)
+     LEFT JOIN qryTrialPeriod AS p ON a.AccountCode = p.AccountCode
+WHERE b.AccountCode Is Not Null OR p.AccountCode Is Not Null
+ORDER BY a.AccountCode""", P),
+
     # ============================================================ INTEGRITY
     Query("qrySalesInvoiceLineTotals", "مجموع أسطر كل فاتورة بيع", """
 SELECT SalesInvoiceID, Sum(LineTotal) AS LinesTotal
@@ -1160,6 +1382,57 @@ CHECKS: List[Check] = [
           "SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V1} AND ExpenseTypeName = 'مصروفات أخرى'", 1),
     Check("طباعة سند التحويل: الصندوق المستلم",
           "SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V3} AND ToBoxName = 'TEST الخزينة'", 1),
+
+    # Journal entries (the lines the sync posts)
+    Check("قيود Sale: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalSale GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيود SalesReturn: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalSalesReturn GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيود Purchase: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPurchase GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيود PurchaseReturn: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPurchaseReturn GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيود Payments: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPayments GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيود Expense: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalExpense GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيود CashVoucher: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalCashVoucher GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيود Stock: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalStock GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيود Opening: كل قيد متوازن",
+          "SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalOpening GROUP BY SourceType, SourceID "
+          "HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x", 0),
+    Check("قيد الفاتورة الآجلة: 6 أسطر (نقدي، عميل، مبيعات، ضريبة، تكلفة، مخزون)",
+          "SELECT COUNT(*) FROM qryJournalSale WHERE SourceID = {ref:INV2}", 6),
+    Check("قيد الفاتورة الآجلة: المتبقي على العميل 360 في ذمم العملاء",
+          "SELECT Debit FROM qryJournalSale WHERE SourceID = {ref:INV2} AND AccountCode = 1300", 360),
+    Check("قيد الفاتورة الآجلة: التكلفة = 2×60 + 10×10",
+          "SELECT Debit FROM qryJournalSale WHERE SourceID = {ref:INV2} AND AccountCode = 5100", 220),
+    Check("ذمم العملاء من القيود = أرصدة العملاء (164)",
+          'SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 1300', 164),
+    Check("ذمم الموردين من القيود = رصيد المورد (2855 دائن)",
+          'SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 2100', -2855),
+    Check("المخزون من القيود = قيمة المخزون بالتكلفة (7040)",
+          'SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock) AS x WHERE AccountCode = 1400', 7040),
+    Check("صندوق الكاشير من القيود = رصيده (770)",
+          'SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalExpense UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalCashVoucher UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 110000 + {ref:BOXC}', 770),
+    Check("الخزينة من القيود = رصيدها (7700)",
+          'SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalExpense UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalCashVoucher UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 110000 + {ref:BOXM}', 7700),
+    Check("ضريبة المخرجات من القيود = 15 + 150 + 60 − 6",
+          'SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn) AS x WHERE AccountCode = 2200', -219),
+    Check("مصروف سند النقدية لا يُقيَّد مرتين",
+          "SELECT COUNT(*) FROM qryJournalExpense WHERE SourceID = {ref:EXPV}", 0),
+    Check("سند صرف المصروف يُقيَّد على حساب نوع المصروف",
+          "SELECT Debit FROM qryJournalCashVoucher WHERE SourceID = {ref:V1} AND AccountCode = 530009", 50),
 
     # Integrity
     Check("فحص السلامة: لا توجد مشكلات",

@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=17;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=15;Roles=3;Permissions=24;RolePermissions=49;Employees=1;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=31;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=17;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=5;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=16;Roles=3;Permissions=25;RolePermissions=51;Employees=1;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=22;JournalSourceTypes=13;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -546,6 +546,10 @@ Private Sub CreateAllTables()
     CreateTable_Expenses
     CreateTable_CashVouchers
     CreateTable_CashClosings
+    CreateTable_Accounts
+    CreateTable_JournalSourceTypes
+    CreateTable_JournalEntries
+    CreateTable_JournalLines
     CreateTable_TransactionTypes
     CreateTable_InventoryTransactions
     CreateTable_StockCounts
@@ -1516,6 +1520,95 @@ Private Sub CreateTable_CashClosings()
     EndTable tdf, " ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—: Ã—œ ‰ﬁœÌ… ’‰œÊﬁ «·ﬂ«‘Ì— ›Ì ‰Â«Ì… «·Ê—œÌ… Ê —ÕÌ·Â« ··Œ“Ì‰… «·—∆Ì”Ì… √Ê  ”ÊÌ Â« „⁄ «·„«·ﬂ.", "[TransferAmount]+[KeptAmount]=[CountedAmount]", "«·„—ÕÛ¯· + «·„ »ﬁÌ = «·‰ﬁœÌ… «·›⁄·Ì…"
 End Sub
 
+Private Sub CreateTable_Accounts()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "Accounts") Then Exit Sub
+    AddField tdf, "AccountCode", "LONG", 0, True, "", _
+             ">0", "—ﬁ„ «·Õ”«» √ﬂ»— „‰ ’›—", "—ﬁ„ «·Õ”«»", ""
+    AddField tdf, "AccountName", "TEXT", 100, True, "", _
+             "", "", "«”„ «·Õ”«»", ""
+    AddField tdf, "AccountType", "TEXT", 10, True, "", _
+             "In (""ASSET"",""LIABILITY"",""EQUITY"",""REVENUE"",""EXPENSE"")", "√’Ê·° Œ’Ê„° ÕﬁÊﬁ „·ﬂÌ…° ≈Ì—«œ« ° „’—Ê›« ", "‰Ê⁄ «·Õ”«»", ""
+    AddField tdf, "ParentCode", "LONG", 0, False, "", _
+             "", "", "«·Õ”«» «·—∆Ì”Ì", ""
+    AddField tdf, "IsActive", "BOOL", 0, False, "True", _
+             "", "", "‰‘ÿ", ""
+    AddIndex tdf, "PrimaryKey", "AccountCode", True, True, False
+    EndTable tdf, "œ·Ì· «·Õ”«»« : «·Õ”«»«  «· Ì  ı—ÕÛ¯· ≈·ÌÂ« «·ﬁÌÊœ. Õ”«»«  «·’‰«œÌﬁ (110000 + —ﬁ„ «·’‰œÊﬁ) Ê√‰Ê«⁄ «·„’—Ê›«  (530000 + —ﬁ„ «·‰Ê⁄)  ı‰‘√  ·ﬁ«∆Ì«.", "", ""
+End Sub
+
+Private Sub CreateTable_JournalSourceTypes()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "JournalSourceTypes") Then Exit Sub
+    AddField tdf, "SourceType", "TEXT", 20, True, "", _
+             "", "", "‰Ê⁄ «·⁄„·Ì…", ""
+    AddField tdf, "TypeName", "TEXT", 50, True, "", _
+             "", "", "«·«”„", ""
+    AddField tdf, "SortOrder", "INT", 0, True, "0", _
+             "", "", "«· — Ì»", ""
+    AddIndex tdf, "PrimaryKey", "SourceType", True, True, False
+    EndTable tdf, "√‰Ê«⁄ „’«œ— «·ﬁÌÊœ: √‰Ê«⁄ «·⁄„·Ì«  «· Ì Ìı‰‘√ ⁄‰Â« ﬁÌœ ¬·Ì° Ê„‰Â« Ìı⁄—› √’· «·ﬁÌœ.", "", ""
+End Sub
+
+Private Sub CreateTable_JournalEntries()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "JournalEntries") Then Exit Sub
+    AddField tdf, "EntryID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ œ«Œ·Ì", ""
+    AddField tdf, "EntryNumber", "TEXT", 20, True, "", _
+             "", "", "—ﬁ„ «·ﬁÌœ", ""
+    AddField tdf, "EntryDate", "DATETIME", 0, True, "", _
+             "", "", " «—ÌŒ «·ﬁÌœ", ""
+    AddField tdf, "SourceType", "TEXT", 20, True, "", _
+             "", "", "‰Ê⁄ «·⁄„·Ì…", ""
+    AddField tdf, "SourceID", "LONG", 0, True, "", _
+             "", "", "—ﬁ„ «·⁄„·Ì… «·œ«Œ·Ì", ""
+    AddField tdf, "SourceNumber", "TEXT", 20, False, "", _
+             "", "", "—ﬁ„ „” ‰œ «·⁄„·Ì…", ""
+    AddField tdf, "Description", "TEXT", 255, False, "", _
+             "", "", "«·»Ì«‰", ""
+    AddField tdf, "TotalDebit", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "≈Ã„«·Ì «·„œÌ‰", ""
+    AddField tdf, "TotalCredit", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "≈Ã„«·Ì «·œ«∆‰", ""
+    AddField tdf, "LineCount", "INT", 0, True, "0", _
+             "", "", "⁄œœ «·√”ÿ—", ""
+    AddField tdf, "Signature", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "»’„… «·ﬁÌœ", " ﬂ‘›  €Ì¯— «·⁄„·Ì… »⁄œ ≈‰‘«¡ «·ﬁÌœ"
+    AddField tdf, "UpdatedAt", "DATETIME", 0, False, "", _
+             "", "", "¬Œ—  ÕœÌÀ", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "EntryID", True, True, False
+    AddIndex tdf, "UX_EntryNumber", "EntryNumber", False, True, False
+    AddIndex tdf, "UX_SourceType_SourceID", "SourceType,SourceID", False, True, False
+    AddIndex tdf, "IX_EntryDate", "EntryDate", False, False, False
+    EndTable tdf, "ﬁÌÊœ «·ÌÊ„Ì…: ﬁÌœ ¬·Ì ·ﬂ· ⁄„·Ì…° „—»Êÿ »√’·Â« (SourceType + SourceID). ÌıÕœÛ¯À ≈–«  €Ì—  «·⁄„·Ì….", "[TotalDebit]=[TotalCredit]", "«·ﬁÌœ €Ì— „ Ê«“‰: «·„œÌ‰ ÌÃ» √‰ Ì”«ÊÌ «·œ«∆‰"
+End Sub
+
+Private Sub CreateTable_JournalLines()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "JournalLines") Then Exit Sub
+    AddField tdf, "JournalLineID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ «·”ÿ— «·œ«Œ·Ì", ""
+    AddField tdf, "EntryID", "LONG", 0, True, "", _
+             "", "", "«·ﬁÌœ", ""
+    AddField tdf, "LineNumber", "INT", 0, True, "", _
+             "", "", "—ﬁ„ «·”ÿ—", ""
+    AddField tdf, "AccountCode", "LONG", 0, True, "", _
+             "", "", "«·Õ”«»", ""
+    AddField tdf, "Debit", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "„œÌ‰", ""
+    AddField tdf, "Credit", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "œ«∆‰", ""
+    AddField tdf, "LineText", "TEXT", 255, False, "", _
+             "", "", "«·»Ì«‰", ""
+    AddIndex tdf, "PrimaryKey", "JournalLineID", True, True, False
+    AddIndex tdf, "UX_EntryID_LineNumber", "EntryID,LineNumber", False, True, False
+    AddIndex tdf, "IX_AccountCode", "AccountCode", False, False, False
+    EndTable tdf, "√”ÿ— «·ﬁÌÊœ: «·ÿ—› «·„œÌ‰ Ê«·ÿ—› «·œ«∆‰ ·ﬂ· ﬁÌœ.", "", ""
+End Sub
+
 Private Sub CreateTable_TransactionTypes()
     Dim tdf As DAO.TableDef
     If Not BeginTable(tdf, "TransactionTypes") Then Exit Sub
@@ -1707,6 +1800,8 @@ Private Sub SeedAll()
     Seed_CashBoxes
     Seed_Customers
     Seed_ExpenseTypes
+    Seed_Accounts
+    Seed_JournalSourceTypes
     Seed_TransactionTypes
     Seed_LabelSettings
 End Sub
@@ -1734,7 +1829,8 @@ Private Sub Seed_Sequences()
     SeedRow "[SequenceName] = 'CASH_OUT'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_OUT', 'COT-', 1, 6, '”‰œ«  ’—› «·‰ﬁœÌ… («·Œ“Ì‰…)')"
     SeedRow "[SequenceName] = 'CASH_TRANSFER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_TRANSFER', 'TRF-', 1, 6, '«· ÕÊÌ· »Ì‰ «·’‰«œÌﬁ')"
     SeedRow "[SequenceName] = 'CASH_CLOSING'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_CLOSING', 'CLS-', 1, 6, ' ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—')"
-    EndSeed "Sequences", 15
+    SeedRow "[SequenceName] = 'JOURNAL'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('JOURNAL', 'JV-', 1, 6, 'ﬁÌÊœ «·ÌÊ„Ì…')"
+    EndSeed "Sequences", 16
 End Sub
 
 Private Sub Seed_Roles()
@@ -1765,13 +1861,14 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'EXPENSES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EXPENSES', '«·„’—Ê›« ', '«·„’—Ê›« ', 60)") Then GrantNewPermission "EXPENSES", "1,2"
     If SeedRow("[PermissionKey] = 'CASH_BOX'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_BOX', '«·Œ“Ì‰…: ”‰œ«  «·ﬁ»÷ Ê«·’—› Ê«· ÕÊÌ· Ê«·’‰«œÌﬁ', '«·Œ“Ì‰…', 65)") Then GrantNewPermission "CASH_BOX", "1,2"
     If SeedRow("[PermissionKey] = 'CASH_CLOSING'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_CLOSING', ' ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—', '«·Œ“Ì‰…', 66)") Then GrantNewPermission "CASH_CLOSING", "1,2,3"
+    If SeedRow("[PermissionKey] = 'JOURNAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('JOURNAL', 'ﬁÌÊœ «·ÌÊ„Ì… Êœ·Ì· «·Õ”«»«  Ê„Ì“«‰ «·„—«Ã⁄…', '«·Õ”«»« ', 75)") Then GrantNewPermission "JOURNAL", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', '«· ﬁ«—Ì— «· ‘€Ì·Ì…', '«· ﬁ«—Ì—', 70)") Then GrantNewPermission "REPORTS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', ' ﬁ«—Ì— «·√—»«Õ Ê«·÷—Ì»…', '«· ﬁ«—Ì—', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
     If SeedRow("[PermissionKey] = 'DASHBOARD_FINANCIAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', '«·√—ﬁ«„ «·„«·Ì… ›Ì ·ÊÕ… «· Õﬂ„', '«· ﬁ«—Ì—', 72)") Then GrantNewPermission "DASHBOARD_FINANCIAL", "1,2"
     If SeedRow("[PermissionKey] = 'SETTINGS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 80)") Then GrantNewPermission "SETTINGS", "1"
     If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', '«·„” Œœ„Ê‰ Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 81)") Then GrantNewPermission "USERS", "1"
     If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 82)") Then GrantNewPermission "BACKUP", "1"
-    EndSeed "Permissions", 24
+    EndSeed "Permissions", 25
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -1794,6 +1891,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'EXPENSES')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_BOX')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_CLOSING')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'JOURNAL')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'DASHBOARD_FINANCIAL')"
@@ -1817,6 +1915,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'EXPENSES')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_BOX')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CASH_CLOSING')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'JOURNAL')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'DASHBOARD_FINANCIAL')"
@@ -1825,7 +1924,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 49
+    EndSeed "RolePermissions", 51
 End Sub
 
 Private Sub Seed_Employees()
@@ -1887,6 +1986,51 @@ Private Sub Seed_ExpenseTypes()
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (8, '«·„” ·“„« ')"
     ExecSeed "INSERT INTO [ExpenseTypes] ([ExpenseTypeID], [ExpenseTypeName]) VALUES (9, '„’—Ê›«  √Œ—Ï')"
     EndSeed "ExpenseTypes", 9
+End Sub
+
+Private Sub Seed_Accounts()
+    If Not BeginSeed("Accounts", True) Then Exit Sub
+    SeedRow "[AccountCode] = 1100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1100, '«·‰ﬁœÌ… »«·Œ“Ì‰… Ê«·’‰«œÌﬁ', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 110001", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (110001, '«·Œ“Ì‰… «·—∆Ì”Ì…', 'ASSET', 1100)"
+    SeedRow "[AccountCode] = 110002", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (110002, '’‰œÊﬁ «·ﬂ«‘Ì—', 'ASSET', 1100)"
+    SeedRow "[AccountCode] = 1190", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1190, '‰ﬁœÌ… €Ì— „Ê“⁄… ⁄·Ï ’‰œÊﬁ', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1200, '«·»‰ﬂ Ê«·‘»ﬂ… („œÏ Ê«· ÕÊÌ·« )', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1300, '–„„ «·⁄„·«¡', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1400, '«·„Œ“Ê‰', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1500", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1500, '÷—Ì»… «·ﬁÌ„… «·„÷«›… - „œŒ·« ', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 1600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (1600, '”·› «·„ÊŸ›Ì‰', 'ASSET', Null)"
+    SeedRow "[AccountCode] = 2100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (2100, '–„„ «·„Ê—œÌ‰', 'LIABILITY', Null)"
+    SeedRow "[AccountCode] = 2200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (2200, '÷—Ì»… «·ﬁÌ„… «·„÷«›… - „Œ—Ã« ', 'LIABILITY', Null)"
+    SeedRow "[AccountCode] = 3100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (3100, 'Ã«—Ì «·„«·ﬂ', 'EQUITY', Null)"
+    SeedRow "[AccountCode] = 3900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (3900, '√—’œ… «›  «ÕÌ…', 'EQUITY', Null)"
+    SeedRow "[AccountCode] = 4100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4100, '«·„»Ì⁄« ', 'REVENUE', Null)"
+    SeedRow "[AccountCode] = 4110", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4110, '„—œÊœ«  «·„»Ì⁄« ', 'REVENUE', Null)"
+    SeedRow "[AccountCode] = 4200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4200, '≈Ì—«œ«  √Œ—Ï', 'REVENUE', Null)"
+    SeedRow "[AccountCode] = 4300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (4300, '“Ì«œ… «·’‰«œÌﬁ', 'REVENUE', Null)"
+    SeedRow "[AccountCode] = 5100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5100, ' ﬂ·›… «·»÷«⁄… «·„»«⁄…', 'EXPENSE', Null)"
+    SeedRow "[AccountCode] = 5200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5200, '›—Êﬁ«  Ê ”ÊÌ«  «·„Œ“Ê‰', 'EXPENSE', Null)"
+    SeedRow "[AccountCode] = 5300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5300, '«·„’—Ê›«  «· ‘€Ì·Ì…', 'EXPENSE', Null)"
+    SeedRow "[AccountCode] = 5400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5400, '⁄Ã“ «·’‰«œÌﬁ', 'EXPENSE', Null)"
+    SeedRow "[AccountCode] = 5900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode]) VALUES (5900, '„’—Ê›«  √Œ—Ï', 'EXPENSE', Null)"
+    EndSeed "Accounts", 22
+End Sub
+
+Private Sub Seed_JournalSourceTypes()
+    If Not BeginSeed("JournalSourceTypes", True) Then Exit Sub
+    SeedRow "[SourceType] = 'SALE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SALE', '›« Ê—… »Ì⁄', 1)"
+    SeedRow "[SourceType] = 'SALES_RETURN'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SALES_RETURN', '„— Ã⁄ »Ì⁄', 2)"
+    SeedRow "[SourceType] = 'PURCHASE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('PURCHASE', '›« Ê—… ‘—«¡', 3)"
+    SeedRow "[SourceType] = 'PURCHASE_RETURN'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('PURCHASE_RETURN', '„— Ã⁄ ‘—«¡', 4)"
+    SeedRow "[SourceType] = 'CUSTOMER_PAYMENT'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CUSTOMER_PAYMENT', '”‰œ ﬁ»÷ „‰ ⁄„Ì·', 5)"
+    SeedRow "[SourceType] = 'SUPPLIER_PAYMENT'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SUPPLIER_PAYMENT', '”‰œ ’—› ·„Ê—œ', 6)"
+    SeedRow "[SourceType] = 'EXPENSE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('EXPENSE', '„’—Ê›', 7)"
+    SeedRow "[SourceType] = 'CASH_VOUCHER'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CASH_VOUCHER', '”‰œ ‰ﬁœÌ…', 8)"
+    SeedRow "[SourceType] = 'STOCK_MOVE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('STOCK_MOVE', 'Õ—ﬂ… „Œ“Ê‰ ÌœÊÌ…', 9)"
+    SeedRow "[SourceType] = 'STOCK_COUNT'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('STOCK_COUNT', ' ”ÊÌ… Ã—œ', 10)"
+    SeedRow "[SourceType] = 'BOX_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('BOX_OPENING', '—’Ìœ «›  «ÕÌ ·’‰œÊﬁ', 11)"
+    SeedRow "[SourceType] = 'CUSTOMER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CUSTOMER_OPENING', '—’Ìœ «›  «ÕÌ ·⁄„Ì·', 12)"
+    SeedRow "[SourceType] = 'SUPPLIER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SUPPLIER_OPENING', '—’Ìœ «›  «ÕÌ ·„Ê—œ', 13)"
+    EndSeed "JournalSourceTypes", 13
 End Sub
 
 Private Sub Seed_TransactionTypes()

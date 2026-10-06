@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -565,6 +565,7 @@ Private Sub BuildAllForms()
     BuildForm_frmUnits
     BuildForm_frmExpenseTypes
     BuildForm_frmCashBoxes
+    BuildForm_frmAccounts
     BuildForm_frmSettings
     BuildForm_frmLabelSettings
     BuildForm_frmSearch
@@ -599,91 +600,98 @@ Private Sub BuildAllForms()
     BuildForm_frmTreasury
     BuildForm_frmCashVoucher
     BuildForm_frmCashClosing
+    BuildForm_frmJournal
+    BuildForm_frmJournalEntry
 End Sub
 
 Private Sub BuildForm_frmMain()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmMain", "نظام إدارة المحل", "", 18994, 9559, False, False, False, _
+    StartForm "frmMain", "نظام إدارة المحل", "", 18994, 9634, False, False, False, _
               ""
     SetFormProp "TimerInterval", 300000
-    Set c = AddRect("boxSidebar", 0, 0, 3515, 9559, CLR_PRIMARY)
+    Set c = AddRect("boxSidebar", 0, 0, 3515, 9634, CLR_PRIMARY)
     Set c = AddIcon("icoApp", ChrW(&HE80F), 227, 255, 567, 567, 22, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblAppTitle", "نظام إدارة المحل", 850, 227, 2551, 425, 15, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblStoreName", " ", 850, 652, 2551, 312, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddButton("btnNavSales", "المبيعات", 142, 1304, 3231, 499, "nav")
+    Set c = AddButton("btnNavSales", "المبيعات", 142, 1304, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmPOS"
     c.OnClick = EP
-    Set c = AddIcon("icoSales", ChrW(&HE7BF), 255, 1372, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoSales", ChrW(&HE7BF), 255, 1361, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavPurchases", "المشتريات", 142, 1843, 3231, 499, "nav")
+    Set c = AddButton("btnNavPurchases", "المشتريات", 142, 1814, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmPurchaseInvoice"
     c.OnClick = EP
-    Set c = AddIcon("icoPurchases", ChrW(&HE896), 255, 1911, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoPurchases", ChrW(&HE896), 255, 1871, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavInventory", "المخزون", 142, 2382, 3231, 499, "nav")
+    Set c = AddButton("btnNavInventory", "المخزون", 142, 2324, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmInventory"
     c.OnClick = EP
-    Set c = AddIcon("icoInventory", ChrW(&HE7B8), 255, 2450, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoInventory", ChrW(&HE7B8), 255, 2381, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavProducts", "المنتجات", 142, 2921, 3231, 499, "nav")
+    Set c = AddButton("btnNavProducts", "المنتجات", 142, 2834, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmProducts"
     c.OnClick = EP
-    Set c = AddIcon("icoProducts", ChrW(&HE8EC), 255, 2989, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoProducts", ChrW(&HE8EC), 255, 2891, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavCustomers", "العملاء", 142, 3460, 3231, 499, "nav")
+    Set c = AddButton("btnNavCustomers", "العملاء", 142, 3344, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmCustomers"
     c.OnClick = EP
-    Set c = AddIcon("icoCustomers", ChrW(&HE716), 255, 3528, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoCustomers", ChrW(&HE716), 255, 3401, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavSuppliers", "الموردون", 142, 3999, 3231, 499, "nav")
+    Set c = AddButton("btnNavSuppliers", "الموردون", 142, 3854, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmSuppliers"
     c.OnClick = EP
-    Set c = AddIcon("icoSuppliers", ChrW(&HE77B), 255, 4067, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoSuppliers", ChrW(&HE77B), 255, 3911, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavExpenses", "المصروفات", 142, 4538, 3231, 499, "nav")
+    Set c = AddButton("btnNavExpenses", "المصروفات", 142, 4364, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmExpenses"
     c.OnClick = EP
-    Set c = AddIcon("icoExpenses", ChrW(&HE8C7), 255, 4606, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoExpenses", ChrW(&HE8C7), 255, 4421, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavTreasury", "الخزينة", 142, 5077, 3231, 499, "nav")
+    Set c = AddButton("btnNavTreasury", "الخزينة", 142, 4874, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmTreasury"
     c.OnClick = EP
-    Set c = AddIcon("icoTreasury", ChrW(&HE825), 255, 5145, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoTreasury", ChrW(&HE825), 255, 4931, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavStockCount", "الجرد", 142, 5616, 3231, 499, "nav")
+    Set c = AddButton("btnNavJournal", "قيود اليومية", 142, 5384, 3231, 471, "nav")
+    SetCtlProp c, "Tag", "frmJournal"
+    c.OnClick = EP
+    Set c = AddIcon("icoJournal", ChrW(&HE8F1), 255, 5441, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    c.OnClick = EP
+    Set c = AddButton("btnNavStockCount", "الجرد", 142, 5894, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmStockCount"
     c.OnClick = EP
-    Set c = AddIcon("icoStockCount", ChrW(&HE8EF), 255, 5684, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoStockCount", ChrW(&HE8EF), 255, 5951, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavReports", "التقارير", 142, 6155, 3231, 499, "nav")
+    Set c = AddButton("btnNavReports", "التقارير", 142, 6404, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmReportCenter"
     c.OnClick = EP
-    Set c = AddIcon("icoReports", ChrW(&HE8A5), 255, 6223, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoReports", ChrW(&HE8A5), 255, 6461, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavSearch", "البحث", 142, 6694, 3231, 499, "nav")
+    Set c = AddButton("btnNavSearch", "البحث", 142, 6914, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmSearch"
     c.OnClick = EP
-    Set c = AddIcon("icoSearch", ChrW(&HE721), 255, 6762, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoSearch", ChrW(&HE721), 255, 6971, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavSettings", "الإعدادات", 142, 7233, 3231, 499, "nav")
+    Set c = AddButton("btnNavSettings", "الإعدادات", 142, 7424, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmSettings"
     c.OnClick = EP
-    Set c = AddIcon("icoSettings", ChrW(&HE713), 255, 7301, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoSettings", ChrW(&HE713), 255, 7481, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavUsers", "المستخدمون", 142, 7772, 3231, 499, "nav")
+    Set c = AddButton("btnNavUsers", "المستخدمون", 142, 7934, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmUsers"
     c.OnClick = EP
-    Set c = AddIcon("icoUsers", ChrW(&HE8D7), 255, 7840, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoUsers", ChrW(&HE8D7), 255, 7991, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavBackup", "نسخة احتياطية", 142, 8311, 3231, 499, "nav")
+    Set c = AddButton("btnNavBackup", "نسخة احتياطية", 142, 8444, 3231, 471, "nav")
     SetCtlProp c, "Tag", "frmBackup"
     c.OnClick = EP
-    Set c = AddIcon("icoBackup", ChrW(&HE8B7), 255, 8379, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoBackup", ChrW(&HE8B7), 255, 8501, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
-    Set c = AddButton("btnNavLogout", "تسجيل الخروج", 142, 8850, 3231, 499, "nav")
+    Set c = AddButton("btnNavLogout", "تسجيل الخروج", 142, 8954, 3231, 471, "nav")
     c.OnClick = EP
-    Set c = AddIcon("icoLogout", ChrW(&HE7E8), 255, 8918, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddIcon("icoLogout", ChrW(&HE7E8), 255, 9011, 454, 369, 13, False, CLR_SIDEBAR_TEXT, "", 0)
     c.OnClick = EP
     Set c = AddLabel("lblWelcome", "لوحة التحكم", 11736, 284, 6804, 539, 20, True, CLR_TEXT, "", 3)
     Set c = AddLabel("lblToday", " ", 11736, 879, 6804, 340, 11, False, CLR_MUTED, "", 3)
@@ -832,7 +840,7 @@ Private Sub BuildForm_frmMain()
     Set c = AddLabel("lblTileValue8", "-", 4139, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
     Set c = AddLabel("lblTileSub8", " ", 4139, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblIntegrity", " ", 3969, 9105, 14571, 312, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblIntegrity", " ", 3969, 9180, 14571, 312, 10, True, CLR_MUTED, "", 0)
     m_frm.OnOpen = EP
     m_frm.OnLoad = EP
     m_frm.OnActivate = EP
@@ -898,6 +906,12 @@ Private Sub BuildForm_frmMain()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub icoTreasury_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmTreasury"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNavJournal_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmJournal"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub icoJournal_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmJournal"", 0" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnNavStockCount_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmStockCount"", 7" & vbCrLf
@@ -1033,7 +1047,7 @@ Private Sub BuildForm_frmMain()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
-    s = s & "    spec = ""boxSidebar,0,0,3515,9559,0,0,0,1000;lblWelcome,11736,284,6804,539,1000,0,0,0;lblToday,11736,879,6804,340,1000,0,0,0;boxTile1,15066,1418,3472,1361,750,250,0,0;boxKpiIcon1,17461,1645,907,907,750,250,0,0;icoKpi1,17461,1787,907,624,750,250,0,0""" & vbCrLf
+    s = s & "    spec = ""boxSidebar,0,0,3515,9634,0,0,0,1000;lblWelcome,11736,284,6804,539,1000,0,0,0;lblToday,11736,879,6804,340,1000,0,0,0;boxTile1,15066,1418,3472,1361,750,250,0,0;boxKpiIcon1,17461,1645,907,907,750,250,0,0;icoKpi1,17461,1787,907,624,750,250,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileTitle1,15236,1503,2111,312,750,250,0,0;lblTileValue1,15236,1815,2111,567,750,250,0,0;lblTileSub1,15236,2410,2111,284,750,250,0,0;boxTile2,11367,1418,3472,1361,500,250,0,0;boxKpiIcon2,13762,1645,907,907,500,250,0,0;icoKpi2,13762,1787,907,624,500,250,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileTitle2,11537,1503,2111,312,500,250,0,0;lblTileValue2,11537,1815,2111,567,500,250,0,0;lblTileSub2,11537,2410,2111,284,500,250,0,0;boxTile3,7668,1418,3472,1361,250,250,0,0;boxKpiIcon3,10063,1645,907,907,250,250,0,0;icoKpi3,10063,1787,907,624,250,250,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileTitle3,7838,1503,2111,312,250,250,0,0;lblTileValue3,7838,1815,2111,567,250,250,0,0;lblTileSub3,7838,2410,2111,284,250,250,0,0;boxTile4,3969,1418,3472,1361,0,250,0,0;boxKpiIcon4,6364,1645,907,907,0,250,0,0;icoKpi4,6364,1787,907,624,0,250,0,0""" & vbCrLf
@@ -1048,8 +1062,8 @@ Private Sub BuildForm_frmMain()
     s = s & "    spec = spec & "";icoTileLogout,3969,6180,3472,652,0,250,666,333;lblTileLogout,3969,6860,3472,397,0,250,666,333;btnTileLogout,3969,6010,3472,1361,0,250,666,333;boxTile5,15066,7541,3472,1049,750,250,1000,0;lblTileTitle5,15236,7598,3132,284,750,250,1000,0;lblTileValue5,15236,7893,3132,408,750,250,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileSub5,15236,8306,3132,255,750,250,1000,0;boxTile6,11367,7541,3472,1049,500,250,1000,0;lblTileTitle6,11537,7598,3132,284,500,250,1000,0;lblTileValue6,11537,7893,3132,408,500,250,1000,0;lblTileSub6,11537,8306,3132,255,500,250,1000,0;boxTile7,7668,7541,3472,1049,250,250,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileTitle7,7838,7598,3132,284,250,250,1000,0;lblTileValue7,7838,7893,3132,408,250,250,1000,0;lblTileSub7,7838,8306,3132,255,250,250,1000,0;boxTile8,3969,7541,3472,1049,0,250,1000,0;lblTileTitle8,4139,7598,3132,284,0,250,1000,0;lblTileValue8,4139,7893,3132,408,0,250,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileSub8,4139,8306,3132,255,0,250,1000,0;lblIntegrity,3969,9105,14571,312,0,1000,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 9559, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub8,4139,8306,3132,255,0,250,1000,0;lblIntegrity,3969,9180,14571,312,0,1000,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9634, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmMain", s
     Exit Sub
@@ -2223,6 +2237,113 @@ Private Sub BuildForm_frmCashBoxes()
     Exit Sub
 EH:
     AbortForm "frmCashBoxes", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmAccounts()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmAccounts", "دليل الحسابات", "SELECT * FROM Accounts", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=Accounts|PK=AccountCode|LIST=SELECT t.AccountCode, t.AccountCode AS [الرقم], t.AccountName AS [الحساب] FROM Accounts AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.AccountCode|SEARCH=t.AccountName|ACTIVE=t.IsActive|UNIQUE=AccountCode"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "دليل الحسابات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "الحسابات التي تُرحَّل إليها القيود الآلية", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", "تراجع", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnJournal", "قيود اليومية", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddCheck("chkShowInactive", "", 227, 2579)
+    SetCtlProp c, "DefaultValue", "False"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 3, "0;1134;3629", True)
+    c.AfterUpdate = EP
+    Set c = AddText("AccountCode", "AccountCode", 7201, 1701, 2948, 425)
+    SetCtlProp c, "ControlTipText", "الصناديق 110000 + رقم الصندوق، وأنواع المصروفات 530000 + رقم النوع"
+    SetCtlProp c, "StatusBarText", "الصناديق 110000 + رقم الصندوق، وأنواع المصروفات 530000 + رقم النوع"
+    Set c = AddLabel("lblAccountCode", "رقم الحساب *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "AccountCode", 0)
+    Set c = AddCombo("AccountType", "AccountType", 12134, 1701, 2948, 425, "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات", 2, "0;2835")
+    Set c = AddLabel("lblAccountType", "نوع الحساب *", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "AccountType", 0)
+    Set c = AddText("AccountName", "AccountName", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblAccountName", "اسم الحساب *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "AccountName", 0)
+    Set c = AddCombo("ParentCode", "ParentCode", 7201, 2835, 2948, 425, "SELECT AccountCode, AccountName FROM Accounts ORDER BY AccountCode", 2, "1134;3402")
+    Set c = AddLabel("lblParentCode", "الحساب الرئيسي", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "ParentCode", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 2920)
+    Set c = AddLabel("lblIsActive", "نشط", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblAccountNote", "القيود آلية: تُنشأ من العمليات وتُحدَّث معها، ولا تُكتب يدويًا", 5443, 3402, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 4082, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnJournal_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmJournal""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub chkShowInactive_AfterUpdate()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmAccounts", s
+    Exit Sub
+EH:
+    AbortForm "frmAccounts", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmSettings()
@@ -5546,4 +5667,165 @@ Private Sub BuildForm_frmCashClosing()
     Exit Sub
 EH:
     AbortForm "frmCashClosing", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmJournal()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmJournal", "قيود اليومية", "", 15309, 9015, False, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "قيود اليومية", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "قيد لكل عملية مربوط بأصلها: افتح القيد أو أصل العملية", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtFrom", "", 227, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblFrom", "من تاريخ", 227, 992, 1701, 284, 9, False, CLR_MUTED, "txtFrom", 0)
+    Set c = AddText("txtTo", "", 2041, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblTo", "إلى تاريخ", 2041, 992, 1701, 284, 9, False, CLR_MUTED, "txtTo", 0)
+    Set c = AddButton("btnToday", "اليوم", 3856, 1304, 1191, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnThisMonth", "هذا الشهر", 5132, 1304, 1191, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnLastMonth", "الشهر الماضي", 6408, 1304, 1191, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnThisYear", "هذه السنة", 7684, 1304, 1191, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddCombo("cboSourceType", "", 9015, 1304, 2381, 454, "", 2, "0;2268")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblSourceType", "نوع العملية", 9015, 992, 2381, 284, 9, False, CLR_MUTED, "cboSourceType", 0)
+    Set c = AddText("txtSearch", "", 11510, 1304, 2041, 454)
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblSearch", "بحث (رقم / بيان)", 11510, 992, 2041, 284, 9, False, CLR_MUTED, "txtSearch", 0)
+    Set c = AddButton("btnShow", "عرض", 13665, 1304, 1418, 454, "primary")
+    c.OnClick = EP
+    Set c = AddList("lstEntries", 227, 1928, 14855, 2665, 7, "0;1474;1361;1928;1588;6577;1701", True)
+    c.AfterUpdate = EP
+    c.OnDblClick = EP
+    Set c = AddLabel("lblTotals", " ", 227, 4649, 14855, 340, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblLinesCap", "أسطر القيد المختار", 227, 5046, 6804, 312, 10, True, CLR_MUTED, "", 0)
+    Set c = AddList("lstLines", 227, 5386, 14855, 2325, 5, "1247;3402;6010;1814;1814", True)
+    Set c = AddButton("btnOpenEntry", "فتح القيد", 227, 7881, 1588, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnOpenSource", "فتح أصل العملية", 1928, 7881, 2041, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnSync", "تحديث القيود", 4082, 7881, 1701, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrint", "طباعة اليومية", 5896, 7881, 1701, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnTrial", "ميزان المراجعة", 7710, 7881, 1701, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAccounts", "دليل الحسابات", 9524, 7881, 1701, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "رجوع", 13721, 7881, 1361, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSync", " ", 227, 8505, 14855, 312, 9, False, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnResize = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    JournalLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstEntries_AfterUpdate()" & vbCrLf
+    s = s & "    JournalEntryPicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstEntries_DblClick(Cancel As Integer)" & vbCrLf
+    s = s & "    JournalOpenEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboSourceType_AfterUpdate()" & vbCrLf
+    s = s & "    JournalRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_AfterUpdate()" & vbCrLf
+    s = s & "    JournalRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnToday_Click()" & vbCrLf
+    s = s & "    JournalQuickPeriod Me, ""TODAY""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnThisMonth_Click()" & vbCrLf
+    s = s & "    JournalQuickPeriod Me, ""MONTH""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnLastMonth_Click()" & vbCrLf
+    s = s & "    JournalQuickPeriod Me, ""LASTMONTH""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnThisYear_Click()" & vbCrLf
+    s = s & "    JournalQuickPeriod Me, ""YEAR""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnShow_Click()" & vbCrLf
+    s = s & "    JournalRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpenEntry_Click()" & vbCrLf
+    s = s & "    JournalOpenEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpenSource_Click()" & vbCrLf
+    s = s & "    OpenJournalSource Me!lstEntries.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSync_Click()" & vbCrLf
+    s = s & "    JournalSync Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintJournal Me, ""JOURNAL""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTrial_Click()" & vbCrLf
+    s = s & "    PrintJournal Me, ""TRIAL""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAccounts_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAccounts""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,13665,1304,1418,454,1000,0,0,0;lstEntries,227,1928,14855,2665,0,1000,0,1000;lblTotals,227,4649,14855,340,0,1000,1000,0;lblLinesCap,227,5046,6804,312,0,0,1000,0;lstLines,227,5386,14855,2325,0,1000,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnOpenEntry,227,7881,1588,510,0,0,1000,0;btnOpenSource,1928,7881,2041,510,0,0,1000,0;btnSync,4082,7881,1701,510,0,0,1000,0;btnPrint,5896,7881,1701,510,0,0,1000,0;btnTrial,7710,7881,1701,510,0,0,1000,0;btnAccounts,9524,7881,1701,510,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnClose,13721,7881,1361,510,1000,0,1000,0;lblSync,227,8505,14855,312,0,1000,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 15309, 9015, -1190, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmJournal", s
+    Exit Sub
+EH:
+    AbortForm "frmJournal", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmJournalEntry()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmJournalEntry", "قيد يومية", "", 11907, 6464, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 11907, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "قيد يومية", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "القيد الآلي للعملية", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtEntryID", "", 11340, 57, 340, 227)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblHeader", " ", 227, 1021, 11453, 369, 11, True, CLR_TEXT, "", 0)
+    Set c = AddLabel("lblDescription", " ", 227, 1418, 11453, 340, 10, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstLines", 227, 1871, 11453, 2835, 5, "1134;2835;3629;1701;1701", True)
+    Set c = AddLabel("lblTotals", " ", 227, 4791, 11453, 369, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnOpenSource", "فتح أصل العملية", 227, 5613, 2155, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrint", "طباعة القيد", 2495, 5613, 1701, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 10206, 5613, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    JournalEntryLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpenSource_Click()" & vbCrLf
+    s = s & "    OpenJournalSource Me!txtEntryID.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintJournalEntry Me!txtEntryID.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmJournalEntry", s
+    Exit Sub
+EH:
+    AbortForm "frmJournalEntry", Err.Number, Err.Description
 End Sub

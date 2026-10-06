@@ -212,6 +212,8 @@ class Result:
     count_lines: int
     count_value: D
     cash_balance: Dict[str, D]
+    journal_entries: int
+    journal_stock: D
 
 
 def simulate() -> Result:
@@ -285,6 +287,7 @@ def simulate() -> Result:
         else:
             raise ValueError(op)
     s.user = 1
+    s.sync_journal()
     return Result(
         db, s, ids,
         stock={n: s.stock(pid) for n, pid in ids["prod"].items()},
@@ -296,13 +299,15 @@ def simulate() -> Result:
         sales_total=sim.dec(s.one("SELECT Sum(TotalAmount) FROM SalesInvoices")),
         purchases_total=sim.dec(s.one("SELECT Sum(TotalAmount) FROM PurchaseInvoices")),
         count_lines=count_lines, count_value=count_value,
-        cash_balance={kind: s.cash_balance(s.box_of_type(kind)) for kind in ("MAIN", "CASHIER")})
+        cash_balance={kind: s.cash_balance(s.box_of_type(kind)) for kind in ("MAIN", "CASHIER")},
+        journal_entries=s.one("SELECT COUNT(*) FROM JournalEntries"),
+        journal_stock=sim.dec(round(s.one("SELECT Sum(Debit) - Sum(Credit) FROM JournalLines WHERE AccountCode = 1400"), 2)))
 
 
 # Order in which RemoveDemoData empties the tables (children before parents).
-DOCUMENT_TABLES = ["CashVouchers", "CashClosings", "SalesReturnDetails", "SalesReturns", "CustomerPayments", "SalesInvoiceDetails", "SalesInvoices",
+DOCUMENT_TABLES = ["JournalLines", "JournalEntries", "CashVouchers", "CashClosings", "SalesReturnDetails", "SalesReturns", "CustomerPayments", "SalesInvoiceDetails", "SalesInvoices",
                    "PurchaseReturnDetails", "PurchaseReturns", "SupplierPayments", "PurchaseInvoiceDetails",
                    "PurchaseInvoices", "StockCountDetails", "StockCounts", "InventoryTransactions", "Expenses"]
 DOCUMENT_SEQUENCES = ["SALES_INVOICE", "SALES_RETURN", "PURCHASE_INVOICE", "PURCHASE_RETURN", "CUSTOMER_PAYMENT",
                       "SUPPLIER_PAYMENT", "EXPENSE", "STOCK_COUNT", "STOCK_ADJUST", "PRODUCT_CODE", "ZATCA_ICV",
-                      "CASH_IN", "CASH_OUT", "CASH_TRANSFER", "CASH_CLOSING"]
+                      "CASH_IN", "CASH_OUT", "CASH_TRANSFER", "CASH_CLOSING", "JOURNAL"]

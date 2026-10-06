@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 67
+Private Const EXPECTED_RELATION_COUNT As Long = 70
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -435,6 +435,9 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_CashClosings_CashBoxID", "CashBoxes", "CashBoxID", "CashClosings", "CashBoxID", 0&)
     c.Add Array("FK_CashClosings_EmployeeID", "Employees", "EmployeeID", "CashClosings", "EmployeeID", 0&)
     c.Add Array("FK_CashClosings_ToCashBoxID", "CashBoxes", "CashBoxID", "CashClosings", "ToCashBoxID", 0&)
+    c.Add Array("FK_JournalEntries_SourceType", "JournalSourceTypes", "SourceType", "JournalEntries", "SourceType", 256&)
+    c.Add Array("FK_JournalLines_EntryID", "JournalEntries", "EntryID", "JournalLines", "EntryID", 4096&)
+    c.Add Array("FK_JournalLines_AccountCode", "Accounts", "AccountCode", "JournalLines", "AccountCode", 0&)
     c.Add Array("FK_InventoryTransactions_ProductID", "Products", "ProductID", "InventoryTransactions", "ProductID", 0&)
     c.Add Array("FK_InventoryTransactions_TransactionTypeID", "TransactionTypes", "TransactionTypeID", "InventoryTransactions", "TransactionTypeID", 0&)
     c.Add Array("FK_InventoryTransactions_EmployeeID", "Employees", "EmployeeID", "InventoryTransactions", "EmployeeID", 0&)

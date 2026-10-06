@@ -26,7 +26,7 @@ ICONS = {
     "customers": 0xE716, "suppliers": 0xE77B, "expenses": 0xE8C7, "stocktake": 0xE8EF,
     "reports": 0xE8A5, "search": 0xE721, "settings": 0xE713, "users": 0xE8D7,
     "backup": 0xE8B7, "logout": 0xE7E8, "home": 0xE80F, "category": 0xE8FD,
-    "treasury": 0xE825,
+    "treasury": 0xE825, "journal": 0xE8F1,
 }
 
 
@@ -127,6 +127,8 @@ EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORD
 PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder"
 CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
+ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
+ACCOUNT_ROWS = "SELECT AccountCode, AccountName FROM Accounts ORDER BY AccountCode"
 ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 
@@ -287,6 +289,18 @@ DATA_SCREENS: List[DataScreen] = [
                 Info("lblBoxNote", "الرصيد لا يُكتب يدويًا: يُحسب من المبيعات والسندات والمصروفات"),
                 Fld("Notes", span=2)]),
     DataScreen(
+        "frmAccounts", "Accounts", "دليل الحسابات", "الحسابات التي تُرحَّل إليها القيود الآلية", "journal",
+        list_select="t.AccountCode AS [الرقم], t.AccountName AS [الحساب]",
+        list_from="Accounts AS t", list_order="t.AccountCode",
+        list_headers=[("الرقم", 2.0), ("الحساب", 6.4)],
+        search=["t.AccountName"], active="t.IsActive", unique=["AccountCode"],
+        extra_buttons=[("btnJournal", "قيود اليومية", 'OpenScreen "frmJournal"')],
+        fields=[Fld("AccountCode", hint="الصناديق 110000 + رقم الصندوق، وأنواع المصروفات 530000 + رقم النوع"),
+                Fld("AccountType", rows=ACCOUNT_TYPES, widths="0;5"),
+                Fld("AccountName", span=2), Fld("ParentCode", rows=ACCOUNT_ROWS, widths="2;6"),
+                Fld("IsActive"),
+                Info("lblAccountNote", "القيود آلية: تُنشأ من العمليات وتُحدَّث معها، ولا تُكتب يدويًا")]),
+    DataScreen(
         "frmSettings", "Settings", "الإعدادات", "بيانات المحل الضريبية وإعدادات التشغيل", "settings",
         kind="SINGLE", allow_add=False, allow_delete=False,
         record_source="SELECT * FROM Settings WHERE SettingID = 1",
@@ -351,6 +365,7 @@ NAV_ITEMS: List[NavItem] = [
     NavItem("Suppliers", "الموردون", "suppliers", "frmSuppliers", 5),
     NavItem("Expenses", "المصروفات", "expenses", "frmExpenses", 5),
     NavItem("Treasury", "الخزينة", "treasury", "frmTreasury", 0),
+    NavItem("Journal", "قيود اليومية", "journal", "frmJournal", 0),
     NavItem("StockCount", "الجرد", "stocktake", "frmStockCount", 7),
     NavItem("Reports", "التقارير", "reports", "frmReportCenter", 5),
     NavItem("Search", "البحث", "search", "frmSearch", 5),
@@ -379,6 +394,7 @@ SCREEN_PERMISSIONS = {
     "frmCafeItem": "SALES_POS",
     "frmTreasury": "CASH_CLOSING", "frmCashClosing": "CASH_CLOSING",
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX",
+    "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
 }
 
 
@@ -466,6 +482,8 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("CASH_BALANCES", "أرصدة الخزينة والصناديق", "CashBoxBalanceQuery", "rptCashBalances", "#"),
     ReportEntry("CASH_CLOSINGS", "تصفيات يومية الكاشير", "CashClosingsQuery", "rptCashClosings", "Pb#"),
     ReportEntry("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P$"),
+    ReportEntry("JOURNAL", "قيود اليومية", "JournalLinesQuery", "rptJournal", "PJ"),
+    ReportEntry("TRIAL_BALANCE", "ميزان المراجعة", "TrialBalanceQuery", "rptTrialBalance", "PJ"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
     ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),
@@ -790,16 +808,16 @@ def layout_main() -> FormModel:
     for item in NAV_ITEMS:
         name = f"btnNav{item.key}"
         call = (f'OpenScreen "{item.target}", {item.phase}' if item.target else "LogoutUser")
-        button(m, name, item.caption, cm(0.25), y, "nav", w=side_w - cm(0.5), h=cm(0.88),
+        button(m, name, item.caption, cm(0.25), y, "nav", w=side_w - cm(0.5), h=cm(0.83),
                call=call)
         if item.target:
             m.controls[-1].props["Tag"] = item.target       # MainLoad disables what the user may not open
-        icon = m.add(Control("icon", f"ico{item.key}", cm(0.45), y + cm(0.12), cm(0.8),
+        icon = m.add(Control("icon", f"ico{item.key}", cm(0.45), y + cm(0.1), cm(0.8),
                              cm(0.65), {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"),
                                         "FontSize": 13, "ForeColor": Sym("CLR_SIDEBAR_TEXT")},
                              events=["Click"], decorative=True))
         m.code += [f"Private Sub {icon.name}_Click()", f"    {call}", "End Sub"]
-        y += cm(0.95)
+        y += cm(0.9)
 
     cx = side_w + cm(0.8)
     cw = width - cx - cm(0.8)
@@ -1019,6 +1037,7 @@ def all_forms() -> List[FormModel]:
     from forms_labels import label_forms
     from forms_touch import touch_forms
     from forms_cash import cash_forms
+    from forms_journal import journal_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
-            + security_forms() + label_forms() + touch_forms() + cash_forms())
+            + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms())

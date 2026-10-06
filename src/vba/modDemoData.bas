@@ -62,6 +62,8 @@ Public Function LoadDemoData() As Boolean
     DemoSteps4
     DemoSteps5
     DemoSteps6
+    TempVars.Add "UserID", m_adminID
+    Check SyncJournal(), "قيود اليومية"
     ws.CommitTrans
     inTrans = False
     TempVars.Add "UserID", m_adminID
@@ -633,6 +635,10 @@ Public Function VerifyDemoData() As Boolean
     End If
     Expect DbValue("SELECT COUNT(*) FROM StockCounts WHERE Status = 'POSTED'") = 1, "جرد مُرحّل واحد"
     Expect DbValue("SELECT COUNT(*) FROM IntegrityCheckQuery") = 0, "فحص سلامة البيانات: لا توجد أي مشكلة"
+    Expect DbValue("SELECT COUNT(*) FROM JournalEntries") = 35, "35 قيد يومية متوازن"
+    Expect DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit") = 0, "كل القيود متوازنة"
+    Expect AccountBalance(1300) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Customers"), 0), "حساب ذمم العملاء = أرصدة العملاء"
+    Expect AccountBalance(1400) = CCur(5799.27), "حساب المخزون في القيود = 5799.27"
     Debug.Print "--- نجح: " & m_passed & " | فشل: " & m_failed
     If m_failed = 0 Then
         TestMsg "البيانات التجريبية مطابقة تمامًا للنتائج المحسوبة مسبقًا (" & m_passed & " فحصًا)." & vbCrLf & _
@@ -701,6 +707,8 @@ Public Function RemoveDemoData() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
+    db.Execute "DELETE FROM JournalLines", dbFailOnError
+    db.Execute "DELETE FROM JournalEntries", dbFailOnError
     db.Execute "DELETE FROM CashVouchers", dbFailOnError
     db.Execute "DELETE FROM CashClosings", dbFailOnError
     db.Execute "DELETE FROM SalesReturnDetails", dbFailOnError
@@ -740,6 +748,7 @@ Public Function RemoveDemoData() As Boolean
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_OUT'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_TRANSFER'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_CLOSING'", dbFailOnError
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'JOURNAL'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PRODUCT_CODE' AND (SELECT COUNT(*) FROM Products) = 0", dbFailOnError
     ws.CommitTrans
     inTrans = False

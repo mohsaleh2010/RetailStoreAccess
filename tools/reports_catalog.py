@@ -178,6 +178,20 @@ LIST_SPECS: List[ListSpec] = [
         Col("الفرق", "Difference", 2.2, MONEY, True), Col("الترحيل", "DestinationName", 3.0),
         Col("المرحَّل", "TransferAmount", 2.6, MONEY, True), Col("المتبقي", "KeptAmount", 3.3, MONEY, True)],
         [("ClosingDate", False)], landscape=True, no_data="لا توجد تصفيات في هذه الفترة."),
+    ListSpec("JOURNAL", [
+        Col("رقم القيد", "EntryNumber", 2.4), Col("التاريخ", "=GDate([EntryDate])", 2.2),
+        Col("العملية", "TypeName", 3.0), Col("المستند", "SourceNumber", 2.6), Col("الحساب", "AccountCode", 1.8),
+        Col("اسم الحساب", "AccountName", 4.4), Col("البيان", "LineText", 5.0, grow=True),
+        Col("مدين", "=IIf([Debit]=0,Null,[Debit])", 2.6, MONEY, True),
+        Col("دائن", "=IIf([Credit]=0,Null,[Credit])", 3.4, MONEY, True)],
+        [("EntryDate", False), ("EntryNumber", False), ("LineNumber", False)], landscape=True,
+        no_data="لا توجد قيود في هذه الفترة."),
+    ListSpec("TRIAL_BALANCE", [
+        Col("الحساب", "AccountCode", 2.0), Col("اسم الحساب", "AccountName", 5.6, grow=True),
+        Col("رصيد أول المدة", "OpeningBalance", 2.8, MONEY, True), Col("مدين الفترة", "PeriodDebit", 2.8, MONEY, True),
+        Col("دائن الفترة", "PeriodCredit", 2.8, MONEY, True), Col("الرصيد الختامي", "ClosingBalance", 3.0, MONEY, True)],
+        [("AccountCode", False)], no_data="لا توجد قيود.",
+        summary=[("مجموع الأرصدة (صفر = متوازن)", "=Sum([ClosingBalance])")]),
     ListSpec("SLOW_MOVING", [
         Col("الكود", "ProductCode", 2.2), Col("المنتج", "ProductName", 5.0, grow=True),
         Col("التصنيف", "CategoryName", 2.5), Col("الكمية", "CurrentQuantity", 1.8, QTY, True),

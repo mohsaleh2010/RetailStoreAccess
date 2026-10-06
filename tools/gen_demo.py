@@ -259,6 +259,8 @@ Public Function LoadDemoData() As Boolean
     DemoSettings
     DemoMasters
 @@STEP_CALLS@@
+    TempVars.Add "UserID", m_adminID
+    Check SyncJournal(), "قيود اليومية"
     ws.CommitTrans
     inTrans = False
     TempVars.Add "UserID", m_adminID
@@ -462,6 +464,10 @@ Public Function VerifyDemoData() As Boolean
     End If
     Expect DbValue("SELECT COUNT(*) FROM StockCounts WHERE Status = 'POSTED'") = 1, "جرد مُرحّل واحد"
     Expect DbValue("SELECT COUNT(*) FROM IntegrityCheckQuery") = 0, "فحص سلامة البيانات: لا توجد أي مشكلة"
+    Expect DbValue("SELECT COUNT(*) FROM JournalEntries") = @@JOURNAL_ENTRIES@@, "@@JOURNAL_ENTRIES@@ قيد يومية متوازن"
+    Expect DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit") = 0, "كل القيود متوازنة"
+    Expect AccountBalance(1300) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Customers"), 0), "حساب ذمم العملاء = أرصدة العملاء"
+    Expect AccountBalance(1400) = CCur(@@JOURNAL_STOCK@@), "حساب المخزون في القيود = @@JOURNAL_STOCK@@"
     Debug.Print "--- نجح: " & m_passed & " | فشل: " & m_failed
     If m_failed = 0 Then
         TestMsg "البيانات التجريبية مطابقة تمامًا للنتائج المحسوبة مسبقًا (" & m_passed & " فحصًا)." & vbCrLf & _
@@ -593,6 +599,7 @@ def build_demo_vba() -> str:
         "N_EMPLOYEES": str(counts["Employees"]), "N_EXPENSES": str(counts["Expenses"]),
         "SALES_TOTAL": money(r.sales_total), "PURCHASES_TOTAL": money(r.purchases_total),
         "VERIFY": verify_lines(r), "LOW": str(low), "SLOW": str(slow), "REMOVE_SQL": remove,
+        "JOURNAL_ENTRIES": str(r.journal_entries), "JOURNAL_STOCK": money(r.journal_stock),
     }
     text = TEMPLATE
     for k, v in values.items():

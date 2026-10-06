@@ -132,6 +132,61 @@ class Store:
                                   closing=cid)
         return cid, expected
 
+    # ------------------------------------------------------------- journal (modJournal.SyncJournal)
+    def sync_journal(self):
+        """Same steps as SyncJournal: returns (added, updated, removed)."""
+        import queries as Q
+        c = self.c
+        c.execute("INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode) "
+                  "SELECT 110000 + b.CashBoxID, b.BoxName, 'ASSET', 1100 FROM CashBoxes AS b "
+                  "WHERE 110000 + b.CashBoxID NOT IN (SELECT AccountCode FROM Accounts)")
+        c.execute("INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode) "
+                  "SELECT 530000 + t.ExpenseTypeID, t.ExpenseTypeName, 'EXPENSE', 5300 FROM ExpenseTypes AS t "
+                  "WHERE 530000 + t.ExpenseTypeID NOT IN (SELECT AccountCode FROM Accounts)")
+        kinds = dict(c.execute("SELECT SourceType, TypeName FROM JournalSourceTypes").fetchall())
+        existing = {(t, i): (eid, dec(sig), when, dec(debit)) for eid, t, i, sig, when, debit in c.execute(
+            "SELECT EntryID, SourceType, SourceID, Signature, EntryDate, TotalDebit FROM JournalEntries").fetchall()}
+        seen, added, updated, removed = set(), 0, 0, 0
+        for q in Q.JOURNAL_SOURCE_QUERIES:
+            for t, i, no, when, debit, credit, sig, n, first in c.execute(
+                    f"SELECT SourceType, SourceID, Max(SourceNumber), Max(SourceDate), Sum(Debit), Sum(Credit), "
+                    f"Sum(AccountCode * (Debit + Debit + Credit)), Count(*), "
+                    f"Max(Party) FROM {q} GROUP BY SourceType, SourceID").fetchall():
+                seen.add((t, i))
+                debit, credit, sig = (dec(round(v or 0, 4)) for v in (debit, credit, sig))
+                if debit != credit:
+                    continue
+                when = when or "2000-01-01 00:00:00"
+                doc = (no or "-")[:20]
+                text = (kinds[t] + " " + doc + (" - " + first if first else ""))[:255]
+                head = dict(EntryDate=when, SourceType=t, SourceID=i, SourceNumber=doc, Description=text,
+                            TotalDebit=float(debit), TotalCredit=float(credit), Signature=float(sig), LineCount=-n)
+                if (t, i) not in existing:
+                    added += 1
+                    self.insert("JournalEntries", EntryNumber=f"~{added:06d}", **head)
+                else:
+                    eid, old_sig, old_when, old_debit = existing[(t, i)]
+                    if old_sig != sig or old_when != when or old_debit != debit:
+                        c.execute("DELETE FROM JournalLines WHERE EntryID = ?", (eid,))
+                        sets = ", ".join(f"{k} = ?" for k in head)
+                        c.execute(f"UPDATE JournalEntries SET {sets}, UpdatedAt = ? WHERE EntryID = ?",
+                                  list(head.values()) + [self.now, eid])
+                        updated += 1
+            c.execute(f"INSERT INTO JournalLines (EntryID, LineNumber, AccountCode, Debit, Credit, LineText) "
+                      f"SELECT e.EntryID, q.LineOrder, q.AccountCode, q.Debit, q.Credit, q.LineText FROM {q} AS q "
+                      f"INNER JOIN JournalEntries AS e ON (q.SourceType = e.SourceType AND q.SourceID = e.SourceID) "
+                      f"WHERE e.LineCount < 0")
+        c.execute("UPDATE JournalEntries SET LineCount = -LineCount WHERE LineCount < 0")
+        for key, (eid, *_rest) in existing.items():
+            if key not in seen:
+                c.execute("DELETE FROM JournalLines WHERE EntryID = ?", (eid,))
+                c.execute("DELETE FROM JournalEntries WHERE EntryID = ?", (eid,))
+                removed += 1
+        for (eid,) in c.execute("SELECT EntryID FROM JournalEntries WHERE EntryNumber LIKE '~%' "
+                                "ORDER BY EntryDate, EntryID").fetchall():
+            c.execute("UPDATE JournalEntries SET EntryNumber = ? WHERE EntryID = ?", (self.next_number("JOURNAL"), eid))
+        return added, updated, removed
+
     def stock(self, pid) -> D:
         return dec(self.one("SELECT CurrentQuantity FROM Products WHERE ProductID = ?", pid))
 
