@@ -327,6 +327,41 @@ Public Function ChangeOwnPassword(ByVal OldPassword As String, ByVal NewPassword
     ChangeOwnPassword = SetUserPassword(id, NewPassword, False)
 End Function
 
+Public Sub ResetDeveloperPassword()
+    ' The programmer forgot the password of "developer": run it from the Immediate window
+    ' (Ctrl+G) of the programmer's own .accdb copy. Refused in an ACCDE (the client's file).
+    Dim id As Variant, pwd As String, again As String, msg As String
+    If IsCompiledFile() Then
+        MsgBox "€Ì— „ «Õ ›Ì „·› ACCDE. €Ì¯— ﬂ·„… «·„—Ê— „‰ ‰”Œ ﬂ ACCDB.", vbExclamation + MSG_RTL, APP_TITLE
+        Exit Sub
+    End If
+    id = DbValue("SELECT EmployeeID FROM Employees WHERE IsDeveloper = True")
+    If IsNull(id) Then
+        MsgBox "·« ÌÊÃœ Õ”«» „»—„Ã »⁄œ. ‘€¯· BuildSchema: Ìÿ·» ﬂ·„… „—Ê—Â ÊÌ‰‘∆Â.", vbExclamation + MSG_RTL, APP_TITLE
+        Exit Sub
+    End If
+    pwd = InputBox("ﬂ·„… „—Ê— ÃœÌœ… ·Õ”«» «·„»—„Ã developer (" & MIN_PASSWORD_LENGTH & " √Õ—› ⁄·Ï «·√ﬁ·):", APP_TITLE)
+    If Len(pwd) = 0 Then Exit Sub
+    again = InputBox("«ﬂ » ﬂ·„… «·„—Ê— „—… √Œ—Ï ·· √ﬂÌœ:", APP_TITLE)
+    If again <> pwd Then
+        MsgBox "ﬂ·„ « «·„—Ê— €Ì— „ ÿ«»ﬁ Ì‰. ·„ Ì €Ì— ‘Ì¡.", vbExclamation + MSG_RTL, APP_TITLE
+        Exit Sub
+    End If
+    msg = SetUserPassword(CLng(id), pwd, False)
+    If Len(msg) = 0 Then
+        CurrentDb.Execute "UPDATE Employees SET IsActive = True WHERE EmployeeID = " & CLng(id), dbFailOnError
+        MsgBox " „  €ÌÌ— ﬂ·„… „—Ê— «·„»—„Ã. «œŒ· »«”„ developer Êﬂ·„… «·„—Ê— «·ÃœÌœ….", vbInformation + MSG_RTL, APP_TITLE
+    Else
+        MsgBox msg & vbCrLf & "·„ Ì €Ì— ‘Ì¡.", vbExclamation + MSG_RTL, APP_TITLE
+    End If
+End Sub
+
+Private Function IsCompiledFile() As Boolean
+    ' An ACCDE carries the database property MDE = "T".
+    On Error Resume Next
+    IsCompiledFile = (CurrentDb.Properties("MDE") = "T")
+End Function
+
 Public Sub EnsureTestUser()
     ' The in-Access tests run from the Immediate window as the built-in administrator.
     If CurrentUserID() = 0 Then TempVars.Add "UserID", 1

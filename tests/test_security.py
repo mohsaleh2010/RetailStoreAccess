@@ -175,6 +175,15 @@ class SecurityCodeTests(unittest.TestCase):
                      gen_test_security.build_test_security_vba(), read("modDashboard")):
             self.assertIn("EnsureTestUser", text)
 
+    def test_forgotten_developer_password(self):
+        # Immediate window of the programmer's .accdb; never in the client's ACCDE.
+        text = read("modSecurity")
+        reset = proc(text, "ResetDeveloperPassword")
+        for part in ("If IsCompiledFile() Then", "WHERE IsDeveloper = True", "again <> pwd",
+                     "SetUserPassword(CLng(id), pwd, False)"):
+            self.assertIn(part, reset)
+        self.assertIn('CurrentDb.Properties("MDE") = "T"', proc(text, "IsCompiledFile"))
+
     def test_user_mode_blocks_shift_and_starts_on_login(self):
         text = read("modStartup")
         self.assertIn('SetDbProp db, "AllowBypassKey", dbBoolean, Developer', text)
