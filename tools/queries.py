@@ -195,6 +195,67 @@ def IN_TREE(alias):
     return "(" + " OR ".join(f"{alias}.Level{n}Code = QLong('AccountCode')" for n in range(1, 6)) + ")"
 
 
+ONE_ROW = "Settings AS z WHERE z.SettingID = 1"        # a FROM for the fixed rows (Access needs one)
+INCOME_SECTIONS = [(1, "إيرادات النشاط", "صافي إيرادات النشاط"), (2, "تكلفة المبيعات", "إجمالي تكلفة المبيعات"),
+                   (3, "المصروفات التشغيلية والإدارية", "إجمالي المصروفات التشغيلية والإدارية"),
+                   (4, "إيرادات أخرى", "إجمالي الإيرادات الأخرى"), (5, "مصروفات أخرى", "إجمالي المصروفات الأخرى")]
+# results after a section: (block, caption, sign of each section)
+INCOME_RESULTS = [(25, "مجمل الربح", {1: 1, 2: -1}), (35, "الربح التشغيلي", {1: 1, 2: -1, 3: -1}),
+                  (60, "صافي الربح (الخسارة)", {1: 1, 2: -1, 3: -1, 4: 1, 5: -1})]
+
+
+def _income_statement():
+    def amount(col, signs):
+        terms = " + ".join(f"IIf(q.SectionNo = {n}, {sign} * q.{col}, 0)" for n, sign in signs.items())
+        return nz(f"Sum({terms})")
+    parts = ["""SELECT q.SectionNo * 10 + 1 AS Block, q.TreeKey AS AccountKey, 'A' AS RowKind, q.AccountName AS Caption,
+       q.AccountCode AS LineAccount, q.CurrentAmount AS CurrentValue, q.PriorAmount AS PriorValue
+FROM qryIncomeAccounts AS q"""]
+    for n, title, total in INCOME_SECTIONS:
+        parts.append(f"SELECT {n * 10}, '', 'H', '{title}', Null, Null, Null\nFROM {ONE_ROW}")
+        parts.append(f"SELECT {n * 10 + 2}, '', 'T', '{total}', Null, {amount('CurrentAmount', {n: 1})}, "
+                     f"{amount('PriorAmount', {n: 1})}\nFROM qryIncomeAccounts AS q")
+    for block, title, signs in INCOME_RESULTS:
+        parts.append(f"SELECT {block}, '', 'R', '{title}', Null, {amount('CurrentAmount', signs)}, "
+                     f"{amount('PriorAmount', signs)}\nFROM qryIncomeAccounts AS q")
+    return "\nUNION ALL\n".join(parts) + "\nORDER BY Block, AccountKey"
+
+
+CLASS_TOTALS = "IIf(i.ClassNo = 1, 'إجمالي الأصول', IIf(i.ClassNo = 2, 'إجمالي الخصوم', 'إجمالي حقوق الملكية'))"
+
+
+def _balance_sheet():
+    return f"""SELECT q.Level1Code AS ClassNo, g.TreeKey AS GroupKey, 1 AS Pos, q.TreeKey AS AccountKey, 'A' AS RowKind,
+       q.AccountName AS Caption, q.AccountCode AS LineAccount, q.CurrentAmount AS CurrentValue,
+       q.PriorAmount AS PriorValue
+FROM qryBalanceAccounts AS q INNER JOIN Accounts AS g ON q.Level2Code = g.AccountCode
+UNION ALL
+SELECT 3, g.TreeKey, 1, 'Z', 'A', 'صافي ربح (خسارة) الفترات غير المقفلة', Null, -x.NetProfitSum, -y.NetCompareSum
+FROM Accounts AS g, qryProfitAt AS x, qryProfitCompare AS y
+WHERE g.AccountCode = 32
+UNION ALL
+SELECT c.AccountCode, '', 0, '', 'C', c.AccountName, Null, Null, Null
+FROM Accounts AS c
+WHERE c.AccountCode IN (1, 2, 3)
+UNION ALL
+SELECT g.Level1Code, g.TreeKey, 0, '', 'G', g.AccountName, Null, Null, Null
+FROM Accounts AS g
+WHERE g.AccountCode IN (SELECT GroupCode FROM qryBalanceItems)
+UNION ALL
+SELECT g.Level1Code, g.TreeKey, 2, '', 'S', g.AccountName, Null, Sum(i.CurrentValue), Sum(i.PriorValue)
+FROM Accounts AS g INNER JOIN qryBalanceItems AS i ON g.AccountCode = i.GroupCode
+GROUP BY g.Level1Code, g.TreeKey, g.AccountName
+UNION ALL
+SELECT i.ClassNo, '~', 9, '', 'T', {CLASS_TOTALS}, Null, Sum(i.CurrentValue), Sum(i.PriorValue)
+FROM qryBalanceItems AS i
+GROUP BY i.ClassNo
+UNION ALL
+SELECT 4, '', 9, '', 'T', 'إجمالي الخصوم وحقوق الملكية', Null, {nz("Sum(i.CurrentValue)")}, {nz("Sum(i.PriorValue)")}
+FROM qryBalanceItems AS i
+WHERE i.ClassNo IN (2, 3)
+ORDER BY ClassNo, GroupKey, Pos, AccountKey"""
+
+
 ACCOUNT_TYPE_NAME = ("IIf(a.AccountType = 'ASSET', 'أصول', IIf(a.AccountType = 'LIABILITY', 'خصوم', "
                      "IIf(a.AccountType = 'EQUITY', 'حقوق ملكية', IIf(a.AccountType = 'REVENUE', 'إيرادات', "
                      "'مصروفات'))))")
@@ -975,6 +1036,70 @@ SELECT a.AccountCode, a.AccountName, {ACCOUNT_TYPE_NAME} AS TypeName, a.AccountL
        r.SumClosing AS ClosingBalance
 FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode
 ORDER BY a.TreeKey""", P),
+
+    # ======================================================= FINANCIAL STATEMENTS
+    # Rows in their printed order: Block / ClassNo, GroupKey, Pos, AccountKey. RowKind: H heading,
+    # C class, G group, A account, S group total, T total, R result (gross profit, net profit...).
+    Query("qryCompareMoves", "حركة الحسابات في فترة المقارنة", """
+SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd')
+GROUP BY l.AccountCode""", ["CompareStart", "CompareEnd"]),
+
+    Query("qryIncomeAccounts", "حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة", f"""
+SELECT a.AccountCode, a.AccountName, a.TreeKey,
+       IIf(a.Level2Code = 41, 1, IIf(a.Level2Code = 51, 2, IIf(a.Level2Code = 52, 3,
+           IIf(a.AccountType = 'REVENUE', 4, 5)))) AS SectionNo,
+       IIf(a.AccountType = 'REVENUE', 1, -1) * ({nz("c.SumCredit")} - {nz("c.SumDebit")}) AS CurrentAmount,
+       IIf(a.AccountType = 'REVENUE', 1, -1) * ({nz("p.SumCredit")} - {nz("p.SumDebit")}) AS PriorAmount
+FROM (Accounts AS a LEFT JOIN qryTrialPeriod AS c ON a.AccountCode = c.AccountCode)
+     LEFT JOIN qryCompareMoves AS p ON a.AccountCode = p.AccountCode
+WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR p.AccountCode Is Not Null)""",
+          P + ["CompareStart", "CompareEnd"]),
+
+    Query("IncomeStatementQuery", "قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة", f"""
+{_income_statement()}""", P + ["CompareStart", "CompareEnd"]),
+
+    Query("qryBalanceAt", "رصيد كل حساب في نهاية الفترة (مدين موجب)", """
+SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS NetAt
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate < QDate('PeriodEnd')
+GROUP BY l.AccountCode""", ["PeriodEnd"]),
+
+    Query("qryBalanceCompare", "رصيد كل حساب في نهاية فترة المقارنة (مدين موجب)", """
+SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS NetCompare
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate < QDate('CompareEnd')
+GROUP BY l.AccountCode""", ["CompareEnd"]),
+
+    Query("qryBalanceAccounts", "حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب)", f"""
+SELECT a.AccountCode, a.AccountName, a.TreeKey, a.Level1Code, a.Level2Code,
+       IIf(a.AccountType = 'ASSET', 1, -1) * {nz("b.NetAt")} AS CurrentAmount,
+       IIf(a.AccountType = 'ASSET', 1, -1) * {nz("c.NetCompare")} AS PriorAmount
+FROM (Accounts AS a LEFT JOIN qryBalanceAt AS b ON a.AccountCode = b.AccountCode)
+     LEFT JOIN qryBalanceCompare AS c ON a.AccountCode = c.AccountCode
+WHERE a.AccountType IN ('ASSET', 'LIABILITY', 'EQUITY') AND ({nz("b.NetAt")} <> 0 OR {nz("c.NetCompare")} <> 0)""",
+          ["PeriodEnd", "CompareEnd"]),
+
+    Query("qryProfitAt", "صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب)", f"""
+SELECT {nz("Sum(b.NetAt)")} AS NetProfitSum
+FROM qryBalanceAt AS b INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode
+WHERE a.AccountType IN ('REVENUE', 'EXPENSE')""", ["PeriodEnd"]),
+
+    Query("qryProfitCompare", "صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب)", f"""
+SELECT {nz("Sum(c.NetCompare)")} AS NetCompareSum
+FROM qryBalanceCompare AS c INNER JOIN Accounts AS a ON c.AccountCode = a.AccountCode
+WHERE a.AccountType IN ('REVENUE', 'EXPENSE')""", ["CompareEnd"]),
+
+    Query("qryBalanceItems", "بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32)", """
+SELECT q.Level1Code AS ClassNo, q.Level2Code AS GroupCode, q.CurrentAmount AS CurrentValue, q.PriorAmount AS PriorValue
+FROM qryBalanceAccounts AS q
+UNION ALL
+SELECT 3, 32, -x.NetProfitSum, -y.NetCompareSum
+FROM qryProfitAt AS x, qryProfitCompare AS y""", ["PeriodEnd", "CompareEnd"]),
+
+    Query("BalanceSheetQuery", "الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة", f"""
+{_balance_sheet()}""", P + ["CompareStart", "CompareEnd"]),
 
     Query("AccountTreeQuery", "شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود", f"""
 SELECT a.AccountCode, a.AccountName, {ACCOUNT_TYPE_NAME} AS TypeName, a.AccountLevel, a.TreeKey,

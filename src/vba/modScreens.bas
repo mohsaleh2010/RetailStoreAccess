@@ -191,6 +191,7 @@ Public Sub SetQuickPeriod(ByVal frm As Access.Form, ByVal Which As String)
         Case "MONTH":     frm!txtFrom.Value = DateSerial(y, m, 1): frm!txtTo.Value = Date
         Case "LASTMONTH": frm!txtFrom.Value = DateSerial(y, m - 1, 1): frm!txtTo.Value = DateSerial(y, m, 0)
         Case "YEAR":      frm!txtFrom.Value = DateSerial(y, 1, 1): frm!txtTo.Value = Date
+        Case "LASTYEAR":  frm!txtFrom.Value = DateSerial(y - 1, 1, 1): frm!txtTo.Value = DateSerial(y - 1, 12, 31)
     End Select
 End Sub
 
@@ -271,6 +272,7 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
         End If
         SetPeriod fromDate, toDate
         criteria = PeriodText(fromDate, toDate)
+        If HasNeed(needs, "F") Then criteria = PrepareFinancials(CStr(r(0)), fromDate, toDate)   ' modFinancials
     End If
     If Not RequireChoice(frm!cboCustomer, HasNeed(needs, "C"), "CustomerID", "العميل") Then Exit Function
     If Not RequireChoice(frm!cboSupplier, HasNeed(needs, "S"), "SupplierID", "المورد") Then Exit Function

@@ -26,7 +26,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -48,6 +48,8 @@ Public Function BuildReports() As Boolean
     BuildReport_rptJournalEntry
     BuildReport_rptAccountStatement
     BuildReport_rptGeneralLedger
+    BuildReport_rptIncomeStatement
+    BuildReport_rptBalanceSheet
     BuildReport_rptDailySales
     BuildReport_rptMonthlySales
     BuildReport_rptSalesByPeriod
@@ -1090,6 +1092,98 @@ Private Sub BuildReport_rptGeneralLedger()
     Exit Sub
 EH:
     AbortReport "rptGeneralLedger", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptIncomeStatement()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptIncomeStatement", "ﬁ«∆„… «·œŒ·", "IncomeStatementQuery", 10773, "", "Block,AccountKey", False, True
+    SetSection 3, 2041
+    SetSection 4, 340
+    SetSection 0, 340
+    HideSection 1
+    HideSection 2
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "ﬁ«∆„… «·œŒ·", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 709)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblItem", "«·»‰œ", 0, 1445, 4649, 284, 9, True, 2)
+    Set c = RLabel(3, "lblCurrent", "«·› —… «·Õ«·Ì…", 4649, 1292, 3062, 284, 9, True, 2)
+    Set c = RLabel(3, "lblPrior", "› —… «·„ﬁ«—‰…", 7711, 1292, 3062, 284, 9, True, 2)
+    Set c = RLabel(3, "lblCol1", "«·Õ”«»", 4649, 1616, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "«·„Ã„Ê⁄", 6180, 1616, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "«·Õ”«»", 7711, 1616, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "«·„Ã„Ê⁄", 9242, 1616, 1531, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(0, "txtItem", "=IIf([RowKind]=""A"",""      "" & [Caption],IIf([RowKind]=""S"",""≈Ã„«·Ì "" & [Caption],[Caption]))", 0, 28, 4649, 284, 9, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol1", "=IIf([RowKind]=""A"",[CurrentValue],Null)", 4649, 28, 1531, 284, 9, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol2", "=IIf([RowKind]=""S"" Or [RowKind]=""T"" Or [RowKind]=""R"",[CurrentValue],Null)", 6180, 28, 1531, 284, 9, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol3", "=IIf([RowKind]=""A"",[PriorValue],Null)", 7711, 28, 1531, 284, 9, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol4", "=IIf([RowKind]=""S"" Or [RowKind]=""T"" Or [RowKind]=""R"",[PriorValue],Null)", 9242, 28, 1531, 284, 9, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""·«  ÊÃœ ﬁÌÊœ ··› —… «·„Õœœ….""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptIncomeStatement", s
+    Exit Sub
+EH:
+    AbortReport "rptIncomeStatement", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptBalanceSheet()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptBalanceSheet", "«·„Ì“«‰Ì… «·⁄„Ê„Ì… (ﬁ«∆„… «·„—ﬂ“ «·„«·Ì)", "BalanceSheetQuery", 10773, "", "ClassNo,GroupKey,Pos,AccountKey", False, True
+    SetSection 3, 2041
+    SetSection 4, 340
+    SetSection 0, 340
+    HideSection 1
+    HideSection 2
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "«·„Ì“«‰Ì… «·⁄„Ê„Ì… (ﬁ«∆„… «·„—ﬂ“ «·„«·Ì)", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 709)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblItem", "«·»‰œ", 0, 1445, 4649, 284, 9, True, 2)
+    Set c = RLabel(3, "lblCurrent", "«·› —… «·Õ«·Ì…", 4649, 1292, 3062, 284, 9, True, 2)
+    Set c = RLabel(3, "lblPrior", "› —… «·„ﬁ«—‰…", 7711, 1292, 3062, 284, 9, True, 2)
+    Set c = RLabel(3, "lblCol1", "«·Õ”«»", 4649, 1616, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "«·„Ã„Ê⁄", 6180, 1616, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "«·Õ”«»", 7711, 1616, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "«·„Ã„Ê⁄", 9242, 1616, 1531, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(0, "txtItem", "=IIf([RowKind]=""A"",""      "" & [Caption],IIf([RowKind]=""S"",""≈Ã„«·Ì "" & [Caption],[Caption]))", 0, 28, 4649, 284, 9, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol1", "=IIf([RowKind]=""A"",[CurrentValue],Null)", 4649, 28, 1531, 284, 9, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol2", "=IIf([RowKind]=""S"" Or [RowKind]=""T"" Or [RowKind]=""R"",[CurrentValue],Null)", 6180, 28, 1531, 284, 9, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol3", "=IIf([RowKind]=""A"",[PriorValue],Null)", 7711, 28, 1531, 284, 9, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol4", "=IIf([RowKind]=""S"" Or [RowKind]=""T"" Or [RowKind]=""R"",[PriorValue],Null)", 9242, 28, 1531, 284, 9, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""·«  ÊÃœ ﬁÌÊœ ··› —… «·„Õœœ….""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptBalanceSheet", s
+    Exit Sub
+EH:
+    AbortReport "rptBalanceSheet", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptDailySales()

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **86**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **96**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -86,12 +86,22 @@
 | 78 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
 | 79 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
 | 80 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 81 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 82 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 83 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 84 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 85 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 86 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 81 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة | `CompareStart`, `CompareEnd` |
+| 82 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 83 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 84 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 85 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 86 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 87 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 88 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 89 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 90 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 91 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 92 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 93 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 94 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 95 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 96 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -1613,6 +1623,205 @@ SELECT a.AccountCode, a.AccountName, IIf(a.AccountType = 'ASSET', 'أصول', II
        r.SumClosing AS ClosingBalance
 FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode
 ORDER BY a.TreeKey
+```
+
+## qryCompareMoves
+
+حركة الحسابات في فترة المقارنة
+
+المعاملات: `CompareStart`, `CompareEnd`
+
+```sql
+SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd')
+GROUP BY l.AccountCode
+```
+
+## qryIncomeAccounts
+
+حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة
+
+المعاملات: `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd`
+
+```sql
+SELECT a.AccountCode, a.AccountName, a.TreeKey,
+       IIf(a.Level2Code = 41, 1, IIf(a.Level2Code = 51, 2, IIf(a.Level2Code = 52, 3,
+           IIf(a.AccountType = 'REVENUE', 4, 5)))) AS SectionNo,
+       IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(c.SumCredit, 0)) - CCur(Nz(c.SumDebit, 0))) AS CurrentAmount,
+       IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(p.SumCredit, 0)) - CCur(Nz(p.SumDebit, 0))) AS PriorAmount
+FROM (Accounts AS a LEFT JOIN qryTrialPeriod AS c ON a.AccountCode = c.AccountCode)
+     LEFT JOIN qryCompareMoves AS p ON a.AccountCode = p.AccountCode
+WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR p.AccountCode Is Not Null)
+```
+
+## IncomeStatementQuery
+
+قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة
+
+المعاملات: `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd`
+
+```sql
+SELECT q.SectionNo * 10 + 1 AS Block, q.TreeKey AS AccountKey, 'A' AS RowKind, q.AccountName AS Caption,
+       q.AccountCode AS LineAccount, q.CurrentAmount AS CurrentValue, q.PriorAmount AS PriorValue
+FROM qryIncomeAccounts AS q
+UNION ALL
+SELECT 10, '', 'H', 'إيرادات النشاط', Null, Null, Null
+FROM Settings AS z WHERE z.SettingID = 1
+UNION ALL
+SELECT 12, '', 'T', 'صافي إيرادات النشاط', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0)), 0))
+FROM qryIncomeAccounts AS q
+UNION ALL
+SELECT 20, '', 'H', 'تكلفة المبيعات', Null, Null, Null
+FROM Settings AS z WHERE z.SettingID = 1
+UNION ALL
+SELECT 22, '', 'T', 'إجمالي تكلفة المبيعات', Null, CCur(Nz(Sum(IIf(q.SectionNo = 2, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 2, 1 * q.PriorAmount, 0)), 0))
+FROM qryIncomeAccounts AS q
+UNION ALL
+SELECT 30, '', 'H', 'المصروفات التشغيلية والإدارية', Null, Null, Null
+FROM Settings AS z WHERE z.SettingID = 1
+UNION ALL
+SELECT 32, '', 'T', 'إجمالي المصروفات التشغيلية والإدارية', Null, CCur(Nz(Sum(IIf(q.SectionNo = 3, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 3, 1 * q.PriorAmount, 0)), 0))
+FROM qryIncomeAccounts AS q
+UNION ALL
+SELECT 40, '', 'H', 'إيرادات أخرى', Null, Null, Null
+FROM Settings AS z WHERE z.SettingID = 1
+UNION ALL
+SELECT 42, '', 'T', 'إجمالي الإيرادات الأخرى', Null, CCur(Nz(Sum(IIf(q.SectionNo = 4, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 4, 1 * q.PriorAmount, 0)), 0))
+FROM qryIncomeAccounts AS q
+UNION ALL
+SELECT 50, '', 'H', 'مصروفات أخرى', Null, Null, Null
+FROM Settings AS z WHERE z.SettingID = 1
+UNION ALL
+SELECT 52, '', 'T', 'إجمالي المصروفات الأخرى', Null, CCur(Nz(Sum(IIf(q.SectionNo = 5, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 5, 1 * q.PriorAmount, 0)), 0))
+FROM qryIncomeAccounts AS q
+UNION ALL
+SELECT 25, '', 'R', 'مجمل الربح', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 2, -1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 2, -1 * q.PriorAmount, 0)), 0))
+FROM qryIncomeAccounts AS q
+UNION ALL
+SELECT 35, '', 'R', 'الربح التشغيلي', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 2, -1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 3, -1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 2, -1 * q.PriorAmount, 0) + IIf(q.SectionNo = 3, -1 * q.PriorAmount, 0)), 0))
+FROM qryIncomeAccounts AS q
+UNION ALL
+SELECT 60, '', 'R', 'صافي الربح (الخسارة)', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 2, -1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 3, -1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 4, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 5, -1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 2, -1 * q.PriorAmount, 0) + IIf(q.SectionNo = 3, -1 * q.PriorAmount, 0) + IIf(q.SectionNo = 4, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 5, -1 * q.PriorAmount, 0)), 0))
+FROM qryIncomeAccounts AS q
+ORDER BY Block, AccountKey
+```
+
+## qryBalanceAt
+
+رصيد كل حساب في نهاية الفترة (مدين موجب)
+
+المعاملات: `PeriodEnd`
+
+```sql
+SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS NetAt
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate < QDate('PeriodEnd')
+GROUP BY l.AccountCode
+```
+
+## qryBalanceCompare
+
+رصيد كل حساب في نهاية فترة المقارنة (مدين موجب)
+
+المعاملات: `CompareEnd`
+
+```sql
+SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS NetCompare
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate < QDate('CompareEnd')
+GROUP BY l.AccountCode
+```
+
+## qryBalanceAccounts
+
+حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب)
+
+المعاملات: `PeriodEnd`, `CompareEnd`
+
+```sql
+SELECT a.AccountCode, a.AccountName, a.TreeKey, a.Level1Code, a.Level2Code,
+       IIf(a.AccountType = 'ASSET', 1, -1) * CCur(Nz(b.NetAt, 0)) AS CurrentAmount,
+       IIf(a.AccountType = 'ASSET', 1, -1) * CCur(Nz(c.NetCompare, 0)) AS PriorAmount
+FROM (Accounts AS a LEFT JOIN qryBalanceAt AS b ON a.AccountCode = b.AccountCode)
+     LEFT JOIN qryBalanceCompare AS c ON a.AccountCode = c.AccountCode
+WHERE a.AccountType IN ('ASSET', 'LIABILITY', 'EQUITY') AND (CCur(Nz(b.NetAt, 0)) <> 0 OR CCur(Nz(c.NetCompare, 0)) <> 0)
+```
+
+## qryProfitAt
+
+صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب)
+
+المعاملات: `PeriodEnd`
+
+```sql
+SELECT CCur(Nz(Sum(b.NetAt), 0)) AS NetProfitSum
+FROM qryBalanceAt AS b INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode
+WHERE a.AccountType IN ('REVENUE', 'EXPENSE')
+```
+
+## qryProfitCompare
+
+صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب)
+
+المعاملات: `CompareEnd`
+
+```sql
+SELECT CCur(Nz(Sum(c.NetCompare), 0)) AS NetCompareSum
+FROM qryBalanceCompare AS c INNER JOIN Accounts AS a ON c.AccountCode = a.AccountCode
+WHERE a.AccountType IN ('REVENUE', 'EXPENSE')
+```
+
+## qryBalanceItems
+
+بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32)
+
+المعاملات: `PeriodEnd`, `CompareEnd`
+
+```sql
+SELECT q.Level1Code AS ClassNo, q.Level2Code AS GroupCode, q.CurrentAmount AS CurrentValue, q.PriorAmount AS PriorValue
+FROM qryBalanceAccounts AS q
+UNION ALL
+SELECT 3, 32, -x.NetProfitSum, -y.NetCompareSum
+FROM qryProfitAt AS x, qryProfitCompare AS y
+```
+
+## BalanceSheetQuery
+
+الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة
+
+المعاملات: `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd`
+
+```sql
+SELECT q.Level1Code AS ClassNo, g.TreeKey AS GroupKey, 1 AS Pos, q.TreeKey AS AccountKey, 'A' AS RowKind,
+       q.AccountName AS Caption, q.AccountCode AS LineAccount, q.CurrentAmount AS CurrentValue,
+       q.PriorAmount AS PriorValue
+FROM qryBalanceAccounts AS q INNER JOIN Accounts AS g ON q.Level2Code = g.AccountCode
+UNION ALL
+SELECT 3, g.TreeKey, 1, 'Z', 'A', 'صافي ربح (خسارة) الفترات غير المقفلة', Null, -x.NetProfitSum, -y.NetCompareSum
+FROM Accounts AS g, qryProfitAt AS x, qryProfitCompare AS y
+WHERE g.AccountCode = 32
+UNION ALL
+SELECT c.AccountCode, '', 0, '', 'C', c.AccountName, Null, Null, Null
+FROM Accounts AS c
+WHERE c.AccountCode IN (1, 2, 3)
+UNION ALL
+SELECT g.Level1Code, g.TreeKey, 0, '', 'G', g.AccountName, Null, Null, Null
+FROM Accounts AS g
+WHERE g.AccountCode IN (SELECT GroupCode FROM qryBalanceItems)
+UNION ALL
+SELECT g.Level1Code, g.TreeKey, 2, '', 'S', g.AccountName, Null, Sum(i.CurrentValue), Sum(i.PriorValue)
+FROM Accounts AS g INNER JOIN qryBalanceItems AS i ON g.AccountCode = i.GroupCode
+GROUP BY g.Level1Code, g.TreeKey, g.AccountName
+UNION ALL
+SELECT i.ClassNo, '~', 9, '', 'T', IIf(i.ClassNo = 1, 'إجمالي الأصول', IIf(i.ClassNo = 2, 'إجمالي الخصوم', 'إجمالي حقوق الملكية')), Null, Sum(i.CurrentValue), Sum(i.PriorValue)
+FROM qryBalanceItems AS i
+GROUP BY i.ClassNo
+UNION ALL
+SELECT 4, '', 9, '', 'T', 'إجمالي الخصوم وحقوق الملكية', Null, CCur(Nz(Sum(i.CurrentValue), 0)), CCur(Nz(Sum(i.PriorValue), 0))
+FROM qryBalanceItems AS i
+WHERE i.ClassNo IN (2, 3)
+ORDER BY ClassNo, GroupKey, Pos, AccountKey
 ```
 
 ## AccountTreeQuery

@@ -403,6 +403,17 @@ Public Function TestJournal() As Boolean
                  "ﬂ‘› «·Õ”«» «·—∆Ì”Ì («·√’Ê·) Ì‘„· ﬂ· Õ”«»« Â «· «»⁄…", passed, failed, report
     CurrentDb.Execute "DELETE FROM tmpLedger", dbFailOnError
 
+    ' the financial statements (modFinancials) over all the entries until today
+    Call PrepareFinancials("INCOME", DateSerial(2000, 1, 1), Date)
+    CheckJournal Nz(DbValue("SELECT CurrentValue FROM IncomeStatementQuery WHERE Block = 60"), 0) = _
+                 Nz(DbValue("SELECT Sum(l.Credit) - Sum(l.Debit) FROM JournalLines AS l INNER JOIN Accounts AS a ON " & _
+                 "l.AccountCode = a.AccountCode WHERE a.AccountType IN ('REVENUE', 'EXPENSE')"), 0), _
+                 "’«›Ì «·—»Õ ›Ì ﬁ«∆„… «·œŒ· = «·≈Ì—«œ«  - «·„’—Ê›« ", passed, failed, report
+    Call PrepareFinancials("BALANCE", DateSerial(2000, 1, 1), Date)
+    CheckJournal Nz(DbValue("SELECT CurrentValue FROM BalanceSheetQuery WHERE ClassNo = 1 AND RowKind = 'T'"), 0) = _
+                 Nz(DbValue("SELECT CurrentValue FROM BalanceSheetQuery WHERE ClassNo = 4"), 0), _
+                 "«·„Ì“«‰Ì… „ Ê«“‰…: «·√’Ê· = «·Œ’Ê„ + ÕﬁÊﬁ «·„·ﬂÌ…", passed, failed, report
+
     ' a new, changed and deleted operation, rolled back
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans

@@ -409,7 +409,7 @@ SCREEN_PERMISSIONS = {
     "frmTreasury": "CASH_CLOSING", "frmCashClosing": "CASH_CLOSING",
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
-    "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL",
+    "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
 }
 
 
@@ -503,6 +503,8 @@ REPORTS: List[ReportEntry] = [
                 "PJ"),
     ReportEntry("ACCOUNT_TREE", "دليل الحسابات (شجرة الحسابات)", "AccountTreeQuery", "rptAccountTree", "J"),
     ReportEntry("GENERAL_LEDGER", "دفتر الأستاذ (كل الحسابات)", "GeneralLedgerQuery", "rptGeneralLedger", "PJ"),
+    ReportEntry("INCOME_STATEMENT", "قائمة الدخل", "IncomeStatementQuery", "rptIncomeStatement", "PJ$F"),
+    ReportEntry("BALANCE_SHEET", "الميزانية العمومية", "BalanceSheetQuery", "rptBalanceSheet", "PJ$F"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
     ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),

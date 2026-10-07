@@ -225,7 +225,8 @@ def layout_ledger() -> FormModel:
             ("btnPrintStatement", "طباعة كشف الحساب", "secondary", 3.8, 'PrintLedger Me, "STATEMENT"'),
             ("btnPrintLedger", "دفتر الأستاذ", "secondary", 2.8, 'PrintLedger Me, "LEDGER"'),
             ("btnManual", "قيد يدوي", "secondary", 2.4, 'OpenScreen "frmManualEntry"'),
-            ("btnAccounts", "دليل الحسابات", "secondary", 2.8, 'OpenScreen "frmAccounts"')]:
+            ("btnAccounts", "دليل الحسابات", "secondary", 2.8, 'OpenScreen "frmAccounts"'),
+            ("btnFinancials", "القوائم المالية", "secondary", 3.2, 'OpenScreen "frmFinancials"')]:
         button(m, name, caption, x, y, style, w=cm(w), h=cm(0.9), call=call)
         x += cm(w) + cm(0.2)
     button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), y, "secondary", w=cm(2.4), h=cm(0.9),
@@ -239,6 +240,65 @@ def layout_ledger() -> FormModel:
     return m
 
 
+# ------------------------------------------------------------- financial statements
+STATEMENT_KINDS = "INCOME;قائمة الدخل;BALANCE;الميزانية العمومية"
+FIN_LIST_WIDTHS = "0;10.6;3.8;3.8;3.8;4.2"
+
+
+def layout_financials() -> FormModel:
+    width, height = cm(27.0), cm(17.0)
+    m = FormModel("frmFinancials", "القوائم المالية", width, height, popup=False, allow_add=False)
+    title_band(m, "القوائم المالية", "قائمة الدخل والميزانية العمومية من القيود، مع فترة المقارنة", "reports")
+    y = cm(2.3)
+    c = m.add(Control("combo", "cboStatement", cm(0.4), y, cm(4.6), cm(0.8),
+                      {"RowSource": STATEMENT_KINDS, "RowSourceType": "Value List", "ColumnCount": 2,
+                       "ColumnWidths": "0;4.5", "LimitToList": True}, events=["AfterUpdate"]))
+    labelled(m, "cboStatement", "القائمة", c)
+    c = m.add(Control("text", "txtFrom", cm(5.2), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtFrom", "من تاريخ", c)
+    c = m.add(Control("text", "txtTo", cm(8.4), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtTo", "إلى تاريخ (الميزانية في هذا اليوم)", c)
+    for i, (name, caption, which) in enumerate([("btnThisMonth", "هذا الشهر", "MONTH"),
+                                                ("btnLastMonth", "الشهر الماضي", "LASTMONTH"),
+                                                ("btnThisYear", "هذه السنة", "YEAR"),
+                                                ("btnLastYear", "السنة الماضية", "LASTYEAR")]):
+        button(m, name, caption, cm(11.6) + i * cm(2.6), y, "secondary", w=cm(2.45), h=cm(0.8),
+               call=f'FinancialsQuickPeriod Me, "{which}"')
+    button(m, "btnShow", "عرض", cm(22.2), y, "primary", w=cm(2.5), h=cm(0.8), call="FinancialsRefresh Me")
+    m.add(Control("label", "lblCompare", cm(0.4), cm(3.3), width - cm(0.8), cm(0.55),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+    part = (width - cm(0.8)) // 3
+    for i in range(1, 4):
+        x = cm(0.4) + (i - 1) * part
+        m.add(Control("label", f"lblCap{i}", x, cm(3.95), part - cm(0.2), cm(0.5),
+                      {"Caption": " ", "FontSize": 9, "FontBold": True, "ForeColor": Sym("CLR_MUTED")}))
+        m.add(Control("label", f"lblVal{i}", x, cm(4.5), part - cm(0.2), cm(0.75),
+                      {"Caption": "-", "FontSize": 14, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("list", "lstRows", cm(0.4), cm(5.45), width - cm(0.8), cm(8.4),
+                  {"ColumnCount": 6, "ColumnWidths": FIN_LIST_WIDTHS, "ColumnHeads": True}, events=["DblClick"]))
+    m.add(Control("label", "lblInfo", cm(0.4), cm(14.0), width - cm(0.8), cm(0.55),
+                  {"Caption": "نقر مزدوج على حساب يفتح كشف حسابه للفترة نفسها", "FontSize": 9,
+                   "ForeColor": Sym("CLR_MUTED")}))
+    x, y = cm(0.4), cm(14.8)
+    for name, caption, style, w, call in [
+            ("btnPrint", "طباعة القائمة", "primary", 3.2, "PrintFinancials Me"),
+            ("btnLedger", "كشف حساب", "secondary", 2.8, "FinancialsOpenLedger Me"),
+            ("btnTrial", "ميزان المراجعة", "secondary", 3.0, 'OpenScreen "frmJournal"')]:
+        button(m, name, caption, x, y, style, w=cm(w), h=cm(0.9), call=call)
+        x += cm(w) + cm(0.2)
+    button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), y, "secondary", w=cm(2.4), h=cm(0.9),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    FinancialsLoad Me", "End Sub",
+               "Private Sub cboStatement_AfterUpdate()", "    FinancialsRefresh Me", "End Sub",
+               "Private Sub lstRows_DblClick(Cancel As Integer)", "    FinancialsOpenLedger Me", "End Sub"] + m.code)
+    shrink_area(m, ("lstRows",), cm(1.6))
+    fit_window(m, split_x=cm(22.1), bottom_y=cm(11.0), stretch_w=("lstRows", "lblInfo", "lblCompare"),
+               stretch_h=("lstRows",))
+    return m
+
+
 def journal_forms() -> List[FormModel]:
     lines, heads = layout_manual_lines()
-    return [layout_journal(), layout_journal_entry(), lines, layout_manual_entry(heads), layout_ledger()]
+    return [layout_journal(), layout_journal_entry(), lines, layout_manual_entry(heads), layout_ledger(),
+            layout_financials()]

@@ -59,7 +59,7 @@ Public Function SearchColumnWidths(ByVal Kind As String) As String
 End Function
 
 Public Function ReportCount() As Long
-    ReportCount = 31
+    ReportCount = 33
 End Function
 
 Public Function ScreenPermission(ByVal FormName As String) As String
@@ -103,6 +103,7 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmAccounts": ScreenPermission = "JOURNAL"
         Case "frmManualEntry": ScreenPermission = "MANUAL_ENTRY"
         Case "frmLedger": ScreenPermission = "JOURNAL"
+        Case "frmFinancials": ScreenPermission = "REPORTS_PROFIT"
     End Select
 End Function
 
@@ -134,11 +135,13 @@ Public Function ReportRow(ByVal Index As Long) As Variant
         Case 23: ReportRow = Array("TRIAL_BALANCE_TREE", "„Ì“«‰ «·„—«Ã⁄… »«·„” ÊÌ« ", "TrialBalanceTreeQuery", "rptTrialBalanceTree", "PJ", "")
         Case 24: ReportRow = Array("ACCOUNT_TREE", "œ·Ì· «·Õ”«»«  (‘Ã—… «·Õ”«»« )", "AccountTreeQuery", "rptAccountTree", "J", "")
         Case 25: ReportRow = Array("GENERAL_LEDGER", "œ› — «·√” «– (ﬂ· «·Õ”«»« )", "GeneralLedgerQuery", "rptGeneralLedger", "PJ", "")
-        Case 26: ReportRow = Array("SLOW_MOVING", "«·„‰ Ã«  €Ì— «·„ Õ—ﬂ…", "SlowMovingProductsQuery", "rptSlowMoving", "", "")
-        Case 27: ReportRow = Array("STOCK_BY_CATEGORY", "«·„Œ“Ê‰ Õ”» «· ’‰Ì›", "StockByCategoryQuery", "rptStockByCategory", "", "")
-        Case 28: ReportRow = Array("VAT_SUMMARY", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›…", "VatSummaryQuery", "rptVatSummary", "P$", "")
-        Case 29: ReportRow = Array("CUSTOMER_BALANCES", "√—’œ… «·⁄„·«¡", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
-        Case 30: ReportRow = Array("SUPPLIER_BALANCES", "√—’œ… «·„Ê—œÌ‰", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
-        Case 31: ReportRow = Array("INTEGRITY", "›Õ’ ”·«„… «·»Ì«‰« ", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
+        Case 26: ReportRow = Array("INCOME_STATEMENT", "ﬁ«∆„… «·œŒ·", "IncomeStatementQuery", "rptIncomeStatement", "PJ$F", "")
+        Case 27: ReportRow = Array("BALANCE_SHEET", "«·„Ì“«‰Ì… «·⁄„Ê„Ì…", "BalanceSheetQuery", "rptBalanceSheet", "PJ$F", "")
+        Case 28: ReportRow = Array("SLOW_MOVING", "«·„‰ Ã«  €Ì— «·„ Õ—ﬂ…", "SlowMovingProductsQuery", "rptSlowMoving", "", "")
+        Case 29: ReportRow = Array("STOCK_BY_CATEGORY", "«·„Œ“Ê‰ Õ”» «· ’‰Ì›", "StockByCategoryQuery", "rptStockByCategory", "", "")
+        Case 30: ReportRow = Array("VAT_SUMMARY", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›…", "VatSummaryQuery", "rptVatSummary", "P$", "")
+        Case 31: ReportRow = Array("CUSTOMER_BALANCES", "√—’œ… «·⁄„·«¡", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
+        Case 32: ReportRow = Array("SUPPLIER_BALANCES", "√—’œ… «·„Ê—œÌ‰", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
+        Case 33: ReportRow = Array("INTEGRITY", "›Õ’ ”·«„… «·»Ì«‰« ", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
     End Select
 End Function

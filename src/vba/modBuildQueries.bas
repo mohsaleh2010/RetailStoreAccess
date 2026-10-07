@@ -23,8 +23,8 @@ Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,Dashbo" & _
     "ardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPa" & _
-    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurc" & _
-    "haseReturnedQty,IntegrityCheckQuery"
+    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAcc" & _
+    "ounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -733,6 +733,16 @@ Private Sub CreateAllQueries()
     Q_GeneralLedgerQuery
     Q_qryTreeRollup
     Q_TrialBalanceTreeQuery
+    Q_qryCompareMoves
+    Q_qryIncomeAccounts
+    Q_IncomeStatementQuery
+    Q_qryBalanceAt
+    Q_qryBalanceCompare
+    Q_qryBalanceAccounts
+    Q_qryProfitAt
+    Q_qryProfitCompare
+    Q_qryBalanceItems
+    Q_BalanceSheetQuery
     Q_AccountTreeQuery
     Q_qrySalesInvoiceLineTotals
     Q_qryPurchaseInvoiceLineTotals
@@ -1922,6 +1932,165 @@ Private Sub Q_TrialBalanceTreeQuery()
     s = s & "FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode" & vbCrLf
     s = s & "ORDER BY a.TreeKey" & vbCrLf
     SaveQuery "TrialBalanceTreeQuery", "ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة", s
+End Sub
+
+Private Sub Q_qryCompareMoves()
+    Dim s As String
+    s = "SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit" & vbCrLf
+    s = s & "FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID" & vbCrLf
+    s = s & "WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd')" & vbCrLf
+    s = s & "GROUP BY l.AccountCode" & vbCrLf
+    SaveQuery "qryCompareMoves", "حركة الحسابات في فترة المقارنة", s
+End Sub
+
+Private Sub Q_qryIncomeAccounts()
+    Dim s As String
+    s = "SELECT a.AccountCode, a.AccountName, a.TreeKey," & vbCrLf
+    s = s & "       IIf(a.Level2Code = 41, 1, IIf(a.Level2Code = 51, 2, IIf(a.Level2Code = 52, 3," & vbCrLf
+    s = s & "           IIf(a.AccountType = 'REVENUE', 4, 5)))) AS SectionNo," & vbCrLf
+    s = s & "       IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(c.SumCredit, 0)) - CCur(Nz(c.SumDebit, 0))) AS CurrentAmount," & vbCrLf
+    s = s & "       IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(p.SumCredit, 0)) - CCur(Nz(p.SumDebit, 0))) AS PriorAmount" & vbCrLf
+    s = s & "FROM (Accounts AS a LEFT JOIN qryTrialPeriod AS c ON a.AccountCode = c.AccountCode)" & vbCrLf
+    s = s & "     LEFT JOIN qryCompareMoves AS p ON a.AccountCode = p.AccountCode" & vbCrLf
+    s = s & "WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR p.AccountCode Is Not Null)" & vbCrLf
+    SaveQuery "qryIncomeAccounts", "حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة", s
+End Sub
+
+Private Sub Q_IncomeStatementQuery()
+    Dim s As String
+    s = "SELECT q.SectionNo * 10 + 1 AS Block, q.TreeKey AS AccountKey, 'A' AS RowKind, q.AccountName AS Caption," & vbCrLf
+    s = s & "       q.AccountCode AS LineAccount, q.CurrentAmount AS CurrentValue, q.PriorAmount AS PriorValue" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 10, '', 'H', 'إيرادات النشاط', Null, Null, Null" & vbCrLf
+    s = s & "FROM Settings AS z WHERE z.SettingID = 1" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 12, '', 'T', 'صافي إيرادات النشاط', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0)), 0))" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 20, '', 'H', 'تكلفة المبيعات', Null, Null, Null" & vbCrLf
+    s = s & "FROM Settings AS z WHERE z.SettingID = 1" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 22, '', 'T', 'إجمالي تكلفة المبيعات', Null, CCur(Nz(Sum(IIf(q.SectionNo = 2, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 2, 1 * q.PriorAmount, 0)), 0))" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 30, '', 'H', 'المصروفات التشغيلية والإدارية', Null, Null, Null" & vbCrLf
+    s = s & "FROM Settings AS z WHERE z.SettingID = 1" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 32, '', 'T', 'إجمالي المصروفات التشغيلية والإدارية', Null, CCur(Nz(Sum(IIf(q.SectionNo = 3, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 3, 1 * q.PriorAmount, 0)), 0))" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 40, '', 'H', 'إيرادات أخرى', Null, Null, Null" & vbCrLf
+    s = s & "FROM Settings AS z WHERE z.SettingID = 1" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 42, '', 'T', 'إجمالي الإيرادات الأخرى', Null, CCur(Nz(Sum(IIf(q.SectionNo = 4, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 4, 1 * q.PriorAmount, 0)), 0))" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 50, '', 'H', 'مصروفات أخرى', Null, Null, Null" & vbCrLf
+    s = s & "FROM Settings AS z WHERE z.SettingID = 1" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 52, '', 'T', 'إجمالي المصروفات الأخرى', Null, CCur(Nz(Sum(IIf(q.SectionNo = 5, 1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 5, 1 * q.PriorAmount, 0)), 0))" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 25, '', 'R', 'مجمل الربح', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 2, -1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 2, -1 * q.PriorAmount, 0)), 0))" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 35, '', 'R', 'الربح التشغيلي', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 2, -1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 3, -1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 2, -1 * q.PriorAmount, 0) + IIf(q.SectionNo = 3, -1 * q.PriorAmount, 0)), 0))" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 60, '', 'R', 'صافي الربح (الخسارة)', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 2, -1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 3, -1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 4, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 5, -1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 2, -1 * q.PriorAmount, 0) + IIf(q.SectionNo = 3, -1 * q.PriorAmount, 0) + IIf(q.SectionNo = 4, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 5, -1 * q.PriorAmount, 0)), 0))" & vbCrLf
+    s = s & "FROM qryIncomeAccounts AS q" & vbCrLf
+    s = s & "ORDER BY Block, AccountKey" & vbCrLf
+    SaveQuery "IncomeStatementQuery", "قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة", s
+End Sub
+
+Private Sub Q_qryBalanceAt()
+    Dim s As String
+    s = "SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS NetAt" & vbCrLf
+    s = s & "FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID" & vbCrLf
+    s = s & "WHERE e.EntryDate < QDate('PeriodEnd')" & vbCrLf
+    s = s & "GROUP BY l.AccountCode" & vbCrLf
+    SaveQuery "qryBalanceAt", "رصيد كل حساب في نهاية الفترة (مدين موجب)", s
+End Sub
+
+Private Sub Q_qryBalanceCompare()
+    Dim s As String
+    s = "SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS NetCompare" & vbCrLf
+    s = s & "FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID" & vbCrLf
+    s = s & "WHERE e.EntryDate < QDate('CompareEnd')" & vbCrLf
+    s = s & "GROUP BY l.AccountCode" & vbCrLf
+    SaveQuery "qryBalanceCompare", "رصيد كل حساب في نهاية فترة المقارنة (مدين موجب)", s
+End Sub
+
+Private Sub Q_qryBalanceAccounts()
+    Dim s As String
+    s = "SELECT a.AccountCode, a.AccountName, a.TreeKey, a.Level1Code, a.Level2Code," & vbCrLf
+    s = s & "       IIf(a.AccountType = 'ASSET', 1, -1) * CCur(Nz(b.NetAt, 0)) AS CurrentAmount," & vbCrLf
+    s = s & "       IIf(a.AccountType = 'ASSET', 1, -1) * CCur(Nz(c.NetCompare, 0)) AS PriorAmount" & vbCrLf
+    s = s & "FROM (Accounts AS a LEFT JOIN qryBalanceAt AS b ON a.AccountCode = b.AccountCode)" & vbCrLf
+    s = s & "     LEFT JOIN qryBalanceCompare AS c ON a.AccountCode = c.AccountCode" & vbCrLf
+    s = s & "WHERE a.AccountType IN ('ASSET', 'LIABILITY', 'EQUITY') AND (CCur(Nz(b.NetAt, 0)) <> 0 OR CCur(Nz(c.NetCompare, 0)) <> 0)" & vbCrLf
+    SaveQuery "qryBalanceAccounts", "حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب)", s
+End Sub
+
+Private Sub Q_qryProfitAt()
+    Dim s As String
+    s = "SELECT CCur(Nz(Sum(b.NetAt), 0)) AS NetProfitSum" & vbCrLf
+    s = s & "FROM qryBalanceAt AS b INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode" & vbCrLf
+    s = s & "WHERE a.AccountType IN ('REVENUE', 'EXPENSE')" & vbCrLf
+    SaveQuery "qryProfitAt", "صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب)", s
+End Sub
+
+Private Sub Q_qryProfitCompare()
+    Dim s As String
+    s = "SELECT CCur(Nz(Sum(c.NetCompare), 0)) AS NetCompareSum" & vbCrLf
+    s = s & "FROM qryBalanceCompare AS c INNER JOIN Accounts AS a ON c.AccountCode = a.AccountCode" & vbCrLf
+    s = s & "WHERE a.AccountType IN ('REVENUE', 'EXPENSE')" & vbCrLf
+    SaveQuery "qryProfitCompare", "صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب)", s
+End Sub
+
+Private Sub Q_qryBalanceItems()
+    Dim s As String
+    s = "SELECT q.Level1Code AS ClassNo, q.Level2Code AS GroupCode, q.CurrentAmount AS CurrentValue, q.PriorAmount AS PriorValue" & vbCrLf
+    s = s & "FROM qryBalanceAccounts AS q" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 3, 32, -x.NetProfitSum, -y.NetCompareSum" & vbCrLf
+    s = s & "FROM qryProfitAt AS x, qryProfitCompare AS y" & vbCrLf
+    SaveQuery "qryBalanceItems", "بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32)", s
+End Sub
+
+Private Sub Q_BalanceSheetQuery()
+    Dim s As String
+    s = "SELECT q.Level1Code AS ClassNo, g.TreeKey AS GroupKey, 1 AS Pos, q.TreeKey AS AccountKey, 'A' AS RowKind," & vbCrLf
+    s = s & "       q.AccountName AS Caption, q.AccountCode AS LineAccount, q.CurrentAmount AS CurrentValue," & vbCrLf
+    s = s & "       q.PriorAmount AS PriorValue" & vbCrLf
+    s = s & "FROM qryBalanceAccounts AS q INNER JOIN Accounts AS g ON q.Level2Code = g.AccountCode" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 3, g.TreeKey, 1, 'Z', 'A', 'صافي ربح (خسارة) الفترات غير المقفلة', Null, -x.NetProfitSum, -y.NetCompareSum" & vbCrLf
+    s = s & "FROM Accounts AS g, qryProfitAt AS x, qryProfitCompare AS y" & vbCrLf
+    s = s & "WHERE g.AccountCode = 32" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT c.AccountCode, '', 0, '', 'C', c.AccountName, Null, Null, Null" & vbCrLf
+    s = s & "FROM Accounts AS c" & vbCrLf
+    s = s & "WHERE c.AccountCode IN (1, 2, 3)" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT g.Level1Code, g.TreeKey, 0, '', 'G', g.AccountName, Null, Null, Null" & vbCrLf
+    s = s & "FROM Accounts AS g" & vbCrLf
+    s = s & "WHERE g.AccountCode IN (SELECT GroupCode FROM qryBalanceItems)" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT g.Level1Code, g.TreeKey, 2, '', 'S', g.AccountName, Null, Sum(i.CurrentValue), Sum(i.PriorValue)" & vbCrLf
+    s = s & "FROM Accounts AS g INNER JOIN qryBalanceItems AS i ON g.AccountCode = i.GroupCode" & vbCrLf
+    s = s & "GROUP BY g.Level1Code, g.TreeKey, g.AccountName" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT i.ClassNo, '~', 9, '', 'T', IIf(i.ClassNo = 1, 'إجمالي الأصول', IIf(i.ClassNo = 2, 'إجمالي الخصوم', 'إجمالي حقوق الملكية')), Null, Sum(i.CurrentValue), Sum(i.PriorValue)" & vbCrLf
+    s = s & "FROM qryBalanceItems AS i" & vbCrLf
+    s = s & "GROUP BY i.ClassNo" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 4, '', 9, '', 'T', 'إجمالي الخصوم وحقوق الملكية', Null, CCur(Nz(Sum(i.CurrentValue), 0)), CCur(Nz(Sum(i.PriorValue), 0))" & vbCrLf
+    s = s & "FROM qryBalanceItems AS i" & vbCrLf
+    s = s & "WHERE i.ClassNo IN (2, 3)" & vbCrLf
+    s = s & "ORDER BY ClassNo, GroupKey, Pos, AccountKey" & vbCrLf
+    SaveQuery "BalanceSheetQuery", "الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة", s
 End Sub
 
 Private Sub Q_AccountTreeQuery()

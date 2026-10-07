@@ -100,5 +100,50 @@ def general_ledger() -> ReportModel:
                    '=[LedgerCode] & "  " & [LedgerName]', False)
 
 
+# --------------------------------------------------------------- financial statements
+# account amounts in the first column of each period, totals and results in the second
+CAPTION_EXPR = ('=IIf([RowKind]="A","      " & [Caption],IIf([RowKind]="S","إجمالي " & [Caption],[Caption]))')
+TOTAL_KINDS = '[RowKind]="S" Or [RowKind]="T" Or [RowKind]="R"'
+
+
+def _financial(name, caption, query, sorts):
+    from reports_catalog import title_block, page_footer
+    m = ReportModel(name, caption, W,
+                    {SEC_PAGE_HEADER: cm(3.6), SEC_DETAIL: cm(0.6), SEC_PAGE_FOOTER: cm(0.6)},
+                    record_source=query, group="", sorts=sorts, page_setup=True,
+                    no_data="لا توجد قيود للفترة المحددة.")
+    y = title_block(m, caption, W, True)
+    name_w, col_w = cm(8.2), (W - cm(8.2)) // 4
+    m.add(SEC_PAGE_HEADER, Control("rect", "boxColumns", 0, y, W, cm(1.25),
+                                   {"BackStyle": 1, "BackColor": Sym("CLR_SECONDARY")}, decorative=True))
+    lbl(m, SEC_PAGE_HEADER, "lblItem", "البند", 0, y + cm(0.35), name_w, cm(0.5), 9, True, align=2)
+    lbl(m, SEC_PAGE_HEADER, "lblCurrent", "الفترة الحالية", name_w, y + cm(0.08), 2 * col_w, cm(0.5), 9, True,
+        align=2)
+    lbl(m, SEC_PAGE_HEADER, "lblPrior", "فترة المقارنة", name_w + 2 * col_w, y + cm(0.08), W - name_w - 2 * col_w,
+        cm(0.5), 9, True, align=2)
+    txt(m, SEC_DETAIL, "txtItem", CAPTION_EXPR, 0, cm(0.05), name_w, cm(0.5), 9, grow=True)
+    for i, (head, col, kinds) in enumerate([("الحساب", "CurrentValue", '[RowKind]="A"'),
+                                            ("المجموع", "CurrentValue", TOTAL_KINDS),
+                                            ("الحساب", "PriorValue", '[RowKind]="A"'),
+                                            ("المجموع", "PriorValue", TOTAL_KINDS)]):
+        x = name_w + i * col_w
+        w = col_w if i < 3 else W - x
+        lbl(m, SEC_PAGE_HEADER, f"lblCol{i + 1}", head, x, y + cm(0.65), w, cm(0.5), 8, True, align=2)
+        txt(m, SEC_DETAIL, f"txtCol{i + 1}", f"=IIf({kinds},[{col}],Null)", x, cm(0.05), w, cm(0.5), 9,
+            bold=i % 2 == 1, align=2, fmt=MONEY)
+    page_footer(m, W)
+    return m
+
+
+def income_statement() -> ReportModel:
+    return _financial("rptIncomeStatement", "قائمة الدخل", "IncomeStatementQuery",
+                      [("Block", False), ("AccountKey", False)])
+
+
+def balance_sheet() -> ReportModel:
+    return _financial("rptBalanceSheet", "الميزانية العمومية (قائمة المركز المالي)", "BalanceSheetQuery",
+                      [("ClassNo", False), ("GroupKey", False), ("Pos", False), ("AccountKey", False)])
+
+
 def journal_reports() -> List[ReportModel]:
-    return [journal_entry(), account_statement(), general_ledger()]
+    return [journal_entry(), account_statement(), general_ledger(), income_statement(), balance_sheet()]
