@@ -378,8 +378,6 @@ Static_modStartup = _static("modStartup")
 Static_modForms = _static("modForms")
 Static_modScreens = _static("modScreens")
 
-if __name__ == "__main__":
-    unittest.main()
 
 
 class FormRecordAccessTests(unittest.TestCase):
@@ -438,3 +436,30 @@ class WindowFitTests(unittest.TestCase):
             self.assertTrue(set(m.fit) <= names, m.name)
             for line in gen_forms.fit_code_lines(m) if m.fit else []:
                 self.assertLess(len(line), 1000)
+
+
+class ControlPropertyTests(unittest.TestCase):
+    """BuildForms sets only properties the control type has: Access stops the whole screen
+    with error 438 otherwise (BackColor on the locked IsSystem check box of frmAccounts)."""
+
+    MISSING = {"AddCheck": {"BackColor", "ForeColor", "FontSize", "FontBold", "Caption", "TextAlign",
+                            "Format", "InputMask", "RowSource"},
+               "AddRect": {"FontSize", "Caption", "Locked", "ControlSource"},
+               "AddList": {"Caption", "Format", "InputMask"}}
+
+    def test_no_missing_properties(self):
+        with open(os.path.join(ROOT, "src", "vba", "modBuildForms.bas"), encoding="utf-8") as fh:
+            lines = fh.read().splitlines()
+        kind = None
+        for no, line in enumerate(lines, 1):
+            m = re.match(r'\s+Set c = (Add\w+)\(', line)
+            if m:
+                kind = m.group(1)
+                continue
+            m = re.match(r'\s+(?:c\.(\w+) =|SetCtlProp c, "(\w+)")', line)
+            if m and kind in self.MISSING:
+                self.assertNotIn(m.group(1) or m.group(2), self.MISSING[kind], f"line {no}: {line.strip()}")
+
+
+if __name__ == "__main__":
+    unittest.main()

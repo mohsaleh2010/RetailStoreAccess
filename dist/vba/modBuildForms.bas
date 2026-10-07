@@ -2720,7 +2720,6 @@ Private Sub BuildForm_frmAccounts()
     Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
     Set c = AddCheck("IsSystem", "IsSystem", 12134, 3487)
     SetCtlProp c, "Locked", True
-    c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
     Set c = AddLabel("lblIsSystem", "Õ”«» √”«”Ì ›Ì «·‰Ÿ«„", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "IsSystem", 0)
     Set c = AddText("AccountLevel", "AccountLevel", 7201, 3969, 2948, 425)

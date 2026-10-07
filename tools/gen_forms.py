@@ -100,8 +100,8 @@ def control_lines(c: F.Control):
         if key in HELPER_PROPS:
             continue
         out.append(f"    SetCtlProp c, {vba_str(key)}, {lit(value)}")
-        if key == "Locked" and value:
-            out.append("    c.BackColor = CLR_LOCKED")
+        if key == "Locked" and value and c.kind in ("text", "combo"):
+            out.append("    c.BackColor = CLR_LOCKED")     # a check box has no BackColor (error 438)
     for ev in c.events:
         out.append(f'    c.{EVENT_PROPERTY[ev]} = EP')
     return out
