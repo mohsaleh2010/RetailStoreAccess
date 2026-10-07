@@ -471,7 +471,8 @@ Public Sub VatShowReturn(ByVal frm As Access.Form, ByVal VatReturnID As Long)
     frm!txtFilingRef.Value = rs!FilingRef
     frm!txtPaidDate.Value = IIf(IsNull(rs!PaidDate), Date, rs!PaidDate)
     frm!txtPaidAmount.Value = IIf(Nz(rs!PaidAmount, 0) <> 0, rs!PaidAmount, IIf(rs!NetDue > 0, rs!NetDue, Null))
-    frm!cboPayAccount.Value = Nz(rs!PaidAccount, 1200)
+    frm!cboPayAccount.Value = Nz(rs!PaidAccount, IIf(IsNull(SettingValue("DefaultBankID")), 1200, _
+                                                     120000 + Nz(SettingValue("DefaultBankID"), 0)))
     If status = "FILED" Then
         info = "الإقرار " & rs!ReturnNumber & " معتمد في " & GDate(rs!FiledDate)
         If Nz(rs!PaidAmount, 0) <> 0 Then

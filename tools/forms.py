@@ -125,6 +125,7 @@ PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Ite
                 "FROM Products ORDER BY ProductName")
 EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName"
 PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder"
+BANK_ROWS = "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName"
 CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
 ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
@@ -232,7 +233,8 @@ DATA_SCREENS: List[DataScreen] = [
                                          button=("btnCalcVat", "احسب 15%", "CalcExpenseVat Me")),
             Fld("TotalAmount", locked=True), Fld("SupplierInvoiceRef"),
             Fld("CashBoxID", rows=CASHBOX_ROWS, hint="المصروف النقدي يُخصم من هذا الصندوق (يُختار صندوقك تلقائيًا)"),
-            Info("lblCashNote", "الدفع النقدي يُخصم من الصندوق"),
+            Fld("BankID", rows=BANK_ROWS, widths="0;6",
+                hint="التحويل البنكي يُخصم من هذا البنك (البنك الافتراضي تلقائيًا)"),
             Fld("Description", span=2),
         ]),
     DataScreen(
@@ -298,6 +300,20 @@ DATA_SCREENS: List[DataScreen] = [
                 Info("lblBoxNote", "الرصيد لا يُكتب يدويًا: يُحسب من المبيعات والسندات والمصروفات"),
                 Fld("Notes", span=2)]),
     DataScreen(
+        "frmBanks", "Banks", "البنوك", "الحسابات البنكية للمحل وأرصدتها", "treasury",
+        list_select="t.BankName AS [البنك], t.AccountNo AS [رقم الحساب]",
+        list_from="Banks AS t", list_order="t.BankName",
+        list_headers=[("البنك", 5.2), ("رقم الحساب", 3.2)],
+        search=["t.BankName", "t.AccountNo", "t.IBAN"], active="t.IsActive", unique=["BankName"],
+        extra_buttons=[("btnBankTx", "الحركات البنكية", 'OpenScreen "frmBankTx", 0, Me!BankID'),
+                       ("btnRecon", "التسوية البنكية", 'OpenScreen "frmBankRecon", 0, Me!BankID'),
+                       ("btnStatement", "كشف حساب", 'OpenScreen "frmLedger", 0, 120000 + Nz(Me!BankID, 0)')],
+        fields=[Fld("BankName", span=2), Fld("AccountNo"), Fld("IBAN"),
+                Fld("OpeningBalance", hint="رصيد الحساب في البنك عند بدء استخدام البرنامج"),
+                Fld("OpeningDate"), Fld("IsActive"),
+                Info("lblBankNote", "حساب البنك في الدليل = 120000 + رقمه، والرصيد من القيود"),
+                Fld("Notes", span=2)]),
+    DataScreen(
         "frmAccounts", "Accounts", "دليل الحسابات", "شجرة الحسابات: الحسابات الرئيسية والفرعية", "journal",
         list_select="t.AccountCode AS [الرقم], Space((t.AccountLevel - 1) * 3) & t.AccountName AS [الحساب], "
                     "IIf(t.IsPosting, 'فرعي', 'رئيسي') AS [النوع]",
@@ -343,6 +359,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("InvoicePrintMode", rows=INVOICE_PRINT_MODES, widths="0;6",
                 hint="عند حفظ فاتورة البيع أو المرتجع"),
             Fld("CreditBlockDays", hint="0 = لا يتوقف البيع الآجل بسبب التأخير"),
+            Fld("DefaultBankID", rows=BANK_ROWS, widths="0;6", hint="التحويلات البنكية في الفواتير والسندات تُقيَّد فيه"),
             Info("lblStoreNameNote"),
             Fld("AllowAdminCompanyName", hint="يظهر للمبرمج فقط"),
         ]),
@@ -419,6 +436,7 @@ SCREEN_PERMISSIONS = {
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
     "frmPeriodClosing": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN",
     "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
+    "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS",
 }
 
 
@@ -1069,6 +1087,8 @@ def all_forms() -> List[FormModel]:
     from forms_cash import cash_forms
     from forms_journal import journal_forms
     from forms_aging import aging_forms
+    from forms_bank import bank_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
-            + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms())
+            + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
+            + bank_forms())

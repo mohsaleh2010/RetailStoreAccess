@@ -19,19 +19,22 @@ Option Explicit
 
 Private Const SOURCE_QUERIES As String = "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase," & _
     "qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock," & _
-    "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn"
+    "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn,qryJournalBankTx"
 
 '==============================================================================
 ' Accounts and synchronisation
 '==============================================================================
 Public Sub EnsureAccounts()
-    ' a sub-account for each cash box and each expense type, then the levels of the tree (modAccounts)
+    ' a sub-account for each cash box, each bank and each expense type, then the levels of the tree (modAccounts)
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 110000 + b.CashBoxID, b.BoxName, 'ASSET', 1100, True, True FROM CashBoxes AS b " & _
         "WHERE 110000 + b.CashBoxID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 530000 + t.ExpenseTypeID, t.ExpenseTypeName, 'EXPENSE', 5300, True, True FROM ExpenseTypes AS t " & _
         "WHERE 530000 + t.ExpenseTypeID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
+        "SELECT 120000 + k.BankID, k.BankName, 'ASSET', 1210, True, True FROM Banks AS k " & _
+        "WHERE 120000 + k.BankID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
     RebuildAccountTree
 End Sub
 
@@ -223,6 +226,8 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "YEAR_CLOSE":       OpenScreen "frmPeriodClosing"
         Case "VAT_RETURN":       OpenScreen "frmVatReturn", 0, id
         Case "VAT_PAYMENT":      OpenScreen "frmVatReturn", 0, id
+        Case "BANK_OPENING":     OpenScreen "frmBanks", 0, id
+        Case "BANK_TX":          OpenScreen "frmBankTx", 0, DbValue("SELECT BankID FROM BankTransactions WHERE BankTxID = " & id)
         Case Else:               ShowWarning "القيد غير موجود."
     End Select
 End Sub

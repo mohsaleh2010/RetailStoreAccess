@@ -159,7 +159,9 @@ class SchemaStructureTests(unittest.TestCase):
                             # the VAT return: returns are negative adjustments, the VAT of a period
                             # may be a credit, corrections go both ways
                             "SalesStdAdjust", "SalesStdVAT", "SalesZeroAdjust", "SalesExemptAdjust",
-                            "PurchStdAdjust", "PurchStdVAT", "PurchZeroAdjust", "Corrections", "NetDue"}
+                            "PurchStdAdjust", "PurchStdVAT", "PurchZeroAdjust", "Corrections", "NetDue",
+                            # a bank account may be overdrawn; the operations in a reconciliation go both ways
+                            "StatementBalance", "BookBalance", "Outstanding", "ClearedAmount"}
         for t in TABLES:
             for f in t.fields:
                 if f.kind == "MONEY" and f.name not in allowed_negative:

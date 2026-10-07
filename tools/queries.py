@@ -40,9 +40,10 @@ P = ["PeriodStart", "PeriodEnd"]
 # modJournal.SyncJournal creates / refreshes one entry per (SourceType, SourceID).
 # --------------------------------------------------------------------------
 def cash_account(a):
-    """The cash box of a document (110000 + box), else 1190 (cash without a box) or 1200 (bank / card)."""
-    return (f"IIf({a}.CashBoxID Is Null, IIf({a}.PaymentMethodID Is Null Or {a}.PaymentMethodID = 1, 1190, 1200), "
-            f"110000 + {a}.CashBoxID)")
+    """The cash box of a document (110000 + box), else 1190 (cash without a box), the bank of a bank
+    transfer (120000 + bank), or 1200 (Mada / wallets waiting for the bank settlement)."""
+    return (f"IIf({a}.CashBoxID Is Null, IIf({a}.PaymentMethodID Is Null Or {a}.PaymentMethodID = 1, 1190, "
+            f"IIf({a}.BankID Is Null, 1200, 120000 + {a}.BankID)), 110000 + {a}.CashBoxID)")
 
 
 def jline(stype, key, number, when, party, order, account, debit, credit, text, source, where):
@@ -59,7 +60,8 @@ def jquery(branches):
 ZERO = "CCur(0)"
 JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournalPurchase", "qryJournalPurchaseReturn",
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
-                          "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn"]
+                          "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
+                          "qryJournalBankTx"]
 
 
 def _sale():
@@ -177,6 +179,35 @@ def _manual():
     k = ("'MANUAL'", "m.ManualEntryID", "m.EntryNumber", "m.EntryDate", "m.Description")
     return jline(*k, "m.LineNo", "m.LineAccount", "m.LineDebit", "m.LineCredit", "m.LineNote",
                  "qryManualEntryLines AS m", "m.LineDebit + m.LineCredit <> 0")
+
+
+def _bank_tx():
+    # BANK = the account of the bank of the transaction; 1200 holds Mada / wallet collections until settled
+    src, bank = "BankTransactions AS t", "120000 + t.BankID"
+    k = ("'BANK_TX'", "t.BankTxID", "t.TxNumber", "t.TxDate", "t.Description")
+    net = "t.Amount - t.FeeAmount - t.FeeVAT"
+
+    def kind(*types):
+        return " OR ".join(f"t.TxType = '{x}'" for x in types)
+    return jquery([
+        # deposit: cash box -> bank; withdraw: bank -> cash box
+        jline(*k, 1, bank, "t.Amount", ZERO, "'إيداع نقدية'", src, kind("DEPOSIT")),
+        jline(*k, 2, "110000 + t.CashBoxID", ZERO, "t.Amount", "'إيداع في البنك'", src, kind("DEPOSIT")),
+        jline(*k, 1, "110000 + t.CashBoxID", "t.Amount", ZERO, "'سحب من البنك'", src, kind("WITHDRAW")),
+        jline(*k, 2, bank, ZERO, "t.Amount", "'سحب نقدية'", src, kind("WITHDRAW")),
+        # Mada settlement: the collections leave 1200, the net reaches the bank, the fee is an expense
+        jline(*k, 1, bank, net, ZERO, "'صافي تسوية مدى'", src, f"t.TxType = 'SETTLEMENT' AND {net} <> 0"),
+        jline(*k, 2, 5610, "t.FeeAmount", ZERO, "'عمولة مدى'", src, "t.TxType = 'SETTLEMENT' AND t.FeeAmount <> 0"),
+        jline(*k, 3, 1500, "t.FeeVAT", ZERO, "'ضريبة العمولة'", src, "t.FeeVAT <> 0 AND (" + kind("SETTLEMENT", "OTHER_OUT") + ")"),
+        jline(*k, 4, 1200, ZERO, "t.Amount", "'تحصيلات مدى'", src, kind("SETTLEMENT")),
+        # between two banks
+        jline(*k, 1, "120000 + t.ToBankID", "t.Amount", ZERO, "'تحويل وارد'", src, kind("TRANSFER")),
+        jline(*k, 2, bank, ZERO, "t.Amount", "'تحويل صادر'", src, kind("TRANSFER")),
+        # other: the account chosen (interest, loans, owner...; bank charges with their VAT)
+        jline(*k, 1, bank, "t.Amount", ZERO, "t.Reference", src, kind("OTHER_IN")),
+        jline(*k, 2, "t.CounterAccount", ZERO, "t.Amount", "t.Description", src, kind("OTHER_IN")),
+        jline(*k, 1, "t.CounterAccount", "t.Amount - t.FeeVAT", ZERO, "t.Description", src, kind("OTHER_OUT")),
+        jline(*k, 2, bank, ZERO, "t.Amount", "t.Reference", src, kind("OTHER_OUT"))])
 
 
 def _year_close():
@@ -378,6 +409,7 @@ def _opening():
     kb = ("'BOX_OPENING'", "b.CashBoxID", "b.BoxName", "b.OpeningDate", "b.BoxName")
     kc = ("'CUSTOMER_OPENING'", "c.CustomerID", "c.CustomerName", "c.CreatedAt", "c.CustomerName")
     ks = ("'SUPPLIER_OPENING'", "s.SupplierID", "s.SupplierName", "s.CreatedAt", "s.SupplierName")
+    kk = ("'BANK_OPENING'", "k.BankID", "k.BankName", "k.OpeningDate", "k.BankName")
     pos, neg = "IIf({0}.OpeningBalance > 0, {0}.OpeningBalance, 0)", "IIf({0}.OpeningBalance < 0, -{0}.OpeningBalance, 0)"
     return jquery([
         jline(*kb, 1, "110000 + b.CashBoxID", "b.OpeningBalance", ZERO, "b.BoxName", "CashBoxes AS b",
@@ -390,7 +422,11 @@ def _opening():
         jline(*ks, 1, 2100, neg.format("s"), pos.format("s"), "s.SupplierName", "Suppliers AS s",
               "s.OpeningBalance <> 0"),
         jline(*ks, 2, 3900, pos.format("s"), neg.format("s"), "'رصيد افتتاحي'", "Suppliers AS s",
-              "s.OpeningBalance <> 0")])
+              "s.OpeningBalance <> 0"),
+        jline(*kk, 1, "120000 + k.BankID", pos.format("k"), neg.format("k"), "k.BankName", "Banks AS k",
+              "k.OpeningBalance <> 0"),
+        jline(*kk, 2, 3900, neg.format("k"), pos.format("k"), "'رصيد افتتاحي'", "Banks AS k",
+              "k.OpeningBalance <> 0")])
 
 QUERIES: List[Query] = [
 
@@ -1066,6 +1102,16 @@ SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق 
 FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID
 WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
+SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description,
+       CCur(0), t.Amount, t.EmployeeID
+FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
+WHERE t.TxType = 'DEPOSIT'
+UNION ALL
+SELECT t.CashBoxID, t.TxDate, 'BANK_WITHDRAW', 'سحب من البنك', t.TxNumber, k.BankName, t.Description,
+       t.Amount, CCur(0), t.EmployeeID
+FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
+WHERE t.TxType = 'WITHDRAW'
+UNION ALL
 SELECT b.CashBoxID, b.OpeningDate, 'OPENING', 'رصيد افتتاحي', '-', b.BoxName, b.Notes,
        b.OpeningBalance, CCur(0), Null
 FROM CashBoxes AS b
@@ -1195,6 +1241,34 @@ SELECT h.YearClosingID, h.ClosingNumber, h.ClosingDate, h.Notes, l.LineNumber AS
 FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClosingID = l.YearClosingID"""),
     Query("qryJournalYearClose", "أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة", _year_close()),
     Query("qryJournalVatReturn", "أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده", _vat_return()),
+    Query("qryJournalBankTx", "أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى", _bank_tx()),
+
+    # ================================================================ BANKS (modBank)
+    # every operation on the account of a bank (120000 + BankID), whatever made it: one item per
+    # operation, with its net amount (debit positive) and whether it appeared in a bank statement
+    Query("qryBankItemSums", "صافي كل عملية على حساب كل بنك في القيود", """
+SELECT l.AccountCode - 120000 AS BankID, e.SourceType, e.SourceID, Max(e.EntryDate) AS ItemDate,
+       Max(e.SourceNumber) AS ItemNumber, Max(e.Description) AS ItemText, Sum(l.Debit) - Sum(l.Credit) AS ItemAmount
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE l.AccountCode > 120000 AND l.AccountCode < 130000
+GROUP BY l.AccountCode, e.SourceType, e.SourceID"""),
+
+    Query("qryBankItems", "عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة", """
+SELECT i.BankID, i.SourceType, i.SourceID, i.ItemDate, i.ItemNumber, i.ItemText, i.ItemAmount,
+       t.TypeName, c.ReconciliationID, c.ClearedAmount, IIf(c.ClearingID Is Null, 0, 1) AS IsCleared
+FROM (qryBankItemSums AS i INNER JOIN JournalSourceTypes AS t ON i.SourceType = t.SourceType)
+     LEFT JOIN BankClearings AS c ON (i.BankID = c.BankID AND i.SourceType = c.SourceType AND i.SourceID = c.SourceID)
+WHERE i.ItemAmount <> 0"""),
+
+    Query("qryBankTotals", "رصيد كل بنك في الدفاتر", """
+SELECT BankID, Sum(ItemAmount) AS BookBalance, Max(ItemDate) AS LastItemDate
+FROM qryBankItemSums
+GROUP BY BankID"""),
+
+    Query("BankBalanceQuery", "أرصدة البنوك في الدفاتر", f"""
+SELECT k.BankID, k.BankName, k.AccountNo, k.IBAN, k.IsActive, {nz("t.BookBalance")} AS Balance, t.LastItemDate
+FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID
+ORDER BY k.BankName"""),
 
     Query("JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", f"""
 SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber,

@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -670,7 +670,8 @@ def account_upgrade_sub() -> str:
     out.append(f'    m_db.Execute "UPDATE [Accounts] SET [IsPosting] = False WHERE [AccountCode] IN ({headers})", '
                f'dbFailOnError')
     out.append(f'    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN ({system}) OR '
-               f'[AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError')
+               f'[AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 120001 AND 129999 OR '
+               f'[AccountCode] BETWEEN 530001 AND 539999", dbFailOnError')
     out.append("End Sub")
     return "\n".join(out)
 

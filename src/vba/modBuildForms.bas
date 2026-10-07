@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -573,6 +573,7 @@ Private Sub BuildAllForms()
     BuildForm_frmUnits
     BuildForm_frmExpenseTypes
     BuildForm_frmCashBoxes
+    BuildForm_frmBanks
     BuildForm_frmAccounts
     BuildForm_frmSettings
     BuildForm_frmLabelSettings
@@ -621,6 +622,8 @@ Private Sub BuildAllForms()
     BuildForm_frmVatReturn
     BuildForm_frmAging
     BuildForm_frmAllocation
+    BuildForm_frmBankTx
+    BuildForm_frmBankRecon
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -1639,7 +1642,10 @@ Private Sub BuildForm_frmExpenses()
     SetCtlProp c, "ControlTipText", "المصروف النقدي يُخصم من هذا الصندوق (يُختار صندوقك تلقائيًا)"
     SetCtlProp c, "StatusBarText", "المصروف النقدي يُخصم من هذا الصندوق (يُختار صندوقك تلقائيًا)"
     Set c = AddLabel("lblCashBoxID", "صُرف من صندوق", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "CashBoxID", 0)
-    Set c = AddLabel("lblCashNote", "الدفع النقدي يُخصم من الصندوق", 10376, 3969, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddCombo("BankID", "BankID", 12134, 3969, 2948, 425, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3402")
+    SetCtlProp c, "ControlTipText", "التحويل البنكي يُخصم من هذا البنك (البنك الافتراضي تلقائيًا)"
+    SetCtlProp c, "StatusBarText", "التحويل البنكي يُخصم من هذا البنك (البنك الافتراضي تلقائيًا)"
+    Set c = AddLabel("lblBankID", "البنك", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "BankID", 0)
     Set c = AddText("Description", "Description", 7201, 4536, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
@@ -2291,6 +2297,129 @@ EH:
     AbortForm "frmCashBoxes", Err.Number, Err.Description
 End Sub
 
+Private Sub BuildForm_frmBanks()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmBanks", "البنوك", "SELECT * FROM Banks", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=Banks|PK=BankID|LIST=SELECT t.BankID, t.BankName AS [البنك], t.AccountNo AS [رقم الحساب] FROM Banks AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.BankName|SEARCH=t.BankName,t.AccountNo,t.IBAN|ACTIVE=t.IsActive|UNIQUE=BankName"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "البنوك", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "الحسابات البنكية للمحل وأرصدتها", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", "تراجع", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnBankTx", "الحركات البنكية", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnRecon", "التسوية البنكية", 7937, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnStatement", "كشف حساب", 9751, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddCheck("chkShowInactive", "", 227, 2579)
+    SetCtlProp c, "DefaultValue", "False"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 3, "0;2948;1814", True)
+    c.AfterUpdate = EP
+    Set c = AddText("BankName", "BankName", 7201, 1701, 7881, 425)
+    Set c = AddLabel("lblBankName", "اسم البنك / الحساب *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "BankName", 0)
+    Set c = AddText("AccountNo", "AccountNo", 7201, 2268, 2948, 425)
+    Set c = AddLabel("lblAccountNo", "رقم الحساب", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "AccountNo", 0)
+    Set c = AddText("IBAN", "IBAN", 12134, 2268, 2948, 425)
+    Set c = AddLabel("lblIBAN", "الآيبان", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "IBAN", 0)
+    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 2835, 2948, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    SetCtlProp c, "ControlTipText", "رصيد الحساب في البنك عند بدء استخدام البرنامج"
+    SetCtlProp c, "StatusBarText", "رصيد الحساب في البنك عند بدء استخدام البرنامج"
+    Set c = AddLabel("lblOpeningBalance", "الرصيد الافتتاحي", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
+    Set c = AddText("OpeningDate", "OpeningDate", 12134, 2835, 2948, 425)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblOpeningDate", "تاريخ الرصيد الافتتاحي", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "OpeningDate", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 3487)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblBankNote", "حساب البنك في الدليل = 120000 + رقمه، والرصيد من القيود", 10376, 3402, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 3969, 7881, 425)
+    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 4649, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnBankTx_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmBankTx"", 0, Me!BankID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRecon_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmBankRecon"", 0, Me!BankID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStatement_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmLedger"", 0, 120000 + Nz(Me!BankID, 0)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub chkShowInactive_AfterUpdate()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmBanks", s
+    Exit Sub
+EH:
+    AbortForm "frmBanks", Err.Number, Err.Description
+End Sub
+
 Private Sub BuildForm_frmAccounts()
     Dim c As Access.Control, s As String
     On Error GoTo EH
@@ -2518,7 +2647,11 @@ Private Sub BuildForm_frmSettings()
     SetCtlProp c, "ControlTipText", "0 = لا يتوقف البيع الآجل بسبب التأخير"
     SetCtlProp c, "StatusBarText", "0 = لا يتوقف البيع الآجل بسبب التأخير"
     Set c = AddLabel("lblCreditBlockDays", "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم)", 7768, 7938, 2268, 425, 10, False, CLR_MUTED, "CreditBlockDays", 0)
-    Set c = AddLabel("lblStoreNameNote", " ", 227, 8505, 14855, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddCombo("DefaultBankID", "DefaultBankID", 2552, 8505, 4989, 425, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3402")
+    SetCtlProp c, "ControlTipText", "التحويلات البنكية في الفواتير والسندات تُقيَّد فيه"
+    SetCtlProp c, "StatusBarText", "التحويلات البنكية في الفواتير والسندات تُقيَّد فيه"
+    Set c = AddLabel("lblDefaultBankID", "البنك الافتراضي للتحويلات البنكية", 227, 8505, 2268, 425, 10, False, CLR_MUTED, "DefaultBankID", 0)
+    Set c = AddLabel("lblStoreNameNote", " ", 7768, 8505, 7314, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddCheck("AllowAdminCompanyName", "AllowAdminCompanyName", 2552, 9157)
     SetCtlProp c, "ControlTipText", "يظهر للمبرمج فقط"
     SetCtlProp c, "StatusBarText", "يظهر للمبرمج فقط"
@@ -4321,6 +4454,7 @@ Private Sub BuildForm_frmActivation()
     c.OnClick = EP
     Set c = AddLabel("lblListCap", "الأجهزة المفعّلة", 227, 3572, 6804, 340, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstMachines", 227, 3941, 10319, 2041, 4, "0;2835;3118;2268", True)
+    c.RowSource = "SELECT ActivationID, ComputerName AS [الجهاز], MachineID AS [رقم الجهاز], ActivatedAt AS [تاريخ التفعيل] FROM Activations ORDER BY ActivatedAt"
     Set c = AddButton("btnRemove", "إلغاء تفعيل الجهاز المحدد", 227, 6095, 3175, 510, "danger")
     c.OnClick = EP
     Set c = AddRect("boxDeveloper", 227, 6776, 10319, 2126, CLR_SURFACE)
@@ -5695,6 +5829,8 @@ Private Sub BuildForm_frmTreasury()
     c.OnClick = EP
     Set c = AddButton("btnBoxes", "الصناديق", 8503, 1021, 1361, 482, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnBanks", "البنوك", 9977, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "رجوع", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblBoxesCap", "الخزينة والصناديق (الرصيد الآن)", 227, 1701, 5103, 312, 10, True, CLR_MUTED, "", 0)
@@ -5758,6 +5894,9 @@ Private Sub BuildForm_frmTreasury()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnBoxes_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmCashBoxes""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnBanks_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmBanks""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -6523,6 +6662,7 @@ Private Sub BuildForm_frmPeriodClosing()
     c.OnClick = EP
     Set c = AddLabel("lblHistoryCap", "سجل الإقفال وإعادة الفتح", 227, 5642, 6804, 340, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstHistory", 227, 6010, 12020, 2608, 7, "0;1588;1474;794;1928;2041;3402", True)
+    c.RowSource = "SELECT p.PeriodClosingID, IIf(p.ActionType = 'CLOSE', 'إقفال فترة', IIf(p.ActionType = 'REOPEN', 'إعادة فتح', IIf(p.ActionType = 'YEAR_CLOSE', 'إقفال سنة', 'إعادة فتح سنة'))) AS [العملية], p.ClosedThrough AS [مقفلة حتى], p.FiscalYear AS [السنة], e.EmployeeName AS [بواسطة], p.CreatedAt AS [في], p.Notes AS [السبب] FROM PeriodClosings AS p INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID ORDER BY p.PeriodClosingID DESC"
     Set c = AddButton("btnClose", "إغلاق", 10773, 8845, 1474, 567, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -6623,6 +6763,7 @@ Private Sub BuildForm_frmVatReturn()
     c.OnClick = EP
     Set c = AddLabel("lblHistoryCap", "الإقرارات المحفوظة (اختر إقرارًا لعرضه)", 227, 9129, 6804, 312, 9, True, CLR_MUTED, "", 0)
     Set c = AddList("lstReturns", 227, 9469, 12814, 1361, 8, "0;1814;1474;1474;1134;1701;1701;1474", True)
+    c.RowSource = "SELECT VatReturnID, ReturnNumber AS [الإقرار], Format(PeriodFrom, 'yyyy/mm/dd') AS [من], Format(PeriodTo, 'yyyy/mm/dd') AS [إلى], IIf(Status = 'FILED', 'معتمد', 'مسودة') AS [الحالة], Format(NetDue, '#,##0.00') AS [الصافي], Format(PaidAmount, '#,##0.00') AS [المسدد], Format(FiledDate, 'yyyy/mm/dd') AS [اعتُمد في] FROM VatReturns ORDER BY PeriodFrom DESC"
     c.AfterUpdate = EP
     Set c = AddButton("btnClose", "إغلاق", 13041, 10263, 1474, 567, "secondary")
     c.OnClick = EP
@@ -6818,4 +6959,220 @@ Private Sub BuildForm_frmAllocation()
     Exit Sub
 EH:
     AbortForm "frmAllocation", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmBankTx()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmBankTx", "الحركات البنكية", "", 14742, 10206, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 14742, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "الحركات البنكية", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "إيداع وسحب، تسوية تحصيلات مدى بعمولتها، التحويل بين البنوك، والحركات الأخرى", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboType", "", 227, 1304, 3175, 454, "DEPOSIT;إيداع نقدية من صندوق;WITHDRAW;سحب نقدية إلى صندوق;SETTLEMENT;تسوية تحصيلات مدى;TRANSFER;تحويل إلى بنك آخر;OTHER_IN;وارد آخر (فوائد أو قرض);OTHER_OUT;صادر آخر (رسوم بنكية وغيرها)", 2, "0;3062")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblType", "نوع الحركة", 227, 992, 3175, 284, 9, False, CLR_MUTED, "cboType", 0)
+    Set c = AddText("txtDate", "", 3515, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblDate", "التاريخ", 3515, 992, 1701, 284, 9, False, CLR_MUTED, "txtDate", 0)
+    Set c = AddCombo("cboBank", "", 5330, 1304, 2948, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblBank", "البنك", 5330, 992, 2948, 284, 9, False, CLR_MUTED, "cboBank", 0)
+    Set c = AddCombo("cboToBank", "", 8392, 1304, 2948, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblToBank", "إلى بنك (التحويل)", 8392, 992, 2948, 284, 9, False, CLR_MUTED, "cboToBank", 0)
+    Set c = AddCombo("cboBox", "", 11453, 1304, 3062, 454, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3969")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblBox", "الصندوق (إيداع / سحب)", 11453, 992, 3062, 284, 9, False, CLR_MUTED, "cboBox", 0)
+    Set c = AddText("txtAmount", "", 227, 2183, 1814, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblAmount", "المبلغ", 227, 1871, 1814, 284, 9, False, CLR_MUTED, "txtAmount", 0)
+    Set c = AddText("txtFee", "", 2155, 2183, 1588, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblFee", "عمولة مدى", 2155, 1871, 1588, 284, 9, False, CLR_MUTED, "txtFee", 0)
+    Set c = AddText("txtFeeVAT", "", 3856, 2183, 1588, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblFeeVAT", "ضريبة العمولة / الرسوم", 3856, 1871, 1588, 284, 9, False, CLR_MUTED, "txtFeeVAT", 0)
+    Set c = AddCombo("cboCounter", "", 5557, 2183, 3969, 454, "SELECT AccountCode, AccountCode & '  ' & AccountName FROM Accounts WHERE IsPosting = True AND IsActive = True AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, 2100) ORDER BY TreeKey", 2, "0;3856")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblCounter", "الحساب المقابل (الحركات الأخرى)", 5557, 1871, 3969, 284, 9, False, CLR_MUTED, "cboCounter", 0)
+    Set c = AddText("txtReference", "", 9639, 2183, 1814, 454)
+    Set c = AddLabel("lblReference", "مرجع البنك", 9639, 1871, 1814, 284, 9, False, CLR_MUTED, "txtReference", 0)
+    Set c = AddText("txtDescription", "", 11567, 2183, 2948, 454)
+    Set c = AddLabel("lblDescription", "البيان", 11567, 1871, 2948, 284, 9, False, CLR_MUTED, "txtDescription", 0)
+    Set c = AddLabel("lblInfo", " ", 227, 2778, 11113, 567, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnSave", "حفظ الحركة", 11567, 2835, 2948, 510, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblListCap", "الحركات المسجلة", 227, 3515, 6804, 312, 10, True, CLR_MUTED, "", 0)
+    Set c = AddList("lstTx", 227, 3856, 14288, 5443, 7, "0;1474;1361;1361;2268;1701;5670", True)
+    c.RowSource = "SELECT t.BankTxID, t.TxNumber AS [الرقم], Format(t.TxDate, 'yyyy/mm/dd') AS [التاريخ], IIf(t.TxType = 'DEPOSIT', 'إيداع', IIf(t.TxType = 'WITHDRAW', 'سحب', IIf(t.TxType = 'SETTLEMENT', 'تسوية مدى', IIf(t.TxType = 'TRANSFER', 'تحويل', IIf(t.TxType = 'OTHER_IN', 'وارد', 'صادر'))))) AS [النوع], k.BankName AS [البنك], Format(t.Amount, '#,##0.00') AS [المبلغ], t.Description AS [البيان] FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID ORDER BY t.TxDate DESC, t.BankTxID DESC"
+    Set c = AddButton("btnDelete", "حذف الحركة", 227, 9469, 1701, 510, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnRecon", "التسوية البنكية", 2041, 9469, 1928, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13041, 9469, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    BankTxLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboType_AfterUpdate()" & vbCrLf
+    s = s & "    BankTxTypeChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboBank_AfterUpdate()" & vbCrLf
+    s = s & "    BankTxRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboToBank_AfterUpdate()" & vbCrLf
+    s = s & "    BankTxRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboBox_AfterUpdate()" & vbCrLf
+    s = s & "    BankTxRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtAmount_AfterUpdate()" & vbCrLf
+    s = s & "    BankTxRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtFee_AfterUpdate()" & vbCrLf
+    s = s & "    BankTxRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtFeeVAT_AfterUpdate()" & vbCrLf
+    s = s & "    BankTxRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    SaveBankTx Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    DeleteSelectedBankTx Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRecon_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmBankRecon"", 0, Me!cboBank.Value" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmBankTx", s
+    Exit Sub
+EH:
+    AbortForm "frmBankTx", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmBankRecon()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmBankRecon", "التسوية البنكية", "", 15309, 10886, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "التسوية البنكية", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "مطابقة كشف البنك مع الدفاتر: علِّم العمليات الظاهرة في الكشف", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboBank", "", 227, 1304, 3062, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblBank", "البنك", 227, 992, 3062, 284, 9, False, CLR_MUTED, "cboBank", 0)
+    Set c = AddText("txtStatementDate", "", 3402, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblStatementDate", "تاريخ كشف البنك", 3402, 992, 1701, 284, 9, False, CLR_MUTED, "txtStatementDate", 0)
+    Set c = AddText("txtStatementBalance", "", 5216, 1304, 1928, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddLabel("lblStatementBalance", "رصيد الكشف في هذا التاريخ", 5216, 992, 1928, 284, 9, False, CLR_MUTED, "txtStatementBalance", 0)
+    Set c = AddButton("btnStart", "بدء / تحديث التسوية", 7258, 1304, 2381, 454, "primary")
+    c.OnClick = EP
+    Set c = AddText("txtReconID", "", 9752, 1304, 340, 454)
+    SetCtlProp c, "Visible", False
+    Set c = AddRect("boxBook", 227, 1899, 3600, 964, CLR_SURFACE)
+    Set c = AddLabel("lblBookCap", "الرصيد في الدفاتر", 369, 1984, 3316, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblBook", "-", 369, 2296, 3316, 482, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddRect("boxOutstanding", 3940, 1899, 3600, 964, CLR_SURFACE)
+    Set c = AddLabel("lblOutstandingCap", "عمليات لم تظهر في الكشف", 4082, 1984, 3316, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblOutstanding", "-", 4082, 2296, 3316, 482, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddRect("boxAdjusted", 7653, 1899, 3600, 964, CLR_SURFACE)
+    Set c = AddLabel("lblAdjustedCap", "الدفاتر بعد استبعادها", 7795, 1984, 3316, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblAdjusted", "-", 7795, 2296, 3316, 482, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddRect("boxDifference", 11366, 1899, 3600, 964, CLR_SURFACE)
+    Set c = AddLabel("lblDifferenceCap", "الفرق مع الكشف", 11508, 1984, 3316, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblDifference", "-", 11508, 2296, 3316, 482, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblState", " ", 227, 2920, 14855, 539, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblOpenCap", "عمليات الدفاتر غير المطابقة (حتى تاريخ الكشف)", 227, 3515, 7371, 312, 10, True, CLR_TEXT, "", 0)
+    Set c = AddList("lstOpen", 227, 3856, 7371, 4196, 7, "0;1134;1247;1247;1588;1021;1021", True)
+    SetCtlProp c, "MultiSelect", 2
+    c.OnDblClick = EP
+    Set c = AddLabel("lblClearedCap", "المطابقة في هذه التسوية", 7711, 3515, 7371, 312, 10, True, CLR_TEXT, "", 0)
+    Set c = AddList("lstCleared", 7711, 3856, 7371, 4196, 6, "0;1247;1474;1474;1361;1361", True)
+    SetCtlProp c, "MultiSelect", 2
+    c.OnDblClick = EP
+    Set c = AddButton("btnClear", "مطابقة المحدد", 227, 8165, 1928, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnAddTx", "حركة بنكية جديدة", 2268, 8165, 2155, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnRefresh", "تحديث", 4536, 8165, 1247, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnclear", "إلغاء المطابقة", 7711, 8165, 1928, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblReconsCap", "تسويات هذا البنك", 227, 8788, 6804, 312, 9, True, CLR_MUTED, "", 0)
+    Set c = AddList("lstRecons", 227, 9129, 7371, 1531, 5, "0;1588;1588;1928;1361", True)
+    c.AfterUpdate = EP
+    Set c = AddButton("btnFinish", "اعتماد التسوية", 7711, 9129, 1928, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnReopen", "إعادة فتح", 9752, 9129, 1474, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDeleteRecon", "حذف الجارية", 11339, 9129, 1588, 510, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13608, 10149, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    BankReconLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboBank_AfterUpdate()" & vbCrLf
+    s = s & "    BankReconBankChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstRecons_AfterUpdate()" & vbCrLf
+    s = s & "    BankReconPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstOpen_DblClick(Cancel As Integer)" & vbCrLf
+    s = s & "    BankReconClear Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstCleared_DblClick(Cancel As Integer)" & vbCrLf
+    s = s & "    BankReconUnclear Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStart_Click()" & vbCrLf
+    s = s & "    BankReconStart Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClear_Click()" & vbCrLf
+    s = s & "    BankReconClear Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAddTx_Click()" & vbCrLf
+    s = s & "    BankReconAddTx Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRefresh_Click()" & vbCrLf
+    s = s & "    BankReconRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnclear_Click()" & vbCrLf
+    s = s & "    BankReconUnclear Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnFinish_Click()" & vbCrLf
+    s = s & "    BankReconFinish Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReopen_Click()" & vbCrLf
+    s = s & "    BankReconReopen Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDeleteRecon_Click()" & vbCrLf
+    s = s & "    BankReconDelete Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmBankRecon", s
+    Exit Sub
+EH:
+    AbortForm "frmBankRecon", Err.Number, Err.Description
 End Sub

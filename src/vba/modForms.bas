@@ -472,6 +472,12 @@ Private Function ValidateExpense(ByVal frm As Access.Form) As Boolean
     Else
         frm!CashBoxID.Value = Null
     End If
+    ' a bank transfer leaves the default bank (modBank)
+    If Nz(frm!PaymentMethodID.Value, 0) <> BANK_TRANSFER_METHOD_ID Then
+        frm!BankID.Value = Null
+    ElseIf IsNull(frm!BankID.Value) Then
+        frm!BankID.Value = BankFor(frm!PaymentMethodID.Value, Nz(frm!TotalAmount.Value, 0))
+    End If
     If frm!ExpenseDate.Value > Date Then
         If Not AskYesNo("تاريخ المصروف في المستقبل. هل تريد الحفظ على أي حال؟") Then
             SafeFocus frm!ExpenseDate

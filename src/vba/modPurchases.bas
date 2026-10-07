@@ -136,6 +136,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     rs!RemainingAmount = remaining
     If remaining > 0 Then rs!DueDate = DueDateFor("S", SupplierID, docDate)       ' modAging
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), paid)      ' modCash
+    rs!BankID = BankFor(PaymentMethodID, paid)                                 ' modBank
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     rs.Update
     rs.Bookmark = rs.LastModified
@@ -303,6 +304,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
     rs!TotalAmount = sumTotal
     rs!RefundedAmount = refunded
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), refunded)
+    rs!BankID = BankFor(PaymentMethodID, refunded)
     rs.Update
     rs.Bookmark = rs.LastModified
     retID = rs!PurchaseReturnID
@@ -398,6 +400,7 @@ Public Function PostSupplierPayment(ByVal SupplierID As Long, ByVal Amount As Cu
     rs!Amount = Amount
     rs!PaymentMethodID = PaymentMethodID
     rs!CashBoxID = CashBoxFor(PaymentMethodID, Amount)
+    rs!BankID = BankFor(PaymentMethodID, Amount)
     rs!EmployeeID = CurrentUserID()
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     rs.Update

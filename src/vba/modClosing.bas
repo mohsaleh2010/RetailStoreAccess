@@ -57,7 +57,7 @@ Public Function ClosedRecordProblem(ByVal frm As Access.Form, Optional ByVal Del
                     p = ClosedPeriodProblem(frm!CreatedAt.Value)
                 End If
             End If
-        Case "CashBoxes"
+        Case "CashBoxes", "Banks"
             If Not frm.NewRecord Then
                 If Deleting Or Nz(frm!OpeningBalance.Value, 0) <> Nz(frm!OpeningBalance.OldValue, 0) Or _
                    Nz(frm!OpeningDate.Value, 0) <> Nz(frm!OpeningDate.OldValue, 0) Then

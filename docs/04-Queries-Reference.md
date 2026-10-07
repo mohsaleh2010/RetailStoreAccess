@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **117**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **122**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -96,33 +96,38 @@
 | 88 | [`qryYearCloseLines`](#qryyearcloselines) | أسطر قيود إقفال السنوات مع رأس كل إقفال |  |
 | 89 | [`qryJournalYearClose`](#qryjournalyearclose) | أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة |  |
 | 90 | [`qryJournalVatReturn`](#qryjournalvatreturn) | أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده |  |
-| 91 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 92 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 93 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 94 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 95 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 96 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
-| 97 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 98 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 99 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
-| 100 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 101 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
-| 102 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
-| 103 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 104 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 105 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 106 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 107 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 108 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 109 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 110 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 111 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 112 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 113 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 114 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 115 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 116 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 117 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 91 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
+| 92 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
+| 93 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
+| 94 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
+| 95 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
+| 96 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 97 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 98 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 99 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 100 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 101 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
+| 102 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 103 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 104 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 105 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 106 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
+| 107 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
+| 108 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 109 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 110 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 111 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 112 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 113 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 114 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 115 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 116 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 117 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 118 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 119 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 120 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 121 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 122 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -1340,6 +1345,16 @@ SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق 
 FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID
 WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
+SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description,
+       CCur(0), t.Amount, t.EmployeeID
+FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
+WHERE t.TxType = 'DEPOSIT'
+UNION ALL
+SELECT t.CashBoxID, t.TxDate, 'BANK_WITHDRAW', 'سحب من البنك', t.TxNumber, k.BankName, t.Description,
+       t.Amount, CCur(0), t.EmployeeID
+FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
+WHERE t.TxType = 'WITHDRAW'
+UNION ALL
 SELECT b.CashBoxID, b.OpeningDate, 'OPENING', 'رصيد افتتاحي', '-', b.BoxName, b.Notes,
        b.OpeningBalance, CCur(0), Null
 FROM CashBoxes AS b
@@ -1522,7 +1537,7 @@ GROUP BY ReferenceID
 أسطر قيود فواتير البيع
 
 ```sql
-SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, 1200), 110000 + h.CashBoxID) AS AccountCode, h.PaidAmount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText
+SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, IIf(h.BankID Is Null, 1200, 120000 + h.BankID)), 110000 + h.CashBoxID) AS AccountCode, h.PaidAmount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText
 FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
 WHERE h.PaidAmount <> 0
 UNION ALL
@@ -1560,7 +1575,7 @@ SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber
 FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
 WHERE r.Tax <> 0
 UNION ALL
-SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 3 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, 1200), 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.RefundedAmount AS Credit, c.CustomerName AS LineText
+SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 3 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, IIf(r.BankID Is Null, 1200, 120000 + r.BankID)), 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.RefundedAmount AS Credit, c.CustomerName AS LineText
 FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
 WHERE r.RefundedAmount <> 0
 UNION ALL
@@ -1590,7 +1605,7 @@ SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumbe
 FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
 WHERE h.Tax <> 0
 UNION ALL
-SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 3 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, 1200), 110000 + h.CashBoxID) AS AccountCode, CCur(0) AS Debit, h.PaidAmount AS Credit, s.SupplierName AS LineText
+SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 3 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, IIf(h.BankID Is Null, 1200, 120000 + h.BankID)), 110000 + h.CashBoxID) AS AccountCode, CCur(0) AS Debit, h.PaidAmount AS Credit, s.SupplierName AS LineText
 FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
 WHERE h.PaidAmount <> 0
 UNION ALL
@@ -1604,7 +1619,7 @@ WHERE h.RemainingAmount <> 0
 أسطر قيود مرتجعات الشراء
 
 ```sql
-SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, 1200), 110000 + r.CashBoxID) AS AccountCode, r.RefundedAmount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText
+SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, IIf(r.BankID Is Null, 1200, 120000 + r.BankID)), 110000 + r.CashBoxID) AS AccountCode, r.RefundedAmount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText
 FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID
 WHERE r.RefundedAmount <> 0
 UNION ALL
@@ -1626,7 +1641,7 @@ WHERE r.Tax <> 0
 أسطر قيود سندات القبض من العملاء والصرف للموردين
 
 ```sql
-SELECT 'CUSTOMER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, 1200), 110000 + p.CashBoxID) AS AccountCode, p.Amount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText
+SELECT 'CUSTOMER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, IIf(p.BankID Is Null, 1200, 120000 + p.BankID)), 110000 + p.CashBoxID) AS AccountCode, p.Amount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText
 FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID
 WHERE p.Amount <> 0
 UNION ALL
@@ -1638,7 +1653,7 @@ SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumbe
 FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
 WHERE p.Amount <> 0
 UNION ALL
-SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, 1200), 110000 + p.CashBoxID) AS AccountCode, CCur(0) AS Debit, p.Amount AS Credit, s.SupplierName AS LineText
+SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, IIf(p.BankID Is Null, 1200, 120000 + p.BankID)), 110000 + p.CashBoxID) AS AccountCode, CCur(0) AS Debit, p.Amount AS Credit, s.SupplierName AS LineText
 FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
 WHERE p.Amount <> 0
 ```
@@ -1656,7 +1671,7 @@ SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS Sour
 FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
 WHERE v.CashVoucherID Is Null AND e.Tax <> 0
 UNION ALL
-SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 3 AS LineOrder, IIf(e.CashBoxID Is Null, IIf(e.PaymentMethodID Is Null Or e.PaymentMethodID = 1, 1190, 1200), 110000 + e.CashBoxID) AS AccountCode, CCur(0) AS Debit, e.TotalAmount AS Credit, e.Description AS LineText
+SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 3 AS LineOrder, IIf(e.CashBoxID Is Null, IIf(e.PaymentMethodID Is Null Or e.PaymentMethodID = 1, 1190, IIf(e.BankID Is Null, 1200, 120000 + e.BankID)), 110000 + e.CashBoxID) AS AccountCode, CCur(0) AS Debit, e.TotalAmount AS Credit, e.Description AS LineText
 FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
 WHERE v.CashVoucherID Is Null AND e.TotalAmount <> 0
 ```
@@ -1745,6 +1760,14 @@ UNION ALL
 SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText
 FROM Suppliers AS s
 WHERE s.OpeningBalance <> 0
+UNION ALL
+SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 1 AS LineOrder, 120000 + k.BankID AS AccountCode, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Credit, k.BankName AS LineText
+FROM Banks AS k
+WHERE k.OpeningBalance <> 0
+UNION ALL
+SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText
+FROM Banks AS k
+WHERE k.OpeningBalance <> 0
 ```
 
 ## qryManualEntryLines
@@ -1815,6 +1838,112 @@ UNION ALL
 SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, v.PaidAccount AS AccountCode, CCur(0) AS Debit, v.PaidAmount AS Credit, v.FilingRef AS LineText
 FROM VatReturns AS v
 WHERE v.Status = 'FILED' AND v.PaidAmount <> 0
+```
+
+## qryJournalBankTx
+
+أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى
+
+```sql
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'إيداع نقدية' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'DEPOSIT'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 110000 + t.CashBoxID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'إيداع في البنك' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'DEPOSIT'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 110000 + t.CashBoxID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'سحب من البنك' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'WITHDRAW'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'سحب نقدية' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'WITHDRAW'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount - t.FeeAmount - t.FeeVAT AS Debit, CCur(0) AS Credit, 'صافي تسوية مدى' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'SETTLEMENT' AND t.Amount - t.FeeAmount - t.FeeVAT <> 0
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 5610 AS AccountCode, t.FeeAmount AS Debit, CCur(0) AS Credit, 'عمولة مدى' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'SETTLEMENT' AND t.FeeAmount <> 0
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 3 AS LineOrder, 1500 AS AccountCode, t.FeeVAT AS Debit, CCur(0) AS Credit, 'ضريبة العمولة' AS LineText
+FROM BankTransactions AS t
+WHERE t.FeeVAT <> 0 AND (t.TxType = 'SETTLEMENT' OR t.TxType = 'OTHER_OUT')
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 4 AS LineOrder, 1200 AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'تحصيلات مدى' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'SETTLEMENT'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.ToBankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'تحويل وارد' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'TRANSFER'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'تحويل صادر' AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'TRANSFER'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, t.Reference AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'OTHER_IN'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, t.CounterAccount AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, t.Description AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'OTHER_IN'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, t.CounterAccount AS AccountCode, t.Amount - t.FeeVAT AS Debit, CCur(0) AS Credit, t.Description AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'OTHER_OUT'
+UNION ALL
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, t.Reference AS LineText
+FROM BankTransactions AS t
+WHERE t.TxType = 'OTHER_OUT'
+```
+
+## qryBankItemSums
+
+صافي كل عملية على حساب كل بنك في القيود
+
+```sql
+SELECT l.AccountCode - 120000 AS BankID, e.SourceType, e.SourceID, Max(e.EntryDate) AS ItemDate,
+       Max(e.SourceNumber) AS ItemNumber, Max(e.Description) AS ItemText, Sum(l.Debit) - Sum(l.Credit) AS ItemAmount
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE l.AccountCode > 120000 AND l.AccountCode < 130000
+GROUP BY l.AccountCode, e.SourceType, e.SourceID
+```
+
+## qryBankItems
+
+عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة
+
+```sql
+SELECT i.BankID, i.SourceType, i.SourceID, i.ItemDate, i.ItemNumber, i.ItemText, i.ItemAmount,
+       t.TypeName, c.ReconciliationID, c.ClearedAmount, IIf(c.ClearingID Is Null, 0, 1) AS IsCleared
+FROM (qryBankItemSums AS i INNER JOIN JournalSourceTypes AS t ON i.SourceType = t.SourceType)
+     LEFT JOIN BankClearings AS c ON (i.BankID = c.BankID AND i.SourceType = c.SourceType AND i.SourceID = c.SourceID)
+WHERE i.ItemAmount <> 0
+```
+
+## qryBankTotals
+
+رصيد كل بنك في الدفاتر
+
+```sql
+SELECT BankID, Sum(ItemAmount) AS BookBalance, Max(ItemDate) AS LastItemDate
+FROM qryBankItemSums
+GROUP BY BankID
+```
+
+## BankBalanceQuery
+
+أرصدة البنوك في الدفاتر
+
+```sql
+SELECT k.BankID, k.BankName, k.AccountNo, k.IBAN, k.IsActive, CCur(Nz(t.BookBalance, 0)) AS Balance, t.LastItemDate
+FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID
+ORDER BY k.BankName
 ```
 
 ## JournalLinesQuery

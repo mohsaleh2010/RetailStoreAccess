@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=34;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=16;Customers=22;Products=23;SalesInvoices=36;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=19;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=10;ManualEntryLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=17;Roles=3;Permissions=28;RolePermissions=56;Employees=1;Screens=41;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=75;JournalSourceTypes=17;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=35;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=16;Customers=22;Products=23;SalesInvoices=37;SalesInvoiceDetails=14;SalesReturns=30;SalesReturnDetails=14;PurchaseInvoices=20;PurchaseInvoiceDetails=11;PurchaseReturns=19;PurchaseReturnDetails=11;CustomerPayments=12;SupplierPayments=12;Banks=9;BankTransactions=15;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=3;Expenses=14;CashVouchers=14;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=10;ManualEntryLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=19;Roles=3;Permissions=29;RolePermissions=58;Employees=1;Screens=44;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=76;JournalSourceTypes=19;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -583,6 +583,10 @@ Private Sub CreateAllTables()
     CreateTable_PurchaseReturnDetails
     CreateTable_CustomerPayments
     CreateTable_SupplierPayments
+    CreateTable_Banks
+    CreateTable_BankTransactions
+    CreateTable_BankReconciliations
+    CreateTable_BankClearings
     CreateTable_CustomerAllocations
     CreateTable_SupplierAllocations
     CreateTable_ExpenseTypes
@@ -676,6 +680,8 @@ Private Sub CreateTable_Settings()
              "", "", "«·”„«Õ ·„œÌ— «·‰Ÿ«„ » €ÌÌ— «”„ «·„Õ·", ""
     AddField tdf, "ClosedThrough", "DATETIME", 0, False, "", _
              "", "", "«·› —… „ﬁ›·… Õ Ï (·« Ìı÷«› Ê·« Ìı⁄œÛ¯· „” ‰œ » «—ÌŒ Õ Ï Â–« «·ÌÊ„)", ""
+    AddField tdf, "DefaultBankID", "LONG", 0, False, "", _
+             "", "", "«·»‰ﬂ «·«› —«÷Ì ·· ÕÊÌ·«  «·»‰ﬂÌ…", "«·„»«·€ «·„œ›Ê⁄… √Ê «·„” ·„… »ÿ—Ìﬁ… ´ ÕÊÌ· »‰ﬂÌª  ıﬁÌÛ¯œ ›Ì Õ”«» Â–« «·»‰ﬂ"
     AddField tdf, "CreditBlockDays", "INT", 0, False, "0", _
              ">=0", "⁄œœ «·√Ì«„ ·« ÌﬂÊ‰ ”«·»«", "≈Ìﬁ«› «·»Ì⁄ «·¬Ã· ·⁄„Ì· „ √Œ— √ﬂÀ— „‰ (ÌÊ„)", ""
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
@@ -1156,6 +1162,8 @@ Private Sub CreateTable_SalesInvoices()
              "", "", "«”„ «·⁄„Ì· ⁄·Ï «·ÿ·»", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
              "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "Ìı„·√ ⁄‰œ «·œ›⁄ «·‰ﬁœÌ: «·„»·€ «·„œ›Ê⁄ ÌœŒ· Â–« «·’‰œÊﬁ"
+    AddField tdf, "BankID", "LONG", 0, False, "", _
+             "", "", "«·»‰ﬂ", "«·„»·€ «·„ÕÊÛ¯· »‰ﬂÌ« ÌıﬁÌÛ¯œ ›Ì Õ”«» Â–« «·»‰ﬂ"
     AddIndex tdf, "PrimaryKey", "SalesInvoiceID", True, True, False
     AddIndex tdf, "UX_InvoiceNumber", "InvoiceNumber", False, True, False
     AddIndex tdf, "IX_InvoiceDate", "InvoiceDate", False, False, False
@@ -1261,6 +1269,8 @@ Private Sub CreateTable_SalesReturns()
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
              "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·—œ «·‰ﬁœÌ ÌŒ—Ã „‰ Â–« «·’‰œÊﬁ"
+    AddField tdf, "BankID", "LONG", 0, False, "", _
+             "", "", "«·»‰ﬂ", "«·„»·€ «·„ÕÊÛ¯· »‰ﬂÌ« ÌıﬁÌÛ¯œ ›Ì Õ”«» Â–« «·»‰ﬂ"
     AddIndex tdf, "PrimaryKey", "SalesReturnID", True, True, False
     AddIndex tdf, "UX_ReturnNumber", "ReturnNumber", False, True, False
     AddIndex tdf, "IX_ReturnDate", "ReturnDate", False, False, False
@@ -1344,6 +1354,8 @@ Private Sub CreateTable_PurchaseInvoices()
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
              "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·„œ›Ê⁄ ‰ﬁœ« ÌŒ—Ã „‰ Â–« «·’‰œÊﬁ"
+    AddField tdf, "BankID", "LONG", 0, False, "", _
+             "", "", "«·»‰ﬂ", "«·„»·€ «·„ÕÊÛ¯· »‰ﬂÌ« ÌıﬁÌÛ¯œ ›Ì Õ”«» Â–« «·»‰ﬂ"
     AddIndex tdf, "PrimaryKey", "PurchaseInvoiceID", True, True, False
     AddIndex tdf, "UX_InvoiceNumber", "InvoiceNumber", False, True, False
     AddIndex tdf, "IX_InvoiceDate", "InvoiceDate", False, False, False
@@ -1420,6 +1432,8 @@ Private Sub CreateTable_PurchaseReturns()
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
              "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·«” —œ«œ «·‰ﬁœÌ ÌœŒ· Â–« «·’‰œÊﬁ"
+    AddField tdf, "BankID", "LONG", 0, False, "", _
+             "", "", "«·»‰ﬂ", "«·„»·€ «·„ÕÊÛ¯· »‰ﬂÌ« ÌıﬁÌÛ¯œ ›Ì Õ”«» Â–« «·»‰ﬂ"
     AddIndex tdf, "PrimaryKey", "PurchaseReturnID", True, True, False
     AddIndex tdf, "UX_ReturnNumber", "ReturnNumber", False, True, False
     AddIndex tdf, "IX_ReturnDate", "ReturnDate", False, False, False
@@ -1480,6 +1494,8 @@ Private Sub CreateTable_CustomerPayments()
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
              "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·„»·€ «·‰ﬁœÌ ÌœŒ· Â–« «·’‰œÊﬁ"
+    AddField tdf, "BankID", "LONG", 0, False, "", _
+             "", "", "«·»‰ﬂ", "«·„»·€ «·„ÕÊÛ¯· »‰ﬂÌ« ÌıﬁÌÛ¯œ ›Ì Õ”«» Â–« «·»‰ﬂ"
     AddIndex tdf, "PrimaryKey", "PaymentID", True, True, False
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
@@ -1511,10 +1527,132 @@ Private Sub CreateTable_SupplierPayments()
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
              "", "", "’‰œÊﬁ «·‰ﬁœÌ…", "«·„»·€ «·‰ﬁœÌ ÌŒ—Ã „‰ Â–« «·’‰œÊﬁ"
+    AddField tdf, "BankID", "LONG", 0, False, "", _
+             "", "", "«·»‰ﬂ", "«·„»·€ «·„ÕÊÛ¯· »‰ﬂÌ« ÌıﬁÌÛ¯œ ›Ì Õ”«» Â–« «·»‰ﬂ"
     AddIndex tdf, "PrimaryKey", "PaymentID", True, True, False
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
     EndTable tdf, "œ›⁄«  «·„Ê—œÌ‰ (”‰œ«  «·’—›): «·„»«·€ «·„œ›Ê⁄… ··„Ê—œÌ‰ ·”œ«œ √—’œ Â„.", "", ""
+End Sub
+
+Private Sub CreateTable_Banks()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "Banks") Then Exit Sub
+    AddField tdf, "BankID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ «·»‰ﬂ", ""
+    AddField tdf, "BankName", "TEXT", 100, True, "", _
+             "", "", "«”„ «·»‰ﬂ / «·Õ”«»", ""
+    AddField tdf, "AccountNo", "TEXT", 30, False, "", _
+             "", "", "—ﬁ„ «·Õ”«»", ""
+    AddField tdf, "IBAN", "TEXT", 34, False, "", _
+             "", "", "«·¬Ì»«‰", ""
+    AddField tdf, "OpeningBalance", "MONEY", 0, True, "0", _
+             "", "", "«·—’Ìœ «·«›  «ÕÌ", "—’Ìœ «·Õ”«» ›Ì «·»‰ﬂ ⁄‰œ »œ¡ «” Œœ«„ «·»—‰«„Ã"
+    AddField tdf, "OpeningDate", "DATE", 0, True, "Date()", _
+             "", "", " «—ÌŒ «·—’Ìœ «·«›  «ÕÌ", ""
+    AddField tdf, "IsActive", "BOOL", 0, False, "True", _
+             "", "", "‰‘ÿ", ""
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "„·«ÕŸ« ", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "BankID", True, True, False
+    AddIndex tdf, "UX_BankName", "BankName", False, True, False
+    EndTable tdf, "«·»‰Êﬂ: ﬂ· Õ”«» »‰ﬂÌ ··„Õ·. Õ”«»Â ›Ì «·œ·Ì· 120000 + —ﬁ„Â  Õ  ´«·Õ”«»«  «·»‰ﬂÌ…ª (1210).", "", ""
+End Sub
+
+Private Sub CreateTable_BankTransactions()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "BankTransactions") Then Exit Sub
+    AddField tdf, "BankTxID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ œ«Œ·Ì", ""
+    AddField tdf, "TxNumber", "TEXT", 20, True, "", _
+             "", "", "—ﬁ„ «·Õ—ﬂ…", ""
+    AddField tdf, "TxDate", "DATE", 0, True, "Date()", _
+             "", "", "«· «—ÌŒ", ""
+    AddField tdf, "TxType", "TEXT", 12, True, "", _
+             "In (""DEPOSIT"",""WITHDRAW"",""SETTLEMENT"",""TRANSFER"",""OTHER_IN"",""OTHER_OUT"")", "≈Ìœ«⁄° ”Õ»°  ”ÊÌ… „œÏ°  ÕÊÌ·° Ê«—œ ¬Œ—° ’«œ— ¬Œ—", "«·‰Ê⁄", ""
+    AddField tdf, "BankID", "LONG", 0, True, "", _
+             "", "", "«·»‰ﬂ", ""
+    AddField tdf, "ToBankID", "LONG", 0, False, "", _
+             "", "", "≈·Ï »‰ﬂ", ""
+    AddField tdf, "CashBoxID", "LONG", 0, False, "", _
+             "", "", "«·’‰œÊﬁ", ""
+    AddField tdf, "CounterAccount", "LONG", 0, False, "", _
+             "", "", "«·Õ”«» «·„ﬁ«»·", ""
+    AddField tdf, "Amount", "MONEY", 0, True, "0", _
+             ">0", "«·„»·€ ÌÃ» √‰ ÌﬂÊ‰ √ﬂ»— „‰ ’›—", "«·„»·€", "›Ì  ”ÊÌ… „œÏ: ≈Ã„«·Ì «· Õ’Ì·«  ﬁ»· «·⁄„Ê·…"
+    AddField tdf, "FeeAmount", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "«·⁄„Ê·…", " ”ÊÌ… „œÏ: ⁄„Ê·… «·»‰ﬂ »œÊ‰ ÷—Ì»…"
+    AddField tdf, "FeeVAT", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "÷—Ì»… «·⁄„Ê·…", "÷—Ì»… „œŒ·«  ⁄·Ï «·⁄„Ê·…"
+    AddField tdf, "Reference", "TEXT", 40, False, "", _
+             "", "", "„—Ã⁄ «·»‰ﬂ", ""
+    AddField tdf, "Description", "TEXT", 255, False, "", _
+             "", "", "«·»Ì«‰", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "«·„ÊŸ›", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "BankTxID", True, True, False
+    AddIndex tdf, "UX_TxNumber", "TxNumber", False, True, False
+    AddIndex tdf, "IX_TxDate", "TxDate", False, False, False
+    EndTable tdf, "«·Õ—ﬂ«  «·»‰ﬂÌ…: ≈Ìœ«⁄ ‰ﬁœÌ… „‰ ’‰œÊﬁ° ”Õ» ≈·Ï ’‰œÊﬁ°  ”ÊÌ…  Õ’Ì·«  „œÏ (»⁄„Ê· Â«)°  ÕÊÌ· »Ì‰ »‰ﬂÌ‰° ÊÕ—ﬂ«  √Œ—Ï (⁄„Ê·« ° ›Ê«∆œ° ﬁ—Ê÷...) »Õ”«» „ﬁ«»·.", "[FeeAmount]+[FeeVAT]<[Amount] Or [TxType]<>""SETTLEMENT""", "«·⁄„Ê·… Ê÷—Ì» Â« √ﬁ· „‰ „»·€ «· ”ÊÌ…"
+End Sub
+
+Private Sub CreateTable_BankReconciliations()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "BankReconciliations") Then Exit Sub
+    AddField tdf, "ReconciliationID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ œ«Œ·Ì", ""
+    AddField tdf, "ReconNumber", "TEXT", 20, True, "", _
+             "", "", "—ﬁ„ «· ”ÊÌ…", ""
+    AddField tdf, "BankID", "LONG", 0, True, "", _
+             "", "", "«·»‰ﬂ", ""
+    AddField tdf, "StatementDate", "DATE", 0, True, "Date()", _
+             "", "", " «—ÌŒ ﬂ‘› «·»‰ﬂ", ""
+    AddField tdf, "StatementBalance", "MONEY", 0, True, "0", _
+             "", "", "—’Ìœ ﬂ‘› «·»‰ﬂ", ""
+    AddField tdf, "BookBalance", "MONEY", 0, True, "0", _
+             "", "", "«·—’Ìœ ›Ì «·œ›« — ›Ì «· «—ÌŒ", ""
+    AddField tdf, "Outstanding", "MONEY", 0, True, "0", _
+             "", "", "Õ—ﬂ«  ·„  ŸÂ— ›Ì «·ﬂ‘› (’«›Ì)", ""
+    AddField tdf, "Difference", "MONEY", 0, True, "0", _
+             "", "", "«·›—ﬁ", ""
+    AddField tdf, "Status", "TEXT", 10, True, """OPEN""", _
+             "In (""OPEN"",""DONE"")", "OPEN = Ã«—Ì…° DONE = „⁄ „œ…", "«·Õ«·…", ""
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "„·«ÕŸ« ", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "«·„ÊŸ›", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "ReconciliationID", True, True, False
+    AddIndex tdf, "UX_ReconNumber", "ReconNumber", False, True, False
+    AddIndex tdf, "IX_BankID", "BankID", False, False, False
+    EndTable tdf, "«· ”ÊÌ«  «·»‰ﬂÌ…: „ÿ«»ﬁ… ﬂ‘› «·»‰ﬂ ›Ì  «—ÌŒ „⁄ «·œ›« —: —’Ìœ «·ﬂ‘›° Ê«·—’Ìœ ›Ì «·œ›« —° Ê«·Õ—ﬂ«  €Ì— «·Ÿ«Â—… ›Ì «·ﬂ‘›.", "", ""
+End Sub
+
+Private Sub CreateTable_BankClearings()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "BankClearings") Then Exit Sub
+    AddField tdf, "ClearingID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ œ«Œ·Ì", ""
+    AddField tdf, "ReconciliationID", "LONG", 0, True, "", _
+             "", "", "«· ”ÊÌ…", ""
+    AddField tdf, "BankID", "LONG", 0, True, "", _
+             "", "", "«·»‰ﬂ", ""
+    AddField tdf, "SourceType", "TEXT", 20, True, "", _
+             "", "", "‰Ê⁄ «·⁄„·Ì…", ""
+    AddField tdf, "SourceID", "LONG", 0, True, "", _
+             "", "", "—ﬁ„ «·⁄„·Ì…", ""
+    AddField tdf, "ClearedAmount", "MONEY", 0, True, "0", _
+             "", "", "«·„»·€ ÌÊ„ «·„ÿ«»ﬁ… („œÌ‰ „ÊÃ»)", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "ClearingID", True, True, False
+    AddIndex tdf, "UX_BankID_SourceType_SourceID", "BankID,SourceType,SourceID", False, True, False
+    EndTable tdf, "Õ—ﬂ«  «·œ›« — «·„ÿ«»ﬁ… ·ﬂ‘› «·»‰ﬂ: ﬂ· ⁄„·Ì… ﬁÌœÂ« ⁄·Ï Õ”«» «·»‰ﬂ ŸÂ—  ›Ì ﬂ‘› «·»‰ﬂ: ‰Ê⁄ «·⁄„·Ì… Ê—ﬁ„Â« Ê„»·€Â« ÌÊ„ «·„ÿ«»ﬁ….", "", ""
 End Sub
 
 Private Sub CreateTable_CustomerAllocations()
@@ -1602,6 +1740,8 @@ Private Sub CreateTable_Expenses()
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
              "", "", "’ı—› „‰ ’‰œÊﬁ", "«·„’—Ê› «·‰ﬁœÌ ÌŒ—Ã „‰ Â–« «·’‰œÊﬁ∫ ›«—€ = ·„ Ìıœ›⁄ „‰ ’‰œÊﬁ"
+    AddField tdf, "BankID", "LONG", 0, False, "", _
+             "", "", "«·»‰ﬂ", "«·„»·€ «·„ÕÊÛ¯· »‰ﬂÌ« ÌıﬁÌÛ¯œ ›Ì Õ”«» Â–« «·»‰ﬂ"
     AddIndex tdf, "PrimaryKey", "ExpenseID", True, True, False
     AddIndex tdf, "UX_ExpenseNumber", "ExpenseNumber", False, True, False
     AddIndex tdf, "IX_ExpenseDate", "ExpenseDate", False, False, False
@@ -2210,7 +2350,9 @@ Private Sub Seed_Sequences()
     SeedRow "[SequenceName] = 'CASH_CLOSING'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('CASH_CLOSING', 'CLS-', 1, 6, ' ’›Ì… ÌÊ„Ì… «·ﬂ«‘Ì—')"
     SeedRow "[SequenceName] = 'JOURNAL'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('JOURNAL', 'JV-', 1, 6, 'ﬁÌÊœ «·ÌÊ„Ì…')"
     SeedRow "[SequenceName] = 'MANUAL_ENTRY'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('MANUAL_ENTRY', 'MJ-', 1, 6, '«·ﬁÌÊœ «·ÌœÊÌ…')"
-    EndSeed "Sequences", 17
+    SeedRow "[SequenceName] = 'BANK_TX'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('BANK_TX', 'BNK-', 1, 6, '«·Õ—ﬂ«  «·»‰ﬂÌ…')"
+    SeedRow "[SequenceName] = 'BANK_RECON'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('BANK_RECON', 'REC-', 1, 6, '«· ”ÊÌ«  «·»‰ﬂÌ…')"
+    EndSeed "Sequences", 19
 End Sub
 
 Private Sub Seed_Roles()
@@ -2245,13 +2387,14 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'MANUAL_ENTRY'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('MANUAL_ENTRY', '«·ﬁÌÊœ «·ÌœÊÌ…: ≈÷«›… Ê ⁄œÌ· ÊÕ–›', '«·Õ”«»« ', 76)") Then GrantNewPermission "MANUAL_ENTRY", "1,2"
     If SeedRow("[PermissionKey] = 'PERIOD_CLOSE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PERIOD_CLOSE', '≈ﬁ›«· «·› —«  Ê«·”‰… «·„«·Ì… Ê≈⁄«œ… › ÕÂ«', '«·Õ”«»« ', 77)") Then GrantNewPermission "PERIOD_CLOSE", "1"
     If SeedRow("[PermissionKey] = 'VAT_RETURN'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('VAT_RETURN', '≈ﬁ—«— ÷—Ì»… «·ﬁÌ„… «·„÷«›…: «·«⁄ „«œ Ê«·”œ«œ', '«·Õ”«»« ', 78)") Then GrantNewPermission "VAT_RETURN", "1,2"
+    If SeedRow("[PermissionKey] = 'BANKS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BANKS', '«·»‰Êﬂ: «·Õ”«»«  Ê«·Õ—ﬂ«  «·»‰ﬂÌ… Ê«· ”ÊÌ… «·»‰ﬂÌ…', '«·Œ“Ì‰…', 67)") Then GrantNewPermission "BANKS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', '«· ﬁ«—Ì— «· ‘€Ì·Ì…', '«· ﬁ«—Ì—', 70)") Then GrantNewPermission "REPORTS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', ' ﬁ«—Ì— «·√—»«Õ Ê«·÷—Ì»…', '«· ﬁ«—Ì—', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
     If SeedRow("[PermissionKey] = 'DASHBOARD_FINANCIAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', '«·√—ﬁ«„ «·„«·Ì… ›Ì ·ÊÕ… «· Õﬂ„', '«· ﬁ«—Ì—', 72)") Then GrantNewPermission "DASHBOARD_FINANCIAL", "1,2"
     If SeedRow("[PermissionKey] = 'SETTINGS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 80)") Then GrantNewPermission "SETTINGS", "1"
     If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', '«·„” Œœ„Ê‰ Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 81)") Then GrantNewPermission "USERS", "1"
     If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 82)") Then GrantNewPermission "BACKUP", "1"
-    EndSeed "Permissions", 28
+    EndSeed "Permissions", 29
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -2278,6 +2421,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'MANUAL_ENTRY')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'PERIOD_CLOSE')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'VAT_RETURN')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'BANKS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'DASHBOARD_FINANCIAL')"
@@ -2304,6 +2448,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'JOURNAL')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'MANUAL_ENTRY')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'VAT_RETURN')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'BANKS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'DASHBOARD_FINANCIAL')"
@@ -2312,7 +2457,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 56
+    EndSeed "RolePermissions", 58
 End Sub
 
 Private Sub Seed_Employees()
@@ -2356,15 +2501,18 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmPeriodClosing'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPeriodClosing', '≈ﬁ›«· «·› —«  Ê«·”‰… «·„«·Ì…', '«·Õ”«»« ', 310, 'PERIOD_CLOSE', False, False, False)"
     SeedRow "[ScreenName] = 'frmVatReturn'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmVatReturn', '≈ﬁ—«— ÷—Ì»… «·ﬁÌ„… «·„÷«›…', '«·Õ”«»« ', 320, 'VAT_RETURN', True, True, True)"
     SeedRow "[ScreenName] = 'frmAging'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAging', '√⁄„«— «·œÌÊ‰ («·⁄„·«¡ Ê«·„Ê—œÊ‰)', '«· ﬁ«—Ì—', 330, 'REPORTS', False, False, False)"
-    SeedRow "[ScreenName] = 'frmAllocation'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAllocation', '—»ÿ «·”œ«œ »«·›Ê« Ì—', '«·⁄„·«¡', 340, 'CUSTOMER_PAYMENTS', True, False, True)"
-    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', '«· ﬁ«—Ì—', '«· ﬁ«—Ì—', 350, 'REPORTS', False, False, False)"
-    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', '«·»ÕÀ', '«·‰Ÿ«„', 360, Null, False, False, False)"
-    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 370, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', '«·„” Œœ„Ê‰', '«·‰Ÿ«„', 380, 'USERS', True, True, False)"
-    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', '«·√œÊ«— Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 390, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', '’·«ÕÌ«  «·‘«‘«  ··„” Œœ„Ì‰', '«·‰Ÿ«„', 400, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 410, 'BACKUP', False, False, False)"
-    EndSeed "Screens", 41
+    SeedRow "[ScreenName] = 'frmBanks'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBanks', '«·»‰Êﬂ', '«·Œ“Ì‰…', 340, 'BANKS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmBankTx'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBankTx', '«·Õ—ﬂ«  «·»‰ﬂÌ…', '«·Œ“Ì‰…', 350, 'BANKS', True, False, True)"
+    SeedRow "[ScreenName] = 'frmBankRecon'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBankRecon', '«· ”ÊÌ… «·»‰ﬂÌ…', '«·Œ“Ì‰…', 360, 'BANKS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmAllocation'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAllocation', '—»ÿ «·”œ«œ »«·›Ê« Ì—', '«·⁄„·«¡', 370, 'CUSTOMER_PAYMENTS', True, False, True)"
+    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', '«· ﬁ«—Ì—', '«· ﬁ«—Ì—', 380, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', '«·»ÕÀ', '«·‰Ÿ«„', 390, Null, False, False, False)"
+    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', '≈⁄œ«œ«  «·„Õ·', '«·‰Ÿ«„', 400, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', '«·„” Œœ„Ê‰', '«·‰Ÿ«„', 410, 'USERS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', '«·√œÊ«— Ê«·’·«ÕÌ« ', '«·‰Ÿ«„', 420, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', '’·«ÕÌ«  «·‘«‘«  ··„” Œœ„Ì‰', '«·‰Ÿ«„', 430, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', '«·‰”Œ «·«Õ Ì«ÿÌ', '«·‰Ÿ«„', 440, 'BACKUP', False, False, False)"
+    EndSeed "Screens", 44
 End Sub
 
 Private Sub Seed_Categories()
@@ -2430,7 +2578,8 @@ Private Sub Seed_Accounts()
     SeedRow "[AccountCode] = 110001", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (110001, '«·Œ“Ì‰… «·—∆Ì”Ì…', 'ASSET', 1100, True, True)"
     SeedRow "[AccountCode] = 110002", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (110002, '’‰œÊﬁ «·ﬂ«‘Ì—', 'ASSET', 1100, True, True)"
     SeedRow "[AccountCode] = 1190", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1190, '‰ﬁœÌ… €Ì— „Ê“⁄… ⁄·Ï ’‰œÊﬁ', 'ASSET', 11, True, True)"
-    SeedRow "[AccountCode] = 1200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1200, '«·»‰ﬂ Ê«·‘»ﬂ… („œÏ Ê«· ÕÊÌ·« )', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1200", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1200, '„œÏ Ê«·„Õ«›Ÿ  Õ  «· ”ÊÌ… («·»‰ﬂ Ê«·‘»ﬂ…)', 'ASSET', 11, True, True)"
+    SeedRow "[AccountCode] = 1210", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1210, '«·Õ”«»«  «·»‰ﬂÌ…', 'ASSET', 11, False, True)"
     SeedRow "[AccountCode] = 1250", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1250, '‘Ìﬂ«   Õ  «· Õ’Ì·', 'ASSET', 11, True, False)"
     SeedRow "[AccountCode] = 1300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1300, '–„„ «·⁄„·«¡', 'ASSET', 11, True, True)"
     SeedRow "[AccountCode] = 1310", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (1310, '√Ê—«ﬁ «·ﬁ»÷', 'ASSET', 11, True, False)"
@@ -2491,7 +2640,7 @@ Private Sub Seed_Accounts()
     SeedRow "[AccountCode] = 5510", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5510, '«·»œ·«  Ê«·ÕÊ«›“', 'EXPENSE', 52, True, False)"
     SeedRow "[AccountCode] = 5520", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5520, '«· √„Ì‰«  «·«Ã „«⁄Ì…', 'EXPENSE', 52, True, False)"
     SeedRow "[AccountCode] = 5600", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5600, '≈Â·«ﬂ «·√’Ê· «·À«» …', 'EXPENSE', 52, True, False)"
-    SeedRow "[AccountCode] = 5610", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5610, '⁄„Ê·«  «·»‰Êﬂ Ê‰ﬁ«ÿ «·»Ì⁄', 'EXPENSE', 52, True, False)"
+    SeedRow "[AccountCode] = 5610", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5610, '⁄„Ê·«  «·»‰Êﬂ Ê‰ﬁ«ÿ «·»Ì⁄', 'EXPENSE', 52, True, True)"
     SeedRow "[AccountCode] = 5620", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5620, '«·—”Ê„ «·ÕﬂÊ„Ì… Ê«· —«ŒÌ’', 'EXPENSE', 52, True, False)"
     SeedRow "[AccountCode] = 5630", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5630, '«·œ⁄«Ì… Ê«·≈⁄·«‰', 'EXPENSE', 52, True, False)"
     SeedRow "[AccountCode] = 53", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (53, '„’—Ê›«  √Œ—Ï', 'EXPENSE', 5, False, True)"
@@ -2499,7 +2648,7 @@ Private Sub Seed_Accounts()
     SeedRow "[AccountCode] = 5700", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5700, '«·œÌÊ‰ «·„⁄œÊ„…', 'EXPENSE', 53, True, False)"
     SeedRow "[AccountCode] = 5800", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5800, '«·“ﬂ«…', 'EXPENSE', 53, True, False)"
     SeedRow "[AccountCode] = 5900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (5900, '„’—Ê›«  „ ‰Ê⁄…', 'EXPENSE', 53, True, True)"
-    EndSeed "Accounts", 75
+    EndSeed "Accounts", 76
 End Sub
 
 Private Sub Seed_JournalSourceTypes()
@@ -2521,7 +2670,9 @@ Private Sub Seed_JournalSourceTypes()
     SeedRow "[SourceType] = 'YEAR_CLOSE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('YEAR_CLOSE', 'ﬁÌœ ≈ﬁ›«· «·”‰…', 15)"
     SeedRow "[SourceType] = 'VAT_RETURN'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('VAT_RETURN', ' ”ÊÌ… ≈ﬁ—«— ÷—Ì»… «·ﬁÌ„… «·„÷«›…', 16)"
     SeedRow "[SourceType] = 'VAT_PAYMENT'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('VAT_PAYMENT', '”œ«œ ÷—Ì»… «·ﬁÌ„… «·„÷«›…', 17)"
-    EndSeed "JournalSourceTypes", 17
+    SeedRow "[SourceType] = 'BANK_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('BANK_OPENING', '—’Ìœ «›  «ÕÌ ·»‰ﬂ', 18)"
+    SeedRow "[SourceType] = 'BANK_TX'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('BANK_TX', 'Õ—ﬂ… »‰ﬂÌ…', 19)"
+    EndSeed "JournalSourceTypes", 19
 End Sub
 
 Private Sub Seed_TransactionTypes()
@@ -2551,6 +2702,7 @@ Private Sub UpgradeAccountTree()
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 1100 WHERE [AccountCode] = 110002 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1190 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1200 AND [ParentCode] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1210 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1250 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1300 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 11 WHERE [AccountCode] = 1310 AND [ParentCode] Is Null", dbFailOnError
@@ -2615,6 +2767,6 @@ Private Sub UpgradeAccountTree()
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5700 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5800 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5900 AND [ParentCode] Is Null", dbFailOnError
-    m_db.Execute "UPDATE [Accounts] SET [IsPosting] = False WHERE [AccountCode] IN (1, 11, 1100, 12, 2, 21, 22, 3, 31, 32, 4, 41, 42, 5, 51, 52, 5300, 53)", dbFailOnError
-    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN (1, 11, 1100, 110001, 110002, 1190, 1200, 1300, 1400, 1500, 1600, 12, 2, 21, 2100, 2200, 2250, 22, 3, 31, 3100, 3900, 32, 3300, 4, 41, 4100, 4110, 42, 4200, 4300, 5, 51, 5100, 5200, 52, 5300, 53, 5400, 5900) OR [AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [IsPosting] = False WHERE [AccountCode] IN (1, 11, 1100, 1210, 12, 2, 21, 22, 3, 31, 32, 4, 41, 42, 5, 51, 52, 5300, 53)", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN (1, 11, 1100, 110001, 110002, 1190, 1200, 1210, 1300, 1400, 1500, 1600, 12, 2, 21, 2100, 2200, 2250, 22, 3, 31, 3100, 3900, 32, 3300, 4, 41, 4100, 4110, 42, 4200, 4300, 5, 51, 5100, 5200, 52, 5300, 5610, 53, 5400, 5900) OR [AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 120001 AND 129999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError
 End Sub

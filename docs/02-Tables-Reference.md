@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **48** | عدد الحقول: **576**
+عدد الجداول: **52** | عدد الحقول: **627**
 
 ## الفهرس
 
@@ -32,28 +32,32 @@
 24. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
 25. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
 26. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
-27. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-28. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-29. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-30. [`Expenses`](#expenses) – المصروفات
-31. [`CashVouchers`](#cashvouchers) – سندات النقدية
-32. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-33. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-34. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-35. [`JournalEntries`](#journalentries) – قيود اليومية
-36. [`JournalLines`](#journallines) – أسطر القيود
-37. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-38. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-39. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-40. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-41. [`ManualEntries`](#manualentries) – القيود اليدوية
-42. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-43. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-44. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-45. [`StockCounts`](#stockcounts) – جلسات الجرد
-46. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-47. [`AuditLog`](#auditlog) – سجل العمليات
-48. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+27. [`Banks`](#banks) – البنوك
+28. [`BankTransactions`](#banktransactions) – الحركات البنكية
+29. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+30. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+31. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+32. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+33. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+34. [`Expenses`](#expenses) – المصروفات
+35. [`CashVouchers`](#cashvouchers) – سندات النقدية
+36. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+37. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+38. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+39. [`JournalEntries`](#journalentries) – قيود اليومية
+40. [`JournalLines`](#journallines) – أسطر القيود
+41. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+42. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+43. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+44. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+45. [`ManualEntries`](#manualentries) – القيود اليدوية
+46. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+47. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+48. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+49. [`StockCounts`](#stockcounts) – جلسات الجرد
+50. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+51. [`AuditLog`](#auditlog) – سجل العمليات
+52. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -94,7 +98,8 @@
 | 31 | InvoicePrintMode | Short Text | 10 | ✔ | `"PREVIEW"` | `In ("DIRECT","PREVIEW","NONE")` |  | الطباعة عند حفظ الفاتورة – DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة |
 | 32 | AllowAdminCompanyName | Yes/No |  |  | `False` |  |  | السماح لمدير النظام بتغيير اسم المحل |
 | 33 | ClosedThrough | Date/Time |  |  |  |  |  | الفترة مقفلة حتى (لا يُضاف ولا يُعدَّل مستند بتاريخ حتى هذا اليوم) |
-| 34 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
+| 34 | DefaultBankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك الافتراضي للتحويلات البنكية – المبالغ المدفوعة أو المستلمة بطريقة «تحويل بنكي» تُقيَّد في حساب هذا البنك |
+| 35 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -112,7 +117,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 17 سجل
+- بيانات أساسية: 19 سجل
 
 ## Roles
 
@@ -141,7 +146,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 28 سجل
+- بيانات أساسية: 29 سجل
 
 ## RolePermissions
 
@@ -153,7 +158,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 56 سجل
+- بيانات أساسية: 58 سجل
 
 ## Employees
 
@@ -201,7 +206,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 41 سجل
+- بيانات أساسية: 44 سجل
 
 ## UserScreens
 
@@ -441,6 +446,7 @@
 | 34 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
 | 35 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
 | 36 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
+| 37 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -508,6 +514,7 @@
 | 27 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
 | 28 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 29 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
+| 30 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -563,6 +570,7 @@
 | 17 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 18 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 19 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المدفوع نقدًا يخرج من هذا الصندوق |
+| 20 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 
 - المفتاح الأساسي: `PurchaseInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -615,6 +623,7 @@
 | 16 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 17 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 18 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الاسترداد النقدي يدخل هذا الصندوق |
+| 19 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 
 - المفتاح الأساسي: `PurchaseReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -658,6 +667,7 @@
 | 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 11 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المبلغ النقدي يدخل هذا الصندوق |
+| 12 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
@@ -680,10 +690,97 @@
 | 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 11 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المبلغ النقدي يخرج من هذا الصندوق |
+| 12 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
 - فهرس عادي: `PaymentDate`
+
+## Banks
+
+**البنوك** – كل حساب بنكي للمحل. حسابه في الدليل 120000 + رقمه تحت «الحسابات البنكية» (1210).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **BankID** 🔑 | AutoNumber |  |  |  |  |  | رقم البنك |
+| 2 | BankName | Short Text | 100 | ✔ |  |  |  | اسم البنك / الحساب |
+| 3 | AccountNo | Short Text | 30 |  |  |  |  | رقم الحساب |
+| 4 | IBAN | Short Text | 34 |  |  |  |  | الآيبان |
+| 5 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – رصيد الحساب في البنك عند بدء استخدام البرنامج |
+| 6 | OpeningDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الرصيد الافتتاحي |
+| 7 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 8 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `BankID`
+- فهرس فريد: `BankName`
+
+## BankTransactions
+
+**الحركات البنكية** – إيداع نقدية من صندوق، سحب إلى صندوق، تسوية تحصيلات مدى (بعمولتها)، تحويل بين بنكين، وحركات أخرى (عمولات، فوائد، قروض...) بحساب مقابل.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **BankTxID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | TxNumber | Short Text | 20 | ✔ |  |  |  | رقم الحركة |
+| 3 | TxDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | التاريخ |
+| 4 | TxType | Short Text | 12 | ✔ |  | `In ("DEPOSIT","WITHDRAW","SETTLEMENT","TRANSFER","OTHER_IN","OTHER_OUT")` |  | النوع |
+| 5 | BankID | Number (Long) |  | ✔ |  |  | `Banks.BankID` | البنك |
+| 6 | ToBankID | Number (Long) |  |  |  |  | `Banks.BankID` | إلى بنك |
+| 7 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | الصندوق |
+| 8 | CounterAccount | Number (Long) |  |  |  |  | `Accounts.AccountCode` | الحساب المقابل |
+| 9 | Amount | Currency |  | ✔ | `0` | `>0` |  | المبلغ – في تسوية مدى: إجمالي التحصيلات قبل العمولة |
+| 10 | FeeAmount | Currency |  | ✔ | `0` | `>=0` |  | العمولة – تسوية مدى: عمولة البنك بدون ضريبة |
+| 11 | FeeVAT | Currency |  | ✔ | `0` | `>=0` |  | ضريبة العمولة – ضريبة مدخلات على العمولة |
+| 12 | Reference | Short Text | 40 |  |  |  |  | مرجع البنك |
+| 13 | Description | Short Text | 255 |  |  |  |  | البيان |
+| 14 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 15 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `BankTxID`
+- فهرس فريد: `TxNumber`
+- فهرس عادي: `TxDate`
+- قاعدة تحقق على مستوى الجدول: `[FeeAmount]+[FeeVAT]<[Amount] Or [TxType]<>"SETTLEMENT"` – العمولة وضريبتها أقل من مبلغ التسوية
+
+## BankReconciliations
+
+**التسويات البنكية** – مطابقة كشف البنك في تاريخ مع الدفاتر: رصيد الكشف، والرصيد في الدفاتر، والحركات غير الظاهرة في الكشف.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ReconciliationID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | ReconNumber | Short Text | 20 | ✔ |  |  |  | رقم التسوية |
+| 3 | BankID | Number (Long) |  | ✔ |  |  | `Banks.BankID` | البنك |
+| 4 | StatementDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ كشف البنك |
+| 5 | StatementBalance | Currency |  | ✔ | `0` |  |  | رصيد كشف البنك |
+| 6 | BookBalance | Currency |  | ✔ | `0` |  |  | الرصيد في الدفاتر في التاريخ |
+| 7 | Outstanding | Currency |  | ✔ | `0` |  |  | حركات لم تظهر في الكشف (صافي) |
+| 8 | Difference | Currency |  | ✔ | `0` |  |  | الفرق |
+| 9 | Status | Short Text | 10 | ✔ | `"OPEN"` | `In ("OPEN","DONE")` |  | الحالة |
+| 10 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 11 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 12 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `ReconciliationID`
+- فهرس فريد: `ReconNumber`
+- فهرس عادي: `BankID`
+
+## BankClearings
+
+**حركات الدفاتر المطابقة لكشف البنك** – كل عملية قيدها على حساب البنك ظهرت في كشف البنك: نوع العملية ورقمها ومبلغها يوم المطابقة.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ClearingID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | ReconciliationID | Number (Long) |  | ✔ |  |  | `BankReconciliations.ReconciliationID` | التسوية |
+| 3 | BankID | Number (Long) |  | ✔ |  |  | `Banks.BankID` | البنك |
+| 4 | SourceType | Short Text | 20 | ✔ |  |  |  | نوع العملية |
+| 5 | SourceID | Number (Long) |  | ✔ |  |  |  | رقم العملية |
+| 6 | ClearedAmount | Currency |  | ✔ | `0` |  |  | المبلغ يوم المطابقة (مدين موجب) |
+| 7 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `ClearingID`
+- فهرس فريد: `BankID, SourceType, SourceID`
 
 ## CustomerAllocations
 
@@ -752,6 +849,7 @@
 | 11 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
 | 12 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 13 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صُرف من صندوق – المصروف النقدي يخرج من هذا الصندوق؛ فارغ = لم يُدفع من صندوق |
+| 14 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 
 - المفتاح الأساسي: `ExpenseID`
 - فهرس فريد: `ExpenseNumber`
@@ -839,7 +937,7 @@
 - المفتاح الأساسي: `AccountCode`
 - فهرس عادي: `ParentCode`
 - فهرس عادي: `TreeKey`
-- بيانات أساسية: 75 سجل
+- بيانات أساسية: 76 سجل
 
 ## JournalSourceTypes
 
@@ -852,7 +950,7 @@
 | 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 17 سجل
+- بيانات أساسية: 19 سجل
 
 ## JournalEntries
 

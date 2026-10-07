@@ -79,6 +79,9 @@ def control_lines(c: F.Control):
                    f"{p.get('ColumnCount', 1)}, {vba_str(widths)}, {lit(bool(p.get('ColumnHeads')))})")
         if p.get("RowSourceType") == "Value List":
             out.append('    c.RowSourceType = "Value List"')
+        if p.get("RowSource"):                  # a fixed row source (the screen code may change it)
+            assert len(p["RowSource"]) < 900, c.name
+            out.append(f"    c.RowSource = {vba_str(p['RowSource'])}")
         if "FontSize" in p:
             out.append(f"    c.FontSize = {p['FontSize']}")
     elif c.kind == "subform":
