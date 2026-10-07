@@ -1,0 +1,7 @@
+# Optional: the tests that use these skip when they are missing (python3 -m unittest discover -s tests).
+qrcode            # decodes the ZATCA QR images (test_sales)
+Pillow            # barcode / QR images
+numpy
+opencv-python-headless
+zxing-cpp         # reads the printed barcodes back (test_labels)
+# LibreOffice with python3-uno (not on PyPI) runs the VBA modules in tests/vba_harness.py.

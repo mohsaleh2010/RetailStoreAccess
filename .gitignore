@@ -2,3 +2,8 @@ __pycache__/
 *.pyc
 *.laccdb
 BuildFrontEnd.log
+
+# Access files built locally (BuildFrontEnd.vbs) and their logs
+*.accdb
+*.accde
+RunAllTests.log
