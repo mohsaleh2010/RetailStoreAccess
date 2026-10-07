@@ -461,5 +461,28 @@ class ControlPropertyTests(unittest.TestCase):
                 self.assertNotIn(m.group(1) or m.group(2), self.MISSING[kind], f"line {no}: {line.strip()}")
 
 
+
+class SharedTableScreenTests(unittest.TestCase):
+    """modForms runs table handlers (Case "<table>" on the TABLE tag). When two screens edit
+    one table, a handler written for one of them must check the screen name: UserCurrent of
+    frmUsers stopped frmEmployeePay (error 2465, lblPasswordState)."""
+
+    def test_handlers_of_shared_tables_check_the_screen(self):
+        import collections
+        screens = collections.defaultdict(list)
+        for m in MODELS:
+            found = re.search(r"\bTABLE=(\w+)", m.tag or "")
+            if found:
+                screens[found.group(1)].append(m.name)
+        shared = {t for t, names in screens.items() if len(names) > 1}
+        self.assertIn("Employees", shared)
+        with open(os.path.join(ROOT, "src", "vba", "modForms.bas"), encoding="utf-8") as fh:
+            text = fh.read()
+        for t in shared:
+            for case in re.finditer(rf'^        Case [^\n]*"{t}"[^\n]*\n(.*?)(?=^        Case |^    End Select)',
+                                    text, re.M | re.S):
+                self.assertIn("frm.Name = ", case.group(0), f"{t}: {case.group(0).strip()}")
+
+
 if __name__ == "__main__":
     unittest.main()
