@@ -192,6 +192,29 @@ class Store:
         self.sync_journal()
         return cid, profit
 
+    # ------------------------------------------------------------- VAT return (modVat.FileVatReturn)
+    VAT_FIELDS = ["SalesStdAmount", "SalesStdAdjust", "SalesStdVAT", "SalesZeroAmount", "SalesZeroAdjust",
+                  "SalesExemptAmount", "SalesExemptAdjust", "PurchStdAmount", "PurchStdAdjust", "PurchStdVAT",
+                  "PurchZeroAmount", "PurchZeroAdjust"]
+
+    def file_vat_return(self, totals, period_from, period_to, filed, corrections=0, carried=0, ref=None):
+        """Same steps as SaveVatDraft + FileVatReturn (without their checks): totals = the row of
+        qryVatReturnTotals for the period; box 16 = output VAT - input VAT + corrections - carried credit."""
+        values = {f: float(cur(totals[f])) for f in self.VAT_FIELDS}
+        net = cur(totals["SalesStdVAT"]) - cur(totals["PurchStdVAT"]) + cur(corrections) - cur(carried)
+        vid = self.insert("VatReturns", ReturnNumber="VAT-" + period_to[:10].replace("-", ""), PeriodFrom=period_from,
+                          PeriodTo=period_to, Status="FILED", Corrections=float(corrections),
+                          CarriedCredit=float(carried), NetDue=float(net), FiledDate=filed, FilingRef=ref,
+                          PaidAmount=0, EmployeeID=self.user, **values)
+        self.sync_journal()
+        return vid, net
+
+    def pay_vat_return(self, vid, paid, amount, account=1200):
+        """PayVatReturn: the payment entry, 2250 to the bank."""
+        self.c.execute("UPDATE VatReturns SET PaidDate = ?, PaidAmount = ?, PaidAccount = ? WHERE VatReturnID = ?",
+                       (paid, float(amount), account, vid))
+        return self.sync_journal()
+
     # ------------------------------------------------------------- journal (modJournal.SyncJournal)
     def sync_journal(self):
         """Same steps as SyncJournal: returns (added, updated, removed)."""

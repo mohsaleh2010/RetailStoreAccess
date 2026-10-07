@@ -19,7 +19,7 @@ Option Explicit
 
 Private Const SOURCE_QUERIES As String = "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase," & _
     "qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock," & _
-    "qryJournalOpening,qryJournalManual,qryJournalYearClose"
+    "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn"
 
 '==============================================================================
 ' Accounts and synchronisation
@@ -221,6 +221,8 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "SUPPLIER_OPENING": OpenScreen "frmSuppliers", 0, id
         Case "MANUAL":           OpenScreen "frmManualEntry", 0, id
         Case "YEAR_CLOSE":       OpenScreen "frmPeriodClosing"
+        Case "VAT_RETURN":       OpenScreen "frmVatReturn", 0, id
+        Case "VAT_PAYMENT":      OpenScreen "frmVatReturn", 0, id
         Case Else:               ShowWarning "القيد غير موجود."
     End Select
 End Sub
@@ -387,6 +389,7 @@ Public Function TestJournal() As Boolean
     Dim added As Long, updated As Long, removed As Long, ws As DAO.Workspace, inTrans As Boolean, id As Long
     Dim manualID As Long, jv As Variant, number As String, opening As Currency, debit As Currency, credit As Currency
     Dim fy As Long, profit As Currency, wasClosed As Date
+    Dim vatID As Long, vatFrom As Date, vatTo As Date, vatNet As Currency
     Calendar = vbCalGreg
     EnsureTestUser
     g_SilentMode = True
@@ -514,6 +517,35 @@ Public Function TestJournal() As Boolean
         CheckJournal Len(msg) = 0 And ClosedThroughDate() = wasClosed, "إعادة فتح الفترة " & msg, passed, failed, report
     End If
     CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+
+    ' the VAT return of last month (modVat): filed with a balanced settlement entry, paid, back to a draft
+    vatFrom = DateSerial(Year(Date), Month(Date) - 1, 1)
+    vatTo = DateSerial(Year(Date), Month(Date), 0)
+    If Len(VatOverlap(vatFrom, vatTo, 0)) = 0 And ClosedThroughDate() < Date Then
+        vatID = 0
+        msg = SaveVatDraft(vatFrom, vatTo, 0, 0, vatID)
+        CheckJournal Len(msg) = 0 And vatID > 0, "مسودة الإقرار الضريبي للشهر الماضي " & msg, passed, failed, report
+        msg = FileVatReturn(vatID, Date, "TEST")
+        vatNet = Nz(DbValue("SELECT SalesStdVAT - PurchStdVAT FROM VatReturns WHERE VatReturnID = " & vatID), 0)
+        CheckJournal Len(msg) = 0 And DbValue("SELECT Status FROM VatReturns WHERE VatReturnID = " & vatID) = "FILED" And _
+                     (vatNet = 0 Or Not IsNull(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = 'VAT_RETURN' " & _
+                                                       "AND SourceID = " & vatID))), _
+                     "اعتماد الإقرار ينشئ قيد التسوية " & msg, passed, failed, report
+        CheckJournal Nz(DbValue("SELECT Sum(l.Debit) - Sum(l.Credit) FROM JournalLines AS l INNER JOIN JournalEntries AS e " & _
+                                "ON l.EntryID = e.EntryID WHERE e.SourceType = 'VAT_RETURN' AND e.SourceID = " & vatID), 0) = 0, _
+                     "قيد التسوية متوازن", passed, failed, report
+        If vatNet > 0 Then
+            msg = PayVatReturn(vatID, Date, vatNet, 1200)
+            CheckJournal Len(msg) = 0 And Not IsNull(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = " & _
+                         "'VAT_PAYMENT' AND SourceID = " & vatID)), "سداد الضريبة ينشئ قيد السداد " & msg, passed, failed, report
+            msg = CancelVatPayment(vatID)
+        End If
+        msg = msg & UnfileVatReturn(vatID, "TEST")
+        CheckJournal Len(msg) = 0 And IsNull(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType LIKE 'VAT_*' " & _
+                     "AND SourceID = " & vatID)), "إلغاء الاعتماد والسداد يحذف القيدين " & msg, passed, failed, report
+    Else
+        Debug.Print "[--] الإقرار الضريبي: للشهر الماضي إقرار أو الفترة مقفلة"
+    End If
 
     ' closing last year: revenue and expenses to retained earnings, then reopened (when the years before it are closed)
     fy = Year(Date) - 1

@@ -7,6 +7,7 @@ The journal and the trial balance are list reports of reports_catalog.py."""
 from typing import List
 
 from reports import (ReportModel, MONEY, SEC_DETAIL, SEC_HEADER, SEC_FOOTER, SEC_PAGE_HEADER, SEC_PAGE_FOOTER,
+                     SEC_RPT_FOOTER,
                      lbl, txt, hline)
 from reports_docs import W, columns, signatures, store_block
 from forms import Control, Sym, cm
@@ -145,5 +146,44 @@ def balance_sheet() -> ReportModel:
                       [("ClassNo", False), ("GroupKey", False), ("Pos", False), ("AccountKey", False)])
 
 
+# ------------------------------------------------------------------ VAT return
+def vat_return() -> ReportModel:
+    from reports_catalog import title_block, page_footer
+    m = ReportModel("rptVatReturn", "إقرار ضريبة القيمة المضافة", W,
+                    {SEC_PAGE_HEADER: cm(3.7), SEC_DETAIL: cm(0.7), SEC_RPT_FOOTER: cm(2.2),
+                     SEC_PAGE_FOOTER: cm(0.6)},
+                    record_source="VatReturnQuery", group="", sorts=[("BoxNo", False)], page_setup=True,
+                    no_data="الإقرار غير موجود.")
+    y = title_block(m, "إقرار ضريبة القيمة المضافة", W, True)
+    txt(m, SEC_PAGE_HEADER, "txtReturn",
+        '="الإقرار: " & [ReturnNumber] & "    الحالة: " & IIf([Status]="FILED","معتمد في " & GDate([FiledDate]),'
+        '"مسودة (غير معتمد)") & IIf(IsNull([FilingRef]),"","    رقم الإقرار لدى الهيئة: " & [FilingRef])',
+        0, y, W, cm(0.55), 10, True)
+    y += cm(0.7)
+    num_w, amt_w = cm(1.2), cm(3.2)
+    text_w = W - num_w - 3 * amt_w
+    m.add(SEC_PAGE_HEADER, Control("rect", "boxColumns", 0, y, W, cm(0.7),
+                                   {"BackStyle": 1, "BackColor": Sym("CLR_SECONDARY")}, decorative=True))
+    cols = [("البند", "BoxNo", num_w, None), ("الوصف", "BoxText", text_w, None),
+            ("المبلغ (بدون الضريبة)", "Amount", amt_w, MONEY), ("التعديلات (المرتجعات)", "Adjust", amt_w, MONEY),
+            ("ضريبة القيمة المضافة", "VAT", W - num_w - text_w - 2 * amt_w, MONEY)]
+    x = 0
+    for i, (title, source, w, fmt) in enumerate(cols):
+        lbl(m, SEC_PAGE_HEADER, f"lblCol{i + 1}", title, x, y + cm(0.1), w, cm(0.5), 8, True, align=2)
+        txt(m, SEC_DETAIL, f"txtCol{i + 1}", source, x, cm(0.08), w, cm(0.55), 9, align=2 if fmt else 0, fmt=fmt,
+            grow=source == "BoxText")
+        x += w
+    assert x == W
+    hline(m, SEC_DETAIL, "lnRow", cm(0.66), W)
+    F = SEC_RPT_FOOTER
+    hline(m, F, "lnNet", cm(0.1), W)
+    txt(m, F, "txtNet", '=IIf(Sum(IIf([BoxNo]=16,[VAT],0))>=0,"صافي الضريبة المستحقة للسداد: ",'
+        '"ضريبة مستردة تُرحَّل للإقرار التالي: ") & Format(IIf(Sum(IIf([BoxNo]=16,[VAT],0))>=0,1,-1)*Sum(IIf([BoxNo]=16,[VAT],0)),"#,##0.00")',
+        0, cm(0.3), W, cm(0.7), 13, True)
+    signatures(m, F, cm(1.4), ["المحاسب", "المدير"])
+    page_footer(m, W)
+    return m
+
+
 def journal_reports() -> List[ReportModel]:
-    return [journal_entry(), account_statement(), general_ledger(), income_statement(), balance_sheet()]
+    return [journal_entry(), account_statement(), general_ledger(), income_statement(), balance_sheet(), vat_return()]

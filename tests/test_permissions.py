@@ -86,7 +86,8 @@ class EnforcementTests(unittest.TestCase):
         self.assertEqual({s[0] for s in doc_screens},
                          {"frmPOS", "frmTouchPOS", "frmCafePOS", "frmSalesReturn", "frmCustomerPayment",
                           "frmPurchaseInvoice", "frmPurchaseReturn", "frmSupplierPayment", "frmInventory",
-                          "frmStockCount", "frmCashVoucher", "frmCashClosing", "frmManualEntry"})
+                          "frmStockCount", "frmCashVoucher", "frmCashClosing", "frmManualEntry",
+                          "frmVatReturn"})
 
     def test_data_screens_check_add_edit_delete(self):
         text = read("modForms")

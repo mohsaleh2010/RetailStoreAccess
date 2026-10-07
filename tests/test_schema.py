@@ -155,7 +155,11 @@ class SchemaStructureTests(unittest.TestCase):
 
     def test_money_amounts_cannot_be_negative_except_balances(self):
         allowed_negative = {"OpeningBalance", "CurrentBalance", "DifferenceValue", "ExpectedBalance", "Difference",
-                            "NetProfit"}                     # a year closing may be a loss
+                            "NetProfit",                     # a year closing may be a loss
+                            # the VAT return: returns are negative adjustments, the VAT of a period
+                            # may be a credit, corrections go both ways
+                            "SalesStdAdjust", "SalesStdVAT", "SalesZeroAdjust", "SalesExemptAdjust",
+                            "PurchStdAdjust", "PurchStdVAT", "PurchZeroAdjust", "Corrections", "NetDue"}
         for t in TABLES:
             for f in t.fields:
                 if f.kind == "MONEY" and f.name not in allowed_negative:

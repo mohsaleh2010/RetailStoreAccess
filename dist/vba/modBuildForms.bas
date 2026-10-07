@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -618,6 +618,7 @@ Private Sub BuildAllForms()
     BuildForm_frmLedger
     BuildForm_frmFinancials
     BuildForm_frmPeriodClosing
+    BuildForm_frmVatReturn
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -6395,6 +6396,8 @@ Private Sub BuildForm_frmFinancials()
     c.OnClick = EP
     Set c = AddButton("btnClosing", "≈ﬁ›«· «·› —« ", 5669, 7485, 1701, 510, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnVat", "«·≈ﬁ—«— «·÷—Ì»Ì", 7483, 7485, 1814, 510, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "—ÃÊ⁄", 13721, 7485, 1361, 510, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -6436,13 +6439,16 @@ Private Sub BuildForm_frmFinancials()
     s = s & "Private Sub btnClosing_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmPeriodClosing"", 0" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnVat_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmVatReturn"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,12587,1304,1418,454,1000,0,0,0;lblCompare,227,1871,14855,312,0,1000,0,0;lstRows,227,3090,14855,3856,0,1000,0,1000;lblInfo,227,7031,14855,312,0,1000,1000,0;btnPrint,227,7485,1814,510,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnLedger,2154,7485,1588,510,0,0,1000,0;btnTrial,3855,7485,1701,510,0,0,1000,0;btnClosing,5669,7485,1701,510,0,0,1000,0;btnClose,13721,7485,1361,510,1000,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnLedger,2154,7485,1588,510,0,0,1000,0;btnTrial,3855,7485,1701,510,0,0,1000,0;btnClosing,5669,7485,1701,510,0,0,1000,0;btnVat,7483,7485,1814,510,0,0,1000,0;btnClose,13721,7485,1361,510,1000,0,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 15309, 8732, -2381, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmFinancials", s
@@ -6512,4 +6518,132 @@ Private Sub BuildForm_frmPeriodClosing()
     Exit Sub
 EH:
     AbortForm "frmPeriodClosing", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmVatReturn()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmVatReturn", "≈ﬁ—«— ÷—Ì»… «·ﬁÌ„… «·„÷«›…", "", 14742, 11000, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 14742, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8A5), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "≈ﬁ—«— ÷—Ì»… «·ﬁÌ„… «·„÷«›…", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "Œ«‰«  ‰„Ê–Ã ÂÌ∆… «·“ﬂ«… Ê«·÷—Ì»… Ê«·Ã„«—ﬂ „‰ «·„” ‰œ« ° À„ «·«⁄ „«œ ÊﬁÌœ «· ”ÊÌ… Ê«·”œ«œ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtFrom", "", 227, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblFrom", "»œ«Ì… «·› —… «·÷—Ì»Ì…", 227, 992, 1701, 284, 9, False, CLR_MUTED, "txtFrom", 0)
+    Set c = AddText("txtTo", "", 2041, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblTo", "‰Â«Ì… «·› —…", 2041, 992, 1701, 284, 9, False, CLR_MUTED, "txtTo", 0)
+    Set c = AddButton("btnLastMonth", "«·‘Â— «·„«÷Ì", 3856, 1304, 1474, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnLastQuarter", "«·—»⁄ «·„«÷Ì", 5443, 1304, 1474, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnCalc", "«Õ”»", 7031, 1304, 1361, 454, "primary")
+    c.OnClick = EP
+    Set c = AddText("txtReturnID", "", 8505, 1304, 567, 454)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblState", " ", 227, 1843, 14288, 567, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddList("lstBoxes", 227, 2466, 14288, 3912, 5, "680;7598;1928;1928;1928", True)
+    c.RowSourceType = "Value List"
+    Set c = AddText("txtCorrections", "", 227, 6804, 1928, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblCorrections", "14-  ’ÕÌÕ«  ”«»ﬁ… (+/-)", 227, 6492, 1928, 284, 9, False, CLR_MUTED, "txtCorrections", 0)
+    Set c = AddText("txtCarried", "", 2268, 6804, 1928, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblCarried", "15- —’Ìœ œ«∆‰ „—ÕÛ¯·", 2268, 6492, 1928, 284, 9, False, CLR_MUTED, "txtCarried", 0)
+    Set c = AddLabel("lblNetDue", " ", 4309, 6804, 5670, 454, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnSaveDraft", "Õ›Ÿ „”Êœ…", 10093, 6804, 1474, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrint", "ÿ»«⁄…", 11680, 6804, 1247, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDeleteDraft", "Õ–› «·„”Êœ…", 13041, 6804, 1474, 454, "danger")
+    c.OnClick = EP
+    Set c = AddText("txtFiledDate", "", 227, 7683, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblFiledDate", " «—ÌŒ «·«⁄ „«œ", 227, 7371, 1701, 284, 9, False, CLR_MUTED, "txtFiledDate", 0)
+    Set c = AddText("txtFilingRef", "", 2041, 7683, 2041, 454)
+    Set c = AddLabel("lblFilingRef", "—ﬁ„ «·≈ﬁ—«— ·œÏ «·ÂÌ∆…", 2041, 7371, 2041, 284, 9, False, CLR_MUTED, "txtFilingRef", 0)
+    Set c = AddText("txtNotes", "", 4196, 7683, 2948, 454)
+    Set c = AddLabel("lblNotes", "”»» ≈·€«¡ «·«⁄ „«œ", 4196, 7371, 2948, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddButton("btnFile", "«⁄ „«œ «·≈ﬁ—«—", 7258, 7683, 1701, 454, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnfile", "≈·€«¡ «·«⁄ „«œ", 9072, 7683, 1588, 454, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnEntry", "ﬁÌœ «· ”ÊÌ…", 10773, 7683, 1588, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddText("txtPaidDate", "", 227, 8562, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblPaidDate", " «—ÌŒ «·”œ«œ", 227, 8250, 1701, 284, 9, False, CLR_MUTED, "txtPaidDate", 0)
+    Set c = AddText("txtPaidAmount", "", 2041, 8562, 1701, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddLabel("lblPaidAmount", "«·„»·€ «·„”œœ", 2041, 8250, 1701, 284, 9, False, CLR_MUTED, "txtPaidAmount", 0)
+    Set c = AddCombo("cboPayAccount", "", 3856, 8562, 3289, 454, "", 2, "0;3175")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblPayAccount", "”ıœˆ¯œ  „‰ Õ”«»", 3856, 8250, 3289, 284, 9, False, CLR_MUTED, "cboPayAccount", 0)
+    Set c = AddButton("btnPay", " ”ÃÌ· «·”œ«œ", 7258, 8562, 1701, 454, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnpay", "≈·€«¡ «·”œ«œ", 9072, 8562, 1588, 454, "danger")
+    c.OnClick = EP
+    Set c = AddLabel("lblHistoryCap", "«·≈ﬁ—«—«  «·„Õ›ÊŸ… («Œ — ≈ﬁ—«—« ·⁄—÷Â)", 227, 9129, 6804, 312, 9, True, CLR_MUTED, "", 0)
+    Set c = AddList("lstReturns", 227, 9469, 12814, 1361, 8, "0;1814;1474;1474;1134;1701;1701;1474", True)
+    c.AfterUpdate = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13041, 10263, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    VatReturnLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtCorrections_AfterUpdate()" & vbCrLf
+    s = s & "    VatShowNet Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtCarried_AfterUpdate()" & vbCrLf
+    s = s & "    VatShowNet Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstReturns_AfterUpdate()" & vbCrLf
+    s = s & "    VatPickReturn Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnLastMonth_Click()" & vbCrLf
+    s = s & "    VatQuickPeriod Me, ""LASTMONTH""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnLastQuarter_Click()" & vbCrLf
+    s = s & "    VatQuickPeriod Me, ""LASTQUARTER""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCalc_Click()" & vbCrLf
+    s = s & "    VatCalculate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSaveDraft_Click()" & vbCrLf
+    s = s & "    VatSaveDraft Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintVatReturn Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDeleteDraft_Click()" & vbCrLf
+    s = s & "    VatDeleteDraft Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnFile_Click()" & vbCrLf
+    s = s & "    VatFile Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnfile_Click()" & vbCrLf
+    s = s & "    VatUnfile Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnEntry_Click()" & vbCrLf
+    s = s & "    VatOpenEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPay_Click()" & vbCrLf
+    s = s & "    VatPay Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnpay_Click()" & vbCrLf
+    s = s & "    VatUnpay Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmVatReturn", s
+    Exit Sub
+EH:
+    AbortForm "frmVatReturn", Err.Number, Err.Description
 End Sub

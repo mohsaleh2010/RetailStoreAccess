@@ -59,7 +59,7 @@ def jquery(branches):
 ZERO = "CCur(0)"
 JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournalPurchase", "qryJournalPurchaseReturn",
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
-                          "qryJournalOpening", "qryJournalManual", "qryJournalYearClose"]
+                          "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn"]
 
 
 def _sale():
@@ -147,8 +147,10 @@ def _cash_voucher():
               "v.VoucherType = 'IN'"),
         jline(*k, 2, "IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, 4200))", ZERO, "v.Amount",
               "v.Description", "CashVouchers AS v", "v.VoucherType = 'IN'"),
-        jline(*k, 1, out_account, "v.Amount", ZERO, "v.Description", out_src, "v.VoucherType = 'OUT'"),
+        # an expense with a tax invoice (its tax added later in the expenses screen): the tax is input VAT
+        jline(*k, 1, out_account, f"v.Amount - {nz('x.Tax')}", ZERO, "v.Description", out_src, "v.VoucherType = 'OUT'"),
         jline(*k, 2, "110000 + v.CashBoxID", ZERO, "v.Amount", "v.PartyName", out_src, "v.VoucherType = 'OUT'"),
+        jline(*k, 3, 1500, "x.Tax", ZERO, "'ضريبة المدخلات'", out_src, "v.VoucherType = 'OUT' AND x.Tax <> 0"),
         jline(*k, 1, "110000 + v.ToCashBoxID", "v.Amount", ZERO, "v.Description", "CashVouchers AS v",
               "v.VoucherType = 'TRANSFER'"),
         jline(*k, 2, "110000 + v.CashBoxID", ZERO, "v.Amount", "v.Description", "CashVouchers AS v",
@@ -181,6 +183,111 @@ def _year_close():
     k = ("'YEAR_CLOSE'", "y.YearClosingID", "y.ClosingNumber", "y.ClosingDate", "y.Notes")
     return jline(*k, "y.LineNo", "y.LineAccount", "y.LineDebit", "y.LineCredit", "y.LineNote",
                  "qryYearCloseLines AS y", "y.LineDebit + y.LineCredit <> 0")
+
+
+def _signed(x):
+    """(debit, credit) of a signed amount: positive on the debit side, negative on the credit side."""
+    return f"IIf({x} > 0, {x}, 0)", f"IIf({x} < 0, -{x}, 0)"
+
+
+def _vat_return():
+    # the filed return: output VAT (2200) and input VAT (1500) of the period closed into the VAT
+    # settlement account 2250, with the corrections of earlier periods; the credit carried from
+    # the return before is already a debit balance of 2250. The payment: 2250 to the bank.
+    src, filed = "VatReturns AS v", "v.Status = 'FILED'"
+    k = ("'VAT_RETURN'", "v.VatReturnID", "v.ReturnNumber", "v.FiledDate", "v.ReturnNumber")
+    kp = ("'VAT_PAYMENT'", "v.VatReturnID", "v.ReturnNumber", "v.PaidDate", "v.ReturnNumber")
+    net = "(v.SalesStdVAT - v.PurchStdVAT + v.Corrections)"
+    return jquery([
+        jline(*k, 1, 2200, *_signed("v.SalesStdVAT"), "'ضريبة المخرجات للفترة'", src,
+              f"{filed} AND v.SalesStdVAT <> 0"),
+        jline(*k, 2, 1500, *reversed(_signed("v.PurchStdVAT")), "'ضريبة المدخلات للفترة'", src,
+              f"{filed} AND v.PurchStdVAT <> 0"),
+        jline(*k, 3, 2200, *_signed("v.Corrections"), "'تصحيحات من الفترات السابقة'", src,
+              f"{filed} AND v.Corrections <> 0"),
+        jline(*k, 4, 2250, *reversed(_signed(net)), "'صافي ضريبة الفترة'", src, f"{filed} AND {net} <> 0"),
+        jline(*kp, 1, 2250, "v.PaidAmount", ZERO, "'سداد ضريبة القيمة المضافة'", src,
+              f"{filed} AND v.PaidAmount <> 0"),
+        jline(*kp, 2, "v.PaidAccount", ZERO, "v.PaidAmount", "v.FilingRef", src, f"{filed} AND v.PaidAmount <> 0")])
+
+
+# The boxes of the VAT return form (ZATCA): (box, caption, amount, adjustment, VAT, kind)
+# L = a line, T = a total, N = the net figures. Boxes the shop does not record (sales to citizens,
+# exports, imports, exempt purchases) stay zero; the user adds them through the corrections.
+_SALES = "v.SalesStdAmount + v.SalesZeroAmount + v.SalesExemptAmount"
+_SALES_ADJ = "v.SalesStdAdjust + v.SalesZeroAdjust + v.SalesExemptAdjust"
+VAT_BOXES = [
+    (1, "المبيعات الخاضعة للنسبة الأساسية (15%)", "v.SalesStdAmount", "v.SalesStdAdjust", "v.SalesStdVAT", "L"),
+    (2, "المبيعات للمواطنين (الخدمات الصحية الخاصة والتعليم الأهلي والمسكن الأول)", ZERO, ZERO, ZERO, "L"),
+    (3, "المبيعات المحلية الخاضعة للنسبة الصفرية", "v.SalesZeroAmount", "v.SalesZeroAdjust", ZERO, "L"),
+    (4, "الصادرات", ZERO, ZERO, ZERO, "L"),
+    (5, "المبيعات المعفاة", "v.SalesExemptAmount", "v.SalesExemptAdjust", ZERO, "L"),
+    (6, "إجمالي المبيعات", _SALES, _SALES_ADJ, "v.SalesStdVAT", "T"),
+    (7, "المشتريات الخاضعة للنسبة الأساسية (مع المصروفات بفاتورة ضريبية)", "v.PurchStdAmount", "v.PurchStdAdjust",
+     "v.PurchStdVAT", "L"),
+    (8, "الاستيرادات الخاضعة للنسبة الأساسية والمدفوعة ضريبتها في الجمارك", ZERO, ZERO, ZERO, "L"),
+    (9, "الاستيرادات الخاضعة للضريبة بآلية الاحتساب العكسي", ZERO, ZERO, ZERO, "L"),
+    (10, "المشتريات الخاضعة للنسبة الصفرية", "v.PurchZeroAmount", "v.PurchZeroAdjust", ZERO, "L"),
+    (11, "المشتريات المعفاة", ZERO, ZERO, ZERO, "L"),
+    (12, "إجمالي المشتريات", "v.PurchStdAmount + v.PurchZeroAmount", "v.PurchStdAdjust + v.PurchZeroAdjust",
+     "v.PurchStdVAT", "T"),
+    (13, "إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية", "Null", "Null",
+     "v.SalesStdVAT - v.PurchStdVAT", "N"),
+    (14, "تصحيحات من الفترات السابقة", "Null", "Null", "v.Corrections", "N"),
+    (15, "ضريبة القيمة المضافة المرحَّلة من الفترات السابقة (رصيد دائن)", "Null", "Null", "v.CarriedCredit", "N"),
+    (16, "صافي الضريبة المستحقة (سالب = مستردة)", "Null", "Null", "v.NetDue", "N"),
+]
+
+
+def _vat_boxes():
+    head = ("v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, "
+            "v.PaidDate, v.PaidAmount")
+    rows = []
+    for box, caption, amount, adjust, vat, kind in VAT_BOXES:
+        if box == 1:
+            rows.append(f"SELECT {box} AS BoxNo, '{caption}' AS BoxText, {amount} AS Amount, {adjust} AS Adjust, "
+                        f"{vat} AS VAT, '{kind}' AS RowKind, {head}\nFROM qryVatReturnHead AS v")
+        else:
+            rows.append(f"SELECT {box}, '{caption}', {amount}, {adjust}, {vat}, '{kind}', {head}\n"
+                        f"FROM qryVatReturnHead AS v")
+    return "\nUNION ALL\n".join(rows)
+
+
+def _vat_lines():
+    sale = ("SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID")
+    sret = ("SalesReturns AS r INNER JOIN SalesReturnDetails AS d ON r.SalesReturnID = d.SalesReturnID")
+    buy = ("PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d ON h.PurchaseInvoiceID = d.PurchaseInvoiceID")
+    pret = ("PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS d ON r.PurchaseReturnID = d.PurchaseReturnID")
+    cat = "IIf(d.VATRate > 0, 'S', 'Z')"
+    return f"""SELECT 'S' AS Side, d.VATCategory AS Category, h.InvoiceDate AS DocDate, d.NetAmount AS Amount,
+       {ZERO} AS Adjust, d.Tax AS VAT
+FROM {sale}
+UNION ALL
+SELECT 'S', d.VATCategory, r.ReturnDate, {ZERO}, -d.NetAmount, -d.Tax
+FROM {sret}
+UNION ALL
+SELECT 'P', {cat}, h.InvoiceDate, d.NetAmount, {ZERO}, d.Tax
+FROM {buy}
+UNION ALL
+SELECT 'P', {cat}, r.ReturnDate, {ZERO}, -d.NetAmount, -d.Tax
+FROM {pret}
+UNION ALL
+SELECT 'P', 'S', e.ExpenseDate, e.Amount, {ZERO}, e.Tax
+FROM Expenses AS e
+WHERE e.Tax <> 0"""
+
+
+def _vat_totals():
+    cols = []
+    for name, side, cat, col in [
+            ("SalesStdAmount", "S", "S", "Amount"), ("SalesStdAdjust", "S", "S", "Adjust"), ("SalesStdVAT", "S", "S", "VAT"),
+            ("SalesZeroAmount", "S", "Z", "Amount"), ("SalesZeroAdjust", "S", "Z", "Adjust"),
+            ("SalesExemptAmount", "S", "E", "Amount"), ("SalesExemptAdjust", "S", "E", "Adjust"),
+            ("PurchStdAmount", "P", "S", "Amount"), ("PurchStdAdjust", "P", "S", "Adjust"), ("PurchStdVAT", "P", "S", "VAT"),
+            ("PurchZeroAmount", "P", "Z", "Amount"), ("PurchZeroAdjust", "P", "Z", "Adjust")]:
+        expr = f"Sum(IIf(Side = '{side}' AND Category = '{cat}', {col}, 0))"
+        cols.append(f"{nz(expr)} AS {name}")
+    return "SELECT " + ",\n       ".join(cols) + f"\nFROM qryVatReturnLines\nWHERE {period('DocDate')}"
 
 
 def _tree_rollup():
@@ -659,6 +766,15 @@ SELECT QDate('PeriodStart') AS PeriodFrom, DateAdd('d', -1, QDate('PeriodEnd')) 
        o.OutputVAT - p.PurchaseVAT - e.ExpenseVAT AS NetVATDue
 FROM qryVatOutput AS o, qryVatInputPurchases AS p, qryVatInputExpenses AS e""", P),
 
+    # the VAT return (modVat, frmVatReturn): the lines of every taxable document by side
+    # (S sales, P purchases and expenses) and category (S standard, Z zero rate, E exempt)
+    Query("qryVatReturnLines", "أسطر الإقرار الضريبي: المبيعات والمشتريات والمصروفات بفئتها الضريبية", _vat_lines()),
+    Query("qryVatReturnTotals", "خانات الإقرار الضريبي للفترة محسوبة من المستندات (صف واحد)", _vat_totals(), P),
+    Query("qryVatReturnHead", "الإقرار الضريبي المختار", """
+SELECT * FROM VatReturns
+WHERE VatReturnID = QLong('VatReturnID')""", ["VatReturnID"]),
+    Query("VatReturnQuery", "إقرار ضريبة القيمة المضافة بخانات نموذج الهيئة (1 إلى 16)", _vat_boxes(), ["VatReturnID"]),
+
     # ============================================================ DASHBOARD
     # Own parameters (set by modDashboard), so the dashboard never changes the
     # period chosen in the report centre: DashDay = today, DashMonth = first day
@@ -962,6 +1078,7 @@ SELECT h.YearClosingID, h.ClosingNumber, h.ClosingDate, h.Notes, l.LineNumber AS
        l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote
 FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClosingID = l.YearClosingID"""),
     Query("qryJournalYearClose", "أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة", _year_close()),
+    Query("qryJournalVatReturn", "أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده", _vat_return()),
 
     Query("JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", f"""
 SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber,
@@ -1580,6 +1697,15 @@ CHECKS: List[Check] = [
           "SELECT InputVAT FROM VatSummaryQuery", -15),
     Check("الضريبة: الصافي المستحق = 204 + 15",
           "SELECT NetVATDue FROM VatSummaryQuery", 219),
+
+    # VAT return (the boxes of the form)
+    Check("الإقرار الضريبي: ضريبة المبيعات الخاضعة (الخانة 1) = ضريبة المخرجات",
+          "SELECT SalesStdVAT FROM qryVatReturnTotals", 204),
+    Check("الإقرار الضريبي: ضريبة المشتريات والمصروفات (الخانة 7) = ضريبة المدخلات",
+          "SELECT PurchStdVAT FROM qryVatReturnTotals", -15),
+    Check("الإقرار الضريبي: صافي المبيعات الخاضعة (الخانة 1 مع التعديلات) = صافي المبيعات",
+          "SELECT SalesStdAmount + SalesStdAdjust + SalesZeroAmount + SalesZeroAdjust + SalesExemptAmount + "
+          "SalesExemptAdjust FROM qryVatReturnTotals", 1360),
 
     # Printing
     Check("طباعة الفاتورة الآجلة: سطران",

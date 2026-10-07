@@ -21,10 +21,10 @@ Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtl
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
-    "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,Dashbo" & _
-    "ardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPa" & _
-    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatem" & _
-    "entQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVat" & _
+    "ReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJourna" & _
+    "lSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeR" & _
+    "ollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -546,6 +546,12 @@ Private Sub RunChecks()
         "SELECT InputVAT FROM VatSummaryQuery", -15
     Chk "«·÷—Ì»…: «·’«›Ì «·„” Õﬁ = 204 + 15", _
         "SELECT NetVATDue FROM VatSummaryQuery", 219
+    Chk "«·≈ﬁ—«— «·÷—Ì»Ì: ÷—Ì»… «·„»Ì⁄«  «·Œ«÷⁄… («·Œ«‰… 1) = ÷—Ì»… «·„Œ—Ã« ", _
+        "SELECT SalesStdVAT FROM qryVatReturnTotals", 204
+    Chk "«·≈ﬁ—«— «·÷—Ì»Ì: ÷—Ì»… «·„‘ —Ì«  Ê«·„’—Ê›«  («·Œ«‰… 7) = ÷—Ì»… «·„œŒ·« ", _
+        "SELECT PurchStdVAT FROM qryVatReturnTotals", -15
+    Chk "«·≈ﬁ—«— «·÷—Ì»Ì: ’«›Ì «·„»Ì⁄«  «·Œ«÷⁄… («·Œ«‰… 1 „⁄ «· ⁄œÌ·« ) = ’«›Ì «·„»Ì⁄« ", _
+        "SELECT SalesStdAmount + SalesStdAdjust + SalesZeroAmount + SalesZeroAdjust + SalesExemptAmount + SalesExemptAdjust FROM qryVatReturnTotals", 1360
     Chk "ÿ»«⁄… «·›« Ê—… «·¬Ã·…: ”ÿ—«‰", _
         "SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = " & R("INV2"), 2
     Chk "ÿ»«⁄… «·›« Ê—… «·¬Ã·…: „Ã„Ê⁄ «·√”ÿ— = 460", _
@@ -694,6 +700,10 @@ Private Sub CreateAllQueries()
     Q_qryVatInputPurchases
     Q_qryVatInputExpenses
     Q_VatSummaryQuery
+    Q_qryVatReturnLines
+    Q_qryVatReturnTotals
+    Q_qryVatReturnHead
+    Q_VatReturnQuery
     Q_DashboardQuery
     Q_qryDashboardTopProducts
     Q_qrySalesDocPrint
@@ -725,6 +735,7 @@ Private Sub CreateAllQueries()
     Q_qryJournalManual
     Q_qryYearCloseLines
     Q_qryJournalYearClose
+    Q_qryJournalVatReturn
     Q_JournalLinesQuery
     Q_qryJournalEntryPrint
     Q_qryTrialBefore
@@ -1241,6 +1252,105 @@ Private Sub Q_VatSummaryQuery()
     SaveQuery "VatSummaryQuery", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›… ··› —… (··≈ﬁ—«— «·÷—Ì»Ì)", s
 End Sub
 
+Private Sub Q_qryVatReturnLines()
+    Dim s As String
+    s = "SELECT 'S' AS Side, d.VATCategory AS Category, h.InvoiceDate AS DocDate, d.NetAmount AS Amount," & vbCrLf
+    s = s & "       CCur(0) AS Adjust, d.Tax AS VAT" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', d.VATCategory, r.ReturnDate, CCur(0), -d.NetAmount, -d.Tax" & vbCrLf
+    s = s & "FROM SalesReturns AS r INNER JOIN SalesReturnDetails AS d ON r.SalesReturnID = d.SalesReturnID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'P', IIf(d.VATRate > 0, 'S', 'Z'), h.InvoiceDate, d.NetAmount, CCur(0), d.Tax" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d ON h.PurchaseInvoiceID = d.PurchaseInvoiceID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'P', IIf(d.VATRate > 0, 'S', 'Z'), r.ReturnDate, CCur(0), -d.NetAmount, -d.Tax" & vbCrLf
+    s = s & "FROM PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS d ON r.PurchaseReturnID = d.PurchaseReturnID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'P', 'S', e.ExpenseDate, e.Amount, CCur(0), e.Tax" & vbCrLf
+    s = s & "FROM Expenses AS e" & vbCrLf
+    s = s & "WHERE e.Tax <> 0" & vbCrLf
+    SaveQuery "qryVatReturnLines", "√”ÿ— «·≈ﬁ—«— «·÷—Ì»Ì: «·„»Ì⁄«  Ê«·„‘ —Ì«  Ê«·„’—Ê›«  »›∆ Â« «·÷—Ì»Ì…", s
+End Sub
+
+Private Sub Q_qryVatReturnTotals()
+    Dim s As String
+    s = "SELECT CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'S', Amount, 0)), 0)) AS SalesStdAmount," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'S', Adjust, 0)), 0)) AS SalesStdAdjust," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'S', VAT, 0)), 0)) AS SalesStdVAT," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'Z', Amount, 0)), 0)) AS SalesZeroAmount," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'Z', Adjust, 0)), 0)) AS SalesZeroAdjust," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'E', Amount, 0)), 0)) AS SalesExemptAmount," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'E', Adjust, 0)), 0)) AS SalesExemptAdjust," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'S', Amount, 0)), 0)) AS PurchStdAmount," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'S', Adjust, 0)), 0)) AS PurchStdAdjust," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'S', VAT, 0)), 0)) AS PurchStdVAT," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'Z', Amount, 0)), 0)) AS PurchZeroAmount," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'Z', Adjust, 0)), 0)) AS PurchZeroAdjust" & vbCrLf
+    s = s & "FROM qryVatReturnLines" & vbCrLf
+    s = s & "WHERE DocDate >= QDate('PeriodStart') AND DocDate < QDate('PeriodEnd')" & vbCrLf
+    SaveQuery "qryVatReturnTotals", "Œ«‰«  «·≈ﬁ—«— «·÷—Ì»Ì ··› —… „Õ”Ê»… „‰ «·„” ‰œ«  (’› Ê«Õœ)", s
+End Sub
+
+Private Sub Q_qryVatReturnHead()
+    Dim s As String
+    s = "SELECT * FROM VatReturns" & vbCrLf
+    s = s & "WHERE VatReturnID = QLong('VatReturnID')" & vbCrLf
+    SaveQuery "qryVatReturnHead", "«·≈ﬁ—«— «·÷—Ì»Ì «·„Œ «—", s
+End Sub
+
+Private Sub Q_VatReturnQuery()
+    Dim s As String
+    s = "SELECT 1 AS BoxNo, '«·„»Ì⁄«  «·Œ«÷⁄… ··‰”»… «·√”«”Ì… (15%)' AS BoxText, v.SalesStdAmount AS Amount, v.SalesStdAdjust AS Adjust, v.SalesStdVAT AS VAT, 'L' AS RowKind, v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 2, '«·„»Ì⁄«  ··„Ê«ÿ‰Ì‰ («·Œœ„«  «·’ÕÌ… «·Œ«’… Ê«· ⁄·Ì„ «·√Â·Ì Ê«·„”ﬂ‰ «·√Ê·)', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 3, '«·„»Ì⁄«  «·„Õ·Ì… «·Œ«÷⁄… ··‰”»… «·’›—Ì…', v.SalesZeroAmount, v.SalesZeroAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 4, '«·’«œ—« ', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 5, '«·„»Ì⁄«  «·„⁄›«…', v.SalesExemptAmount, v.SalesExemptAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 6, '≈Ã„«·Ì «·„»Ì⁄« ', v.SalesStdAmount + v.SalesZeroAmount + v.SalesExemptAmount, v.SalesStdAdjust + v.SalesZeroAdjust + v.SalesExemptAdjust, v.SalesStdVAT, 'T', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 7, '«·„‘ —Ì«  «·Œ«÷⁄… ··‰”»… «·√”«”Ì… („⁄ «·„’—Ê›«  »›« Ê—… ÷—Ì»Ì…)', v.PurchStdAmount, v.PurchStdAdjust, v.PurchStdVAT, 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 8, '«·«” Ì—«œ«  «·Œ«÷⁄… ··‰”»… «·√”«”Ì… Ê«·„œ›Ê⁄… ÷—Ì» Â« ›Ì «·Ã„«—ﬂ', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 9, '«·«” Ì—«œ«  «·Œ«÷⁄… ··÷—Ì»… »¬·Ì… «·«Õ ”«» «·⁄ﬂ”Ì', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 10, '«·„‘ —Ì«  «·Œ«÷⁄… ··‰”»… «·’›—Ì…', v.PurchZeroAmount, v.PurchZeroAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 11, '«·„‘ —Ì«  «·„⁄›«…', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 12, '≈Ã„«·Ì «·„‘ —Ì« ', v.PurchStdAmount + v.PurchZeroAmount, v.PurchStdAdjust + v.PurchZeroAdjust, v.PurchStdVAT, 'T', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 13, '≈Ã„«·Ì ÷—Ì»… «·ﬁÌ„… «·„÷«›… «·„” Õﬁ… ⁄‰ «·› —… «·Õ«·Ì…', Null, Null, v.SalesStdVAT - v.PurchStdVAT, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 14, ' ’ÕÌÕ«  „‰ «·› —«  «·”«»ﬁ…', Null, Null, v.Corrections, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 15, '÷—Ì»… «·ﬁÌ„… «·„÷«›… «·„—ÕÛ¯·… „‰ «·› —«  «·”«»ﬁ… (—’Ìœ œ«∆‰)', Null, Null, v.CarriedCredit, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 16, '’«›Ì «·÷—Ì»… «·„” Õﬁ… (”«·» = „” —œ…)', Null, Null, v.NetDue, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    SaveQuery "VatReturnQuery", "≈ﬁ—«— ÷—Ì»… «·ﬁÌ„… «·„÷«›… »Œ«‰«  ‰„Ê–Ã «·ÂÌ∆… (1 ≈·Ï 16)", s
+End Sub
+
 Private Sub Q_DashboardQuery()
     Dim s As String
     s = "SELECT (SELECT CCur(Nz(Sum(d.GrossAmount), 0)) FROM qrySalesDocuments AS d" & vbCrLf
@@ -1712,13 +1822,17 @@ Private Sub Q_qryJournalCashVoucher()
     s = s & "FROM CashVouchers AS v" & vbCrLf
     s = s & "WHERE v.VoucherType = 'IN'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', 5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, 5900)))) AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText" & vbCrLf
+    s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', 5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, 5900)))) AS AccountCode, v.Amount - CCur(Nz(x.Tax, 0)) AS Debit, CCur(0) AS Credit, v.Description AS LineText" & vbCrLf
     s = s & "FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID" & vbCrLf
     s = s & "WHERE v.VoucherType = 'OUT'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.PartyName AS LineText" & vbCrLf
     s = s & "FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID" & vbCrLf
     s = s & "WHERE v.VoucherType = 'OUT'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 3 AS LineOrder, 1500 AS AccountCode, x.Tax AS Debit, CCur(0) AS Credit, '÷—Ì»… «·„œŒ·« ' AS LineText" & vbCrLf
+    s = s & "FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID" & vbCrLf
+    s = s & "WHERE v.VoucherType = 'OUT' AND x.Tax <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, 110000 + v.ToCashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText" & vbCrLf
     s = s & "FROM CashVouchers AS v" & vbCrLf
@@ -1808,6 +1922,34 @@ Private Sub Q_qryJournalYearClose()
     s = s & "FROM qryYearCloseLines AS y" & vbCrLf
     s = s & "WHERE y.LineDebit + y.LineCredit <> 0" & vbCrLf
     SaveQuery "qryJournalYearClose", "√”ÿ— ﬁÌÊœ ≈ﬁ›«· «·”‰Ê« : «·≈Ì—«œ«  Ê«·„’—Ê›«  ≈·Ï «·√—»«Õ «·„Õ Ã“…", s
+End Sub
+
+Private Sub Q_qryJournalVatReturn()
+    Dim s As String
+    s = "SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 1 AS LineOrder, 2200 AS AccountCode, IIf(v.SalesStdVAT > 0, v.SalesStdVAT, 0) AS Debit, IIf(v.SalesStdVAT < 0, -v.SalesStdVAT, 0) AS Credit, '÷—Ì»… «·„Œ—Ã«  ··› —…' AS LineText" & vbCrLf
+    s = s & "FROM VatReturns AS v" & vbCrLf
+    s = s & "WHERE v.Status = 'FILED' AND v.SalesStdVAT <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, 1500 AS AccountCode, IIf(v.PurchStdVAT < 0, -v.PurchStdVAT, 0) AS Debit, IIf(v.PurchStdVAT > 0, v.PurchStdVAT, 0) AS Credit, '÷—Ì»… «·„œŒ·«  ··› —…' AS LineText" & vbCrLf
+    s = s & "FROM VatReturns AS v" & vbCrLf
+    s = s & "WHERE v.Status = 'FILED' AND v.PurchStdVAT <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 3 AS LineOrder, 2200 AS AccountCode, IIf(v.Corrections > 0, v.Corrections, 0) AS Debit, IIf(v.Corrections < 0, -v.Corrections, 0) AS Credit, ' ’ÕÌÕ«  „‰ «·› —«  «·”«»ﬁ…' AS LineText" & vbCrLf
+    s = s & "FROM VatReturns AS v" & vbCrLf
+    s = s & "WHERE v.Status = 'FILED' AND v.Corrections <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 4 AS LineOrder, 2250 AS AccountCode, IIf((v.SalesStdVAT - v.PurchStdVAT + v.Corrections) < 0, -(v.SalesStdVAT - v.PurchStdVAT + v.Corrections), 0) AS Debit, IIf((v.SalesStdVAT - v.PurchStdVAT + v.Corrections) > 0, (v.SalesStdVAT - v.PurchStdVAT + v.Corrections), 0) AS Credit, '’«›Ì ÷—Ì»… «·› —…' AS LineText" & vbCrLf
+    s = s & "FROM VatReturns AS v" & vbCrLf
+    s = s & "WHERE v.Status = 'FILED' AND (v.SalesStdVAT - v.PurchStdVAT + v.Corrections) <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 1 AS LineOrder, 2250 AS AccountCode, v.PaidAmount AS Debit, CCur(0) AS Credit, '”œ«œ ÷—Ì»… «·ﬁÌ„… «·„÷«›…' AS LineText" & vbCrLf
+    s = s & "FROM VatReturns AS v" & vbCrLf
+    s = s & "WHERE v.Status = 'FILED' AND v.PaidAmount <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, v.PaidAccount AS AccountCode, CCur(0) AS Debit, v.PaidAmount AS Credit, v.FilingRef AS LineText" & vbCrLf
+    s = s & "FROM VatReturns AS v" & vbCrLf
+    s = s & "WHERE v.Status = 'FILED' AND v.PaidAmount <> 0" & vbCrLf
+    SaveQuery "qryJournalVatReturn", "√”ÿ— ﬁÌÊœ «·≈ﬁ—«— «·÷—Ì»Ì «·„⁄ „œ («· ”ÊÌ…) Ê”œ«œÂ", s
 End Sub
 
 Private Sub Q_JournalLinesQuery()

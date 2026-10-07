@@ -410,7 +410,7 @@ SCREEN_PERMISSIONS = {
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
-    "frmPeriodClosing": "PERIOD_CLOSE",
+    "frmPeriodClosing": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN",
 }
 
 

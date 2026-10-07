@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **99**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **104**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -47,64 +47,69 @@
 | 39 | [`qryVatInputPurchases`](#qryvatinputpurchases) | ضريبة المدخلات من المشتريات (ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
 | 40 | [`qryVatInputExpenses`](#qryvatinputexpenses) | ضريبة المدخلات من المصروفات | `PeriodStart`, `PeriodEnd` |
 | 41 | [`VatSummaryQuery`](#vatsummaryquery) | ملخص ضريبة القيمة المضافة للفترة (للإقرار الضريبي) | `PeriodStart`, `PeriodEnd` |
-| 42 | [`DashboardQuery`](#dashboardquery) | مؤشرات لوحة التحكم في سجل واحد (اليوم، الشهر، الأرصدة، المخزون) | `DashDay`, `DashMonth`, `DashEnd` |
-| 43 | [`qryDashboardTopProducts`](#qrydashboardtopproducts) | صافي الكمية المباعة لكل منتج منذ بداية الشهر (لوحة التحكم) | `DashMonth`, `DashEnd` |
-| 44 | [`qrySalesDocPrint`](#qrysalesdocprint) | بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف) |  |
-| 45 | [`qryPurchaseDocPrint`](#qrypurchasedocprint) | بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف) |  |
-| 46 | [`qryVoucherPrint`](#qryvoucherprint) | بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين) |  |
-| 47 | [`qryCashMovements`](#qrycashmovements) | كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (−) |  |
-| 48 | [`qryCashBoxTotals`](#qrycashboxtotals) | إجمالي الداخل والخارج لكل صندوق |  |
-| 49 | [`CashBoxBalanceQuery`](#cashboxbalancequery) | أرصدة الخزينة والصناديق الآن |  |
-| 50 | [`CashStatementQuery`](#cashstatementquery) | حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 51 | [`qryCashDays`](#qrycashdays) | مقبوضات ومدفوعات كل يوم داخل الفترة | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 52 | [`qryCashDayOpening`](#qrycashdayopening) | رصيد أول كل يوم من أيام الحركة (كل الحركات قبل ذلك اليوم) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 53 | [`CashDailyQuery`](#cashdailyquery) | حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 54 | [`CashClosingsQuery`](#cashclosingsquery) | تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 55 | [`qryCashClosingPrint`](#qrycashclosingprint) | بيانات طباعة تصفية الكاشير |  |
-| 56 | [`qryCashVoucherPrint`](#qrycashvoucherprint) | بيانات طباعة سندات قبض وصرف وتحويل النقدية |  |
-| 57 | [`qrySaleCost`](#qrysalecost) | تكلفة كل فاتورة بيع |  |
-| 58 | [`qryReturnCost`](#qryreturncost) | تكلفة ما عاد للمخزون من كل مرتجع بيع |  |
-| 59 | [`qryStockCountValue`](#qrystockcountvalue) | قيمة فروقات كل جرد مُرحّل |  |
-| 60 | [`qryJournalSale`](#qryjournalsale) | أسطر قيود فواتير البيع |  |
-| 61 | [`qryJournalSalesReturn`](#qryjournalsalesreturn) | أسطر قيود مرتجعات البيع |  |
-| 62 | [`qryJournalPurchase`](#qryjournalpurchase) | أسطر قيود فواتير الشراء |  |
-| 63 | [`qryJournalPurchaseReturn`](#qryjournalpurchasereturn) | أسطر قيود مرتجعات الشراء |  |
-| 64 | [`qryJournalPayments`](#qryjournalpayments) | أسطر قيود سندات القبض من العملاء والصرف للموردين |  |
-| 65 | [`qryJournalExpense`](#qryjournalexpense) | أسطر قيود المصروفات (عدا المسجلة بسند نقدية) |  |
-| 66 | [`qryJournalCashVoucher`](#qryjournalcashvoucher) | أسطر قيود سندات النقدية (قبض وصرف وتحويل) |  |
-| 67 | [`qryJournalStock`](#qryjournalstock) | أسطر قيود حركات المخزون اليدوية وتسويات الجرد |  |
-| 68 | [`qryJournalOpening`](#qryjournalopening) | أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين |  |
-| 69 | [`qryManualEntryLines`](#qrymanualentrylines) | أسطر القيود اليدوية مع رأس كل قيد |  |
-| 70 | [`qryJournalManual`](#qryjournalmanual) | أسطر القيود اليدوية |  |
-| 71 | [`qryYearCloseLines`](#qryyearcloselines) | أسطر قيود إقفال السنوات مع رأس كل إقفال |  |
-| 72 | [`qryJournalYearClose`](#qryjournalyearclose) | أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة |  |
-| 73 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 74 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 75 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 76 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 77 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 78 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
-| 79 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 80 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 81 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
-| 82 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 83 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
-| 84 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
-| 85 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 86 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 87 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 88 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 89 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 90 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 91 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 92 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 93 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 94 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 95 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 96 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 97 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 98 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 99 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 42 | [`qryVatReturnLines`](#qryvatreturnlines) | أسطر الإقرار الضريبي: المبيعات والمشتريات والمصروفات بفئتها الضريبية |  |
+| 43 | [`qryVatReturnTotals`](#qryvatreturntotals) | خانات الإقرار الضريبي للفترة محسوبة من المستندات (صف واحد) | `PeriodStart`, `PeriodEnd` |
+| 44 | [`qryVatReturnHead`](#qryvatreturnhead) | الإقرار الضريبي المختار | `VatReturnID` |
+| 45 | [`VatReturnQuery`](#vatreturnquery) | إقرار ضريبة القيمة المضافة بخانات نموذج الهيئة (1 إلى 16) | `VatReturnID` |
+| 46 | [`DashboardQuery`](#dashboardquery) | مؤشرات لوحة التحكم في سجل واحد (اليوم، الشهر، الأرصدة، المخزون) | `DashDay`, `DashMonth`, `DashEnd` |
+| 47 | [`qryDashboardTopProducts`](#qrydashboardtopproducts) | صافي الكمية المباعة لكل منتج منذ بداية الشهر (لوحة التحكم) | `DashMonth`, `DashEnd` |
+| 48 | [`qrySalesDocPrint`](#qrysalesdocprint) | بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف) |  |
+| 49 | [`qryPurchaseDocPrint`](#qrypurchasedocprint) | بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف) |  |
+| 50 | [`qryVoucherPrint`](#qryvoucherprint) | بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين) |  |
+| 51 | [`qryCashMovements`](#qrycashmovements) | كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (−) |  |
+| 52 | [`qryCashBoxTotals`](#qrycashboxtotals) | إجمالي الداخل والخارج لكل صندوق |  |
+| 53 | [`CashBoxBalanceQuery`](#cashboxbalancequery) | أرصدة الخزينة والصناديق الآن |  |
+| 54 | [`CashStatementQuery`](#cashstatementquery) | حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 55 | [`qryCashDays`](#qrycashdays) | مقبوضات ومدفوعات كل يوم داخل الفترة | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 56 | [`qryCashDayOpening`](#qrycashdayopening) | رصيد أول كل يوم من أيام الحركة (كل الحركات قبل ذلك اليوم) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 57 | [`CashDailyQuery`](#cashdailyquery) | حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 58 | [`CashClosingsQuery`](#cashclosingsquery) | تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 59 | [`qryCashClosingPrint`](#qrycashclosingprint) | بيانات طباعة تصفية الكاشير |  |
+| 60 | [`qryCashVoucherPrint`](#qrycashvoucherprint) | بيانات طباعة سندات قبض وصرف وتحويل النقدية |  |
+| 61 | [`qrySaleCost`](#qrysalecost) | تكلفة كل فاتورة بيع |  |
+| 62 | [`qryReturnCost`](#qryreturncost) | تكلفة ما عاد للمخزون من كل مرتجع بيع |  |
+| 63 | [`qryStockCountValue`](#qrystockcountvalue) | قيمة فروقات كل جرد مُرحّل |  |
+| 64 | [`qryJournalSale`](#qryjournalsale) | أسطر قيود فواتير البيع |  |
+| 65 | [`qryJournalSalesReturn`](#qryjournalsalesreturn) | أسطر قيود مرتجعات البيع |  |
+| 66 | [`qryJournalPurchase`](#qryjournalpurchase) | أسطر قيود فواتير الشراء |  |
+| 67 | [`qryJournalPurchaseReturn`](#qryjournalpurchasereturn) | أسطر قيود مرتجعات الشراء |  |
+| 68 | [`qryJournalPayments`](#qryjournalpayments) | أسطر قيود سندات القبض من العملاء والصرف للموردين |  |
+| 69 | [`qryJournalExpense`](#qryjournalexpense) | أسطر قيود المصروفات (عدا المسجلة بسند نقدية) |  |
+| 70 | [`qryJournalCashVoucher`](#qryjournalcashvoucher) | أسطر قيود سندات النقدية (قبض وصرف وتحويل) |  |
+| 71 | [`qryJournalStock`](#qryjournalstock) | أسطر قيود حركات المخزون اليدوية وتسويات الجرد |  |
+| 72 | [`qryJournalOpening`](#qryjournalopening) | أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين |  |
+| 73 | [`qryManualEntryLines`](#qrymanualentrylines) | أسطر القيود اليدوية مع رأس كل قيد |  |
+| 74 | [`qryJournalManual`](#qryjournalmanual) | أسطر القيود اليدوية |  |
+| 75 | [`qryYearCloseLines`](#qryyearcloselines) | أسطر قيود إقفال السنوات مع رأس كل إقفال |  |
+| 76 | [`qryJournalYearClose`](#qryjournalyearclose) | أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة |  |
+| 77 | [`qryJournalVatReturn`](#qryjournalvatreturn) | أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده |  |
+| 78 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 79 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 80 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 81 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 82 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 83 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
+| 84 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 85 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 86 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 87 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 88 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
+| 89 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
+| 90 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 91 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 92 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 93 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 94 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 95 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 96 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 97 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 98 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 99 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 100 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 101 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 102 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 103 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 104 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -172,46 +177,49 @@
 | 58 | الضريبة: ضريبة المخرجات = 150 + 60 − 6 | `SELECT OutputVAT FROM VatSummaryQuery` | 204 |
 | 59 | الضريبة: ضريبة المدخلات = −45 (مرتجع شراء) + 30 (مصروف) | `SELECT InputVAT FROM VatSummaryQuery` | -15 |
 | 60 | الضريبة: الصافي المستحق = 204 + 15 | `SELECT NetVATDue FROM VatSummaryQuery` | 219 |
-| 61 | طباعة الفاتورة الآجلة: سطران | `SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 2 |
-| 62 | طباعة الفاتورة الآجلة: مجموع الأسطر = 460 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 460 |
-| 63 | طباعة الإشعار الدائن: سطر واحد بقيمة 46 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = {ref:CRN1}` | 46 |
-| 64 | رصيد صندوق الكاشير = 500 + 115 + 1150 + 100 + 200 − 230 − 50 − 15 − 1000 | `SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = {ref:BOXC}` | 770 |
-| 65 | رصيد الخزينة = 10000 − 5000 + 1000 + 2000 − 300 | `SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = {ref:BOXM}` | 7700 |
-| 66 | الصناديق المسجلة بدون حركة رصيدها صفر | `SELECT Sum(Balance) FROM CashBoxBalanceQuery WHERE CashBoxID <= 2` | 0 |
-| 67 | حركة صندوق الكاشير: رصيد أول المدة = 500 + 115 − 50 | `SELECT AmountIn FROM CashStatementQuery WHERE SortKey = 0` | 565 |
-| 68 | حركة صندوق الكاشير: 6 حركات في الفترة | `SELECT COUNT(*) FROM CashStatementQuery WHERE SortKey = 1` | 6 |
-| 69 | حركة صندوق الكاشير: رصيد آخر المدة = 770 | `SELECT Sum(AmountIn) - Sum(AmountOut) FROM CashStatementQuery` | 770 |
-| 70 | حركة الخزينة: التحويل من الكاشير داخل = 1000 | `SELECT AmountIn FROM CashStatementQuery WHERE MoveType = 'TRANSFER_IN'` | 1000 |
-| 71 | يومية صندوق الكاشير يوم التصفية: رصيد أول اليوم = 565 + 1150 + 100 − 230 | `SELECT OpeningBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 1585 |
-| 72 | يومية صندوق الكاشير يوم التصفية: المدفوعات = 15 عجز + 1000 تحويل | `SELECT Payments FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 1015 |
-| 73 | يومية صندوق الكاشير يوم التصفية: رصيد آخر اليوم = 570 | `SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 570 |
-| 74 | يومية صندوق الكاشير: آخر يوم = الرصيد الحالي | `SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:3})` | 770 |
-| 75 | تصفيات الكاشير خلال الفترة: تصفية واحدة بعجز 15 | `SELECT Difference FROM CashClosingsQuery` | -15 |
-| 76 | طباعة سند صرف المصروف: نوع المصروف | `SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V1} AND ExpenseTypeName = 'مصروفات أخرى'` | 1 |
-| 77 | طباعة سند التحويل: الصندوق المستلم | `SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V3} AND ToBoxName = 'TEST الخزينة'` | 1 |
-| 78 | قيود Sale: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalSale GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 79 | قيود SalesReturn: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalSalesReturn GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 80 | قيود Purchase: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPurchase GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 81 | قيود PurchaseReturn: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPurchaseReturn GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 82 | قيود Payments: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPayments GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 83 | قيود Expense: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalExpense GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 84 | قيود CashVoucher: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalCashVoucher GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 85 | قيود Stock: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalStock GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 86 | قيود Opening: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalOpening GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 87 | قيد الفاتورة الآجلة: 6 أسطر (نقدي، عميل، مبيعات، ضريبة، تكلفة، مخزون) | `SELECT COUNT(*) FROM qryJournalSale WHERE SourceID = {ref:INV2}` | 6 |
-| 88 | قيد الفاتورة الآجلة: المتبقي على العميل 360 في ذمم العملاء | `SELECT Debit FROM qryJournalSale WHERE SourceID = {ref:INV2} AND AccountCode = 1300` | 360 |
-| 89 | قيد الفاتورة الآجلة: التكلفة = 2×60 + 10×10 | `SELECT Debit FROM qryJournalSale WHERE SourceID = {ref:INV2} AND AccountCode = 5100` | 220 |
-| 90 | ذمم العملاء من القيود = أرصدة العملاء (164) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 1300` | 164 |
-| 91 | ذمم الموردين من القيود = رصيد المورد (2855 دائن) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 2100` | -2855 |
-| 92 | المخزون من القيود = قيمة المخزون بالتكلفة (7040) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock) AS x WHERE AccountCode = 1400` | 7040 |
-| 93 | صندوق الكاشير من القيود = رصيده (770) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalExpense UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalCashVoucher UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 110000 + {ref:BOXC}` | 770 |
-| 94 | الخزينة من القيود = رصيدها (7700) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalExpense UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalCashVoucher UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 110000 + {ref:BOXM}` | 7700 |
-| 95 | ضريبة المخرجات من القيود = 15 + 150 + 60 − 6 | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn) AS x WHERE AccountCode = 2200` | -219 |
-| 96 | مصروف سند النقدية لا يُقيَّد مرتين | `SELECT COUNT(*) FROM qryJournalExpense WHERE SourceID = {ref:EXPV}` | 0 |
-| 97 | القيد اليدوي: 3 أسطر متوازنة (3000) | `SELECT COUNT(*) FROM qryJournalManual WHERE SourceID = {ref:MJ1} AND SourceType = 'MANUAL'` | 3 |
-| 98 | قيود Manual: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalManual GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
-| 99 | سند صرف المصروف يُقيَّد على حساب نوع المصروف | `SELECT Debit FROM qryJournalCashVoucher WHERE SourceID = {ref:V1} AND AccountCode = 530009` | 50 |
-| 100 | فحص السلامة: لا توجد مشكلات | `SELECT COUNT(*) FROM IntegrityCheckQuery` | 0 |
+| 61 | الإقرار الضريبي: ضريبة المبيعات الخاضعة (الخانة 1) = ضريبة المخرجات | `SELECT SalesStdVAT FROM qryVatReturnTotals` | 204 |
+| 62 | الإقرار الضريبي: ضريبة المشتريات والمصروفات (الخانة 7) = ضريبة المدخلات | `SELECT PurchStdVAT FROM qryVatReturnTotals` | -15 |
+| 63 | الإقرار الضريبي: صافي المبيعات الخاضعة (الخانة 1 مع التعديلات) = صافي المبيعات | `SELECT SalesStdAmount + SalesStdAdjust + SalesZeroAmount + SalesZeroAdjust + SalesExemptAmount + SalesExemptAdjust FROM qryVatReturnTotals` | 1360 |
+| 64 | طباعة الفاتورة الآجلة: سطران | `SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 2 |
+| 65 | طباعة الفاتورة الآجلة: مجموع الأسطر = 460 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'SALE' AND DocID = {ref:INV2}` | 460 |
+| 66 | طباعة الإشعار الدائن: سطر واحد بقيمة 46 | `SELECT Sum(LineTotal) FROM qrySalesDocPrint WHERE DocKind = 'RETURN' AND DocID = {ref:CRN1}` | 46 |
+| 67 | رصيد صندوق الكاشير = 500 + 115 + 1150 + 100 + 200 − 230 − 50 − 15 − 1000 | `SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = {ref:BOXC}` | 770 |
+| 68 | رصيد الخزينة = 10000 − 5000 + 1000 + 2000 − 300 | `SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = {ref:BOXM}` | 7700 |
+| 69 | الصناديق المسجلة بدون حركة رصيدها صفر | `SELECT Sum(Balance) FROM CashBoxBalanceQuery WHERE CashBoxID <= 2` | 0 |
+| 70 | حركة صندوق الكاشير: رصيد أول المدة = 500 + 115 − 50 | `SELECT AmountIn FROM CashStatementQuery WHERE SortKey = 0` | 565 |
+| 71 | حركة صندوق الكاشير: 6 حركات في الفترة | `SELECT COUNT(*) FROM CashStatementQuery WHERE SortKey = 1` | 6 |
+| 72 | حركة صندوق الكاشير: رصيد آخر المدة = 770 | `SELECT Sum(AmountIn) - Sum(AmountOut) FROM CashStatementQuery` | 770 |
+| 73 | حركة الخزينة: التحويل من الكاشير داخل = 1000 | `SELECT AmountIn FROM CashStatementQuery WHERE MoveType = 'TRANSFER_IN'` | 1000 |
+| 74 | يومية صندوق الكاشير يوم التصفية: رصيد أول اليوم = 565 + 1150 + 100 − 230 | `SELECT OpeningBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 1585 |
+| 75 | يومية صندوق الكاشير يوم التصفية: المدفوعات = 15 عجز + 1000 تحويل | `SELECT Payments FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 1015 |
+| 76 | يومية صندوق الكاشير يوم التصفية: رصيد آخر اليوم = 570 | `SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:4})` | 570 |
+| 77 | يومية صندوق الكاشير: آخر يوم = الرصيد الحالي | `SELECT ClosingBalance FROM CashDailyQuery WHERE CashDay = DateValue({day:3})` | 770 |
+| 78 | تصفيات الكاشير خلال الفترة: تصفية واحدة بعجز 15 | `SELECT Difference FROM CashClosingsQuery` | -15 |
+| 79 | طباعة سند صرف المصروف: نوع المصروف | `SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V1} AND ExpenseTypeName = 'مصروفات أخرى'` | 1 |
+| 80 | طباعة سند التحويل: الصندوق المستلم | `SELECT COUNT(*) FROM qryCashVoucherPrint WHERE DocID = {ref:V3} AND ToBoxName = 'TEST الخزينة'` | 1 |
+| 81 | قيود Sale: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalSale GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 82 | قيود SalesReturn: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalSalesReturn GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 83 | قيود Purchase: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPurchase GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 84 | قيود PurchaseReturn: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPurchaseReturn GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 85 | قيود Payments: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalPayments GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 86 | قيود Expense: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalExpense GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 87 | قيود CashVoucher: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalCashVoucher GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 88 | قيود Stock: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalStock GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 89 | قيود Opening: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalOpening GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 90 | قيد الفاتورة الآجلة: 6 أسطر (نقدي، عميل، مبيعات، ضريبة، تكلفة، مخزون) | `SELECT COUNT(*) FROM qryJournalSale WHERE SourceID = {ref:INV2}` | 6 |
+| 91 | قيد الفاتورة الآجلة: المتبقي على العميل 360 في ذمم العملاء | `SELECT Debit FROM qryJournalSale WHERE SourceID = {ref:INV2} AND AccountCode = 1300` | 360 |
+| 92 | قيد الفاتورة الآجلة: التكلفة = 2×60 + 10×10 | `SELECT Debit FROM qryJournalSale WHERE SourceID = {ref:INV2} AND AccountCode = 5100` | 220 |
+| 93 | ذمم العملاء من القيود = أرصدة العملاء (164) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 1300` | 164 |
+| 94 | ذمم الموردين من القيود = رصيد المورد (2855 دائن) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 2100` | -2855 |
+| 95 | المخزون من القيود = قيمة المخزون بالتكلفة (7040) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock) AS x WHERE AccountCode = 1400` | 7040 |
+| 96 | صندوق الكاشير من القيود = رصيده (770) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalExpense UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalCashVoucher UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 110000 + {ref:BOXC}` | 770 |
+| 97 | الخزينة من القيود = رصيدها (7700) | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchase UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPurchaseReturn UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalPayments UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalExpense UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalCashVoucher UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalStock UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalOpening) AS x WHERE AccountCode = 110000 + {ref:BOXM}` | 7700 |
+| 98 | ضريبة المخرجات من القيود = 15 + 150 + 60 − 6 | `SELECT Sum(Debit) - Sum(Credit) FROM (SELECT AccountCode, Debit, Credit FROM qryJournalSale UNION ALL SELECT AccountCode, Debit, Credit FROM qryJournalSalesReturn) AS x WHERE AccountCode = 2200` | -219 |
+| 99 | مصروف سند النقدية لا يُقيَّد مرتين | `SELECT COUNT(*) FROM qryJournalExpense WHERE SourceID = {ref:EXPV}` | 0 |
+| 100 | القيد اليدوي: 3 أسطر متوازنة (3000) | `SELECT COUNT(*) FROM qryJournalManual WHERE SourceID = {ref:MJ1} AND SourceType = 'MANUAL'` | 3 |
+| 101 | قيود Manual: كل قيد متوازن | `SELECT COUNT(*) FROM (SELECT SourceType, SourceID FROM qryJournalManual GROUP BY SourceType, SourceID HAVING Abs(Sum(Debit) - Sum(Credit)) > 0.001) AS x` | 0 |
+| 102 | سند صرف المصروف يُقيَّد على حساب نوع المصروف | `SELECT Debit FROM qryJournalCashVoucher WHERE SourceID = {ref:V1} AND AccountCode = 530009` | 50 |
+| 103 | فحص السلامة: لا توجد مشكلات | `SELECT COUNT(*) FROM IntegrityCheckQuery` | 0 |
 
 ## qrySalesDocuments
 
@@ -822,6 +830,119 @@ SELECT QDate('PeriodStart') AS PeriodFrom, DateAdd('d', -1, QDate('PeriodEnd')) 
 FROM qryVatOutput AS o, qryVatInputPurchases AS p, qryVatInputExpenses AS e
 ```
 
+## qryVatReturnLines
+
+أسطر الإقرار الضريبي: المبيعات والمشتريات والمصروفات بفئتها الضريبية
+
+```sql
+SELECT 'S' AS Side, d.VATCategory AS Category, h.InvoiceDate AS DocDate, d.NetAmount AS Amount,
+       CCur(0) AS Adjust, d.Tax AS VAT
+FROM SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID
+UNION ALL
+SELECT 'S', d.VATCategory, r.ReturnDate, CCur(0), -d.NetAmount, -d.Tax
+FROM SalesReturns AS r INNER JOIN SalesReturnDetails AS d ON r.SalesReturnID = d.SalesReturnID
+UNION ALL
+SELECT 'P', IIf(d.VATRate > 0, 'S', 'Z'), h.InvoiceDate, d.NetAmount, CCur(0), d.Tax
+FROM PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d ON h.PurchaseInvoiceID = d.PurchaseInvoiceID
+UNION ALL
+SELECT 'P', IIf(d.VATRate > 0, 'S', 'Z'), r.ReturnDate, CCur(0), -d.NetAmount, -d.Tax
+FROM PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS d ON r.PurchaseReturnID = d.PurchaseReturnID
+UNION ALL
+SELECT 'P', 'S', e.ExpenseDate, e.Amount, CCur(0), e.Tax
+FROM Expenses AS e
+WHERE e.Tax <> 0
+```
+
+## qryVatReturnTotals
+
+خانات الإقرار الضريبي للفترة محسوبة من المستندات (صف واحد)
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'S', Amount, 0)), 0)) AS SalesStdAmount,
+       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'S', Adjust, 0)), 0)) AS SalesStdAdjust,
+       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'S', VAT, 0)), 0)) AS SalesStdVAT,
+       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'Z', Amount, 0)), 0)) AS SalesZeroAmount,
+       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'Z', Adjust, 0)), 0)) AS SalesZeroAdjust,
+       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'E', Amount, 0)), 0)) AS SalesExemptAmount,
+       CCur(Nz(Sum(IIf(Side = 'S' AND Category = 'E', Adjust, 0)), 0)) AS SalesExemptAdjust,
+       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'S', Amount, 0)), 0)) AS PurchStdAmount,
+       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'S', Adjust, 0)), 0)) AS PurchStdAdjust,
+       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'S', VAT, 0)), 0)) AS PurchStdVAT,
+       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'Z', Amount, 0)), 0)) AS PurchZeroAmount,
+       CCur(Nz(Sum(IIf(Side = 'P' AND Category = 'Z', Adjust, 0)), 0)) AS PurchZeroAdjust
+FROM qryVatReturnLines
+WHERE DocDate >= QDate('PeriodStart') AND DocDate < QDate('PeriodEnd')
+```
+
+## qryVatReturnHead
+
+الإقرار الضريبي المختار
+
+المعاملات: `VatReturnID`
+
+```sql
+SELECT * FROM VatReturns
+WHERE VatReturnID = QLong('VatReturnID')
+```
+
+## VatReturnQuery
+
+إقرار ضريبة القيمة المضافة بخانات نموذج الهيئة (1 إلى 16)
+
+المعاملات: `VatReturnID`
+
+```sql
+SELECT 1 AS BoxNo, 'المبيعات الخاضعة للنسبة الأساسية (15%)' AS BoxText, v.SalesStdAmount AS Amount, v.SalesStdAdjust AS Adjust, v.SalesStdVAT AS VAT, 'L' AS RowKind, v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 2, 'المبيعات للمواطنين (الخدمات الصحية الخاصة والتعليم الأهلي والمسكن الأول)', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 3, 'المبيعات المحلية الخاضعة للنسبة الصفرية', v.SalesZeroAmount, v.SalesZeroAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 4, 'الصادرات', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 5, 'المبيعات المعفاة', v.SalesExemptAmount, v.SalesExemptAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 6, 'إجمالي المبيعات', v.SalesStdAmount + v.SalesZeroAmount + v.SalesExemptAmount, v.SalesStdAdjust + v.SalesZeroAdjust + v.SalesExemptAdjust, v.SalesStdVAT, 'T', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 7, 'المشتريات الخاضعة للنسبة الأساسية (مع المصروفات بفاتورة ضريبية)', v.PurchStdAmount, v.PurchStdAdjust, v.PurchStdVAT, 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 8, 'الاستيرادات الخاضعة للنسبة الأساسية والمدفوعة ضريبتها في الجمارك', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 9, 'الاستيرادات الخاضعة للضريبة بآلية الاحتساب العكسي', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 10, 'المشتريات الخاضعة للنسبة الصفرية', v.PurchZeroAmount, v.PurchZeroAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 11, 'المشتريات المعفاة', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 12, 'إجمالي المشتريات', v.PurchStdAmount + v.PurchZeroAmount, v.PurchStdAdjust + v.PurchZeroAdjust, v.PurchStdVAT, 'T', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 13, 'إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية', Null, Null, v.SalesStdVAT - v.PurchStdVAT, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 14, 'تصحيحات من الفترات السابقة', Null, Null, v.Corrections, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 15, 'ضريبة القيمة المضافة المرحَّلة من الفترات السابقة (رصيد دائن)', Null, Null, v.CarriedCredit, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+UNION ALL
+SELECT 16, 'صافي الضريبة المستحقة (سالب = مستردة)', Null, Null, v.NetDue, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount
+FROM qryVatReturnHead AS v
+```
+
 ## DashboardQuery
 
 مؤشرات لوحة التحكم في سجل واحد (اليوم، الشهر، الأرصدة، المخزون)
@@ -1358,13 +1479,17 @@ SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumbe
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'IN'
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', 5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, 5900)))) AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', 5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, 5900)))) AS AccountCode, v.Amount - CCur(Nz(x.Tax, 0)) AS Debit, CCur(0) AS Credit, v.Description AS LineText
 FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID
 WHERE v.VoucherType = 'OUT'
 UNION ALL
 SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.PartyName AS LineText
 FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID
 WHERE v.VoucherType = 'OUT'
+UNION ALL
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 3 AS LineOrder, 1500 AS AccountCode, x.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText
+FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID
+WHERE v.VoucherType = 'OUT' AND x.Tax <> 0
 UNION ALL
 SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, 110000 + v.ToCashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText
 FROM CashVouchers AS v
@@ -1465,6 +1590,36 @@ FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClo
 SELECT 'YEAR_CLOSE' AS SourceType, y.YearClosingID AS SourceID, y.ClosingNumber AS SourceNumber, y.ClosingDate AS SourceDate, y.Notes AS Party, y.LineNo AS LineOrder, y.LineAccount AS AccountCode, y.LineDebit AS Debit, y.LineCredit AS Credit, y.LineNote AS LineText
 FROM qryYearCloseLines AS y
 WHERE y.LineDebit + y.LineCredit <> 0
+```
+
+## qryJournalVatReturn
+
+أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده
+
+```sql
+SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 1 AS LineOrder, 2200 AS AccountCode, IIf(v.SalesStdVAT > 0, v.SalesStdVAT, 0) AS Debit, IIf(v.SalesStdVAT < 0, -v.SalesStdVAT, 0) AS Credit, 'ضريبة المخرجات للفترة' AS LineText
+FROM VatReturns AS v
+WHERE v.Status = 'FILED' AND v.SalesStdVAT <> 0
+UNION ALL
+SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, 1500 AS AccountCode, IIf(v.PurchStdVAT < 0, -v.PurchStdVAT, 0) AS Debit, IIf(v.PurchStdVAT > 0, v.PurchStdVAT, 0) AS Credit, 'ضريبة المدخلات للفترة' AS LineText
+FROM VatReturns AS v
+WHERE v.Status = 'FILED' AND v.PurchStdVAT <> 0
+UNION ALL
+SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 3 AS LineOrder, 2200 AS AccountCode, IIf(v.Corrections > 0, v.Corrections, 0) AS Debit, IIf(v.Corrections < 0, -v.Corrections, 0) AS Credit, 'تصحيحات من الفترات السابقة' AS LineText
+FROM VatReturns AS v
+WHERE v.Status = 'FILED' AND v.Corrections <> 0
+UNION ALL
+SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 4 AS LineOrder, 2250 AS AccountCode, IIf((v.SalesStdVAT - v.PurchStdVAT + v.Corrections) < 0, -(v.SalesStdVAT - v.PurchStdVAT + v.Corrections), 0) AS Debit, IIf((v.SalesStdVAT - v.PurchStdVAT + v.Corrections) > 0, (v.SalesStdVAT - v.PurchStdVAT + v.Corrections), 0) AS Credit, 'صافي ضريبة الفترة' AS LineText
+FROM VatReturns AS v
+WHERE v.Status = 'FILED' AND (v.SalesStdVAT - v.PurchStdVAT + v.Corrections) <> 0
+UNION ALL
+SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 1 AS LineOrder, 2250 AS AccountCode, v.PaidAmount AS Debit, CCur(0) AS Credit, 'سداد ضريبة القيمة المضافة' AS LineText
+FROM VatReturns AS v
+WHERE v.Status = 'FILED' AND v.PaidAmount <> 0
+UNION ALL
+SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, v.PaidAccount AS AccountCode, CCur(0) AS Debit, v.PaidAmount AS Credit, v.FilingRef AS LineText
+FROM VatReturns AS v
+WHERE v.Status = 'FILED' AND v.PaidAmount <> 0
 ```
 
 ## JournalLinesQuery

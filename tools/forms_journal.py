@@ -284,7 +284,8 @@ def layout_financials() -> FormModel:
             ("btnPrint", "طباعة القائمة", "primary", 3.2, "PrintFinancials Me"),
             ("btnLedger", "كشف حساب", "secondary", 2.8, "FinancialsOpenLedger Me"),
             ("btnTrial", "ميزان المراجعة", "secondary", 3.0, 'OpenScreen "frmJournal"'),
-            ("btnClosing", "إقفال الفترات", "secondary", 3.0, 'OpenScreen "frmPeriodClosing", 0')]:
+            ("btnClosing", "إقفال الفترات", "secondary", 3.0, 'OpenScreen "frmPeriodClosing", 0'),
+            ("btnVat", "الإقرار الضريبي", "secondary", 3.2, 'OpenScreen "frmVatReturn", 0')]:
         button(m, name, caption, x, y, style, w=cm(w), h=cm(0.9), call=call)
         x += cm(w) + cm(0.2)
     button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), y, "secondary", w=cm(2.4), h=cm(0.9),
@@ -353,7 +354,89 @@ def layout_period_closing() -> FormModel:
     return m
 
 
+# ------------------------------------------------------------------ VAT return
+VAT_HISTORY = ("SELECT VatReturnID, ReturnNumber AS [الإقرار], Format(PeriodFrom, 'yyyy/mm/dd') AS [من], "
+               "Format(PeriodTo, 'yyyy/mm/dd') AS [إلى], "
+               "IIf(Status = 'FILED', 'معتمد', 'مسودة') AS [الحالة], Format(NetDue, '#,##0.00') AS [الصافي], "
+               "Format(PaidAmount, '#,##0.00') AS [المسدد], Format(FiledDate, 'yyyy/mm/dd') AS [اعتُمد في] FROM VatReturns "
+               "ORDER BY PeriodFrom DESC")
+
+
+def layout_vat_return() -> FormModel:
+    width, height = cm(26.0), cm(19.4)
+    m = FormModel("frmVatReturn", "إقرار ضريبة القيمة المضافة", width, height, popup=True, allow_add=False)
+    title_band(m, "إقرار ضريبة القيمة المضافة",
+               "خانات نموذج هيئة الزكاة والضريبة والجمارك من المستندات، ثم الاعتماد وقيد التسوية والسداد", "reports")
+    y = cm(2.3)
+    c = m.add(Control("text", "txtFrom", cm(0.4), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtFrom", "بداية الفترة الضريبية", c)
+    c = m.add(Control("text", "txtTo", cm(3.6), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtTo", "نهاية الفترة", c)
+    button(m, "btnLastMonth", "الشهر الماضي", cm(6.8), y, "secondary", w=cm(2.6), h=cm(0.8),
+           call='VatQuickPeriod Me, "LASTMONTH"')
+    button(m, "btnLastQuarter", "الربع الماضي", cm(9.6), y, "secondary", w=cm(2.6), h=cm(0.8),
+           call='VatQuickPeriod Me, "LASTQUARTER"')
+    button(m, "btnCalc", "احسب", cm(12.4), y, "primary", w=cm(2.4), h=cm(0.8), call="VatCalculate Me")
+    m.add(Control("text", "txtReturnID", cm(15.0), y, cm(1.0), cm(0.8), {"Visible": False}))
+    m.add(Control("label", "lblState", cm(0.4), cm(3.25), width - cm(0.8), cm(1.0),
+                  {"Caption": " ", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("list", "lstBoxes", cm(0.4), cm(4.35), width - cm(0.8), cm(6.9),
+                  {"RowSourceType": "Value List", "RowSource": "", "ColumnCount": 5,
+                   "ColumnWidths": "1.2;13.4;3.4;3.4;3.4", "ColumnHeads": True}))
+    # boxes 14 and 15, box 16
+    y = cm(12.0)
+    c = m.add(Control("text", "txtCorrections", cm(0.4), y, cm(3.4), cm(0.8), {"Format": "#,##0.00"},
+                      events=["AfterUpdate"]))
+    labelled(m, "txtCorrections", "14- تصحيحات سابقة (+/-)", c)
+    c = m.add(Control("text", "txtCarried", cm(4.0), y, cm(3.4), cm(0.8), {"Format": "#,##0.00"},
+                      events=["AfterUpdate"]))
+    labelled(m, "txtCarried", "15- رصيد دائن مرحَّل", c)
+    m.add(Control("label", "lblNetDue", cm(7.6), y, cm(10.0), cm(0.8),
+                  {"Caption": " ", "FontSize": 14, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    button(m, "btnSaveDraft", "حفظ مسودة", cm(17.8), y, "secondary", w=cm(2.6), h=cm(0.8), call="VatSaveDraft Me")
+    button(m, "btnPrint", "طباعة", cm(20.6), y, "secondary", w=cm(2.2), h=cm(0.8), call="PrintVatReturn Me")
+    button(m, "btnDeleteDraft", "حذف المسودة", cm(23.0), y, "danger", w=cm(2.6), h=cm(0.8), call="VatDeleteDraft Me")
+    # filing
+    y = cm(13.55)
+    c = m.add(Control("text", "txtFiledDate", cm(0.4), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtFiledDate", "تاريخ الاعتماد", c)
+    c = m.add(Control("text", "txtFilingRef", cm(3.6), y, cm(3.6), cm(0.8), {}))
+    labelled(m, "txtFilingRef", "رقم الإقرار لدى الهيئة", c)
+    c = m.add(Control("text", "txtNotes", cm(7.4), y, cm(5.2), cm(0.8), {}))
+    labelled(m, "txtNotes", "سبب إلغاء الاعتماد", c)
+    button(m, "btnFile", "اعتماد الإقرار", cm(12.8), y, "primary", w=cm(3.0), h=cm(0.8), call="VatFile Me")
+    button(m, "btnUnfile", "إلغاء الاعتماد", cm(16.0), y, "danger", w=cm(2.8), h=cm(0.8), call="VatUnfile Me")
+    button(m, "btnEntry", "قيد التسوية", cm(19.0), y, "secondary", w=cm(2.8), h=cm(0.8), call="VatOpenEntry Me")
+    # payment
+    y = cm(15.1)
+    c = m.add(Control("text", "txtPaidDate", cm(0.4), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtPaidDate", "تاريخ السداد", c)
+    c = m.add(Control("text", "txtPaidAmount", cm(3.6), y, cm(3.0), cm(0.8), {"Format": "#,##0.00"}))
+    labelled(m, "txtPaidAmount", "المبلغ المسدد", c)
+    c = m.add(Control("combo", "cboPayAccount", cm(6.8), y, cm(5.8), cm(0.8),
+                      {"RowSourceType": "Table/Query", "RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;5.6",
+                       "LimitToList": True}))
+    labelled(m, "cboPayAccount", "سُدِّدت من حساب", c)
+    button(m, "btnPay", "تسجيل السداد", cm(12.8), y, "primary", w=cm(3.0), h=cm(0.8), call="VatPay Me")
+    button(m, "btnUnpay", "إلغاء السداد", cm(16.0), y, "danger", w=cm(2.8), h=cm(0.8), call="VatUnpay Me")
+    # the returns
+    m.add(Control("label", "lblHistoryCap", cm(0.4), cm(16.1), cm(12.0), cm(0.55),
+                  {"Caption": "الإقرارات المحفوظة (اختر إقرارًا لعرضه)", "FontSize": 9, "FontBold": True,
+                   "ForeColor": Sym("CLR_MUTED")}))
+    m.add(Control("list", "lstReturns", cm(0.4), cm(16.7), width - cm(3.4), cm(2.4),
+                  {"RowSourceType": "Table/Query", "RowSource": VAT_HISTORY, "ColumnCount": 8,
+                   "ColumnWidths": "0;3.2;2.6;2.6;2;3;3;2.6", "ColumnHeads": True}, events=["AfterUpdate"]))
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(18.1), "secondary", w=cm(2.6), h=cm(1.0),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    VatReturnLoad Me", "End Sub",
+               "Private Sub txtCorrections_AfterUpdate()", "    VatShowNet Me", "End Sub",
+               "Private Sub txtCarried_AfterUpdate()", "    VatShowNet Me", "End Sub",
+               "Private Sub lstReturns_AfterUpdate()", "    VatPickReturn Me", "End Sub"] + m.code)
+    return m
+
+
 def journal_forms() -> List[FormModel]:
     lines, heads = layout_manual_lines()
     return [layout_journal(), layout_journal_entry(), lines, layout_manual_entry(heads), layout_ledger(),
-            layout_financials(), layout_period_closing()]
+            layout_financials(), layout_period_closing(), layout_vat_return()]

@@ -28,7 +28,8 @@
 | + | شجرة الحسابات (5 مستويات) والقيود اليدوية وميزان المراجعة بالمستويات | ✅ بانتظار الموافقة | [docs/20-Accounts-Manual-Entries.md](docs/20-Accounts-Manual-Entries.md) |
 | + | كشف الحساب ودفتر الأستاذ | ✅ تمت الموافقة | [docs/21-Ledger.md](docs/21-Ledger.md) |
 | + | القوائم المالية: قائمة الدخل والميزانية العمومية مع المقارنة | ✅ تمت الموافقة | [docs/22-Financial-Statements.md](docs/22-Financial-Statements.md) |
-| + | إقفال الفترات وإقفال السنة المالية | ✅ بانتظار الموافقة | [docs/23-Period-Closing.md](docs/23-Period-Closing.md) |
+| + | إقفال الفترات وإقفال السنة المالية | ✅ تمت الموافقة | [docs/23-Period-Closing.md](docs/23-Period-Closing.md) |
+| + | إقرار ضريبة القيمة المضافة: خانات نموذج الهيئة، الاعتماد وقيد التسوية، السداد | ✅ بانتظار الموافقة | [docs/24-VAT-Return.md](docs/24-VAT-Return.md) |
 
 ## هيكل المستودع
 
@@ -100,6 +101,7 @@
 | 18 | `modLedger` (دائمة) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal` |
 | 19 | `modFinancials` (دائمة) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal` |
 | 20 | `modClosing` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestJournal` |
+| 21 | `modVat` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal`, `TestQueries` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

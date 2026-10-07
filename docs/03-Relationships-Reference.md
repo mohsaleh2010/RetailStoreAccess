@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` و`tools/relations.py` – لا تعدّله يدويًا.
 
-عدد العلاقات: **80** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **10**، التحديث المتتالي: **3**.
+عدد العلاقات: **82** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **10**، التحديث المتتالي: **3**.
 
 ## مخطط الكيانات والعلاقات
 
@@ -76,6 +76,8 @@ erDiagram
     Employees ||--o{ FiscalYearClosings : "EmployeeID"
     FiscalYearClosings ||--o{ FiscalYearClosingLines : "YearClosingID"
     Accounts ||--o{ FiscalYearClosingLines : "AccountCode"
+    Accounts |o--o{ VatReturns : "PaidAccount"
+    Employees ||--o{ VatReturns : "EmployeeID"
     Employees ||--o{ ManualEntries : "EmployeeID"
     ManualEntries ||--o{ ManualEntryLines : "ManualEntryID"
     Accounts ||--o{ ManualEntryLines : "AccountCode"
@@ -164,15 +166,17 @@ erDiagram
 | 66 | `FK_FiscalYearClosings_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | FiscalYearClosings (إقفال السنوات المالية) | `EmployeeID` | ✔ | فرض التكامل |
 | 67 | `FK_FiscalYearClosingLines_YearClosingID` | FiscalYearClosings (إقفال السنوات المالية) | `YearClosingID` | FiscalYearClosingLines (أسطر قيود إقفال السنوات) | `YearClosingID` | ✔ | فرض التكامل + حذف متتالٍ |
 | 68 | `FK_FiscalYearClosingLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | FiscalYearClosingLines (أسطر قيود إقفال السنوات) | `AccountCode` | ✔ | فرض التكامل |
-| 69 | `FK_ManualEntries_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | ManualEntries (القيود اليدوية) | `EmployeeID` | ✔ | فرض التكامل |
-| 70 | `FK_ManualEntryLines_ManualEntryID` | ManualEntries (القيود اليدوية) | `ManualEntryID` | ManualEntryLines (أسطر القيود اليدوية) | `ManualEntryID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 71 | `FK_ManualEntryLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | ManualEntryLines (أسطر القيود اليدوية) | `AccountCode` | ✔ | فرض التكامل |
-| 72 | `FK_InventoryTransactions_ProductID` | Products (المنتجات) | `ProductID` | InventoryTransactions (حركة المخزون) | `ProductID` | ✔ | فرض التكامل |
-| 73 | `FK_InventoryTransactions_TransactionTypeID` | TransactionTypes (أنواع حركات المخزون) | `TransactionTypeID` | InventoryTransactions (حركة المخزون) | `TransactionTypeID` | ✔ | فرض التكامل |
-| 74 | `FK_InventoryTransactions_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | InventoryTransactions (حركة المخزون) | `EmployeeID` |  | فرض التكامل |
-| 75 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
-| 76 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
-| 77 | `FK_StockCounts_PostedByID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `PostedByID` |  | فرض التكامل |
-| 78 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 79 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
-| 80 | `FK_AuditLog_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | AuditLog (سجل العمليات) | `EmployeeID` |  | فرض التكامل |
+| 69 | `FK_VatReturns_PaidAccount` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | VatReturns (إقرارات ضريبة القيمة المضافة) | `PaidAccount` |  | فرض التكامل |
+| 70 | `FK_VatReturns_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | VatReturns (إقرارات ضريبة القيمة المضافة) | `EmployeeID` | ✔ | فرض التكامل |
+| 71 | `FK_ManualEntries_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | ManualEntries (القيود اليدوية) | `EmployeeID` | ✔ | فرض التكامل |
+| 72 | `FK_ManualEntryLines_ManualEntryID` | ManualEntries (القيود اليدوية) | `ManualEntryID` | ManualEntryLines (أسطر القيود اليدوية) | `ManualEntryID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 73 | `FK_ManualEntryLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | ManualEntryLines (أسطر القيود اليدوية) | `AccountCode` | ✔ | فرض التكامل |
+| 74 | `FK_InventoryTransactions_ProductID` | Products (المنتجات) | `ProductID` | InventoryTransactions (حركة المخزون) | `ProductID` | ✔ | فرض التكامل |
+| 75 | `FK_InventoryTransactions_TransactionTypeID` | TransactionTypes (أنواع حركات المخزون) | `TransactionTypeID` | InventoryTransactions (حركة المخزون) | `TransactionTypeID` | ✔ | فرض التكامل |
+| 76 | `FK_InventoryTransactions_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | InventoryTransactions (حركة المخزون) | `EmployeeID` |  | فرض التكامل |
+| 77 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
+| 78 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
+| 79 | `FK_StockCounts_PostedByID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `PostedByID` |  | فرض التكامل |
+| 80 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 81 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
+| 82 | `FK_AuditLog_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | AuditLog (سجل العمليات) | `EmployeeID` |  | فرض التكامل |

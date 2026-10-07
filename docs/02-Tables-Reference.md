@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **45** | عدد الحقول: **531**
+عدد الجداول: **46** | عدد الحقول: **559**
 
 ## الفهرس
 
@@ -43,14 +43,15 @@
 35. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
 36. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
 37. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-38. [`ManualEntries`](#manualentries) – القيود اليدوية
-39. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-40. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-41. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-42. [`StockCounts`](#stockcounts) – جلسات الجرد
-43. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-44. [`AuditLog`](#auditlog) – سجل العمليات
-45. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+38. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+39. [`ManualEntries`](#manualentries) – القيود اليدوية
+40. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+41. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+42. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+43. [`StockCounts`](#stockcounts) – جلسات الجرد
+44. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+45. [`AuditLog`](#auditlog) – سجل العمليات
+46. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -137,7 +138,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 27 سجل
+- بيانات أساسية: 28 سجل
 
 ## RolePermissions
 
@@ -149,7 +150,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 54 سجل
+- بيانات أساسية: 56 سجل
 
 ## Employees
 
@@ -197,7 +198,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 38 سجل
+- بيانات أساسية: 39 سجل
 
 ## UserScreens
 
@@ -810,7 +811,7 @@
 | 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 15 سجل
+- بيانات أساسية: 17 سجل
 
 ## JournalEntries
 
@@ -908,6 +909,46 @@
 
 - المفتاح الأساسي: `YearClosingLineID`
 - فهرس فريد: `YearClosingID, LineNumber`
+
+## VatReturns
+
+**إقرارات ضريبة القيمة المضافة** – إقرار كل فترة ضريبية (شهر أو ربع سنة) بخانات نموذج هيئة الزكاة والضريبة والجمارك. المسودة تُحسب من المستندات، وعند الاعتماد تُحفظ قيمها كما هي ويُنشأ قيد التسوية (ضريبة المخرجات والمدخلات إلى حساب التسوية 2250)، ثم قيد السداد عند تسجيله.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **VatReturnID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | ReturnNumber | Short Text | 20 | ✔ |  |  |  | رقم الإقرار – VAT-yyyymmdd (آخر يوم في الفترة) |
+| 3 | PeriodFrom | Date/Time (تاريخ) |  | ✔ |  |  |  | بداية الفترة |
+| 4 | PeriodTo | Date/Time (تاريخ) |  | ✔ |  |  |  | نهاية الفترة |
+| 5 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","FILED")` |  | الحالة |
+| 6 | SalesStdAmount | Currency |  | ✔ | `0` | `>=0` |  | 1- المبيعات الخاضعة للنسبة الأساسية |
+| 7 | SalesStdAdjust | Currency |  | ✔ | `0` |  |  | 1- تعديلات (مرتجعات) المبيعات الخاضعة |
+| 8 | SalesStdVAT | Currency |  | ✔ | `0` |  |  | 1- ضريبة المبيعات الخاضعة |
+| 9 | SalesZeroAmount | Currency |  | ✔ | `0` | `>=0` |  | 3- المبيعات بنسبة صفرية |
+| 10 | SalesZeroAdjust | Currency |  | ✔ | `0` |  |  | 3- تعديلات المبيعات بنسبة صفرية |
+| 11 | SalesExemptAmount | Currency |  | ✔ | `0` | `>=0` |  | 5- المبيعات المعفاة |
+| 12 | SalesExemptAdjust | Currency |  | ✔ | `0` |  |  | 5- تعديلات المبيعات المعفاة |
+| 13 | PurchStdAmount | Currency |  | ✔ | `0` | `>=0` |  | 7- المشتريات والمصروفات الخاضعة للنسبة الأساسية |
+| 14 | PurchStdAdjust | Currency |  | ✔ | `0` |  |  | 7- تعديلات (مرتجعات) المشتريات الخاضعة |
+| 15 | PurchStdVAT | Currency |  | ✔ | `0` |  |  | 7- ضريبة المشتريات الخاضعة |
+| 16 | PurchZeroAmount | Currency |  | ✔ | `0` | `>=0` |  | 10- المشتريات بنسبة صفرية |
+| 17 | PurchZeroAdjust | Currency |  | ✔ | `0` |  |  | 10- تعديلات المشتريات بنسبة صفرية |
+| 18 | Corrections | Currency |  | ✔ | `0` |  |  | 14- تصحيحات من الفترات السابقة – موجبة تزيد الضريبة المستحقة، سالبة تنقصها |
+| 19 | CarriedCredit | Currency |  | ✔ | `0` | `>=0` |  | 15- الرصيد الدائن المرحَّل من الفترات السابقة |
+| 20 | NetDue | Currency |  | ✔ | `0` |  |  | 16- صافي الضريبة المستحقة (سالب = مستردة) – SalesStdVAT − PurchStdVAT + Corrections − CarriedCredit |
+| 21 | FiledDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ الاعتماد (تاريخ قيد التسوية) |
+| 22 | FilingRef | Short Text | 30 |  |  |  |  | رقم الإقرار لدى الهيئة |
+| 23 | PaidDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ السداد |
+| 24 | PaidAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ المسدد |
+| 25 | PaidAccount | Number (Long) |  |  |  |  | `Accounts.AccountCode` | حساب السداد (البنك) |
+| 26 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 27 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أعدّه / اعتمده |
+| 28 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `VatReturnID`
+- فهرس فريد: `ReturnNumber`
+- فهرس عادي: `PeriodFrom`
+- قاعدة تحقق على مستوى الجدول: `[PeriodTo]>=[PeriodFrom] And ([PaidAmount]=0 Or [PaidAmount]<=[NetDue])` – نهاية الفترة قبل بدايتها، أو المسدد أكبر من الضريبة المستحقة
 
 ## ManualEntries
 
