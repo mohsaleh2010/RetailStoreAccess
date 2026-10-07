@@ -370,6 +370,7 @@ TABLES: List[Table] = [
             ("CHEQUES", "الشيكات الواردة والصادرة: التسجيل والتحصيل والارتداد", "الخزينة", 68),
             ("FIXED_ASSETS", "الأصول الثابتة والإهلاك", "الحسابات", 79),
             ("PAYROLL", "مسير الرواتب: الإعداد والترحيل والصرف", "الحسابات", 80),
+            ("BUDGET", "الموازنة التقديرية: الإعداد والمقارنة بالفعلي", "الحسابات", 81),
             ("REPORTS", "التقارير التشغيلية", "التقارير", 70),
             ("REPORTS_PROFIT", "تقارير الأرباح والضريبة", "التقارير", 71),
             ("DASHBOARD_FINANCIAL", "الأرقام المالية في لوحة التحكم", "التقارير", 72),
@@ -1119,6 +1120,48 @@ TABLES: List[Table] = [
         indexes=[ux("CenterCode"), ux("CenterName")],
     ),
 
+    # ----------------------------------------------------------------- Budget
+    Table(
+        "Budgets", "الموازنات التقديرية",
+        "موازنة كل سنة: مبلغ شهري لكل حساب إيرادات أو مصروفات، ويمكن لكل مركز تكلفة.",
+        [
+            auto("BudgetID", "رقم داخلي"),
+            int_("BudgetYear", "السنة", required=True),
+            text("BudgetName", 100, "اسم الموازنة", required=True),
+            text("Notes", 255, "ملاحظات"),
+            long_("EmployeeID", "أعدّها", required=True, fk="Employees.EmployeeID"),
+            created_at(),
+        ],
+        pk=["BudgetID"],
+        indexes=[ux("BudgetYear")],
+    ),
+
+    Table(
+        "BudgetLines", "أسطر الموازنة",
+        "حساب (ومركز تكلفة اختياري) ومبلغه في كل شهر. بلا مركز = الحساب في كل المراكز.",
+        [
+            auto("BudgetLineID", "رقم داخلي"),
+            long_("BudgetID", "الموازنة", required=True, fk="Budgets.BudgetID", cascade=True),
+            long_("AccountCode", "الحساب", required=True, fk="Accounts.AccountCode"),
+            long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID", note="فارغ = كل المراكز"),
+            money("M1", "الشهر 1"),
+            money("M2", "الشهر 2"),
+            money("M3", "الشهر 3"),
+            money("M4", "الشهر 4"),
+            money("M5", "الشهر 5"),
+            money("M6", "الشهر 6"),
+            money("M7", "الشهر 7"),
+            money("M8", "الشهر 8"),
+            money("M9", "الشهر 9"),
+            money("M10", "الشهر 10"),
+            money("M11", "الشهر 11"),
+            money("M12", "الشهر 12"),
+            text("Notes", 150, "ملاحظات"),
+        ],
+        pk=["BudgetLineID"],
+        indexes=[ix("BudgetID"), ix("AccountCode")],
+    ),
+
     # --------------------------------------------------------------- Payroll
     Table(
         "PayrollRuns", "مسيرات الرواتب",
@@ -1806,6 +1849,7 @@ SCREEN_LIST = [
     ("frmDepreciation", "الإهلاك الشهري", "الحسابات", "FIXED_ASSETS", True, False, True),
     ("frmPayroll", "مسير الرواتب", "الحسابات", "PAYROLL", True, True, True),
     ("frmCostCenters", "مراكز التكلفة والفروع", "الحسابات", "JOURNAL", True, True, True),
+    ("frmBudget", "الموازنة التقديرية", "الحسابات", "BUDGET", True, True, True),
     ("frmAllocation", "ربط السداد بالفواتير", "العملاء", "CUSTOMER_PAYMENTS", True, False, True),
     ("frmReportCenter", "التقارير", "التقارير", "REPORTS", False, False, False),
     ("frmSearch", "البحث", "النظام", None, False, False, False),

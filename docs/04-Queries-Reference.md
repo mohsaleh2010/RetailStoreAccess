@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **141**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **145**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -134,19 +134,23 @@
 | 126 | [`qryCenterSums`](#qrycentersums) | الإيرادات وتكلفة المبيعات والمصروفات لكل مركز تكلفة |  |
 | 127 | [`CostCenterProfitQuery`](#costcenterprofitquery) | قائمة الدخل لكل مركز تكلفة: الإيرادات، تكلفة المبيعات، مجمل الربح، المصروفات، صافي الربح | `PeriodStart`, `PeriodEnd` |
 | 128 | [`CostCenterAccountsQuery`](#costcenteraccountsquery) | إيرادات ومصروفات كل مركز تكلفة بالحسابات | `PeriodStart`, `PeriodEnd` |
-| 129 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 130 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 131 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 132 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 133 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 134 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 135 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 136 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 137 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 138 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 139 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 140 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 141 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 129 | [`qryBudgetMonths`](#qrybudgetmonths) | أشهر الموازنة: سطر لكل شهر من كل سطر موازنة |  |
+| 130 | [`qryBudgetPlanned`](#qrybudgetplanned) | مبلغ الموازنة لكل سطر في أشهر الفترة | `PeriodStart`, `PeriodEnd` |
+| 131 | [`qryBudgetActual`](#qrybudgetactual) | الفعلي لكل سطر موازنة في الفترة من القيود | `PeriodStart`, `PeriodEnd` |
+| 132 | [`BudgetVsActualQuery`](#budgetvsactualquery) | الموازنة مقابل الفعلي في الفترة: الانحراف ونسبته، وهل هو ملائم | `PeriodStart`, `PeriodEnd` |
+| 133 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 134 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 135 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 136 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 137 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 138 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 139 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 140 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 141 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 142 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 143 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 144 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 145 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -2622,6 +2626,101 @@ SELECT n.CenterKey, n.CenterName, m.AccountCode, m.AccountName, m.TreeKey,
        IIf(m.Level2Code = 41 Or m.Level2Code = 42, 'إيرادات', IIf(m.Level2Code = 51, 'تكلفة المبيعات', 'مصروفات'))
            AS SectionName, m.CenterAmount
 FROM qryCenterNames AS n INNER JOIN qryCenterMoves AS m ON n.CenterKey = m.CenterKey
+```
+
+## qryBudgetMonths
+
+أشهر الموازنة: سطر لكل شهر من كل سطر موازنة
+
+```sql
+SELECT l.BudgetLineID, h.BudgetYear, 1 AS MonthNo, h.BudgetYear * 100 + 1 AS MonthKey, l.M1 AS PlanAmount
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 2, h.BudgetYear * 100 + 2, l.M2
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 3, h.BudgetYear * 100 + 3, l.M3
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 4, h.BudgetYear * 100 + 4, l.M4
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 5, h.BudgetYear * 100 + 5, l.M5
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 6, h.BudgetYear * 100 + 6, l.M6
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 7, h.BudgetYear * 100 + 7, l.M7
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 8, h.BudgetYear * 100 + 8, l.M8
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 9, h.BudgetYear * 100 + 9, l.M9
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 10, h.BudgetYear * 100 + 10, l.M10
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 11, h.BudgetYear * 100 + 11, l.M11
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 12, h.BudgetYear * 100 + 12, l.M12
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+```
+
+## qryBudgetPlanned
+
+مبلغ الموازنة لكل سطر في أشهر الفترة
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT BudgetLineID, Sum(PlanAmount) AS SumPlan
+FROM qryBudgetMonths
+WHERE BudgetYear = Year(QDate('PeriodStart')) AND MonthKey >= Year(QDate('PeriodStart')) * 100 + Month(QDate('PeriodStart'))
+      AND MonthKey <= Year(DateAdd('d', -1, QDate('PeriodEnd'))) * 100 + Month(DateAdd('d', -1, QDate('PeriodEnd')))
+GROUP BY BudgetLineID
+```
+
+## qryBudgetActual
+
+الفعلي لكل سطر موازنة في الفترة من القيود
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT b.BudgetLineID, Sum(IIf(a.AccountType = 'REVENUE', l.Credit - l.Debit, l.Debit - l.Credit)) AS SumActual
+FROM Budgets AS h, BudgetLines AS b, Accounts AS a, JournalEntries AS e, JournalLines AS l, Accounts AS d
+WHERE h.BudgetYear = Year(QDate('PeriodStart')) AND b.BudgetID = h.BudgetID AND a.AccountCode = b.AccountCode
+      AND l.EntryID = e.EntryID AND d.AccountCode = l.AccountCode AND (d.Level1Code = b.AccountCode OR d.Level2Code = b.AccountCode OR d.Level3Code = b.AccountCode OR d.Level4Code = b.AccountCode OR d.Level5Code = b.AccountCode)
+      AND (b.CostCenterID Is Null OR l.CostCenterID = b.CostCenterID)
+      AND e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd') AND e.SourceType <> 'YEAR_CLOSE'
+GROUP BY b.BudgetLineID
+```
+
+## BudgetVsActualQuery
+
+الموازنة مقابل الفعلي في الفترة: الانحراف ونسبته، وهل هو ملائم
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT b.BudgetLineID, b.AccountCode, a.AccountName, a.TreeKey, a.AccountType,
+       IIf(a.AccountType = 'REVENUE', 'الإيرادات', 'المصروفات') AS SectionName,
+       IIf(c.CenterName Is Null, 'كل المراكز', c.CenterName) AS BudgetCenter,
+       CCur(Nz(p.SumPlan, 0)) AS BudgetAmount, CCur(Nz(x.SumActual, 0)) AS ActualAmount,
+       CCur(Nz(x.SumActual, 0)) - CCur(Nz(p.SumPlan, 0)) AS Variance,
+       IIf(CCur(Nz(p.SumPlan, 0)) = 0, Null, (CCur(Nz(x.SumActual, 0)) - CCur(Nz(p.SumPlan, 0))) / CCur(Nz(p.SumPlan, 0))) AS VariancePct,
+       IIf(CCur(Nz(x.SumActual, 0)) = CCur(Nz(p.SumPlan, 0)), 'مطابق', IIf((a.AccountType = 'REVENUE') = (CCur(Nz(x.SumActual, 0)) > CCur(Nz(p.SumPlan, 0))),
+           'ملائم', 'غير ملائم')) AS VarianceNote
+FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)
+       INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode)
+      LEFT JOIN CostCenters AS c ON b.CostCenterID = c.CostCenterID)
+     LEFT JOIN qryBudgetPlanned AS p ON b.BudgetLineID = p.BudgetLineID)
+     LEFT JOIN qryBudgetActual AS x ON b.BudgetLineID = x.BudgetLineID
+WHERE h.BudgetYear = Year(QDate('PeriodStart'))
 ```
 
 ## qryBalanceAt

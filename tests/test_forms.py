@@ -94,6 +94,7 @@ class WiringTests(unittest.TestCase):
 
     def test_event_procedure_signatures(self):
         sig = {"BeforeUpdate": "(Cancel As Integer)", "Unload": "(Cancel As Integer)", "Open": "(Cancel As Integer)",
+               "BeforeInsert": "(Cancel As Integer)",
                "Error": "(DataErr As Integer, Response As Integer)",
                "KeyDown": "(KeyCode As Integer, Shift As Integer)", "DblClick": "(Cancel As Integer)"}
         for m in MODELS:

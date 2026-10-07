@@ -467,7 +467,7 @@ SCREEN_PERMISSIONS = {
     "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
     "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
     "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
-    "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL", "frmCostCenters": "JOURNAL",
+    "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL", "frmCostCenters": "JOURNAL", "frmBudget": "BUDGET",
 }
 
 
@@ -567,6 +567,7 @@ REPORTS: List[ReportEntry] = [
                 "PJ"),
     ReportEntry("COST_CENTER_ACCOUNTS", "إيرادات ومصروفات كل مركز تكلفة", "CostCenterAccountsQuery",
                 "rptCostCenterAccounts", "PJ"),
+    ReportEntry("BUDGET_VS_ACTUAL", "الموازنة مقابل الفعلي", "BudgetVsActualQuery", "rptBudgetVsActual", "PJ"),
     ReportEntry("FIXED_ASSETS", "سجل الأصول الثابتة", "FixedAssetsQuery", "rptFixedAssets", "J"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
@@ -1126,7 +1127,8 @@ def all_forms() -> List[FormModel]:
     from forms_bank import bank_forms
     from forms_assets import asset_forms
     from forms_payroll import payroll_forms
+    from forms_budget import budget_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
-            + bank_forms() + asset_forms() + payroll_forms())
+            + bank_forms() + asset_forms() + payroll_forms() + budget_forms())

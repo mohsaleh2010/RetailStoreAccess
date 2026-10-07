@@ -176,6 +176,12 @@ LIST_SPECS: List[ListSpec] = [
         Col("المركز", "CenterName", 4.0), Col("القسم", "SectionName", 3.0), Col("الحساب", "AccountCode", 2.0),
         Col("اسم الحساب", "AccountName", 6.0, grow=True), Col("المبلغ", "CenterAmount", 4.0, MONEY)],
         [("CenterKey", False), ("TreeKey", False)], no_data="لا توجد إيرادات أو مصروفات في الفترة."),
+    ListSpec("BUDGET_VS_ACTUAL", [
+        Col("البند", "SectionName", 2.4), Col("الحساب", "AccountCode", 1.8), Col("اسم الحساب", "AccountName", 5.4, grow=True),
+        Col("المركز", "BudgetCenter", 3.0), Col("الموازنة", "BudgetAmount", 3.0, MONEY, True),
+        Col("الفعلي", "ActualAmount", 3.0, MONEY, True), Col("الانحراف", "Variance", 3.0, MONEY),
+        Col("النسبة", "VariancePct", 1.8, PCT), Col("التقييم", "VarianceNote", 4.0)],
+        [("AccountType", True), ("TreeKey", False)], landscape=True, no_data="لا توجد موازنة لسنة الفترة."),
     ListSpec("FIXED_ASSETS", [
         Col("الرقم", "AssetCode", 2.0), Col("الأصل", "AssetName", 5.2, grow=True), Col("المجموعة", "AssetGroup", 3.6),
         Col("الشراء", "=GDate([PurchaseDate])", 2.2), Col("العمر (شهر)", "UsefulLifeMonths", 1.8, INT),

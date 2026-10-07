@@ -288,11 +288,12 @@ def layout_financials() -> FormModel:
     for name, caption, style, w, call in [
             ("btnPrint", "طباعة القائمة", "primary", 3.2, "PrintFinancials Me"),
             ("btnLedger", "كشف حساب", "secondary", 2.8, "FinancialsOpenLedger Me"),
-            ("btnTrial", "ميزان المراجعة", "secondary", 3.0, 'OpenScreen "frmJournal"'),
-            ("btnClosing", "إقفال الفترات", "secondary", 3.0, 'OpenScreen "frmPeriodClosing", 0'),
-            ("btnVat", "الإقرار الضريبي", "secondary", 3.2, 'OpenScreen "frmVatReturn", 0'),
+            ("btnTrial", "ميزان المراجعة", "secondary", 2.8, 'OpenScreen "frmJournal"'),
+            ("btnClosing", "إقفال الفترات", "secondary", 2.7, 'OpenScreen "frmPeriodClosing", 0'),
+            ("btnVat", "الإقرار الضريبي", "secondary", 2.9, 'OpenScreen "frmVatReturn", 0'),
             ("btnAssets", "الأصول الثابتة", "secondary", 3.0, 'OpenScreen "frmAssets", 0'),
-            ("btnPayroll", "الرواتب", "secondary", 2.2, 'OpenScreen "frmPayroll"')]:
+            ("btnPayroll", "الرواتب", "secondary", 2.2, 'OpenScreen "frmPayroll"'),
+            ("btnBudget", "الموازنة", "secondary", 2.2, 'OpenScreen "frmBudget"')]:
         button(m, name, caption, x, y, style, w=cm(w), h=cm(0.9), call=call)
         x += cm(w) + cm(0.2)
     button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), y, "secondary", w=cm(2.4), h=cm(0.9),

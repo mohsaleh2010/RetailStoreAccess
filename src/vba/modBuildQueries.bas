@@ -26,7 +26,7 @@ Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySa
     "int,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
     ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,qryAdvanceMoves,qryAdva" & _
     "nceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQu" & _
-    "ery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "ery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -789,6 +789,10 @@ Private Sub CreateAllQueries()
     Q_qryCenterSums
     Q_CostCenterProfitQuery
     Q_CostCenterAccountsQuery
+    Q_qryBudgetMonths
+    Q_qryBudgetPlanned
+    Q_qryBudgetActual
+    Q_BudgetVsActualQuery
     Q_qryBalanceAt
     Q_qryBalanceCompare
     Q_qryBalanceAccounts
@@ -2818,6 +2822,87 @@ Private Sub Q_CostCenterAccountsQuery()
     s = s & "           AS SectionName, m.CenterAmount" & vbCrLf
     s = s & "FROM qryCenterNames AS n INNER JOIN qryCenterMoves AS m ON n.CenterKey = m.CenterKey" & vbCrLf
     SaveQuery "CostCenterAccountsQuery", "إيرادات ومصروفات كل مركز تكلفة بالحسابات", s
+End Sub
+
+Private Sub Q_qryBudgetMonths()
+    Dim s As String
+    s = "SELECT l.BudgetLineID, h.BudgetYear, 1 AS MonthNo, h.BudgetYear * 100 + 1 AS MonthKey, l.M1 AS PlanAmount" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 2, h.BudgetYear * 100 + 2, l.M2" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 3, h.BudgetYear * 100 + 3, l.M3" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 4, h.BudgetYear * 100 + 4, l.M4" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 5, h.BudgetYear * 100 + 5, l.M5" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 6, h.BudgetYear * 100 + 6, l.M6" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 7, h.BudgetYear * 100 + 7, l.M7" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 8, h.BudgetYear * 100 + 8, l.M8" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 9, h.BudgetYear * 100 + 9, l.M9" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 10, h.BudgetYear * 100 + 10, l.M10" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 11, h.BudgetYear * 100 + 11, l.M11" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.BudgetLineID, h.BudgetYear, 12, h.BudgetYear * 100 + 12, l.M12" & vbCrLf
+    s = s & "FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID" & vbCrLf
+    SaveQuery "qryBudgetMonths", "أشهر الموازنة: سطر لكل شهر من كل سطر موازنة", s
+End Sub
+
+Private Sub Q_qryBudgetPlanned()
+    Dim s As String
+    s = "SELECT BudgetLineID, Sum(PlanAmount) AS SumPlan" & vbCrLf
+    s = s & "FROM qryBudgetMonths" & vbCrLf
+    s = s & "WHERE BudgetYear = Year(QDate('PeriodStart')) AND MonthKey >= Year(QDate('PeriodStart')) * 100 + Month(QDate('PeriodStart'))" & vbCrLf
+    s = s & "      AND MonthKey <= Year(DateAdd('d', -1, QDate('PeriodEnd'))) * 100 + Month(DateAdd('d', -1, QDate('PeriodEnd')))" & vbCrLf
+    s = s & "GROUP BY BudgetLineID" & vbCrLf
+    SaveQuery "qryBudgetPlanned", "مبلغ الموازنة لكل سطر في أشهر الفترة", s
+End Sub
+
+Private Sub Q_qryBudgetActual()
+    Dim s As String
+    s = "SELECT b.BudgetLineID, Sum(IIf(a.AccountType = 'REVENUE', l.Credit - l.Debit, l.Debit - l.Credit)) AS SumActual" & vbCrLf
+    s = s & "FROM Budgets AS h, BudgetLines AS b, Accounts AS a, JournalEntries AS e, JournalLines AS l, Accounts AS d" & vbCrLf
+    s = s & "WHERE h.BudgetYear = Year(QDate('PeriodStart')) AND b.BudgetID = h.BudgetID AND a.AccountCode = b.AccountCode" & vbCrLf
+    s = s & "      AND l.EntryID = e.EntryID AND d.AccountCode = l.AccountCode AND (d.Level1Code = b.AccountCode OR d.Level2Code = b.AccountCode OR d.Level3Code = b.AccountCode OR d.Level4Code = b.AccountCode OR d.Level5Code = b.AccountCode)" & vbCrLf
+    s = s & "      AND (b.CostCenterID Is Null OR l.CostCenterID = b.CostCenterID)" & vbCrLf
+    s = s & "      AND e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd') AND e.SourceType <> 'YEAR_CLOSE'" & vbCrLf
+    s = s & "GROUP BY b.BudgetLineID" & vbCrLf
+    SaveQuery "qryBudgetActual", "الفعلي لكل سطر موازنة في الفترة من القيود", s
+End Sub
+
+Private Sub Q_BudgetVsActualQuery()
+    Dim s As String
+    s = "SELECT b.BudgetLineID, b.AccountCode, a.AccountName, a.TreeKey, a.AccountType," & vbCrLf
+    s = s & "       IIf(a.AccountType = 'REVENUE', 'الإيرادات', 'المصروفات') AS SectionName," & vbCrLf
+    s = s & "       IIf(c.CenterName Is Null, 'كل المراكز', c.CenterName) AS BudgetCenter," & vbCrLf
+    s = s & "       CCur(Nz(p.SumPlan, 0)) AS BudgetAmount, CCur(Nz(x.SumActual, 0)) AS ActualAmount," & vbCrLf
+    s = s & "       CCur(Nz(x.SumActual, 0)) - CCur(Nz(p.SumPlan, 0)) AS Variance," & vbCrLf
+    s = s & "       IIf(CCur(Nz(p.SumPlan, 0)) = 0, Null, (CCur(Nz(x.SumActual, 0)) - CCur(Nz(p.SumPlan, 0))) / CCur(Nz(p.SumPlan, 0))) AS VariancePct," & vbCrLf
+    s = s & "       IIf(CCur(Nz(x.SumActual, 0)) = CCur(Nz(p.SumPlan, 0)), 'مطابق', IIf((a.AccountType = 'REVENUE') = (CCur(Nz(x.SumActual, 0)) > CCur(Nz(p.SumPlan, 0)))," & vbCrLf
+    s = s & "           'ملائم', 'غير ملائم')) AS VarianceNote" & vbCrLf
+    s = s & "FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)" & vbCrLf
+    s = s & "       INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode)" & vbCrLf
+    s = s & "      LEFT JOIN CostCenters AS c ON b.CostCenterID = c.CostCenterID)" & vbCrLf
+    s = s & "     LEFT JOIN qryBudgetPlanned AS p ON b.BudgetLineID = p.BudgetLineID)" & vbCrLf
+    s = s & "     LEFT JOIN qryBudgetActual AS x ON b.BudgetLineID = x.BudgetLineID" & vbCrLf
+    s = s & "WHERE h.BudgetYear = Year(QDate('PeriodStart'))" & vbCrLf
+    SaveQuery "BudgetVsActualQuery", "الموازنة مقابل الفعلي في الفترة: الانحراف ونسبته، وهل هو ملائم", s
 End Sub
 
 Private Sub Q_qryBalanceAt()

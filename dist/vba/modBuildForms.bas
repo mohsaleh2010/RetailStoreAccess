@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -631,6 +631,8 @@ Private Sub BuildAllForms()
     BuildForm_frmDepreciation
     BuildForm_frmPayrollLines
     BuildForm_frmPayroll
+    BuildForm_frmBudgetLines
+    BuildForm_frmBudget
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -6822,15 +6824,17 @@ Private Sub BuildForm_frmFinancials()
     c.OnClick = EP
     Set c = AddButton("btnLedger", "ﬂ‘› Õ”«»", 2154, 7485, 1588, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnTrial", "„Ì“«‰ «·„—«Ã⁄…", 3855, 7485, 1701, 510, "secondary")
+    Set c = AddButton("btnTrial", "„Ì“«‰ «·„—«Ã⁄…", 3855, 7485, 1588, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnClosing", "≈ﬁ›«· «·› —« ", 5669, 7485, 1701, 510, "secondary")
+    Set c = AddButton("btnClosing", "≈ﬁ›«· «·› —« ", 5556, 7485, 1531, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnVat", "«·≈ﬁ—«— «·÷—Ì»Ì", 7483, 7485, 1814, 510, "secondary")
+    Set c = AddButton("btnVat", "«·≈ﬁ—«— «·÷—Ì»Ì", 7200, 7485, 1644, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnAssets", "«·√’Ê· «·À«» …", 9410, 7485, 1701, 510, "secondary")
+    Set c = AddButton("btnAssets", "«·√’Ê· «·À«» …", 8957, 7485, 1701, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnPayroll", "«·—Ê« »", 11224, 7485, 1247, 510, "secondary")
+    Set c = AddButton("btnPayroll", "«·—Ê« »", 10771, 7485, 1247, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnBudget", "«·„Ê«“‰…", 12131, 7485, 1247, 510, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "—ÃÊ⁄", 13721, 7485, 1361, 510, "secondary")
     c.OnClick = EP
@@ -6882,14 +6886,17 @@ Private Sub BuildForm_frmFinancials()
     s = s & "Private Sub btnPayroll_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmPayroll""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnBudget_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmBudget""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,12587,1304,1418,454,1000,0,0,0;lblCompare,227,1871,14855,312,0,1000,0,0;lstRows,227,3090,14855,3856,0,1000,0,1000;lblInfo,227,7031,14855,312,0,1000,1000,0;btnPrint,227,7485,1814,510,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnLedger,2154,7485,1588,510,0,0,1000,0;btnTrial,3855,7485,1701,510,0,0,1000,0;btnClosing,5669,7485,1701,510,0,0,1000,0;btnVat,7483,7485,1814,510,0,0,1000,0;btnAssets,9410,7485,1701,510,0,0,1000,0;btnPayroll,11224,7485,1247,510,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnClose,13721,7485,1361,510,1000,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnLedger,2154,7485,1588,510,0,0,1000,0;btnTrial,3855,7485,1588,510,0,0,1000,0;btnClosing,5556,7485,1531,510,0,0,1000,0;btnVat,7200,7485,1644,510,0,0,1000,0;btnAssets,8957,7485,1701,510,0,0,1000,0;btnPayroll,10771,7485,1247,510,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnBudget,12131,7485,1247,510,0,0,1000,0;btnClose,13721,7485,1361,510,1000,0,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 15309, 8732, -2381, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmFinancials", s
@@ -7936,4 +7943,175 @@ Private Sub BuildForm_frmPayroll()
     Exit Sub
 EH:
     AbortForm "frmPayroll", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmBudgetLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmBudgetLines", "√”ÿ— «·„Ê«“‰…", "SELECT * FROM BudgetLines WHERE BudgetID = 0 ORDER BY AccountCode", 14855, 397, False, True, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    Set c = AddCombo("AccountCode", "AccountCode", 28, 0, 2211, 397, "SELECT AccountCode, AccountCode & '  ' & AccountName FROM Accounts WHERE AccountType IN ('REVENUE', 'EXPENSE') AND IsActive = True ORDER BY TreeKey", 2, "0;3118")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    Set c = AddCombo("CostCenterID", "CostCenterID", 2267, 0, 1191, 397, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;1701")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    Set c = AddText("M1", "M1", 3486, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M2", "M2", 4336, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M3", "M3", 5186, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M4", "M4", 6036, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M5", "M5", 6886, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M6", "M6", 7736, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M7", "M7", 8586, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M8", "M8", 9436, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M9", "M9", 10286, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M10", "M10", 11136, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M11", "M11", 11986, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("M12", "M12", 12836, 0, 822, 397)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("txtYearTotal", "=Nz([M1],0)+Nz([M2],0)+Nz([M3],0)+Nz([M4],0)+Nz([M5],0)+Nz([M6],0)+Nz([M7],0)+Nz([M8],0)+Nz([M9],0)+Nz([M10],0)+Nz([M11],0)+Nz([M12],0)", 13686, 0, 964, 397)
+    c.FontBold = True
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddText("BudgetID", "BudgetID", 14678, 0, 28, 397)
+    SetCtlProp c, "Visible", False
+    m_frm.BeforeInsert = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeInsert(Cancel As Integer)" & vbCrLf
+    s = s & "    BudgetLineInsert Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    BudgetLineCheck Me, Cancel" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    BudgetLineSaved Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmBudgetLines", s
+    Exit Sub
+EH:
+    AbortForm "frmBudgetLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmBudget()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmBudget", "«·„Ê«“‰… «· ﬁœÌ—Ì…", "", 15309, 10886, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8A5), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "«·„Ê«“‰… «· ﬁœÌ—Ì…", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "„»·€ ‘Â—Ì ·ﬂ· Õ”«» ≈Ì—«œ«  √Ê „’—Ê›«  (ÊÌ„ﬂ‰ ·ﬂ· „—ﬂ“)° À„ «·„ﬁ«—‰… »«·›⁄·Ì", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboBudget", "", 227, 1304, 2608, 454, "SELECT BudgetID, BudgetYear & '  ' & BudgetName FROM Budgets ORDER BY BudgetYear DESC", 2, "0;3969")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblBudget", "«·„Ê«“‰…", 227, 992, 2608, 284, 9, False, CLR_MUTED, "cboBudget", 0)
+    Set c = AddText("txtYear", "", 2948, 1304, 1021, 454)
+    SetCtlProp c, "Format", "0"
+    Set c = AddLabel("lblYear", "”‰… ÃœÌœ…", 2948, 992, 1021, 284, 9, False, CLR_MUTED, "txtYear", 0)
+    Set c = AddButton("btnCreate", "≈‰‘«¡ „Ê«“‰…", 4082, 1304, 1588, 454, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnAddAccounts", "≈÷«›… ﬂ· «·Õ”«»« ", 5783, 1304, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddText("txtFillYear", "", 7825, 1304, 1021, 454)
+    SetCtlProp c, "Format", "0"
+    Set c = AddLabel("lblFillYear", "›⁄·Ì ”‰…", 7825, 992, 1021, 284, 9, False, CLR_MUTED, "txtFillYear", 0)
+    Set c = AddText("txtPercent", "", 8959, 1304, 1021, 454)
+    SetCtlProp c, "Format", "0%"
+    Set c = AddLabel("lblPercent", "“Ì«œ…", 8959, 992, 1021, 284, 9, False, CLR_MUTED, "txtPercent", 0)
+    Set c = AddButton("btnFill", "„·¡ „‰ «·›⁄·Ì", 10093, 1304, 1701, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddText("txtAnnual", "", 11907, 1304, 1247, 454)
+    SetCtlProp c, "Format", "#,##0"
+    Set c = AddLabel("lblAnnual", "„»·€ ”‰ÊÌ", 11907, 992, 1247, 284, 9, False, CLR_MUTED, "txtAnnual", 0)
+    Set c = AddButton("btnSpread", " Ê“Ì⁄ ⁄·Ï «·√‘Â—", 13268, 1304, 1814, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddText("txtBudgetID", "", 15139, 907, 113, 227)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblCol1", "«·Õ”«»", 255, 1956, 2211, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "«·„—ﬂ“", 2494, 1956, 1191, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "Ì‰«Ì—", 3713, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "›»—«Ì—", 4563, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol5", "„«—”", 5413, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol6", "√»—Ì·", 6263, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol7", "„«ÌÊ", 7113, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol8", "ÌÊ‰ÌÊ", 7963, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol9", "ÌÊ·ÌÊ", 8813, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol10", "√€”ÿ”", 9663, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol11", "”» „»—", 10513, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol12", "√ﬂ Ê»—", 11363, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol13", "‰Ê›„»—", 12213, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol14", "œÌ”„»—", 13063, 1956, 822, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol15", "«·”‰…", 13913, 1956, 964, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subLines", "frmBudgetLines", 227, 2296, 14855, 3912)
+    Set c = AddLabel("lblTotals", " ", 227, 6294, 11340, 340, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnDelete", "Õ–› «·„Ê«“‰…", 13381, 6237, 1701, 425, "danger")
+    c.OnClick = EP
+    Set c = AddText("txtFrom", "", 227, 7116, 1588, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblFrom", "„ﬁ«—‰… „‰", 227, 6804, 1588, 284, 9, False, CLR_MUTED, "txtFrom", 0)
+    Set c = AddText("txtTo", "", 1928, 7116, 1588, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblTo", "≈·Ï", 1928, 6804, 1588, 284, 9, False, CLR_MUTED, "txtTo", 0)
+    Set c = AddButton("btnCompare", "«·„Ê«“‰… „ﬁ«»· «·›⁄·Ì", 3629, 7116, 2381, 454, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrint", "ÿ»«⁄… «·„ﬁ«—‰…", 6124, 7116, 1701, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblVariance", " ", 7938, 7116, 7144, 454, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddList("lstVariance", 227, 7711, 14855, 2381, 9, "0;1134;3402;1928;1701;1701;1701;1021;1361", True)
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13608, 10206, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    BudgetLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboBudget_AfterUpdate()" & vbCrLf
+    s = s & "    BudgetPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCreate_Click()" & vbCrLf
+    s = s & "    BudgetCreate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAddAccounts_Click()" & vbCrLf
+    s = s & "    BudgetAddAccounts Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnFill_Click()" & vbCrLf
+    s = s & "    BudgetFill Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSpread_Click()" & vbCrLf
+    s = s & "    BudgetSpread Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    BudgetDelete Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCompare_Click()" & vbCrLf
+    s = s & "    BudgetCompare Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintBudgetVariance Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmBudget", s
+    Exit Sub
+EH:
+    AbortForm "frmBudget", Err.Number, Err.Description
 End Sub

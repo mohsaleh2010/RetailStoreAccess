@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **59** | عدد الحقول: **740**
+عدد الجداول: **61** | عدد الحقول: **763**
 
 ## الفهرس
 
@@ -39,32 +39,34 @@
 31. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
 32. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
 33. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
-34. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
-35. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
-36. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-37. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-38. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-39. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-40. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-41. [`Expenses`](#expenses) – المصروفات
-42. [`CashVouchers`](#cashvouchers) – سندات النقدية
-43. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-44. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-45. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-46. [`JournalEntries`](#journalentries) – قيود اليومية
-47. [`JournalLines`](#journallines) – أسطر القيود
-48. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-49. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-50. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-51. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-52. [`ManualEntries`](#manualentries) – القيود اليدوية
-53. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-54. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-55. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-56. [`StockCounts`](#stockcounts) – جلسات الجرد
-57. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-58. [`AuditLog`](#auditlog) – سجل العمليات
-59. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+34. [`Budgets`](#budgets) – الموازنات التقديرية
+35. [`BudgetLines`](#budgetlines) – أسطر الموازنة
+36. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+37. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+38. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+39. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+40. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+41. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+42. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+43. [`Expenses`](#expenses) – المصروفات
+44. [`CashVouchers`](#cashvouchers) – سندات النقدية
+45. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+46. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+47. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+48. [`JournalEntries`](#journalentries) – قيود اليومية
+49. [`JournalLines`](#journallines) – أسطر القيود
+50. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+51. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+52. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+53. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+54. [`ManualEntries`](#manualentries) – القيود اليدوية
+55. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+56. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+57. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+58. [`StockCounts`](#stockcounts) – جلسات الجرد
+59. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+60. [`AuditLog`](#auditlog) – سجل العمليات
+61. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -157,7 +159,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 32 سجل
+- بيانات أساسية: 33 سجل
 
 ## RolePermissions
 
@@ -169,7 +171,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 64 سجل
+- بيانات أساسية: 66 سجل
 
 ## Employees
 
@@ -228,7 +230,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 49 سجل
+- بيانات أساسية: 50 سجل
 
 ## UserScreens
 
@@ -883,6 +885,50 @@
 - المفتاح الأساسي: `CostCenterID`
 - فهرس فريد: `CenterCode`
 - فهرس فريد: `CenterName`
+
+## Budgets
+
+**الموازنات التقديرية** – موازنة كل سنة: مبلغ شهري لكل حساب إيرادات أو مصروفات، ويمكن لكل مركز تكلفة.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **BudgetID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | BudgetYear | Number (Integer) |  | ✔ |  |  |  | السنة |
+| 3 | BudgetName | Short Text | 100 | ✔ |  |  |  | اسم الموازنة |
+| 4 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 5 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أعدّها |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `BudgetID`
+- فهرس فريد: `BudgetYear`
+
+## BudgetLines
+
+**أسطر الموازنة** – حساب (ومركز تكلفة اختياري) ومبلغه في كل شهر. بلا مركز = الحساب في كل المراكز.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **BudgetLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | BudgetID | Number (Long) |  | ✔ |  |  | `Budgets.BudgetID` | الموازنة |
+| 3 | AccountCode | Number (Long) |  | ✔ |  |  | `Accounts.AccountCode` | الحساب |
+| 4 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – فارغ = كل المراكز |
+| 5 | M1 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 1 |
+| 6 | M2 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 2 |
+| 7 | M3 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 3 |
+| 8 | M4 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 4 |
+| 9 | M5 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 5 |
+| 10 | M6 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 6 |
+| 11 | M7 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 7 |
+| 12 | M8 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 8 |
+| 13 | M9 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 9 |
+| 14 | M10 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 10 |
+| 15 | M11 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 11 |
+| 16 | M12 | Currency |  | ✔ | `0` | `>=0` |  | الشهر 12 |
+| 17 | Notes | Short Text | 150 |  |  |  |  | ملاحظات |
+
+- المفتاح الأساسي: `BudgetLineID`
+- فهرس عادي: `BudgetID`
+- فهرس عادي: `AccountCode`
 
 ## PayrollRuns
 

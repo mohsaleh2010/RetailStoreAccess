@@ -102,6 +102,8 @@ class ReplayTests(unittest.TestCase):
             with self.subTest(rep.key):
                 if rep.key == "INTEGRITY":
                     continue                          # checked with a tolerance above
+                if rep.key == "BUDGET_VS_ACTUAL":
+                    continue                          # needs a budget, entered by the user (not demo data)
                 self.assertGreater(rows, 0, rep.query)
 
     def test_dashboard_has_today(self):

@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 134
+Private Const EXPECTED_RELATION_COUNT As Long = 138
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -456,6 +456,10 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_DepreciationRuns_EmployeeID", "Employees", "EmployeeID", "DepreciationRuns", "EmployeeID", 0&)
     c.Add Array("FK_AssetDepreciations_RunID", "DepreciationRuns", "RunID", "AssetDepreciations", "RunID", 4096&)
     c.Add Array("FK_AssetDepreciations_AssetID", "FixedAssets", "AssetID", "AssetDepreciations", "AssetID", 0&)
+    c.Add Array("FK_Budgets_EmployeeID", "Employees", "EmployeeID", "Budgets", "EmployeeID", 0&)
+    c.Add Array("FK_BudgetLines_BudgetID", "Budgets", "BudgetID", "BudgetLines", "BudgetID", 4096&)
+    c.Add Array("FK_BudgetLines_AccountCode", "Accounts", "AccountCode", "BudgetLines", "AccountCode", 0&)
+    c.Add Array("FK_BudgetLines_CostCenterID", "CostCenters", "CostCenterID", "BudgetLines", "CostCenterID", 0&)
     c.Add Array("FK_PayrollRuns_BankID", "Banks", "BankID", "PayrollRuns", "BankID", 0&)
     c.Add Array("FK_PayrollRuns_CashBoxID", "CashBoxes", "CashBoxID", "PayrollRuns", "CashBoxID", 0&)
     c.Add Array("FK_PayrollRuns_EmployeeID", "Employees", "EmployeeID", "PayrollRuns", "EmployeeID", 0&)

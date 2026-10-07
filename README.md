@@ -35,7 +35,8 @@
 | + | الشيكات الواردة والصادرة: تحت التحصيل، محصَّل، مرتد | ✅ تمت الموافقة | [docs/27-Cheques.md](docs/27-Cheques.md) |
 | + | الأصول الثابتة والإهلاك الشهري والبيع أو الاستبعاد | ✅ تمت الموافقة | [docs/28-Fixed-Assets.md](docs/28-Fixed-Assets.md) |
 | + | الرواتب: مسير شهري، التأمينات، خصم السلف، القيد والصرف | ✅ تمت الموافقة | [docs/29-Payroll.md](docs/29-Payroll.md) |
-| + | مراكز التكلفة والفروع: توزيع القيود وقائمة دخل لكل مركز | ✅ بانتظار الموافقة | [docs/30-Cost-Centers.md](docs/30-Cost-Centers.md) |
+| + | مراكز التكلفة والفروع: توزيع القيود وقائمة دخل لكل مركز | ✅ تمت الموافقة | [docs/30-Cost-Centers.md](docs/30-Cost-Centers.md) |
+| + | الموازنة التقديرية: شهرية لكل حساب ومركز، والمقارنة بالفعلي والانحراف | ✅ بانتظار الموافقة | [docs/31-Budget.md](docs/31-Budget.md) |
 
 ## هيكل المستودع
 
@@ -114,6 +115,7 @@
 | 25 | `modAssets` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestAssets` |
 | 26 | `modPayroll` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestPayroll` |
 | 27 | `modCostCenters` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestCostCenters` |
+| 28 | `modBudget` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestBudget` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

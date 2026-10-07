@@ -1631,6 +1631,79 @@ SELECT n.CenterKey, n.CenterName, m.AccountCode, m.AccountName, m.TreeKey,
            AS SectionName, m.CenterAmount
 FROM qryCenterNames AS n INNER JOIN qryCenterMoves AS m ON n.CenterKey = m.CenterKey""", P),
 
+    # ================================================================== BUDGET
+    # the budget of the year of the period start; whole months: a month counts when the period touches it
+    Query("qryBudgetMonths", "أشهر الموازنة: سطر لكل شهر من كل سطر موازنة", """
+SELECT l.BudgetLineID, h.BudgetYear, 1 AS MonthNo, h.BudgetYear * 100 + 1 AS MonthKey, l.M1 AS PlanAmount
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 2, h.BudgetYear * 100 + 2, l.M2
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 3, h.BudgetYear * 100 + 3, l.M3
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 4, h.BudgetYear * 100 + 4, l.M4
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 5, h.BudgetYear * 100 + 5, l.M5
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 6, h.BudgetYear * 100 + 6, l.M6
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 7, h.BudgetYear * 100 + 7, l.M7
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 8, h.BudgetYear * 100 + 8, l.M8
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 9, h.BudgetYear * 100 + 9, l.M9
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 10, h.BudgetYear * 100 + 10, l.M10
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 11, h.BudgetYear * 100 + 11, l.M11
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID
+UNION ALL
+SELECT l.BudgetLineID, h.BudgetYear, 12, h.BudgetYear * 100 + 12, l.M12
+FROM BudgetLines AS l INNER JOIN Budgets AS h ON l.BudgetID = h.BudgetID"""),
+
+    Query("qryBudgetPlanned", "مبلغ الموازنة لكل سطر في أشهر الفترة", """
+SELECT BudgetLineID, Sum(PlanAmount) AS SumPlan
+FROM qryBudgetMonths
+WHERE BudgetYear = Year(QDate('PeriodStart')) AND MonthKey >= Year(QDate('PeriodStart')) * 100 + Month(QDate('PeriodStart'))
+      AND MonthKey <= Year(DateAdd('d', -1, QDate('PeriodEnd'))) * 100 + Month(DateAdd('d', -1, QDate('PeriodEnd')))
+GROUP BY BudgetLineID""", P),
+
+    # the actual of a budget line: its account and its sub-accounts (a main account takes all of them),
+    # in its cost centre when it has one, without the year closing entries
+    Query("qryBudgetActual", "الفعلي لكل سطر موازنة في الفترة من القيود", f"""
+SELECT b.BudgetLineID, Sum(IIf(a.AccountType = 'REVENUE', l.Credit - l.Debit, l.Debit - l.Credit)) AS SumActual
+FROM Budgets AS h, BudgetLines AS b, Accounts AS a, JournalEntries AS e, JournalLines AS l, Accounts AS d
+WHERE h.BudgetYear = Year(QDate('PeriodStart')) AND b.BudgetID = h.BudgetID AND a.AccountCode = b.AccountCode
+      AND l.EntryID = e.EntryID AND d.AccountCode = l.AccountCode AND (d.Level1Code = b.AccountCode OR d.Level2Code = b.AccountCode OR d.Level3Code = b.AccountCode OR d.Level4Code = b.AccountCode OR d.Level5Code = b.AccountCode)
+      AND (b.CostCenterID Is Null OR l.CostCenterID = b.CostCenterID)
+      AND {period("e.EntryDate")} AND e.SourceType <> 'YEAR_CLOSE'
+GROUP BY b.BudgetLineID""", P),
+
+    Query("BudgetVsActualQuery", "الموازنة مقابل الفعلي في الفترة: الانحراف ونسبته، وهل هو ملائم", f"""
+SELECT b.BudgetLineID, b.AccountCode, a.AccountName, a.TreeKey, a.AccountType,
+       IIf(a.AccountType = 'REVENUE', 'الإيرادات', 'المصروفات') AS SectionName,
+       IIf(c.CenterName Is Null, 'كل المراكز', c.CenterName) AS BudgetCenter,
+       {nz("p.SumPlan")} AS BudgetAmount, {nz("x.SumActual")} AS ActualAmount,
+       {nz("x.SumActual")} - {nz("p.SumPlan")} AS Variance,
+       IIf({nz("p.SumPlan")} = 0, Null, ({nz("x.SumActual")} - {nz("p.SumPlan")}) / {nz("p.SumPlan")}) AS VariancePct,
+       IIf({nz("x.SumActual")} = {nz("p.SumPlan")}, 'مطابق', IIf((a.AccountType = 'REVENUE') = ({nz("x.SumActual")} > {nz("p.SumPlan")}),
+           'ملائم', 'غير ملائم')) AS VarianceNote
+FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)
+       INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode)
+      LEFT JOIN CostCenters AS c ON b.CostCenterID = c.CostCenterID)
+     LEFT JOIN qryBudgetPlanned AS p ON b.BudgetLineID = p.BudgetLineID)
+     LEFT JOIN qryBudgetActual AS x ON b.BudgetLineID = x.BudgetLineID
+WHERE h.BudgetYear = Year(QDate('PeriodStart'))""", P),
+
     Query("qryBalanceAt", "رصيد كل حساب في نهاية الفترة (مدين موجب)", """
 SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS NetAt
 FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
