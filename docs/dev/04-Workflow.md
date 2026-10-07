@@ -91,6 +91,10 @@
 | فحص الكود | `VbaModuleChecks` و`ProjectStaticTests` | التصريح عن المتغيرات، والأسماء، والأطوال، والترميز، وقواعد القسم 3 |
 | داخل Access | `RunAllTests` (يشغّله المستخدم) | السلوك الحقيقي داخل معاملات تُلغى |
 
+**ملاحظات على LibreOffice:**
+- قيمة من نوع `Currency` لا تعود من LibreOffice إلى Python، فتصل `None`. لذلك تغلّف الاختبارات الدالة بدالة ترجع `Double`، كما في `test_indicators.py`.
+- قسمة `Currency` على `Currency` تعطي في LibreOffice `Currency` بأربعة أرقام عشرية. لذلك حوّل إلى `CDbl` قبل القسمة عندما تحتاج نسبة دقيقة، فتتطابق النتيجة في Access وفي LibreOffice.
+
 ## 6) خريطة سريعة: «أريد أن…»
 | أريد أن… | أعدّل… |
 |---|---|

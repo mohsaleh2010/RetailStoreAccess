@@ -53,7 +53,8 @@
 | + | مراكز التكلفة والفروع: توزيع القيود وقائمة دخل لكل مركز | ✅ تمت الموافقة | [docs/30-Cost-Centers.md](docs/30-Cost-Centers.md) |
 | + | الموازنة التقديرية: شهرية لكل حساب ومركز، والمقارنة بالفعلي والانحراف | ✅ تمت الموافقة | [docs/31-Budget.md](docs/31-Budget.md) |
 | + | المصروفات المتكررة، وشاشة «المحاسبة والمالية» لكل شاشات الحسابات | ✅ تمت الموافقة | [docs/32-Recurring-Expenses.md](docs/32-Recurring-Expenses.md) |
-| + | سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد | ✅ بانتظار الموافقة | [docs/33-Audit-Trail.md](docs/33-Audit-Trail.md) |
+| + | سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد | ✅ تمت الموافقة | [docs/33-Audit-Trail.md](docs/33-Audit-Trail.md) |
+| + | المؤشرات المالية في لوحة التحكم: هامش الربح، دوران المخزون، فترة التحصيل، السيولة | ✅ بانتظار الموافقة | [docs/34-Financial-Indicators.md](docs/34-Financial-Indicators.md) |
 
 ## هيكل المستودع
 
@@ -133,6 +134,9 @@
 | 26 | `modPayroll` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestPayroll` |
 | 27 | `modCostCenters` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestCostCenters` |
 | 28 | `modBudget` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestBudget` |
+| 29 | `modRecurring` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildForms` | `TestRecurring` |
+| 30 | `modAudit` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestAudit` |
+| 31 | `modIndicators` (دائمة) | `BuildQueries`, `BuildForms` | `TestIndicators` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

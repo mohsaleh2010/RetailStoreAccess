@@ -1070,6 +1070,28 @@ SELECT (SELECT {nz("Sum(d.GrossAmount)")} FROM qrySalesDocuments AS d
 FROM Settings AS st
 WHERE st.SettingID = 1""", ["DashDay", "DashMonth", "DashEnd"]),
 
+    # Financial indicators (modIndicators): from the journal, so they agree with the financial
+    # statements. IndEnd = the day after AsOf (exclusive); IndMonth / IndPrevMonth = first day of this /
+    # the previous month; IndYear = AsOf - 364 (the last 365 days); Ind90 = AsOf - 89 (the last 90 days).
+    Query("qryIndicatorLines", "أسطر القيود مع مجموعة الحساب (المستوى 2) لحساب المؤشرات المالية", """
+SELECT l.AccountCode, a.Level2Code, e.EntryDate, e.SourceType, l.Debit, l.Credit
+FROM (JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)
+     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode"""),
+
+    Query("FinancialIndicatorsQuery", "المؤشرات المالية (صف واحد): هامش الربح، دوران المخزون، فترة التحصيل، السيولة", f"""
+SELECT {nz("Sum(IIf(i.Level2Code = 41 AND i.EntryDate >= QDate('IndMonth') AND i.EntryDate < QDate('IndEnd') AND i.SourceType <> 'YEAR_CLOSE', i.Credit - i.Debit, 0))")} AS MonthSales,
+       {nz("Sum(IIf(i.Level2Code = 51 AND i.EntryDate >= QDate('IndMonth') AND i.EntryDate < QDate('IndEnd') AND i.SourceType <> 'YEAR_CLOSE', i.Debit - i.Credit, 0))")} AS MonthCost,
+       {nz("Sum(IIf(i.Level2Code = 41 AND i.EntryDate >= QDate('IndPrevMonth') AND i.EntryDate < QDate('IndMonth') AND i.SourceType <> 'YEAR_CLOSE', i.Credit - i.Debit, 0))")} AS PrevSales,
+       {nz("Sum(IIf(i.Level2Code = 51 AND i.EntryDate >= QDate('IndPrevMonth') AND i.EntryDate < QDate('IndMonth') AND i.SourceType <> 'YEAR_CLOSE', i.Debit - i.Credit, 0))")} AS PrevCost,
+       {nz("Sum(IIf(i.Level2Code = 51 AND i.EntryDate >= QDate('IndYear') AND i.EntryDate < QDate('IndEnd') AND i.SourceType <> 'YEAR_CLOSE', i.Debit - i.Credit, 0))")} AS YearCost,
+       {nz("Sum(IIf(i.AccountCode = 1400 AND i.EntryDate < QDate('IndYear'), i.Debit - i.Credit, 0))")} AS StockStart,
+       {nz("Sum(IIf(i.AccountCode = 1400 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0))")} AS StockEnd,
+       {nz("Sum(IIf(i.AccountCode = 1300 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0))")} AS Receivables,
+       {nz("Sum(IIf(i.AccountCode = 1300 AND i.SourceType = 'SALE' AND i.EntryDate >= QDate('Ind90') AND i.EntryDate < QDate('IndEnd'), i.Debit, 0))")} AS CreditSales,
+       {nz("Sum(IIf(i.Level2Code = 11 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0))")} AS CurrentAssets,
+       {nz("Sum(IIf(i.Level2Code = 21 AND i.EntryDate < QDate('IndEnd'), i.Credit - i.Debit, 0))")} AS CurrentLiabilities
+FROM qryIndicatorLines AS i""", ["IndEnd", "IndMonth", "IndPrevMonth", "IndYear", "Ind90"]),
+
     Query("qryDashboardTopProducts", "صافي الكمية المباعة لكل منتج منذ بداية الشهر (لوحة التحكم)", """
 SELECT l.ProductID, p.ProductName, Sum(l.SignedQty) AS NetQty, Sum(l.LineGross) AS NetSales
 FROM qrySalesLineItems AS l INNER JOIN Products AS p ON l.ProductID = p.ProductID

@@ -885,7 +885,10 @@ def layout_data_screen(s: DataScreen) -> FormModel:
 
 DASHBOARD_TILES = [("TODAY", "مبيعات اليوم"), ("MONTH", "مبيعات الشهر"), ("PROFIT", "صافي ربح الشهر (تقريبي)"),
                    ("LOW", "منتجات منخفضة المخزون"), ("DEBT", "ديون العملاء"), ("DUE", "مستحقات الموردين"),
-                   ("STOCK", "قيمة المخزون بالتكلفة"), ("EXPENSES", "مصروفات الشهر")]
+                   ("STOCK", "قيمة المخزون بالتكلفة"), ("EXPENSES", "مصروفات الشهر"),
+                   # financial indicators (modIndicators)
+                   ("MARGIN", "هامش الربح الإجمالي (الشهر)"), ("TURNOVER", "دوران المخزون (12 شهرًا)"),
+                   ("COLLECTION", "متوسط فترة التحصيل"), ("LIQUIDITY", "نسبة السيولة (التداول)")]
 
 
 # figure cards 1-4: icon and colour of the square
@@ -946,7 +949,7 @@ def layout_main() -> FormModel:
     m.add(Control("label", "lblToday", cx + cw - cm(12), cm(1.55), cm(12), cm(0.6),
                   {"Caption": " ", "FontSize": 11, "ForeColor": Sym("CLR_MUTED"), "TextAlign": 3}))
     button(m, "btnRefresh", "تحديث", cx, cm(0.6), "secondary", w=cm(2.4), h=cm(0.8),
-           call="DashboardRefresh Me")
+           call="DashboardRefresh Me, True")
     button(m, "btnChangePassword", "كلمة المرور", cx + cm(2.6), cm(0.6), "secondary", w=cm(2.7), h=cm(0.8),
            call='OpenScreen "frmChangePassword", 10')
     m.add(Control("label", "lblUpdated", cx + cm(5.5), cm(0.75), cm(6.0), cm(0.55),
@@ -987,7 +990,7 @@ def layout_main() -> FormModel:
 
     # 12 coloured launcher tiles (3 rows share the extra height)
     by_key = {item.key: item for item in NAV_ITEMS}
-    row_h, row_gap, top = cm(2.4), cm(0.3), cm(5.2)
+    row_h, row_gap, top = cm(1.75), cm(0.25), cm(5.2)
     for i, (key, caption, rgb, light) in enumerate(LAUNCH_TILES):
         item = by_key[key]
         tx, ty, row = col_x(i), top + (i // 4) * (row_h + row_gap), i // 4
@@ -995,11 +998,11 @@ def layout_main() -> FormModel:
         fore = "CLR_PRIMARY" if light else "CLR_SURFACE"
         m.add(Control("rect", f"boxNav{key}", tx, ty, tile_w, row_h,
                       {"BackColor": Sym(f"RGB({rgb[0]}, {rgb[1]}, {rgb[2]})")}, decorative=True))
-        m.add(Control("icon", f"icoTile{key}", tx, ty + cm(0.3), tile_w, cm(1.15),
-                      {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"), "FontSize": 26, "TextAlign": 2,
+        m.add(Control("icon", f"icoTile{key}", tx, ty + cm(0.12), tile_w, cm(0.85),
+                      {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"), "FontSize": 22, "TextAlign": 2,
                        "ForeColor": Sym(fore)}, decorative=True))
-        m.add(Control("label", f"lblTile{key}", tx, ty + cm(1.5), tile_w, cm(0.7),
-                      {"Caption": caption, "FontSize": 13, "FontBold": True, "TextAlign": 2,
+        m.add(Control("label", f"lblTile{key}", tx, ty + cm(1.0), tile_w, cm(0.62),
+                      {"Caption": caption, "FontSize": 12, "FontBold": True, "TextAlign": 2,
                        "ForeColor": Sym("CLR_TEXT" if light else "CLR_SURFACE")}, decorative=True))
         button(m, f"btnTile{key}", caption, tx, ty, "secondary", w=tile_w, h=row_h, call=call)
         m.controls[-1].props["Transparent"] = True       # the coloured tile under it shows through
@@ -1008,10 +1011,13 @@ def layout_main() -> FormModel:
         for name in (f"boxNav{key}", f"icoTile{key}", f"lblTile{key}", f"btnTile{key}"):
             extra[name] = col_fit(i, row * 333, 333)
 
-    # 4 smaller figure cards (tiles 5-8)
+    # 4 smaller figure cards (tiles 5-8), then the 4 financial indicators (tiles 9-12)
     sy = top + 3 * row_h + 2 * row_gap + cm(0.3)
     for i, (key, caption) in enumerate(DASHBOARD_TILES[4:]):
         n, tx = i + 5, col_x(i)
+        if n > 8:
+            i, tx = i - 4, col_x(i - 4)
+            sy = top + 3 * row_h + 2 * row_gap + cm(0.3) + cm(1.85) + cm(0.25)
         m.add(Control("rect", f"boxTile{n}", tx, sy, tile_w, cm(1.85), {"BackColor": Sym("CLR_SURFACE")},
                       decorative=True))
         m.add(Control("label", f"lblTileTitle{n}", tx + cm(0.3), sy + cm(0.1), tile_w - cm(0.6), cm(0.5),
@@ -1027,7 +1033,7 @@ def layout_main() -> FormModel:
         for part in ("Title", "Value"):
             m.code += [f"Private Sub lblTile{part}{i + 1}_Click()", f'    DashboardTileClick "{key}"', "End Sub"]
 
-    height = max(sy + cm(1.85) + cm(1.0), y + cm(0.3))     # y: below the last side-menu button
+    height = max(sy + cm(1.85) + cm(1.0), y + cm(0.3))     # sy: the last card row; y: the last side-menu button
     m.height = height
     m.controls[0].h = height                     # side bar
     m.add(Control("label", "lblIntegrity", cx, height - cm(0.8), cw, cm(0.55),

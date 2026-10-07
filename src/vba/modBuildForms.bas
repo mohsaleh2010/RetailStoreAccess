@@ -785,114 +785,138 @@ Private Sub BuildForm_frmMain()
     Set c = AddLabel("lblTileValue4", "-", 4139, 1815, 2111, 567, 20, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
     Set c = AddLabel("lblTileSub4", " ", 4139, 2410, 2111, 284, 9, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxNavSales", 15066, 2948, 3472, 1361, RGB(67, 160, 71))
-    Set c = AddIcon("icoTileSales", ChrW(&HE7BF), 15066, 3118, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileSales", "المبيعات", 15066, 3798, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileSales", "المبيعات", 15066, 2948, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavSales", 15066, 2948, 3472, 992, RGB(67, 160, 71))
+    Set c = AddIcon("icoTileSales", ChrW(&HE7BF), 15066, 3016, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileSales", "المبيعات", 15066, 3515, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileSales", "المبيعات", 15066, 2948, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmPOS"
     c.OnClick = EP
-    Set c = AddRect("boxNavPurchases", 11367, 2948, 3472, 1361, RGB(30, 136, 229))
-    Set c = AddIcon("icoTilePurchases", ChrW(&HE896), 11367, 3118, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTilePurchases", "المشتريات", 11367, 3798, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTilePurchases", "المشتريات", 11367, 2948, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavPurchases", 11367, 2948, 3472, 992, RGB(30, 136, 229))
+    Set c = AddIcon("icoTilePurchases", ChrW(&HE896), 11367, 3016, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTilePurchases", "المشتريات", 11367, 3515, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTilePurchases", "المشتريات", 11367, 2948, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmPurchaseInvoice"
     c.OnClick = EP
-    Set c = AddRect("boxNavInventory", 7668, 2948, 3472, 1361, RGB(251, 140, 0))
-    Set c = AddIcon("icoTileInventory", ChrW(&HE7B8), 7668, 3118, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileInventory", "المخزون", 7668, 3798, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileInventory", "المخزون", 7668, 2948, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavInventory", 7668, 2948, 3472, 992, RGB(251, 140, 0))
+    Set c = AddIcon("icoTileInventory", ChrW(&HE7B8), 7668, 3016, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileInventory", "المخزون", 7668, 3515, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileInventory", "المخزون", 7668, 2948, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmInventory"
     c.OnClick = EP
-    Set c = AddRect("boxNavProducts", 3969, 2948, 3472, 1361, RGB(142, 36, 170))
-    Set c = AddIcon("icoTileProducts", ChrW(&HE8EC), 3969, 3118, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileProducts", "المنتجات", 3969, 3798, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileProducts", "المنتجات", 3969, 2948, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavProducts", 3969, 2948, 3472, 992, RGB(142, 36, 170))
+    Set c = AddIcon("icoTileProducts", ChrW(&HE8EC), 3969, 3016, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileProducts", "المنتجات", 3969, 3515, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileProducts", "المنتجات", 3969, 2948, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmProducts"
     c.OnClick = EP
-    Set c = AddRect("boxNavCustomers", 15066, 4479, 3472, 1361, RGB(229, 57, 53))
-    Set c = AddIcon("icoTileCustomers", ChrW(&HE716), 15066, 4649, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileCustomers", "العملاء", 15066, 5329, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileCustomers", "العملاء", 15066, 4479, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavCustomers", 15066, 4082, 3472, 992, RGB(229, 57, 53))
+    Set c = AddIcon("icoTileCustomers", ChrW(&HE716), 15066, 4150, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileCustomers", "العملاء", 15066, 4649, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileCustomers", "العملاء", 15066, 4082, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmCustomers"
     c.OnClick = EP
-    Set c = AddRect("boxNavSuppliers", 11367, 4479, 3472, 1361, RGB(57, 73, 171))
-    Set c = AddIcon("icoTileSuppliers", ChrW(&HE77B), 11367, 4649, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileSuppliers", "الموردون", 11367, 5329, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileSuppliers", "الموردون", 11367, 4479, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavSuppliers", 11367, 4082, 3472, 992, RGB(57, 73, 171))
+    Set c = AddIcon("icoTileSuppliers", ChrW(&HE77B), 11367, 4150, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileSuppliers", "الموردون", 11367, 4649, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileSuppliers", "الموردون", 11367, 4082, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmSuppliers"
     c.OnClick = EP
-    Set c = AddRect("boxNavExpenses", 7668, 4479, 3472, 1361, RGB(0, 137, 123))
-    Set c = AddIcon("icoTileExpenses", ChrW(&HE8C7), 7668, 4649, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileExpenses", "المصروفات", 7668, 5329, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileExpenses", "المصروفات", 7668, 4479, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavExpenses", 7668, 4082, 3472, 992, RGB(0, 137, 123))
+    Set c = AddIcon("icoTileExpenses", ChrW(&HE8C7), 7668, 4150, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileExpenses", "المصروفات", 7668, 4649, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileExpenses", "المصروفات", 7668, 4082, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmExpenses"
     c.OnClick = EP
-    Set c = AddRect("boxNavReports", 3969, 4479, 3472, 1361, RGB(216, 27, 96))
-    Set c = AddIcon("icoTileReports", ChrW(&HE8A5), 3969, 4649, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileReports", "التقارير", 3969, 5329, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileReports", "التقارير", 3969, 4479, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavReports", 3969, 4082, 3472, 992, RGB(216, 27, 96))
+    Set c = AddIcon("icoTileReports", ChrW(&HE8A5), 3969, 4150, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileReports", "التقارير", 3969, 4649, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileReports", "التقارير", 3969, 4082, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmReportCenter"
     c.OnClick = EP
-    Set c = AddRect("boxNavSettings", 15066, 6010, 3472, 1361, RGB(232, 236, 243))
-    Set c = AddIcon("icoTileSettings", ChrW(&HE713), 15066, 6180, 3472, 652, 26, False, CLR_PRIMARY, "", 2)
-    Set c = AddLabel("lblTileSettings", "الإعدادات", 15066, 6860, 3472, 397, 13, True, CLR_TEXT, "", 2)
-    Set c = AddButton("btnTileSettings", "الإعدادات", 15066, 6010, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavSettings", 15066, 5216, 3472, 992, RGB(232, 236, 243))
+    Set c = AddIcon("icoTileSettings", ChrW(&HE713), 15066, 5284, 3472, 482, 22, False, CLR_PRIMARY, "", 2)
+    Set c = AddLabel("lblTileSettings", "الإعدادات", 15066, 5783, 3472, 352, 12, True, CLR_TEXT, "", 2)
+    Set c = AddButton("btnTileSettings", "الإعدادات", 15066, 5216, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmSettings"
     c.OnClick = EP
-    Set c = AddRect("boxNavUsers", 11367, 6010, 3472, 1361, RGB(232, 236, 243))
-    Set c = AddIcon("icoTileUsers", ChrW(&HE8D7), 11367, 6180, 3472, 652, 26, False, CLR_PRIMARY, "", 2)
-    Set c = AddLabel("lblTileUsers", "المستخدمون", 11367, 6860, 3472, 397, 13, True, CLR_TEXT, "", 2)
-    Set c = AddButton("btnTileUsers", "المستخدمون", 11367, 6010, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavUsers", 11367, 5216, 3472, 992, RGB(232, 236, 243))
+    Set c = AddIcon("icoTileUsers", ChrW(&HE8D7), 11367, 5284, 3472, 482, 22, False, CLR_PRIMARY, "", 2)
+    Set c = AddLabel("lblTileUsers", "المستخدمون", 11367, 5783, 3472, 352, 12, True, CLR_TEXT, "", 2)
+    Set c = AddButton("btnTileUsers", "المستخدمون", 11367, 5216, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmUsers"
     c.OnClick = EP
-    Set c = AddRect("boxNavTreasury", 7668, 6010, 3472, 1361, RGB(0, 121, 107))
-    Set c = AddIcon("icoTileTreasury", ChrW(&HE825), 7668, 6180, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileTreasury", "الخزينة", 7668, 6860, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileTreasury", "الخزينة", 7668, 6010, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavTreasury", 7668, 5216, 3472, 992, RGB(0, 121, 107))
+    Set c = AddIcon("icoTileTreasury", ChrW(&HE825), 7668, 5284, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileTreasury", "الخزينة", 7668, 5783, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileTreasury", "الخزينة", 7668, 5216, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmTreasury"
     c.OnClick = EP
-    Set c = AddRect("boxNavAccounting", 3969, 6010, 3472, 1361, RGB(31, 58, 95))
-    Set c = AddIcon("icoTileAccounting", ChrW(&HE8F1), 3969, 6180, 3472, 652, 26, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileAccounting", "المحاسبة والمالية", 3969, 6860, 3472, 397, 13, True, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileAccounting", "المحاسبة والمالية", 3969, 6010, 3472, 1361, "secondary")
+    Set c = AddRect("boxNavAccounting", 3969, 5216, 3472, 992, RGB(31, 58, 95))
+    Set c = AddIcon("icoTileAccounting", ChrW(&HE8F1), 3969, 5284, 3472, 482, 22, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAccounting", "المحاسبة والمالية", 3969, 5783, 3472, 352, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAccounting", "المحاسبة والمالية", 3969, 5216, 3472, 992, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmAccounting"
     c.OnClick = EP
-    Set c = AddRect("boxTile5", 15066, 7541, 3472, 1049, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle5", "ديون العملاء", 15236, 7598, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile5", 15066, 6378, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle5", "ديون العملاء", 15236, 6435, 3132, 284, 9, False, CLR_MUTED, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue5", "-", 15236, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTileValue5", "-", 15236, 6730, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub5", " ", 15236, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile6", 11367, 7541, 3472, 1049, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle6", "مستحقات الموردين", 11537, 7598, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTileSub5", " ", 15236, 7143, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile6", 11367, 6378, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle6", "مستحقات الموردين", 11537, 6435, 3132, 284, 9, False, CLR_MUTED, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue6", "-", 11537, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTileValue6", "-", 11537, 6730, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub6", " ", 11537, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile7", 7668, 7541, 3472, 1049, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle7", "قيمة المخزون بالتكلفة", 7838, 7598, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTileSub6", " ", 11537, 7143, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile7", 7668, 6378, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle7", "قيمة المخزون بالتكلفة", 7838, 6435, 3132, 284, 9, False, CLR_MUTED, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue7", "-", 7838, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTileValue7", "-", 7838, 6730, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub7", " ", 7838, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
-    Set c = AddRect("boxTile8", 3969, 7541, 3472, 1049, CLR_SURFACE)
-    Set c = AddLabel("lblTileTitle8", "مصروفات الشهر", 4139, 7598, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTileSub7", " ", 7838, 7143, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile8", 3969, 6378, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle8", "مصروفات الشهر", 4139, 6435, 3132, 284, 9, False, CLR_MUTED, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileValue8", "-", 4139, 7893, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblTileValue8", "-", 4139, 6730, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
     c.OnClick = EP
-    Set c = AddLabel("lblTileSub8", " ", 4139, 8306, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblTileSub8", " ", 4139, 7143, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile9", 15066, 7569, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle9", "هامش الربح الإجمالي (الشهر)", 15236, 7626, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileValue9", "-", 15236, 7921, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileSub9", " ", 15236, 8334, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile10", 11367, 7569, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle10", "دوران المخزون (12 شهرًا)", 11537, 7626, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileValue10", "-", 11537, 7921, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileSub10", " ", 11537, 8334, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile11", 7668, 7569, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle11", "متوسط فترة التحصيل", 7838, 7626, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileValue11", "-", 7838, 7921, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileSub11", " ", 7838, 8334, 3132, 255, 8, False, CLR_MUTED, "", 0)
+    Set c = AddRect("boxTile12", 3969, 7569, 3472, 1049, CLR_SURFACE)
+    Set c = AddLabel("lblTileTitle12", "نسبة السيولة (التداول)", 4139, 7626, 3132, 284, 9, False, CLR_MUTED, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileValue12", "-", 4139, 7921, 3132, 408, 15, True, CLR_PRIMARY, "", 0)
+    c.OnClick = EP
+    Set c = AddLabel("lblTileSub12", " ", 4139, 8334, 3132, 255, 8, False, CLR_MUTED, "", 0)
     Set c = AddLabel("lblIntegrity", " ", 3969, 9180, 14571, 312, 10, True, CLR_MUTED, "", 0)
     m_frm.OnOpen = EP
     m_frm.OnLoad = EP
@@ -961,7 +985,7 @@ Private Sub BuildForm_frmMain()
     s = s & "    LogoutUser" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnRefresh_Click()" & vbCrLf
-    s = s & "    DashboardRefresh Me" & vbCrLf
+    s = s & "    DashboardRefresh Me, True" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnChangePassword_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmChangePassword"", 10" & vbCrLf
@@ -1050,24 +1074,50 @@ Private Sub BuildForm_frmMain()
     s = s & "Private Sub lblTileValue8_Click()" & vbCrLf
     s = s & "    DashboardTileClick ""EXPENSES""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lblTileTitle9_Click()" & vbCrLf
+    s = s & "    DashboardTileClick ""MARGIN""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lblTileValue9_Click()" & vbCrLf
+    s = s & "    DashboardTileClick ""MARGIN""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lblTileTitle10_Click()" & vbCrLf
+    s = s & "    DashboardTileClick ""TURNOVER""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lblTileValue10_Click()" & vbCrLf
+    s = s & "    DashboardTileClick ""TURNOVER""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lblTileTitle11_Click()" & vbCrLf
+    s = s & "    DashboardTileClick ""COLLECTION""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lblTileValue11_Click()" & vbCrLf
+    s = s & "    DashboardTileClick ""COLLECTION""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lblTileTitle12_Click()" & vbCrLf
+    s = s & "    DashboardTileClick ""LIQUIDITY""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lblTileValue12_Click()" & vbCrLf
+    s = s & "    DashboardTileClick ""LIQUIDITY""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxSidebar,0,0,3515,9634,0,0,0,1000;lblWelcome,11736,284,6804,539,1000,0,0,0;lblToday,11736,879,6804,340,1000,0,0,0;boxTile1,15066,1418,3472,1361,750,250,0,0;boxKpiIcon1,17461,1645,907,907,750,250,0,0;icoKpi1,17461,1787,907,624,750,250,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileTitle1,15236,1503,2111,312,750,250,0,0;lblTileValue1,15236,1815,2111,567,750,250,0,0;lblTileSub1,15236,2410,2111,284,750,250,0,0;boxTile2,11367,1418,3472,1361,500,250,0,0;boxKpiIcon2,13762,1645,907,907,500,250,0,0;icoKpi2,13762,1787,907,624,500,250,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileTitle2,11537,1503,2111,312,500,250,0,0;lblTileValue2,11537,1815,2111,567,500,250,0,0;lblTileSub2,11537,2410,2111,284,500,250,0,0;boxTile3,7668,1418,3472,1361,250,250,0,0;boxKpiIcon3,10063,1645,907,907,250,250,0,0;icoKpi3,10063,1787,907,624,250,250,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileTitle3,7838,1503,2111,312,250,250,0,0;lblTileValue3,7838,1815,2111,567,250,250,0,0;lblTileSub3,7838,2410,2111,284,250,250,0,0;boxTile4,3969,1418,3472,1361,0,250,0,0;boxKpiIcon4,6364,1645,907,907,0,250,0,0;icoKpi4,6364,1787,907,624,0,250,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileTitle4,4139,1503,2111,312,0,250,0,0;lblTileValue4,4139,1815,2111,567,0,250,0,0;lblTileSub4,4139,2410,2111,284,0,250,0,0;boxNavSales,15066,2948,3472,1361,750,250,0,333;icoTileSales,15066,3118,3472,652,750,250,0,333;lblTileSales,15066,3798,3472,397,750,250,0,333""" & vbCrLf
-    s = s & "    spec = spec & "";btnTileSales,15066,2948,3472,1361,750,250,0,333;boxNavPurchases,11367,2948,3472,1361,500,250,0,333;icoTilePurchases,11367,3118,3472,652,500,250,0,333;lblTilePurchases,11367,3798,3472,397,500,250,0,333;btnTilePurchases,11367,2948,3472,1361,500,250,0,333;boxNavInventory,7668,2948,3472,1361,250,250,0,333""" & vbCrLf
-    s = s & "    spec = spec & "";icoTileInventory,7668,3118,3472,652,250,250,0,333;lblTileInventory,7668,3798,3472,397,250,250,0,333;btnTileInventory,7668,2948,3472,1361,250,250,0,333;boxNavProducts,3969,2948,3472,1361,0,250,0,333;icoTileProducts,3969,3118,3472,652,0,250,0,333;lblTileProducts,3969,3798,3472,397,0,250,0,333""" & vbCrLf
-    s = s & "    spec = spec & "";btnTileProducts,3969,2948,3472,1361,0,250,0,333;boxNavCustomers,15066,4479,3472,1361,750,250,333,333;icoTileCustomers,15066,4649,3472,652,750,250,333,333;lblTileCustomers,15066,5329,3472,397,750,250,333,333;btnTileCustomers,15066,4479,3472,1361,750,250,333,333;boxNavSuppliers,11367,4479,3472,1361,500,250,333,333""" & vbCrLf
-    s = s & "    spec = spec & "";icoTileSuppliers,11367,4649,3472,652,500,250,333,333;lblTileSuppliers,11367,5329,3472,397,500,250,333,333;btnTileSuppliers,11367,4479,3472,1361,500,250,333,333;boxNavExpenses,7668,4479,3472,1361,250,250,333,333;icoTileExpenses,7668,4649,3472,652,250,250,333,333;lblTileExpenses,7668,5329,3472,397,250,250,333,333""" & vbCrLf
-    s = s & "    spec = spec & "";btnTileExpenses,7668,4479,3472,1361,250,250,333,333;boxNavReports,3969,4479,3472,1361,0,250,333,333;icoTileReports,3969,4649,3472,652,0,250,333,333;lblTileReports,3969,5329,3472,397,0,250,333,333;btnTileReports,3969,4479,3472,1361,0,250,333,333;boxNavSettings,15066,6010,3472,1361,750,250,666,333""" & vbCrLf
-    s = s & "    spec = spec & "";icoTileSettings,15066,6180,3472,652,750,250,666,333;lblTileSettings,15066,6860,3472,397,750,250,666,333;btnTileSettings,15066,6010,3472,1361,750,250,666,333;boxNavUsers,11367,6010,3472,1361,500,250,666,333;icoTileUsers,11367,6180,3472,652,500,250,666,333;lblTileUsers,11367,6860,3472,397,500,250,666,333""" & vbCrLf
-    s = s & "    spec = spec & "";btnTileUsers,11367,6010,3472,1361,500,250,666,333;boxNavTreasury,7668,6010,3472,1361,250,250,666,333;icoTileTreasury,7668,6180,3472,652,250,250,666,333;lblTileTreasury,7668,6860,3472,397,250,250,666,333;btnTileTreasury,7668,6010,3472,1361,250,250,666,333;boxNavAccounting,3969,6010,3472,1361,0,250,666,333""" & vbCrLf
-    s = s & "    spec = spec & "";icoTileAccounting,3969,6180,3472,652,0,250,666,333;lblTileAccounting,3969,6860,3472,397,0,250,666,333;btnTileAccounting,3969,6010,3472,1361,0,250,666,333;boxTile5,15066,7541,3472,1049,750,250,1000,0;lblTileTitle5,15236,7598,3132,284,750,250,1000,0;lblTileValue5,15236,7893,3132,408,750,250,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileSub5,15236,8306,3132,255,750,250,1000,0;boxTile6,11367,7541,3472,1049,500,250,1000,0;lblTileTitle6,11537,7598,3132,284,500,250,1000,0;lblTileValue6,11537,7893,3132,408,500,250,1000,0;lblTileSub6,11537,8306,3132,255,500,250,1000,0;boxTile7,7668,7541,3472,1049,250,250,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileTitle7,7838,7598,3132,284,250,250,1000,0;lblTileValue7,7838,7893,3132,408,250,250,1000,0;lblTileSub7,7838,8306,3132,255,250,250,1000,0;boxTile8,3969,7541,3472,1049,0,250,1000,0;lblTileTitle8,4139,7598,3132,284,0,250,1000,0;lblTileValue8,4139,7893,3132,408,0,250,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblTileSub8,4139,8306,3132,255,0,250,1000,0;lblIntegrity,3969,9180,14571,312,0,1000,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle4,4139,1503,2111,312,0,250,0,0;lblTileValue4,4139,1815,2111,567,0,250,0,0;lblTileSub4,4139,2410,2111,284,0,250,0,0;boxNavSales,15066,2948,3472,992,750,250,0,333;icoTileSales,15066,3016,3472,482,750,250,0,333;lblTileSales,15066,3515,3472,352,750,250,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";btnTileSales,15066,2948,3472,992,750,250,0,333;boxNavPurchases,11367,2948,3472,992,500,250,0,333;icoTilePurchases,11367,3016,3472,482,500,250,0,333;lblTilePurchases,11367,3515,3472,352,500,250,0,333;btnTilePurchases,11367,2948,3472,992,500,250,0,333;boxNavInventory,7668,2948,3472,992,250,250,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";icoTileInventory,7668,3016,3472,482,250,250,0,333;lblTileInventory,7668,3515,3472,352,250,250,0,333;btnTileInventory,7668,2948,3472,992,250,250,0,333;boxNavProducts,3969,2948,3472,992,0,250,0,333;icoTileProducts,3969,3016,3472,482,0,250,0,333;lblTileProducts,3969,3515,3472,352,0,250,0,333""" & vbCrLf
+    s = s & "    spec = spec & "";btnTileProducts,3969,2948,3472,992,0,250,0,333;boxNavCustomers,15066,4082,3472,992,750,250,333,333;icoTileCustomers,15066,4150,3472,482,750,250,333,333;lblTileCustomers,15066,4649,3472,352,750,250,333,333;btnTileCustomers,15066,4082,3472,992,750,250,333,333;boxNavSuppliers,11367,4082,3472,992,500,250,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";icoTileSuppliers,11367,4150,3472,482,500,250,333,333;lblTileSuppliers,11367,4649,3472,352,500,250,333,333;btnTileSuppliers,11367,4082,3472,992,500,250,333,333;boxNavExpenses,7668,4082,3472,992,250,250,333,333;icoTileExpenses,7668,4150,3472,482,250,250,333,333;lblTileExpenses,7668,4649,3472,352,250,250,333,333""" & vbCrLf
+    s = s & "    spec = spec & "";btnTileExpenses,7668,4082,3472,992,250,250,333,333;boxNavReports,3969,4082,3472,992,0,250,333,333;icoTileReports,3969,4150,3472,482,0,250,333,333;lblTileReports,3969,4649,3472,352,0,250,333,333;btnTileReports,3969,4082,3472,992,0,250,333,333;boxNavSettings,15066,5216,3472,992,750,250,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";icoTileSettings,15066,5284,3472,482,750,250,666,333;lblTileSettings,15066,5783,3472,352,750,250,666,333;btnTileSettings,15066,5216,3472,992,750,250,666,333;boxNavUsers,11367,5216,3472,992,500,250,666,333;icoTileUsers,11367,5284,3472,482,500,250,666,333;lblTileUsers,11367,5783,3472,352,500,250,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";btnTileUsers,11367,5216,3472,992,500,250,666,333;boxNavTreasury,7668,5216,3472,992,250,250,666,333;icoTileTreasury,7668,5284,3472,482,250,250,666,333;lblTileTreasury,7668,5783,3472,352,250,250,666,333;btnTileTreasury,7668,5216,3472,992,250,250,666,333;boxNavAccounting,3969,5216,3472,992,0,250,666,333""" & vbCrLf
+    s = s & "    spec = spec & "";icoTileAccounting,3969,5284,3472,482,0,250,666,333;lblTileAccounting,3969,5783,3472,352,0,250,666,333;btnTileAccounting,3969,5216,3472,992,0,250,666,333;boxTile5,15066,6378,3472,1049,750,250,1000,0;lblTileTitle5,15236,6435,3132,284,750,250,1000,0;lblTileValue5,15236,6730,3132,408,750,250,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub5,15236,7143,3132,255,750,250,1000,0;boxTile6,11367,6378,3472,1049,500,250,1000,0;lblTileTitle6,11537,6435,3132,284,500,250,1000,0;lblTileValue6,11537,6730,3132,408,500,250,1000,0;lblTileSub6,11537,7143,3132,255,500,250,1000,0;boxTile7,7668,6378,3472,1049,250,250,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle7,7838,6435,3132,284,250,250,1000,0;lblTileValue7,7838,6730,3132,408,250,250,1000,0;lblTileSub7,7838,7143,3132,255,250,250,1000,0;boxTile8,3969,6378,3472,1049,0,250,1000,0;lblTileTitle8,4139,6435,3132,284,0,250,1000,0;lblTileValue8,4139,6730,3132,408,0,250,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub8,4139,7143,3132,255,0,250,1000,0;boxTile9,15066,7569,3472,1049,750,250,1000,0;lblTileTitle9,15236,7626,3132,284,750,250,1000,0;lblTileValue9,15236,7921,3132,408,750,250,1000,0;lblTileSub9,15236,8334,3132,255,750,250,1000,0;boxTile10,11367,7569,3472,1049,500,250,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileTitle10,11537,7626,3132,284,500,250,1000,0;lblTileValue10,11537,7921,3132,408,500,250,1000,0;lblTileSub10,11537,8334,3132,255,500,250,1000,0;boxTile11,7668,7569,3472,1049,250,250,1000,0;lblTileTitle11,7838,7626,3132,284,250,250,1000,0;lblTileValue11,7838,7921,3132,408,250,250,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblTileSub11,7838,8334,3132,255,250,250,1000,0;boxTile12,3969,7569,3472,1049,0,250,1000,0;lblTileTitle12,4139,7626,3132,284,0,250,1000,0;lblTileValue12,4139,7921,3132,408,0,250,1000,0;lblTileSub12,4139,8334,3132,255,0,250,1000,0;lblIntegrity,3969,9180,14571,312,0,1000,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 18994, 9634, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmMain", s

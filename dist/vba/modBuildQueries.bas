@@ -22,11 +22,11 @@ Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvo" & _
-    "iceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryDashboardTopProducts,qrySalesDocPr" & _
-    "int,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
-    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdva" & _
-    "nceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,Cost" & _
-    "CenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "iceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryIndicatorLines,FinancialIndicators" & _
+    "Query,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayme" & _
+    "nts,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTota" & _
+    "ls,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNam" & _
+    "es,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -720,6 +720,8 @@ Private Sub CreateAllQueries()
     Q_qryVatReturnHead
     Q_VatReturnQuery
     Q_DashboardQuery
+    Q_qryIndicatorLines
+    Q_FinancialIndicatorsQuery
     Q_qryDashboardTopProducts
     Q_qrySalesDocPrint
     Q_qryPurchaseDocPrint
@@ -1598,6 +1600,31 @@ Private Sub Q_DashboardQuery()
     s = s & "FROM Settings AS st" & vbCrLf
     s = s & "WHERE st.SettingID = 1" & vbCrLf
     SaveQuery "DashboardQuery", "ãÄÔÑÇÊ áæÍÉ ÇáÊÍßã Ýí ÓÌá æÇÍÏ (Çáíæã¡ ÇáÔåÑ¡ ÇáÃÑÕÏÉ¡ ÇáãÎÒæä)", s
+End Sub
+
+Private Sub Q_qryIndicatorLines()
+    Dim s As String
+    s = "SELECT l.AccountCode, a.Level2Code, e.EntryDate, e.SourceType, l.Debit, l.Credit" & vbCrLf
+    s = s & "FROM (JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)" & vbCrLf
+    s = s & "     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode" & vbCrLf
+    SaveQuery "qryIndicatorLines", "ÃÓØÑ ÇáÞíæÏ ãÚ ãÌãæÚÉ ÇáÍÓÇÈ (ÇáãÓÊæì 2) áÍÓÇÈ ÇáãÄÔÑÇÊ ÇáãÇáíÉ", s
+End Sub
+
+Private Sub Q_FinancialIndicatorsQuery()
+    Dim s As String
+    s = "SELECT CCur(Nz(Sum(IIf(i.Level2Code = 41 AND i.EntryDate >= QDate('IndMonth') AND i.EntryDate < QDate('IndEnd') AND i.SourceType <> 'YEAR_CLOSE', i.Credit - i.Debit, 0)), 0)) AS MonthSales," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.Level2Code = 51 AND i.EntryDate >= QDate('IndMonth') AND i.EntryDate < QDate('IndEnd') AND i.SourceType <> 'YEAR_CLOSE', i.Debit - i.Credit, 0)), 0)) AS MonthCost," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.Level2Code = 41 AND i.EntryDate >= QDate('IndPrevMonth') AND i.EntryDate < QDate('IndMonth') AND i.SourceType <> 'YEAR_CLOSE', i.Credit - i.Debit, 0)), 0)) AS PrevSales," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.Level2Code = 51 AND i.EntryDate >= QDate('IndPrevMonth') AND i.EntryDate < QDate('IndMonth') AND i.SourceType <> 'YEAR_CLOSE', i.Debit - i.Credit, 0)), 0)) AS PrevCost," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.Level2Code = 51 AND i.EntryDate >= QDate('IndYear') AND i.EntryDate < QDate('IndEnd') AND i.SourceType <> 'YEAR_CLOSE', i.Debit - i.Credit, 0)), 0)) AS YearCost," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.AccountCode = 1400 AND i.EntryDate < QDate('IndYear'), i.Debit - i.Credit, 0)), 0)) AS StockStart," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.AccountCode = 1400 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0)), 0)) AS StockEnd," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.AccountCode = 1300 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0)), 0)) AS Receivables," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.AccountCode = 1300 AND i.SourceType = 'SALE' AND i.EntryDate >= QDate('Ind90') AND i.EntryDate < QDate('IndEnd'), i.Debit, 0)), 0)) AS CreditSales," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.Level2Code = 11 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0)), 0)) AS CurrentAssets," & vbCrLf
+    s = s & "       CCur(Nz(Sum(IIf(i.Level2Code = 21 AND i.EntryDate < QDate('IndEnd'), i.Credit - i.Debit, 0)), 0)) AS CurrentLiabilities" & vbCrLf
+    s = s & "FROM qryIndicatorLines AS i" & vbCrLf
+    SaveQuery "FinancialIndicatorsQuery", "ÇáãÄÔÑÇÊ ÇáãÇáíÉ (ÕÝ æÇÍÏ): åÇãÔ ÇáÑÈÍ¡ ÏæÑÇä ÇáãÎÒæä¡ ÝÊÑÉ ÇáÊÍÕíá¡ ÇáÓíæáÉ", s
 End Sub
 
 Private Sub Q_qryDashboardTopProducts()

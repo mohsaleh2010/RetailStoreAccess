@@ -112,6 +112,8 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
 - Two screens on one table (`frmUsers` / `frmEmployeePay` on `Employees`): table handlers in
   `modForms` must check `frm.Name`.
 - Dates: set `Calendar = vbCalGreg` (Saudi PCs may default to Hijri); show dates with `GDate`.
+- Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness
+  cannot return a `Currency` either — wrap it in a `Double` function, see `tests/test_indicators.py`).
 
 ## Accounting model (short)
 Journal entries are rebuilt from the documents by `SyncJournal` (`modJournal`), one source query per
@@ -122,9 +124,8 @@ banks 120000+bank, 1200 Mada/wallet clearing, 1300 customers, 2100 suppliers, 15
 
 ## Status and roadmap
 Phases 1–12, accounting, VAT return, aging, banks, cheques, fixed assets, payroll, cost centres,
-budget, recurring expenses and the audit trail are done (see `README.md` for approval status).
-Remaining in phase 3: **financial indicators on the dashboard** (margin, inventory turnover,
-collection period, liquidity).
+budget, recurring expenses, the audit trail and the financial indicators of the dashboard are done
+(see `README.md` for approval status): phase 3 is complete. Next steps are decided by the owner.
 
 ## Standard procedures
 **Run the tests:** `python3 tools/generate.py`, then `python3 -m unittest discover -s tests`; report the

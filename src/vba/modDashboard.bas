@@ -6,6 +6,8 @@ Attribute VB_Name = "modDashboard"
 '   4 cards    today / month sales, month net profit, low-stock products
 '   12 tiles   coloured shortcuts to the screens (disabled without permission)
 '   4 cards    customer debts, supplier dues, stock value, month expenses
+'   4 cards    financial indicators: gross margin, stock turnover, collection period,
+'              current ratio (modIndicators, from the journal, kept 10 minutes)
 ' Figures come from DashboardQuery (own parameters
 ' DashDay / DashMonth / DashEnd, so the report-centre period is never changed);
 ' the month profit comes from ProfitQuery with the report period saved and restored.
@@ -21,7 +23,8 @@ Option Explicit
 Private Const HIDDEN_AMOUNT As String = "••••"
 Private m_lastRefresh As Date
 
-Public Sub DashboardRefresh(ByVal frm As Access.Form)
+Public Sub DashboardRefresh(ByVal frm As Access.Form, Optional ByVal Force As Boolean = False)
+    ' Force (the Refresh button): the financial indicators are recomputed at once.
     Dim rs As DAO.Recordset, financial As Boolean, lowCount As Long
     On Error GoTo EH
     Calendar = vbCalGreg
@@ -48,12 +51,38 @@ Public Sub DashboardRefresh(ByVal frm As Access.Form)
     SetTile frm, 7, Money(rs!StockValue, financial), "بمتوسط التكلفة"
     SetTile frm, 8, Money(rs!MonthExpenses, financial), "بدون الضريبة"
     rs.Close
+    ShowIndicators frm, financial, Force
     frm!lblUpdated.Caption = "آخر تحديث: " & Format$(Now, "hh:nn")
     m_lastRefresh = Now
     RefreshIntegrityStatus frm
     Exit Sub
 EH:
     frm!lblUpdated.Caption = "تعذر تحديث المؤشرات: " & Err.Description
+End Sub
+
+Private Sub ShowIndicators(ByVal frm As Access.Form, ByVal financial As Boolean, ByVal Force As Boolean)
+    ' Cards 9-12: the financial indicators (modIndicators), hidden without the financial figures.
+    Dim ind As Variant, i As Integer
+    If Not financial Then
+        For i = 9 To 12
+            SetTile frm, i, HIDDEN_AMOUNT, "يتطلب صلاحية الأرقام المالية"
+        Next
+        Exit Sub
+    End If
+    On Error GoTo Failed
+    ind = FinancialIndicators(Date, Force)
+    SetTile frm, 9, CStr(ind(0)(0)), CStr(ind(0)(1))
+    SetTile frm, 10, CStr(ind(1)(0)), CStr(ind(1)(1))
+    SetTile frm, 11, CStr(ind(2)(0)), CStr(ind(2)(1))
+    SetTile frm, 12, CStr(ind(3)(0)), CStr(ind(3)(1))
+    For i = 0 To 3
+        frm.Controls("lblTileValue" & (i + 9)).ForeColor = ind(i)(2)
+    Next
+    Exit Sub
+Failed:
+    For i = 9 To 12
+        SetTile frm, i, "-", "تعذر الحساب: " & Err.Description
+    Next
 End Sub
 
 Public Sub DashboardActivate(ByVal frm As Access.Form)
@@ -90,6 +119,9 @@ Public Sub DashboardTileClick(ByVal TileKey As String)
         Case "DEBT":  OpenReportOrQuery "rptCustomerBalances", "CustomerBalanceQuery", "[Balance] > 0"
         Case "DUE":   OpenReportOrQuery "rptSupplierBalances", "SupplierBalanceQuery", "[Balance] > 0"
         Case "STOCK": OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", "[IsActive] = True"
+        Case "MARGIN", "LIQUIDITY": OpenScreen "frmFinancials", 0        ' income statement / balance sheet
+        Case "TURNOVER": OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", "[IsActive] = True"
+        Case "COLLECTION": OpenScreen "frmAging", 0, "C"
     End Select
 End Sub
 
