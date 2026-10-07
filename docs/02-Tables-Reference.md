@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **52** | عدد الحقول: **627**
+عدد الجداول: **53** | عدد الحقول: **643**
 
 ## الفهرس
 
@@ -34,30 +34,31 @@
 26. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
 27. [`Banks`](#banks) – البنوك
 28. [`BankTransactions`](#banktransactions) – الحركات البنكية
-29. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-30. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-31. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-32. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-33. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-34. [`Expenses`](#expenses) – المصروفات
-35. [`CashVouchers`](#cashvouchers) – سندات النقدية
-36. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-37. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-38. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-39. [`JournalEntries`](#journalentries) – قيود اليومية
-40. [`JournalLines`](#journallines) – أسطر القيود
-41. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-42. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-43. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-44. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-45. [`ManualEntries`](#manualentries) – القيود اليدوية
-46. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-47. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-48. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-49. [`StockCounts`](#stockcounts) – جلسات الجرد
-50. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-51. [`AuditLog`](#auditlog) – سجل العمليات
-52. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+29. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
+30. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+31. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+32. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+33. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+34. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+35. [`Expenses`](#expenses) – المصروفات
+36. [`CashVouchers`](#cashvouchers) – سندات النقدية
+37. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+38. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+39. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+40. [`JournalEntries`](#journalentries) – قيود اليومية
+41. [`JournalLines`](#journallines) – أسطر القيود
+42. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+43. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+44. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+45. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+46. [`ManualEntries`](#manualentries) – القيود اليدوية
+47. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+48. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+49. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+50. [`StockCounts`](#stockcounts) – جلسات الجرد
+51. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+52. [`AuditLog`](#auditlog) – سجل العمليات
+53. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -117,7 +118,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 19 سجل
+- بيانات أساسية: 20 سجل
 
 ## Roles
 
@@ -146,7 +147,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 29 سجل
+- بيانات أساسية: 30 سجل
 
 ## RolePermissions
 
@@ -158,7 +159,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 58 سجل
+- بيانات أساسية: 60 سجل
 
 ## Employees
 
@@ -206,7 +207,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 44 سجل
+- بيانات أساسية: 45 سجل
 
 ## UserScreens
 
@@ -742,6 +743,35 @@
 - فهرس عادي: `TxDate`
 - قاعدة تحقق على مستوى الجدول: `[FeeAmount]+[FeeVAT]<[Amount] Or [TxType]<>"SETTLEMENT"` – العمولة وضريبتها أقل من مبلغ التسوية
 
+## Cheques
+
+**الشيكات الواردة والصادرة** – شيك وارد من عميل (يسدد رصيده ويبقى في «شيكات تحت التحصيل» حتى يُحصَّل في البنك أو يرتد) أو صادر لمورد (يسدد رصيده ويبقى في «أوراق الدفع» حتى يصرفه البنك أو يرتد).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ChequeID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | ChequeRef | Short Text | 20 | ✔ |  |  |  | رقم القيد الداخلي |
+| 3 | Direction | Short Text | 3 | ✔ |  | `In ("IN","OUT")` |  | الاتجاه |
+| 4 | CustomerID | Number (Long) |  |  |  |  | `Customers.CustomerID` | العميل (الوارد) |
+| 5 | SupplierID | Number (Long) |  |  |  |  | `Suppliers.SupplierID` | المورد (الصادر) |
+| 6 | ChequeNo | Short Text | 30 | ✔ |  |  |  | رقم الشيك |
+| 7 | DrawerBank | Short Text | 100 |  |  |  |  | بنك الساحب (الوارد) |
+| 8 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | بنكنا – الوارد: البنك الذي حُصِّل فيه؛ الصادر: البنك المسحوب عليه |
+| 9 | IssueDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الاستلام / الإصدار |
+| 10 | DueDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الاستحقاق |
+| 11 | Amount | Currency |  | ✔ | `0` | `>0` |  | المبلغ |
+| 12 | Status | Short Text | 10 | ✔ | `"PENDING"` | `In ("PENDING","COLLECTED","BOUNCED")` |  | الحالة |
+| 13 | StatusDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ التحصيل / الارتداد |
+| 14 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 15 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `ChequeID`
+- فهرس فريد: `ChequeRef`
+- فهرس عادي: `DueDate`
+- فهرس عادي: `ChequeNo`
+- قاعدة تحقق على مستوى الجدول: `([Direction]="IN" And [CustomerID] Is Not Null And [SupplierID] Is Null) Or ([Direction]="OUT" And [SupplierID] Is Not Null And [CustomerID] Is Null)` – الشيك الوارد لعميل، والصادر لمورد
+
 ## BankReconciliations
 
 **التسويات البنكية** – مطابقة كشف البنك في تاريخ مع الدفاتر: رصيد الكشف، والرصيد في الدفاتر، والحركات غير الظاهرة في الكشف.
@@ -950,7 +980,7 @@
 | 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 19 سجل
+- بيانات أساسية: 21 سجل
 
 ## JournalEntries
 

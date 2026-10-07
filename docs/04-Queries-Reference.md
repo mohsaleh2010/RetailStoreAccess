@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **122**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **124**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -96,38 +96,40 @@
 | 88 | [`qryYearCloseLines`](#qryyearcloselines) | أسطر قيود إقفال السنوات مع رأس كل إقفال |  |
 | 89 | [`qryJournalYearClose`](#qryjournalyearclose) | أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة |  |
 | 90 | [`qryJournalVatReturn`](#qryjournalvatreturn) | أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده |  |
-| 91 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
-| 92 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
-| 93 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
-| 94 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
-| 95 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
-| 96 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 97 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 98 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 99 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 100 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 101 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
-| 102 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 103 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 104 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
-| 105 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 106 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
-| 107 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
-| 108 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 109 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 110 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 111 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 112 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 113 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 114 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 115 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 116 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 117 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 118 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 119 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 120 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 121 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 122 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 91 | [`qryJournalCheque`](#qryjournalcheque) | أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد |  |
+| 92 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
+| 93 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
+| 94 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
+| 95 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
+| 96 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
+| 97 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
+| 98 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 99 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 100 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 101 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 102 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 103 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
+| 104 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 105 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 106 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 107 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 108 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
+| 109 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
+| 110 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 111 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 112 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 113 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 114 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 115 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 116 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 117 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 118 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 119 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 120 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 121 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 122 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 123 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 124 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -594,6 +596,14 @@ SELECT c.CustomerID, c.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-',
        IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0)
 FROM Customers AS c
 WHERE c.OpeningBalance <> 0
+UNION ALL
+SELECT q.CustomerID, q.IssueDate, 'CHEQUE', 'شيك وارد', q.ChequeID, q.ChequeNo, CCur(0), q.Amount
+FROM Cheques AS q
+WHERE q.Direction = 'IN'
+UNION ALL
+SELECT q.CustomerID, q.StatusDate, 'CHEQUE_BOUNCE', 'شيك مرتد', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)
+FROM Cheques AS q
+WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'
 ```
 
 ## qryCustomerLedgerTotals
@@ -672,6 +682,14 @@ SELECT s.SupplierID, s.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-',
        IIf(s.OpeningBalance > 0, s.OpeningBalance, 0)
 FROM Suppliers AS s
 WHERE s.OpeningBalance <> 0
+UNION ALL
+SELECT q.SupplierID, q.IssueDate, 'CHEQUE', 'شيك صادر', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)
+FROM Cheques AS q
+WHERE q.Direction = 'OUT'
+UNION ALL
+SELECT q.SupplierID, q.StatusDate, 'CHEQUE_BOUNCE', 'شيك مرتد', q.ChequeID, q.ChequeNo, CCur(0), q.Amount
+FROM Cheques AS q
+WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'
 ```
 
 ## qrySupplierLedgerTotals
@@ -877,6 +895,14 @@ UNION ALL
 SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, -s.OpeningBalance, 0
 FROM Suppliers AS s
 WHERE s.OpeningBalance < 0
+UNION ALL
+SELECT 'C', q.CustomerID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0
+FROM Cheques AS q
+WHERE q.Direction = 'IN' AND q.Status <> 'BOUNCED'
+UNION ALL
+SELECT 'S', q.SupplierID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0
+FROM Cheques AS q
+WHERE q.Direction = 'OUT' AND q.Status <> 'BOUNCED'
 ```
 
 ## qryAgingAllocations
@@ -1840,6 +1866,60 @@ FROM VatReturns AS v
 WHERE v.Status = 'FILED' AND v.PaidAmount <> 0
 ```
 
+## qryJournalCheque
+
+أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد
+
+```sql
+SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 1250 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'شيك وارد تحت التحصيل' AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'IN'
+UNION ALL
+SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'IN'
+UNION ALL
+SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2100 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'OUT'
+UNION ALL
+SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 2110 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'شيك صادر' AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'OUT'
+UNION ALL
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 120000 + q.BankID AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'تحصيل شيك' AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'IN' AND q.Status = 'COLLECTED'
+UNION ALL
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1250 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'IN' AND q.Status = 'COLLECTED'
+UNION ALL
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 1300 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'شيك مرتد' AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'
+UNION ALL
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1250 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'
+UNION ALL
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2110 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'OUT' AND q.Status = 'COLLECTED'
+UNION ALL
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 120000 + q.BankID AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'صرف شيك' AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'OUT' AND q.Status = 'COLLECTED'
+UNION ALL
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2110 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'
+UNION ALL
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 2100 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'شيك مرتد' AS LineText
+FROM Cheques AS q
+WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'
+```
+
 ## qryJournalBankTx
 
 أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى
@@ -1944,6 +2024,21 @@ GROUP BY BankID
 SELECT k.BankID, k.BankName, k.AccountNo, k.IBAN, k.IsActive, CCur(Nz(t.BookBalance, 0)) AS Balance, t.LastItemDate
 FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID
 ORDER BY k.BankName
+```
+
+## ChequesQuery
+
+الشيكات الواردة والصادرة مع العميل أو المورد وحالتها
+
+```sql
+SELECT q.ChequeID, q.ChequeRef, q.Direction, IIf(q.Direction = 'IN', 'وارد', 'صادر') AS DirectionName,
+       IIf(q.Direction = 'IN', c.CustomerName, s.SupplierName) AS PartyName, q.ChequeNo, q.DrawerBank,
+       k.BankName, q.IssueDate, q.DueDate, q.Amount, q.Status,
+       IIf(q.Status = 'PENDING', 'تحت التحصيل', IIf(q.Status = 'COLLECTED', IIf(q.Direction = 'IN', 'محصَّل', 'مصروف'),
+           'مرتد')) AS StatusName, q.StatusDate, q.Notes
+FROM ((Cheques AS q LEFT JOIN Customers AS c ON q.CustomerID = c.CustomerID)
+      LEFT JOIN Suppliers AS s ON q.SupplierID = s.SupplierID)
+     LEFT JOIN Banks AS k ON q.BankID = k.BankID
 ```
 
 ## JournalLinesQuery

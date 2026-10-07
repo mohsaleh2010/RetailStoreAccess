@@ -1,0 +1,443 @@
+Attribute VB_Name = "modCheque"
+'==============================================================================
+' modCheque  -  Retail Store Management System
+'
+' Received and issued cheques (table Cheques, screen frmCheques, permission CHEQUES):
+'   received (IN) from a customer: pays his balance at once and waits in 1250
+'       "cheques under collection"; collected -> the bank, bounced -> back on the
+'       customer's balance.
+'   issued (OUT) to a supplier: pays his balance at once and waits in 2110
+'       "notes payable"; paid by the bank -> the bank, bounced -> back to the supplier.
+' Journal sources CHEQUE (the receipt / issue) and CHEQUE_STATUS (the collection /
+' bounce); the customer and supplier ledgers and the aging show them too.
+' CurrentBalance of the customer / supplier follows (modSales.AdjustBalance).
+'==============================================================================
+Option Compare Database
+Option Explicit
+
+Private Function ChequeField(ByVal ChequeID As Long, ByVal FieldName As String) As Variant
+    ChequeField = DbValue("SELECT " & FieldName & " FROM Cheques WHERE ChequeID = " & ChequeID)
+End Function
+
+Private Function CanCheques(ByVal Action As String) As String
+    If Not HasPermission("CHEQUES") Then
+        CanCheques = "·«  „·ﬂ ’·«ÕÌ… «·‘Ìﬂ« ."
+    ElseIf Not CanScreenAction("frmCheques", Action, True) Then
+        CanCheques = "·«  „·ﬂ ’·«ÕÌ… " & IIf(Action = "ADD", " ”ÃÌ· «·‘Ìﬂ« ", IIf(Action = "EDIT", " Õ’Ì· «·‘Ìﬂ«  Ê«— œ«œÂ«", _
+                     "Õ–› «·‘Ìﬂ« ")) & "."
+    End If
+End Function
+
+Private Sub MoveBalance(ByVal Direction As String, ByVal PartyID As Long, ByVal Delta As Currency)
+    ' Delta > 0: the party owes more (customer) / is owed more (supplier).
+    If Direction = "IN" Then
+        AdjustBalance CurrentDb, "Customers", "CustomerID", PartyID, Delta
+    Else
+        AdjustBalance CurrentDb, "Suppliers", "SupplierID", PartyID, Delta
+    End If
+End Sub
+
+Private Function PartyOf(ByVal ChequeID As Long) As Long
+    PartyOf = Nz(ChequeField(ChequeID, "IIf(Direction = 'IN', CustomerID, SupplierID)"), 0)
+End Function
+
+'------------------------------------------------------------------------------
+' Receive / issue
+'------------------------------------------------------------------------------
+Public Function ChequeProblem(ByVal Direction As String, ByVal PartyID As Variant, ByVal ChequeNo As String, _
+                              ByVal BankID As Variant, ByVal IssueDate As Variant, ByVal DueDate As Variant, _
+                              ByVal Amount As Currency) As String
+    Dim p As String
+    If Direction <> "IN" And Direction <> "OUT" Then
+        p = "«Œ — ‰Ê⁄ «·‘Ìﬂ: Ê«—œ √Ê ’«œ—."
+    ElseIf IsNull(PartyID) Then
+        p = IIf(Direction = "IN", "«Œ — «·⁄„Ì·.", "«Œ — «·„Ê—œ.")
+    ElseIf Direction = "IN" And CLng(PartyID) = Nz(SettingValue("DefaultCustomerID"), 1) Then
+        p = "·« Ìı”ÃÛ¯· ‘Ìﬂ ⁄·Ï «·⁄„Ì· «·‰ﬁœÌ."
+    ElseIf Len(Trim$(ChequeNo)) = 0 Then
+        p = "«ﬂ » —ﬁ„ «·‘Ìﬂ."
+    ElseIf Amount <= 0 Then
+        p = "«·„»·€ ÌÃ» √‰ ÌﬂÊ‰ √ﬂ»— „‰ ’›—."
+    ElseIf Not IsDate(IssueDate) Or Not IsDate(DueDate) Then
+        p = "«ﬂ »  «—ÌŒ " & IIf(Direction = "IN", "«·«” ·«„", "«·≈’œ«—") & " Ê «—ÌŒ «·«” Õﬁ«ﬁ."
+    ElseIf DateValue(IssueDate) > Date Then
+        p = " «—ÌŒ " & IIf(Direction = "IN", "«·«” ·«„", "«·≈’œ«—") & " »⁄œ «·ÌÊ„."
+    ElseIf DateValue(DueDate) < DateValue(IssueDate) Then
+        p = " «—ÌŒ «·«” Õﬁ«ﬁ ﬁ»·  «—ÌŒ " & IIf(Direction = "IN", "«·«” ·«„", "«·≈’œ«—") & "."
+    ElseIf Direction = "OUT" And IsNull(BankID) Then
+        p = "«Œ — «·»‰ﬂ «·„”ÕÊ» ⁄·ÌÂ «·‘Ìﬂ."
+    ElseIf Not IsNull(BankID) Then
+        If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive = True AND BankID = " & CLng(BankID)), 0) = 0 Then
+            p = "«·»‰ﬂ €Ì— ‰‘ÿ."
+        End If
+    End If
+    If Len(p) = 0 And Direction = "IN" Then
+        If Nz(DbValue("SELECT COUNT(*) FROM Cheques WHERE Direction = 'IN' AND CustomerID = " & CLng(PartyID) & _
+                      " AND ChequeNo = " & SqlText(Trim$(ChequeNo))), 0) > 0 Then p = "Â–« «·‘Ìﬂ „”Ã· „‰ ﬁ»· ·‰›” «·⁄„Ì·."
+    End If
+    If Len(p) = 0 Then p = ClosedPeriodProblem(IssueDate)
+    ChequeProblem = p
+End Function
+
+Public Function PostCheque(ByVal Direction As String, ByVal PartyID As Variant, ByVal ChequeNo As String, _
+                           ByVal DrawerBank As String, ByVal BankID As Variant, ByVal IssueDate As Variant, _
+                           ByVal DueDate As Variant, ByVal Amount As Currency, ByVal Notes As String, _
+                           ByRef NewID As Long) As String
+    Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean, ref As String
+    On Error GoTo EH
+    NewID = 0
+    PostCheque = CanCheques("ADD")
+    If Len(PostCheque) = 0 Then PostCheque = ChequeProblem(Direction, PartyID, ChequeNo, BankID, IssueDate, DueDate, Amount)
+    If Len(PostCheque) > 0 Then Exit Function
+    Set db = CurrentDb
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    ref = NextNumber("CHEQUE")
+    Set rs = db.OpenRecordset("Cheques", dbOpenDynaset, dbAppendOnly)
+    rs.AddNew
+    rs!ChequeRef = ref
+    rs!Direction = Direction
+    If Direction = "IN" Then rs!CustomerID = CLng(PartyID) Else rs!SupplierID = CLng(PartyID)
+    rs!ChequeNo = Left$(Trim$(ChequeNo), 30)
+    If Len(Trim$(DrawerBank)) > 0 Then rs!DrawerBank = Left$(Trim$(DrawerBank), 100)
+    If Not IsNull(BankID) Then rs!BankID = CLng(BankID)
+    rs!IssueDate = DateValue(IssueDate)
+    rs!DueDate = DateValue(DueDate)
+    rs!Amount = Amount
+    rs!Status = "PENDING"
+    If Len(Trim$(Notes)) > 0 Then rs!Notes = Left$(Trim$(Notes), 255)
+    rs!EmployeeID = CurrentUserID()
+    rs.Update
+    rs.Bookmark = rs.LastModified
+    NewID = rs!ChequeID
+    rs.Close
+    MoveBalance Direction, CLng(PartyID), -Amount                  ' the cheque pays the balance
+    ws.CommitTrans
+    inTrans = False
+    LogAction "CHEQUE_" & Direction, "Cheques", ref, ChequeNo & " " & Format$(Amount, "0.00")
+    PostCheque = SyncJournal()
+    Exit Function
+EH:
+    PostCheque = " ⁄–— Õ›Ÿ «·‘Ìﬂ: " & Err.Description
+    NewID = 0
+    If inTrans Then ws.Rollback
+End Function
+
+Public Function DeleteCheque(ByVal ChequeID As Long) As String
+    ' A cheque still under collection, recorded in an open period.
+    Dim direction As Variant, amount As Currency
+    DeleteCheque = CanCheques("DELETE")
+    If Len(DeleteCheque) > 0 Then Exit Function
+    direction = ChequeField(ChequeID, "Direction")
+    If IsNull(direction) Then
+        DeleteCheque = "«·‘Ìﬂ €Ì— „ÊÃÊœ."
+        Exit Function
+    End If
+    If ChequeField(ChequeID, "Status") <> "PENDING" Then
+        DeleteCheque = "ÌıÕ–› «·‘Ìﬂ  Õ  «· Õ’Ì· ›ﬁÿ: √·€ˆ  Õ’Ì·Â √Ê «— œ«œÂ √Ê·«."
+        Exit Function
+    End If
+    DeleteCheque = ClosedPeriodProblem(ChequeField(ChequeID, "IssueDate"))
+    If Len(DeleteCheque) > 0 Then Exit Function
+    amount = ChequeField(ChequeID, "Amount")
+    MoveBalance direction, PartyOf(ChequeID), amount
+    CurrentDb.Execute "DELETE FROM Cheques WHERE ChequeID = " & ChequeID, dbFailOnError
+    LogAction "CHEQUE_DELETE", "Cheques", CStr(ChequeID)
+    DeleteCheque = SyncJournal()
+End Function
+
+'------------------------------------------------------------------------------
+' Collect / bounce / undo
+'------------------------------------------------------------------------------
+Public Function SetChequeStatus(ByVal ChequeID As Long, ByVal NewStatus As String, ByVal StatusDate As Variant, _
+                                ByVal BankID As Variant) As String
+    ' NewStatus COLLECTED (the bank collected / paid it) or BOUNCED.
+    Dim direction As Variant, amount As Currency, due As Variant
+    SetChequeStatus = CanCheques("EDIT")
+    If Len(SetChequeStatus) > 0 Then Exit Function
+    direction = ChequeField(ChequeID, "Direction")
+    If IsNull(direction) Then
+        SetChequeStatus = "«Œ — «·‘Ìﬂ."
+        Exit Function
+    End If
+    If ChequeField(ChequeID, "Status") <> "PENDING" Then
+        SetChequeStatus = "«·‘Ìﬂ ·Ì”  Õ  «· Õ’Ì·."
+        Exit Function
+    End If
+    If NewStatus <> "COLLECTED" And NewStatus <> "BOUNCED" Then Exit Function
+    If Not IsDate(StatusDate) Then
+        SetChequeStatus = "«ﬂ »  «—ÌŒ " & IIf(NewStatus = "BOUNCED", "«·«— œ«œ.", IIf(direction = "IN", "«· Õ’Ì·.", "«·’—›."))
+        Exit Function
+    End If
+    due = ChequeField(ChequeID, "DueDate")
+    If DateValue(StatusDate) > Date Then
+        SetChequeStatus = "«· «—ÌŒ »⁄œ «·ÌÊ„."
+    ElseIf DateValue(StatusDate) < DateValue(ChequeField(ChequeID, "IssueDate")) Then
+        SetChequeStatus = "«· «—ÌŒ ﬁ»·  «—ÌŒ «·‘Ìﬂ."
+    ElseIf NewStatus = "COLLECTED" And DateValue(StatusDate) < DateValue(due) Then
+        SetChequeStatus = "«·‘Ìﬂ „” Õﬁ ›Ì " & GDate(due) & ": ·« ÌıÕ’Û¯· ﬁ»· «” Õﬁ«ﬁÂ."
+    ElseIf NewStatus = "COLLECTED" And IsNull(BankID) Then
+        SetChequeStatus = "«Œ — «·»‰ﬂ."
+    End If
+    If Len(SetChequeStatus) = 0 And NewStatus = "COLLECTED" Then
+        If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive = True AND BankID = " & CLng(BankID)), 0) = 0 Then
+            SetChequeStatus = "«·»‰ﬂ €Ì— ‰‘ÿ."
+        End If
+    End If
+    If Len(SetChequeStatus) = 0 Then SetChequeStatus = ClosedPeriodProblem(StatusDate)
+    If Len(SetChequeStatus) > 0 Then Exit Function
+    amount = ChequeField(ChequeID, "Amount")
+    CurrentDb.Execute "UPDATE Cheques SET Status = " & SqlText(NewStatus) & ", StatusDate = " & SqlDate(DateValue(StatusDate)) & _
+                      IIf(NewStatus = "COLLECTED", ", BankID = " & CLng(Nz(BankID, 0)), "") & _
+                      " WHERE ChequeID = " & ChequeID, dbFailOnError
+    If NewStatus = "BOUNCED" Then MoveBalance direction, PartyOf(ChequeID), amount     ' owed again
+    LogAction "CHEQUE_" & NewStatus, "Cheques", CStr(ChequeID)
+    SetChequeStatus = SyncJournal()
+End Function
+
+Public Function UndoChequeStatus(ByVal ChequeID As Long) As String
+    ' Back under collection (a mistake): not when its bank movement was reconciled.
+    Dim status As String
+    UndoChequeStatus = CanCheques("EDIT")
+    If Len(UndoChequeStatus) > 0 Then Exit Function
+    status = Nz(ChequeField(ChequeID, "Status"), "")
+    If status <> "COLLECTED" And status <> "BOUNCED" Then
+        UndoChequeStatus = "«·‘Ìﬂ  Õ  «· Õ’Ì·."
+        Exit Function
+    End If
+    If Nz(DbValue("SELECT COUNT(*) FROM BankClearings WHERE SourceType = 'CHEQUE_STATUS' AND SourceID = " & ChequeID), 0) > 0 Then
+        UndoChequeStatus = "Õ—ﬂ… «·‘Ìﬂ „ÿ«»ﬁ… ›Ì  ”ÊÌ… »‰ﬂÌ…: √·€ˆ „ÿ«»ﬁ Â« √Ê·«."
+        Exit Function
+    End If
+    UndoChequeStatus = ClosedPeriodProblem(ChequeField(ChequeID, "StatusDate"))
+    If Len(UndoChequeStatus) > 0 Then Exit Function
+    If status = "BOUNCED" Then MoveBalance ChequeField(ChequeID, "Direction"), PartyOf(ChequeID), -ChequeField(ChequeID, "Amount")
+    CurrentDb.Execute "UPDATE Cheques SET Status = 'PENDING', StatusDate = Null WHERE ChequeID = " & ChequeID, dbFailOnError
+    LogAction "CHEQUE_UNDO", "Cheques", CStr(ChequeID)
+    UndoChequeStatus = SyncJournal()
+End Function
+
+'------------------------------------------------------------------------------
+' Screen frmCheques (OpenArgs "IN" / "OUT")
+'------------------------------------------------------------------------------
+Public Sub ChequesLoad(ByVal frm As Access.Form)
+    Dim msg As String
+    Calendar = vbCalGreg
+    msg = SyncJournal()
+    If Len(msg) > 0 Then ShowWarning msg
+    frm!cboDirection.Value = IIf(Nz(frm.OpenArgs, "IN") = "OUT", "OUT", "IN")
+    frm!cboShow.Value = "PENDING"
+    frm!txtIssueDate.Value = Date
+    frm!txtDueDate.Value = Date
+    frm!txtActionDate.Value = Date
+    frm!cboActionBank.Value = SettingValue("DefaultBankID")
+    ChequesDirectionChanged frm
+End Sub
+
+Public Sub ChequesDirectionChanged(ByVal frm As Access.Form)
+    If frm!cboDirection.Value = "IN" Then
+        frm!cboParty.RowSource = "SELECT CustomerID, CustomerName FROM Customers WHERE IsActive = True AND CustomerID <> " & _
+                                 Nz(SettingValue("DefaultCustomerID"), 1) & " ORDER BY CustomerName"
+        frm!lblParty.Caption = "«·⁄„Ì·"
+        frm!btnCollect.Caption = " Õ’Ì· ›Ì «·»‰ﬂ"
+    Else
+        frm!cboParty.RowSource = "SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName"
+        frm!lblParty.Caption = "«·„Ê—œ"
+        frm!btnCollect.Caption = "’—›Â «·»‰ﬂ"
+    End If
+    frm!cboParty.Value = Null
+    frm!txtDrawerBank.Enabled = (frm!cboDirection.Value = "IN")
+    ChequesRefresh frm
+End Sub
+
+Public Sub ChequesRefresh(ByVal frm As Access.Form)
+    Dim where As String, kind As String, pending As Currency, soon As Currency, late As Currency
+    kind = Nz(frm!cboDirection.Value, "IN")
+    where = "Direction = " & SqlText(kind)
+    Select Case Nz(frm!cboShow.Value, "PENDING")
+        Case "PENDING": where = where & " AND Status = 'PENDING'"
+        Case "DUE": where = where & " AND Status = 'PENDING' AND DueDate <= " & SqlDate(Date + 7)
+        Case "COLLECTED": where = where & " AND Status = 'COLLECTED'"
+        Case "BOUNCED": where = where & " AND Status = 'BOUNCED'"
+    End Select
+    frm!lstCheques.RowSource = "SELECT ChequeID, ChequeRef AS [«·ﬁÌœ], ChequeNo AS [—ﬁ„ «·‘Ìﬂ], PartyName AS [" & _
+        IIf(kind = "IN", "«·⁄„Ì·", "«·„Ê—œ") & "], Format(DueDate, 'yyyy/mm/dd') AS [«·«” Õﬁ«ﬁ], Format(Amount, '#,##0.00') " & _
+        "AS [«·„»·€], StatusName AS [«·Õ«·…], Format(StatusDate, 'yyyy/mm/dd') AS [›Ì], Nz(BankName, DrawerBank) AS [«·»‰ﬂ] " & _
+        "FROM ChequesQuery WHERE " & where & " ORDER BY DueDate, ChequeID"
+    pending = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind)), 0)
+    soon = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind) & _
+                      " AND DueDate <= " & SqlDate(Date + 7)), 0)
+    late = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind) & _
+                      " AND DueDate < " & SqlDate(Date)), 0)
+    frm!lblTotals.Caption = IIf(kind = "IN", "‘Ìﬂ«   Õ  «· Õ’Ì·: ", "‘Ìﬂ«  ’«œ—… ·„  ı’—›: ") & Format$(pending, "#,##0.00") & _
+        "    „” Õﬁ… Œ·«· 7 √Ì«„: " & Format$(soon, "#,##0.00") & "    ›«  «” Õﬁ«ﬁÂ«: " & Format$(late, "#,##0.00")
+    frm!lblTotals.ForeColor = IIf(late > 0, CLR_DANGER, CLR_PRIMARY)
+End Sub
+
+Public Sub SaveCheque(ByVal frm As Access.Form)
+    Dim msg As String, id As Long
+    msg = PostCheque(Nz(frm!cboDirection.Value, ""), frm!cboParty.Value, Nz(frm!txtChequeNo.Value, ""), _
+                     Nz(frm!txtDrawerBank.Value, ""), frm!cboBank.Value, frm!txtIssueDate.Value, frm!txtDueDate.Value, _
+                     CCur(Nz(frm!txtAmount.Value, 0)), Nz(frm!txtNotes.Value, ""), id)
+    If id = 0 Then
+        ShowWarning msg
+        Exit Sub
+    End If
+    If Len(msg) > 0 Then ShowWarning msg
+    ShowInfo " „  ”ÃÌ· «·‘Ìﬂ " & ChequeField(id, "ChequeRef") & "."
+    frm!txtChequeNo.Value = Null
+    frm!txtAmount.Value = Null
+    frm!txtNotes.Value = Null
+    ChequesRefresh frm
+End Sub
+
+Private Function PickedCheque(ByVal frm As Access.Form) As Long
+    PickedCheque = Nz(frm!lstCheques.Value, 0)
+    If PickedCheque = 0 Then ShowWarning "«Œ — «·‘Ìﬂ „‰ «·ﬁ«∆„…."
+End Function
+
+Private Sub ChequeDone(ByVal frm As Access.Form, ByVal Msg As String, ByVal Success As String)
+    If Len(Msg) > 0 Then
+        ShowWarning Msg
+    Else
+        ShowInfo Success
+    End If
+    ChequesRefresh frm
+End Sub
+
+Public Sub CollectCheque(ByVal frm As Access.Form)
+    Dim id As Long, msg As String
+    id = PickedCheque(frm)
+    If id = 0 Then Exit Sub
+    msg = SetChequeStatus(id, "COLLECTED", frm!txtActionDate.Value, frm!cboActionBank.Value)
+    If ChequeField(id, "Status") = "COLLECTED" Then
+        ChequeDone frm, "", IIf(frm!cboDirection.Value = "IN", " „  Õ’Ì· «·‘Ìﬂ ›Ì «·»‰ﬂ.", " „  ”ÃÌ· ’—› «·‘Ìﬂ.")
+    Else
+        ChequeDone frm, msg, ""
+    End If
+End Sub
+
+Public Sub BounceCheque(ByVal frm As Access.Form)
+    Dim id As Long, msg As String
+    id = PickedCheque(frm)
+    If id = 0 Then Exit Sub
+    If Not AskYesNo(" ”ÃÌ· «— œ«œ «·‘Ìﬂø Ì⁄Êœ „»·€Â ⁄·Ï " & IIf(frm!cboDirection.Value = "IN", "«·⁄„Ì·.", "«·„Ê—œ.")) Then Exit Sub
+    msg = SetChequeStatus(id, "BOUNCED", frm!txtActionDate.Value, Null)
+    If ChequeField(id, "Status") = "BOUNCED" Then
+        ChequeDone frm, "", " „  ”ÃÌ· «— œ«œ «·‘Ìﬂ."
+    Else
+        ChequeDone frm, msg, ""
+    End If
+End Sub
+
+Public Sub UndoCheque(ByVal frm As Access.Form)
+    Dim id As Long, msg As String
+    id = PickedCheque(frm)
+    If id = 0 Then Exit Sub
+    If Not AskYesNo("≈—Ã«⁄ «·‘Ìﬂ ≈·Ï ´ Õ  «· Õ’Ì·ª ÊÕ–› ﬁÌœ  Õ’Ì·Â √Ê «— œ«œÂø") Then Exit Sub
+    msg = UndoChequeStatus(id)
+    If ChequeField(id, "Status") = "PENDING" Then
+        ChequeDone frm, "", "⁄«œ «·‘Ìﬂ  Õ  «· Õ’Ì·."
+    Else
+        ChequeDone frm, msg, ""
+    End If
+End Sub
+
+Public Sub DeleteSelectedCheque(ByVal frm As Access.Form)
+    Dim id As Long, msg As String
+    id = PickedCheque(frm)
+    If id = 0 Then Exit Sub
+    If Not AskYesNo("Õ–› «·‘Ìﬂ «·„Õœœ ÊﬁÌœÂø") Then Exit Sub
+    msg = DeleteCheque(id)
+    If IsNull(ChequeField(id, "ChequeID")) Then
+        ChequeDone frm, "", " „ Õ–› «·‘Ìﬂ."
+    Else
+        ChequeDone frm, msg, ""
+    End If
+End Sub
+
+'------------------------------------------------------------------------------
+' In-Access test (RunAllTests): inside a transaction that is rolled back
+'------------------------------------------------------------------------------
+Private Sub CheckCheque(ByVal ok As Boolean, ByVal Title As String, ByRef passed As Long, ByRef failed As Long, _
+                        ByRef report As String)
+    If ok Then
+        passed = passed + 1
+        Debug.Print "[OK] " & Title
+    Else
+        failed = failed + 1
+        report = report & "- " & Title & vbCrLf
+        Debug.Print "[X]  " & Title
+    End If
+End Sub
+
+Public Function TestCheques() As Boolean
+    Dim passed As Long, failed As Long, report As String, msg As String, ws As DAO.Workspace, inTrans As Boolean
+    Dim cust As Long, supp As Long, bank As Long, id As Long, id2 As Long, before As Currency, sBefore As Currency
+    Calendar = vbCalGreg
+    EnsureTestUser
+    g_SilentMode = True
+    Debug.Print "=== TestCheques  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
+    On Error GoTo EH
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    If ClosedThroughDate() >= Date Then
+        Debug.Print "[--] «·› —… „ﬁ›·… Õ Ï «·ÌÊ„"
+        GoTo Undo
+    End If
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, AllowCredit, CreditLimit, Notes) VALUES ('TEST ⁄„Ì· ‘Ìﬂ« ', True, 0, " & _
+                      "'TEST')", dbFailOnError
+    cust = DbValue("SELECT CustomerID FROM Customers WHERE CustomerName = 'TEST ⁄„Ì· ‘Ìﬂ« '")
+    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, Notes) VALUES ('TEST „Ê—œ ‘Ìﬂ« ', 'TEST')", dbFailOnError
+    supp = DbValue("SELECT SupplierID FROM Suppliers WHERE SupplierName = 'TEST „Ê—œ ‘Ìﬂ« '")
+    CurrentDb.Execute "INSERT INTO Banks (BankName, OpeningBalance, OpeningDate, IsActive) VALUES ('TEST »‰ﬂ «·‘Ìﬂ« ', 0, " & _
+                      SqlDate(Date) & ", True)", dbFailOnError
+    bank = DbValue("SELECT BankID FROM Banks WHERE BankName = 'TEST »‰ﬂ «·‘Ìﬂ« '")
+    before = AccountBalance(1250)
+
+    msg = PostCheque("IN", cust, "TEST-1001", "»‰ﬂ «·”«Õ»", Null, Date, Date, 500, "", id)
+    CheckCheque Len(msg) = 0 And id > 0 And Nz(DbValue("SELECT CurrentBalance FROM Customers WHERE CustomerID = " & cust), 0) = -500 _
+                And AccountBalance(1250) = before + 500, "‘Ìﬂ Ê«—œ Ì”œœ —’Ìœ «·⁄„Ì· ÊÌ»ﬁÏ  Õ  «· Õ’Ì· " & msg, passed, failed, report
+    CheckCheque Len(PostCheque("IN", cust, "TEST-1001", "", Null, Date, Date, 500, "", id2)) > 0, _
+                "·« Ì ﬂ—— «·‘Ìﬂ ‰›”Â ··⁄„Ì·", passed, failed, report
+    msg = SetChequeStatus(id, "COLLECTED", Date, bank)
+    CheckCheque Len(msg) = 0 And AccountBalance(1250) = before And BankBookBalance(bank) = 500, _
+                " Õ’Ì· «·‘Ìﬂ: „‰  Õ  «· Õ’Ì· ≈·Ï «·»‰ﬂ " & msg, passed, failed, report
+    msg = UndoChequeStatus(id)
+    msg = msg & SetChequeStatus(id, "BOUNCED", Date, Null)
+    CheckCheque Len(msg) = 0 And BankBookBalance(bank) = 0 And AccountBalance(1250) = before And _
+                Nz(DbValue("SELECT CurrentBalance FROM Customers WHERE CustomerID = " & cust), 0) = 0, _
+                "«·‘Ìﬂ «·„— œ Ì⁄Êœ ⁄·Ï «·⁄„Ì· " & msg, passed, failed, report
+
+    sBefore = AccountBalance(2110)
+    msg = PostCheque("OUT", supp, "TEST-2001", "", bank, Date, Date + 30, 300, "", id2)
+    CheckCheque Len(msg) = 0 And Nz(DbValue("SELECT CurrentBalance FROM Suppliers WHERE SupplierID = " & supp), 0) = -300 And _
+                AccountBalance(2110) = sBefore - 300, "‘Ìﬂ ’«œ— Ì”œœ —’Ìœ «·„Ê—œ ÊÌ»ﬁÏ ›Ì √Ê—«ﬁ «·œ›⁄ " & msg, _
+                passed, failed, report
+    CheckCheque Len(SetChequeStatus(id2, "COLLECTED", Date, bank)) > 0, "·« Ìı’—› «·‘Ìﬂ ﬁ»· «” Õﬁ«ﬁÂ", passed, failed, report
+    msg = DeleteCheque(id2)
+    CheckCheque Len(msg) = 0 And Nz(DbValue("SELECT CurrentBalance FROM Suppliers WHERE SupplierID = " & supp), 0) = 0 And _
+                AccountBalance(2110) = sBefore, "Õ–› «·‘Ìﬂ  Õ  «· Õ’Ì· Ì⁄Ìœ «·—’Ìœ " & msg, passed, failed, report
+    CheckCheque Nz(DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit"), 0) = 0 And _
+                AccountBalance(1300) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Customers"), 0) And _
+                -AccountBalance(2100) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Suppliers"), 0), _
+                "«·ﬁÌÊœ „ Ê«“‰…° ÊÕ”«»« «·⁄„·«¡ Ê«·„Ê—œÌ‰ = √—’œ Â„", passed, failed, report
+Undo:
+    ws.Rollback
+    inTrans = False
+    GoTo Done
+EH:
+    CheckCheque False, "Œÿ√: " & Err.Description, passed, failed, report
+    If inTrans Then ws.Rollback
+Done:
+    g_SilentMode = False
+    Debug.Print "--- ‰ÃÕ: " & passed & " | ›‘·: " & failed
+    If failed = 0 Then
+        TestMsg "Ã„Ì⁄ «Œ »«—«  «·‘Ìﬂ«  ‰«ÃÕ… (" & passed & " «Œ »«—«).", vbInformation + MSG_RTL, "TestCheques"
+        TestCheques = True
+    Else
+        TestMsg "‰ÃÕ " & passed & " Ê›‘· " & failed & ":" & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, "TestCheques"
+    End If
+End Function

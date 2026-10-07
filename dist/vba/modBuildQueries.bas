@@ -24,8 +24,8 @@ Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySa
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvo" & _
     "iceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryDashboardTopProducts,qrySalesDocPr" & _
     "int,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
-    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeM" & _
-    "oves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,Tr" & _
+    "ialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -750,11 +750,13 @@ Private Sub CreateAllQueries()
     Q_qryYearCloseLines
     Q_qryJournalYearClose
     Q_qryJournalVatReturn
+    Q_qryJournalCheque
     Q_qryJournalBankTx
     Q_qryBankItemSums
     Q_qryBankItems
     Q_qryBankTotals
     Q_BankBalanceQuery
+    Q_ChequesQuery
     Q_JournalLinesQuery
     Q_qryJournalEntryPrint
     Q_qryTrialBefore
@@ -1076,6 +1078,14 @@ Private Sub Q_qryCustomerLedger()
     s = s & "       IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0)" & vbCrLf
     s = s & "FROM Customers AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT q.CustomerID, q.IssueDate, 'CHEQUE', '‘Ìﬂ Ê«—œ', q.ChequeID, q.ChequeNo, CCur(0), q.Amount" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT q.CustomerID, q.StatusDate, 'CHEQUE_BOUNCE', '‘Ìﬂ „— œ', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'" & vbCrLf
     SaveQuery "qryCustomerLedger", "œ› — Õ”«» «·⁄„·«¡: „œÌ‰ (⁄·ÌÂ) / œ«∆‰ (·Â)", s
 End Sub
 
@@ -1142,6 +1152,14 @@ Private Sub Q_qrySupplierLedger()
     s = s & "       IIf(s.OpeningBalance > 0, s.OpeningBalance, 0)" & vbCrLf
     s = s & "FROM Suppliers AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT q.SupplierID, q.IssueDate, 'CHEQUE', '‘Ìﬂ ’«œ—', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT q.SupplierID, q.StatusDate, 'CHEQUE_BOUNCE', '‘Ìﬂ „— œ', q.ChequeID, q.ChequeNo, CCur(0), q.Amount" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'" & vbCrLf
     SaveQuery "qrySupplierLedger", "œ› — Õ”«» «·„Ê—œÌ‰: œ«∆‰ (··„Ê—œ) / „œÌ‰ (”ıœˆ¯œ ·Â)", s
 End Sub
 
@@ -1315,6 +1333,14 @@ Private Sub Q_qryAgingCredits()
     s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, '—’Ìœ «›  «ÕÌ', s.CreatedAt, -s.OpeningBalance, 0" & vbCrLf
     s = s & "FROM Suppliers AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance < 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'C', q.CustomerID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN' AND q.Status <> 'BOUNCED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', q.SupplierID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT' AND q.Status <> 'BOUNCED'" & vbCrLf
     SaveQuery "qryAgingCredits", "„« Ì”œœ «·„” Õﬁ: «·„— Ã⁄«  (⁄·Ï ›« Ê— Â« √Ê·«) Ê«·”‰œ«  Ê«·—’Ìœ «·«›  «ÕÌ «·œ«∆‰", s
 End Sub
 
@@ -2145,6 +2171,58 @@ Private Sub Q_qryJournalVatReturn()
     SaveQuery "qryJournalVatReturn", "√”ÿ— ﬁÌÊœ «·≈ﬁ—«— «·÷—Ì»Ì «·„⁄ „œ («· ”ÊÌ…) Ê”œ«œÂ", s
 End Sub
 
+Private Sub Q_qryJournalCheque()
+    Dim s As String
+    s = "SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 1250 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, '‘Ìﬂ Ê«—œ  Õ  «· Õ’Ì·' AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2100 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 2110 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, '‘Ìﬂ ’«œ—' AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 120000 + q.BankID AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, ' Õ’Ì· ‘Ìﬂ' AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN' AND q.Status = 'COLLECTED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1250 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN' AND q.Status = 'COLLECTED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 1300 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, '‘Ìﬂ „— œ' AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1250 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2110 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT' AND q.Status = 'COLLECTED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 120000 + q.BankID AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, '’—› ‘Ìﬂ' AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT' AND q.Status = 'COLLECTED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2110 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 2100 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, '‘Ìﬂ „— œ' AS LineText" & vbCrLf
+    s = s & "FROM Cheques AS q" & vbCrLf
+    s = s & "WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'" & vbCrLf
+    SaveQuery "qryJournalCheque", "√”ÿ— ﬁÌÊœ «·‘Ìﬂ« : «·«” ·«„ √Ê «·≈’œ«—° À„ «· Õ’Ì· √Ê «·«— œ«œ", s
+End Sub
+
 Private Sub Q_qryJournalBankTx()
     Dim s As String
     s = "SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, '≈Ìœ«⁄ ‰ﬁœÌ…' AS LineText" & vbCrLf
@@ -2239,6 +2317,19 @@ Private Sub Q_BankBalanceQuery()
     s = s & "FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID" & vbCrLf
     s = s & "ORDER BY k.BankName" & vbCrLf
     SaveQuery "BankBalanceQuery", "√—’œ… «·»‰Êﬂ ›Ì «·œ›« —", s
+End Sub
+
+Private Sub Q_ChequesQuery()
+    Dim s As String
+    s = "SELECT q.ChequeID, q.ChequeRef, q.Direction, IIf(q.Direction = 'IN', 'Ê«—œ', '’«œ—') AS DirectionName," & vbCrLf
+    s = s & "       IIf(q.Direction = 'IN', c.CustomerName, s.SupplierName) AS PartyName, q.ChequeNo, q.DrawerBank," & vbCrLf
+    s = s & "       k.BankName, q.IssueDate, q.DueDate, q.Amount, q.Status," & vbCrLf
+    s = s & "       IIf(q.Status = 'PENDING', ' Õ  «· Õ’Ì·', IIf(q.Status = 'COLLECTED', IIf(q.Direction = 'IN', '„Õ’Û¯·', '„’—Ê›')," & vbCrLf
+    s = s & "           '„— œ')) AS StatusName, q.StatusDate, q.Notes" & vbCrLf
+    s = s & "FROM ((Cheques AS q LEFT JOIN Customers AS c ON q.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "      LEFT JOIN Suppliers AS s ON q.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "     LEFT JOIN Banks AS k ON q.BankID = k.BankID" & vbCrLf
+    SaveQuery "ChequesQuery", "«·‘Ìﬂ«  «·Ê«—œ… Ê«·’«œ—… „⁄ «·⁄„Ì· √Ê «·„Ê—œ ÊÕ«· Â«", s
 End Sub
 
 Private Sub Q_JournalLinesQuery()

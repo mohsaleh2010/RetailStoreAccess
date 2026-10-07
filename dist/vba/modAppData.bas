@@ -111,6 +111,7 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmBanks": ScreenPermission = "BANKS"
         Case "frmBankTx": ScreenPermission = "BANKS"
         Case "frmBankRecon": ScreenPermission = "BANKS"
+        Case "frmCheques": ScreenPermission = "CHEQUES"
     End Select
 End Function
 

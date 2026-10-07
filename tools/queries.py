@@ -61,7 +61,7 @@ ZERO = "CCur(0)"
 JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournalPurchase", "qryJournalPurchaseReturn",
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
                           "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
-                          "qryJournalBankTx"]
+                          "qryJournalBankTx", "qryJournalCheque"]
 
 
 def _sale():
@@ -208,6 +208,28 @@ def _bank_tx():
         jline(*k, 2, "t.CounterAccount", ZERO, "t.Amount", "t.Description", src, kind("OTHER_IN")),
         jline(*k, 1, "t.CounterAccount", "t.Amount - t.FeeVAT", ZERO, "t.Description", src, kind("OTHER_OUT")),
         jline(*k, 2, bank, ZERO, "t.Amount", "t.Reference", src, kind("OTHER_OUT"))])
+
+
+def _cheque():
+    # received: 1250 until the bank collects it; issued: 2110 until the bank pays it. A bounced cheque goes
+    # back to the customer / supplier. CHEQUE = the receipt / issue, CHEQUE_STATUS = the collection / bounce.
+    src = "Cheques AS q"
+    k = ("'CHEQUE'", "q.ChequeID", "q.ChequeRef", "q.IssueDate", "q.ChequeNo")
+    ks = ("'CHEQUE_STATUS'", "q.ChequeID", "q.ChequeRef", "q.StatusDate", "q.ChequeNo")
+    bank = "120000 + q.BankID"
+    return jquery([
+        jline(*k, 1, 1250, "q.Amount", ZERO, "'شيك وارد تحت التحصيل'", src, "q.Direction = 'IN'"),
+        jline(*k, 2, 1300, ZERO, "q.Amount", "q.ChequeNo", src, "q.Direction = 'IN'"),
+        jline(*k, 1, 2100, "q.Amount", ZERO, "q.ChequeNo", src, "q.Direction = 'OUT'"),
+        jline(*k, 2, 2110, ZERO, "q.Amount", "'شيك صادر'", src, "q.Direction = 'OUT'"),
+        jline(*ks, 1, bank, "q.Amount", ZERO, "'تحصيل شيك'", src, "q.Direction = 'IN' AND q.Status = 'COLLECTED'"),
+        jline(*ks, 2, 1250, ZERO, "q.Amount", "q.ChequeNo", src, "q.Direction = 'IN' AND q.Status = 'COLLECTED'"),
+        jline(*ks, 1, 1300, "q.Amount", ZERO, "'شيك مرتد'", src, "q.Direction = 'IN' AND q.Status = 'BOUNCED'"),
+        jline(*ks, 2, 1250, ZERO, "q.Amount", "q.ChequeNo", src, "q.Direction = 'IN' AND q.Status = 'BOUNCED'"),
+        jline(*ks, 1, 2110, "q.Amount", ZERO, "q.ChequeNo", src, "q.Direction = 'OUT' AND q.Status = 'COLLECTED'"),
+        jline(*ks, 2, bank, ZERO, "q.Amount", "'صرف شيك'", src, "q.Direction = 'OUT' AND q.Status = 'COLLECTED'"),
+        jline(*ks, 1, 2110, "q.Amount", ZERO, "q.ChequeNo", src, "q.Direction = 'OUT' AND q.Status = 'BOUNCED'"),
+        jline(*ks, 2, 2100, ZERO, "q.Amount", "'شيك مرتد'", src, "q.Direction = 'OUT' AND q.Status = 'BOUNCED'")])
 
 
 def _year_close():
@@ -658,7 +680,15 @@ SELECT c.CustomerID, c.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-',
        IIf(c.OpeningBalance > 0, c.OpeningBalance, 0),
        IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0)
 FROM Customers AS c
-WHERE c.OpeningBalance <> 0"""),
+WHERE c.OpeningBalance <> 0
+UNION ALL
+SELECT q.CustomerID, q.IssueDate, 'CHEQUE', 'شيك وارد', q.ChequeID, q.ChequeNo, CCur(0), q.Amount
+FROM Cheques AS q
+WHERE q.Direction = 'IN'
+UNION ALL
+SELECT q.CustomerID, q.StatusDate, 'CHEQUE_BOUNCE', 'شيك مرتد', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)
+FROM Cheques AS q
+WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'"""),
 
     Query("qryCustomerLedgerTotals", "مجاميع حساب كل عميل", """
 SELECT CustomerID, Sum(Debit) AS TotalDebit, Sum(Credit) AS TotalCredit,
@@ -710,7 +740,15 @@ SELECT s.SupplierID, s.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-',
        IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0),
        IIf(s.OpeningBalance > 0, s.OpeningBalance, 0)
 FROM Suppliers AS s
-WHERE s.OpeningBalance <> 0"""),
+WHERE s.OpeningBalance <> 0
+UNION ALL
+SELECT q.SupplierID, q.IssueDate, 'CHEQUE', 'شيك صادر', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)
+FROM Cheques AS q
+WHERE q.Direction = 'OUT'
+UNION ALL
+SELECT q.SupplierID, q.StatusDate, 'CHEQUE_BOUNCE', 'شيك مرتد', q.ChequeID, q.ChequeNo, CCur(0), q.Amount
+FROM Cheques AS q
+WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'"""),
 
     Query("qrySupplierLedgerTotals", "مجاميع حساب كل مورد", """
 SELECT SupplierID, Sum(Debit) AS TotalDebit, Sum(Credit) AS TotalCredit,
@@ -811,7 +849,8 @@ SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.
 FROM Suppliers AS s
 WHERE s.OpeningBalance > 0"""),
 
-    # what pays it: returns (on their own invoice first), payments, a credit opening balance
+    # what pays it: returns (on their own invoice first), payments, cheques (a bounced one pays nothing:
+    # the invoices it paid are open again), a credit opening balance
     Query("qryAgingCredits", "ما يسدد المستحق: المرتجعات (على فاتورتها أولًا) والسندات والرصيد الافتتاحي الدائن", """
 SELECT 'C' AS PartyKind, r.CustomerID AS PartyID, 'RETURN' AS CreditType, r.SalesReturnID AS CreditID,
        r.ReturnNumber AS CreditNo, r.ReturnDate AS CreditDate, r.TotalAmount - r.RefundedAmount AS Amount,
@@ -836,7 +875,15 @@ FROM SupplierPayments AS p
 UNION ALL
 SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, -s.OpeningBalance, 0
 FROM Suppliers AS s
-WHERE s.OpeningBalance < 0"""),
+WHERE s.OpeningBalance < 0
+UNION ALL
+SELECT 'C', q.CustomerID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0
+FROM Cheques AS q
+WHERE q.Direction = 'IN' AND q.Status <> 'BOUNCED'
+UNION ALL
+SELECT 'S', q.SupplierID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0
+FROM Cheques AS q
+WHERE q.Direction = 'OUT' AND q.Status <> 'BOUNCED'"""),
 
     # the invoices a payment was linked to (an older payment made "for an invoice" counts as linked)
     Query("qryAgingAllocations", "ربط السندات بالفواتير (ومنها السند المسجل عن فاتورة قبل الربط)", """
@@ -1241,6 +1288,7 @@ SELECT h.YearClosingID, h.ClosingNumber, h.ClosingDate, h.Notes, l.LineNumber AS
 FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClosingID = l.YearClosingID"""),
     Query("qryJournalYearClose", "أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة", _year_close()),
     Query("qryJournalVatReturn", "أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده", _vat_return()),
+    Query("qryJournalCheque", "أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد", _cheque()),
     Query("qryJournalBankTx", "أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى", _bank_tx()),
 
     # ================================================================ BANKS (modBank)
@@ -1269,6 +1317,16 @@ GROUP BY BankID"""),
 SELECT k.BankID, k.BankName, k.AccountNo, k.IBAN, k.IsActive, {nz("t.BookBalance")} AS Balance, t.LastItemDate
 FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID
 ORDER BY k.BankName"""),
+
+    Query("ChequesQuery", "الشيكات الواردة والصادرة مع العميل أو المورد وحالتها", """
+SELECT q.ChequeID, q.ChequeRef, q.Direction, IIf(q.Direction = 'IN', 'وارد', 'صادر') AS DirectionName,
+       IIf(q.Direction = 'IN', c.CustomerName, s.SupplierName) AS PartyName, q.ChequeNo, q.DrawerBank,
+       k.BankName, q.IssueDate, q.DueDate, q.Amount, q.Status,
+       IIf(q.Status = 'PENDING', 'تحت التحصيل', IIf(q.Status = 'COLLECTED', IIf(q.Direction = 'IN', 'محصَّل', 'مصروف'),
+           'مرتد')) AS StatusName, q.StatusDate, q.Notes
+FROM ((Cheques AS q LEFT JOIN Customers AS c ON q.CustomerID = c.CustomerID)
+      LEFT JOIN Suppliers AS s ON q.SupplierID = s.SupplierID)
+     LEFT JOIN Banks AS k ON q.BankID = k.BankID"""),
 
     Query("JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", f"""
 SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber,

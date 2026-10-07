@@ -307,7 +307,8 @@ DATA_SCREENS: List[DataScreen] = [
         search=["t.BankName", "t.AccountNo", "t.IBAN"], active="t.IsActive", unique=["BankName"],
         extra_buttons=[("btnBankTx", "الحركات البنكية", 'OpenScreen "frmBankTx", 0, Me!BankID'),
                        ("btnRecon", "التسوية البنكية", 'OpenScreen "frmBankRecon", 0, Me!BankID'),
-                       ("btnStatement", "كشف حساب", 'OpenScreen "frmLedger", 0, 120000 + Nz(Me!BankID, 0)')],
+                       ("btnStatement", "كشف حساب", 'OpenScreen "frmLedger", 0, 120000 + Nz(Me!BankID, 0)'),
+                       ("btnCheques", "الشيكات", 'OpenScreen "frmCheques", 0, "IN"')],
         fields=[Fld("BankName", span=2), Fld("AccountNo"), Fld("IBAN"),
                 Fld("OpeningBalance", hint="رصيد الحساب في البنك عند بدء استخدام البرنامج"),
                 Fld("OpeningDate"), Fld("IsActive"),
@@ -436,7 +437,7 @@ SCREEN_PERMISSIONS = {
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
     "frmPeriodClosing": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN",
     "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
-    "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS",
+    "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
 }
 
 

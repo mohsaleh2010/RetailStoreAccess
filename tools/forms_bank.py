@@ -134,5 +134,70 @@ def layout_bank_recon() -> FormModel:
     return m
 
 
+# ------------------------------------------------------------------ cheques
+DIRECTIONS = "IN;شيكات واردة (من العملاء);OUT;شيكات صادرة (للموردين)"
+SHOW = "PENDING;تحت التحصيل;DUE;مستحقة خلال 7 أيام أو فات استحقاقها;COLLECTED;المحصَّلة / المصروفة;BOUNCED;المرتدة;ALL;الكل"
+
+
+def layout_cheques() -> FormModel:
+    width, height = cm(27.0), cm(18.6)
+    m = FormModel("frmCheques", "الشيكات", width, height, popup=True, allow_add=False)
+    title_band(m, "الشيكات الواردة والصادرة",
+               "تسجيل الشيك يسدد رصيد العميل أو المورد، ثم يُحصَّل في البنك أو يرتد", "treasury")
+    y = cm(2.3)
+    c = value_list_combo(m, "cboDirection", cm(0.4), y, cm(6.0))
+    c.props.update({"RowSource": DIRECTIONS, "ColumnWidths": "0;5.8"})
+    labelled(m, "cboDirection", "النوع", c)
+    c = value_list_combo(m, "cboShow", cm(6.6), y, cm(6.4))
+    c.props.update({"RowSource": SHOW, "ColumnWidths": "0;6.2"})
+    labelled(m, "cboShow", "عرض", c)
+    m.add(Control("label", "lblTotals", cm(13.2), y, width - cm(13.6), cm(0.8),
+                  {"Caption": " ", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    # a new cheque
+    m.add(Control("label", "lblNewCap", cm(0.4), cm(3.4), cm(12.0), cm(0.55),
+                  {"Caption": "تسجيل شيك جديد", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_TEXT")}))
+    y = cm(4.55)
+    c = table_combo(m, "cboParty", cm(0.4), y, cm(6.0), events=())
+    labelled(m, "cboParty", "العميل", c)
+    c = m.add(Control("text", "txtChequeNo", cm(6.6), y, cm(3.0), cm(0.8), {}))
+    labelled(m, "txtChequeNo", "رقم الشيك", c)
+    c = m.add(Control("text", "txtDrawerBank", cm(9.8), y, cm(4.0), cm(0.8), {}))
+    labelled(m, "txtDrawerBank", "بنك الساحب (الوارد)", c)
+    c = table_combo(m, "cboBank", cm(14.0), y, cm(4.4), rows=BANK_ROWS, events=())
+    labelled(m, "cboBank", "بنكنا (الصادر: المسحوب عليه)", c)
+    c = m.add(Control("text", "txtIssueDate", cm(18.6), y, cm(2.6), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtIssueDate", "تاريخ الشيك", c)
+    c = m.add(Control("text", "txtDueDate", cm(21.4), y, cm(2.6), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtDueDate", "الاستحقاق", c)
+    c = m.add(Control("text", "txtAmount", cm(24.2), y, cm(2.4), cm(0.8), {"Format": "#,##0.00"}))
+    labelled(m, "txtAmount", "المبلغ", c)
+    y = cm(6.0)
+    c = m.add(Control("text", "txtNotes", cm(0.4), y, cm(13.4), cm(0.8), {}))
+    labelled(m, "txtNotes", "ملاحظات", c)
+    button(m, "btnSave", "تسجيل الشيك", cm(14.0), y, "primary", w=cm(4.4), h=cm(0.8), call="SaveCheque Me")
+    m.add(Control("list", "lstCheques", cm(0.4), cm(7.2), width - cm(0.8), cm(8.2),
+                  {"ColumnCount": 9, "ColumnWidths": "0;2.4;2.8;5.4;2.4;2.6;2.4;2.4;4.6", "ColumnHeads": True}))
+    # the selected cheque
+    y = cm(16.3)
+    c = m.add(Control("text", "txtActionDate", cm(0.4), y, cm(2.8), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtActionDate", "تاريخ العملية", c)
+    c = table_combo(m, "cboActionBank", cm(3.4), y, cm(4.4), rows=BANK_ROWS, events=())
+    labelled(m, "cboActionBank", "البنك (التحصيل / الصرف)", c)
+    x = cm(8.0)
+    for name, caption, style, w, call in [("btnCollect", "تحصيل في البنك", "primary", 3.4, "CollectCheque Me"),
+                                          ("btnBounce", "ارتداد", "danger", 2.2, "BounceCheque Me"),
+                                          ("btnUndo", "إلغاء الحالة", "secondary", 2.8, "UndoCheque Me"),
+                                          ("btnDelete", "حذف", "danger", 1.8, "DeleteSelectedCheque Me")]:
+        button(m, name, caption, x, y, style, w=cm(w), h=cm(0.8), call=call)
+        x += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(17.4), "secondary", w=cm(2.6), h=cm(0.9),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    ChequesLoad Me", "End Sub",
+               "Private Sub cboDirection_AfterUpdate()", "    ChequesDirectionChanged Me", "End Sub",
+               "Private Sub cboShow_AfterUpdate()", "    ChequesRefresh Me", "End Sub"] + m.code)
+    return m
+
+
 def bank_forms() -> List[FormModel]:
-    return [layout_bank_tx(), layout_bank_recon()]
+    return [layout_bank_tx(), layout_bank_recon(), layout_cheques()]

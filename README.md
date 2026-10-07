@@ -31,7 +31,8 @@
 | + | إقفال الفترات وإقفال السنة المالية | ✅ تمت الموافقة | [docs/23-Period-Closing.md](docs/23-Period-Closing.md) |
 | + | إقرار ضريبة القيمة المضافة: خانات نموذج الهيئة، الاعتماد وقيد التسوية، السداد | ✅ تمت الموافقة | [docs/24-VAT-Return.md](docs/24-VAT-Return.md) |
 | + | أعمار الديون، تاريخ الاستحقاق، ربط السداد بالفواتير، إيقاف الآجل للمتأخرين | ✅ تمت الموافقة | [docs/25-Aging.md](docs/25-Aging.md) |
-| + | البنوك، تسوية مدى بعمولتها، الإيداع والسحب، التسوية البنكية | ✅ بانتظار الموافقة | [docs/26-Banks.md](docs/26-Banks.md) |
+| + | البنوك، تسوية مدى بعمولتها، الإيداع والسحب، التسوية البنكية | ✅ تمت الموافقة | [docs/26-Banks.md](docs/26-Banks.md) |
+| + | الشيكات الواردة والصادرة: تحت التحصيل، محصَّل، مرتد | ✅ بانتظار الموافقة | [docs/27-Cheques.md](docs/27-Cheques.md) |
 
 ## هيكل المستودع
 
@@ -106,6 +107,7 @@
 | 21 | `modVat` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal`, `TestQueries` |
 | 22 | `modAging` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestAging` |
 | 23 | `modBank` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestBank` |
+| 24 | `modCheque` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestCheques` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

@@ -45,7 +45,8 @@ def layout_treasury() -> FormModel:
             ("btnTransfer", "تحويل بين الصناديق", 3.6, 'TreasuryOpen Me, "TRANSFER"'),
             ("btnClosing", "تصفية يومية الكاشير", 3.8, 'TreasuryOpen Me, "CLOSING"'),
             ("btnBoxes", "الصناديق", 2.4, 'OpenScreen "frmCashBoxes"'),
-            ("btnBanks", "البنوك", 2.4, 'OpenScreen "frmBanks"')]:
+            ("btnBanks", "البنوك", 2.4, 'OpenScreen "frmBanks"'),
+            ("btnCheques", "الشيكات", 2.4, 'OpenScreen "frmCheques", 0, "IN"')]:
         button(m, name, caption, x, cm(1.8), "primary" if name == "btnClosing" else "secondary",
                w=cm(w), call=call)
         x += cm(w) + cm(0.2)

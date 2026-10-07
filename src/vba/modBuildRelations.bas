@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 105
+Private Const EXPECTED_RELATION_COUNT As Long = 109
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -438,6 +438,10 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_BankTransactions_CashBoxID", "CashBoxes", "CashBoxID", "BankTransactions", "CashBoxID", 0&)
     c.Add Array("FK_BankTransactions_CounterAccount", "Accounts", "AccountCode", "BankTransactions", "CounterAccount", 0&)
     c.Add Array("FK_BankTransactions_EmployeeID", "Employees", "EmployeeID", "BankTransactions", "EmployeeID", 0&)
+    c.Add Array("FK_Cheques_CustomerID", "Customers", "CustomerID", "Cheques", "CustomerID", 0&)
+    c.Add Array("FK_Cheques_SupplierID", "Suppliers", "SupplierID", "Cheques", "SupplierID", 0&)
+    c.Add Array("FK_Cheques_BankID", "Banks", "BankID", "Cheques", "BankID", 0&)
+    c.Add Array("FK_Cheques_EmployeeID", "Employees", "EmployeeID", "Cheques", "EmployeeID", 0&)
     c.Add Array("FK_BankReconciliations_BankID", "Banks", "BankID", "BankReconciliations", "BankID", 0&)
     c.Add Array("FK_BankReconciliations_EmployeeID", "Employees", "EmployeeID", "BankReconciliations", "EmployeeID", 0&)
     c.Add Array("FK_BankClearings_ReconciliationID", "BankReconciliations", "ReconciliationID", "BankClearings", "ReconciliationID", 4096&)
