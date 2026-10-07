@@ -48,11 +48,12 @@ def layout_journal() -> FormModel:
     for name, caption, style, w, call in [
             ("btnOpenEntry", "فتح القيد", "primary", 2.8, "JournalOpenEntry Me"),
             ("btnOpenSource", "فتح أصل العملية", "primary", 3.6, "OpenJournalSource Me!lstEntries.Value"),
-            ("btnSync", "تحديث القيود", "secondary", 3.0, "JournalSync Me"),
-            ("btnPrint", "طباعة اليومية", "secondary", 3.0, 'PrintJournal Me, "JOURNAL"'),
-            ("btnTrial", "ميزان المراجعة", "secondary", 3.0, 'PrintJournal Me, "TRIAL"'),
-            ("btnAccounts", "دليل الحسابات", "secondary", 3.0, 'OpenScreen "frmAccounts"'),
-            ("btnManual", "قيد يدوي", "secondary", 2.4, 'OpenScreen "frmManualEntry"')]:
+            ("btnSync", "تحديث القيود", "secondary", 2.6, "JournalSync Me"),
+            ("btnPrint", "طباعة اليومية", "secondary", 2.6, 'PrintJournal Me, "JOURNAL"'),
+            ("btnTrial", "ميزان المراجعة", "secondary", 2.8, 'PrintJournal Me, "TRIAL"'),
+            ("btnAccounts", "دليل الحسابات", "secondary", 2.8, 'OpenScreen "frmAccounts"'),
+            ("btnLedger", "كشف حساب", "secondary", 2.4, 'OpenScreen "frmLedger"'),
+            ("btnManual", "قيد يدوي", "secondary", 2.2, 'OpenScreen "frmManualEntry"')]:
         button(m, name, caption, x, y, style, w=cm(w), h=cm(0.9), call=call)
         x += cm(w) + cm(0.2)
     button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), y, "secondary", w=cm(2.4), h=cm(0.9),
@@ -177,6 +178,67 @@ def layout_manual_entry(heads) -> FormModel:
     return m
 
 
+# ------------------------------------------------------------- account statement
+LEDGER_ACCOUNTS = ("SELECT AccountCode, AccountCode & '  ' & Space((AccountLevel - 1) * 2) & AccountName AS Account "
+                   "FROM Accounts ORDER BY TreeKey")
+LEDGER_LIST_WIDTHS = "0;2.2;2.4;3.0;2.6;5.6;3.0;2.4;2.4;2.6"
+
+
+def layout_ledger() -> FormModel:
+    width, height = cm(27.0), cm(17.0)
+    m = FormModel("frmLedger", "كشف حساب", width, height, popup=False, allow_add=False)
+    title_band(m, "كشف حساب ودفتر الأستاذ",
+               "حركة أي حساب برصيد أول المدة والرصيد بعد كل قيد؛ الحساب الرئيسي يشمل حساباته التابعة", "journal")
+    y = cm(2.3)
+    c = m.add(Control("combo", "cboAccount", cm(0.4), y, cm(9.0), cm(0.8),
+                      {"RowSource": LEDGER_ACCOUNTS, "ColumnCount": 2, "ColumnWidths": "0;9", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboAccount", "الحساب", c)
+    c = m.add(Control("text", "txtFrom", cm(9.6), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtFrom", "من تاريخ", c)
+    c = m.add(Control("text", "txtTo", cm(12.8), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtTo", "إلى تاريخ", c)
+    for i, (name, caption, which) in enumerate([("btnThisMonth", "هذا الشهر", "MONTH"),
+                                                ("btnLastMonth", "الشهر الماضي", "LASTMONTH"),
+                                                ("btnThisYear", "هذه السنة", "YEAR")]):
+        button(m, name, caption, cm(16.0) + i * cm(2.25), y, "secondary", w=cm(2.1), h=cm(0.8),
+               call=f'LedgerQuickPeriod Me, "{which}"')
+    button(m, "btnShow", "عرض", cm(23.0), y, "primary", w=cm(2.5), h=cm(0.8), call="LedgerRefresh Me")
+    # the four figures of the statement
+    part = (width - cm(0.8)) // 4
+    for i, (key, caption) in enumerate([("Opening", "رصيد أول المدة"), ("Debit", "مدين الفترة"),
+                                        ("Credit", "دائن الفترة"), ("Closing", "الرصيد الختامي")]):
+        x = cm(0.4) + i * part
+        m.add(Control("label", f"lblCap{key}", x, cm(3.45), part - cm(0.2), cm(0.5),
+                      {"Caption": caption, "FontSize": 9, "FontBold": True, "ForeColor": Sym("CLR_MUTED")}))
+        m.add(Control("label", f"lbl{key}", x, cm(3.95), part - cm(0.2), cm(0.75),
+                      {"Caption": "-", "FontSize": 14, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("list", "lstLines", cm(0.4), cm(4.95), width - cm(0.8), cm(8.6),
+                  {"ColumnCount": 10, "ColumnWidths": LEDGER_LIST_WIDTHS, "ColumnHeads": True},
+                  events=["DblClick"]))
+    m.add(Control("label", "lblInfo", cm(0.4), cm(13.7), width - cm(0.8), cm(0.6),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+    x, y = cm(0.4), cm(14.6)
+    for name, caption, style, w, call in [
+            ("btnOpenEntry", "فتح القيد", "primary", 2.6, "LedgerOpenEntry Me"),
+            ("btnOpenSource", "فتح أصل العملية", "primary", 3.6, "LedgerOpenSource Me"),
+            ("btnPrintStatement", "طباعة كشف الحساب", "secondary", 3.8, 'PrintLedger Me, "STATEMENT"'),
+            ("btnPrintLedger", "دفتر الأستاذ", "secondary", 2.8, 'PrintLedger Me, "LEDGER"'),
+            ("btnManual", "قيد يدوي", "secondary", 2.4, 'OpenScreen "frmManualEntry"'),
+            ("btnAccounts", "دليل الحسابات", "secondary", 2.8, 'OpenScreen "frmAccounts"')]:
+        button(m, name, caption, x, y, style, w=cm(w), h=cm(0.9), call=call)
+        x += cm(w) + cm(0.2)
+    button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), y, "secondary", w=cm(2.4), h=cm(0.9),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    LedgerLoad Me", "End Sub",
+               "Private Sub cboAccount_AfterUpdate()", "    LedgerRefresh Me", "End Sub",
+               "Private Sub lstLines_DblClick(Cancel As Integer)", "    LedgerOpenEntry Me", "End Sub"] + m.code)
+    shrink_area(m, ("lstLines",), cm(1.6))
+    fit_window(m, split_x=cm(22.9), bottom_y=cm(11.0), stretch_w=("lstLines", "lblInfo"), stretch_h=("lstLines",))
+    return m
+
+
 def journal_forms() -> List[FormModel]:
     lines, heads = layout_manual_lines()
-    return [layout_journal(), layout_journal_entry(), lines, layout_manual_entry(heads)]
+    return [layout_journal(), layout_journal_entry(), lines, layout_manual_entry(heads), layout_ledger()]

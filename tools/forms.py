@@ -299,6 +299,7 @@ DATA_SCREENS: List[DataScreen] = [
         list_headers=[("الرقم", 1.8), ("الحساب", 5.4), ("النوع", 1.2)],
         search=["t.AccountName"], active="t.IsActive", unique=["AccountCode"],
         extra_buttons=[("btnJournal", "قيود اليومية", 'OpenScreen "frmJournal"'),
+                       ("btnStatement", "كشف حساب", 'OpenScreen "frmLedger", 0, Me!AccountCode'),
                        ("btnManual", "قيد يدوي", 'OpenScreen "frmManualEntry"')],
         fields=[Fld("AccountCode", hint="رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ"),
                 Fld("ParentCode", rows=ACCOUNT_ROWS, widths="0;7", hook=True,
@@ -408,7 +409,7 @@ SCREEN_PERMISSIONS = {
     "frmTreasury": "CASH_CLOSING", "frmCashClosing": "CASH_CLOSING",
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
-    "frmManualEntry": "MANUAL_ENTRY",
+    "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL",
 }
 
 
@@ -501,6 +502,7 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("TRIAL_BALANCE_TREE", "ميزان المراجعة بالمستويات", "TrialBalanceTreeQuery", "rptTrialBalanceTree",
                 "PJ"),
     ReportEntry("ACCOUNT_TREE", "دليل الحسابات (شجرة الحسابات)", "AccountTreeQuery", "rptAccountTree", "J"),
+    ReportEntry("GENERAL_LEDGER", "دفتر الأستاذ (كل الحسابات)", "GeneralLedgerQuery", "rptGeneralLedger", "PJ"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
     ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),

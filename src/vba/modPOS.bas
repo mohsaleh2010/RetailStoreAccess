@@ -40,6 +40,12 @@ Public Sub EnsureLocalTables()
         CurrentDb.Execute "CREATE TABLE tmpRolePermissions (PermissionKey TEXT(50) CONSTRAINT pkRolePerm PRIMARY KEY, " & _
             "PermissionName TEXT(100), ModuleName TEXT(50), SortOrder INTEGER, Granted BIT)", dbFailOnError
     End If
+    ' the account statement shown in frmLedger, with the balance after each line
+    If Not LocalTableExists("tmpLedger") Then
+        CurrentDb.Execute "CREATE TABLE tmpLedger (LineNo COUNTER CONSTRAINT pkLedger PRIMARY KEY, EntryRef LONG, " & _
+            "DateText TEXT(10), EntryNo TEXT(20), KindName TEXT(50), DocNo TEXT(20), Details TEXT(255), " & _
+            "SubName TEXT(100), DebitText TEXT(20), CreditText TEXT(20), BalanceText TEXT(30))", dbFailOnError
+    End If
     ' lines of the manual journal entry being written (frmManualEntry)
     If Not LocalTableExists("tmpManualLines") Then
         CurrentDb.Execute "CREATE TABLE tmpManualLines (LineNo COUNTER CONSTRAINT pkManualLines PRIMARY KEY, " & _

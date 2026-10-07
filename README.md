@@ -26,6 +26,7 @@
 | + | قيود اليومية ودليل الحسابات وميزان المراجعة | ✅ بانتظار الموافقة | [docs/18-Journal.md](docs/18-Journal.md) |
 | + | صلاحيات الشاشات لكل مستخدم، وحساب المبرمج، وتفعيل البرنامج على جهاز محدد | ✅ بانتظار الموافقة | [docs/19-Permissions-Activation.md](docs/19-Permissions-Activation.md) |
 | + | شجرة الحسابات (5 مستويات) والقيود اليدوية وميزان المراجعة بالمستويات | ✅ بانتظار الموافقة | [docs/20-Accounts-Manual-Entries.md](docs/20-Accounts-Manual-Entries.md) |
+| + | كشف الحساب ودفتر الأستاذ | ✅ بانتظار الموافقة | [docs/21-Ledger.md](docs/21-Ledger.md) |
 
 ## هيكل المستودع
 
@@ -94,6 +95,7 @@
 | 15 | `modJournal` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal` |
 | 16 | `modActivation` (دائمة) | `BuildSchema` (يطلب كلمة مرور المبرمج), `BuildRelations`, `BuildForms` | `TestSecurity` |
 | 17 | `modAccounts`, `modManualEntry` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal` |
+| 18 | `modLedger` (دائمة) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

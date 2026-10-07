@@ -23,7 +23,8 @@ Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,Dashbo" & _
     "ardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPa" & _
-    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryTreeRollup,TrialBalanceTreeQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurc" & _
+    "haseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -727,6 +728,9 @@ Private Sub CreateAllQueries()
     Q_qryTrialBefore
     Q_qryTrialPeriod
     Q_TrialBalanceQuery
+    Q_qryStatementBefore
+    Q_AccountStatementQuery
+    Q_GeneralLedgerQuery
     Q_qryTreeRollup
     Q_TrialBalanceTreeQuery
     Q_AccountTreeQuery
@@ -1828,6 +1832,52 @@ Private Sub Q_TrialBalanceQuery()
     s = s & "WHERE b.AccountCode Is Not Null OR p.AccountCode Is Not Null" & vbCrLf
     s = s & "ORDER BY a.AccountCode" & vbCrLf
     SaveQuery "TrialBalanceQuery", "ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب)", s
+End Sub
+
+Private Sub Q_qryStatementBefore()
+    Dim s As String
+    s = "SELECT CCur(Nz(Sum(o.Debit), 0)) - CCur(Nz(Sum(o.Credit), 0)) AS SumBefore" & vbCrLf
+    s = s & "FROM (JournalLines AS o INNER JOIN JournalEntries AS f ON o.EntryID = f.EntryID)" & vbCrLf
+    s = s & "     INNER JOIN Accounts AS b ON o.AccountCode = b.AccountCode" & vbCrLf
+    s = s & "WHERE (b.Level1Code = QLong('AccountCode') OR b.Level2Code = QLong('AccountCode') OR b.Level3Code = QLong('AccountCode') OR b.Level4Code = QLong('AccountCode') OR b.Level5Code = QLong('AccountCode')) AND f.EntryDate < QDate('PeriodStart')" & vbCrLf
+    SaveQuery "qryStatementBefore", "رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة", s
+End Sub
+
+Private Sub Q_AccountStatementQuery()
+    Dim s As String
+    s = "SELECT 1 AS SortKey, s.AccountCode AS StatementAccount, s.AccountName AS StatementName, e.EntryDate AS LineDate," & vbCrLf
+    s = s & "       e.EntryNumber AS EntryNo, e.EntryID AS EntryRef, k.TypeName AS KindName, e.SourceNumber AS DocNo," & vbCrLf
+    s = s & "       e.Description AS Details, a.AccountCode AS SubCode, a.AccountName AS SubName, l.Debit AS LineDebit," & vbCrLf
+    s = s & "       l.Credit AS LineCredit" & vbCrLf
+    s = s & "FROM (((JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)" & vbCrLf
+    s = s & "      INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode)" & vbCrLf
+    s = s & "     INNER JOIN JournalSourceTypes AS k ON e.SourceType = k.SourceType), Accounts AS s" & vbCrLf
+    s = s & "WHERE s.AccountCode = QLong('AccountCode') AND (a.Level1Code = QLong('AccountCode') OR a.Level2Code = QLong('AccountCode') OR a.Level3Code = QLong('AccountCode') OR a.Level4Code = QLong('AccountCode') OR a.Level5Code = QLong('AccountCode')) AND e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd')" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 0, s.AccountCode, s.AccountName, QDate('PeriodStart'), '-', 0, 'رصيد أول المدة', Null, Null, Null, Null," & vbCrLf
+    s = s & "       IIf(x.SumBefore > 0, x.SumBefore, 0), IIf(x.SumBefore < 0, -x.SumBefore, 0)" & vbCrLf
+    s = s & "FROM Accounts AS s, qryStatementBefore AS x" & vbCrLf
+    s = s & "WHERE s.AccountCode = QLong('AccountCode')" & vbCrLf
+    s = s & "ORDER BY SortKey, LineDate, EntryNo" & vbCrLf
+    SaveQuery "AccountStatementQuery", "كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة)", s
+End Sub
+
+Private Sub Q_GeneralLedgerQuery()
+    Dim s As String
+    s = "SELECT 1 AS SortKey, a.TreeKey AS AccountKey, a.AccountCode AS LedgerCode, a.AccountName AS LedgerName," & vbCrLf
+    s = s & "       e.EntryDate AS LineDate, e.EntryNumber AS EntryNo, e.EntryID AS EntryRef, k.TypeName AS KindName," & vbCrLf
+    s = s & "       e.SourceNumber AS DocNo, e.Description AS Details, l.Debit AS LineDebit, l.Credit AS LineCredit" & vbCrLf
+    s = s & "FROM ((JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)" & vbCrLf
+    s = s & "      INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode)" & vbCrLf
+    s = s & "     INNER JOIN JournalSourceTypes AS k ON e.SourceType = k.SourceType" & vbCrLf
+    s = s & "WHERE (QLong('AccountCode') = 0 OR (a.Level1Code = QLong('AccountCode') OR a.Level2Code = QLong('AccountCode') OR a.Level3Code = QLong('AccountCode') OR a.Level4Code = QLong('AccountCode') OR a.Level5Code = QLong('AccountCode'))) AND e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd')" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 0, b.TreeKey, b.AccountCode, b.AccountName, QDate('PeriodStart'), '-', 0, 'رصيد أول المدة', Null, Null," & vbCrLf
+    s = s & "       IIf(t.OpeningBalance > 0, t.OpeningBalance, 0), IIf(t.OpeningBalance < 0, -t.OpeningBalance, 0)" & vbCrLf
+    s = s & "FROM TrialBalanceQuery AS t INNER JOIN Accounts AS b ON t.AccountCode = b.AccountCode" & vbCrLf
+    s = s & "WHERE QLong('AccountCode') = 0 OR (b.Level1Code = QLong('AccountCode') OR b.Level2Code = QLong('AccountCode') OR b.Level3Code = QLong('AccountCode') OR b.Level4Code = QLong('AccountCode') OR b.Level5Code = QLong('AccountCode'))" & vbCrLf
+    s = s & "ORDER BY AccountKey, SortKey, LineDate, EntryNo" & vbCrLf
+    SaveQuery "GeneralLedgerQuery", "دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات)", s
 End Sub
 
 Private Sub Q_qryTreeRollup()

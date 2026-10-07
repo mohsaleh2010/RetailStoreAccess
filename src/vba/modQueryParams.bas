@@ -19,6 +19,8 @@ Attribute VB_Name = "modQueryParams"
 '     SupplierID   supplier for SupplierStatementQuery
 '     ProductID    product for ProductMovementQuery
 '     CashBoxID    cash box for the treasury queries (0 = all boxes)
+'     AccountCode  account of the statement / ledger: a main account takes all its
+'                  sub-accounts (0 = every account, general ledger only)
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -37,7 +39,7 @@ End Sub
 
 Public Sub ClearQueryParams()
     Dim names As Variant, i As Long
-    names = Array("PeriodStart", "PeriodEnd", "CustomerID", "SupplierID", "ProductID", "CashBoxID")
+    names = Array("PeriodStart", "PeriodEnd", "CustomerID", "SupplierID", "ProductID", "CashBoxID", "AccountCode")
     On Error Resume Next
     For i = LBound(names) To UBound(names)
         TempVars.Remove names(i)

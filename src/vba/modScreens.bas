@@ -255,6 +255,7 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
         End If
         msg = SyncJournal()
         If Len(msg) > 0 Then ShowWarning msg
+        SetQueryParam "AccountCode", 0             ' general ledger from here: every account
     End If
 
     If HasNeed(needs, "P") Or HasNeed(needs, "D") Then

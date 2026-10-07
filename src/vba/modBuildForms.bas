@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -615,6 +615,7 @@ Private Sub BuildAllForms()
     BuildForm_frmJournalEntry
     BuildForm_frmManualLines
     BuildForm_frmManualEntry
+    BuildForm_frmLedger
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -2276,7 +2277,9 @@ Private Sub BuildForm_frmAccounts()
     c.OnClick = EP
     Set c = AddButton("btnJournal", "قيود اليومية", 6123, 1021, 1701, 482, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnManual", "قيد يدوي", 7937, 1021, 1701, 482, "secondary")
+    Set c = AddButton("btnStatement", "كشف حساب", 7937, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnManual", "قيد يدوي", 9751, 1021, 1701, 482, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
@@ -2364,6 +2367,9 @@ Private Sub BuildForm_frmAccounts()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnJournal_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmJournal""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStatement_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmLedger"", 0, Me!AccountCode" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnManual_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmManualEntry""" & vbCrLf
@@ -5948,15 +5954,17 @@ Private Sub BuildForm_frmJournal()
     c.OnClick = EP
     Set c = AddButton("btnOpenSource", "فتح أصل العملية", 1928, 7881, 2041, 510, "primary")
     c.OnClick = EP
-    Set c = AddButton("btnSync", "تحديث القيود", 4082, 7881, 1701, 510, "secondary")
+    Set c = AddButton("btnSync", "تحديث القيود", 4082, 7881, 1474, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnPrint", "طباعة اليومية", 5896, 7881, 1701, 510, "secondary")
+    Set c = AddButton("btnPrint", "طباعة اليومية", 5669, 7881, 1474, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnTrial", "ميزان المراجعة", 7710, 7881, 1701, 510, "secondary")
+    Set c = AddButton("btnTrial", "ميزان المراجعة", 7256, 7881, 1588, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnAccounts", "دليل الحسابات", 9524, 7881, 1701, 510, "secondary")
+    Set c = AddButton("btnAccounts", "دليل الحسابات", 8957, 7881, 1588, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnManual", "قيد يدوي", 11338, 7881, 1361, 510, "secondary")
+    Set c = AddButton("btnLedger", "كشف حساب", 10658, 7881, 1361, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnManual", "قيد يدوي", 12132, 7881, 1247, 510, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "رجوع", 13721, 7881, 1361, 510, "secondary")
     c.OnClick = EP
@@ -6012,6 +6020,9 @@ Private Sub BuildForm_frmJournal()
     s = s & "Private Sub btnAccounts_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmAccounts""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnLedger_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmLedger""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnManual_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmManualEntry""" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -6021,8 +6032,8 @@ Private Sub BuildForm_frmJournal()
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,13665,1304,1418,454,1000,0,0,0;lstEntries,227,1928,14855,2665,0,1000,0,1000;lblTotals,227,4649,14855,340,0,1000,1000,0;lblLinesCap,227,5046,6804,312,0,0,1000,0;lstLines,227,5386,14855,2325,0,1000,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnOpenEntry,227,7881,1588,510,0,0,1000,0;btnOpenSource,1928,7881,2041,510,0,0,1000,0;btnSync,4082,7881,1701,510,0,0,1000,0;btnPrint,5896,7881,1701,510,0,0,1000,0;btnTrial,7710,7881,1701,510,0,0,1000,0;btnAccounts,9524,7881,1701,510,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnManual,11338,7881,1361,510,0,0,1000,0;btnClose,13721,7881,1361,510,1000,0,1000,0;lblSync,227,8505,14855,312,0,1000,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnOpenEntry,227,7881,1588,510,0,0,1000,0;btnOpenSource,1928,7881,2041,510,0,0,1000,0;btnSync,4082,7881,1474,510,0,0,1000,0;btnPrint,5669,7881,1474,510,0,0,1000,0;btnTrial,7256,7881,1588,510,0,0,1000,0;btnAccounts,8957,7881,1588,510,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnLedger,10658,7881,1361,510,0,0,1000,0;btnManual,12132,7881,1247,510,0,0,1000,0;btnClose,13721,7881,1361,510,1000,0,1000,0;lblSync,227,8505,14855,312,0,1000,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 15309, 9015, -1190, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmJournal", s
@@ -6219,4 +6230,113 @@ Private Sub BuildForm_frmManualEntry()
     Exit Sub
 EH:
     AbortForm "frmManualEntry", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmLedger()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmLedger", "كشف حساب", "", 15309, 8732, False, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "كشف حساب ودفتر الأستاذ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "حركة أي حساب برصيد أول المدة والرصيد بعد كل قيد؛ الحساب الرئيسي يشمل حساباته التابعة", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboAccount", "", 227, 1304, 5103, 454, "SELECT AccountCode, AccountCode & '  ' & Space((AccountLevel - 1) * 2) & AccountName AS Account FROM Accounts ORDER BY TreeKey", 2, "0;5103")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblAccount", "الحساب", 227, 992, 5103, 284, 9, False, CLR_MUTED, "cboAccount", 0)
+    Set c = AddText("txtFrom", "", 5443, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblFrom", "من تاريخ", 5443, 992, 1701, 284, 9, False, CLR_MUTED, "txtFrom", 0)
+    Set c = AddText("txtTo", "", 7258, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblTo", "إلى تاريخ", 7258, 992, 1701, 284, 9, False, CLR_MUTED, "txtTo", 0)
+    Set c = AddButton("btnThisMonth", "هذا الشهر", 9072, 1304, 1191, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnLastMonth", "الشهر الماضي", 10348, 1304, 1191, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnThisYear", "هذه السنة", 11624, 1304, 1191, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnShow", "عرض", 13041, 1304, 1418, 454, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblCapOpening", "رصيد أول المدة", 227, 1956, 3600, 284, 9, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblOpening", "-", 227, 2240, 3600, 425, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblCapDebit", "مدين الفترة", 3940, 1956, 3600, 284, 9, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblDebit", "-", 3940, 2240, 3600, 425, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblCapCredit", "دائن الفترة", 7653, 1956, 3600, 284, 9, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCredit", "-", 7653, 2240, 3600, 425, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblCapClosing", "الرصيد الختامي", 11366, 1956, 3600, 284, 9, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblClosing", "-", 11366, 2240, 3600, 425, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddList("lstLines", 227, 2807, 14855, 3969, 10, "0;1247;1361;1701;1474;3175;1701;1361;1361;1474", True)
+    c.OnDblClick = EP
+    Set c = AddLabel("lblInfo", " ", 227, 6861, 14855, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnOpenEntry", "فتح القيد", 227, 7371, 1474, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnOpenSource", "فتح أصل العملية", 1814, 7371, 2041, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrintStatement", "طباعة كشف الحساب", 3968, 7371, 2155, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrintLedger", "دفتر الأستاذ", 6236, 7371, 1588, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnManual", "قيد يدوي", 7937, 7371, 1361, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAccounts", "دليل الحسابات", 9411, 7371, 1588, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "رجوع", 13721, 7371, 1361, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnResize = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    LedgerLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboAccount_AfterUpdate()" & vbCrLf
+    s = s & "    LedgerRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstLines_DblClick(Cancel As Integer)" & vbCrLf
+    s = s & "    LedgerOpenEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnThisMonth_Click()" & vbCrLf
+    s = s & "    LedgerQuickPeriod Me, ""MONTH""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnLastMonth_Click()" & vbCrLf
+    s = s & "    LedgerQuickPeriod Me, ""LASTMONTH""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnThisYear_Click()" & vbCrLf
+    s = s & "    LedgerQuickPeriod Me, ""YEAR""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnShow_Click()" & vbCrLf
+    s = s & "    LedgerRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpenEntry_Click()" & vbCrLf
+    s = s & "    LedgerOpenEntry Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpenSource_Click()" & vbCrLf
+    s = s & "    LedgerOpenSource Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrintStatement_Click()" & vbCrLf
+    s = s & "    PrintLedger Me, ""STATEMENT""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrintLedger_Click()" & vbCrLf
+    s = s & "    PrintLedger Me, ""LEDGER""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnManual_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmManualEntry""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAccounts_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAccounts""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,13041,1304,1418,454,1000,0,0,0;lstLines,227,2807,14855,3969,0,1000,0,1000;lblInfo,227,6861,14855,340,0,1000,1000,0;btnOpenEntry,227,7371,1474,510,0,0,1000,0;btnOpenSource,1814,7371,2041,510,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnPrintStatement,3968,7371,2155,510,0,0,1000,0;btnPrintLedger,6236,7371,1588,510,0,0,1000,0;btnManual,7937,7371,1361,510,0,0,1000,0;btnAccounts,9411,7371,1588,510,0,0,1000,0;btnClose,13721,7371,1361,510,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 15309, 8732, -2494, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmLedger", s
+    Exit Sub
+EH:
+    AbortForm "frmLedger", Err.Number, Err.Description
 End Sub

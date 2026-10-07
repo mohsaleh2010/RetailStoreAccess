@@ -99,8 +99,9 @@ class CatalogueTests(unittest.TestCase):
                     self.assertEqual(by_name[r.report].record_source, "")
                 else:
                     self.assertEqual(by_name[r.report].record_source, r.query)
+        grouped = {"rptGeneralLedger"}          # grouped on the account (reports_journal.py)
         self.assertEqual({s.key for s in RC.LIST_SPECS} | {s.key for s in RC.CARD_SPECS},
-                         {r.key for r in F.REPORTS if r.report not in DRAWN})
+                         {r.key for r in F.REPORTS if r.report not in DRAWN | grouped})
 
     def test_low_stock_report_exists(self):
         """Required by the specification: "Low Stock Products Report"."""

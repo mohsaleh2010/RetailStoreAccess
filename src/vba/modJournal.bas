@@ -358,7 +358,7 @@ End Sub
 Public Function TestJournal() As Boolean
     Dim passed As Long, failed As Long, report As String, msg As String
     Dim added As Long, updated As Long, removed As Long, ws As DAO.Workspace, inTrans As Boolean, id As Long
-    Dim manualID As Long, jv As Variant, number As String
+    Dim manualID As Long, jv As Variant, number As String, opening As Currency, debit As Currency, credit As Currency
     Calendar = vbCalGreg
     EnsureTestUser
     g_SilentMode = True
@@ -392,6 +392,16 @@ Public Function TestJournal() As Boolean
     CheckJournal Nz(DbValue("SELECT COUNT(*) FROM JournalLines AS l INNER JOIN Accounts AS a ON l.AccountCode = " & _
                             "a.AccountCode WHERE a.IsPosting = False"), 0) = 0, "لا قيود على الحسابات الرئيسية", _
                  passed, failed, report
+
+    ' the account statement (modLedger): customers and all the assets agree with the account balances
+    EnsureLocalTables
+    Call FillLedger(1300, DateSerial(2000, 1, 1), Date, opening, debit, credit)
+    CheckJournal opening + debit - credit = AccountBalance(1300), "كشف حساب العملاء = رصيد الحساب", passed, failed, report
+    Call FillLedger(1, DateSerial(2000, 1, 1), Date, opening, debit, credit)
+    CheckJournal opening + debit - credit = Nz(DbValue("SELECT Sum(l.Debit) - Sum(l.Credit) FROM JournalLines AS l " & _
+                 "INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode WHERE a.AccountType = 'ASSET'"), 0), _
+                 "كشف الحساب الرئيسي (الأصول) يشمل كل حساباته التابعة", passed, failed, report
+    CurrentDb.Execute "DELETE FROM tmpLedger", dbFailOnError
 
     ' a new, changed and deleted operation, rolled back
     Set ws = DBEngine.Workspaces(0)

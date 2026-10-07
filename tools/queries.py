@@ -190,6 +190,11 @@ GROUP BY d.Level{n}Code""")
     return "\nUNION ALL\n".join(parts)
 
 
+def IN_TREE(alias):
+    """The account of the line is the chosen account or one of its sub-accounts."""
+    return "(" + " OR ".join(f"{alias}.Level{n}Code = QLong('AccountCode')" for n in range(1, 6)) + ")"
+
+
 ACCOUNT_TYPE_NAME = ("IIf(a.AccountType = 'ASSET', 'أصول', IIf(a.AccountType = 'LIABILITY', 'خصوم', "
                      "IIf(a.AccountType = 'EQUITY', 'حقوق ملكية', IIf(a.AccountType = 'REVENUE', 'إيرادات', "
                      "'مصروفات'))))")
@@ -923,6 +928,44 @@ FROM (Accounts AS a LEFT JOIN qryTrialBefore AS b ON a.AccountCode = b.AccountCo
      LEFT JOIN qryTrialPeriod AS p ON a.AccountCode = p.AccountCode
 WHERE b.AccountCode Is Not Null OR p.AccountCode Is Not Null
 ORDER BY a.AccountCode""", P),
+
+    # A main account takes all its sub-accounts: QLong('AccountCode') is one of the LevelNCode of the line.
+    Query("qryStatementBefore", "رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة", f"""
+SELECT {nz("Sum(o.Debit)")} - {nz("Sum(o.Credit)")} AS SumBefore
+FROM (JournalLines AS o INNER JOIN JournalEntries AS f ON o.EntryID = f.EntryID)
+     INNER JOIN Accounts AS b ON o.AccountCode = b.AccountCode
+WHERE {IN_TREE("b")} AND f.EntryDate < QDate('PeriodStart')""", ["PeriodStart", "AccountCode"]),
+
+    Query("AccountStatementQuery", "كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة)", f"""
+SELECT 1 AS SortKey, s.AccountCode AS StatementAccount, s.AccountName AS StatementName, e.EntryDate AS LineDate,
+       e.EntryNumber AS EntryNo, e.EntryID AS EntryRef, k.TypeName AS KindName, e.SourceNumber AS DocNo,
+       e.Description AS Details, a.AccountCode AS SubCode, a.AccountName AS SubName, l.Debit AS LineDebit,
+       l.Credit AS LineCredit
+FROM (((JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)
+      INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode)
+     INNER JOIN JournalSourceTypes AS k ON e.SourceType = k.SourceType), Accounts AS s
+WHERE s.AccountCode = QLong('AccountCode') AND {IN_TREE("a")} AND {period("e.EntryDate")}
+UNION ALL
+SELECT 0, s.AccountCode, s.AccountName, QDate('PeriodStart'), '-', 0, 'رصيد أول المدة', Null, Null, Null, Null,
+       IIf(x.SumBefore > 0, x.SumBefore, 0), IIf(x.SumBefore < 0, -x.SumBefore, 0)
+FROM Accounts AS s, qryStatementBefore AS x
+WHERE s.AccountCode = QLong('AccountCode')
+ORDER BY SortKey, LineDate, EntryNo""", P + ["AccountCode"]),
+
+    Query("GeneralLedgerQuery", "دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات)", f"""
+SELECT 1 AS SortKey, a.TreeKey AS AccountKey, a.AccountCode AS LedgerCode, a.AccountName AS LedgerName,
+       e.EntryDate AS LineDate, e.EntryNumber AS EntryNo, e.EntryID AS EntryRef, k.TypeName AS KindName,
+       e.SourceNumber AS DocNo, e.Description AS Details, l.Debit AS LineDebit, l.Credit AS LineCredit
+FROM ((JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)
+      INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode)
+     INNER JOIN JournalSourceTypes AS k ON e.SourceType = k.SourceType
+WHERE (QLong('AccountCode') = 0 OR {IN_TREE("a")}) AND {period("e.EntryDate")}
+UNION ALL
+SELECT 0, b.TreeKey, b.AccountCode, b.AccountName, QDate('PeriodStart'), '-', 0, 'رصيد أول المدة', Null, Null,
+       IIf(t.OpeningBalance > 0, t.OpeningBalance, 0), IIf(t.OpeningBalance < 0, -t.OpeningBalance, 0)
+FROM TrialBalanceQuery AS t INNER JOIN Accounts AS b ON t.AccountCode = b.AccountCode
+WHERE QLong('AccountCode') = 0 OR {IN_TREE("b")}
+ORDER BY AccountKey, SortKey, LineDate, EntryNo""", P + ["AccountCode"]),
 
     Query("qryTreeRollup", "أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات", _tree_rollup(), P),
 

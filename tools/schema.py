@@ -1345,6 +1345,7 @@ SCREEN_LIST = [
     ("frmJournal", "قيود اليومية", "الحسابات", "JOURNAL", False, False, False),
     ("frmAccounts", "دليل الحسابات", "الحسابات", "JOURNAL", True, True, True),
     ("frmManualEntry", "القيود اليدوية", "الحسابات", "MANUAL_ENTRY", True, True, True),
+    ("frmLedger", "كشف حساب ودفتر الأستاذ", "الحسابات", "JOURNAL", False, False, False),
     ("frmReportCenter", "التقارير", "التقارير", "REPORTS", False, False, False),
     ("frmSearch", "البحث", "النظام", None, False, False, False),
     ("frmSettings", "إعدادات المحل", "النظام", "SETTINGS", False, True, False),

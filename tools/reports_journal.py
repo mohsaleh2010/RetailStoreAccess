@@ -1,11 +1,15 @@
 """Journal entry print (A4, grouped on the entry): rptJournalEntry (qryJournalEntryPrint).
+Account statement (rptAccountStatement, AccountStatementQuery) and general ledger
+(rptGeneralLedger, GeneralLedgerQuery): A4, the opening balance first, a running balance per
+account (RunningSum over the group) and the totals of each account.
 The journal and the trial balance are list reports of reports_catalog.py."""
 
 from typing import List
 
-from reports import ReportModel, MONEY, SEC_DETAIL, SEC_HEADER, SEC_FOOTER, txt, hline
+from reports import (ReportModel, MONEY, SEC_DETAIL, SEC_HEADER, SEC_FOOTER, SEC_PAGE_HEADER, SEC_PAGE_FOOTER,
+                     lbl, txt, hline)
 from reports_docs import W, columns, signatures, store_block
-from forms import cm
+from forms import Control, Sym, cm
 
 
 def journal_entry() -> ReportModel:
@@ -37,5 +41,64 @@ def journal_entry() -> ReportModel:
     return m
 
 
+LEDGER_COLS = [  # (title, source, width cm)
+    ("التاريخ", "=GDate([LineDate])", 2.0), ("القيد", "EntryNo", 2.0), ("العملية", "KindName", 2.5),
+    ("المستند", "DocNo", 2.0), ("البيان", "Details", 4.4), ("مدين", "=IIf([LineDebit]=0,Null,[LineDebit])", 2.0),
+    ("دائن", "=IIf([LineCredit]=0,Null,[LineCredit])", 2.0), ("الرصيد", "=[LineDebit]-[LineCredit]", 2.1)]
+
+
+def _ledger(name, caption, query, group, account_expr, sub_col):
+    from reports_catalog import title_block, page_footer
+    cols = list(LEDGER_COLS)
+    if sub_col:                                  # a main account: the sub-account of each line
+        cols[4] = ("البيان", "Details", 2.6)
+        cols.insert(5, ("الحساب", "SubName", 1.8))
+    m = ReportModel(name, caption, W,
+                    {SEC_PAGE_HEADER: cm(2.95), SEC_HEADER: cm(0.8), SEC_DETAIL: cm(0.55),
+                     SEC_FOOTER: cm(2.0), SEC_PAGE_FOOTER: cm(0.6)},
+                    record_source=query, group=group,
+                    sorts=[("SortKey", False), ("LineDate", False), ("EntryNo", False)], page_setup=True,
+                    no_data="لا توجد قيود للاختيارات المحددة.")
+    y = title_block(m, caption, W, True)
+    m.add(SEC_PAGE_HEADER, Control("rect", "boxColumns", 0, y, W, cm(0.65),
+                                   {"BackStyle": 1, "BackColor": Sym("CLR_SECONDARY")}, decorative=True))
+    txt(m, SEC_HEADER, "txtAccount", account_expr, 0, cm(0.12), W, cm(0.6), 11, True)
+    x = 0
+    for i, (title, source, width) in enumerate(cols):
+        cw = cm(width) if i < len(cols) - 1 else W - x
+        money = title in ("مدين", "دائن", "الرصيد")
+        lbl(m, SEC_PAGE_HEADER, f"lblCol{i + 1}", title, x, y + cm(0.08), cw, cm(0.5), 8, True, align=2)
+        t = txt(m, SEC_DETAIL, f"txtCol{i + 1}", source, x, cm(0.03), cw, cm(0.5), 8, align=2 if money else 0,
+                fmt=MONEY if money else None, grow=title == "البيان")
+        if title == "الرصيد":
+            t.props["RunningSum"] = 1            # over the account (the group)
+        x += cw
+    assert x == W
+    F = SEC_FOOTER
+    hline(m, F, "lnTotals", cm(0.05), W)
+    part = W // 4
+    for i, (caption, expr) in enumerate([
+            ("رصيد أول المدة", "=Sum(IIf([SortKey]=0,[LineDebit]-[LineCredit],0))"),
+            ("مدين الفترة", "=Sum(IIf([SortKey]=1,[LineDebit],0))"),
+            ("دائن الفترة", "=Sum(IIf([SortKey]=1,[LineCredit],0))"),
+            ("الرصيد الختامي", "=Sum([LineDebit]-[LineCredit])")]):
+        lbl(m, F, f"lblSum{i + 1}", caption, i * part, cm(0.15), part, cm(0.5), 9, True, align=2)
+        txt(m, F, f"txtSum{i + 1}", expr, i * part, cm(0.7), part, cm(0.55), 11, True, align=2, fmt=MONEY)
+    txt(m, F, "txtNature", '=IIf(Sum([LineDebit]-[LineCredit])>=0,"الرصيد مدين","الرصيد دائن")',
+        3 * part, cm(1.3), W - 3 * part, cm(0.5), 9, align=2)
+    page_footer(m, W)
+    return m
+
+
+def account_statement() -> ReportModel:
+    return _ledger("rptAccountStatement", "كشف حساب", "AccountStatementQuery", "StatementAccount",
+                   '="الحساب: " & [StatementAccount] & "  " & [StatementName]', True)
+
+
+def general_ledger() -> ReportModel:
+    return _ledger("rptGeneralLedger", "دفتر الأستاذ", "GeneralLedgerQuery", "AccountKey",
+                   '=[LedgerCode] & "  " & [LedgerName]', False)
+
+
 def journal_reports() -> List[ReportModel]:
-    return [journal_entry()]
+    return [journal_entry(), account_statement(), general_ledger()]
