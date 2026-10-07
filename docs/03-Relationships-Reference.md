@@ -2,7 +2,9 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` و`tools/relations.py` – لا تعدّله يدويًا.
 
-عدد العلاقات: **138** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **16**، التحديث المتتالي: **3**.
+عدد العلاقات: **128** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **16**، التحديث المتتالي: **3**.
+
+حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، والمستخدمون يُعطَّلون ولا يُحذفون: `AuditLog.EmployeeID`، `BankReconciliations.EmployeeID`، `Budgets.EmployeeID`، `CustomerAllocations.EmployeeID`، `DepreciationRuns.EmployeeID`، `FiscalYearClosings.EmployeeID`، `PeriodClosings.EmployeeID`، `StockCounts.PostedByID`، `SupplierAllocations.EmployeeID`، `VatReturns.EmployeeID`.
 
 ## مخطط الكيانات والعلاقات
 
@@ -84,10 +86,8 @@ erDiagram
     Banks |o--o{ FixedAssets : "DisposalBankID"
     CashBoxes |o--o{ FixedAssets : "DisposalCashBoxID"
     Employees ||--o{ FixedAssets : "EmployeeID"
-    Employees ||--o{ DepreciationRuns : "EmployeeID"
     DepreciationRuns ||--o{ AssetDepreciations : "RunID"
     FixedAssets ||--o{ AssetDepreciations : "AssetID"
-    Employees ||--o{ Budgets : "EmployeeID"
     Budgets ||--o{ BudgetLines : "BudgetID"
     Accounts ||--o{ BudgetLines : "AccountCode"
     CostCenters |o--o{ BudgetLines : "CostCenterID"
@@ -98,15 +98,12 @@ erDiagram
     Employees ||--o{ PayrollLines : "EmployeeID"
     CostCenters |o--o{ PayrollLines : "CostCenterID"
     Banks ||--o{ BankReconciliations : "BankID"
-    Employees ||--o{ BankReconciliations : "EmployeeID"
     BankReconciliations ||--o{ BankClearings : "ReconciliationID"
     Banks ||--o{ BankClearings : "BankID"
     CustomerPayments ||--o{ CustomerAllocations : "PaymentID"
     SalesInvoices ||--o{ CustomerAllocations : "SalesInvoiceID"
-    Employees ||--o{ CustomerAllocations : "EmployeeID"
     SupplierPayments ||--o{ SupplierAllocations : "PaymentID"
     PurchaseInvoices ||--o{ SupplierAllocations : "PurchaseInvoiceID"
-    Employees ||--o{ SupplierAllocations : "EmployeeID"
     ExpenseTypes ||--o{ Expenses : "ExpenseTypeID"
     PaymentMethods |o--o{ Expenses : "PaymentMethodID"
     Employees ||--o{ Expenses : "EmployeeID"
@@ -127,12 +124,9 @@ erDiagram
     JournalEntries ||--o{ JournalLines : "EntryID"
     Accounts ||--o{ JournalLines : "AccountCode"
     CostCenters |o--o{ JournalLines : "CostCenterID"
-    Employees ||--o{ PeriodClosings : "EmployeeID"
-    Employees ||--o{ FiscalYearClosings : "EmployeeID"
     FiscalYearClosings ||--o{ FiscalYearClosingLines : "YearClosingID"
     Accounts ||--o{ FiscalYearClosingLines : "AccountCode"
     Accounts |o--o{ VatReturns : "PaidAccount"
-    Employees ||--o{ VatReturns : "EmployeeID"
     Employees ||--o{ ManualEntries : "EmployeeID"
     ManualEntries ||--o{ ManualEntryLines : "ManualEntryID"
     Accounts ||--o{ ManualEntryLines : "AccountCode"
@@ -142,10 +136,8 @@ erDiagram
     Employees |o--o{ InventoryTransactions : "EmployeeID"
     Categories |o--o{ StockCounts : "CategoryID"
     Employees ||--o{ StockCounts : "EmployeeID"
-    Employees |o--o{ StockCounts : "PostedByID"
     StockCounts ||--o{ StockCountDetails : "StockCountID"
     Products ||--o{ StockCountDetails : "ProductID"
-    Employees |o--o{ AuditLog : "EmployeeID"
 ```
 
 `||--o{` = إلزامي (كل سجل في الجدول الفرعي يجب أن يرتبط بسجل في الأصلي)، `|o--o{` = اختياري (الحقل يمكن أن يكون فارغًا).
@@ -230,65 +222,55 @@ erDiagram
 | 74 | `FK_FixedAssets_DisposalBankID` | Banks (البنوك) | `BankID` | FixedAssets (الأصول الثابتة) | `DisposalBankID` |  | فرض التكامل |
 | 75 | `FK_FixedAssets_DisposalCashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | FixedAssets (الأصول الثابتة) | `DisposalCashBoxID` |  | فرض التكامل |
 | 76 | `FK_FixedAssets_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | FixedAssets (الأصول الثابتة) | `EmployeeID` | ✔ | فرض التكامل |
-| 77 | `FK_DepreciationRuns_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | DepreciationRuns (قيود الإهلاك الشهرية) | `EmployeeID` | ✔ | فرض التكامل |
-| 78 | `FK_AssetDepreciations_RunID` | DepreciationRuns (قيود الإهلاك الشهرية) | `RunID` | AssetDepreciations (إهلاك كل أصل في كل شهر) | `RunID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 79 | `FK_AssetDepreciations_AssetID` | FixedAssets (الأصول الثابتة) | `AssetID` | AssetDepreciations (إهلاك كل أصل في كل شهر) | `AssetID` | ✔ | فرض التكامل |
-| 80 | `FK_Budgets_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | Budgets (الموازنات التقديرية) | `EmployeeID` | ✔ | فرض التكامل |
-| 81 | `FK_BudgetLines_BudgetID` | Budgets (الموازنات التقديرية) | `BudgetID` | BudgetLines (أسطر الموازنة) | `BudgetID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 82 | `FK_BudgetLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | BudgetLines (أسطر الموازنة) | `AccountCode` | ✔ | فرض التكامل |
-| 83 | `FK_BudgetLines_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | BudgetLines (أسطر الموازنة) | `CostCenterID` |  | فرض التكامل |
-| 84 | `FK_PayrollRuns_BankID` | Banks (البنوك) | `BankID` | PayrollRuns (مسيرات الرواتب) | `BankID` |  | فرض التكامل |
-| 85 | `FK_PayrollRuns_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | PayrollRuns (مسيرات الرواتب) | `CashBoxID` |  | فرض التكامل |
-| 86 | `FK_PayrollRuns_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | PayrollRuns (مسيرات الرواتب) | `EmployeeID` | ✔ | فرض التكامل |
-| 87 | `FK_PayrollLines_PayrollRunID` | PayrollRuns (مسيرات الرواتب) | `PayrollRunID` | PayrollLines (أسطر مسير الرواتب) | `PayrollRunID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 88 | `FK_PayrollLines_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | PayrollLines (أسطر مسير الرواتب) | `EmployeeID` | ✔ | فرض التكامل |
-| 89 | `FK_PayrollLines_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | PayrollLines (أسطر مسير الرواتب) | `CostCenterID` |  | فرض التكامل |
-| 90 | `FK_BankReconciliations_BankID` | Banks (البنوك) | `BankID` | BankReconciliations (التسويات البنكية) | `BankID` | ✔ | فرض التكامل |
-| 91 | `FK_BankReconciliations_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | BankReconciliations (التسويات البنكية) | `EmployeeID` | ✔ | فرض التكامل |
-| 92 | `FK_BankClearings_ReconciliationID` | BankReconciliations (التسويات البنكية) | `ReconciliationID` | BankClearings (حركات الدفاتر المطابقة لكشف البنك) | `ReconciliationID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 93 | `FK_BankClearings_BankID` | Banks (البنوك) | `BankID` | BankClearings (حركات الدفاتر المطابقة لكشف البنك) | `BankID` | ✔ | فرض التكامل |
-| 94 | `FK_CustomerAllocations_PaymentID` | CustomerPayments (دفعات العملاء (سندات القبض)) | `PaymentID` | CustomerAllocations (ربط سندات القبض بالفواتير) | `PaymentID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 95 | `FK_CustomerAllocations_SalesInvoiceID` | SalesInvoices (فواتير المبيعات) | `SalesInvoiceID` | CustomerAllocations (ربط سندات القبض بالفواتير) | `SalesInvoiceID` | ✔ | فرض التكامل |
-| 96 | `FK_CustomerAllocations_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | CustomerAllocations (ربط سندات القبض بالفواتير) | `EmployeeID` | ✔ | فرض التكامل |
-| 97 | `FK_SupplierAllocations_PaymentID` | SupplierPayments (دفعات الموردين (سندات الصرف)) | `PaymentID` | SupplierAllocations (ربط سندات الصرف بفواتير الشراء) | `PaymentID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 98 | `FK_SupplierAllocations_PurchaseInvoiceID` | PurchaseInvoices (فواتير المشتريات) | `PurchaseInvoiceID` | SupplierAllocations (ربط سندات الصرف بفواتير الشراء) | `PurchaseInvoiceID` | ✔ | فرض التكامل |
-| 99 | `FK_SupplierAllocations_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | SupplierAllocations (ربط سندات الصرف بفواتير الشراء) | `EmployeeID` | ✔ | فرض التكامل |
-| 100 | `FK_Expenses_ExpenseTypeID` | ExpenseTypes (أنواع المصروفات) | `ExpenseTypeID` | Expenses (المصروفات) | `ExpenseTypeID` | ✔ | فرض التكامل |
-| 101 | `FK_Expenses_PaymentMethodID` | PaymentMethods (طرق الدفع) | `PaymentMethodID` | Expenses (المصروفات) | `PaymentMethodID` |  | فرض التكامل |
-| 102 | `FK_Expenses_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | Expenses (المصروفات) | `EmployeeID` | ✔ | فرض التكامل |
-| 103 | `FK_Expenses_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | Expenses (المصروفات) | `CashBoxID` |  | فرض التكامل |
-| 104 | `FK_Expenses_BankID` | Banks (البنوك) | `BankID` | Expenses (المصروفات) | `BankID` |  | فرض التكامل |
-| 105 | `FK_Expenses_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | Expenses (المصروفات) | `CostCenterID` |  | فرض التكامل |
-| 106 | `FK_CashVouchers_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | CashVouchers (سندات النقدية) | `CashBoxID` | ✔ | فرض التكامل |
-| 107 | `FK_CashVouchers_ToCashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | CashVouchers (سندات النقدية) | `ToCashBoxID` |  | فرض التكامل |
-| 108 | `FK_CashVouchers_ExpenseID` | Expenses (المصروفات) | `ExpenseID` | CashVouchers (سندات النقدية) | `ExpenseID` |  | فرض التكامل |
-| 109 | `FK_CashVouchers_ClosingID` | CashClosings (تصفية يومية الكاشير) | `ClosingID` | CashVouchers (سندات النقدية) | `ClosingID` |  | فرض التكامل |
-| 110 | `FK_CashVouchers_AdvanceEmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | CashVouchers (سندات النقدية) | `AdvanceEmployeeID` |  | فرض التكامل |
-| 111 | `FK_CashVouchers_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | CashVouchers (سندات النقدية) | `CostCenterID` |  | فرض التكامل |
-| 112 | `FK_CashVouchers_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | CashVouchers (سندات النقدية) | `EmployeeID` | ✔ | فرض التكامل |
-| 113 | `FK_CashClosings_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | CashClosings (تصفية يومية الكاشير) | `CashBoxID` | ✔ | فرض التكامل |
-| 114 | `FK_CashClosings_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | CashClosings (تصفية يومية الكاشير) | `EmployeeID` | ✔ | فرض التكامل |
-| 115 | `FK_CashClosings_ToCashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | CashClosings (تصفية يومية الكاشير) | `ToCashBoxID` |  | فرض التكامل |
-| 116 | `FK_JournalEntries_SourceType` | JournalSourceTypes (أنواع مصادر القيود) | `SourceType` | JournalEntries (قيود اليومية) | `SourceType` | ✔ | فرض التكامل + تحديث متتالٍ |
-| 117 | `FK_JournalLines_EntryID` | JournalEntries (قيود اليومية) | `EntryID` | JournalLines (أسطر القيود) | `EntryID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 118 | `FK_JournalLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | JournalLines (أسطر القيود) | `AccountCode` | ✔ | فرض التكامل |
-| 119 | `FK_JournalLines_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | JournalLines (أسطر القيود) | `CostCenterID` |  | فرض التكامل |
-| 120 | `FK_PeriodClosings_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | PeriodClosings (سجل إقفال الفترات) | `EmployeeID` | ✔ | فرض التكامل |
-| 121 | `FK_FiscalYearClosings_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | FiscalYearClosings (إقفال السنوات المالية) | `EmployeeID` | ✔ | فرض التكامل |
-| 122 | `FK_FiscalYearClosingLines_YearClosingID` | FiscalYearClosings (إقفال السنوات المالية) | `YearClosingID` | FiscalYearClosingLines (أسطر قيود إقفال السنوات) | `YearClosingID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 123 | `FK_FiscalYearClosingLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | FiscalYearClosingLines (أسطر قيود إقفال السنوات) | `AccountCode` | ✔ | فرض التكامل |
-| 124 | `FK_VatReturns_PaidAccount` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | VatReturns (إقرارات ضريبة القيمة المضافة) | `PaidAccount` |  | فرض التكامل |
-| 125 | `FK_VatReturns_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | VatReturns (إقرارات ضريبة القيمة المضافة) | `EmployeeID` | ✔ | فرض التكامل |
-| 126 | `FK_ManualEntries_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | ManualEntries (القيود اليدوية) | `EmployeeID` | ✔ | فرض التكامل |
-| 127 | `FK_ManualEntryLines_ManualEntryID` | ManualEntries (القيود اليدوية) | `ManualEntryID` | ManualEntryLines (أسطر القيود اليدوية) | `ManualEntryID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 128 | `FK_ManualEntryLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | ManualEntryLines (أسطر القيود اليدوية) | `AccountCode` | ✔ | فرض التكامل |
-| 129 | `FK_ManualEntryLines_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | ManualEntryLines (أسطر القيود اليدوية) | `CostCenterID` |  | فرض التكامل |
-| 130 | `FK_InventoryTransactions_ProductID` | Products (المنتجات) | `ProductID` | InventoryTransactions (حركة المخزون) | `ProductID` | ✔ | فرض التكامل |
-| 131 | `FK_InventoryTransactions_TransactionTypeID` | TransactionTypes (أنواع حركات المخزون) | `TransactionTypeID` | InventoryTransactions (حركة المخزون) | `TransactionTypeID` | ✔ | فرض التكامل |
-| 132 | `FK_InventoryTransactions_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | InventoryTransactions (حركة المخزون) | `EmployeeID` |  | فرض التكامل |
-| 133 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
-| 134 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
-| 135 | `FK_StockCounts_PostedByID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `PostedByID` |  | فرض التكامل |
-| 136 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 137 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
-| 138 | `FK_AuditLog_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | AuditLog (سجل العمليات) | `EmployeeID` |  | فرض التكامل |
+| 77 | `FK_AssetDepreciations_RunID` | DepreciationRuns (قيود الإهلاك الشهرية) | `RunID` | AssetDepreciations (إهلاك كل أصل في كل شهر) | `RunID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 78 | `FK_AssetDepreciations_AssetID` | FixedAssets (الأصول الثابتة) | `AssetID` | AssetDepreciations (إهلاك كل أصل في كل شهر) | `AssetID` | ✔ | فرض التكامل |
+| 79 | `FK_BudgetLines_BudgetID` | Budgets (الموازنات التقديرية) | `BudgetID` | BudgetLines (أسطر الموازنة) | `BudgetID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 80 | `FK_BudgetLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | BudgetLines (أسطر الموازنة) | `AccountCode` | ✔ | فرض التكامل |
+| 81 | `FK_BudgetLines_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | BudgetLines (أسطر الموازنة) | `CostCenterID` |  | فرض التكامل |
+| 82 | `FK_PayrollRuns_BankID` | Banks (البنوك) | `BankID` | PayrollRuns (مسيرات الرواتب) | `BankID` |  | فرض التكامل |
+| 83 | `FK_PayrollRuns_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | PayrollRuns (مسيرات الرواتب) | `CashBoxID` |  | فرض التكامل |
+| 84 | `FK_PayrollRuns_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | PayrollRuns (مسيرات الرواتب) | `EmployeeID` | ✔ | فرض التكامل |
+| 85 | `FK_PayrollLines_PayrollRunID` | PayrollRuns (مسيرات الرواتب) | `PayrollRunID` | PayrollLines (أسطر مسير الرواتب) | `PayrollRunID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 86 | `FK_PayrollLines_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | PayrollLines (أسطر مسير الرواتب) | `EmployeeID` | ✔ | فرض التكامل |
+| 87 | `FK_PayrollLines_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | PayrollLines (أسطر مسير الرواتب) | `CostCenterID` |  | فرض التكامل |
+| 88 | `FK_BankReconciliations_BankID` | Banks (البنوك) | `BankID` | BankReconciliations (التسويات البنكية) | `BankID` | ✔ | فرض التكامل |
+| 89 | `FK_BankClearings_ReconciliationID` | BankReconciliations (التسويات البنكية) | `ReconciliationID` | BankClearings (حركات الدفاتر المطابقة لكشف البنك) | `ReconciliationID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 90 | `FK_BankClearings_BankID` | Banks (البنوك) | `BankID` | BankClearings (حركات الدفاتر المطابقة لكشف البنك) | `BankID` | ✔ | فرض التكامل |
+| 91 | `FK_CustomerAllocations_PaymentID` | CustomerPayments (دفعات العملاء (سندات القبض)) | `PaymentID` | CustomerAllocations (ربط سندات القبض بالفواتير) | `PaymentID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 92 | `FK_CustomerAllocations_SalesInvoiceID` | SalesInvoices (فواتير المبيعات) | `SalesInvoiceID` | CustomerAllocations (ربط سندات القبض بالفواتير) | `SalesInvoiceID` | ✔ | فرض التكامل |
+| 93 | `FK_SupplierAllocations_PaymentID` | SupplierPayments (دفعات الموردين (سندات الصرف)) | `PaymentID` | SupplierAllocations (ربط سندات الصرف بفواتير الشراء) | `PaymentID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 94 | `FK_SupplierAllocations_PurchaseInvoiceID` | PurchaseInvoices (فواتير المشتريات) | `PurchaseInvoiceID` | SupplierAllocations (ربط سندات الصرف بفواتير الشراء) | `PurchaseInvoiceID` | ✔ | فرض التكامل |
+| 95 | `FK_Expenses_ExpenseTypeID` | ExpenseTypes (أنواع المصروفات) | `ExpenseTypeID` | Expenses (المصروفات) | `ExpenseTypeID` | ✔ | فرض التكامل |
+| 96 | `FK_Expenses_PaymentMethodID` | PaymentMethods (طرق الدفع) | `PaymentMethodID` | Expenses (المصروفات) | `PaymentMethodID` |  | فرض التكامل |
+| 97 | `FK_Expenses_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | Expenses (المصروفات) | `EmployeeID` | ✔ | فرض التكامل |
+| 98 | `FK_Expenses_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | Expenses (المصروفات) | `CashBoxID` |  | فرض التكامل |
+| 99 | `FK_Expenses_BankID` | Banks (البنوك) | `BankID` | Expenses (المصروفات) | `BankID` |  | فرض التكامل |
+| 100 | `FK_Expenses_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | Expenses (المصروفات) | `CostCenterID` |  | فرض التكامل |
+| 101 | `FK_CashVouchers_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | CashVouchers (سندات النقدية) | `CashBoxID` | ✔ | فرض التكامل |
+| 102 | `FK_CashVouchers_ToCashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | CashVouchers (سندات النقدية) | `ToCashBoxID` |  | فرض التكامل |
+| 103 | `FK_CashVouchers_ExpenseID` | Expenses (المصروفات) | `ExpenseID` | CashVouchers (سندات النقدية) | `ExpenseID` |  | فرض التكامل |
+| 104 | `FK_CashVouchers_ClosingID` | CashClosings (تصفية يومية الكاشير) | `ClosingID` | CashVouchers (سندات النقدية) | `ClosingID` |  | فرض التكامل |
+| 105 | `FK_CashVouchers_AdvanceEmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | CashVouchers (سندات النقدية) | `AdvanceEmployeeID` |  | فرض التكامل |
+| 106 | `FK_CashVouchers_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | CashVouchers (سندات النقدية) | `CostCenterID` |  | فرض التكامل |
+| 107 | `FK_CashVouchers_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | CashVouchers (سندات النقدية) | `EmployeeID` | ✔ | فرض التكامل |
+| 108 | `FK_CashClosings_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | CashClosings (تصفية يومية الكاشير) | `CashBoxID` | ✔ | فرض التكامل |
+| 109 | `FK_CashClosings_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | CashClosings (تصفية يومية الكاشير) | `EmployeeID` | ✔ | فرض التكامل |
+| 110 | `FK_CashClosings_ToCashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | CashClosings (تصفية يومية الكاشير) | `ToCashBoxID` |  | فرض التكامل |
+| 111 | `FK_JournalEntries_SourceType` | JournalSourceTypes (أنواع مصادر القيود) | `SourceType` | JournalEntries (قيود اليومية) | `SourceType` | ✔ | فرض التكامل + تحديث متتالٍ |
+| 112 | `FK_JournalLines_EntryID` | JournalEntries (قيود اليومية) | `EntryID` | JournalLines (أسطر القيود) | `EntryID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 113 | `FK_JournalLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | JournalLines (أسطر القيود) | `AccountCode` | ✔ | فرض التكامل |
+| 114 | `FK_JournalLines_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | JournalLines (أسطر القيود) | `CostCenterID` |  | فرض التكامل |
+| 115 | `FK_FiscalYearClosingLines_YearClosingID` | FiscalYearClosings (إقفال السنوات المالية) | `YearClosingID` | FiscalYearClosingLines (أسطر قيود إقفال السنوات) | `YearClosingID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 116 | `FK_FiscalYearClosingLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | FiscalYearClosingLines (أسطر قيود إقفال السنوات) | `AccountCode` | ✔ | فرض التكامل |
+| 117 | `FK_VatReturns_PaidAccount` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | VatReturns (إقرارات ضريبة القيمة المضافة) | `PaidAccount` |  | فرض التكامل |
+| 118 | `FK_ManualEntries_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | ManualEntries (القيود اليدوية) | `EmployeeID` | ✔ | فرض التكامل |
+| 119 | `FK_ManualEntryLines_ManualEntryID` | ManualEntries (القيود اليدوية) | `ManualEntryID` | ManualEntryLines (أسطر القيود اليدوية) | `ManualEntryID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 120 | `FK_ManualEntryLines_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | ManualEntryLines (أسطر القيود اليدوية) | `AccountCode` | ✔ | فرض التكامل |
+| 121 | `FK_ManualEntryLines_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | ManualEntryLines (أسطر القيود اليدوية) | `CostCenterID` |  | فرض التكامل |
+| 122 | `FK_InventoryTransactions_ProductID` | Products (المنتجات) | `ProductID` | InventoryTransactions (حركة المخزون) | `ProductID` | ✔ | فرض التكامل |
+| 123 | `FK_InventoryTransactions_TransactionTypeID` | TransactionTypes (أنواع حركات المخزون) | `TransactionTypeID` | InventoryTransactions (حركة المخزون) | `TransactionTypeID` | ✔ | فرض التكامل |
+| 124 | `FK_InventoryTransactions_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | InventoryTransactions (حركة المخزون) | `EmployeeID` |  | فرض التكامل |
+| 125 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
+| 126 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
+| 127 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 128 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |

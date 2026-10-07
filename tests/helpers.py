@@ -56,7 +56,7 @@ def build_sqlite(with_relationship_rules=False):
             cols.append(c)
         cols.append("PRIMARY KEY (" + ", ".join(f'"{k}"' for k in t.pk) + ")")
         for f in t.fields:
-            if f.fk:
+            if f.fk and (t.name, f.name) in rel_by_child:   # unenforced fields have no relationship
                 tt, tf = f.fk.split(".")
                 c = f'FOREIGN KEY ("{f.name}") REFERENCES "{tt}" ("{tf}")'
                 if with_relationship_rules:

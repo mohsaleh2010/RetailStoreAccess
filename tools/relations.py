@@ -42,11 +42,43 @@ class Relation:
         return " + ".join(parts)
 
 
+# Access allows 32 indexes per table, and every enforced relationship counts as an index on
+# BOTH of its tables. Employees is the parent of a "recorded by" field in almost every table,
+# so these fields keep their fk (lookups, the mirror's joins) without an enforced relationship.
+# The program writes the logged-in user to them, and users are deactivated, never deleted.
+UNENFORCED = {
+    ("AuditLog", "EmployeeID"),
+    ("StockCounts", "PostedByID"),
+    ("CustomerAllocations", "EmployeeID"),
+    ("SupplierAllocations", "EmployeeID"),
+    ("BankReconciliations", "EmployeeID"),
+    ("DepreciationRuns", "EmployeeID"),
+    ("Budgets", "EmployeeID"),
+    ("PeriodClosings", "EmployeeID"),
+    ("FiscalYearClosings", "EmployeeID"),
+    ("VatReturns", "EmployeeID"),
+}
+
+ACCESS_MAX_INDEXES = 32
+
+
+def retired_relations() -> List[str]:
+    """Relationships an older BuildRelationships created and the current one removes."""
+    return sorted(f"FK_{child}_{field}" for child, field in UNENFORCED)
+
+
+def index_load(name: str) -> int:
+    """What Access counts against its 32 indexes for a table: the primary key, its own
+    indexes and every enforced relationship it takes part in (as parent or as child)."""
+    t = table(name)
+    return 1 + len(t.indexes) + sum(r.parent == name or r.child == name for r in relations())
+
+
 def relations() -> List[Relation]:
     out = []
     for t in TABLES:
         for f in t.fields:
-            if not f.fk:
+            if not f.fk or (t.name, f.name) in UNENFORCED:
                 continue
             parent, parent_field = f.fk.split(".")
             parent_kind = next(p.kind for p in table(parent).fields if p.name == parent_field)

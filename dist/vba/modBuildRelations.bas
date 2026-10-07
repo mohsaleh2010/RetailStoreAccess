@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 138
+Private Const EXPECTED_RELATION_COUNT As Long = 128
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -50,6 +50,15 @@ Public Function BuildRelationships(Optional ByVal BackEndPath As String = "") As
     m_created = 0: m_skipped = 0: m_failed = 0: m_report = ""
     Debug.Print "=== BuildRelationships  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     Set m_db = DBEngine.OpenDatabase(BackEndPath)
+
+    ' relationships an older version created and this one no longer enforces: they would
+    ' hold index slots (Access allows 32 per table, a relationship takes one on each side)
+    For Each spec In RetiredRelations()
+        If RelationExistsIn(m_db, spec) Then
+            m_db.Relations.Delete spec
+            Debug.Print "  - √ı“Ì· : " & spec
+        End If
+    Next
 
     For Each spec In RelationSpecs()
         AddRelation spec(0), spec(1), spec(2), spec(3), spec(4), spec(5)
@@ -453,10 +462,8 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_FixedAssets_DisposalBankID", "Banks", "BankID", "FixedAssets", "DisposalBankID", 0&)
     c.Add Array("FK_FixedAssets_DisposalCashBoxID", "CashBoxes", "CashBoxID", "FixedAssets", "DisposalCashBoxID", 0&)
     c.Add Array("FK_FixedAssets_EmployeeID", "Employees", "EmployeeID", "FixedAssets", "EmployeeID", 0&)
-    c.Add Array("FK_DepreciationRuns_EmployeeID", "Employees", "EmployeeID", "DepreciationRuns", "EmployeeID", 0&)
     c.Add Array("FK_AssetDepreciations_RunID", "DepreciationRuns", "RunID", "AssetDepreciations", "RunID", 4096&)
     c.Add Array("FK_AssetDepreciations_AssetID", "FixedAssets", "AssetID", "AssetDepreciations", "AssetID", 0&)
-    c.Add Array("FK_Budgets_EmployeeID", "Employees", "EmployeeID", "Budgets", "EmployeeID", 0&)
     c.Add Array("FK_BudgetLines_BudgetID", "Budgets", "BudgetID", "BudgetLines", "BudgetID", 4096&)
     c.Add Array("FK_BudgetLines_AccountCode", "Accounts", "AccountCode", "BudgetLines", "AccountCode", 0&)
     c.Add Array("FK_BudgetLines_CostCenterID", "CostCenters", "CostCenterID", "BudgetLines", "CostCenterID", 0&)
@@ -467,15 +474,12 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_PayrollLines_EmployeeID", "Employees", "EmployeeID", "PayrollLines", "EmployeeID", 0&)
     c.Add Array("FK_PayrollLines_CostCenterID", "CostCenters", "CostCenterID", "PayrollLines", "CostCenterID", 0&)
     c.Add Array("FK_BankReconciliations_BankID", "Banks", "BankID", "BankReconciliations", "BankID", 0&)
-    c.Add Array("FK_BankReconciliations_EmployeeID", "Employees", "EmployeeID", "BankReconciliations", "EmployeeID", 0&)
     c.Add Array("FK_BankClearings_ReconciliationID", "BankReconciliations", "ReconciliationID", "BankClearings", "ReconciliationID", 4096&)
     c.Add Array("FK_BankClearings_BankID", "Banks", "BankID", "BankClearings", "BankID", 0&)
     c.Add Array("FK_CustomerAllocations_PaymentID", "CustomerPayments", "PaymentID", "CustomerAllocations", "PaymentID", 4096&)
     c.Add Array("FK_CustomerAllocations_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "CustomerAllocations", "SalesInvoiceID", 0&)
-    c.Add Array("FK_CustomerAllocations_EmployeeID", "Employees", "EmployeeID", "CustomerAllocations", "EmployeeID", 0&)
     c.Add Array("FK_SupplierAllocations_PaymentID", "SupplierPayments", "PaymentID", "SupplierAllocations", "PaymentID", 4096&)
     c.Add Array("FK_SupplierAllocations_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "SupplierAllocations", "PurchaseInvoiceID", 0&)
-    c.Add Array("FK_SupplierAllocations_EmployeeID", "Employees", "EmployeeID", "SupplierAllocations", "EmployeeID", 0&)
     c.Add Array("FK_Expenses_ExpenseTypeID", "ExpenseTypes", "ExpenseTypeID", "Expenses", "ExpenseTypeID", 0&)
     c.Add Array("FK_Expenses_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "Expenses", "PaymentMethodID", 0&)
     c.Add Array("FK_Expenses_EmployeeID", "Employees", "EmployeeID", "Expenses", "EmployeeID", 0&)
@@ -496,12 +500,9 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_JournalLines_EntryID", "JournalEntries", "EntryID", "JournalLines", "EntryID", 4096&)
     c.Add Array("FK_JournalLines_AccountCode", "Accounts", "AccountCode", "JournalLines", "AccountCode", 0&)
     c.Add Array("FK_JournalLines_CostCenterID", "CostCenters", "CostCenterID", "JournalLines", "CostCenterID", 0&)
-    c.Add Array("FK_PeriodClosings_EmployeeID", "Employees", "EmployeeID", "PeriodClosings", "EmployeeID", 0&)
-    c.Add Array("FK_FiscalYearClosings_EmployeeID", "Employees", "EmployeeID", "FiscalYearClosings", "EmployeeID", 0&)
     c.Add Array("FK_FiscalYearClosingLines_YearClosingID", "FiscalYearClosings", "YearClosingID", "FiscalYearClosingLines", "YearClosingID", 4096&)
     c.Add Array("FK_FiscalYearClosingLines_AccountCode", "Accounts", "AccountCode", "FiscalYearClosingLines", "AccountCode", 0&)
     c.Add Array("FK_VatReturns_PaidAccount", "Accounts", "AccountCode", "VatReturns", "PaidAccount", 0&)
-    c.Add Array("FK_VatReturns_EmployeeID", "Employees", "EmployeeID", "VatReturns", "EmployeeID", 0&)
     c.Add Array("FK_ManualEntries_EmployeeID", "Employees", "EmployeeID", "ManualEntries", "EmployeeID", 0&)
     c.Add Array("FK_ManualEntryLines_ManualEntryID", "ManualEntries", "ManualEntryID", "ManualEntryLines", "ManualEntryID", 4096&)
     c.Add Array("FK_ManualEntryLines_AccountCode", "Accounts", "AccountCode", "ManualEntryLines", "AccountCode", 0&)
@@ -511,9 +512,20 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_InventoryTransactions_EmployeeID", "Employees", "EmployeeID", "InventoryTransactions", "EmployeeID", 0&)
     c.Add Array("FK_StockCounts_CategoryID", "Categories", "CategoryID", "StockCounts", "CategoryID", 0&)
     c.Add Array("FK_StockCounts_EmployeeID", "Employees", "EmployeeID", "StockCounts", "EmployeeID", 0&)
-    c.Add Array("FK_StockCounts_PostedByID", "Employees", "EmployeeID", "StockCounts", "PostedByID", 0&)
     c.Add Array("FK_StockCountDetails_StockCountID", "StockCounts", "StockCountID", "StockCountDetails", "StockCountID", 4096&)
     c.Add Array("FK_StockCountDetails_ProductID", "Products", "ProductID", "StockCountDetails", "ProductID", 0&)
-    c.Add Array("FK_AuditLog_EmployeeID", "Employees", "EmployeeID", "AuditLog", "EmployeeID", 0&)
     Set RelationSpecs = c
+End Function
+
+Private Function RetiredRelations() As Variant
+    RetiredRelations = Array("FK_AuditLog_EmployeeID", _
+                             "FK_BankReconciliations_EmployeeID", _
+                             "FK_Budgets_EmployeeID", _
+                             "FK_CustomerAllocations_EmployeeID", _
+                             "FK_DepreciationRuns_EmployeeID", _
+                             "FK_FiscalYearClosings_EmployeeID", _
+                             "FK_PeriodClosings_EmployeeID", _
+                             "FK_StockCounts_PostedByID", _
+                             "FK_SupplierAllocations_EmployeeID", _
+                             "FK_VatReturns_EmployeeID")
 End Function

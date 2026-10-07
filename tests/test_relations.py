@@ -20,11 +20,20 @@ class RelationDefinitionTests(unittest.TestCase):
         self.rels = R.relations()
 
     def test_count_and_names(self):
-        self.assertEqual(len(self.rels), 138)
+        self.assertEqual(len(self.rels), 128)
         names = [r.name for r in self.rels]
         self.assertEqual(len(names), len(set(names)))
         for n in names:
             self.assertLessEqual(len(n), 64, n)
+
+    def test_access_index_limit(self):
+        # Error 3626 "too many indexes on table 'Employees'": a relationship takes an index
+        # on both tables; keep room for later relationships.
+        for t in TABLES:
+            self.assertLessEqual(R.index_load(t.name), R.ACCESS_MAX_INDEXES - 4, t.name)
+        self.assertIn('"FK_AuditLog_EmployeeID"', gen_relations.build_relations_vba())
+        for child, field in R.UNENFORCED:
+            self.assertEqual(next(f.fk for f in table(child).fields if f.name == field), "Employees.EmployeeID")
 
     def test_cascade_delete_only_from_header_to_its_lines(self):
         cascading = {(r.parent, r.child) for r in self.rels if r.cascade_delete}
@@ -61,7 +70,9 @@ class RelationDefinitionTests(unittest.TestCase):
 
     def test_every_table_except_roots_is_connected(self):
         connected = {r.parent for r in self.rels} | {r.child for r in self.rels}
-        self.assertEqual({t.name for t in TABLES} - connected, {"Sequences", "LabelSettings"})
+        # AuditLog and PeriodClosings point only to Employees, without an enforced relationship
+        self.assertEqual({t.name for t in TABLES} - connected,
+                         {"Sequences", "LabelSettings", "AuditLog", "PeriodClosings"})
 
     def test_attribute_values(self):
         by_name = {r.name: r for r in self.rels}

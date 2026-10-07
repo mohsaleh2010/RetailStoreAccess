@@ -3,7 +3,7 @@
 import re
 
 from generate_common import vba_str
-from relations import (relations, REJECTED_INSERTS, REJECTED_DELETES, CASCADE_PRODUCT_SQL,
+from relations import (relations, retired_relations, UNENFORCED, REJECTED_INSERTS, REJECTED_DELETES, CASCADE_PRODUCT_SQL,
                        CASCADE_INVOICE_SQL, CASCADE_LINE_SQL, CASCADE_DELETE_PRODUCT_SQL,
                        CASCADE_DELETE_INVOICE_SQL, CASCADE_COUNT_LINES_SQL, RENAME_KEY_SQL,
                        COUNT_RENAMED_SQL, COUNT_OLD_KEY_SQL)
@@ -70,6 +70,15 @@ Public Function BuildRelationships(Optional ByVal BackEndPath As String = "") As
     m_created = 0: m_skipped = 0: m_failed = 0: m_report = ""
     Debug.Print "=== BuildRelationships  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     Set m_db = DBEngine.OpenDatabase(BackEndPath)
+
+    ' relationships an older version created and this one no longer enforces: they would
+    ' hold index slots (Access allows 32 per table, a relationship takes one on each side)
+    For Each spec In RetiredRelations()
+        If RelationExistsIn(m_db, spec) Then
+            m_db.Relations.Delete spec
+            Debug.Print "  - أُزيلت: " & spec
+        End If
+    Next
 
     For Each spec In RelationSpecs()
         AddRelation spec(0), spec(1), spec(2), spec(3), spec(4), spec(5)
@@ -374,6 +383,10 @@ Private Function RelationSpecs() As Collection
 @@SPECS@@
     Set RelationSpecs = c
 End Function
+
+Private Function RetiredRelations() As Variant
+    RetiredRelations = Array(@@RETIRED@@)
+End Function
 '''
 
 
@@ -392,6 +405,7 @@ def build_relations_vba() -> str:
     for key, value in {
         "@@COUNT@@": str(len(rels)),
         "@@SPECS@@": specs,
+        "@@RETIRED@@": ", _\n                             ".join(vba_str(n) for n in retired_relations()),
         "@@REJECTED_INSERTS@@": ins,
         "@@REJECTED_DELETES@@": dels,
         "@@CASCADE_PRODUCT_SQL@@": vba_str(CASCADE_PRODUCT_SQL),
@@ -417,6 +431,10 @@ def build_relations_md() -> str:
            f"عدد العلاقات: **{len(rels)}** – جميعها مع **Enforce Referential Integrity**. "
            f"الحذف المتتالي: **{sum(r.cascade_delete for r in rels)}**، "
            f"التحديث المتتالي: **{sum(r.cascade_update for r in rels)}**.", "",
+           "حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا "
+           "لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، "
+           "والمستخدمون يُعطَّلون ولا يُحذفون: "
+           + "، ".join(f"`{c}.{f}`" for c, f in sorted(UNENFORCED)) + ".", "",
            "## مخطط الكيانات والعلاقات", "", "```mermaid", "erDiagram"]
     for r in rels:
         card = "||--o{" if r.required else "|o--o{"
