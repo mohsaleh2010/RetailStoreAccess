@@ -24,7 +24,7 @@ Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn," & _
     "frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger," & _
-    "frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting"
+    "frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -637,6 +637,7 @@ Private Sub BuildAllForms()
     BuildForm_frmBudgetLines
     BuildForm_frmBudget
     BuildForm_frmAccounting
+    BuildForm_frmAuditLog
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -1900,6 +1901,8 @@ Private Sub BuildForm_frmUsers()
     c.OnClick = EP
     Set c = AddButton("btnUserScreens", "’·«ÕÌ«  «·‘«‘« ", 10091, 1021, 1701, 482, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnAuditLog", "”Ã· «· œﬁÌﬁ", 11905, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "≈€·«ﬁ", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "»ÕÀ (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -2010,6 +2013,9 @@ Private Sub BuildForm_frmUsers()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnUserScreens_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmUserScreens"", 10" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAuditLog_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAuditLog"", 0" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
@@ -7929,7 +7935,15 @@ Private Sub BuildForm_frmPayrollLines()
     SetCtlProp c, "Format", "#,##0.00"
     Set c = AddText("Notes", "Notes", 13606, 0, 1247, 425)
     c.AfterUpdate = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
     s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    AuditFormBefore Me, ""PayrollLines"", ""PayrollLineID""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    AuditFormAfter Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Overtime_AfterUpdate()" & vbCrLf
     s = s & "    PayrollLineChanged Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -8254,7 +8268,7 @@ End Sub
 Private Sub BuildForm_frmAccounting()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmAccounting", "«·„Õ«”»… Ê«·„«·Ì…", "", 14882, 7879, False, False, False, _
+    StartForm "frmAccounting", "«·„Õ«”»… Ê«·„«·Ì…", "", 14882, 9381, False, False, False, _
               ""
     Set c = AddRect("boxTitle", 0, 0, 14882, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -8388,7 +8402,15 @@ Private Sub BuildForm_frmAccounting()
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmRecurring"
     c.OnClick = EP
-    Set c = AddButton("btnClose", "—ÃÊ⁄", 13181, 7255, 1361, 454, "secondary")
+    Set c = AddRect("boxNavAudit", 11140, 7142, 3402, 1304, RGB(69, 90, 100))
+    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 11140, 7255, 3402, 510, 20, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAudit", "”Ã· «· œﬁÌﬁ", 11140, 7766, 3402, 340, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintAudit", "„‰ √÷«› √Ê ⁄œ¯· √Ê Õ–›", 11140, 8078, 3402, 284, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAudit", "”Ã· «· œﬁÌﬁ", 11140, 7142, 3402, 1304, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmAuditLog"
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "—ÃÊ⁄", 13181, 8757, 1361, 454, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
     m_frm.OnResize = EP
@@ -8444,16 +8466,79 @@ Private Sub BuildForm_frmAccounting()
     s = s & "Private Sub btnTileRecurring_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmRecurring""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileAudit_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAuditLog"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
-    s = s & "    spec = ""boxTitle,0,0,14882,850,0,1000,0,0;btnClose,13181,7255,1361,454,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 14882, 7879, -254, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,14882,850,0,1000,0,0;btnClose,13181,8757,1361,454,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 14882, 9381, -254, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmAccounting", s
     Exit Sub
 EH:
     AbortForm "frmAccounting", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmAuditLog()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmAuditLog", "”Ã· «· œﬁÌﬁ", "", 15309, 10433, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8D7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "”Ã· «· œﬁÌﬁ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "„‰ √÷«› √Ê ⁄œ¯· √Ê Õ–›° Ê„ Ï° Ê„‰ √Ì ÃÂ«“° Ê«·ﬁÌ„ ﬁ»· Ê»⁄œ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtFrom", "", 227, 1304, 1588, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblFrom", "„‰", 227, 992, 1588, 284, 9, False, CLR_MUTED, "txtFrom", 0)
+    Set c = AddText("txtTo", "", 1928, 1304, 1588, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblTo", "≈·Ï", 1928, 992, 1588, 284, 9, False, CLR_MUTED, "txtTo", 0)
+    Set c = AddCombo("cboUser", "", 3629, 1304, 2268, 454, "SELECT EmployeeID, EmployeeName FROM Employees ORDER BY EmployeeName", 2, "0;3969")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblUser", "«·„” Œœ„ (›«—€ = «·ﬂ·)", 3629, 992, 2268, 284, 9, False, CLR_MUTED, "cboUser", 0)
+    Set c = AddCombo("cboAction", "", 6010, 1304, 2155, 454, "ADD;≈÷«›…;EDIT; ⁄œÌ·;DELETE;Õ–›;DOCS;⁄„·Ì«  «·„” ‰œ« ;LOGIN;«·œŒÊ· Ê«·Œ—ÊÃ", 2, "0;2041")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblAction", "«·⁄„·Ì… (›«—€ = «·ﬂ·)", 6010, 992, 2155, 284, 9, False, CLR_MUTED, "cboAction", 0)
+    Set c = AddCombo("cboTable", "", 8278, 1304, 2155, 454, "", 1, "2041")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblTable", "«·ÃœÊ· (›«—€ = «·ﬂ·)", 8278, 992, 2155, 284, 9, False, CLR_MUTED, "cboTable", 0)
+    Set c = AddText("txtSearch", "", 10546, 1304, 2608, 454)
+    Set c = AddLabel("lblSearch", "—ﬁ„ √Ê «”„ «·”Ã·", 10546, 992, 2608, 284, 9, False, CLR_MUTED, "txtSearch", 0)
+    Set c = AddButton("btnShow", "⁄—÷", 13268, 1304, 1814, 454, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblCount", " ", 227, 1871, 14855, 312, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddList("lstLog", 227, 2268, 14855, 3742, 8, "0;1814;1814;1814;1814;907;3175;1701", True)
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblDetails", " ", 227, 6067, 14855, 312, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstChanges", 227, 6464, 14855, 2608, 4, "0;2835;5386;5386", True)
+    Set c = AddButton("btnPrint", "ÿ»«⁄… «·› —…", 227, 9412, 1814, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13608, 9412, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    AuditScreenLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstLog_AfterUpdate()" & vbCrLf
+    s = s & "    AuditScreenPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnShow_Click()" & vbCrLf
+    s = s & "    AuditScreenShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintAuditLog Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmAuditLog", s
+    Exit Sub
+EH:
+    AbortForm "frmAuditLog", Err.Number, Err.Description
 End Sub

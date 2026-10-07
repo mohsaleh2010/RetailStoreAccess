@@ -28,7 +28,9 @@ def layout_payroll_lines() -> Tuple[FormModel, list]:
             ("GosiEmployee", 1.8, {**LOCKED, **money}), ("NetPay", 2.2, {**LOCKED, **money, "FontBold": True}),
             ("Notes", 2.2, {})]
     heads = grid_row(m, [(f, f, w, props, ["AfterUpdate"] if f in EDITABLE else []) for f, w, props in cols], row_h)
-    m.code = []
+    m.form_events = ["BeforeUpdate", "AfterUpdate"]          # the audit trail of the edited lines (modAudit)
+    m.code = ["Private Sub Form_BeforeUpdate(Cancel As Integer)", '    AuditFormBefore Me, "PayrollLines", "PayrollLineID"',
+              "End Sub", "Private Sub Form_AfterUpdate()", "    AuditFormAfter Me", "End Sub"]
     for f in EDITABLE:
         m.code += [f"Private Sub {f}_AfterUpdate()", "    PayrollLineChanged Me", "End Sub"]
     return m, heads

@@ -104,6 +104,8 @@ class ReplayTests(unittest.TestCase):
                     continue                          # checked with a tolerance above
                 if rep.key == "BUDGET_VS_ACTUAL":
                     continue                          # needs a budget, entered by the user (not demo data)
+                if rep.key == "AUDIT_TRAIL":
+                    continue                          # written by the screens in Access, not by the replay
                 self.assertGreater(rows, 0, rep.query)
 
     def test_dashboard_has_today(self):

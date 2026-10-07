@@ -377,6 +377,7 @@ TABLES: List[Table] = [
             ("SETTINGS", "إعدادات المحل", "النظام", 80),
             ("USERS", "المستخدمون والصلاحيات", "النظام", 81),
             ("BACKUP", "النسخ الاحتياطي", "النظام", 82),
+            ("AUDIT_LOG", "سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد", "النظام", 83),
         ],
         seed_missing=True,
     ),
@@ -1760,7 +1761,8 @@ TABLES: List[Table] = [
     # ------------------------------------------------------------- Audit
     Table(
         "AuditLog", "سجل العمليات",
-        "يسجل الدخول والخروج والعمليات الحساسة (تجاوز المخزون، تعديل الأسعار، النسخ الاحتياطي).",
+        "سجل التدقيق: الدخول والخروج، وإضافة أي سجل أو تعديله أو حذفه (والحقول في AuditChanges)، "
+        "وعمليات المستندات والعمليات الحساسة (تجاوز المخزون، تعديل الأسعار، النسخ الاحتياطي).",
         [
             auto("LogID", "رقم السجل"),
             datetime_("LogDate", "التاريخ", required=True, default="Now()"),
@@ -1770,9 +1772,26 @@ TABLES: List[Table] = [
             text("RecordID", 30, "رقم السجل المتأثر"),
             memo("Details", "التفاصيل"),
             text("ComputerName", 50, "اسم الجهاز"),
+            text("RecordLabel", 100, "السجل", note="اسم السجل أو رقمه المقروء (المنتج، رقم المصروف...)"),
         ],
         pk=["LogID"],
         indexes=[ix("LogDate"), ix("ActionType")],
+    ),
+
+    Table(
+        "AuditChanges", "تفاصيل سجل التدقيق",
+        "حقول كل عملية في سجل التدقيق: القيمة قبل وبعد (الإضافة: بعد فقط، الحذف: قبل فقط).",
+        [
+            auto("ChangeID", "رقم داخلي"),
+            long_("LogID", "العملية", required=True, fk="AuditLog.LogID", cascade=True),
+            int_("LineNo", "الترتيب", required=True, default="0"),
+            text("FieldName", 64, "الحقل", required=True),
+            text("FieldCaption", 100, "اسم الحقل"),
+            text("OldValue", 255, "القيمة قبل"),
+            text("NewValue", 255, "القيمة بعد"),
+        ],
+        pk=["ChangeID"],
+        indexes=[ix("LogID")],
     ),
 
     # ------------------------------------------------------------- Barcode labels
@@ -1830,7 +1849,7 @@ TABLES: List[Table] = [
 def _role_permissions():
     perms = [r[0] for r in table("Permissions").seed_rows]
     cashier = ["SALES_POS", "SALES_VIEW", "CUSTOMERS", "CUSTOMER_PAYMENTS", "CASH_CLOSING"]
-    manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK", "PERIOD_CLOSE"}
+    manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK", "PERIOD_CLOSE", "AUDIT_LOG"}
     rows = [(1, p) for p in perms]
     rows += [(2, p) for p in perms if p not in manager_excluded]
     rows += [(3, p) for p in cashier]
@@ -1893,6 +1912,7 @@ SCREEN_LIST = [
     ("frmUsers", "المستخدمون", "النظام", "USERS", True, True, False),
     ("frmRoles", "الأدوار والصلاحيات", "النظام", "USERS", False, True, False),
     ("frmUserScreens", "صلاحيات الشاشات للمستخدمين", "النظام", "USERS", False, True, False),
+    ("frmAuditLog", "سجل التدقيق", "النظام", "AUDIT_LOG", False, False, False),
     ("frmBackup", "النسخ الاحتياطي", "النظام", "BACKUP", False, False, False),
 ]
 

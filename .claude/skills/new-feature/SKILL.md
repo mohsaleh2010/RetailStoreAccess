@@ -5,7 +5,7 @@ description: Implement one new feature of the RetailStoreAccess Access ERP end t
 
 # Implement a feature
 
-Follow `CLAUDE.md` ("Adding a feature" and "Access / VBA rules"). One feature per run.
+Follow `AGENTS.md` ("Adding a feature" and "Access / VBA rules") and `docs/dev/04-Workflow.md`. One feature per run.
 
 1. **Understand first.** Read the related `docs/NN-*.md`, the tables in `tools/schema.py` and the
    nearest similar feature (e.g. `modBudget`, `modRecurring`, `forms_budget.py`) and follow its patterns.
@@ -22,7 +22,7 @@ Follow `CLAUDE.md` ("Adding a feature" and "Access / VBA rules"). One feature pe
    closed periods, cost centre.
 5. `python3 tools/generate.py`, write `tests/test_x.py` (logic mirrored in Python where possible,
    code checks, `VbaModuleChecks`), run all tests (`/run-tests`) until green.
-6. Re-read the diff against the Access / VBA rules in `CLAUDE.md` (IIf / And evaluate both sides,
+6. Re-read the diff against the Access / VBA rules in `AGENTS.md` (IIf / And evaluate both sides,
    Private procedures, reserved names, line length, cp1256, Access SQL limits).
 7. Write `docs/NN-Name.md` in Arabic and add the README row with "✅ بانتظار الموافقة".
 8. Commit (clear English message, no AI model names) and push to the current branch. No pull request.

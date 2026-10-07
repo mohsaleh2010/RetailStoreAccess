@@ -182,6 +182,11 @@ LIST_SPECS: List[ListSpec] = [
         Col("الفعلي", "ActualAmount", 3.0, MONEY, True), Col("الانحراف", "Variance", 3.0, MONEY),
         Col("النسبة", "VariancePct", 1.8, PCT), Col("التقييم", "VarianceNote", 4.0)],
         [("AccountType", True), ("TreeKey", False)], landscape=True, no_data="لا توجد موازنة لسنة الفترة."),
+    ListSpec("AUDIT_TRAIL", [
+        Col("الوقت", "=GDate([LogDate], True)", 2.9), Col("المستخدم", "UserName", 2.6), Col("العملية", "ActionLabel", 2.4),
+        Col("الجدول", "ObjectName", 2.6), Col("الرقم", "RecordID", 1.4), Col("السجل", "RecordLabel", 3.2),
+        Col("الحقل", "FieldCaption", 3.0), Col("قبل", "OldValue", 3.6, grow=True), Col("بعد", "NewValue", 3.6, grow=True)],
+        [("LogID", True), ("LineNo", False)], landscape=True, no_data="لا توجد عمليات في الفترة."),
     ListSpec("FIXED_ASSETS", [
         Col("الرقم", "AssetCode", 2.0), Col("الأصل", "AssetName", 5.2, grow=True), Col("المجموعة", "AssetGroup", 3.6),
         Col("الشراء", "=GDate([PurchaseDate])", 2.2), Col("العمر (شهر)", "UsefulLifeMonths", 1.8, INT),

@@ -484,5 +484,14 @@ class SharedTableScreenTests(unittest.TestCase):
                 self.assertIn("frm.Name = ", case.group(0), f"{t}: {case.group(0).strip()}")
 
 
+
+class ScreensIndexTests(unittest.TestCase):
+
+    def test_screens_index_is_up_to_date(self):
+        with open(os.path.join(ROOT, "docs", "dev", "Screens-Index.md"), encoding="utf-8") as fh:
+            self.assertEqual(fh.read().rstrip("\n"), gen_forms.build_screens_md().rstrip("\n"),
+                             "run: python3 tools/generate.py")
+
+
 if __name__ == "__main__":
     unittest.main()

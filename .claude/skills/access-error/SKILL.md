@@ -11,7 +11,7 @@ VBA is never compiled or run in Access here, so the user's message is the only e
    `BuildForms`, `BuildReports`, the compile step), the screen / report, or the `Test*` procedure and
    the check after the last passing one (count the checks in the test to locate the failing line).
 2. Find the **root cause** in the source (`tools/*.py` for generated modules, `src/vba/*.bas` for
-   hand-written ones). Typical causes are listed in `CLAUDE.md` under "Access / VBA rules":
+   hand-written ones). Typical causes are listed in `AGENTS.md` under "Access / VBA rules" (with reasons in `docs/dev/04-Workflow.md`):
    IIf / And evaluating both sides, Private procedure called from another module, property not
    supported by a control type, 32-index limit, Null in a temp table, alias / bracket rules in
    Access SQL, a shared table handled by two screens.

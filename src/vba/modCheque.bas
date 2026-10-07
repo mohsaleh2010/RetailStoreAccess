@@ -142,8 +142,10 @@ Public Function DeleteCheque(ByVal ChequeID As Long) As String
     If Len(DeleteCheque) > 0 Then Exit Function
     amount = ChequeField(ChequeID, "Amount")
     MoveBalance direction, PartyOf(ChequeID), amount
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("Cheques", "ChequeID", ChequeID)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM Cheques WHERE ChequeID = " & ChequeID, dbFailOnError
-    LogAction "CHEQUE_DELETE", "Cheques", CStr(ChequeID)
+    AuditDeleted "CHEQUE_DELETE", "Cheques", ChequeID, auditBefore
     DeleteCheque = SyncJournal()
 End Function
 

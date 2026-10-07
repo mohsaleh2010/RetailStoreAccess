@@ -24,9 +24,9 @@ Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySa
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvo" & _
     "iceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryDashboardTopProducts,qrySalesDocPr" & _
     "int,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
-    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,qryAdvanceMoves,qryAdva" & _
-    "nceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQu" & _
-    "ery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdva" & _
+    "nceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,Cost" & _
+    "CenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -765,6 +765,7 @@ Private Sub CreateAllQueries()
     Q_BankBalanceQuery
     Q_qryAssetDepTotals
     Q_FixedAssetsQuery
+    Q_AuditTrailQuery
     Q_qryAdvanceMoves
     Q_qryAdvanceTotals
     Q_AdvanceBalanceQuery
@@ -2498,6 +2499,18 @@ Private Sub Q_FixedAssetsQuery()
     s = s & "FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)" & vbCrLf
     s = s & "     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID" & vbCrLf
     SaveQuery "FixedAssetsQuery", "”Ã· «·√’Ê· «·À«» …: «· ﬂ·›… Ê„Ã„⁄ «·≈Â·«ﬂ Ê«·ﬁÌ„… «·œ› —Ì… Ê«·ﬁ”ÿ «·‘Â—Ì", s
+End Sub
+
+Private Sub Q_AuditTrailQuery()
+    Dim s As String
+    s = "SELECT a.LogID, a.LogDate, a.EmployeeID, IIf(e.EmployeeName Is Null, '-', e.EmployeeName) AS UserName, a.ActionType," & vbCrLf
+    s = s & "       IIf(a.ActionType = 'ADD', '≈÷«›…', IIf(a.ActionType = 'EDIT', ' ⁄œÌ·', IIf(a.ActionType = 'DELETE', 'Õ–›'," & vbCrLf
+    s = s & "       IIf(a.ActionType = 'LOGIN', 'œŒÊ·', IIf(a.ActionType = 'LOGOUT', 'Œ—ÊÃ', a.ActionType))))) AS ActionLabel," & vbCrLf
+    s = s & "       a.ObjectName, a.RecordID, a.RecordLabel, a.ComputerName, a.Details," & vbCrLf
+    s = s & "       c.LineNo, c.FieldCaption, c.OldValue, c.NewValue" & vbCrLf
+    s = s & "FROM (AuditLog AS a LEFT JOIN Employees AS e ON a.EmployeeID = e.EmployeeID)" & vbCrLf
+    s = s & "     LEFT JOIN AuditChanges AS c ON a.LogID = c.LogID" & vbCrLf
+    SaveQuery "AuditTrailQuery", "”Ã· «· œﬁÌﬁ: ﬂ· ⁄„·Ì… »„‰ ﬁ«„ »Â« ÊÊﬁ Â«° ÊÕﬁÊ·Â« »«·ﬁÌ„… ﬁ»· Ê»⁄œ", s
 End Sub
 
 Private Sub Q_qryAdvanceMoves()

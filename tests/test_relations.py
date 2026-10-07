@@ -20,7 +20,7 @@ class RelationDefinitionTests(unittest.TestCase):
         self.rels = R.relations()
 
     def test_count_and_names(self):
-        self.assertEqual(len(self.rels), 134)
+        self.assertEqual(len(self.rels), 135)
         names = [r.name for r in self.rels]
         self.assertEqual(len(names), len(set(names)))
         for n in names:
@@ -53,6 +53,7 @@ class RelationDefinitionTests(unittest.TestCase):
             ("DepreciationRuns", "AssetDepreciations"),
             ("PayrollRuns", "PayrollLines"),
             ("Budgets", "BudgetLines"),
+            ("AuditLog", "AuditChanges"),
             ("FiscalYearClosings", "FiscalYearClosingLines"),
         })
 
@@ -70,9 +71,9 @@ class RelationDefinitionTests(unittest.TestCase):
 
     def test_every_table_except_roots_is_connected(self):
         connected = {r.parent for r in self.rels} | {r.child for r in self.rels}
-        # AuditLog and PeriodClosings point only to Employees, without an enforced relationship
+        # PeriodClosings points only to Employees, without an enforced relationship
         self.assertEqual({t.name for t in TABLES} - connected,
-                         {"Sequences", "LabelSettings", "AuditLog", "PeriodClosings"})
+                         {"Sequences", "LabelSettings", "PeriodClosings"})
 
     def test_attribute_values(self):
         by_name = {r.name: r for r in self.rels}

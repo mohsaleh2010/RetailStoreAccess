@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` و`tools/relations.py` – لا تعدّله يدويًا.
 
-عدد العلاقات: **134** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **16**، التحديث المتتالي: **3**.
+عدد العلاقات: **135** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **17**، التحديث المتتالي: **3**.
 
 حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، والمستخدمون يُعطَّلون ولا يُحذفون: `AuditLog.EmployeeID`، `BankReconciliations.EmployeeID`، `Budgets.EmployeeID`، `CustomerAllocations.EmployeeID`، `DepreciationRuns.EmployeeID`، `FiscalYearClosings.EmployeeID`، `PeriodClosings.EmployeeID`، `StockCounts.PostedByID`، `SupplierAllocations.EmployeeID`، `VatReturns.EmployeeID`.
 
@@ -144,6 +144,7 @@ erDiagram
     Employees ||--o{ StockCounts : "EmployeeID"
     StockCounts ||--o{ StockCountDetails : "StockCountID"
     Products ||--o{ StockCountDetails : "ProductID"
+    AuditLog ||--o{ AuditChanges : "LogID"
 ```
 
 `||--o{` = إلزامي (كل سجل في الجدول الفرعي يجب أن يرتبط بسجل في الأصلي)، `|o--o{` = اختياري (الحقل يمكن أن يكون فارغًا).
@@ -286,3 +287,4 @@ erDiagram
 | 132 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
 | 133 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
 | 134 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
+| 135 | `FK_AuditChanges_LogID` | AuditLog (سجل العمليات) | `LogID` | AuditChanges (تفاصيل سجل التدقيق) | `LogID` | ✔ | فرض التكامل + حذف متتالٍ |

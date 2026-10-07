@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -786,6 +786,7 @@ def main():
     # Access imports .bas files in the system ANSI code page -> Windows-1256 + CRLF
     write("dist/vba/modBuildSchema.bas", vba, encoding="cp1256", newline="\r\n")
     write("docs/02-Tables-Reference.md", build_reference_md())
+    write("docs/dev/Screens-Index.md", gen_forms.build_screens_md())
 
     rel = gen_relations.build_relations_vba()
     write("src/vba/modBuildRelations.bas", rel)

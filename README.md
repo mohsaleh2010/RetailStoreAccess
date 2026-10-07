@@ -4,7 +4,18 @@
 
 ## العمل على المشروع من Claude Desktop
 
-افتح المجلد في تبويب **Code** في Claude Desktop. التجهيز والأوامر وطريقة العمل في [docs/00-Claude-Desktop.md](docs/00-Claude-Desktop.md)، وتعليمات Claude نفسه في [CLAUDE.md](CLAUDE.md).
+افتح المجلد في تبويب **Code** في Claude Desktop. التجهيز والأوامر وطريقة العمل في [docs/00-Claude-Desktop.md](docs/00-Claude-Desktop.md).
+
+## للمطوّرين ولأي ذكاء اصطناعي آخر
+
+| الملف | المحتوى |
+|---|---|
+| [AGENTS.md](AGENTS.md) | تعليمات أي أداة ذكاء اصطناعي، مثل Claude وChatGPT/Codex وGemini وCursor وCopilot: القواعد والأوامر وخطوات إضافة ميزة. Claude يقرؤها عبر [CLAUDE.md](CLAUDE.md) |
+| [docs/dev/01-Architecture.md](docs/dev/01-Architecture.md) | بنية المشروع: كيف يولّد Python كود Access، وخطوات البناء، ودور كل وحدة |
+| [docs/dev/02-Database.md](docs/dev/02-Database.md) | قاعدة البيانات: المبادئ، والجداول حسب المجال، والنموذج المحاسبي، والصلاحيات، وحدود Access |
+| [docs/dev/03-Forms.md](docs/dev/03-Forms.md) | الشاشات: أنواعها، وخاصية Tag، والأحداث العامة، والتسمية، وقواعد الشكل |
+| [docs/dev/04-Workflow.md](docs/dev/04-Workflow.md) | طريقة العمل والتفكير، وكل قواعد Access مع سبب كل قاعدة، وتشخيص الأخطاء |
+| [docs/dev/Screens-Index.md](docs/dev/Screens-Index.md) | فهرس كل الشاشات (مولَّد) |
 
 ## مراحل التنفيذ
 
@@ -41,7 +52,8 @@
 | + | الرواتب: مسير شهري، التأمينات، خصم السلف، القيد والصرف | ✅ تمت الموافقة | [docs/29-Payroll.md](docs/29-Payroll.md) |
 | + | مراكز التكلفة والفروع: توزيع القيود وقائمة دخل لكل مركز | ✅ تمت الموافقة | [docs/30-Cost-Centers.md](docs/30-Cost-Centers.md) |
 | + | الموازنة التقديرية: شهرية لكل حساب ومركز، والمقارنة بالفعلي والانحراف | ✅ تمت الموافقة | [docs/31-Budget.md](docs/31-Budget.md) |
-| + | المصروفات المتكررة، وشاشة «المحاسبة والمالية» لكل شاشات الحسابات | ✅ بانتظار الموافقة | [docs/32-Recurring-Expenses.md](docs/32-Recurring-Expenses.md) |
+| + | المصروفات المتكررة، وشاشة «المحاسبة والمالية» لكل شاشات الحسابات | ✅ تمت الموافقة | [docs/32-Recurring-Expenses.md](docs/32-Recurring-Expenses.md) |
+| + | سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد | ✅ بانتظار الموافقة | [docs/33-Audit-Trail.md](docs/33-Audit-Trail.md) |
 
 ## هيكل المستودع
 

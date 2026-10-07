@@ -179,8 +179,10 @@ Public Function DeleteBankTx(ByVal BankTxID As Long) As String
     End If
     DeleteBankTx = ClosedPeriodProblem(d)
     If Len(DeleteBankTx) > 0 Then Exit Function
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("BankTransactions", "BankTxID", BankTxID)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM BankTransactions WHERE BankTxID = " & BankTxID, dbFailOnError
-    LogAction "BANK_TX_DELETE", "BankTransactions", CStr(BankTxID)
+    AuditDeleted "BANK_TX_DELETE", "BankTransactions", BankTxID, auditBefore
     DeleteBankTx = SyncJournal()
 End Function
 
@@ -353,8 +355,10 @@ Public Function DeleteReconciliation(ByVal ReconID As Long) As String
         DeleteReconciliation = "تُحذف التسوية الجارية فقط (أعد فتح المعتمدة أولًا)."
         Exit Function
     End If
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("BankReconciliations", "ReconciliationID", ReconID)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM BankReconciliations WHERE ReconciliationID = " & ReconID, dbFailOnError   ' clearings cascade
-    LogAction "BANK_RECON_DELETE", "BankReconciliations", CStr(ReconID)
+    AuditDeleted "BANK_RECON_DELETE", "BankReconciliations", ReconID, auditBefore
 End Function
 
 Public Function ChangedClearings(ByVal BankID As Long) As Long

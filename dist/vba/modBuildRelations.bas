@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 134
+Private Const EXPECTED_RELATION_COUNT As Long = 135
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -520,6 +520,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_StockCounts_EmployeeID", "Employees", "EmployeeID", "StockCounts", "EmployeeID", 0&)
     c.Add Array("FK_StockCountDetails_StockCountID", "StockCounts", "StockCountID", "StockCountDetails", "StockCountID", 4096&)
     c.Add Array("FK_StockCountDetails_ProductID", "Products", "ProductID", "StockCountDetails", "ProductID", 0&)
+    c.Add Array("FK_AuditChanges_LogID", "AuditLog", "LogID", "AuditChanges", "LogID", 4096&)
     Set RelationSpecs = c
 End Function
 

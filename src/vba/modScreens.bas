@@ -135,6 +135,7 @@ End Sub
 '                 J = accounting report: needs the JOURNAL permission; the entries are
 '                     brought up to date first (SyncJournal)
 '                 $ = shows cost / profit: needs the REPORTS_PROFIT permission
+'                 A = audit trail: needs the AUDIT_LOG permission
 '------------------------------------------------------------------------------
 Public Sub ReportCenterLoad(ByVal frm As Access.Form)
     Dim i As Long, r As Variant, rows As String
@@ -246,6 +247,10 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
     criteria = ""
     If HasNeed(needs, "$") And Not HasPermission("REPORTS_PROFIT") Then
         ShowWarning "هذا التقرير يعرض التكلفة والأرباح ويحتاج صلاحية «تقارير الأرباح والضريبة»."
+        Exit Function
+    End If
+    If HasNeed(needs, "A") And Not HasPermission("AUDIT_LOG") Then
+        ShowWarning "سجل التدقيق يحتاج صلاحية «سجل التدقيق»."
         Exit Function
     End If
     If HasNeed(needs, "#") And Not HasPermission("CASH_BOX") Then

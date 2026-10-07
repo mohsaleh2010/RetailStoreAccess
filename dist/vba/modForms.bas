@@ -128,13 +128,14 @@ Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
     If Not CheckUnique(frm) Then Exit Function
     If Not AssignSequence(frm) Then Exit Function      ' last: a refused save wastes no number
     If HasRecordField(frm, "UpdatedAt") Then frm("UpdatedAt").Value = Now
+    AuditFormBefore frm                                   ' the changed fields (modAudit)
     FormBeforeUpdate = True
 End Function
 
 Public Sub FormAfterUpdate(ByVal frm As Access.Form)
     Dim pk As String
     pk = TagValue(frm, "PK")
-    LogAction "SAVE", TagValue(frm, "TABLE"), CStr(Nz(frm(pk).Value, ""))
+    AuditFormAfter frm                                    ' who added / changed what (modAudit)
     If TagValue(frm, "TABLE") = "Accounts" Then RebuildAccountTree                    ' level and place in the tree
     RefreshList frm
     SetStatus frm, " „ «·Õ›Ÿ", CLR_SUCCESS
@@ -234,7 +235,7 @@ Public Function SaveRecord(ByVal frm As Access.Form) As Boolean
 End Function
 
 Private Sub DeleteRecord(ByVal frm As Access.Form)
-    Dim table As String, pk As String, id As Variant, activeField As String, errNo As Long
+    Dim table As String, pk As String, id As Variant, activeField As String, errNo As Long, before As Collection
 
     If frm.NewRecord Then
         frm.Undo
@@ -262,6 +263,7 @@ Private Sub DeleteRecord(ByVal frm As Access.Form)
     End If
     If Not AskYesNo("Â·  —Ìœ Õ–› Â–« «·”Ã· ‰Â«∆Ì«ø") Then Exit Sub
     If frm.Dirty Then frm.Undo
+    Set before = AuditSnapshot(table, pk, id)             ' the record as it was (modAudit)
 
     On Error Resume Next
     CurrentDb.Execute "DELETE FROM [" & table & "] WHERE [" & pk & "] = " & id, dbFailOnError
@@ -269,7 +271,7 @@ Private Sub DeleteRecord(ByVal frm As Access.Form)
     On Error GoTo 0
 
     If errNo = 0 Then
-        LogAction "DELETE", table, CStr(id)
+        AuditDeleted "DELETE", table, id, before
         frm.Requery
         RefreshList frm
         SetStatus frm, " „ «·Õ–›", CLR_SUCCESS

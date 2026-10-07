@@ -277,7 +277,8 @@ DATA_SCREENS: List[DataScreen] = [
         extra_buttons=[("btnSetPassword", "كلمة المرور", 'OpenScreen "frmChangePassword", 10, Me!EmployeeID'),
                        ("btnUnlock", "فك القفل", "UnlockUser Me"),
                        ("btnRoles", "صلاحيات الأدوار", 'OpenScreen "frmRoles", 10'),
-                       ("btnUserScreens", "صلاحيات الشاشات", 'OpenScreen "frmUserScreens", 10')],
+                       ("btnUserScreens", "صلاحيات الشاشات", 'OpenScreen "frmUserScreens", 10'),
+                       ("btnAuditLog", "سجل التدقيق", 'OpenScreen "frmAuditLog", 0')],
         fields=[
             Fld("EmployeeName", span=2), Fld("Username", hint="بدون مسافات، 3 أحرف على الأقل"),
             Fld("RoleID", rows=ROLE_ROWS, widths="0;4"),
@@ -495,7 +496,7 @@ SCREEN_PERMISSIONS = {
     "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
     "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
     "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL", "frmCostCenters": "JOURNAL", "frmBudget": "BUDGET",
-    "frmRecurring": "EXPENSES", "frmAccounting": "",
+    "frmRecurring": "EXPENSES", "frmAccounting": "", "frmAuditLog": "AUDIT_LOG",
 }
 
 
@@ -597,6 +598,7 @@ REPORTS: List[ReportEntry] = [
                 "rptCostCenterAccounts", "PJ"),
     ReportEntry("BUDGET_VS_ACTUAL", "الموازنة مقابل الفعلي", "BudgetVsActualQuery", "rptBudgetVsActual", "PJ"),
     ReportEntry("FIXED_ASSETS", "سجل الأصول الثابتة", "FixedAssetsQuery", "rptFixedAssets", "J"),
+    ReportEntry("AUDIT_TRAIL", "سجل التدقيق", "AuditTrailQuery", "rptAuditTrail", "DA", "LogDate"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
     ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),
@@ -1160,7 +1162,9 @@ def all_forms() -> List[FormModel]:
     from forms_payroll import payroll_forms
     from forms_budget import budget_forms
     from forms_accounting import accounting_forms
+    from forms_audit import audit_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
-            + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms())
+            + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms()
+            + audit_forms())

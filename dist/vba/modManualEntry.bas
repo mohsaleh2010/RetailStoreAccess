@@ -91,6 +91,7 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
+    Dim auditBefore As Collection
     If ManualEntryID = 0 Then
         Set h = db.OpenRecordset("ManualEntries", dbOpenDynaset)
         h.AddNew
@@ -105,6 +106,7 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
             PostManualEntry = "ÇáÞíÏ ÛíÑ ãæÌæÏ."
             Exit Function
         End If
+        Set auditBefore = AuditSnapshot("ManualEntries", "ManualEntryID", ManualEntryID)   ' modAudit
         h.Edit
         h!UpdatedAt = Now
         db.Execute "DELETE FROM ManualEntryLines WHERE ManualEntryID = " & ManualEntryID, dbFailOnError
@@ -116,6 +118,7 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
     h.Bookmark = h.LastModified
     NewID = h!ManualEntryID
     h.Close
+    If Not auditBefore Is Nothing Then AuditEdited "MANUAL_ENTRY_EDIT", "ManualEntries", "ManualEntryID", NewID, auditBefore
 
     Set rs = db.OpenRecordset("SELECT AccountCode, Debit, Credit, LineText, LineCenter FROM tmpManualLines " & _
                               "WHERE AccountCode Is Not Null ORDER BY LineNo", dbOpenSnapshot)
@@ -159,8 +162,10 @@ Public Function RemoveManualEntry(ByVal ManualEntryID As Long) As String
     RemoveManualEntry = ClosedPeriodProblem(DbValue("SELECT EntryDate FROM ManualEntries WHERE ManualEntryID = " & _
                                                     ManualEntryID))                                   ' modClosing
     If Len(RemoveManualEntry) > 0 Then Exit Function
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("ManualEntries", "ManualEntryID", ManualEntryID)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM ManualEntries WHERE ManualEntryID = " & ManualEntryID, dbFailOnError   ' lines cascade
-    LogAction "MANUAL_ENTRY_DELETE", "ManualEntries", CStr(ManualEntryID)
+    AuditDeleted "MANUAL_ENTRY_DELETE", "ManualEntries", ManualEntryID, auditBefore
 End Function
 
 Public Function JournalEntryOfManual(ByVal ManualEntryID As Long) As Variant

@@ -848,3 +848,49 @@ def build_appdata_vba() -> str:
         text = text.replace(key, value)
     assert not re.search(r"@@[A-Z_]+@@", text)
     return text
+
+
+def build_screens_md() -> str:
+    """docs/dev/Screens-Index.md: every screen, how it is opened, its table and its permission."""
+    models = F.all_forms()
+    perms = F.SCREEN_PERMISSIONS
+    subforms = {}
+    for m in models:
+        for c in m.controls:
+            if c.kind == "subform":
+                subforms[c.props.get("SourceObject")] = m.name
+    callers = {m.name: set() for m in models}
+    for m in models:
+        for target in re.findall(r'OpenScreen "(\w+)"', "\n".join(m.code)):
+            if target in callers and target != m.name:
+                callers[target].add(m.name)
+    for item in F.NAV_ITEMS:
+        if item.target in callers:
+            callers[item.target].add("القائمة الجانبية")
+
+    def kind(m):
+        if m.name in subforms:
+            return "شاشة فرعية في " + subforms[m.name]
+        if m.name == "frmMain":
+            return "الشاشة الرئيسية"
+        return "نافذة منبثقة" if m.popup else "شاشة كاملة"
+
+    def source(m):
+        found = re.search(r"\bTABLE=(\w+)", m.tag or "")
+        if found:
+            return found.group(1)
+        found = re.search(r"\bFROM (\w+)", m.record_source or "")
+        return found.group(1) if found else "-"
+
+    out = ["# فهرس الشاشات (Screens Index)", "",
+           "> ملف مُولَّد تلقائيًا من `tools/forms*.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.", "",
+           f"عدد الشاشات: **{len(models)}**. شرح طريقة بناء الشاشات في [03-Forms.md](03-Forms.md).", "",
+           "| # | الشاشة | العنوان | النوع | الجدول | الصلاحية | تُفتح من |",
+           "|---|---|---|---|---|---|---|"]
+    for i, m in enumerate(models, 1):
+        perm = perms.get(m.name)
+        perm = "مع الشاشة الأم" if m.name in subforms else ("الكل" if perm == "" else (perm or "-"))
+        opened = "، ".join(sorted(callers[m.name])) or "-"
+        out.append(f"| {i} | `{m.name}` | {m.caption} | {kind(m)} | {source(m)} | {perm} | {opened} |")
+    return "\n".join(out) + "\n"
+

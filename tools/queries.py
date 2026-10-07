@@ -1440,6 +1440,15 @@ SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS Ass
 FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)
      LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID"""),
 
+    Query("AuditTrailQuery", "سجل التدقيق: كل عملية بمن قام بها ووقتها، وحقولها بالقيمة قبل وبعد", """
+SELECT a.LogID, a.LogDate, a.EmployeeID, IIf(e.EmployeeName Is Null, '-', e.EmployeeName) AS UserName, a.ActionType,
+       IIf(a.ActionType = 'ADD', 'إضافة', IIf(a.ActionType = 'EDIT', 'تعديل', IIf(a.ActionType = 'DELETE', 'حذف',
+       IIf(a.ActionType = 'LOGIN', 'دخول', IIf(a.ActionType = 'LOGOUT', 'خروج', a.ActionType))))) AS ActionLabel,
+       a.ObjectName, a.RecordID, a.RecordLabel, a.ComputerName, a.Details,
+       c.LineNo, c.FieldCaption, c.OldValue, c.NewValue
+FROM (AuditLog AS a LEFT JOIN Employees AS e ON a.EmployeeID = e.EmployeeID)
+     LEFT JOIN AuditChanges AS c ON a.LogID = c.LogID"""),
+
     # employee advances: given by cash voucher (OUT ADVANCE), paid back in cash (IN ADVANCE) or deducted
     # in a posted payroll
     Query("qryAdvanceMoves", "حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب", """

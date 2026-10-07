@@ -140,12 +140,14 @@ Public Function SaveAsset(ByRef AssetID As Long, ByVal AssetName As String, ByVa
                                  BankID, CashBoxID, CounterAccount, OpeningAccum)
     End If
     If Len(SaveAsset) > 0 Then Exit Function
+    Dim auditBefore As Collection
     If AssetID = 0 Then
         Set rs = CurrentDb.OpenRecordset("FixedAssets", dbOpenDynaset)
         rs.AddNew
         rs!AssetCode = NextNumber("FIXED_ASSET")
         rs!Status = "ACTIVE"
     Else
+        Set auditBefore = AuditSnapshot("FixedAssets", "AssetID", AssetID)       ' modAudit
         Set rs = CurrentDb.OpenRecordset("SELECT * FROM FixedAssets WHERE AssetID = " & AssetID, dbOpenDynaset)
         rs.Edit
     End If
@@ -169,6 +171,7 @@ Public Function SaveAsset(ByRef AssetID As Long, ByVal AssetName As String, ByVa
     AssetID = rs!AssetID
     rs.Close
     LogAction "FIXED_ASSET", "FixedAssets", CStr(AssetID), AssetName
+    If Not auditBefore Is Nothing Then AuditEdited "FIXED_ASSET_EDIT", "FixedAssets", "AssetID", AssetID, auditBefore
     SyncJournal                                        ' the purchase entry
 End Function
 
@@ -176,8 +179,10 @@ Public Function DeleteAsset(ByVal AssetID As Long) As String
     DeleteAsset = CanAssets("frmAssets", "DELETE")
     If Len(DeleteAsset) = 0 Then DeleteAsset = AssetLocked(AssetID)
     If Len(DeleteAsset) > 0 Then Exit Function
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("FixedAssets", "AssetID", AssetID)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM FixedAssets WHERE AssetID = " & AssetID, dbFailOnError
-    LogAction "FIXED_ASSET_DELETE", "FixedAssets", CStr(AssetID)
+    AuditDeleted "FIXED_ASSET_DELETE", "FixedAssets", AssetID, auditBefore
     DeleteAsset = SyncJournal()
 End Function
 
@@ -366,8 +371,10 @@ Public Function DeleteLastRun() As String
     End If
     DeleteLastRun = ClosedPeriodProblem(DbValue("SELECT RunMonth FROM DepreciationRuns WHERE RunID = " & last))
     If Len(DeleteLastRun) > 0 Then Exit Function
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("DepreciationRuns", "RunID", last)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM DepreciationRuns WHERE RunID = " & last, dbFailOnError      ' lines cascade
-    LogAction "DEPRECIATION_DELETE", "DepreciationRuns", CStr(last)
+    AuditDeleted "DEPRECIATION_DELETE", "DepreciationRuns", last, auditBefore
     DeleteLastRun = SyncJournal()
 End Function
 

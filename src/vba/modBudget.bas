@@ -70,8 +70,10 @@ End Function
 Public Function DeleteBudget(ByVal BudgetID As Long) As String
     DeleteBudget = CanBudget("DELETE")
     If Len(DeleteBudget) > 0 Then Exit Function
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("Budgets", "BudgetID", BudgetID)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM Budgets WHERE BudgetID = " & BudgetID, dbFailOnError       ' lines cascade
-    LogAction "BUDGET_DELETE", "Budgets", CStr(BudgetID)
+    AuditDeleted "BUDGET_DELETE", "Budgets", BudgetID, auditBefore
 End Function
 
 Public Function AddAllAccounts(ByVal BudgetID As Long, ByRef Added As Long) As String
@@ -209,10 +211,13 @@ Public Sub BudgetLineCheck(ByVal lines As Access.Form, ByRef Cancel As Integer)
     If Len(msg) > 0 Then
         ShowWarning msg
         Cancel = True
+    Else
+        AuditFormBefore lines, "BudgetLines", "BudgetLineID"          ' modAudit
     End If
 End Sub
 
 Public Sub BudgetLineSaved(ByVal lines As Access.Form)
+    AuditFormAfter lines
     BudgetTotals lines.Parent
 End Sub
 

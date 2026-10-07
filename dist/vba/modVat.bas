@@ -142,11 +142,13 @@ Private Function WriteVatDraft(ByVal FromDate As Date, ByVal ToDate As Date, ByV
     d("CarriedCredit") = CCur(CarriedCredit)
     d("NetDue") = VatNetDue(d)
 
+    Dim auditBefore As Collection
     If VatReturnID = 0 Then
         Set rs = CurrentDb.OpenRecordset("VatReturns", dbOpenDynaset)
         rs.AddNew
         rs!Status = "DRAFT"
     Else
+        Set auditBefore = AuditSnapshot("VatReturns", "VatReturnID", VatReturnID)    ' modAudit
         Set rs = CurrentDb.OpenRecordset("SELECT * FROM VatReturns WHERE VatReturnID = " & VatReturnID, dbOpenDynaset)
         rs.Edit
     End If
@@ -162,6 +164,7 @@ Private Function WriteVatDraft(ByVal FromDate As Date, ByVal ToDate As Date, ByV
     VatReturnID = rs!VatReturnID
     rs.Close
     LogAction "VAT_DRAFT", "VatReturns", "VAT-" & Format$(ToDate, "yyyymmdd")
+    If Not auditBefore Is Nothing Then AuditEdited "VAT_EDIT", "VatReturns", "VatReturnID", VatReturnID, auditBefore
 End Function
 
 Public Function DeleteVatDraft(ByVal VatReturnID As Long) As String
@@ -171,8 +174,10 @@ Public Function DeleteVatDraft(ByVal VatReturnID As Long) As String
         DeleteVatDraft = " ıÕ–› «·„”Êœ… ›ﬁÿ. ·≈ﬁ—«— „⁄ „œ «” Œœ„ ´≈·€«¡ «·«⁄ „«œª √Ê·«."
         Exit Function
     End If
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("VatReturns", "VatReturnID", VatReturnID)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM VatReturns WHERE VatReturnID = " & VatReturnID, dbFailOnError
-    LogAction "VAT_DELETE", "VatReturns", CStr(VatReturnID)
+    AuditDeleted "VAT_DELETE", "VatReturns", VatReturnID, auditBefore
 End Function
 
 Private Function EntryOf(ByVal SourceType As String, ByVal VatReturnID As Long) As Variant

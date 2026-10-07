@@ -231,8 +231,10 @@ Public Function DeletePayroll(ByVal RunID As Long) As String
         DeletePayroll = "تُحذف المسودة فقط: ألغِ الترحيل أولًا."
     End If
     If Len(DeletePayroll) > 0 Then Exit Function
+    Dim auditBefore As Collection
+    Set auditBefore = AuditSnapshot("PayrollRuns", "PayrollRunID", RunID)        ' the record as it was (modAudit)
     CurrentDb.Execute "DELETE FROM PayrollRuns WHERE PayrollRunID = " & RunID, dbFailOnError       ' lines cascade
-    LogAction "PAYROLL_DELETE", "PayrollRuns", CStr(RunID)
+    AuditDeleted "PAYROLL_DELETE", "PayrollRuns", RunID, auditBefore
 End Function
 
 Public Function PayPayroll(ByVal RunID As Long, ByVal PaidDate As Variant, ByVal PaidFrom As String, _
