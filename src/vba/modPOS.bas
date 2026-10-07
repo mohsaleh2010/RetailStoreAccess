@@ -57,6 +57,13 @@ Public Sub EnsureLocalTables()
             "ScreenTitle TEXT(100), ModuleName TEXT(50), SortOrder INTEGER, HasAdd BIT, HasEdit BIT, HasDelete BIT, " & _
             "CanOpen BIT, CanAdd BIT, CanEdit BIT, CanDelete BIT, ActionsNote TEXT(60))", dbFailOnError
     End If
+    ' the open documents of each customer / supplier by age (modAging, frmAging, rptAging)
+    If Not LocalTableExists("tmpAging") Then
+        CurrentDb.Execute "CREATE TABLE tmpAging (LineNo COUNTER CONSTRAINT pkAging PRIMARY KEY, PartyKind TEXT(1), " & _
+            "PartyID LONG, PartyName TEXT(150), DocType TEXT(10), DocTypeName TEXT(30), DocID LONG, DocNo TEXT(30), " & _
+            "DocDate DATETIME, DueDate DATETIME, DaysLate LONG, OpenAmount CURRENCY, NotDue CURRENCY, Days30 CURRENCY, " & _
+            "Days60 CURRENCY, Days90 CURRENCY, Over90 CURRENCY, Credit CURRENCY, AsOfDate DATETIME)", dbFailOnError
+    End If
     ' Phase 7: purchase invoice lines and purchase return lines
     If Not LocalTableExists("tmpPurchaseLines") Then
         CurrentDb.Execute "CREATE TABLE tmpPurchaseLines (LineNo COUNTER CONSTRAINT pkPurchaseLines PRIMARY KEY, " & _

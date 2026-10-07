@@ -702,6 +702,122 @@ FROM qrySupplierLedger AS o
 WHERE o.SupplierID = QLong('SupplierID') AND o.EntryDate < QDate('PeriodStart')
 ORDER BY SortKey, EntryDate""", P + ["SupplierID"]),
 
+
+    # ======================================================= AGING (modAging)
+
+    Query("qryCustomerAllocSums", "مجموع ما رُبط من كل سند بالفواتير", """
+SELECT PaymentID, Sum(Amount) AS SumAllocated
+FROM CustomerAllocations
+GROUP BY PaymentID"""),
+    Query("qryCustomerPaymentFree", "سندات القبض: المربوط بالفواتير والباقي غير المربوط", f"""
+SELECT p.PaymentID, p.CustomerID AS PartyID, p.PaymentNumber, p.PaymentDate, p.Amount,
+       {nz("s.SumAllocated")} AS Allocated, p.Amount - {nz("s.SumAllocated")} AS Free
+FROM CustomerPayments AS p LEFT JOIN qryCustomerAllocSums AS s ON p.PaymentID = s.PaymentID"""),
+    Query("qryCustomerInvoiceAlloc", "مجموع ما رُبط بكل فاتورة من السندات", """
+SELECT SalesInvoiceID, Sum(Amount) AS SumAllocated
+FROM CustomerAllocations
+GROUP BY SalesInvoiceID"""),
+    Query("qryCustomerInvoiceReturns", "مرتجعات كل فاتورة المخصومة من رصيد الحساب", """
+SELECT SalesInvoiceID, Sum(TotalAmount - RefundedAmount) AS SumReturned
+FROM SalesReturns
+GROUP BY SalesInvoiceID"""),
+    Query("qryCustomerInvoiceFree", "الفواتير الآجلة: المتبقي وما رُبط بها وما يمكن ربطه", f"""
+SELECT h.SalesInvoiceID AS InvoiceID, h.CustomerID AS PartyID, h.InvoiceNumber, h.InvoiceDate, h.DueDate,
+       h.RemainingAmount, {nz("a.SumAllocated")} AS Allocated, {nz("r.SumReturned")} AS Returned,
+       h.RemainingAmount - {nz("a.SumAllocated")} - {nz("r.SumReturned")} AS Free
+FROM (SalesInvoices AS h LEFT JOIN qryCustomerInvoiceAlloc AS a ON h.SalesInvoiceID = a.SalesInvoiceID)
+     LEFT JOIN qryCustomerInvoiceReturns AS r ON h.SalesInvoiceID = r.SalesInvoiceID
+WHERE h.RemainingAmount > 0"""),
+
+    Query("qrySupplierAllocSums", "مجموع ما رُبط من كل سند بالفواتير", """
+SELECT PaymentID, Sum(Amount) AS SumAllocated
+FROM SupplierAllocations
+GROUP BY PaymentID"""),
+    Query("qrySupplierPaymentFree", "سندات الصرف: المربوط بالفواتير والباقي غير المربوط", f"""
+SELECT p.PaymentID, p.SupplierID AS PartyID, p.PaymentNumber, p.PaymentDate, p.Amount,
+       {nz("s.SumAllocated")} AS Allocated, p.Amount - {nz("s.SumAllocated")} AS Free
+FROM SupplierPayments AS p LEFT JOIN qrySupplierAllocSums AS s ON p.PaymentID = s.PaymentID"""),
+    Query("qrySupplierInvoiceAlloc", "مجموع ما رُبط بكل فاتورة من السندات", """
+SELECT PurchaseInvoiceID, Sum(Amount) AS SumAllocated
+FROM SupplierAllocations
+GROUP BY PurchaseInvoiceID"""),
+    Query("qrySupplierInvoiceReturns", "مرتجعات كل فاتورة المخصومة من رصيد الحساب", """
+SELECT PurchaseInvoiceID, Sum(TotalAmount - RefundedAmount) AS SumReturned
+FROM PurchaseReturns
+GROUP BY PurchaseInvoiceID"""),
+    Query("qrySupplierInvoiceFree", "الفواتير الآجلة: المتبقي وما رُبط بها وما يمكن ربطه", f"""
+SELECT h.PurchaseInvoiceID AS InvoiceID, h.SupplierID AS PartyID, h.InvoiceNumber, h.InvoiceDate, h.DueDate,
+       h.RemainingAmount, {nz("a.SumAllocated")} AS Allocated, {nz("r.SumReturned")} AS Returned,
+       h.RemainingAmount - {nz("a.SumAllocated")} - {nz("r.SumReturned")} AS Free
+FROM (PurchaseInvoices AS h LEFT JOIN qrySupplierInvoiceAlloc AS a ON h.PurchaseInvoiceID = a.PurchaseInvoiceID)
+     LEFT JOIN qrySupplierInvoiceReturns AS r ON h.PurchaseInvoiceID = r.PurchaseInvoiceID
+WHERE h.RemainingAmount > 0"""),
+
+    # what each party owes, by document (C customers, S suppliers); the due date is DueDate,
+    # else the document date + the terms of the party (modAging.DueOf)
+    Query("qryAgingDebits", "المستحق على كل عميل وللمورد بالمستند: الفواتير الآجلة والرصيد الافتتاحي", """
+SELECT 'C' AS PartyKind, h.CustomerID AS PartyID, 'INVOICE' AS DocType, h.SalesInvoiceID AS DocID,
+       h.InvoiceNumber AS DocNo, h.InvoiceDate AS DocDate, h.DueDate, c.PaymentTermsDays AS TermsDays,
+       h.RemainingAmount AS Amount
+FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
+WHERE h.RemainingAmount > 0
+UNION ALL
+SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, c.CreatedAt, 0, c.OpeningBalance
+FROM Customers AS c
+WHERE c.OpeningBalance > 0
+UNION ALL
+SELECT 'S', h.SupplierID, 'INVOICE', h.PurchaseInvoiceID, h.InvoiceNumber, h.InvoiceDate, h.DueDate,
+       s.PaymentTermsDays, h.RemainingAmount
+FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
+WHERE h.RemainingAmount > 0
+UNION ALL
+SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, s.CreatedAt, 0, s.OpeningBalance
+FROM Suppliers AS s
+WHERE s.OpeningBalance > 0"""),
+
+    # what pays it: returns (on their own invoice first), payments, a credit opening balance
+    Query("qryAgingCredits", "ما يسدد المستحق: المرتجعات (على فاتورتها أولًا) والسندات والرصيد الافتتاحي الدائن", """
+SELECT 'C' AS PartyKind, r.CustomerID AS PartyID, 'RETURN' AS CreditType, r.SalesReturnID AS CreditID,
+       r.ReturnNumber AS CreditNo, r.ReturnDate AS CreditDate, r.TotalAmount - r.RefundedAmount AS Amount,
+       r.SalesInvoiceID AS TargetID
+FROM SalesReturns AS r
+WHERE r.TotalAmount - r.RefundedAmount > 0
+UNION ALL
+SELECT 'C', p.CustomerID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, p.Amount, 0
+FROM CustomerPayments AS p
+UNION ALL
+SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, -c.OpeningBalance, 0
+FROM Customers AS c
+WHERE c.OpeningBalance < 0
+UNION ALL
+SELECT 'S', r.SupplierID, 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, r.TotalAmount - r.RefundedAmount,
+       r.PurchaseInvoiceID
+FROM PurchaseReturns AS r
+WHERE r.TotalAmount - r.RefundedAmount > 0
+UNION ALL
+SELECT 'S', p.SupplierID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, p.Amount, 0
+FROM SupplierPayments AS p
+UNION ALL
+SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, -s.OpeningBalance, 0
+FROM Suppliers AS s
+WHERE s.OpeningBalance < 0"""),
+
+    # the invoices a payment was linked to (an older payment made "for an invoice" counts as linked)
+    Query("qryAgingAllocations", "ربط السندات بالفواتير (ومنها السند المسجل عن فاتورة قبل الربط)", """
+SELECT 'C' AS PartyKind, p.CustomerID AS PartyID, a.PaymentID, a.SalesInvoiceID AS InvoiceID, a.Amount
+FROM CustomerAllocations AS a INNER JOIN CustomerPayments AS p ON a.PaymentID = p.PaymentID
+UNION ALL
+SELECT 'C', p.CustomerID, p.PaymentID, p.SalesInvoiceID, p.Amount
+FROM CustomerPayments AS p LEFT JOIN qryCustomerAllocSums AS s ON p.PaymentID = s.PaymentID
+WHERE p.SalesInvoiceID Is Not Null AND s.PaymentID Is Null
+UNION ALL
+SELECT 'S', p.SupplierID, a.PaymentID, a.PurchaseInvoiceID, a.Amount
+FROM SupplierAllocations AS a INNER JOIN SupplierPayments AS p ON a.PaymentID = p.PaymentID
+UNION ALL
+SELECT 'S', p.SupplierID, p.PaymentID, p.PurchaseInvoiceID, p.Amount
+FROM SupplierPayments AS p LEFT JOIN qrySupplierAllocSums AS s ON p.PaymentID = s.PaymentID
+WHERE p.PurchaseInvoiceID Is Not Null AND s.PaymentID Is Null"""),
+
     # ============================================================= EXPENSES
     Query("ExpensesQuery", "المصروفات خلال فترة", f"""
 SELECT e.ExpenseID, e.ExpenseNumber, e.ExpenseDate, t.ExpenseTypeName, e.Amount, e.Tax,

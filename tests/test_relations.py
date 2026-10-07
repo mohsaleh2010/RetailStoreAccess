@@ -20,7 +20,7 @@ class RelationDefinitionTests(unittest.TestCase):
         self.rels = R.relations()
 
     def test_count_and_names(self):
-        self.assertEqual(len(self.rels), 82)
+        self.assertEqual(len(self.rels), 88)
         names = [r.name for r in self.rels]
         self.assertEqual(len(names), len(set(names)))
         for n in names:
@@ -38,6 +38,8 @@ class RelationDefinitionTests(unittest.TestCase):
             ("Permissions", "RolePermissions"),
             ("JournalEntries", "JournalLines"),
             ("ManualEntries", "ManualEntryLines"),
+            ("CustomerPayments", "CustomerAllocations"),
+            ("SupplierPayments", "SupplierAllocations"),
             ("FiscalYearClosings", "FiscalYearClosingLines"),
         })
 

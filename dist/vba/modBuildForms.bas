@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -619,6 +619,8 @@ Private Sub BuildAllForms()
     BuildForm_frmFinancials
     BuildForm_frmPeriodClosing
     BuildForm_frmVatReturn
+    BuildForm_frmAging
+    BuildForm_frmAllocation
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -1258,7 +1260,7 @@ End Sub
 Private Sub BuildForm_frmCustomers()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmCustomers", "«·⁄„·«¡", "SELECT * FROM Customers", 15309, 9213, True, True, True, _
+    StartForm "frmCustomers", "«·⁄„·«¡", "SELECT * FROM Customers", 15309, 9780, True, True, True, _
               "KIND=LIST|TABLE=Customers|PK=CustomerID|LIST=SELECT t.CustomerID, t.CustomerName AS [«·⁄„Ì·], t.Mobile AS [«·ÃÊ«·], t.CurrentBalance AS [«·—’Ìœ] FROM Customers AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CustomerName|SEARCH=t.CustomerName,t.Mobile,t.Phone,t.VATNumber|ACTIVE=t.IsActive"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -1276,6 +1278,10 @@ Private Sub BuildForm_frmCustomers()
     c.OnClick = EP
     Set c = AddButton("btnStatement", "ﬂ‘› Õ”«»", 7937, 1021, 1701, 482, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnAging", "√⁄„«— «·œÌÊ‰", 9751, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAllocate", "—»ÿ «·”œ«œ", 11565, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "≈€·«ﬁ", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "»ÕÀ (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -1286,7 +1292,7 @@ Private Sub BuildForm_frmCustomers()
     SetCtlProp c, "DefaultValue", "False"
     c.AfterUpdate = EP
     Set c = AddLabel("lblShowInactive", "≈ŸÂ«— €Ì— «·‰‘ÿ", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
-    Set c = AddList("lstItems", 227, 3005, 4990, 5924, 4, "0;2495;1361;907", True)
+    Set c = AddList("lstItems", 227, 3005, 4990, 6491, 4, "0;2495;1361;907", True)
     c.AfterUpdate = EP
     Set c = AddText("CustomerName", "CustomerName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblCustomerName", "«”„ «·⁄„Ì· *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "CustomerName", 0)
@@ -1332,14 +1338,18 @@ Private Sub BuildForm_frmCustomers()
     SetCtlProp c, "ControlTipText", "0 = »œÊ‰ Õœ"
     SetCtlProp c, "StatusBarText", "0 = »œÊ‰ Õœ"
     Set c = AddLabel("lblCreditLimit", "Õœ «·«∆ „«‰", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "CreditLimit", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 6889)
-    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ⁄·Ï «·⁄„Ì·", 10376, 6804, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 7371, 7881, 907)
+    Set c = AddText("PaymentTermsDays", "PaymentTermsDays", 7201, 6804, 2948, 425)
+    SetCtlProp c, "ControlTipText", "«” Õﬁ«ﬁ «·›« Ê—… «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
+    SetCtlProp c, "StatusBarText", "«” Õﬁ«ﬁ «·›« Ê—… «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
+    Set c = AddLabel("lblPaymentTermsDays", "„œ… «·”œ«œ (ÌÊ„)", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 6889)
+    Set c = AddLabel("lblIsActive", "‰‘ÿ", 10376, 6804, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ⁄·Ï «·⁄„Ì·", 5443, 7371, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 7938, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
-    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 7371, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 8533, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 7938, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 9100, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -1387,6 +1397,12 @@ Private Sub BuildForm_frmCustomers()
     s = s & "Private Sub btnStatement_Click()" & vbCrLf
     s = s & "    PrintPartyStatement ""C"", Me!CustomerID" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAging_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAging"", 0, ""C|"" & Me!CustomerID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAllocate_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAllocation"", 0, ""C|"" & Me!CustomerID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -1408,7 +1424,7 @@ End Sub
 Private Sub BuildForm_frmSuppliers()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmSuppliers", "«·„Ê—œÊ‰", "SELECT * FROM Suppliers", 15309, 8222, True, True, True, _
+    StartForm "frmSuppliers", "«·„Ê—œÊ‰", "SELECT * FROM Suppliers", 15309, 8646, True, True, True, _
               "KIND=LIST|TABLE=Suppliers|PK=SupplierID|LIST=SELECT t.SupplierID, t.SupplierName AS [«·„Ê—œ], t.Mobile AS [«·ÃÊ«·], t.CurrentBalance AS [«·—’Ìœ] FROM Suppliers AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.SupplierName|SEARCH=t.SupplierName,t.ContactPerson,t.Mobile,t.VATNumber|ACTIVE=t.IsActive"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE77B), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -1426,6 +1442,10 @@ Private Sub BuildForm_frmSuppliers()
     c.OnClick = EP
     Set c = AddButton("btnStatement", "ﬂ‘› Õ”«»", 7937, 1021, 1701, 482, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnAging", "√⁄„«— «·œÌÊ‰", 9751, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnAllocate", "—»ÿ «·”œ«œ", 11565, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "≈€·«ﬁ", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "»ÕÀ (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -1436,7 +1456,7 @@ Private Sub BuildForm_frmSuppliers()
     SetCtlProp c, "DefaultValue", "False"
     c.AfterUpdate = EP
     Set c = AddLabel("lblShowInactive", "≈ŸÂ«— €Ì— «·‰‘ÿ", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
-    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 4, "0;2495;1361;907", True)
+    Set c = AddList("lstItems", 227, 3005, 4990, 5357, 4, "0;2495;1361;907", True)
     c.AfterUpdate = EP
     Set c = AddText("SupplierName", "SupplierName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblSupplierName", "«”„ «·„Ê—œ *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "SupplierName", 0)
@@ -1468,14 +1488,18 @@ Private Sub BuildForm_frmSuppliers()
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
     Set c = AddLabel("lblCurrentBalance", "«·—’Ìœ «·Õ«·Ì", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "CurrentBalance", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 5755)
-    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ··„Ê—œ", 10376, 5670, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 6237, 7881, 907)
+    Set c = AddText("PaymentTermsDays", "PaymentTermsDays", 7201, 5670, 2948, 425)
+    SetCtlProp c, "ControlTipText", "«” Õﬁ«ﬁ ›« Ê—… «·‘—«¡ «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
+    SetCtlProp c, "StatusBarText", "«” Õﬁ«ﬁ ›« Ê—… «·‘—«¡ «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
+    Set c = AddLabel("lblPaymentTermsDays", "„œ… «·”œ«œ (ÌÊ„)", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 5755)
+    Set c = AddLabel("lblIsActive", "‰‘ÿ", 10376, 5670, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ··„Ê—œ", 5443, 6237, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 6804, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
-    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 7399, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 7966, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -1522,6 +1546,12 @@ Private Sub BuildForm_frmSuppliers()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnStatement_Click()" & vbCrLf
     s = s & "    PrintPartyStatement ""S"", Me!SupplierID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAging_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAging"", 0, ""S|"" & Me!SupplierID" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAllocate_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmAllocation"", 0, ""S|"" & Me!SupplierID" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
@@ -2401,7 +2431,7 @@ End Sub
 Private Sub BuildForm_frmSettings()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmSettings", "«·≈⁄œ«œ« ", "SELECT * FROM Settings WHERE SettingID = 1", 15309, 9865, True, False, True, _
+    StartForm "frmSettings", "«·≈⁄œ«œ« ", "SELECT * FROM Settings WHERE SettingID = 1", 15309, 10432, True, False, True, _
               "KIND=SINGLE|TABLE=Settings|PK=SettingID"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -2484,12 +2514,16 @@ Private Sub BuildForm_frmSettings()
     SetCtlProp c, "ControlTipText", "⁄‰œ Õ›Ÿ ›« Ê—… «·»Ì⁄ √Ê «·„— Ã⁄"
     SetCtlProp c, "StatusBarText", "⁄‰œ Õ›Ÿ ›« Ê—… «·»Ì⁄ √Ê «·„— Ã⁄"
     Set c = AddLabel("lblInvoicePrintMode", "«·ÿ»«⁄… ⁄‰œ Õ›Ÿ «·›« Ê—…", 227, 7938, 2268, 425, 10, False, CLR_MUTED, "InvoicePrintMode", 0)
-    Set c = AddLabel("lblStoreNameNote", " ", 7768, 7938, 7314, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddCheck("AllowAdminCompanyName", "AllowAdminCompanyName", 2552, 8590)
+    Set c = AddText("CreditBlockDays", "CreditBlockDays", 10093, 7938, 4989, 425)
+    SetCtlProp c, "ControlTipText", "0 = ·« Ì Êﬁ› «·»Ì⁄ «·¬Ã· »”»» «· √ŒÌ—"
+    SetCtlProp c, "StatusBarText", "0 = ·« Ì Êﬁ› «·»Ì⁄ «·¬Ã· »”»» «· √ŒÌ—"
+    Set c = AddLabel("lblCreditBlockDays", "≈Ìﬁ«› «·»Ì⁄ «·¬Ã· ·⁄„Ì· „ √Œ— √ﬂÀ— „‰ (ÌÊ„)", 7768, 7938, 2268, 425, 10, False, CLR_MUTED, "CreditBlockDays", 0)
+    Set c = AddLabel("lblStoreNameNote", " ", 227, 8505, 14855, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddCheck("AllowAdminCompanyName", "AllowAdminCompanyName", 2552, 9157)
     SetCtlProp c, "ControlTipText", "ÌŸÂ— ··„»—„Ã ›ﬁÿ"
     SetCtlProp c, "StatusBarText", "ÌŸÂ— ··„»—„Ã ›ﬁÿ"
-    Set c = AddLabel("lblAllowAdminCompanyName", "«·”„«Õ ·„œÌ— «·‰Ÿ«„ » €ÌÌ— «”„ «·„Õ·", 227, 8505, 2268, 425, 10, False, CLR_MUTED, "AllowAdminCompanyName", 0)
-    Set c = AddLabel("lblStatus", " ", 227, 9185, 14855, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblAllowAdminCompanyName", "«·”„«Õ ·„œÌ— «·‰Ÿ«„ » €ÌÌ— «”„ «·„Õ·", 227, 9072, 2268, 425, 10, False, CLR_MUTED, "AllowAdminCompanyName", 0)
+    Set c = AddLabel("lblStatus", " ", 227, 9752, 14855, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -6646,4 +6680,142 @@ Private Sub BuildForm_frmVatReturn()
     Exit Sub
 EH:
     AbortForm "frmVatReturn", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmAging()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmAging", "√⁄„«— «·œÌÊ‰", "", 15309, 10433, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8A5), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "√⁄„«— «·œÌÊ‰", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "«·„ »ﬁÌ „‰ ﬂ· ›« Ê—… ¬Ã·… Õ”»  √ŒÌ—Â« ⁄‰  «—ÌŒ «·«” Õﬁ«ﬁ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboKind", "", 227, 1304, 1814, 454, "C;«·⁄„·«¡;S;«·„Ê—œÊ‰", 2, "0;1701")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblKind", "«·‰Ê⁄", 227, 992, 1814, 284, 9, False, CLR_MUTED, "cboKind", 0)
+    Set c = AddText("txtAsOf", "", 2155, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblAsOf", "›Ì ÌÊ„", 2155, 992, 1701, 284, 9, False, CLR_MUTED, "txtAsOf", 0)
+    Set c = AddButton("btnShow", "⁄—÷", 3969, 1304, 1361, 454, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblTotals", " ", 227, 1871, 14855, 340, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddList("lstParties", 227, 2268, 14855, 3629, 10, "0;3402;1474;1474;1361;1361;1361;1361;1361;1134", True)
+    c.AfterUpdate = EP
+    c.OnDblClick = EP
+    Set c = AddLabel("lblInfo", " ", 227, 5954, 14855, 312, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstDocs", 227, 6350, 14855, 2722, 7, "0;1701;1814;1474;1474;1361;1701", True)
+    Set c = AddButton("btnPrint", "ÿ»«⁄…", 227, 9412, 1361, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnAllocate", "—»ÿ «·”œ«œ »«·›Ê« Ì—", 1701, 9412, 2268, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnStatement", "ﬂ‘› Õ”«»", 4082, 9412, 1588, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13608, 9412, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    AgingLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstParties_AfterUpdate()" & vbCrLf
+    s = s & "    AgingPartyChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstParties_DblClick(Cancel As Integer)" & vbCrLf
+    s = s & "    AgingOpenAllocation Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboKind_AfterUpdate()" & vbCrLf
+    s = s & "    AgingRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnShow_Click()" & vbCrLf
+    s = s & "    AgingRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    PrintAging Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAllocate_Click()" & vbCrLf
+    s = s & "    AgingOpenAllocation Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStatement_Click()" & vbCrLf
+    s = s & "    AgingStatement Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmAging", s
+    Exit Sub
+EH:
+    AbortForm "frmAging", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmAllocation()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmAllocation", "—»ÿ «·”œ«œ »«·›Ê« Ì—", "", 14742, 10433, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 14742, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "—»ÿ «·”œ«œ »«·›Ê« Ì—", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "«Œ — «·”‰œ À„ «·›« Ê—… «· Ì Ì”œœÂ«. „« ·« Ìı—»ÿ Ì”œœ √ﬁœ„ «·›Ê« Ì— «” Õﬁ«ﬁ«", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboKind", "", 227, 1304, 1814, 454, "C;«·⁄„·«¡;S;«·„Ê—œÊ‰", 2, "0;1701")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblKind", "«·‰Ê⁄", 227, 992, 1814, 284, 9, False, CLR_MUTED, "cboKind", 0)
+    Set c = AddCombo("cboParty", "", 2155, 1304, 3969, 454, "", 2, "0;3856")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblParty", "«·⁄„Ì· / «·„Ê—œ", 2155, 992, 3969, 284, 9, False, CLR_MUTED, "cboParty", 0)
+    Set c = AddButton("btnAuto", "—»ÿ  ·ﬁ«∆Ì »«·√ﬁœ„", 6237, 1304, 2041, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblPayCap", "«·”‰œ« ", 227, 1928, 7087, 312, 10, True, CLR_TEXT, "", 0)
+    Set c = AddList("lstPayments", 227, 2268, 7087, 3629, 6, "0;1361;1247;1247;1247;1247", True)
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblInvCap", "«·›Ê« Ì— «·„› ÊÕ…", 7427, 1928, 7087, 312, 10, True, CLR_TEXT, "", 0)
+    Set c = AddList("lstInvoices", 7427, 2268, 7087, 3629, 7, "0;1247;1077;1077;1077;1134;1077", True)
+    c.AfterUpdate = EP
+    Set c = AddText("txtAmount", "", 227, 6350, 1814, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddLabel("lblAmount", "«·„»·€ «·„—»Êÿ", 227, 6038, 1814, 284, 9, False, CLR_MUTED, "txtAmount", 0)
+    Set c = AddButton("btnAllocate", "—»ÿ »«·›« Ê—…", 2155, 6350, 1814, 454, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblAllocCap", "«·—»ÿ «·„”Ã·", 227, 6974, 6804, 312, 10, True, CLR_TEXT, "", 0)
+    Set c = AddList("lstAllocations", 227, 7314, 14288, 2041, 5, "0;1701;1701;1701;1701", True)
+    Set c = AddButton("btnRemove", "≈·€«¡ «·—»ÿ", 227, 9526, 1701, 510, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13041, 9526, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    AllocationLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboParty_AfterUpdate()" & vbCrLf
+    s = s & "    AllocationRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstPayments_AfterUpdate()" & vbCrLf
+    s = s & "    AllocationPicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstInvoices_AfterUpdate()" & vbCrLf
+    s = s & "    AllocationPicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboKind_AfterUpdate()" & vbCrLf
+    s = s & "    AllocationKindChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAuto_Click()" & vbCrLf
+    s = s & "    DoAutoAllocate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAllocate_Click()" & vbCrLf
+    s = s & "    DoAllocate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    DoRemoveAllocation Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmAllocation", s
+    Exit Sub
+EH:
+    AbortForm "frmAllocation", Err.Number, Err.Description
 End Sub

@@ -135,6 +135,11 @@ class SourceTests(unittest.TestCase):
         db.con.execute("CREATE TABLE tmpLabelQueue (LineNo INTEGER PRIMARY KEY, ProductID INTEGER, "
                        "ProductName TEXT, LabelCode TEXT, Price NUMERIC, Copies INTEGER)")
         db.con.execute("CREATE TABLE tmpLabelNumbers (N INTEGER PRIMARY KEY)")
+        # the aging (modPOS.EnsureLocalTables, filled by modAging.FillAging)
+        db.con.execute("CREATE TABLE tmpAging (LineNo INTEGER PRIMARY KEY, PartyKind TEXT, PartyID INTEGER, "
+                       "PartyName TEXT, DocType TEXT, DocTypeName TEXT, DocID INTEGER, DocNo TEXT, DocDate TEXT, "
+                       "DueDate TEXT, DaysLate INTEGER, OpenAmount NUMERIC, NotDue NUMERIC, Days30 NUMERIC, "
+                       "Days60 NUMERIC, Days90 NUMERIC, Over90 NUMERIC, Credit NUMERIC, AsOfDate TEXT)")
         for m in MODELS:
             if m.record_source not in cls.columns:
                 src = m.record_source

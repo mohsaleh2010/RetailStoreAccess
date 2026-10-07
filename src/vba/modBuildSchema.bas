@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=33;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=10;ManualEntryLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=17;Roles=3;Permissions=28;RolePermissions=56;Employees=1;Screens=39;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=75;JournalSourceTypes=17;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=34;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=16;Customers=22;Products=23;SalesInvoices=36;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=19;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=10;ManualEntryLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=17;Roles=3;Permissions=28;RolePermissions=56;Employees=1;Screens=41;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=75;JournalSourceTypes=17;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -583,6 +583,8 @@ Private Sub CreateAllTables()
     CreateTable_PurchaseReturnDetails
     CreateTable_CustomerPayments
     CreateTable_SupplierPayments
+    CreateTable_CustomerAllocations
+    CreateTable_SupplierAllocations
     CreateTable_ExpenseTypes
     CreateTable_Expenses
     CreateTable_CashVouchers
@@ -674,6 +676,8 @@ Private Sub CreateTable_Settings()
              "", "", "السماح لمدير النظام بتغيير اسم المحل", ""
     AddField tdf, "ClosedThrough", "DATETIME", 0, False, "", _
              "", "", "الفترة مقفلة حتى (لا يُضاف ولا يُعدَّل مستند بتاريخ حتى هذا اليوم)", ""
+    AddField tdf, "CreditBlockDays", "INT", 0, False, "0", _
+             ">=0", "عدد الأيام لا يكون سالبًا", "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم)", ""
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
     EndTable tdf, "إعدادات المحل: سجل واحد فقط يحتوي بيانات المحل الضريبية وإعدادات التشغيل.", "", ""
 End Sub
@@ -954,6 +958,8 @@ Private Sub CreateTable_Suppliers()
              "", "", "الرصيد الافتتاحي", "موجب = المحل مدين للمورد"
     AddField tdf, "CurrentBalance", "MONEY", 0, True, "0", _
              "", "", "الرصيد الحالي", "قيمة مساعدة؛ المرجع هو SupplierBalanceQuery"
+    AddField tdf, "PaymentTermsDays", "INT", 0, False, "30", _
+             ">=0", "عدد الأيام لا يكون سالبًا", "مدة السداد (يوم)", ""
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
              "", "", "نشط", ""
     AddField tdf, "Notes", "MEMO", 0, False, "", _
@@ -1003,6 +1009,8 @@ Private Sub CreateTable_Customers()
              "", "", "يسمح بالبيع الآجل", ""
     AddField tdf, "CreditLimit", "MONEY", 0, True, "0", _
              ">=0", "المبلغ لا يمكن أن يكون سالبًا", "حد الائتمان", "0 = بدون حد"
+    AddField tdf, "PaymentTermsDays", "INT", 0, False, "30", _
+             ">=0", "عدد الأيام لا يكون سالبًا", "مدة السداد (يوم)", ""
     AddField tdf, "IsSystem", "BOOL", 0, False, "False", _
              "", "", "سجل نظام", ""
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
@@ -1108,6 +1116,8 @@ Private Sub CreateTable_SalesInvoices()
              ">=0", "المبلغ لا يمكن أن يكون سالبًا", "المبلغ المستلم", "ما سلّمه العميل نقدًا"
     AddField tdf, "ChangeDue", "MONEY", 0, True, "0", _
              ">=0", "المبلغ لا يمكن أن يكون سالبًا", "الباقي للعميل", ""
+    AddField tdf, "DueDate", "DATE", 0, False, "", _
+             "", "", "تاريخ الاستحقاق", ""
     AddField tdf, "Notes", "TEXT", 255, False, "", _
              "", "", "ملاحظات", ""
     AddField tdf, "InvoiceSubType", "TEXT", 10, True, """SIMPLIFIED""", _
@@ -1326,6 +1336,8 @@ Private Sub CreateTable_PurchaseInvoices()
              ">=0", "المبلغ لا يمكن أن يكون سالبًا", "المدفوع", ""
     AddField tdf, "RemainingAmount", "MONEY", 0, True, "0", _
              ">=0", "المبلغ لا يمكن أن يكون سالبًا", "المتبقي", "يُضاف إلى رصيد المورد"
+    AddField tdf, "DueDate", "DATE", 0, False, "", _
+             "", "", "تاريخ الاستحقاق", ""
     AddField tdf, "Notes", "TEXT", 255, False, "", _
              "", "", "ملاحظات", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
@@ -1503,6 +1515,48 @@ Private Sub CreateTable_SupplierPayments()
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
     EndTable tdf, "دفعات الموردين (سندات الصرف): المبالغ المدفوعة للموردين لسداد أرصدتهم.", "", ""
+End Sub
+
+Private Sub CreateTable_CustomerAllocations()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "CustomerAllocations") Then Exit Sub
+    AddField tdf, "AllocationID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "PaymentID", "LONG", 0, True, "", _
+             "", "", "سند القبض", ""
+    AddField tdf, "SalesInvoiceID", "LONG", 0, True, "", _
+             "", "", "الفاتورة", ""
+    AddField tdf, "Amount", "MONEY", 0, True, "0", _
+             ">0", "المبلغ يجب أن يكون أكبر من صفر", "المبلغ", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "الموظف", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "AllocationID", True, True, False
+    AddIndex tdf, "UX_PaymentID_SalesInvoiceID", "PaymentID,SalesInvoiceID", False, True, False
+    AddIndex tdf, "IX_SalesInvoiceID", "SalesInvoiceID", False, False, False
+    EndTable tdf, "ربط سندات القبض بالفواتير: كم من سند القبض سدّد كل فاتورة آجلة. ما لا يُربط بفاتورة يسدد أقدم الفواتير استحقاقًا.", "", ""
+End Sub
+
+Private Sub CreateTable_SupplierAllocations()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "SupplierAllocations") Then Exit Sub
+    AddField tdf, "AllocationID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "PaymentID", "LONG", 0, True, "", _
+             "", "", "سند الصرف", ""
+    AddField tdf, "PurchaseInvoiceID", "LONG", 0, True, "", _
+             "", "", "الفاتورة", ""
+    AddField tdf, "Amount", "MONEY", 0, True, "0", _
+             ">0", "المبلغ يجب أن يكون أكبر من صفر", "المبلغ", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "الموظف", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "AllocationID", True, True, False
+    AddIndex tdf, "UX_PaymentID_PurchaseInvoiceID", "PaymentID,PurchaseInvoiceID", False, True, False
+    AddIndex tdf, "IX_PurchaseInvoiceID", "PurchaseInvoiceID", False, False, False
+    EndTable tdf, "ربط سندات الصرف بفواتير الشراء: كم من سند الصرف سدّد كل فاتورة شراء آجلة. ما لا يُربط بفاتورة يسدد أقدم الفواتير استحقاقًا.", "", ""
 End Sub
 
 Private Sub CreateTable_ExpenseTypes()
@@ -2301,14 +2355,16 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmFinancials'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmFinancials', 'القوائم المالية', 'الحسابات', 300, 'REPORTS_PROFIT', False, False, False)"
     SeedRow "[ScreenName] = 'frmPeriodClosing'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPeriodClosing', 'إقفال الفترات والسنة المالية', 'الحسابات', 310, 'PERIOD_CLOSE', False, False, False)"
     SeedRow "[ScreenName] = 'frmVatReturn'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmVatReturn', 'إقرار ضريبة القيمة المضافة', 'الحسابات', 320, 'VAT_RETURN', True, True, True)"
-    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 330, 'REPORTS', False, False, False)"
-    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 340, Null, False, False, False)"
-    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 350, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 360, 'USERS', True, True, False)"
-    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 370, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 380, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 390, 'BACKUP', False, False, False)"
-    EndSeed "Screens", 39
+    SeedRow "[ScreenName] = 'frmAging'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAging', 'أعمار الديون (العملاء والموردون)', 'التقارير', 330, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmAllocation'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAllocation', 'ربط السداد بالفواتير', 'العملاء', 340, 'CUSTOMER_PAYMENTS', True, False, True)"
+    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 350, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 360, Null, False, False, False)"
+    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 370, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 380, 'USERS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 390, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 400, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 410, 'BACKUP', False, False, False)"
+    EndSeed "Screens", 41
 End Sub
 
 Private Sub Seed_Categories()

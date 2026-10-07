@@ -271,4 +271,6 @@ def all_reports() -> List[ReportModel]:
     from reports_catalog import catalog_reports
     from reports_cash import cash_reports
     from reports_journal import journal_reports
-    return sales_reports() + document_reports() + cash_reports() + journal_reports() + catalog_reports()
+    from reports_aging import aging_reports
+    return (sales_reports() + document_reports() + cash_reports() + journal_reports() + aging_reports()
+            + catalog_reports())

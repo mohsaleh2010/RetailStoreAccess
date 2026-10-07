@@ -215,6 +215,61 @@ class Store:
                        (paid, float(amount), account, vid))
         return self.sync_journal()
 
+    # ------------------------------------------------------------- aging (modAging.ComputeAging)
+    def aging(self, kind, as_of):
+        """Same steps as ComputeAging: what each customer (kind 'C') or supplier ('S') still owes, by
+        document, on the day as_of ('yyyy-mm-dd'). A return pays its own invoice first, a payment the
+        invoices it is linked to; everything else pays the oldest due documents first.
+        Returns (open documents [(party, doc_type, doc_id, doc_no, doc_date, due, open)], {party: credit})."""
+        import datetime as _dt
+        nxt = (_dt.date.fromisoformat(as_of[:10]) + _dt.timedelta(days=1)).isoformat()
+        rows = self.c.execute("SELECT PartyID, DocType, DocID, DocNo, DocDate, DueDate, TermsDays, Amount "
+                              "FROM qryAgingDebits WHERE PartyKind = ? AND DocDate < ?", (kind, nxt)).fetchall()
+        docs, open_ = [], {}
+        for party, dtype, did, dno, ddate, due, terms, amount in rows:
+            if due:
+                due = due[:10]
+            else:
+                due = (_dt.date.fromisoformat(ddate[:10]) + _dt.timedelta(days=terms or 0)).isoformat()
+            docs.append((party, dtype, did, dno, ddate[:10], due, ddate))
+            open_[(party, dtype, did)] = cur(amount)
+        docs.sort(key=lambda d: (d[0], d[5], d[6], d[1] != "OPENING", d[2]))
+        credits = self.c.execute("SELECT PartyID, CreditType, CreditID, Amount, TargetID FROM qryAgingCredits "
+                                 "WHERE PartyKind = ? AND CreditDate < ? ORDER BY CreditDate, CreditType, CreditID",
+                                 (kind, nxt)).fetchall()
+        links = {}
+        for pay, inv, amount in self.c.execute("SELECT PaymentID, InvoiceID, Amount FROM qryAgingAllocations "
+                                               "WHERE PartyKind = ? ORDER BY PaymentID, InvoiceID", (kind,)):
+            links.setdefault(pay, []).append((inv, cur(amount)))
+        pool = {}
+
+        def apply(party, inv, amount):                 # pays the invoice up to what is open, returns the rest
+            key = (party, "INVOICE", inv)
+            if key in open_:
+                part = min(amount, open_[key])
+                open_[key] -= part
+                amount -= part
+            return amount
+
+        for party, ctype, cid, amount, target in credits:     # 1. returns and linked payments
+            left = cur(amount)
+            if ctype == "RETURN":
+                left = apply(party, target, left)
+            elif ctype == "PAYMENT":
+                for inv, part in links.get(cid, []):
+                    part = min(part, left)
+                    left -= part - apply(party, inv, part)
+            pool[party] = pool.get(party, D(0)) + left
+        for party, dtype, did, *_ in docs:                     # 2. the rest: oldest due first
+            key = (party, dtype, did)
+            part = min(pool.get(party, D(0)), open_[key])
+            if part > 0:
+                open_[key] -= part
+                pool[party] -= part
+        result = [(d[0], d[1], d[2], d[3], d[4], d[5], open_[(d[0], d[1], d[2])]) for d in docs
+                  if open_[(d[0], d[1], d[2])] != 0]
+        return result, {p: v for p, v in pool.items() if v != 0}
+
     # ------------------------------------------------------------- journal (modJournal.SyncJournal)
     def sync_journal(self):
         """Same steps as SyncJournal: returns (added, updated, removed)."""

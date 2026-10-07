@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 82
+Private Const EXPECTED_RELATION_COUNT As Long = 88
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -426,6 +426,12 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_SupplierPayments_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "SupplierPayments", "PurchaseInvoiceID", 0&)
     c.Add Array("FK_SupplierPayments_EmployeeID", "Employees", "EmployeeID", "SupplierPayments", "EmployeeID", 0&)
     c.Add Array("FK_SupplierPayments_CashBoxID", "CashBoxes", "CashBoxID", "SupplierPayments", "CashBoxID", 0&)
+    c.Add Array("FK_CustomerAllocations_PaymentID", "CustomerPayments", "PaymentID", "CustomerAllocations", "PaymentID", 4096&)
+    c.Add Array("FK_CustomerAllocations_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "CustomerAllocations", "SalesInvoiceID", 0&)
+    c.Add Array("FK_CustomerAllocations_EmployeeID", "Employees", "EmployeeID", "CustomerAllocations", "EmployeeID", 0&)
+    c.Add Array("FK_SupplierAllocations_PaymentID", "SupplierPayments", "PaymentID", "SupplierAllocations", "PaymentID", 4096&)
+    c.Add Array("FK_SupplierAllocations_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "SupplierAllocations", "PurchaseInvoiceID", 0&)
+    c.Add Array("FK_SupplierAllocations_EmployeeID", "Employees", "EmployeeID", "SupplierAllocations", "EmployeeID", 0&)
     c.Add Array("FK_Expenses_ExpenseTypeID", "ExpenseTypes", "ExpenseTypeID", "Expenses", "ExpenseTypeID", 0&)
     c.Add Array("FK_Expenses_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "Expenses", "PaymentMethodID", 0&)
     c.Add Array("FK_Expenses_EmployeeID", "Employees", "EmployeeID", "Expenses", "EmployeeID", 0&)

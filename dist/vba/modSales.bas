@@ -357,6 +357,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     rs!TotalAmount = CalcTotal("TOTAL")
     rs!PaidAmount = paid
     rs!RemainingAmount = remaining
+    If remaining > 0 Then rs!DueDate = DueDateFor("C", CustomerID, invDate)       ' modAging
     rs!AmountTendered = tend
     rs!ChangeDue = change
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), paid)      ' modCash
@@ -672,7 +673,7 @@ End Sub
 '------------------------------------------------------------------------------
 Private Function CheckCustomer(ByVal CustomerID As Long, ByVal IsCredit As Boolean, _
                                ByVal Remaining As Currency) As String
-    Dim rs As DAO.Recordset
+    Dim rs As DAO.Recordset, blockDays As Long, late As Long
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM Customers WHERE CustomerID = " & CustomerID, dbOpenSnapshot)
     If rs.EOF Then
         CheckCustomer = "ÇáÚãíá ÛíÑ ãæÌæÏ."
@@ -686,6 +687,16 @@ Private Function CheckCustomer(ByVal CustomerID As Long, ByVal IsCredit As Boole
             CheckCustomer = "ÊÌÇæÒ ÍÏ ÇáÇÆÊãÇä: ÇáÑÕíÏ " & Format$(rs!CurrentBalance, "#,##0.00") & _
                             " + ÇáãÊÈŞí " & Format$(Remaining, "#,##0.00") & " ÃßÈÑ ãä ÇáÍÏ " & _
                             Format$(rs!CreditLimit, "#,##0.00") & "."
+        Else
+            ' Settings.CreditBlockDays: no more credit while an invoice is that late (modAging)
+            blockDays = Nz(SettingValue("CreditBlockDays"), 0)
+            If blockDays > 0 Then
+                late = MaxDaysLate("C", CustomerID, Date)
+                If late > blockDays Then
+                    CheckCustomer = "Úáì ÇáÚãíá «" & rs!CustomerName & "» İÇÊæÑÉ ãÊÃÎÑÉ " & late & " íæãğÇ Úä ÇÓÊÍŞÇŞåÇ " & _
+                                    "(ÇáÍÏ " & blockDays & " íæãğÇ)." & vbCrLf & "ÍÕøá ÇáãÊÃÎÑ ÃæáğÇ¡ Ãæ ÈöÚ äŞÏğÇ."
+                End If
+            End If
         End If
     End If
     rs.Close

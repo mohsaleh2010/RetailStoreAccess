@@ -106,6 +106,8 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmFinancials": ScreenPermission = "REPORTS_PROFIT"
         Case "frmPeriodClosing": ScreenPermission = "PERIOD_CLOSE"
         Case "frmVatReturn": ScreenPermission = "VAT_RETURN"
+        Case "frmAging": ScreenPermission = "REPORTS"
+        Case "frmAllocation": ScreenPermission = "CUSTOMER_PAYMENTS"
     End Select
 End Function
 

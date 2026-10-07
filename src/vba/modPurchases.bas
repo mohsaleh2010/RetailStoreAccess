@@ -134,6 +134,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     rs!TotalAmount = CalcTotal("TOTAL")
     rs!PaidAmount = paid
     rs!RemainingAmount = remaining
+    If remaining > 0 Then rs!DueDate = DueDateFor("S", SupplierID, docDate)       ' modAging
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), paid)      ' modCash
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     rs.Update

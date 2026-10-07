@@ -29,7 +29,8 @@
 | + | كشف الحساب ودفتر الأستاذ | ✅ تمت الموافقة | [docs/21-Ledger.md](docs/21-Ledger.md) |
 | + | القوائم المالية: قائمة الدخل والميزانية العمومية مع المقارنة | ✅ تمت الموافقة | [docs/22-Financial-Statements.md](docs/22-Financial-Statements.md) |
 | + | إقفال الفترات وإقفال السنة المالية | ✅ تمت الموافقة | [docs/23-Period-Closing.md](docs/23-Period-Closing.md) |
-| + | إقرار ضريبة القيمة المضافة: خانات نموذج الهيئة، الاعتماد وقيد التسوية، السداد | ✅ بانتظار الموافقة | [docs/24-VAT-Return.md](docs/24-VAT-Return.md) |
+| + | إقرار ضريبة القيمة المضافة: خانات نموذج الهيئة، الاعتماد وقيد التسوية، السداد | ✅ تمت الموافقة | [docs/24-VAT-Return.md](docs/24-VAT-Return.md) |
+| + | أعمار الديون، تاريخ الاستحقاق، ربط السداد بالفواتير، إيقاف الآجل للمتأخرين | ✅ بانتظار الموافقة | [docs/25-Aging.md](docs/25-Aging.md) |
 
 ## هيكل المستودع
 
@@ -102,6 +103,7 @@
 | 19 | `modFinancials` (دائمة) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal` |
 | 20 | `modClosing` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestJournal` |
 | 21 | `modVat` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal`, `TestQueries` |
+| 22 | `modAging` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestAging` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

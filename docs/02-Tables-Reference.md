@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **46** | عدد الحقول: **559**
+عدد الجداول: **48** | عدد الحقول: **576**
 
 ## الفهرس
 
@@ -32,26 +32,28 @@
 24. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
 25. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
 26. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
-27. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-28. [`Expenses`](#expenses) – المصروفات
-29. [`CashVouchers`](#cashvouchers) – سندات النقدية
-30. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-31. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-32. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-33. [`JournalEntries`](#journalentries) – قيود اليومية
-34. [`JournalLines`](#journallines) – أسطر القيود
-35. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-36. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-37. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-38. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-39. [`ManualEntries`](#manualentries) – القيود اليدوية
-40. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-41. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-42. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-43. [`StockCounts`](#stockcounts) – جلسات الجرد
-44. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-45. [`AuditLog`](#auditlog) – سجل العمليات
-46. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+27. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+28. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+29. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+30. [`Expenses`](#expenses) – المصروفات
+31. [`CashVouchers`](#cashvouchers) – سندات النقدية
+32. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+33. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+34. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+35. [`JournalEntries`](#journalentries) – قيود اليومية
+36. [`JournalLines`](#journallines) – أسطر القيود
+37. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+38. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+39. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+40. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+41. [`ManualEntries`](#manualentries) – القيود اليدوية
+42. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+43. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+44. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+45. [`StockCounts`](#stockcounts) – جلسات الجرد
+46. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+47. [`AuditLog`](#auditlog) – سجل العمليات
+48. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -92,6 +94,7 @@
 | 31 | InvoicePrintMode | Short Text | 10 | ✔ | `"PREVIEW"` | `In ("DIRECT","PREVIEW","NONE")` |  | الطباعة عند حفظ الفاتورة – DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة |
 | 32 | AllowAdminCompanyName | Yes/No |  |  | `False` |  |  | السماح لمدير النظام بتغيير اسم المحل |
 | 33 | ClosedThrough | Date/Time |  |  |  |  |  | الفترة مقفلة حتى (لا يُضاف ولا يُعدَّل مستند بتاريخ حتى هذا اليوم) |
+| 34 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -198,7 +201,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 39 سجل
+- بيانات أساسية: 41 سجل
 
 ## UserScreens
 
@@ -318,9 +321,10 @@
 | 10 | City | Short Text | 50 |  |  |  |  | المدينة |
 | 11 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – موجب = المحل مدين للمورد |
 | 12 | CurrentBalance | Currency |  | ✔ | `0` |  |  | الرصيد الحالي – قيمة مساعدة؛ المرجع هو SupplierBalanceQuery |
-| 13 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 14 | Notes | Long Text |  |  |  |  |  | ملاحظات |
-| 15 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 13 | PaymentTermsDays | Number (Integer) |  |  | `30` | `>=0` |  | مدة السداد (يوم) |
+| 14 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 15 | Notes | Long Text |  |  |  |  |  | ملاحظات |
+| 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `SupplierID`
 - فهرس عادي: `SupplierName`
@@ -349,10 +353,11 @@
 | 15 | CurrentBalance | Currency |  | ✔ | `0` |  |  | الرصيد الحالي – قيمة مساعدة؛ المرجع هو CustomerBalanceQuery |
 | 16 | AllowCredit | Yes/No |  |  | `True` |  |  | يسمح بالبيع الآجل |
 | 17 | CreditLimit | Currency |  | ✔ | `0` | `>=0` |  | حد الائتمان – 0 = بدون حد |
-| 18 | IsSystem | Yes/No |  |  | `False` |  |  | سجل نظام |
-| 19 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 20 | Notes | Long Text |  |  |  |  |  | ملاحظات |
-| 21 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 18 | PaymentTermsDays | Number (Integer) |  |  | `30` | `>=0` |  | مدة السداد (يوم) |
+| 19 | IsSystem | Yes/No |  |  | `False` |  |  | سجل نظام |
+| 20 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 21 | Notes | Long Text |  |  |  |  |  | ملاحظات |
+| 22 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `CustomerID`
 - فهرس عادي: `CustomerName`
@@ -416,25 +421,26 @@
 | 14 | RemainingAmount | Currency |  | ✔ | `0` | `>=0` |  | المتبقي – يُضاف إلى رصيد العميل في البيع الآجل |
 | 15 | AmountTendered | Currency |  | ✔ | `0` | `>=0` |  | المبلغ المستلم – ما سلّمه العميل نقدًا |
 | 16 | ChangeDue | Currency |  | ✔ | `0` | `>=0` |  | الباقي للعميل |
-| 17 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 18 | InvoiceSubType | Short Text | 10 | ✔ | `"SIMPLIFIED"` | `In ("SIMPLIFIED","STANDARD")` |  | نوع الفاتورة الضريبية – مبسطة للأفراد B2C، ضريبية للمنشآت B2B (للعميل رقم ضريبي) |
-| 19 | InvoiceTypeCode | Short Text | 3 | ✔ | `"388"` | `In ("388","381","383")` |  | رمز نوع المستند |
-| 20 | InvoiceUUID | Short Text | 36 |  |  |  |  | المعرّف الفريد UUID |
-| 21 | ICV | Number (Long) |  |  |  |  |  | عدّاد الفواتير ICV – تسلسل مشترك لكل المستندات المرسلة للهيئة |
-| 22 | InvoiceHash | Short Text | 255 |  |  |  |  | بصمة المستند |
-| 23 | PreviousInvoiceHash | Short Text | 255 |  |  |  |  | بصمة المستند السابق |
-| 24 | QRCodeData | Long Text |  |  |  |  |  | بيانات رمز QR |
-| 25 | ZatcaStatus | Short Text | 20 | ✔ | `"NOT_SENT"` | `In ("NOT_SENT","PENDING","REPORTED","CLEARED","WARNING","REJECTED")` |  | حالة الإرسال للهيئة |
-| 26 | ZatcaSubmittedAt | Date/Time |  |  |  |  |  | تاريخ الإرسال للهيئة |
-| 27 | ZatcaResponse | Long Text |  |  |  |  |  | رد الهيئة |
-| 28 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
-| 29 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 30 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
-| 31 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
-| 32 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
-| 33 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
-| 34 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
-| 35 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
+| 17 | DueDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ الاستحقاق |
+| 18 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 19 | InvoiceSubType | Short Text | 10 | ✔ | `"SIMPLIFIED"` | `In ("SIMPLIFIED","STANDARD")` |  | نوع الفاتورة الضريبية – مبسطة للأفراد B2C، ضريبية للمنشآت B2B (للعميل رقم ضريبي) |
+| 20 | InvoiceTypeCode | Short Text | 3 | ✔ | `"388"` | `In ("388","381","383")` |  | رمز نوع المستند |
+| 21 | InvoiceUUID | Short Text | 36 |  |  |  |  | المعرّف الفريد UUID |
+| 22 | ICV | Number (Long) |  |  |  |  |  | عدّاد الفواتير ICV – تسلسل مشترك لكل المستندات المرسلة للهيئة |
+| 23 | InvoiceHash | Short Text | 255 |  |  |  |  | بصمة المستند |
+| 24 | PreviousInvoiceHash | Short Text | 255 |  |  |  |  | بصمة المستند السابق |
+| 25 | QRCodeData | Long Text |  |  |  |  |  | بيانات رمز QR |
+| 26 | ZatcaStatus | Short Text | 20 | ✔ | `"NOT_SENT"` | `In ("NOT_SENT","PENDING","REPORTED","CLEARED","WARNING","REJECTED")` |  | حالة الإرسال للهيئة |
+| 27 | ZatcaSubmittedAt | Date/Time |  |  |  |  |  | تاريخ الإرسال للهيئة |
+| 28 | ZatcaResponse | Long Text |  |  |  |  |  | رد الهيئة |
+| 29 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
+| 30 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 31 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
+| 32 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
+| 33 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
+| 34 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
+| 35 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
+| 36 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -553,9 +559,10 @@
 | 13 | TotalAmount | Currency |  | ✔ | `0` | `>=0` |  | الإجمالي شامل الضريبة – TaxableAmount + Tax |
 | 14 | PaidAmount | Currency |  | ✔ | `0` | `>=0` |  | المدفوع |
 | 15 | RemainingAmount | Currency |  | ✔ | `0` | `>=0` |  | المتبقي – يُضاف إلى رصيد المورد |
-| 16 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 17 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 18 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المدفوع نقدًا يخرج من هذا الصندوق |
+| 16 | DueDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ الاستحقاق |
+| 17 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 18 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 19 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المدفوع نقدًا يخرج من هذا الصندوق |
 
 - المفتاح الأساسي: `PurchaseInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -677,6 +684,40 @@
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
 - فهرس عادي: `PaymentDate`
+
+## CustomerAllocations
+
+**ربط سندات القبض بالفواتير** – كم من سند القبض سدّد كل فاتورة آجلة. ما لا يُربط بفاتورة يسدد أقدم الفواتير استحقاقًا.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **AllocationID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | PaymentID | Number (Long) |  | ✔ |  |  | `CustomerPayments.PaymentID` | سند القبض |
+| 3 | SalesInvoiceID | Number (Long) |  | ✔ |  |  | `SalesInvoices.SalesInvoiceID` | الفاتورة |
+| 4 | Amount | Currency |  | ✔ | `0` | `>0` |  | المبلغ |
+| 5 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `AllocationID`
+- فهرس فريد: `PaymentID, SalesInvoiceID`
+- فهرس عادي: `SalesInvoiceID`
+
+## SupplierAllocations
+
+**ربط سندات الصرف بفواتير الشراء** – كم من سند الصرف سدّد كل فاتورة شراء آجلة. ما لا يُربط بفاتورة يسدد أقدم الفواتير استحقاقًا.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **AllocationID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | PaymentID | Number (Long) |  | ✔ |  |  | `SupplierPayments.PaymentID` | سند الصرف |
+| 3 | PurchaseInvoiceID | Number (Long) |  | ✔ |  |  | `PurchaseInvoices.PurchaseInvoiceID` | الفاتورة |
+| 4 | Amount | Currency |  | ✔ | `0` | `>0` |  | المبلغ |
+| 5 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `AllocationID`
+- فهرس فريد: `PaymentID, PurchaseInvoiceID`
+- فهرس عادي: `PurchaseInvoiceID`
 
 ## ExpenseTypes
 

@@ -178,7 +178,9 @@ DATA_SCREENS: List[DataScreen] = [
         search=["t.CustomerName", "t.Mobile", "t.Phone", "t.VATNumber"],
         active="t.IsActive",
         extra_buttons=[("btnPayment", "سند قبض", 'OpenScreen "frmCustomerPayment", 6, Me!CustomerID'),
-                       ("btnStatement", "كشف حساب", 'PrintPartyStatement "C", Me!CustomerID')],
+                       ("btnStatement", "كشف حساب", 'PrintPartyStatement "C", Me!CustomerID'),
+                       ("btnAging", "أعمار الديون", 'OpenScreen "frmAging", 0, "C|" & Me!CustomerID'),
+                       ("btnAllocate", "ربط السداد", 'OpenScreen "frmAllocation", 0, "C|" & Me!CustomerID')],
         fields=[
             Fld("CustomerName", span=2), Fld("Mobile"), Fld("Phone"),
             Fld("Email"), Fld("VATNumber", hint="للعملاء المنشآت (فاتورة ضريبية)"),
@@ -186,6 +188,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("BuildingNo"), Fld("PostalCode"), Fld("Address", span=2),
             Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
             Fld("AllowCredit"), Fld("CreditLimit", hint="0 = بدون حد"),
+            Fld("PaymentTermsDays", hint="استحقاق الفاتورة الآجلة = تاريخها + هذه المدة"),
             Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق على العميل"),
             Fld("Notes", span=2),
         ]),
@@ -197,12 +200,15 @@ DATA_SCREENS: List[DataScreen] = [
         search=["t.SupplierName", "t.ContactPerson", "t.Mobile", "t.VATNumber"],
         active="t.IsActive",
         extra_buttons=[("btnPayment", "سند صرف", 'OpenScreen "frmSupplierPayment", 7, Me!SupplierID'),
-                       ("btnStatement", "كشف حساب", 'PrintPartyStatement "S", Me!SupplierID')],
+                       ("btnStatement", "كشف حساب", 'PrintPartyStatement "S", Me!SupplierID'),
+                       ("btnAging", "أعمار الديون", 'OpenScreen "frmAging", 0, "S|" & Me!SupplierID'),
+                       ("btnAllocate", "ربط السداد", 'OpenScreen "frmAllocation", 0, "S|" & Me!SupplierID')],
         fields=[
             Fld("SupplierName", span=2), Fld("ContactPerson"), Fld("Mobile"),
             Fld("Phone"), Fld("Email"), Fld("VATNumber"), Fld("CRNumber"),
             Fld("City"), Info("lblSupplierNote", " "), Fld("Address", span=2),
             Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
+            Fld("PaymentTermsDays", hint="استحقاق فاتورة الشراء الآجلة = تاريخها + هذه المدة"),
             Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق للمورد"),
             Fld("Notes", span=2),
         ]),
@@ -336,6 +342,7 @@ DATA_SCREENS: List[DataScreen] = [
                 button=("btnBrowseImages", "استعراض", 'BrowseFolder Me, "ImagesFolder"')),
             Fld("InvoicePrintMode", rows=INVOICE_PRINT_MODES, widths="0;6",
                 hint="عند حفظ فاتورة البيع أو المرتجع"),
+            Fld("CreditBlockDays", hint="0 = لا يتوقف البيع الآجل بسبب التأخير"),
             Info("lblStoreNameNote"),
             Fld("AllowAdminCompanyName", hint="يظهر للمبرمج فقط"),
         ]),
@@ -411,6 +418,7 @@ SCREEN_PERMISSIONS = {
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
     "frmPeriodClosing": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN",
+    "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
 }
 
 
@@ -1060,6 +1068,7 @@ def all_forms() -> List[FormModel]:
     from forms_touch import touch_forms
     from forms_cash import cash_forms
     from forms_journal import journal_forms
+    from forms_aging import aging_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
-            + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms())
+            + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms())

@@ -21,10 +21,11 @@ Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtl
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
-    "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVat" & _
-    "ReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJourna" & _
-    "lSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeR" & _
-    "ollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvo" & _
+    "iceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryDashboardTopProducts,qrySalesDocPr" & _
+    "int,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
+    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryB" & _
+    "alanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -690,6 +691,19 @@ Private Sub CreateAllQueries()
     Q_qrySupplierLedgerTotals
     Q_SupplierBalanceQuery
     Q_SupplierStatementQuery
+    Q_qryCustomerAllocSums
+    Q_qryCustomerPaymentFree
+    Q_qryCustomerInvoiceAlloc
+    Q_qryCustomerInvoiceReturns
+    Q_qryCustomerInvoiceFree
+    Q_qrySupplierAllocSums
+    Q_qrySupplierPaymentFree
+    Q_qrySupplierInvoiceAlloc
+    Q_qrySupplierInvoiceReturns
+    Q_qrySupplierInvoiceFree
+    Q_qryAgingDebits
+    Q_qryAgingCredits
+    Q_qryAgingAllocations
     Q_ExpensesQuery
     Q_ExpensesByTypeQuery
     Q_qryProfitSales
@@ -1159,6 +1173,162 @@ Private Sub Q_SupplierStatementQuery()
     s = s & "WHERE o.SupplierID = QLong('SupplierID') AND o.EntryDate < QDate('PeriodStart')" & vbCrLf
     s = s & "ORDER BY SortKey, EntryDate" & vbCrLf
     SaveQuery "SupplierStatementQuery", "كشف حساب مورد لفترة: رصيد سابق ثم الحركات", s
+End Sub
+
+Private Sub Q_qryCustomerAllocSums()
+    Dim s As String
+    s = "SELECT PaymentID, Sum(Amount) AS SumAllocated" & vbCrLf
+    s = s & "FROM CustomerAllocations" & vbCrLf
+    s = s & "GROUP BY PaymentID" & vbCrLf
+    SaveQuery "qryCustomerAllocSums", "مجموع ما رُبط من كل سند بالفواتير", s
+End Sub
+
+Private Sub Q_qryCustomerPaymentFree()
+    Dim s As String
+    s = "SELECT p.PaymentID, p.CustomerID AS PartyID, p.PaymentNumber, p.PaymentDate, p.Amount," & vbCrLf
+    s = s & "       CCur(Nz(s.SumAllocated, 0)) AS Allocated, p.Amount - CCur(Nz(s.SumAllocated, 0)) AS Free" & vbCrLf
+    s = s & "FROM CustomerPayments AS p LEFT JOIN qryCustomerAllocSums AS s ON p.PaymentID = s.PaymentID" & vbCrLf
+    SaveQuery "qryCustomerPaymentFree", "سندات القبض: المربوط بالفواتير والباقي غير المربوط", s
+End Sub
+
+Private Sub Q_qryCustomerInvoiceAlloc()
+    Dim s As String
+    s = "SELECT SalesInvoiceID, Sum(Amount) AS SumAllocated" & vbCrLf
+    s = s & "FROM CustomerAllocations" & vbCrLf
+    s = s & "GROUP BY SalesInvoiceID" & vbCrLf
+    SaveQuery "qryCustomerInvoiceAlloc", "مجموع ما رُبط بكل فاتورة من السندات", s
+End Sub
+
+Private Sub Q_qryCustomerInvoiceReturns()
+    Dim s As String
+    s = "SELECT SalesInvoiceID, Sum(TotalAmount - RefundedAmount) AS SumReturned" & vbCrLf
+    s = s & "FROM SalesReturns" & vbCrLf
+    s = s & "GROUP BY SalesInvoiceID" & vbCrLf
+    SaveQuery "qryCustomerInvoiceReturns", "مرتجعات كل فاتورة المخصومة من رصيد الحساب", s
+End Sub
+
+Private Sub Q_qryCustomerInvoiceFree()
+    Dim s As String
+    s = "SELECT h.SalesInvoiceID AS InvoiceID, h.CustomerID AS PartyID, h.InvoiceNumber, h.InvoiceDate, h.DueDate," & vbCrLf
+    s = s & "       h.RemainingAmount, CCur(Nz(a.SumAllocated, 0)) AS Allocated, CCur(Nz(r.SumReturned, 0)) AS Returned," & vbCrLf
+    s = s & "       h.RemainingAmount - CCur(Nz(a.SumAllocated, 0)) - CCur(Nz(r.SumReturned, 0)) AS Free" & vbCrLf
+    s = s & "FROM (SalesInvoices AS h LEFT JOIN qryCustomerInvoiceAlloc AS a ON h.SalesInvoiceID = a.SalesInvoiceID)" & vbCrLf
+    s = s & "     LEFT JOIN qryCustomerInvoiceReturns AS r ON h.SalesInvoiceID = r.SalesInvoiceID" & vbCrLf
+    s = s & "WHERE h.RemainingAmount > 0" & vbCrLf
+    SaveQuery "qryCustomerInvoiceFree", "الفواتير الآجلة: المتبقي وما رُبط بها وما يمكن ربطه", s
+End Sub
+
+Private Sub Q_qrySupplierAllocSums()
+    Dim s As String
+    s = "SELECT PaymentID, Sum(Amount) AS SumAllocated" & vbCrLf
+    s = s & "FROM SupplierAllocations" & vbCrLf
+    s = s & "GROUP BY PaymentID" & vbCrLf
+    SaveQuery "qrySupplierAllocSums", "مجموع ما رُبط من كل سند بالفواتير", s
+End Sub
+
+Private Sub Q_qrySupplierPaymentFree()
+    Dim s As String
+    s = "SELECT p.PaymentID, p.SupplierID AS PartyID, p.PaymentNumber, p.PaymentDate, p.Amount," & vbCrLf
+    s = s & "       CCur(Nz(s.SumAllocated, 0)) AS Allocated, p.Amount - CCur(Nz(s.SumAllocated, 0)) AS Free" & vbCrLf
+    s = s & "FROM SupplierPayments AS p LEFT JOIN qrySupplierAllocSums AS s ON p.PaymentID = s.PaymentID" & vbCrLf
+    SaveQuery "qrySupplierPaymentFree", "سندات الصرف: المربوط بالفواتير والباقي غير المربوط", s
+End Sub
+
+Private Sub Q_qrySupplierInvoiceAlloc()
+    Dim s As String
+    s = "SELECT PurchaseInvoiceID, Sum(Amount) AS SumAllocated" & vbCrLf
+    s = s & "FROM SupplierAllocations" & vbCrLf
+    s = s & "GROUP BY PurchaseInvoiceID" & vbCrLf
+    SaveQuery "qrySupplierInvoiceAlloc", "مجموع ما رُبط بكل فاتورة من السندات", s
+End Sub
+
+Private Sub Q_qrySupplierInvoiceReturns()
+    Dim s As String
+    s = "SELECT PurchaseInvoiceID, Sum(TotalAmount - RefundedAmount) AS SumReturned" & vbCrLf
+    s = s & "FROM PurchaseReturns" & vbCrLf
+    s = s & "GROUP BY PurchaseInvoiceID" & vbCrLf
+    SaveQuery "qrySupplierInvoiceReturns", "مرتجعات كل فاتورة المخصومة من رصيد الحساب", s
+End Sub
+
+Private Sub Q_qrySupplierInvoiceFree()
+    Dim s As String
+    s = "SELECT h.PurchaseInvoiceID AS InvoiceID, h.SupplierID AS PartyID, h.InvoiceNumber, h.InvoiceDate, h.DueDate," & vbCrLf
+    s = s & "       h.RemainingAmount, CCur(Nz(a.SumAllocated, 0)) AS Allocated, CCur(Nz(r.SumReturned, 0)) AS Returned," & vbCrLf
+    s = s & "       h.RemainingAmount - CCur(Nz(a.SumAllocated, 0)) - CCur(Nz(r.SumReturned, 0)) AS Free" & vbCrLf
+    s = s & "FROM (PurchaseInvoices AS h LEFT JOIN qrySupplierInvoiceAlloc AS a ON h.PurchaseInvoiceID = a.PurchaseInvoiceID)" & vbCrLf
+    s = s & "     LEFT JOIN qrySupplierInvoiceReturns AS r ON h.PurchaseInvoiceID = r.PurchaseInvoiceID" & vbCrLf
+    s = s & "WHERE h.RemainingAmount > 0" & vbCrLf
+    SaveQuery "qrySupplierInvoiceFree", "الفواتير الآجلة: المتبقي وما رُبط بها وما يمكن ربطه", s
+End Sub
+
+Private Sub Q_qryAgingDebits()
+    Dim s As String
+    s = "SELECT 'C' AS PartyKind, h.CustomerID AS PartyID, 'INVOICE' AS DocType, h.SalesInvoiceID AS DocID," & vbCrLf
+    s = s & "       h.InvoiceNumber AS DocNo, h.InvoiceDate AS DocDate, h.DueDate, c.PaymentTermsDays AS TermsDays," & vbCrLf
+    s = s & "       h.RemainingAmount AS Amount" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE h.RemainingAmount > 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, c.CreatedAt, 0, c.OpeningBalance" & vbCrLf
+    s = s & "FROM Customers AS c" & vbCrLf
+    s = s & "WHERE c.OpeningBalance > 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', h.SupplierID, 'INVOICE', h.PurchaseInvoiceID, h.InvoiceNumber, h.InvoiceDate, h.DueDate," & vbCrLf
+    s = s & "       s.PaymentTermsDays, h.RemainingAmount" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE h.RemainingAmount > 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, s.CreatedAt, 0, s.OpeningBalance" & vbCrLf
+    s = s & "FROM Suppliers AS s" & vbCrLf
+    s = s & "WHERE s.OpeningBalance > 0" & vbCrLf
+    SaveQuery "qryAgingDebits", "المستحق على كل عميل وللمورد بالمستند: الفواتير الآجلة والرصيد الافتتاحي", s
+End Sub
+
+Private Sub Q_qryAgingCredits()
+    Dim s As String
+    s = "SELECT 'C' AS PartyKind, r.CustomerID AS PartyID, 'RETURN' AS CreditType, r.SalesReturnID AS CreditID," & vbCrLf
+    s = s & "       r.ReturnNumber AS CreditNo, r.ReturnDate AS CreditDate, r.TotalAmount - r.RefundedAmount AS Amount," & vbCrLf
+    s = s & "       r.SalesInvoiceID AS TargetID" & vbCrLf
+    s = s & "FROM SalesReturns AS r" & vbCrLf
+    s = s & "WHERE r.TotalAmount - r.RefundedAmount > 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'C', p.CustomerID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, p.Amount, 0" & vbCrLf
+    s = s & "FROM CustomerPayments AS p" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, -c.OpeningBalance, 0" & vbCrLf
+    s = s & "FROM Customers AS c" & vbCrLf
+    s = s & "WHERE c.OpeningBalance < 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', r.SupplierID, 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, r.TotalAmount - r.RefundedAmount," & vbCrLf
+    s = s & "       r.PurchaseInvoiceID" & vbCrLf
+    s = s & "FROM PurchaseReturns AS r" & vbCrLf
+    s = s & "WHERE r.TotalAmount - r.RefundedAmount > 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', p.SupplierID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, p.Amount, 0" & vbCrLf
+    s = s & "FROM SupplierPayments AS p" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, -s.OpeningBalance, 0" & vbCrLf
+    s = s & "FROM Suppliers AS s" & vbCrLf
+    s = s & "WHERE s.OpeningBalance < 0" & vbCrLf
+    SaveQuery "qryAgingCredits", "ما يسدد المستحق: المرتجعات (على فاتورتها أولًا) والسندات والرصيد الافتتاحي الدائن", s
+End Sub
+
+Private Sub Q_qryAgingAllocations()
+    Dim s As String
+    s = "SELECT 'C' AS PartyKind, p.CustomerID AS PartyID, a.PaymentID, a.SalesInvoiceID AS InvoiceID, a.Amount" & vbCrLf
+    s = s & "FROM CustomerAllocations AS a INNER JOIN CustomerPayments AS p ON a.PaymentID = p.PaymentID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'C', p.CustomerID, p.PaymentID, p.SalesInvoiceID, p.Amount" & vbCrLf
+    s = s & "FROM CustomerPayments AS p LEFT JOIN qryCustomerAllocSums AS s ON p.PaymentID = s.PaymentID" & vbCrLf
+    s = s & "WHERE p.SalesInvoiceID Is Not Null AND s.PaymentID Is Null" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', p.SupplierID, a.PaymentID, a.PurchaseInvoiceID, a.Amount" & vbCrLf
+    s = s & "FROM SupplierAllocations AS a INNER JOIN SupplierPayments AS p ON a.PaymentID = p.PaymentID" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', p.SupplierID, p.PaymentID, p.PurchaseInvoiceID, p.Amount" & vbCrLf
+    s = s & "FROM SupplierPayments AS p LEFT JOIN qrySupplierAllocSums AS s ON p.PaymentID = s.PaymentID" & vbCrLf
+    s = s & "WHERE p.PurchaseInvoiceID Is Not Null AND s.PaymentID Is Null" & vbCrLf
+    SaveQuery "qryAgingAllocations", "ربط السندات بالفواتير (ومنها السند المسجل عن فاتورة قبل الربط)", s
 End Sub
 
 Private Sub Q_ExpensesQuery()
