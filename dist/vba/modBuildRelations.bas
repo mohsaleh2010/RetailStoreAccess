@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 109
+Private Const EXPECTED_RELATION_COUNT As Long = 119
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -442,6 +442,16 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_Cheques_SupplierID", "Suppliers", "SupplierID", "Cheques", "SupplierID", 0&)
     c.Add Array("FK_Cheques_BankID", "Banks", "BankID", "Cheques", "BankID", 0&)
     c.Add Array("FK_Cheques_EmployeeID", "Employees", "EmployeeID", "Cheques", "EmployeeID", 0&)
+    c.Add Array("FK_FixedAssets_AssetAccount", "Accounts", "AccountCode", "FixedAssets", "AssetAccount", 0&)
+    c.Add Array("FK_FixedAssets_BankID", "Banks", "BankID", "FixedAssets", "BankID", 0&)
+    c.Add Array("FK_FixedAssets_CashBoxID", "CashBoxes", "CashBoxID", "FixedAssets", "CashBoxID", 0&)
+    c.Add Array("FK_FixedAssets_CounterAccount", "Accounts", "AccountCode", "FixedAssets", "CounterAccount", 0&)
+    c.Add Array("FK_FixedAssets_DisposalBankID", "Banks", "BankID", "FixedAssets", "DisposalBankID", 0&)
+    c.Add Array("FK_FixedAssets_DisposalCashBoxID", "CashBoxes", "CashBoxID", "FixedAssets", "DisposalCashBoxID", 0&)
+    c.Add Array("FK_FixedAssets_EmployeeID", "Employees", "EmployeeID", "FixedAssets", "EmployeeID", 0&)
+    c.Add Array("FK_DepreciationRuns_EmployeeID", "Employees", "EmployeeID", "DepreciationRuns", "EmployeeID", 0&)
+    c.Add Array("FK_AssetDepreciations_RunID", "DepreciationRuns", "RunID", "AssetDepreciations", "RunID", 4096&)
+    c.Add Array("FK_AssetDepreciations_AssetID", "FixedAssets", "AssetID", "AssetDepreciations", "AssetID", 0&)
     c.Add Array("FK_BankReconciliations_BankID", "Banks", "BankID", "BankReconciliations", "BankID", 0&)
     c.Add Array("FK_BankReconciliations_EmployeeID", "Employees", "EmployeeID", "BankReconciliations", "EmployeeID", 0&)
     c.Add Array("FK_BankClearings_ReconciliationID", "BankReconciliations", "ReconciliationID", "BankClearings", "ReconciliationID", 4096&)

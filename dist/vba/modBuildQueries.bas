@@ -24,8 +24,9 @@ Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySa
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvo" & _
     "iceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryDashboardTopProducts,qrySalesDocPr" & _
     "int,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
-    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,Tr" & _
-    "ialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod" & _
+    ",TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchas" & _
+    "eReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -751,11 +752,16 @@ Private Sub CreateAllQueries()
     Q_qryJournalYearClose
     Q_qryJournalVatReturn
     Q_qryJournalCheque
+    Q_qryJournalAsset
+    Q_qryDepreciationLines
+    Q_qryJournalDepreciation
     Q_qryJournalBankTx
     Q_qryBankItemSums
     Q_qryBankItems
     Q_qryBankTotals
     Q_BankBalanceQuery
+    Q_qryAssetDepTotals
+    Q_FixedAssetsQuery
     Q_ChequesQuery
     Q_JournalLinesQuery
     Q_qryJournalEntryPrint
@@ -1747,6 +1753,16 @@ Private Sub Q_qryCashMovements()
     s = s & "FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID" & vbCrLf
     s = s & "WHERE t.TxType = 'WITHDRAW'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT a.CashBoxID, a.PurchaseDate, 'ASSET', '‘—«¡ √’· À«» ', a.AssetCode, a.AssetName, a.Notes," & vbCrLf
+    s = s & "       CCur(0), a.Cost + a.InputVAT, a.EmployeeID" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.SourceType = 'CASHBOX'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT a.DisposalCashBoxID, a.DisposalDate, 'ASSET_SALE', '»Ì⁄ √’· À«» ', a.AssetCode, a.AssetName, a.Notes," & vbCrLf
+    s = s & "       a.DisposalProceeds, CCur(0), a.EmployeeID" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND a.DisposalTo = 'CASHBOX' AND a.DisposalProceeds <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT b.CashBoxID, b.OpeningDate, 'OPENING', '—’Ìœ «›  «ÕÌ', '-', b.BoxName, b.Notes," & vbCrLf
     s = s & "       b.OpeningBalance, CCur(0), Null" & vbCrLf
     s = s & "FROM CashBoxes AS b" & vbCrLf
@@ -2223,6 +2239,66 @@ Private Sub Q_qryJournalCheque()
     SaveQuery "qryJournalCheque", "√”ÿ— ﬁÌÊœ «·‘Ìﬂ« : «·«” ·«„ √Ê «·≈’œ«—° À„ «· Õ’Ì· √Ê «·«— œ«œ", s
 End Sub
 
+Private Sub Q_qryJournalAsset()
+    Dim s As String
+    s = "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, a.Cost AS Debit, CCur(0) AS Credit, a.AssetName AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.Cost <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 1500 AS AccountCode, a.InputVAT AS Debit, CCur(0) AS Credit, '÷—Ì»… «·„œŒ·« ' AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.InputVAT <> 0 AND a.SourceType <> 'OPENING'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900))) AS AccountCode, CCur(0) AS Debit, IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) AS Credit, a.Notes AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, a.OpeningAccumDep AS Credit, '≈Â·«ﬂ ”«»ﬁ' AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.SourceType = 'OPENING' AND a.OpeningAccumDep <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, 1790 AS AccountCode, a.DisposalAccumDep AS Debit, CCur(0) AS Credit, '„Ã„⁄ ≈Â·«ﬂ «·√’·' AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND a.DisposalAccumDep <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID) AS AccountCode, a.DisposalProceeds AS Debit, CCur(0) AS Credit, 'À„‰ »Ì⁄ «·√’·' AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND a.DisposalProceeds <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, a.Cost AS Credit, a.AssetName AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 4500 AS AccountCode, CCur(0) AS Debit, (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Credit, '—»Õ »Ì⁄ «·√’·' AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) > 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 5 AS LineOrder, 5650 AS AccountCode, -(a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Debit, CCur(0) AS Credit, 'Œ”«—… »Ì⁄ / «” »⁄«œ «·√’·' AS LineText" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) < 0" & vbCrLf
+    SaveQuery "qryJournalAsset", "√”ÿ— ﬁÌÊœ «ﬁ ‰«¡ «·√’Ê· «·À«» … Ê»Ì⁄Â« √Ê «” »⁄«œÂ«", s
+End Sub
+
+Private Sub Q_qryDepreciationLines()
+    Dim s As String
+    s = "SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName" & vbCrLf
+    s = s & "FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.RunID)" & vbCrLf
+    s = s & "     INNER JOIN FixedAssets AS a ON d.AssetID = a.AssetID" & vbCrLf
+    SaveQuery "qryDepreciationLines", "√”ÿ— ﬁÌÊœ «·≈Â·«ﬂ «·‘Â—Ì… „⁄ «”„ «·√’·", s
+End Sub
+
+Private Sub Q_qryJournalDepreciation()
+    Dim s As String
+    s = "SELECT 'DEPRECIATION' AS SourceType, d.RunID AS SourceID, d.RunNumber AS SourceNumber, d.RunMonth AS SourceDate, '«·≈Â·«ﬂ «·‘Â—Ì' AS Party, 2 * d.LineNo - 1 AS LineOrder, 5600 AS AccountCode, d.Amount AS Debit, CCur(0) AS Credit, d.AssetName AS LineText" & vbCrLf
+    s = s & "FROM qryDepreciationLines AS d" & vbCrLf
+    s = s & "WHERE d.Amount <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'DEPRECIATION' AS SourceType, d.RunID AS SourceID, d.RunNumber AS SourceNumber, d.RunMonth AS SourceDate, '«·≈Â·«ﬂ «·‘Â—Ì' AS Party, 2 * d.LineNo AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, d.Amount AS Credit, d.AssetName AS LineText" & vbCrLf
+    s = s & "FROM qryDepreciationLines AS d" & vbCrLf
+    s = s & "WHERE d.Amount <> 0" & vbCrLf
+    SaveQuery "qryJournalDepreciation", "√”ÿ— ﬁÌÊœ «·≈Â·«ﬂ «·‘Â—Ì…: „’—Ê› «·≈Â·«ﬂ Ê„Ã„⁄ «·≈Â·«ﬂ ·ﬂ· √’·", s
+End Sub
+
 Private Sub Q_qryJournalBankTx()
     Dim s As String
     s = "SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, '≈Ìœ«⁄ ‰ﬁœÌ…' AS LineText" & vbCrLf
@@ -2317,6 +2393,26 @@ Private Sub Q_BankBalanceQuery()
     s = s & "FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID" & vbCrLf
     s = s & "ORDER BY k.BankName" & vbCrLf
     SaveQuery "BankBalanceQuery", "√—’œ… «·»‰Êﬂ ›Ì «·œ›« —", s
+End Sub
+
+Private Sub Q_qryAssetDepTotals()
+    Dim s As String
+    s = "SELECT AssetID, Sum(Amount) AS SumDep, Count(*) AS DepCount" & vbCrLf
+    s = s & "FROM AssetDepreciations" & vbCrLf
+    s = s & "GROUP BY AssetID" & vbCrLf
+    SaveQuery "qryAssetDepTotals", "„Ã„Ê⁄ ≈Â·«ﬂ ﬂ· √’· ›Ì «·ﬁÌÊœ «·‘Â—Ì…", s
+End Sub
+
+Private Sub Q_FixedAssetsQuery()
+    Dim s As String
+    s = "SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS AssetGroup, a.PurchaseDate, a.Cost," & vbCrLf
+    s = s & "       a.SalvageValue, a.UsefulLifeMonths, a.DepStartDate, a.Status, IIf(a.Status = 'ACTIVE', 'ﬁ«∆„', '„” »⁄œ') AS StatusName," & vbCrLf
+    s = s & "       a.OpeningAccumDep + CCur(Nz(t.SumDep, 0)) AS AccumDep, a.Cost - a.OpeningAccumDep - CCur(Nz(t.SumDep, 0)) AS BookValue," & vbCrLf
+    s = s & "       Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2) AS MonthlyDep, CCur(Nz(t.DepCount, 0)) AS DepMonths," & vbCrLf
+    s = s & "       a.DisposalDate, a.DisposalProceeds" & vbCrLf
+    s = s & "FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)" & vbCrLf
+    s = s & "     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID" & vbCrLf
+    SaveQuery "FixedAssetsQuery", "”Ã· «·√’Ê· «·À«» …: «· ﬂ·›… Ê„Ã„⁄ «·≈Â·«ﬂ Ê«·ﬁÌ„… «·œ› —Ì… Ê«·ﬁ”ÿ «·‘Â—Ì", s
 End Sub
 
 Private Sub Q_ChequesQuery()

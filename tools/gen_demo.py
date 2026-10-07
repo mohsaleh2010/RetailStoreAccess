@@ -116,6 +116,11 @@ def step_lines(step, sale_no, purchase_no):
         out.append(f'    Check PostCashVoucher("{kind}", BoxOfType({vba_str(step["box"])}), Null, {vba_str(step["category"])}, '
                    f'{money(step["amount"])}, {vba_str(step["party"])}, {vba_str(step["text"])}, Null, id), "سند نقدية"')
         out.append('    MoveDoc "CASH_VOUCHER", id, when')
+    elif op == "asset":
+        out.append("    id = 0")
+        out.append(f'    Check SaveAsset(id, {vba_str(step["name"])}, {step["account"]}, DateValue(when), {money(step["cost"])}, 0, '
+                   f'{money(step["salvage"])}, {step["life"]}, DateValue(when), "OPENING", Null, Null, Null, '
+                   f'{money(step["opening"])}, "{DD.DEMO_MARK}"), "أصل ثابت"')
     elif op == "closing":
         keep = money(step["keep"])
         out.append(f'    counted = CashBoxBalance(BoxOfType({vba_str(step["box"])})) - {money(step["short"])}')

@@ -438,6 +438,7 @@ SCREEN_PERMISSIONS = {
     "frmPeriodClosing": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN",
     "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
     "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
+    "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
 }
 
 
@@ -533,6 +534,7 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("GENERAL_LEDGER", "دفتر الأستاذ (كل الحسابات)", "GeneralLedgerQuery", "rptGeneralLedger", "PJ"),
     ReportEntry("INCOME_STATEMENT", "قائمة الدخل", "IncomeStatementQuery", "rptIncomeStatement", "PJ$F"),
     ReportEntry("BALANCE_SHEET", "الميزانية العمومية", "BalanceSheetQuery", "rptBalanceSheet", "PJ$F"),
+    ReportEntry("FIXED_ASSETS", "سجل الأصول الثابتة", "FixedAssetsQuery", "rptFixedAssets", "J"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
     ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),
@@ -1089,7 +1091,8 @@ def all_forms() -> List[FormModel]:
     from forms_journal import journal_forms
     from forms_aging import aging_forms
     from forms_bank import bank_forms
+    from forms_assets import asset_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
-            + bank_forms())
+            + bank_forms() + asset_forms())

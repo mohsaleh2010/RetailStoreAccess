@@ -414,6 +414,15 @@ Private Sub DemoSteps5()
     SetDemoUser ""
     Check PostCustomerPayment(CustomerIDOf("„ƒ””… «·÷Ì«›… ·· „ÊÌ‰"), 600.00, 1, "œ›⁄… „‰ «·Õ”«»", id), "”‰œ ﬁ»÷"
     MoveDoc "CUSTOMER_PAYMENT", id, when
+    ' --- asset (day -2)
+    when = DemoWhen(2, 11)
+    SetDemoUser ""
+    id = 0
+    Check SaveAsset(id, "√ÃÂ“… ‰ﬁ«ÿ «·»Ì⁄ Êÿ«»⁄«  «·≈Ì’«·« ", 1720, DateValue(when), 6000.00, 0, 600.00, 36, DateValue(when), "OPENING", Null, Null, Null, 1500.00, "DEMO"), "√’· À«» "
+End Sub
+
+Private Sub DemoSteps6()
+    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency, counted As Currency
     ' --- stock_count (day -2)
     when = DemoWhen(2, 21)
     SetDemoUser ""
@@ -421,10 +430,6 @@ Private Sub DemoSteps5()
     CurrentDb.Execute "UPDATE StockCountDetails SET ActualQuantity = SystemQuantity + (-1) WHERE StockCountID = " & id & " AND ProductID = " & ProductIDOf("6281000000199"), dbFailOnError
     Check PostStockCount(id, False, adjusted, netValue), " —ÕÌ· «·Ã—œ"
     MoveDoc "STOCK_COUNT", id, when
-End Sub
-
-Private Sub DemoSteps6()
-    Dim when As Date, id As Long, refNo As String, adjusted As Long, netValue As Currency, counted As Currency
     ' --- sale (day -1)
     when = DemoWhen(1, 20)
     SetDemoUser "cashier2"
@@ -637,7 +642,7 @@ Public Function VerifyDemoData() As Boolean
     Expect DbValue("SELECT COUNT(*) FROM StockCounts WHERE Status = 'POSTED'") = 1, "Ã—œ „ı—Õ¯· Ê«Õœ"
     Expect DbValue("SELECT COUNT(*) FROM IntegrityCheckQuery") = 0, "›Õ’ ”·«„… «·»Ì«‰« : ·«  ÊÃœ √Ì „‘ﬂ·…"
     n = Nz(DbValue("SELECT COUNT(*) FROM JournalEntries"), 0)
-    Expect n = 34, "34 ﬁÌœ ÌÊ„Ì… («·›⁄·Ì: " & n & ")"
+    Expect n = 35, "35 ﬁÌœ ÌÊ„Ì… («·›⁄·Ì: " & n & ")"
     ExpectJournal "SALE", 10, CCur(-2289.51)
     ExpectJournal "SALES_RETURN", 1, CCur(22.00)
     ExpectJournal "PURCHASE", 5, CCur(8115.50)
@@ -659,6 +664,9 @@ Public Function VerifyDemoData() As Boolean
     ExpectJournal "BANK_TX", 0, CCur(0.00)
     ExpectJournal "CHEQUE", 0, CCur(0.00)
     ExpectJournal "CHEQUE_STATUS", 0, CCur(0.00)
+    ExpectJournal "ASSET", 1, CCur(0.00)
+    ExpectJournal "ASSET_DISPOSAL", 0, CCur(0.00)
+    ExpectJournal "DEPRECIATION", 0, CCur(0.00)
     Expect DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit") = 0, "ﬂ· «·ﬁÌÊœ „ Ê«“‰…"
     Expect AccountBalance(1300) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Customers"), 0), "Õ”«» –„„ «·⁄„·«¡ = √—’œ… «·⁄„·«¡"
     Expect Round(AccountBalance(1400), 2) = CCur(5799.27), "Õ”«» «·„Œ“Ê‰ ›Ì «·ﬁÌÊœ = 5799.27 («·›⁄·Ì: " & _
@@ -743,6 +751,9 @@ Public Function RemoveDemoData() As Boolean
     inTrans = True
     db.Execute "DELETE FROM JournalLines", dbFailOnError
     db.Execute "DELETE FROM JournalEntries", dbFailOnError
+    db.Execute "DELETE FROM AssetDepreciations", dbFailOnError
+    db.Execute "DELETE FROM DepreciationRuns", dbFailOnError
+    db.Execute "DELETE FROM FixedAssets", dbFailOnError
     db.Execute "DELETE FROM CashVouchers", dbFailOnError
     db.Execute "DELETE FROM CashClosings", dbFailOnError
     db.Execute "DELETE FROM SalesReturnDetails", dbFailOnError
@@ -783,6 +794,8 @@ Public Function RemoveDemoData() As Boolean
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_TRANSFER'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_CLOSING'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'JOURNAL'", dbFailOnError
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'FIXED_ASSET'", dbFailOnError
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'DEPRECIATION'", dbFailOnError
     db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PRODUCT_CODE' AND (SELECT COUNT(*) FROM Products) = 0", dbFailOnError
     ws.CommitTrans
     inTrans = False

@@ -166,6 +166,13 @@ LIST_SPECS: List[ListSpec] = [
         Col("المقبوضات", "Receipts", 3.4, MONEY, True), Col("المدفوعات", "Payments", 3.4, MONEY, True),
         Col("رصيد آخر اليوم", "ClosingBalance", 3.6, MONEY), Col("الحركات", "MoveCount", 2.2, INT, True)],
         [("CashDay", False)], no_data="لا توجد حركة نقدية في هذه الفترة."),
+    ListSpec("FIXED_ASSETS", [
+        Col("الرقم", "AssetCode", 2.0), Col("الأصل", "AssetName", 5.2, grow=True), Col("المجموعة", "AssetGroup", 3.6),
+        Col("الشراء", "=GDate([PurchaseDate])", 2.2), Col("العمر (شهر)", "UsefulLifeMonths", 1.8, INT),
+        Col("التكلفة", "Cost", 2.6, MONEY, True), Col("القسط الشهري", "MonthlyDep", 2.4, MONEY, True),
+        Col("مجمع الإهلاك", "AccumDep", 2.6, MONEY, True), Col("القيمة الدفترية", "BookValue", 2.6, MONEY, True),
+        Col("الحالة", "StatusName", 2.4)],
+        [("Status", False), ("AssetCode", False)], landscape=True, no_data="لا توجد أصول ثابتة."),
     ListSpec("CASH_BALANCES", [
         Col("الصندوق", "BoxName", 5.0, grow=True), Col("النوع", "BoxTypeName", 2.6),
         Col("إجمالي الداخل", "TotalIn", 2.9, MONEY, True), Col("إجمالي الخارج", "TotalOut", 2.9, MONEY, True),

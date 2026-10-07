@@ -169,6 +169,8 @@ PLAN = [
     dict(op="sales_return", day=4, hour=10, invoice=6, lines=[(4, 2)]),
     dict(op="sale", day=3, hour=16, customer=8, credit=True, paid=0, lines=[(9, 2), (5, 1), (19, 1)]),
     dict(op="customer_payment", day=2, hour=10, customer=2, amount="600.00"),
+    dict(op="asset", day=2, hour=11, name="أجهزة نقاط البيع وطابعات الإيصالات", account=1720, cost="6000.00",
+         salvage="600.00", life=36, opening="1500.00"),
     dict(op="stock_count", day=2, hour=21, category=5, actual={19: -1}),
     dict(op="sale", day=1, hour=20, user="cashier2", lines=[(7, 10), (8, 6), (18, 2)]),
     dict(op="closing", day=1, hour=23, box="CASHIER", short="0", keep="100.00"),
@@ -178,6 +180,7 @@ PLAN = [
 # cash_in / cash_out: a cash voucher of the box type (MAIN / CASHIER) by the administrator
 # closing: cashier closing of the box: counted = book balance - short, all but "keep" goes to the main safe
 # stock_count "actual": product -> difference to the counted quantity (others counted as recorded)
+# asset: a fixed asset owned before the program (source OPENING) with its depreciation until then
 
 
 def demo_counts():
@@ -281,6 +284,12 @@ def simulate() -> Result:
         elif op in ("cash_in", "cash_out"):
             s.cash_voucher("IN" if op == "cash_in" else "OUT", s.box_of_type(step["box"]), D(step["amount"]),
                            step["category"], party=step["party"], text=step["text"])
+        elif op == "asset":
+            s.insert("FixedAssets", AssetCode=s.next_number("FIXED_ASSET"), AssetName=step["name"],
+                     AssetAccount=step["account"], PurchaseDate=day(step["day"]), Cost=float(D(step["cost"])),
+                     InputVAT=0, SalvageValue=float(D(step["salvage"])), UsefulLifeMonths=step["life"],
+                     DepStartDate=day(step["day"]), SourceType="OPENING", OpeningAccumDep=float(D(step["opening"])),
+                     Status="ACTIVE", DisposalProceeds=0, DisposalAccumDep=0, Notes=DEMO_MARK, EmployeeID=1)
         elif op == "closing":
             box = s.box_of_type(step["box"])
             counted = s.cash_balance(box) - D(step["short"])
@@ -312,9 +321,10 @@ def simulate() -> Result:
 
 
 # Order in which RemoveDemoData empties the tables (children before parents).
-DOCUMENT_TABLES = ["JournalLines", "JournalEntries", "CashVouchers", "CashClosings", "SalesReturnDetails", "SalesReturns", "CustomerPayments", "SalesInvoiceDetails", "SalesInvoices",
+DOCUMENT_TABLES = ["JournalLines", "JournalEntries", "AssetDepreciations", "DepreciationRuns", "FixedAssets", "CashVouchers", "CashClosings", "SalesReturnDetails", "SalesReturns", "CustomerPayments", "SalesInvoiceDetails", "SalesInvoices",
                    "PurchaseReturnDetails", "PurchaseReturns", "SupplierPayments", "PurchaseInvoiceDetails",
                    "PurchaseInvoices", "StockCountDetails", "StockCounts", "InventoryTransactions", "Expenses"]
 DOCUMENT_SEQUENCES = ["SALES_INVOICE", "SALES_RETURN", "PURCHASE_INVOICE", "PURCHASE_RETURN", "CUSTOMER_PAYMENT",
                       "SUPPLIER_PAYMENT", "EXPENSE", "STOCK_COUNT", "STOCK_ADJUST", "PRODUCT_CODE", "ZATCA_ICV",
-                      "CASH_IN", "CASH_OUT", "CASH_TRANSFER", "CASH_CLOSING", "JOURNAL"]
+                      "CASH_IN", "CASH_OUT", "CASH_TRANSFER", "CASH_CLOSING", "JOURNAL", "FIXED_ASSET",
+                      "DEPRECIATION"]

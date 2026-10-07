@@ -270,6 +270,33 @@ class Store:
                   if open_[(d[0], d[1], d[2])] != 0]
         return result, {p: v for p, v in pool.items() if v != 0}
 
+    # ------------------------------------------------------------- depreciation (modAssets.RecordDepreciation)
+    def depreciate(self, month_end):
+        """Same amounts as RecordDepreciation for the month ending on month_end ('yyyy-mm-dd'): straight line,
+        round((cost - salvage) / months, 2), never past the salvage value, from the month of DepStartDate,
+        not in the month of the disposal. Returns (run id, total)."""
+        end = month_end[:10]
+        run = self.insert("DepreciationRuns", RunNumber=self.next_number("DEPRECIATION"), RunMonth=end + " 00:00:00",
+                          TotalAmount=0, EmployeeID=self.user)
+        total, n = D(0), 0
+        for aid, cost, salvage, months, start, bought, status, disposed, opening in self.c.execute(
+                "SELECT AssetID, Cost, SalvageValue, UsefulLifeMonths, DepStartDate, PurchaseDate, Status, "
+                "DisposalDate, OpeningAccumDep FROM FixedAssets ORDER BY AssetID").fetchall():
+            if start[:10] > end or bought[:10] > end or (status != "ACTIVE" and (disposed or "")[:10] <= end):
+                continue
+            monthly = ((dec(cost) - dec(salvage)) / months).quantize(D("0.01"))
+            done = dec(opening) + dec(self.one("SELECT Coalesce(Sum(Amount), 0) FROM AssetDepreciations "
+                                               "WHERE AssetID = ?", aid))
+            remaining = dec(cost) - dec(salvage) - done
+            amount = remaining if remaining - monthly < 1 else monthly      # the rounding cents in the last month
+            if amount > 0:
+                n += 1
+                self.insert("AssetDepreciations", RunID=run, LineNo=n, AssetID=aid, Amount=float(amount))
+                total += amount
+        self.c.execute("UPDATE DepreciationRuns SET TotalAmount = ? WHERE RunID = ?", (float(total), run))
+        self.sync_journal()
+        return run, total
+
     # ------------------------------------------------------------- journal (modJournal.SyncJournal)
     def sync_journal(self):
         """Same steps as SyncJournal: returns (added, updated, removed)."""

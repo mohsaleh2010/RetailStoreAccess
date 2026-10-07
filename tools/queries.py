@@ -61,7 +61,7 @@ ZERO = "CCur(0)"
 JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournalPurchase", "qryJournalPurchaseReturn",
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
                           "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
-                          "qryJournalBankTx", "qryJournalCheque"]
+                          "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation"]
 
 
 def _sale():
@@ -230,6 +230,40 @@ def _cheque():
         jline(*ks, 2, bank, ZERO, "q.Amount", "'صرف شيك'", src, "q.Direction = 'OUT' AND q.Status = 'COLLECTED'"),
         jline(*ks, 1, 2110, "q.Amount", ZERO, "q.ChequeNo", src, "q.Direction = 'OUT' AND q.Status = 'BOUNCED'"),
         jline(*ks, 2, 2100, ZERO, "q.Amount", "'شيك مرتد'", src, "q.Direction = 'OUT' AND q.Status = 'BOUNCED'")])
+
+
+def _asset():
+    # buying: the asset account (and the input VAT) against the bank, a cash box, another account, or for an
+    # asset owned before the program, the opening balances (3900) with its depreciation until then (1790).
+    # selling / scrapping: the accumulated depreciation and the price against the cost; gain 4500, loss 5650
+    src = "FixedAssets AS a"
+    k = ("'ASSET'", "a.AssetID", "a.AssetCode", "a.PurchaseDate", "a.AssetName")
+    kd = ("'ASSET_DISPOSAL'", "a.AssetID", "a.AssetCode", "a.DisposalDate", "a.AssetName")
+    credit = ("IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, "
+              "IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900)))")
+    paid = "IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT)"
+    gain = "(a.DisposalProceeds + a.DisposalAccumDep - a.Cost)"
+    disposed = "a.Status = 'DISPOSED'"
+    return jquery([
+        jline(*k, 1, "a.AssetAccount", "a.Cost", ZERO, "a.AssetName", src, "a.Cost <> 0"),
+        jline(*k, 2, 1500, "a.InputVAT", ZERO, "'ضريبة المدخلات'", src, "a.InputVAT <> 0 AND a.SourceType <> 'OPENING'"),
+        jline(*k, 3, credit, ZERO, paid, "a.Notes", src, f"{paid} <> 0"),
+        jline(*k, 4, 1790, ZERO, "a.OpeningAccumDep", "'إهلاك سابق'", src,
+              "a.SourceType = 'OPENING' AND a.OpeningAccumDep <> 0"),
+        jline(*kd, 1, 1790, "a.DisposalAccumDep", ZERO, "'مجمع إهلاك الأصل'", src, f"{disposed} AND a.DisposalAccumDep <> 0"),
+        jline(*kd, 2, "IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID)",
+              "a.DisposalProceeds", ZERO, "'ثمن بيع الأصل'", src, f"{disposed} AND a.DisposalProceeds <> 0"),
+        jline(*kd, 3, "a.AssetAccount", ZERO, "a.Cost", "a.AssetName", src, disposed),
+        jline(*kd, 4, 4500, ZERO, gain, "'ربح بيع الأصل'", src, f"{disposed} AND {gain} > 0"),
+        jline(*kd, 5, 5650, f"-{gain}", ZERO, "'خسارة بيع / استبعاد الأصل'", src, f"{disposed} AND {gain} < 0")])
+
+
+def _depreciation():
+    k = ("'DEPRECIATION'", "d.RunID", "d.RunNumber", "d.RunMonth", "'الإهلاك الشهري'")
+    src = "qryDepreciationLines AS d"
+    return jquery([
+        jline(*k, "2 * d.LineNo - 1", 5600, "d.Amount", ZERO, "d.AssetName", src, "d.Amount <> 0"),
+        jline(*k, "2 * d.LineNo", 1790, ZERO, "d.Amount", "d.AssetName", src, "d.Amount <> 0")])
 
 
 def _year_close():
@@ -1159,6 +1193,16 @@ SELECT t.CashBoxID, t.TxDate, 'BANK_WITHDRAW', 'سحب من البنك', t.TxNum
 FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
 WHERE t.TxType = 'WITHDRAW'
 UNION ALL
+SELECT a.CashBoxID, a.PurchaseDate, 'ASSET', 'شراء أصل ثابت', a.AssetCode, a.AssetName, a.Notes,
+       CCur(0), a.Cost + a.InputVAT, a.EmployeeID
+FROM FixedAssets AS a
+WHERE a.SourceType = 'CASHBOX'
+UNION ALL
+SELECT a.DisposalCashBoxID, a.DisposalDate, 'ASSET_SALE', 'بيع أصل ثابت', a.AssetCode, a.AssetName, a.Notes,
+       a.DisposalProceeds, CCur(0), a.EmployeeID
+FROM FixedAssets AS a
+WHERE a.Status = 'DISPOSED' AND a.DisposalTo = 'CASHBOX' AND a.DisposalProceeds <> 0
+UNION ALL
 SELECT b.CashBoxID, b.OpeningDate, 'OPENING', 'رصيد افتتاحي', '-', b.BoxName, b.Notes,
        b.OpeningBalance, CCur(0), Null
 FROM CashBoxes AS b
@@ -1289,6 +1333,12 @@ FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClo
     Query("qryJournalYearClose", "أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة", _year_close()),
     Query("qryJournalVatReturn", "أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده", _vat_return()),
     Query("qryJournalCheque", "أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد", _cheque()),
+    Query("qryJournalAsset", "أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها", _asset()),
+    Query("qryDepreciationLines", "أسطر قيود الإهلاك الشهرية مع اسم الأصل", """
+SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName
+FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.RunID)
+     INNER JOIN FixedAssets AS a ON d.AssetID = a.AssetID"""),
+    Query("qryJournalDepreciation", "أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل", _depreciation()),
     Query("qryJournalBankTx", "أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى", _bank_tx()),
 
     # ================================================================ BANKS (modBank)
@@ -1317,6 +1367,20 @@ GROUP BY BankID"""),
 SELECT k.BankID, k.BankName, k.AccountNo, k.IBAN, k.IsActive, {nz("t.BookBalance")} AS Balance, t.LastItemDate
 FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID
 ORDER BY k.BankName"""),
+
+    Query("qryAssetDepTotals", "مجموع إهلاك كل أصل في القيود الشهرية", """
+SELECT AssetID, Sum(Amount) AS SumDep, Count(*) AS DepCount
+FROM AssetDepreciations
+GROUP BY AssetID"""),
+
+    Query("FixedAssetsQuery", "سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري", f"""
+SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS AssetGroup, a.PurchaseDate, a.Cost,
+       a.SalvageValue, a.UsefulLifeMonths, a.DepStartDate, a.Status, IIf(a.Status = 'ACTIVE', 'قائم', 'مستبعد') AS StatusName,
+       a.OpeningAccumDep + {nz("t.SumDep")} AS AccumDep, a.Cost - a.OpeningAccumDep - {nz("t.SumDep")} AS BookValue,
+       Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2) AS MonthlyDep, {nz("t.DepCount")} AS DepMonths,
+       a.DisposalDate, a.DisposalProceeds
+FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)
+     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID"""),
 
     Query("ChequesQuery", "الشيكات الواردة والصادرة مع العميل أو المورد وحالتها", """
 SELECT q.ChequeID, q.ChequeRef, q.Direction, IIf(q.Direction = 'IN', 'وارد', 'صادر') AS DirectionName,

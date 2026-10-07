@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **53** | عدد الحقول: **643**
+عدد الجداول: **56** | عدد الحقول: **679**
 
 ## الفهرس
 
@@ -35,30 +35,33 @@
 27. [`Banks`](#banks) – البنوك
 28. [`BankTransactions`](#banktransactions) – الحركات البنكية
 29. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
-30. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-31. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-32. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-33. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-34. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-35. [`Expenses`](#expenses) – المصروفات
-36. [`CashVouchers`](#cashvouchers) – سندات النقدية
-37. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-38. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-39. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-40. [`JournalEntries`](#journalentries) – قيود اليومية
-41. [`JournalLines`](#journallines) – أسطر القيود
-42. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-43. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-44. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-45. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-46. [`ManualEntries`](#manualentries) – القيود اليدوية
-47. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-48. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-49. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-50. [`StockCounts`](#stockcounts) – جلسات الجرد
-51. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-52. [`AuditLog`](#auditlog) – سجل العمليات
-53. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+30. [`FixedAssets`](#fixedassets) – الأصول الثابتة
+31. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
+32. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
+33. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+34. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+35. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+36. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+37. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+38. [`Expenses`](#expenses) – المصروفات
+39. [`CashVouchers`](#cashvouchers) – سندات النقدية
+40. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+41. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+42. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+43. [`JournalEntries`](#journalentries) – قيود اليومية
+44. [`JournalLines`](#journallines) – أسطر القيود
+45. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+46. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+47. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+48. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+49. [`ManualEntries`](#manualentries) – القيود اليدوية
+50. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+51. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+52. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+53. [`StockCounts`](#stockcounts) – جلسات الجرد
+54. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+55. [`AuditLog`](#auditlog) – سجل العمليات
+56. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -118,7 +121,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 20 سجل
+- بيانات أساسية: 22 سجل
 
 ## Roles
 
@@ -147,7 +150,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 30 سجل
+- بيانات أساسية: 31 سجل
 
 ## RolePermissions
 
@@ -159,7 +162,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 60 سجل
+- بيانات أساسية: 62 سجل
 
 ## Employees
 
@@ -207,7 +210,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 45 سجل
+- بيانات أساسية: 47 سجل
 
 ## UserScreens
 
@@ -772,6 +775,76 @@
 - فهرس عادي: `ChequeNo`
 - قاعدة تحقق على مستوى الجدول: `([Direction]="IN" And [CustomerID] Is Not Null And [SupplierID] Is Null) Or ([Direction]="OUT" And [SupplierID] Is Not Null And [CustomerID] Is Null)` – الشيك الوارد لعميل، والصادر لمورد
 
+## FixedAssets
+
+**الأصول الثابتة** – سجل الأصول: التكلفة وحساب الأصل، والعمر الإنتاجي بالأشهر، والقيمة المتبقية، ومصدر الشراء. يُهلك بالقسط الثابت شهريًا، ويُستبعد عند بيعه أو تلفه.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **AssetID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | AssetCode | Short Text | 20 | ✔ |  |  |  | رقم الأصل |
+| 3 | AssetName | Short Text | 150 | ✔ |  |  |  | اسم الأصل |
+| 4 | AssetAccount | Number (Long) |  | ✔ |  |  | `Accounts.AccountCode` | حساب الأصل – حساب فرعي من الأصول غير المتداولة (12)، مثل الأثاث أو الأجهزة |
+| 5 | PurchaseDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الشراء |
+| 6 | Cost | Currency |  | ✔ | `0` | `>0` |  | التكلفة بدون الضريبة |
+| 7 | InputVAT | Currency |  | ✔ | `0` | `>=0` |  | ضريبة المدخلات |
+| 8 | SalvageValue | Currency |  | ✔ | `0` | `>=0` |  | القيمة المتبقية في آخر العمر |
+| 9 | UsefulLifeMonths | Number (Integer) |  | ✔ |  | `>0` |  | العمر الإنتاجي (شهر) |
+| 10 | DepStartDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | بداية الإهلاك (يُهلك من شهر هذا التاريخ) |
+| 11 | SourceType | Short Text | 10 | ✔ | `"BANK"` | `In ("OPENING","BANK","CASHBOX","ACCOUNT")` |  | مصدر الشراء |
+| 12 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك |
+| 13 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | الصندوق |
+| 14 | CounterAccount | Number (Long) |  |  |  |  | `Accounts.AccountCode` | الحساب الدائن (حساب آخر) |
+| 15 | OpeningAccumDep | Currency |  | ✔ | `0` | `>=0` |  | إهلاك سابق (للأصول الموجودة قبل البرنامج) |
+| 16 | Status | Short Text | 10 | ✔ | `"ACTIVE"` | `In ("ACTIVE","DISPOSED")` |  | الحالة |
+| 17 | DisposalDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ البيع / الاستبعاد |
+| 18 | DisposalProceeds | Currency |  | ✔ | `0` | `>=0` |  | ثمن البيع |
+| 19 | DisposalTo | Short Text | 10 |  |  | `Is Null Or In ("NONE","BANK","CASHBOX")` |  | استلام الثمن |
+| 20 | DisposalBankID | Number (Long) |  |  |  |  | `Banks.BankID` | بنك استلام الثمن |
+| 21 | DisposalCashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق استلام الثمن |
+| 22 | DisposalAccumDep | Currency |  | ✔ | `0` | `>=0` |  | مجمع الإهلاك يوم الاستبعاد |
+| 23 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 24 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 25 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `AssetID`
+- فهرس فريد: `AssetCode`
+- فهرس عادي: `AssetAccount`
+- قاعدة تحقق على مستوى الجدول: `[SalvageValue]+[OpeningAccumDep]<=[Cost]` – القيمة المتبقية والإهلاك السابق لا يتجاوزان التكلفة
+
+## DepreciationRuns
+
+**قيود الإهلاك الشهرية** – قيد إهلاك كل شهر: مصروف الإهلاك (5600) مدين ومجمع الإهلاك (1790) دائن، بسطر لكل أصل.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **RunID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | RunNumber | Short Text | 20 | ✔ |  |  |  | رقم القيد |
+| 3 | RunMonth | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | الشهر (آخر يوم فيه) |
+| 4 | TotalAmount | Currency |  | ✔ | `0` | `>=0` |  | إجمالي الإهلاك |
+| 5 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `RunID`
+- فهرس فريد: `RunNumber`
+- فهرس فريد: `RunMonth`
+
+## AssetDepreciations
+
+**إهلاك كل أصل في كل شهر** – أسطر قيد الإهلاك الشهري.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **DepreciationID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | RunID | Number (Long) |  | ✔ |  |  | `DepreciationRuns.RunID` | قيد الإهلاك |
+| 3 | LineNo | Number (Integer) |  | ✔ |  |  |  | رقم السطر في القيد |
+| 4 | AssetID | Number (Long) |  | ✔ |  |  | `FixedAssets.AssetID` | الأصل |
+| 5 | Amount | Currency |  | ✔ | `0` | `>0` |  | الإهلاك |
+
+- المفتاح الأساسي: `DepreciationID`
+- فهرس فريد: `RunID, AssetID`
+- فهرس عادي: `AssetID`
+
 ## BankReconciliations
 
 **التسويات البنكية** – مطابقة كشف البنك في تاريخ مع الدفاتر: رصيد الكشف، والرصيد في الدفاتر، والحركات غير الظاهرة في الكشف.
@@ -967,7 +1040,7 @@
 - المفتاح الأساسي: `AccountCode`
 - فهرس عادي: `ParentCode`
 - فهرس عادي: `TreeKey`
-- بيانات أساسية: 76 سجل
+- بيانات أساسية: 78 سجل
 
 ## JournalSourceTypes
 
@@ -980,7 +1053,7 @@
 | 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 21 سجل
+- بيانات أساسية: 24 سجل
 
 ## JournalEntries
 
