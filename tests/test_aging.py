@@ -181,6 +181,9 @@ class AgingCodeTests(unittest.TestCase):
         self.assertIn('rs!DueDate = DueDateFor("S", SupplierID, docDate)', proc(read("modPurchases"), "PostPurchaseFromCart"))
         self.assertIn('"TestAging"', read("modTestAll"))
         self.assertIn("CREATE TABLE tmpAging", read("modPOS"))
+        fill = proc(self.text, "FillAging")          # the local table has no defaults: no Null columns
+        self.assertIn("t.Fields(cols(late)).Value = 0", fill)
+        self.assertIn("t!Credit = 0", fill)
 
     def test_schema_screens_report(self):
         for t, inv in [("CustomerAllocations", "SalesInvoiceID"), ("SupplierAllocations", "PurchaseInvoiceID")]:

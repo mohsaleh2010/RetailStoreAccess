@@ -156,6 +156,10 @@ Public Function FillAging(ByVal Kind As String, ByVal AsOf As Date, Optional ByV
         t!DocID = item(2)
         t!DocNo = Left$(Nz(item(3), ""), 30)
         t!OpenAmount = item(6)
+        For late = 0 To 4                       ' the table has no defaults: empty columns would be Null
+            t.Fields(cols(late)).Value = 0
+        Next
+        t!Credit = 0
         If item(1) = "CREDIT" Then
             t!Credit = item(6)
         Else

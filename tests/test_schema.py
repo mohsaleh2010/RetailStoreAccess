@@ -161,7 +161,9 @@ class SchemaStructureTests(unittest.TestCase):
                             "SalesStdAdjust", "SalesStdVAT", "SalesZeroAdjust", "SalesExemptAdjust",
                             "PurchStdAdjust", "PurchStdVAT", "PurchZeroAdjust", "Corrections", "NetDue",
                             # a bank account may be overdrawn; the operations in a reconciliation go both ways
-                            "StatementBalance", "BookBalance", "Outstanding", "ClearedAmount"}
+                            "StatementBalance", "BookBalance", "Outstanding", "ClearedAmount",
+                            # a payroll draft line whose deductions exceed the pay (posting refuses it)
+                            "NetPay"}
         for t in TABLES:
             for f in t.fields:
                 if f.kind == "MONEY" and f.name not in allowed_negative:

@@ -60,6 +60,30 @@ class BuildFrontEndTests(unittest.TestCase):
                         continue
                     self.assertIsNone(re.search(rf"(?<![.!\w]){proc}\s*\(", body), f"{owner} {proc} used in {other}")
 
+    def test_no_date_conversion_of_a_zero_default(self):
+        # VBA evaluates both sides of And / Or: IsDate(x) And DateValue(Nz(x, 0)) fails with
+        # Type mismatch when x is Null (ReopenPeriod, TestJournal).
+        folder = os.path.join(ROOT, "dist", "vba")
+        for name in os.listdir(folder):
+            with open(os.path.join(folder, name), encoding="cp1256") as fh:
+                for no, line in enumerate(fh, 1):
+                    self.assertNotRegex(line.split("'", 1)[0], r"DateValue\(Nz\([^()]*,\s*0\)\)", f"{name}:{no}")
+
+    def test_no_blank_column_names(self):
+        # AS [ ] - Access: error 3126 "Invalid bracketing of name ' '" (the list of frmCostCenters).
+        import sys
+        sys.path.insert(0, os.path.join(ROOT, "tools"))
+        import forms as F
+        import queries as Q
+        texts = [m.tag for m in F.all_forms()] + [q.sql for q in Q.QUERIES]
+        folder = os.path.join(ROOT, "dist", "vba")
+        for name in os.listdir(folder):
+            with open(os.path.join(folder, name), encoding="cp1256") as fh:
+                texts.append(fh.read())
+        for text in texts:
+            found = re.search(r"\bAS \[\s*\]", text)
+            self.assertIsNone(found, text[max(0, found.start() - 80):found.end()] if found else "")
+
     def test_no_chained_currentdb_collections(self):
         # CurrentDb.TableDefs(...).Fields / For Each x In CurrentDb.TableDefs: the temporary
         # database object is released while it is read - error 3420 on a fresh front-end.

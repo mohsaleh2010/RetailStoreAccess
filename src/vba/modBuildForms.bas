@@ -1897,7 +1897,7 @@ Private Sub BuildForm_frmCostCenters()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmCostCenters", "مراكز التكلفة", "SELECT * FROM CostCenters", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=CostCenters|PK=CostCenterID|LIST=SELECT t.CostCenterID, t.CenterCode AS [الرمز], t.CenterName AS [المركز], IIf(t.IsDefault, 'افتراضي', '') AS [ ] FROM CostCenters AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CenterCode|SEARCH=t.CenterCode,t.CenterName|ACTIVE=t.IsActive|UNIQUE=CenterCode,CenterName"
+              "KIND=LIST|TABLE=CostCenters|PK=CostCenterID|LIST=SELECT t.CostCenterID, t.CenterCode AS [الرمز], t.CenterName AS [المركز], IIf(t.IsDefault, 'افتراضي', '') AS [الحالة] FROM CostCenters AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CenterCode|SEARCH=t.CenterCode,t.CenterName|ACTIVE=t.IsActive|UNIQUE=CenterCode,CenterName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "مراكز التكلفة", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)

@@ -303,7 +303,16 @@ Private Sub AddField(ByVal tdf As DAO.TableDef, ByVal FieldName As String, ByVal
     Dim fld As DAO.Field, requiredLater As Boolean
     m_currentStep = "field " & tdf.Name & "." & FieldName
     If m_upgrade Then
-        If FieldExistsIn(tdf, FieldName) Then Exit Sub
+        If FieldExistsIn(tdf, FieldName) Then
+            ' a rule the schema dropped (PayrollLines.NetPay may be negative in a draft): removing
+            ' a rule never fails on the existing rows
+            If Len(ValidationRule) = 0 And Len(tdf.Fields(FieldName).ValidationRule) > 0 Then
+                tdf.Fields(FieldName).ValidationRule = ""
+                tdf.Fields(FieldName).ValidationText = ""
+                LogLine "  ~ أُزيل شرط الحقل: " & tdf.Name & "." & FieldName
+            End If
+            Exit Sub
+        End If
         requiredLater = IsRequired                 ' existing rows get the default value first
         IsRequired = False
     End If
@@ -1947,7 +1956,7 @@ Private Sub CreateTable_PayrollLines()
     AddField tdf, "GosiEmployer", "MONEY", 0, True, "0", _
              ">=0", "المبلغ لا يمكن أن يكون سالبًا", "التأمينات - حصة المنشأة", ""
     AddField tdf, "NetPay", "MONEY", 0, True, "0", _
-             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "صافي الراتب", ""
+             "", "", "صافي الراتب", "قد يكون سالبًا في المسودة؛ الترحيل يرفضه (الخصومات أكبر من الراتب)"
     AddField tdf, "Notes", "TEXT", 150, False, "", _
              "", "", "ملاحظات", ""
     AddIndex tdf, "PrimaryKey", "PayrollLineID", True, True, False

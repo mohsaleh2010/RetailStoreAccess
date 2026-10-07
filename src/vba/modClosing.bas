@@ -123,14 +123,15 @@ End Function
 
 Public Function ReopenPeriod(ByVal Through As Variant, ByVal Notes As String) As String
     ' Through: the new last closed day (earlier than now), or Null to open everything.
-    Dim previous As Date, lastYearEnd As Variant
+    Dim previous As Date, lastYearEnd As Variant, newEnd As Date
     ReopenPeriod = CanClose()
     If Len(ReopenPeriod) > 0 Then Exit Function
     previous = ClosedThroughDate()
     lastYearEnd = DbValue("SELECT Max(ClosingDate) FROM FiscalYearClosings")
+    If IsDate(Through) Then newEnd = Int(CDate(Through))     ' VBA's And evaluates both sides: DateValue(0) fails
     If previous = 0 Then
         ReopenPeriod = "لا توجد فترة مقفلة."
-    ElseIf IsDate(Through) And DateValue(Nz(Through, 0)) >= previous Then
+    ElseIf IsDate(Through) And newEnd >= previous Then
         ReopenPeriod = "اختر تاريخًا قبل " & GDate(previous) & "، أو اترك التاريخ فارغًا لفتح كل الفترات."
     ElseIf IsDate(lastYearEnd) And (Not IsDate(Through) Or Nz(Through, 0) < Nz(lastYearEnd, 0)) Then
         ReopenPeriod = "السنة " & Year(lastYearEnd) & " مقفلة بقيد إقفال. أعد فتح السنة أولًا."

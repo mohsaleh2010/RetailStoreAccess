@@ -266,7 +266,7 @@ DATA_SCREENS: List[DataScreen] = [
         ]),
     DataScreen(
         "frmCostCenters", "CostCenters", "مراكز التكلفة", "الفروع والأقسام: تُوزَّع عليها الإيرادات والمصروفات", "journal",
-        list_select="t.CenterCode AS [الرمز], t.CenterName AS [المركز], IIf(t.IsDefault, 'افتراضي', '') AS [ ]",
+        list_select="t.CenterCode AS [الرمز], t.CenterName AS [المركز], IIf(t.IsDefault, 'افتراضي', '') AS [الحالة]",
         list_from="CostCenters AS t", list_order="t.CenterCode",
         list_headers=[("الرمز", 1.8), ("المركز", 5.0), (" ", 1.6)],
         search=["t.CenterCode", "t.CenterName"], active="t.IsActive", unique=["CenterCode", "CenterName"],

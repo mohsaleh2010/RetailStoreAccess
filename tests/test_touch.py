@@ -192,7 +192,8 @@ class DataTests(unittest.TestCase):
                 f = fields[n]
                 self.assertTrue(not f.required or f.default is not None, f"{t}.{n}")
         schema = read("modBuildSchema")
-        self.assertIn("If FieldExistsIn(tdf, FieldName) Then Exit Sub", schema)
+        self.assertIn("If FieldExistsIn(tdf, FieldName) Then", schema)
+        self.assertIn('tdf.Fields(FieldName).ValidationRule = ""', schema)       # a dropped rule goes too
         self.assertIn('m_db.Execute "UPDATE [" & tdf.Name & "] SET [" & FieldName & "] = " & DefaultValue', schema)
 
     def test_order_types_match(self):
