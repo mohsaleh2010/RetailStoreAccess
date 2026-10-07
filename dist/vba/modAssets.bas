@@ -576,7 +576,7 @@ Public Sub DepreciationRefresh(ByVal frm As Access.Form)
         rs.Close
         frm!lstPreview.RowSource = rows
         frm!lblNext.Caption = "«·‘Â— «· «·Ì ·· ”ÃÌ·: " & Format$(nextMonth, "yyyy/mm") & "   «·≈Ã„«·Ì " & Format$(total, "#,##0.00") & _
-                              IIf(IsNull(LastRunMonth()), "", "   (¬Œ— ‘Â— „”Ã· " & Format$(LastRunMonth(), "yyyy/mm") & ")")
+                              IIf(IsNull(LastRunMonth()), "", "   (¬Œ— ‘Â— „”Ã· " & Format$(Nz(LastRunMonth(), 0), "yyyy/mm") & ")")
     End If
     frm!lstRuns.Requery
 End Sub

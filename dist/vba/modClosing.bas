@@ -99,8 +99,10 @@ Private Sub LogClosing(ByVal ActionType As String, ByVal Through As Variant, ByV
 End Sub
 
 Private Sub SetClosedThrough(ByVal Through As Variant)
-    CurrentDb.Execute "UPDATE Settings SET ClosedThrough = " & IIf(IsDate(Through), SqlDate(Through), "Null") & _
-                      " WHERE SettingID = 1", dbFailOnError
+    Dim sqlValue As String
+    sqlValue = "Null"                                  ' not IIf: VBA evaluates both sides, SqlDate(Null) fails
+    If IsDate(Through) Then sqlValue = SqlDate(Through)
+    CurrentDb.Execute "UPDATE Settings SET ClosedThrough = " & sqlValue & " WHERE SettingID = 1", dbFailOnError
 End Sub
 
 Public Function ClosePeriod(ByVal Through As Date, ByVal Notes As String) As String

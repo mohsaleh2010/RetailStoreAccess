@@ -576,7 +576,7 @@ Public Sub DepreciationRefresh(ByVal frm As Access.Form)
         rs.Close
         frm!lstPreview.RowSource = rows
         frm!lblNext.Caption = "الشهر التالي للتسجيل: " & Format$(nextMonth, "yyyy/mm") & "   الإجمالي " & Format$(total, "#,##0.00") & _
-                              IIf(IsNull(LastRunMonth()), "", "   (آخر شهر مسجل " & Format$(LastRunMonth(), "yyyy/mm") & ")")
+                              IIf(IsNull(LastRunMonth()), "", "   (آخر شهر مسجل " & Format$(Nz(LastRunMonth(), 0), "yyyy/mm") & ")")
     End If
     frm!lstRuns.Requery
 End Sub

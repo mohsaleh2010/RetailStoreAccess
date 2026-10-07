@@ -69,6 +69,20 @@ class BuildFrontEndTests(unittest.TestCase):
                 for no, line in enumerate(fh, 1):
                     self.assertNotRegex(line.split("'", 1)[0], r"DateValue\(Nz\([^()]*,\s*0\)\)", f"{name}:{no}")
 
+    def test_iif_branches_take_no_null(self):
+        # IIf evaluates both branches: IIf(IsDate(x), SqlDate(x), "Null") fails with "Invalid use
+        # of Null" when x is Null (SetClosedThrough, TestJournal). Nz(x, ...) is fine.
+        typed = r"(?:SqlDate|Format\$|CLng|CDate|CCur|CDbl|CInt|DateValue|Year|Month|Day)"
+        folder = os.path.join(ROOT, "dist", "vba")
+        for name in os.listdir(folder):
+            with open(os.path.join(folder, name), encoding="cp1256") as fh:
+                for no, line in enumerate(fh, 1):
+                    code = line.split("'", 1)[0]
+                    for m in re.finditer(r"IIf\((?:Not )?(?:IsNull|IsDate|IsEmpty)\(([^()]+(?:\(\))?)\)", code):
+                        var = re.escape(m.group(1))
+                        rest = code[m.end():]
+                        self.assertNotRegex(rest, typed + r"\(" + var + r"\s*[,)]", f"{name}:{no}: {line.strip()}")
+
     def test_no_blank_column_names(self):
         # AS [ ] - Access: error 3126 "Invalid bracketing of name ' '" (the list of frmCostCenters).
         import sys
