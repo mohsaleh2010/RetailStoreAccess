@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **56** | عدد الحقول: **679**
+عدد الجداول: **58** | عدد الحقول: **724**
 
 ## الفهرس
 
@@ -38,30 +38,32 @@
 30. [`FixedAssets`](#fixedassets) – الأصول الثابتة
 31. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
 32. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
-33. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-34. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-35. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-36. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-37. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-38. [`Expenses`](#expenses) – المصروفات
-39. [`CashVouchers`](#cashvouchers) – سندات النقدية
-40. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-41. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-42. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-43. [`JournalEntries`](#journalentries) – قيود اليومية
-44. [`JournalLines`](#journallines) – أسطر القيود
-45. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-46. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-47. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-48. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-49. [`ManualEntries`](#manualentries) – القيود اليدوية
-50. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-51. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-52. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-53. [`StockCounts`](#stockcounts) – جلسات الجرد
-54. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-55. [`AuditLog`](#auditlog) – سجل العمليات
-56. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+33. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+34. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+35. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+36. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+37. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+38. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+39. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+40. [`Expenses`](#expenses) – المصروفات
+41. [`CashVouchers`](#cashvouchers) – سندات النقدية
+42. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+43. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+44. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+45. [`JournalEntries`](#journalentries) – قيود اليومية
+46. [`JournalLines`](#journallines) – أسطر القيود
+47. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+48. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+49. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+50. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+51. [`ManualEntries`](#manualentries) – القيود اليدوية
+52. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+53. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+54. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+55. [`StockCounts`](#stockcounts) – جلسات الجرد
+56. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+57. [`AuditLog`](#auditlog) – سجل العمليات
+58. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -103,7 +105,11 @@
 | 32 | AllowAdminCompanyName | Yes/No |  |  | `False` |  |  | السماح لمدير النظام بتغيير اسم المحل |
 | 33 | ClosedThrough | Date/Time |  |  |  |  |  | الفترة مقفلة حتى (لا يُضاف ولا يُعدَّل مستند بتاريخ حتى هذا اليوم) |
 | 34 | DefaultBankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك الافتراضي للتحويلات البنكية – المبالغ المدفوعة أو المستلمة بطريقة «تحويل بنكي» تُقيَّد في حساب هذا البنك |
-| 35 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
+| 35 | GosiEmployeeRate | Currency (نسبة) |  | ✔ | `0.0975` | `>=0 And <1` |  | التأمينات: حصة الموظف السعودي |
+| 36 | GosiEmployerRate | Currency (نسبة) |  | ✔ | `0.1175` | `>=0 And <1` |  | التأمينات: حصة المنشأة عن السعودي |
+| 37 | GosiNonSaudiRate | Currency (نسبة) |  | ✔ | `0.02` | `>=0 And <1` |  | التأمينات: حصة المنشأة عن غير السعودي (الأخطار المهنية) |
+| 38 | GosiMaxWage | Currency |  | ✔ | `45000` | `>=0` |  | التأمينات: الحد الأعلى للأجر الخاضع |
+| 39 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -121,7 +127,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 22 سجل
+- بيانات أساسية: 23 سجل
 
 ## Roles
 
@@ -150,7 +156,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 31 سجل
+- بيانات أساسية: 32 سجل
 
 ## RolePermissions
 
@@ -162,7 +168,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 62 سجل
+- بيانات أساسية: 64 سجل
 
 ## Employees
 
@@ -189,6 +195,16 @@
 | 17 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – تدخل فيه نقدية مبيعاته وسنداته؛ فارغ = أول صندوق كاشير نشط |
 | 18 | IsDeveloper | Yes/No |  |  | `False` |  |  | المبرمج |
 | 19 | CustomScreens | Yes/No |  |  | `False` |  |  | صلاحيات شاشات خاصة |
+| 20 | OnPayroll | Yes/No |  |  | `False` |  |  | في مسير الرواتب |
+| 21 | BasicSalary | Currency |  | ✔ | `0` | `>=0` |  | الراتب الأساسي |
+| 22 | HousingAllowance | Currency |  | ✔ | `0` | `>=0` |  | بدل السكن |
+| 23 | TransportAllowance | Currency |  | ✔ | `0` | `>=0` |  | بدل النقل |
+| 24 | OtherAllowance | Currency |  | ✔ | `0` | `>=0` |  | بدلات أخرى |
+| 25 | IsSaudi | Yes/No |  |  | `False` |  |  | سعودي (التأمينات بحصتي الموظف والمنشأة) |
+| 26 | AdvanceInstallment | Currency |  | ✔ | `0` | `>=0` |  | قسط السلفة الشهري – 0 = يُخصم كل الرصيد في أول مسير |
+| 27 | NationalID | Short Text | 15 |  |  |  |  | رقم الهوية / الإقامة |
+| 28 | IBAN | Short Text | 34 |  |  |  |  | آيبان الموظف |
+| 29 | HireDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ التعيين |
 
 - المفتاح الأساسي: `EmployeeID`
 - فهرس فريد: `Username`
@@ -210,7 +226,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 47 سجل
+- بيانات أساسية: 48 سجل
 
 ## UserScreens
 
@@ -845,6 +861,57 @@
 - فهرس فريد: `RunID, AssetID`
 - فهرس عادي: `AssetID`
 
+## PayrollRuns
+
+**مسيرات الرواتب** – مسير كل شهر: مسودة تُعدَّل، ثم يُرحَّل قيده في آخر يوم من الشهر، ثم يُسجَّل صرفه من بنك أو صندوق.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **PayrollRunID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | RunNumber | Short Text | 20 | ✔ |  |  |  | رقم المسير |
+| 3 | PayMonth | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | الشهر (آخر يوم فيه) |
+| 4 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","POSTED")` |  | الحالة |
+| 5 | PaidDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ الصرف |
+| 6 | PaidFrom | Short Text | 10 |  |  | `Is Null Or In ("BANK","CASHBOX")` |  | الصرف من |
+| 7 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك |
+| 8 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | الصندوق |
+| 9 | PaidAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ المصروف |
+| 10 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 11 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أعدّه |
+| 12 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `PayrollRunID`
+- فهرس فريد: `RunNumber`
+- فهرس فريد: `PayMonth`
+
+## PayrollLines
+
+**أسطر مسير الرواتب** – سطر كل موظف: الراتب والبدلات والإضافي والخصومات والتأمينات وصافي الراتب.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **PayrollLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | PayrollRunID | Number (Long) |  | ✔ |  |  | `PayrollRuns.PayrollRunID` | المسير |
+| 3 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 4 | EmployeeName | Short Text | 100 |  |  |  |  | اسم الموظف |
+| 5 | IsSaudi | Yes/No |  |  | `False` |  |  | سعودي |
+| 6 | Basic | Currency |  | ✔ | `0` | `>=0` |  | الأساسي |
+| 7 | Housing | Currency |  | ✔ | `0` | `>=0` |  | بدل السكن |
+| 8 | OtherAllow | Currency |  | ✔ | `0` | `>=0` |  | بدلات أخرى (النقل وغيره) |
+| 9 | Overtime | Currency |  | ✔ | `0` | `>=0` |  | العمل الإضافي |
+| 10 | Additions | Currency |  | ✔ | `0` | `>=0` |  | مكافآت وإضافات |
+| 11 | AbsenceDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصم الغياب |
+| 12 | AdvanceDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصم السلفة |
+| 13 | OtherDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصومات أخرى (جزاءات) |
+| 14 | GosiWage | Currency |  | ✔ | `0` | `>=0` |  | الأجر الخاضع للتأمينات |
+| 15 | GosiEmployee | Currency |  | ✔ | `0` | `>=0` |  | التأمينات - حصة الموظف |
+| 16 | GosiEmployer | Currency |  | ✔ | `0` | `>=0` |  | التأمينات - حصة المنشأة |
+| 17 | NetPay | Currency |  | ✔ | `0` | `>=0` |  | صافي الراتب |
+| 18 | Notes | Short Text | 150 |  |  |  |  | ملاحظات |
+
+- المفتاح الأساسي: `PayrollLineID`
+- فهرس فريد: `PayrollRunID, EmployeeID`
+
 ## BankReconciliations
 
 **التسويات البنكية** – مطابقة كشف البنك في تاريخ مع الدفاتر: رصيد الكشف، والرصيد في الدفاتر، والحركات غير الظاهرة في الكشف.
@@ -977,8 +1044,9 @@
 | 10 | Description | Short Text | 255 |  |  |  |  | البيان |
 | 11 | ExpenseID | Number (Long) |  |  |  |  | `Expenses.ExpenseID` | المصروف المسجَّل – صرف بند مصروف يسجل مصروفًا بنفس المبلغ في المصروفات |
 | 12 | ClosingID | Number (Long) |  |  |  |  | `CashClosings.ClosingID` | تصفية الكاشير |
-| 13 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
-| 14 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 13 | AdvanceEmployeeID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | الموظف صاحب السلفة – سلفة موظف (صرف) أو سدادها نقدًا (قبض) |
+| 14 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 15 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `CashVoucherID`
 - فهرس فريد: `VoucherNumber`
@@ -1053,7 +1121,7 @@
 | 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 24 سجل
+- بيانات أساسية: 26 سجل
 
 ## JournalEntries
 

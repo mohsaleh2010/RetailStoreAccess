@@ -61,7 +61,8 @@ ZERO = "CCur(0)"
 JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournalPurchase", "qryJournalPurchaseReturn",
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
                           "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
-                          "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation"]
+                          "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation",
+                          "qryJournalPayroll"]
 
 
 def _sale():
@@ -147,7 +148,8 @@ def _cash_voucher():
     return jquery([
         jline(*k, 1, "110000 + v.CashBoxID", "v.Amount", ZERO, "v.PartyName", "CashVouchers AS v",
               "v.VoucherType = 'IN'"),
-        jline(*k, 2, "IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, 4200))", ZERO, "v.Amount",
+        jline(*k, 2, "IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, IIf(v.Category = 'ADVANCE', "
+                     "1600, 4200)))", ZERO, "v.Amount",
               "v.Description", "CashVouchers AS v", "v.VoucherType = 'IN'"),
         # an expense with a tax invoice (its tax added later in the expenses screen): the tax is input VAT
         jline(*k, 1, out_account, f"v.Amount - {nz('x.Tax')}", ZERO, "v.Description", out_src, "v.VoucherType = 'OUT'"),
@@ -264,6 +266,28 @@ def _depreciation():
     return jquery([
         jline(*k, "2 * d.LineNo - 1", 5600, "d.Amount", ZERO, "d.AssetName", src, "d.Amount <> 0"),
         jline(*k, "2 * d.LineNo", 1790, ZERO, "d.Amount", "d.AssetName", src, "d.Amount <> 0")])
+
+
+def _payroll():
+    # the posted payroll on the last day of its month: salaries 5500 (basic + housing - absence), allowances 5510,
+    # the employer's GOSI 5520 against GOSI payable 2320 (both shares), the advances deducted 1600, the
+    # penalties 4200 and the net salaries payable 2310; the payment: 2310 against the bank or a cash box
+    src = "PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID"
+    k = ("'PAYROLL'", "r.PayrollRunID", "r.RunNumber", "r.PayMonth", "'مسير الرواتب'")
+    kp = ("'PAYROLL_PAYMENT'", "r.PayrollRunID", "r.RunNumber", "r.PaidDate", "'صرف الرواتب'")
+    posted = "r.Status = 'POSTED'"
+    lines = [(1, 5500, "t.SumSalaries", True, "'الرواتب'"), (2, 5510, "t.SumAllowances", True, "'البدلات والإضافي'"),
+             (3, 5520, "t.SumGosiER", True, "'التأمينات - حصة المنشأة'"),
+             (4, 2320, "t.SumGosi", False, "'التأمينات المستحقة'"), (5, 1600, "t.SumAdvance", False, "'خصم السلف'"),
+             (6, 4200, "t.SumOtherDed", False, "'جزاءات وخصومات'"), (7, 2310, "t.SumNet", False, "'صافي الرواتب'")]
+    out = [jline(*k, n, acc, amount if debit else ZERO, ZERO if debit else amount, text, src,
+                 f"{posted} AND {amount} <> 0") for n, acc, amount, debit, text in lines]
+    paid_from = "IIf(r.PaidFrom = 'BANK', 120000 + r.BankID, 110000 + r.CashBoxID)"
+    out += [jline(*kp, 1, 2310, "r.PaidAmount", ZERO, "'صافي الرواتب'", "PayrollRuns AS r",
+                  f"{posted} AND r.PaidAmount <> 0"),
+            jline(*kp, 2, paid_from, ZERO, "r.PaidAmount", "'صرف الرواتب'", "PayrollRuns AS r",
+                  f"{posted} AND r.PaidAmount <> 0")]
+    return jquery(out)
 
 
 def _year_close():
@@ -1193,6 +1217,11 @@ SELECT t.CashBoxID, t.TxDate, 'BANK_WITHDRAW', 'سحب من البنك', t.TxNum
 FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
 WHERE t.TxType = 'WITHDRAW'
 UNION ALL
+SELECT r.CashBoxID, r.PaidDate, 'PAYROLL', 'صرف الرواتب', r.RunNumber, '-', r.Notes, CCur(0), r.PaidAmount,
+       r.EmployeeID
+FROM PayrollRuns AS r
+WHERE r.Status = 'POSTED' AND r.PaidFrom = 'CASHBOX' AND r.PaidAmount <> 0
+UNION ALL
 SELECT a.CashBoxID, a.PurchaseDate, 'ASSET', 'شراء أصل ثابت', a.AssetCode, a.AssetName, a.Notes,
        CCur(0), a.Cost + a.InputVAT, a.EmployeeID
 FROM FixedAssets AS a
@@ -1339,6 +1368,14 @@ SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetN
 FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.RunID)
      INNER JOIN FixedAssets AS a ON d.AssetID = a.AssetID"""),
     Query("qryJournalDepreciation", "أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل", _depreciation()),
+    Query("qryPayrollTotals", "مجاميع كل مسير رواتب لقيده", """
+SELECT PayrollRunID, Sum(Basic + Housing - AbsenceDeduction) AS SumSalaries,
+       Sum(OtherAllow + Overtime + Additions) AS SumAllowances, Sum(GosiEmployer) AS SumGosiER,
+       Sum(GosiEmployee + GosiEmployer) AS SumGosi, Sum(AdvanceDeduction) AS SumAdvance,
+       Sum(OtherDeduction) AS SumOtherDed, Sum(NetPay) AS SumNet, Count(*) AS LineCount
+FROM PayrollLines
+GROUP BY PayrollRunID"""),
+    Query("qryJournalPayroll", "أسطر قيود مسيرات الرواتب المرحَّلة وصرفها", _payroll()),
     Query("qryJournalBankTx", "أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى", _bank_tx()),
 
     # ================================================================ BANKS (modBank)
@@ -1381,6 +1418,34 @@ SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS Ass
        a.DisposalDate, a.DisposalProceeds
 FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)
      LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID"""),
+
+    # employee advances: given by cash voucher (OUT ADVANCE), paid back in cash (IN ADVANCE) or deducted
+    # in a posted payroll
+    Query("qryAdvanceMoves", "حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب", """
+SELECT v.AdvanceEmployeeID AS EmployeeID, v.VoucherDate AS MoveDate, IIf(v.VoucherType = 'OUT', v.Amount, -v.Amount) AS MoveAmount
+FROM CashVouchers AS v
+WHERE v.Category = 'ADVANCE' AND v.AdvanceEmployeeID Is Not Null
+UNION ALL
+SELECT l.EmployeeID, r.PayMonth, -l.AdvanceDeduction
+FROM PayrollLines AS l INNER JOIN PayrollRuns AS r ON l.PayrollRunID = r.PayrollRunID
+WHERE r.Status = 'POSTED' AND l.AdvanceDeduction <> 0"""),
+
+    Query("qryAdvanceTotals", "رصيد سلف كل موظف", """
+SELECT EmployeeID, Sum(MoveAmount) AS AdvanceBalance
+FROM qryAdvanceMoves
+GROUP BY EmployeeID"""),
+
+    Query("AdvanceBalanceQuery", "أرصدة سلف الموظفين", f"""
+SELECT e.EmployeeID, e.EmployeeName, e.AdvanceInstallment, {nz("t.AdvanceBalance")} AS Balance
+FROM Employees AS e LEFT JOIN qryAdvanceTotals AS t ON e.EmployeeID = t.EmployeeID
+WHERE t.AdvanceBalance <> 0"""),
+
+    Query("PayrollSheetQuery", "مسير الرواتب المختار بأسطر الموظفين", """
+SELECT r.PayrollRunID, r.RunNumber, r.PayMonth, r.Status, l.EmployeeName, l.Basic, l.Housing, l.OtherAllow, l.Overtime,
+       l.Additions, l.Basic + l.Housing + l.OtherAllow + l.Overtime + l.Additions AS Gross, l.AbsenceDeduction,
+       l.AdvanceDeduction, l.OtherDeduction, l.GosiEmployee, l.GosiEmployer, l.NetPay
+FROM PayrollRuns AS r INNER JOIN PayrollLines AS l ON r.PayrollRunID = l.PayrollRunID
+WHERE r.PayrollRunID = QLong('PayrollRunID')""", ["PayrollRunID"]),
 
     Query("ChequesQuery", "الشيكات الواردة والصادرة مع العميل أو المورد وحالتها", """
 SELECT q.ChequeID, q.ChequeRef, q.Direction, IIf(q.Direction = 'IN', 'وارد', 'صادر') AS DirectionName,

@@ -25,7 +25,8 @@ Public Const CASH_METHOD_ID As Long = 1          ' PaymentMethods: نقدي
 
 Private Const BOX_ROWS As String = "SELECT CashBoxID, BoxName FROM CashBoxes WHERE IsActive = True"
 Private Const VOUCHER_TYPES As String = "IN;سند قبض نقدية;OUT;سند صرف نقدية;TRANSFER;تحويل بين الصناديق"
-Private Const IN_CATEGORIES As String = "OTHER;قبض نقدية (إيرادات أخرى);OWNER;إيداع من المالك"
+Private Const IN_CATEGORIES As String = "OTHER;قبض نقدية (إيرادات أخرى);OWNER;إيداع من المالك;" & _
+                                        "ADVANCE;سداد سلفة موظف"
 Private Const OUT_CATEGORIES As String = "EXPENSE;مصروف (يُسجل في المصروفات);OWNER;تسوية / مسحوبات المالك;" & _
                                          "ADVANCE;سلفة موظف;OTHER;صرف آخر"
 Private Const DESTINATIONS As String = "MAIN;ترحيل إلى الخزينة الرئيسية;OWNER;تسليم للمالك (تسوية);" & _
@@ -483,6 +484,9 @@ Public Sub VoucherCategoryChanged(ByVal frm As Access.Form)
     frm!cboExpenseType.Visible = isExpense
     frm!lblExpenseType.Visible = isExpense
     frm!btnNewExpenseType.Visible = isExpense
+    ' an employee advance (or its payback): the employee (modPayroll)
+    frm!cboEmployee.Visible = (Nz(frm!cboCategory.Value, "") = "ADVANCE")
+    frm!lblEmployee.Visible = frm!cboEmployee.Visible
 End Sub
 
 Public Sub VoucherBoxChanged(ByVal frm As Access.Form)
@@ -509,12 +513,21 @@ Public Function SaveCashVoucher(ByVal frm As Access.Form, Optional ByVal PrintAf
     Dim msg As String, newID As Long, kind As String
     If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     kind = Nz(frm!cboVoucherType.Value, "")
+    msg = AdvanceEmployeeProblem(kind, Nz(frm!cboCategory.Value, ""), frm!cboEmployee.Value, Nz(frm!txtAmount.Value, 0))
+    If Len(msg) > 0 Then
+        ShowWarning msg
+        Exit Function
+    End If
     msg = PostCashVoucher(kind, Nz(frm!cboBox.Value, 0), frm!cboToBox.Value, Nz(frm!cboCategory.Value, ""), _
                           Nz(frm!txtAmount.Value, 0), Nz(frm!txtParty.Value, ""), Nz(frm!txtDescription.Value, ""), _
                           frm!cboExpenseType.Value, newID)
     If Len(msg) > 0 Then
         ShowWarning msg
         Exit Function
+    End If
+    If Nz(frm!cboCategory.Value, "") = "ADVANCE" Then
+        CurrentDb.Execute "UPDATE CashVouchers SET AdvanceEmployeeID = " & CLng(frm!cboEmployee.Value) & _
+                          " WHERE CashVoucherID = " & newID, dbFailOnError
     End If
     ShowInfo "تم حفظ " & DLookupList(VOUCHER_TYPES, kind) & " رقم " & _
              DLookup("VoucherNumber", "CashVouchers", "CashVoucherID = " & newID)

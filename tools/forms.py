@@ -263,6 +263,20 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("Notes", span=2),
         ]),
     DataScreen(
+        "frmEmployeePay", "Employees", "رواتب الموظفين", "الراتب والبدلات والتأمينات وقسط السلفة لكل موظف", "users",
+        list_select="t.EmployeeName AS [الموظف], IIf(t.OnPayroll, 'نعم', '') AS [في المسير], t.BasicSalary AS [الأساسي]",
+        list_from="Employees AS t", list_order="t.EmployeeName",
+        list_headers=[("الموظف", 4.6), ("في المسير", 1.8), ("الأساسي", 2.0)],
+        search=["t.EmployeeName", "t.NationalID"], active="t.IsActive", allow_add=False, allow_delete=False,
+        extra_buttons=[("btnPayroll", "مسير الرواتب", 'OpenScreen "frmPayroll", 0')],
+        fields=[
+            Fld("EmployeeName", span=2, locked=True), Fld("OnPayroll"), Fld("IsSaudi"),
+            Fld("BasicSalary"), Fld("HousingAllowance"), Fld("TransportAllowance"), Fld("OtherAllowance"),
+            Fld("AdvanceInstallment", hint="0 = يُخصم كل رصيد السلف في أول مسير"), Fld("HireDate"),
+            Fld("NationalID"), Fld("IBAN"),
+            Info("lblPayNote", "التأمينات على الأساسي + السكن: السعودي بحصتي الموظف والمنشأة، وغيره بحصة المنشأة"),
+        ]),
+    DataScreen(
         "frmCategories", "Categories", "التصنيفات", "تصنيفات المنتجات", "category",
         list_select="t.CategoryName AS [التصنيف]", list_from="Categories AS t",
         list_order="t.CategoryName", list_headers=[("التصنيف", 8.4)],
@@ -439,6 +453,7 @@ SCREEN_PERMISSIONS = {
     "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
     "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
     "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
+    "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL",
 }
 
 
@@ -1092,7 +1107,8 @@ def all_forms() -> List[FormModel]:
     from forms_aging import aging_forms
     from forms_bank import bank_forms
     from forms_assets import asset_forms
+    from forms_payroll import payroll_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
-            + bank_forms() + asset_forms())
+            + bank_forms() + asset_forms() + payroll_forms())

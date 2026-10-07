@@ -99,7 +99,7 @@ def layout_treasury() -> FormModel:
 
 # ------------------------------------------------------------------ cash voucher
 def layout_cash_voucher() -> FormModel:
-    width, height = cm(16.0), cm(12.0)
+    width, height = cm(16.0), cm(13.4)
     m = FormModel("frmCashVoucher", "سند نقدية", width, height, popup=True, allow_add=False)
     title_band(m, "سند نقدية", "قبض نقدية في صندوق، أو صرف منه، أو تحويل بين صندوقين", "treasury")
     half = cm(7.4)
@@ -120,15 +120,18 @@ def layout_cash_voucher() -> FormModel:
     c = m.add(Control("text", "txtAmount", cm(8.2), cm(6.0), half, cm(0.9),
                       {"FontSize": 14, "Format": "#,##0.00"}))
     labelled(m, "txtAmount", "المبلغ *", c)
-    c = m.add(Control("text", "txtParty", cm(0.4), cm(7.6), width - cm(0.8), cm(0.8), {}))
+    c = table_combo(m, "cboEmployee", cm(0.4), cm(7.6), cm(7.4), events=(),
+                    rows="SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName")
+    labelled(m, "cboEmployee", "الموظف صاحب السلفة *", c)
+    c = m.add(Control("text", "txtParty", cm(0.4), cm(9.0), width - cm(0.8), cm(0.8), {}))
     labelled(m, "txtParty", "المستلم", c)
-    c = m.add(Control("text", "txtDescription", cm(0.4), cm(9.0), width - cm(0.8), cm(0.8), {}))
+    c = m.add(Control("text", "txtDescription", cm(0.4), cm(10.4), width - cm(0.8), cm(0.8), {}))
     labelled(m, "txtDescription", "البيان", c)
-    button(m, "btnSave", "حفظ السند", cm(0.4), cm(10.4), "primary", w=cm(3.4), h=cm(1.0),
+    button(m, "btnSave", "حفظ السند", cm(0.4), cm(11.8), "primary", w=cm(3.4), h=cm(1.0),
            call="SaveCashVoucher Me")
-    button(m, "btnSavePrint", "حفظ وطباعة", cm(4.0), cm(10.4), "primary", w=cm(3.4), h=cm(1.0),
+    button(m, "btnSavePrint", "حفظ وطباعة", cm(4.0), cm(11.8), "primary", w=cm(3.4), h=cm(1.0),
            call="SaveCashVoucher Me, True")
-    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(10.4), "secondary", w=cm(2.6),
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(11.8), "secondary", w=cm(2.6),
            h=cm(1.0), call="DoCmd.Close acForm, Me.Name")
     m.form_events = ["Load"]
     m.code = (["Private Sub Form_Load()", "    VoucherLoad Me", "End Sub",

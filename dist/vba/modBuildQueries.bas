@@ -24,9 +24,9 @@ Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySa
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvo" & _
     "iceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryDashboardTopProducts,qrySalesDocPr" & _
     "int,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
-    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod" & _
-    ",TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchas" & _
-    "eReturnedQty,IntegrityCheckQuery"
+    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryJournalPayroll,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanc" & _
+    "eQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQu" & _
+    "ery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -755,6 +755,8 @@ Private Sub CreateAllQueries()
     Q_qryJournalAsset
     Q_qryDepreciationLines
     Q_qryJournalDepreciation
+    Q_qryPayrollTotals
+    Q_qryJournalPayroll
     Q_qryJournalBankTx
     Q_qryBankItemSums
     Q_qryBankItems
@@ -762,6 +764,10 @@ Private Sub CreateAllQueries()
     Q_BankBalanceQuery
     Q_qryAssetDepTotals
     Q_FixedAssetsQuery
+    Q_qryAdvanceMoves
+    Q_qryAdvanceTotals
+    Q_AdvanceBalanceQuery
+    Q_PayrollSheetQuery
     Q_ChequesQuery
     Q_JournalLinesQuery
     Q_qryJournalEntryPrint
@@ -1753,6 +1759,11 @@ Private Sub Q_qryCashMovements()
     s = s & "FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID" & vbCrLf
     s = s & "WHERE t.TxType = 'WITHDRAW'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT r.CashBoxID, r.PaidDate, 'PAYROLL', '’—› «·—Ê« »', r.RunNumber, '-', r.Notes, CCur(0), r.PaidAmount," & vbCrLf
+    s = s & "       r.EmployeeID" & vbCrLf
+    s = s & "FROM PayrollRuns AS r" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND r.PaidFrom = 'CASHBOX' AND r.PaidAmount <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT a.CashBoxID, a.PurchaseDate, 'ASSET', '‘—«¡ √’· À«» ', a.AssetCode, a.AssetName, a.Notes," & vbCrLf
     s = s & "       CCur(0), a.Cost + a.InputVAT, a.EmployeeID" & vbCrLf
     s = s & "FROM FixedAssets AS a" & vbCrLf
@@ -2045,7 +2056,7 @@ Private Sub Q_qryJournalCashVoucher()
     s = s & "FROM CashVouchers AS v" & vbCrLf
     s = s & "WHERE v.VoucherType = 'IN'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, 4200)) AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText" & vbCrLf
+    s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, IIf(v.Category = 'ADVANCE', 1600, 4200))) AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText" & vbCrLf
     s = s & "FROM CashVouchers AS v" & vbCrLf
     s = s & "WHERE v.VoucherType = 'IN'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
@@ -2299,6 +2310,57 @@ Private Sub Q_qryJournalDepreciation()
     SaveQuery "qryJournalDepreciation", "√”ÿ— ﬁÌÊœ «·≈Â·«ﬂ «·‘Â—Ì…: „’—Ê› «·≈Â·«ﬂ Ê„Ã„⁄ «·≈Â·«ﬂ ·ﬂ· √’·", s
 End Sub
 
+Private Sub Q_qryPayrollTotals()
+    Dim s As String
+    s = "SELECT PayrollRunID, Sum(Basic + Housing - AbsenceDeduction) AS SumSalaries," & vbCrLf
+    s = s & "       Sum(OtherAllow + Overtime + Additions) AS SumAllowances, Sum(GosiEmployer) AS SumGosiER," & vbCrLf
+    s = s & "       Sum(GosiEmployee + GosiEmployer) AS SumGosi, Sum(AdvanceDeduction) AS SumAdvance," & vbCrLf
+    s = s & "       Sum(OtherDeduction) AS SumOtherDed, Sum(NetPay) AS SumNet, Count(*) AS LineCount" & vbCrLf
+    s = s & "FROM PayrollLines" & vbCrLf
+    s = s & "GROUP BY PayrollRunID" & vbCrLf
+    SaveQuery "qryPayrollTotals", "„Ã«„Ì⁄ ﬂ· „”Ì— —Ê« » ·ﬁÌœÂ", s
+End Sub
+
+Private Sub Q_qryJournalPayroll()
+    Dim s As String
+    s = "SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, '„”Ì— «·—Ê« »' AS Party, 1 AS LineOrder, 5500 AS AccountCode, t.SumSalaries AS Debit, CCur(0) AS Credit, '«·—Ê« »' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumSalaries <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, '„”Ì— «·—Ê« »' AS Party, 2 AS LineOrder, 5510 AS AccountCode, t.SumAllowances AS Debit, CCur(0) AS Credit, '«·»œ·«  Ê«·≈÷«›Ì' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumAllowances <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, '„”Ì— «·—Ê« »' AS Party, 3 AS LineOrder, 5520 AS AccountCode, t.SumGosiER AS Debit, CCur(0) AS Credit, '«· √„Ì‰«  - Õ’… «·„‰‘√…' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumGosiER <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, '„”Ì— «·—Ê« »' AS Party, 4 AS LineOrder, 2320 AS AccountCode, CCur(0) AS Debit, t.SumGosi AS Credit, '«· √„Ì‰«  «·„” Õﬁ…' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumGosi <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, '„”Ì— «·—Ê« »' AS Party, 5 AS LineOrder, 1600 AS AccountCode, CCur(0) AS Debit, t.SumAdvance AS Credit, 'Œ’„ «·”·›' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumAdvance <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, '„”Ì— «·—Ê« »' AS Party, 6 AS LineOrder, 4200 AS AccountCode, CCur(0) AS Debit, t.SumOtherDed AS Credit, 'Ã“«¡«  ÊŒ’Ê„« ' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumOtherDed <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, '„”Ì— «·—Ê« »' AS Party, 7 AS LineOrder, 2310 AS AccountCode, CCur(0) AS Debit, t.SumNet AS Credit, '’«›Ì «·—Ê« »' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumNet <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYROLL_PAYMENT' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PaidDate AS SourceDate, '’—› «·—Ê« »' AS Party, 1 AS LineOrder, 2310 AS AccountCode, r.PaidAmount AS Debit, CCur(0) AS Credit, '’«›Ì «·—Ê« »' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND r.PaidAmount <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PAYROLL_PAYMENT' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PaidDate AS SourceDate, '’—› «·—Ê« »' AS Party, 2 AS LineOrder, IIf(r.PaidFrom = 'BANK', 120000 + r.BankID, 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.PaidAmount AS Credit, '’—› «·—Ê« »' AS LineText" & vbCrLf
+    s = s & "FROM PayrollRuns AS r" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND r.PaidAmount <> 0" & vbCrLf
+    SaveQuery "qryJournalPayroll", "√”ÿ— ﬁÌÊœ „”Ì—«  «·—Ê« » «·„—ÕÛ¯·… Ê’—›Â«", s
+End Sub
+
 Private Sub Q_qryJournalBankTx()
     Dim s As String
     s = "SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, '≈Ìœ«⁄ ‰ﬁœÌ…' AS LineText" & vbCrLf
@@ -2413,6 +2475,44 @@ Private Sub Q_FixedAssetsQuery()
     s = s & "FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)" & vbCrLf
     s = s & "     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID" & vbCrLf
     SaveQuery "FixedAssetsQuery", "”Ã· «·√’Ê· «·À«» …: «· ﬂ·›… Ê„Ã„⁄ «·≈Â·«ﬂ Ê«·ﬁÌ„… «·œ› —Ì… Ê«·ﬁ”ÿ «·‘Â—Ì", s
+End Sub
+
+Private Sub Q_qryAdvanceMoves()
+    Dim s As String
+    s = "SELECT v.AdvanceEmployeeID AS EmployeeID, v.VoucherDate AS MoveDate, IIf(v.VoucherType = 'OUT', v.Amount, -v.Amount) AS MoveAmount" & vbCrLf
+    s = s & "FROM CashVouchers AS v" & vbCrLf
+    s = s & "WHERE v.Category = 'ADVANCE' AND v.AdvanceEmployeeID Is Not Null" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT l.EmployeeID, r.PayMonth, -l.AdvanceDeduction" & vbCrLf
+    s = s & "FROM PayrollLines AS l INNER JOIN PayrollRuns AS r ON l.PayrollRunID = r.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND l.AdvanceDeduction <> 0" & vbCrLf
+    SaveQuery "qryAdvanceMoves", "Õ—ﬂ«  ”·› «·„ÊŸ›Ì‰: «·’—› Ê«·”œ«œ «·‰ﬁœÌ Ê«·Œ’„ „‰ «·—Ê« »", s
+End Sub
+
+Private Sub Q_qryAdvanceTotals()
+    Dim s As String
+    s = "SELECT EmployeeID, Sum(MoveAmount) AS AdvanceBalance" & vbCrLf
+    s = s & "FROM qryAdvanceMoves" & vbCrLf
+    s = s & "GROUP BY EmployeeID" & vbCrLf
+    SaveQuery "qryAdvanceTotals", "—’Ìœ ”·› ﬂ· „ÊŸ›", s
+End Sub
+
+Private Sub Q_AdvanceBalanceQuery()
+    Dim s As String
+    s = "SELECT e.EmployeeID, e.EmployeeName, e.AdvanceInstallment, CCur(Nz(t.AdvanceBalance, 0)) AS Balance" & vbCrLf
+    s = s & "FROM Employees AS e LEFT JOIN qryAdvanceTotals AS t ON e.EmployeeID = t.EmployeeID" & vbCrLf
+    s = s & "WHERE t.AdvanceBalance <> 0" & vbCrLf
+    SaveQuery "AdvanceBalanceQuery", "√—’œ… ”·› «·„ÊŸ›Ì‰", s
+End Sub
+
+Private Sub Q_PayrollSheetQuery()
+    Dim s As String
+    s = "SELECT r.PayrollRunID, r.RunNumber, r.PayMonth, r.Status, l.EmployeeName, l.Basic, l.Housing, l.OtherAllow, l.Overtime," & vbCrLf
+    s = s & "       l.Additions, l.Basic + l.Housing + l.OtherAllow + l.Overtime + l.Additions AS Gross, l.AbsenceDeduction," & vbCrLf
+    s = s & "       l.AdvanceDeduction, l.OtherDeduction, l.GosiEmployee, l.GosiEmployer, l.NetPay" & vbCrLf
+    s = s & "FROM PayrollRuns AS r INNER JOIN PayrollLines AS l ON r.PayrollRunID = l.PayrollRunID" & vbCrLf
+    s = s & "WHERE r.PayrollRunID = QLong('PayrollRunID')" & vbCrLf
+    SaveQuery "PayrollSheetQuery", "„”Ì— «·—Ê« » «·„Œ «— »√”ÿ— «·„ÊŸ›Ì‰", s
 End Sub
 
 Private Sub Q_ChequesQuery()

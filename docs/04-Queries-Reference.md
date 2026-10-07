@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **129**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **135**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -100,41 +100,47 @@
 | 92 | [`qryJournalAsset`](#qryjournalasset) | أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها |  |
 | 93 | [`qryDepreciationLines`](#qrydepreciationlines) | أسطر قيود الإهلاك الشهرية مع اسم الأصل |  |
 | 94 | [`qryJournalDepreciation`](#qryjournaldepreciation) | أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل |  |
-| 95 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
-| 96 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
-| 97 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
-| 98 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
-| 99 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
-| 100 | [`qryAssetDepTotals`](#qryassetdeptotals) | مجموع إهلاك كل أصل في القيود الشهرية |  |
-| 101 | [`FixedAssetsQuery`](#fixedassetsquery) | سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري |  |
-| 102 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
-| 103 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 104 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 105 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 106 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 107 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 108 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
-| 109 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 110 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 111 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
-| 112 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 113 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
-| 114 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
-| 115 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 116 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 117 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 118 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 119 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 120 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 121 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 122 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 123 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 124 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 125 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 126 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 127 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 128 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 129 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 95 | [`qryPayrollTotals`](#qrypayrolltotals) | مجاميع كل مسير رواتب لقيده |  |
+| 96 | [`qryJournalPayroll`](#qryjournalpayroll) | أسطر قيود مسيرات الرواتب المرحَّلة وصرفها |  |
+| 97 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
+| 98 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
+| 99 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
+| 100 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
+| 101 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
+| 102 | [`qryAssetDepTotals`](#qryassetdeptotals) | مجموع إهلاك كل أصل في القيود الشهرية |  |
+| 103 | [`FixedAssetsQuery`](#fixedassetsquery) | سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري |  |
+| 104 | [`qryAdvanceMoves`](#qryadvancemoves) | حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب |  |
+| 105 | [`qryAdvanceTotals`](#qryadvancetotals) | رصيد سلف كل موظف |  |
+| 106 | [`AdvanceBalanceQuery`](#advancebalancequery) | أرصدة سلف الموظفين |  |
+| 107 | [`PayrollSheetQuery`](#payrollsheetquery) | مسير الرواتب المختار بأسطر الموظفين | `PayrollRunID` |
+| 108 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
+| 109 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 110 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 111 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 112 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 113 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 114 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
+| 115 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 116 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 117 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 118 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 119 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
+| 120 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
+| 121 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 122 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 123 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 124 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 125 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 126 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 127 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 128 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 129 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 130 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 131 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 132 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 133 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 134 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 135 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -1386,6 +1392,11 @@ SELECT t.CashBoxID, t.TxDate, 'BANK_WITHDRAW', 'سحب من البنك', t.TxNum
 FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
 WHERE t.TxType = 'WITHDRAW'
 UNION ALL
+SELECT r.CashBoxID, r.PaidDate, 'PAYROLL', 'صرف الرواتب', r.RunNumber, '-', r.Notes, CCur(0), r.PaidAmount,
+       r.EmployeeID
+FROM PayrollRuns AS r
+WHERE r.Status = 'POSTED' AND r.PaidFrom = 'CASHBOX' AND r.PaidAmount <> 0
+UNION ALL
 SELECT a.CashBoxID, a.PurchaseDate, 'ASSET', 'شراء أصل ثابت', a.AssetCode, a.AssetName, a.Notes,
        CCur(0), a.Cost + a.InputVAT, a.EmployeeID
 FROM FixedAssets AS a
@@ -1726,7 +1737,7 @@ SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumbe
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'IN'
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, 4200)) AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, IIf(v.Category = 'ADVANCE', 1600, 4200))) AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'IN'
 UNION ALL
@@ -2001,6 +2012,61 @@ FROM qryDepreciationLines AS d
 WHERE d.Amount <> 0
 ```
 
+## qryPayrollTotals
+
+مجاميع كل مسير رواتب لقيده
+
+```sql
+SELECT PayrollRunID, Sum(Basic + Housing - AbsenceDeduction) AS SumSalaries,
+       Sum(OtherAllow + Overtime + Additions) AS SumAllowances, Sum(GosiEmployer) AS SumGosiER,
+       Sum(GosiEmployee + GosiEmployer) AS SumGosi, Sum(AdvanceDeduction) AS SumAdvance,
+       Sum(OtherDeduction) AS SumOtherDed, Sum(NetPay) AS SumNet, Count(*) AS LineCount
+FROM PayrollLines
+GROUP BY PayrollRunID
+```
+
+## qryJournalPayroll
+
+أسطر قيود مسيرات الرواتب المرحَّلة وصرفها
+
+```sql
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 1 AS LineOrder, 5500 AS AccountCode, t.SumSalaries AS Debit, CCur(0) AS Credit, 'الرواتب' AS LineText
+FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+WHERE r.Status = 'POSTED' AND t.SumSalaries <> 0
+UNION ALL
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 2 AS LineOrder, 5510 AS AccountCode, t.SumAllowances AS Debit, CCur(0) AS Credit, 'البدلات والإضافي' AS LineText
+FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+WHERE r.Status = 'POSTED' AND t.SumAllowances <> 0
+UNION ALL
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 3 AS LineOrder, 5520 AS AccountCode, t.SumGosiER AS Debit, CCur(0) AS Credit, 'التأمينات - حصة المنشأة' AS LineText
+FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+WHERE r.Status = 'POSTED' AND t.SumGosiER <> 0
+UNION ALL
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 4 AS LineOrder, 2320 AS AccountCode, CCur(0) AS Debit, t.SumGosi AS Credit, 'التأمينات المستحقة' AS LineText
+FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+WHERE r.Status = 'POSTED' AND t.SumGosi <> 0
+UNION ALL
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 5 AS LineOrder, 1600 AS AccountCode, CCur(0) AS Debit, t.SumAdvance AS Credit, 'خصم السلف' AS LineText
+FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+WHERE r.Status = 'POSTED' AND t.SumAdvance <> 0
+UNION ALL
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 6 AS LineOrder, 4200 AS AccountCode, CCur(0) AS Debit, t.SumOtherDed AS Credit, 'جزاءات وخصومات' AS LineText
+FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+WHERE r.Status = 'POSTED' AND t.SumOtherDed <> 0
+UNION ALL
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 7 AS LineOrder, 2310 AS AccountCode, CCur(0) AS Debit, t.SumNet AS Credit, 'صافي الرواتب' AS LineText
+FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+WHERE r.Status = 'POSTED' AND t.SumNet <> 0
+UNION ALL
+SELECT 'PAYROLL_PAYMENT' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PaidDate AS SourceDate, 'صرف الرواتب' AS Party, 1 AS LineOrder, 2310 AS AccountCode, r.PaidAmount AS Debit, CCur(0) AS Credit, 'صافي الرواتب' AS LineText
+FROM PayrollRuns AS r
+WHERE r.Status = 'POSTED' AND r.PaidAmount <> 0
+UNION ALL
+SELECT 'PAYROLL_PAYMENT' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PaidDate AS SourceDate, 'صرف الرواتب' AS Party, 2 AS LineOrder, IIf(r.PaidFrom = 'BANK', 120000 + r.BankID, 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.PaidAmount AS Credit, 'صرف الرواتب' AS LineText
+FROM PayrollRuns AS r
+WHERE r.Status = 'POSTED' AND r.PaidAmount <> 0
+```
+
 ## qryJournalBankTx
 
 أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى
@@ -2129,6 +2195,54 @@ SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS Ass
        a.DisposalDate, a.DisposalProceeds
 FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)
      LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID
+```
+
+## qryAdvanceMoves
+
+حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب
+
+```sql
+SELECT v.AdvanceEmployeeID AS EmployeeID, v.VoucherDate AS MoveDate, IIf(v.VoucherType = 'OUT', v.Amount, -v.Amount) AS MoveAmount
+FROM CashVouchers AS v
+WHERE v.Category = 'ADVANCE' AND v.AdvanceEmployeeID Is Not Null
+UNION ALL
+SELECT l.EmployeeID, r.PayMonth, -l.AdvanceDeduction
+FROM PayrollLines AS l INNER JOIN PayrollRuns AS r ON l.PayrollRunID = r.PayrollRunID
+WHERE r.Status = 'POSTED' AND l.AdvanceDeduction <> 0
+```
+
+## qryAdvanceTotals
+
+رصيد سلف كل موظف
+
+```sql
+SELECT EmployeeID, Sum(MoveAmount) AS AdvanceBalance
+FROM qryAdvanceMoves
+GROUP BY EmployeeID
+```
+
+## AdvanceBalanceQuery
+
+أرصدة سلف الموظفين
+
+```sql
+SELECT e.EmployeeID, e.EmployeeName, e.AdvanceInstallment, CCur(Nz(t.AdvanceBalance, 0)) AS Balance
+FROM Employees AS e LEFT JOIN qryAdvanceTotals AS t ON e.EmployeeID = t.EmployeeID
+WHERE t.AdvanceBalance <> 0
+```
+
+## PayrollSheetQuery
+
+مسير الرواتب المختار بأسطر الموظفين
+
+المعاملات: `PayrollRunID`
+
+```sql
+SELECT r.PayrollRunID, r.RunNumber, r.PayMonth, r.Status, l.EmployeeName, l.Basic, l.Housing, l.OtherAllow, l.Overtime,
+       l.Additions, l.Basic + l.Housing + l.OtherAllow + l.Overtime + l.Additions AS Gross, l.AbsenceDeduction,
+       l.AdvanceDeduction, l.OtherDeduction, l.GosiEmployee, l.GosiEmployer, l.NetPay
+FROM PayrollRuns AS r INNER JOIN PayrollLines AS l ON r.PayrollRunID = l.PayrollRunID
+WHERE r.PayrollRunID = QLong('PayrollRunID')
 ```
 
 ## ChequesQuery

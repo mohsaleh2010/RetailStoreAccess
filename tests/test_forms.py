@@ -136,6 +136,8 @@ class BoundFieldTests(unittest.TestCase):
 
     def test_required_fields_are_on_screen(self):
         for s in F.DATA_SCREENS:
+            if not s.allow_add and s.kind != "SINGLE":       # edits records made elsewhere (frmEmployeePay)
+                continue
             on_screen = {c.source for c in next(x for x in MODELS if x.name == s.name).controls}
             for f in table(s.table).fields:
                 if f.required and f.default is None and f.kind not in ("AUTO", "BOOL") \

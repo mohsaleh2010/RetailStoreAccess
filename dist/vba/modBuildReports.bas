@@ -26,7 +26,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptAging,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptAging,rptPayroll,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -52,6 +52,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptBalanceSheet
     BuildReport_rptVatReturn
     BuildReport_rptAging
+    BuildReport_rptPayroll
     BuildReport_rptDailySales
     BuildReport_rptMonthlySales
     BuildReport_rptSalesByPeriod
@@ -1331,6 +1332,97 @@ Private Sub BuildReport_rptAging()
     Exit Sub
 EH:
     AbortReport "rptAging", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptPayroll()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptPayroll", "„”Ì— «·—Ê« »", "PayrollSheetQuery", 15536, "", "EmployeeName", True, True
+    SetSection 3, 1701
+    SetSection 4, 340
+    SetSection 2, 1361
+    SetSection 0, 340
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 7768, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 7768, 28, 7768, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "„”Ì— «·—Ê« »", 0, 397, 15536, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 15536, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 15536, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "«·„ÊŸ›", 0, 1292, 2381, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "«·√”«”Ì", 2381, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "«·”ﬂ‰", 3576, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "»œ·«  √Œ—Ï", 4771, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "«·≈÷«›Ì", 5966, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "„ﬂ«›¬ ", 7161, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "«·≈Ã„«·Ì", 8356, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol8", "€Ì«»", 9551, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol9", "”·›…", 10746, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol10", "Ã“«¡« ", 11941, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol11", "«· √„Ì‰« ", 13136, 1292, 1195, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol12", "«·’«›Ì", 14331, 1292, 1205, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
+    Set c = RText(2, "txtSum2", "=Sum([Basic])", 2381, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum3", "=Sum([Housing])", 3576, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum4", "=Sum([OtherAllow])", 4771, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum5", "=Sum([Overtime])", 5966, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum6", "=Sum([Additions])", 7161, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum7", "=Sum([Gross])", 8356, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum8", "=Sum([AbsenceDeduction])", 9551, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum9", "=Sum([AdvanceDeduction])", 10746, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum10", "=Sum([OtherDeduction])", 11941, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum11", "=Sum([GosiEmployee])", 13136, 85, 1195, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum12", "=Sum([NetPay])", 14331, 85, 1205, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 15536)
+    Set c = RText(2, "txtSumCaption", "=""«·≈Ã„«·Ì""", 0, 85, 2381, 312, 9, True, 0)
+    Set c = RLabel(2, "lblSign1", "√⁄œ¯Â: ....................", 0, 737, 3591, 312, 10, False, 0)
+    Set c = RLabel(2, "lblSign2", "—«Ã⁄Â: ....................", 3591, 737, 3591, 312, 10, False, 0)
+    Set c = RLabel(2, "lblSign3", "«⁄ „œÂ: ....................", 7182, 737, 3591, 312, 10, False, 0)
+    Set c = RText(0, "txtCol1", "EmployeeName", 0, 17, 2381, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "Basic", 2381, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol3", "Housing", 3576, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol4", "OtherAllow", 4771, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol5", "Overtime", 5966, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol6", "Additions", 7161, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol7", "Gross", 8356, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol8", "AbsenceDeduction", 9551, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol9", "AdvanceDeduction", 10746, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol10", "OtherDeduction", 11941, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol11", "GosiEmployee", 13136, 17, 1195, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol12", "NetPay", 14331, 17, 1205, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""«·„”Ì— »·« √”ÿ—.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptPayroll", s
+    Exit Sub
+EH:
+    AbortReport "rptPayroll", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptDailySales()

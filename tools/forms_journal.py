@@ -286,7 +286,8 @@ def layout_financials() -> FormModel:
             ("btnTrial", "ميزان المراجعة", "secondary", 3.0, 'OpenScreen "frmJournal"'),
             ("btnClosing", "إقفال الفترات", "secondary", 3.0, 'OpenScreen "frmPeriodClosing", 0'),
             ("btnVat", "الإقرار الضريبي", "secondary", 3.2, 'OpenScreen "frmVatReturn", 0'),
-            ("btnAssets", "الأصول الثابتة", "secondary", 3.0, 'OpenScreen "frmAssets", 0')]:
+            ("btnAssets", "الأصول الثابتة", "secondary", 3.0, 'OpenScreen "frmAssets", 0'),
+            ("btnPayroll", "الرواتب", "secondary", 2.2, 'OpenScreen "frmPayroll"')]:
         button(m, name, caption, x, y, style, w=cm(w), h=cm(0.9), call=call)
         x += cm(w) + cm(0.2)
     button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), y, "secondary", w=cm(2.4), h=cm(0.9),

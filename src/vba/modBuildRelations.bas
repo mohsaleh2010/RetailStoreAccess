@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 119
+Private Const EXPECTED_RELATION_COUNT As Long = 125
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -452,6 +452,11 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_DepreciationRuns_EmployeeID", "Employees", "EmployeeID", "DepreciationRuns", "EmployeeID", 0&)
     c.Add Array("FK_AssetDepreciations_RunID", "DepreciationRuns", "RunID", "AssetDepreciations", "RunID", 4096&)
     c.Add Array("FK_AssetDepreciations_AssetID", "FixedAssets", "AssetID", "AssetDepreciations", "AssetID", 0&)
+    c.Add Array("FK_PayrollRuns_BankID", "Banks", "BankID", "PayrollRuns", "BankID", 0&)
+    c.Add Array("FK_PayrollRuns_CashBoxID", "CashBoxes", "CashBoxID", "PayrollRuns", "CashBoxID", 0&)
+    c.Add Array("FK_PayrollRuns_EmployeeID", "Employees", "EmployeeID", "PayrollRuns", "EmployeeID", 0&)
+    c.Add Array("FK_PayrollLines_PayrollRunID", "PayrollRuns", "PayrollRunID", "PayrollLines", "PayrollRunID", 4096&)
+    c.Add Array("FK_PayrollLines_EmployeeID", "Employees", "EmployeeID", "PayrollLines", "EmployeeID", 0&)
     c.Add Array("FK_BankReconciliations_BankID", "Banks", "BankID", "BankReconciliations", "BankID", 0&)
     c.Add Array("FK_BankReconciliations_EmployeeID", "Employees", "EmployeeID", "BankReconciliations", "EmployeeID", 0&)
     c.Add Array("FK_BankClearings_ReconciliationID", "BankReconciliations", "ReconciliationID", "BankClearings", "ReconciliationID", 4096&)
@@ -471,6 +476,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_CashVouchers_ToCashBoxID", "CashBoxes", "CashBoxID", "CashVouchers", "ToCashBoxID", 0&)
     c.Add Array("FK_CashVouchers_ExpenseID", "Expenses", "ExpenseID", "CashVouchers", "ExpenseID", 0&)
     c.Add Array("FK_CashVouchers_ClosingID", "CashClosings", "ClosingID", "CashVouchers", "ClosingID", 0&)
+    c.Add Array("FK_CashVouchers_AdvanceEmployeeID", "Employees", "EmployeeID", "CashVouchers", "AdvanceEmployeeID", 0&)
     c.Add Array("FK_CashVouchers_EmployeeID", "Employees", "EmployeeID", "CashVouchers", "EmployeeID", 0&)
     c.Add Array("FK_CashClosings_CashBoxID", "CashBoxes", "CashBoxID", "CashClosings", "CashBoxID", 0&)
     c.Add Array("FK_CashClosings_EmployeeID", "Employees", "EmployeeID", "CashClosings", "EmployeeID", 0&)

@@ -297,6 +297,45 @@ class Store:
         self.sync_journal()
         return run, total
 
+    # ------------------------------------------------------------- payroll (modPayroll)
+    def payroll_line(self, basic, housing, other, overtime=0, additions=0, absence=0, advance=0, penalties=0,
+                     saudi=False):
+        """CalcPayLine: (net, GOSI wage, employee share, employer share)."""
+        ee_rate, er_rate, non_rate, max_wage = (dec(v) for v in self.c.execute(
+            "SELECT GosiEmployeeRate, GosiEmployerRate, GosiNonSaudiRate, GosiMaxWage FROM Settings").fetchone())
+        wage = dec(basic) + dec(housing)
+        if max_wage > 0 and wage > max_wage:
+            wage = max_wage
+        ee = (wage * ee_rate).quantize(D("0.01")) if saudi else D(0)
+        er = (wage * (er_rate if saudi else non_rate)).quantize(D("0.01"))
+        net = (dec(basic) + dec(housing) + dec(other) + dec(overtime) + dec(additions) - dec(absence) - dec(advance)
+               - dec(penalties) - ee)
+        return net, wage, ee, er
+
+    def advance_balance(self, emp):
+        return dec(self.one("SELECT AdvanceBalance FROM qryAdvanceTotals WHERE EmployeeID = ?", emp) or 0)
+
+    def create_payroll(self, month_end):
+        """CreatePayroll: a draft with a line for each active employee on payroll (with the advance installment)."""
+        run = self.insert("PayrollRuns", RunNumber=self.next_number("PAYROLL"), PayMonth=month_end[:10] + " 00:00:00",
+                          Status="DRAFT", PaidAmount=0, EmployeeID=self.user)
+        for emp, name, saudi, basic, housing, transport, other, installment in self.c.execute(
+                "SELECT EmployeeID, EmployeeName, IsSaudi, BasicSalary, HousingAllowance, TransportAllowance, "
+                "OtherAllowance, AdvanceInstallment FROM Employees WHERE OnPayroll = 1 AND IsActive = 1 AND "
+                "BasicSalary > 0 ORDER BY EmployeeName").fetchall():
+            allow = dec(transport) + dec(other)
+            advance = self.advance_balance(emp)
+            if dec(installment) > 0 and advance > dec(installment):
+                advance = dec(installment)
+            room = self.payroll_line(basic, housing, allow, saudi=bool(saudi))[0]
+            advance = max(D(0), min(advance, room))
+            net, wage, ee, er = self.payroll_line(basic, housing, allow, advance=advance, saudi=bool(saudi))
+            self.insert("PayrollLines", PayrollRunID=run, EmployeeID=emp, EmployeeName=name, IsSaudi=saudi,
+                        Basic=basic, Housing=housing, OtherAllow=float(allow), Overtime=0, Additions=0,
+                        AbsenceDeduction=0, AdvanceDeduction=float(advance), OtherDeduction=0, GosiWage=float(wage),
+                        GosiEmployee=float(ee), GosiEmployer=float(er), NetPay=float(net))
+        return run
+
     # ------------------------------------------------------------- journal (modJournal.SyncJournal)
     def sync_journal(self):
         """Same steps as SyncJournal: returns (added, updated, removed)."""

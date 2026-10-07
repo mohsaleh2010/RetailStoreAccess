@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -676,14 +676,27 @@ def account_upgrade_sub() -> str:
     return "\n".join(out)
 
 
+def long_const(name: str, text: str, sep: str) -> str:
+    """A string constant split at sep into pieces joined with & (a VBA line stays under 1000 characters)."""
+    pieces, cur = [], ""
+    for item in text.split(sep):
+        if cur and len(cur) + len(item) > 400:
+            pieces.append(cur + sep)
+            cur = item
+        else:
+            cur = f"{cur}{sep}{item}" if cur else item
+    pieces.append(cur)
+    return f"Private Const {name} As String = " + " & _\n    ".join(vba_str(p) for p in pieces)
+
+
 def build_vba() -> str:
     names = ",".join(t.name for t in TABLES)
     field_counts = ";".join(f"{t.name}={len(t.fields)}" for t in TABLES)
     seed_counts = ";".join(f"{t.name}={len(t.seed_rows)}" for t in TABLES if t.seed_rows)
     consts = "\n".join([
-        f"Private Const SCHEMA_TABLES As String = {vba_str(names)}",
-        f"Private Const EXPECTED_FIELD_COUNTS As String = {vba_str(field_counts)}",
-        f"Private Const EXPECTED_SEED_COUNTS As String = {vba_str(seed_counts)}",
+        long_const("SCHEMA_TABLES", names, ","),
+        long_const("EXPECTED_FIELD_COUNTS", field_counts, ";"),
+        long_const("EXPECTED_SEED_COUNTS", seed_counts, ";"),
     ])
     parts = [VBA_HEADER.replace("'@@SCHEMA_CONSTANTS@@", consts)]
 

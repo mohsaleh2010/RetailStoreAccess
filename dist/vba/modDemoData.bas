@@ -667,6 +667,8 @@ Public Function VerifyDemoData() As Boolean
     ExpectJournal "ASSET", 1, CCur(0.00)
     ExpectJournal "ASSET_DISPOSAL", 0, CCur(0.00)
     ExpectJournal "DEPRECIATION", 0, CCur(0.00)
+    ExpectJournal "PAYROLL", 0, CCur(0.00)
+    ExpectJournal "PAYROLL_PAYMENT", 0, CCur(0.00)
     Expect DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit") = 0, "ﬂ· «·ﬁÌÊœ „ Ê«“‰…"
     Expect AccountBalance(1300) = Nz(DbValue("SELECT Sum(CurrentBalance) FROM Customers"), 0), "Õ”«» –„„ «·⁄„·«¡ = √—’œ… «·⁄„·«¡"
     Expect Round(AccountBalance(1400), 2) = CCur(5799.27), "Õ”«» «·„Œ“Ê‰ ›Ì «·ﬁÌÊœ = 5799.27 («·›⁄·Ì: " & _
