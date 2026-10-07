@@ -172,10 +172,40 @@ Sub Compile(what)
     If app.IsCompiled Then
         LogLine "[OK] compiled: " & what
     Else
-        Fail "The VBA code does not compile (" & what & ")." & vbCrLf & _
-             "Open the file, press Alt+F11, then Debug > Compile: the line with the error is shown." & vbCrLf & _
-             "Send that line and the message."
+        CompileFailed what
     End If
+End Sub
+
+Sub CompileFailed(what)
+    ' The compiler leaves the line with the error selected in the VBA editor: log it, then
+    ' leave Access open on that line (the file is kept) so the message can be read there too.
+    Dim pane, module, startLine, startCol, endLine, endCol, where
+    On Error Resume Next
+    where = ""
+    startLine = 0
+    Set pane = app.VBE.ActiveCodePane
+    If Err.Number = 0 Then
+        pane.GetSelection startLine, startCol, endLine, endCol
+        Set module = pane.CodeModule
+        where = "Module " & module.Parent.Name & ", line " & startLine & ":" & vbCrLf & _
+                "    " & Trim(module.Lines(startLine, 1))
+        If Err.Number <> 0 Or startLine < 1 Then where = ""
+    End If
+    Err.Clear
+    LogLine "[X]  The VBA code does not compile (" & what & ")."
+    If where <> "" Then LogLine where
+    LogLine "Access is left open on the line: Debug > Compile shows the message again."
+    logFile.Close
+    app.UserControl = True
+    app.VBE.MainWindow.Visible = True
+    app.DoCmd.RunCommand acCmdCompileAndSaveAllModules
+    On Error GoTo 0
+    MsgBox "The VBA code does not compile (" & what & ")." & vbCrLf & vbCrLf & _
+           where & vbCrLf & vbCrLf & _
+           "Access stays open in the VBA editor on the line with the error" & vbCrLf & _
+           "(Debug > Compile shows the message again)." & vbCrLf & _
+           "Send that line, the message and the log: " & logPath, 16, TITLE
+    WScript.Quit 1
 End Sub
 
 Sub RunStep(procName, required)

@@ -41,6 +41,25 @@ class BuildFrontEndTests(unittest.TestCase):
         self.assertEqual(self.text.count('Compile "'), 2)
         self.assertIn("app.IsCompiled", self.text)
 
+    def test_private_procedures_stay_in_their_module(self):
+        # A Private Sub/Function called from another module: "Sub or Function not defined"
+        # when Access compiles (BoxIsActive of modCash, called by modBank and modAssets).
+        folder = os.path.join(ROOT, "dist", "vba")
+        code = {}
+        for name in os.listdir(folder):
+            with open(os.path.join(folder, name), encoding="cp1256") as fh:
+                code[name] = "\n".join(re.sub(r'"[^"]*"', '""', l).split("'", 1)[0] for l in fh.read().splitlines())
+        procs = {n: set(re.findall(r"^(?:Public |Private )?(?:Function|Sub) (\w+)", t, re.M)) for n, t in code.items()}
+        public = set().union(*(re.findall(r"^(?:Public )?(?:Function|Sub) (\w+)", t, re.M) for t in code.values()))
+        for owner, text in code.items():
+            for proc in re.findall(r"^Private (?:Function|Sub) (\w+)", text, re.M):
+                if proc in public:
+                    continue
+                for other, body in code.items():
+                    if other == owner or proc in procs[other] or re.search(rf"\b{proc}\s+As\b", body):
+                        continue
+                    self.assertIsNone(re.search(rf"(?<![.!\w]){proc}\s*\(", body), f"{owner} {proc} used in {other}")
+
     def test_no_chained_currentdb_collections(self):
         # CurrentDb.TableDefs(...).Fields / For Each x In CurrentDb.TableDefs: the temporary
         # database object is released while it is read - error 3420 on a fresh front-end.

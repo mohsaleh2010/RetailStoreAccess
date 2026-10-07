@@ -88,7 +88,7 @@ Private Function BoxName(ByVal BoxID As Variant) As String
     BoxName = Nz(DbValue("SELECT BoxName FROM CashBoxes WHERE CashBoxID = " & CLng(BoxID)), "")
 End Function
 
-Private Function BoxIsActive(ByVal BoxID As Variant) As Boolean
+Public Function BoxIsActive(ByVal BoxID As Variant) As Boolean
     If IsNull(BoxID) Then Exit Function
     BoxIsActive = Nz(DbValue("SELECT COUNT(*) FROM CashBoxes WHERE IsActive = True AND CashBoxID = " & CLng(BoxID)), 0) > 0
 End Function
