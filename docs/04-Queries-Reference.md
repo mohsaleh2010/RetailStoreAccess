@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **96**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **99**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -76,32 +76,35 @@
 | 68 | [`qryJournalOpening`](#qryjournalopening) | أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين |  |
 | 69 | [`qryManualEntryLines`](#qrymanualentrylines) | أسطر القيود اليدوية مع رأس كل قيد |  |
 | 70 | [`qryJournalManual`](#qryjournalmanual) | أسطر القيود اليدوية |  |
-| 71 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 72 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 73 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 74 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 75 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 76 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
-| 77 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 78 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 79 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
-| 80 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 81 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة | `CompareStart`, `CompareEnd` |
-| 82 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 83 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 84 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 85 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 86 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 87 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 88 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 89 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 90 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 91 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 92 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 93 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 94 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 95 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 96 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 71 | [`qryYearCloseLines`](#qryyearcloselines) | أسطر قيود إقفال السنوات مع رأس كل إقفال |  |
+| 72 | [`qryJournalYearClose`](#qryjournalyearclose) | أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة |  |
+| 73 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 74 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 75 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 76 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 77 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 78 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
+| 79 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 80 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 81 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 82 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 83 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
+| 84 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
+| 85 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 86 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 87 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 88 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 89 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 90 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 91 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 92 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 93 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 94 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 95 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 96 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 97 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 98 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 99 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -1444,6 +1447,26 @@ FROM qryManualEntryLines AS m
 WHERE m.LineDebit + m.LineCredit <> 0
 ```
 
+## qryYearCloseLines
+
+أسطر قيود إقفال السنوات مع رأس كل إقفال
+
+```sql
+SELECT h.YearClosingID, h.ClosingNumber, h.ClosingDate, h.Notes, l.LineNumber AS LineNo,
+       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote
+FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClosingID = l.YearClosingID
+```
+
+## qryJournalYearClose
+
+أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة
+
+```sql
+SELECT 'YEAR_CLOSE' AS SourceType, y.YearClosingID AS SourceID, y.ClosingNumber AS SourceNumber, y.ClosingDate AS SourceDate, y.Notes AS Party, y.LineNo AS LineOrder, y.LineAccount AS AccountCode, y.LineDebit AS Debit, y.LineCredit AS Credit, y.LineNote AS LineText
+FROM qryYearCloseLines AS y
+WHERE y.LineDebit + y.LineCredit <> 0
+```
+
 ## JournalLinesQuery
 
 قيود اليومية خلال فترة بأسطرها
@@ -1625,16 +1648,29 @@ FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode
 ORDER BY a.TreeKey
 ```
 
+## qryIncomeMoves
+
+حركة الحسابات في الفترة بدون قيود إقفال السنة
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd') AND e.SourceType <> 'YEAR_CLOSE'
+GROUP BY l.AccountCode
+```
+
 ## qryCompareMoves
 
-حركة الحسابات في فترة المقارنة
+حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة
 
 المعاملات: `CompareStart`, `CompareEnd`
 
 ```sql
 SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit
 FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
-WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd')
+WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd') AND e.SourceType <> 'YEAR_CLOSE'
 GROUP BY l.AccountCode
 ```
 
@@ -1650,7 +1686,7 @@ SELECT a.AccountCode, a.AccountName, a.TreeKey,
            IIf(a.AccountType = 'REVENUE', 4, 5)))) AS SectionNo,
        IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(c.SumCredit, 0)) - CCur(Nz(c.SumDebit, 0))) AS CurrentAmount,
        IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(p.SumCredit, 0)) - CCur(Nz(p.SumDebit, 0))) AS PriorAmount
-FROM (Accounts AS a LEFT JOIN qryTrialPeriod AS c ON a.AccountCode = c.AccountCode)
+FROM (Accounts AS a LEFT JOIN qryIncomeMoves AS c ON a.AccountCode = c.AccountCode)
      LEFT JOIN qryCompareMoves AS p ON a.AccountCode = p.AccountCode
 WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR p.AccountCode Is Not Null)
 ```

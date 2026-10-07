@@ -154,7 +154,8 @@ class SchemaStructureTests(unittest.TestCase):
             self.assertTrue(field(tname, fname).on_delete_cascade, f"{tname}.{fname}")
 
     def test_money_amounts_cannot_be_negative_except_balances(self):
-        allowed_negative = {"OpeningBalance", "CurrentBalance", "DifferenceValue", "ExpectedBalance", "Difference"}
+        allowed_negative = {"OpeningBalance", "CurrentBalance", "DifferenceValue", "ExpectedBalance", "Difference",
+                            "NetProfit"}                     # a year closing may be a loss
         for t in TABLES:
             for f in t.fields:
                 if f.kind == "MONEY" and f.name not in allowed_negative:

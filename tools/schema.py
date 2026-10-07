@@ -253,6 +253,7 @@ TABLES: List[Table] = [
                  rule='In ("DIRECT","PREVIEW","NONE")', rule_text="اختر طريقة الطباعة من القائمة",
                  note="DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة"),
             bool_("AllowAdminCompanyName", "السماح لمدير النظام بتغيير اسم المحل", "False"),
+            datetime_("ClosedThrough", "الفترة مقفلة حتى (لا يُضاف ولا يُعدَّل مستند بتاريخ حتى هذا اليوم)"),
         ],
         pk=["SettingID"],
         seed_columns=["SettingID", "StoreName", "CountryCode", "VATRate", "PricesIncludeVAT",
@@ -349,6 +350,7 @@ TABLES: List[Table] = [
             ("CASH_CLOSING", "تصفية يومية الكاشير", "الخزينة", 66),
             ("JOURNAL", "قيود اليومية ودليل الحسابات وميزان المراجعة", "الحسابات", 75),
             ("MANUAL_ENTRY", "القيود اليدوية: إضافة وتعديل وحذف", "الحسابات", 76),
+            ("PERIOD_CLOSE", "إقفال الفترات والسنة المالية وإعادة فتحها", "الحسابات", 77),
             ("REPORTS", "التقارير التشغيلية", "التقارير", 70),
             ("REPORTS_PROFIT", "تقارير الأرباح والضريبة", "التقارير", 71),
             ("DASHBOARD_FINANCIAL", "الأرقام المالية في لوحة التحكم", "التقارير", 72),
@@ -1058,6 +1060,7 @@ TABLES: List[Table] = [
             ("STOCK_MOVE", "حركة مخزون يدوية", 9), ("STOCK_COUNT", "تسوية جرد", 10),
             ("BOX_OPENING", "رصيد افتتاحي لصندوق", 11), ("CUSTOMER_OPENING", "رصيد افتتاحي لعميل", 12),
             ("SUPPLIER_OPENING", "رصيد افتتاحي لمورد", 13), ("MANUAL", "قيد يدوي", 14),
+            ("YEAR_CLOSE", "قيد إقفال السنة", 15),
         ],
         seed_missing=True,
     ),
@@ -1100,6 +1103,58 @@ TABLES: List[Table] = [
         ],
         pk=["JournalLineID"],
         indexes=[ux("EntryID", "LineNumber"), ix("AccountCode")],
+    ),
+
+    Table(
+        "PeriodClosings", "سجل إقفال الفترات",
+        "كل إقفال أو إعادة فتح لفترة أو سنة مالية: التاريخ الجديد للإقفال والسابق، ومن قام به والسبب.",
+        [
+            auto("PeriodClosingID", "رقم داخلي"),
+            text("ActionType", 12, "العملية", required=True,
+                 rule='In ("CLOSE","REOPEN","YEAR_CLOSE","YEAR_OPEN")',
+                 rule_text="إقفال، إعادة فتح، إقفال سنة، إعادة فتح سنة"),
+            datetime_("ClosedThrough", "مقفلة حتى (بعد العملية)"),
+            datetime_("PreviousThrough", "مقفلة حتى (قبل العملية)"),
+            int_("FiscalYear", "السنة المالية"),
+            text("Notes", 255, "السبب / ملاحظات"),
+            long_("EmployeeID", "قام به", required=True, fk="Employees.EmployeeID"),
+            created_at(),
+        ],
+        pk=["PeriodClosingID"],
+    ),
+
+    Table(
+        "FiscalYearClosings", "إقفال السنوات المالية",
+        "قيد إقفال كل سنة: أرصدة الإيرادات والمصروفات في 31 ديسمبر تُقفل في الأرباح المحتجزة (3300). "
+        "أسطره محفوظة كما كانت يوم الإقفال، ويُرحَّل لليومية كعملية «قيد إقفال السنة».",
+        [
+            auto("YearClosingID", "رقم داخلي"),
+            int_("FiscalYear", "السنة المالية", required=True),
+            text("ClosingNumber", 20, "رقم الإقفال", required=True),
+            date_("ClosingDate", "تاريخ الإقفال"),
+            money("NetProfit", "صافي ربح (خسارة) السنة", rule=None, rule_text=None),
+            long_("EmployeeID", "أقفلها", required=True, fk="Employees.EmployeeID"),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["YearClosingID"],
+        indexes=[ux("FiscalYear"), ux("ClosingNumber")],
+    ),
+
+    Table(
+        "FiscalYearClosingLines", "أسطر قيود إقفال السنوات",
+        "لكل حساب إيرادات أو مصروفات رصيده معكوسًا، ثم صافي الربح في الأرباح المحتجزة.",
+        [
+            auto("YearClosingLineID", "رقم السطر الداخلي"),
+            long_("YearClosingID", "إقفال السنة", required=True, fk="FiscalYearClosings.YearClosingID", cascade=True),
+            int_("LineNumber", "رقم السطر", required=True),
+            long_("AccountCode", "الحساب", required=True, fk="Accounts.AccountCode"),
+            money("Debit", "مدين"),
+            money("Credit", "دائن"),
+            text("LineText", 150, "البيان"),
+        ],
+        pk=["YearClosingLineID"],
+        indexes=[ux("YearClosingID", "LineNumber")],
     ),
 
     Table(
@@ -1305,7 +1360,7 @@ TABLES: List[Table] = [
 def _role_permissions():
     perms = [r[0] for r in table("Permissions").seed_rows]
     cashier = ["SALES_POS", "SALES_VIEW", "CUSTOMERS", "CUSTOMER_PAYMENTS", "CASH_CLOSING"]
-    manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK"}
+    manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK", "PERIOD_CLOSE"}
     rows = [(1, p) for p in perms]
     rows += [(2, p) for p in perms if p not in manager_excluded]
     rows += [(3, p) for p in cashier]
@@ -1347,6 +1402,7 @@ SCREEN_LIST = [
     ("frmManualEntry", "القيود اليدوية", "الحسابات", "MANUAL_ENTRY", True, True, True),
     ("frmLedger", "كشف حساب ودفتر الأستاذ", "الحسابات", "JOURNAL", False, False, False),
     ("frmFinancials", "القوائم المالية", "الحسابات", "REPORTS_PROFIT", False, False, False),
+    ("frmPeriodClosing", "إقفال الفترات والسنة المالية", "الحسابات", "PERIOD_CLOSE", False, False, False),
     ("frmReportCenter", "التقارير", "التقارير", "REPORTS", False, False, False),
     ("frmSearch", "البحث", "النظام", None, False, False, False),
     ("frmSettings", "إعدادات المحل", "النظام", "SETTINGS", False, True, False),
@@ -1411,7 +1467,7 @@ ACCOUNT_TREE = [
     (3100, "جاري المالك", E, 31, True, True),
     (3900, "أرصدة افتتاحية", E, 31, True, True),
     (32, "الأرباح المحتجزة ونتائج الأعمال", E, 3, False, True),
-    (3300, "الأرباح المحتجزة", E, 32, True, False),
+    (3300, "الأرباح المحتجزة", E, 32, True, True),
     (3400, "صافي ربح (خسارة) العام", E, 32, True, False),
     (4, "الإيرادات", R, None, False, True),
     (41, "إيرادات النشاط", R, 4, False, True),

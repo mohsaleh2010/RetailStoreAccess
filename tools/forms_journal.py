@@ -283,7 +283,8 @@ def layout_financials() -> FormModel:
     for name, caption, style, w, call in [
             ("btnPrint", "طباعة القائمة", "primary", 3.2, "PrintFinancials Me"),
             ("btnLedger", "كشف حساب", "secondary", 2.8, "FinancialsOpenLedger Me"),
-            ("btnTrial", "ميزان المراجعة", "secondary", 3.0, 'OpenScreen "frmJournal"')]:
+            ("btnTrial", "ميزان المراجعة", "secondary", 3.0, 'OpenScreen "frmJournal"'),
+            ("btnClosing", "إقفال الفترات", "secondary", 3.0, 'OpenScreen "frmPeriodClosing", 0')]:
         button(m, name, caption, x, y, style, w=cm(w), h=cm(0.9), call=call)
         x += cm(w) + cm(0.2)
     button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), y, "secondary", w=cm(2.4), h=cm(0.9),
@@ -298,7 +299,61 @@ def layout_financials() -> FormModel:
     return m
 
 
+# ------------------------------------------------------------- period closing
+CLOSING_HISTORY = ("SELECT p.PeriodClosingID, IIf(p.ActionType = 'CLOSE', 'إقفال فترة', IIf(p.ActionType = 'REOPEN', "
+                   "'إعادة فتح', IIf(p.ActionType = 'YEAR_CLOSE', 'إقفال سنة', 'إعادة فتح سنة'))) AS [العملية], "
+                   "p.ClosedThrough AS [مقفلة حتى], p.FiscalYear AS [السنة], e.EmployeeName AS [بواسطة], "
+                   "p.CreatedAt AS [في], p.Notes AS [السبب] FROM PeriodClosings AS p INNER JOIN Employees AS e ON "
+                   "p.EmployeeID = e.EmployeeID ORDER BY p.PeriodClosingID DESC")
+
+
+def layout_period_closing() -> FormModel:
+    width, height = cm(22.0), cm(17.0)
+    m = FormModel("frmPeriodClosing", "إقفال الفترات والسنة المالية", width, height, popup=True, allow_add=False)
+    title_band(m, "إقفال الفترات والسنة المالية",
+               "بعد الإقفال لا يُضاف ولا يُعدَّل ولا يُحذف أي مستند بتاريخ مقفل", "journal")
+    m.add(Control("label", "lblState", cm(0.4), cm(1.85), width - cm(0.8), cm(0.8),
+                  {"Caption": " ", "FontSize": 14, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    # a period
+    m.add(Control("label", "lblPeriodCap", cm(0.4), cm(2.85), cm(12.0), cm(0.6),
+                  {"Caption": "إقفال فترة (شهر أو أكثر)", "FontSize": 11, "FontBold": True,
+                   "ForeColor": Sym("CLR_TEXT")}))
+    c = m.add(Control("text", "txtThrough", cm(0.4), cm(4.0), cm(3.4), cm(0.85), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtThrough", "مقفلة حتى يوم", c)
+    c = m.add(Control("text", "txtNotes", cm(4.0), cm(4.0), width - cm(4.4), cm(0.85), {}))
+    labelled(m, "txtNotes", "السبب / ملاحظات (مطلوب لإعادة الفتح)", c)
+    button(m, "btnClosePeriod", "إقفال حتى هذا اليوم", cm(0.4), cm(5.1), "primary", w=cm(4.6), h=cm(0.9),
+           call="DoClosePeriod Me")
+    button(m, "btnReopenPeriod", "إعادة الفتح إلى هذا اليوم", cm(5.2), cm(5.1), "danger", w=cm(5.2), h=cm(0.9),
+           call="DoReopenPeriod Me")
+    # a fiscal year
+    m.add(Control("label", "lblYearCap", cm(0.4), cm(6.4), cm(12.0), cm(0.6),
+                  {"Caption": "إقفال السنة المالية (الإيرادات والمصروفات إلى الأرباح المحتجزة)", "FontSize": 11,
+                   "FontBold": True, "ForeColor": Sym("CLR_TEXT")}))
+    c = m.add(Control("combo", "cboYear", cm(0.4), cm(7.55), cm(3.4), cm(0.85),
+                      {"RowSourceType": "Value List", "RowSource": "", "ColumnCount": 1, "ColumnWidths": "3",
+                       "LimitToList": True}, events=["AfterUpdate"]))
+    labelled(m, "cboYear", "السنة", c)
+    m.add(Control("label", "lblYearInfo", cm(4.0), cm(7.6), width - cm(4.4), cm(0.75),
+                  {"Caption": " ", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    button(m, "btnCloseYear", "إقفال السنة", cm(0.4), cm(8.65), "primary", w=cm(4.6), h=cm(0.9), call="DoCloseYear Me")
+    button(m, "btnReopenYear", "إعادة فتح السنة", cm(5.2), cm(8.65), "danger", w=cm(5.2), h=cm(0.9),
+           call="DoReopenYear Me")
+    m.add(Control("label", "lblHistoryCap", cm(0.4), cm(9.95), cm(12.0), cm(0.6),
+                  {"Caption": "سجل الإقفال وإعادة الفتح", "FontSize": 10, "FontBold": True,
+                   "ForeColor": Sym("CLR_MUTED")}))
+    m.add(Control("list", "lstHistory", cm(0.4), cm(10.6), width - cm(0.8), cm(4.6),
+                  {"RowSourceType": "Table/Query", "RowSource": CLOSING_HISTORY, "ColumnCount": 7,
+                   "ColumnWidths": "0;2.8;2.6;1.4;3.4;3.6;6", "ColumnHeads": True}))
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(15.6), "secondary", w=cm(2.6), h=cm(1.0),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    PeriodClosingLoad Me", "End Sub",
+               "Private Sub cboYear_AfterUpdate()", "    PeriodClosingRefresh Me", "End Sub"] + m.code)
+    return m
+
+
 def journal_forms() -> List[FormModel]:
     lines, heads = layout_manual_lines()
     return [layout_journal(), layout_journal_entry(), lines, layout_manual_entry(heads), layout_ledger(),
-            layout_financials()]
+            layout_financials(), layout_period_closing()]

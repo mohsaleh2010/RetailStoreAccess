@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **42** | عدد الحقول: **507**
+عدد الجداول: **45** | عدد الحقول: **531**
 
 ## الفهرس
 
@@ -40,14 +40,17 @@
 32. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
 33. [`JournalEntries`](#journalentries) – قيود اليومية
 34. [`JournalLines`](#journallines) – أسطر القيود
-35. [`ManualEntries`](#manualentries) – القيود اليدوية
-36. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-37. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-38. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-39. [`StockCounts`](#stockcounts) – جلسات الجرد
-40. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-41. [`AuditLog`](#auditlog) – سجل العمليات
-42. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+35. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+36. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+37. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+38. [`ManualEntries`](#manualentries) – القيود اليدوية
+39. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+40. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+41. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+42. [`StockCounts`](#stockcounts) – جلسات الجرد
+43. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+44. [`AuditLog`](#auditlog) – سجل العمليات
+45. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -87,6 +90,7 @@
 | 30 | ImagesFolder | Short Text | 255 |  |  |  |  | مجلد صور المنتجات – المسارات النسبية للصور تُقرأ منه؛ فارغ = مجلد Images بجانب ملف البيانات |
 | 31 | InvoicePrintMode | Short Text | 10 | ✔ | `"PREVIEW"` | `In ("DIRECT","PREVIEW","NONE")` |  | الطباعة عند حفظ الفاتورة – DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة |
 | 32 | AllowAdminCompanyName | Yes/No |  |  | `False` |  |  | السماح لمدير النظام بتغيير اسم المحل |
+| 33 | ClosedThrough | Date/Time |  |  |  |  |  | الفترة مقفلة حتى (لا يُضاف ولا يُعدَّل مستند بتاريخ حتى هذا اليوم) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -133,7 +137,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 26 سجل
+- بيانات أساسية: 27 سجل
 
 ## RolePermissions
 
@@ -145,7 +149,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 53 سجل
+- بيانات أساسية: 54 سجل
 
 ## Employees
 
@@ -193,7 +197,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 37 سجل
+- بيانات أساسية: 38 سجل
 
 ## UserScreens
 
@@ -806,7 +810,7 @@
 | 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 14 سجل
+- بيانات أساسية: 15 سجل
 
 ## JournalEntries
 
@@ -851,6 +855,59 @@
 - المفتاح الأساسي: `JournalLineID`
 - فهرس فريد: `EntryID, LineNumber`
 - فهرس عادي: `AccountCode`
+
+## PeriodClosings
+
+**سجل إقفال الفترات** – كل إقفال أو إعادة فتح لفترة أو سنة مالية: التاريخ الجديد للإقفال والسابق، ومن قام به والسبب.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **PeriodClosingID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | ActionType | Short Text | 12 | ✔ |  | `In ("CLOSE","REOPEN","YEAR_CLOSE","YEAR_OPEN")` |  | العملية |
+| 3 | ClosedThrough | Date/Time |  |  |  |  |  | مقفلة حتى (بعد العملية) |
+| 4 | PreviousThrough | Date/Time |  |  |  |  |  | مقفلة حتى (قبل العملية) |
+| 5 | FiscalYear | Number (Integer) |  |  |  |  |  | السنة المالية |
+| 6 | Notes | Short Text | 255 |  |  |  |  | السبب / ملاحظات |
+| 7 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | قام به |
+| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `PeriodClosingID`
+
+## FiscalYearClosings
+
+**إقفال السنوات المالية** – قيد إقفال كل سنة: أرصدة الإيرادات والمصروفات في 31 ديسمبر تُقفل في الأرباح المحتجزة (3300). أسطره محفوظة كما كانت يوم الإقفال، ويُرحَّل لليومية كعملية «قيد إقفال السنة».
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **YearClosingID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | FiscalYear | Number (Integer) |  | ✔ |  |  |  | السنة المالية |
+| 3 | ClosingNumber | Short Text | 20 | ✔ |  |  |  | رقم الإقفال |
+| 4 | ClosingDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الإقفال |
+| 5 | NetProfit | Currency |  | ✔ | `0` |  |  | صافي ربح (خسارة) السنة |
+| 6 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أقفلها |
+| 7 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `YearClosingID`
+- فهرس فريد: `FiscalYear`
+- فهرس فريد: `ClosingNumber`
+
+## FiscalYearClosingLines
+
+**أسطر قيود إقفال السنوات** – لكل حساب إيرادات أو مصروفات رصيده معكوسًا، ثم صافي الربح في الأرباح المحتجزة.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **YearClosingLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر الداخلي |
+| 2 | YearClosingID | Number (Long) |  | ✔ |  |  | `FiscalYearClosings.YearClosingID` | إقفال السنة |
+| 3 | LineNumber | Number (Integer) |  | ✔ |  |  |  | رقم السطر |
+| 4 | AccountCode | Number (Long) |  | ✔ |  |  | `Accounts.AccountCode` | الحساب |
+| 5 | Debit | Currency |  | ✔ | `0` | `>=0` |  | مدين |
+| 6 | Credit | Currency |  | ✔ | `0` | `>=0` |  | دائن |
+| 7 | LineText | Short Text | 150 |  |  |  |  | البيان |
+
+- المفتاح الأساسي: `YearClosingLineID`
+- فهرس فريد: `YearClosingID, LineNumber`
 
 ## ManualEntries
 

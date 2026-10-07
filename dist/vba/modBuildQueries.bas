@@ -23,8 +23,8 @@ Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,SupplierStatementQuery,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,Dashbo" & _
     "ardQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPa" & _
-    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAcc" & _
-    "ounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "yments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatem" & _
+    "entQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -723,6 +723,8 @@ Private Sub CreateAllQueries()
     Q_qryJournalOpening
     Q_qryManualEntryLines
     Q_qryJournalManual
+    Q_qryYearCloseLines
+    Q_qryJournalYearClose
     Q_JournalLinesQuery
     Q_qryJournalEntryPrint
     Q_qryTrialBefore
@@ -733,6 +735,7 @@ Private Sub CreateAllQueries()
     Q_GeneralLedgerQuery
     Q_qryTreeRollup
     Q_TrialBalanceTreeQuery
+    Q_qryIncomeMoves
     Q_qryCompareMoves
     Q_qryIncomeAccounts
     Q_IncomeStatementQuery
@@ -1791,6 +1794,22 @@ Private Sub Q_qryJournalManual()
     SaveQuery "qryJournalManual", "√”ÿ— «·ﬁÌÊœ «·ÌœÊÌ…", s
 End Sub
 
+Private Sub Q_qryYearCloseLines()
+    Dim s As String
+    s = "SELECT h.YearClosingID, h.ClosingNumber, h.ClosingDate, h.Notes, l.LineNumber AS LineNo," & vbCrLf
+    s = s & "       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote" & vbCrLf
+    s = s & "FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClosingID = l.YearClosingID" & vbCrLf
+    SaveQuery "qryYearCloseLines", "√”ÿ— ﬁÌÊœ ≈ﬁ›«· «·”‰Ê«  „⁄ —√” ﬂ· ≈ﬁ›«·", s
+End Sub
+
+Private Sub Q_qryJournalYearClose()
+    Dim s As String
+    s = "SELECT 'YEAR_CLOSE' AS SourceType, y.YearClosingID AS SourceID, y.ClosingNumber AS SourceNumber, y.ClosingDate AS SourceDate, y.Notes AS Party, y.LineNo AS LineOrder, y.LineAccount AS AccountCode, y.LineDebit AS Debit, y.LineCredit AS Credit, y.LineNote AS LineText" & vbCrLf
+    s = s & "FROM qryYearCloseLines AS y" & vbCrLf
+    s = s & "WHERE y.LineDebit + y.LineCredit <> 0" & vbCrLf
+    SaveQuery "qryJournalYearClose", "√”ÿ— ﬁÌÊœ ≈ﬁ›«· «·”‰Ê« : «·≈Ì—«œ«  Ê«·„’—Ê›«  ≈·Ï «·√—»«Õ «·„Õ Ã“…", s
+End Sub
+
 Private Sub Q_JournalLinesQuery()
     Dim s As String
     s = "SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber," & vbCrLf
@@ -1934,13 +1953,22 @@ Private Sub Q_TrialBalanceTreeQuery()
     SaveQuery "TrialBalanceTreeQuery", "„Ì“«‰ «·„—«Ã⁄… »«·„” ÊÌ« : ﬂ· Õ”«» —∆Ì”Ì »„Ã„Ê⁄ Õ”«»« Â «· «»⁄…", s
 End Sub
 
+Private Sub Q_qryIncomeMoves()
+    Dim s As String
+    s = "SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit" & vbCrLf
+    s = s & "FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID" & vbCrLf
+    s = s & "WHERE e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd') AND e.SourceType <> 'YEAR_CLOSE'" & vbCrLf
+    s = s & "GROUP BY l.AccountCode" & vbCrLf
+    SaveQuery "qryIncomeMoves", "Õ—ﬂ… «·Õ”«»«  ›Ì «·› —… »œÊ‰ ﬁÌÊœ ≈ﬁ›«· «·”‰…", s
+End Sub
+
 Private Sub Q_qryCompareMoves()
     Dim s As String
     s = "SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit" & vbCrLf
     s = s & "FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID" & vbCrLf
-    s = s & "WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd')" & vbCrLf
+    s = s & "WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd') AND e.SourceType <> 'YEAR_CLOSE'" & vbCrLf
     s = s & "GROUP BY l.AccountCode" & vbCrLf
-    SaveQuery "qryCompareMoves", "Õ—ﬂ… «·Õ”«»«  ›Ì › —… «·„ﬁ«—‰…", s
+    SaveQuery "qryCompareMoves", "Õ—ﬂ… «·Õ”«»«  ›Ì › —… «·„ﬁ«—‰… »œÊ‰ ﬁÌÊœ ≈ﬁ›«· «·”‰…", s
 End Sub
 
 Private Sub Q_qryIncomeAccounts()
@@ -1950,7 +1978,7 @@ Private Sub Q_qryIncomeAccounts()
     s = s & "           IIf(a.AccountType = 'REVENUE', 4, 5)))) AS SectionNo," & vbCrLf
     s = s & "       IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(c.SumCredit, 0)) - CCur(Nz(c.SumDebit, 0))) AS CurrentAmount," & vbCrLf
     s = s & "       IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(p.SumCredit, 0)) - CCur(Nz(p.SumDebit, 0))) AS PriorAmount" & vbCrLf
-    s = s & "FROM (Accounts AS a LEFT JOIN qryTrialPeriod AS c ON a.AccountCode = c.AccountCode)" & vbCrLf
+    s = s & "FROM (Accounts AS a LEFT JOIN qryIncomeMoves AS c ON a.AccountCode = c.AccountCode)" & vbCrLf
     s = s & "     LEFT JOIN qryCompareMoves AS p ON a.AccountCode = p.AccountCode" & vbCrLf
     s = s & "WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR p.AccountCode Is Not Null)" & vbCrLf
     SaveQuery "qryIncomeAccounts", "Õ”«»«  ﬁ«∆„… «·œŒ·: ’«›Ì Õ—ﬂ… ﬂ· Õ”«» ≈Ì—«œ«  √Ê „’—Ê›«  ›Ì «·› —… Ê› —… «·„ﬁ«—‰…", s

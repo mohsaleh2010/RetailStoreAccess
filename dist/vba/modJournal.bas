@@ -19,7 +19,7 @@ Option Explicit
 
 Private Const SOURCE_QUERIES As String = "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase," & _
     "qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock," & _
-    "qryJournalOpening,qryJournalManual"
+    "qryJournalOpening,qryJournalManual,qryJournalYearClose"
 
 '==============================================================================
 ' Accounts and synchronisation
@@ -41,11 +41,13 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
     Dim db As DAO.Database, ws As DAO.Workspace, inTrans As Boolean
     Dim rs As DAO.Recordset, e As DAO.Recordset, existing As Object, seen As Object, kinds As Object
     Dim sources() As String, i As Long, key As String, info As Variant, k As Variant, skipped As String
+    Dim closed As Date, locked As String, st As String
 
     On Error GoTo EH
     Added = 0: Updated = 0: Removed = 0
     Calendar = vbCalGreg
     Set db = CurrentDb
+    closed = ClosedThroughDate()            ' entries until this day never change (modClosing); 0 = none
     EnsureAccounts
     Set kinds = CreateObject("Scripting.Dictionary")
     Set rs = db.OpenRecordset("SELECT SourceType, TypeName FROM JournalSourceTypes", dbOpenSnapshot)
@@ -79,9 +81,12 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
             " GROUP BY SourceType, SourceID", dbOpenSnapshot)
         Do Until rs.EOF
             key = rs!SourceType & "|" & rs!SourceID
+            st = CStr(rs!SourceType)
             seen(key) = True
             If CCur(Nz(rs!SumDebit, 0)) <> CCur(Nz(rs!SumCredit, 0)) Then
-                skipped = skipped & "  " & kinds(CStr(rs!SourceType)) & " " & Nz(rs!DocNumber, "") & vbCrLf
+                skipped = skipped & "  " & kinds(st) & " " & Nz(rs!DocNumber, "") & vbCrLf
+            ElseIf Not existing.Exists(key) And InClosedPeriod(st, SourceDateOf(rs), closed) Then
+                locked = locked & "  " & kinds(st) & " " & Nz(rs!DocNumber, "") & vbCrLf
             ElseIf Not existing.Exists(key) Then
                 e.AddNew
                 e!EntryNumber = "~" & Format$(Added + 1, "000000")      ' numbered in date order below
@@ -90,7 +95,11 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
                 Added = Added + 1
             Else
                 info = existing(key)
-                If info(1) <> CCur(Nz(rs!Sig, 0)) Or info(2) <> SourceDateOf(rs) Or info(3) <> CCur(rs!SumDebit) Then
+                If info(1) = CCur(Nz(rs!Sig, 0)) And info(2) = SourceDateOf(rs) And info(3) = CCur(rs!SumDebit) Then
+                    ' unchanged
+                ElseIf InClosedPeriod(st, info(2), closed) Or InClosedPeriod(st, SourceDateOf(rs), closed) Then
+                    locked = locked & "  " & kinds(st) & " " & Nz(rs!DocNumber, "") & vbCrLf
+                Else
                     db.Execute "DELETE FROM JournalLines WHERE EntryID = " & info(0), dbFailOnError
                     e.FindFirst "EntryID = " & info(0)
                     e.Edit
@@ -116,9 +125,14 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
     For Each k In existing.Keys
         If Not seen.Exists(k) Then
             info = existing(k)
-            db.Execute "DELETE FROM JournalLines WHERE EntryID = " & info(0), dbFailOnError
-            db.Execute "DELETE FROM JournalEntries WHERE EntryID = " & info(0), dbFailOnError
-            Removed = Removed + 1
+            st = Split(k, "|")(0)
+            If InClosedPeriod(st, info(2), closed) Then
+                locked = locked & "  " & kinds(st) & " (" & GDate(info(2)) & ")" & vbCrLf
+            Else
+                db.Execute "DELETE FROM JournalLines WHERE EntryID = " & info(0), dbFailOnError
+                db.Execute "DELETE FROM JournalEntries WHERE EntryID = " & info(0), dbFailOnError
+                Removed = Removed + 1
+            End If
         End If
     Next
 
@@ -140,12 +154,24 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
     If Len(skipped) > 0 Then
         SyncJournal = "⁄„·Ì«  €Ì— „ Ê«“‰… ·„ Ìı‰‘√ ·Â« ﬁÌœ (—«Ã⁄Â«):" & vbCrLf & Left$(skipped, 700)
     End If
+    If Len(locked) > 0 Then
+        SyncJournal = SyncJournal & IIf(Len(SyncJournal) > 0, vbCrLf, "") & _
+            "⁄„·Ì«  ›Ì › —… „ﬁ›·…  €Ì—  Ê·„ Ì €Ì— ﬁÌœÂ« (√⁄œ › Õ «·› —… ≈‰ ﬂ«‰ «· €ÌÌ— „ﬁ’Êœ«):" & vbCrLf & _
+            Left$(locked, 700)
+    End If
     Exit Function
 
 EH:
     SyncJournal = " ⁄–—  ÕœÌÀ «·ﬁÌÊœ: " & Err.Description & " (" & Err.Number & ")"
     If inTrans Then ws.Rollback
     Added = 0: Updated = 0: Removed = 0
+End Function
+
+Private Function InClosedPeriod(ByVal SourceType As String, ByVal When As Variant, ByVal Closed As Date) As Boolean
+    ' A journal entry dated in the closed period is never added, changed or removed, except the year
+    ' closing entry, which the closing itself creates and removes.
+    If Closed = 0 Or SourceType = "YEAR_CLOSE" Or Not IsDate(When) Then Exit Function
+    InClosedPeriod = (DateValue(When) <= Closed)
 End Function
 
 Private Function SourceDateOf(ByVal rs As DAO.Recordset) As Date
@@ -194,6 +220,7 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "CUSTOMER_OPENING": OpenScreen "frmCustomers", 0, id
         Case "SUPPLIER_OPENING": OpenScreen "frmSuppliers", 0, id
         Case "MANUAL":           OpenScreen "frmManualEntry", 0, id
+        Case "YEAR_CLOSE":       OpenScreen "frmPeriodClosing"
         Case Else:               ShowWarning "«·ﬁÌœ €Ì— „ÊÃÊœ."
     End Select
 End Sub
@@ -359,6 +386,7 @@ Public Function TestJournal() As Boolean
     Dim passed As Long, failed As Long, report As String, msg As String
     Dim added As Long, updated As Long, removed As Long, ws As DAO.Workspace, inTrans As Boolean, id As Long
     Dim manualID As Long, jv As Variant, number As String, opening As Currency, debit As Currency, credit As Currency
+    Dim fy As Long, profit As Currency, wasClosed As Date
     Calendar = vbCalGreg
     EnsureTestUser
     g_SilentMode = True
@@ -469,7 +497,39 @@ Public Function TestJournal() As Boolean
     msg = msg & SyncJournal(added, updated, removed)
     CheckJournal Len(msg) = 0 And removed = 1 And IsNull(JournalEntryOfManual(manualID)), _
                  "Õ–› «·ﬁÌœ «·ÌœÊÌ ÌÕ–› ﬁÌœÂ", passed, failed, report
+
+    ' closing a period (modClosing): nothing dated in it, then reopened as it was
+    wasClosed = ClosedThroughDate()
+    If wasClosed < Date - 2 Then
+        msg = ClosePeriod(Date - 2, "TEST")
+        CheckJournal Len(msg) = 0 And ClosedThroughDate() = Date - 2, "≈ﬁ›«· «·› —… Õ Ï " & GDate(Date - 2) & " " & msg, _
+                     passed, failed, report
+        CurrentDb.Execute "UPDATE tmpManualLines SET Debit = 100 WHERE AccountCode = 5500", dbFailOnError
+        CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 100 WHERE AccountCode = 2310", dbFailOnError
+        CheckJournal Len(PostManualEntry(0, Date - 3, "TEST-MJ", "", Null, manualID)) > 0 And manualID = 0, _
+                     "≈ﬁ›«· «·› —… Ì„‰⁄ «·ﬁÌœ «·ÌœÊÌ » «—ÌŒ „ﬁ›·", passed, failed, report
+        msg = PostManualEntry(0, Date, "TEST-MJ", "", Null, manualID)
+        CheckJournal Len(msg) = 0 And manualID > 0, "«·ﬁÌœ » «—ÌŒ „› ÊÕ ÌıÕ›Ÿ " & msg, passed, failed, report
+        msg = ReopenPeriod(IIf(wasClosed > 0, wasClosed, Null), "TEST")
+        CheckJournal Len(msg) = 0 And ClosedThroughDate() = wasClosed, "≈⁄«œ… › Õ «·› —… " & msg, passed, failed, report
+    End If
     CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+
+    ' closing last year: revenue and expenses to retained earnings, then reopened (when the years before it are closed)
+    fy = Year(Date) - 1
+    msg = YearCloseProblem(fy)
+    If Len(msg) = 0 Then
+        profit = YearNetProfit(fy)
+        msg = CloseFiscalYear(fy, "TEST")
+        CheckJournal Len(msg) = 0 And YearIsClosed(fy) And YearNetProfit(fy) = 0 And _
+                     Nz(DbValue("SELECT NetProfit FROM FiscalYearClosings WHERE FiscalYear = " & fy), 0) = profit, _
+                     "≈ﬁ›«· «·”‰… " & fy & ": «·≈Ì—«œ«  Ê«·„’—Ê›«  ≈·Ï «·√—»«Õ «·„Õ Ã“… " & msg, passed, failed, report
+        msg = ReopenFiscalYear(fy, "TEST")
+        CheckJournal Len(msg) = 0 And Not YearIsClosed(fy) And YearNetProfit(fy) = profit, _
+                     "≈⁄«œ… › Õ «·”‰… " & fy & "  ⁄Ìœ √—’œ Â« " & msg, passed, failed, report
+    Else
+        Debug.Print "[--] ≈ﬁ›«· «·”‰… " & fy & ": " & msg
+    End If
     ws.Rollback
     inTrans = False
     GoTo Done

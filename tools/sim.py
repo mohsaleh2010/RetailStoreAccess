@@ -161,6 +161,37 @@ class Store:
                       [len(chain), "".join(f"{a:010d}" for a in chain)] + levels + [code])
         return problems
 
+    # ------------------------------------------------------------- year closing (modClosing.CloseFiscalYear)
+    def close_year(self, fiscal_year):
+        """Same steps as CloseFiscalYear (without its checks): revenue and expense balances until
+        31 December reversed, the net profit to retained earnings 3300, closed through 31 December."""
+        c = self.c
+        year_end, next_year = f"{fiscal_year}-12-31 00:00:00", f"{fiscal_year + 1}-01-01 00:00:00"
+        cid = self.insert("FiscalYearClosings", FiscalYear=fiscal_year, ClosingNumber=f"FY-{fiscal_year}",
+                          ClosingDate=year_end, NetProfit=0, EmployeeID=self.user,
+                          Notes=f"إقفال السنة {fiscal_year}")
+        rows = c.execute("SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) FROM (JournalLines AS l INNER JOIN "
+                         "JournalEntries AS e ON l.EntryID = e.EntryID) INNER JOIN Accounts AS a ON l.AccountCode = "
+                         "a.AccountCode WHERE e.EntryDate < ? AND a.AccountType IN ('REVENUE', 'EXPENSE') "
+                         "GROUP BY l.AccountCode HAVING Sum(l.Debit) <> Sum(l.Credit) ORDER BY l.AccountCode",
+                         (next_year,)).fetchall()
+        profit, n = D(0), 0
+        for code, net in rows:
+            net = cur(net)
+            n += 1
+            self.insert("FiscalYearClosingLines", YearClosingID=cid, LineNumber=n, AccountCode=code,
+                        Debit=float(-net if net < 0 else 0), Credit=float(net if net > 0 else 0),
+                        LineText=f"إقفال السنة {fiscal_year}")
+            profit -= net
+        if n and profit:
+            self.insert("FiscalYearClosingLines", YearClosingID=cid, LineNumber=n + 1, AccountCode=3300,
+                        Debit=float(-profit if profit < 0 else 0), Credit=float(profit if profit > 0 else 0),
+                        LineText=f"صافي ربح السنة {fiscal_year}")
+        c.execute("UPDATE FiscalYearClosings SET NetProfit = ? WHERE YearClosingID = ?", (float(profit), cid))
+        c.execute("UPDATE Settings SET ClosedThrough = ? WHERE SettingID = 1", (year_end,))
+        self.sync_journal()
+        return cid, profit
+
     # ------------------------------------------------------------- journal (modJournal.SyncJournal)
     def sync_journal(self):
         """Same steps as SyncJournal: returns (added, updated, removed)."""
@@ -177,6 +208,11 @@ class Store:
         existing = {(t, i): (eid, dec(sig), when, dec(debit)) for eid, t, i, sig, when, debit in c.execute(
             "SELECT EntryID, SourceType, SourceID, Signature, EntryDate, TotalDebit FROM JournalEntries").fetchall()}
         seen, added, updated, removed = set(), 0, 0, 0
+        closed = (self.one("SELECT ClosedThrough FROM Settings WHERE SettingID = 1") or "")[:10]
+        self.locked = []
+
+        def in_closed(t, when):                        # InClosedPeriod
+            return bool(closed) and t != "YEAR_CLOSE" and bool(when) and when[:10] <= closed
         for q in Q.JOURNAL_SOURCE_QUERIES:
             for t, i, no, when, debit, credit, sig, n, first in c.execute(
                     f"SELECT SourceType, SourceID, Max(SourceNumber), Max(SourceDate), Sum(Debit), Sum(Credit), "
@@ -191,12 +227,18 @@ class Store:
                 text = (kinds[t] + " " + doc + (" - " + first if first else ""))[:255]
                 head = dict(EntryDate=when, SourceType=t, SourceID=i, SourceNumber=doc, Description=text,
                             TotalDebit=float(debit), TotalCredit=float(credit), Signature=float(sig), LineCount=-n)
-                if (t, i) not in existing:
+                if (t, i) not in existing and in_closed(t, when):
+                    self.locked.append((t, i))
+                elif (t, i) not in existing:
                     added += 1
                     self.insert("JournalEntries", EntryNumber=f"~{added:06d}", **head)
                 else:
                     eid, old_sig, old_when, old_debit = existing[(t, i)]
-                    if old_sig != sig or old_when != when or old_debit != debit:
+                    if old_sig == sig and old_when == when and old_debit == debit:
+                        pass
+                    elif in_closed(t, old_when) or in_closed(t, when):
+                        self.locked.append((t, i))
+                    else:
                         c.execute("DELETE FROM JournalLines WHERE EntryID = ?", (eid,))
                         sets = ", ".join(f"{k} = ?" for k in head)
                         c.execute(f"UPDATE JournalEntries SET {sets}, UpdatedAt = ? WHERE EntryID = ?",
@@ -207,8 +249,10 @@ class Store:
                       f"INNER JOIN JournalEntries AS e ON (q.SourceType = e.SourceType AND q.SourceID = e.SourceID) "
                       f"WHERE e.LineCount < 0")
         c.execute("UPDATE JournalEntries SET LineCount = -LineCount WHERE LineCount < 0")
-        for key, (eid, *_rest) in existing.items():
-            if key not in seen:
+        for key, (eid, _sig, old_when, _debit) in existing.items():
+            if key not in seen and in_closed(key[0], old_when):
+                self.locked.append(key)
+            elif key not in seen:
                 c.execute("DELETE FROM JournalLines WHERE EntryID = ?", (eid,))
                 c.execute("DELETE FROM JournalEntries WHERE EntryID = ?", (eid,))
                 removed += 1

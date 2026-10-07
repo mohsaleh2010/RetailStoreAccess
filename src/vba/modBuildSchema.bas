@@ -26,9 +26,9 @@ Private Const DB_VERSION_120 As Long = 128      ' dbVersion120 (.accdb format)
 Private Const DISPLAY_CHECKBOX As Integer = 106 ' acCheckBox
 Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlReading
 
-Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=32;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;ManualEntries=10;ManualEntryLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=17;Roles=3;Permissions=26;RolePermissions=53;Employees=1;Screens=37;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=75;JournalSourceTypes=14;TransactionTypes=8;LabelSettings=1"
+Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,ExpenseTypes,Expenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings,FiscalYearClosingLines,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,LabelSettings"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=33;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=19;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;CashBoxes=8;Suppliers=15;Customers=21;Products=23;SalesInvoices=35;SalesInvoiceDetails=14;SalesReturns=29;SalesReturnDetails=14;PurchaseInvoices=18;PurchaseInvoiceDetails=11;PurchaseReturns=18;PurchaseReturnDetails=11;CustomerPayments=11;SupplierPayments=11;ExpenseTypes=3;Expenses=13;CashVouchers=14;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=13;JournalLines=7;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;ManualEntries=10;ManualEntryLines=7;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=8;LabelSettings=19"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=17;Roles=3;Permissions=27;RolePermissions=54;Employees=1;Screens=38;Categories=1;Units=8;PaymentMethods=4;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=75;JournalSourceTypes=15;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -591,6 +591,9 @@ Private Sub CreateAllTables()
     CreateTable_JournalSourceTypes
     CreateTable_JournalEntries
     CreateTable_JournalLines
+    CreateTable_PeriodClosings
+    CreateTable_FiscalYearClosings
+    CreateTable_FiscalYearClosingLines
     CreateTable_ManualEntries
     CreateTable_ManualEntryLines
     CreateTable_TransactionTypes
@@ -668,6 +671,8 @@ Private Sub CreateTable_Settings()
              "In (""DIRECT"",""PREVIEW"",""NONE"")", "اختر طريقة الطباعة من القائمة", "الطباعة عند حفظ الفاتورة", "DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة"
     AddField tdf, "AllowAdminCompanyName", "BOOL", 0, False, "False", _
              "", "", "السماح لمدير النظام بتغيير اسم المحل", ""
+    AddField tdf, "ClosedThrough", "DATETIME", 0, False, "", _
+             "", "", "الفترة مقفلة حتى (لا يُضاف ولا يُعدَّل مستند بتاريخ حتى هذا اليوم)", ""
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
     EndTable tdf, "إعدادات المحل: سجل واحد فقط يحتوي بيانات المحل الضريبية وإعدادات التشغيل.", "", ""
 End Sub
@@ -1740,6 +1745,76 @@ Private Sub CreateTable_JournalLines()
     EndTable tdf, "أسطر القيود: الطرف المدين والطرف الدائن لكل قيد.", "", ""
 End Sub
 
+Private Sub CreateTable_PeriodClosings()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "PeriodClosings") Then Exit Sub
+    AddField tdf, "PeriodClosingID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "ActionType", "TEXT", 12, True, "", _
+             "In (""CLOSE"",""REOPEN"",""YEAR_CLOSE"",""YEAR_OPEN"")", "إقفال، إعادة فتح، إقفال سنة، إعادة فتح سنة", "العملية", ""
+    AddField tdf, "ClosedThrough", "DATETIME", 0, False, "", _
+             "", "", "مقفلة حتى (بعد العملية)", ""
+    AddField tdf, "PreviousThrough", "DATETIME", 0, False, "", _
+             "", "", "مقفلة حتى (قبل العملية)", ""
+    AddField tdf, "FiscalYear", "INT", 0, False, "", _
+             "", "", "السنة المالية", ""
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "السبب / ملاحظات", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "قام به", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "PeriodClosingID", True, True, False
+    EndTable tdf, "سجل إقفال الفترات: كل إقفال أو إعادة فتح لفترة أو سنة مالية: التاريخ الجديد للإقفال والسابق، ومن قام به والسبب.", "", ""
+End Sub
+
+Private Sub CreateTable_FiscalYearClosings()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "FiscalYearClosings") Then Exit Sub
+    AddField tdf, "YearClosingID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "FiscalYear", "INT", 0, True, "", _
+             "", "", "السنة المالية", ""
+    AddField tdf, "ClosingNumber", "TEXT", 20, True, "", _
+             "", "", "رقم الإقفال", ""
+    AddField tdf, "ClosingDate", "DATE", 0, True, "Date()", _
+             "", "", "تاريخ الإقفال", ""
+    AddField tdf, "NetProfit", "MONEY", 0, True, "0", _
+             "", "", "صافي ربح (خسارة) السنة", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "أقفلها", ""
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "ملاحظات", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "YearClosingID", True, True, False
+    AddIndex tdf, "UX_FiscalYear", "FiscalYear", False, True, False
+    AddIndex tdf, "UX_ClosingNumber", "ClosingNumber", False, True, False
+    EndTable tdf, "إقفال السنوات المالية: قيد إقفال كل سنة: أرصدة الإيرادات والمصروفات في 31 ديسمبر تُقفل في الأرباح المحتجزة (3300). أسطره محفوظة كما كانت يوم الإقفال، ويُرحَّل لليومية كعملية «قيد إقفال السنة».", "", ""
+End Sub
+
+Private Sub CreateTable_FiscalYearClosingLines()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "FiscalYearClosingLines") Then Exit Sub
+    AddField tdf, "YearClosingLineID", "AUTO", 0, False, "", _
+             "", "", "رقم السطر الداخلي", ""
+    AddField tdf, "YearClosingID", "LONG", 0, True, "", _
+             "", "", "إقفال السنة", ""
+    AddField tdf, "LineNumber", "INT", 0, True, "", _
+             "", "", "رقم السطر", ""
+    AddField tdf, "AccountCode", "LONG", 0, True, "", _
+             "", "", "الحساب", ""
+    AddField tdf, "Debit", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "مدين", ""
+    AddField tdf, "Credit", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "دائن", ""
+    AddField tdf, "LineText", "TEXT", 150, False, "", _
+             "", "", "البيان", ""
+    AddIndex tdf, "PrimaryKey", "YearClosingLineID", True, True, False
+    AddIndex tdf, "UX_YearClosingID_LineNumber", "YearClosingID,LineNumber", False, True, False
+    EndTable tdf, "أسطر قيود إقفال السنوات: لكل حساب إيرادات أو مصروفات رصيده معكوسًا، ثم صافي الربح في الأرباح المحتجزة.", "", ""
+End Sub
+
 Private Sub CreateTable_ManualEntries()
     Dim tdf As DAO.TableDef
     If Not BeginTable(tdf, "ManualEntries") Then Exit Sub
@@ -2048,13 +2123,14 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'CASH_CLOSING'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CASH_CLOSING', 'تصفية يومية الكاشير', 'الخزينة', 66)") Then GrantNewPermission "CASH_CLOSING", "1,2,3"
     If SeedRow("[PermissionKey] = 'JOURNAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('JOURNAL', 'قيود اليومية ودليل الحسابات وميزان المراجعة', 'الحسابات', 75)") Then GrantNewPermission "JOURNAL", "1,2"
     If SeedRow("[PermissionKey] = 'MANUAL_ENTRY'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('MANUAL_ENTRY', 'القيود اليدوية: إضافة وتعديل وحذف', 'الحسابات', 76)") Then GrantNewPermission "MANUAL_ENTRY", "1,2"
+    If SeedRow("[PermissionKey] = 'PERIOD_CLOSE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PERIOD_CLOSE', 'إقفال الفترات والسنة المالية وإعادة فتحها', 'الحسابات', 77)") Then GrantNewPermission "PERIOD_CLOSE", "1"
     If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', 'التقارير التشغيلية', 'التقارير', 70)") Then GrantNewPermission "REPORTS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', 'تقارير الأرباح والضريبة', 'التقارير', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
     If SeedRow("[PermissionKey] = 'DASHBOARD_FINANCIAL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('DASHBOARD_FINANCIAL', 'الأرقام المالية في لوحة التحكم', 'التقارير', 72)") Then GrantNewPermission "DASHBOARD_FINANCIAL", "1,2"
     If SeedRow("[PermissionKey] = 'SETTINGS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SETTINGS', 'إعدادات المحل', 'النظام', 80)") Then GrantNewPermission "SETTINGS", "1"
     If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', 'المستخدمون والصلاحيات', 'النظام', 81)") Then GrantNewPermission "USERS", "1"
     If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', 'النسخ الاحتياطي', 'النظام', 82)") Then GrantNewPermission "BACKUP", "1"
-    EndSeed "Permissions", 26
+    EndSeed "Permissions", 27
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -2079,6 +2155,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CASH_CLOSING')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'JOURNAL')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'MANUAL_ENTRY')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'PERIOD_CLOSE')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'DASHBOARD_FINANCIAL')"
@@ -2112,7 +2189,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 53
+    EndSeed "RolePermissions", 54
 End Sub
 
 Private Sub Seed_Employees()
@@ -2153,14 +2230,15 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmManualEntry'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmManualEntry', 'القيود اليدوية', 'الحسابات', 280, 'MANUAL_ENTRY', True, True, True)"
     SeedRow "[ScreenName] = 'frmLedger'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmLedger', 'كشف حساب ودفتر الأستاذ', 'الحسابات', 290, 'JOURNAL', False, False, False)"
     SeedRow "[ScreenName] = 'frmFinancials'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmFinancials', 'القوائم المالية', 'الحسابات', 300, 'REPORTS_PROFIT', False, False, False)"
-    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 310, 'REPORTS', False, False, False)"
-    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 320, Null, False, False, False)"
-    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 330, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 340, 'USERS', True, True, False)"
-    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 350, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 360, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 370, 'BACKUP', False, False, False)"
-    EndSeed "Screens", 37
+    SeedRow "[ScreenName] = 'frmPeriodClosing'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPeriodClosing', 'إقفال الفترات والسنة المالية', 'الحسابات', 310, 'PERIOD_CLOSE', False, False, False)"
+    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 320, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 330, Null, False, False, False)"
+    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 340, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 350, 'USERS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 360, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 370, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 380, 'BACKUP', False, False, False)"
+    EndSeed "Screens", 38
 End Sub
 
 Private Sub Seed_Categories()
@@ -2266,7 +2344,7 @@ Private Sub Seed_Accounts()
     SeedRow "[AccountCode] = 3100", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3100, 'جاري المالك', 'EQUITY', 31, True, True)"
     SeedRow "[AccountCode] = 3900", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3900, 'أرصدة افتتاحية', 'EQUITY', 31, True, True)"
     SeedRow "[AccountCode] = 32", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (32, 'الأرباح المحتجزة ونتائج الأعمال', 'EQUITY', 3, False, True)"
-    SeedRow "[AccountCode] = 3300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3300, 'الأرباح المحتجزة', 'EQUITY', 32, True, False)"
+    SeedRow "[AccountCode] = 3300", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3300, 'الأرباح المحتجزة', 'EQUITY', 32, True, True)"
     SeedRow "[AccountCode] = 3400", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (3400, 'صافي ربح (خسارة) العام', 'EQUITY', 32, True, False)"
     SeedRow "[AccountCode] = 4", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (4, 'الإيرادات', 'REVENUE', Null, False, True)"
     SeedRow "[AccountCode] = 41", "INSERT INTO [Accounts] ([AccountCode], [AccountName], [AccountType], [ParentCode], [IsPosting], [IsSystem]) VALUES (41, 'إيرادات النشاط', 'REVENUE', 4, False, True)"
@@ -2314,7 +2392,8 @@ Private Sub Seed_JournalSourceTypes()
     SeedRow "[SourceType] = 'CUSTOMER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('CUSTOMER_OPENING', 'رصيد افتتاحي لعميل', 12)"
     SeedRow "[SourceType] = 'SUPPLIER_OPENING'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('SUPPLIER_OPENING', 'رصيد افتتاحي لمورد', 13)"
     SeedRow "[SourceType] = 'MANUAL'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('MANUAL', 'قيد يدوي', 14)"
-    EndSeed "JournalSourceTypes", 14
+    SeedRow "[SourceType] = 'YEAR_CLOSE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('YEAR_CLOSE', 'قيد إقفال السنة', 15)"
+    EndSeed "JournalSourceTypes", 15
 End Sub
 
 Private Sub Seed_TransactionTypes()
@@ -2409,5 +2488,5 @@ Private Sub UpgradeAccountTree()
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5800 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5900 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [IsPosting] = False WHERE [AccountCode] IN (1, 11, 1100, 12, 2, 21, 22, 3, 31, 32, 4, 41, 42, 5, 51, 52, 5300, 53)", dbFailOnError
-    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN (1, 11, 1100, 110001, 110002, 1190, 1200, 1300, 1400, 1500, 1600, 12, 2, 21, 2100, 2200, 22, 3, 31, 3100, 3900, 32, 4, 41, 4100, 4110, 42, 4200, 4300, 5, 51, 5100, 5200, 52, 5300, 53, 5400, 5900) OR [AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN (1, 11, 1100, 110001, 110002, 1190, 1200, 1300, 1400, 1500, 1600, 12, 2, 21, 2100, 2200, 22, 3, 31, 3100, 3900, 32, 3300, 4, 41, 4100, 4110, 42, 4200, 4300, 5, 51, 5100, 5200, 52, 5300, 53, 5400, 5900) OR [AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError
 End Sub

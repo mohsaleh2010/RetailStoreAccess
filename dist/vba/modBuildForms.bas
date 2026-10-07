@@ -22,7 +22,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmUsers,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -617,6 +617,7 @@ Private Sub BuildAllForms()
     BuildForm_frmManualEntry
     BuildForm_frmLedger
     BuildForm_frmFinancials
+    BuildForm_frmPeriodClosing
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -6392,6 +6393,8 @@ Private Sub BuildForm_frmFinancials()
     c.OnClick = EP
     Set c = AddButton("btnTrial", "„Ì“«‰ «·„—«Ã⁄…", 3855, 7485, 1701, 510, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnClosing", "≈ﬁ›«· «·› —« ", 5669, 7485, 1701, 510, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "—ÃÊ⁄", 13721, 7485, 1361, 510, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -6430,17 +6433,83 @@ Private Sub BuildForm_frmFinancials()
     s = s & "Private Sub btnTrial_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmJournal""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClosing_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmPeriodClosing"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,12587,1304,1418,454,1000,0,0,0;lblCompare,227,1871,14855,312,0,1000,0,0;lstRows,227,3090,14855,3856,0,1000,0,1000;lblInfo,227,7031,14855,312,0,1000,1000,0;btnPrint,227,7485,1814,510,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnLedger,2154,7485,1588,510,0,0,1000,0;btnTrial,3855,7485,1701,510,0,0,1000,0;btnClose,13721,7485,1361,510,1000,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnLedger,2154,7485,1588,510,0,0,1000,0;btnTrial,3855,7485,1701,510,0,0,1000,0;btnClosing,5669,7485,1701,510,0,0,1000,0;btnClose,13721,7485,1361,510,1000,0,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 15309, 8732, -2381, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmFinancials", s
     Exit Sub
 EH:
     AbortForm "frmFinancials", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmPeriodClosing()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmPeriodClosing", "≈ﬁ›«· «·› —«  Ê«·”‰… «·„«·Ì…", "", 12474, 9639, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12474, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "≈ﬁ›«· «·› —«  Ê«·”‰… «·„«·Ì…", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "»⁄œ «·≈ﬁ›«· ·« Ìı÷«› Ê·« Ìı⁄œÛ¯· Ê·« ÌıÕ–› √Ì „” ‰œ » «—ÌŒ „ﬁ›·", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblState", " ", 227, 1049, 12020, 454, 14, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblPeriodCap", "≈ﬁ›«· › —… (‘Â— √Ê √ﬂÀ—)", 227, 1616, 6804, 340, 11, True, CLR_TEXT, "", 0)
+    Set c = AddText("txtThrough", "", 227, 2268, 1928, 482)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblThrough", "„ﬁ›·… Õ Ï ÌÊ„", 227, 1956, 1928, 284, 9, False, CLR_MUTED, "txtThrough", 0)
+    Set c = AddText("txtNotes", "", 2268, 2268, 9979, 482)
+    Set c = AddLabel("lblNotes", "«·”»» / „·«ÕŸ«  („ÿ·Ê» ·≈⁄«œ… «·› Õ)", 2268, 1956, 9979, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddButton("btnClosePeriod", "≈ﬁ›«· Õ Ï Â–« «·ÌÊ„", 227, 2892, 2608, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnReopenPeriod", "≈⁄«œ… «·› Õ ≈·Ï Â–« «·ÌÊ„", 2948, 2892, 2948, 510, "danger")
+    c.OnClick = EP
+    Set c = AddLabel("lblYearCap", "≈ﬁ›«· «·”‰… «·„«·Ì… («·≈Ì—«œ«  Ê«·„’—Ê›«  ≈·Ï «·√—»«Õ «·„Õ Ã“…)", 227, 3629, 6804, 340, 11, True, CLR_TEXT, "", 0)
+    Set c = AddCombo("cboYear", "", 227, 4281, 1928, 482, "", 1, "1701")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblYear", "«·”‰…", 227, 3969, 1928, 284, 9, False, CLR_MUTED, "cboYear", 0)
+    Set c = AddLabel("lblYearInfo", " ", 2268, 4309, 9979, 425, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnCloseYear", "≈ﬁ›«· «·”‰…", 227, 4905, 2608, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnReopenYear", "≈⁄«œ… › Õ «·”‰…", 2948, 4905, 2948, 510, "danger")
+    c.OnClick = EP
+    Set c = AddLabel("lblHistoryCap", "”Ã· «·≈ﬁ›«· Ê≈⁄«œ… «·› Õ", 227, 5642, 6804, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddList("lstHistory", 227, 6010, 12020, 2608, 7, "0;1588;1474;794;1928;2041;3402", True)
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 10773, 8845, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    PeriodClosingLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboYear_AfterUpdate()" & vbCrLf
+    s = s & "    PeriodClosingRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClosePeriod_Click()" & vbCrLf
+    s = s & "    DoClosePeriod Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReopenPeriod_Click()" & vbCrLf
+    s = s & "    DoReopenPeriod Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCloseYear_Click()" & vbCrLf
+    s = s & "    DoCloseYear Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReopenYear_Click()" & vbCrLf
+    s = s & "    DoReopenYear Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmPeriodClosing", s
+    Exit Sub
+EH:
+    AbortForm "frmPeriodClosing", Err.Number, Err.Description
 End Sub

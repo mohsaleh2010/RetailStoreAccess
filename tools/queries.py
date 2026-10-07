@@ -59,7 +59,7 @@ def jquery(branches):
 ZERO = "CCur(0)"
 JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournalPurchase", "qryJournalPurchaseReturn",
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
-                          "qryJournalOpening", "qryJournalManual"]
+                          "qryJournalOpening", "qryJournalManual", "qryJournalYearClose"]
 
 
 def _sale():
@@ -175,6 +175,12 @@ def _manual():
     k = ("'MANUAL'", "m.ManualEntryID", "m.EntryNumber", "m.EntryDate", "m.Description")
     return jline(*k, "m.LineNo", "m.LineAccount", "m.LineDebit", "m.LineCredit", "m.LineNote",
                  "qryManualEntryLines AS m", "m.LineDebit + m.LineCredit <> 0")
+
+
+def _year_close():
+    k = ("'YEAR_CLOSE'", "y.YearClosingID", "y.ClosingNumber", "y.ClosingDate", "y.Notes")
+    return jline(*k, "y.LineNo", "y.LineAccount", "y.LineDebit", "y.LineCredit", "y.LineNote",
+                 "qryYearCloseLines AS y", "y.LineDebit + y.LineCredit <> 0")
 
 
 def _tree_rollup():
@@ -951,6 +957,11 @@ SELECT h.ManualEntryID, h.EntryNumber, h.EntryDate, h.Description, l.LineNumber 
        l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote
 FROM ManualEntries AS h INNER JOIN ManualEntryLines AS l ON h.ManualEntryID = l.ManualEntryID"""),
     Query("qryJournalManual", "أسطر القيود اليدوية", _manual()),
+    Query("qryYearCloseLines", "أسطر قيود إقفال السنوات مع رأس كل إقفال", """
+SELECT h.YearClosingID, h.ClosingNumber, h.ClosingDate, h.Notes, l.LineNumber AS LineNo,
+       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote
+FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClosingID = l.YearClosingID"""),
+    Query("qryJournalYearClose", "أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة", _year_close()),
 
     Query("JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", f"""
 SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber,
@@ -1040,10 +1051,17 @@ ORDER BY a.TreeKey""", P),
     # ======================================================= FINANCIAL STATEMENTS
     # Rows in their printed order: Block / ClassNo, GroupKey, Pos, AccountKey. RowKind: H heading,
     # C class, G group, A account, S group total, T total, R result (gross profit, net profit...).
-    Query("qryCompareMoves", "حركة الحسابات في فترة المقارنة", """
+    # the income statement leaves out the year closing entries (they empty revenue and expenses)
+    Query("qryIncomeMoves", "حركة الحسابات في الفترة بدون قيود إقفال السنة", f"""
 SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit
 FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
-WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd')
+WHERE {period("e.EntryDate")} AND e.SourceType <> 'YEAR_CLOSE'
+GROUP BY l.AccountCode""", P),
+
+    Query("qryCompareMoves", "حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة", """
+SELECT l.AccountCode, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit
+FROM JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID
+WHERE e.EntryDate >= QDate('CompareStart') AND e.EntryDate < QDate('CompareEnd') AND e.SourceType <> 'YEAR_CLOSE'
 GROUP BY l.AccountCode""", ["CompareStart", "CompareEnd"]),
 
     Query("qryIncomeAccounts", "حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة", f"""
@@ -1052,7 +1070,7 @@ SELECT a.AccountCode, a.AccountName, a.TreeKey,
            IIf(a.AccountType = 'REVENUE', 4, 5)))) AS SectionNo,
        IIf(a.AccountType = 'REVENUE', 1, -1) * ({nz("c.SumCredit")} - {nz("c.SumDebit")}) AS CurrentAmount,
        IIf(a.AccountType = 'REVENUE', 1, -1) * ({nz("p.SumCredit")} - {nz("p.SumDebit")}) AS PriorAmount
-FROM (Accounts AS a LEFT JOIN qryTrialPeriod AS c ON a.AccountCode = c.AccountCode)
+FROM (Accounts AS a LEFT JOIN qryIncomeMoves AS c ON a.AccountCode = c.AccountCode)
      LEFT JOIN qryCompareMoves AS p ON a.AccountCode = p.AccountCode
 WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR p.AccountCode Is Not Null)""",
           P + ["CompareStart", "CompareEnd"]),

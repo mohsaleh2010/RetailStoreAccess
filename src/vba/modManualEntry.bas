@@ -81,6 +81,11 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
         Exit Function
     End If
     PostManualEntry = ManualEntryProblem(EntryDate, Description)
+    If Len(PostManualEntry) = 0 Then PostManualEntry = ClosedPeriodProblem(EntryDate)          ' modClosing
+    If Len(PostManualEntry) = 0 And ManualEntryID > 0 Then
+        PostManualEntry = ClosedPeriodProblem(DbValue("SELECT EntryDate FROM ManualEntries WHERE ManualEntryID = " & _
+                                                      ManualEntryID))
+    End If
     If Len(PostManualEntry) > 0 Then Exit Function
     Set db = CurrentDb
     Set ws = DBEngine.Workspaces(0)
@@ -150,6 +155,9 @@ Public Function RemoveManualEntry(ByVal ManualEntryID As Long) As String
         RemoveManualEntry = "القيد غير موجود."
         Exit Function
     End If
+    RemoveManualEntry = ClosedPeriodProblem(DbValue("SELECT EntryDate FROM ManualEntries WHERE ManualEntryID = " & _
+                                                    ManualEntryID))                                   ' modClosing
+    If Len(RemoveManualEntry) > 0 Then Exit Function
     CurrentDb.Execute "DELETE FROM ManualEntries WHERE ManualEntryID = " & ManualEntryID, dbFailOnError   ' lines cascade
     LogAction "MANUAL_ENTRY_DELETE", "ManualEntries", CStr(ManualEntryID)
 End Function
@@ -211,7 +219,11 @@ Public Sub ManualOpen(ByVal frm As Access.Form, ByVal ManualEntryID As Long)
     frm!subLines.Form.Requery
     ManualRecalc frm
     ManualButtons frm
-    frm!lblStatus.Caption = "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه."
+    If Len(ClosedPeriodProblem(frm!txtDate.Value)) > 0 Then
+        frm!lblStatus.Caption = "قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح."
+    Else
+        frm!lblStatus.Caption = "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه."
+    End If
 End Sub
 
 Public Sub ManualFindPicked(ByVal frm As Access.Form)

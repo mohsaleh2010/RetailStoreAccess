@@ -97,7 +97,13 @@ Public Sub FormCurrent(ByVal frm As Access.Form)
 End Sub
 
 Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
+    Dim closedMsg As String
     If Not CanScreenAction(frm.Name, IIf(frm.NewRecord, "ADD", "EDIT")) Then Exit Function
+    closedMsg = ClosedRecordProblem(frm)                    ' a closed period (modClosing)
+    If Len(closedMsg) > 0 Then
+        ShowWarning closedMsg
+        Exit Function
+    End If
     If Not CheckRequired(frm) Then Exit Function
     Select Case TagValue(frm, "TABLE")
         Case "Products"
@@ -229,6 +235,10 @@ Private Sub DeleteRecord(ByVal frm As Access.Form)
         Exit Sub
     End If
     If Not CanScreenAction(frm.Name, "DELETE") Then Exit Sub
+    If Len(ClosedRecordProblem(frm, True)) > 0 Then          ' a closed period (modClosing)
+        ShowWarning ClosedRecordProblem(frm, True)
+        Exit Sub
+    End If
     table = TagValue(frm, "TABLE")
     pk = TagValue(frm, "PK")
     id = frm(pk).Value
