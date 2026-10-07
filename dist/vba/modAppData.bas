@@ -118,6 +118,7 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmEmployeePay": ScreenPermission = "PAYROLL"
         Case "frmCostCenters": ScreenPermission = "JOURNAL"
         Case "frmBudget": ScreenPermission = "BUDGET"
+        Case "frmRecurring": ScreenPermission = "EXPENSES"
     End Select
 End Function
 

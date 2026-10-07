@@ -180,7 +180,10 @@ class JournalScreenTests(unittest.TestCase):
                 self.assertIn(ctl, names, f"{form}: {pname} uses {ctl}")
 
     def test_navigation_permissions_and_reports(self):
-        self.assertIn("Journal", {n.key for n in F.NAV_ITEMS})
+        nav = {n.key: n.target for n in F.NAV_ITEMS}             # the journal is a tile of the accounting hub
+        self.assertEqual(nav["Accounting"], "frmAccounting")
+        import forms_accounting as A
+        self.assertIn("frmJournal", {t[3] for t in A.HUB_TILES})
         for form in ("frmJournal", "frmJournalEntry", "frmAccounts"):
             self.assertEqual(F.SCREEN_PERMISSIONS[form], "JOURNAL")
         keys = {r.key: r for r in F.REPORTS}

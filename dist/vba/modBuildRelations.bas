@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 128
+Private Const EXPECTED_RELATION_COUNT As Long = 134
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -486,6 +486,12 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_Expenses_CashBoxID", "CashBoxes", "CashBoxID", "Expenses", "CashBoxID", 0&)
     c.Add Array("FK_Expenses_BankID", "Banks", "BankID", "Expenses", "BankID", 0&)
     c.Add Array("FK_Expenses_CostCenterID", "CostCenters", "CostCenterID", "Expenses", "CostCenterID", 0&)
+    c.Add Array("FK_Expenses_RecurringID", "RecurringExpenses", "RecurringID", "Expenses", "RecurringID", 0&)
+    c.Add Array("FK_RecurringExpenses_ExpenseTypeID", "ExpenseTypes", "ExpenseTypeID", "RecurringExpenses", "ExpenseTypeID", 0&)
+    c.Add Array("FK_RecurringExpenses_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "RecurringExpenses", "PaymentMethodID", 0&)
+    c.Add Array("FK_RecurringExpenses_CashBoxID", "CashBoxes", "CashBoxID", "RecurringExpenses", "CashBoxID", 0&)
+    c.Add Array("FK_RecurringExpenses_BankID", "Banks", "BankID", "RecurringExpenses", "BankID", 0&)
+    c.Add Array("FK_RecurringExpenses_CostCenterID", "CostCenters", "CostCenterID", "RecurringExpenses", "CostCenterID", 0&)
     c.Add Array("FK_CashVouchers_CashBoxID", "CashBoxes", "CashBoxID", "CashVouchers", "CashBoxID", 0&)
     c.Add Array("FK_CashVouchers_ToCashBoxID", "CashBoxes", "CashBoxID", "CashVouchers", "ToCashBoxID", 0&)
     c.Add Array("FK_CashVouchers_ExpenseID", "Expenses", "ExpenseID", "CashVouchers", "ExpenseID", 0&)

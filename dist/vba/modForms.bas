@@ -94,6 +94,7 @@ Public Sub FormCurrent(ByVal frm As Access.Form)
         Case "Customers", "Suppliers": LockPartnerFields frm
         Case "Employees"                                            ' frmEmployeePay reads it too
             If frm.Name = "frmUsers" Then UserCurrent frm           ' modSecurityScreens
+        Case "RecurringExpenses": RecurringCurrent frm             ' modRecurring
     End Select
 End Sub
 
@@ -121,6 +122,8 @@ Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
             End If
         Case "Accounts"
             If Not ValidateAccount(frm) Then Exit Function         ' modAccounts
+        Case "RecurringExpenses"
+            If Not ValidateRecurring(frm) Then Exit Function       ' modRecurring
     End Select
     If Not CheckUnique(frm) Then Exit Function
     If Not AssignSequence(frm) Then Exit Function      ' last: a refused save wastes no number

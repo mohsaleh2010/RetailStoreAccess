@@ -119,6 +119,10 @@ Public Sub ApplyNavPermissions(ByVal frm As Access.Form)
             ctl.Enabled = allowed
             If Left$(ctl.Name, 7) = "btnTile" And Not allowed Then
                 frm.Controls("boxNav" & Mid$(ctl.Name, 8)).BackColor = RGB(205, 210, 218)
+            ElseIf Left$(ctl.Name, 6) = "btnNav" And Not allowed Then
+                ' the side-menu button is transparent: its caption and icon show it is closed
+                frm.Controls("lblNav" & Mid$(ctl.Name, 7)).ForeColor = RGB(120, 134, 156)
+                frm.Controls("ico" & Mid$(ctl.Name, 7)).ForeColor = RGB(120, 134, 156)
             End If
         End If
     Next
@@ -137,6 +141,7 @@ Public Sub LogoutUser(Optional ByVal Ask As Boolean = True)
     On Error Resume Next
     TempVars.Remove "UserID"
     TempVars.Remove "LowStockAlertShown"
+    TempVars.Remove "RecurringAlertShown"
     On Error GoTo 0
     DoCmd.OpenForm "frmLogin"
 End Sub

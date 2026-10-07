@@ -129,6 +129,7 @@ BANK_ROWS = "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY B
 CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
 CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
+FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
 ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
 # main (summary) accounts only: a sub-account always hangs under a main account
 ACCOUNT_ROWS = ("SELECT AccountCode, Space((AccountLevel - 1) * 3) & AccountName AS Account FROM Accounts "
@@ -240,6 +241,32 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("Description", span=2),
         ]),
     DataScreen(
+        "frmRecurring", "RecurringExpenses", "المصروفات المتكررة",
+        "الإيجار والكهرباء والاشتراكات: يُنشأ المصروف تلقائيًا في تاريخ استحقاقه", "expenses",
+        list_select=("t.RecurringName AS [المصروف], IIf(t.Frequency = 'MONTHLY', 'شهري', IIf(t.Frequency = 'QUARTERLY', "
+                     "'ربع سنوي', 'سنوي')) AS [التكرار], t.Amount + t.Tax AS [المبلغ], t.NextDueDate AS [المستحق]"),
+        list_from="RecurringExpenses AS t", list_order="t.NextDueDate, t.RecurringName",
+        list_headers=[("المصروف", 3.4), ("التكرار", 1.6), ("المبلغ", 1.6), ("المستحق", 2.0)],
+        search=["t.RecurringName", "t.Description"], active="t.IsActive", unique=["RecurringName"],
+        extra_buttons=[("btnCreateDue", "إنشاء المستحق الآن", "RecurringCreateNow Me"),
+                       ("btnExpenses", "المصروفات", 'OpenScreen "frmExpenses"')],
+        fields=[
+            Fld("RecurringName", span=2),
+            Fld("ExpenseTypeID", rows=EXPENSE_TYPE_ROWS),
+            Fld("PaymentMethodID", rows=PAYMENT_ROWS),
+            Fld("Amount"), Fld("Tax", button=("btnCalcVat", "احسب 15%", "CalcExpenseVat Me")),
+            Fld("Frequency", rows=FREQUENCIES, widths="0;4"),
+            Fld("DueDay", hint="من 1 إلى 28 (يوم الإيجار مثلًا)"),
+            Fld("StartDate"), Fld("EndDate", hint="فارغ = بلا نهاية"),
+            Fld("NextDueDate", locked=True, hint="يحسبه البرنامج"), Fld("LastCreatedDate", locked=True),
+            Fld("CashBoxID", rows=CASHBOX_ROWS, hint="للدفع النقدي؛ فارغ = صندوق من يُنشئ المصروف"),
+            Fld("BankID", rows=BANK_ROWS, widths="0;6", hint="للتحويل البنكي؛ فارغ = البنك الافتراضي"),
+            Fld("CostCenterID", rows=CENTER_ROWS, widths="0;6", hint="فارغ = مركز من يُنشئ المصروف"),
+            Fld("IsActive"),
+            Info("lblRecurringInfo"),
+            Fld("Description", span=2),
+        ]),
+    DataScreen(
         "frmUsers", "Employees", "المستخدمون", "الموظفون وأسماء الدخول والأدوار", "users",
         list_select="t.Username AS [المستخدم], t.EmployeeName AS [الاسم], r.RoleName AS [الدور]",
         list_from="Employees AS t INNER JOIN Roles AS r ON t.RoleID = r.RoleID",
@@ -268,7 +295,7 @@ DATA_SCREENS: List[DataScreen] = [
         "frmCostCenters", "CostCenters", "مراكز التكلفة", "الفروع والأقسام: تُوزَّع عليها الإيرادات والمصروفات", "journal",
         list_select="t.CenterCode AS [الرمز], t.CenterName AS [المركز], IIf(t.IsDefault, 'افتراضي', '') AS [الحالة]",
         list_from="CostCenters AS t", list_order="t.CenterCode",
-        list_headers=[("الرمز", 1.8), ("المركز", 5.0), (" ", 1.6)],
+        list_headers=[("الرمز", 1.8), ("المركز", 5.0), ("الحالة", 1.6)],
         search=["t.CenterCode", "t.CenterName"], active="t.IsActive", unique=["CenterCode", "CenterName"],
         fields=[Fld("CenterCode"), Fld("CenterName"),
                 Fld("IsDefault", hint="لمن لا مركز له من المستخدمين"), Fld("IsActive"),
@@ -431,7 +458,7 @@ NAV_ITEMS: List[NavItem] = [
     NavItem("Suppliers", "الموردون", "suppliers", "frmSuppliers", 5),
     NavItem("Expenses", "المصروفات", "expenses", "frmExpenses", 5),
     NavItem("Treasury", "الخزينة", "treasury", "frmTreasury", 0),
-    NavItem("Journal", "قيود اليومية", "journal", "frmJournal", 0),
+    NavItem("Accounting", "المحاسبة والمالية", "journal", "frmAccounting", 0),
     NavItem("StockCount", "الجرد", "stocktake", "frmStockCount", 7),
     NavItem("Reports", "التقارير", "reports", "frmReportCenter", 5),
     NavItem("Search", "البحث", "search", "frmSearch", 5),
@@ -468,6 +495,7 @@ SCREEN_PERMISSIONS = {
     "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
     "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
     "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL", "frmCostCenters": "JOURNAL", "frmBudget": "BUDGET",
+    "frmRecurring": "EXPENSES", "frmAccounting": "",
 }
 
 
@@ -869,7 +897,7 @@ LAUNCH_TILES = [
     ("Customers", "العملاء", (229, 57, 53), False), ("Suppliers", "الموردون", (57, 73, 171), False),
     ("Expenses", "المصروفات", (0, 137, 123), False), ("Reports", "التقارير", (216, 27, 96), False),
     ("Settings", "الإعدادات", (232, 236, 243), True), ("Users", "المستخدمون", (232, 236, 243), True),
-    ("Treasury", "الخزينة", (0, 121, 107), False), ("Logout", "تسجيل الخروج", (244, 81, 30), False),
+    ("Treasury", "الخزينة", (0, 121, 107), False), ("Accounting", "المحاسبة والمالية", (31, 58, 95), False),
 ]
 
 
@@ -891,17 +919,20 @@ def layout_main() -> FormModel:
                   decorative=True))
     y = cm(2.3)
     for item in NAV_ITEMS:
-        name = f"btnNav{item.key}"
+        # icon and caption as their own controls with a transparent button on top (like the tiles):
+        # an Access button paints over a label lying on it as soon as it has the focus or the mouse
         call = (f'OpenScreen "{item.target}", {item.phase}' if item.target else "LogoutUser")
-        button(m, name, item.caption, cm(0.25), y, "nav", w=side_w - cm(0.5), h=cm(0.83),
+        m.add(Control("icon", f"ico{item.key}", cm(0.45), y + cm(0.1), cm(0.8), cm(0.65),
+                      {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"), "FontSize": 13,
+                       "ForeColor": Sym("CLR_SIDEBAR_TEXT")}, decorative=True))
+        m.add(Control("label", f"lblNav{item.key}", cm(1.5), y + cm(0.08), side_w - cm(1.9), cm(0.67),
+                      {"Caption": item.caption, "FontSize": 12, "FontBold": True,
+                       "ForeColor": Sym("CLR_SIDEBAR_TEXT")}, decorative=True))
+        button(m, f"btnNav{item.key}", item.caption, cm(0.25), y, "nav", w=side_w - cm(0.5), h=cm(0.83),
                call=call)
+        m.controls[-1].props["Transparent"] = True
         if item.target:
             m.controls[-1].props["Tag"] = item.target       # MainLoad disables what the user may not open
-        icon = m.add(Control("icon", f"ico{item.key}", cm(0.45), y + cm(0.1), cm(0.8),
-                             cm(0.65), {"Caption": Sym(f"ChrW(&H{ICONS[item.icon]:X})"),
-                                        "FontSize": 13, "ForeColor": Sym("CLR_SIDEBAR_TEXT")},
-                             events=["Click"], decorative=True))
-        m.code += [f"Private Sub {icon.name}_Click()", f"    {call}", "End Sub"]
         y += cm(0.9)
 
     cx = side_w + cm(0.8)
@@ -1128,7 +1159,8 @@ def all_forms() -> List[FormModel]:
     from forms_assets import asset_forms
     from forms_payroll import payroll_forms
     from forms_budget import budget_forms
+    from forms_accounting import accounting_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
-            + bank_forms() + asset_forms() + payroll_forms() + budget_forms())
+            + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms())

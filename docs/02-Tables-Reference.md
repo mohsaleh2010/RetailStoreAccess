@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **61** | عدد الحقول: **763**
+عدد الجداول: **62** | عدد الحقول: **782**
 
 ## الفهرس
 
@@ -49,24 +49,25 @@
 41. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
 42. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
 43. [`Expenses`](#expenses) – المصروفات
-44. [`CashVouchers`](#cashvouchers) – سندات النقدية
-45. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-46. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-47. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-48. [`JournalEntries`](#journalentries) – قيود اليومية
-49. [`JournalLines`](#journallines) – أسطر القيود
-50. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-51. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-52. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-53. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-54. [`ManualEntries`](#manualentries) – القيود اليدوية
-55. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-56. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-57. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-58. [`StockCounts`](#stockcounts) – جلسات الجرد
-59. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-60. [`AuditLog`](#auditlog) – سجل العمليات
-61. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+44. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
+45. [`CashVouchers`](#cashvouchers) – سندات النقدية
+46. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+47. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+48. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+49. [`JournalEntries`](#journalentries) – قيود اليومية
+50. [`JournalLines`](#journallines) – أسطر القيود
+51. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+52. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+53. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+54. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+55. [`ManualEntries`](#manualentries) – القيود اليدوية
+56. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+57. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+58. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+59. [`StockCounts`](#stockcounts) – جلسات الجرد
+60. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+61. [`AuditLog`](#auditlog) – سجل العمليات
+62. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -230,7 +231,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 50 سجل
+- بيانات أساسية: 52 سجل
 
 ## UserScreens
 
@@ -1091,11 +1092,41 @@
 | 13 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صُرف من صندوق – المصروف النقدي يخرج من هذا الصندوق؛ فارغ = لم يُدفع من صندوق |
 | 14 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 | 15 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
+| 16 | RecurringID | Number (Long) |  |  |  |  | `RecurringExpenses.RecurringID` | من مصروف متكرر – أنشأه البرنامج من المصروف المتكرر بتاريخ استحقاقه |
 
 - المفتاح الأساسي: `ExpenseID`
 - فهرس فريد: `ExpenseNumber`
 - فهرس عادي: `ExpenseDate`
 - قاعدة تحقق على مستوى الجدول: `[TotalAmount]=[Amount]+[Tax]` – الإجمالي = المبلغ + الضريبة
+
+## RecurringExpenses
+
+**المصروفات المتكررة** – مصروف ثابت يتكرر (الإيجار، الكهرباء، الاشتراكات): يُنشئ البرنامج المصروف في تاريخ استحقاقه، مرة واحدة لكل تاريخ.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **RecurringID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | RecurringName | Short Text | 100 | ✔ |  |  |  | اسم المصروف |
+| 3 | ExpenseTypeID | Number (Long) |  | ✔ |  |  | `ExpenseTypes.ExpenseTypeID` | نوع المصروف |
+| 4 | Amount | Currency |  | ✔ | `0` | `>0` |  | المبلغ قبل الضريبة |
+| 5 | Tax | Currency |  | ✔ | `0` | `>=0` |  | ضريبة المدخلات |
+| 6 | PaymentMethodID | Number (Long) |  | ✔ |  |  | `PaymentMethods.PaymentMethodID` | طريقة الدفع |
+| 7 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | من صندوق – للدفع النقدي؛ فارغ = صندوق من يُنشئ المصروف |
+| 8 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | من بنك – للتحويل البنكي؛ فارغ = البنك الافتراضي |
+| 9 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
+| 10 | Frequency | Short Text | 10 | ✔ | `"MONTHLY"` | `In ("MONTHLY","QUARTERLY","YEARLY")` |  | التكرار |
+| 11 | DueDay | Number (Integer) |  | ✔ | `1` | `Between 1 And 28` |  | يوم الاستحقاق |
+| 12 | StartDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | يبدأ من |
+| 13 | EndDate | Date/Time (تاريخ) |  |  |  |  |  | ينتهي في |
+| 14 | NextDueDate | Date/Time (تاريخ) |  |  |  |  |  | الاستحقاق التالي |
+| 15 | LastCreatedDate | Date/Time (تاريخ) |  |  |  |  |  | آخر مصروف أُنشئ |
+| 16 | Description | Short Text | 255 |  |  |  |  | الوصف |
+| 17 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 18 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `RecurringID`
+- فهرس فريد: `RecurringName`
+- فهرس عادي: `NextDueDate`
 
 ## CashVouchers
 

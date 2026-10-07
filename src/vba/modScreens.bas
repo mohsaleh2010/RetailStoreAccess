@@ -26,7 +26,10 @@ Public Sub MainLoad(ByVal frm As Access.Form)
                    "WHERE e.EmployeeID = " & CurrentUserID()), "") & ")"
     ApplyNavPermissions frm                   ' modSecurityScreens
     DashboardRefresh frm                      ' tiles, lists and the integrity line (modDashboard)
-    If Not g_SilentMode Then LowStockAlert    ' once per session
+    If Not g_SilentMode Then
+        LowStockAlert                         ' once per session
+        RecurringAlert                        ' the recurring expenses that are due (modRecurring)
+    End If
 End Sub
 
 Public Sub RefreshIntegrityStatus(ByVal frm As Access.Form)

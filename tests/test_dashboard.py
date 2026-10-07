@@ -127,7 +127,9 @@ class DashboardCodeTests(unittest.TestCase):
         main = next(m for m in F.all_forms() if m.name == "frmMain")
         self.assertEqual(main.form_props.get("TimerInterval"), 300000)
         self.assertIn("DashboardRefresh frm", read("modScreens"))
-        self.assertIn("If Not g_SilentMode Then LowStockAlert", read("modScreens"))
+        main = read("modScreens")
+        self.assertIn("    If Not g_SilentMode Then\n        LowStockAlert ", main)
+        self.assertIn("        RecurringAlert ", main)
 
 
 class StaticModDashboard(VbaModuleChecks, unittest.TestCase):

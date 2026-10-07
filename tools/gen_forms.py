@@ -196,7 +196,7 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "@@FORM_NAMES@@"
+@@FORM_NAMES@@
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -744,11 +744,24 @@ End Sub
 '''
 
 
+def form_names_const(names) -> str:
+    """FORM_NAMES split into pieces joined with &: a VBA line stays under 1000 characters."""
+    pieces, cur = [], ""
+    for n in names:
+        if cur and len(cur) + len(n) > 400:
+            pieces.append(cur + ",")
+            cur = n
+        else:
+            cur = f"{cur},{n}" if cur else n
+    pieces.append(cur)
+    return "Private Const FORM_NAMES As String = " + " & _\n    ".join(vba_str(p) for p in pieces)
+
+
 def build_forms_vba() -> str:
     models = F.all_forms()
     text = BUILDER_TEMPLATE
     for key, value in {
-        "@@FORM_NAMES@@": ",".join(m.name for m in models),
+        "@@FORM_NAMES@@": form_names_const([m.name for m in models]),
         "@@BUILD_ALL@@": "\n".join(f"    BuildForm_{m.name}" for m in models),
         "@@FORM_SUBS@@": "\n\n".join(form_sub(m) for m in models),
     }.items():
