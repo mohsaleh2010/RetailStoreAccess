@@ -3,7 +3,7 @@ Layout conventions are the same as forms.py."""
 
 from typing import List
 
-from forms import BANK_ROWS, CASHBOX_ROWS, Control, FormModel, Sym, button, cm, labelled, title_band
+from forms import BANK_ROWS, CASHBOX_ROWS, CENTER_ROWS, Control, FormModel, Sym, button, cm, labelled, title_band
 from forms_bank import COUNTER_ROWS
 from forms_cash import table_combo, value_list_combo
 
@@ -55,7 +55,9 @@ def layout_assets() -> FormModel:
     labelled(m, "cboCounter", "الحساب الدائن", c)
     _text(m, "txtOpeningAccum", "إهلاك سابق", cm(22.4), y, cm(4.2), "#,##0.00")
     y = cm(5.2)
-    _text(m, "txtNotes", "ملاحظات", cm(0.4), y, cm(11.0))
+    _text(m, "txtNotes", "ملاحظات", cm(0.4), y, cm(7.4))
+    c = table_combo(m, "cboCenter", cm(8.0), y, cm(3.4), rows=CENTER_ROWS, events=())
+    labelled(m, "cboCenter", "مركز التكلفة", c)
     x = cm(11.6)
     for name, caption, style, w, call in [("btnSave", "حفظ الأصل", "primary", 3.0, "AssetSave Me"),
                                           ("btnNew", "أصل جديد", "secondary", 2.6, "AssetNew Me"),

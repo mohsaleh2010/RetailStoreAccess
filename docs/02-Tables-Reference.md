@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **58** | عدد الحقول: **724**
+عدد الجداول: **59** | عدد الحقول: **740**
 
 ## الفهرس
 
@@ -38,32 +38,33 @@
 30. [`FixedAssets`](#fixedassets) – الأصول الثابتة
 31. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
 32. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
-33. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
-34. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
-35. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-36. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-37. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-38. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-39. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-40. [`Expenses`](#expenses) – المصروفات
-41. [`CashVouchers`](#cashvouchers) – سندات النقدية
-42. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-43. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-44. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-45. [`JournalEntries`](#journalentries) – قيود اليومية
-46. [`JournalLines`](#journallines) – أسطر القيود
-47. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-48. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-49. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-50. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-51. [`ManualEntries`](#manualentries) – القيود اليدوية
-52. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-53. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-54. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-55. [`StockCounts`](#stockcounts) – جلسات الجرد
-56. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-57. [`AuditLog`](#auditlog) – سجل العمليات
-58. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+33. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
+34. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+35. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+36. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+37. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+38. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+39. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+40. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+41. [`Expenses`](#expenses) – المصروفات
+42. [`CashVouchers`](#cashvouchers) – سندات النقدية
+43. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+44. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+45. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+46. [`JournalEntries`](#journalentries) – قيود اليومية
+47. [`JournalLines`](#journallines) – أسطر القيود
+48. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+49. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+50. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+51. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+52. [`ManualEntries`](#manualentries) – القيود اليدوية
+53. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+54. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+55. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+56. [`StockCounts`](#stockcounts) – جلسات الجرد
+57. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+58. [`AuditLog`](#auditlog) – سجل العمليات
+59. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -205,6 +206,7 @@
 | 27 | NationalID | Short Text | 15 |  |  |  |  | رقم الهوية / الإقامة |
 | 28 | IBAN | Short Text | 34 |  |  |  |  | آيبان الموظف |
 | 29 | HireDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ التعيين |
+| 30 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مبيعاته ومسير راتبه على هذا المركز |
 
 - المفتاح الأساسي: `EmployeeID`
 - فهرس فريد: `Username`
@@ -226,7 +228,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 48 سجل
+- بيانات أساسية: 49 سجل
 
 ## UserScreens
 
@@ -467,6 +469,7 @@
 | 35 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
 | 36 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
 | 37 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 38 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -535,6 +538,7 @@
 | 28 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 29 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
 | 30 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 31 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -801,27 +805,28 @@
 | 2 | AssetCode | Short Text | 20 | ✔ |  |  |  | رقم الأصل |
 | 3 | AssetName | Short Text | 150 | ✔ |  |  |  | اسم الأصل |
 | 4 | AssetAccount | Number (Long) |  | ✔ |  |  | `Accounts.AccountCode` | حساب الأصل – حساب فرعي من الأصول غير المتداولة (12)، مثل الأثاث أو الأجهزة |
-| 5 | PurchaseDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الشراء |
-| 6 | Cost | Currency |  | ✔ | `0` | `>0` |  | التكلفة بدون الضريبة |
-| 7 | InputVAT | Currency |  | ✔ | `0` | `>=0` |  | ضريبة المدخلات |
-| 8 | SalvageValue | Currency |  | ✔ | `0` | `>=0` |  | القيمة المتبقية في آخر العمر |
-| 9 | UsefulLifeMonths | Number (Integer) |  | ✔ |  | `>0` |  | العمر الإنتاجي (شهر) |
-| 10 | DepStartDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | بداية الإهلاك (يُهلك من شهر هذا التاريخ) |
-| 11 | SourceType | Short Text | 10 | ✔ | `"BANK"` | `In ("OPENING","BANK","CASHBOX","ACCOUNT")` |  | مصدر الشراء |
-| 12 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك |
-| 13 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | الصندوق |
-| 14 | CounterAccount | Number (Long) |  |  |  |  | `Accounts.AccountCode` | الحساب الدائن (حساب آخر) |
-| 15 | OpeningAccumDep | Currency |  | ✔ | `0` | `>=0` |  | إهلاك سابق (للأصول الموجودة قبل البرنامج) |
-| 16 | Status | Short Text | 10 | ✔ | `"ACTIVE"` | `In ("ACTIVE","DISPOSED")` |  | الحالة |
-| 17 | DisposalDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ البيع / الاستبعاد |
-| 18 | DisposalProceeds | Currency |  | ✔ | `0` | `>=0` |  | ثمن البيع |
-| 19 | DisposalTo | Short Text | 10 |  |  | `Is Null Or In ("NONE","BANK","CASHBOX")` |  | استلام الثمن |
-| 20 | DisposalBankID | Number (Long) |  |  |  |  | `Banks.BankID` | بنك استلام الثمن |
-| 21 | DisposalCashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق استلام الثمن |
-| 22 | DisposalAccumDep | Currency |  | ✔ | `0` | `>=0` |  | مجمع الإهلاك يوم الاستبعاد |
-| 23 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 24 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
-| 25 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 5 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – يذهب إليه إهلاك الأصل وربح أو خسارة بيعه |
+| 6 | PurchaseDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الشراء |
+| 7 | Cost | Currency |  | ✔ | `0` | `>0` |  | التكلفة بدون الضريبة |
+| 8 | InputVAT | Currency |  | ✔ | `0` | `>=0` |  | ضريبة المدخلات |
+| 9 | SalvageValue | Currency |  | ✔ | `0` | `>=0` |  | القيمة المتبقية في آخر العمر |
+| 10 | UsefulLifeMonths | Number (Integer) |  | ✔ |  | `>0` |  | العمر الإنتاجي (شهر) |
+| 11 | DepStartDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | بداية الإهلاك (يُهلك من شهر هذا التاريخ) |
+| 12 | SourceType | Short Text | 10 | ✔ | `"BANK"` | `In ("OPENING","BANK","CASHBOX","ACCOUNT")` |  | مصدر الشراء |
+| 13 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك |
+| 14 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | الصندوق |
+| 15 | CounterAccount | Number (Long) |  |  |  |  | `Accounts.AccountCode` | الحساب الدائن (حساب آخر) |
+| 16 | OpeningAccumDep | Currency |  | ✔ | `0` | `>=0` |  | إهلاك سابق (للأصول الموجودة قبل البرنامج) |
+| 17 | Status | Short Text | 10 | ✔ | `"ACTIVE"` | `In ("ACTIVE","DISPOSED")` |  | الحالة |
+| 18 | DisposalDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ البيع / الاستبعاد |
+| 19 | DisposalProceeds | Currency |  | ✔ | `0` | `>=0` |  | ثمن البيع |
+| 20 | DisposalTo | Short Text | 10 |  |  | `Is Null Or In ("NONE","BANK","CASHBOX")` |  | استلام الثمن |
+| 21 | DisposalBankID | Number (Long) |  |  |  |  | `Banks.BankID` | بنك استلام الثمن |
+| 22 | DisposalCashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق استلام الثمن |
+| 23 | DisposalAccumDep | Currency |  | ✔ | `0` | `>=0` |  | مجمع الإهلاك يوم الاستبعاد |
+| 24 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 25 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 26 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `AssetID`
 - فهرس فريد: `AssetCode`
@@ -861,6 +866,24 @@
 - فهرس فريد: `RunID, AssetID`
 - فهرس عادي: `AssetID`
 
+## CostCenters
+
+**مراكز التكلفة والفروع** – الفروع أو الأقسام (التجزئة، المطعم، المقهى...). تُوزَّع عليها الإيرادات والمصروفات في القيود، ومنها قائمة دخل لكل مركز.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **CostCenterID** 🔑 | AutoNumber |  |  |  |  |  | رقم المركز |
+| 2 | CenterCode | Short Text | 10 | ✔ |  |  |  | رمز المركز |
+| 3 | CenterName | Short Text | 100 | ✔ |  |  |  | اسم المركز |
+| 4 | IsDefault | Yes/No |  |  | `False` |  |  | المركز الافتراضي |
+| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 6 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 7 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `CostCenterID`
+- فهرس فريد: `CenterCode`
+- فهرس فريد: `CenterName`
+
 ## PayrollRuns
 
 **مسيرات الرواتب** – مسير كل شهر: مسودة تُعدَّل، ثم يُرحَّل قيده في آخر يوم من الشهر، ثم يُسجَّل صرفه من بنك أو صندوق.
@@ -894,20 +917,21 @@
 | 2 | PayrollRunID | Number (Long) |  | ✔ |  |  | `PayrollRuns.PayrollRunID` | المسير |
 | 3 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
 | 4 | EmployeeName | Short Text | 100 |  |  |  |  | اسم الموظف |
-| 5 | IsSaudi | Yes/No |  |  | `False` |  |  | سعودي |
-| 6 | Basic | Currency |  | ✔ | `0` | `>=0` |  | الأساسي |
-| 7 | Housing | Currency |  | ✔ | `0` | `>=0` |  | بدل السكن |
-| 8 | OtherAllow | Currency |  | ✔ | `0` | `>=0` |  | بدلات أخرى (النقل وغيره) |
-| 9 | Overtime | Currency |  | ✔ | `0` | `>=0` |  | العمل الإضافي |
-| 10 | Additions | Currency |  | ✔ | `0` | `>=0` |  | مكافآت وإضافات |
-| 11 | AbsenceDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصم الغياب |
-| 12 | AdvanceDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصم السلفة |
-| 13 | OtherDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصومات أخرى (جزاءات) |
-| 14 | GosiWage | Currency |  | ✔ | `0` | `>=0` |  | الأجر الخاضع للتأمينات |
-| 15 | GosiEmployee | Currency |  | ✔ | `0` | `>=0` |  | التأمينات - حصة الموظف |
-| 16 | GosiEmployer | Currency |  | ✔ | `0` | `>=0` |  | التأمينات - حصة المنشأة |
-| 17 | NetPay | Currency |  | ✔ | `0` | `>=0` |  | صافي الراتب |
-| 18 | Notes | Short Text | 150 |  |  |  |  | ملاحظات |
+| 5 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الموظف يوم إنشاء المسير |
+| 6 | IsSaudi | Yes/No |  |  | `False` |  |  | سعودي |
+| 7 | Basic | Currency |  | ✔ | `0` | `>=0` |  | الأساسي |
+| 8 | Housing | Currency |  | ✔ | `0` | `>=0` |  | بدل السكن |
+| 9 | OtherAllow | Currency |  | ✔ | `0` | `>=0` |  | بدلات أخرى (النقل وغيره) |
+| 10 | Overtime | Currency |  | ✔ | `0` | `>=0` |  | العمل الإضافي |
+| 11 | Additions | Currency |  | ✔ | `0` | `>=0` |  | مكافآت وإضافات |
+| 12 | AbsenceDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصم الغياب |
+| 13 | AdvanceDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصم السلفة |
+| 14 | OtherDeduction | Currency |  | ✔ | `0` | `>=0` |  | خصومات أخرى (جزاءات) |
+| 15 | GosiWage | Currency |  | ✔ | `0` | `>=0` |  | الأجر الخاضع للتأمينات |
+| 16 | GosiEmployee | Currency |  | ✔ | `0` | `>=0` |  | التأمينات - حصة الموظف |
+| 17 | GosiEmployer | Currency |  | ✔ | `0` | `>=0` |  | التأمينات - حصة المنشأة |
+| 18 | NetPay | Currency |  | ✔ | `0` | `>=0` |  | صافي الراتب |
+| 19 | Notes | Short Text | 150 |  |  |  |  | ملاحظات |
 
 - المفتاح الأساسي: `PayrollLineID`
 - فهرس فريد: `PayrollRunID, EmployeeID`
@@ -1020,6 +1044,7 @@
 | 12 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 13 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صُرف من صندوق – المصروف النقدي يخرج من هذا الصندوق؛ فارغ = لم يُدفع من صندوق |
 | 14 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 15 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
 
 - المفتاح الأساسي: `ExpenseID`
 - فهرس فريد: `ExpenseNumber`
@@ -1045,8 +1070,9 @@
 | 11 | ExpenseID | Number (Long) |  |  |  |  | `Expenses.ExpenseID` | المصروف المسجَّل – صرف بند مصروف يسجل مصروفًا بنفس المبلغ في المصروفات |
 | 12 | ClosingID | Number (Long) |  |  |  |  | `CashClosings.ClosingID` | تصفية الكاشير |
 | 13 | AdvanceEmployeeID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | الموظف صاحب السلفة – سلفة موظف (صرف) أو سدادها نقدًا (قبض) |
-| 14 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
-| 15 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 14 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
+| 15 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `CashVoucherID`
 - فهرس فريد: `VoucherNumber`
@@ -1162,6 +1188,7 @@
 | 5 | Debit | Currency |  | ✔ | `0` | `>=0` |  | مدين |
 | 6 | Credit | Currency |  | ✔ | `0` | `>=0` |  | دائن |
 | 7 | LineText | Short Text | 255 |  |  |  |  | البيان |
+| 8 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مستند العملية؛ فارغ = غير موزع |
 
 - المفتاح الأساسي: `JournalLineID`
 - فهرس فريد: `EntryID, LineNumber`
@@ -1294,6 +1321,7 @@
 | 5 | Debit | Currency |  | ✔ | `0` | `>=0` |  | مدين |
 | 6 | Credit | Currency |  | ✔ | `0` | `>=0` |  | دائن |
 | 7 | LineText | Short Text | 150 |  |  |  |  | بيان السطر |
+| 8 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
 
 - المفتاح الأساسي: `ManualLineID`
 - فهرس فريد: `ManualEntryID, LineNumber`

@@ -126,6 +126,7 @@ PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Ite
 EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName"
 PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder"
 BANK_ROWS = "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName"
+CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
 CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
 ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
@@ -235,6 +236,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("CashBoxID", rows=CASHBOX_ROWS, hint="المصروف النقدي يُخصم من هذا الصندوق (يُختار صندوقك تلقائيًا)"),
             Fld("BankID", rows=BANK_ROWS, widths="0;6",
                 hint="التحويل البنكي يُخصم من هذا البنك (البنك الافتراضي تلقائيًا)"),
+            Fld("CostCenterID", rows=CENTER_ROWS, widths="0;6", hint="فارغ = مركز المستخدم أو المركز الافتراضي"),
             Fld("Description", span=2),
         ]),
     DataScreen(
@@ -263,6 +265,16 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("Notes", span=2),
         ]),
     DataScreen(
+        "frmCostCenters", "CostCenters", "مراكز التكلفة", "الفروع والأقسام: تُوزَّع عليها الإيرادات والمصروفات", "journal",
+        list_select="t.CenterCode AS [الرمز], t.CenterName AS [المركز], IIf(t.IsDefault, 'افتراضي', '') AS [ ]",
+        list_from="CostCenters AS t", list_order="t.CenterCode",
+        list_headers=[("الرمز", 1.8), ("المركز", 5.0), (" ", 1.6)],
+        search=["t.CenterCode", "t.CenterName"], active="t.IsActive", unique=["CenterCode", "CenterName"],
+        fields=[Fld("CenterCode"), Fld("CenterName"),
+                Fld("IsDefault", hint="لمن لا مركز له من المستخدمين"), Fld("IsActive"),
+                Info("lblCenterNote", "مركز الموظف من شاشة رواتب الموظفين؛ المستندات القديمة «غير موزعة»"),
+                Fld("Notes", span=2)]),
+    DataScreen(
         "frmEmployeePay", "Employees", "رواتب الموظفين", "الراتب والبدلات والتأمينات وقسط السلفة لكل موظف", "users",
         list_select="t.EmployeeName AS [الموظف], IIf(t.OnPayroll, 'نعم', '') AS [في المسير], t.BasicSalary AS [الأساسي]",
         list_from="Employees AS t", list_order="t.EmployeeName",
@@ -274,6 +286,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("BasicSalary"), Fld("HousingAllowance"), Fld("TransportAllowance"), Fld("OtherAllowance"),
             Fld("AdvanceInstallment", hint="0 = يُخصم كل رصيد السلف في أول مسير"), Fld("HireDate"),
             Fld("NationalID"), Fld("IBAN"),
+            Fld("CostCenterID", rows=CENTER_ROWS, widths="0;6", hint="مبيعاته ومسير راتبه على هذا المركز"),
             Info("lblPayNote", "التأمينات على الأساسي + السكن: السعودي بحصتي الموظف والمنشأة، وغيره بحصة المنشأة"),
         ]),
     DataScreen(
@@ -337,7 +350,8 @@ DATA_SCREENS: List[DataScreen] = [
         search=["t.AccountName"], active="t.IsActive", unique=["AccountCode"],
         extra_buttons=[("btnJournal", "قيود اليومية", 'OpenScreen "frmJournal"'),
                        ("btnStatement", "كشف حساب", 'OpenScreen "frmLedger", 0, Me!AccountCode'),
-                       ("btnManual", "قيد يدوي", 'OpenScreen "frmManualEntry"')],
+                       ("btnManual", "قيد يدوي", 'OpenScreen "frmManualEntry"'),
+                       ("btnCenters", "مراكز التكلفة", 'OpenScreen "frmCostCenters"')],
         fields=[Fld("AccountCode", hint="رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ"),
                 Fld("ParentCode", rows=ACCOUNT_ROWS, widths="0;7", hook=True,
                     hint="الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا)"),
@@ -453,7 +467,7 @@ SCREEN_PERMISSIONS = {
     "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
     "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
     "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
-    "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL",
+    "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL", "frmCostCenters": "JOURNAL",
 }
 
 
@@ -549,6 +563,10 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("GENERAL_LEDGER", "دفتر الأستاذ (كل الحسابات)", "GeneralLedgerQuery", "rptGeneralLedger", "PJ"),
     ReportEntry("INCOME_STATEMENT", "قائمة الدخل", "IncomeStatementQuery", "rptIncomeStatement", "PJ$F"),
     ReportEntry("BALANCE_SHEET", "الميزانية العمومية", "BalanceSheetQuery", "rptBalanceSheet", "PJ$F"),
+    ReportEntry("COST_CENTER_PROFIT", "قائمة الدخل حسب مركز التكلفة", "CostCenterProfitQuery", "rptCostCenterProfit",
+                "PJ"),
+    ReportEntry("COST_CENTER_ACCOUNTS", "إيرادات ومصروفات كل مركز تكلفة", "CostCenterAccountsQuery",
+                "rptCostCenterAccounts", "PJ"),
     ReportEntry("FIXED_ASSETS", "سجل الأصول الثابتة", "FixedAssetsQuery", "rptFixedAssets", "J"),
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),

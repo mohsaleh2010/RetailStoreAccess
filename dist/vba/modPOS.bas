@@ -51,6 +51,9 @@ Public Sub EnsureLocalTables()
         CurrentDb.Execute "CREATE TABLE tmpManualLines (LineNo COUNTER CONSTRAINT pkManualLines PRIMARY KEY, " & _
             "AccountCode LONG, Debit CURRENCY, Credit CURRENCY, LineText TEXT(150))", dbFailOnError
     End If
+    If Not LocalFieldExists("tmpManualLines", "LineCenter") Then        ' the cost centre of each line
+        CurrentDb.Execute "ALTER TABLE tmpManualLines ADD COLUMN LineCenter LONG", dbFailOnError
+    End If
     ' the screens of the user being edited in frmUserScreens
     If Not LocalTableExists("tmpUserScreens") Then
         CurrentDb.Execute "CREATE TABLE tmpUserScreens (ScreenName TEXT(64) CONSTRAINT pkUserScreens PRIMARY KEY, " & _

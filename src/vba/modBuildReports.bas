@@ -26,7 +26,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptAging,rptPayroll,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptAging,rptPayroll,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -69,6 +69,8 @@ Public Function BuildReports() As Boolean
     BuildReport_rptExpensesByType
     BuildReport_rptCashStatement
     BuildReport_rptCashDaily
+    BuildReport_rptCostCenterProfit
+    BuildReport_rptCostCenterAccounts
     BuildReport_rptFixedAssets
     BuildReport_rptCashBalances
     BuildReport_rptCashClosings
@@ -2446,6 +2448,112 @@ Private Sub BuildReport_rptCashDaily()
     Exit Sub
 EH:
     AbortReport "rptCashDaily", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptCostCenterProfit()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptCostCenterProfit", "قائمة الدخل حسب مركز التكلفة", "CostCenterProfitQuery", 15536, "", "CenterCode", True, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 7768, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 7768, 28, 7768, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "قائمة الدخل حسب مركز التكلفة", 0, 397, 15536, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 15536, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 15536, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "الرمز", 0, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "المركز", 1134, 1292, 3062, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "الإيرادات", 4196, 1292, 1814, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "تكلفة المبيعات", 6010, 1292, 1814, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "مجمل الربح", 7824, 1292, 1814, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "المصروفات", 9638, 1292, 1814, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "صافي الربح", 11452, 1292, 4084, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal3", "=Sum([Revenue])", 4196, 85, 1814, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal4", "=Sum([CostOfSales])", 6010, 85, 1814, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal5", "=Sum([GrossProfit])", 7824, 85, 1814, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal6", "=Sum([Expenses])", 9638, 85, 1814, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal7", "=Sum([NetProfit])", 11452, 85, 4084, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 15536)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 4196, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "CenterCode", 0, 17, 1134, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "CenterName", 1134, 17, 3062, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol3", "Revenue", 4196, 17, 1814, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol4", "CostOfSales", 6010, 17, 1814, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol5", "GrossProfit", 7824, 17, 1814, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol6", "Expenses", 9638, 17, 1814, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol7", "NetProfit", 11452, 17, 4084, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا توجد إيرادات أو مصروفات في الفترة.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptCostCenterProfit", s
+    Exit Sub
+EH:
+    AbortReport "rptCostCenterProfit", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptCostCenterAccounts()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptCostCenterAccounts", "إيرادات ومصروفات كل مركز تكلفة", "CostCenterAccountsQuery", 10773, "", "CenterKey,TreeKey", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "إيرادات ومصروفات كل مركز تكلفة", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "المركز", 0, 1292, 2268, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "القسم", 2268, 1292, 1701, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "الحساب", 3969, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "اسم الحساب", 5103, 1292, 3402, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "المبلغ", 8505, 1292, 2268, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 10773, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "CenterName", 0, 17, 2268, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "SectionName", 2268, 17, 1701, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "AccountCode", 3969, 17, 1134, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "AccountName", 5103, 17, 3402, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol5", "CenterAmount", 8505, 17, 2268, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا توجد إيرادات أو مصروفات في الفترة.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptCostCenterAccounts", s
+    Exit Sub
+EH:
+    AbortReport "rptCostCenterAccounts", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptFixedAssets()

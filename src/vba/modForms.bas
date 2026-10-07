@@ -466,6 +466,7 @@ Private Function ValidateExpense(ByVal frm As Access.Form) As Boolean
     End If
     frm!TotalAmount.Value = Nz(frm!Amount.Value, 0) + Nz(frm!Tax.Value, 0)
     If IsNull(frm!EmployeeID.Value) Then frm!EmployeeID.Value = CurrentUserID()
+    If frm.NewRecord And IsNull(frm!CostCenterID.Value) Then frm!CostCenterID.Value = CostCenterFor()   ' modCostCenters
     ' a cash expense leaves a cash box (modCash); other payment methods do not
     If Nz(frm!PaymentMethodID.Value, 0) = CASH_METHOD_ID Then
         If IsNull(frm!CashBoxID.Value) Then frm!CashBoxID.Value = CurrentCashBoxID()

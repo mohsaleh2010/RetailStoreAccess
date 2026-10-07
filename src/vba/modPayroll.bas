@@ -83,6 +83,7 @@ Private Sub AddLines(ByVal RunID As Long)
         l!PayrollRunID = RunID
         l!EmployeeID = e!EmployeeID
         l!EmployeeName = Left$(e!EmployeeName, 100)
+        l!CostCenterID = e!CostCenterID
         l!IsSaudi = Nz(e!IsSaudi, False)
         l!Basic = Nz(e!BasicSalary, 0)
         l!Housing = Nz(e!HousingAllowance, 0)

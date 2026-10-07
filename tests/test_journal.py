@@ -126,7 +126,7 @@ class JournalCodeTests(unittest.TestCase):
         listed = re.search(r'SOURCE_QUERIES As String = ((?:"[^"]*"(?: & _\s+)?)+)', text).group(1)
         self.assertEqual("".join(re.findall(r'"([^"]*)"', listed)).split(","), Q.JOURNAL_SOURCE_QUERIES)
         sync = proc(text, "SyncJournal")
-        for part in ["Sum(AccountCode * (Debit + Debit + Credit)) AS Sig", "Max(Party) AS FirstText",
+        for part in ["Sum(AccountCode * (Debit + Debit + Credit)) + Sum(CostCenter * (Debit + Debit + Credit) * 7) AS Sig", "Max(Party) AS FirstText",
                      "GROUP BY SourceType, SourceID", 'e!EntryNumber = "~"', "WHERE e.LineCount < 0",
                      "UPDATE JournalEntries SET LineCount = -LineCount WHERE LineCount < 0",
                      "EntryNumber Like '~*'", "ORDER BY EntryDate, EntryID", 'NextNumber("JOURNAL")',

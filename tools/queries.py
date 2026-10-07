@@ -46,11 +46,22 @@ def cash_account(a):
             f"IIf({a}.BankID Is Null, 1200, 120000 + {a}.BankID)), 110000 + {a}.CashBoxID)")
 
 
-def jline(stype, key, number, when, party, order, account, debit, credit, text, source, where):
-    """party: the customer / supplier / payee of the operation (the entry description)."""
+def jline(stype, key, number, when, party, order, account, debit, credit, text, source, where, center="0"):
+    """party: the customer / supplier / payee of the operation (the entry description).
+    center: the cost centre of the line (0 = not allocated)."""
     return (f"SELECT {stype} AS SourceType, {key} AS SourceID, {number} AS SourceNumber, {when} AS SourceDate, "
             f"{party} AS Party, {order} AS LineOrder, {account} AS AccountCode, {debit} AS Debit, "
-            f"{credit} AS Credit, {text} AS LineText\nFROM {source}\nWHERE {where}")
+            f"{credit} AS Credit, {text} AS LineText, {center} AS CostCenter\nFROM {source}\nWHERE {where}")
+
+
+def with_center(sql, expr):
+    """Every line of the entry on the cost centre of its document."""
+    return sql.replace(", 0 AS CostCenter\n", f", {expr} AS CostCenter\n")
+
+
+def cc(alias, field="CostCenterID"):
+    """The cost centre of a document, 0 when it has none."""
+    return f"IIf({alias}.{field} Is Null, 0, {alias}.{field})"
 
 
 def jquery(branches):
@@ -69,27 +80,27 @@ def _sale():
     src = "SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID"
     cost = f"({src}) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID"
     k = ("'SALE'", "h.SalesInvoiceID", "h.InvoiceNumber", "h.InvoiceDate", "c.CustomerName")
-    return jquery([
+    return with_center(jquery([
         jline(*k, 1, cash_account("h"), "h.PaidAmount", ZERO, "c.CustomerName", src, "h.PaidAmount <> 0"),
         jline(*k, 2, 1300, "h.RemainingAmount", ZERO, "c.CustomerName", src, "h.RemainingAmount <> 0"),
         jline(*k, 3, 4100, ZERO, "h.TaxableAmount", "'المبيعات'", src, "h.TaxableAmount <> 0"),
         jline(*k, 4, 2200, ZERO, "h.Tax", "'ضريبة المخرجات'", src, "h.Tax <> 0"),
         jline(*k, 5, 5100, "k.SaleCost", ZERO, "'تكلفة البضاعة المباعة'", cost, "k.SaleCost <> 0"),
-        jline(*k, 6, 1400, ZERO, "k.SaleCost", "'المخزون'", cost, "k.SaleCost <> 0")])
+        jline(*k, 6, 1400, ZERO, "k.SaleCost", "'المخزون'", cost, "k.SaleCost <> 0")]), cc("h"))
 
 
 def _sales_return():
     src = "SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID"
     cost = f"({src}) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID"
     k = ("'SALES_RETURN'", "r.SalesReturnID", "r.ReturnNumber", "r.ReturnDate", "c.CustomerName")
-    return jquery([
+    return with_center(jquery([
         jline(*k, 1, 4110, "r.TaxableAmount", ZERO, "'مردودات المبيعات'", src, "r.TaxableAmount <> 0"),
         jline(*k, 2, 2200, "r.Tax", ZERO, "'ضريبة المخرجات'", src, "r.Tax <> 0"),
         jline(*k, 3, cash_account("r"), ZERO, "r.RefundedAmount", "c.CustomerName", src, "r.RefundedAmount <> 0"),
         jline(*k, 4, 1300, ZERO, "r.TotalAmount - r.RefundedAmount", "c.CustomerName", src,
               "r.TotalAmount - r.RefundedAmount <> 0"),
         jline(*k, 5, 1400, "k.ReturnCost", ZERO, "'المخزون'", cost, "k.ReturnCost <> 0"),
-        jline(*k, 6, 5100, ZERO, "k.ReturnCost", "'تكلفة البضاعة المباعة'", cost, "k.ReturnCost <> 0")])
+        jline(*k, 6, 5100, ZERO, "k.ReturnCost", "'تكلفة البضاعة المباعة'", cost, "k.ReturnCost <> 0")]), cc("r"))
 
 
 def _purchase():
@@ -130,12 +141,12 @@ def _expense():
     src = ("(Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) "
            "LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID")
     k = ("'EXPENSE'", "e.ExpenseID", "e.ExpenseNumber", "e.ExpenseDate", "t.ExpenseTypeName")
-    return jquery([
+    return with_center(jquery([
         jline(*k, 1, "530000 + e.ExpenseTypeID", "e.Amount", ZERO, "t.ExpenseTypeName", src,
               "v.CashVoucherID Is Null AND e.Amount <> 0"),
         jline(*k, 2, 1500, "e.Tax", ZERO, "'ضريبة المدخلات'", src, "v.CashVoucherID Is Null AND e.Tax <> 0"),
         jline(*k, 3, cash_account("e"), ZERO, "e.TotalAmount", "e.Description", src,
-              "v.CashVoucherID Is Null AND e.TotalAmount <> 0")])
+              "v.CashVoucherID Is Null AND e.TotalAmount <> 0")]), cc("e"))
 
 
 def _cash_voucher():
@@ -145,7 +156,7 @@ def _cash_voucher():
     out_account = ("IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', "
                    "5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, "
                    "5900))))")
-    return jquery([
+    return with_center(jquery([
         jline(*k, 1, "110000 + v.CashBoxID", "v.Amount", ZERO, "v.PartyName", "CashVouchers AS v",
               "v.VoucherType = 'IN'"),
         jline(*k, 2, "IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, IIf(v.Category = 'ADVANCE', "
@@ -158,7 +169,7 @@ def _cash_voucher():
         jline(*k, 1, "110000 + v.ToCashBoxID", "v.Amount", ZERO, "v.Description", "CashVouchers AS v",
               "v.VoucherType = 'TRANSFER'"),
         jline(*k, 2, "110000 + v.CashBoxID", ZERO, "v.Amount", "v.Description", "CashVouchers AS v",
-              "v.VoucherType = 'TRANSFER'")])
+              "v.VoucherType = 'TRANSFER'")]), cc("v"))
 
 
 def _stock():
@@ -180,7 +191,7 @@ def _stock():
 def _manual():
     k = ("'MANUAL'", "m.ManualEntryID", "m.EntryNumber", "m.EntryDate", "m.Description")
     return jline(*k, "m.LineNo", "m.LineAccount", "m.LineDebit", "m.LineCredit", "m.LineNote",
-                 "qryManualEntryLines AS m", "m.LineDebit + m.LineCredit <> 0")
+                 "qryManualEntryLines AS m", "m.LineDebit + m.LineCredit <> 0", center="m.LineCenter")
 
 
 def _bank_tx():
@@ -246,7 +257,7 @@ def _asset():
     paid = "IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT)"
     gain = "(a.DisposalProceeds + a.DisposalAccumDep - a.Cost)"
     disposed = "a.Status = 'DISPOSED'"
-    return jquery([
+    return with_center(jquery([
         jline(*k, 1, "a.AssetAccount", "a.Cost", ZERO, "a.AssetName", src, "a.Cost <> 0"),
         jline(*k, 2, 1500, "a.InputVAT", ZERO, "'ضريبة المدخلات'", src, "a.InputVAT <> 0 AND a.SourceType <> 'OPENING'"),
         jline(*k, 3, credit, ZERO, paid, "a.Notes", src, f"{paid} <> 0"),
@@ -257,22 +268,22 @@ def _asset():
               "a.DisposalProceeds", ZERO, "'ثمن بيع الأصل'", src, f"{disposed} AND a.DisposalProceeds <> 0"),
         jline(*kd, 3, "a.AssetAccount", ZERO, "a.Cost", "a.AssetName", src, disposed),
         jline(*kd, 4, 4500, ZERO, gain, "'ربح بيع الأصل'", src, f"{disposed} AND {gain} > 0"),
-        jline(*kd, 5, 5650, f"-{gain}", ZERO, "'خسارة بيع / استبعاد الأصل'", src, f"{disposed} AND {gain} < 0")])
+        jline(*kd, 5, 5650, f"-{gain}", ZERO, "'خسارة بيع / استبعاد الأصل'", src, f"{disposed} AND {gain} < 0")]), cc("a"))
 
 
 def _depreciation():
     k = ("'DEPRECIATION'", "d.RunID", "d.RunNumber", "d.RunMonth", "'الإهلاك الشهري'")
     src = "qryDepreciationLines AS d"
     return jquery([
-        jline(*k, "2 * d.LineNo - 1", 5600, "d.Amount", ZERO, "d.AssetName", src, "d.Amount <> 0"),
-        jline(*k, "2 * d.LineNo", 1790, ZERO, "d.Amount", "d.AssetName", src, "d.Amount <> 0")])
+        jline(*k, "2 * d.LineNo - 1", 5600, "d.Amount", ZERO, "d.AssetName", src, "d.Amount <> 0", center="d.LineCenter"),
+        jline(*k, "2 * d.LineNo", 1790, ZERO, "d.Amount", "d.AssetName", src, "d.Amount <> 0", center="d.LineCenter")])
 
 
 def _payroll():
     # the posted payroll on the last day of its month: salaries 5500 (basic + housing - absence), allowances 5510,
     # the employer's GOSI 5520 against GOSI payable 2320 (both shares), the advances deducted 1600, the
     # penalties 4200 and the net salaries payable 2310; the payment: 2310 against the bank or a cash box
-    src = "PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID"
+    src = "PayrollRuns AS r INNER JOIN qryPayrollCenterTotals AS t ON r.PayrollRunID = t.PayrollRunID"
     k = ("'PAYROLL'", "r.PayrollRunID", "r.RunNumber", "r.PayMonth", "'مسير الرواتب'")
     kp = ("'PAYROLL_PAYMENT'", "r.PayrollRunID", "r.RunNumber", "r.PaidDate", "'صرف الرواتب'")
     posted = "r.Status = 'POSTED'"
@@ -280,8 +291,9 @@ def _payroll():
              (3, 5520, "t.SumGosiER", True, "'التأمينات - حصة المنشأة'"),
              (4, 2320, "t.SumGosi", False, "'التأمينات المستحقة'"), (5, 1600, "t.SumAdvance", False, "'خصم السلف'"),
              (6, 4200, "t.SumOtherDed", False, "'جزاءات وخصومات'"), (7, 2310, "t.SumNet", False, "'صافي الرواتب'")]
-    out = [jline(*k, n, acc, amount if debit else ZERO, ZERO if debit else amount, text, src,
-                 f"{posted} AND {amount} <> 0") for n, acc, amount, debit, text in lines]
+    # a group of lines for each cost centre of the employees (line order: centre x 10 + line)
+    out = [jline(*k, f"{n} + 10 * t.CenterKey", acc, amount if debit else ZERO, ZERO if debit else amount, text, src,
+                 f"{posted} AND {amount} <> 0", center="t.CenterKey") for n, acc, amount, debit, text in lines]
     paid_from = "IIf(r.PaidFrom = 'BANK', 120000 + r.BankID, 110000 + r.CashBoxID)"
     out += [jline(*kp, 1, 2310, "r.PaidAmount", ZERO, "'صافي الرواتب'", "PayrollRuns AS r",
                   f"{posted} AND r.PaidAmount <> 0"),
@@ -1352,7 +1364,8 @@ GROUP BY ReferenceID"""),
     Query("qryJournalOpening", "أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين", _opening()),
     Query("qryManualEntryLines", "أسطر القيود اليدوية مع رأس كل قيد", """
 SELECT h.ManualEntryID, h.EntryNumber, h.EntryDate, h.Description, l.LineNumber AS LineNo,
-       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote
+       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote,
+       IIf(l.CostCenterID Is Null, 0, l.CostCenterID) AS LineCenter
 FROM ManualEntries AS h INNER JOIN ManualEntryLines AS l ON h.ManualEntryID = l.ManualEntryID"""),
     Query("qryJournalManual", "أسطر القيود اليدوية", _manual()),
     Query("qryYearCloseLines", "أسطر قيود إقفال السنوات مع رأس كل إقفال", """
@@ -1364,7 +1377,8 @@ FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClo
     Query("qryJournalCheque", "أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد", _cheque()),
     Query("qryJournalAsset", "أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها", _asset()),
     Query("qryDepreciationLines", "أسطر قيود الإهلاك الشهرية مع اسم الأصل", """
-SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName
+SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName,
+       IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS LineCenter
 FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.RunID)
      INNER JOIN FixedAssets AS a ON d.AssetID = a.AssetID"""),
     Query("qryJournalDepreciation", "أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل", _depreciation()),
@@ -1375,6 +1389,13 @@ SELECT PayrollRunID, Sum(Basic + Housing - AbsenceDeduction) AS SumSalaries,
        Sum(OtherDeduction) AS SumOtherDed, Sum(NetPay) AS SumNet, Count(*) AS LineCount
 FROM PayrollLines
 GROUP BY PayrollRunID"""),
+    Query("qryPayrollCenterTotals", "مجاميع كل مسير رواتب لكل مركز تكلفة لقيده", """
+SELECT PayrollRunID, IIf(CostCenterID Is Null, 0, CostCenterID) AS CenterKey,
+       Sum(Basic + Housing - AbsenceDeduction) AS SumSalaries, Sum(OtherAllow + Overtime + Additions) AS SumAllowances,
+       Sum(GosiEmployer) AS SumGosiER, Sum(GosiEmployee + GosiEmployer) AS SumGosi, Sum(AdvanceDeduction) AS SumAdvance,
+       Sum(OtherDeduction) AS SumOtherDed, Sum(NetPay) AS SumNet
+FROM PayrollLines
+GROUP BY PayrollRunID, IIf(CostCenterID Is Null, 0, CostCenterID)"""),
     Query("qryJournalPayroll", "أسطر قيود مسيرات الرواتب المرحَّلة وصرفها", _payroll()),
     Query("qryJournalBankTx", "أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى", _bank_tx()),
 
@@ -1571,6 +1592,44 @@ WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR 
 
     Query("IncomeStatementQuery", "قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة", f"""
 {_income_statement()}""", P + ["CompareStart", "CompareEnd"]),
+
+    # ============================================================ COST CENTRES
+    # revenue and expenses of the period by cost centre (0 = not allocated), without the year closing entries
+    Query("qryCenterMoves", "صافي حركة كل حساب إيرادات أو مصروفات لكل مركز تكلفة في الفترة", f"""
+SELECT IIf(l.CostCenterID Is Null, 0, l.CostCenterID) AS CenterKey, l.AccountCode, a.AccountName, a.TreeKey,
+       a.Level2Code, IIf(a.AccountType = 'REVENUE', 1, -1) * (Sum(l.Credit) - Sum(l.Debit)) AS CenterAmount
+FROM (JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)
+     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode
+WHERE {period("e.EntryDate")} AND e.SourceType <> 'YEAR_CLOSE' AND a.AccountType IN ('REVENUE', 'EXPENSE')
+GROUP BY IIf(l.CostCenterID Is Null, 0, l.CostCenterID), l.AccountCode, a.AccountName, a.TreeKey, a.Level2Code,
+         a.AccountType""", P),
+
+    Query("qryCenterNames", "مراكز التكلفة ومعها «غير موزع»", """
+SELECT CostCenterID AS CenterKey, CenterCode, CenterName
+FROM CostCenters
+UNION ALL
+SELECT 0, '-', 'غير موزع'
+FROM Settings AS z
+WHERE z.SettingID = 1"""),
+
+    Query("qryCenterSums", "الإيرادات وتكلفة المبيعات والمصروفات لكل مركز تكلفة", """
+SELECT CenterKey, Sum(IIf(Level2Code = 41 Or Level2Code = 42, CenterAmount, 0)) AS SumRevenue,
+       Sum(IIf(Level2Code = 51, CenterAmount, 0)) AS SumCostOfSales,
+       Sum(IIf(Level2Code = 52 Or Level2Code = 53, CenterAmount, 0)) AS SumExpenses
+FROM qryCenterMoves
+GROUP BY CenterKey"""),
+
+    Query("CostCenterProfitQuery", "قائمة الدخل لكل مركز تكلفة: الإيرادات، تكلفة المبيعات، مجمل الربح، المصروفات، صافي الربح", """
+SELECT n.CenterKey, n.CenterCode, n.CenterName, s.SumRevenue AS Revenue, s.SumCostOfSales AS CostOfSales,
+       s.SumRevenue - s.SumCostOfSales AS GrossProfit, s.SumExpenses AS Expenses,
+       s.SumRevenue - s.SumCostOfSales - s.SumExpenses AS NetProfit
+FROM qryCenterNames AS n INNER JOIN qryCenterSums AS s ON n.CenterKey = s.CenterKey""", P),
+
+    Query("CostCenterAccountsQuery", "إيرادات ومصروفات كل مركز تكلفة بالحسابات", """
+SELECT n.CenterKey, n.CenterName, m.AccountCode, m.AccountName, m.TreeKey,
+       IIf(m.Level2Code = 41 Or m.Level2Code = 42, 'إيرادات', IIf(m.Level2Code = 51, 'تكلفة المبيعات', 'مصروفات'))
+           AS SectionName, m.CenterAmount
+FROM qryCenterNames AS n INNER JOIN qryCenterMoves AS m ON n.CenterKey = m.CenterKey""", P),
 
     Query("qryBalanceAt", "رصيد كل حساب في نهاية الفترة (مدين موجب)", """
 SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS NetAt

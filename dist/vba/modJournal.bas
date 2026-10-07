@@ -79,7 +79,8 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
     For i = 0 To UBound(sources)
         Set rs = db.OpenRecordset("SELECT SourceType, SourceID, Max(SourceNumber) AS DocNumber, " & _
             "Max(SourceDate) AS DocDate, Sum(Debit) AS SumDebit, Sum(Credit) AS SumCredit, " & _
-            "Sum(AccountCode * (Debit + Debit + Credit)) AS Sig, Count(*) AS LineTotal, " & _
+            "Sum(AccountCode * (Debit + Debit + Credit)) + Sum(CostCenter * (Debit + Debit + Credit) * 7) AS Sig, " & _
+            "Count(*) AS LineTotal, " & _
             "Max(Party) AS FirstText FROM " & sources(i) & _
             " GROUP BY SourceType, SourceID", dbOpenSnapshot)
         Do Until rs.EOF
@@ -116,8 +117,10 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
         Loop
         rs.Close
         ' lines of the new and changed entries (LineCount < 0 = waiting for its lines)
-        db.Execute "INSERT INTO JournalLines (EntryID, LineNumber, AccountCode, Debit, Credit, LineText) " & _
-            "SELECT e.EntryID, q.LineOrder, q.AccountCode, q.Debit, q.Credit, q.LineText FROM " & sources(i) & _
+        ' the cost centre: 0 in the source queries = not allocated (an entry without centre keeps its old signature)
+        db.Execute "INSERT INTO JournalLines (EntryID, LineNumber, AccountCode, Debit, Credit, LineText, CostCenterID) " & _
+            "SELECT e.EntryID, q.LineOrder, q.AccountCode, q.Debit, q.Credit, q.LineText, " & _
+            "IIf(q.CostCenter = 0, Null, q.CostCenter) FROM " & sources(i) & _
             " AS q INNER JOIN JournalEntries AS e ON (q.SourceType = e.SourceType AND q.SourceID = e.SourceID) " & _
             "WHERE e.LineCount < 0", dbFailOnError
     Next

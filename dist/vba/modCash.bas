@@ -193,6 +193,7 @@ Private Function InsertVoucher(ByVal db As DAO.Database, ByVal VoucherType As St
         rs!PaymentMethodID = CASH_METHOD_ID
         rs!Description = Left$("ÓäÏ ÕÑÝ äÞÏíÉ " & vNo & IIf(Len(Description) > 0, " - " & Description, ""), 255)
         rs!EmployeeID = CurrentUserID()
+        rs!CostCenterID = CostCenterFor()                  ' modCostCenters
         rs.Update
         rs.Bookmark = rs.LastModified
         expenseID = rs!ExpenseID
@@ -217,6 +218,7 @@ Private Function InsertVoucher(ByVal db As DAO.Database, ByVal VoucherType As St
     If expenseID > 0 Then rs!ExpenseID = expenseID
     If ClosingID > 0 Then rs!ClosingID = ClosingID
     rs!EmployeeID = CurrentUserID()
+    rs!CostCenterID = CostCenterFor()                      ' modCostCenters
     rs.Update
     rs.Bookmark = rs.LastModified
     InsertVoucher = rs!CashVoucherID

@@ -362,6 +362,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     rs!ChangeDue = change
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), paid)      ' modCash
     rs!BankID = BankFor(PaymentMethodID, paid)                                 ' modBank
+    rs!CostCenterID = CostCenterFor()                                          ' modCostCenters
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     If Len(OrderType) > 0 Then rs!OrderType = OrderType
     If Len(Trim$(TableNo)) > 0 Then rs!TableNo = Left$(Trim$(TableNo), 10)
@@ -503,6 +504,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     rs!ReturnNumber = retNo
     rs!ReturnDate = retDate
     rs!SalesInvoiceID = SalesInvoiceID
+    rs!CostCenterID = DbValue("SELECT CostCenterID FROM SalesInvoices WHERE SalesInvoiceID = " & SalesInvoiceID)
     rs!CustomerID = customerID
     rs!EmployeeID = CurrentUserID()
     rs!Reason = Left$(Reason, 255)

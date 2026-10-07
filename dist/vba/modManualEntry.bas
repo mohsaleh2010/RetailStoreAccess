@@ -117,7 +117,7 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
     NewID = h!ManualEntryID
     h.Close
 
-    Set rs = db.OpenRecordset("SELECT AccountCode, Debit, Credit, LineText FROM tmpManualLines " & _
+    Set rs = db.OpenRecordset("SELECT AccountCode, Debit, Credit, LineText, LineCenter FROM tmpManualLines " & _
                               "WHERE AccountCode Is Not Null ORDER BY LineNo", dbOpenSnapshot)
     Set h = db.OpenRecordset("ManualEntryLines", dbOpenDynaset, dbAppendOnly)
     Do Until rs.EOF
@@ -129,6 +129,7 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
         h!Debit = Nz(rs!Debit, 0)
         h!Credit = Nz(rs!Credit, 0)
         If Len(Trim$(Nz(rs!LineText, ""))) > 0 Then h!LineText = Left$(Trim$(rs!LineText), 150)
+        h!CostCenterID = rs!LineCenter                     ' modCostCenters
         h.Update
         total = total + Nz(rs!Debit, 0)
         rs.MoveNext
@@ -213,8 +214,8 @@ Public Sub ManualOpen(ByVal frm As Access.Form, ByVal ManualEntryID As Long)
     frm!txtReference.Value = rs!Reference
     rs.Close
     CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit, LineText) SELECT AccountCode, Debit, " & _
-                      "Credit, LineText FROM ManualEntryLines WHERE ManualEntryID = " & ManualEntryID & _
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit, LineText, LineCenter) SELECT AccountCode, " & _
+                      "Debit, Credit, LineText, CostCenterID FROM ManualEntryLines WHERE ManualEntryID = " & ManualEntryID & _
                       " ORDER BY LineNumber", dbFailOnError
     frm!subLines.Form.Requery
     ManualRecalc frm
@@ -320,8 +321,9 @@ Public Sub ReverseManualEntry(ByVal frm As Access.Form)
     If id = 0 Then Exit Sub
     number = Nz(frm!txtNumber.Value, "")
     CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit, LineText) SELECT AccountCode, Credit, " & _
-                      "Debit, LineText FROM ManualEntryLines WHERE ManualEntryID = " & id & " ORDER BY LineNumber", dbFailOnError
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit, LineText, LineCenter) SELECT AccountCode, " & _
+                      "Credit, Debit, LineText, CostCenterID FROM ManualEntryLines WHERE ManualEntryID = " & id & _
+                      " ORDER BY LineNumber", dbFailOnError
     frm!txtDescription.Value = Left$("ÚßÓ ÇáÞíÏ " & number & ": " & Nz(frm!txtDescription.Value, ""), 255)
     frm!txtReversalOf.Value = id
     frm!txtEntryID.Value = Null

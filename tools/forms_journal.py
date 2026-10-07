@@ -103,7 +103,10 @@ POSTING_ACCOUNTS = ("SELECT AccountCode, AccountCode & '  ' & AccountName AS Acc
                     "WHERE IsPosting = True AND IsActive = True ORDER BY TreeKey")
 MANUAL_FIND_ROWS = ("SELECT ManualEntryID, EntryNumber, EntryDate, Description FROM ManualEntries "
                     "ORDER BY EntryDate DESC, ManualEntryID DESC")
-MANUAL_TITLES = ["#", "الحساب", "مدين", "دائن", "بيان السطر", ""]
+MANUAL_TITLES = ["#", "الحساب", "مدين", "دائن", "بيان السطر", "مركز التكلفة", ""]
+
+
+CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
 
 
 def layout_manual_lines() -> Tuple[FormModel, list]:
@@ -118,7 +121,9 @@ def layout_manual_lines() -> Tuple[FormModel, list]:
          ["AfterUpdate"]),
         ("Debit", "Debit", 3.0, {"Format": "#,##0.00"}, ["AfterUpdate"]),
         ("Credit", "Credit", 3.0, {"Format": "#,##0.00"}, ["AfterUpdate"]),
-        ("LineText", "LineText", 8.7, {}, ["AfterUpdate"]),
+        ("LineText", "LineText", 5.6, {}, ["AfterUpdate"]),
+        ("LineCenter", "LineCenter", 3.1, {"_kind": "combo", "RowSource": CENTER_ROWS, "ColumnCount": 2,
+                                           "ColumnWidths": "0;3", "BoundColumn": 1, "LimitToList": True}, []),
         ("btnRemove", "", 0.8, {"_kind": "button", "Caption": Sym(f"ChrW(&H{0xE74D:X})"),
                                "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
     ], row_h)

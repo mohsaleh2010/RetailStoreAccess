@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **135**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **141**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -101,46 +101,52 @@
 | 93 | [`qryDepreciationLines`](#qrydepreciationlines) | أسطر قيود الإهلاك الشهرية مع اسم الأصل |  |
 | 94 | [`qryJournalDepreciation`](#qryjournaldepreciation) | أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل |  |
 | 95 | [`qryPayrollTotals`](#qrypayrolltotals) | مجاميع كل مسير رواتب لقيده |  |
-| 96 | [`qryJournalPayroll`](#qryjournalpayroll) | أسطر قيود مسيرات الرواتب المرحَّلة وصرفها |  |
-| 97 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
-| 98 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
-| 99 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
-| 100 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
-| 101 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
-| 102 | [`qryAssetDepTotals`](#qryassetdeptotals) | مجموع إهلاك كل أصل في القيود الشهرية |  |
-| 103 | [`FixedAssetsQuery`](#fixedassetsquery) | سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري |  |
-| 104 | [`qryAdvanceMoves`](#qryadvancemoves) | حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب |  |
-| 105 | [`qryAdvanceTotals`](#qryadvancetotals) | رصيد سلف كل موظف |  |
-| 106 | [`AdvanceBalanceQuery`](#advancebalancequery) | أرصدة سلف الموظفين |  |
-| 107 | [`PayrollSheetQuery`](#payrollsheetquery) | مسير الرواتب المختار بأسطر الموظفين | `PayrollRunID` |
-| 108 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
-| 109 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 110 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 111 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 112 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 113 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 114 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
-| 115 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 116 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 117 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
-| 118 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 119 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
-| 120 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
-| 121 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 122 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 123 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 124 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 125 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 126 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 127 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 128 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 129 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 130 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 131 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 132 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 133 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 134 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 135 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 96 | [`qryPayrollCenterTotals`](#qrypayrollcentertotals) | مجاميع كل مسير رواتب لكل مركز تكلفة لقيده |  |
+| 97 | [`qryJournalPayroll`](#qryjournalpayroll) | أسطر قيود مسيرات الرواتب المرحَّلة وصرفها |  |
+| 98 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
+| 99 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
+| 100 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
+| 101 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
+| 102 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
+| 103 | [`qryAssetDepTotals`](#qryassetdeptotals) | مجموع إهلاك كل أصل في القيود الشهرية |  |
+| 104 | [`FixedAssetsQuery`](#fixedassetsquery) | سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري |  |
+| 105 | [`qryAdvanceMoves`](#qryadvancemoves) | حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب |  |
+| 106 | [`qryAdvanceTotals`](#qryadvancetotals) | رصيد سلف كل موظف |  |
+| 107 | [`AdvanceBalanceQuery`](#advancebalancequery) | أرصدة سلف الموظفين |  |
+| 108 | [`PayrollSheetQuery`](#payrollsheetquery) | مسير الرواتب المختار بأسطر الموظفين | `PayrollRunID` |
+| 109 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
+| 110 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 111 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 112 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 113 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 114 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 115 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
+| 116 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 117 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 118 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 119 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 120 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
+| 121 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
+| 122 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 123 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 124 | [`qryCenterMoves`](#qrycentermoves) | صافي حركة كل حساب إيرادات أو مصروفات لكل مركز تكلفة في الفترة | `PeriodStart`, `PeriodEnd` |
+| 125 | [`qryCenterNames`](#qrycenternames) | مراكز التكلفة ومعها «غير موزع» |  |
+| 126 | [`qryCenterSums`](#qrycentersums) | الإيرادات وتكلفة المبيعات والمصروفات لكل مركز تكلفة |  |
+| 127 | [`CostCenterProfitQuery`](#costcenterprofitquery) | قائمة الدخل لكل مركز تكلفة: الإيرادات، تكلفة المبيعات، مجمل الربح، المصروفات، صافي الربح | `PeriodStart`, `PeriodEnd` |
+| 128 | [`CostCenterAccountsQuery`](#costcenteraccountsquery) | إيرادات ومصروفات كل مركز تكلفة بالحسابات | `PeriodStart`, `PeriodEnd` |
+| 129 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 130 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 131 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 132 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 133 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 134 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 135 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 136 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 137 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 138 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 139 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 140 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 141 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -1589,27 +1595,27 @@ GROUP BY ReferenceID
 أسطر قيود فواتير البيع
 
 ```sql
-SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, IIf(h.BankID Is Null, 1200, 120000 + h.BankID)), 110000 + h.CashBoxID) AS AccountCode, h.PaidAmount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText
+SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, IIf(h.BankID Is Null, 1200, 120000 + h.BankID)), 110000 + h.CashBoxID) AS AccountCode, h.PaidAmount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter
 FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
 WHERE h.PaidAmount <> 0
 UNION ALL
-SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 1300 AS AccountCode, h.RemainingAmount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText
+SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 1300 AS AccountCode, h.RemainingAmount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter
 FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
 WHERE h.RemainingAmount <> 0
 UNION ALL
-SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 3 AS LineOrder, 4100 AS AccountCode, CCur(0) AS Debit, h.TaxableAmount AS Credit, 'المبيعات' AS LineText
+SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 3 AS LineOrder, 4100 AS AccountCode, CCur(0) AS Debit, h.TaxableAmount AS Credit, 'المبيعات' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter
 FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
 WHERE h.TaxableAmount <> 0
 UNION ALL
-SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 4 AS LineOrder, 2200 AS AccountCode, CCur(0) AS Debit, h.Tax AS Credit, 'ضريبة المخرجات' AS LineText
+SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 4 AS LineOrder, 2200 AS AccountCode, CCur(0) AS Debit, h.Tax AS Credit, 'ضريبة المخرجات' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter
 FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
 WHERE h.Tax <> 0
 UNION ALL
-SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 5 AS LineOrder, 5100 AS AccountCode, k.SaleCost AS Debit, CCur(0) AS Credit, 'تكلفة البضاعة المباعة' AS LineText
+SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 5 AS LineOrder, 5100 AS AccountCode, k.SaleCost AS Debit, CCur(0) AS Credit, 'تكلفة البضاعة المباعة' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter
 FROM (SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID
 WHERE k.SaleCost <> 0
 UNION ALL
-SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 6 AS LineOrder, 1400 AS AccountCode, CCur(0) AS Debit, k.SaleCost AS Credit, 'المخزون' AS LineText
+SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 6 AS LineOrder, 1400 AS AccountCode, CCur(0) AS Debit, k.SaleCost AS Credit, 'المخزون' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter
 FROM (SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID
 WHERE k.SaleCost <> 0
 ```
@@ -1619,27 +1625,27 @@ WHERE k.SaleCost <> 0
 أسطر قيود مرتجعات البيع
 
 ```sql
-SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 4110 AS AccountCode, r.TaxableAmount AS Debit, CCur(0) AS Credit, 'مردودات المبيعات' AS LineText
+SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 4110 AS AccountCode, r.TaxableAmount AS Debit, CCur(0) AS Credit, 'مردودات المبيعات' AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter
 FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
 WHERE r.TaxableAmount <> 0
 UNION ALL
-SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 2200 AS AccountCode, r.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المخرجات' AS LineText
+SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 2200 AS AccountCode, r.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المخرجات' AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter
 FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
 WHERE r.Tax <> 0
 UNION ALL
-SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 3 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, IIf(r.BankID Is Null, 1200, 120000 + r.BankID)), 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.RefundedAmount AS Credit, c.CustomerName AS LineText
+SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 3 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, IIf(r.BankID Is Null, 1200, 120000 + r.BankID)), 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.RefundedAmount AS Credit, c.CustomerName AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter
 FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
 WHERE r.RefundedAmount <> 0
 UNION ALL
-SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 4 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, r.TotalAmount - r.RefundedAmount AS Credit, c.CustomerName AS LineText
+SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 4 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, r.TotalAmount - r.RefundedAmount AS Credit, c.CustomerName AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter
 FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
 WHERE r.TotalAmount - r.RefundedAmount <> 0
 UNION ALL
-SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 5 AS LineOrder, 1400 AS AccountCode, k.ReturnCost AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText
+SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 5 AS LineOrder, 1400 AS AccountCode, k.ReturnCost AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter
 FROM (SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID
 WHERE k.ReturnCost <> 0
 UNION ALL
-SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 6 AS LineOrder, 5100 AS AccountCode, CCur(0) AS Debit, k.ReturnCost AS Credit, 'تكلفة البضاعة المباعة' AS LineText
+SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 6 AS LineOrder, 5100 AS AccountCode, CCur(0) AS Debit, k.ReturnCost AS Credit, 'تكلفة البضاعة المباعة' AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter
 FROM (SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID
 WHERE k.ReturnCost <> 0
 ```
@@ -1649,19 +1655,19 @@ WHERE k.ReturnCost <> 0
 أسطر قيود فواتير الشراء
 
 ```sql
-SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 1400 AS AccountCode, h.TaxableAmount AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText
+SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 1400 AS AccountCode, h.TaxableAmount AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText, 0 AS CostCenter
 FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
 WHERE h.TaxableAmount <> 0
 UNION ALL
-SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 1500 AS AccountCode, h.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText
+SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 1500 AS AccountCode, h.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, 0 AS CostCenter
 FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
 WHERE h.Tax <> 0
 UNION ALL
-SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 3 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, IIf(h.BankID Is Null, 1200, 120000 + h.BankID)), 110000 + h.CashBoxID) AS AccountCode, CCur(0) AS Debit, h.PaidAmount AS Credit, s.SupplierName AS LineText
+SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 3 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, IIf(h.BankID Is Null, 1200, 120000 + h.BankID)), 110000 + h.CashBoxID) AS AccountCode, CCur(0) AS Debit, h.PaidAmount AS Credit, s.SupplierName AS LineText, 0 AS CostCenter
 FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
 WHERE h.PaidAmount <> 0
 UNION ALL
-SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 4 AS LineOrder, 2100 AS AccountCode, CCur(0) AS Debit, h.RemainingAmount AS Credit, s.SupplierName AS LineText
+SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 4 AS LineOrder, 2100 AS AccountCode, CCur(0) AS Debit, h.RemainingAmount AS Credit, s.SupplierName AS LineText, 0 AS CostCenter
 FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
 WHERE h.RemainingAmount <> 0
 ```
@@ -1671,19 +1677,19 @@ WHERE h.RemainingAmount <> 0
 أسطر قيود مرتجعات الشراء
 
 ```sql
-SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, IIf(r.BankID Is Null, 1200, 120000 + r.BankID)), 110000 + r.CashBoxID) AS AccountCode, r.RefundedAmount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText
+SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, IIf(r.BankID Is Null, 1200, 120000 + r.BankID)), 110000 + r.CashBoxID) AS AccountCode, r.RefundedAmount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter
 FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID
 WHERE r.RefundedAmount <> 0
 UNION ALL
-SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 2100 AS AccountCode, r.TotalAmount - r.RefundedAmount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText
+SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 2100 AS AccountCode, r.TotalAmount - r.RefundedAmount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter
 FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID
 WHERE r.TotalAmount - r.RefundedAmount <> 0
 UNION ALL
-SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 3 AS LineOrder, 1400 AS AccountCode, CCur(0) AS Debit, r.TaxableAmount AS Credit, 'المخزون' AS LineText
+SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 3 AS LineOrder, 1400 AS AccountCode, CCur(0) AS Debit, r.TaxableAmount AS Credit, 'المخزون' AS LineText, 0 AS CostCenter
 FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID
 WHERE r.TaxableAmount <> 0
 UNION ALL
-SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 4 AS LineOrder, 1500 AS AccountCode, CCur(0) AS Debit, r.Tax AS Credit, 'ضريبة المدخلات' AS LineText
+SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 4 AS LineOrder, 1500 AS AccountCode, CCur(0) AS Debit, r.Tax AS Credit, 'ضريبة المدخلات' AS LineText, 0 AS CostCenter
 FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID
 WHERE r.Tax <> 0
 ```
@@ -1693,19 +1699,19 @@ WHERE r.Tax <> 0
 أسطر قيود سندات القبض من العملاء والصرف للموردين
 
 ```sql
-SELECT 'CUSTOMER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, IIf(p.BankID Is Null, 1200, 120000 + p.BankID)), 110000 + p.CashBoxID) AS AccountCode, p.Amount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText
+SELECT 'CUSTOMER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, IIf(p.BankID Is Null, 1200, 120000 + p.BankID)), 110000 + p.CashBoxID) AS AccountCode, p.Amount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText, 0 AS CostCenter
 FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID
 WHERE p.Amount <> 0
 UNION ALL
-SELECT 'CUSTOMER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, p.Amount AS Credit, c.CustomerName AS LineText
+SELECT 'CUSTOMER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, p.Amount AS Credit, c.CustomerName AS LineText, 0 AS CostCenter
 FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID
 WHERE p.Amount <> 0
 UNION ALL
-SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 2100 AS AccountCode, p.Amount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText
+SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 2100 AS AccountCode, p.Amount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter
 FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
 WHERE p.Amount <> 0
 UNION ALL
-SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, IIf(p.BankID Is Null, 1200, 120000 + p.BankID)), 110000 + p.CashBoxID) AS AccountCode, CCur(0) AS Debit, p.Amount AS Credit, s.SupplierName AS LineText
+SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, IIf(p.BankID Is Null, 1200, 120000 + p.BankID)), 110000 + p.CashBoxID) AS AccountCode, CCur(0) AS Debit, p.Amount AS Credit, s.SupplierName AS LineText, 0 AS CostCenter
 FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
 WHERE p.Amount <> 0
 ```
@@ -1715,15 +1721,15 @@ WHERE p.Amount <> 0
 أسطر قيود المصروفات (عدا المسجلة بسند نقدية)
 
 ```sql
-SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 1 AS LineOrder, 530000 + e.ExpenseTypeID AS AccountCode, e.Amount AS Debit, CCur(0) AS Credit, t.ExpenseTypeName AS LineText
+SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 1 AS LineOrder, 530000 + e.ExpenseTypeID AS AccountCode, e.Amount AS Debit, CCur(0) AS Credit, t.ExpenseTypeName AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter
 FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
 WHERE v.CashVoucherID Is Null AND e.Amount <> 0
 UNION ALL
-SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 2 AS LineOrder, 1500 AS AccountCode, e.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText
+SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 2 AS LineOrder, 1500 AS AccountCode, e.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter
 FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
 WHERE v.CashVoucherID Is Null AND e.Tax <> 0
 UNION ALL
-SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 3 AS LineOrder, IIf(e.CashBoxID Is Null, IIf(e.PaymentMethodID Is Null Or e.PaymentMethodID = 1, 1190, IIf(e.BankID Is Null, 1200, 120000 + e.BankID)), 110000 + e.CashBoxID) AS AccountCode, CCur(0) AS Debit, e.TotalAmount AS Credit, e.Description AS LineText
+SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 3 AS LineOrder, IIf(e.CashBoxID Is Null, IIf(e.PaymentMethodID Is Null Or e.PaymentMethodID = 1, 1190, IIf(e.BankID Is Null, 1200, 120000 + e.BankID)), 110000 + e.CashBoxID) AS AccountCode, CCur(0) AS Debit, e.TotalAmount AS Credit, e.Description AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter
 FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
 WHERE v.CashVoucherID Is Null AND e.TotalAmount <> 0
 ```
@@ -1733,31 +1739,31 @@ WHERE v.CashVoucherID Is Null AND e.TotalAmount <> 0
 أسطر قيود سندات النقدية (قبض وصرف وتحويل)
 
 ```sql
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.PartyName AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.PartyName AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'IN'
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, IIf(v.Category = 'ADVANCE', 1600, 4200))) AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'OVERAGE', 4300, IIf(v.Category = 'ADVANCE', 1600, 4200))) AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'IN'
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', 5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, 5900)))) AS AccountCode, v.Amount - CCur(Nz(x.Tax, 0)) AS Debit, CCur(0) AS Credit, v.Description AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', 5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, 5900)))) AS AccountCode, v.Amount - CCur(Nz(x.Tax, 0)) AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID
 WHERE v.VoucherType = 'OUT'
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.PartyName AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.PartyName AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID
 WHERE v.VoucherType = 'OUT'
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 3 AS LineOrder, 1500 AS AccountCode, x.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 3 AS LineOrder, 1500 AS AccountCode, x.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID
 WHERE v.VoucherType = 'OUT' AND x.Tax <> 0
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, 110000 + v.ToCashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, 110000 + v.ToCashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'TRANSFER'
 ```
@@ -1767,19 +1773,19 @@ WHERE v.VoucherType = 'TRANSFER'
 أسطر قيود حركات المخزون اليدوية وتسويات الجرد
 
 ```sql
-SELECT 'STOCK_MOVE' AS SourceType, i.TransactionID AS SourceID, i.ReferenceNumber AS SourceNumber, i.TransactionDate AS SourceDate, p.ProductName AS Party, 1 AS LineOrder, 1400 AS AccountCode, IIf(i.Quantity * i.UnitCost > 0, i.Quantity * i.UnitCost, 0) AS Debit, IIf(i.Quantity * i.UnitCost < 0, -i.Quantity * i.UnitCost, 0) AS Credit, i.Notes AS LineText
+SELECT 'STOCK_MOVE' AS SourceType, i.TransactionID AS SourceID, i.ReferenceNumber AS SourceNumber, i.TransactionDate AS SourceDate, p.ProductName AS Party, 1 AS LineOrder, 1400 AS AccountCode, IIf(i.Quantity * i.UnitCost > 0, i.Quantity * i.UnitCost, 0) AS Debit, IIf(i.Quantity * i.UnitCost < 0, -i.Quantity * i.UnitCost, 0) AS Credit, i.Notes AS LineText, 0 AS CostCenter
 FROM InventoryTransactions AS i INNER JOIN Products AS p ON i.ProductID = p.ProductID
 WHERE i.ReferenceType = 'MANUAL' AND i.Quantity * i.UnitCost <> 0
 UNION ALL
-SELECT 'STOCK_MOVE' AS SourceType, i.TransactionID AS SourceID, i.ReferenceNumber AS SourceNumber, i.TransactionDate AS SourceDate, p.ProductName AS Party, 2 AS LineOrder, IIf(i.TransactionTypeID = 8, 3900, 5200) AS AccountCode, IIf(i.Quantity * i.UnitCost < 0, -i.Quantity * i.UnitCost, 0) AS Debit, IIf(i.Quantity * i.UnitCost > 0, i.Quantity * i.UnitCost, 0) AS Credit, i.Notes AS LineText
+SELECT 'STOCK_MOVE' AS SourceType, i.TransactionID AS SourceID, i.ReferenceNumber AS SourceNumber, i.TransactionDate AS SourceDate, p.ProductName AS Party, 2 AS LineOrder, IIf(i.TransactionTypeID = 8, 3900, 5200) AS AccountCode, IIf(i.Quantity * i.UnitCost < 0, -i.Quantity * i.UnitCost, 0) AS Debit, IIf(i.Quantity * i.UnitCost > 0, i.Quantity * i.UnitCost, 0) AS Credit, i.Notes AS LineText, 0 AS CostCenter
 FROM InventoryTransactions AS i INNER JOIN Products AS p ON i.ProductID = p.ProductID
 WHERE i.ReferenceType = 'MANUAL' AND i.Quantity * i.UnitCost <> 0
 UNION ALL
-SELECT 'STOCK_COUNT' AS SourceType, k.StockCountID AS SourceID, k.CountNumber AS SourceNumber, k.CountDate AS SourceDate, 'تسوية الجرد' AS Party, 1 AS LineOrder, 1400 AS AccountCode, IIf(k.CountValue > 0, k.CountValue, 0) AS Debit, IIf(k.CountValue < 0, -k.CountValue, 0) AS Credit, 'المخزون' AS LineText
+SELECT 'STOCK_COUNT' AS SourceType, k.StockCountID AS SourceID, k.CountNumber AS SourceNumber, k.CountDate AS SourceDate, 'تسوية الجرد' AS Party, 1 AS LineOrder, 1400 AS AccountCode, IIf(k.CountValue > 0, k.CountValue, 0) AS Debit, IIf(k.CountValue < 0, -k.CountValue, 0) AS Credit, 'المخزون' AS LineText, 0 AS CostCenter
 FROM qryStockCountValue AS k
 WHERE k.CountValue <> 0
 UNION ALL
-SELECT 'STOCK_COUNT' AS SourceType, k.StockCountID AS SourceID, k.CountNumber AS SourceNumber, k.CountDate AS SourceDate, 'تسوية الجرد' AS Party, 2 AS LineOrder, 5200 AS AccountCode, IIf(k.CountValue < 0, -k.CountValue, 0) AS Debit, IIf(k.CountValue > 0, k.CountValue, 0) AS Credit, 'فروقات الجرد' AS LineText
+SELECT 'STOCK_COUNT' AS SourceType, k.StockCountID AS SourceID, k.CountNumber AS SourceNumber, k.CountDate AS SourceDate, 'تسوية الجرد' AS Party, 2 AS LineOrder, 5200 AS AccountCode, IIf(k.CountValue < 0, -k.CountValue, 0) AS Debit, IIf(k.CountValue > 0, k.CountValue, 0) AS Credit, 'فروقات الجرد' AS LineText, 0 AS CostCenter
 FROM qryStockCountValue AS k
 WHERE k.CountValue <> 0
 ```
@@ -1789,35 +1795,35 @@ WHERE k.CountValue <> 0
 أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين
 
 ```sql
-SELECT 'BOX_OPENING' AS SourceType, b.CashBoxID AS SourceID, b.BoxName AS SourceNumber, b.OpeningDate AS SourceDate, b.BoxName AS Party, 1 AS LineOrder, 110000 + b.CashBoxID AS AccountCode, b.OpeningBalance AS Debit, CCur(0) AS Credit, b.BoxName AS LineText
+SELECT 'BOX_OPENING' AS SourceType, b.CashBoxID AS SourceID, b.BoxName AS SourceNumber, b.OpeningDate AS SourceDate, b.BoxName AS Party, 1 AS LineOrder, 110000 + b.CashBoxID AS AccountCode, b.OpeningBalance AS Debit, CCur(0) AS Credit, b.BoxName AS LineText, 0 AS CostCenter
 FROM CashBoxes AS b
 WHERE b.OpeningBalance <> 0
 UNION ALL
-SELECT 'BOX_OPENING' AS SourceType, b.CashBoxID AS SourceID, b.BoxName AS SourceNumber, b.OpeningDate AS SourceDate, b.BoxName AS Party, 2 AS LineOrder, 3900 AS AccountCode, CCur(0) AS Debit, b.OpeningBalance AS Credit, 'رصيد افتتاحي' AS LineText
+SELECT 'BOX_OPENING' AS SourceType, b.CashBoxID AS SourceID, b.BoxName AS SourceNumber, b.OpeningDate AS SourceDate, b.BoxName AS Party, 2 AS LineOrder, 3900 AS AccountCode, CCur(0) AS Debit, b.OpeningBalance AS Credit, 'رصيد افتتاحي' AS LineText, 0 AS CostCenter
 FROM CashBoxes AS b
 WHERE b.OpeningBalance <> 0
 UNION ALL
-SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.CreatedAt AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 1300 AS AccountCode, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Credit, c.CustomerName AS LineText
+SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.CreatedAt AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 1300 AS AccountCode, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Credit, c.CustomerName AS LineText, 0 AS CostCenter
 FROM Customers AS c
 WHERE c.OpeningBalance <> 0
 UNION ALL
-SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.CreatedAt AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText
+SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.CreatedAt AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText, 0 AS CostCenter
 FROM Customers AS c
 WHERE c.OpeningBalance <> 0
 UNION ALL
-SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 2100 AS AccountCode, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Credit, s.SupplierName AS LineText
+SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 2100 AS AccountCode, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter
 FROM Suppliers AS s
 WHERE s.OpeningBalance <> 0
 UNION ALL
-SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText
+SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText, 0 AS CostCenter
 FROM Suppliers AS s
 WHERE s.OpeningBalance <> 0
 UNION ALL
-SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 1 AS LineOrder, 120000 + k.BankID AS AccountCode, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Credit, k.BankName AS LineText
+SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 1 AS LineOrder, 120000 + k.BankID AS AccountCode, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Credit, k.BankName AS LineText, 0 AS CostCenter
 FROM Banks AS k
 WHERE k.OpeningBalance <> 0
 UNION ALL
-SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText
+SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText, 0 AS CostCenter
 FROM Banks AS k
 WHERE k.OpeningBalance <> 0
 ```
@@ -1828,7 +1834,8 @@ WHERE k.OpeningBalance <> 0
 
 ```sql
 SELECT h.ManualEntryID, h.EntryNumber, h.EntryDate, h.Description, l.LineNumber AS LineNo,
-       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote
+       l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote,
+       IIf(l.CostCenterID Is Null, 0, l.CostCenterID) AS LineCenter
 FROM ManualEntries AS h INNER JOIN ManualEntryLines AS l ON h.ManualEntryID = l.ManualEntryID
 ```
 
@@ -1837,7 +1844,7 @@ FROM ManualEntries AS h INNER JOIN ManualEntryLines AS l ON h.ManualEntryID = l.
 أسطر القيود اليدوية
 
 ```sql
-SELECT 'MANUAL' AS SourceType, m.ManualEntryID AS SourceID, m.EntryNumber AS SourceNumber, m.EntryDate AS SourceDate, m.Description AS Party, m.LineNo AS LineOrder, m.LineAccount AS AccountCode, m.LineDebit AS Debit, m.LineCredit AS Credit, m.LineNote AS LineText
+SELECT 'MANUAL' AS SourceType, m.ManualEntryID AS SourceID, m.EntryNumber AS SourceNumber, m.EntryDate AS SourceDate, m.Description AS Party, m.LineNo AS LineOrder, m.LineAccount AS AccountCode, m.LineDebit AS Debit, m.LineCredit AS Credit, m.LineNote AS LineText, m.LineCenter AS CostCenter
 FROM qryManualEntryLines AS m
 WHERE m.LineDebit + m.LineCredit <> 0
 ```
@@ -1857,7 +1864,7 @@ FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClo
 أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة
 
 ```sql
-SELECT 'YEAR_CLOSE' AS SourceType, y.YearClosingID AS SourceID, y.ClosingNumber AS SourceNumber, y.ClosingDate AS SourceDate, y.Notes AS Party, y.LineNo AS LineOrder, y.LineAccount AS AccountCode, y.LineDebit AS Debit, y.LineCredit AS Credit, y.LineNote AS LineText
+SELECT 'YEAR_CLOSE' AS SourceType, y.YearClosingID AS SourceID, y.ClosingNumber AS SourceNumber, y.ClosingDate AS SourceDate, y.Notes AS Party, y.LineNo AS LineOrder, y.LineAccount AS AccountCode, y.LineDebit AS Debit, y.LineCredit AS Credit, y.LineNote AS LineText, 0 AS CostCenter
 FROM qryYearCloseLines AS y
 WHERE y.LineDebit + y.LineCredit <> 0
 ```
@@ -1867,27 +1874,27 @@ WHERE y.LineDebit + y.LineCredit <> 0
 أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده
 
 ```sql
-SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 1 AS LineOrder, 2200 AS AccountCode, IIf(v.SalesStdVAT > 0, v.SalesStdVAT, 0) AS Debit, IIf(v.SalesStdVAT < 0, -v.SalesStdVAT, 0) AS Credit, 'ضريبة المخرجات للفترة' AS LineText
+SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 1 AS LineOrder, 2200 AS AccountCode, IIf(v.SalesStdVAT > 0, v.SalesStdVAT, 0) AS Debit, IIf(v.SalesStdVAT < 0, -v.SalesStdVAT, 0) AS Credit, 'ضريبة المخرجات للفترة' AS LineText, 0 AS CostCenter
 FROM VatReturns AS v
 WHERE v.Status = 'FILED' AND v.SalesStdVAT <> 0
 UNION ALL
-SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, 1500 AS AccountCode, IIf(v.PurchStdVAT < 0, -v.PurchStdVAT, 0) AS Debit, IIf(v.PurchStdVAT > 0, v.PurchStdVAT, 0) AS Credit, 'ضريبة المدخلات للفترة' AS LineText
+SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, 1500 AS AccountCode, IIf(v.PurchStdVAT < 0, -v.PurchStdVAT, 0) AS Debit, IIf(v.PurchStdVAT > 0, v.PurchStdVAT, 0) AS Credit, 'ضريبة المدخلات للفترة' AS LineText, 0 AS CostCenter
 FROM VatReturns AS v
 WHERE v.Status = 'FILED' AND v.PurchStdVAT <> 0
 UNION ALL
-SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 3 AS LineOrder, 2200 AS AccountCode, IIf(v.Corrections > 0, v.Corrections, 0) AS Debit, IIf(v.Corrections < 0, -v.Corrections, 0) AS Credit, 'تصحيحات من الفترات السابقة' AS LineText
+SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 3 AS LineOrder, 2200 AS AccountCode, IIf(v.Corrections > 0, v.Corrections, 0) AS Debit, IIf(v.Corrections < 0, -v.Corrections, 0) AS Credit, 'تصحيحات من الفترات السابقة' AS LineText, 0 AS CostCenter
 FROM VatReturns AS v
 WHERE v.Status = 'FILED' AND v.Corrections <> 0
 UNION ALL
-SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 4 AS LineOrder, 2250 AS AccountCode, IIf((v.SalesStdVAT - v.PurchStdVAT + v.Corrections) < 0, -(v.SalesStdVAT - v.PurchStdVAT + v.Corrections), 0) AS Debit, IIf((v.SalesStdVAT - v.PurchStdVAT + v.Corrections) > 0, (v.SalesStdVAT - v.PurchStdVAT + v.Corrections), 0) AS Credit, 'صافي ضريبة الفترة' AS LineText
+SELECT 'VAT_RETURN' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.FiledDate AS SourceDate, v.ReturnNumber AS Party, 4 AS LineOrder, 2250 AS AccountCode, IIf((v.SalesStdVAT - v.PurchStdVAT + v.Corrections) < 0, -(v.SalesStdVAT - v.PurchStdVAT + v.Corrections), 0) AS Debit, IIf((v.SalesStdVAT - v.PurchStdVAT + v.Corrections) > 0, (v.SalesStdVAT - v.PurchStdVAT + v.Corrections), 0) AS Credit, 'صافي ضريبة الفترة' AS LineText, 0 AS CostCenter
 FROM VatReturns AS v
 WHERE v.Status = 'FILED' AND (v.SalesStdVAT - v.PurchStdVAT + v.Corrections) <> 0
 UNION ALL
-SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 1 AS LineOrder, 2250 AS AccountCode, v.PaidAmount AS Debit, CCur(0) AS Credit, 'سداد ضريبة القيمة المضافة' AS LineText
+SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 1 AS LineOrder, 2250 AS AccountCode, v.PaidAmount AS Debit, CCur(0) AS Credit, 'سداد ضريبة القيمة المضافة' AS LineText, 0 AS CostCenter
 FROM VatReturns AS v
 WHERE v.Status = 'FILED' AND v.PaidAmount <> 0
 UNION ALL
-SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, v.PaidAccount AS AccountCode, CCur(0) AS Debit, v.PaidAmount AS Credit, v.FilingRef AS LineText
+SELECT 'VAT_PAYMENT' AS SourceType, v.VatReturnID AS SourceID, v.ReturnNumber AS SourceNumber, v.PaidDate AS SourceDate, v.ReturnNumber AS Party, 2 AS LineOrder, v.PaidAccount AS AccountCode, CCur(0) AS Debit, v.PaidAmount AS Credit, v.FilingRef AS LineText, 0 AS CostCenter
 FROM VatReturns AS v
 WHERE v.Status = 'FILED' AND v.PaidAmount <> 0
 ```
@@ -1897,51 +1904,51 @@ WHERE v.Status = 'FILED' AND v.PaidAmount <> 0
 أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد
 
 ```sql
-SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 1250 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'شيك وارد تحت التحصيل' AS LineText
+SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 1250 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'شيك وارد تحت التحصيل' AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'IN'
 UNION ALL
-SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText
+SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'IN'
 UNION ALL
-SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2100 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText
+SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2100 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'OUT'
 UNION ALL
-SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 2110 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'شيك صادر' AS LineText
+SELECT 'CHEQUE' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.IssueDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 2110 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'شيك صادر' AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'OUT'
 UNION ALL
-SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 120000 + q.BankID AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'تحصيل شيك' AS LineText
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 120000 + q.BankID AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'تحصيل شيك' AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'IN' AND q.Status = 'COLLECTED'
 UNION ALL
-SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1250 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1250 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'IN' AND q.Status = 'COLLECTED'
 UNION ALL
-SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 1300 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'شيك مرتد' AS LineText
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 1300 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, 'شيك مرتد' AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'
 UNION ALL
-SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1250 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 1250 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, q.ChequeNo AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'IN' AND q.Status = 'BOUNCED'
 UNION ALL
-SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2110 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2110 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'OUT' AND q.Status = 'COLLECTED'
 UNION ALL
-SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 120000 + q.BankID AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'صرف شيك' AS LineText
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 120000 + q.BankID AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'صرف شيك' AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'OUT' AND q.Status = 'COLLECTED'
 UNION ALL
-SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2110 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 1 AS LineOrder, 2110 AS AccountCode, q.Amount AS Debit, CCur(0) AS Credit, q.ChequeNo AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'
 UNION ALL
-SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 2100 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'شيك مرتد' AS LineText
+SELECT 'CHEQUE_STATUS' AS SourceType, q.ChequeID AS SourceID, q.ChequeRef AS SourceNumber, q.StatusDate AS SourceDate, q.ChequeNo AS Party, 2 AS LineOrder, 2100 AS AccountCode, CCur(0) AS Debit, q.Amount AS Credit, 'شيك مرتد' AS LineText, 0 AS CostCenter
 FROM Cheques AS q
 WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'
 ```
@@ -1951,39 +1958,39 @@ WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'
 أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها
 
 ```sql
-SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, a.Cost AS Debit, CCur(0) AS Credit, a.AssetName AS LineText
+SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, a.Cost AS Debit, CCur(0) AS Credit, a.AssetName AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE a.Cost <> 0
 UNION ALL
-SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 1500 AS AccountCode, a.InputVAT AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText
+SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 1500 AS AccountCode, a.InputVAT AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE a.InputVAT <> 0 AND a.SourceType <> 'OPENING'
 UNION ALL
-SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900))) AS AccountCode, CCur(0) AS Debit, IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) AS Credit, a.Notes AS LineText
+SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900))) AS AccountCode, CCur(0) AS Debit, IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) AS Credit, a.Notes AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) <> 0
 UNION ALL
-SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, a.OpeningAccumDep AS Credit, 'إهلاك سابق' AS LineText
+SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, a.OpeningAccumDep AS Credit, 'إهلاك سابق' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE a.SourceType = 'OPENING' AND a.OpeningAccumDep <> 0
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, 1790 AS AccountCode, a.DisposalAccumDep AS Debit, CCur(0) AS Credit, 'مجمع إهلاك الأصل' AS LineText
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, 1790 AS AccountCode, a.DisposalAccumDep AS Debit, CCur(0) AS Credit, 'مجمع إهلاك الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE a.Status = 'DISPOSED' AND a.DisposalAccumDep <> 0
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID) AS AccountCode, a.DisposalProceeds AS Debit, CCur(0) AS Credit, 'ثمن بيع الأصل' AS LineText
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID) AS AccountCode, a.DisposalProceeds AS Debit, CCur(0) AS Credit, 'ثمن بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE a.Status = 'DISPOSED' AND a.DisposalProceeds <> 0
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, a.Cost AS Credit, a.AssetName AS LineText
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, a.Cost AS Credit, a.AssetName AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE a.Status = 'DISPOSED'
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 4500 AS AccountCode, CCur(0) AS Debit, (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Credit, 'ربح بيع الأصل' AS LineText
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 4500 AS AccountCode, CCur(0) AS Debit, (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Credit, 'ربح بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) > 0
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 5 AS LineOrder, 5650 AS AccountCode, -(a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Debit, CCur(0) AS Credit, 'خسارة بيع / استبعاد الأصل' AS LineText
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 5 AS LineOrder, 5650 AS AccountCode, -(a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Debit, CCur(0) AS Credit, 'خسارة بيع / استبعاد الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
 FROM FixedAssets AS a
 WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) < 0
 ```
@@ -1993,7 +2000,8 @@ WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cos
 أسطر قيود الإهلاك الشهرية مع اسم الأصل
 
 ```sql
-SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName
+SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName,
+       IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS LineCenter
 FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.RunID)
      INNER JOIN FixedAssets AS a ON d.AssetID = a.AssetID
 ```
@@ -2003,11 +2011,11 @@ FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.Ru
 أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل
 
 ```sql
-SELECT 'DEPRECIATION' AS SourceType, d.RunID AS SourceID, d.RunNumber AS SourceNumber, d.RunMonth AS SourceDate, 'الإهلاك الشهري' AS Party, 2 * d.LineNo - 1 AS LineOrder, 5600 AS AccountCode, d.Amount AS Debit, CCur(0) AS Credit, d.AssetName AS LineText
+SELECT 'DEPRECIATION' AS SourceType, d.RunID AS SourceID, d.RunNumber AS SourceNumber, d.RunMonth AS SourceDate, 'الإهلاك الشهري' AS Party, 2 * d.LineNo - 1 AS LineOrder, 5600 AS AccountCode, d.Amount AS Debit, CCur(0) AS Credit, d.AssetName AS LineText, d.LineCenter AS CostCenter
 FROM qryDepreciationLines AS d
 WHERE d.Amount <> 0
 UNION ALL
-SELECT 'DEPRECIATION' AS SourceType, d.RunID AS SourceID, d.RunNumber AS SourceNumber, d.RunMonth AS SourceDate, 'الإهلاك الشهري' AS Party, 2 * d.LineNo AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, d.Amount AS Credit, d.AssetName AS LineText
+SELECT 'DEPRECIATION' AS SourceType, d.RunID AS SourceID, d.RunNumber AS SourceNumber, d.RunMonth AS SourceDate, 'الإهلاك الشهري' AS Party, 2 * d.LineNo AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, d.Amount AS Credit, d.AssetName AS LineText, d.LineCenter AS CostCenter
 FROM qryDepreciationLines AS d
 WHERE d.Amount <> 0
 ```
@@ -2025,44 +2033,57 @@ FROM PayrollLines
 GROUP BY PayrollRunID
 ```
 
+## qryPayrollCenterTotals
+
+مجاميع كل مسير رواتب لكل مركز تكلفة لقيده
+
+```sql
+SELECT PayrollRunID, IIf(CostCenterID Is Null, 0, CostCenterID) AS CenterKey,
+       Sum(Basic + Housing - AbsenceDeduction) AS SumSalaries, Sum(OtherAllow + Overtime + Additions) AS SumAllowances,
+       Sum(GosiEmployer) AS SumGosiER, Sum(GosiEmployee + GosiEmployer) AS SumGosi, Sum(AdvanceDeduction) AS SumAdvance,
+       Sum(OtherDeduction) AS SumOtherDed, Sum(NetPay) AS SumNet
+FROM PayrollLines
+GROUP BY PayrollRunID, IIf(CostCenterID Is Null, 0, CostCenterID)
+```
+
 ## qryJournalPayroll
 
 أسطر قيود مسيرات الرواتب المرحَّلة وصرفها
 
 ```sql
-SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 1 AS LineOrder, 5500 AS AccountCode, t.SumSalaries AS Debit, CCur(0) AS Credit, 'الرواتب' AS LineText
-FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 1 + 10 * t.CenterKey AS LineOrder, 5500 AS AccountCode, t.SumSalaries AS Debit, CCur(0) AS Credit, 'الرواتب' AS LineText, t.CenterKey AS CostCenter
+FROM PayrollRuns AS r INNER JOIN qryPayrollCenterTotals AS t ON r.PayrollRunID = t.PayrollRunID
 WHERE r.Status = 'POSTED' AND t.SumSalaries <> 0
 UNION ALL
-SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 2 AS LineOrder, 5510 AS AccountCode, t.SumAllowances AS Debit, CCur(0) AS Credit, 'البدلات والإضافي' AS LineText
-FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 2 + 10 * t.CenterKey AS LineOrder, 5510 AS AccountCode, t.SumAllowances AS Debit, CCur(0) AS Credit, 'البدلات والإضافي' AS LineText, t.CenterKey AS CostCenter
+FROM PayrollRuns AS r INNER JOIN qryPayrollCenterTotals AS t ON r.PayrollRunID = t.PayrollRunID
 WHERE r.Status = 'POSTED' AND t.SumAllowances <> 0
 UNION ALL
-SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 3 AS LineOrder, 5520 AS AccountCode, t.SumGosiER AS Debit, CCur(0) AS Credit, 'التأمينات - حصة المنشأة' AS LineText
-FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 3 + 10 * t.CenterKey AS LineOrder, 5520 AS AccountCode, t.SumGosiER AS Debit, CCur(0) AS Credit, 'التأمينات - حصة المنشأة' AS LineText, t.CenterKey AS CostCenter
+FROM PayrollRuns AS r INNER JOIN qryPayrollCenterTotals AS t ON r.PayrollRunID = t.PayrollRunID
 WHERE r.Status = 'POSTED' AND t.SumGosiER <> 0
 UNION ALL
-SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 4 AS LineOrder, 2320 AS AccountCode, CCur(0) AS Debit, t.SumGosi AS Credit, 'التأمينات المستحقة' AS LineText
-FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 4 + 10 * t.CenterKey AS LineOrder, 2320 AS AccountCode, CCur(0) AS Debit, t.SumGosi AS Credit, 'التأمينات المستحقة' AS LineText, t.CenterKey AS CostCenter
+FROM PayrollRuns AS r INNER JOIN qryPayrollCenterTotals AS t ON r.PayrollRunID = t.PayrollRunID
 WHERE r.Status = 'POSTED' AND t.SumGosi <> 0
 UNION ALL
-SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 5 AS LineOrder, 1600 AS AccountCode, CCur(0) AS Debit, t.SumAdvance AS Credit, 'خصم السلف' AS LineText
-FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 5 + 10 * t.CenterKey AS LineOrder, 1600 AS AccountCode, CCur(0) AS Debit, t.SumAdvance AS Credit, 'خصم السلف' AS LineText, t.CenterKey AS CostCenter
+FROM PayrollRuns AS r INNER JOIN qryPayrollCenterTotals AS t ON r.PayrollRunID = t.PayrollRunID
 WHERE r.Status = 'POSTED' AND t.SumAdvance <> 0
 UNION ALL
-SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 6 AS LineOrder, 4200 AS AccountCode, CCur(0) AS Debit, t.SumOtherDed AS Credit, 'جزاءات وخصومات' AS LineText
-FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 6 + 10 * t.CenterKey AS LineOrder, 4200 AS AccountCode, CCur(0) AS Debit, t.SumOtherDed AS Credit, 'جزاءات وخصومات' AS LineText, t.CenterKey AS CostCenter
+FROM PayrollRuns AS r INNER JOIN qryPayrollCenterTotals AS t ON r.PayrollRunID = t.PayrollRunID
 WHERE r.Status = 'POSTED' AND t.SumOtherDed <> 0
 UNION ALL
-SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 7 AS LineOrder, 2310 AS AccountCode, CCur(0) AS Debit, t.SumNet AS Credit, 'صافي الرواتب' AS LineText
-FROM PayrollRuns AS r INNER JOIN qryPayrollTotals AS t ON r.PayrollRunID = t.PayrollRunID
+SELECT 'PAYROLL' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PayMonth AS SourceDate, 'مسير الرواتب' AS Party, 7 + 10 * t.CenterKey AS LineOrder, 2310 AS AccountCode, CCur(0) AS Debit, t.SumNet AS Credit, 'صافي الرواتب' AS LineText, t.CenterKey AS CostCenter
+FROM PayrollRuns AS r INNER JOIN qryPayrollCenterTotals AS t ON r.PayrollRunID = t.PayrollRunID
 WHERE r.Status = 'POSTED' AND t.SumNet <> 0
 UNION ALL
-SELECT 'PAYROLL_PAYMENT' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PaidDate AS SourceDate, 'صرف الرواتب' AS Party, 1 AS LineOrder, 2310 AS AccountCode, r.PaidAmount AS Debit, CCur(0) AS Credit, 'صافي الرواتب' AS LineText
+SELECT 'PAYROLL_PAYMENT' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PaidDate AS SourceDate, 'صرف الرواتب' AS Party, 1 AS LineOrder, 2310 AS AccountCode, r.PaidAmount AS Debit, CCur(0) AS Credit, 'صافي الرواتب' AS LineText, 0 AS CostCenter
 FROM PayrollRuns AS r
 WHERE r.Status = 'POSTED' AND r.PaidAmount <> 0
 UNION ALL
-SELECT 'PAYROLL_PAYMENT' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PaidDate AS SourceDate, 'صرف الرواتب' AS Party, 2 AS LineOrder, IIf(r.PaidFrom = 'BANK', 120000 + r.BankID, 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.PaidAmount AS Credit, 'صرف الرواتب' AS LineText
+SELECT 'PAYROLL_PAYMENT' AS SourceType, r.PayrollRunID AS SourceID, r.RunNumber AS SourceNumber, r.PaidDate AS SourceDate, 'صرف الرواتب' AS Party, 2 AS LineOrder, IIf(r.PaidFrom = 'BANK', 120000 + r.BankID, 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.PaidAmount AS Credit, 'صرف الرواتب' AS LineText, 0 AS CostCenter
 FROM PayrollRuns AS r
 WHERE r.Status = 'POSTED' AND r.PaidAmount <> 0
 ```
@@ -2072,59 +2093,59 @@ WHERE r.Status = 'POSTED' AND r.PaidAmount <> 0
 أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى
 
 ```sql
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'إيداع نقدية' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'إيداع نقدية' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'DEPOSIT'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 110000 + t.CashBoxID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'إيداع في البنك' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 110000 + t.CashBoxID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'إيداع في البنك' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'DEPOSIT'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 110000 + t.CashBoxID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'سحب من البنك' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 110000 + t.CashBoxID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'سحب من البنك' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'WITHDRAW'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'سحب نقدية' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'سحب نقدية' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'WITHDRAW'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount - t.FeeAmount - t.FeeVAT AS Debit, CCur(0) AS Credit, 'صافي تسوية مدى' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount - t.FeeAmount - t.FeeVAT AS Debit, CCur(0) AS Credit, 'صافي تسوية مدى' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'SETTLEMENT' AND t.Amount - t.FeeAmount - t.FeeVAT <> 0
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 5610 AS AccountCode, t.FeeAmount AS Debit, CCur(0) AS Credit, 'عمولة مدى' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 5610 AS AccountCode, t.FeeAmount AS Debit, CCur(0) AS Credit, 'عمولة مدى' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'SETTLEMENT' AND t.FeeAmount <> 0
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 3 AS LineOrder, 1500 AS AccountCode, t.FeeVAT AS Debit, CCur(0) AS Credit, 'ضريبة العمولة' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 3 AS LineOrder, 1500 AS AccountCode, t.FeeVAT AS Debit, CCur(0) AS Credit, 'ضريبة العمولة' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.FeeVAT <> 0 AND (t.TxType = 'SETTLEMENT' OR t.TxType = 'OTHER_OUT')
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 4 AS LineOrder, 1200 AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'تحصيلات مدى' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 4 AS LineOrder, 1200 AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'تحصيلات مدى' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'SETTLEMENT'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.ToBankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'تحويل وارد' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.ToBankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, 'تحويل وارد' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'TRANSFER'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'تحويل صادر' AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, 'تحويل صادر' AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'TRANSFER'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, t.Reference AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, 120000 + t.BankID AS AccountCode, t.Amount AS Debit, CCur(0) AS Credit, t.Reference AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'OTHER_IN'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, t.CounterAccount AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, t.Description AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, t.CounterAccount AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, t.Description AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'OTHER_IN'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, t.CounterAccount AS AccountCode, t.Amount - t.FeeVAT AS Debit, CCur(0) AS Credit, t.Description AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 1 AS LineOrder, t.CounterAccount AS AccountCode, t.Amount - t.FeeVAT AS Debit, CCur(0) AS Credit, t.Description AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'OTHER_OUT'
 UNION ALL
-SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, t.Reference AS LineText
+SELECT 'BANK_TX' AS SourceType, t.BankTxID AS SourceID, t.TxNumber AS SourceNumber, t.TxDate AS SourceDate, t.Description AS Party, 2 AS LineOrder, 120000 + t.BankID AS AccountCode, CCur(0) AS Debit, t.Amount AS Credit, t.Reference AS LineText, 0 AS CostCenter
 FROM BankTransactions AS t
 WHERE t.TxType = 'OTHER_OUT'
 ```
@@ -2534,6 +2555,73 @@ UNION ALL
 SELECT 60, '', 'R', 'صافي الربح (الخسارة)', Null, CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 2, -1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 3, -1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 4, 1 * q.CurrentAmount, 0) + IIf(q.SectionNo = 5, -1 * q.CurrentAmount, 0)), 0)), CCur(Nz(Sum(IIf(q.SectionNo = 1, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 2, -1 * q.PriorAmount, 0) + IIf(q.SectionNo = 3, -1 * q.PriorAmount, 0) + IIf(q.SectionNo = 4, 1 * q.PriorAmount, 0) + IIf(q.SectionNo = 5, -1 * q.PriorAmount, 0)), 0))
 FROM qryIncomeAccounts AS q
 ORDER BY Block, AccountKey
+```
+
+## qryCenterMoves
+
+صافي حركة كل حساب إيرادات أو مصروفات لكل مركز تكلفة في الفترة
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT IIf(l.CostCenterID Is Null, 0, l.CostCenterID) AS CenterKey, l.AccountCode, a.AccountName, a.TreeKey,
+       a.Level2Code, IIf(a.AccountType = 'REVENUE', 1, -1) * (Sum(l.Credit) - Sum(l.Debit)) AS CenterAmount
+FROM (JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)
+     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode
+WHERE e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd') AND e.SourceType <> 'YEAR_CLOSE' AND a.AccountType IN ('REVENUE', 'EXPENSE')
+GROUP BY IIf(l.CostCenterID Is Null, 0, l.CostCenterID), l.AccountCode, a.AccountName, a.TreeKey, a.Level2Code,
+         a.AccountType
+```
+
+## qryCenterNames
+
+مراكز التكلفة ومعها «غير موزع»
+
+```sql
+SELECT CostCenterID AS CenterKey, CenterCode, CenterName
+FROM CostCenters
+UNION ALL
+SELECT 0, '-', 'غير موزع'
+FROM Settings AS z
+WHERE z.SettingID = 1
+```
+
+## qryCenterSums
+
+الإيرادات وتكلفة المبيعات والمصروفات لكل مركز تكلفة
+
+```sql
+SELECT CenterKey, Sum(IIf(Level2Code = 41 Or Level2Code = 42, CenterAmount, 0)) AS SumRevenue,
+       Sum(IIf(Level2Code = 51, CenterAmount, 0)) AS SumCostOfSales,
+       Sum(IIf(Level2Code = 52 Or Level2Code = 53, CenterAmount, 0)) AS SumExpenses
+FROM qryCenterMoves
+GROUP BY CenterKey
+```
+
+## CostCenterProfitQuery
+
+قائمة الدخل لكل مركز تكلفة: الإيرادات، تكلفة المبيعات، مجمل الربح، المصروفات، صافي الربح
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT n.CenterKey, n.CenterCode, n.CenterName, s.SumRevenue AS Revenue, s.SumCostOfSales AS CostOfSales,
+       s.SumRevenue - s.SumCostOfSales AS GrossProfit, s.SumExpenses AS Expenses,
+       s.SumRevenue - s.SumCostOfSales - s.SumExpenses AS NetProfit
+FROM qryCenterNames AS n INNER JOIN qryCenterSums AS s ON n.CenterKey = s.CenterKey
+```
+
+## CostCenterAccountsQuery
+
+إيرادات ومصروفات كل مركز تكلفة بالحسابات
+
+المعاملات: `PeriodStart`, `PeriodEnd`
+
+```sql
+SELECT n.CenterKey, n.CenterName, m.AccountCode, m.AccountName, m.TreeKey,
+       IIf(m.Level2Code = 41 Or m.Level2Code = 42, 'إيرادات', IIf(m.Level2Code = 51, 'تكلفة المبيعات', 'مصروفات'))
+           AS SectionName, m.CenterAmount
+FROM qryCenterNames AS n INNER JOIN qryCenterMoves AS m ON n.CenterKey = m.CenterKey
 ```
 
 ## qryBalanceAt

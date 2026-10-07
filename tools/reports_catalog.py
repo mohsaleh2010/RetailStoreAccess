@@ -166,6 +166,16 @@ LIST_SPECS: List[ListSpec] = [
         Col("المقبوضات", "Receipts", 3.4, MONEY, True), Col("المدفوعات", "Payments", 3.4, MONEY, True),
         Col("رصيد آخر اليوم", "ClosingBalance", 3.6, MONEY), Col("الحركات", "MoveCount", 2.2, INT, True)],
         [("CashDay", False)], no_data="لا توجد حركة نقدية في هذه الفترة."),
+    ListSpec("COST_CENTER_PROFIT", [
+        Col("الرمز", "CenterCode", 2.0), Col("المركز", "CenterName", 5.4, grow=True),
+        Col("الإيرادات", "Revenue", 3.2, MONEY, True), Col("تكلفة المبيعات", "CostOfSales", 3.2, MONEY, True),
+        Col("مجمل الربح", "GrossProfit", 3.2, MONEY, True), Col("المصروفات", "Expenses", 3.2, MONEY, True),
+        Col("صافي الربح", "NetProfit", 3.2, MONEY, True)],
+        [("CenterCode", False)], landscape=True, no_data="لا توجد إيرادات أو مصروفات في الفترة."),
+    ListSpec("COST_CENTER_ACCOUNTS", [
+        Col("المركز", "CenterName", 4.0), Col("القسم", "SectionName", 3.0), Col("الحساب", "AccountCode", 2.0),
+        Col("اسم الحساب", "AccountName", 6.0, grow=True), Col("المبلغ", "CenterAmount", 4.0, MONEY)],
+        [("CenterKey", False), ("TreeKey", False)], no_data="لا توجد إيرادات أو مصروفات في الفترة."),
     ListSpec("FIXED_ASSETS", [
         Col("الرقم", "AssetCode", 2.0), Col("الأصل", "AssetName", 5.2, grow=True), Col("المجموعة", "AssetGroup", 3.6),
         Col("الشراء", "=GDate([PurchaseDate])", 2.2), Col("العمر (شهر)", "UsefulLifeMonths", 1.8, INT),

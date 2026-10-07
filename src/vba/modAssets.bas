@@ -403,6 +403,7 @@ Public Sub AssetNew(ByVal frm As Access.Form)
     frm!cboCounter.Value = Null
     frm!txtOpeningAccum.Value = 0
     frm!txtNotes.Value = Null
+    frm!cboCenter.Value = CostCenterFor()
     frm!txtDisposalDate.Value = Date
     frm!txtProceeds.Value = Null
     frm!cboDisposalTo.Value = "BANK"
@@ -442,6 +443,7 @@ Public Sub AssetShow(ByVal frm As Access.Form, ByVal AssetID As Long)
     frm!cboCounter.Value = rs!CounterAccount
     frm!txtOpeningAccum.Value = rs!OpeningAccumDep
     frm!txtNotes.Value = rs!Notes
+    frm!cboCenter.Value = rs!CostCenterID
     If rs!Status = "DISPOSED" Then
         frm!txtDisposalDate.Value = rs!DisposalDate
         frm!txtProceeds.Value = rs!DisposalProceeds
@@ -494,6 +496,10 @@ Public Sub AssetSave(ByVal frm As Access.Form)
         ShowWarning msg
         Exit Sub
     End If
+    ' the cost centre of the asset (modCostCenters): its depreciation and its sale go there
+    CurrentDb.Execute "UPDATE FixedAssets SET CostCenterID = " & IIf(IsNull(frm!cboCenter.Value), "Null", _
+                      Nz(frm!cboCenter.Value, 0)) & " WHERE AssetID = " & id, dbFailOnError
+    SyncJournal
     ShowInfo IIf(isNew, "تم حفظ الأصل وقيد شرائه.", "تم حفظ التعديل.")
     AssetShow frm, id
 End Sub

@@ -360,7 +360,7 @@ class Store:
         for q in Q.JOURNAL_SOURCE_QUERIES:
             for t, i, no, when, debit, credit, sig, n, first in c.execute(
                     f"SELECT SourceType, SourceID, Max(SourceNumber), Max(SourceDate), Sum(Debit), Sum(Credit), "
-                    f"Sum(AccountCode * (Debit + Debit + Credit)), Count(*), "
+                    f"Sum(AccountCode * (Debit + Debit + Credit)) + Sum(CostCenter * (Debit + Debit + Credit) * 7), Count(*), "
                     f"Max(Party) FROM {q} GROUP BY SourceType, SourceID").fetchall():
                 seen.add((t, i))
                 debit, credit, sig = (dec(round(v or 0, 4)) for v in (debit, credit, sig))
@@ -388,8 +388,9 @@ class Store:
                         c.execute(f"UPDATE JournalEntries SET {sets}, UpdatedAt = ? WHERE EntryID = ?",
                                   list(head.values()) + [self.now, eid])
                         updated += 1
-            c.execute(f"INSERT INTO JournalLines (EntryID, LineNumber, AccountCode, Debit, Credit, LineText) "
-                      f"SELECT e.EntryID, q.LineOrder, q.AccountCode, q.Debit, q.Credit, q.LineText FROM {q} AS q "
+            c.execute(f"INSERT INTO JournalLines (EntryID, LineNumber, AccountCode, Debit, Credit, LineText, CostCenterID) "
+                      f"SELECT e.EntryID, q.LineOrder, q.AccountCode, q.Debit, q.Credit, q.LineText, "
+                      f"IIf(q.CostCenter = 0, Null, q.CostCenter) FROM {q} AS q "
                       f"INNER JOIN JournalEntries AS e ON (q.SourceType = e.SourceType AND q.SourceID = e.SourceID) "
                       f"WHERE e.LineCount < 0")
         c.execute("UPDATE JournalEntries SET LineCount = -LineCount WHERE LineCount < 0")
