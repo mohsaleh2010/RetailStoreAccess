@@ -73,7 +73,8 @@
 | نص يضعه الكود في `.Caption` أو `.RowSource` أو `MsgBox` / `InputBox` يمر بـ `Tr(...)` (الرسائل عبر `ShowWarning` و`AskYesNo` تُترجم وحدها) | نص عربي في الواجهة الإنجليزية |
 | لا مقارنة في SQL مع نص عربي (`= 'نقدي'`): النصوص العربية في SQL تُترجم في الواجهة الإنجليزية | استعلام لا يجد بياناته |
 | اسم عمود القائمة بعد ترجمته لا يساوي حقلًا في تعبيره، ولو مؤهلًا: `Format(q.Cost, ...) AS [التكلفة]` يصير `AS [Cost]`. اختر عنوانًا ترجمته مختلفة: `[تكلفة الأصل]` | Circular reference caused by alias |
-| SQL يعرض اسمًا من جداول البيانات الأساسية يقرأ `[@Accounts] AS a` (وكذلك `[@PaymentMethods]` و`[@JournalSourceTypes]` و`[@TransactionTypes]` و`[@Roles]` و`[@Permissions]` و`[@Screens]` و`[@Categories]` و`[@Units]` و`[@ExpenseTypes]`) ويمر بـ `Tr` | الاسم العربي في الواجهة الإنجليزية |
+| SQL يعرض اسمًا من جداول البيانات الأساسية يقرأ `[@Accounts] AS a` (وكذلك `[@PaymentMethods]` و`[@JournalSourceTypes]` و`[@TransactionTypes]` و`[@Roles]` و`[@Permissions]` و`[@Screens]` و`[@Categories]` و`[@Units]` و`[@ExpenseTypes]` و`[@Customers]` و`[@Suppliers]` و`[@CashBoxes]` و`[@Banks]` و`[@CostCenters]` و`[@SalesReps]`) ويمر بـ `Tr`، ولا `DLookup` لهذه الأسماء | الاسم العربي في الواجهة الإنجليزية |
+| النص الذي يكتبه المستخدم (البحث) يُضاف إلى SQL **بعد** `Tr` لا قبله | كلمة عربية يبحث بها المستخدم تُترجم فلا يجد شيئًا |
 | `MSG_RTL` دالة في `modLang` (صفر في الإنجليزية)، وليست ثابتًا | رسائل معكوسة الاتجاه |
 
 ## 4) تشخيص خطأ يأتي من Access

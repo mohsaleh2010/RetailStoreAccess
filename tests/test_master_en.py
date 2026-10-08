@@ -56,6 +56,25 @@ class SchemaTests(unittest.TestCase):
         model = next(m for m in F.all_forms() if m.name == "frmAccounts")
         self.assertIn("AccountNameEn", {c.name for c in model.controls})
 
+    def test_party_screens_have_the_english_name(self):
+        """docs/40: the user types the English name of a customer, supplier, box, bank, cost centre or rep."""
+        screens = {"frmCustomers": "CustomerNameEn", "frmSuppliers": "SupplierNameEn", "frmCashBoxes": "BoxNameEn",
+                   "frmBanks": "BankNameEn", "frmCostCenters": "CenterNameEn", "frmSalesReps": "RepNameEn"}
+        models = {m.name: m for m in F.all_forms()}
+        for form, field in screens.items():
+            with self.subTest(form):
+                self.assertIn(field, {c.name for c in models[form].controls})
+                self.assertIn("t." + field, models[form].tag)          # searched in both languages
+
+    def test_sub_accounts_take_the_english_name(self):
+        """The account of a box, bank or expense type gets its English name, unless the account has one."""
+        body = re.search(r"Public Sub EnsureAccounts\(\).*?End Sub", read("modJournal"), re.S).group(0)
+        for code, src in (("110000 + CashBoxID", "BoxNameEn"), ("120000 + BankID", "BankNameEn"),
+                          ("530000 + ExpenseTypeID", "ExpenseTypeNameEn")):
+            self.assertIn(f'FillAccountNamesEn "SELECT {code} AS SubCode, {src} AS SubNameEn', body)
+        fill = re.search(r"Private Sub FillAccountNamesEn.*?End Sub", read("modJournal"), re.S).group(0)
+        self.assertIn("AccountNameEn Is Null", fill)
+
 
 class MarkerTests(unittest.TestCase):
 
@@ -81,7 +100,7 @@ class MarkerTests(unittest.TestCase):
                 continue                                 # writing, or the first step of qryLoc<Table>
             if "'SALE' AS DocKind" in s:
                 continue                                 # qrySalesDocPrint: the tax invoice stays Arabic (ZATCA)
-            if re.search(r"Name =\s*$|Name = \w", s):
+            if re.search(r"Name =\s*$|Name = ['\w]", s):
                 continue                                 # a look-up by the name the user typed (the table itself)
             for tbl, (_, ar_field, _, _) in ENGLISH_NAMES.items():
                 for m in re.finditer(rf"(?<![@\w\[]){tbl}\s+AS\s+(\w+)", s):
@@ -90,6 +109,33 @@ class MarkerTests(unittest.TestCase):
                 if re.search(rf"\b(?:FROM|JOIN)\s+{tbl}\b(?!\s+AS)", s) and re.search(rf"(?<![\w.]){ar_field}\b", s):
                     with self.subTest(sql=s[:90]):
                         self.fail(f"reads {tbl}.{ar_field} without [@{tbl}] AS x: {s[:120]}")
+
+    def test_no_dlookup_of_a_name(self):
+        """DLookup("CustomerName", "Customers", ...) cannot go through Tr: read the name with DbValue(Tr(...))."""
+        pairs = {(ar, tbl) for tbl, (_, ar, _, _) in ENGLISH_NAMES.items()}
+        for name in G.STATIC_MODULES:
+            for m in re.finditer(r'DLookup\("(\w+)",\s*"(\w+)"', read(name)):
+                with self.subTest(module=name):
+                    self.assertNotIn(m.groups(), pairs)
+
+    def test_typed_text_is_not_translated(self):
+        """The text the user searches for goes in after Tr: an Arabic word typed in an English front-end is not
+        translated into English before the search (modForms.RefreshList, modScreens search)."""
+        forms_ = read("modForms")
+        self.assertLess(forms_.index('sql = Tr(TagValue(frm, "LIST"))'), forms_.index('"{SEARCH}", searchCond'))
+        screens = read("modScreens")
+        self.assertLess(screens.index("sql = Tr(SearchTemplate(kind))"), screens.index('"{LIKE}", LikePattern(txt)'))
+        for name in ("modForms", "modScreens"):
+            self.assertNotIn("RowSource = Tr(sql)", read(name))
+
+    def test_closing_box_list_has_the_alias_it_filters_on(self):
+        """ClosingLoad adds  AND q.CashBoxID = ...  for a cashier: BOX_ROWS must name the table q
+        (without it Access asks for the value of q.CashBoxID)."""
+        cash = read("modCash")
+        self.assertIn('If Not HasPermission("CASH_BOX") Then sql = sql & " AND q.CashBoxID = "', cash)
+        rows = re.search(r'Private Const BOX_ROWS As String = "([^"]+)"', cash).group(1)
+        self.assertIn(" AS q ", rows + " ")
+        self.assertNotRegex(rows, r"(?<![\w.])(CashBoxID|BoxName|IsActive)\b")
 
     def test_resolution(self):
         sql = "SELECT a.AccountName FROM [@Accounts] AS a"
@@ -134,6 +180,21 @@ class EnglishDataTests(unittest.TestCase):
         db.con.execute("UPDATE Accounts SET AccountNameEn = 'Special' WHERE AccountCode = 5990")
         self.assertEqual(db.con.execute("SELECT AccountName FROM qryLocAccounts WHERE AccountCode = 5990").fetchone()[0],
                          "Special")
+
+    def test_party_names_follow_the_language(self):
+        """docs/40: a customer, supplier, box or bank with an English name shows it in an English front-end."""
+        for english in (False, True):
+            db = self.db(english)
+            c = db.con
+            c.execute("UPDATE Suppliers SET SupplierNameEn = 'Supplier EN'")
+            c.execute("UPDATE Banks SET BankNameEn = 'Bank EN'")
+            self.assertEqual(c.execute("SELECT CustomerName FROM CustomerBalanceQuery WHERE CustomerID = 1")
+                             .fetchone()[0], "Cash customer" if english else "عميل نقدي")
+            self.assertEqual(c.execute("SELECT BoxName FROM CashBoxBalanceQuery WHERE CashBoxID = 1").fetchone()[0],
+                             "Main treasury" if english else "الخزينة الرئيسية")
+            names = {r[0] for r in c.execute("SELECT SupplierName FROM SupplierBalanceQuery")}
+            if names:
+                self.assertEqual(names == {"Supplier EN"}, english)
 
     def test_every_saved_query_runs_in_english(self):
         db = self.db(True)

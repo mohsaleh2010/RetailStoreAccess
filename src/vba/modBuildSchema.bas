@@ -29,9 +29,9 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
     "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=5;Permissions=5;RolePermissions=2;Employees=30;Screens=9;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=8;Suppliers=17;Customers=23;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
-    "CustomerPayments=16;SupplierPayments=15;Banks=9;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=7;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;" & _
-    "CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=5;Permissions=5;RolePermissions=2;Employees=30;Screens=9;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+    "CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=8;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;" & _
+    "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=36;RolePermissions=71;Employees=1;Screens=58;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
@@ -1036,6 +1036,8 @@ Private Sub CreateTable_CashBoxes()
              "", "", "رقم الصندوق", ""
     AddField tdf, "BoxName", "TEXT", 50, True, "", _
              "", "", "اسم الصندوق", ""
+    AddField tdf, "BoxNameEn", "TEXT", 50, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "BoxType", "TEXT", 10, True, """CASHIER""", _
              "In (""MAIN"",""CASHIER"")", "MAIN = خزينة رئيسية، CASHIER = صندوق كاشير", "النوع", ""
     AddField tdf, "OpeningBalance", "MONEY", 0, True, "0", _
@@ -1060,6 +1062,8 @@ Private Sub CreateTable_Suppliers()
              "", "", "رقم المورد", ""
     AddField tdf, "SupplierName", "TEXT", 150, True, "", _
              "", "", "اسم المورد", ""
+    AddField tdf, "SupplierNameEn", "TEXT", 150, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "ContactPerson", "TEXT", 100, False, "", _
              "", "", "الشخص المسؤول", ""
     AddField tdf, "Mobile", "TEXT", 20, False, "", _
@@ -1103,6 +1107,8 @@ Private Sub CreateTable_Customers()
              "", "", "رقم العميل", ""
     AddField tdf, "CustomerName", "TEXT", 150, True, "", _
              "", "", "اسم العميل", ""
+    AddField tdf, "CustomerNameEn", "TEXT", 150, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "Mobile", "TEXT", 20, False, "", _
              "", "", "الجوال", ""
     AddField tdf, "Phone", "TEXT", 20, False, "", _
@@ -1696,6 +1702,8 @@ Private Sub CreateTable_Banks()
              "", "", "رقم البنك", ""
     AddField tdf, "BankName", "TEXT", 100, True, "", _
              "", "", "اسم البنك / الحساب", ""
+    AddField tdf, "BankNameEn", "TEXT", 100, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "AccountNo", "TEXT", 30, False, "", _
              "", "", "رقم الحساب", ""
     AddField tdf, "IBAN", "TEXT", 34, False, "", _
@@ -1906,6 +1914,8 @@ Private Sub CreateTable_CostCenters()
              "", "", "رمز المركز", ""
     AddField tdf, "CenterName", "TEXT", 100, True, "", _
              "", "", "اسم المركز", ""
+    AddField tdf, "CenterNameEn", "TEXT", 100, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "IsDefault", "BOOL", 0, False, "False", _
              "", "", "المركز الافتراضي", ""
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
@@ -1930,7 +1940,7 @@ Private Sub CreateTable_SalesReps()
     AddField tdf, "RepName", "TEXT", 100, True, "", _
              "", "", "اسم المندوب", ""
     AddField tdf, "RepNameEn", "TEXT", 100, False, "", _
-             "", "", "الاسم بالإنجليزية", ""
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "Mobile", "TEXT", 20, False, "", _
              "", "", "الجوال", ""
     AddField tdf, "EmployeeID", "LONG", 0, False, "", _
@@ -3781,4 +3791,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Salaries' WHERE [ExpenseTypeID] = 7 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Supplies' WHERE [ExpenseTypeID] = 8 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Other expenses' WHERE [ExpenseTypeID] = 9 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Customers] SET [CustomerNameEn] = 'Cash customer' WHERE [CustomerID] = 1 AND [CustomerNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [CashBoxes] SET [BoxNameEn] = 'Main treasury' WHERE [CashBoxID] = 1 AND [BoxNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [CashBoxes] SET [BoxNameEn] = 'Cashier box' WHERE [CashBoxID] = 2 AND [BoxNameEn] Is Null", dbFailOnError
 End Sub

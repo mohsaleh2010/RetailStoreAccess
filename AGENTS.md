@@ -125,10 +125,15 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   (`Format(q.Cost, ...) AS [التكلفة]` becomes `AS [Cost]`: circular reference) - choose a caption whose
   English differs (`[تكلفة الأصل]` = Asset cost). `test_i18n` checks it.
 - Master data names: SQL that shows the name of an account, payment method, journal source or stock move
-  type, role, permission, screen, category, unit or expense type reads `[@Accounts] AS a` (also
-  `[@PaymentMethods]`, `[@JournalSourceTypes]`, `[@TransactionTypes]`, `[@Roles]`, `[@Permissions]`, `[@Screens]`,
-  `[@Categories]`, `[@Units]`, `[@ExpenseTypes]`; not for a look-up by the typed name) and goes through `Tr`: an English front-end reads `qryLocAccounts` (same columns, English name). A new
-  master table with an English name goes into `tools/master_en.py` (`docs/39-English-Master-Data.md`).
+  type, role, permission, screen, category, unit, expense type, customer, supplier, cash box, bank, cost centre
+  or sales rep reads `[@Accounts] AS a` (also `[@PaymentMethods]`, `[@JournalSourceTypes]`, `[@TransactionTypes]`,
+  `[@Roles]`, `[@Permissions]`, `[@Screens]`, `[@Categories]`, `[@Units]`, `[@ExpenseTypes]`, `[@Customers]`,
+  `[@Suppliers]`, `[@CashBoxes]`, `[@Banks]`, `[@CostCenters]`, `[@SalesReps]`; not for a look-up by the typed name,
+  not in `qrySalesDocPrint`, the tax invoice) and goes through `Tr`: an English front-end reads `qryLocAccounts`
+  (same columns, English name). No `DLookup` of such a name (it cannot go through `Tr`): `DbValue(Tr("SELECT ..."))`.
+  A new master table with an English name goes into `tools/master_en.py` (`docs/39-English-Master-Data.md`, `docs/40`).
+- Text the user typed (a search) is added to SQL **after** `Tr`, never before: `Tr` would translate an Arabic word
+  of it (`sql = Tr(template)`, then `Replace(sql, "{LIKE}", ...)`).
   `MSG_RTL` is a function of `modLang` (0 in English). The English texts contain no `" ' [ ] ; | & = < >`.
 - Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness
   cannot return a `Currency` either — wrap it in a `Double` function, see `tests/test_indicators.py`).

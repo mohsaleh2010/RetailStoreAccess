@@ -239,12 +239,12 @@ End Sub
 
 Public Sub ChequesDirectionChanged(ByVal frm As Access.Form)
     If frm!cboDirection.Value = "IN" Then
-        frm!cboParty.RowSource = Tr("SELECT CustomerID, CustomerName FROM Customers WHERE IsActive = True AND CustomerID <> " & _
-                                 Nz(SettingValue("DefaultCustomerID"), 1) & " ORDER BY CustomerName")
+        frm!cboParty.RowSource = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsActive = True AND " & _
+                                 "c.CustomerID <> " & Nz(SettingValue("DefaultCustomerID"), 1) & " ORDER BY c.CustomerName")
         frm!lblParty.Caption = Tr("«·⁄„Ì·")
         frm!btnCollect.Caption = Tr(" Õ’Ì· ›Ì «·»‰ﬂ")
     Else
-        frm!cboParty.RowSource = Tr("SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName")
+        frm!cboParty.RowSource = Tr("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive = True ORDER BY s.SupplierName")
         frm!lblParty.Caption = Tr("«·„Ê—œ")
         frm!btnCollect.Caption = Tr("’—›Â «·»‰ﬂ")
     End If

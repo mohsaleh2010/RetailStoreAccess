@@ -165,6 +165,10 @@ UNIT_NAMES_EN = {1: "Piece", 2: "Box", 3: "Carton", 4: "Pack", 5: "Kilo", 6: "Li
 EXPENSE_TYPE_NAMES_EN = {1: "Rent", 2: "Electricity", 3: "Water", 4: "Internet and telecom", 5: "Transport",
                          6: "Maintenance", 7: "Salaries", 8: "Supplies", 9: "Other expenses"}
 
+CASH_BOX_NAMES_EN = {1: "Main treasury", 2: "Cashier box"}
+
+CUSTOMER_NAMES_EN = {1: "Cash customer"}
+
 # table: (English field, Arabic field, key field, names by key)
 ENGLISH_NAMES = {
     "Accounts": ("AccountNameEn", "AccountName", "AccountCode", ACCOUNT_NAMES_EN),
@@ -177,4 +181,11 @@ ENGLISH_NAMES = {
     "Categories": ("CategoryNameEn", "CategoryName", "CategoryID", CATEGORY_NAMES_EN),
     "Units": ("UnitNameEn", "UnitName", "UnitID", UNIT_NAMES_EN),
     "ExpenseTypes": ("ExpenseTypeNameEn", "ExpenseTypeName", "ExpenseTypeID", EXPENSE_TYPE_NAMES_EN),
+    # the names the user types (docs/40): no seeded rows but the two boxes and the cash customer
+    "Customers": ("CustomerNameEn", "CustomerName", "CustomerID", CUSTOMER_NAMES_EN),
+    "Suppliers": ("SupplierNameEn", "SupplierName", "SupplierID", {}),
+    "CashBoxes": ("BoxNameEn", "BoxName", "CashBoxID", CASH_BOX_NAMES_EN),
+    "Banks": ("BankNameEn", "BankName", "BankID", {}),
+    "CostCenters": ("CenterNameEn", "CenterName", "CostCenterID", {}),
+    "SalesReps": ("RepNameEn", "RepName", "SalesRepID", {}),
 }

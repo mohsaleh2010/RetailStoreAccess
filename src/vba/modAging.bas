@@ -135,9 +135,11 @@ Public Function FillAging(ByVal Kind As String, ByVal AsOf As Date, Optional ByV
     db.Execute "DELETE FROM tmpAging", dbFailOnError
     Set names = CreateObject("Scripting.Dictionary")
     If Kind = "C" Then
-        Set rs = db.OpenRecordset("SELECT CustomerID AS ID, CustomerName AS PartyName FROM Customers", dbOpenSnapshot)
+        Set rs = db.OpenRecordset(Tr("SELECT c.CustomerID AS ID, c.CustomerName AS PartyName FROM [@Customers] AS c"), _
+                                  dbOpenSnapshot)
     Else
-        Set rs = db.OpenRecordset("SELECT SupplierID AS ID, SupplierName AS PartyName FROM Suppliers", dbOpenSnapshot)
+        Set rs = db.OpenRecordset(Tr("SELECT s.SupplierID AS ID, s.SupplierName AS PartyName FROM [@Suppliers] AS s"), _
+                                  dbOpenSnapshot)
     End If
     Do Until rs.EOF
         names(CStr(rs!ID)) = rs!PartyName.Value
@@ -391,10 +393,10 @@ End Sub
 
 Public Sub AllocationKindChanged(ByVal frm As Access.Form)
     If frm!cboKind.Value = "C" Then
-        frm!cboParty.RowSource = Tr("SELECT CustomerID, CustomerName FROM Customers WHERE AllowCredit = True Or " & _
-                                 "CurrentBalance <> 0 ORDER BY CustomerName")
+        frm!cboParty.RowSource = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.AllowCredit = True Or " & _
+                                 "c.CurrentBalance <> 0 ORDER BY c.CustomerName")
     Else
-        frm!cboParty.RowSource = Tr("SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName")
+        frm!cboParty.RowSource = Tr("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s ORDER BY s.SupplierName")
     End If
     frm!cboParty.Value = Null
     AllocationRefresh frm

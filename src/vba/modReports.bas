@@ -229,12 +229,12 @@ Public Sub PrintPartyStatement(ByVal PartyKind As String, ByVal PartyID As Varia
     SetPeriod DateSerial(Year(Date), 1, 1), Date
     If PartyKind = "C" Then
         SetQueryParam "CustomerID", CLng(PartyID)
-        partyName = DLookup("CustomerName", "Customers", "CustomerID = " & CLng(PartyID))
+        partyName = DbValue(Tr("SELECT c.CustomerName FROM [@Customers] AS c WHERE c.CustomerID = " & CLng(PartyID)))
         OpenReportOrQuery "rptCustomerStatement", "CustomerStatementQuery", "", _
                           PeriodText(DateSerial(Year(Date), 1, 1), Date) & "    العميل: " & Nz(partyName, "")
     Else
         SetQueryParam "SupplierID", CLng(PartyID)
-        partyName = DLookup("SupplierName", "Suppliers", "SupplierID = " & CLng(PartyID))
+        partyName = DbValue(Tr("SELECT s.SupplierName FROM [@Suppliers] AS s WHERE s.SupplierID = " & CLng(PartyID)))
         OpenReportOrQuery "rptSupplierStatement", "SupplierStatementQuery", "", _
                           PeriodText(DateSerial(Year(Date), 1, 1), Date) & "    المورد: " & Nz(partyName, "")
     End If

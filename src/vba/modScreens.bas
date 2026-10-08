@@ -81,7 +81,7 @@ Public Sub RunSearch(ByVal frm As Access.Form)
     num = "-1"                                 ' {NUM}: exact record number search
     If Len(txt) > 0 And Len(txt) <= 9 And txt Like String$(Len(txt), "#") Then num = txt
 
-    sql = SearchTemplate(kind)
+    sql = Tr(SearchTemplate(kind))             ' translated before the typed text goes in (modLang)
     sql = Replace(sql, "{LIKE}", LikePattern(txt))
     sql = Replace(sql, "{NUM}", num)
     If IsDate(frm!txtFrom.Value) Then
@@ -95,7 +95,7 @@ Public Sub RunSearch(ByVal frm As Access.Form)
         sql = Replace(sql, "{TO}", SqlDate(#12/31/9999#))
     End If
 
-    frm!lstResults.RowSource = Tr(sql)
+    frm!lstResults.RowSource = sql
     n = frm!lstResults.ListCount - 1           ' first row = column headings
     If n < 0 Then n = 0
     frm!lblCount.Caption = Tr(n & " نتيجة" & IIf(n > 0, " - انقر مرتين على النتيجة لفتحها", ""))

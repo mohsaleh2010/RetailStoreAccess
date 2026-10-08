@@ -666,7 +666,8 @@ End Function
 '------------------------------------------------------------------------------
 Private Function CheckSupplier(ByVal SupplierID As Long) As String
     Dim rs As DAO.Recordset
-    Set rs = CurrentDb.OpenRecordset("SELECT SupplierName, IsActive FROM Suppliers WHERE SupplierID = " & SupplierID, _
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT s.SupplierName, s.IsActive FROM [@Suppliers] AS s WHERE s.SupplierID = " & _
+                                        SupplierID), _
                                      dbOpenSnapshot)
     If rs.EOF Then
         CheckSupplier = "«Œ — «·„Ê—œ."

@@ -9,8 +9,8 @@ from forms_sales import LOCKED, PAYMENT_ROWS, PAYMENT_TYPES, grid_row, header_la
 
 PURCHASE_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, PurchasePrice "
                          "FROM Products WHERE IsActive = True ORDER BY ProductName")
-ACTIVE_SUPPLIER_ROWS = ("SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True "
-                        "ORDER BY SupplierName")
+ACTIVE_SUPPLIER_ROWS = ("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive = True "
+                        "ORDER BY s.SupplierName")
 PURCHASE_REFUND_TYPES = "CREDIT;خصم من رصيد المورد;CASH;استرداد نقدي من المورد"
 MANUAL_TYPE_ROWS = ("SELECT t.TransactionTypeID, t.TypeName FROM [@TransactionTypes] AS t WHERE t.IsManual = True "
                     "ORDER BY t.TransactionTypeID")

@@ -77,7 +77,7 @@ JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournal
 
 
 def _sale():
-    src = "SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID"
+    src = "SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID"
     cost = f"({src}) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID"
     k = ("'SALE'", "h.SalesInvoiceID", "h.InvoiceNumber", "h.InvoiceDate", "c.CustomerName")
     return with_center(jquery([
@@ -90,7 +90,7 @@ def _sale():
 
 
 def _sales_return():
-    src = "SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID"
+    src = "SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID"
     cost = f"({src}) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID"
     k = ("'SALES_RETURN'", "r.SalesReturnID", "r.ReturnNumber", "r.ReturnDate", "c.CustomerName")
     return with_center(jquery([
@@ -104,7 +104,7 @@ def _sales_return():
 
 
 def _purchase():
-    src = "PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID"
+    src = "PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID"
     k = ("'PURCHASE'", "h.PurchaseInvoiceID", "h.InvoiceNumber", "h.InvoiceDate", "s.SupplierName")
     return jquery([
         jline(*k, 1, 1400, "h.TaxableAmount", ZERO, "'المخزون'", src, "h.TaxableAmount <> 0"),
@@ -114,7 +114,7 @@ def _purchase():
 
 
 def _purchase_return():
-    src = "PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID"
+    src = "PurchaseReturns AS r INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID"
     k = ("'PURCHASE_RETURN'", "r.PurchaseReturnID", "r.ReturnNumber", "r.ReturnDate", "s.SupplierName")
     return jquery([
         jline(*k, 1, cash_account("r"), "r.RefundedAmount", ZERO, "s.SupplierName", src, "r.RefundedAmount <> 0"),
@@ -125,8 +125,8 @@ def _purchase_return():
 
 
 def _payments():
-    cs = "CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID"
-    ss = "SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID"
+    cs = "CustomerPayments AS p INNER JOIN [@Customers] AS c ON p.CustomerID = c.CustomerID"
+    ss = "SupplierPayments AS p INNER JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID"
     kc = ("'CUSTOMER_PAYMENT'", "p.PaymentID", "p.PaymentNumber", "p.PaymentDate", "c.CustomerName")
     ks = ("'SUPPLIER_PAYMENT'", "p.PaymentID", "p.PaymentNumber", "p.PaymentDate", "s.SupplierName")
     return jquery([
@@ -517,20 +517,20 @@ def _opening():
     kk = ("'BANK_OPENING'", "k.BankID", "k.BankName", "k.OpeningDate", "k.BankName")
     pos, neg = "IIf({0}.OpeningBalance > 0, {0}.OpeningBalance, 0)", "IIf({0}.OpeningBalance < 0, -{0}.OpeningBalance, 0)"
     return jquery([
-        jline(*kb, 1, "110000 + b.CashBoxID", "b.OpeningBalance", ZERO, "b.BoxName", "CashBoxes AS b",
+        jline(*kb, 1, "110000 + b.CashBoxID", "b.OpeningBalance", ZERO, "b.BoxName", "[@CashBoxes] AS b",
               "b.OpeningBalance <> 0"),
-        jline(*kb, 2, 3900, ZERO, "b.OpeningBalance", "'رصيد افتتاحي'", "CashBoxes AS b", "b.OpeningBalance <> 0"),
-        jline(*kc, 1, 1300, pos.format("c"), neg.format("c"), "c.CustomerName", "Customers AS c",
+        jline(*kb, 2, 3900, ZERO, "b.OpeningBalance", "'رصيد افتتاحي'", "[@CashBoxes] AS b", "b.OpeningBalance <> 0"),
+        jline(*kc, 1, 1300, pos.format("c"), neg.format("c"), "c.CustomerName", "[@Customers] AS c",
               "c.OpeningBalance <> 0"),
-        jline(*kc, 2, 3900, neg.format("c"), pos.format("c"), "'رصيد افتتاحي'", "Customers AS c",
+        jline(*kc, 2, 3900, neg.format("c"), pos.format("c"), "'رصيد افتتاحي'", "[@Customers] AS c",
               "c.OpeningBalance <> 0"),
-        jline(*ks, 1, 2100, neg.format("s"), pos.format("s"), "s.SupplierName", "Suppliers AS s",
+        jline(*ks, 1, 2100, neg.format("s"), pos.format("s"), "s.SupplierName", "[@Suppliers] AS s",
               "s.OpeningBalance <> 0"),
-        jline(*ks, 2, 3900, pos.format("s"), neg.format("s"), "'رصيد افتتاحي'", "Suppliers AS s",
+        jline(*ks, 2, 3900, pos.format("s"), neg.format("s"), "'رصيد افتتاحي'", "[@Suppliers] AS s",
               "s.OpeningBalance <> 0"),
-        jline(*kk, 1, "120000 + k.BankID", pos.format("k"), neg.format("k"), "k.BankName", "Banks AS k",
+        jline(*kk, 1, "120000 + k.BankID", pos.format("k"), neg.format("k"), "k.BankName", "[@Banks] AS k",
               "k.OpeningBalance <> 0"),
-        jline(*kk, 2, 3900, neg.format("k"), pos.format("k"), "'رصيد افتتاحي'", "Banks AS k",
+        jline(*kk, 2, 3900, neg.format("k"), pos.format("k"), "'رصيد افتتاحي'", "[@Banks] AS k",
               "k.OpeningBalance <> 0")])
 
 def localized_queries() -> List[Query]:
@@ -625,7 +625,7 @@ ORDER BY d.SalesYear DESC, d.SalesMonth DESC"""),
 SELECT s.DocType, s.DocID, s.DocNumber, s.DocDate, s.CustomerID, c.CustomerName,
        e.EmployeeName, s.PaymentType, s.NetAmount, s.VATAmount, s.GrossAmount,
        s.SettledAmount, s.OnAccount
-FROM (qrySalesDocuments AS s INNER JOIN Customers AS c ON s.CustomerID = c.CustomerID)
+FROM (qrySalesDocuments AS s INNER JOIN [@Customers] AS c ON s.CustomerID = c.CustomerID)
      INNER JOIN Employees AS e ON s.EmployeeID = e.EmployeeID
 WHERE {period("s.DocDate")}
 ORDER BY s.DocDate""", P),
@@ -677,7 +677,7 @@ FROM PurchaseReturns AS r"""),
 SELECT d.DocType, d.DocID, d.DocNumber, d.SupplierRef, d.DocDate, d.SupplierID,
        s.SupplierName, d.PaymentType, d.NetAmount, d.VATAmount, d.GrossAmount,
        d.SettledAmount, d.OnAccount
-FROM qryPurchaseDocuments AS d INNER JOIN Suppliers AS s ON d.SupplierID = s.SupplierID
+FROM qryPurchaseDocuments AS d INNER JOIN [@Suppliers] AS s ON d.SupplierID = s.SupplierID
 WHERE {period("d.DocDate")}
 ORDER BY d.DocDate""", P),
 
@@ -711,7 +711,7 @@ SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName,
        p.CurrentQuantity, p.MinimumQuantity, p.MinimumQuantity - p.CurrentQuantity AS ShortageQty,
        s.SupplierName, s.Mobile AS SupplierMobile
 FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
-     LEFT JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
+     LEFT JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID
 WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity
 ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName"""),
 
@@ -780,7 +780,7 @@ UNION ALL
 SELECT c.CustomerID, c.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-',
        IIf(c.OpeningBalance > 0, c.OpeningBalance, 0),
        IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0)
-FROM Customers AS c
+FROM [@Customers] AS c
 WHERE c.OpeningBalance <> 0
 UNION ALL
 SELECT q.CustomerID, q.IssueDate, 'CHEQUE', 'شيك وارد', q.ChequeID, q.ChequeNo, CCur(0), q.Amount
@@ -802,7 +802,7 @@ SELECT c.CustomerID, c.CustomerName, c.Mobile, c.CreditLimit, c.AllowCredit, c.I
        {nz("l.TotalDebit")} AS DebitTotal, {nz("l.TotalCredit")} AS CreditTotal,
        {nz("l.TotalDebit")} - {nz("l.TotalCredit")} AS Balance,
        c.CurrentBalance AS CachedBalance, l.LastEntryDate
-FROM Customers AS c LEFT JOIN qryCustomerLedgerTotals AS l ON c.CustomerID = l.CustomerID
+FROM [@Customers] AS c LEFT JOIN qryCustomerLedgerTotals AS l ON c.CustomerID = l.CustomerID
 ORDER BY c.CustomerName"""),
 
     Query("CustomersWithDebtQuery", "العملاء الذين عليهم مبالغ مستحقة", """
@@ -840,7 +840,7 @@ UNION ALL
 SELECT s.SupplierID, s.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-',
        IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0),
        IIf(s.OpeningBalance > 0, s.OpeningBalance, 0)
-FROM Suppliers AS s
+FROM [@Suppliers] AS s
 WHERE s.OpeningBalance <> 0
 UNION ALL
 SELECT q.SupplierID, q.IssueDate, 'CHEQUE', 'شيك صادر', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)
@@ -862,7 +862,7 @@ SELECT s.SupplierID, s.SupplierName, s.ContactPerson, s.Mobile, s.IsActive,
        {nz("l.TotalDebit")} AS DebitTotal, {nz("l.TotalCredit")} AS CreditTotal,
        {nz("l.TotalCredit")} - {nz("l.TotalDebit")} AS Balance,
        s.CurrentBalance AS CachedBalance, l.LastEntryDate
-FROM Suppliers AS s LEFT JOIN qrySupplierLedgerTotals AS l ON s.SupplierID = l.SupplierID
+FROM [@Suppliers] AS s LEFT JOIN qrySupplierLedgerTotals AS l ON s.SupplierID = l.SupplierID
 ORDER BY s.SupplierName"""),
 
     # ------------------------------------------------- currencies (modCurrency)
@@ -879,7 +879,7 @@ SELECT p.SupplierID, p.CurrencyCode, -p.Amount, Round(-p.Amount / p.ExchangeRate
 FROM SupplierPayments AS p
 UNION ALL
 SELECT s.SupplierID, 'SAR', s.OpeningBalance, s.OpeningBalance
-FROM Suppliers AS s
+FROM [@Suppliers] AS s
 WHERE s.OpeningBalance <> 0
 UNION ALL
 SELECT q.SupplierID, 'SAR', IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)
@@ -901,7 +901,7 @@ GROUP BY SupplierID, CurrencyCode"""),
 SELECT s.SupplierName, t.SupplierID, t.CurrencyCode, t.FxBalance, t.BookBalance, l.Rate AS LastRate, l.RateDate AS LastRateDate,
        Round(t.FxBalance * {nz("l.Rate")}, 2) AS RevaluedBalance,
        Round(t.FxBalance * {nz("l.Rate")}, 2) - t.BookBalance AS FxDifference
-FROM ((qrySupplierFxTotals AS t INNER JOIN Suppliers AS s ON t.SupplierID = s.SupplierID)
+FROM ((qrySupplierFxTotals AS t INNER JOIN [@Suppliers] AS s ON t.SupplierID = s.SupplierID)
       LEFT JOIN qryLatestRates AS l ON t.CurrencyCode = l.CurrencyCode)
       INNER JOIN Settings AS st ON st.SettingID = 1
 WHERE t.CurrencyCode <> st.CurrencyCode AND (t.FxBalance <> 0 OR t.BookBalance <> 0)"""),
@@ -975,20 +975,20 @@ WHERE h.RemainingAmount > 0"""),
 SELECT 'C' AS PartyKind, h.CustomerID AS PartyID, 'INVOICE' AS DocType, h.SalesInvoiceID AS DocID,
        h.InvoiceNumber AS DocNo, h.InvoiceDate AS DocDate, h.DueDate, c.PaymentTermsDays AS TermsDays,
        h.RemainingAmount AS Amount
-FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
+FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID
 WHERE h.RemainingAmount > 0
 UNION ALL
 SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, c.CreatedAt, 0, c.OpeningBalance
-FROM Customers AS c
+FROM [@Customers] AS c
 WHERE c.OpeningBalance > 0
 UNION ALL
 SELECT 'S', h.SupplierID, 'INVOICE', h.PurchaseInvoiceID, h.InvoiceNumber, h.InvoiceDate, h.DueDate,
        s.PaymentTermsDays, h.RemainingAmount
-FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
+FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID
 WHERE h.RemainingAmount > 0
 UNION ALL
 SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, s.CreatedAt, 0, s.OpeningBalance
-FROM Suppliers AS s
+FROM [@Suppliers] AS s
 WHERE s.OpeningBalance > 0"""),
 
     # what pays it: returns (on their own invoice first), payments, cheques (a bounced one pays nothing:
@@ -1004,7 +1004,7 @@ SELECT 'C', p.CustomerID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate
 FROM CustomerPayments AS p
 UNION ALL
 SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, -c.OpeningBalance, 0
-FROM Customers AS c
+FROM [@Customers] AS c
 WHERE c.OpeningBalance < 0
 UNION ALL
 SELECT 'S', r.SupplierID, 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, r.TotalAmount - r.RefundedAmount,
@@ -1016,7 +1016,7 @@ SELECT 'S', p.SupplierID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate
 FROM SupplierPayments AS p
 UNION ALL
 SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, -s.OpeningBalance, 0
-FROM Suppliers AS s
+FROM [@Suppliers] AS s
 WHERE s.OpeningBalance < 0
 UNION ALL
 SELECT 'C', q.CustomerID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0
@@ -1187,17 +1187,17 @@ SELECT s.SalesRepID, s.RepCode, s.RepName, s.Region, s.IsActive, s.CommissionRat
        IIf(IIf(s.CommissionBase = 'COLLECTION', {nz("t.SumCollected")}, {nz("t.SumSales")}) > 0,
            Round(IIf(s.CommissionBase = 'COLLECTION', {nz("t.SumCollected")}, {nz("t.SumSales")}) * s.CommissionRate, 2),
            0) AS Commission
-FROM (SalesReps AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)
+FROM ([@SalesReps] AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)
      LEFT JOIN qryRepTargetTotals AS g ON s.SalesRepID = g.SalesRepID
 WHERE s.IsActive = True OR {nz("t.SumSales")} <> 0 OR {nz("t.SumCollected")} <> 0""", P),
     Query("RepCustomersQuery", "عملاء كل مندوب وأرصدتهم", f"""
 SELECT s.SalesRepID, s.RepName, c.CustomerID, c.CustomerName, c.Mobile, b.Balance
-FROM (Customers AS c INNER JOIN SalesReps AS s ON c.SalesRepID = s.SalesRepID)
+FROM ([@Customers] AS c INNER JOIN [@SalesReps] AS s ON c.SalesRepID = s.SalesRepID)
      INNER JOIN CustomerBalanceQuery AS b ON c.CustomerID = b.CustomerID"""),
     Query("RepCommissionBalanceQuery", "العمولات المستحقة لكل مندوب: المرحَّل والمصروف والباقي", f"""
 SELECT s.SalesRepID, s.RepCode, s.RepName, {nz("p.SumPosted")} AS Posted, {nz("d.SumPaid")} AS Paid,
        {nz("p.SumPosted")} - {nz("d.SumPaid")} AS Payable
-FROM (SalesReps AS s LEFT JOIN qryRepCommissionPosted AS p ON s.SalesRepID = p.SalesRepID)
+FROM ([@SalesReps] AS s LEFT JOIN qryRepCommissionPosted AS p ON s.SalesRepID = p.SalesRepID)
      LEFT JOIN qryRepCommissionPaid AS d ON s.SalesRepID = d.SalesRepID"""),
     Query("CommissionSheetQuery", "مسير العمولات المختار بأسطر المندوبين", """
 SELECT r.CommissionRunID, r.RunNumber, r.RunMonth, r.Status, l.SalesRepID, l.RepName, l.NetSales, l.Collections,
@@ -1281,7 +1281,7 @@ FROM ((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d
          ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)
        INNER JOIN Products AS p ON d.ProductID = p.ProductID)
       INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
-     INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID)
+     INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID)
     INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID
 UNION ALL
 SELECT 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, o.SupplierInvoiceNo,
@@ -1296,7 +1296,7 @@ FROM ((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd
         INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)
        INNER JOIN Products AS p ON rd.ProductID = p.ProductID)
       INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
-     INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID)
+     INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID)
     INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID"""),
 
     Query("qryVoucherPrint", "بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين)", """
@@ -1304,13 +1304,13 @@ SELECT 'RECEIPT' AS DocKind, p.PaymentID AS DocID, p.PaymentNumber AS DocNumber,
        p.PaymentDate AS DocDate, 1 AS LineNumber, c.CustomerName AS PartyName,
        c.Mobile AS PartyMobile, p.Amount, m.MethodName, p.Notes, e.EmployeeName,
        c.CurrentBalance AS PartyBalance
-FROM ((CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID)
+FROM ((CustomerPayments AS p INNER JOIN [@Customers] AS c ON p.CustomerID = c.CustomerID)
       INNER JOIN [@PaymentMethods] AS m ON p.PaymentMethodID = m.PaymentMethodID)
      INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID
 UNION ALL
 SELECT 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, 1, s.SupplierName, s.Mobile,
        p.Amount, m.MethodName, p.Notes, e.EmployeeName, s.CurrentBalance
-FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID)
+FROM ((SupplierPayments AS p INNER JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID)
       INNER JOIN [@PaymentMethods] AS m ON p.PaymentMethodID = m.PaymentMethodID)
      INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID"""),
 
@@ -1319,32 +1319,32 @@ FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.Suppl
 SELECT h.CashBoxID, h.InvoiceDate AS MoveDate, 'SALE' AS MoveType, 'فاتورة بيع' AS MoveTypeName,
        h.InvoiceNumber AS DocNumber, c.CustomerName AS PartyName, h.Notes AS Details,
        h.PaidAmount AS AmountIn, CCur(0) AS AmountOut, h.EmployeeID
-FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
+FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID
 WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0
 UNION ALL
 SELECT r.CashBoxID, r.ReturnDate, 'SALES_RETURN', 'مرتجع بيع (رد نقدي)', r.ReturnNumber,
        c.CustomerName, r.Reason, CCur(0), r.RefundedAmount, r.EmployeeID
-FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID
+FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID
 WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0
 UNION ALL
 SELECT p.CashBoxID, p.PaymentDate, 'CUSTOMER_PAYMENT', 'سند قبض من عميل', p.PaymentNumber,
        c.CustomerName, p.Notes, p.Amount, CCur(0), p.EmployeeID
-FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID
+FROM CustomerPayments AS p INNER JOIN [@Customers] AS c ON p.CustomerID = c.CustomerID
 WHERE p.CashBoxID Is Not Null
 UNION ALL
 SELECT h.CashBoxID, h.InvoiceDate, 'PURCHASE', 'فاتورة شراء', h.InvoiceNumber,
        s.SupplierName, h.Notes, CCur(0), h.PaidAmount, h.EmployeeID
-FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID
+FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID
 WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0
 UNION ALL
 SELECT r.CashBoxID, r.ReturnDate, 'PURCHASE_RETURN', 'مرتجع شراء (استرداد نقدي)', r.ReturnNumber,
        s.SupplierName, r.Reason, r.RefundedAmount, CCur(0), r.EmployeeID
-FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID
+FROM PurchaseReturns AS r INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID
 WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0
 UNION ALL
 SELECT p.CashBoxID, p.PaymentDate, 'SUPPLIER_PAYMENT', 'سند صرف لمورد', p.PaymentNumber,
        s.SupplierName, p.Notes, CCur(0), p.Amount, p.EmployeeID
-FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
+FROM SupplierPayments AS p INNER JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID
 WHERE p.CashBoxID Is Not Null
 UNION ALL
 SELECT e.CashBoxID, e.ExpenseDate, 'EXPENSE', 'مصروف', e.ExpenseNumber,
@@ -1369,22 +1369,22 @@ WHERE v.VoucherType = 'OUT'
 UNION ALL
 SELECT v.CashBoxID, v.VoucherDate, 'TRANSFER_OUT', 'تحويل إلى صندوق آخر', v.VoucherNumber,
        b.BoxName, v.Description, CCur(0), v.Amount, v.EmployeeID
-FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.ToCashBoxID = b.CashBoxID
+FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.ToCashBoxID = b.CashBoxID
 WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
 SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق آخر', v.VoucherNumber,
        b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
-FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID
+FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID
 WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
 SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description,
        CCur(0), t.Amount, t.EmployeeID
-FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
+FROM BankTransactions AS t INNER JOIN [@Banks] AS k ON t.BankID = k.BankID
 WHERE t.TxType = 'DEPOSIT'
 UNION ALL
 SELECT t.CashBoxID, t.TxDate, 'BANK_WITHDRAW', 'سحب من البنك', t.TxNumber, k.BankName, t.Description,
        t.Amount, CCur(0), t.EmployeeID
-FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID
+FROM BankTransactions AS t INNER JOIN [@Banks] AS k ON t.BankID = k.BankID
 WHERE t.TxType = 'WITHDRAW'
 UNION ALL
 SELECT r.CashBoxID, r.PaidDate, 'PAYROLL', 'صرف الرواتب', r.RunNumber, '-', r.Notes, CCur(0), r.PaidAmount,
@@ -1404,7 +1404,7 @@ WHERE a.Status = 'DISPOSED' AND a.DisposalTo = 'CASHBOX' AND a.DisposalProceeds 
 UNION ALL
 SELECT b.CashBoxID, b.OpeningDate, 'OPENING', 'رصيد افتتاحي', '-', b.BoxName, b.Notes,
        b.OpeningBalance, CCur(0), Null
-FROM CashBoxes AS b
+FROM [@CashBoxes] AS b
 WHERE b.OpeningBalance <> 0"""),
 
     Query("qryCashBoxTotals", "إجمالي الداخل والخارج لكل صندوق", """
@@ -1417,13 +1417,13 @@ SELECT b.CashBoxID, b.BoxName, b.BoxType,
        IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', 'صندوق كاشير') AS BoxTypeName, b.IsActive,
        {nz("t.BoxIn")} AS TotalIn, {nz("t.BoxOut")} AS TotalOut,
        {nz("t.BoxIn")} - {nz("t.BoxOut")} AS Balance, t.LastMoveDate
-FROM CashBoxes AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID
+FROM [@CashBoxes] AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID
 ORDER BY b.BoxType DESC, b.BoxName"""),
 
     Query("CashStatementQuery", "حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق)", f"""
 SELECT 1 AS SortKey, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber, m.PartyName, m.Details,
        b.BoxName, m.AmountIn, m.AmountOut, m.CashBoxID
-FROM qryCashMovements AS m INNER JOIN CashBoxes AS b ON m.CashBoxID = b.CashBoxID
+FROM qryCashMovements AS m INNER JOIN [@CashBoxes] AS b ON m.CashBoxID = b.CashBoxID
 WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND {period("m.MoveDate")}
 UNION ALL
 SELECT 0, QDate('PeriodStart'), 'BALANCE_FWD', 'رصيد أول المدة', '-', Null, Null, Null,
@@ -1461,9 +1461,9 @@ SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c
        IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك',
            'يبقى في الصندوق')) AS DestinationName,
        t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes, c.CashBoxID
-FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)
+FROM ((CashClosings AS c INNER JOIN [@CashBoxes] AS b ON c.CashBoxID = b.CashBoxID)
       INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)
-     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID
+     LEFT JOIN [@CashBoxes] AS t ON c.ToCashBoxID = t.CashBoxID
 WHERE (QLong('CashBoxID') = 0 OR c.CashBoxID = QLong('CashBoxID')) AND {period("c.ClosingDate")}
 ORDER BY c.ClosingDate""", P + ["CashBoxID"]),
 
@@ -1473,9 +1473,9 @@ SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c
        IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك',
            'يبقى في الصندوق')) AS DestinationName,
        t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes
-FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)
+FROM ((CashClosings AS c INNER JOIN [@CashBoxes] AS b ON c.CashBoxID = b.CashBoxID)
       INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)
-     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID"""),
+     LEFT JOIN [@CashBoxes] AS t ON c.ToCashBoxID = t.CashBoxID"""),
 
     Query("qryCashVoucherPrint", "بيانات طباعة سندات قبض وصرف وتحويل النقدية", """
 SELECT v.CashVoucherID AS DocID, v.VoucherNumber, v.VoucherDate, v.VoucherType,
@@ -1487,9 +1487,9 @@ SELECT v.CashVoucherID AS DocID, v.VoucherNumber, v.VoucherDate, v.VoucherType,
            IIf(v.Category = 'TRANSFER', 'تحويل بين الصناديق', 'أخرى')))))) AS CategoryName,
        b.BoxName, t.BoxName AS ToBoxName, v.Amount, v.PartyName, v.Description,
        x.ExpenseTypeName, e.EmployeeName
-FROM ((((CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID)
+FROM ((((CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID)
         INNER JOIN Employees AS e ON v.EmployeeID = e.EmployeeID)
-       LEFT JOIN CashBoxes AS t ON v.ToCashBoxID = t.CashBoxID)
+       LEFT JOIN [@CashBoxes] AS t ON v.ToCashBoxID = t.CashBoxID)
       LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)
      LEFT JOIN [@ExpenseTypes] AS x ON ex.ExpenseTypeID = x.ExpenseTypeID"""),
 
@@ -1586,7 +1586,7 @@ GROUP BY BankID"""),
 
     Query("BankBalanceQuery", "أرصدة البنوك في الدفاتر", f"""
 SELECT k.BankID, k.BankName, k.AccountNo, k.IBAN, k.IsActive, {nz("t.BookBalance")} AS Balance, t.LastItemDate
-FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID
+FROM [@Banks] AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID
 ORDER BY k.BankName"""),
 
     Query("qryAssetDepTotals", "مجموع إهلاك كل أصل في القيود الشهرية", """
@@ -1646,9 +1646,9 @@ SELECT q.ChequeID, q.ChequeRef, q.Direction, IIf(q.Direction = 'IN', 'وارد',
        k.BankName, q.IssueDate, q.DueDate, q.Amount, q.Status,
        IIf(q.Status = 'PENDING', 'تحت التحصيل', IIf(q.Status = 'COLLECTED', IIf(q.Direction = 'IN', 'محصَّل', 'مصروف'),
            'مرتد')) AS StatusName, q.StatusDate, q.Notes
-FROM ((Cheques AS q LEFT JOIN Customers AS c ON q.CustomerID = c.CustomerID)
-      LEFT JOIN Suppliers AS s ON q.SupplierID = s.SupplierID)
-     LEFT JOIN Banks AS k ON q.BankID = k.BankID"""),
+FROM ((Cheques AS q LEFT JOIN [@Customers] AS c ON q.CustomerID = c.CustomerID)
+      LEFT JOIN [@Suppliers] AS s ON q.SupplierID = s.SupplierID)
+     LEFT JOIN [@Banks] AS k ON q.BankID = k.BankID"""),
 
     Query("JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", f"""
 SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber,
@@ -1778,7 +1778,7 @@ GROUP BY IIf(l.CostCenterID Is Null, 0, l.CostCenterID), l.AccountCode, a.Accoun
 
     Query("qryCenterNames", "مراكز التكلفة ومعها «غير موزع»", """
 SELECT CostCenterID AS CenterKey, CenterCode, CenterName
-FROM CostCenters
+FROM [@CostCenters]
 UNION ALL
 SELECT 0, '-', 'غير موزع'
 FROM Settings AS z
@@ -1871,7 +1871,7 @@ SELECT b.BudgetLineID, b.AccountCode, a.AccountName, a.TreeKey, a.AccountType,
            'ملائم', 'غير ملائم')) AS VarianceNote
 FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)
        INNER JOIN [@Accounts] AS a ON b.AccountCode = a.AccountCode)
-      LEFT JOIN CostCenters AS c ON b.CostCenterID = c.CostCenterID)
+      LEFT JOIN [@CostCenters] AS c ON b.CostCenterID = c.CostCenterID)
      LEFT JOIN qryBudgetPlanned AS p ON b.BudgetLineID = p.BudgetLineID)
      LEFT JOIN qryBudgetActual AS x ON b.BudgetLineID = x.BudgetLineID
 WHERE h.BudgetYear = Year(QDate('PeriodStart'))""", P),

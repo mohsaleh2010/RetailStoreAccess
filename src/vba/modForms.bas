@@ -322,9 +322,10 @@ Public Sub RefreshList(ByVal frm As Access.Form)
     If TagValue(frm, "TABLE") = "Employees" And Not IsDeveloper() Then
         searchCond = "t.IsDeveloper = False AND (" & searchCond & ")"        ' the programmer stays hidden
     End If
-    sql = Replace(TagValue(frm, "LIST"), "{ACTIVE}", activeCond)
+    sql = Tr(TagValue(frm, "LIST"))           ' translated before the typed text goes in (modLang)
+    sql = Replace(sql, "{ACTIVE}", activeCond)
     sql = Replace(sql, "{SEARCH}", searchCond)
-    frm!lstItems.RowSource = Tr(sql)
+    frm!lstItems.RowSource = sql
     n = frm!lstItems.ListCount + (frm!lstItems.ColumnHeads * 1)   ' ColumnHeads True = -1
     If ControlExists(frm, "lblCount") Then frm!lblCount.Caption = Tr(n & " سجل")
     If Not frm.NewRecord Then frm!lstItems.Value = frm(TagValue(frm, "PK")).Value

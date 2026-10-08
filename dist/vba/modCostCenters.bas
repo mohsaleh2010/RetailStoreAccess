@@ -28,7 +28,8 @@ Public Function CostCenterFor(Optional ByVal EmployeeID As Long = 0) As Variant
 End Function
 
 Public Function CostCenterRows() As String
-    CostCenterRows = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
+    CostCenterRows = Tr("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True " & _
+                        "ORDER BY c.CenterCode")
 End Function
 
 '------------------------------------------------------------------------------

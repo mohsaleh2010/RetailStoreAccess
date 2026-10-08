@@ -639,6 +639,7 @@ TABLES: List[Table] = [
         [
             auto("CashBoxID", "رقم الصندوق"),
             text("BoxName", 50, "اسم الصندوق", required=True),
+            text("BoxNameEn", 50, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("BoxType", 10, "النوع", required=True, default='"CASHIER"',
                  rule='In ("MAIN","CASHIER")', rule_text="MAIN = خزينة رئيسية، CASHIER = صندوق كاشير"),
             money("OpeningBalance", "الرصيد الافتتاحي"),
@@ -659,6 +660,7 @@ TABLES: List[Table] = [
         [
             auto("SupplierID", "رقم المورد"),
             text("SupplierName", 150, "اسم المورد", required=True),
+            text("SupplierNameEn", 150, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("ContactPerson", 100, "الشخص المسؤول"),
             text("Mobile", 20, "الجوال"),
             text("Phone", 20, "الهاتف"),
@@ -689,6 +691,7 @@ TABLES: List[Table] = [
         [
             auto("CustomerID", "رقم العميل"),
             text("CustomerName", 150, "اسم العميل", required=True),
+            text("CustomerNameEn", 150, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("Mobile", 20, "الجوال"),
             text("Phone", 20, "الهاتف"),
             text("Email", 100, "البريد الإلكتروني"),
@@ -1047,6 +1050,7 @@ TABLES: List[Table] = [
         [
             auto("BankID", "رقم البنك"),
             text("BankName", 100, "اسم البنك / الحساب", required=True),
+            text("BankNameEn", 100, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("AccountNo", 30, "رقم الحساب"),
             text("IBAN", 34, "الآيبان"),
             money("OpeningBalance", "الرصيد الافتتاحي", rule=None, note="رصيد الحساب في البنك عند بدء استخدام البرنامج"),
@@ -1202,6 +1206,7 @@ TABLES: List[Table] = [
             auto("CostCenterID", "رقم المركز"),
             text("CenterCode", 10, "رمز المركز", required=True),
             text("CenterName", 100, "اسم المركز", required=True),
+            text("CenterNameEn", 100, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             bool_("IsDefault", "المركز الافتراضي", "False"),
             is_active(),
             text("Notes", 255, "ملاحظات"),
@@ -1219,7 +1224,7 @@ TABLES: List[Table] = [
             auto("SalesRepID", "رقم داخلي"),
             text("RepCode", 20, "كود المندوب", required=True),
             text("RepName", 100, "اسم المندوب", required=True),
-            text("RepNameEn", 100, "الاسم بالإنجليزية"),
+            text("RepNameEn", 100, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("Mobile", 20, "الجوال"),
             long_("EmployeeID", "مستخدم البرنامج", fk="Employees.EmployeeID",
                   note="مبيعات هذا المستخدم لعميل بلا مندوب تُنسب لهذا المندوب"),

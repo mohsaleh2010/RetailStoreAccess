@@ -119,19 +119,20 @@ class DataScreen:
 
 CATEGORY_ROWS = "SELECT c.CategoryID, c.CategoryName FROM [@Categories] AS c ORDER BY c.CategoryName"
 UNIT_ROWS = "SELECT u.UnitID, u.UnitName FROM [@Units] AS u ORDER BY u.UnitName"
-SUPPLIER_ROWS = "SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName"
-CUSTOMER_ROWS = "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName"
+SUPPLIER_ROWS = "SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s ORDER BY s.SupplierName"
+CUSTOMER_ROWS = "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c ORDER BY c.CustomerName"
 PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Item "
                 "FROM Products ORDER BY ProductName")
 EXPENSE_TYPE_ROWS = ("SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x "
                      "ORDER BY x.ExpenseTypeName")
 PAYMENT_ROWS = "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p ORDER BY p.SortOrder"
-BANK_ROWS = "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName"
-CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
+BANK_ROWS = "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName"
+CENTER_ROWS = ("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True "
+               "ORDER BY c.CenterCode")
 CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies "
                  "WHERE IsActive = True ORDER BY SortOrder, CurrencyCode")
-REP_ROWS = "SELECT SalesRepID, RepName FROM SalesReps WHERE IsActive = True ORDER BY RepName"
-CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
+REP_ROWS = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName"
+CASHBOX_ROWS = "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
 COMMISSION_BASES = "SALES;صافي المبيعات (بدون الضريبة);COLLECTION;التحصيل"
 EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
@@ -182,16 +183,16 @@ DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmCustomers", "Customers", "العملاء", "بيانات العملاء وأرصدتهم", "customers",
         list_select="t.CustomerName AS [العميل], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد]",
-        list_from="Customers AS t", list_order="t.CustomerName",
+        list_from="[@Customers] AS t", list_order="t.CustomerName",
         list_headers=[("العميل", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
-        search=["t.CustomerName", "t.Mobile", "t.Phone", "t.VATNumber"],
+        search=["t.CustomerName", "t.CustomerNameEn", "t.Mobile", "t.Phone", "t.VATNumber"],
         active="t.IsActive",
         extra_buttons=[("btnPayment", "سند قبض", 'OpenScreen "frmCustomerPayment", 6, Me!CustomerID'),
                        ("btnStatement", "كشف حساب", 'PrintPartyStatement "C", Me!CustomerID'),
                        ("btnAging", "أعمار الديون", 'OpenScreen "frmAging", 0, "C|" & Me!CustomerID'),
                        ("btnAllocate", "ربط السداد", 'OpenScreen "frmAllocation", 0, "C|" & Me!CustomerID')],
         fields=[
-            Fld("CustomerName", span=2), Fld("Mobile"), Fld("Phone"),
+            Fld("CustomerName", span=2), Fld("CustomerNameEn", span=2), Fld("Mobile"), Fld("Phone"),
             Fld("Email"), Fld("VATNumber", hint="للعملاء المنشآت (فاتورة ضريبية)"),
             Fld("CRNumber"), Fld("City"), Fld("District"), Fld("StreetName"),
             Fld("BuildingNo"), Fld("PostalCode"), Fld("Address", span=2),
@@ -205,16 +206,16 @@ DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmSuppliers", "Suppliers", "الموردون", "بيانات الموردين وأرصدتهم", "suppliers",
         list_select="t.SupplierName AS [المورد], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد]",
-        list_from="Suppliers AS t", list_order="t.SupplierName",
+        list_from="[@Suppliers] AS t", list_order="t.SupplierName",
         list_headers=[("المورد", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
-        search=["t.SupplierName", "t.ContactPerson", "t.Mobile", "t.VATNumber"],
+        search=["t.SupplierName", "t.SupplierNameEn", "t.ContactPerson", "t.Mobile", "t.VATNumber"],
         active="t.IsActive",
         extra_buttons=[("btnPayment", "سند صرف", 'OpenScreen "frmSupplierPayment", 7, Me!SupplierID'),
                        ("btnStatement", "كشف حساب", 'PrintPartyStatement "S", Me!SupplierID'),
                        ("btnAging", "أعمار الديون", 'OpenScreen "frmAging", 0, "S|" & Me!SupplierID'),
                        ("btnAllocate", "ربط السداد", 'OpenScreen "frmAllocation", 0, "S|" & Me!SupplierID')],
         fields=[
-            Fld("SupplierName", span=2), Fld("ContactPerson"), Fld("Mobile"),
+            Fld("SupplierName", span=2), Fld("SupplierNameEn", span=2), Fld("ContactPerson"), Fld("Mobile"),
             Fld("Phone"), Fld("Email"), Fld("VATNumber"), Fld("CRNumber"),
             Fld("City"), Info("lblSupplierNote", " "), Fld("Address", span=2),
             Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
@@ -275,7 +276,7 @@ DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmSalesReps", "SalesReps", "المندوبين", "مندوبو المبيعات: عملاؤهم ونسبة عمولتهم ومركز تكلفتهم", "customers",
         list_select="t.RepCode AS [الكود], t.RepName AS [المندوب], t.Region AS [المنطقة / خط السير]",
-        list_from="SalesReps AS t", list_order="t.RepName",
+        list_from="[@SalesReps] AS t", list_order="t.RepName",
         list_headers=[("الكود", 1.8), ("المندوب", 4.2), ("المنطقة", 2.4)],
         search=["t.RepCode", "t.RepName", "t.RepNameEn", "t.Mobile", "t.Region"], active="t.IsActive",
         seq="SALES_REP:RepCode", unique=["RepCode", "RepName"],
@@ -299,10 +300,10 @@ DATA_SCREENS: List[DataScreen] = [
         "frmRepTargets", "SalesRepTargets", "أهداف المندوبين", "الهدف الشهري لصافي مبيعات كل مندوب (بدون الضريبة)",
         "customers",
         list_select="s.RepName AS [المندوب], t.TargetYear & '/' & t.TargetMonth AS [الشهر], t.TargetAmount AS [الهدف]",
-        list_from="SalesRepTargets AS t INNER JOIN SalesReps AS s ON t.SalesRepID = s.SalesRepID",
+        list_from="SalesRepTargets AS t INNER JOIN [@SalesReps] AS s ON t.SalesRepID = s.SalesRepID",
         list_order="t.TargetYear DESC, t.TargetMonth DESC, s.RepName",
         list_headers=[("المندوب", 4.0), ("الشهر", 2.0), ("الهدف", 2.4)],
-        search=["s.RepName", "s.RepCode"],
+        search=["s.RepName", "s.RepNameEn", "s.RepCode"],
         fields=[Fld("SalesRepID", rows=REP_ROWS, widths="0;6"), Fld("TargetYear"), Fld("TargetMonth"),
                 Fld("TargetAmount"),
                 Info("lblTargetNote", "لكل مندوب هدف واحد في الشهر؛ تقرير «أداء المندوبين» يقارن الفعلي بالهدف")]),
@@ -361,10 +362,10 @@ DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmCostCenters", "CostCenters", "مراكز التكلفة", "الفروع والأقسام: تُوزَّع عليها الإيرادات والمصروفات", "journal",
         list_select="t.CenterCode AS [الرمز], t.CenterName AS [المركز], IIf(t.IsDefault, 'افتراضي', '') AS [الحالة]",
-        list_from="CostCenters AS t", list_order="t.CenterCode",
+        list_from="[@CostCenters] AS t", list_order="t.CenterCode",
         list_headers=[("الرمز", 1.8), ("المركز", 5.0), ("الحالة", 1.6)],
-        search=["t.CenterCode", "t.CenterName"], active="t.IsActive", unique=["CenterCode", "CenterName"],
-        fields=[Fld("CenterCode"), Fld("CenterName"),
+        search=["t.CenterCode", "t.CenterName", "t.CenterNameEn"], active="t.IsActive", unique=["CenterCode", "CenterName"],
+        fields=[Fld("CenterCode"), Fld("CenterName"), Fld("CenterNameEn"),
                 Fld("IsDefault", hint="لمن لا مركز له من المستخدمين"), Fld("IsActive"),
                 Info("lblCenterNote", "مركز الموظف من شاشة رواتب الموظفين؛ المستندات القديمة «غير موزعة»"),
                 Fld("Notes", span=2)]),
@@ -410,11 +411,11 @@ DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmCashBoxes", "CashBoxes", "الصناديق", "الخزينة الرئيسية وصناديق الكاشير", "treasury",
         list_select="t.BoxName AS [الصندوق], IIf(t.BoxType = 'MAIN', 'خزينة', 'كاشير') AS [النوع]",
-        list_from="CashBoxes AS t", list_order="t.BoxType DESC, t.BoxName",
+        list_from="[@CashBoxes] AS t", list_order="t.BoxType DESC, t.BoxName",
         list_headers=[("الصندوق", 5.6), ("النوع", 2.8)],
-        search=["t.BoxName", "t.Notes"], active="t.IsActive", unique=["BoxName"],
+        search=["t.BoxName", "t.BoxNameEn", "t.Notes"], active="t.IsActive", unique=["BoxName"],
         extra_buttons=[("btnTreasury", "الخزينة", 'OpenScreen "frmTreasury"')],
-        fields=[Fld("BoxName", span=2), Fld("BoxType", rows=BOX_TYPES, widths="0;5"),
+        fields=[Fld("BoxName", span=2), Fld("BoxNameEn", span=2), Fld("BoxType", rows=BOX_TYPES, widths="0;5"),
                 Fld("IsActive"),
                 Fld("OpeningBalance", hint="النقدية الموجودة في الصندوق عند بدء استخدام البرنامج"),
                 Fld("OpeningDate"),
@@ -423,14 +424,14 @@ DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmBanks", "Banks", "البنوك", "الحسابات البنكية للمحل وأرصدتها", "treasury",
         list_select="t.BankName AS [البنك], t.AccountNo AS [رقم الحساب]",
-        list_from="Banks AS t", list_order="t.BankName",
+        list_from="[@Banks] AS t", list_order="t.BankName",
         list_headers=[("البنك", 5.2), ("رقم الحساب", 3.2)],
-        search=["t.BankName", "t.AccountNo", "t.IBAN"], active="t.IsActive", unique=["BankName"],
+        search=["t.BankName", "t.BankNameEn", "t.AccountNo", "t.IBAN"], active="t.IsActive", unique=["BankName"],
         extra_buttons=[("btnBankTx", "الحركات البنكية", 'OpenScreen "frmBankTx", 0, Me!BankID'),
                        ("btnRecon", "التسوية البنكية", 'OpenScreen "frmBankRecon", 0, Me!BankID'),
                        ("btnStatement", "كشف حساب", 'OpenScreen "frmLedger", 0, 120000 + Nz(Me!BankID, 0)'),
                        ("btnCheques", "الشيكات", 'OpenScreen "frmCheques", 0, "IN"')],
-        fields=[Fld("BankName", span=2), Fld("AccountNo"), Fld("IBAN"),
+        fields=[Fld("BankName", span=2), Fld("BankNameEn", span=2), Fld("AccountNo"), Fld("IBAN"),
                 Fld("OpeningBalance", hint="رصيد الحساب في البنك عند بدء استخدام البرنامج"),
                 Fld("OpeningDate"), Fld("IsActive"),
                 Info("lblBankNote", "حساب البنك في الدليل = 120000 + رقمه، والرصيد من القيود"),
@@ -591,31 +592,33 @@ SEARCH_KINDS: List[SearchKind] = [
     SearchKind("CUSTOMER", "العملاء",
                "SELECT c.CustomerID, c.CustomerName AS [العميل], c.Mobile AS [رقم الجوال], "
                "c.VATNumber AS [الرقم الضريبي], c.CurrentBalance AS [الرصيد] "
-               "FROM Customers AS c WHERE c.CustomerName Like {LIKE} OR c.Mobile Like {LIKE} "
+               "FROM [@Customers] AS c WHERE c.CustomerName Like {LIKE} OR c.CustomerNameEn Like {LIKE} OR c.Mobile Like {LIKE} "
                "OR c.Phone Like {LIKE} OR c.VATNumber Like {LIKE} OR c.CustomerID = {NUM} "
                "ORDER BY c.CustomerName",
                [0, 9, 3.5, 4.5, 3]),
     SearchKind("SUPPLIER", "الموردون",
                "SELECT s.SupplierID, s.SupplierName AS [المورد], s.ContactPerson AS [المسؤول], "
                "s.Mobile AS [رقم الجوال], s.CurrentBalance AS [الرصيد] "
-               "FROM Suppliers AS s WHERE s.SupplierName Like {LIKE} OR s.ContactPerson Like {LIKE} "
+               "FROM [@Suppliers] AS s WHERE s.SupplierName Like {LIKE} OR s.SupplierNameEn Like {LIKE} "
+               "OR s.ContactPerson Like {LIKE} "
                "OR s.Mobile Like {LIKE} OR s.VATNumber Like {LIKE} OR s.SupplierID = {NUM} "
                "ORDER BY s.SupplierName",
                [0, 8, 5, 3.5, 3]),
     SearchKind("SALE", "فواتير البيع",
                "SELECT h.SalesInvoiceID, h.InvoiceNumber AS [رقم الفاتورة], h.InvoiceDate AS [التاريخ], "
                "c.CustomerName AS [العميل], h.TotalAmount AS [الإجمالي], h.RemainingAmount AS [المتبقي] "
-               "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID "
-               "WHERE (h.InvoiceNumber Like {LIKE} OR c.CustomerName Like {LIKE} OR c.Mobile Like {LIKE}) "
+               "FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID "
+               "WHERE (h.InvoiceNumber Like {LIKE} OR c.CustomerName Like {LIKE} OR c.CustomerNameEn Like {LIKE} "
+               "OR c.Mobile Like {LIKE}) "
                "AND h.InvoiceDate >= {FROM} AND h.InvoiceDate < {TO} ORDER BY h.InvoiceDate DESC",
                [0, 3.5, 4, 8, 3, 3]),
     SearchKind("PURCHASE", "فواتير الشراء",
                "SELECT h.PurchaseInvoiceID, h.InvoiceNumber AS [رقم الفاتورة], "
                "h.SupplierInvoiceNo AS [فاتورة المورد], h.InvoiceDate AS [التاريخ], "
                "s.SupplierName AS [المورد], h.TotalAmount AS [الإجمالي] "
-               "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID "
+               "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID "
                "WHERE (h.InvoiceNumber Like {LIKE} OR h.SupplierInvoiceNo Like {LIKE} "
-               "OR s.SupplierName Like {LIKE}) AND h.InvoiceDate >= {FROM} AND h.InvoiceDate < {TO} "
+               "OR s.SupplierName Like {LIKE} OR s.SupplierNameEn Like {LIKE}) AND h.InvoiceDate >= {FROM} AND h.InvoiceDate < {TO} "
                "ORDER BY h.InvoiceDate DESC",
                [0, 3.5, 3.5, 4, 7, 3]),
 ]

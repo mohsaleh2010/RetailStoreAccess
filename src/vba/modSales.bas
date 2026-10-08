@@ -696,7 +696,7 @@ End Sub
 Private Function CheckCustomer(ByVal CustomerID As Long, ByVal IsCredit As Boolean, _
                                ByVal Remaining As Currency) As String
     Dim rs As DAO.Recordset, blockDays As Long, late As Long
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM Customers WHERE CustomerID = " & CustomerID, dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT * FROM [@Customers] WHERE CustomerID = " & CustomerID), dbOpenSnapshot)
     If rs.EOF Then
         CheckCustomer = "العميل غير موجود."
     ElseIf Not rs!IsActive Then

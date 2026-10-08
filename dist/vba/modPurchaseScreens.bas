@@ -364,9 +364,9 @@ Public Sub LoadPurchaseForReturn(ByVal frm As Access.Form, ByVal PurchaseInvoice
         "FROM (PurchaseInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) " & _
         "LEFT JOIN qryPurchaseReturnedQty AS r ON d.PurchaseDetailID = r.PurchaseDetailID " & _
         "WHERE d.PurchaseInvoiceID = " & PurchaseInvoiceID, dbFailOnError
-    Set rs = CurrentDb.OpenRecordset("SELECT h.*, s.SupplierName FROM PurchaseInvoices AS h INNER JOIN Suppliers " & _
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT h.*, s.SupplierName FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] " & _
                                      "AS s ON h.SupplierID = s.SupplierID WHERE h.PurchaseInvoiceID = " & _
-                                     PurchaseInvoiceID, dbOpenSnapshot)
+                                     PurchaseInvoiceID), dbOpenSnapshot)
     frm!txtInvoiceID.Value = PurchaseInvoiceID
     frm!txtInvoiceNo.Value = rs!InvoiceNumber
     frm!lblInvoiceInfo.Caption = Tr("«· «—ÌŒ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd") & "    «·„Ê—œ: " & _
@@ -503,9 +503,9 @@ Public Sub PurchaseViewLoad(ByVal frm As Access.Form)
         Exit Sub
     End If
     id = CLng(frm.OpenArgs)
-    Set rs = CurrentDb.OpenRecordset("SELECT h.*, s.SupplierName, e.EmployeeName FROM (PurchaseInvoices AS h " & _
-        "INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID) INNER JOIN Employees AS e " & _
-        "ON h.EmployeeID = e.EmployeeID WHERE h.PurchaseInvoiceID = " & id, dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT h.*, s.SupplierName, e.EmployeeName FROM (PurchaseInvoices AS h " & _
+        "INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID) INNER JOIN Employees AS e " & _
+        "ON h.EmployeeID = e.EmployeeID WHERE h.PurchaseInvoiceID = " & id), dbOpenSnapshot)
     If rs.EOF Then
         rs.Close
         ShowWarning "«·›« Ê—… €Ì— „ÊÃÊœ…."

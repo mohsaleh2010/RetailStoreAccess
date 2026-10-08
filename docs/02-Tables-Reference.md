@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **69** | عدد الحقول: **883**
+عدد الجداول: **69** | عدد الحقول: **888**
 
 ## الفهرس
 
@@ -370,12 +370,13 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **CashBoxID** 🔑 | AutoNumber |  |  |  |  |  | رقم الصندوق |
 | 2 | BoxName | Short Text | 50 | ✔ |  |  |  | اسم الصندوق |
-| 3 | BoxType | Short Text | 10 | ✔ | `"CASHIER"` | `In ("MAIN","CASHIER")` |  | النوع |
-| 4 | OpeningBalance | Currency |  | ✔ | `0` | `>=0` |  | الرصيد الافتتاحي |
-| 5 | OpeningDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الرصيد الافتتاحي |
-| 6 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 7 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 3 | BoxNameEn | Short Text | 50 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | BoxType | Short Text | 10 | ✔ | `"CASHIER"` | `In ("MAIN","CASHIER")` |  | النوع |
+| 5 | OpeningBalance | Currency |  | ✔ | `0` | `>=0` |  | الرصيد الافتتاحي |
+| 6 | OpeningDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الرصيد الافتتاحي |
+| 7 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 8 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `CashBoxID`
 - فهرس فريد: `BoxName`
@@ -389,21 +390,22 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **SupplierID** 🔑 | AutoNumber |  |  |  |  |  | رقم المورد |
 | 2 | SupplierName | Short Text | 150 | ✔ |  |  |  | اسم المورد |
-| 3 | ContactPerson | Short Text | 100 |  |  |  |  | الشخص المسؤول |
-| 4 | Mobile | Short Text | 20 |  |  |  |  | الجوال |
-| 5 | Phone | Short Text | 20 |  |  |  |  | الهاتف |
-| 6 | Email | Short Text | 100 |  |  |  |  | البريد الإلكتروني |
-| 7 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3"` |  | الرقم الضريبي |
-| 8 | CRNumber | Short Text | 20 |  |  |  |  | السجل التجاري |
-| 9 | Address | Short Text | 255 |  |  |  |  | العنوان |
-| 10 | City | Short Text | 50 |  |  |  |  | المدينة |
-| 11 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – موجب = المحل مدين للمورد |
-| 12 | CurrentBalance | Currency |  | ✔ | `0` |  |  | الرصيد الحالي – قيمة مساعدة؛ المرجع هو SupplierBalanceQuery |
-| 13 | PaymentTermsDays | Number (Integer) |  |  | `30` | `>=0` |  | مدة السداد (يوم) |
-| 14 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 15 | Notes | Long Text |  |  |  |  |  | ملاحظات |
-| 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 17 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | عملة التعامل – تُقترح في فواتيره وسنداته |
+| 3 | SupplierNameEn | Short Text | 150 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | ContactPerson | Short Text | 100 |  |  |  |  | الشخص المسؤول |
+| 5 | Mobile | Short Text | 20 |  |  |  |  | الجوال |
+| 6 | Phone | Short Text | 20 |  |  |  |  | الهاتف |
+| 7 | Email | Short Text | 100 |  |  |  |  | البريد الإلكتروني |
+| 8 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3"` |  | الرقم الضريبي |
+| 9 | CRNumber | Short Text | 20 |  |  |  |  | السجل التجاري |
+| 10 | Address | Short Text | 255 |  |  |  |  | العنوان |
+| 11 | City | Short Text | 50 |  |  |  |  | المدينة |
+| 12 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – موجب = المحل مدين للمورد |
+| 13 | CurrentBalance | Currency |  | ✔ | `0` |  |  | الرصيد الحالي – قيمة مساعدة؛ المرجع هو SupplierBalanceQuery |
+| 14 | PaymentTermsDays | Number (Integer) |  |  | `30` | `>=0` |  | مدة السداد (يوم) |
+| 15 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 16 | Notes | Long Text |  |  |  |  |  | ملاحظات |
+| 17 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 18 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | عملة التعامل – تُقترح في فواتيره وسنداته |
 
 - المفتاح الأساسي: `SupplierID`
 - فهرس عادي: `SupplierName`
@@ -417,27 +419,28 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **CustomerID** 🔑 | AutoNumber |  |  |  |  |  | رقم العميل |
 | 2 | CustomerName | Short Text | 150 | ✔ |  |  |  | اسم العميل |
-| 3 | Mobile | Short Text | 20 |  |  |  |  | الجوال |
-| 4 | Phone | Short Text | 20 |  |  |  |  | الهاتف |
-| 5 | Email | Short Text | 100 |  |  |  |  | البريد الإلكتروني |
-| 6 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3"` |  | الرقم الضريبي – إذا وُجد تصدر للعميل فاتورة ضريبية B2B |
-| 7 | CRNumber | Short Text | 20 |  |  |  |  | السجل التجاري |
-| 8 | BuildingNo | Short Text | 10 |  |  |  |  | رقم المبنى |
-| 9 | StreetName | Short Text | 100 |  |  |  |  | الشارع |
-| 10 | District | Short Text | 100 |  |  |  |  | الحي |
-| 11 | City | Short Text | 50 |  |  |  |  | المدينة |
-| 12 | PostalCode | Short Text | 10 |  |  |  |  | الرمز البريدي |
-| 13 | Address | Short Text | 255 |  |  |  |  | العنوان |
-| 14 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – موجب = العميل مدين للمحل |
-| 15 | CurrentBalance | Currency |  | ✔ | `0` |  |  | الرصيد الحالي – قيمة مساعدة؛ المرجع هو CustomerBalanceQuery |
-| 16 | AllowCredit | Yes/No |  |  | `True` |  |  | يسمح بالبيع الآجل |
-| 17 | CreditLimit | Currency |  | ✔ | `0` | `>=0` |  | حد الائتمان – 0 = بدون حد |
-| 18 | PaymentTermsDays | Number (Integer) |  |  | `30` | `>=0` |  | مدة السداد (يوم) |
-| 19 | IsSystem | Yes/No |  |  | `False` |  |  | سجل نظام |
-| 20 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 21 | Notes | Long Text |  |  |  |  |  | ملاحظات |
-| 22 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 23 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – المندوب المسؤول عن العميل: تُنسب له فواتيره وتحصيلاته |
+| 3 | CustomerNameEn | Short Text | 150 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | Mobile | Short Text | 20 |  |  |  |  | الجوال |
+| 5 | Phone | Short Text | 20 |  |  |  |  | الهاتف |
+| 6 | Email | Short Text | 100 |  |  |  |  | البريد الإلكتروني |
+| 7 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3"` |  | الرقم الضريبي – إذا وُجد تصدر للعميل فاتورة ضريبية B2B |
+| 8 | CRNumber | Short Text | 20 |  |  |  |  | السجل التجاري |
+| 9 | BuildingNo | Short Text | 10 |  |  |  |  | رقم المبنى |
+| 10 | StreetName | Short Text | 100 |  |  |  |  | الشارع |
+| 11 | District | Short Text | 100 |  |  |  |  | الحي |
+| 12 | City | Short Text | 50 |  |  |  |  | المدينة |
+| 13 | PostalCode | Short Text | 10 |  |  |  |  | الرمز البريدي |
+| 14 | Address | Short Text | 255 |  |  |  |  | العنوان |
+| 15 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – موجب = العميل مدين للمحل |
+| 16 | CurrentBalance | Currency |  | ✔ | `0` |  |  | الرصيد الحالي – قيمة مساعدة؛ المرجع هو CustomerBalanceQuery |
+| 17 | AllowCredit | Yes/No |  |  | `True` |  |  | يسمح بالبيع الآجل |
+| 18 | CreditLimit | Currency |  | ✔ | `0` | `>=0` |  | حد الائتمان – 0 = بدون حد |
+| 19 | PaymentTermsDays | Number (Integer) |  |  | `30` | `>=0` |  | مدة السداد (يوم) |
+| 20 | IsSystem | Yes/No |  |  | `False` |  |  | سجل نظام |
+| 21 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 22 | Notes | Long Text |  |  |  |  |  | ملاحظات |
+| 23 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 24 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – المندوب المسؤول عن العميل: تُنسب له فواتيره وتحصيلاته |
 
 - المفتاح الأساسي: `CustomerID`
 - فهرس عادي: `CustomerName`
@@ -796,13 +799,14 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **BankID** 🔑 | AutoNumber |  |  |  |  |  | رقم البنك |
 | 2 | BankName | Short Text | 100 | ✔ |  |  |  | اسم البنك / الحساب |
-| 3 | AccountNo | Short Text | 30 |  |  |  |  | رقم الحساب |
-| 4 | IBAN | Short Text | 34 |  |  |  |  | الآيبان |
-| 5 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – رصيد الحساب في البنك عند بدء استخدام البرنامج |
-| 6 | OpeningDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الرصيد الافتتاحي |
-| 7 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 8 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 3 | BankNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | AccountNo | Short Text | 30 |  |  |  |  | رقم الحساب |
+| 5 | IBAN | Short Text | 34 |  |  |  |  | الآيبان |
+| 6 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – رصيد الحساب في البنك عند بدء استخدام البرنامج |
+| 7 | OpeningDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الرصيد الافتتاحي |
+| 8 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `BankID`
 - فهرس فريد: `BankName`
@@ -943,10 +947,11 @@
 | 1 | **CostCenterID** 🔑 | AutoNumber |  |  |  |  |  | رقم المركز |
 | 2 | CenterCode | Short Text | 10 | ✔ |  |  |  | رمز المركز |
 | 3 | CenterName | Short Text | 100 | ✔ |  |  |  | اسم المركز |
-| 4 | IsDefault | Yes/No |  |  | `False` |  |  | المركز الافتراضي |
-| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 6 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 7 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 4 | CenterNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 5 | IsDefault | Yes/No |  |  | `False` |  |  | المركز الافتراضي |
+| 6 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 7 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `CostCenterID`
 - فهرس فريد: `CenterCode`
@@ -961,7 +966,7 @@
 | 1 | **SalesRepID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
 | 2 | RepCode | Short Text | 20 | ✔ |  |  |  | كود المندوب |
 | 3 | RepName | Short Text | 100 | ✔ |  |  |  | اسم المندوب |
-| 4 | RepNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية |
+| 4 | RepNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
 | 5 | Mobile | Short Text | 20 |  |  |  |  | الجوال |
 | 6 | EmployeeID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | مستخدم البرنامج – مبيعات هذا المستخدم لعميل بلا مندوب تُنسب لهذا المندوب |
 | 7 | Region | Short Text | 50 |  |  |  |  | المنطقة / خط السير |

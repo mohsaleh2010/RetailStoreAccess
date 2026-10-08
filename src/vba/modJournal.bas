@@ -35,7 +35,24 @@ Public Sub EnsureAccounts()
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 120000 + k.BankID, k.BankName, 'ASSET', 1210, True, True FROM Banks AS k " & _
         "WHERE 120000 + k.BankID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
+    ' their English names (docs/40-English-Party-Names.md), for the accounts that have none yet
+    FillAccountNamesEn "SELECT 110000 + CashBoxID AS SubCode, BoxNameEn AS SubNameEn FROM CashBoxes WHERE BoxNameEn Is Not Null"
+    FillAccountNamesEn "SELECT 530000 + ExpenseTypeID AS SubCode, ExpenseTypeNameEn AS SubNameEn FROM ExpenseTypes " & _
+                       "WHERE ExpenseTypeNameEn Is Not Null"
+    FillAccountNamesEn "SELECT 120000 + BankID AS SubCode, BankNameEn AS SubNameEn FROM Banks WHERE BankNameEn Is Not Null"
     RebuildAccountTree
+End Sub
+
+Private Sub FillAccountNamesEn(ByVal Sql As String)
+    ' the English name of a box, bank or expense type reaches its account; a name typed on the account is kept
+    Dim rs As DAO.Recordset
+    Set rs = CurrentDb.OpenRecordset(Sql, dbOpenSnapshot)
+    Do Until rs.EOF
+        CurrentDb.Execute "UPDATE Accounts SET AccountNameEn = " & SqlText(rs!SubNameEn) & " WHERE AccountCode = " & _
+                          rs!SubCode & " AND AccountNameEn Is Null", dbFailOnError
+        rs.MoveNext
+    Loop
+    rs.Close
 End Sub
 
 Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated As Long, _
@@ -586,6 +603,13 @@ Public Function TestJournal() As Boolean
     Else
         Debug.Print "[--] إقفال السنة " & fy & ": " & msg
     End If
+    ' the English name of a new box reaches its account (docs/40-English-Party-Names.md)
+    CurrentDb.Execute "INSERT INTO CashBoxes (BoxName, BoxNameEn, BoxType) VALUES ('TEST صندوق الأسماء', " & _
+                      "'TEST names box', 'CASHIER')", dbFailOnError
+    id = Nz(DbValue("SELECT CashBoxID FROM CashBoxes WHERE BoxName = 'TEST صندوق الأسماء'"), 0)
+    EnsureAccounts
+    CheckJournal Nz(DbValue("SELECT AccountNameEn FROM Accounts WHERE AccountCode = " & (110000 + id)), "") = _
+                 "TEST names box", "حساب الصندوق الجديد يأخذ اسمه الإنجليزي", passed, failed, report
     ws.Rollback
     inTrans = False
     GoTo Done

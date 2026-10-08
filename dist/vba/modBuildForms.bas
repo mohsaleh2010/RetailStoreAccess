@@ -1184,7 +1184,7 @@ Private Sub BuildForm_frmProducts()
     Set c = AddLabel("lblCategoryID", "«· ’‰Ì›", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "CategoryID", 0)
     Set c = AddCombo("UnitID", "UnitID", 12134, 3402, 2948, 425, "SELECT u.UnitID, u.UnitName FROM [@Units] AS u ORDER BY u.UnitName", 2, "0;3402")
     Set c = AddLabel("lblUnitID", "«·ÊÕœ…", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "UnitID", 0)
-    Set c = AddCombo("SupplierID", "SupplierID", 7201, 3969, 2948, 425, "SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName", 2, "0;3402")
+    Set c = AddCombo("SupplierID", "SupplierID", 7201, 3969, 2948, 425, "SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s ORDER BY s.SupplierName", 2, "0;3402")
     Set c = AddLabel("lblSupplierID", "«·„Ê—œ «·«› —«÷Ì", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "SupplierID", 0)
     Set c = AddCombo("VATCategory", "VATCategory", 12134, 3969, 2948, 425, "S;Œ«÷⁄ ··÷—Ì»… 15%;Z;‰”»… ’›—Ì…;E;„⁄›Ï „‰ «·÷—Ì»…", 2, "0;2552")
     c.AfterUpdate = EP
@@ -1311,8 +1311,8 @@ End Sub
 Private Sub BuildForm_frmCustomers()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmCustomers", "«·⁄„·«¡", "SELECT * FROM Customers", 15309, 9780, True, True, True, _
-              "KIND=LIST|TABLE=Customers|PK=CustomerID|LIST=SELECT t.CustomerID, t.CustomerName AS [«·⁄„Ì·], t.Mobile AS [—ﬁ„ «·ÃÊ«·], t.CurrentBalance AS [«·—’Ìœ] FROM Customers AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CustomerName|SEARCH=t.CustomerName,t.Mobile,t.Phone,t.VATNumber|ACTIVE=t.IsActive"
+    StartForm "frmCustomers", "«·⁄„·«¡", "SELECT * FROM Customers", 15309, 10347, True, True, True, _
+              "KIND=LIST|TABLE=Customers|PK=CustomerID|LIST=SELECT t.CustomerID, t.CustomerName AS [«·⁄„Ì·], t.Mobile AS [—ﬁ„ «·ÃÊ«·], t.CurrentBalance AS [«·—’Ìœ] FROM [@Customers] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CustomerName|SEARCH=t.CustomerName,t.CustomerNameEn,t.Mobile,t.Phone,t.VATNumber|ACTIVE=t.IsActive"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«·⁄„·«¡", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -1343,68 +1343,70 @@ Private Sub BuildForm_frmCustomers()
     SetCtlProp c, "DefaultValue", "False"
     c.AfterUpdate = EP
     Set c = AddLabel("lblShowInactive", "≈ŸÂ«— €Ì— «·‰‘ÿ", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
-    Set c = AddList("lstItems", 227, 3005, 4990, 6491, 4, "0;2495;1361;907", True)
+    Set c = AddList("lstItems", 227, 3005, 4990, 7058, 4, "0;2495;1361;907", True)
     c.AfterUpdate = EP
     Set c = AddText("CustomerName", "CustomerName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblCustomerName", "«”„ «·⁄„Ì· *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "CustomerName", 0)
-    Set c = AddText("Mobile", "Mobile", 7201, 2268, 2948, 425)
-    Set c = AddLabel("lblMobile", "«·ÃÊ«·", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "Mobile", 0)
-    Set c = AddText("Phone", "Phone", 12134, 2268, 2948, 425)
-    Set c = AddLabel("lblPhone", "«·Â« ›", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "Phone", 0)
-    Set c = AddText("Email", "Email", 7201, 2835, 2948, 425)
-    Set c = AddLabel("lblEmail", "«·»—Ìœ «·≈·ﬂ —Ê‰Ì", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "Email", 0)
-    Set c = AddText("VATNumber", "VATNumber", 12134, 2835, 2948, 425)
+    Set c = AddText("CustomerNameEn", "CustomerNameEn", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblCustomerNameEn", "«·«”„ »«·≈‰Ã·Ì“Ì…", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "CustomerNameEn", 0)
+    Set c = AddText("Mobile", "Mobile", 7201, 2835, 2948, 425)
+    Set c = AddLabel("lblMobile", "«·ÃÊ«·", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "Mobile", 0)
+    Set c = AddText("Phone", "Phone", 12134, 2835, 2948, 425)
+    Set c = AddLabel("lblPhone", "«·Â« ›", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "Phone", 0)
+    Set c = AddText("Email", "Email", 7201, 3402, 2948, 425)
+    Set c = AddLabel("lblEmail", "«·»—Ìœ «·≈·ﬂ —Ê‰Ì", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "Email", 0)
+    Set c = AddText("VATNumber", "VATNumber", 12134, 3402, 2948, 425)
     SetCtlProp c, "ControlTipText", "··⁄„·«¡ «·„‰‘¬  (›« Ê—… ÷—Ì»Ì…)"
     SetCtlProp c, "StatusBarText", "··⁄„·«¡ «·„‰‘¬  (›« Ê—… ÷—Ì»Ì…)"
-    Set c = AddLabel("lblVATNumber", "«·—ﬁ„ «·÷—Ì»Ì", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "VATNumber", 0)
-    Set c = AddText("CRNumber", "CRNumber", 7201, 3402, 2948, 425)
-    Set c = AddLabel("lblCRNumber", "«·”Ã· «· Ã«—Ì", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "CRNumber", 0)
-    Set c = AddText("City", "City", 12134, 3402, 2948, 425)
-    Set c = AddLabel("lblCity", "«·„œÌ‰…", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "City", 0)
-    Set c = AddText("District", "District", 7201, 3969, 2948, 425)
-    Set c = AddLabel("lblDistrict", "«·ÕÌ", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "District", 0)
-    Set c = AddText("StreetName", "StreetName", 12134, 3969, 2948, 425)
-    Set c = AddLabel("lblStreetName", "«·‘«—⁄", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "StreetName", 0)
-    Set c = AddText("BuildingNo", "BuildingNo", 7201, 4536, 2948, 425)
-    Set c = AddLabel("lblBuildingNo", "—ﬁ„ «·„»‰Ï", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "BuildingNo", 0)
-    Set c = AddText("PostalCode", "PostalCode", 12134, 4536, 2948, 425)
-    Set c = AddLabel("lblPostalCode", "«·—„“ «·»—ÌœÌ", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "PostalCode", 0)
-    Set c = AddText("Address", "Address", 7201, 5103, 7881, 425)
-    Set c = AddLabel("lblAddress", "«·⁄‰Ê«‰", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "Address", 0)
-    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 5670, 2948, 425)
+    Set c = AddLabel("lblVATNumber", "«·—ﬁ„ «·÷—Ì»Ì", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "VATNumber", 0)
+    Set c = AddText("CRNumber", "CRNumber", 7201, 3969, 2948, 425)
+    Set c = AddLabel("lblCRNumber", "«·”Ã· «· Ã«—Ì", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "CRNumber", 0)
+    Set c = AddText("City", "City", 12134, 3969, 2948, 425)
+    Set c = AddLabel("lblCity", "«·„œÌ‰…", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "City", 0)
+    Set c = AddText("District", "District", 7201, 4536, 2948, 425)
+    Set c = AddLabel("lblDistrict", "«·ÕÌ", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "District", 0)
+    Set c = AddText("StreetName", "StreetName", 12134, 4536, 2948, 425)
+    Set c = AddLabel("lblStreetName", "«·‘«—⁄", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "StreetName", 0)
+    Set c = AddText("BuildingNo", "BuildingNo", 7201, 5103, 2948, 425)
+    Set c = AddLabel("lblBuildingNo", "—ﬁ„ «·„»‰Ï", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "BuildingNo", 0)
+    Set c = AddText("PostalCode", "PostalCode", 12134, 5103, 2948, 425)
+    Set c = AddLabel("lblPostalCode", "«·—„“ «·»—ÌœÌ", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "PostalCode", 0)
+    Set c = AddText("Address", "Address", 7201, 5670, 7881, 425)
+    Set c = AddLabel("lblAddress", "«·⁄‰Ê«‰", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "Address", 0)
+    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 6237, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "ControlTipText", "Ìıﬁ›· »⁄œ √Ê· ⁄„·Ì…"
     SetCtlProp c, "StatusBarText", "Ìıﬁ›· »⁄œ √Ê· ⁄„·Ì…"
-    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
-    Set c = AddText("CurrentBalance", "CurrentBalance", 12134, 5670, 2948, 425)
+    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
+    Set c = AddText("CurrentBalance", "CurrentBalance", 12134, 6237, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddLabel("lblCurrentBalance", "«·—’Ìœ «·Õ«·Ì", 10376, 5670, 1701, 425, 10, False, CLR_MUTED, "CurrentBalance", 0)
-    Set c = AddCheck("AllowCredit", "AllowCredit", 7201, 6322)
-    Set c = AddLabel("lblAllowCredit", "Ì”„Õ »«·»Ì⁄ «·¬Ã·", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "AllowCredit", 0)
-    Set c = AddText("CreditLimit", "CreditLimit", 12134, 6237, 2948, 425)
+    Set c = AddLabel("lblCurrentBalance", "«·—’Ìœ «·Õ«·Ì", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "CurrentBalance", 0)
+    Set c = AddCheck("AllowCredit", "AllowCredit", 7201, 6889)
+    Set c = AddLabel("lblAllowCredit", "Ì”„Õ »«·»Ì⁄ «·¬Ã·", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "AllowCredit", 0)
+    Set c = AddText("CreditLimit", "CreditLimit", 12134, 6804, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "ControlTipText", "0 = »œÊ‰ Õœ"
     SetCtlProp c, "StatusBarText", "0 = »œÊ‰ Õœ"
-    Set c = AddLabel("lblCreditLimit", "Õœ «·«∆ „«‰", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "CreditLimit", 0)
-    Set c = AddText("PaymentTermsDays", "PaymentTermsDays", 7201, 6804, 2948, 425)
+    Set c = AddLabel("lblCreditLimit", "Õœ «·«∆ „«‰", 10376, 6804, 1701, 425, 10, False, CLR_MUTED, "CreditLimit", 0)
+    Set c = AddText("PaymentTermsDays", "PaymentTermsDays", 7201, 7371, 2948, 425)
     SetCtlProp c, "ControlTipText", "«” Õﬁ«ﬁ «·›« Ê—… «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
     SetCtlProp c, "StatusBarText", "«” Õﬁ«ﬁ «·›« Ê—… «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
-    Set c = AddLabel("lblPaymentTermsDays", "„œ… «·”œ«œ (ÌÊ„)", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
-    Set c = AddCombo("SalesRepID", "SalesRepID", 12134, 6804, 2948, 425, "SELECT SalesRepID, RepName FROM SalesReps WHERE IsActive = True ORDER BY RepName", 2, "0;3402")
+    Set c = AddLabel("lblPaymentTermsDays", "„œ… «·”œ«œ (ÌÊ„)", 5443, 7371, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
+    Set c = AddCombo("SalesRepID", "SalesRepID", 12134, 7371, 2948, 425, "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", " ı‰”» ·Â ›Ê« Ì— «·⁄„Ì· Ê Õ’Ì·« Â"
     SetCtlProp c, "StatusBarText", " ı‰”» ·Â ›Ê« Ì— «·⁄„Ì· Ê Õ’Ì·« Â"
-    Set c = AddLabel("lblSalesRepID", "«·„‰œÊ»", 10376, 6804, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 7456)
-    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 7371, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ⁄·Ï «·⁄„Ì·", 10376, 7371, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 7938, 7881, 907)
+    Set c = AddLabel("lblSalesRepID", "«·„‰œÊ»", 10376, 7371, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 8023)
+    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 7938, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ⁄·Ï «·⁄„Ì·", 10376, 7938, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 8505, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
-    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 7938, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 9100, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 8505, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 9667, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -1479,8 +1481,8 @@ End Sub
 Private Sub BuildForm_frmSuppliers()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmSuppliers", "«·„Ê—œÊ‰", "SELECT * FROM Suppliers", 15309, 8646, True, True, True, _
-              "KIND=LIST|TABLE=Suppliers|PK=SupplierID|LIST=SELECT t.SupplierID, t.SupplierName AS [«·„Ê—œ], t.Mobile AS [—ﬁ„ «·ÃÊ«·], t.CurrentBalance AS [«·—’Ìœ] FROM Suppliers AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.SupplierName|SEARCH=t.SupplierName,t.ContactPerson,t.Mobile,t.VATNumber|ACTIVE=t.IsActive"
+    StartForm "frmSuppliers", "«·„Ê—œÊ‰", "SELECT * FROM Suppliers", 15309, 9213, True, True, True, _
+              "KIND=LIST|TABLE=Suppliers|PK=SupplierID|LIST=SELECT t.SupplierID, t.SupplierName AS [«·„Ê—œ], t.Mobile AS [—ﬁ„ «·ÃÊ«·], t.CurrentBalance AS [«·—’Ìœ] FROM [@Suppliers] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.SupplierName|SEARCH=t.SupplierName,t.SupplierNameEn,t.ContactPerson,t.Mobile,t.VATNumber|ACTIVE=t.IsActive"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE77B), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«·„Ê—œÊ‰", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -1511,54 +1513,56 @@ Private Sub BuildForm_frmSuppliers()
     SetCtlProp c, "DefaultValue", "False"
     c.AfterUpdate = EP
     Set c = AddLabel("lblShowInactive", "≈ŸÂ«— €Ì— «·‰‘ÿ", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
-    Set c = AddList("lstItems", 227, 3005, 4990, 5357, 4, "0;2495;1361;907", True)
+    Set c = AddList("lstItems", 227, 3005, 4990, 5924, 4, "0;2495;1361;907", True)
     c.AfterUpdate = EP
     Set c = AddText("SupplierName", "SupplierName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblSupplierName", "«”„ «·„Ê—œ *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "SupplierName", 0)
-    Set c = AddText("ContactPerson", "ContactPerson", 7201, 2268, 2948, 425)
-    Set c = AddLabel("lblContactPerson", "«·‘Œ’ «·„”ƒÊ·", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ContactPerson", 0)
-    Set c = AddText("Mobile", "Mobile", 12134, 2268, 2948, 425)
-    Set c = AddLabel("lblMobile", "«·ÃÊ«·", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "Mobile", 0)
-    Set c = AddText("Phone", "Phone", 7201, 2835, 2948, 425)
-    Set c = AddLabel("lblPhone", "«·Â« ›", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "Phone", 0)
-    Set c = AddText("Email", "Email", 12134, 2835, 2948, 425)
-    Set c = AddLabel("lblEmail", "«·»—Ìœ «·≈·ﬂ —Ê‰Ì", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "Email", 0)
-    Set c = AddText("VATNumber", "VATNumber", 7201, 3402, 2948, 425)
-    Set c = AddLabel("lblVATNumber", "«·—ﬁ„ «·÷—Ì»Ì", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "VATNumber", 0)
-    Set c = AddText("CRNumber", "CRNumber", 12134, 3402, 2948, 425)
-    Set c = AddLabel("lblCRNumber", "«·”Ã· «· Ã«—Ì", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "CRNumber", 0)
-    Set c = AddText("City", "City", 7201, 3969, 2948, 425)
-    Set c = AddLabel("lblCity", "«·„œÌ‰…", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "City", 0)
-    Set c = AddLabel("lblSupplierNote", " ", 10376, 3969, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddText("Address", "Address", 7201, 4536, 7881, 425)
-    Set c = AddLabel("lblAddress", "«·⁄‰Ê«‰", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "Address", 0)
-    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 5103, 2948, 425)
+    Set c = AddText("SupplierNameEn", "SupplierNameEn", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblSupplierNameEn", "«·«”„ »«·≈‰Ã·Ì“Ì…", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "SupplierNameEn", 0)
+    Set c = AddText("ContactPerson", "ContactPerson", 7201, 2835, 2948, 425)
+    Set c = AddLabel("lblContactPerson", "«·‘Œ’ «·„”ƒÊ·", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "ContactPerson", 0)
+    Set c = AddText("Mobile", "Mobile", 12134, 2835, 2948, 425)
+    Set c = AddLabel("lblMobile", "«·ÃÊ«·", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "Mobile", 0)
+    Set c = AddText("Phone", "Phone", 7201, 3402, 2948, 425)
+    Set c = AddLabel("lblPhone", "«·Â« ›", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "Phone", 0)
+    Set c = AddText("Email", "Email", 12134, 3402, 2948, 425)
+    Set c = AddLabel("lblEmail", "«·»—Ìœ «·≈·ﬂ —Ê‰Ì", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "Email", 0)
+    Set c = AddText("VATNumber", "VATNumber", 7201, 3969, 2948, 425)
+    Set c = AddLabel("lblVATNumber", "«·—ﬁ„ «·÷—Ì»Ì", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "VATNumber", 0)
+    Set c = AddText("CRNumber", "CRNumber", 12134, 3969, 2948, 425)
+    Set c = AddLabel("lblCRNumber", "«·”Ã· «· Ã«—Ì", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "CRNumber", 0)
+    Set c = AddText("City", "City", 7201, 4536, 2948, 425)
+    Set c = AddLabel("lblCity", "«·„œÌ‰…", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "City", 0)
+    Set c = AddLabel("lblSupplierNote", " ", 10376, 4536, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddText("Address", "Address", 7201, 5103, 7881, 425)
+    Set c = AddLabel("lblAddress", "«·⁄‰Ê«‰", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "Address", 0)
+    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 5670, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "ControlTipText", "Ìıﬁ›· »⁄œ √Ê· ⁄„·Ì…"
     SetCtlProp c, "StatusBarText", "Ìıﬁ›· »⁄œ √Ê· ⁄„·Ì…"
-    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
-    Set c = AddText("CurrentBalance", "CurrentBalance", 12134, 5103, 2948, 425)
+    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
+    Set c = AddText("CurrentBalance", "CurrentBalance", 12134, 5670, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddLabel("lblCurrentBalance", "«·—’Ìœ «·Õ«·Ì", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "CurrentBalance", 0)
-    Set c = AddText("PaymentTermsDays", "PaymentTermsDays", 7201, 5670, 2948, 425)
+    Set c = AddLabel("lblCurrentBalance", "«·—’Ìœ «·Õ«·Ì", 10376, 5670, 1701, 425, 10, False, CLR_MUTED, "CurrentBalance", 0)
+    Set c = AddText("PaymentTermsDays", "PaymentTermsDays", 7201, 6237, 2948, 425)
     SetCtlProp c, "ControlTipText", "«” Õﬁ«ﬁ ›« Ê—… «·‘—«¡ «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
     SetCtlProp c, "StatusBarText", "«” Õﬁ«ﬁ ›« Ê—… «·‘—«¡ «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
-    Set c = AddLabel("lblPaymentTermsDays", "„œ… «·”œ«œ (ÌÊ„)", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
-    Set c = AddCombo("CurrencyCode", "CurrencyCode", 12134, 5670, 2948, 425, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive = True ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
+    Set c = AddLabel("lblPaymentTermsDays", "„œ… «·”œ«œ (ÌÊ„)", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
+    Set c = AddCombo("CurrencyCode", "CurrencyCode", 12134, 6237, 2948, 425, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive = True ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
     SetCtlProp c, "ControlTipText", " ıﬁ —Õ ›Ì ›Ê« Ì—Â Ê”‰œ« Â"
     SetCtlProp c, "StatusBarText", " ıﬁ —Õ ›Ì ›Ê« Ì—Â Ê”‰œ« Â"
-    Set c = AddLabel("lblCurrencyCode", "⁄„·… «· ⁄«„·", 10376, 5670, 1701, 425, 10, False, CLR_MUTED, "CurrencyCode", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 6322)
-    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ··„Ê—œ (»«·—Ì«· œ«∆„«)", 10376, 6237, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 6804, 7881, 907)
+    Set c = AddLabel("lblCurrencyCode", "⁄„·… «· ⁄«„·", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "CurrencyCode", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 6889)
+    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ··„Ê—œ (»«·—Ì«· œ«∆„«)", 10376, 6804, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 7371, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
-    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 7966, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 7371, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 8533, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -1714,15 +1718,15 @@ Private Sub BuildForm_frmExpenses()
     Set c = AddLabel("lblTotalAmount", "«·≈Ã„«·Ì", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "TotalAmount", 0)
     Set c = AddText("SupplierInvoiceRef", "SupplierInvoiceRef", 12134, 4536, 2948, 425)
     Set c = AddLabel("lblSupplierInvoiceRef", "—ﬁ„ ›« Ê—… «·„’—Ê›", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "SupplierInvoiceRef", 0)
-    Set c = AddCombo("CashBoxID", "CashBoxID", 7201, 5103, 2948, 425, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3402")
+    Set c = AddCombo("CashBoxID", "CashBoxID", 7201, 5103, 2948, 425, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "«·„’—Ê› «·‰ﬁœÌ ÌıŒ’„ „‰ Â–« «·’‰œÊﬁ (ÌıŒ «— ’‰œÊﬁﬂ  ·ﬁ«∆Ì«)"
     SetCtlProp c, "StatusBarText", "«·„’—Ê› «·‰ﬁœÌ ÌıŒ’„ „‰ Â–« «·’‰œÊﬁ (ÌıŒ «— ’‰œÊﬁﬂ  ·ﬁ«∆Ì«)"
     Set c = AddLabel("lblCashBoxID", "’ı—› „‰ ’‰œÊﬁ", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "CashBoxID", 0)
-    Set c = AddCombo("BankID", "BankID", 12134, 5103, 2948, 425, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3402")
+    Set c = AddCombo("BankID", "BankID", 12134, 5103, 2948, 425, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "«· ÕÊÌ· «·»‰ﬂÌ ÌıŒ’„ „‰ Â–« «·»‰ﬂ («·»‰ﬂ «·«› —«÷Ì  ·ﬁ«∆Ì«)"
     SetCtlProp c, "StatusBarText", "«· ÕÊÌ· «·»‰ﬂÌ ÌıŒ’„ „‰ Â–« «·»‰ﬂ («·»‰ﬂ «·«› —«÷Ì  ·ﬁ«∆Ì«)"
     Set c = AddLabel("lblBankID", "«·»‰ﬂ", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "BankID", 0)
-    Set c = AddCombo("CostCenterID", "CostCenterID", 7201, 5670, 2948, 425, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;3402")
+    Set c = AddCombo("CostCenterID", "CostCenterID", 7201, 5670, 2948, 425, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "›«—€ = „—ﬂ“ «·„” Œœ„ √Ê «·„—ﬂ“ «·«› —«÷Ì"
     SetCtlProp c, "StatusBarText", "›«—€ = „—ﬂ“ «·„” Œœ„ √Ê «·„—ﬂ“ «·«› —«÷Ì"
     Set c = AddLabel("lblCostCenterID", "„—ﬂ“ «· ﬂ·›…", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "CostCenterID", 0)
@@ -2033,7 +2037,7 @@ Private Sub BuildForm_frmSalesReps()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmSalesReps", "«·„‰œÊ»Ì‰", "SELECT * FROM SalesReps", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=SalesReps|PK=SalesRepID|LIST=SELECT t.SalesRepID, t.RepCode AS [«·ﬂÊœ], t.RepName AS [«·„‰œÊ»], t.Region AS [«·„‰ÿﬁ… / Œÿ «·”Ì—] FROM SalesReps AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.RepName|SEARCH=t.RepCode,t.RepName,t.RepNameEn,t.Mobile,t.Region|ACTIVE=t.IsActive|SEQ=SALES_REP:RepCode|UNIQUE=RepCode,RepName"
+              "KIND=LIST|TABLE=SalesReps|PK=SalesRepID|LIST=SELECT t.SalesRepID, t.RepCode AS [«·ﬂÊœ], t.RepName AS [«·„‰œÊ»], t.Region AS [«·„‰ÿﬁ… / Œÿ «·”Ì—] FROM [@SalesReps] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.RepName|SEARCH=t.RepCode,t.RepName,t.RepNameEn,t.Mobile,t.Region|ACTIVE=t.IsActive|SEQ=SALES_REP:RepCode|UNIQUE=RepCode,RepName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«·„‰œÊ»Ì‰", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2087,7 +2091,7 @@ Private Sub BuildForm_frmSalesReps()
     Set c = AddLabel("lblCommissionRate", "‰”»… «·⁄„Ê·…", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "CommissionRate", 0)
     Set c = AddCombo("CommissionBase", "CommissionBase", 12134, 3969, 2948, 425, "SALES;’«›Ì «·„»Ì⁄«  (»œÊ‰ «·÷—Ì»…);COLLECTION;«· Õ’Ì·", 2, "0;2552")
     Set c = AddLabel("lblCommissionBase", "√”«” «·⁄„Ê·…", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "CommissionBase", 0)
-    Set c = AddCombo("CostCenterID", "CostCenterID", 7201, 4536, 2948, 425, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;3402")
+    Set c = AddCombo("CostCenterID", "CostCenterID", 7201, 4536, 2948, 425, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "„—ﬂ“ ﬁÌœ ⁄„Ê· Â"
     SetCtlProp c, "StatusBarText", "„—ﬂ“ ﬁÌœ ⁄„Ê· Â"
     Set c = AddLabel("lblCostCenterID", "„—ﬂ“ «· ﬂ·›…", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "CostCenterID", 0)
@@ -2169,7 +2173,7 @@ Private Sub BuildForm_frmRepTargets()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmRepTargets", "√Âœ«› «·„‰œÊ»Ì‰", "SELECT * FROM SalesRepTargets", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=SalesRepTargets|PK=TargetID|LIST=SELECT t.TargetID, s.RepName AS [«·„‰œÊ»], t.TargetYear & '/' & t.TargetMonth AS [«·‘Â—], t.TargetAmount AS [«·Âœ›] FROM SalesRepTargets AS t INNER JOIN SalesReps AS s ON t.SalesRepID = s.SalesRepID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.TargetYear DESC, t.TargetMonth DESC, s.RepName|SEARCH=s.RepName,s.RepCode"
+              "KIND=LIST|TABLE=SalesRepTargets|PK=TargetID|LIST=SELECT t.TargetID, s.RepName AS [«·„‰œÊ»], t.TargetYear & '/' & t.TargetMonth AS [«·‘Â—], t.TargetAmount AS [«·Âœ›] FROM SalesRepTargets AS t INNER JOIN [@SalesReps] AS s ON t.SalesRepID = s.SalesRepID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.TargetYear DESC, t.TargetMonth DESC, s.RepName|SEARCH=s.RepName,s.RepNameEn,s.RepCode"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "√Âœ«› «·„‰œÊ»Ì‰", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2190,7 +2194,7 @@ Private Sub BuildForm_frmRepTargets()
     c.OnChange = EP
     Set c = AddList("lstItems", 227, 2551, 4990, 5387, 4, "0;2268;1134;1361", True)
     c.AfterUpdate = EP
-    Set c = AddCombo("SalesRepID", "SalesRepID", 7201, 1701, 2948, 425, "SELECT SalesRepID, RepName FROM SalesReps WHERE IsActive = True ORDER BY RepName", 2, "0;3402")
+    Set c = AddCombo("SalesRepID", "SalesRepID", 7201, 1701, 2948, 425, "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName", 2, "0;3402")
     Set c = AddLabel("lblSalesRepID", "«·„‰œÊ» *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
     Set c = AddText("TargetYear", "TargetYear", 12134, 1701, 2948, 425)
     Set c = AddLabel("lblTargetYear", "«·”‰… *", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "TargetYear", 0)
@@ -2332,15 +2336,15 @@ Private Sub BuildForm_frmRecurring()
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
     Set c = AddLabel("lblLastCreatedDate", "¬Œ— „’—Ê› √ı‰‘∆", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "LastCreatedDate", 0)
-    Set c = AddCombo("CashBoxID", "CashBoxID", 7201, 5103, 2948, 425, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3402")
+    Set c = AddCombo("CashBoxID", "CashBoxID", 7201, 5103, 2948, 425, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "··œ›⁄ «·‰ﬁœÌ∫ ›«—€ = ’‰œÊﬁ „‰ Ìı‰‘∆ «·„’—Ê›"
     SetCtlProp c, "StatusBarText", "··œ›⁄ «·‰ﬁœÌ∫ ›«—€ = ’‰œÊﬁ „‰ Ìı‰‘∆ «·„’—Ê›"
     Set c = AddLabel("lblCashBoxID", "„‰ ’‰œÊﬁ", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "CashBoxID", 0)
-    Set c = AddCombo("BankID", "BankID", 12134, 5103, 2948, 425, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3402")
+    Set c = AddCombo("BankID", "BankID", 12134, 5103, 2948, 425, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "·· ÕÊÌ· «·»‰ﬂÌ∫ ›«—€ = «·»‰ﬂ «·«› —«÷Ì"
     SetCtlProp c, "StatusBarText", "·· ÕÊÌ· «·»‰ﬂÌ∫ ›«—€ = «·»‰ﬂ «·«› —«÷Ì"
     Set c = AddLabel("lblBankID", "„‰ »‰ﬂ", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "BankID", 0)
-    Set c = AddCombo("CostCenterID", "CostCenterID", 7201, 5670, 2948, 425, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;3402")
+    Set c = AddCombo("CostCenterID", "CostCenterID", 7201, 5670, 2948, 425, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "›«—€ = „—ﬂ“ „‰ Ìı‰‘∆ «·„’—Ê›"
     SetCtlProp c, "StatusBarText", "›«—€ = „—ﬂ“ „‰ Ìı‰‘∆ «·„’—Ê›"
     Set c = AddLabel("lblCostCenterID", "„—ﬂ“ «· ﬂ·›…", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "CostCenterID", 0)
@@ -2476,7 +2480,7 @@ Private Sub BuildForm_frmUsers()
     Set c = AddLabel("lblMaxDiscountPercent", "√ﬁ’Ï ‰”»… Œ’„", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "MaxDiscountPercent", 0)
     Set c = AddCheck("IsActive", "IsActive", 12134, 3487)
     Set c = AddLabel("lblIsActive", "‰‘ÿ", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddCombo("CashBoxID", "CashBoxID", 7201, 3969, 2948, 425, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3402")
+    Set c = AddCombo("CashBoxID", "CashBoxID", 7201, 3969, 2948, 425, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "‰ﬁœÌ… „»Ì⁄«  «·„” Œœ„ Ê”‰œ« Â  œŒ· Â–« «·’‰œÊﬁ∫ ›«—€ = √Ê· ’‰œÊﬁ ﬂ«‘Ì—"
     SetCtlProp c, "StatusBarText", "‰ﬁœÌ… „»Ì⁄«  «·„” Œœ„ Ê”‰œ« Â  œŒ· Â–« «·’‰œÊﬁ∫ ›«—€ = √Ê· ’‰œÊﬁ ﬂ«‘Ì—"
     Set c = AddLabel("lblCashBoxID", "’‰œÊﬁ «·‰ﬁœÌ…", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "CashBoxID", 0)
@@ -2581,7 +2585,7 @@ Private Sub BuildForm_frmCostCenters()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmCostCenters", "„—«ﬂ“ «· ﬂ·›…", "SELECT * FROM CostCenters", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=CostCenters|PK=CostCenterID|LIST=SELECT t.CostCenterID, t.CenterCode AS [«·—„“], t.CenterName AS [«·„—ﬂ“], IIf(t.IsDefault, '«› —«÷Ì', '') AS [«·Õ«·…] FROM CostCenters AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CenterCode|SEARCH=t.CenterCode,t.CenterName|ACTIVE=t.IsActive|UNIQUE=CenterCode,CenterName"
+              "KIND=LIST|TABLE=CostCenters|PK=CostCenterID|LIST=SELECT t.CostCenterID, t.CenterCode AS [«·—„“], t.CenterName AS [«·„—ﬂ“], IIf(t.IsDefault, '«› —«÷Ì', '') AS [«·Õ«·…] FROM [@CostCenters] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CenterCode|SEARCH=t.CenterCode,t.CenterName,t.CenterNameEn|ACTIVE=t.IsActive|UNIQUE=CenterCode,CenterName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "„—«ﬂ“ «· ﬂ·›…", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2610,13 +2614,15 @@ Private Sub BuildForm_frmCostCenters()
     Set c = AddLabel("lblCenterCode", "—„“ «·„—ﬂ“ *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "CenterCode", 0)
     Set c = AddText("CenterName", "CenterName", 12134, 1701, 2948, 425)
     Set c = AddLabel("lblCenterName", "«”„ «·„—ﬂ“ *", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "CenterName", 0)
-    Set c = AddCheck("IsDefault", "IsDefault", 7201, 2353)
+    Set c = AddText("CenterNameEn", "CenterNameEn", 7201, 2268, 2948, 425)
+    Set c = AddLabel("lblCenterNameEn", "«·«”„ »«·≈‰Ã·Ì“Ì…", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "CenterNameEn", 0)
+    Set c = AddCheck("IsDefault", "IsDefault", 12134, 2353)
     SetCtlProp c, "ControlTipText", "·„‰ ·« „—ﬂ“ ·Â „‰ «·„” Œœ„Ì‰"
     SetCtlProp c, "StatusBarText", "·„‰ ·« „—ﬂ“ ·Â „‰ «·„” Œœ„Ì‰"
-    Set c = AddLabel("lblIsDefault", "«·„—ﬂ“ «·«› —«÷Ì", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "IsDefault", 0)
-    Set c = AddCheck("IsActive", "IsActive", 12134, 2353)
-    Set c = AddLabel("lblIsActive", "‰‘ÿ", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblCenterNote", "„—ﬂ“ «·„ÊŸ› „‰ ‘«‘… —Ê« » «·„ÊŸ›Ì‰∫ «·„” ‰œ«  «·ﬁœÌ„… ´€Ì— „Ê“⁄…ª", 5443, 2835, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddLabel("lblIsDefault", "«·„—ﬂ“ «·«› —«÷Ì", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "IsDefault", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 2920)
+    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblCenterNote", "„—ﬂ“ «·„ÊŸ› „‰ ‘«‘… —Ê« » «·„ÊŸ›Ì‰∫ «·„” ‰œ«  «·ﬁœÌ„… ´€Ì— „Ê“⁄…ª", 10376, 2835, 4706, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddText("Notes", "Notes", 7201, 3402, 7881, 425)
     Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
     Set c = AddLabel("lblStatus", " ", 5443, 4082, 9639, 340, 10, True, CLR_MUTED, "", 0)
@@ -2739,7 +2745,7 @@ Private Sub BuildForm_frmEmployeePay()
     Set c = AddLabel("lblNationalID", "—ﬁ„ «·ÂÊÌ… / «·≈ﬁ«„…", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "NationalID", 0)
     Set c = AddText("IBAN", "IBAN", 12134, 4536, 2948, 425)
     Set c = AddLabel("lblIBAN", "¬Ì»«‰ «·„ÊŸ›", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "IBAN", 0)
-    Set c = AddCombo("CostCenterID", "CostCenterID", 7201, 5103, 2948, 425, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;3402")
+    Set c = AddCombo("CostCenterID", "CostCenterID", 7201, 5103, 2948, 425, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "„»Ì⁄« Â Ê„”Ì— —« »Â ⁄·Ï Â–« «·„—ﬂ“"
     SetCtlProp c, "StatusBarText", "„»Ì⁄« Â Ê„”Ì— —« »Â ⁄·Ï Â–« «·„—ﬂ“"
     Set c = AddLabel("lblCostCenterID", "„—ﬂ“ «· ﬂ·›…", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "CostCenterID", 0)
@@ -3117,7 +3123,7 @@ Private Sub BuildForm_frmCashBoxes()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmCashBoxes", "«·’‰«œÌﬁ", "SELECT * FROM CashBoxes", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=CashBoxes|PK=CashBoxID|LIST=SELECT t.CashBoxID, t.BoxName AS [«·’‰œÊﬁ], IIf(t.BoxType = 'MAIN', 'Œ“Ì‰…', 'ﬂ«‘Ì—') AS [«·‰Ê⁄] FROM CashBoxes AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.BoxType DESC, t.BoxName|SEARCH=t.BoxName,t.Notes|ACTIVE=t.IsActive|UNIQUE=BoxName"
+              "KIND=LIST|TABLE=CashBoxes|PK=CashBoxID|LIST=SELECT t.CashBoxID, t.BoxName AS [«·’‰œÊﬁ], IIf(t.BoxType = 'MAIN', 'Œ“Ì‰…', 'ﬂ«‘Ì—') AS [«·‰Ê⁄] FROM [@CashBoxes] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.BoxType DESC, t.BoxName|SEARCH=t.BoxName,t.BoxNameEn,t.Notes|ACTIVE=t.IsActive|UNIQUE=BoxName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«·’‰«œÌﬁ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -3146,22 +3152,24 @@ Private Sub BuildForm_frmCashBoxes()
     c.AfterUpdate = EP
     Set c = AddText("BoxName", "BoxName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblBoxName", "«”„ «·’‰œÊﬁ *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "BoxName", 0)
-    Set c = AddCombo("BoxType", "BoxType", 7201, 2268, 2948, 425, "MAIN;Œ“Ì‰… —∆Ì”Ì…;CASHIER;’‰œÊﬁ ﬂ«‘Ì—", 2, "0;2835")
-    Set c = AddLabel("lblBoxType", "«·‰Ê⁄", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "BoxType", 0)
-    Set c = AddCheck("IsActive", "IsActive", 12134, 2353)
-    Set c = AddLabel("lblIsActive", "‰‘ÿ", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 2835, 2948, 425)
+    Set c = AddText("BoxNameEn", "BoxNameEn", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblBoxNameEn", "«·«”„ »«·≈‰Ã·Ì“Ì…", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "BoxNameEn", 0)
+    Set c = AddCombo("BoxType", "BoxType", 7201, 2835, 2948, 425, "MAIN;Œ“Ì‰… —∆Ì”Ì…;CASHIER;’‰œÊﬁ ﬂ«‘Ì—", 2, "0;2835")
+    Set c = AddLabel("lblBoxType", "«·‰Ê⁄", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "BoxType", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 2920)
+    Set c = AddLabel("lblIsActive", "‰‘ÿ", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 3402, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "ControlTipText", "«·‰ﬁœÌ… «·„ÊÃÊœ… ›Ì «·’‰œÊﬁ ⁄‰œ »œ¡ «” Œœ«„ «·»—‰«„Ã"
     SetCtlProp c, "StatusBarText", "«·‰ﬁœÌ… «·„ÊÃÊœ… ›Ì «·’‰œÊﬁ ⁄‰œ »œ¡ «” Œœ«„ «·»—‰«„Ã"
-    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
-    Set c = AddText("OpeningDate", "OpeningDate", 12134, 2835, 2948, 425)
+    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
+    Set c = AddText("OpeningDate", "OpeningDate", 12134, 3402, 2948, 425)
     SetCtlProp c, "Format", "yyyy/mm/dd"
-    Set c = AddLabel("lblOpeningDate", " «—ÌŒ «·—’Ìœ «·«›  «ÕÌ", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "OpeningDate", 0)
-    Set c = AddLabel("lblBoxNote", "«·—’Ìœ ·« Ìıﬂ » ÌœÊÌ«: ÌıÕ”» „‰ «·„»Ì⁄«  Ê«·”‰œ«  Ê«·„’—Ê›« ", 5443, 3402, 9639, 425, 10, True, CLR_ACCENT, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 3969, 7881, 425)
-    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 4649, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblOpeningDate", " «—ÌŒ «·—’Ìœ «·«›  «ÕÌ", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "OpeningDate", 0)
+    Set c = AddLabel("lblBoxNote", "«·—’Ìœ ·« Ìıﬂ » ÌœÊÌ«: ÌıÕ”» „‰ «·„»Ì⁄«  Ê«·”‰œ«  Ê«·„’—Ê›« ", 5443, 3969, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 4536, 7881, 425)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 5216, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -3228,7 +3236,7 @@ Private Sub BuildForm_frmBanks()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmBanks", "«·»‰Êﬂ", "SELECT * FROM Banks", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=Banks|PK=BankID|LIST=SELECT t.BankID, t.BankName AS [«·»‰ﬂ], t.AccountNo AS [—ﬁ„ «·Õ”«»] FROM Banks AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.BankName|SEARCH=t.BankName,t.AccountNo,t.IBAN|ACTIVE=t.IsActive|UNIQUE=BankName"
+              "KIND=LIST|TABLE=Banks|PK=BankID|LIST=SELECT t.BankID, t.BankName AS [«·»‰ﬂ], t.AccountNo AS [—ﬁ„ «·Õ”«»] FROM [@Banks] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.BankName|SEARCH=t.BankName,t.BankNameEn,t.AccountNo,t.IBAN|ACTIVE=t.IsActive|UNIQUE=BankName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«·»‰Êﬂ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -3263,24 +3271,26 @@ Private Sub BuildForm_frmBanks()
     c.AfterUpdate = EP
     Set c = AddText("BankName", "BankName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblBankName", "«”„ «·»‰ﬂ / «·Õ”«» *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "BankName", 0)
-    Set c = AddText("AccountNo", "AccountNo", 7201, 2268, 2948, 425)
-    Set c = AddLabel("lblAccountNo", "—ﬁ„ «·Õ”«»", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "AccountNo", 0)
-    Set c = AddText("IBAN", "IBAN", 12134, 2268, 2948, 425)
-    Set c = AddLabel("lblIBAN", "«·¬Ì»«‰", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "IBAN", 0)
-    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 2835, 2948, 425)
+    Set c = AddText("BankNameEn", "BankNameEn", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblBankNameEn", "«·«”„ »«·≈‰Ã·Ì“Ì…", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "BankNameEn", 0)
+    Set c = AddText("AccountNo", "AccountNo", 7201, 2835, 2948, 425)
+    Set c = AddLabel("lblAccountNo", "—ﬁ„ «·Õ”«»", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "AccountNo", 0)
+    Set c = AddText("IBAN", "IBAN", 12134, 2835, 2948, 425)
+    Set c = AddLabel("lblIBAN", "«·¬Ì»«‰", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "IBAN", 0)
+    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 3402, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "ControlTipText", "—’Ìœ «·Õ”«» ›Ì «·»‰ﬂ ⁄‰œ »œ¡ «” Œœ«„ «·»—‰«„Ã"
     SetCtlProp c, "StatusBarText", "—’Ìœ «·Õ”«» ›Ì «·»‰ﬂ ⁄‰œ »œ¡ «” Œœ«„ «·»—‰«„Ã"
-    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
-    Set c = AddText("OpeningDate", "OpeningDate", 12134, 2835, 2948, 425)
+    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
+    Set c = AddText("OpeningDate", "OpeningDate", 12134, 3402, 2948, 425)
     SetCtlProp c, "Format", "yyyy/mm/dd"
-    Set c = AddLabel("lblOpeningDate", " «—ÌŒ «·—’Ìœ «·«›  «ÕÌ", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "OpeningDate", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 3487)
-    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBankNote", "Õ”«» «·»‰ﬂ ›Ì «·œ·Ì· = 120000 + —ﬁ„Â° Ê«·—’Ìœ „‰ «·ﬁÌÊœ", 10376, 3402, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 3969, 7881, 425)
-    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 4649, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblOpeningDate", " «—ÌŒ «·—’Ìœ «·«›  «ÕÌ", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "OpeningDate", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 4054)
+    Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblBankNote", "Õ”«» «·»‰ﬂ ›Ì «·œ·Ì· = 120000 + —ﬁ„Â° Ê«·—’Ìœ „‰ «·ﬁÌÊœ", 10376, 3969, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 4536, 7881, 425)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 5216, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -3585,7 +3595,7 @@ Private Sub BuildForm_frmSettings()
     SetCtlProp c, "ControlTipText", "0 = ·« Ì Êﬁ› «·»Ì⁄ «·¬Ã· »”»» «· √ŒÌ—"
     SetCtlProp c, "StatusBarText", "0 = ·« Ì Êﬁ› «·»Ì⁄ «·¬Ã· »”»» «· √ŒÌ—"
     Set c = AddLabel("lblCreditBlockDays", "≈Ìﬁ«› «·»Ì⁄ «·¬Ã· ·⁄„Ì· „ √Œ— √ﬂÀ— „‰ (ÌÊ„)", 7768, 7938, 2268, 425, 10, False, CLR_MUTED, "CreditBlockDays", 0)
-    Set c = AddCombo("DefaultBankID", "DefaultBankID", 2552, 8505, 4989, 425, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3402")
+    Set c = AddCombo("DefaultBankID", "DefaultBankID", 2552, 8505, 4989, 425, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "«· ÕÊÌ·«  «·»‰ﬂÌ… ›Ì «·›Ê« Ì— Ê«·”‰œ«   ıﬁÌÛ¯œ ›ÌÂ"
     SetCtlProp c, "StatusBarText", "«· ÕÊÌ·«  «·»‰ﬂÌ… ›Ì «·›Ê« Ì— Ê«·”‰œ«   ıﬁÌÛ¯œ ›ÌÂ"
     Set c = AddLabel("lblDefaultBankID", "«·»‰ﬂ «·«› —«÷Ì ·· ÕÊÌ·«  «·»‰ﬂÌ…", 227, 8505, 2268, 425, 10, False, CLR_MUTED, "DefaultBankID", 0)
@@ -3879,13 +3889,13 @@ Private Sub BuildForm_frmReportCenter()
     c.OnClick = EP
     Set c = AddButton("btnThisYear", "Â–Â «·”‰…", 10944, 2948, 1644, 425, "secondary")
     c.OnClick = EP
-    Set c = AddCombo("cboCustomer", "", 5670, 3912, 4593, 454, "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName", 2, "0;4536")
+    Set c = AddCombo("cboCustomer", "", 5670, 3912, 4593, 454, "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c ORDER BY c.CustomerName", 2, "0;4536")
     Set c = AddLabel("lblCustomer", "«·⁄„Ì·", 5670, 3600, 4593, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
-    Set c = AddCombo("cboSupplier", "", 10490, 3912, 4593, 454, "SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName", 2, "0;4536")
+    Set c = AddCombo("cboSupplier", "", 10490, 3912, 4593, 454, "SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s ORDER BY s.SupplierName", 2, "0;4536")
     Set c = AddLabel("lblSupplier", "«·„Ê—œ", 10490, 3600, 4593, 284, 9, False, CLR_MUTED, "cboSupplier", 0)
     Set c = AddCombo("cboProduct", "", 5670, 4734, 4593, 454, "SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Item FROM Products ORDER BY ProductName", 2, "0;4536")
     Set c = AddLabel("lblProduct", "«·„‰ Ã", 5670, 4422, 4593, 284, 9, False, CLR_MUTED, "cboProduct", 0)
-    Set c = AddCombo("cboCashBox", "", 10490, 4734, 4593, 454, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;4536")
+    Set c = AddCombo("cboCashBox", "", 10490, 4734, 4593, 454, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;4536")
     Set c = AddLabel("lblCashBox", "«·Œ“Ì‰… / «·’‰œÊﬁ", 10490, 4422, 4593, 284, 9, False, CLR_MUTED, "cboCashBox", 0)
     Set c = AddCombo("cboExpenseType", "", 5670, 5556, 4593, 454, "SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x ORDER BY x.ExpenseTypeName", 2, "0;4536")
     Set c = AddLabel("lblExpenseType", "‰Ê⁄ «·„’—Ê›", 5670, 5244, 4593, 284, 9, False, CLR_MUTED, "cboExpenseType", 0)
@@ -4046,7 +4056,7 @@ Private Sub BuildForm_frmPOS()
     c.OnClick = EP
     Set c = AddButton("btnReprint", "≈⁄«œ… ÿ»«⁄…", 10204, 7881, 1588, 624, "secondary")
     c.OnClick = EP
-    Set c = AddCombo("cboCustomer", "", 12474, 1304, 6294, 454, "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName", 2, "0;5670")
+    Set c = AddCombo("cboCustomer", "", 12474, 1304, 6294, 454, "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c ORDER BY c.CustomerName", 2, "0;5670")
     c.AfterUpdate = EP
     Set c = AddLabel("lblCustomer", "«·⁄„Ì·", 12474, 992, 6294, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
     Set c = AddLabel("lblCustomerInfo", " ", 12474, 1786, 6294, 284, 9, False, CLR_MUTED, "", 0)
@@ -4287,7 +4297,7 @@ Private Sub BuildForm_frmCustomerPayment()
     Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "”‰œ ﬁ»÷", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", " ”ÃÌ· œ›⁄… „‰ ⁄„Ì· ⁄·Ï Õ”«»Â", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddCombo("cboCustomer", "", 227, 1361, 8618, 454, "SELECT CustomerID, CustomerName FROM Customers WHERE IsSystem = False AND IsActive = True ORDER BY CustomerName", 2, "0;5670")
+    Set c = AddCombo("cboCustomer", "", 227, 1361, 8618, 454, "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsSystem = False AND c.IsActive = True ORDER BY c.CustomerName", 2, "0;5670")
     c.AfterUpdate = EP
     Set c = AddLabel("lblCustomer", "«·⁄„Ì·", 227, 1049, 8618, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
     Set c = AddLabel("lblBalance", " ", 227, 1871, 8618, 340, 11, True, CLR_PRIMARY, "", 0)
@@ -4494,7 +4504,7 @@ Private Sub BuildForm_frmPurchaseInvoice()
     c.OnClick = EP
     Set c = AddButton("btnLastInvoice", "¬Œ— ›« Ê—…", 9751, 8448, 1588, 624, "secondary")
     c.OnClick = EP
-    Set c = AddCombo("cboSupplier", "", 12474, 1304, 6294, 454, "SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName", 2, "0;5670")
+    Set c = AddCombo("cboSupplier", "", 12474, 1304, 6294, 454, "SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive = True ORDER BY s.SupplierName", 2, "0;5670")
     c.AfterUpdate = EP
     Set c = AddLabel("lblSupplier", "«·„Ê—œ *", 12474, 992, 6294, 284, 9, False, CLR_MUTED, "cboSupplier", 0)
     Set c = AddLabel("lblSupplierInfo", " ", 12474, 1786, 6294, 284, 9, False, CLR_MUTED, "", 0)
@@ -4757,7 +4767,7 @@ Private Sub BuildForm_frmSupplierPayment()
     Set c = AddIcon("icoTitle", ChrW(&HE77B), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "”‰œ ’—›", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", " ”ÃÌ· œ›⁄… ·„Ê—œ „‰ Õ”«»Â", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddCombo("cboSupplier", "", 227, 1361, 8618, 454, "SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName", 2, "0;5670")
+    Set c = AddCombo("cboSupplier", "", 227, 1361, 8618, 454, "SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive = True ORDER BY s.SupplierName", 2, "0;5670")
     c.AfterUpdate = EP
     Set c = AddLabel("lblSupplier", "«·„Ê—œ", 227, 1049, 8618, 284, 9, False, CLR_MUTED, "cboSupplier", 0)
     Set c = AddLabel("lblBalance", " ", 227, 1871, 8618, 340, 11, True, CLR_PRIMARY, "", 0)
@@ -5755,7 +5765,7 @@ Private Sub BuildForm_frmTouchPOS()
     c.AfterUpdate = EP
     Set c = AddLabel("lblTable", "—ﬁ„ «·ÿ«Ê·…", 3572, 2098, 2835, 284, 9, False, CLR_MUTED, "cboTable", 0)
     Set c = AddLabel("lblTakeaway", "ÿ·» ”›—Ì: Ìı€·Û¯› ÊÌı”·Û¯„ ··⁄„Ì·", 170, 2410, 6237, 567, 14, True, CLR_MUTED, "", 2)
-    Set c = AddCombo("cboCustomer", "", 3345, 2410, 3062, 482, "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName", 2, "0;5670")
+    Set c = AddCombo("cboCustomer", "", 3345, 2410, 3062, 482, "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c ORDER BY c.CustomerName", 2, "0;5670")
     c.FontSize = 12
     c.AfterUpdate = EP
     Set c = AddLabel("lblCustomer", "«·⁄„Ì· («Œ Ì«—Ì)", 3345, 2098, 3062, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
@@ -6302,7 +6312,7 @@ Private Sub BuildForm_frmCafePOS()
     SetCtlProp c, "Visible", False
     Set c = AddCombo("cboPaymentMethod", "", 10458, 57, 170, 170, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;2835")
     SetCtlProp c, "Visible", False
-    Set c = AddCombo("cboCustomer", "", 10656, 57, 170, 170, "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName", 2, "0;5670")
+    Set c = AddCombo("cboCustomer", "", 10656, 57, 170, 170, "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c ORDER BY c.CustomerName", 2, "0;5670")
     SetCtlProp c, "Visible", False
     Set c = AddLabel("lblChange", " ", 10854, 57, 170, 170, 10, False, CLR_TEXT, "", 0)
     SetCtlProp c, "Visible", False
@@ -7263,7 +7273,7 @@ Private Sub BuildForm_frmManualLines()
     c.AfterUpdate = EP
     Set c = AddText("LineText", "LineText", 9325, 0, 3175, 425)
     c.AfterUpdate = EP
-    Set c = AddCombo("LineCenter", "LineCenter", 12528, 0, 1758, 425, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;1701")
+    Set c = AddCombo("LineCenter", "LineCenter", 12528, 0, 1758, 425, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;1701")
     SetCtlProp c, "BoundColumn", 1
     SetCtlProp c, "LimitToList", True
     Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 14314, 17, 454, 391, "danger")
@@ -7988,15 +7998,15 @@ Private Sub BuildForm_frmBankTx()
     Set c = AddText("txtDate", "", 3515, 1304, 1701, 454)
     SetCtlProp c, "Format", "yyyy/mm/dd"
     Set c = AddLabel("lblDate", "«· «—ÌŒ", 3515, 992, 1701, 284, 9, False, CLR_MUTED, "txtDate", 0)
-    Set c = AddCombo("cboBank", "", 5330, 1304, 2948, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    Set c = AddCombo("cboBank", "", 5330, 1304, 2948, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
     Set c = AddLabel("lblBank", "«·»‰ﬂ", 5330, 992, 2948, 284, 9, False, CLR_MUTED, "cboBank", 0)
-    Set c = AddCombo("cboToBank", "", 8392, 1304, 2948, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    Set c = AddCombo("cboToBank", "", 8392, 1304, 2948, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
     Set c = AddLabel("lblToBank", "≈·Ï »‰ﬂ («· ÕÊÌ·)", 8392, 992, 2948, 284, 9, False, CLR_MUTED, "cboToBank", 0)
-    Set c = AddCombo("cboBox", "", 11453, 1304, 3062, 454, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3969")
+    Set c = AddCombo("cboBox", "", 11453, 1304, 3062, 454, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
     Set c = AddLabel("lblBox", "«·’‰œÊﬁ (≈Ìœ«⁄ / ”Õ»)", 11453, 992, 3062, 284, 9, False, CLR_MUTED, "cboBox", 0)
@@ -8024,7 +8034,7 @@ Private Sub BuildForm_frmBankTx()
     c.OnClick = EP
     Set c = AddLabel("lblListCap", "«·Õ—ﬂ«  «·„”Ã·…", 227, 3515, 6804, 312, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstTx", 227, 3856, 14288, 5443, 7, "0;1474;1361;1361;2268;1701;5670", True)
-    c.RowSource = Tr("SELECT t.BankTxID, t.TxNumber AS [«·—ﬁ„], Format(t.TxDate, 'yyyy/mm/dd') AS [«· «—ÌŒ], IIf(t.TxType = 'DEPOSIT', '≈Ìœ«⁄', IIf(t.TxType = 'WITHDRAW', '”Õ»', IIf(t.TxType = 'SETTLEMENT', ' ”ÊÌ… „œÏ', IIf(t.TxType = 'TRANSFER', ' ÕÊÌ·', IIf(t.TxType = 'OTHER_IN', 'Ê«—œ', '’«œ—'))))) AS [«·‰Ê⁄], k.BankName AS [«·»‰ﬂ], Format(t.Amount, '#,##0.00') AS [„»·€ «·Õ—ﬂ…], t.Description AS [ ›«’Ì· «·⁄„·Ì…] FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID ORDER BY t.TxDate DESC, t.BankTxID DESC")
+    c.RowSource = Tr("SELECT t.BankTxID, t.TxNumber AS [«·—ﬁ„], Format(t.TxDate, 'yyyy/mm/dd') AS [«· «—ÌŒ], IIf(t.TxType = 'DEPOSIT', '≈Ìœ«⁄', IIf(t.TxType = 'WITHDRAW', '”Õ»', IIf(t.TxType = 'SETTLEMENT', ' ”ÊÌ… „œÏ', IIf(t.TxType = 'TRANSFER', ' ÕÊÌ·', IIf(t.TxType = 'OTHER_IN', 'Ê«—œ', '’«œ—'))))) AS [«·‰Ê⁄], k.BankName AS [«·»‰ﬂ], Format(t.Amount, '#,##0.00') AS [„»·€ «·Õ—ﬂ…], t.Description AS [ ›«’Ì· «·⁄„·Ì…] FROM BankTransactions AS t INNER JOIN [@Banks] AS k ON t.BankID = k.BankID ORDER BY t.TxDate DESC, t.BankTxID DESC")
     Set c = AddButton("btnDelete", "Õ–› «·Õ—ﬂ…", 227, 9469, 1701, 510, "danger")
     c.OnClick = EP
     Set c = AddButton("btnRecon", "«· ”ÊÌ… «·»‰ﬂÌ…", 2041, 9469, 1928, 510, "secondary")
@@ -8084,7 +8094,7 @@ Private Sub BuildForm_frmBankRecon()
     Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«· ”ÊÌ… «·»‰ﬂÌ…", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", "„ÿ«»ﬁ… ﬂ‘› «·»‰ﬂ „⁄ «·œ›« —: ⁄·ˆ¯„ «·⁄„·Ì«  «·Ÿ«Â—… ›Ì «·ﬂ‘›", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddCombo("cboBank", "", 227, 1304, 3062, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    Set c = AddCombo("cboBank", "", 227, 1304, 3062, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
     Set c = AddLabel("lblBank", "«·»‰ﬂ", 227, 992, 3062, 284, 9, False, CLR_MUTED, "cboBank", 0)
@@ -8214,7 +8224,7 @@ Private Sub BuildForm_frmCheques()
     Set c = AddLabel("lblChequeNo", "—ﬁ„ «·‘Ìﬂ", 3742, 2268, 1701, 284, 9, False, CLR_MUTED, "txtChequeNo", 0)
     Set c = AddText("txtDrawerBank", "", 5557, 2580, 2268, 454)
     Set c = AddLabel("lblDrawerBank", "»‰ﬂ «·”«Õ» («·Ê«—œ)", 5557, 2268, 2268, 284, 9, False, CLR_MUTED, "txtDrawerBank", 0)
-    Set c = AddCombo("cboBank", "", 7938, 2580, 2495, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    Set c = AddCombo("cboBank", "", 7938, 2580, 2495, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblBank", "»‰ﬂ‰« («·’«œ—: «·„”ÕÊ» ⁄·ÌÂ)", 7938, 2268, 2495, 284, 9, False, CLR_MUTED, "cboBank", 0)
     Set c = AddText("txtIssueDate", "", 10546, 2580, 1474, 454)
@@ -8234,7 +8244,7 @@ Private Sub BuildForm_frmCheques()
     Set c = AddText("txtActionDate", "", 227, 9242, 1588, 454)
     SetCtlProp c, "Format", "yyyy/mm/dd"
     Set c = AddLabel("lblActionDate", " «—ÌŒ «·⁄„·Ì…", 227, 8930, 1588, 284, 9, False, CLR_MUTED, "txtActionDate", 0)
-    Set c = AddCombo("cboActionBank", "", 1928, 9242, 2495, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    Set c = AddCombo("cboActionBank", "", 1928, 9242, 2495, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblActionBank", "«·»‰ﬂ («· Õ’Ì· / «·’—›)", 1928, 8930, 2495, 284, 9, False, CLR_MUTED, "cboActionBank", 0)
     Set c = AddButton("btnCollect", " Õ’Ì· ›Ì «·»‰ﬂ", 4536, 9242, 1928, 454, "primary")
@@ -8323,10 +8333,10 @@ Private Sub BuildForm_frmAssets()
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
     Set c = AddLabel("lblSource", "„’œ— «·‘—«¡", 1928, 1814, 3175, 284, 9, False, CLR_MUTED, "cboSource", 0)
-    Set c = AddCombo("cboBank", "", 5216, 2126, 2041, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    Set c = AddCombo("cboBank", "", 5216, 2126, 2041, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblBank", "«·»‰ﬂ", 5216, 1814, 2041, 284, 9, False, CLR_MUTED, "cboBank", 0)
-    Set c = AddCombo("cboBox", "", 7371, 2126, 1928, 454, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3969")
+    Set c = AddCombo("cboBox", "", 7371, 2126, 1928, 454, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblBox", "«·’‰œÊﬁ", 7371, 1814, 1928, 284, 9, False, CLR_MUTED, "cboBox", 0)
     Set c = AddCombo("cboCounter", "", 9412, 2126, 3175, 454, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, 2100) ORDER BY TreeKey", 2, "0;3062")
@@ -8337,7 +8347,7 @@ Private Sub BuildForm_frmAssets()
     Set c = AddLabel("lblOpeningAccum", "≈Â·«ﬂ ”«»ﬁ", 12701, 1814, 2381, 284, 9, False, CLR_MUTED, "txtOpeningAccum", 0)
     Set c = AddText("txtNotes", "", 227, 2948, 4196, 454)
     Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 227, 2636, 4196, 284, 9, False, CLR_MUTED, "txtNotes", 0)
-    Set c = AddCombo("cboCenter", "", 4536, 2948, 1928, 454, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;3969")
+    Set c = AddCombo("cboCenter", "", 4536, 2948, 1928, 454, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblCenter", "„—ﬂ“ «· ﬂ·›…", 4536, 2636, 1928, 284, 9, False, CLR_MUTED, "cboCenter", 0)
     Set c = AddButton("btnSave", "Õ›Ÿ «·√’·", 6577, 2948, 1701, 454, "primary")
@@ -8364,10 +8374,10 @@ Private Sub BuildForm_frmAssets()
     Set c = AddText("txtProceeds", "", 5216, 9497, 1474, 454)
     SetCtlProp c, "Format", "#,##0.00"
     Set c = AddLabel("lblProceeds", "À„‰ «·»Ì⁄", 5216, 9185, 1474, 284, 9, False, CLR_MUTED, "txtProceeds", 0)
-    Set c = AddCombo("cboDisposalBank", "", 6804, 9497, 1928, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    Set c = AddCombo("cboDisposalBank", "", 6804, 9497, 1928, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblDisposalBank", "«·»‰ﬂ", 6804, 9185, 1928, 284, 9, False, CLR_MUTED, "cboDisposalBank", 0)
-    Set c = AddCombo("cboDisposalBox", "", 8845, 9497, 1814, 454, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3969")
+    Set c = AddCombo("cboDisposalBox", "", 8845, 9497, 1814, 454, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblDisposalBox", "«·’‰œÊﬁ", 8845, 9185, 1814, 284, 9, False, CLR_MUTED, "cboDisposalBox", 0)
     Set c = AddButton("btnDispose", "»Ì⁄ / «” »⁄«œ", 10773, 9497, 1701, 454, "danger")
@@ -8612,10 +8622,10 @@ Private Sub BuildForm_frmPayroll()
     Set c = AddCombo("cboPaidFrom", "", 1928, 8845, 1701, 454, "BANK;„‰ «·»‰ﬂ;CASHBOX;„‰ ’‰œÊﬁ", 2, "0;1588")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblPaidFrom", "«·’—›", 1928, 8533, 1701, 284, 9, False, CLR_MUTED, "cboPaidFrom", 0)
-    Set c = AddCombo("cboBank", "", 3742, 8845, 2268, 454, "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName", 2, "0;3969")
+    Set c = AddCombo("cboBank", "", 3742, 8845, 2268, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblBank", "«·»‰ﬂ", 3742, 8533, 2268, 284, 9, False, CLR_MUTED, "cboBank", 0)
-    Set c = AddCombo("cboBox", "", 6124, 8845, 2041, 454, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3969")
+    Set c = AddCombo("cboBox", "", 6124, 8845, 2041, 454, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblBox", "«·’‰œÊﬁ", 6124, 8533, 2041, 284, 9, False, CLR_MUTED, "cboBox", 0)
     Set c = AddButton("btnPay", " ”ÃÌ· «·’—›", 8278, 8845, 1701, 454, "primary")
@@ -8700,7 +8710,7 @@ Private Sub BuildForm_frmBudgetLines()
     Set c = AddCombo("AccountCode", "AccountCode", 28, 0, 2211, 397, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE AccountType IN ('REVENUE', 'EXPENSE') AND IsActive = True ORDER BY TreeKey", 2, "0;3118")
     SetCtlProp c, "BoundColumn", 1
     SetCtlProp c, "LimitToList", True
-    Set c = AddCombo("CostCenterID", "CostCenterID", 2267, 0, 1191, 397, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;1701")
+    Set c = AddCombo("CostCenterID", "CostCenterID", 2267, 0, 1191, 397, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;1701")
     SetCtlProp c, "BoundColumn", 1
     SetCtlProp c, "LimitToList", True
     Set c = AddText("M1", "M1", 3486, 0, 822, 397)

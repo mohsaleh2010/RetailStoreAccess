@@ -460,9 +460,9 @@ Public Sub LoadInvoiceForReturn(ByVal frm As Access.Form, ByVal SalesInvoiceID A
         "FROM (SalesInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) " & _
         "LEFT JOIN qrySalesReturnedQty AS r ON d.SalesDetailID = r.SalesDetailID " & _
         "WHERE d.SalesInvoiceID = " & SalesInvoiceID, dbFailOnError
-    Set rs = CurrentDb.OpenRecordset("SELECT h.*, c.CustomerName FROM SalesInvoices AS h INNER JOIN Customers " & _
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT h.*, c.CustomerName FROM SalesInvoices AS h INNER JOIN [@Customers] " & _
                                      "AS c ON h.CustomerID = c.CustomerID WHERE h.SalesInvoiceID = " & _
-                                     SalesInvoiceID, dbOpenSnapshot)
+                                     SalesInvoiceID), dbOpenSnapshot)
     frm!txtInvoiceID.Value = SalesInvoiceID
     frm!txtInvoiceNo.Value = rs!InvoiceNumber
     frm!lblInvoiceInfo.Caption = Tr("«· «—ÌŒ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    «·⁄„Ì·: " & _
@@ -601,9 +601,9 @@ Public Sub InvoiceViewLoad(ByVal frm As Access.Form)
         Exit Sub
     End If
     id = CLng(frm.OpenArgs)
-    Set rs = CurrentDb.OpenRecordset("SELECT h.*, c.CustomerName, e.EmployeeName FROM (SalesInvoices AS h " & _
-        "INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID) INNER JOIN Employees AS e " & _
-        "ON h.EmployeeID = e.EmployeeID WHERE h.SalesInvoiceID = " & id, dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT h.*, c.CustomerName, e.EmployeeName FROM (SalesInvoices AS h " & _
+        "INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID) INNER JOIN Employees AS e " & _
+        "ON h.EmployeeID = e.EmployeeID WHERE h.SalesInvoiceID = " & id), dbOpenSnapshot)
     If rs.EOF Then
         ShowWarning "«·›« Ê—… €Ì— „ÊÃÊœ…."
         Exit Sub

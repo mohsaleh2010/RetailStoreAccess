@@ -23,14 +23,14 @@ Option Explicit
 
 Public Const CASH_METHOD_ID As Long = 1          ' PaymentMethods: نقدي
 
-Private Const BOX_ROWS As String = "SELECT CashBoxID, BoxName FROM CashBoxes WHERE IsActive = True"
+Private Const BOX_ROWS As String = "SELECT q.CashBoxID, q.BoxName FROM [@CashBoxes] AS q WHERE q.IsActive = True"
 Private Const VOUCHER_TYPES As String = "IN;سند قبض نقدية;OUT;سند صرف نقدية;TRANSFER;تحويل بين الصناديق"
 Private Const IN_CATEGORIES As String = "OTHER;قبض نقدية (إيرادات أخرى);OWNER;إيداع من المالك;" & _
                                         "ADVANCE;سداد سلفة موظف"
 Private Const OUT_CATEGORIES As String = "EXPENSE;مصروف (يُسجل في المصروفات);OWNER;تسوية / مسحوبات المالك;" & _
                                          "ADVANCE;سلفة موظف;COMMISSION;صرف عمولة مندوب;OTHER;صرف آخر"
 Private Const EMPLOYEE_ROWS As String = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
-Private Const REP_ROWS As String = "SELECT SalesRepID, RepName FROM SalesReps WHERE IsActive = True ORDER BY RepName"
+Private Const REP_ROWS As String = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName"
 Private Const DESTINATIONS As String = "MAIN;ترحيل إلى الخزينة الرئيسية;OWNER;تسليم للمالك (تسوية);" & _
                                        "KEEP;يبقى في الصندوق"
 
@@ -87,7 +87,7 @@ End Function
 
 Private Function BoxName(ByVal BoxID As Variant) As String
     If IsNull(BoxID) Then Exit Function
-    BoxName = Nz(DbValue("SELECT BoxName FROM CashBoxes WHERE CashBoxID = " & CLng(BoxID)), "")
+    BoxName = Nz(DbValue(Tr("SELECT b.BoxName FROM [@CashBoxes] AS b WHERE b.CashBoxID = " & CLng(BoxID))), "")
 End Function
 
 Public Function BoxIsActive(ByVal BoxID As Variant) As Boolean
@@ -441,7 +441,7 @@ End Sub
 Public Sub VoucherLoad(ByVal frm As Access.Form)
     Dim parts() As String, kind As String
     frm!cboVoucherType.RowSource = Tr(VOUCHER_TYPES)
-    frm!cboBox.RowSource = Tr(BOX_ROWS & " ORDER BY BoxType DESC, BoxName")
+    frm!cboBox.RowSource = Tr(BOX_ROWS & " ORDER BY q.BoxType DESC, q.BoxName")
     frm!cboToBox.RowSource = Tr(frm!cboBox.RowSource)
     kind = "OUT"
     If Not IsNull(frm.OpenArgs) Then
@@ -498,7 +498,7 @@ Public Sub VoucherCategoryChanged(ByVal frm As Access.Form)
             frm!lblEmployee.Caption = Tr("الموظف صاحب السلفة *")
             frm!cboEmployee.Visible = True
         Case "COMMISSION"
-            If frm!cboEmployee.RowSource <> REP_ROWS Then
+            If frm!cboEmployee.RowSource <> Tr(REP_ROWS) Then
                 frm!cboEmployee.RowSource = Tr(REP_ROWS)
                 frm!cboEmployee.Value = Null
             End If
@@ -590,8 +590,8 @@ Public Sub ClosingLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     sql = BOX_ROWS
     If Not HasPermission("CASH_BOX") Then sql = sql & " AND q.CashBoxID = " & CurrentCashBoxID()
-    frm!cboBox.RowSource = Tr(sql & " ORDER BY BoxType, BoxName")
-    frm!cboToBox.RowSource = Tr(BOX_ROWS & " AND BoxType = 'MAIN' ORDER BY BoxName")
+    frm!cboBox.RowSource = Tr(sql & " ORDER BY q.BoxType, q.BoxName")
+    frm!cboToBox.RowSource = Tr(BOX_ROWS & " AND q.BoxType = 'MAIN' ORDER BY q.BoxName")
     frm!cboDestination.RowSource = Tr(DESTINATIONS)
     frm!cboDestination.Value = "MAIN"
     If Not IsNull(frm.OpenArgs) Then

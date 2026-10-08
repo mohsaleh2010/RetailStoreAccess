@@ -16,7 +16,7 @@ TX_LIST = ("SELECT t.BankTxID, t.TxNumber AS [الرقم], Format(t.TxDate, 'yyy
            "IIf(t.TxType = 'DEPOSIT', 'إيداع', IIf(t.TxType = 'WITHDRAW', 'سحب', IIf(t.TxType = 'SETTLEMENT', "
            "'تسوية مدى', IIf(t.TxType = 'TRANSFER', 'تحويل', IIf(t.TxType = 'OTHER_IN', 'وارد', 'صادر'))))) AS [النوع], "
            "k.BankName AS [البنك], Format(t.Amount, '#,##0.00') AS [مبلغ الحركة], t.Description AS [تفاصيل العملية] "
-           "FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID "
+           "FROM BankTransactions AS t INNER JOIN [@Banks] AS k ON t.BankID = k.BankID "
            "ORDER BY t.TxDate DESC, t.BankTxID DESC")
 
 

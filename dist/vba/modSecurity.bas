@@ -415,8 +415,8 @@ Public Function CanOpenScreen(ByVal FormName As String, Optional ByVal Quiet As 
     ElseIf HasPermission(key) Then
         CanOpenScreen = True
     ElseIf Not Quiet Then
-        ShowWarning "áÇ Êãáß ÕáÇÍíÉ «" & Nz(DLookup("PermissionName", "Permissions", "PermissionKey = " & _
-                    SqlText(key)), key) & "». ÑÇÌÚ ãÏíÑ ÇáäÙÇã."
+        ShowWarning "áÇ Êãáß ÕáÇÍíÉ «" & Nz(DbValue(Tr("SELECT p.PermissionName FROM [@Permissions] AS p " & _
+                    "WHERE p.PermissionKey = " & SqlText(key))), key) & "». ÑÇÌÚ ãÏíÑ ÇáäÙÇã."
     End If
 End Function
 

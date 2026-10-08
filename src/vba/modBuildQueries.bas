@@ -20,15 +20,16 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qryLocRoles1,qryLocRoles,qryLocPermissions1,qryLocPermissions,qryLocScreens1,qryLocScreens,qryLocCategories1,qryLocCategories,qryLocUnits1,qryLocUnits,qryLocExpenseTypes1,qryLocExpenseTypes,qrySalesDocuments,qrySalesLineItems,qr" & _
-    "ySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustom" & _
-    "erLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,q" & _
-    "rySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturn" & _
-    "Query,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashD" & _
-    "ays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalV" & _
-    "atReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQue" & _
-    "ry,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,Budge" & _
-    "tVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qryLocRoles1,qryLocRoles,qryLocPermissions1,qryLocPermissions,qryLocScreens1,qryLocScreens,qryLocCategories1,qryLocCategories,qryLocUnits1,qryLocUnits,qryLocExpenseTypes1,qryLocExpenseTypes,qryLocCustomers1,qryLocCustomers,qryLo" & _
+    "cSuppliers1,qryLocSuppliers,qryLocCashBoxes1,qryLocCashBoxes,qryLocBanks1,qryLocBanks,qryLocCostCenters1,qryLocCostCenters,qryLocSalesReps1,qryLocSalesReps,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,q" & _
+    "ryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLa" & _
+    "testRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryPr" & _
+    "ofitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndi" & _
+    "catorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournal" & _
+    "PurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankT" & _
+    "x,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCo" & _
+    "mpareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySal" & _
+    "esReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -684,6 +685,18 @@ Private Sub CreateAllQueries()
     Q_qryLocUnits
     Q_qryLocExpenseTypes1
     Q_qryLocExpenseTypes
+    Q_qryLocCustomers1
+    Q_qryLocCustomers
+    Q_qryLocSuppliers1
+    Q_qryLocSuppliers
+    Q_qryLocCashBoxes1
+    Q_qryLocCashBoxes
+    Q_qryLocBanks1
+    Q_qryLocBanks
+    Q_qryLocCostCenters1
+    Q_qryLocCostCenters
+    Q_qryLocSalesReps1
+    Q_qryLocSalesReps
     Q_qrySalesDocuments
     Q_qrySalesLineItems
     Q_qrySalesLinesInPeriod
@@ -970,6 +983,78 @@ Private Sub Q_qryLocExpenseTypes()
     SaveQuery "qryLocExpenseTypes", "ExpenseTypes بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
 End Sub
 
+Private Sub Q_qryLocCustomers1()
+    Dim s As String
+    s = "SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID FROM Customers AS t" & vbCrLf
+    SaveQuery "qryLocCustomers1", "Customers للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocCustomers()
+    Dim s As String
+    s = "SELECT CustomerID, Nz(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID FROM qryLocCustomers1" & vbCrLf
+    SaveQuery "qryLocCustomers", "Customers بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocSuppliers1()
+    Dim s As String
+    s = "SELECT t.SupplierID, t.SupplierName AS LocArabicName, t.SupplierNameEn, t.ContactPerson, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.Address, t.City, t.OpeningBalance, t.CurrentBalance, t.PaymentTermsDays, t.IsActive, t.Notes, t.CreatedAt, t.CurrencyCode FROM Suppliers AS t" & vbCrLf
+    SaveQuery "qryLocSuppliers1", "Suppliers للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocSuppliers()
+    Dim s As String
+    s = "SELECT SupplierID, Nz(SupplierNameEn, LocArabicName) AS SupplierName, SupplierNameEn, ContactPerson, Mobile, Phone, Email, VATNumber, CRNumber, Address, City, OpeningBalance, CurrentBalance, PaymentTermsDays, IsActive, Notes, CreatedAt, CurrencyCode FROM qryLocSuppliers1" & vbCrLf
+    SaveQuery "qryLocSuppliers", "Suppliers بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocCashBoxes1()
+    Dim s As String
+    s = "SELECT t.CashBoxID, t.BoxName AS LocArabicName, t.BoxNameEn, t.BoxType, t.OpeningBalance, t.OpeningDate, t.IsActive, t.Notes, t.CreatedAt FROM CashBoxes AS t" & vbCrLf
+    SaveQuery "qryLocCashBoxes1", "CashBoxes للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocCashBoxes()
+    Dim s As String
+    s = "SELECT CashBoxID, Nz(BoxNameEn, LocArabicName) AS BoxName, BoxNameEn, BoxType, OpeningBalance, OpeningDate, IsActive, Notes, CreatedAt FROM qryLocCashBoxes1" & vbCrLf
+    SaveQuery "qryLocCashBoxes", "CashBoxes بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocBanks1()
+    Dim s As String
+    s = "SELECT t.BankID, t.BankName AS LocArabicName, t.BankNameEn, t.AccountNo, t.IBAN, t.OpeningBalance, t.OpeningDate, t.IsActive, t.Notes, t.CreatedAt FROM Banks AS t" & vbCrLf
+    SaveQuery "qryLocBanks1", "Banks للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocBanks()
+    Dim s As String
+    s = "SELECT BankID, Nz(BankNameEn, LocArabicName) AS BankName, BankNameEn, AccountNo, IBAN, OpeningBalance, OpeningDate, IsActive, Notes, CreatedAt FROM qryLocBanks1" & vbCrLf
+    SaveQuery "qryLocBanks", "Banks بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocCostCenters1()
+    Dim s As String
+    s = "SELECT t.CostCenterID, t.CenterCode, t.CenterName AS LocArabicName, t.CenterNameEn, t.IsDefault, t.IsActive, t.Notes, t.CreatedAt FROM CostCenters AS t" & vbCrLf
+    SaveQuery "qryLocCostCenters1", "CostCenters للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocCostCenters()
+    Dim s As String
+    s = "SELECT CostCenterID, CenterCode, Nz(CenterNameEn, LocArabicName) AS CenterName, CenterNameEn, IsDefault, IsActive, Notes, CreatedAt FROM qryLocCostCenters1" & vbCrLf
+    SaveQuery "qryLocCostCenters", "CostCenters بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocSalesReps1()
+    Dim s As String
+    s = "SELECT t.SalesRepID, t.RepCode, t.RepName AS LocArabicName, t.RepNameEn, t.Mobile, t.EmployeeID, t.Region, t.CostCenterID, t.CommissionRate, t.CommissionBase, t.IsActive, t.Notes, t.CreatedAt FROM SalesReps AS t" & vbCrLf
+    SaveQuery "qryLocSalesReps1", "SalesReps للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocSalesReps()
+    Dim s As String
+    s = "SELECT SalesRepID, RepCode, Nz(RepNameEn, LocArabicName) AS RepName, RepNameEn, Mobile, EmployeeID, Region, CostCenterID, CommissionRate, CommissionBase, IsActive, Notes, CreatedAt FROM qryLocSalesReps1" & vbCrLf
+    SaveQuery "qryLocSalesReps", "SalesReps بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
 Private Sub Q_qrySalesDocuments()
     Dim s As String
     s = "SELECT 'SALE' AS DocType, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber," & vbCrLf
@@ -1063,7 +1148,7 @@ Private Sub Q_SalesByPeriodQuery()
     s = "SELECT s.DocType, s.DocID, s.DocNumber, s.DocDate, s.CustomerID, c.CustomerName," & vbCrLf
     s = s & "       e.EmployeeName, s.PaymentType, s.NetAmount, s.VATAmount, s.GrossAmount," & vbCrLf
     s = s & "       s.SettledAmount, s.OnAccount" & vbCrLf
-    s = s & "FROM (qrySalesDocuments AS s INNER JOIN Customers AS c ON s.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "FROM (qrySalesDocuments AS s INNER JOIN [@Customers] AS c ON s.CustomerID = c.CustomerID)" & vbCrLf
     s = s & "     INNER JOIN Employees AS e ON s.EmployeeID = e.EmployeeID" & vbCrLf
     s = s & "WHERE s.DocDate >= QDate('PeriodStart') AND s.DocDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "ORDER BY s.DocDate" & vbCrLf
@@ -1132,7 +1217,7 @@ Private Sub Q_PurchasesQuery()
     s = "SELECT d.DocType, d.DocID, d.DocNumber, d.SupplierRef, d.DocDate, d.SupplierID," & vbCrLf
     s = s & "       s.SupplierName, d.PaymentType, d.NetAmount, d.VATAmount, d.GrossAmount," & vbCrLf
     s = s & "       d.SettledAmount, d.OnAccount" & vbCrLf
-    s = s & "FROM qryPurchaseDocuments AS d INNER JOIN Suppliers AS s ON d.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM qryPurchaseDocuments AS d INNER JOIN [@Suppliers] AS s ON d.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE d.DocDate >= QDate('PeriodStart') AND d.DocDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "ORDER BY d.DocDate" & vbCrLf
     SaveQuery "PurchasesQuery", "فواتير ومرتجعات الشراء خلال فترة مع المورد", s
@@ -1177,7 +1262,7 @@ Private Sub Q_LowStockQuery()
     s = s & "       p.CurrentQuantity, p.MinimumQuantity, p.MinimumQuantity - p.CurrentQuantity AS ShortageQty," & vbCrLf
     s = s & "       s.SupplierName, s.Mobile AS SupplierMobile" & vbCrLf
     s = s & "FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
-    s = s & "     LEFT JOIN Suppliers AS s ON p.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "     LEFT JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity" & vbCrLf
     s = s & "ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName" & vbCrLf
     SaveQuery "LowStockQuery", "المنتجات منخفضة المخزون: CurrentQuantity <= MinimumQuantity", s
@@ -1260,7 +1345,7 @@ Private Sub Q_qryCustomerLedger()
     s = s & "SELECT c.CustomerID, c.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-'," & vbCrLf
     s = s & "       IIf(c.OpeningBalance > 0, c.OpeningBalance, 0)," & vbCrLf
     s = s & "       IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0)" & vbCrLf
-    s = s & "FROM Customers AS c" & vbCrLf
+    s = s & "FROM [@Customers] AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT q.CustomerID, q.IssueDate, 'CHEQUE', 'شيك وارد', q.ChequeID, q.ChequeNo, CCur(0), q.Amount" & vbCrLf
@@ -1288,7 +1373,7 @@ Private Sub Q_CustomerBalanceQuery()
     s = s & "       CCur(Nz(l.TotalDebit, 0)) AS DebitTotal, CCur(Nz(l.TotalCredit, 0)) AS CreditTotal," & vbCrLf
     s = s & "       CCur(Nz(l.TotalDebit, 0)) - CCur(Nz(l.TotalCredit, 0)) AS Balance," & vbCrLf
     s = s & "       c.CurrentBalance AS CachedBalance, l.LastEntryDate" & vbCrLf
-    s = s & "FROM Customers AS c LEFT JOIN qryCustomerLedgerTotals AS l ON c.CustomerID = l.CustomerID" & vbCrLf
+    s = s & "FROM [@Customers] AS c LEFT JOIN qryCustomerLedgerTotals AS l ON c.CustomerID = l.CustomerID" & vbCrLf
     s = s & "ORDER BY c.CustomerName" & vbCrLf
     SaveQuery "CustomerBalanceQuery", "رصيد كل عميل محسوبًا من الحركات (موجب = عليه للمحل)", s
 End Sub
@@ -1334,7 +1419,7 @@ Private Sub Q_qrySupplierLedger()
     s = s & "SELECT s.SupplierID, s.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-'," & vbCrLf
     s = s & "       IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0)," & vbCrLf
     s = s & "       IIf(s.OpeningBalance > 0, s.OpeningBalance, 0)" & vbCrLf
-    s = s & "FROM Suppliers AS s" & vbCrLf
+    s = s & "FROM [@Suppliers] AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT q.SupplierID, q.IssueDate, 'CHEQUE', 'شيك صادر', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)" & vbCrLf
@@ -1362,7 +1447,7 @@ Private Sub Q_SupplierBalanceQuery()
     s = s & "       CCur(Nz(l.TotalDebit, 0)) AS DebitTotal, CCur(Nz(l.TotalCredit, 0)) AS CreditTotal," & vbCrLf
     s = s & "       CCur(Nz(l.TotalCredit, 0)) - CCur(Nz(l.TotalDebit, 0)) AS Balance," & vbCrLf
     s = s & "       s.CurrentBalance AS CachedBalance, l.LastEntryDate" & vbCrLf
-    s = s & "FROM Suppliers AS s LEFT JOIN qrySupplierLedgerTotals AS l ON s.SupplierID = l.SupplierID" & vbCrLf
+    s = s & "FROM [@Suppliers] AS s LEFT JOIN qrySupplierLedgerTotals AS l ON s.SupplierID = l.SupplierID" & vbCrLf
     s = s & "ORDER BY s.SupplierName" & vbCrLf
     SaveQuery "SupplierBalanceQuery", "رصيد كل مورد محسوبًا من الحركات (موجب = مستحق للمورد)", s
 End Sub
@@ -1380,7 +1465,7 @@ Private Sub Q_qrySupplierFxMoves()
     s = s & "FROM SupplierPayments AS p" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT s.SupplierID, 'SAR', s.OpeningBalance, s.OpeningBalance" & vbCrLf
-    s = s & "FROM Suppliers AS s" & vbCrLf
+    s = s & "FROM [@Suppliers] AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT q.SupplierID, 'SAR', IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)" & vbCrLf
@@ -1418,7 +1503,7 @@ Private Sub Q_SupplierFxBalanceQuery()
     s = "SELECT s.SupplierName, t.SupplierID, t.CurrencyCode, t.FxBalance, t.BookBalance, l.Rate AS LastRate, l.RateDate AS LastRateDate," & vbCrLf
     s = s & "       Round(t.FxBalance * CCur(Nz(l.Rate, 0)), 2) AS RevaluedBalance," & vbCrLf
     s = s & "       Round(t.FxBalance * CCur(Nz(l.Rate, 0)), 2) - t.BookBalance AS FxDifference" & vbCrLf
-    s = s & "FROM ((qrySupplierFxTotals AS t INNER JOIN Suppliers AS s ON t.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "FROM ((qrySupplierFxTotals AS t INNER JOIN [@Suppliers] AS s ON t.SupplierID = s.SupplierID)" & vbCrLf
     s = s & "      LEFT JOIN qryLatestRates AS l ON t.CurrencyCode = l.CurrencyCode)" & vbCrLf
     s = s & "      INNER JOIN Settings AS st ON st.SettingID = 1" & vbCrLf
     s = s & "WHERE t.CurrencyCode <> st.CurrencyCode AND (t.FxBalance <> 0 OR t.BookBalance <> 0)" & vbCrLf
@@ -1531,20 +1616,20 @@ Private Sub Q_qryAgingDebits()
     s = "SELECT 'C' AS PartyKind, h.CustomerID AS PartyID, 'INVOICE' AS DocType, h.SalesInvoiceID AS DocID," & vbCrLf
     s = s & "       h.InvoiceNumber AS DocNo, h.InvoiceDate AS DocDate, h.DueDate, c.PaymentTermsDays AS TermsDays," & vbCrLf
     s = s & "       h.RemainingAmount AS Amount" & vbCrLf
-    s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE h.RemainingAmount > 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, c.CreatedAt, 0, c.OpeningBalance" & vbCrLf
-    s = s & "FROM Customers AS c" & vbCrLf
+    s = s & "FROM [@Customers] AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance > 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'S', h.SupplierID, 'INVOICE', h.PurchaseInvoiceID, h.InvoiceNumber, h.InvoiceDate, h.DueDate," & vbCrLf
     s = s & "       s.PaymentTermsDays, h.RemainingAmount" & vbCrLf
-    s = s & "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE h.RemainingAmount > 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, s.CreatedAt, 0, s.OpeningBalance" & vbCrLf
-    s = s & "FROM Suppliers AS s" & vbCrLf
+    s = s & "FROM [@Suppliers] AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance > 0" & vbCrLf
     SaveQuery "qryAgingDebits", "المستحق على كل عميل وللمورد بالمستند: الفواتير الآجلة والرصيد الافتتاحي", s
 End Sub
@@ -1561,7 +1646,7 @@ Private Sub Q_qryAgingCredits()
     s = s & "FROM CustomerPayments AS p" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, -c.OpeningBalance, 0" & vbCrLf
-    s = s & "FROM Customers AS c" & vbCrLf
+    s = s & "FROM [@Customers] AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance < 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'S', r.SupplierID, 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, r.TotalAmount - r.RefundedAmount," & vbCrLf
@@ -1573,7 +1658,7 @@ Private Sub Q_qryAgingCredits()
     s = s & "FROM SupplierPayments AS p" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, -s.OpeningBalance, 0" & vbCrLf
-    s = s & "FROM Suppliers AS s" & vbCrLf
+    s = s & "FROM [@Suppliers] AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance < 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'C', q.CustomerID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0" & vbCrLf
@@ -1882,7 +1967,7 @@ Private Sub Q_RepPerformanceQuery()
     s = s & "       IIf(IIf(s.CommissionBase = 'COLLECTION', CCur(Nz(t.SumCollected, 0)), CCur(Nz(t.SumSales, 0))) > 0," & vbCrLf
     s = s & "           Round(IIf(s.CommissionBase = 'COLLECTION', CCur(Nz(t.SumCollected, 0)), CCur(Nz(t.SumSales, 0))) * s.CommissionRate, 2)," & vbCrLf
     s = s & "           0) AS Commission" & vbCrLf
-    s = s & "FROM (SalesReps AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)" & vbCrLf
+    s = s & "FROM ([@SalesReps] AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)" & vbCrLf
     s = s & "     LEFT JOIN qryRepTargetTotals AS g ON s.SalesRepID = g.SalesRepID" & vbCrLf
     s = s & "WHERE s.IsActive = True OR CCur(Nz(t.SumSales, 0)) <> 0 OR CCur(Nz(t.SumCollected, 0)) <> 0" & vbCrLf
     SaveQuery "RepPerformanceQuery", "أداء المندوبين في الفترة: المبيعات والتحصيل والهدف والإنجاز والعمولة المتوقعة", s
@@ -1891,7 +1976,7 @@ End Sub
 Private Sub Q_RepCustomersQuery()
     Dim s As String
     s = "SELECT s.SalesRepID, s.RepName, c.CustomerID, c.CustomerName, c.Mobile, b.Balance" & vbCrLf
-    s = s & "FROM (Customers AS c INNER JOIN SalesReps AS s ON c.SalesRepID = s.SalesRepID)" & vbCrLf
+    s = s & "FROM ([@Customers] AS c INNER JOIN [@SalesReps] AS s ON c.SalesRepID = s.SalesRepID)" & vbCrLf
     s = s & "     INNER JOIN CustomerBalanceQuery AS b ON c.CustomerID = b.CustomerID" & vbCrLf
     SaveQuery "RepCustomersQuery", "عملاء كل مندوب وأرصدتهم", s
 End Sub
@@ -1900,7 +1985,7 @@ Private Sub Q_RepCommissionBalanceQuery()
     Dim s As String
     s = "SELECT s.SalesRepID, s.RepCode, s.RepName, CCur(Nz(p.SumPosted, 0)) AS Posted, CCur(Nz(d.SumPaid, 0)) AS Paid," & vbCrLf
     s = s & "       CCur(Nz(p.SumPosted, 0)) - CCur(Nz(d.SumPaid, 0)) AS Payable" & vbCrLf
-    s = s & "FROM (SalesReps AS s LEFT JOIN qryRepCommissionPosted AS p ON s.SalesRepID = p.SalesRepID)" & vbCrLf
+    s = s & "FROM ([@SalesReps] AS s LEFT JOIN qryRepCommissionPosted AS p ON s.SalesRepID = p.SalesRepID)" & vbCrLf
     s = s & "     LEFT JOIN qryRepCommissionPaid AS d ON s.SalesRepID = d.SalesRepID" & vbCrLf
     SaveQuery "RepCommissionBalanceQuery", "العمولات المستحقة لكل مندوب: المرحَّل والمصروف والباقي", s
 End Sub
@@ -1999,7 +2084,7 @@ Private Sub Q_qryPurchaseDocPrint()
     s = s & "         ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
     s = s & "      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)" & vbCrLf
-    s = s & "     INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "     INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID)" & vbCrLf
     s = s & "    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, o.SupplierInvoiceNo," & vbCrLf
@@ -2014,7 +2099,7 @@ Private Sub Q_qryPurchaseDocPrint()
     s = s & "        INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)" & vbCrLf
     s = s & "      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)" & vbCrLf
-    s = s & "     INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "     INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID)" & vbCrLf
     s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID" & vbCrLf
     SaveQuery "qryPurchaseDocPrint", "بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف)", s
 End Sub
@@ -2025,13 +2110,13 @@ Private Sub Q_qryVoucherPrint()
     s = s & "       p.PaymentDate AS DocDate, 1 AS LineNumber, c.CustomerName AS PartyName," & vbCrLf
     s = s & "       c.Mobile AS PartyMobile, p.Amount, m.MethodName, p.Notes, e.EmployeeName," & vbCrLf
     s = s & "       c.CurrentBalance AS PartyBalance" & vbCrLf
-    s = s & "FROM ((CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "FROM ((CustomerPayments AS p INNER JOIN [@Customers] AS c ON p.CustomerID = c.CustomerID)" & vbCrLf
     s = s & "      INNER JOIN [@PaymentMethods] AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
     s = s & "     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, 1, s.SupplierName, s.Mobile," & vbCrLf
     s = s & "       p.Amount, m.MethodName, p.Notes, e.EmployeeName, s.CurrentBalance" & vbCrLf
-    s = s & "FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "FROM ((SupplierPayments AS p INNER JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID)" & vbCrLf
     s = s & "      INNER JOIN [@PaymentMethods] AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
     s = s & "     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID" & vbCrLf
     SaveQuery "qryVoucherPrint", "بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين)", s
@@ -2042,32 +2127,32 @@ Private Sub Q_qryCashMovements()
     s = "SELECT h.CashBoxID, h.InvoiceDate AS MoveDate, 'SALE' AS MoveType, 'فاتورة بيع' AS MoveTypeName," & vbCrLf
     s = s & "       h.InvoiceNumber AS DocNumber, c.CustomerName AS PartyName, h.Notes AS Details," & vbCrLf
     s = s & "       h.PaidAmount AS AmountIn, CCur(0) AS AmountOut, h.EmployeeID" & vbCrLf
-    s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT r.CashBoxID, r.ReturnDate, 'SALES_RETURN', 'مرتجع بيع (رد نقدي)', r.ReturnNumber," & vbCrLf
     s = s & "       c.CustomerName, r.Reason, CCur(0), r.RefundedAmount, r.EmployeeID" & vbCrLf
-    s = s & "FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT p.CashBoxID, p.PaymentDate, 'CUSTOMER_PAYMENT', 'سند قبض من عميل', p.PaymentNumber," & vbCrLf
     s = s & "       c.CustomerName, p.Notes, p.Amount, CCur(0), p.EmployeeID" & vbCrLf
-    s = s & "FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM CustomerPayments AS p INNER JOIN [@Customers] AS c ON p.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE p.CashBoxID Is Not Null" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT h.CashBoxID, h.InvoiceDate, 'PURCHASE', 'فاتورة شراء', h.InvoiceNumber," & vbCrLf
     s = s & "       s.SupplierName, h.Notes, CCur(0), h.PaidAmount, h.EmployeeID" & vbCrLf
-    s = s & "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE h.CashBoxID Is Not Null AND h.PaidAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT r.CashBoxID, r.ReturnDate, 'PURCHASE_RETURN', 'مرتجع شراء (استرداد نقدي)', r.ReturnNumber," & vbCrLf
     s = s & "       s.SupplierName, r.Reason, r.RefundedAmount, CCur(0), r.EmployeeID" & vbCrLf
-    s = s & "FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseReturns AS r INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE r.CashBoxID Is Not Null AND r.RefundedAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT p.CashBoxID, p.PaymentDate, 'SUPPLIER_PAYMENT', 'سند صرف لمورد', p.PaymentNumber," & vbCrLf
     s = s & "       s.SupplierName, p.Notes, CCur(0), p.Amount, p.EmployeeID" & vbCrLf
-    s = s & "FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM SupplierPayments AS p INNER JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE p.CashBoxID Is Not Null" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT e.CashBoxID, e.ExpenseDate, 'EXPENSE', 'مصروف', e.ExpenseNumber," & vbCrLf
@@ -2092,22 +2177,22 @@ Private Sub Q_qryCashMovements()
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT v.CashBoxID, v.VoucherDate, 'TRANSFER_OUT', 'تحويل إلى صندوق آخر', v.VoucherNumber," & vbCrLf
     s = s & "       b.BoxName, v.Description, CCur(0), v.Amount, v.EmployeeID" & vbCrLf
-    s = s & "FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.ToCashBoxID = b.CashBoxID" & vbCrLf
+    s = s & "FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.ToCashBoxID = b.CashBoxID" & vbCrLf
     s = s & "WHERE v.VoucherType = 'TRANSFER'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق آخر', v.VoucherNumber," & vbCrLf
     s = s & "       b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID" & vbCrLf
-    s = s & "FROM CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID" & vbCrLf
+    s = s & "FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID" & vbCrLf
     s = s & "WHERE v.VoucherType = 'TRANSFER'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description," & vbCrLf
     s = s & "       CCur(0), t.Amount, t.EmployeeID" & vbCrLf
-    s = s & "FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID" & vbCrLf
+    s = s & "FROM BankTransactions AS t INNER JOIN [@Banks] AS k ON t.BankID = k.BankID" & vbCrLf
     s = s & "WHERE t.TxType = 'DEPOSIT'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT t.CashBoxID, t.TxDate, 'BANK_WITHDRAW', 'سحب من البنك', t.TxNumber, k.BankName, t.Description," & vbCrLf
     s = s & "       t.Amount, CCur(0), t.EmployeeID" & vbCrLf
-    s = s & "FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID" & vbCrLf
+    s = s & "FROM BankTransactions AS t INNER JOIN [@Banks] AS k ON t.BankID = k.BankID" & vbCrLf
     s = s & "WHERE t.TxType = 'WITHDRAW'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT r.CashBoxID, r.PaidDate, 'PAYROLL', 'صرف الرواتب', r.RunNumber, '-', r.Notes, CCur(0), r.PaidAmount," & vbCrLf
@@ -2127,7 +2212,7 @@ Private Sub Q_qryCashMovements()
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT b.CashBoxID, b.OpeningDate, 'OPENING', 'رصيد افتتاحي', '-', b.BoxName, b.Notes," & vbCrLf
     s = s & "       b.OpeningBalance, CCur(0), Null" & vbCrLf
-    s = s & "FROM CashBoxes AS b" & vbCrLf
+    s = s & "FROM [@CashBoxes] AS b" & vbCrLf
     s = s & "WHERE b.OpeningBalance <> 0" & vbCrLf
     SaveQuery "qryCashMovements", "كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (-)", s
 End Sub
@@ -2146,7 +2231,7 @@ Private Sub Q_CashBoxBalanceQuery()
     s = s & "       IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', 'صندوق كاشير') AS BoxTypeName, b.IsActive," & vbCrLf
     s = s & "       CCur(Nz(t.BoxIn, 0)) AS TotalIn, CCur(Nz(t.BoxOut, 0)) AS TotalOut," & vbCrLf
     s = s & "       CCur(Nz(t.BoxIn, 0)) - CCur(Nz(t.BoxOut, 0)) AS Balance, t.LastMoveDate" & vbCrLf
-    s = s & "FROM CashBoxes AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID" & vbCrLf
+    s = s & "FROM [@CashBoxes] AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID" & vbCrLf
     s = s & "ORDER BY b.BoxType DESC, b.BoxName" & vbCrLf
     SaveQuery "CashBoxBalanceQuery", "أرصدة الخزينة والصناديق الآن", s
 End Sub
@@ -2155,7 +2240,7 @@ Private Sub Q_CashStatementQuery()
     Dim s As String
     s = "SELECT 1 AS SortKey, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber, m.PartyName, m.Details," & vbCrLf
     s = s & "       b.BoxName, m.AmountIn, m.AmountOut, m.CashBoxID" & vbCrLf
-    s = s & "FROM qryCashMovements AS m INNER JOIN CashBoxes AS b ON m.CashBoxID = b.CashBoxID" & vbCrLf
+    s = s & "FROM qryCashMovements AS m INNER JOIN [@CashBoxes] AS b ON m.CashBoxID = b.CashBoxID" & vbCrLf
     s = s & "WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND m.MoveDate >= QDate('PeriodStart') AND m.MoveDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 0, QDate('PeriodStart'), 'BALANCE_FWD', 'رصيد أول المدة', '-', Null, Null, Null," & vbCrLf
@@ -2203,9 +2288,9 @@ Private Sub Q_CashClosingsQuery()
     s = s & "       IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك'," & vbCrLf
     s = s & "           'يبقى في الصندوق')) AS DestinationName," & vbCrLf
     s = s & "       t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes, c.CashBoxID" & vbCrLf
-    s = s & "FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)" & vbCrLf
+    s = s & "FROM ((CashClosings AS c INNER JOIN [@CashBoxes] AS b ON c.CashBoxID = b.CashBoxID)" & vbCrLf
     s = s & "      INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)" & vbCrLf
-    s = s & "     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID" & vbCrLf
+    s = s & "     LEFT JOIN [@CashBoxes] AS t ON c.ToCashBoxID = t.CashBoxID" & vbCrLf
     s = s & "WHERE (QLong('CashBoxID') = 0 OR c.CashBoxID = QLong('CashBoxID')) AND c.ClosingDate >= QDate('PeriodStart') AND c.ClosingDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "ORDER BY c.ClosingDate" & vbCrLf
     SaveQuery "CashClosingsQuery", "تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق)", s
@@ -2218,9 +2303,9 @@ Private Sub Q_qryCashClosingPrint()
     s = s & "       IIf(c.Destination = 'MAIN', 'الخزينة الرئيسية', IIf(c.Destination = 'OWNER', 'تسوية مع المالك'," & vbCrLf
     s = s & "           'يبقى في الصندوق')) AS DestinationName," & vbCrLf
     s = s & "       t.BoxName AS ToBoxName, c.TransferAmount, c.KeptAmount, c.Notes" & vbCrLf
-    s = s & "FROM ((CashClosings AS c INNER JOIN CashBoxes AS b ON c.CashBoxID = b.CashBoxID)" & vbCrLf
+    s = s & "FROM ((CashClosings AS c INNER JOIN [@CashBoxes] AS b ON c.CashBoxID = b.CashBoxID)" & vbCrLf
     s = s & "      INNER JOIN Employees AS e ON c.EmployeeID = e.EmployeeID)" & vbCrLf
-    s = s & "     LEFT JOIN CashBoxes AS t ON c.ToCashBoxID = t.CashBoxID" & vbCrLf
+    s = s & "     LEFT JOIN [@CashBoxes] AS t ON c.ToCashBoxID = t.CashBoxID" & vbCrLf
     SaveQuery "qryCashClosingPrint", "بيانات طباعة تصفية الكاشير", s
 End Sub
 
@@ -2235,9 +2320,9 @@ Private Sub Q_qryCashVoucherPrint()
     s = s & "           IIf(v.Category = 'TRANSFER', 'تحويل بين الصناديق', 'أخرى')))))) AS CategoryName," & vbCrLf
     s = s & "       b.BoxName, t.BoxName AS ToBoxName, v.Amount, v.PartyName, v.Description," & vbCrLf
     s = s & "       x.ExpenseTypeName, e.EmployeeName" & vbCrLf
-    s = s & "FROM ((((CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxID)" & vbCrLf
+    s = s & "FROM ((((CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID)" & vbCrLf
     s = s & "        INNER JOIN Employees AS e ON v.EmployeeID = e.EmployeeID)" & vbCrLf
-    s = s & "       LEFT JOIN CashBoxes AS t ON v.ToCashBoxID = t.CashBoxID)" & vbCrLf
+    s = s & "       LEFT JOIN [@CashBoxes] AS t ON v.ToCashBoxID = t.CashBoxID)" & vbCrLf
     s = s & "      LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)" & vbCrLf
     s = s & "     LEFT JOIN [@ExpenseTypes] AS x ON ex.ExpenseTypeID = x.ExpenseTypeID" & vbCrLf
     SaveQuery "qryCashVoucherPrint", "بيانات طباعة سندات قبض وصرف وتحويل النقدية", s
@@ -2272,27 +2357,27 @@ End Sub
 Private Sub Q_qryJournalSale()
     Dim s As String
     s = "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, IIf(h.BankID Is Null, 1200, 120000 + h.BankID)), 110000 + h.CashBoxID) AS AccountCode, h.PaidAmount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE h.PaidAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 1300 AS AccountCode, h.RemainingAmount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE h.RemainingAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 3 AS LineOrder, 4100 AS AccountCode, CCur(0) AS Debit, h.TaxableAmount AS Credit, 'المبيعات' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE h.TaxableAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 4 AS LineOrder, 2200 AS AccountCode, CCur(0) AS Debit, h.Tax AS Credit, 'ضريبة المخرجات' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE h.Tax <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 5 AS LineOrder, 5100 AS AccountCode, k.SaleCost AS Debit, CCur(0) AS Credit, 'تكلفة البضاعة المباعة' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID" & vbCrLf
+    s = s & "FROM (SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID" & vbCrLf
     s = s & "WHERE k.SaleCost <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 6 AS LineOrder, 1400 AS AccountCode, CCur(0) AS Debit, k.SaleCost AS Credit, 'المخزون' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID" & vbCrLf
+    s = s & "FROM (SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID" & vbCrLf
     s = s & "WHERE k.SaleCost <> 0" & vbCrLf
     SaveQuery "qryJournalSale", "أسطر قيود فواتير البيع", s
 End Sub
@@ -2300,27 +2385,27 @@ End Sub
 Private Sub Q_qryJournalSalesReturn()
     Dim s As String
     s = "SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 4110 AS AccountCode, r.TaxableAmount AS Debit, CCur(0) AS Credit, 'مردودات المبيعات' AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE r.TaxableAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 2200 AS AccountCode, r.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المخرجات' AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE r.Tax <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 3 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, IIf(r.BankID Is Null, 1200, 120000 + r.BankID)), 110000 + r.CashBoxID) AS AccountCode, CCur(0) AS Debit, r.RefundedAmount AS Credit, c.CustomerName AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE r.RefundedAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 4 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, r.TotalAmount - r.RefundedAmount AS Credit, c.CustomerName AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE r.TotalAmount - r.RefundedAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 5 AS LineOrder, 1400 AS AccountCode, k.ReturnCost AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID" & vbCrLf
+    s = s & "FROM (SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID" & vbCrLf
     s = s & "WHERE k.ReturnCost <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALES_RETURN' AS SourceType, r.SalesReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, c.CustomerName AS Party, 6 AS LineOrder, 5100 AS AccountCode, CCur(0) AS Debit, k.ReturnCost AS Credit, 'تكلفة البضاعة المباعة' AS LineText, IIf(r.CostCenterID Is Null, 0, r.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (SalesReturns AS r INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID" & vbCrLf
+    s = s & "FROM (SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID) INNER JOIN qryReturnCost AS k ON r.SalesReturnID = k.SalesReturnID" & vbCrLf
     s = s & "WHERE k.ReturnCost <> 0" & vbCrLf
     SaveQuery "qryJournalSalesReturn", "أسطر قيود مرتجعات البيع", s
 End Sub
@@ -2328,19 +2413,19 @@ End Sub
 Private Sub Q_qryJournalPurchase()
     Dim s As String
     s = "SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 1400 AS AccountCode, h.TaxableAmount AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE h.TaxableAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 1500 AS AccountCode, h.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE h.Tax <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 3 AS LineOrder, IIf(h.CashBoxID Is Null, IIf(h.PaymentMethodID Is Null Or h.PaymentMethodID = 1, 1190, IIf(h.BankID Is Null, 1200, 120000 + h.BankID)), 110000 + h.CashBoxID) AS AccountCode, CCur(0) AS Debit, h.PaidAmount AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE h.PaidAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 4 AS LineOrder, 2100 AS AccountCode, CCur(0) AS Debit, h.RemainingAmount AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseInvoices AS h INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE h.RemainingAmount <> 0" & vbCrLf
     SaveQuery "qryJournalPurchase", "أسطر قيود فواتير الشراء", s
 End Sub
@@ -2348,19 +2433,19 @@ End Sub
 Private Sub Q_qryJournalPurchaseReturn()
     Dim s As String
     s = "SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, IIf(r.CashBoxID Is Null, IIf(r.PaymentMethodID Is Null Or r.PaymentMethodID = 1, 1190, IIf(r.BankID Is Null, 1200, 120000 + r.BankID)), 110000 + r.CashBoxID) AS AccountCode, r.RefundedAmount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseReturns AS r INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE r.RefundedAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 2100 AS AccountCode, r.TotalAmount - r.RefundedAmount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseReturns AS r INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE r.TotalAmount - r.RefundedAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 3 AS LineOrder, 1400 AS AccountCode, CCur(0) AS Debit, r.TaxableAmount AS Credit, 'المخزون' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseReturns AS r INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE r.TaxableAmount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PURCHASE_RETURN' AS SourceType, r.PurchaseReturnID AS SourceID, r.ReturnNumber AS SourceNumber, r.ReturnDate AS SourceDate, s.SupplierName AS Party, 4 AS LineOrder, 1500 AS AccountCode, CCur(0) AS Debit, r.Tax AS Credit, 'ضريبة المدخلات' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseReturns AS r INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM PurchaseReturns AS r INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE r.Tax <> 0" & vbCrLf
     SaveQuery "qryJournalPurchaseReturn", "أسطر قيود مرتجعات الشراء", s
 End Sub
@@ -2368,19 +2453,19 @@ End Sub
 Private Sub Q_qryJournalPayments()
     Dim s As String
     s = "SELECT 'CUSTOMER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, IIf(p.BankID Is Null, 1200, 120000 + p.BankID)), 110000 + p.CashBoxID) AS AccountCode, p.Amount AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM CustomerPayments AS p INNER JOIN [@Customers] AS c ON p.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE p.Amount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'CUSTOMER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 1300 AS AccountCode, CCur(0) AS Debit, p.Amount AS Credit, c.CustomerName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "FROM CustomerPayments AS p INNER JOIN [@Customers] AS c ON p.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE p.Amount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 2100 AS AccountCode, p.Amount AS Debit, CCur(0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM SupplierPayments AS p INNER JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE p.Amount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SUPPLIER_PAYMENT' AS SourceType, p.PaymentID AS SourceID, p.PaymentNumber AS SourceNumber, p.PaymentDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, IIf(p.CashBoxID Is Null, IIf(p.PaymentMethodID Is Null Or p.PaymentMethodID = 1, 1190, IIf(p.BankID Is Null, 1200, 120000 + p.BankID)), 110000 + p.CashBoxID) AS AccountCode, CCur(0) AS Debit, p.Amount AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "FROM SupplierPayments AS p INNER JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE p.Amount <> 0" & vbCrLf
     SaveQuery "qryJournalPayments", "أسطر قيود سندات القبض من العملاء والصرف للموردين", s
 End Sub
@@ -2456,35 +2541,35 @@ End Sub
 Private Sub Q_qryJournalOpening()
     Dim s As String
     s = "SELECT 'BOX_OPENING' AS SourceType, b.CashBoxID AS SourceID, b.BoxName AS SourceNumber, b.OpeningDate AS SourceDate, b.BoxName AS Party, 1 AS LineOrder, 110000 + b.CashBoxID AS AccountCode, b.OpeningBalance AS Debit, CCur(0) AS Credit, b.BoxName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM CashBoxes AS b" & vbCrLf
+    s = s & "FROM [@CashBoxes] AS b" & vbCrLf
     s = s & "WHERE b.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'BOX_OPENING' AS SourceType, b.CashBoxID AS SourceID, b.BoxName AS SourceNumber, b.OpeningDate AS SourceDate, b.BoxName AS Party, 2 AS LineOrder, 3900 AS AccountCode, CCur(0) AS Debit, b.OpeningBalance AS Credit, 'رصيد افتتاحي' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM CashBoxes AS b" & vbCrLf
+    s = s & "FROM [@CashBoxes] AS b" & vbCrLf
     s = s & "WHERE b.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.CreatedAt AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 1300 AS AccountCode, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Credit, c.CustomerName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM Customers AS c" & vbCrLf
+    s = s & "FROM [@Customers] AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.CreatedAt AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM Customers AS c" & vbCrLf
+    s = s & "FROM [@Customers] AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 2100 AS AccountCode, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM Suppliers AS s" & vbCrLf
+    s = s & "FROM [@Suppliers] AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM Suppliers AS s" & vbCrLf
+    s = s & "FROM [@Suppliers] AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 1 AS LineOrder, 120000 + k.BankID AS AccountCode, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Credit, k.BankName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM Banks AS k" & vbCrLf
+    s = s & "FROM [@Banks] AS k" & vbCrLf
     s = s & "WHERE k.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Credit, 'رصيد افتتاحي' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM Banks AS k" & vbCrLf
+    s = s & "FROM [@Banks] AS k" & vbCrLf
     s = s & "WHERE k.OpeningBalance <> 0" & vbCrLf
     SaveQuery "qryJournalOpening", "أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين", s
 End Sub
@@ -2836,7 +2921,7 @@ End Sub
 Private Sub Q_BankBalanceQuery()
     Dim s As String
     s = "SELECT k.BankID, k.BankName, k.AccountNo, k.IBAN, k.IsActive, CCur(Nz(t.BookBalance, 0)) AS Balance, t.LastItemDate" & vbCrLf
-    s = s & "FROM Banks AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID" & vbCrLf
+    s = s & "FROM [@Banks] AS k LEFT JOIN qryBankTotals AS t ON k.BankID = t.BankID" & vbCrLf
     s = s & "ORDER BY k.BankName" & vbCrLf
     SaveQuery "BankBalanceQuery", "أرصدة البنوك في الدفاتر", s
 End Sub
@@ -2918,9 +3003,9 @@ Private Sub Q_ChequesQuery()
     s = s & "       k.BankName, q.IssueDate, q.DueDate, q.Amount, q.Status," & vbCrLf
     s = s & "       IIf(q.Status = 'PENDING', 'تحت التحصيل', IIf(q.Status = 'COLLECTED', IIf(q.Direction = 'IN', 'محصَّل', 'مصروف')," & vbCrLf
     s = s & "           'مرتد')) AS StatusName, q.StatusDate, q.Notes" & vbCrLf
-    s = s & "FROM ((Cheques AS q LEFT JOIN Customers AS c ON q.CustomerID = c.CustomerID)" & vbCrLf
-    s = s & "      LEFT JOIN Suppliers AS s ON q.SupplierID = s.SupplierID)" & vbCrLf
-    s = s & "     LEFT JOIN Banks AS k ON q.BankID = k.BankID" & vbCrLf
+    s = s & "FROM ((Cheques AS q LEFT JOIN [@Customers] AS c ON q.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "      LEFT JOIN [@Suppliers] AS s ON q.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "     LEFT JOIN [@Banks] AS k ON q.BankID = k.BankID" & vbCrLf
     SaveQuery "ChequesQuery", "الشيكات الواردة والصادرة مع العميل أو المورد وحالتها", s
 End Sub
 
@@ -3161,7 +3246,7 @@ End Sub
 Private Sub Q_qryCenterNames()
     Dim s As String
     s = "SELECT CostCenterID AS CenterKey, CenterCode, CenterName" & vbCrLf
-    s = s & "FROM CostCenters" & vbCrLf
+    s = s & "FROM [@CostCenters]" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 0, '-', 'غير موزع'" & vbCrLf
     s = s & "FROM Settings AS z" & vbCrLf
@@ -3271,7 +3356,7 @@ Private Sub Q_BudgetVsActualQuery()
     s = s & "           'ملائم', 'غير ملائم')) AS VarianceNote" & vbCrLf
     s = s & "FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)" & vbCrLf
     s = s & "       INNER JOIN [@Accounts] AS a ON b.AccountCode = a.AccountCode)" & vbCrLf
-    s = s & "      LEFT JOIN CostCenters AS c ON b.CostCenterID = c.CostCenterID)" & vbCrLf
+    s = s & "      LEFT JOIN [@CostCenters] AS c ON b.CostCenterID = c.CostCenterID)" & vbCrLf
     s = s & "     LEFT JOIN qryBudgetPlanned AS p ON b.BudgetLineID = p.BudgetLineID)" & vbCrLf
     s = s & "     LEFT JOIN qryBudgetActual AS x ON b.BudgetLineID = x.BudgetLineID" & vbCrLf
     s = s & "WHERE h.BudgetYear = Year(QDate('PeriodStart'))" & vbCrLf

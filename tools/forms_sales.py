@@ -12,8 +12,8 @@ PAYMENT_ROWS = ("SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] A
                 "ORDER BY p.SortOrder")
 POS_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, SellingPrice "
                     "FROM Products WHERE IsActive = True ORDER BY ProductName")
-CREDIT_CUSTOMER_ROWS = ("SELECT CustomerID, CustomerName FROM Customers WHERE IsSystem = False "
-                        "AND IsActive = True ORDER BY CustomerName")
+CREDIT_CUSTOMER_ROWS = ("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsSystem = False "
+                        "AND c.IsActive = True ORDER BY c.CustomerName")
 
 
 def grid_row(m: FormModel, columns: List[Tuple[str, str, float, dict, list]], row_h: int):

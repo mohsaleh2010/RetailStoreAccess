@@ -106,7 +106,8 @@ MANUAL_FIND_ROWS = ("SELECT ManualEntryID, EntryNumber, EntryDate, Description F
 MANUAL_TITLES = ["#", "الحساب", "مدين", "دائن", "بيان السطر", "مركز التكلفة", ""]
 
 
-CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
+CENTER_ROWS = ("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True "
+               "ORDER BY c.CenterCode")
 
 
 def layout_manual_lines() -> Tuple[FormModel, list]:

@@ -415,8 +415,8 @@ Public Function CanOpenScreen(ByVal FormName As String, Optional ByVal Quiet As 
     ElseIf HasPermission(key) Then
         CanOpenScreen = True
     ElseIf Not Quiet Then
-        ShowWarning "لا تملك صلاحية «" & Nz(DLookup("PermissionName", "Permissions", "PermissionKey = " & _
-                    SqlText(key)), key) & "». راجع مدير النظام."
+        ShowWarning "لا تملك صلاحية «" & Nz(DbValue(Tr("SELECT p.PermissionName FROM [@Permissions] AS p " & _
+                    "WHERE p.PermissionKey = " & SqlText(key))), key) & "». راجع مدير النظام."
     End If
 End Function
 
