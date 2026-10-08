@@ -538,13 +538,15 @@ def localized_queries() -> List[Query]:
     name field, qryLoc<Table> has the same columns as the table, with the English name of each row (else its
     Arabic name) in the name column. An English front-end reads it where the SQL says [@Table] (modLang.LangSql).
     Two steps, so that no alias repeats a field of its own expression (Access: circular reference)."""
-    from master_en import ENGLISH_NAMES
+    from master_en import ENGLISH_NAMES, EXTRA_NAMES
     from schema import table
     out = []
     for tbl, (en_field, ar_field, _, _) in ENGLISH_NAMES.items():
         names = [f.name for f in table(tbl).fields]
-        step1 = ", ".join(f"t.{n} AS LocArabicName" if n == ar_field else f"t.{n}" for n in names)
-        step2 = ", ".join(f"Nz({en_field}, LocArabicName) AS {n}" if n == ar_field else n for n in names)
+        pairs = {ar_field: (en_field, "LocArabicName")}
+        pairs.update({ar: (en, f"LocArabic{ar}") for en, ar, _ in EXTRA_NAMES.get(tbl, [])})
+        step1 = ", ".join(f"t.{n} AS {pairs[n][1]}" if n in pairs else f"t.{n}" for n in names)
+        step2 = ", ".join(f"Nz({pairs[n][0]}, {pairs[n][1]}) AS {n}" if n in pairs else n for n in names)
         out.append(Query(f"qryLoc{tbl}1", f"{tbl} للواجهة الإنجليزية (خطوة 1)", f"SELECT {step1} FROM {tbl} AS t"))
         out.append(Query(f"qryLoc{tbl}", f"{tbl} بالأسماء الإنجليزية (الواجهة الإنجليزية)",
                          f"SELECT {step2} FROM qryLoc{tbl}1"))

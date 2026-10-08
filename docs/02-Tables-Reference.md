@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **69** | عدد الحقول: **888**
+عدد الجداول: **69** | عدد الحقول: **890**
 
 ## الفهرس
 
@@ -166,7 +166,8 @@
 | 2 | PermissionName | Short Text | 100 | ✔ |  |  |  | اسم الصلاحية |
 | 3 | PermissionNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
 | 4 | ModuleName | Short Text | 50 |  |  |  |  | القسم |
-| 5 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 5 | ModuleNameEn | Short Text | 50 |  |  |  |  | القسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
 - بيانات أساسية: 36 سجل
@@ -234,11 +235,12 @@
 | 2 | ScreenTitle | Short Text | 100 | ✔ |  |  |  | الشاشة |
 | 3 | ScreenTitleEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
 | 4 | ModuleName | Short Text | 50 |  |  |  |  | القسم |
-| 5 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
-| 6 | PermissionKey | Short Text | 50 |  |  |  |  | صلاحية الدور – فارغ = متاحة لكل المستخدمين؛ تُستخدم للمستخدم الذي ليست له صلاحيات شاشات خاصة |
-| 7 | HasAdd | Yes/No |  |  | `False` |  |  | فيها إضافة / حفظ مستند |
-| 8 | HasEdit | Yes/No |  |  | `False` |  |  | فيها تعديل |
-| 9 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
+| 5 | ModuleNameEn | Short Text | 50 |  |  |  |  | القسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 7 | PermissionKey | Short Text | 50 |  |  |  |  | صلاحية الدور – فارغ = متاحة لكل المستخدمين؛ تُستخدم للمستخدم الذي ليست له صلاحيات شاشات خاصة |
+| 8 | HasAdd | Yes/No |  |  | `False` |  |  | فيها إضافة / حفظ مستند |
+| 9 | HasEdit | Yes/No |  |  | `False` |  |  | فيها تعديل |
+| 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
 - بيانات أساسية: 58 سجل

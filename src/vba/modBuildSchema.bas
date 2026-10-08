@@ -29,7 +29,7 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
     "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=5;Permissions=5;RolePermissions=2;Employees=30;Screens=9;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
     "CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=8;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;" & _
     "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=36;RolePermissions=71;Employees=1;Screens=58;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
@@ -774,6 +774,8 @@ Private Sub CreateTable_Permissions()
              "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "ModuleName", "TEXT", 50, False, "", _
              "", "", "القسم", ""
+    AddField tdf, "ModuleNameEn", "TEXT", 50, False, "", _
+             "", "", "القسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "SortOrder", "INT", 0, True, "0", _
              "", "", "الترتيب", ""
     AddIndex tdf, "PrimaryKey", "PermissionKey", True, True, False
@@ -870,6 +872,8 @@ Private Sub CreateTable_Screens()
              "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "ModuleName", "TEXT", 50, False, "", _
              "", "", "القسم", ""
+    AddField tdf, "ModuleNameEn", "TEXT", 50, False, "", _
+             "", "", "القسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "SortOrder", "INT", 0, True, "0", _
              "", "", "الترتيب", ""
     AddField tdf, "PermissionKey", "TEXT", 50, False, "", _
@@ -3715,6 +3719,16 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Users and permissions' WHERE [PermissionKey] = 'USERS' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Backup' WHERE [PermissionKey] = 'BACKUP' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Audit trail: who added, edited or deleted, with the values before and after' WHERE [PermissionKey] = 'AUDIT_LOG' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Sales' WHERE [ModuleName] = 'المبيعات' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Customers' WHERE [ModuleName] = 'العملاء' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Purchases' WHERE [ModuleName] = 'المشتريات' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Suppliers' WHERE [ModuleName] = 'الموردون' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Inventory' WHERE [ModuleName] = 'المخزون' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Expenses' WHERE [ModuleName] = 'المصروفات' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Treasury' WHERE [ModuleName] = 'الخزينة' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Accounting' WHERE [ModuleName] = 'الحسابات' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Reports' WHERE [ModuleName] = 'التقارير' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'System' WHERE [ModuleName] = 'النظام' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Point of sale (shops)' WHERE [ScreenName] = 'frmPOS' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Point of sale (restaurants)' WHERE [ScreenName] = 'frmTouchPOS' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Point of sale (cafes)' WHERE [ScreenName] = 'frmCafePOS' AND [ScreenTitleEn] Is Null", dbFailOnError
@@ -3773,6 +3787,16 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Screen permissions of users' WHERE [ScreenName] = 'frmUserScreens' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Audit trail' WHERE [ScreenName] = 'frmAuditLog' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Backup' WHERE [ScreenName] = 'frmBackup' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Sales' WHERE [ModuleName] = 'المبيعات' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Customers' WHERE [ModuleName] = 'العملاء' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Purchases' WHERE [ModuleName] = 'المشتريات' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Suppliers' WHERE [ModuleName] = 'الموردون' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Inventory' WHERE [ModuleName] = 'المخزون' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Expenses' WHERE [ModuleName] = 'المصروفات' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Treasury' WHERE [ModuleName] = 'الخزينة' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Accounting' WHERE [ModuleName] = 'الحسابات' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Reports' WHERE [ModuleName] = 'التقارير' AND [ModuleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'System' WHERE [ModuleName] = 'النظام' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Categories] SET [CategoryNameEn] = 'General' WHERE [CategoryID] = 1 AND [CategoryNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Piece' WHERE [UnitID] = 1 AND [UnitNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Box' WHERE [UnitID] = 2 AND [UnitNameEn] Is Null", dbFailOnError

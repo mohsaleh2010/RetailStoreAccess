@@ -925,25 +925,25 @@ End Sub
 
 Private Sub Q_qryLocPermissions1()
     Dim s As String
-    s = "SELECT t.PermissionKey, t.PermissionName AS LocArabicName, t.PermissionNameEn, t.ModuleName, t.SortOrder FROM Permissions AS t" & vbCrLf
+    s = "SELECT t.PermissionKey, t.PermissionName AS LocArabicName, t.PermissionNameEn, t.ModuleName AS LocArabicModuleName, t.ModuleNameEn, t.SortOrder FROM Permissions AS t" & vbCrLf
     SaveQuery "qryLocPermissions1", "Permissions ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
 End Sub
 
 Private Sub Q_qryLocPermissions()
     Dim s As String
-    s = "SELECT PermissionKey, Nz(PermissionNameEn, LocArabicName) AS PermissionName, PermissionNameEn, ModuleName, SortOrder FROM qryLocPermissions1" & vbCrLf
+    s = "SELECT PermissionKey, Nz(PermissionNameEn, LocArabicName) AS PermissionName, PermissionNameEn, Nz(ModuleNameEn, LocArabicModuleName) AS ModuleName, ModuleNameEn, SortOrder FROM qryLocPermissions1" & vbCrLf
     SaveQuery "qryLocPermissions", "Permissions »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
 End Sub
 
 Private Sub Q_qryLocScreens1()
     Dim s As String
-    s = "SELECT t.ScreenName, t.ScreenTitle AS LocArabicName, t.ScreenTitleEn, t.ModuleName, t.SortOrder, t.PermissionKey, t.HasAdd, t.HasEdit, t.HasDelete FROM Screens AS t" & vbCrLf
+    s = "SELECT t.ScreenName, t.ScreenTitle AS LocArabicName, t.ScreenTitleEn, t.ModuleName AS LocArabicModuleName, t.ModuleNameEn, t.SortOrder, t.PermissionKey, t.HasAdd, t.HasEdit, t.HasDelete FROM Screens AS t" & vbCrLf
     SaveQuery "qryLocScreens1", "Screens ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
 End Sub
 
 Private Sub Q_qryLocScreens()
     Dim s As String
-    s = "SELECT ScreenName, Nz(ScreenTitleEn, LocArabicName) AS ScreenTitle, ScreenTitleEn, ModuleName, SortOrder, PermissionKey, HasAdd, HasEdit, HasDelete FROM qryLocScreens1" & vbCrLf
+    s = "SELECT ScreenName, Nz(ScreenTitleEn, LocArabicName) AS ScreenTitle, ScreenTitleEn, Nz(ModuleNameEn, LocArabicModuleName) AS ModuleName, ModuleNameEn, SortOrder, PermissionKey, HasAdd, HasEdit, HasDelete FROM qryLocScreens1" & vbCrLf
     SaveQuery "qryLocScreens", "Screens »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
 End Sub
 

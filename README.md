@@ -61,7 +61,8 @@
 | + | الواجهة الإنجليزية: ملف واجهة بالإنجليزية من اليسار لليمين على نفس البيانات، والرسائل والتقارير مترجمة | ✅ تمت الموافقة | [docs/38-English-Interface.md](docs/38-English-Interface.md) |
 | + | الأسماء الإنجليزية للحسابات وطرق الدفع وأنواع القيود وحركات المخزون: القوائم المالية والقيود بالإنجليزية | ✅ تمت الموافقة | [docs/39-English-Master-Data.md](docs/39-English-Master-Data.md) |
 | + | الأسماء الإنجليزية للأدوار والصلاحيات والشاشات والتصنيفات والوحدات وأنواع المصروفات | ✅ تمت الموافقة | [docs/39-English-Master-Data.md](docs/39-English-Master-Data.md) |
-| + | الأسماء الإنجليزية للعملاء والموردين والصناديق والبنوك ومراكز التكلفة والمندوبين | ✅ بانتظار الموافقة | [docs/40-English-Party-Names.md](docs/40-English-Party-Names.md) |
+| + | الأسماء الإنجليزية للعملاء والموردين والصناديق والبنوك ومراكز التكلفة والمندوبين | ✅ تمت الموافقة | [docs/40-English-Party-Names.md](docs/40-English-Party-Names.md) |
+| + | أسماء المجموعات بالإنجليزية في شاشتي الصلاحيات (المبيعات، الحسابات…) | ✅ بانتظار الموافقة | [docs/41-English-Permission-Groups.md](docs/41-English-Permission-Groups.md) |
 
 ## هيكل المستودع
 
@@ -150,6 +151,7 @@
 | 35 | `modJournal`، `modVat`، `modPurchaseScreens`، `modAging`، `modCash`، `modCheque`، `modBank`، `modBudget`، `modPOS`، `modLang` والوحدات المولَّدة (الأسهل: `BuildFrontEnd.vbs`) | `BuildSchema` (يملأ الأسماء الإنجليزية)، `BuildQueries`, `BuildForms`, `BuildReports` | `TestLang` |
 | 36 | `modPurchaseScreens`، `modScreens`، `modSecurity`، `modSecurityScreens`، `modTouchPOS` والوحدات المولَّدة (الأسهل: `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestLang` |
 | 37 | `modAging`، `modCash`، `modCheque`، `modCostCenters`، `modForms`، `modJournal`، `modPOS`، `modPurchaseScreens`، `modPurchases`، `modReports`، `modSales`، `modScreens`، `modSecurity` والوحدات المولَّدة (الأسهل: `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal`, `TestLang` |
+| 38 | `modBuildSchema` و`modBuildQueries` (مولَّدتان؛ أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries` | `TestLang` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

@@ -12,7 +12,7 @@ import forms as F
 import generate as G
 import i18n
 import queries as Q
-from master_en import ENGLISH_NAMES
+from master_en import ENGLISH_NAMES, EXTRA_NAMES
 from schema import table
 
 MARK = re.compile(r"\[@(\w+)\]")
@@ -28,6 +28,9 @@ def fill_english(con):
     for tbl, (en_field, _, key, names) in ENGLISH_NAMES.items():
         for k, en in names.items():
             con.execute(f'UPDATE "{tbl}" SET {en_field} = ? WHERE {key} = ? AND {en_field} IS NULL', (en, k))
+        for extra_en, extra_ar, by_arabic in EXTRA_NAMES.get(tbl, []):
+            for ar, en in by_arabic.items():
+                con.execute(f'UPDATE "{tbl}" SET {extra_en} = ? WHERE {extra_ar} = ? AND {extra_en} IS NULL', (en, ar))
 
 
 class SchemaTests(unittest.TestCase):
@@ -48,9 +51,24 @@ class SchemaTests(unittest.TestCase):
     def test_build_schema_fills_only_empty_names(self):
         vba = read("modBuildSchema")
         body = re.search(r"Private Sub SeedEnglishNames\(\).*?End Sub", vba, re.S).group(0)
-        self.assertEqual(body.count("m_db.Execute"), sum(len(v[3]) for v in ENGLISH_NAMES.values()))
+        self.assertEqual(body.count("m_db.Execute"), sum(len(v[3]) for v in ENGLISH_NAMES.values())
+                         + sum(len(e[2]) for v in EXTRA_NAMES.values() for e in v))
         self.assertEqual(body.count("Is Null"), body.count("m_db.Execute"))
         self.assertLess(vba.index("    UpgradeAccountTree\n"), vba.index("    SeedEnglishNames\n"))
+
+    def test_every_group_has_an_english_name(self):
+        """docs/41: the group (ModuleName) of every seeded permission and screen has its English name."""
+        for tbl, extras in EXTRA_NAMES.items():
+            self.assertIn(tbl, ENGLISH_NAMES)                 # its qryLoc<Table> carries the extra names
+            t = table(tbl)
+            for en_field, ar_field, by_arabic in extras:
+                fld = next(f for f in t.fields if f.name == en_field)
+                self.assertFalse(fld.required)
+                values = {row[t.seed_columns.index(ar_field)] for row in t.seed_rows}
+                self.assertEqual(values, set(by_arabic), tbl)
+                for en in by_arabic.values():
+                    self.assertLessEqual(len(en), fld.size)
+                    en.encode("ascii")
 
     def test_accounts_screen_has_the_english_name(self):
         model = next(m for m in F.all_forms() if m.name == "frmAccounts")
@@ -195,6 +213,19 @@ class EnglishDataTests(unittest.TestCase):
             names = {r[0] for r in c.execute("SELECT SupplierName FROM SupplierBalanceQuery")}
             if names:
                 self.assertEqual(names == {"Supplier EN"}, english)
+
+    def test_permission_groups_follow_the_language(self):
+        """docs/41: the permission screens read [@Permissions] / [@Screens]: the group is English in English."""
+        for english, sales in ((False, "المبيعات"), (True, "Sales")):
+            c = self.db(english).con
+            perm, screen = ("qryLocPermissions", "qryLocScreens") if english else ("Permissions", "Screens")
+            self.assertEqual(c.execute(f"SELECT ModuleName FROM {perm} WHERE PermissionKey = 'SALES_POS'").fetchone()[0],
+                             sales)
+            self.assertEqual(c.execute(f"SELECT ModuleName FROM {screen} WHERE ScreenName = 'frmPOS'").fetchone()[0],
+                             sales)
+        lines = read("modSecurityScreens")
+        self.assertIn("p.ModuleName", lines.split("FROM [@Permissions] AS p")[0].rsplit("INSERT INTO tmpRolePermissions", 1)[1])
+        self.assertIn("s.ModuleName", lines.split("FROM [@Screens] AS s")[0].rsplit("INSERT INTO tmpUserScreens", 1)[1])
 
     def test_every_saved_query_runs_in_english(self):
         db = self.db(True)

@@ -131,7 +131,9 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   `[@Suppliers]`, `[@CashBoxes]`, `[@Banks]`, `[@CostCenters]`, `[@SalesReps]`; not for a look-up by the typed name,
   not in `qrySalesDocPrint`, the tax invoice) and goes through `Tr`: an English front-end reads `qryLocAccounts`
   (same columns, English name). No `DLookup` of such a name (it cannot go through `Tr`): `DbValue(Tr("SELECT ..."))`.
-  A new master table with an English name goes into `tools/master_en.py` (`docs/39-English-Master-Data.md`, `docs/40`).
+  A new master table with an English name goes into `tools/master_en.py` (`docs/39-English-Master-Data.md`, `docs/40`);
+  a second translated column of such a table (the group `ModuleName` of permissions and screens) goes into `EXTRA_NAMES`
+  (`docs/41`).
 - Text the user typed (a search) is added to SQL **after** `Tr`, never before: `Tr` would translate an Arabic word
   of it (`sql = Tr(template)`, then `Replace(sql, "{LIKE}", ...)`).
   `MSG_RTL` is a function of `modLang` (0 in English). The English texts contain no `" ' [ ] ; | & = < >`.

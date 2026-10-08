@@ -692,13 +692,18 @@ def account_upgrade_sub() -> str:
 def english_names_sub() -> str:
     """The English names of the system rows (tools/master_en.py), for a new or an older back-end:
     only the names still empty are filled, so a name the user changed is kept. Safe to run every time."""
-    from master_en import ENGLISH_NAMES
+    from master_en import ENGLISH_NAMES, EXTRA_NAMES
     out = ["Private Sub SeedEnglishNames()"]
     for tbl, (en_field, _, key, names) in ENGLISH_NAMES.items():
         for k, en in names.items():
             sql = (f"UPDATE [{tbl}] SET [{en_field}] = {sql_value(en)} WHERE [{key}] = {sql_value(k)} "
                    f"AND [{en_field}] Is Null")
             out.append(f"    m_db.Execute {vba_str(sql)}, dbFailOnError")
+        for en_field, ar_field, by_arabic in EXTRA_NAMES.get(tbl, []):
+            for ar, en in by_arabic.items():
+                sql = (f"UPDATE [{tbl}] SET [{en_field}] = {sql_value(en)} WHERE [{ar_field}] = {sql_value(ar)} "
+                       f"AND [{en_field}] Is Null")
+                out.append(f"    m_db.Execute {vba_str(sql)}, dbFailOnError")
     out.append("End Sub")
     return "\n".join(out)
 

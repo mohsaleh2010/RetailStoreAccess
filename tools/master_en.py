@@ -169,6 +169,10 @@ CASH_BOX_NAMES_EN = {1: "Main treasury", 2: "Cashier box"}
 
 CUSTOMER_NAMES_EN = {1: "Cash customer"}
 
+MODULE_NAMES_EN = {"المبيعات": "Sales", "العملاء": "Customers", "المشتريات": "Purchases", "الموردون": "Suppliers",
+                   "المخزون": "Inventory", "المصروفات": "Expenses", "الخزينة": "Treasury", "الحسابات": "Accounting",
+                   "التقارير": "Reports", "النظام": "System"}
+
 # table: (English field, Arabic field, key field, names by key)
 ENGLISH_NAMES = {
     "Accounts": ("AccountNameEn", "AccountName", "AccountCode", ACCOUNT_NAMES_EN),
@@ -188,4 +192,11 @@ ENGLISH_NAMES = {
     "Banks": ("BankNameEn", "BankName", "BankID", {}),
     "CostCenters": ("CenterNameEn", "CenterName", "CostCenterID", {}),
     "SalesReps": ("RepNameEn", "RepName", "SalesRepID", {}),
+}
+
+# More English names of a table of ENGLISH_NAMES, by the Arabic value (the group of a permission or screen in the
+# permission screens, docs/41): table: [(English field, Arabic field, names by Arabic value)]
+EXTRA_NAMES = {
+    "Permissions": [("ModuleNameEn", "ModuleName", MODULE_NAMES_EN)],
+    "Screens": [("ModuleNameEn", "ModuleName", MODULE_NAMES_EN)],
 }

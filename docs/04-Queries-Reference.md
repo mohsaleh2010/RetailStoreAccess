@@ -398,7 +398,7 @@ SELECT RoleID, RoleCode, Nz(RoleNameEn, LocArabicName) AS RoleName, RoleNameEn, 
 Permissions للواجهة الإنجليزية (خطوة 1)
 
 ```sql
-SELECT t.PermissionKey, t.PermissionName AS LocArabicName, t.PermissionNameEn, t.ModuleName, t.SortOrder FROM Permissions AS t
+SELECT t.PermissionKey, t.PermissionName AS LocArabicName, t.PermissionNameEn, t.ModuleName AS LocArabicModuleName, t.ModuleNameEn, t.SortOrder FROM Permissions AS t
 ```
 
 ## qryLocPermissions
@@ -406,7 +406,7 @@ SELECT t.PermissionKey, t.PermissionName AS LocArabicName, t.PermissionNameEn, t
 Permissions بالأسماء الإنجليزية (الواجهة الإنجليزية)
 
 ```sql
-SELECT PermissionKey, Nz(PermissionNameEn, LocArabicName) AS PermissionName, PermissionNameEn, ModuleName, SortOrder FROM qryLocPermissions1
+SELECT PermissionKey, Nz(PermissionNameEn, LocArabicName) AS PermissionName, PermissionNameEn, Nz(ModuleNameEn, LocArabicModuleName) AS ModuleName, ModuleNameEn, SortOrder FROM qryLocPermissions1
 ```
 
 ## qryLocScreens1
@@ -414,7 +414,7 @@ SELECT PermissionKey, Nz(PermissionNameEn, LocArabicName) AS PermissionName, Per
 Screens للواجهة الإنجليزية (خطوة 1)
 
 ```sql
-SELECT t.ScreenName, t.ScreenTitle AS LocArabicName, t.ScreenTitleEn, t.ModuleName, t.SortOrder, t.PermissionKey, t.HasAdd, t.HasEdit, t.HasDelete FROM Screens AS t
+SELECT t.ScreenName, t.ScreenTitle AS LocArabicName, t.ScreenTitleEn, t.ModuleName AS LocArabicModuleName, t.ModuleNameEn, t.SortOrder, t.PermissionKey, t.HasAdd, t.HasEdit, t.HasDelete FROM Screens AS t
 ```
 
 ## qryLocScreens
@@ -422,7 +422,7 @@ SELECT t.ScreenName, t.ScreenTitle AS LocArabicName, t.ScreenTitleEn, t.ModuleNa
 Screens بالأسماء الإنجليزية (الواجهة الإنجليزية)
 
 ```sql
-SELECT ScreenName, Nz(ScreenTitleEn, LocArabicName) AS ScreenTitle, ScreenTitleEn, ModuleName, SortOrder, PermissionKey, HasAdd, HasEdit, HasDelete FROM qryLocScreens1
+SELECT ScreenName, Nz(ScreenTitleEn, LocArabicName) AS ScreenTitle, ScreenTitleEn, Nz(ModuleNameEn, LocArabicModuleName) AS ModuleName, ModuleNameEn, SortOrder, PermissionKey, HasAdd, HasEdit, HasDelete FROM qryLocScreens1
 ```
 
 ## qryLocCategories1
