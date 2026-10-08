@@ -29,10 +29,10 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
     "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=41;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=41;SalesInvoiceDetails=14;SalesReturns=34;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=44;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=42;SalesInvoiceDetails=14;SalesReturns=35;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
     "CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=8;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;" & _
     "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=37;RolePermissions=73;Employees=1;Screens=60;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=37;RolePermissions=73;Employees=1;Screens=61;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -745,6 +745,12 @@ Private Sub CreateTable_Settings()
              ">=0", "عدد الأيام لا يكون سالبًا", "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم)", ""
     AddField tdf, "EInvoiceEnabled", "BOOL", 0, False, "False", _
              "", "", "تفعيل الفاتورة الإلكترونية", ""
+    AddField tdf, "OpenSslPath", "TEXT", 255, False, "", _
+             "", "", "مسار برنامج OpenSSL", "فارغ = openssl في مسار النظام (docs/46)"
+    AddField tdf, "ZatcaKeyFile", "TEXT", 255, False, "", _
+             "", "", "ملف المفتاح الخاص للجهاز", "secp256k1، على جهاز آمن؛ لا يُحفظ في البيانات"
+    AddField tdf, "ZatcaCertificate", "MEMO", 0, False, "", _
+             "", "", "شهادة الجهاز (CSID)", ""
     AddField tdf, "EInvoiceEnvironment", "TEXT", 12, True, """TEST""", _
              "In (""TEST"",""SIMULATION"",""PRODUCTION"")", "TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية", "بيئة الفاتورة الإلكترونية", "السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45)"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
@@ -1303,6 +1309,8 @@ Private Sub CreateTable_SalesInvoices()
              "", "", "مسار ملف XML الموقّع", ""
     AddField tdf, "EInvoiceAttempts", "INT", 0, False, "0", _
              "", "", "محاولات الإرسال", ""
+    AddField tdf, "EInvoiceXml", "MEMO", 0, False, "", _
+             "", "", "ملف الفاتورة الإلكترونية الموقّع", ""
     AddField tdf, "EInvoiceError", "TEXT", 255, False, "", _
              "", "", "آخر خطأ في الإرسال", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
@@ -1428,6 +1436,8 @@ Private Sub CreateTable_SalesReturns()
              "", "", "مسار ملف XML الموقّع", ""
     AddField tdf, "EInvoiceAttempts", "INT", 0, False, "0", _
              "", "", "محاولات الإرسال", ""
+    AddField tdf, "EInvoiceXml", "MEMO", 0, False, "", _
+             "", "", "ملف الفاتورة الإلكترونية الموقّع", ""
     AddField tdf, "EInvoiceError", "TEXT", 255, False, "", _
              "", "", "آخر خطأ في الإرسال", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
@@ -3334,7 +3344,8 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 580, 'BACKUP', False, False, False)"
     SeedRow "[ScreenName] = 'frmEnglishNames'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEnglishNames', 'الأسماء الإنجليزية', 'النظام', 590, 'SETTINGS', False, True, False)"
     SeedRow "[ScreenName] = 'frmEInvoices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEInvoices', 'الفاتورة الإلكترونية', 'المبيعات', 600, 'EINVOICE', False, True, False)"
-    EndSeed "Screens", 60
+    SeedRow "[ScreenName] = 'frmZatcaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmZatcaSetup', 'إعداد ربط منصة فاتورة', 'النظام', 610, 'SETTINGS', False, True, False)"
+    EndSeed "Screens", 61
 End Sub
 
 Private Sub Seed_Categories()
@@ -3865,6 +3876,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Backup' WHERE [ScreenName] = 'frmBackup' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'English names' WHERE [ScreenName] = 'frmEnglishNames' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'E-invoicing' WHERE [ScreenName] = 'frmEInvoices' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Fatoora connection setup' WHERE [ScreenName] = 'frmZatcaSetup' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Sales' WHERE [ModuleName] = 'المبيعات' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Customers' WHERE [ModuleName] = 'العملاء' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Purchases' WHERE [ModuleName] = 'المشتريات' AND [ModuleNameEn] Is Null", dbFailOnError

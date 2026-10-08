@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2373
+Private Const ENTRY_COUNT As Long = 2419
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -225,16 +225,16 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=IIf([DocKind]=""RECEIPT"",""ÇÓÊáãäÇ ãä: "",""ÕÑİäÇ Åáì: "") & [PartyName]") = "=IIf([DocKind]=""RECEIPT"",""Received from: "",""Paid to: "") & [PartyName]", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÃõäÔÆÊ ÇáãæÇÒäÉ ÈÓØÑ áßá ÍÓÇÈ ÅíÑÇÏÇÊ æãÕÑæİÇÊ (") = "The budget was created with a line for each revenue and expense account (", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÇÓã ÈÇáÅäÌáíÒíÉ") = "English name", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÈÇÚ") = "Sold", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞÑ ÇáÍĞİ (ÎØÃ ") = "Could not delete (error ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÌá ÇáÊÏŞíŞ") = "Audit trail", "Tr sample 6", passed, failed, report
+    CheckLang Tr("=""æÑŞÉ ÌÑÏ "" & IIf([Status]=""POSTED"",""(ãõÑÍøá)"",IIf([Status]=""CANCELLED"",""(ãáÛì)"",""(ãİÊæÍ)""))") = "=""Count sheet "" & IIf([Status]=""POSTED"",""(Posted)"",IIf([Status]=""CANCELLED"",""(Cancelled)"",""(Open)""))", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÃõÖíİ ") = "Added ", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÇÓã ÇáÅäÌáíÒí ÃØæá ãä ") = "The English name is longer than ", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáßæÏ") = "Code", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞÑ ÇáÍÓÇÈ: ") = "Could not calculate: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÓÌá ÇáÃÕæá æŞíÏ ÔÑÇÆåÇ¡ æÇáÅåáÇß ÈÇáŞÓØ ÇáËÇÈÊ¡ æÇáÈíÚ Ãæ ÇáÇÓÊÈÚÇÏ") = "Asset register and purchase entry, straight-line depreciation, and sale or disposal", "Tr sample 6", passed, failed, report
     CheckLang Tr("áÇ ÊæÌÏ İÊÑÉ ãŞİáÉ") = "There is no closed period", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
-    CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÒÑ ÇáÇŞÊÑÇÍ íßÊÈ ÇáÇÓã ÇáÚÑÈí ÈÍÑæİ áÇÊíäíÉ İí ÇáÎÇäÇÊ ÇáİÇÑÛÉ İŞØ. ÑÇÌÚå æÚÏøáå Ëã ÇÍİÙ. ÇáÇÓã ÇáİÇÑÛ íÙåÑ ÈÇáÚÑÈíÉ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ") = "ÒÑ ÇáÇŞÊÑÇÍ íßÊÈ ÇáÇÓã ÇáÚÑÈí ÈÍÑæİ áÇÊíäíÉ İí ÇáÎÇäÇÊ ÇáİÇÑÛÉ İŞØ. ÑÇÌÚå æÚÏøáå Ëã ÇÍİÙ. ÇáÇÓã ÇáİÇÑÛ íÙåÑ ÈÇáÚÑÈíÉ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _
+    CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÇáÔåÇÏÉ ÇáİÚáíÉ ÊõØáÈ ãä ÇáåíÆÉ İí ÇáãÑÍáÉ ÇáÊÇáíÉ (ÊÓÌíá ÇáÌåÇÒ). ááÊÌÑÈÉ ÇáÂä: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ»¡ æÇİÍÕ Çáãáİ ÈÃÏÇÉ ÇáåíÆÉ") = "ÇáÔåÇÏÉ ÇáİÚáíÉ ÊõØáÈ ãä ÇáåíÆÉ İí ÇáãÑÍáÉ ÇáÊÇáíÉ (ÊÓÌíá ÇáÌåÇÒ). ááÊÌÑÈÉ ÇáÂä: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ»¡ æÇİÍÕ Çáãáİ ÈÃÏÇÉ ÇáåíÆÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _
               passed, failed, report
     UseLanguage saved
     Debug.Print "--- passed: " & passed & " | failed: " & failed

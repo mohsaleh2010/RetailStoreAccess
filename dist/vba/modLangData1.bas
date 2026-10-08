@@ -14,6 +14,7 @@ Public Sub LangData1()
 End Sub
 
 Private Sub D1_1()
+    LangAdd "ÇáÔåÇÏÉ ÇáİÚáíÉ ÊõØáÈ ãä ÇáåíÆÉ İí ÇáãÑÍáÉ ÇáÊÇáíÉ (ÊÓÌíá ÇáÌåÇÒ). ááÊÌÑÈÉ ÇáÂä: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ»¡ æÇİÍÕ Çáãáİ ÈÃÏÇÉ ÇáåíÆÉ", "The real certificate is requested from ZATCA in the next phase (device registration). To try now: Test certificate then XML file of an invoice, and check the file with the ZATCA tool"
     LangAdd "ÒÑ ÇáÇŞÊÑÇÍ íßÊÈ ÇáÇÓã ÇáÚÑÈí ÈÍÑæİ áÇÊíäíÉ İí ÇáÎÇäÇÊ ÇáİÇÑÛÉ İŞØ. ÑÇÌÚå æÚÏøáå Ëã ÇÍİÙ. ÇáÇÓã ÇáİÇÑÛ íÙåÑ ÈÇáÚÑÈíÉ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "Suggest writes the Arabic name in Latin letters in the empty boxes only. Review and correct it, then save. An empty name shows in Arabic in the English interface"
     LangAdd "ÇáÍÓÇÈÇÊ ÇáÃÓÇÓíÉ (ÇáãÚáóøãÉ) ÊÓÊÎÏãåÇ ÇáŞíæÏ ÇáÂáíÉ: áÇ ÊõÍĞİ æáÇ íÊÛíÑ äæÚåÇ. ÇáŞíæÏ ÇáíÏæíÉ ãä ÒÑ «ŞíÏ íÏæí", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "íõÚÑÖ ÇáÊŞÑíÑ ááãÚÇíäÉ æãäåÇ ÇáØÈÇÚÉ. «ÍİÙ PDF» æ«ÊÕÏíÑ Excel» íÍİÙÇä Çáãáİ İí ãÌáÏ Reports ÈÌÇäÈ ãáİ ÇáÈÑäÇãÌ", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
@@ -47,6 +48,7 @@ Private Sub D1_1()
     LangAdd "ÅíÏÇÚ æÓÍÈ¡ ÊÓæíÉ ÊÍÕíáÇÊ ãÏì ÈÚãæáÊåÇ¡ ÇáÊÍæíá Èíä ÇáÈäæß¡ æÇáÍÑßÇÊ ÇáÃÎÑì", "Deposit and withdrawal, settlement of Mada collections with their fee, transfer between banks, and other moves"
     LangAdd "ÇáİÇÊæÑÉ ÇáÍÇáíÉ áã ÊõÍİÙ (ÓÊÈŞì ãÍİæÙÉ ãÄŞÊğÇ áåĞÇ ÇáÌåÇÒ). åá ÊÑíÏ ÇáÎÑæÌ", "The current invoice is not saved (it will stay held for this computer). Do you want to exit"
     LangAdd "ãÈáÛ ÔåÑí áßá ÍÓÇÈ ÅíÑÇÏÇÊ Ãæ ãÕÑæİÇÊ (æíãßä áßá ãÑßÒ)¡ Ëã ÇáãŞÇÑäÉ ÈÇáİÚáí", "A monthly amount for each revenue or expense account (and for each center), then the comparison with the actual"
+    LangAdd "ÅÚÏÇÏ ãäÙæãÉ ãÕáÍÉ ÇáÖÑÇÆÈ ÇáãÕÑíÉ íÃÊí İí ãÑÍáÉ ÇáÅíÕÇá ÇáÅáßÊÑæäí ÇáãÕÑí", "The Egyptian Tax Authority setup comes with the Egyptian e-receipt phase"
     LangAdd "ÇÎÊÑ ãÌáÏ ÇáäÓÎ ÇáÇÍÊíÇØí (íİÖá ŞÑÕ ÂÎÑ Ãæ İáÇÔÉ Ãæ ãÌáÏ ãÊÒÇãä ãÚ ÇáÓÍÇÈÉ", "Choose the backup folder (preferably another disk, a USB drive or a folder synced with the cloud"
     LangAdd "ÇáÅåáÇß ÇáÓÇÈŞ ááÃÕæá ÇáãæÌæÏÉ ŞÈá ÇáÈÑäÇãÌ İŞØ (ãÕÏÑ ÇáÔÑÇÁ: ÑÕíÏ ÇİÊÊÇÍí", "Previous depreciation, only for assets owned before the program (purchase source: opening balance"
     LangAdd "ÊÑÍíá ÇáÌÑÏ íÍæøá ÇáİÑæŞÇÊ Åáì ÍÑßÇÊ ÊÓæíÉ İí ÇáãÎÒæä æáÇ íãßä ÇáÊÑÇÌÚ Úäå", "Posting the count turns the differences into stock adjustment moves and cannot be undone"
@@ -102,6 +104,7 @@ Private Sub D1_1()
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. áÅŞÑÇÑ ãÚÊãÏ ÇÓÊÎÏã «ÅáÛÇÁ ÇáÇÚÊãÇÏ» ÃæáğÇ", "Only the draft is deleted. For an approved return use Cancel approval first"
     LangAdd "ÛíÑ ãæÌæÏÉ Úáì åĞÇ ÇáÌåÇÒ. ÇÎÊÑåÇ ãä ÌÏíÏ İí ÅÚÏÇÏÇÊ ÇáãáÕŞÇÊ", "does not exist on this computer. Choose it again in the label settings"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÃÓÚÇÑ ÇáÈíÚ. ÇãÓÍ ÚãæÏ «ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ", "You do not have the permission to change sale prices. Clear the column New sale price"
+    LangAdd "ÃÕäÇİ ãÚİÇÉ Ãæ ÈäÓÈÉ ÕİÑíÉ: ÊÍÊÇÌ ÓÈÈ ÇáÅÚİÇÁ¡ æáã íõÏÚã ÈÚÏ", "Exempt or zero-rated items: they need an exemption reason, not supported yet"
     LangAdd "ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÑÍóøáÉ ãä ÇáİÊÑÇÊ ÇáÓÇÈŞÉ (ÑÕíÏ ÏÇÆä", "VAT carried from previous periods (credit balance"
     LangAdd "ŞíÏ İí İÊÑÉ ãŞİáÉ: ááÚÑÖ İŞØ. íãßä Úãá ŞíÏ ÚßÓí ÈÊÇÑíÎ ãİÊæÍ", "An entry in a closed period: view only. A reversing entry can be made on an open date"
     LangAdd "ááÅíÏÇÚ æÇáÓÍÈ æÇáÊÍæíá æÊÓæíÉ ãÏì ÇÎÊÑ äæÚ ÇáÍÑßÉ ÇáÎÇÕ ÈåÇ", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
@@ -131,12 +134,12 @@ Private Sub D1_1()
     LangAdd "ŞíÏ ãÍİæÙ: ÚÏøá Ëã ÇÍİÙ¡ İíÊÍÏË ŞíÏå İí ÇáíæãíÉ ÈäİÓ ÑŞãå", "Saved entry: edit and save, and its journal entry is updated with the same number"
     LangAdd "íõÍĞİ ÇáÔíß ÊÍÊ ÇáÊÍÕíá İŞØ: ÃáÛö ÊÍÕíáå Ãæ ÇÑÊÏÇÏå ÃæáğÇ", "Only a cheque under collection is deleted: cancel its collection or bounce first"
     LangAdd "ÅÑÌÇÚ ÇáÔíß Åáì «ÊÍÊ ÇáÊÍÕíá» æÍĞİ ŞíÏ ÊÍÕíáå Ãæ ÇÑÊÏÇÏå", "Return the cheque to Under collection and delete the entry of its collection or bounce"
-    LangAdd "ÇßÊÈ ÓÈÈ ÇáÍÑßÉ İí ÇáãáÇÍÙÇÊ (ãËÇá: ÊÇáİ¡ åÏíÉ ãä ÇáãæÑÏ", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
-    LangAdd "ÇáãÈáÛ ÇáãÏİæÚ (F8) - ÇÊÑßå İÇÑÛğÇ ÅĞÇ ÏİÚ ÇáãÈáÛ ÈÇáÖÈØ", "Amount paid (F8) - leave it empty if the exact amount is paid"
-    LangAdd "ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ", "The remainder of each credit invoice by its delay after the due date"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "ÇßÊÈ ÓÈÈ ÇáÍÑßÉ İí ÇáãáÇÍÙÇÊ (ãËÇá: ÊÇáİ¡ åÏíÉ ãä ÇáãæÑÏ", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
+    LangAdd "ÇáãÈáÛ ÇáãÏİæÚ (F8) - ÇÊÑßå İÇÑÛğÇ ÅĞÇ ÏİÚ ÇáãÈáÛ ÈÇáÖÈØ", "Amount paid (F8) - leave it empty if the exact amount is paid"
+    LangAdd "ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ", "The remainder of each credit invoice by its delay after the due date"
     LangAdd "ÏæÑ ãÏíÑ ÇáäÙÇã íãáß ßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ æáÇ íãßä ÊŞííÏå", "The system administrator role always has all the permissions and cannot be restricted"
     LangAdd "Úáì ÇáÃÕá ŞíæÏ ÅåáÇß: áÇ ÊÊÛíÑ ÈíÇäÇÊå ÇáãÇáíÉ æáÇ íõÍĞİ", "The asset has depreciation entries: its financial data do not change and it is not deleted"
     LangAdd "áÇ íÊÛíÑ ÑŞã ÍÓÇÈ ãÍİæÙ. ÃäÔÆ ÍÓÇÈğÇ ÌÏíÏğÇ æÚØøá ÇáŞÏíã", "A saved account number does not change. Create a new account and deactivate the old one"
@@ -175,6 +178,7 @@ Private Sub D1_2()
     LangAdd "ÇáŞíãÉ ÇáãÊÈŞíÉ æÇáÅåáÇß ÇáÓÇÈŞ áÇ íÊÌÇæÒÇä ÇáÊßáİÉ", "The residual value and the previous depreciation do not exceed the cost"
     LangAdd "ÇáãÏíÑ ÇáãÓÄæá Úä ÇáÎÒíäÉ: ÇÎÊÑ áå ÇáÎÒíäÉ ÇáÑÆíÓíÉ", "The manager in charge of the treasury: choose the main treasury for him"
     LangAdd "ÊÇÑíÎ ÇáãÕÑæİ İí ÇáãÓÊŞÈá. åá ÊÑíÏ ÇáÍİÙ Úáì Ãí ÍÇá", "The expense date is in the future. Do you want to save anyway"
+    LangAdd "ÊæÌÏ ÔåÇÏÉ ãÍİæÙÉ. åá ÊÑíÏ ÇÓÊÈÏÇáåÇ ÈÔåÇÏÉ ÊÌÑíÈíÉ", "A certificate is saved. Replace it with a test certificate"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to add in the payment matching screen"
     LangAdd "áã ÊõÚãá äÓÎÉ ÇÍÊíÇØíÉ Çáíæã. åá ÊÑíÏ Úãá äÓÎÉ ÇáÂä", "No backup was made today. Do you want to make a backup now"
     LangAdd "åá ÊÑíÏ ÅáÛÇÁ ÇáİÇÊæÑÉ ÇáÍÇáíÉ æÇáÈÏÁ ÈİÇÊæÑÉ ÌÏíÏÉ", "Do you want to cancel the current invoice and start a new one"
@@ -229,6 +233,7 @@ Private Sub D1_2()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to add in the bank reconciliation screen"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to add in the bank transactions screen"
     LangAdd "áåĞÇ ÇáÍÓÇÈ ÍÓÇÈÇÊ ÊÇÈÚÉ¡ İíÈŞì ÍÓÇÈğÇ ÑÆíÓíğÇ", "This account has sub-accounts, so it stays a main account"
+    LangAdd "ãİÊÇÍ ÇáÌåÇÒ æÔåÇÏÊå æÈÑäÇãÌ ÇáÊæŞíÚ (ÇáÓÚæÏíÉ", "Key and certificate of the device and the signing program (Saudi Arabia"
     LangAdd "äŞÑ ãÒÏæÌ Úáì ÍÓÇÈ íİÊÍ ßÔİ ÍÓÇÈå ááİÊÑÉ äİÓåÇ", "Double-click an account to open its statement for the same period"
     LangAdd "ÇÎÊÑ ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ßÔİ ÇáÈäß Ëã «ãØÇÈŞÉ", "Choose the transactions shown on the bank statement, then Match"
     LangAdd "ÇÎÊÑ ÇáİÇÊæÑÉ ÇáÃÕáíÉ Ëã ÍÏÏ ÇáßãíÇÊ ÇáãÑÊÌÚÉ", "Choose the original invoice, then set the returned quantities"
@@ -252,16 +257,17 @@ Private Sub D1_2()
     LangAdd "ÇÊÑßå İÇÑÛğÇ ááØÈÇÚÉ Úáì ÇáØÇÈÚÉ ÇáÇİÊÑÇÖíÉ", "Leave it empty to print on the default printer"
     LangAdd "ÇÎÊÑ ÇáãÔÑæÈ: ÇáÍÌã æÇáÅÖÇİÇÊ ÊÙåÑ ÊáŞÇÆíğÇ", "Choose the drink: the size and extras appear automatically"
     LangAdd "ÇáÓÚÑ æÇáÎÕã áÇ íãßä Ãä íßæäÇ ÓÇáÈíä (ÇáÓØÑ", "The price and the discount cannot be negative (line"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ÊÇÑíÎ ÇáäåÇíÉ íÌÈ Ãä íßæä ÈÚÏ ÊÇÑíÎ ÇáÈÏÇíÉ", "The end date must be after the start date"
     LangAdd "ÊãÊ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ ÈäÌÇÍ æÊã ÇáÊÍŞŞ ãäåÇ", "The backup was made successfully and checked"
     LangAdd "ÊäÈíå: ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ ÃŞá ãä ÊßáİÉ ÇáÔÑÇÁ", "Warning: the new sale price is below the purchase cost"
     LangAdd "ÓÈÈ ÇáÅÑÌÇÚ ãØáæÈ (ÅáÒÇãí İí ÇáÅÔÚÇÑ ÇáÏÇÆä", "The return reason is required (mandatory on the credit note"
     LangAdd "ÚãáíÇÊ ÛíÑ ãÊæÇÒäÉ áã íõäÔÃ áåÇ ŞíÏ (ÑÇÌÚåÇ", "Unbalanced transactions with no entry created (review them"
-End Sub
-
-Private Sub D1_3()
     LangAdd "Úãíá ÇáãÑÊÌÚ íÎÊáİ Úä Úãíá ÇáİÇÊæÑÉ ÇáÃÕáíÉ", "The customer of the return differs from the customer of the original invoice"
     LangAdd "ãŞİáÉ: ÕÇİí ÇáÑÈÍ ÇáãÑÍóøá ááÃÑÈÇÍ ÇáãÍÊÌÒÉ", "Closed: net profit carried to retained earnings"
+    LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ááÌåÇÒ (íÈŞì Úáì ÌåÇÒ Âãä", "Private key file of the device (kept on a safe computer"
     LangAdd "ãäÊÌ ÓØÑ ÇáãÑÊÌÚ íÎÊáİ Úä ãäÊÌ ÇáÓØÑ ÇáÃÕáí", "The product of the return line differs from the product of the original line"
     LangAdd "ÅÌãÇáí İÇÊæÑÉ ÇáÔÑÇÁ áÇ íÓÇæí ãÌãæÚ ÃÓØÑåÇ", "The purchase invoice total does not equal the sum of its lines"
     LangAdd "ÅíŞÇİ ÇáÈíÚ ÇáÂÌá áÚãíá ãÊÃÎÑ ÃßËÑ ãä (íæã", "Stop credit sales to a customer late more than (days"
@@ -271,6 +277,7 @@ Private Sub D1_3()
     LangAdd "ÈíÇäÇÊß ÇáÍÇáíÉ áã ÊÊÛíÑ¡ æäÓÎÊåÇ ÇáæŞÇÆíÉ", "Your current data did not change, and its safety copy"
     LangAdd "ÊÇÑíÎ ÇáİÇÊæÑÉ áÇ íãßä Ãä íßæä İí ÇáãÓÊŞÈá", "The invoice date cannot be in the future"
     LangAdd "ßáãÉ ãÑæÑ ãÄŞÊÉ: ÓíõØáÈ ÊÛííÑåÇ ÚäÏ ÇáÏÎæá", "Temporary password: the user is asked to change it at login"
+    LangAdd "áÇ ÊæÌÏ ÔåÇÏÉ ÇáÌåÇÒ (CSID) İí ÅÚÏÇÏ ÇáÑÈØ", "There is no device certificate (CSID) in the connection setup"
     LangAdd "ãÔßáÉ İí ÇáÈíÇäÇÊ - ÑÇÌÚ ÊŞÑíÑ İÍÕ ÇáÓáÇãÉ", "A data problem - check the integrity report"
     LangAdd "ãäÕÉ İÇÊæÑÉ (åíÆÉ ÇáÒßÇÉ æÇáÖÑíÈÉ æÇáÌãÇÑß", "the Fatoora platform (ZATCA"
     LangAdd "íæÌÏ ÍŞá ãØáæÈ İÇÑÛ. Ãßãá ÇáÈíÇäÇÊ Ëã ÇÍİÙ", "A required field is empty. Complete the data, then save"
@@ -319,15 +326,4 @@ Private Sub D1_3()
     LangAdd "ÑÇÌÚ ÇáÊÇÑíÎ æÇáÃÓØÑ Ëã ÇÖÛØ «ÍİÙ ÇáŞíÏ", "Check the date and the lines, then click Save entry"
     LangAdd "ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "The new sale price cannot be negative"
     LangAdd "ÚÏøá ÇáÅÖÇİí æÇáÎÕæãÇÊ Ëã «ÊÑÍíá ÇáãÓíÑ", "Edit the overtime and deductions, then Post the run"
-    LangAdd "ßáãÉ ÇáÈÍË (ÇÓã¡ ßæÏ¡ ÈÇÑßæÏ¡ ÑŞã¡ ÌæÇá", "Search text (name, code, barcode, number, mobile"
-    LangAdd "áÇ ÊæÌÏ ãÕÑæİÇÊ ãÊßÑÑÉ ãÓÊÍŞÉ ÍÊì Çáíæã", "There are no recurring expenses due up to today"
-    LangAdd "áÇ íãßä ÊİÚíá ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÇáÂä", "E-invoicing cannot be enabled now"
-    LangAdd "íÌÈ Ãä íİÚøáå ãÏíÑ ÇáäÙÇã ŞÈá ÇáÇÓÊÎÏÇã", "The system administrator must activate it before use"
-    LangAdd "ÃÍÑİ Úáì ÇáÃŞá¡ æáÇ ÊÓÇæí ÇÓã ÇáãÓÊÎÏã", "characters at least, and not equal to the user name"
-    LangAdd "ÃÏÎá ÇáäŞÏíÉ ÇáãæÌæÏÉ İÚáğÇ İí ÇáÕäÏæŞ", "Enter the cash actually in the box"
-    LangAdd "ÃÖİå İí ÊÕÍíÍÇÊ ÇáÅŞÑÇÑ ÇáÊÇáí (ÇáÎÇäÉ", "Add it to the corrections of the next return (box"
-    LangAdd "Ãæ ÇÊÑß ÇáÊÇÑíÎ İÇÑÛğÇ áİÊÍ ßá ÇáİÊÑÇÊ", "or leave the date empty to open all periods"
-    LangAdd "ÇáÅŞÑÇÑÇÊ ÇáãÍİæÙÉ (ÇÎÊÑ ÅŞÑÇÑğÇ áÚÑÖå", "Saved returns (choose a return to show it"
-    LangAdd "ÇáÌÑÏ ÛíÑ ãæÌæÏ Ãæ Êã ÊÑÍíáå Ãæ ÅáÛÇÄå", "The count does not exist or was posted or cancelled"
-    LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ÃßÈÑ ãä ÇáßãíÉ ÇáãÈÇÚÉ", "The returned quantity is more than the quantity sold"
 End Sub

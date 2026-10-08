@@ -14,6 +14,7 @@ Public Sub LangData1()
 End Sub
 
 Private Sub D1_1()
+    LangAdd "الشهادة الفعلية تُطلب من الهيئة في المرحلة التالية (تسجيل الجهاز). للتجربة الآن: «شهادة تجريبية» ثم «ملف XML لفاتورة»، وافحص الملف بأداة الهيئة", "The real certificate is requested from ZATCA in the next phase (device registration). To try now: Test certificate then XML file of an invoice, and check the file with the ZATCA tool"
     LangAdd "زر الاقتراح يكتب الاسم العربي بحروف لاتينية في الخانات الفارغة فقط. راجعه وعدّله ثم احفظ. الاسم الفارغ يظهر بالعربية في الواجهة الإنجليزية", "Suggest writes the Arabic name in Latin letters in the empty boxes only. Review and correct it, then save. An empty name shows in Arabic in the English interface"
     LangAdd "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "يُعرض التقرير للمعاينة ومنها الطباعة. «حفظ PDF» و«تصدير Excel» يحفظان الملف في مجلد Reports بجانب ملف البرنامج", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
@@ -47,6 +48,7 @@ Private Sub D1_1()
     LangAdd "إيداع وسحب، تسوية تحصيلات مدى بعمولتها، التحويل بين البنوك، والحركات الأخرى", "Deposit and withdrawal, settlement of Mada collections with their fee, transfer between banks, and other moves"
     LangAdd "الفاتورة الحالية لم تُحفظ (ستبقى محفوظة مؤقتًا لهذا الجهاز). هل تريد الخروج", "The current invoice is not saved (it will stay held for this computer). Do you want to exit"
     LangAdd "مبلغ شهري لكل حساب إيرادات أو مصروفات (ويمكن لكل مركز)، ثم المقارنة بالفعلي", "A monthly amount for each revenue or expense account (and for each center), then the comparison with the actual"
+    LangAdd "إعداد منظومة مصلحة الضرائب المصرية يأتي في مرحلة الإيصال الإلكتروني المصري", "The Egyptian Tax Authority setup comes with the Egyptian e-receipt phase"
     LangAdd "اختر مجلد النسخ الاحتياطي (يفضل قرص آخر أو فلاشة أو مجلد متزامن مع السحابة", "Choose the backup folder (preferably another disk, a USB drive or a folder synced with the cloud"
     LangAdd "الإهلاك السابق للأصول الموجودة قبل البرنامج فقط (مصدر الشراء: رصيد افتتاحي", "Previous depreciation, only for assets owned before the program (purchase source: opening balance"
     LangAdd "ترحيل الجرد يحوّل الفروقات إلى حركات تسوية في المخزون ولا يمكن التراجع عنه", "Posting the count turns the differences into stock adjustment moves and cannot be undone"
@@ -102,6 +104,7 @@ Private Sub D1_1()
     LangAdd "تُحذف المسودة فقط. لإقرار معتمد استخدم «إلغاء الاعتماد» أولًا", "Only the draft is deleted. For an approved return use Cancel approval first"
     LangAdd "غير موجودة على هذا الجهاز. اخترها من جديد في إعدادات الملصقات", "does not exist on this computer. Choose it again in the label settings"
     LangAdd "لا تملك صلاحية تعديل أسعار البيع. امسح عمود «سعر البيع الجديد", "You do not have the permission to change sale prices. Clear the column New sale price"
+    LangAdd "أصناف معفاة أو بنسبة صفرية: تحتاج سبب الإعفاء، ولم يُدعم بعد", "Exempt or zero-rated items: they need an exemption reason, not supported yet"
     LangAdd "ضريبة القيمة المضافة المرحَّلة من الفترات السابقة (رصيد دائن", "VAT carried from previous periods (credit balance"
     LangAdd "قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح", "An entry in a closed period: view only. A reversing entry can be made on an open date"
     LangAdd "للإيداع والسحب والتحويل وتسوية مدى اختر نوع الحركة الخاص بها", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
@@ -131,12 +134,12 @@ Private Sub D1_1()
     LangAdd "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه", "Saved entry: edit and save, and its journal entry is updated with the same number"
     LangAdd "يُحذف الشيك تحت التحصيل فقط: ألغِ تحصيله أو ارتداده أولًا", "Only a cheque under collection is deleted: cancel its collection or bounce first"
     LangAdd "إرجاع الشيك إلى «تحت التحصيل» وحذف قيد تحصيله أو ارتداده", "Return the cheque to Under collection and delete the entry of its collection or bounce"
-    LangAdd "اكتب سبب الحركة في الملاحظات (مثال: تالف، هدية من المورد", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
-    LangAdd "المبلغ المدفوع (F8) - اتركه فارغًا إذا دفع المبلغ بالضبط", "Amount paid (F8) - leave it empty if the exact amount is paid"
-    LangAdd "المتبقي من كل فاتورة آجلة حسب تأخيرها عن تاريخ الاستحقاق", "The remainder of each credit invoice by its delay after the due date"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "اكتب سبب الحركة في الملاحظات (مثال: تالف، هدية من المورد", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
+    LangAdd "المبلغ المدفوع (F8) - اتركه فارغًا إذا دفع المبلغ بالضبط", "Amount paid (F8) - leave it empty if the exact amount is paid"
+    LangAdd "المتبقي من كل فاتورة آجلة حسب تأخيرها عن تاريخ الاستحقاق", "The remainder of each credit invoice by its delay after the due date"
     LangAdd "دور مدير النظام يملك كل الصلاحيات دائمًا ولا يمكن تقييده", "The system administrator role always has all the permissions and cannot be restricted"
     LangAdd "على الأصل قيود إهلاك: لا تتغير بياناته المالية ولا يُحذف", "The asset has depreciation entries: its financial data do not change and it is not deleted"
     LangAdd "لا يتغير رقم حساب محفوظ. أنشئ حسابًا جديدًا وعطّل القديم", "A saved account number does not change. Create a new account and deactivate the old one"
@@ -175,6 +178,7 @@ Private Sub D1_2()
     LangAdd "القيمة المتبقية والإهلاك السابق لا يتجاوزان التكلفة", "The residual value and the previous depreciation do not exceed the cost"
     LangAdd "المدير المسؤول عن الخزينة: اختر له الخزينة الرئيسية", "The manager in charge of the treasury: choose the main treasury for him"
     LangAdd "تاريخ المصروف في المستقبل. هل تريد الحفظ على أي حال", "The expense date is in the future. Do you want to save anyway"
+    LangAdd "توجد شهادة محفوظة. هل تريد استبدالها بشهادة تجريبية", "A certificate is saved. Replace it with a test certificate"
     LangAdd "لا تملك صلاحية الإضافة في شاشة ربط السداد بالفواتير", "You do not have the permission to add in the payment matching screen"
     LangAdd "لم تُعمل نسخة احتياطية اليوم. هل تريد عمل نسخة الآن", "No backup was made today. Do you want to make a backup now"
     LangAdd "هل تريد إلغاء الفاتورة الحالية والبدء بفاتورة جديدة", "Do you want to cancel the current invoice and start a new one"
@@ -229,6 +233,7 @@ Private Sub D1_2()
     LangAdd "لا تملك صلاحية الإضافة في شاشة التسوية البنكية", "You do not have the permission to add in the bank reconciliation screen"
     LangAdd "لا تملك صلاحية الإضافة في شاشة الحركات البنكية", "You do not have the permission to add in the bank transactions screen"
     LangAdd "لهذا الحساب حسابات تابعة، فيبقى حسابًا رئيسيًا", "This account has sub-accounts, so it stays a main account"
+    LangAdd "مفتاح الجهاز وشهادته وبرنامج التوقيع (السعودية", "Key and certificate of the device and the signing program (Saudi Arabia"
     LangAdd "نقر مزدوج على حساب يفتح كشف حسابه للفترة نفسها", "Double-click an account to open its statement for the same period"
     LangAdd "اختر العمليات الظاهرة في كشف البنك ثم «مطابقة", "Choose the transactions shown on the bank statement, then Match"
     LangAdd "اختر الفاتورة الأصلية ثم حدد الكميات المرتجعة", "Choose the original invoice, then set the returned quantities"
@@ -252,16 +257,17 @@ Private Sub D1_2()
     LangAdd "اتركه فارغًا للطباعة على الطابعة الافتراضية", "Leave it empty to print on the default printer"
     LangAdd "اختر المشروب: الحجم والإضافات تظهر تلقائيًا", "Choose the drink: the size and extras appear automatically"
     LangAdd "السعر والخصم لا يمكن أن يكونا سالبين (السطر", "The price and the discount cannot be negative (line"
+End Sub
+
+Private Sub D1_3()
     LangAdd "تاريخ النهاية يجب أن يكون بعد تاريخ البداية", "The end date must be after the start date"
     LangAdd "تمت النسخة الاحتياطية بنجاح وتم التحقق منها", "The backup was made successfully and checked"
     LangAdd "تنبيه: سعر البيع الجديد أقل من تكلفة الشراء", "Warning: the new sale price is below the purchase cost"
     LangAdd "سبب الإرجاع مطلوب (إلزامي في الإشعار الدائن", "The return reason is required (mandatory on the credit note"
     LangAdd "عمليات غير متوازنة لم يُنشأ لها قيد (راجعها", "Unbalanced transactions with no entry created (review them"
-End Sub
-
-Private Sub D1_3()
     LangAdd "عميل المرتجع يختلف عن عميل الفاتورة الأصلية", "The customer of the return differs from the customer of the original invoice"
     LangAdd "مقفلة: صافي الربح المرحَّل للأرباح المحتجزة", "Closed: net profit carried to retained earnings"
+    LangAdd "ملف المفتاح الخاص للجهاز (يبقى على جهاز آمن", "Private key file of the device (kept on a safe computer"
     LangAdd "منتج سطر المرتجع يختلف عن منتج السطر الأصلي", "The product of the return line differs from the product of the original line"
     LangAdd "إجمالي فاتورة الشراء لا يساوي مجموع أسطرها", "The purchase invoice total does not equal the sum of its lines"
     LangAdd "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم", "Stop credit sales to a customer late more than (days"
@@ -271,6 +277,7 @@ Private Sub D1_3()
     LangAdd "بياناتك الحالية لم تتغير، ونسختها الوقائية", "Your current data did not change, and its safety copy"
     LangAdd "تاريخ الفاتورة لا يمكن أن يكون في المستقبل", "The invoice date cannot be in the future"
     LangAdd "كلمة مرور مؤقتة: سيُطلب تغييرها عند الدخول", "Temporary password: the user is asked to change it at login"
+    LangAdd "لا توجد شهادة الجهاز (CSID) في إعداد الربط", "There is no device certificate (CSID) in the connection setup"
     LangAdd "مشكلة في البيانات - راجع تقرير فحص السلامة", "A data problem - check the integrity report"
     LangAdd "منصة فاتورة (هيئة الزكاة والضريبة والجمارك", "the Fatoora platform (ZATCA"
     LangAdd "يوجد حقل مطلوب فارغ. أكمل البيانات ثم احفظ", "A required field is empty. Complete the data, then save"
@@ -319,15 +326,4 @@ Private Sub D1_3()
     LangAdd "راجع التاريخ والأسطر ثم اضغط «حفظ القيد", "Check the date and the lines, then click Save entry"
     LangAdd "سعر البيع الجديد لا يمكن أن يكون سالبًا", "The new sale price cannot be negative"
     LangAdd "عدّل الإضافي والخصومات ثم «ترحيل المسير", "Edit the overtime and deductions, then Post the run"
-    LangAdd "كلمة البحث (اسم، كود، باركود، رقم، جوال", "Search text (name, code, barcode, number, mobile"
-    LangAdd "لا توجد مصروفات متكررة مستحقة حتى اليوم", "There are no recurring expenses due up to today"
-    LangAdd "لا يمكن تفعيل الفاتورة الإلكترونية الآن", "E-invoicing cannot be enabled now"
-    LangAdd "يجب أن يفعّله مدير النظام قبل الاستخدام", "The system administrator must activate it before use"
-    LangAdd "أحرف على الأقل، ولا تساوي اسم المستخدم", "characters at least, and not equal to the user name"
-    LangAdd "أدخل النقدية الموجودة فعلًا في الصندوق", "Enter the cash actually in the box"
-    LangAdd "أضفه في تصحيحات الإقرار التالي (الخانة", "Add it to the corrections of the next return (box"
-    LangAdd "أو اترك التاريخ فارغًا لفتح كل الفترات", "or leave the date empty to open all periods"
-    LangAdd "الإقرارات المحفوظة (اختر إقرارًا لعرضه", "Saved returns (choose a return to show it"
-    LangAdd "الجرد غير موجود أو تم ترحيله أو إلغاؤه", "The count does not exist or was posted or cancelled"
-    LangAdd "الكمية المرتجعة أكبر من الكمية المباعة", "The returned quantity is more than the quantity sold"
 End Sub

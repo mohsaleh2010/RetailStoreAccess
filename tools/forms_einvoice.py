@@ -44,7 +44,8 @@ def layout_einvoices() -> FormModel:
     bx = cm(0.4)
     for name, caption, style, w, call in [
             ("btnSendPicked", "إرسال المختار", "primary", 3.6, "EInvoicesSendPicked Me"),
-            ("btnSendAll", "إرسال كل المعلّق", "secondary", 3.8, "EInvoicesSendAll Me")]:
+            ("btnSendAll", "إرسال كل المعلّق", "secondary", 3.8, "EInvoicesSendAll Me"),
+            ("btnSetup", "إعداد الربط", "secondary", 3.2, "EInvoiceSetupOpen")]:
         button(m, name, caption, bx, y, style, w=cm(w), h=cm(0.9), call=call)
         bx += cm(w) + cm(0.2)
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), y, "secondary", w=cm(2.6), h=cm(0.9),
@@ -55,6 +56,46 @@ def layout_einvoices() -> FormModel:
                "Private Sub lstDocs_AfterUpdate()", "    EInvoicesPick Me", "End Sub",
                "Private Sub cboEnvironment_AfterUpdate()", "    EInvoiceSettingChanged Me", "End Sub",
                "Private Sub chkEnabled_AfterUpdate()", "    EInvoiceSettingChanged Me", "End Sub"] + m.code)
+    return m
+
+
+def layout_zatca_setup() -> FormModel:
+    """frmZatcaSetup (docs/46): OpenSSL, the private key file and the certificate of the device (modZatcaXml)."""
+    width, height = cm(22.0), cm(16.8)
+    m = FormModel("frmZatcaSetup", "إعداد ربط منصة فاتورة", width, height, popup=True, allow_add=False)
+    title_band(m, "إعداد ربط منصة فاتورة", "مفتاح الجهاز وشهادته وبرنامج التوقيع (السعودية)", "settings")
+    y = cm(2.4)
+    c = m.add(Control("text", "txtOpenSsl", cm(0.4), y, width - cm(0.8), cm(0.8), {}))
+    labelled(m, "txtOpenSsl", "مسار برنامج OpenSSL (فارغ = openssl من مسار النظام)", c)
+    y = cm(3.9)
+    c = m.add(Control("text", "txtKeyFile", cm(0.4), y, width - cm(4.2), cm(0.8), {}))
+    labelled(m, "txtKeyFile", "ملف المفتاح الخاص للجهاز (يبقى على جهاز آمن)", c)
+    button(m, "btnBrowseKey", "استعراض", width - cm(3.6), y, "secondary", w=cm(3.2), h=cm(0.8),
+           call="ZatcaSetupBrowseKey Me")
+    y = cm(5.4)
+    c = m.add(Control("text", "txtCertificate", cm(0.4), y, width - cm(0.8), cm(5.0),
+                      {"EnterKeyBehavior": True, "ScrollBars": 2, "FontSize": 8, "TextAlign": 1},
+                      events=["AfterUpdate"]))
+    labelled(m, "txtCertificate", "شهادة الجهاز (CSID) كما تصدرها الهيئة", c)
+    m.add(Control("label", "lblCertInfo", cm(0.4), cm(10.6), width - cm(0.8), cm(1.2),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("label", "lblSetupNote", cm(0.4), cm(12.0), width - cm(0.8), cm(1.6),
+                  {"Caption": "الشهادة الفعلية تُطلب من الهيئة في المرحلة التالية (تسجيل الجهاز). للتجربة الآن: "
+                              "«شهادة تجريبية» ثم «ملف XML لفاتورة»، وافحص الملف بأداة الهيئة (fatoora -validate).",
+                   "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+    y = cm(15.2)
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnSave", "حفظ", "primary", 3.0, "ZatcaSetupSave Me"),
+            ("btnTestCert", "شهادة تجريبية", "secondary", 3.4, "ZatcaSetupTestCertificate Me"),
+            ("btnExportXml", "ملف XML لفاتورة", "secondary", 3.6, "ZatcaSetupExportXml Me")]:
+        button(m, name, caption, bx, y, style, w=cm(w), h=cm(0.9), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), y, "secondary", w=cm(2.6), h=cm(0.9),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    ZatcaSetupLoad Me", "End Sub",
+               "Private Sub txtCertificate_AfterUpdate()", "    ZatcaSetupShowCert Me", "End Sub"] + m.code)
     return m
 
 

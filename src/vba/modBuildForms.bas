@@ -27,7 +27,7 @@ Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines," & _
     "frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal," & _
-    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices"
+    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -656,6 +656,7 @@ Private Sub BuildAllForms()
     BuildForm_frmEnglishNameLines
     BuildForm_frmEnglishNames
     BuildForm_frmEInvoices
+    BuildForm_frmZatcaSetup
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -9475,6 +9476,8 @@ Private Sub BuildForm_frmEInvoices()
     c.OnClick = EP
     Set c = AddButton("btnSendAll", "إرسال كل المعلّق", 2381, 9412, 2155, 510, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnSetup", "إعداد الربط", 4649, 9412, 1814, 510, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13608, 9412, 1474, 510, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -9503,6 +9506,9 @@ Private Sub BuildForm_frmEInvoices()
     s = s & "Private Sub btnSendAll_Click()" & vbCrLf
     s = s & "    EInvoicesSendAll Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSetup_Click()" & vbCrLf
+    s = s & "    EInvoiceSetupOpen" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -9510,4 +9516,64 @@ Private Sub BuildForm_frmEInvoices()
     Exit Sub
 EH:
     AbortForm "frmEInvoices", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmZatcaSetup()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmZatcaSetup", "إعداد ربط منصة فاتورة", "", 12474, 9526, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12474, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "إعداد ربط منصة فاتورة", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "مفتاح الجهاز وشهادته وبرنامج التوقيع (السعودية)", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtOpenSsl", "", 227, 1361, 12020, 454)
+    Set c = AddLabel("lblOpenSsl", "مسار برنامج OpenSSL (فارغ = openssl من مسار النظام)", 227, 1049, 12020, 284, 9, False, CLR_MUTED, "txtOpenSsl", 0)
+    Set c = AddText("txtKeyFile", "", 227, 2211, 10093, 454)
+    Set c = AddLabel("lblKeyFile", "ملف المفتاح الخاص للجهاز (يبقى على جهاز آمن)", 227, 1899, 10093, 284, 9, False, CLR_MUTED, "txtKeyFile", 0)
+    Set c = AddButton("btnBrowseKey", "استعراض", 10433, 2211, 1814, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddText("txtCertificate", "", 227, 3062, 12020, 2835)
+    c.FontSize = 8
+    SetCtlProp c, "EnterKeyBehavior", True
+    SetCtlProp c, "ScrollBars", 2
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblCertificate", "شهادة الجهاز (CSID) كما تصدرها الهيئة", 227, 2750, 12020, 284, 9, False, CLR_MUTED, "txtCertificate", 0)
+    Set c = AddLabel("lblCertInfo", " ", 227, 6010, 12020, 680, 9, False, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblSetupNote", "الشهادة الفعلية تُطلب من الهيئة في المرحلة التالية (تسجيل الجهاز). للتجربة الآن: «شهادة تجريبية» ثم «ملف XML لفاتورة»، وافحص الملف بأداة الهيئة (fatoora -validate).", 227, 6804, 12020, 907, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnSave", "حفظ", 227, 8618, 1701, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnTestCert", "شهادة تجريبية", 2041, 8618, 1928, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnExportXml", "ملف XML لفاتورة", 4082, 8618, 2041, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 10773, 8618, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    ZatcaSetupLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtCertificate_AfterUpdate()" & vbCrLf
+    s = s & "    ZatcaSetupShowCert Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnBrowseKey_Click()" & vbCrLf
+    s = s & "    ZatcaSetupBrowseKey Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    ZatcaSetupSave Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTestCert_Click()" & vbCrLf
+    s = s & "    ZatcaSetupTestCertificate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnExportXml_Click()" & vbCrLf
+    s = s & "    ZatcaSetupExportXml Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmZatcaSetup", s
+    Exit Sub
+EH:
+    AbortForm "frmZatcaSetup", Err.Number, Err.Description
 End Sub

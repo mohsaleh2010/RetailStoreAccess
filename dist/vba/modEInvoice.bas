@@ -287,6 +287,15 @@ Public Sub EInvoicesShow(ByVal frm As Access.Form)
     frm!lblSummary.ForeColor = IIf(overdue > 0, CLR_DANGER, CLR_PRIMARY)
 End Sub
 
+Public Sub EInvoiceSetupOpen()
+    ' The setup of the platform of the country: Saudi Arabia now (modZatcaXml), Egypt in phase D.
+    If AppCountry() = "SA" Then
+        OpenScreen "frmZatcaSetup"
+    Else
+        ShowInfo "≈⁄œ«œ „‰ŸÊ„… „’·Õ… «·÷—«∆» «·„’—Ì… Ì√ Ì ›Ì „—Õ·… «·≈Ì’«· «·≈·ﬂ —Ê‰Ì «·„’—Ì."
+    End If
+End Sub
+
 Public Function EnvironmentName() As String
     Select Case Nz(SettingValue("EInvoiceEnvironment"), "TEST")
         Case "PRODUCTION": EnvironmentName = "«·»Ì∆… «·›⁄·Ì…"

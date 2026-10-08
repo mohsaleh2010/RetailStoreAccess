@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **70** | عدد الحقول: **911**
+عدد الجداول: **70** | عدد الحقول: **916**
 
 ## الفهرس
 
@@ -123,7 +123,10 @@
 | 38 | GosiMaxWage | Currency |  | ✔ | `45000` | `>=0` |  | التأمينات: الحد الأعلى للأجر الخاضع |
 | 39 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
 | 40 | EInvoiceEnabled | Yes/No |  |  | `False` |  |  | تفعيل الفاتورة الإلكترونية |
-| 41 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
+| 41 | OpenSslPath | Short Text | 255 |  |  |  |  | مسار برنامج OpenSSL – فارغ = openssl في مسار النظام (docs/46) |
+| 42 | ZatcaKeyFile | Short Text | 255 |  |  |  |  | ملف المفتاح الخاص للجهاز – secp256k1، على جهاز آمن؛ لا يُحفظ في البيانات |
+| 43 | ZatcaCertificate | Long Text |  |  |  |  |  | شهادة الجهاز (CSID) |
+| 44 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -246,7 +249,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 60 سجل
+- بيانات أساسية: 61 سجل
 
 ## UserScreens
 
@@ -523,17 +526,18 @@
 | 28 | ZatcaResponse | Long Text |  |  |  |  |  | رد الهيئة |
 | 29 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
 | 30 | EInvoiceAttempts | Number (Integer) |  |  | `0` |  |  | محاولات الإرسال |
-| 31 | EInvoiceError | Short Text | 255 |  |  |  |  | آخر خطأ في الإرسال |
-| 32 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 33 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
-| 34 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
-| 35 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
-| 36 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
-| 37 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
-| 38 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
-| 39 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
-| 40 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
-| 41 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
+| 31 | EInvoiceXml | Long Text |  |  |  |  |  | ملف الفاتورة الإلكترونية الموقّع |
+| 32 | EInvoiceError | Short Text | 255 |  |  |  |  | آخر خطأ في الإرسال |
+| 33 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 34 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
+| 35 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
+| 36 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
+| 37 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
+| 38 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
+| 39 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
+| 40 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 41 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
+| 42 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -600,12 +604,13 @@
 | 26 | ZatcaResponse | Long Text |  |  |  |  |  | رد الهيئة |
 | 27 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
 | 28 | EInvoiceAttempts | Number (Integer) |  |  | `0` |  |  | محاولات الإرسال |
-| 29 | EInvoiceError | Short Text | 255 |  |  |  |  | آخر خطأ في الإرسال |
-| 30 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 31 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
-| 32 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
-| 33 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
-| 34 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
+| 29 | EInvoiceXml | Long Text |  |  |  |  |  | ملف الفاتورة الإلكترونية الموقّع |
+| 30 | EInvoiceError | Short Text | 255 |  |  |  |  | آخر خطأ في الإرسال |
+| 31 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 32 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
+| 33 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 34 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
+| 35 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`

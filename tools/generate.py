@@ -15,6 +15,7 @@ import gen_queries  # noqa: E402
 import gen_forms  # noqa: E402
 import gen_qr  # noqa: E402
 import gen_lang  # noqa: E402
+import gen_zatca  # noqa: E402
 import gen_reports  # noqa: E402
 import gen_test_sales  # noqa: E402
 import gen_test_purchases  # noqa: E402
@@ -25,7 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modSalesReps", "modEnglishNames", "modCountry", "modHttp", "modEInvoice", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modSalesReps", "modEnglishNames", "modCountry", "modHttp", "modEInvoice", "modZatcaXml", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -861,7 +862,8 @@ def main():
                        ("modTestPurchases", gen_test_purchases.build_test_purchases_vba()),
                        ("modTestSecurity", gen_test_security.build_test_security_vba()),
                        ("modDemoData", gen_demo.build_demo_vba()),
-                       ("modLang", gen_lang.build_lang_vba())):
+                       ("modLang", gen_lang.build_lang_vba()),
+                       ("modZatcaData", gen_zatca.build_zatca_data_vba())):
         write(f"src/vba/{name}.bas", text)
         write(f"dist/vba/{name}.bas", text, encoding="cp1256", newline="\r\n")
     for n, text in enumerate(gen_lang.data_modules(), 1):      # the dictionary of modLang

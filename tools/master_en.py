@@ -157,7 +157,7 @@ SCREEN_TITLES_EN = {
     "frmAllocation": "Match payments to invoices", "frmReportCenter": "Reports", "frmSearch": "Search",
     "frmSettings": "Store settings", "frmUsers": "Users", "frmRoles": "Roles and permissions",
     "frmUserScreens": "Screen permissions of users", "frmAuditLog": "Audit trail", "frmBackup": "Backup",
-    "frmEnglishNames": "English names", "frmEInvoices": "E-invoicing",
+    "frmEnglishNames": "English names", "frmEInvoices": "E-invoicing", "frmZatcaSetup": "Fatoora connection setup",
 }
 
 CATEGORY_NAMES_EN = {1: "General"}

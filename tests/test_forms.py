@@ -317,7 +317,7 @@ class ProjectStaticTests(unittest.TestCase):
             DoEvents IsMissing IsObject TypeName VarType CSng Sqr Exp Log Rnd Second Day Hex$
             StrConv LenB AscB ChrB MidB Filter Join InStrB DMin DSum DAvg Eval Reports
             CreateReport CreateReportControl CreateGroupLevel GetSetting SaveSetting FileDateTime FileLen
-            CreateObject GetObject""".split())
+            CreateObject GetObject EOF LOF FreeFile CByte""".split())
         for name, text in modules.items():
             in_type = False
             for line in logical_lines(text):

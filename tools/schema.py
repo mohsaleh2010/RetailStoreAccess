@@ -207,6 +207,7 @@ def zatca_fields(type_code_default):
         memo("ZatcaResponse", "رد الهيئة"),
         text("SignedXmlPath", 255, "مسار ملف XML الموقّع"),
         int_("EInvoiceAttempts", "محاولات الإرسال", default="0"),
+        memo("EInvoiceXml", "ملف الفاتورة الإلكترونية الموقّع"),
         text("EInvoiceError", 255, "آخر خطأ في الإرسال"),
     ]
 
@@ -286,6 +287,9 @@ TABLES: List[Table] = [
             int_("CreditBlockDays", "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم)", default="0", rule=">=0",
                  rule_text="عدد الأيام لا يكون سالبًا"),
             bool_("EInvoiceEnabled", "تفعيل الفاتورة الإلكترونية", "False"),
+            text("OpenSslPath", 255, "مسار برنامج OpenSSL", note="فارغ = openssl في مسار النظام (docs/46)"),
+            text("ZatcaKeyFile", 255, "ملف المفتاح الخاص للجهاز", note="secp256k1، على جهاز آمن؛ لا يُحفظ في البيانات"),
+            memo("ZatcaCertificate", "شهادة الجهاز (CSID)"),
             text("EInvoiceEnvironment", 12, "بيئة الفاتورة الإلكترونية", required=True, default='"TEST"',
                  rule='In ("TEST","SIMULATION","PRODUCTION")',
                  rule_text="TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية",
@@ -2154,6 +2158,7 @@ SCREEN_LIST = [
     ("frmBackup", "النسخ الاحتياطي", "النظام", "BACKUP", False, False, False),
     ("frmEnglishNames", "الأسماء الإنجليزية", "النظام", "SETTINGS", False, True, False),
     ("frmEInvoices", "الفاتورة الإلكترونية", "المبيعات", "EINVOICE", False, True, False),
+    ("frmZatcaSetup", "إعداد ربط منصة فاتورة", "النظام", "SETTINGS", False, True, False),
 ]
 
 
