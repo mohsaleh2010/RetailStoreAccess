@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2279
+Private Const ENTRY_COUNT As Long = 2296
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -225,16 +225,16 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=IIf(Sum([LineDebit]-[LineCredit])>=0,""الرصيد مدين"",""الرصيد دائن"")") = "=IIf(Sum([LineDebit]-[LineCredit])>=0,""Debit balance"",""Credit balance"")", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إجمالي الخصوم وحقوق الملكية") = "Total liabilities and equity", "Tr sample 2", passed, failed, report
-    CheckLang Tr("الانحراف") = "Variance", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المبلغ") = "Amount", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذر إنشاء الجرد: ") = "The count could not be created: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("سعر البيع (") = "Sale price (", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا توجد قيود إهلاك.") = "There are no depreciation entries.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("=IIf([Difference]<0,""العجز"",IIf([Difference]>0,""الزيادة"",""الفرق""))") = "=IIf([Difference]<0,""Shortage"",IIf([Difference]>0,""Overage"",""Difference""))", "Tr sample 1", passed, failed, report
+    CheckLang Tr("إجمالي الخارج") = "Total out", "Tr sample 2", passed, failed, report
+    CheckLang Tr("الاسم المختصر للمحل") = "Short store name", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المالك") = "Owner", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعديل") = "Edit", "Tr sample 5", passed, failed, report
+    CheckLang Tr("سحب نقدية من البنك") = "Cash withdrawal from the bank", "Tr sample 6", passed, failed, report
+    CheckLang Tr("لا توجد فترة مقفلة") = "There is no closed period", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
-    CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي") = "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي", "العربية: من اليمين ولا ترجمة", _
+    CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("زر الاقتراح يكتب الاسم العربي بحروف لاتينية في الخانات الفارغة فقط. راجعه وعدّله ثم احفظ. الاسم الفارغ يظهر بالعربية في الواجهة الإنجليزية") = "زر الاقتراح يكتب الاسم العربي بحروف لاتينية في الخانات الفارغة فقط. راجعه وعدّله ثم احفظ. الاسم الفارغ يظهر بالعربية في الواجهة الإنجليزية", "العربية: من اليمين ولا ترجمة", _
               passed, failed, report
     UseLanguage saved
     Debug.Print "--- passed: " & passed & " | failed: " & failed

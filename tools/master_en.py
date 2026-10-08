@@ -156,6 +156,7 @@ SCREEN_TITLES_EN = {
     "frmAllocation": "Match payments to invoices", "frmReportCenter": "Reports", "frmSearch": "Search",
     "frmSettings": "Store settings", "frmUsers": "Users", "frmRoles": "Roles and permissions",
     "frmUserScreens": "Screen permissions of users", "frmAuditLog": "Audit trail", "frmBackup": "Backup",
+    "frmEnglishNames": "English names",
 }
 
 CATEGORY_NAMES_EN = {1: "General"}
@@ -200,3 +201,27 @@ EXTRA_NAMES = {
     "Permissions": [("ModuleNameEn", "ModuleName", MODULE_NAMES_EN)],
     "Screens": [("ModuleNameEn", "ModuleName", MODULE_NAMES_EN)],
 }
+
+# The tables of the English names screen (frmEnglishNames, docs/42), the names the user types first.
+# modEnglishNames.NAME_TABLES holds the same list (tests/test_english_names.py).
+NAMES_SCREEN_TABLES = ["Customers", "Suppliers", "Products", "Categories", "Units", "CashBoxes", "Banks", "CostCenters",
+                       "SalesReps", "ExpenseTypes", "Accounts", "PaymentMethods", "Roles"]
+
+
+def names_screen_specs():
+    """(table, key field, Arabic field, English field, English field size, table caption). Every key is a number."""
+    from schema import table
+    out = []
+    for name in NAMES_SCREEN_TABLES:
+        if name == "Products":
+            en, ar, key = "ProductNameEn", "ProductName", "ProductID"
+        else:
+            en, ar, key, _ = ENGLISH_NAMES[name]
+        t = table(name)
+        fields = {f.name: f for f in t.fields}
+        out.append((name, key, ar, en, fields[en].size, t.caption))
+    return out
+
+
+def names_screen_const() -> str:
+    return ";".join(f"{t},{k},{a},{e},{size},{cap}" for t, k, a, e, size, cap in names_screen_specs())

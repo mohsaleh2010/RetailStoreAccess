@@ -2106,6 +2106,7 @@ SCREEN_LIST = [
     ("frmUserScreens", "صلاحيات الشاشات للمستخدمين", "النظام", "USERS", False, True, False),
     ("frmAuditLog", "سجل التدقيق", "النظام", "AUDIT_LOG", False, False, False),
     ("frmBackup", "النسخ الاحتياطي", "النظام", "BACKUP", False, False, False),
+    ("frmEnglishNames", "الأسماء الإنجليزية", "النظام", "SETTINGS", False, True, False),
 ]
 
 

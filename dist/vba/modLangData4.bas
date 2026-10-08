@@ -16,6 +16,38 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "ﬂ· «·‘«‘« ", "All screens"
+    LangAdd "ﬂ· «·„—«ﬂ“", "All centers"
+    LangAdd "ﬂ„Ì… «·’‰›", "Item quantity"
+    LangAdd "ﬂÊœ «·„‰ Ã", "Product code"
+    LangAdd "„»·€ «·”‰œ", "Voucher amount"
+    LangAdd "„»·€ «·‘Ìﬂ", "Cheque amount"
+    LangAdd "„Ã„· «·—»Õ", "Gross profit"
+    LangAdd "„— Ã⁄ ‘—«¡", "Purchase return"
+    LangAdd "„—Ã⁄ «·»‰ﬂ", "Bank reference"
+    LangAdd "„—ÕÛ¯·… ›Ì", "posted on"
+    LangAdd "„”Êœ… „”Ì—", "Run draft"
+    LangAdd "„‰ «·ﬁ«∆„…", "from the list"
+    LangAdd "„‰Â« ÷—Ì»…", "of which VAT"
+    LangAdd "‰”»… ’›—Ì…", "Zero rate"
+    LangAdd "‰ﬁÿ… «·»Ì⁄", "Point of sale"
+    LangAdd "‰Ê⁄ «·Õ—ﬂ…", "Move type"
+    LangAdd "‰Ê⁄ «·Õ”«»", "Account type"
+    LangAdd "‰Ê⁄ «·‘—«¡", "Purchase type"
+    LangAdd "Ê—ﬁ… «·Ã—œ", "Count sheet"
+    LangAdd "¬Œ—  ÕœÌÀ", "Last update"
+    LangAdd "¬Œ—  ’›Ì…", "Last closing"
+    LangAdd "¬Œ— „⁄«„·", "Last rate"
+    LangAdd "√—»⁄… ⁄‘—", "fourteen"
+    LangAdd "√ı‰‘∆ „‰Â", "Created from it"
+    LangAdd "≈⁄«œ… › Õ", "Reopen"
+    LangAdd "≈ﬁ›«· ”‰…", "Close a year"
+    LangAdd "≈·Ï  «—ÌŒ", "To date"
+    LangAdd "≈·Ï ’‰œÊﬁ", "To box"
+    LangAdd "«”„ «·√’·", "Asset name"
+    LangAdd "«”„ «·„Õ·", "Store name"
+    LangAdd "«⁄ ı„œ ›Ì", "Approved on"
+    LangAdd "«·≈⁄œ«œ« ", "Settings"
     LangAdd "«·≈Ì—«œ« ", "Revenue"
     LangAdd "«·«” Õﬁ«ﬁ", "Due date"
     LangAdd "«· √„Ì‰« ", "Social insurance"
@@ -62,6 +94,7 @@ Private Sub D4_1()
     LangAdd "”ıÃˆ¯· ›Ì", "Recorded on"
     LangAdd "‘—«¡ ‰ﬁœÌ", "Cash purchase"
     LangAdd "’—›‰« ≈·Ï", "Paid to"
+    LangAdd "ÿ—ﬁ «·œ›⁄", "Payment methods"
     LangAdd "ÿ·»  Ê’Ì·", "Delivery order"
     LangAdd "ÿ·» œ«Œ·Ì", "Dine-in order"
     LangAdd "⁄Ã“  ’›Ì…", "Closing shortage"
@@ -103,6 +136,9 @@ Private Sub D4_1()
     LangAdd "«·«‰Õ—«›", "Variance"
     LangAdd "«·»«—ﬂÊœ", "Barcode"
     LangAdd "«· ﬁ«—Ì—", "Reports"
+End Sub
+
+Private Sub D4_2()
     LangAdd "«·’«œ—« ", "Exports"
     LangAdd "«·’·«ÕÌ…", "Permission"
     LangAdd "«·’‰«œÌﬁ", "Boxes"
@@ -136,9 +172,6 @@ Private Sub D4_1()
     LangAdd "”ﬂ— ﬁ·Ì·", "Little sugar"
     LangAdd "‘—«¡ ¬Ã·", "Credit purchase"
     LangAdd "‘Â— ÃœÌœ", "New month"
-End Sub
-
-Private Sub D4_2()
     LangAdd "‘Ìﬂ ’«œ—", "Issued cheque"
     LangAdd "‘Ìﬂ „— œ", "Bounced cheque"
     LangAdd "‘Ìﬂ Ê«—œ", "Received cheque"
@@ -173,6 +206,7 @@ Private Sub D4_2()
     LangAdd "«” ⁄—«÷", "Browse"
     LangAdd "«› —«÷Ì", "Default"
     LangAdd "«·¬Ì»«‰", "IBAN"
+    LangAdd "«·√œÊ«—", "Roles"
     LangAdd "«·√—»«Õ", "Profit"
     LangAdd "«·√”«”Ì", "Basic"
     LangAdd "«·√’‰«›", "Items"
@@ -225,6 +259,9 @@ Private Sub D4_2()
     LangAdd "«·„—«Ã⁄", "Reviewer"
     LangAdd "«·„— Ã⁄", "Return"
     LangAdd "«·„— œ…", "Bounced"
+End Sub
+
+Private Sub D4_3()
     LangAdd "«·„”ƒÊ·", "Manager"
     LangAdd "«·„” Õﬁ", "Due"
     LangAdd "«·„” ·„", "Recipient"
@@ -259,9 +296,6 @@ Private Sub D4_2()
     LangAdd "„—…/”‰…", "times/year"
     LangAdd "„” ÊÌ« ", "levels"
     LangAdd "„’—Ê›« ", "Expenses"
-End Sub
-
-Private Sub D4_3()
     LangAdd "„·«ÕŸ« ", "Notes"
     LangAdd "„·ÌÊ‰«‰", "two million"
     LangAdd "Ê«·œ«∆‰", "and credit"
@@ -348,6 +382,9 @@ Private Sub D4_3()
     LangAdd "„⁄«Ì‰…", "Preview"
     LangAdd "„⁄ „œ…", "Approved"
     LangAdd "„ﬂ«›¬ ", "Bonuses"
+End Sub
+
+Private Sub D4_4()
     LangAdd "„·«ÌÌ‰", "million"
     LangAdd "„„‰ÊÕ…", "Granted"
     LangAdd "„‰ »‰ﬂ", "From a bank"
@@ -382,9 +419,6 @@ Private Sub D4_3()
     LangAdd "«·œÊ—", "Role"
     LangAdd "«·—»Õ", "Profit"
     LangAdd "«·—ﬁ„", "Number"
-End Sub
-
-Private Sub D4_4()
     LangAdd "«·—„“", "Code"
     LangAdd "«·”»»", "Reason"
     LangAdd "«·”Ã·", "Record"
@@ -421,6 +455,7 @@ Private Sub D4_4()
     LangAdd " Ê’Ì·", "Delivery"
     LangAdd "À·«À…", "three"
     LangAdd "Ã«—Ì…", "Open"
+    LangAdd "Õ—›«", "characters"
     LangAdd "Œ“Ì‰…", "Treasury"
     LangAdd "Œ„”Ê‰", "fifty"
     LangAdd "œ«Œ·Ì", "Internal"
@@ -470,6 +505,9 @@ Private Sub D4_4()
     LangAdd "«·ﬂ·", "All"
     LangAdd "»À„‰", "for a price"
     LangAdd "»œÊ‰", "None"
+End Sub
+
+Private Sub D4_5()
     LangAdd " ”⁄…", "nine"
     LangAdd "ÃœÌœ", "New"
     LangAdd "Õ”«»", "Account"
@@ -505,9 +543,6 @@ Private Sub D4_4()
     LangAdd "„— œ", "Bounced"
     LangAdd "„”œœ", "Paid"
     LangAdd "„”Ì—", "Run"
-End Sub
-
-Private Sub D4_5()
     LangAdd "„·€Ï", "Cancelled"
     LangAdd "‰«ﬁ’", "Missing"
     LangAdd "‰”Œ…", "Backup"

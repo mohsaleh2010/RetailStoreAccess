@@ -60,6 +60,12 @@ Public Sub EnsureLocalTables()
             "ScreenTitle TEXT(100), ModuleName TEXT(50), SortOrder INTEGER, HasAdd BIT, HasEdit BIT, HasDelete BIT, " & _
             "CanOpen BIT, CanAdd BIT, CanEdit BIT, CanDelete BIT, ActionsNote TEXT(60))", dbFailOnError
     End If
+    ' the names and English names being edited in frmEnglishNames (modEnglishNames)
+    If Not LocalTableExists("tmpEnglishNames") Then
+        CurrentDb.Execute "CREATE TABLE tmpEnglishNames (LineNo COUNTER CONSTRAINT pkEnglishNames PRIMARY KEY, " & _
+            "TableName TEXT(30), TableTitle TEXT(60), KeyValue LONG, ArabicName TEXT(255), EnglishName TEXT(255), " & _
+            "OldEnglish TEXT(255), MaxLen INTEGER)", dbFailOnError
+    End If
     ' the open documents of each customer / supplier by age (modAging, frmAging, rptAging)
     If Not LocalTableExists("tmpAging") Then
         CurrentDb.Execute "CREATE TABLE tmpAging (LineNo COUNTER CONSTRAINT pkAging PRIMARY KEY, PartyKind TEXT(1), " & _

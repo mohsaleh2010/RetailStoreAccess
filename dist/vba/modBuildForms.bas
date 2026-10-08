@@ -27,7 +27,7 @@ Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines," & _
     "frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal," & _
-    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions"
+    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -653,6 +653,8 @@ Private Sub BuildAllForms()
     BuildForm_frmAuditLog
     BuildForm_frmCommissionLines
     BuildForm_frmCommissions
+    BuildForm_frmEnglishNameLines
+    BuildForm_frmEnglishNames
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -3532,8 +3534,10 @@ Private Sub BuildForm_frmSettings()
     c.OnClick = EP
     Set c = AddText("StoreName", "StoreName", 2552, 1701, 4989, 425)
     Set c = AddLabel("lblStoreName", "«”„ «·„Õ· *", 227, 1701, 2268, 425, 10, False, CLR_MUTED, "StoreName", 0)
-    Set c = AddText("StoreNameEn", "StoreNameEn", 10093, 1701, 4989, 425)
+    Set c = AddText("StoreNameEn", "StoreNameEn", 10093, 1701, 3685, 425)
     Set c = AddLabel("lblStoreNameEn", "«”„ «·„Õ· »«·≈‰Ã·Ì“Ì…", 7768, 1701, 2268, 425, 10, False, CLR_MUTED, "StoreNameEn", 0)
+    Set c = AddButton("btnEnglishNames", "»«ﬁÌ «·√”„«¡", 13835, 1701, 1247, 425, "secondary")
+    c.OnClick = EP
     Set c = AddText("VATNumber", "VATNumber", 2552, 2268, 4989, 425)
     SetCtlProp c, "ControlTipText", "15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »‹ 3"
     SetCtlProp c, "StatusBarText", "15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »‹ 3"
@@ -3657,6 +3661,9 @@ Private Sub BuildForm_frmSettings()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnEnglishNames_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmEnglishNames""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnBrowseBackup_Click()" & vbCrLf
     s = s & "    BrowseFolder Me, ""BackupFolder""" & vbCrLf
@@ -9335,4 +9342,88 @@ Private Sub BuildForm_frmCommissions()
     Exit Sub
 EH:
     AbortForm "frmCommissions", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmEnglishNameLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmEnglishNameLines", "«·√”„«¡ «·≈‰Ã·Ì“Ì…", "SELECT * FROM tmpEnglishNames ORDER BY LineNo", 12247, 397, False, False, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddText("TableTitle", "TableTitle", 28, 0, 2495, 397)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("ArabicName", "ArabicName", 2551, 0, 4706, 397)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("EnglishName", "EnglishName", 7285, 0, 4706, 397)
+    s = ""
+    FinishForm "frmEnglishNameLines", s
+    Exit Sub
+EH:
+    AbortForm "frmEnglishNameLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmEnglishNames()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmEnglishNames", "«·√”„«¡ «·≈‰Ã·Ì“Ì…", "", 12928, 9979, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12928, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "«·√”„«¡ «·≈‰Ã·Ì“Ì…", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "«”„ ≈‰Ã·Ì“Ì ·ﬂ· ⁄„Ì· Ê„Ê—œ Ê„‰ Ã Ê’‰œÊﬁ ÊÕ”«»: ÌŸÂ— ›Ì «·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboTable", "", 227, 1304, 3629, 454, "", 2, "0;3402")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblTable", "«·ÃœÊ·", 227, 992, 3629, 284, 9, False, CLR_MUTED, "cboTable", 0)
+    Set c = AddCheck("chkMissing", "", 4082, 1389)
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblMissing", "»œÊ‰ «”„ ≈‰Ã·Ì“Ì ›ﬁÿ", 4451, 1304, 2693, 454, 10, False, CLR_TEXT, "chkMissing", 0)
+    Set c = AddLabel("lblCount", " ", 7258, 1304, 5444, 454, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblCol1", "«·ÃœÊ·", 255, 1956, 2495, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "«·«”„ »«·⁄—»Ì…", 2778, 1956, 4706, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "«·«”„ »«·≈‰Ã·Ì“Ì…", 7512, 1956, 4706, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subNames", "frmEnglishNameLines", 227, 2296, 12247, 6010)
+    Set c = AddLabel("lblNote", "“— «·«ﬁ —«Õ Ìﬂ » «·«”„ «·⁄—»Ì »Õ—Ê› ·« Ì‰Ì… ›Ì «·Œ«‰«  «·›«—€… ›ﬁÿ. —«Ã⁄Â Ê⁄œ¯·Â À„ «Õ›Ÿ. «·«”„ «·›«—€ ÌŸÂ— »«·⁄—»Ì… ›Ì «·Ê«ÃÂ… «·≈‰Ã·Ì“Ì….", 227, 8392, 12474, 510, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnSave", "Õ›Ÿ", 227, 9072, 1928, 567, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnSuggest", "«ﬁ —«Õ ··›«—€", 2268, 9072, 1928, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnShow", " ÕœÌÀ «·ﬁ«∆„…", 4309, 9072, 1928, 567, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 11227, 9072, 1474, 567, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    EnglishNamesLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboTable_AfterUpdate()" & vbCrLf
+    s = s & "    EnglishNamesShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub chkMissing_AfterUpdate()" & vbCrLf
+    s = s & "    EnglishNamesShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    SaveEnglishNames Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSuggest_Click()" & vbCrLf
+    s = s & "    EnglishNamesSuggest Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnShow_Click()" & vbCrLf
+    s = s & "    EnglishNamesShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmEnglishNames", s
+    Exit Sub
+EH:
+    AbortForm "frmEnglishNames", Err.Number, Err.Description
 End Sub

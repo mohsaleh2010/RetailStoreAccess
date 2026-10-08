@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2279
+Private Const ENTRY_COUNT As Long = 2296
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -225,16 +225,16 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=IIf(Sum([LineDebit]-[LineCredit])>=0,""ÇáÑÕíÏ ãÏíä"",""ÇáÑÕíÏ ÏÇÆä"")") = "=IIf(Sum([LineDebit]-[LineCredit])>=0,""Debit balance"",""Credit balance"")", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÌãÇáí ÇáÎÕæã æÍŞæŞ ÇáãáßíÉ") = "Total liabilities and equity", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÇäÍÑÇİ") = "Variance", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÈáÛ") = "Amount", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞÑ ÅäÔÇÁ ÇáÌÑÏ: ") = "The count could not be created: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÚÑ ÇáÈíÚ (") = "Sale price (", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ ÊæÌÏ ŞíæÏ ÅåáÇß.") = "There are no depreciation entries.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("=IIf([Difference]<0,""ÇáÚÌÒ"",IIf([Difference]>0,""ÇáÒíÇÏÉ"",""ÇáİÑŞ""))") = "=IIf([Difference]<0,""Shortage"",IIf([Difference]>0,""Overage"",""Difference""))", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÌãÇáí ÇáÎÇÑÌ") = "Total out", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÇÓã ÇáãÎÊÕÑ ááãÍá") = "Short store name", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÇáß") = "Owner", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚÏíá") = "Edit", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÓÍÈ äŞÏíÉ ãä ÇáÈäß") = "Cash withdrawal from the bank", "Tr sample 6", passed, failed, report
+    CheckLang Tr("áÇ ÊæÌÏ İÊÑÉ ãŞİáÉ") = "There is no closed period", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
-    CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÇáÍÓÇÈÇÊ ÇáÃÓÇÓíÉ (ÇáãÚáóøãÉ) ÊÓÊÎÏãåÇ ÇáŞíæÏ ÇáÂáíÉ: áÇ ÊõÍĞİ æáÇ íÊÛíÑ äæÚåÇ. ÇáŞíæÏ ÇáíÏæíÉ ãä ÒÑ «ŞíÏ íÏæí") = "ÇáÍÓÇÈÇÊ ÇáÃÓÇÓíÉ (ÇáãÚáóøãÉ) ÊÓÊÎÏãåÇ ÇáŞíæÏ ÇáÂáíÉ: áÇ ÊõÍĞİ æáÇ íÊÛíÑ äæÚåÇ. ÇáŞíæÏ ÇáíÏæíÉ ãä ÒÑ «ŞíÏ íÏæí", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _
+    CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÒÑ ÇáÇŞÊÑÇÍ íßÊÈ ÇáÇÓã ÇáÚÑÈí ÈÍÑæİ áÇÊíäíÉ İí ÇáÎÇäÇÊ ÇáİÇÑÛÉ İŞØ. ÑÇÌÚå æÚÏøáå Ëã ÇÍİÙ. ÇáÇÓã ÇáİÇÑÛ íÙåÑ ÈÇáÚÑÈíÉ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ") = "ÒÑ ÇáÇŞÊÑÇÍ íßÊÈ ÇáÇÓã ÇáÚÑÈí ÈÍÑæİ áÇÊíäíÉ İí ÇáÎÇäÇÊ ÇáİÇÑÛÉ İŞØ. ÑÇÌÚå æÚÏøáå Ëã ÇÍİÙ. ÇáÇÓã ÇáİÇÑÛ íÙåÑ ÈÇáÚÑÈíÉ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _
               passed, failed, report
     UseLanguage saved
     Debug.Print "--- passed: " & passed & " | failed: " & failed

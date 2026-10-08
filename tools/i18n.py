@@ -127,15 +127,24 @@ def vba_literals(line: str) -> List[str]:
     return out
 
 
+# Constants of Arabic data that never reach Tr (the transliteration tables of modEnglishNames)
+DATA_CONSTANTS = {"TRANSLIT_LETTERS", "TRANSLIT_WORDS"}
+
+
 def module_strings(text: str, skip_tests: bool = True) -> List[str]:
     """Arabic literals of a hand-written module that the user can see: not in Debug.Print, not in the
     in-Access test procedures (Test*, Check*) that only the developer runs."""
-    out, in_test = [], False
+    out, in_test, in_data = [], False, False
     for line in text.splitlines():
         head = re.match(r"\s*(?:Public |Private )?(?:Function|Sub) (\w+)", line)
         if head:
             in_test = skip_tests and head.group(1).startswith("Test")
-        if in_test or "Debug.Print" in line:
+        if re.match(r"\s*(?:Public |Private )?Const (\w+)", line):
+            in_data = re.match(r"\s*(?:Public |Private )?Const (\w+)", line).group(1) in DATA_CONSTANTS
+        skip = in_test or in_data or "Debug.Print" in line
+        if in_data and not line.rstrip().endswith(" _"):
+            in_data = False                          # the last line of a data constant
+        if skip:
             continue
         out += [s for s in vba_literals(line) if has_arabic(s)]
     return out

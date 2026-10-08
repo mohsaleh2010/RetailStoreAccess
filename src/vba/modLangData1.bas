@@ -14,6 +14,7 @@ Public Sub LangData1()
 End Sub
 
 Private Sub D1_1()
+    LangAdd "زر الاقتراح يكتب الاسم العربي بحروف لاتينية في الخانات الفارغة فقط. راجعه وعدّله ثم احفظ. الاسم الفارغ يظهر بالعربية في الواجهة الإنجليزية", "Suggest writes the Arabic name in Latin letters in the empty boxes only. Review and correct it, then save. An empty name shows in Arabic in the English interface"
     LangAdd "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "يُعرض التقرير للمعاينة ومنها الطباعة. «حفظ PDF» و«تصدير Excel» يحفظان الملف في مجلد Reports بجانب ملف البرنامج", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
     LangAdd "تم النسخ لكن تعذر فتح النسخة للتحقق منها. أعد المحاولة بعد إغلاق البرنامج على الأجهزة الأخرى", "Copied, but the copy could not be opened to check it. Try again after closing the program on the other computers"
@@ -49,6 +50,7 @@ Private Sub D1_1()
     LangAdd "مجمل الربح ± فروقات المخزون - المصروفات. الرصيد الافتتاحي لا يدخل في الربح", "Gross profit +/- stock differences - expenses. The opening balance is not part of the profit"
     LangAdd "هذا الصنف لا يتابع المخزون (يُحضَّر عند الطلب)، فلا تُسجَّل له حركات مخزون", "This item does not track stock (prepared on order), so no stock moves are recorded for it"
     LangAdd "يناير,فبراير,مارس,أبريل,مايو,يونيو,يوليو,أغسطس,سبتمبر,أكتوبر,نوفمبر,ديسمبر", "January,February,March,April,May,June,July,August,September,October,November,December"
+    LangAdd "اسم إنجليزي لكل عميل ومورد ومنتج وصندوق وحساب: يظهر في الواجهة الإنجليزية", "An English name for each customer, supplier, product, box and account: shown in the English interface"
     LangAdd "سيُعاد إظهار أدوات Access ويُسمح بمفتاح Shift عند الفتح. هل تريد المتابعة", "The Access tools will be shown again and the Shift key allowed on opening. Do you want to continue"
     LangAdd "الإقرار معتمد: لا تتغير قيمه. ألغِ الاعتماد أولًا إن كان التغيير مقصودًا", "The return is approved: its values do not change. Cancel the approval first if the change is intended"
     LangAdd "هذا التقرير يعرض التكلفة والأرباح ويحتاج صلاحية «تقارير الأرباح والضريبة", "This report shows costs and profits and needs the permission Profit and VAT reports"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "عملات التعامل؛ عملة البرنامج الريال وكل المبالغ تُحفظ به", "Trading currencies, the program currency is the riyal and every amount is kept in it"
     LangAdd "لا يتغير رقم حساب محفوظ. أنشئ حسابًا جديدًا وعطّل القديم", "A saved account number does not change. Create a new account and deactivate the old one"
     LangAdd "لكل عملة سعر واحد في اليوم؛ عملة البرنامج لا تحتاج سعرًا", "Each currency has one rate a day, the program currency needs no rate"
-    LangAdd "لم تُعيَّن كلمة مرور بعد، ولا يستطيع هذا المستخدم الدخول", "No password is set yet, and this user cannot log in"
-    LangAdd "تأكد من الطابعة الافتراضية، ويمكنك إعادة الطباعة لاحقًا", "Check the default printer, you can reprint later"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "لم تُعيَّن كلمة مرور بعد، ولا يستطيع هذا المستخدم الدخول", "No password is set yet, and this user cannot log in"
+    LangAdd "تأكد من الطابعة الافتراضية، ويمكنك إعادة الطباعة لاحقًا", "Check the default printer, you can reprint later"
     LangAdd "توجد فاتورة غير مكتملة من جلسة سابقة. هل تريد استكمالها", "There is an unfinished invoice from a previous session. Do you want to continue it"
     LangAdd "لا توجد بيانات لعرضها في هذا التقرير للاختيارات المحددة", "There is no data to show in this report for the choices made"
     LangAdd "لا يمكن الحذف أو التعديل لوجود عمليات مرتبطة بهذا السجل", "Cannot delete or edit because there are transactions linked to this record"
@@ -255,11 +257,11 @@ Private Sub D1_2()
     LangAdd "الرصيد المرحَّل (الخانة 15) لا يكون سالبًا", "The carried balance (box 15) is never negative"
     LangAdd "بياناتك الحالية لم تتغير، ونسختها الوقائية", "Your current data did not change, and its safety copy"
     LangAdd "تاريخ الفاتورة لا يمكن أن يكون في المستقبل", "The invoice date cannot be in the future"
-    LangAdd "كلمة مرور مؤقتة: سيُطلب تغييرها عند الدخول", "Temporary password: the user is asked to change it at login"
-    LangAdd "مشكلة في البيانات - راجع تقرير فحص السلامة", "A data problem - check the integrity report"
 End Sub
 
 Private Sub D1_3()
+    LangAdd "كلمة مرور مؤقتة: سيُطلب تغييرها عند الدخول", "Temporary password: the user is asked to change it at login"
+    LangAdd "مشكلة في البيانات - راجع تقرير فحص السلامة", "A data problem - check the integrity report"
     LangAdd "يوجد حقل مطلوب فارغ. أكمل البيانات ثم احفظ", "A required field is empty. Complete the data, then save"
     LangAdd "يُسجَّل إهلاك الشهر في آخر يوم منه أو بعده", "The depreciation of a month is recorded on its last day or later"
     LangAdd "إجمالي فاتورة البيع لا يساوي مجموع أسطرها", "The sales invoice total does not equal the sum of its lines"
@@ -331,9 +333,4 @@ Private Sub D1_3()
     LangAdd "الكمية يجب أن تكون أكبر من صفر (السطر", "The quantity must be greater than zero (line"
     LangAdd "المقارنة داخل سنة واحدة (موازنة السنة", "Comparison within one year (the budget of the year"
     LangAdd "تاريخ السداد قبل تاريخ اعتماد الإقرار", "The payment date is before the approval date of the return"
-    LangAdd "تُحذف المسودة فقط: ألغِ الترحيل أولًا", "Only the draft is deleted: unpost it first"
-    LangAdd "حركة الخزينة اليومية (أول اليوم وآخره", "Daily treasury moves (start and end of the day"
-    LangAdd "رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ", "A new number that is not repeated, it does not change after saving"
-    LangAdd "سجل التدقيق يحتاج صلاحية «سجل التدقيق", "The audit trail needs the permission Audit trail"
-    LangAdd "عرض فقط - التصحيح يكون بمرتجع مشتريات", "View only - a correction is made with a purchase return"
 End Sub

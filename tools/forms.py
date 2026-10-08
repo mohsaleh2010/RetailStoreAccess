@@ -466,7 +466,8 @@ DATA_SCREENS: List[DataScreen] = [
                        ("btnLabelSettings", "ملصقات الباركود", 'OpenScreen "frmLabelSettings"'),
                        ("btnActivation", "تفعيل البرنامج", 'OpenScreen "frmActivation", 10')],
         fields=[
-            Fld("StoreName"), Fld("StoreNameEn"),
+            Fld("StoreName"),
+            Fld("StoreNameEn", button=("btnEnglishNames", "باقي الأسماء", 'OpenScreen "frmEnglishNames"')),
             Fld("VATNumber", hint="15 رقمًا يبدأ وينتهي بـ 3"), Fld("CRNumber"),
             Fld("BuildingNo"), Fld("StreetName"), Fld("District"), Fld("City"),
             Fld("PostalCode"), Fld("AdditionalNo"), Fld("Phone"), Fld("Email"),
@@ -566,6 +567,7 @@ SCREEN_PERMISSIONS = {
     "frmRecurring": "EXPENSES", "frmAccounting": "", "frmAuditLog": "AUDIT_LOG",
     "frmCurrencies": "CURRENCIES", "frmCurrencyRates": "CURRENCIES",
     "frmSalesReps": "SALES_REPS", "frmRepTargets": "SALES_REPS", "frmCommissions": "SALES_REPS",
+    "frmEnglishNames": "SETTINGS",
 }
 
 
@@ -1258,8 +1260,9 @@ def all_forms() -> List[FormModel]:
     from forms_accounting import accounting_forms
     from forms_audit import audit_forms
     from forms_sales_reps import sales_rep_forms
+    from forms_names import names_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
             + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms()
-            + audit_forms() + sales_rep_forms())
+            + audit_forms() + sales_rep_forms() + names_forms())

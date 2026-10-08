@@ -16,6 +16,38 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "كل الشاشات", "All screens"
+    LangAdd "كل المراكز", "All centers"
+    LangAdd "كمية الصنف", "Item quantity"
+    LangAdd "كود المنتج", "Product code"
+    LangAdd "مبلغ السند", "Voucher amount"
+    LangAdd "مبلغ الشيك", "Cheque amount"
+    LangAdd "مجمل الربح", "Gross profit"
+    LangAdd "مرتجع شراء", "Purchase return"
+    LangAdd "مرجع البنك", "Bank reference"
+    LangAdd "مرحَّلة في", "posted on"
+    LangAdd "مسودة مسير", "Run draft"
+    LangAdd "من القائمة", "from the list"
+    LangAdd "منها ضريبة", "of which VAT"
+    LangAdd "نسبة صفرية", "Zero rate"
+    LangAdd "نقطة البيع", "Point of sale"
+    LangAdd "نوع الحركة", "Move type"
+    LangAdd "نوع الحساب", "Account type"
+    LangAdd "نوع الشراء", "Purchase type"
+    LangAdd "ورقة الجرد", "Count sheet"
+    LangAdd "آخر تحديث", "Last update"
+    LangAdd "آخر تصفية", "Last closing"
+    LangAdd "آخر معامل", "Last rate"
+    LangAdd "أربعة عشر", "fourteen"
+    LangAdd "أُنشئ منه", "Created from it"
+    LangAdd "إعادة فتح", "Reopen"
+    LangAdd "إقفال سنة", "Close a year"
+    LangAdd "إلى تاريخ", "To date"
+    LangAdd "إلى صندوق", "To box"
+    LangAdd "اسم الأصل", "Asset name"
+    LangAdd "اسم المحل", "Store name"
+    LangAdd "اعتُمد في", "Approved on"
+    LangAdd "الإعدادات", "Settings"
     LangAdd "الإيرادات", "Revenue"
     LangAdd "الاستحقاق", "Due date"
     LangAdd "التأمينات", "Social insurance"
@@ -62,6 +94,7 @@ Private Sub D4_1()
     LangAdd "سُجِّل في", "Recorded on"
     LangAdd "شراء نقدي", "Cash purchase"
     LangAdd "صرفنا إلى", "Paid to"
+    LangAdd "طرق الدفع", "Payment methods"
     LangAdd "طلب توصيل", "Delivery order"
     LangAdd "طلب داخلي", "Dine-in order"
     LangAdd "عجز تصفية", "Closing shortage"
@@ -103,6 +136,9 @@ Private Sub D4_1()
     LangAdd "الانحراف", "Variance"
     LangAdd "الباركود", "Barcode"
     LangAdd "التقارير", "Reports"
+End Sub
+
+Private Sub D4_2()
     LangAdd "الصادرات", "Exports"
     LangAdd "الصلاحية", "Permission"
     LangAdd "الصناديق", "Boxes"
@@ -136,9 +172,6 @@ Private Sub D4_1()
     LangAdd "سكر قليل", "Little sugar"
     LangAdd "شراء آجل", "Credit purchase"
     LangAdd "شهر جديد", "New month"
-End Sub
-
-Private Sub D4_2()
     LangAdd "شيك صادر", "Issued cheque"
     LangAdd "شيك مرتد", "Bounced cheque"
     LangAdd "شيك وارد", "Received cheque"
@@ -173,6 +206,7 @@ Private Sub D4_2()
     LangAdd "استعراض", "Browse"
     LangAdd "افتراضي", "Default"
     LangAdd "الآيبان", "IBAN"
+    LangAdd "الأدوار", "Roles"
     LangAdd "الأرباح", "Profit"
     LangAdd "الأساسي", "Basic"
     LangAdd "الأصناف", "Items"
@@ -225,6 +259,9 @@ Private Sub D4_2()
     LangAdd "المراجع", "Reviewer"
     LangAdd "المرتجع", "Return"
     LangAdd "المرتدة", "Bounced"
+End Sub
+
+Private Sub D4_3()
     LangAdd "المسؤول", "Manager"
     LangAdd "المستحق", "Due"
     LangAdd "المستلم", "Recipient"
@@ -259,9 +296,6 @@ Private Sub D4_2()
     LangAdd "مرة/سنة", "times/year"
     LangAdd "مستويات", "levels"
     LangAdd "مصروفات", "Expenses"
-End Sub
-
-Private Sub D4_3()
     LangAdd "ملاحظات", "Notes"
     LangAdd "مليونان", "two million"
     LangAdd "والدائن", "and credit"
@@ -348,6 +382,9 @@ Private Sub D4_3()
     LangAdd "معاينة", "Preview"
     LangAdd "معتمدة", "Approved"
     LangAdd "مكافآت", "Bonuses"
+End Sub
+
+Private Sub D4_4()
     LangAdd "ملايين", "million"
     LangAdd "ممنوحة", "Granted"
     LangAdd "من بنك", "From a bank"
@@ -382,9 +419,6 @@ Private Sub D4_3()
     LangAdd "الدور", "Role"
     LangAdd "الربح", "Profit"
     LangAdd "الرقم", "Number"
-End Sub
-
-Private Sub D4_4()
     LangAdd "الرمز", "Code"
     LangAdd "السبب", "Reason"
     LangAdd "السجل", "Record"
@@ -421,6 +455,7 @@ Private Sub D4_4()
     LangAdd "توصيل", "Delivery"
     LangAdd "ثلاثة", "three"
     LangAdd "جارية", "Open"
+    LangAdd "حرفًا", "characters"
     LangAdd "خزينة", "Treasury"
     LangAdd "خمسون", "fifty"
     LangAdd "داخلي", "Internal"
@@ -470,6 +505,9 @@ Private Sub D4_4()
     LangAdd "الكل", "All"
     LangAdd "بثمن", "for a price"
     LangAdd "بدون", "None"
+End Sub
+
+Private Sub D4_5()
     LangAdd "تسعة", "nine"
     LangAdd "جديد", "New"
     LangAdd "حساب", "Account"
@@ -505,9 +543,6 @@ Private Sub D4_4()
     LangAdd "مرتد", "Bounced"
     LangAdd "مسدد", "Paid"
     LangAdd "مسير", "Run"
-End Sub
-
-Private Sub D4_5()
     LangAdd "ملغى", "Cancelled"
     LangAdd "ناقص", "Missing"
     LangAdd "نسخة", "Backup"

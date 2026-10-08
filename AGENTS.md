@@ -68,6 +68,7 @@ Optional test dependencies (tests skip when missing): `pip install -r requiremen
 | `dist/tools/BuildFrontEnd.vbs` | Builds the whole front-end in Access in one step; `EnableShiftKey.vbs` re-enables SHIFT |
 | `tests/` | `access_sqlite.py` (SQLite mirror of Access SQL: `Nz`, `IIf`, `DateAdd`, `Year` …), `helpers.py` (`VbaModuleChecks`), `vba_harness.py` (LibreOffice Basic runner) |
 | `tools/i18n.py`, `tools/i18n_en.py`, `tools/gen_lang.py` | The English interface: Arabic -> English dictionary, its Python mirror of `Tr`, and the generated `modLang` + `modLangData*` |
+| `tools/master_en.py`, `tools/translit.py` | English names of the master data (`qryLoc*`, `docs/39`-`41`) and the transliteration suggested by the English names screen (mirror of `modEnglishNames.Transliterate`, `docs/42`) |
 | `docs/NN-*.md` | One Arabic document per feature; `README.md` lists them with their approval status |
 
 ## Adding a feature (checklist)
@@ -107,7 +108,9 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
 - Do not name variables like built-in functions or keywords: `left`, `month`, `line`, `text`, `now`,
   `dir`, `sub`, `exp_`, `base` … No procedure name may exist Public in two modules.
 - Lines < 1000 characters and < 24 line continuations (`long_const`, `form_names_const` split strings).
-- Only Windows-1256 characters in VBA (no `−`, smart symbols outside cp1256).
+- Only Windows-1256 characters in VBA (no `−`, smart symbols outside cp1256, no Arabic-Indic digits `٠-٩`: test
+  `AscW` codes `&H660`-`&H669`). An Arabic constant that is data, not interface text, goes into
+  `i18n.DATA_CONSTANTS`.
 - Access SQL: an alias may not be reused inside its own expression; every `UNION` branch needs a
   `FROM`; no `&` in saved queries; no column named `[ ]`; parameters come from
   `QDate`/`QLong` (`modQueryParams`) and must be declared; no subquery in the column list of a

@@ -14,6 +14,7 @@ Public Sub LangData1()
 End Sub
 
 Private Sub D1_1()
+    LangAdd "ÒÑ ÇáÇŞÊÑÇÍ íßÊÈ ÇáÇÓã ÇáÚÑÈí ÈÍÑæİ áÇÊíäíÉ İí ÇáÎÇäÇÊ ÇáİÇÑÛÉ İŞØ. ÑÇÌÚå æÚÏøáå Ëã ÇÍİÙ. ÇáÇÓã ÇáİÇÑÛ íÙåÑ ÈÇáÚÑÈíÉ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "Suggest writes the Arabic name in Latin letters in the empty boxes only. Review and correct it, then save. An empty name shows in Arabic in the English interface"
     LangAdd "ÇáÍÓÇÈÇÊ ÇáÃÓÇÓíÉ (ÇáãÚáóøãÉ) ÊÓÊÎÏãåÇ ÇáŞíæÏ ÇáÂáíÉ: áÇ ÊõÍĞİ æáÇ íÊÛíÑ äæÚåÇ. ÇáŞíæÏ ÇáíÏæíÉ ãä ÒÑ «ŞíÏ íÏæí", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "íõÚÑÖ ÇáÊŞÑíÑ ááãÚÇíäÉ æãäåÇ ÇáØÈÇÚÉ. «ÍİÙ PDF» æ«ÊÕÏíÑ Excel» íÍİÙÇä Çáãáİ İí ãÌáÏ Reports ÈÌÇäÈ ãáİ ÇáÈÑäÇãÌ", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
     LangAdd "Êã ÇáäÓÎ áßä ÊÚĞÑ İÊÍ ÇáäÓÎÉ ááÊÍŞŞ ãäåÇ. ÃÚÏ ÇáãÍÇæáÉ ÈÚÏ ÅÛáÇŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì", "Copied, but the copy could not be opened to check it. Try again after closing the program on the other computers"
@@ -49,6 +50,7 @@ Private Sub D1_1()
     LangAdd "ãÌãá ÇáÑÈÍ ± İÑæŞÇÊ ÇáãÎÒæä - ÇáãÕÑæİÇÊ. ÇáÑÕíÏ ÇáÇİÊÊÇÍí áÇ íÏÎá İí ÇáÑÈÍ", "Gross profit +/- stock differences - expenses. The opening balance is not part of the profit"
     LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä (íõÍÖóøÑ ÚäÏ ÇáØáÈ)¡ İáÇ ÊõÓÌóøá áå ÍÑßÇÊ ãÎÒæä", "This item does not track stock (prepared on order), so no stock moves are recorded for it"
     LangAdd "íäÇíÑ,İÈÑÇíÑ,ãÇÑÓ,ÃÈÑíá,ãÇíæ,íæäíæ,íæáíæ,ÃÛÓØÓ,ÓÈÊãÈÑ,ÃßÊæÈÑ,äæİãÈÑ,ÏíÓãÈÑ", "January,February,March,April,May,June,July,August,September,October,November,December"
+    LangAdd "ÇÓã ÅäÌáíÒí áßá Úãíá æãæÑÏ æãäÊÌ æÕäÏæŞ æÍÓÇÈ: íÙåÑ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "An English name for each customer, supplier, product, box and account: shown in the English interface"
     LangAdd "ÓíõÚÇÏ ÅÙåÇÑ ÃÏæÇÊ Access æíõÓãÍ ÈãİÊÇÍ Shift ÚäÏ ÇáİÊÍ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "The Access tools will be shown again and the Shift key allowed on opening. Do you want to continue"
     LangAdd "ÇáÅŞÑÇÑ ãÚÊãÏ: áÇ ÊÊÛíÑ Şíãå. ÃáÛö ÇáÇÚÊãÇÏ ÃæáğÇ Åä ßÇä ÇáÊÛííÑ ãŞÕæÏğÇ", "The return is approved: its values do not change. Cancel the approval first if the change is intended"
     LangAdd "åĞÇ ÇáÊŞÑíÑ íÚÑÖ ÇáÊßáİÉ æÇáÃÑÈÇÍ æíÍÊÇÌ ÕáÇÍíÉ «ÊŞÇÑíÑ ÇáÃÑÈÇÍ æÇáÖÑíÈÉ", "This report shows costs and profits and needs the permission Profit and VAT reports"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "ÚãáÇÊ ÇáÊÚÇãáº ÚãáÉ ÇáÈÑäÇãÌ ÇáÑíÇá æßá ÇáãÈÇáÛ ÊõÍİÙ Èå", "Trading currencies, the program currency is the riyal and every amount is kept in it"
     LangAdd "áÇ íÊÛíÑ ÑŞã ÍÓÇÈ ãÍİæÙ. ÃäÔÆ ÍÓÇÈğÇ ÌÏíÏğÇ æÚØøá ÇáŞÏíã", "A saved account number does not change. Create a new account and deactivate the old one"
     LangAdd "áßá ÚãáÉ ÓÚÑ æÇÍÏ İí Çáíæãº ÚãáÉ ÇáÈÑäÇãÌ áÇ ÊÍÊÇÌ ÓÚÑğÇ", "Each currency has one rate a day, the program currency needs no rate"
-    LangAdd "áã ÊõÚíóøä ßáãÉ ãÑæÑ ÈÚÏ¡ æáÇ íÓÊØíÚ åĞÇ ÇáãÓÊÎÏã ÇáÏÎæá", "No password is set yet, and this user cannot log in"
-    LangAdd "ÊÃßÏ ãä ÇáØÇÈÚÉ ÇáÇİÊÑÇÖíÉ¡ æíãßäß ÅÚÇÏÉ ÇáØÈÇÚÉ áÇÍŞğÇ", "Check the default printer, you can reprint later"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "áã ÊõÚíóøä ßáãÉ ãÑæÑ ÈÚÏ¡ æáÇ íÓÊØíÚ åĞÇ ÇáãÓÊÎÏã ÇáÏÎæá", "No password is set yet, and this user cannot log in"
+    LangAdd "ÊÃßÏ ãä ÇáØÇÈÚÉ ÇáÇİÊÑÇÖíÉ¡ æíãßäß ÅÚÇÏÉ ÇáØÈÇÚÉ áÇÍŞğÇ", "Check the default printer, you can reprint later"
     LangAdd "ÊæÌÏ İÇÊæÑÉ ÛíÑ ãßÊãáÉ ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáåÇ", "There is an unfinished invoice from a previous session. Do you want to continue it"
     LangAdd "áÇ ÊæÌÏ ÈíÇäÇÊ áÚÑÖåÇ İí åĞÇ ÇáÊŞÑíÑ ááÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "There is no data to show in this report for the choices made"
     LangAdd "áÇ íãßä ÇáÍĞİ Ãæ ÇáÊÚÏíá áæÌæÏ ÚãáíÇÊ ãÑÊÈØÉ ÈåĞÇ ÇáÓÌá", "Cannot delete or edit because there are transactions linked to this record"
@@ -255,11 +257,11 @@ Private Sub D1_2()
     LangAdd "ÇáÑÕíÏ ÇáãÑÍóøá (ÇáÎÇäÉ 15) áÇ íßæä ÓÇáÈğÇ", "The carried balance (box 15) is never negative"
     LangAdd "ÈíÇäÇÊß ÇáÍÇáíÉ áã ÊÊÛíÑ¡ æäÓÎÊåÇ ÇáæŞÇÆíÉ", "Your current data did not change, and its safety copy"
     LangAdd "ÊÇÑíÎ ÇáİÇÊæÑÉ áÇ íãßä Ãä íßæä İí ÇáãÓÊŞÈá", "The invoice date cannot be in the future"
-    LangAdd "ßáãÉ ãÑæÑ ãÄŞÊÉ: ÓíõØáÈ ÊÛííÑåÇ ÚäÏ ÇáÏÎæá", "Temporary password: the user is asked to change it at login"
-    LangAdd "ãÔßáÉ İí ÇáÈíÇäÇÊ - ÑÇÌÚ ÊŞÑíÑ İÍÕ ÇáÓáÇãÉ", "A data problem - check the integrity report"
 End Sub
 
 Private Sub D1_3()
+    LangAdd "ßáãÉ ãÑæÑ ãÄŞÊÉ: ÓíõØáÈ ÊÛííÑåÇ ÚäÏ ÇáÏÎæá", "Temporary password: the user is asked to change it at login"
+    LangAdd "ãÔßáÉ İí ÇáÈíÇäÇÊ - ÑÇÌÚ ÊŞÑíÑ İÍÕ ÇáÓáÇãÉ", "A data problem - check the integrity report"
     LangAdd "íæÌÏ ÍŞá ãØáæÈ İÇÑÛ. Ãßãá ÇáÈíÇäÇÊ Ëã ÇÍİÙ", "A required field is empty. Complete the data, then save"
     LangAdd "íõÓÌóøá ÅåáÇß ÇáÔåÑ İí ÂÎÑ íæã ãäå Ãæ ÈÚÏå", "The depreciation of a month is recorded on its last day or later"
     LangAdd "ÅÌãÇáí İÇÊæÑÉ ÇáÈíÚ áÇ íÓÇæí ãÌãæÚ ÃÓØÑåÇ", "The sales invoice total does not equal the sum of its lines"
@@ -331,9 +333,4 @@ Private Sub D1_3()
     LangAdd "ÇáßãíÉ íÌÈ Ãä Êßæä ÃßÈÑ ãä ÕİÑ (ÇáÓØÑ", "The quantity must be greater than zero (line"
     LangAdd "ÇáãŞÇÑäÉ ÏÇÎá ÓäÉ æÇÍÏÉ (ãæÇÒäÉ ÇáÓäÉ", "Comparison within one year (the budget of the year"
     LangAdd "ÊÇÑíÎ ÇáÓÏÇÏ ŞÈá ÊÇÑíÎ ÇÚÊãÇÏ ÇáÅŞÑÇÑ", "The payment date is before the approval date of the return"
-    LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ: ÃáÛö ÇáÊÑÍíá ÃæáğÇ", "Only the draft is deleted: unpost it first"
-    LangAdd "ÍÑßÉ ÇáÎÒíäÉ ÇáíæãíÉ (Ãæá Çáíæã æÂÎÑå", "Daily treasury moves (start and end of the day"
-    LangAdd "ÑŞã ÌÏíÏ áÇ íÊßÑÑº áÇ íÊÛíÑ ÈÚÏ ÇáÍİÙ", "A new number that is not repeated, it does not change after saving"
-    LangAdd "ÓÌá ÇáÊÏŞíŞ íÍÊÇÌ ÕáÇÍíÉ «ÓÌá ÇáÊÏŞíŞ", "The audit trail needs the permission Audit trail"
-    LangAdd "ÚÑÖ İŞØ - ÇáÊÕÍíÍ íßæä ÈãÑÊÌÚ ãÔÊÑíÇÊ", "View only - a correction is made with a purchase return"
 End Sub
