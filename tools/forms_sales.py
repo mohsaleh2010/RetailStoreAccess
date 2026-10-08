@@ -3,7 +3,7 @@ Layout conventions are the same as forms.py (twips, x from the start edge)."""
 
 from typing import List, Tuple
 
-from forms import (Control, FormModel, Sym, ICONS, button, cm, fit_window, labelled, title_band,
+from forms import (Control, FormModel, Sym, ICONS, button, cm, currency_pair, fit_window, labelled, title_band,
                    CUSTOMER_ROWS)
 
 PAYMENT_TYPES = "CASH;نقدي;CREDIT;آجل"
@@ -265,10 +265,11 @@ def layout_customer_payment() -> FormModel:
     labelled(m, "cboCustomer", "العميل", c)
     m.add(Control("label", "lblBalance", cm(0.4), cm(3.3), width - cm(0.8), cm(0.6),
                   {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
-    c = m.add(Control("text", "txtAmount", cm(0.4), cm(4.6), cm(7.4), cm(0.9),
+    c = m.add(Control("text", "txtAmount", cm(0.4), cm(4.6), cm(4.4), cm(0.9),
                       {"FontSize": 14, "Format": "#,##0.00"}))
     labelled(m, "txtAmount", "المبلغ *", c)
-    c = m.add(Control("combo", "cboPaymentMethod", cm(8.2), cm(4.6), width - cm(8.6), cm(0.9),
+    currency_pair(m, cm(5.0), cm(4.6), h=cm(0.9), cbo_w=cm(2.6), rate_w=cm(2.4))
+    c = m.add(Control("combo", "cboPaymentMethod", cm(10.4), cm(4.6), width - cm(10.8), cm(0.9),
                       {"RowSource": PAYMENT_ROWS, "ColumnCount": 2, "ColumnWidths": "0;6"}))
     labelled(m, "cboPaymentMethod", "طريقة الدفع", c)
     c = m.add(Control("text", "txtNotes", cm(0.4), cm(6.2), width - cm(0.8), cm(0.8), {}))

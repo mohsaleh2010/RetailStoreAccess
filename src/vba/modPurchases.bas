@@ -27,7 +27,10 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
                                      ByVal InvoiceDate As Variant, ByVal PaymentType As String, _
                                      ByVal PaymentMethodID As Variant, ByVal ChargeVat As Boolean, _
                                      ByVal InvoiceDiscount As Currency, ByVal PaidAmount As Variant, _
-                                     ByVal Notes As String, ByRef NewInvoiceID As Long) As String
+                                     ByVal Notes As String, ByRef NewInvoiceID As Long, _
+                                     Optional ByVal CurrencyCode As String = "", Optional ByVal FxRate As Double = 1) As String
+    ' The prices, discounts and the paid amount of the cart are in CurrencyCode (default: the program
+    ' currency); the invoice is kept in SAR, with its currency, rate and total there (modCurrency).
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim n As Long, i As Long, msg As String, vatRate As Currency, rate As Currency
     Dim productIDs() As Long, newPrices() As Variant, isCredit As Boolean, reclaim As Boolean
@@ -43,6 +46,9 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
         Exit Function
     End If
     msg = CheckSupplier(SupplierID)
+    If Len(CurrencyCode) = 0 Then CurrencyCode = BaseCurrency()
+    If IsBaseCurrency(CurrencyCode) Then FxRate = 1
+    If Len(msg) = 0 Then msg = CurrencyProblem(CurrencyCode, FxRate)
     If Len(msg) = 0 Then msg = PurchaseDocDate(InvoiceDate, docDate)
     If Len(msg) = 0 And Len(Trim$(SupplierInvoiceNo)) > 0 Then
         If Not IsNull(DbValue("SELECT InvoiceNumber FROM PurchaseInvoices WHERE SupplierID = " & SupplierID & _
@@ -82,7 +88,8 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
             Exit Function
         End If
         If ChargeVat And Nz(rs!VATCategory, "S") = "S" Then rate = vatRate Else rate = 0
-        CalcAddLine Nz(rs!Quantity, 0), Nz(rs!UnitCost, 0), Nz(rs!LineDiscount, 0), rate
+        CalcAddLine Nz(rs!Quantity, 0), CCur(CDbl(Nz(rs!UnitCost, 0)) * FxRate), _
+                    ToBase(Nz(rs!LineDiscount, 0), FxRate), rate
         ReDim Preserve productIDs(0 To n)
         ReDim Preserve newPrices(0 To n)
         productIDs(n) = rs!ProductID
@@ -91,7 +98,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
         rs.MoveNext
     Loop
     rs.Close
-    msg = CalcRun(InvoiceDiscount, False)
+    msg = CalcRun(ToBase(InvoiceDiscount, FxRate), False)
     If Len(msg) = 0 And Len(priceChanges) > 0 And Not HasPermission("PRODUCTS") Then
         msg = "لا تملك صلاحية تعديل أسعار البيع. امسح عمود «سعر البيع الجديد»."
     End If
@@ -105,7 +112,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     If IsNull(PaidAmount) Then
         If isCredit Then tend = 0 Else tend = CalcTotal("TOTAL")
     Else
-        tend = CCur(PaidAmount)
+        tend = ToBase(CCur(PaidAmount), FxRate)
     End If
     msg = Settle(CalcTotal("TOTAL"), tend, isCredit, paid, remaining, change)
     If Len(msg) > 0 Then
@@ -134,6 +141,9 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     rs!TotalAmount = CalcTotal("TOTAL")
     rs!PaidAmount = paid
     rs!RemainingAmount = remaining
+    rs!CurrencyCode = CurrencyCode
+    rs!ExchangeRate = FxRate
+    rs!ForeignAmount = FromBase(CalcTotal("TOTAL"), FxRate)
     If remaining > 0 Then rs!DueDate = DueDateFor("S", SupplierID, docDate)       ' modAging
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), paid)      ' modCash
     rs!BankID = BankFor(PaymentMethodID, paid)                                 ' modBank
@@ -303,6 +313,11 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
     rs!Tax = sumTax
     rs!TotalAmount = sumTotal
     rs!RefundedAmount = refunded
+    ' the currency and rate of the invoice it returns (modCurrency)
+    rs!CurrencyCode = Nz(DbValue("SELECT CurrencyCode FROM PurchaseInvoices WHERE PurchaseInvoiceID = " & PurchaseInvoiceID), _
+                         BaseCurrency())
+    rs!ExchangeRate = Nz(DbValue("SELECT ExchangeRate FROM PurchaseInvoices WHERE PurchaseInvoiceID = " & PurchaseInvoiceID), 1)
+    rs!ForeignAmount = FromBase(sumTotal, rs!ExchangeRate)
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), refunded)
     rs!BankID = BankFor(PaymentMethodID, refunded)
     rs.Update
@@ -358,9 +373,11 @@ End Function
 '------------------------------------------------------------------------------
 Public Function PostSupplierPayment(ByVal SupplierID As Long, ByVal Amount As Currency, _
                                     ByVal PaymentMethodID As Long, ByVal Notes As String, _
-                                    ByRef NewPaymentID As Long) As String
+                                    ByRef NewPaymentID As Long, Optional ByVal CurrencyCode As String = "", _
+                                    Optional ByVal FxRate As Double = 1) As String
+    ' Amount is in CurrencyCode (default: the program currency); it is kept in SAR (modCurrency).
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
-    Dim owed As Currency, payNo As String, msg As String
+    Dim owed As Currency, payNo As String, msg As String, foreign As Currency
 
     On Error GoTo EH
     NewPaymentID = 0
@@ -374,10 +391,15 @@ Public Function PostSupplierPayment(ByVal SupplierID As Long, ByVal Amount As Cu
         Exit Function
     End If
     msg = CheckSupplier(SupplierID)
+    If Len(CurrencyCode) = 0 Then CurrencyCode = BaseCurrency()
+    If IsBaseCurrency(CurrencyCode) Then FxRate = 1
+    If Len(msg) = 0 Then msg = CurrencyProblem(CurrencyCode, FxRate)
     If Len(msg) > 0 Then
         PostSupplierPayment = msg
         Exit Function
     End If
+    foreign = Amount
+    Amount = ToBase(foreign, FxRate)
     owed = Nz(DbValue("SELECT CurrentBalance FROM Suppliers WHERE SupplierID = " & SupplierID), 0)
     If Amount > owed Then
         If Not AskYesNo("المبلغ (" & Format$(Amount, "#,##0.00") & ") أكبر من المستحق للمورد (" & _
@@ -398,6 +420,9 @@ Public Function PostSupplierPayment(ByVal SupplierID As Long, ByVal Amount As Cu
     rs!SupplierID = SupplierID
     rs!PaymentDate = Now
     rs!Amount = Amount
+    rs!CurrencyCode = CurrencyCode
+    rs!ExchangeRate = FxRate
+    rs!ForeignAmount = foreign
     rs!PaymentMethodID = PaymentMethodID
     rs!CashBoxID = CashBoxFor(PaymentMethodID, Amount)
     rs!BankID = BankFor(PaymentMethodID, Amount)

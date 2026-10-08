@@ -170,7 +170,7 @@ class PostingCodeTests(unittest.TestCase):
         body = proc(self.text, "PostPurchaseFromCart")
         self.assertRegex(body, r'ApplyStockMovement db, productIDs\(i\), CalcLine\(i, "QTY"\), TT_PURCHASE, '
                                r'unitCost, "PURCHASE",[\s\S]*?, True')
-        self.assertIn("CalcRun(InvoiceDiscount, False)", body)          # purchase prices exclude VAT
+        self.assertIn("CalcRun(ToBase(InvoiceDiscount, FxRate), False)", body)   # prices exclude VAT; in SAR
         body = proc(self.text, "PostPurchaseReturn")
         self.assertRegex(body, r"ApplyStockMovement db, productIDs\(i\), -qtys\(i\), TT_PURCHASE_RETURN")
         self.assertIn('CheckStockAvailable(productIDs, qtys, n, "الإرجاع للمورد")', body)

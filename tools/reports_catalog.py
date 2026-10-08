@@ -257,6 +257,12 @@ LIST_SPECS: List[ListSpec] = [
         Col("دائن", "CreditTotal", 2.2, MONEY, True), Col("الرصيد", "Balance", 2.4, MONEY, True),
         Col("آخر حركة", "=GDate([LastEntryDate])", 2.0)],
         [("SupplierName", False)]),
+    ListSpec("SUPPLIER_FX", [
+        Col("المورد", "SupplierName", 5.0, grow=True), Col("العملة", "CurrencyCode", 1.4),
+        Col("الرصيد بالعملة", "FxBalance", 2.8, MONEY), Col("بالدفاتر (ريال)", "BookBalance", 2.8, MONEY, True),
+        Col("آخر معامل", "LastRate", 2.0, "0.0000"), Col("بآخر سعر (ريال)", "RevaluedBalance", 2.8, MONEY, True),
+        Col("فرق العملة", "FxDifference", 2.6, MONEY, True)],
+        [("CurrencyCode", False), ("SupplierName", False)], no_data="لا توجد أرصدة موردين بعملات أجنبية."),
     ListSpec("INTEGRITY", [
         Col("الرمز", "IssueCode", 3.4), Col("المشكلة", "IssueText", 6.8, grow=True),
         Col("الجدول", "SourceTable", 3.0), Col("السجل", "RecordID", 1.6, INT),

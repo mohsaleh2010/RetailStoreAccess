@@ -4,7 +4,7 @@ Layout conventions are the same as forms.py (twips, x from the start edge)."""
 
 from typing import List, Tuple
 
-from forms import Control, FormModel, Sym, button, cm, fit_window, labelled, shrink_area, title_band, CATEGORY_ROWS
+from forms import Control, FormModel, Sym, button, cm, currency_pair, fit_window, labelled, shrink_area, title_band, CATEGORY_ROWS
 from forms_sales import LOCKED, PAYMENT_ROWS, PAYMENT_TYPES, grid_row, header_labels
 
 PURCHASE_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, PurchasePrice "
@@ -118,8 +118,9 @@ def layout_purchase_invoice(line_heads) -> FormModel:
                       {"Format": "#,##0.00"}, events=["AfterUpdate"]))
     labelled(m, "txtInvoiceDiscount", "خصم على الفاتورة (بدون ضريبة)", c)
     check_with_label(m, "chkChargeVAT", "المورد يحتسب الضريبة", x2, cm(7.2), half, ["AfterUpdate"])
-    c = m.add(Control("text", "txtNotes", px, cm(8.65), pw, cm(0.8), {}))
+    c = m.add(Control("text", "txtNotes", px, cm(8.65), half, cm(0.8), {}))
     labelled(m, "txtNotes", "ملاحظات", c)
+    currency_pair(m, x2, cm(8.65), cbo_w=cm(2.6), rate_w=half - cm(2.8), call="PurCurrencyPicked Me")
 
     m.add(Control("rect", "boxTotals", px, cm(9.6), pw, cm(3.75), {"BackColor": Sym("CLR_SURFACE")},
                   decorative=True))
@@ -249,10 +250,11 @@ def layout_supplier_payment() -> FormModel:
     labelled(m, "cboSupplier", "المورد", c)
     m.add(Control("label", "lblBalance", cm(0.4), cm(3.3), width - cm(0.8), cm(0.6),
                   {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
-    c = m.add(Control("text", "txtAmount", cm(0.4), cm(4.6), cm(7.4), cm(0.9),
+    c = m.add(Control("text", "txtAmount", cm(0.4), cm(4.6), cm(4.4), cm(0.9),
                       {"FontSize": 14, "Format": "#,##0.00"}))
     labelled(m, "txtAmount", "المبلغ *", c)
-    c = m.add(Control("combo", "cboPaymentMethod", cm(8.2), cm(4.6), width - cm(8.6), cm(0.9),
+    currency_pair(m, cm(5.0), cm(4.6), h=cm(0.9), cbo_w=cm(2.6), rate_w=cm(2.4))
+    c = m.add(Control("combo", "cboPaymentMethod", cm(10.4), cm(4.6), width - cm(10.8), cm(0.9),
                       {"RowSource": PAYMENT_ROWS, "ColumnCount": 2, "ColumnWidths": "0;6"}))
     labelled(m, "cboPaymentMethod", "طريقة الدفع", c)
     c = m.add(Control("text", "txtNotes", cm(0.4), cm(6.2), width - cm(0.8), cm(0.8), {}))

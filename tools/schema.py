@@ -132,6 +132,16 @@ def datetime_(name, caption, required=False, default=None):
     return Field(name, "DATETIME", caption, required=required, default=default)
 
 
+def fx_fields(foreign_caption="المبلغ بالعملة"):
+    """Currency of a document (modCurrency): the amount fields stay in the program currency (SAR);
+    these say in which currency the document was entered, at which rate, and its total there."""
+    return [Field("CurrencyCode", "TEXT", "العملة", size=3, default='"SAR"', fk="Currencies.CurrencyCode",
+                  note="فارغ = عملة البرنامج (Settings.CurrencyCode)"),
+            Field("ExchangeRate", "RATE", "معامل التحويل", required=True, default="1", rule=">0",
+                  rule_text="المعامل يجب أن يكون أكبر من صفر", note="قيمة وحدة واحدة من العملة بعملة البرنامج"),
+            money("ForeignAmount", foreign_caption, note="الإجمالي بعملة المستند (0 للمستندات القديمة)")]
+
+
 def created_at():
     return datetime_("CreatedAt", "تاريخ الإنشاء", required=True, default="Now()")
 
@@ -371,6 +381,7 @@ TABLES: List[Table] = [
             ("FIXED_ASSETS", "الأصول الثابتة والإهلاك", "الحسابات", 79),
             ("PAYROLL", "مسير الرواتب: الإعداد والترحيل والصرف", "الحسابات", 80),
             ("BUDGET", "الموازنة التقديرية: الإعداد والمقارنة بالفعلي", "الحسابات", 81),
+            ("CURRENCIES", "العملات وأسعارها", "الحسابات", 84),
             ("REPORTS", "التقارير التشغيلية", "التقارير", 70),
             ("REPORTS_PROFIT", "تقارير الأرباح والضريبة", "التقارير", 71),
             ("DASHBOARD_FINANCIAL", "الأرقام المالية في لوحة التحكم", "التقارير", 72),
@@ -554,6 +565,66 @@ TABLES: List[Table] = [
     ),
 
     Table(
+        "Currencies", "العملات",
+        "عملات التعامل. عملة البرنامج هي Settings.CurrencyCode (الريال)، وكل المبالغ تُحفظ بها؛ "
+        "المستند بعملة أخرى يحفظ عملته ومعامله ومبلغه بها.",
+        [
+            text("CurrencyCode", 3, "رمز العملة", required=True, rule="Len([CurrencyCode])=3",
+                 rule_text="رمز العملة 3 أحرف (ISO 4217) مثل USD"),
+            text("CurrencyName", 50, "اسم العملة", required=True),
+            text("CurrencyNameEn", 50, "اسم العملة بالإنجليزية"),
+            text("Symbol", 10, "الرمز المختصر"),
+            byte_("DecimalPlaces", "عدد الخانات العشرية", default="2", rule="Between 0 And 3",
+                  rule_text="من 0 إلى 3 خانات"),
+            int_("SortOrder", "الترتيب", required=True, default="0"),
+            is_active(),
+        ],
+        pk=["CurrencyCode"],
+        indexes=[ux("CurrencyName")],
+        seed_columns=["CurrencyCode", "CurrencyName", "CurrencyNameEn", "Symbol", "DecimalPlaces", "SortOrder"],
+        seed_rows=[
+            ("SAR", "ريال سعودي", "Saudi Riyal", "ر.س", 2, 1),
+            ("USD", "دولار أمريكي", "US Dollar", "$", 2, 2),
+            ("EUR", "يورو", "Euro", "€", 2, 3),
+            ("AED", "درهم إماراتي", "UAE Dirham", "د.إ", 2, 4),
+            ("KWD", "دينار كويتي", "Kuwaiti Dinar", "د.ك", 3, 5),
+            ("BHD", "دينار بحريني", "Bahraini Dinar", "د.ب", 3, 6),
+            ("QAR", "ريال قطري", "Qatari Riyal", "ر.ق", 2, 7),
+            ("OMR", "ريال عماني", "Omani Rial", "ر.ع", 3, 8),
+            ("EGP", "جنيه مصري", "Egyptian Pound", "ج.م", 2, 9),
+            ("GBP", "جنيه إسترليني", "Pound Sterling", "£", 2, 10),
+            ("CNY", "يوان صيني", "Chinese Yuan", "¥", 2, 11),
+        ],
+        seed_missing=True,
+    ),
+
+    Table(
+        "CurrencyRates", "أسعار العملات",
+        "معامل كل عملة في تاريخ: قيمة وحدة واحدة منها بعملة البرنامج. المستند يأخذ آخر سعر في تاريخه أو قبله.",
+        [
+            auto("CurrencyRateID", "رقم داخلي"),
+            Field("CurrencyCode", "TEXT", "العملة", size=3, required=True, fk="Currencies.CurrencyCode"),
+            date_("RateDate", "التاريخ"),
+            Field("Rate", "RATE", "المعامل", required=True, default="1", rule=">0",
+                  rule_text="المعامل يجب أن يكون أكبر من صفر"),
+            text("Notes", 100, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["CurrencyRateID"],
+        indexes=[ux("CurrencyCode", "RateDate")],
+        seed_columns=["CurrencyRateID", "CurrencyCode", "RateDate", "Rate", "Notes"],
+        seed_rows=[
+            # the currencies pegged to the dollar; the others are entered by the user
+            (1, "USD", "2000-01-01", 3.75, "سعر الربط الرسمي"),
+            (2, "AED", "2000-01-01", 1.0211, "مرتبط بالدولار"),
+            (3, "BHD", "2000-01-01", 9.9734, "مرتبط بالدولار"),
+            (4, "QAR", "2000-01-01", 1.0302, "مرتبط بالدولار"),
+            (5, "OMR", "2000-01-01", 9.7529, "مرتبط بالدولار"),
+        ],
+        seed_missing=True,
+    ),
+
+    Table(
         "CashBoxes", "الخزينة والصناديق",
         "الخزينة الرئيسية وصناديق الكاشير. الرصيد لا يُخزَّن: يُحسب من الحركات (qryCashMovements).",
         [
@@ -596,6 +667,8 @@ TABLES: List[Table] = [
             is_active(),
             memo("Notes", "ملاحظات"),
             created_at(),
+            Field("CurrencyCode", "TEXT", "عملة التعامل", size=3, default='"SAR"', fk="Currencies.CurrencyCode",
+                  note="تُقترح في فواتيره وسنداته"),
         ],
         pk=["SupplierID"],
         indexes=[ix("SupplierName"), ix("Mobile")],
@@ -822,6 +895,7 @@ TABLES: List[Table] = [
             long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
                   note="المدفوع نقدًا يخرج من هذا الصندوق"),
             long_("BankID", "البنك", fk="Banks.BankID", note="المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك"),
+            *fx_fields(),
         ],
         pk=["PurchaseInvoiceID"],
         indexes=[ux("InvoiceNumber"), ix("InvoiceDate"), ix("SupplierInvoiceNo")],
@@ -873,6 +947,7 @@ TABLES: List[Table] = [
             long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
                   note="الاسترداد النقدي يدخل هذا الصندوق"),
             long_("BankID", "البنك", fk="Banks.BankID", note="المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك"),
+            *fx_fields(),
         ],
         pk=["PurchaseReturnID"],
         indexes=[ux("ReturnNumber"), ix("ReturnDate")],
@@ -921,6 +996,7 @@ TABLES: List[Table] = [
             long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
                   note="المبلغ النقدي يدخل هذا الصندوق"),
             long_("BankID", "البنك", fk="Banks.BankID", note="المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك"),
+            *fx_fields(),
         ],
         pk=["PaymentID"],
         indexes=[ux("PaymentNumber"), ix("PaymentDate")],
@@ -945,6 +1021,7 @@ TABLES: List[Table] = [
             long_("CashBoxID", "صندوق النقدية", fk="CashBoxes.CashBoxID",
                   note="المبلغ النقدي يخرج من هذا الصندوق"),
             long_("BankID", "البنك", fk="Banks.BankID", note="المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك"),
+            *fx_fields(),
         ],
         pk=["PaymentID"],
         indexes=[ux("PaymentNumber"), ix("PaymentDate")],
@@ -1326,6 +1403,7 @@ TABLES: List[Table] = [
             long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID"),
             long_("RecurringID", "من مصروف متكرر", fk="RecurringExpenses.RecurringID",
                   note="أنشأه البرنامج من المصروف المتكرر بتاريخ استحقاقه"),
+            *fx_fields("المبلغ بالعملة (بدون الضريبة)"), money("ForeignTax", "الضريبة بالعملة"),
         ],
         pk=["ExpenseID"],
         indexes=[ux("ExpenseNumber"), ix("ExpenseDate")],
@@ -1507,6 +1585,7 @@ TABLES: List[Table] = [
             money("Signature", "بصمة القيد", note="تكشف تغيّر العملية بعد إنشاء القيد"),
             datetime_("UpdatedAt", "آخر تحديث"),
             created_at(),
+            *fx_fields("مبلغ المستند بعملته"),
         ],
         pk=["EntryID"],
         indexes=[ux("EntryNumber"), ux("SourceType", "SourceID"), ix("EntryDate")],
@@ -1642,6 +1721,7 @@ TABLES: List[Table] = [
             long_("EmployeeID", "أدخله", required=True, fk="Employees.EmployeeID"),
             created_at(),
             datetime_("UpdatedAt", "آخر تعديل"),
+            *fx_fields("إجمالي القيد بالعملة"),
         ],
         pk=["ManualEntryID"],
         indexes=[ux("EntryNumber"), ix("EntryDate")],
@@ -1659,6 +1739,7 @@ TABLES: List[Table] = [
             money("Credit", "دائن"),
             text("LineText", 150, "بيان السطر"),
             long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID"),
+            money("ForeignDebit", "مدين بالعملة"), money("ForeignCredit", "دائن بالعملة"),
         ],
         pk=["ManualLineID"],
         indexes=[ux("ManualEntryID", "LineNumber"), ix("AccountCode")],
@@ -1905,6 +1986,8 @@ SCREEN_LIST = [
     ("frmPayroll", "مسير الرواتب", "الحسابات", "PAYROLL", True, True, True),
     ("frmCostCenters", "مراكز التكلفة والفروع", "الحسابات", "JOURNAL", True, True, True),
     ("frmBudget", "الموازنة التقديرية", "الحسابات", "BUDGET", True, True, True),
+    ("frmCurrencies", "العملات", "الحسابات", "CURRENCIES", True, True, True),
+    ("frmCurrencyRates", "أسعار العملات", "الحسابات", "CURRENCIES", True, True, True),
     ("frmAllocation", "ربط السداد بالفواتير", "العملاء", "CUSTOMER_PAYMENTS", True, False, True),
     ("frmReportCenter", "التقارير", "التقارير", "REPORTS", False, False, False),
     ("frmSearch", "البحث", "النظام", None, False, False, False),

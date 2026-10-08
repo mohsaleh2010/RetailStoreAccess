@@ -472,6 +472,7 @@ Private Function ValidateExpense(ByVal frm As Access.Form) As Boolean
             Exit Function
         End If
     End If
+    If Not ExpenseCurrencyOK(frm) Then Exit Function                ' modCurrency
     frm!TotalAmount.Value = Nz(frm!Amount.Value, 0) + Nz(frm!Tax.Value, 0)
     If IsNull(frm!EmployeeID.Value) Then frm!EmployeeID.Value = CurrentUserID()
     If frm.NewRecord And IsNull(frm!CostCenterID.Value) Then frm!CostCenterID.Value = CostCenterFor()   ' modCostCenters
@@ -571,6 +572,7 @@ Public Sub FieldChanged(ByVal frm As Access.Form, ByVal FieldName As String)
         Case "Products"
             UpdatePriceInfo frm
         Case "Expenses"
+            ExpenseCurrencyChanged frm, FieldName                  ' modCurrency
             frm!TotalAmount.Value = Nz(frm!Amount.Value, 0) + Nz(frm!Tax.Value, 0)
             If FieldName = "PaymentMethodID" Then
                 If Nz(frm!PaymentMethodID.Value, 0) = CASH_METHOD_ID Then

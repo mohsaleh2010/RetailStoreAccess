@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 135
+Private Const EXPECTED_RELATION_COUNT As Long = 144
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -396,6 +396,8 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_UserScreens_EmployeeID", "Employees", "EmployeeID", "UserScreens", "EmployeeID", 0&)
     c.Add Array("FK_UserScreens_ScreenName", "Screens", "ScreenName", "UserScreens", "ScreenName", 256&)
     c.Add Array("FK_Activations_EmployeeID", "Employees", "EmployeeID", "Activations", "EmployeeID", 0&)
+    c.Add Array("FK_CurrencyRates_CurrencyCode", "Currencies", "CurrencyCode", "CurrencyRates", "CurrencyCode", 256&)
+    c.Add Array("FK_Suppliers_CurrencyCode", "Currencies", "CurrencyCode", "Suppliers", "CurrencyCode", 256&)
     c.Add Array("FK_Products_CategoryID", "Categories", "CategoryID", "Products", "CategoryID", 0&)
     c.Add Array("FK_Products_UnitID", "Units", "UnitID", "Products", "UnitID", 0&)
     c.Add Array("FK_Products_SupplierID", "Suppliers", "SupplierID", "Products", "SupplierID", 0&)
@@ -422,6 +424,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_PurchaseInvoices_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "PurchaseInvoices", "PaymentMethodID", 0&)
     c.Add Array("FK_PurchaseInvoices_CashBoxID", "CashBoxes", "CashBoxID", "PurchaseInvoices", "CashBoxID", 0&)
     c.Add Array("FK_PurchaseInvoices_BankID", "Banks", "BankID", "PurchaseInvoices", "BankID", 0&)
+    c.Add Array("FK_PurchaseInvoices_CurrencyCode", "Currencies", "CurrencyCode", "PurchaseInvoices", "CurrencyCode", 256&)
     c.Add Array("FK_PurchaseInvoiceDetails_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "PurchaseInvoiceDetails", "PurchaseInvoiceID", 4096&)
     c.Add Array("FK_PurchaseInvoiceDetails_ProductID", "Products", "ProductID", "PurchaseInvoiceDetails", "ProductID", 0&)
     c.Add Array("FK_PurchaseReturns_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "PurchaseReturns", "PurchaseInvoiceID", 0&)
@@ -430,6 +433,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_PurchaseReturns_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "PurchaseReturns", "PaymentMethodID", 0&)
     c.Add Array("FK_PurchaseReturns_CashBoxID", "CashBoxes", "CashBoxID", "PurchaseReturns", "CashBoxID", 0&)
     c.Add Array("FK_PurchaseReturns_BankID", "Banks", "BankID", "PurchaseReturns", "BankID", 0&)
+    c.Add Array("FK_PurchaseReturns_CurrencyCode", "Currencies", "CurrencyCode", "PurchaseReturns", "CurrencyCode", 256&)
     c.Add Array("FK_PurchaseReturnDetails_PurchaseReturnID", "PurchaseReturns", "PurchaseReturnID", "PurchaseReturnDetails", "PurchaseReturnID", 4096&)
     c.Add Array("FK_PurchaseReturnDetails_PurchaseDetailID", "PurchaseInvoiceDetails", "PurchaseDetailID", "PurchaseReturnDetails", "PurchaseDetailID", 0&)
     c.Add Array("FK_PurchaseReturnDetails_ProductID", "Products", "ProductID", "PurchaseReturnDetails", "ProductID", 0&)
@@ -439,12 +443,14 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_CustomerPayments_EmployeeID", "Employees", "EmployeeID", "CustomerPayments", "EmployeeID", 0&)
     c.Add Array("FK_CustomerPayments_CashBoxID", "CashBoxes", "CashBoxID", "CustomerPayments", "CashBoxID", 0&)
     c.Add Array("FK_CustomerPayments_BankID", "Banks", "BankID", "CustomerPayments", "BankID", 0&)
+    c.Add Array("FK_CustomerPayments_CurrencyCode", "Currencies", "CurrencyCode", "CustomerPayments", "CurrencyCode", 256&)
     c.Add Array("FK_SupplierPayments_SupplierID", "Suppliers", "SupplierID", "SupplierPayments", "SupplierID", 0&)
     c.Add Array("FK_SupplierPayments_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "SupplierPayments", "PaymentMethodID", 0&)
     c.Add Array("FK_SupplierPayments_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "SupplierPayments", "PurchaseInvoiceID", 0&)
     c.Add Array("FK_SupplierPayments_EmployeeID", "Employees", "EmployeeID", "SupplierPayments", "EmployeeID", 0&)
     c.Add Array("FK_SupplierPayments_CashBoxID", "CashBoxes", "CashBoxID", "SupplierPayments", "CashBoxID", 0&)
     c.Add Array("FK_SupplierPayments_BankID", "Banks", "BankID", "SupplierPayments", "BankID", 0&)
+    c.Add Array("FK_SupplierPayments_CurrencyCode", "Currencies", "CurrencyCode", "SupplierPayments", "CurrencyCode", 256&)
     c.Add Array("FK_BankTransactions_BankID", "Banks", "BankID", "BankTransactions", "BankID", 0&)
     c.Add Array("FK_BankTransactions_ToBankID", "Banks", "BankID", "BankTransactions", "ToBankID", 0&)
     c.Add Array("FK_BankTransactions_CashBoxID", "CashBoxes", "CashBoxID", "BankTransactions", "CashBoxID", 0&)
@@ -487,6 +493,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_Expenses_BankID", "Banks", "BankID", "Expenses", "BankID", 0&)
     c.Add Array("FK_Expenses_CostCenterID", "CostCenters", "CostCenterID", "Expenses", "CostCenterID", 0&)
     c.Add Array("FK_Expenses_RecurringID", "RecurringExpenses", "RecurringID", "Expenses", "RecurringID", 0&)
+    c.Add Array("FK_Expenses_CurrencyCode", "Currencies", "CurrencyCode", "Expenses", "CurrencyCode", 256&)
     c.Add Array("FK_RecurringExpenses_ExpenseTypeID", "ExpenseTypes", "ExpenseTypeID", "RecurringExpenses", "ExpenseTypeID", 0&)
     c.Add Array("FK_RecurringExpenses_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "RecurringExpenses", "PaymentMethodID", 0&)
     c.Add Array("FK_RecurringExpenses_CashBoxID", "CashBoxes", "CashBoxID", "RecurringExpenses", "CashBoxID", 0&)
@@ -503,6 +510,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_CashClosings_EmployeeID", "Employees", "EmployeeID", "CashClosings", "EmployeeID", 0&)
     c.Add Array("FK_CashClosings_ToCashBoxID", "CashBoxes", "CashBoxID", "CashClosings", "ToCashBoxID", 0&)
     c.Add Array("FK_JournalEntries_SourceType", "JournalSourceTypes", "SourceType", "JournalEntries", "SourceType", 256&)
+    c.Add Array("FK_JournalEntries_CurrencyCode", "Currencies", "CurrencyCode", "JournalEntries", "CurrencyCode", 256&)
     c.Add Array("FK_JournalLines_EntryID", "JournalEntries", "EntryID", "JournalLines", "EntryID", 4096&)
     c.Add Array("FK_JournalLines_AccountCode", "Accounts", "AccountCode", "JournalLines", "AccountCode", 0&)
     c.Add Array("FK_JournalLines_CostCenterID", "CostCenters", "CostCenterID", "JournalLines", "CostCenterID", 0&)
@@ -510,6 +518,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_FiscalYearClosingLines_AccountCode", "Accounts", "AccountCode", "FiscalYearClosingLines", "AccountCode", 0&)
     c.Add Array("FK_VatReturns_PaidAccount", "Accounts", "AccountCode", "VatReturns", "PaidAccount", 0&)
     c.Add Array("FK_ManualEntries_EmployeeID", "Employees", "EmployeeID", "ManualEntries", "EmployeeID", 0&)
+    c.Add Array("FK_ManualEntries_CurrencyCode", "Currencies", "CurrencyCode", "ManualEntries", "CurrencyCode", 256&)
     c.Add Array("FK_ManualEntryLines_ManualEntryID", "ManualEntries", "ManualEntryID", "ManualEntryLines", "ManualEntryID", 4096&)
     c.Add Array("FK_ManualEntryLines_AccountCode", "Accounts", "AccountCode", "ManualEntryLines", "AccountCode", 0&)
     c.Add Array("FK_ManualEntryLines_CostCenterID", "CostCenters", "CostCenterID", "ManualEntryLines", "CostCenterID", 0&)

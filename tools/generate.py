@@ -23,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",

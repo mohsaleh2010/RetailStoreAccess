@@ -173,7 +173,9 @@ class ManualEntryCodeTests(unittest.TestCase):
 
     def test_reverse_swaps_debit_and_credit(self):
         body = proc(self.text, "ReverseManualEntry")
-        self.assertIn('SELECT AccountCode, " & _\n                      "Credit, Debit, LineText, CostCenterID FROM ManualEntryLines', body)
+        # the target columns are swapped: (AccountCode, Credit, Debit, ...) SELECT AccountCode, <debit>, <credit>
+        self.assertIn('"INSERT INTO tmpManualLines (AccountCode, Credit, Debit, LineText, LineCenter) SELECT AccountCode, " & _\n'
+                      '                      LINE_AMOUNTS & ", LineText, CostCenterID FROM ManualEntryLines', body)
         self.assertIn("frm!txtEntryID.Value = Null", body)
 
     def test_opened_from_the_journal(self):

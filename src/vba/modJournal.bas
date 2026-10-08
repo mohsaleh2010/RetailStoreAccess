@@ -152,6 +152,7 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
         rs.MoveNext
     Loop
     rs.Close
+    StampJournalCurrencies                  ' the currency, rate and foreign amount of each document (modCurrency)
     ws.CommitTrans
     inTrans = False
     If Added + Updated + Removed > 0 Then
@@ -378,6 +379,10 @@ Public Sub JournalEntryLoad(ByVal frm As Access.Form)
     frm!lblDescription.Caption = "البيان: " & Nz(rs!Description, "-")
     frm!lblTotals.Caption = "الإجمالي: مدين " & Format$(rs!TotalDebit, "#,##0.00") & " = دائن " & _
                             Format$(rs!TotalCredit, "#,##0.00")
+    If Not IsBaseCurrency(rs!CurrencyCode) Then             ' posted in SAR from a document in a currency (modCurrency)
+        frm!lblTotals.Caption = frm!lblTotals.Caption & "    |    العملة " & rs!CurrencyCode & "  المعامل " & _
+            Format$(rs!ExchangeRate, "0.0000") & "  مبلغ المستند " & Format$(rs!ForeignAmount, "#,##0.00") & " " & rs!CurrencyCode
+    End If
     rs.Close
     frm!lstLines.RowSource = EntryLinesSql(frm.OpenArgs)
 End Sub

@@ -20,7 +20,7 @@ class RelationDefinitionTests(unittest.TestCase):
         self.rels = R.relations()
 
     def test_count_and_names(self):
-        self.assertEqual(len(self.rels), 135)
+        self.assertEqual(len(self.rels), 144)
         names = [r.name for r in self.rels]
         self.assertEqual(len(names), len(set(names)))
         for n in names:
@@ -58,9 +58,13 @@ class RelationDefinitionTests(unittest.TestCase):
         })
 
     def test_cascade_update_only_for_text_keys(self):
-        self.assertEqual([r.name for r in self.rels if r.cascade_update],
-                         ["FK_RolePermissions_PermissionKey", "FK_UserScreens_ScreenName",
-                          "FK_JournalEntries_SourceType"])
+        # a renamed currency code follows into its rates and documents
+        currency = {f"FK_{t}_CurrencyCode" for t in ("Suppliers", "CurrencyRates", "PurchaseInvoices", "PurchaseReturns",
+                                                     "CustomerPayments", "SupplierPayments", "Expenses",
+                                                     "ManualEntries", "JournalEntries")}
+        self.assertEqual({r.name for r in self.rels if r.cascade_update},
+                         {"FK_RolePermissions_PermissionKey", "FK_UserScreens_ScreenName",
+                          "FK_JournalEntries_SourceType"} | currency)
 
     def test_documents_are_never_cascade_deleted_from_master_data(self):
         masters = {"Customers", "Suppliers", "Products", "Employees", "Categories", "Units",

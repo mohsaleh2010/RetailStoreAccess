@@ -26,7 +26,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptAging,rptPayroll,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptAging,rptPayroll,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -84,6 +84,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptStockByCategory
     BuildReport_rptCustomerBalances
     BuildReport_rptSupplierBalances
+    BuildReport_rptSupplierFx
     BuildReport_rptIntegrityCheck
     BuildReport_rptProfit
     BuildReport_rptVatSummary
@@ -3297,6 +3298,64 @@ Private Sub BuildReport_rptSupplierBalances()
     Exit Sub
 EH:
     AbortReport "rptSupplierBalances", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptSupplierFx()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptSupplierFx", "أرصدة الموردين بالعملات وفروق العملة", "SupplierFxBalanceQuery", 10773, "", "CurrencyCode,SupplierName", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "أرصدة الموردين بالعملات وفروق العملة", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "المورد", 0, 1292, 2835, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "العملة", 2835, 1292, 794, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "الرصيد بالعملة", 3629, 1292, 1588, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "بالدفاتر (ريال)", 5217, 1292, 1588, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "آخر معامل", 6805, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "بآخر سعر (ريال)", 7939, 1292, 1588, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "فرق العملة", 9527, 1292, 1246, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal4", "=Sum([BookBalance])", 5217, 85, 1588, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal6", "=Sum([RevaluedBalance])", 7939, 85, 1588, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal7", "=Sum([FxDifference])", 9527, 85, 1246, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 5217, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "SupplierName", 0, 17, 2835, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol2", "CurrencyCode", 2835, 17, 794, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "FxBalance", 3629, 17, 1588, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol4", "BookBalance", 5217, 17, 1588, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol5", "LastRate", 6805, 17, 1134, 284, 8, False, 2)
+    SetCtl c, "Format", "0.0000"
+    Set c = RText(0, "txtCol6", "RevaluedBalance", 7939, 17, 1588, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol7", "FxDifference", 9527, 17, 1246, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا توجد أرصدة موردين بعملات أجنبية.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptSupplierFx", s
+    Exit Sub
+EH:
+    AbortReport "rptSupplierFx", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptIntegrityCheck()

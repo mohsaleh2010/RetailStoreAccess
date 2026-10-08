@@ -77,6 +77,11 @@ KIND=LIST|TABLE=Products|PK=ProductID|LIST=SELECT ...|SEARCH=t.ProductName,t.Bar
 - **اسم العمود في القائمة** لا يكون فارغًا `AS [ ]`، وإلا ظهر الخطأ 3126.
 - **السطر في الكود المولَّد** أقل من 1000 حرف.
 
+**العملة في الشاشات:** الدالة `currency_pair` في `tools/forms.py` تضع `cboCurrency` و`txtRate` في أي شاشة مستند، والكود في `modCurrency`:
+- `CurrencyReset`: يضع العملة الافتراضية للمستند.
+- `CurrencyPicked`: يقترح المعامل عند اختيار العملة.
+- `CurrencyChoice`: يتحقق من العملة والمعامل عند الحفظ.
+
 ## 6) الوصول إلى الشاشات والصلاحيات
 - **القائمة الجانبية:** `NAV_ITEMS` في `tools/forms.py`.
 - **مربعات الشاشة الرئيسية:** `LAUNCH_TILES`.

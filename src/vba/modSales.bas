@@ -565,9 +565,11 @@ End Function
 
 Public Function PostCustomerPayment(ByVal CustomerID As Long, ByVal Amount As Currency, _
                                     ByVal PaymentMethodID As Long, ByVal Notes As String, _
-                                    ByRef NewPaymentID As Long) As String
+                                    ByRef NewPaymentID As Long, Optional ByVal CurrencyCode As String = "", _
+                                    Optional ByVal FxRate As Double = 1) As String
+    ' Amount is in CurrencyCode (default: the program currency); it is kept in SAR (modCurrency).
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
-    Dim balance As Currency, payNo As String
+    Dim balance As Currency, payNo As String, foreign As Currency, msg As String
 
     On Error GoTo EH
     NewPaymentID = 0
@@ -580,6 +582,15 @@ Public Function PostCustomerPayment(ByVal CustomerID As Long, ByVal Amount As Cu
         PostCustomerPayment = "لا تُسجَّل دفعات على العميل النقدي."
         Exit Function
     End If
+    If Len(CurrencyCode) = 0 Then CurrencyCode = BaseCurrency()
+    If IsBaseCurrency(CurrencyCode) Then FxRate = 1
+    msg = CurrencyProblem(CurrencyCode, FxRate)
+    If Len(msg) > 0 Then
+        PostCustomerPayment = msg
+        Exit Function
+    End If
+    foreign = Amount
+    Amount = ToBase(foreign, FxRate)
     balance = Nz(DbValue("SELECT CurrentBalance FROM Customers WHERE CustomerID = " & CustomerID), 0)
     If Amount > balance Then
         If Not AskYesNo("المبلغ (" & Format$(Amount, "#,##0.00") & ") أكبر من الرصيد المستحق (" & _
@@ -600,6 +611,9 @@ Public Function PostCustomerPayment(ByVal CustomerID As Long, ByVal Amount As Cu
     rs!CustomerID = CustomerID
     rs!PaymentDate = Now
     rs!Amount = Amount
+    rs!CurrencyCode = CurrencyCode
+    rs!ExchangeRate = FxRate
+    rs!ForeignAmount = foreign
     rs!PaymentMethodID = PaymentMethodID
     rs!CashBoxID = CashBoxFor(PaymentMethodID, Amount)
     rs!BankID = BankFor(PaymentMethodID, Amount)

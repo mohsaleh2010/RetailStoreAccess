@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **63** | عدد الحقول: **790**
+عدد الجداول: **65** | عدد الحقول: **828**
 
 ## الفهرس
 
@@ -18,57 +18,59 @@
 10. [`Categories`](#categories) – التصنيفات
 11. [`Units`](#units) – وحدات القياس
 12. [`PaymentMethods`](#paymentmethods) – طرق الدفع
-13. [`CashBoxes`](#cashboxes) – الخزينة والصناديق
-14. [`Suppliers`](#suppliers) – الموردون
-15. [`Customers`](#customers) – العملاء
-16. [`Products`](#products) – المنتجات
-17. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
-18. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
-19. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
-20. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
-21. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
-22. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
-23. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
-24. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
-25. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
-26. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
-27. [`Banks`](#banks) – البنوك
-28. [`BankTransactions`](#banktransactions) – الحركات البنكية
-29. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
-30. [`FixedAssets`](#fixedassets) – الأصول الثابتة
-31. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
-32. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
-33. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
-34. [`Budgets`](#budgets) – الموازنات التقديرية
-35. [`BudgetLines`](#budgetlines) – أسطر الموازنة
-36. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
-37. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
-38. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-39. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-40. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-41. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-42. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-43. [`Expenses`](#expenses) – المصروفات
-44. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
-45. [`CashVouchers`](#cashvouchers) – سندات النقدية
-46. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-47. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-48. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-49. [`JournalEntries`](#journalentries) – قيود اليومية
-50. [`JournalLines`](#journallines) – أسطر القيود
-51. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-52. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-53. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-54. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-55. [`ManualEntries`](#manualentries) – القيود اليدوية
-56. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-57. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-58. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-59. [`StockCounts`](#stockcounts) – جلسات الجرد
-60. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-61. [`AuditLog`](#auditlog) – سجل العمليات
-62. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-63. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+13. [`Currencies`](#currencies) – العملات
+14. [`CurrencyRates`](#currencyrates) – أسعار العملات
+15. [`CashBoxes`](#cashboxes) – الخزينة والصناديق
+16. [`Suppliers`](#suppliers) – الموردون
+17. [`Customers`](#customers) – العملاء
+18. [`Products`](#products) – المنتجات
+19. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
+20. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
+21. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
+22. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
+23. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
+24. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
+25. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
+26. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
+27. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
+28. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
+29. [`Banks`](#banks) – البنوك
+30. [`BankTransactions`](#banktransactions) – الحركات البنكية
+31. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
+32. [`FixedAssets`](#fixedassets) – الأصول الثابتة
+33. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
+34. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
+35. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
+36. [`Budgets`](#budgets) – الموازنات التقديرية
+37. [`BudgetLines`](#budgetlines) – أسطر الموازنة
+38. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+39. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+40. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+41. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+42. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+43. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+44. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+45. [`Expenses`](#expenses) – المصروفات
+46. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
+47. [`CashVouchers`](#cashvouchers) – سندات النقدية
+48. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+49. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+50. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+51. [`JournalEntries`](#journalentries) – قيود اليومية
+52. [`JournalLines`](#journallines) – أسطر القيود
+53. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+54. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+55. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+56. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+57. [`ManualEntries`](#manualentries) – القيود اليدوية
+58. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+59. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+60. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+61. [`StockCounts`](#stockcounts) – جلسات الجرد
+62. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+63. [`AuditLog`](#auditlog) – سجل العمليات
+64. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+65. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -161,7 +163,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 34 سجل
+- بيانات أساسية: 35 سجل
 
 ## RolePermissions
 
@@ -173,7 +175,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 67 سجل
+- بيانات أساسية: 69 سجل
 
 ## Employees
 
@@ -232,7 +234,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 53 سجل
+- بيانات أساسية: 55 سجل
 
 ## UserScreens
 
@@ -315,6 +317,41 @@
 - فهرس فريد: `MethodName`
 - بيانات أساسية: 4 سجل
 
+## Currencies
+
+**العملات** – عملات التعامل. عملة البرنامج هي Settings.CurrencyCode (الريال)، وكل المبالغ تُحفظ بها؛ المستند بعملة أخرى يحفظ عملته ومعامله ومبلغه بها.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **CurrencyCode** 🔑 | Short Text | 3 | ✔ |  | `Len([CurrencyCode])=3` |  | رمز العملة |
+| 2 | CurrencyName | Short Text | 50 | ✔ |  |  |  | اسم العملة |
+| 3 | CurrencyNameEn | Short Text | 50 |  |  |  |  | اسم العملة بالإنجليزية |
+| 4 | Symbol | Short Text | 10 |  |  |  |  | الرمز المختصر |
+| 5 | DecimalPlaces | Number (Byte) |  | ✔ | `2` | `Between 0 And 3` |  | عدد الخانات العشرية |
+| 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 7 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+
+- المفتاح الأساسي: `CurrencyCode`
+- فهرس فريد: `CurrencyName`
+- بيانات أساسية: 11 سجل
+
+## CurrencyRates
+
+**أسعار العملات** – معامل كل عملة في تاريخ: قيمة وحدة واحدة منها بعملة البرنامج. المستند يأخذ آخر سعر في تاريخه أو قبله.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **CurrencyRateID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | CurrencyCode | Short Text | 3 | ✔ |  |  | `Currencies.CurrencyCode` | العملة |
+| 3 | RateDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | التاريخ |
+| 4 | Rate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | المعامل |
+| 5 | Notes | Short Text | 100 |  |  |  |  | ملاحظات |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `CurrencyRateID`
+- فهرس فريد: `CurrencyCode, RateDate`
+- بيانات أساسية: 5 سجل
+
 ## CashBoxes
 
 **الخزينة والصناديق** – الخزينة الرئيسية وصناديق الكاشير. الرصيد لا يُخزَّن: يُحسب من الحركات (qryCashMovements).
@@ -356,6 +393,7 @@
 | 14 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
 | 15 | Notes | Long Text |  |  |  |  |  | ملاحظات |
 | 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 17 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | عملة التعامل – تُقترح في فواتيره وسنداته |
 
 - المفتاح الأساسي: `SupplierID`
 - فهرس عادي: `SupplierName`
@@ -599,6 +637,9 @@
 | 18 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 19 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المدفوع نقدًا يخرج من هذا الصندوق |
 | 20 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 21 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
+| 22 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
+| 23 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
 
 - المفتاح الأساسي: `PurchaseInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -652,6 +693,9 @@
 | 17 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 18 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الاسترداد النقدي يدخل هذا الصندوق |
 | 19 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 20 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
+| 21 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
+| 22 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
 
 - المفتاح الأساسي: `PurchaseReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -696,6 +740,9 @@
 | 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 11 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المبلغ النقدي يدخل هذا الصندوق |
 | 12 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 13 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
+| 14 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
+| 15 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
 
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
@@ -719,6 +766,9 @@
 | 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 11 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – المبلغ النقدي يخرج من هذا الصندوق |
 | 12 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 13 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
+| 14 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
+| 15 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
 
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
@@ -1094,6 +1144,10 @@
 | 14 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 | 15 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
 | 16 | RecurringID | Number (Long) |  |  |  |  | `RecurringExpenses.RecurringID` | من مصروف متكرر – أنشأه البرنامج من المصروف المتكرر بتاريخ استحقاقه |
+| 17 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
+| 18 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
+| 19 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة (بدون الضريبة) – الإجمالي بعملة المستند (0 للمستندات القديمة) |
+| 20 | ForeignTax | Currency |  | ✔ | `0` | `>=0` |  | الضريبة بالعملة |
 
 - المفتاح الأساسي: `ExpenseID`
 - فهرس فريد: `ExpenseNumber`
@@ -1246,6 +1300,9 @@
 | 11 | Signature | Currency |  | ✔ | `0` | `>=0` |  | بصمة القيد – تكشف تغيّر العملية بعد إنشاء القيد |
 | 12 | UpdatedAt | Date/Time |  |  |  |  |  | آخر تحديث |
 | 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 14 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
+| 15 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
+| 16 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | مبلغ المستند بعملته – الإجمالي بعملة المستند (0 للمستندات القديمة) |
 
 - المفتاح الأساسي: `EntryID`
 - فهرس فريد: `EntryNumber`
@@ -1381,6 +1438,9 @@
 | 8 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أدخله |
 | 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 10 | UpdatedAt | Date/Time |  |  |  |  |  | آخر تعديل |
+| 11 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
+| 12 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
+| 13 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | إجمالي القيد بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
 
 - المفتاح الأساسي: `ManualEntryID`
 - فهرس فريد: `EntryNumber`
@@ -1400,6 +1460,8 @@
 | 6 | Credit | Currency |  | ✔ | `0` | `>=0` |  | دائن |
 | 7 | LineText | Short Text | 150 |  |  |  |  | بيان السطر |
 | 8 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
+| 9 | ForeignDebit | Currency |  | ✔ | `0` | `>=0` |  | مدين بالعملة |
+| 10 | ForeignCredit | Currency |  | ✔ | `0` | `>=0` |  | دائن بالعملة |
 
 - المفتاح الأساسي: `ManualLineID`
 - فهرس فريد: `ManualEntryID, LineNumber`

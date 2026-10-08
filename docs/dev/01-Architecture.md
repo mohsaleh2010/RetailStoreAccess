@@ -61,6 +61,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
 | `modJournal`، `modAccounts`، `modManualEntry`، `modLedger`، `modFinancials`، `modClosing`، `modVat` | المحاسبة: القيود الآلية، وشجرة الحسابات، والقيود اليدوية، وكشف الحساب، والقوائم المالية، والإقفال، والإقرار الضريبي |
 | `modAging`، `modAssets`، `modPayroll`، `modCostCenters`، `modBudget`، `modRecurring` | أعمار الديون، والأصول والإهلاك، والرواتب، ومراكز التكلفة، والموازنة، والمصروفات المتكررة |
 | `modAudit` | سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد |
+| `modCurrency` | العملات: عملة البرنامج، وأسعار العملات، والتحويل `ToBase`/`FromBase`، وحقلا العملة والمعامل في الشاشات، وختم القيود بعملة المستند |
 | `modTestAll` | `RunAllTests`: كل اختبارات Access بملخص واحد |
 
 ## 5) لماذا Python؟

@@ -79,15 +79,19 @@ Optional test dependencies (tests skip when missing): `pip install -r requiremen
    that works inside `ws.BeginTrans` … `ws.Rollback` and add it to the list in `modTestAll`.
 4. If it posts accounting entries: add the journal query and keep `JOURNAL_SOURCE_QUERIES` (`tools/queries.py`) and
    `SOURCE_QUERIES` (`modJournal`) identical; respect closed periods (`ClosedPeriodProblem`).
-5. Audit trail (`modAudit`): data screens and bound grids are audited by `modForms` /
+5. Money: every amount field stays in the program currency (SAR). A document entered in another currency
+   also stores `CurrencyCode`, `ExchangeRate`, `ForeignAmount` (`tools/schema.fx_fields`); its screen uses
+   `currency_pair` + `CurrencyChoice`, and posting converts with `ToBase` (`modCurrency`). Add the
+   document to `StampJournalCurrencies` so its journal entry carries the currency.
+6. Audit trail (`modAudit`): data screens and bound grids are audited by `modForms` /
    `AuditFormBefore` + `AuditFormAfter`. Code that deletes a document takes
    `Set auditBefore = AuditSnapshot(table, key, id)` before the `DELETE` and calls
    `AuditDeleted "X_DELETE", table, id, auditBefore` after it; code that edits a saved record uses
    `AuditSnapshot` + `AuditEdited`. A test checks every document delete.
-6. `python3 tools/generate.py`, add `tests/test_x.py` (Python mirror + code checks + `VbaModuleChecks`),
+7. `python3 tools/generate.py`, add `tests/test_x.py` (Python mirror + code checks + `VbaModuleChecks`),
    run all tests. Update tests that check exact code text when the change is intentional
    (relation count in `test_relations.py`, document-screen set in `test_permissions.py` …).
-7. Write `docs/NN-Name.md` (Arabic) and add the row to `README.md` with "✅ بانتظار الموافقة";
+8. Write `docs/NN-Name.md` (Arabic) and add the row to `README.md` with "✅ بانتظار الموافقة";
    update `docs/dev/*.md` when tables, screens, modules or rules changed.
 
 ## Access / VBA rules (each one was a real failure in Access)
@@ -97,7 +101,7 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
 - A **Private** procedure cannot be called from another module (compile error). Make it Public.
 - Block `If … End If` instead of single-line `If … Then A Else B` that calls Subs; no `Switch()`.
 - Do not name variables like built-in functions or keywords: `left`, `month`, `line`, `text`, `now`,
-  `dir`, `sub`, `exp_` … No procedure name may exist Public in two modules.
+  `dir`, `sub`, `exp_`, `base` … No procedure name may exist Public in two modules.
 - Lines < 1000 characters and < 24 line continuations (`long_const`, `form_names_const` split strings).
 - Only Windows-1256 characters in VBA (no `−`, smart symbols outside cp1256).
 - Access SQL: an alias may not be reused inside its own expression; every `UNION` branch needs a

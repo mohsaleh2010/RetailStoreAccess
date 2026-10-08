@@ -127,6 +127,8 @@ EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORD
 PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder"
 BANK_ROWS = "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName"
 CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
+CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies "
+                 "WHERE IsActive = True ORDER BY SortOrder, CurrencyCode")
 CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
 FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
@@ -212,7 +214,8 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("City"), Info("lblSupplierNote", " "), Fld("Address", span=2),
             Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
             Fld("PaymentTermsDays", hint="استحقاق فاتورة الشراء الآجلة = تاريخها + هذه المدة"),
-            Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق للمورد"),
+            Fld("CurrencyCode", rows=CURRENCY_ROWS, widths="1.2;4", hint="تُقترح في فواتيره وسنداته"),
+            Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق للمورد (بالريال دائمًا)"),
             Fld("Notes", span=2),
         ]),
     DataScreen(
@@ -227,7 +230,10 @@ DATA_SCREENS: List[DataScreen] = [
         extra_buttons=[("btnExpenseTypes", "أنواع المصروفات", 'OpenScreen "frmExpenseTypes"'),
                        ("btnTreasury", "الخزينة", 'OpenScreen "frmTreasury"')],
         fields=[
-            Fld("ExpenseNumber", locked=True, hint="يُولَّد عند الحفظ"), Fld("ExpenseDate"),
+            Fld("ExpenseNumber", locked=True, hint="يُولَّد عند الحفظ"), Fld("ExpenseDate", hook=True),
+            Fld("CurrencyCode", rows=CURRENCY_ROWS, widths="1.2;4", hook=True, hint="المصروف بعملة أخرى: اكتب مبلغه بها"),
+            Fld("ExchangeRate", hook=True, hint="قيمة وحدة واحدة بالريال"),
+            Fld("ForeignAmount", hook=True), Fld("ForeignTax", hook=True),
             Fld("ExpenseTypeID", rows=EXPENSE_TYPE_ROWS,
                 button=("btnNewType", "نوع جديد", 'AddExpenseType Me, "ExpenseTypeID"')),
             Fld("PaymentMethodID", rows=PAYMENT_ROWS, hook=True),
@@ -240,6 +246,27 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("CostCenterID", rows=CENTER_ROWS, widths="0;6", hint="فارغ = مركز المستخدم أو المركز الافتراضي"),
             Fld("Description", span=2),
         ]),
+    DataScreen(
+        "frmCurrencies", "Currencies", "العملات", "عملات التعامل؛ عملة البرنامج الريال وكل المبالغ تُحفظ به", "treasury",
+        list_select="t.CurrencyCode AS [الرمز], t.CurrencyName AS [العملة]",
+        list_from="Currencies AS t", list_order="t.SortOrder, t.CurrencyCode",
+        list_headers=[("الرمز", 1.6), ("العملة", 6.8)],
+        search=["t.CurrencyCode", "t.CurrencyName", "t.CurrencyNameEn"], active="t.IsActive",
+        unique=["CurrencyCode", "CurrencyName"],
+        extra_buttons=[("btnRates", "أسعار العملات", 'OpenScreen "frmCurrencyRates", 0')],
+        fields=[Fld("CurrencyCode", hint="3 أحرف (ISO) مثل USD"), Fld("CurrencyName"), Fld("CurrencyNameEn"),
+                Fld("Symbol"), Fld("DecimalPlaces"), Fld("SortOrder"), Fld("IsActive"),
+                Info("lblCurrencyNote", "المعامل = قيمة وحدة واحدة من العملة بالريال؛ يُسجَّل لكل تاريخ في «أسعار العملات»")]),
+    DataScreen(
+        "frmCurrencyRates", "CurrencyRates", "أسعار العملات", "معامل كل عملة في تاريخ؛ المستند يأخذ آخر سعر في تاريخه أو قبله",
+        "treasury",
+        list_select="t.CurrencyCode AS [العملة], t.RateDate AS [التاريخ], t.Rate AS [المعامل]",
+        list_from="CurrencyRates AS t", list_order="t.RateDate DESC, t.CurrencyCode",
+        list_headers=[("العملة", 1.8), ("التاريخ", 2.6), ("المعامل", 2.2)],
+        search=["t.CurrencyCode", "t.Notes"],
+        fields=[Fld("CurrencyCode", rows=CURRENCY_ROWS, widths="1.2;4"), Fld("RateDate"),
+                Fld("Rate", hint="مثال: الدولار 3.75"), Fld("Notes"),
+                Info("lblRateNote", "لكل عملة سعر واحد في اليوم؛ عملة البرنامج لا تحتاج سعرًا")]),
     DataScreen(
         "frmRecurring", "RecurringExpenses", "المصروفات المتكررة",
         "الإيجار والكهرباء والاشتراكات: يُنشأ المصروف تلقائيًا في تاريخ استحقاقه", "expenses",
@@ -497,6 +524,7 @@ SCREEN_PERMISSIONS = {
     "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
     "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL", "frmCostCenters": "JOURNAL", "frmBudget": "BUDGET",
     "frmRecurring": "EXPENSES", "frmAccounting": "", "frmAuditLog": "AUDIT_LOG",
+    "frmCurrencies": "CURRENCIES", "frmCurrencyRates": "CURRENCIES",
 }
 
 
@@ -604,6 +632,7 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),
     ReportEntry("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances"),
     ReportEntry("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances"),
+    ReportEntry("SUPPLIER_FX", "أرصدة الموردين بالعملات وفروق العملة", "SupplierFxBalanceQuery", "rptSupplierFx"),
     ReportEntry("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck"),
 ]
 
@@ -1054,6 +1083,17 @@ def labelled(m: FormModel, name, caption, ctl: Control, label_h=cm(0.5)):
     m.add(Control("label", "lbl" + name[3:], ctl.x, ctl.y - label_h - cm(0.05), ctl.w, label_h,
                   {"Caption": caption, "FontSize": 9, "ForeColor": Sym("CLR_MUTED")},
                   parent=ctl.name))
+
+
+def currency_pair(m: FormModel, x, y, h=cm(0.8), cbo_w=cm(2.6), rate_w=cm(2.4), call="CurrencyPicked Me"):
+    """The currency of a document and its rate (modCurrency): cboCurrency + txtRate, side by side."""
+    c = m.add(Control("combo", "cboCurrency", x, y, cbo_w, h,
+                      {"RowSource": CURRENCY_ROWS, "ColumnCount": 2, "ColumnWidths": "1.2;4", "ListWidth": "5.5cm",
+                       "LimitToList": True}, events=["AfterUpdate"]))
+    labelled(m, "cboCurrency", "العملة *", c)
+    c = m.add(Control("text", "txtRate", x + cbo_w + cm(0.2), y, rate_w, h, {"Format": "0.0000"}))
+    labelled(m, "txtRate", "المعامل", c)
+    m.code += ["Private Sub cboCurrency_AfterUpdate()", f"    {call}", "End Sub"]
 
 
 def layout_search() -> FormModel:

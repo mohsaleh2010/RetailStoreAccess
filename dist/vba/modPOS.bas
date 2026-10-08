@@ -552,6 +552,7 @@ End Function
 Public Sub PaymentLoad(ByVal frm As Access.Form)
     If Not IsNull(frm.OpenArgs) Then frm!cboCustomer.Value = CLng(frm.OpenArgs)
     frm!cboPaymentMethod.Value = 1
+    CurrencyReset frm                                       ' modCurrency
     PaymentCustomerChanged frm
 End Sub
 
@@ -565,19 +566,23 @@ Public Sub PaymentCustomerChanged(ByVal frm As Access.Form)
 End Sub
 
 Public Function SavePayment(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
-    Dim msg As String, newID As Long
+    Dim msg As String, newID As Long, code As String, fx As Double
     If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If IsNull(frm!cboCustomer.Value) Then
         ShowWarning "«Œ — «·⁄„Ì·."
         Exit Function
     End If
-    msg = PostCustomerPayment(frm!cboCustomer.Value, Nz(frm!txtAmount.Value, 0), Nz(frm!cboPaymentMethod.Value, 1), _
-                              Nz(frm!txtNotes.Value, ""), newID)
+    msg = CurrencyChoice(frm, code, fx)                             ' modCurrency
+    If Len(msg) = 0 Then
+        msg = PostCustomerPayment(frm!cboCustomer.Value, Nz(frm!txtAmount.Value, 0), Nz(frm!cboPaymentMethod.Value, 1), _
+                                  Nz(frm!txtNotes.Value, ""), newID, code, fx)
+    End If
     If Len(msg) > 0 Then
         ShowWarning msg
         Exit Function
     End If
-    ShowInfo " „ Õ›Ÿ ”‰œ «·ﬁ»÷ " & DLookup("PaymentNumber", "CustomerPayments", "PaymentID = " & newID)
+    ShowInfo " „ Õ›Ÿ ”‰œ «·ﬁ»÷ " & DLookup("PaymentNumber", "CustomerPayments", "PaymentID = " & newID) & _
+             IIf(IsBaseCurrency(code), "", vbCrLf & CurrencyNote(code, fx, Nz(frm!txtAmount.Value, 0)))
     If PrintAfter Then PrintVoucher "RECEIPT", newID
     frm!txtAmount.Value = Null
     frm!txtNotes.Value = Null

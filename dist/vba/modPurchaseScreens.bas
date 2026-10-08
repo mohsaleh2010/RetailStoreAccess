@@ -48,6 +48,13 @@ Private Sub ResetPurchaseHeader(ByVal frm As Access.Form)
     frm!txtNotes.Value = Null
     frm!txtQty.Value = 1
     frm!lblSupplierInfo.Caption = " "
+    CurrencyReset frm                                       ' modCurrency
+End Sub
+
+Public Sub PurCurrencyPicked(ByVal frm As Access.Form)
+    ' the rate of the currency on the invoice day; the prices typed are in that currency
+    CurrencyPicked frm, frm!txtInvoiceDate.Value
+    RecalcPurchase frm
 End Sub
 
 Public Sub PurchaseKeyDown(ByVal frm As Access.Form, ByRef KeyCode As Integer, ByVal Shift As Integer)
@@ -202,6 +209,9 @@ Public Sub RecalcPurchase(ByVal frm As Access.Form)
     frm!lblDiscount.Caption = Format$(CalcTotal("DISCOUNT"), "#,##0.00")
     frm!lblTax.Caption = Format$(CalcTotal("TAX"), "#,##0.00")
     frm!lblTotal.Caption = Format$(total, "#,##0.00")
+    If Not IsBaseCurrency(frm!cboCurrency.Value) And IsNumeric(Nz(frm!txtRate.Value, "")) Then
+        frm!lblItems.Caption = n & " ’‰›    " & CurrencyNote(frm!cboCurrency.Value, frm!txtRate.Value, total)
+    End If
     If frm!cboPaymentType.Value = "CREDIT" Then
         frm!lblRemaining.Caption = "⁄·Ï «·Õ”«»: " & Format$(total - Nz(frm!txtPaid.Value, 0), "#,##0.00")
     Else
@@ -224,6 +234,7 @@ Public Sub PurSupplierChanged(ByVal frm As Access.Form)
         frm!chkChargeVAT.Value = Not IsNull(rs!VATNumber)
     End If
     rs.Close
+    CurrencyReset frm, DbValue("SELECT CurrencyCode FROM Suppliers WHERE SupplierID = " & frm!cboSupplier.Value)
     RecalcPurchase frm
 End Sub
 
@@ -239,7 +250,7 @@ Public Sub PurPaymentTypeChanged(ByVal frm As Access.Form)
 End Sub
 
 Public Function SavePurchase(ByVal frm As Access.Form) As Boolean
-    Dim msg As String, newID As Long, invNo As String, paidNow As Variant
+    Dim msg As String, newID As Long, invNo As String, paidNow As Variant, code As String, fx As Double
     If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If frm!subLines.Form.Dirty Then frm!subLines.Form.Dirty = False
     If IsNull(frm!cboSupplier.Value) Then
@@ -248,10 +259,14 @@ Public Function SavePurchase(ByVal frm As Access.Form) As Boolean
         Exit Function
     End If
     If frm!cboPaymentType.Value = "CREDIT" Then paidNow = Nz(frm!txtPaid.Value, 0) Else paidNow = Null
-    msg = PostPurchaseFromCart(frm!cboSupplier.Value, Nz(frm!txtSupplierInvoiceNo.Value, ""), _
-                               frm!txtInvoiceDate.Value, Nz(frm!cboPaymentType.Value, "CASH"), _
-                               frm!cboPaymentMethod.Value, Nz(frm!chkChargeVAT.Value, True), _
-                               Nz(frm!txtInvoiceDiscount.Value, 0), paidNow, Nz(frm!txtNotes.Value, ""), newID)
+    msg = CurrencyChoice(frm, code, fx)                             ' modCurrency
+    If Len(msg) = 0 Then
+        msg = PostPurchaseFromCart(frm!cboSupplier.Value, Nz(frm!txtSupplierInvoiceNo.Value, ""), _
+                                   frm!txtInvoiceDate.Value, Nz(frm!cboPaymentType.Value, "CASH"), _
+                                   frm!cboPaymentMethod.Value, Nz(frm!chkChargeVAT.Value, True), _
+                                   Nz(frm!txtInvoiceDiscount.Value, 0), paidNow, Nz(frm!txtNotes.Value, ""), newID, _
+                                   code, fx)
+    End If
     If Len(msg) > 0 Then
         SetPurStatus frm, msg, CLR_DANGER
         ShowWarning msg
@@ -438,6 +453,12 @@ Public Sub SupplierPaymentLoad(ByVal frm As Access.Form)
 End Sub
 
 Public Sub SupplierPaymentChanged(ByVal frm As Access.Form)
+    ' the supplier's currency is proposed (modCurrency)
+    If IsNull(frm!cboSupplier.Value) Then
+        CurrencyReset frm
+    Else
+        CurrencyReset frm, DbValue("SELECT CurrencyCode FROM Suppliers WHERE SupplierID = " & frm!cboSupplier.Value)
+    End If
     If IsNull(frm!cboSupplier.Value) Then
         frm!lblBalance.Caption = " "
     Else
@@ -447,19 +468,23 @@ Public Sub SupplierPaymentChanged(ByVal frm As Access.Form)
 End Sub
 
 Public Function SaveSupplierPayment(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
-    Dim msg As String, newID As Long
+    Dim msg As String, newID As Long, code As String, fx As Double
     If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     If IsNull(frm!cboSupplier.Value) Then
         ShowWarning "«Œ — «·„Ê—œ."
         Exit Function
     End If
-    msg = PostSupplierPayment(frm!cboSupplier.Value, Nz(frm!txtAmount.Value, 0), Nz(frm!cboPaymentMethod.Value, 1), _
-                              Nz(frm!txtNotes.Value, ""), newID)
+    msg = CurrencyChoice(frm, code, fx)                             ' modCurrency
+    If Len(msg) = 0 Then
+        msg = PostSupplierPayment(frm!cboSupplier.Value, Nz(frm!txtAmount.Value, 0), Nz(frm!cboPaymentMethod.Value, 1), _
+                                  Nz(frm!txtNotes.Value, ""), newID, code, fx)
+    End If
     If Len(msg) > 0 Then
         ShowWarning msg
         Exit Function
     End If
-    ShowInfo " „ Õ›Ÿ ”‰œ «·’—› " & DLookup("PaymentNumber", "SupplierPayments", "PaymentID = " & newID)
+    ShowInfo " „ Õ›Ÿ ”‰œ «·’—› " & DLookup("PaymentNumber", "SupplierPayments", "PaymentID = " & newID) & _
+             IIf(IsBaseCurrency(code), "", vbCrLf & CurrencyNote(code, fx, Nz(frm!txtAmount.Value, 0)))
     If PrintAfter Then PrintVoucher "PAYMENT", newID
     frm!txtAmount.Value = Null
     frm!txtNotes.Value = Null

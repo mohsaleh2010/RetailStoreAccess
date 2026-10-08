@@ -59,7 +59,7 @@ Public Function SearchColumnWidths(ByVal Kind As String) As String
 End Function
 
 Public Function ReportCount() As Long
-    ReportCount = 38
+    ReportCount = 39
 End Function
 
 Public Function ScreenPermission(ByVal FormName As String) As String
@@ -120,6 +120,8 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmBudget": ScreenPermission = "BUDGET"
         Case "frmRecurring": ScreenPermission = "EXPENSES"
         Case "frmAuditLog": ScreenPermission = "AUDIT_LOG"
+        Case "frmCurrencies": ScreenPermission = "CURRENCIES"
+        Case "frmCurrencyRates": ScreenPermission = "CURRENCIES"
     End Select
 End Function
 
@@ -163,6 +165,7 @@ Public Function ReportRow(ByVal Index As Long) As Variant
         Case 35: ReportRow = Array("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$", "")
         Case 36: ReportRow = Array("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
         Case 37: ReportRow = Array("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
-        Case 38: ReportRow = Array("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
+        Case 38: ReportRow = Array("SUPPLIER_FX", "أرصدة الموردين بالعملات وفروق العملة", "SupplierFxBalanceQuery", "rptSupplierFx", "", "")
+        Case 39: ReportRow = Array("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
     End Select
 End Function

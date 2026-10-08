@@ -834,6 +834,47 @@ SELECT s.SupplierID, s.SupplierName, s.ContactPerson, s.Mobile, s.IsActive,
 FROM Suppliers AS s LEFT JOIN qrySupplierLedgerTotals AS l ON s.SupplierID = l.SupplierID
 ORDER BY s.SupplierName"""),
 
+    # ------------------------------------------------- currencies (modCurrency)
+    # each operation on a supplier's balance in SAR and in the currency of its document
+    Query("qrySupplierFxMoves", "حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بالريال)", """
+SELECT h.SupplierID, h.CurrencyCode, h.TotalAmount - h.PaidAmount AS BaseAmount,
+       Round((h.TotalAmount - h.PaidAmount) / h.ExchangeRate, 2) AS FxAmount
+FROM PurchaseInvoices AS h
+UNION ALL
+SELECT r.SupplierID, r.CurrencyCode, r.RefundedAmount - r.TotalAmount, Round((r.RefundedAmount - r.TotalAmount) / r.ExchangeRate, 2)
+FROM PurchaseReturns AS r
+UNION ALL
+SELECT p.SupplierID, p.CurrencyCode, -p.Amount, Round(-p.Amount / p.ExchangeRate, 2)
+FROM SupplierPayments AS p
+UNION ALL
+SELECT s.SupplierID, 'SAR', s.OpeningBalance, s.OpeningBalance
+FROM Suppliers AS s
+WHERE s.OpeningBalance <> 0
+UNION ALL
+SELECT q.SupplierID, 'SAR', IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)
+FROM Cheques AS q
+WHERE q.Direction = 'OUT'"""),
+    Query("qryLatestRateDates", "تاريخ آخر سعر لكل عملة", """
+SELECT CurrencyCode, Max(RateDate) AS LastRateDate
+FROM CurrencyRates
+GROUP BY CurrencyCode"""),
+    Query("qryLatestRates", "آخر معامل لكل عملة", """
+SELECT r.CurrencyCode, r.RateDate, r.Rate
+FROM CurrencyRates AS r INNER JOIN qryLatestRateDates AS d
+     ON (r.CurrencyCode = d.CurrencyCode AND r.RateDate = d.LastRateDate)"""),
+    Query("qrySupplierFxTotals", "رصيد كل مورد بكل عملة", """
+SELECT SupplierID, CurrencyCode, Sum(BaseAmount) AS BookBalance, Sum(FxAmount) AS FxBalance
+FROM qrySupplierFxMoves
+GROUP BY SupplierID, CurrencyCode"""),
+    Query("SupplierFxBalanceQuery", "أرصدة الموردين بالعملات الأجنبية: بالدفاتر، وبآخر سعر، وفرق العملة غير المحقق", f"""
+SELECT s.SupplierName, t.SupplierID, t.CurrencyCode, t.FxBalance, t.BookBalance, l.Rate AS LastRate, l.RateDate AS LastRateDate,
+       Round(t.FxBalance * {nz("l.Rate")}, 2) AS RevaluedBalance,
+       Round(t.FxBalance * {nz("l.Rate")}, 2) - t.BookBalance AS FxDifference
+FROM ((qrySupplierFxTotals AS t INNER JOIN Suppliers AS s ON t.SupplierID = s.SupplierID)
+      LEFT JOIN qryLatestRates AS l ON t.CurrencyCode = l.CurrencyCode)
+      INNER JOIN Settings AS st ON st.SettingID = 1
+WHERE t.CurrencyCode <> st.CurrencyCode AND (t.FxBalance <> 0 OR t.BookBalance <> 0)"""),
+
     Query("SupplierStatementQuery", "كشف حساب مورد لفترة: رصيد سابق ثم الحركات", f"""
 SELECT 1 AS SortKey, l.EntryDate, l.EntryType, l.EntryTypeName, l.DocNumber, l.Debit, l.Credit
 FROM qrySupplierLedger AS l

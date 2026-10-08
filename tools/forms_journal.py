@@ -6,7 +6,7 @@ from typing import List
 
 from typing import Tuple
 
-from forms import Control, FormModel, Sym, button, cm, fit_window, labelled, shrink_area, title_band
+from forms import Control, FormModel, Sym, button, cm, currency_pair, fit_window, labelled, shrink_area, title_band
 from forms_sales import LOCKED, grid_row, header_labels
 
 LINE_WIDTHS = "1.8;5.0;6.4;2.6;2.6"
@@ -153,8 +153,9 @@ def layout_manual_entry(heads) -> FormModel:
     labelled(m, "txtDate", "التاريخ", c)
     c = m.add(Control("text", "txtReference", cm(7.2), y, cm(4.2), cm(0.8), {}))
     labelled(m, "txtReference", "المرجع (اختياري)", c)
-    c = m.add(Control("text", "txtDescription", cm(11.6), y, width - cm(12.0), cm(0.8), {}))
+    c = m.add(Control("text", "txtDescription", cm(11.6), y, width - cm(17.4), cm(0.8), {}))
     labelled(m, "txtDescription", "البيان", c)
+    currency_pair(m, width - cm(5.6), y, cbo_w=cm(2.6), rate_w=cm(2.4), call="ManualCurrencyPicked Me")
     header_labels(m, cm(0.4), cm(4.85), MANUAL_TITLES, heads)
     m.add(Control("subform", "subLines", cm(0.4), cm(5.45), cm(26.2), cm(7.6),
                   {"SourceObject": "frmManualLines"}))
@@ -178,7 +179,7 @@ def layout_manual_entry(heads) -> FormModel:
     m.form_events = ["Load"]
     m.code = (["Private Sub Form_Load()", "    ManualEntryLoad Me", "End Sub",
                "Private Sub cboFind_AfterUpdate()", "    ManualFindPicked Me", "End Sub"] + m.code)
-    fit_window(m, split_x=cm(24.0), bottom_y=cm(13.0),
+    fit_window(m, split_x=cm(21.3), bottom_y=cm(13.0),   # the currency pair follows the right edge
                stretch_w=("subLines", "lblTotals", "lblStatus", "txtDescription"), stretch_h=("subLines",))
     return m
 

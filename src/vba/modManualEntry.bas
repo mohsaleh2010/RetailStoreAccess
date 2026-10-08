@@ -16,6 +16,10 @@ Attribute VB_Name = "modManualEntry"
 Option Compare Database
 Option Explicit
 
+' the lines in the currency of the entry (entries saved before the currencies have no foreign amounts)
+Private Const LINE_AMOUNTS As String = "IIf(ForeignDebit + ForeignCredit = 0, Debit, ForeignDebit), " & _
+                                       "IIf(ForeignDebit + ForeignCredit = 0, Credit, ForeignCredit)"
+
 '------------------------------------------------------------------------------
 ' Rules and saving
 '------------------------------------------------------------------------------
@@ -70,17 +74,23 @@ Public Function ManualEntryProblem(ByVal EntryDate As Variant, ByVal Description
 End Function
 
 Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As Variant, ByVal Description As String, _
-                                ByVal Reference As String, ByVal ReversalOf As Variant, ByRef NewID As Long) As String
+                                ByVal Reference As String, ByVal ReversalOf As Variant, ByRef NewID As Long, _
+                                Optional ByVal CurrencyCode As String = "", Optional ByVal FxRate As Double = 1) As String
     ' "" on success; NewID = the saved entry. ManualEntryID = 0: a new entry.
+    ' The amounts of tmpManualLines are in CurrencyCode (default: the program currency): each line is
+    ' converted to SAR and keeps its foreign amount; a rounding cent goes to the largest line (modCurrency).
     Dim ws As DAO.Workspace, db As DAO.Database, h As DAO.Recordset, rs As DAO.Recordset, inTrans As Boolean
-    Dim n As Long, total As Currency
+    Dim n As Long, total As Currency, credits As Currency, foreignTotal As Currency, diff As Currency, fixLine As Variant
     On Error GoTo EH
     NewID = 0
     If Not HasPermission("MANUAL_ENTRY") Then
         PostManualEntry = "لا تملك صلاحية القيود اليدوية."
         Exit Function
     End If
+    If Len(CurrencyCode) = 0 Then CurrencyCode = BaseCurrency()
+    If IsBaseCurrency(CurrencyCode) Then FxRate = 1
     PostManualEntry = ManualEntryProblem(EntryDate, Description)
+    If Len(PostManualEntry) = 0 Then PostManualEntry = CurrencyProblem(CurrencyCode, FxRate)
     If Len(PostManualEntry) = 0 Then PostManualEntry = ClosedPeriodProblem(EntryDate)          ' modClosing
     If Len(PostManualEntry) = 0 And ManualEntryID > 0 Then
         PostManualEntry = ClosedPeriodProblem(DbValue("SELECT EntryDate FROM ManualEntries WHERE ManualEntryID = " & _
@@ -114,6 +124,8 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
     h!EntryDate = DateValue(EntryDate)
     h!Description = Left$(Trim$(Description), 255)
     h!Reference = IIf(Len(Trim$(Reference)) = 0, Null, Left$(Trim$(Reference), 50))
+    h!CurrencyCode = CurrencyCode
+    h!ExchangeRate = FxRate
     h.Update
     h.Bookmark = h.LastModified
     NewID = h!ManualEntryID
@@ -129,17 +141,36 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
         h!ManualEntryID = NewID
         h!LineNumber = n
         h!AccountCode = rs!AccountCode
-        h!Debit = Nz(rs!Debit, 0)
-        h!Credit = Nz(rs!Credit, 0)
+        h!Debit = ToBase(Nz(rs!Debit, 0), FxRate)
+        h!Credit = ToBase(Nz(rs!Credit, 0), FxRate)
+        h!ForeignDebit = Nz(rs!Debit, 0)
+        h!ForeignCredit = Nz(rs!Credit, 0)
         If Len(Trim$(Nz(rs!LineText, ""))) > 0 Then h!LineText = Left$(Trim$(rs!LineText), 150)
         h!CostCenterID = rs!LineCenter                     ' modCostCenters
+        total = total + h!Debit
+        credits = credits + h!Credit
+        foreignTotal = foreignTotal + Nz(rs!Debit, 0)
         h.Update
-        total = total + Nz(rs!Debit, 0)
         rs.MoveNext
     Loop
     rs.Close
     h.Close
-    db.Execute "UPDATE ManualEntries SET TotalAmount = " & Str$(total) & " WHERE ManualEntryID = " & NewID, dbFailOnError
+    ' balanced in the currency, the conversion may leave a cent: on the largest line of the smaller side
+    diff = total - credits
+    If diff <> 0 Then
+        fixLine = DbValue("SELECT TOP 1 ManualLineID FROM ManualEntryLines WHERE ManualEntryID = " & NewID & " AND " & _
+                          IIf(diff > 0, "Credit > 0 ORDER BY Credit DESC", "Debit > 0 ORDER BY Debit DESC"))
+        If diff > 0 Then
+            db.Execute "UPDATE ManualEntryLines SET Credit = Credit + " & Str$(diff) & " WHERE ManualLineID = " & fixLine, _
+                       dbFailOnError
+        Else
+            db.Execute "UPDATE ManualEntryLines SET Debit = Debit - " & Str$(diff) & " WHERE ManualLineID = " & fixLine, _
+                       dbFailOnError
+            total = total - diff
+        End If
+    End If
+    db.Execute "UPDATE ManualEntries SET TotalAmount = " & Str$(total) & ", ForeignAmount = " & Str$(foreignTotal) & _
+               " WHERE ManualEntryID = " & NewID, dbFailOnError
     ws.CommitTrans
     inTrans = False
     LogAction IIf(ManualEntryID = 0, "MANUAL_ENTRY_ADD", "MANUAL_ENTRY_EDIT"), "ManualEntries", CStr(NewID)
@@ -195,6 +226,7 @@ Public Sub ManualNew(ByVal frm As Access.Form)
     frm!txtDescription.Value = Null
     frm!txtReference.Value = Null
     frm!cboFind.Value = Null
+    CurrencyReset frm                                       ' modCurrency
     frm!subLines.Form.Requery
     ManualRecalc frm
     ManualButtons frm
@@ -217,10 +249,13 @@ Public Sub ManualOpen(ByVal frm As Access.Form, ByVal ManualEntryID As Long)
     frm!txtDate.Value = rs!EntryDate
     frm!txtDescription.Value = rs!Description
     frm!txtReference.Value = rs!Reference
+    frm!cboCurrency.Value = Nz(rs!CurrencyCode, BaseCurrency())       ' the lines are shown in its currency
+    frm!txtRate.Value = Nz(rs!ExchangeRate, 1)
+    frm!txtRate.Locked = IsBaseCurrency(frm!cboCurrency.Value)
     rs.Close
     CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
     CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit, LineText, LineCenter) SELECT AccountCode, " & _
-                      "Debit, Credit, LineText, CostCenterID FROM ManualEntryLines WHERE ManualEntryID = " & ManualEntryID & _
+                      LINE_AMOUNTS & ", LineText, CostCenterID FROM ManualEntryLines WHERE ManualEntryID = " & ManualEntryID & _
                       " ORDER BY LineNumber", dbFailOnError
     frm!subLines.Form.Requery
     ManualRecalc frm
@@ -230,6 +265,11 @@ Public Sub ManualOpen(ByVal frm As Access.Form, ByVal ManualEntryID As Long)
     Else
         frm!lblStatus.Caption = "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه."
     End If
+End Sub
+
+Public Sub ManualCurrencyPicked(ByVal frm As Access.Form)
+    ' the lines are typed in the chosen currency; its rate on the entry date is proposed
+    CurrencyPicked frm, frm!txtDate.Value
 End Sub
 
 Public Sub ManualFindPicked(ByVal frm As Access.Form)
@@ -277,12 +317,15 @@ Public Sub ManualRecalc(ByVal frm As Access.Form)
 End Sub
 
 Public Function SaveManualEntry(ByVal frm As Access.Form) As Boolean
-    Dim id As Long, msg As String, newID As Long, number As String, sync As String
+    Dim id As Long, msg As String, newID As Long, number As String, sync As String, code As String, fx As Double
     id = Nz(frm!txtEntryID.Value, 0)
     If Not CanScreenAction(frm.Name, IIf(id = 0, "ADD", "EDIT")) Then Exit Function      ' frmUserScreens
     If frm!subLines.Form.Dirty Then frm!subLines.Form.Dirty = False
-    msg = PostManualEntry(id, frm!txtDate.Value, Nz(frm!txtDescription.Value, ""), Nz(frm!txtReference.Value, ""), _
-                          frm!txtReversalOf.Value, newID)
+    msg = CurrencyChoice(frm, code, fx)                             ' modCurrency
+    If Len(msg) = 0 Then
+        msg = PostManualEntry(id, frm!txtDate.Value, Nz(frm!txtDescription.Value, ""), Nz(frm!txtReference.Value, ""), _
+                              frm!txtReversalOf.Value, newID, code, fx)
+    End If
     If Len(msg) > 0 Then
         ShowWarning msg
         Exit Function
@@ -326,8 +369,8 @@ Public Sub ReverseManualEntry(ByVal frm As Access.Form)
     If id = 0 Then Exit Sub
     number = Nz(frm!txtNumber.Value, "")
     CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit, LineText, LineCenter) SELECT AccountCode, " & _
-                      "Credit, Debit, LineText, CostCenterID FROM ManualEntryLines WHERE ManualEntryID = " & id & _
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Credit, Debit, LineText, LineCenter) SELECT AccountCode, " & _
+                      LINE_AMOUNTS & ", LineText, CostCenterID FROM ManualEntryLines WHERE ManualEntryID = " & id & _
                       " ORDER BY LineNumber", dbFailOnError
     frm!txtDescription.Value = Left$("عكس القيد " & number & ": " & Nz(frm!txtDescription.Value, ""), 255)
     frm!txtReversalOf.Value = id
