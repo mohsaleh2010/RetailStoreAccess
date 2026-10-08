@@ -95,6 +95,7 @@ Public Sub FormCurrent(ByVal frm As Access.Form)
         Case "Employees"                                            ' frmEmployeePay reads it too
             If frm.Name = "frmUsers" Then UserCurrent frm           ' modSecurityScreens
         Case "RecurringExpenses": RecurringCurrent frm             ' modRecurring
+        Case "SalesReps": SalesRepCurrent frm                      ' modSalesReps
     End Select
 End Sub
 

@@ -57,6 +57,7 @@
 | + | المؤشرات المالية في لوحة التحكم: هامش الربح، دوران المخزون، فترة التحصيل، السيولة | ✅ بانتظار الموافقة | [docs/34-Financial-Indicators.md](docs/34-Financial-Indicators.md) |
 | + | خطة العملات المتعددة والمندوبين والواجهة الإنجليزية | 📋 خطة | [docs/35-Plan-Currency-Reps-Language.md](docs/35-Plan-Currency-Reps-Language.md) |
 | + | العملات المتعددة: عملة ومعامل لكل مستند، والترحيل بالمكافئ بالريال | ✅ بانتظار الموافقة | [docs/36-Currencies.md](docs/36-Currencies.md) |
+| + | المندوبين: عملاء المندوب، والأهداف الشهرية، ومسير العمولات وقيده وصرفه، وتقارير الأداء | ✅ بانتظار الموافقة | [docs/37-Sales-Reps.md](docs/37-Sales-Reps.md) |
 
 ## هيكل المستودع
 
@@ -140,6 +141,7 @@
 | 30 | `modAudit` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestAudit` |
 | 31 | `modIndicators` (دائمة) | `BuildQueries`, `BuildForms` | `TestIndicators` |
 | 32 | `modCurrency` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestCurrency` |
+| 33 | `modSalesReps` (دائمة)، واستبدال `modSales` و`modCash` و`modJournal` و`modForms` و`modScreens` | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestSalesReps` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

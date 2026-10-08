@@ -129,8 +129,11 @@ BANK_ROWS = "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY B
 CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
 CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies "
                  "WHERE IsActive = True ORDER BY SortOrder, CurrencyCode")
+REP_ROWS = "SELECT SalesRepID, RepName FROM SalesReps WHERE IsActive = True ORDER BY RepName"
 CASHBOX_ROWS = "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
+COMMISSION_BASES = "SALES;صافي المبيعات (بدون الضريبة);COLLECTION;التحصيل"
+EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
 FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
 ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
 # main (summary) accounts only: a sub-account always hangs under a main account
@@ -194,6 +197,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
             Fld("AllowCredit"), Fld("CreditLimit", hint="0 = بدون حد"),
             Fld("PaymentTermsDays", hint="استحقاق الفاتورة الآجلة = تاريخها + هذه المدة"),
+            Fld("SalesRepID", rows=REP_ROWS, widths="0;6", hint="تُنسب له فواتير العميل وتحصيلاته"),
             Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق على العميل"),
             Fld("Notes", span=2),
         ]),
@@ -267,6 +271,40 @@ DATA_SCREENS: List[DataScreen] = [
         fields=[Fld("CurrencyCode", rows=CURRENCY_ROWS, widths="1.2;4"), Fld("RateDate"),
                 Fld("Rate", hint="مثال: الدولار 3.75"), Fld("Notes"),
                 Info("lblRateNote", "لكل عملة سعر واحد في اليوم؛ عملة البرنامج لا تحتاج سعرًا")]),
+    DataScreen(
+        "frmSalesReps", "SalesReps", "المندوبين", "مندوبو المبيعات: عملاؤهم ونسبة عمولتهم ومركز تكلفتهم", "customers",
+        list_select="t.RepCode AS [الكود], t.RepName AS [المندوب], t.Region AS [المنطقة]",
+        list_from="SalesReps AS t", list_order="t.RepName",
+        list_headers=[("الكود", 1.8), ("المندوب", 4.2), ("المنطقة", 2.4)],
+        search=["t.RepCode", "t.RepName", "t.RepNameEn", "t.Mobile", "t.Region"], active="t.IsActive",
+        seq="SALES_REP:RepCode", unique=["RepCode", "RepName"],
+        extra_buttons=[("btnTargets", "الأهداف", 'OpenScreen "frmRepTargets", 0'),
+                       ("btnCommissions", "العمولات", 'OpenScreen "frmCommissions", 0'),
+                       ("btnRepReport", "أداء المندوبين", 'OpenScreen "frmReportCenter", 0, "REP_PERFORMANCE"')],
+        fields=[
+            Fld("RepCode", hint="يُولَّد تلقائيًا إذا تُرك فارغًا"), Fld("Mobile"),
+            Fld("RepName", span=2), Fld("RepNameEn", span=2),
+            Fld("EmployeeID", rows=EMPLOYEE_ROWS, widths="0;6",
+                hint="مبيعات هذا المستخدم لعميل بلا مندوب تُنسب للمندوب"),
+            Fld("Region"),
+            Fld("CommissionRate", hint="مثال: 2% تُكتب 0.02"),
+            Fld("CommissionBase", rows=COMMISSION_BASES, widths="0;4.5"),
+            Fld("CostCenterID", rows=CENTER_ROWS, widths="0;6", hint="مركز قيد عمولته"),
+            Fld("IsActive"),
+            Info("lblRepInfo"),
+            Fld("Notes", span=2),
+        ]),
+    DataScreen(
+        "frmRepTargets", "SalesRepTargets", "أهداف المندوبين", "الهدف الشهري لصافي مبيعات كل مندوب (بدون الضريبة)",
+        "customers",
+        list_select="s.RepName AS [المندوب], t.TargetYear & '/' & t.TargetMonth AS [الشهر], t.TargetAmount AS [الهدف]",
+        list_from="SalesRepTargets AS t INNER JOIN SalesReps AS s ON t.SalesRepID = s.SalesRepID",
+        list_order="t.TargetYear DESC, t.TargetMonth DESC, s.RepName",
+        list_headers=[("المندوب", 4.0), ("الشهر", 2.0), ("الهدف", 2.4)],
+        search=["s.RepName", "s.RepCode"],
+        fields=[Fld("SalesRepID", rows=REP_ROWS, widths="0;6"), Fld("TargetYear"), Fld("TargetMonth"),
+                Fld("TargetAmount"),
+                Info("lblTargetNote", "لكل مندوب هدف واحد في الشهر؛ تقرير «أداء المندوبين» يقارن الفعلي بالهدف")]),
     DataScreen(
         "frmRecurring", "RecurringExpenses", "المصروفات المتكررة",
         "الإيجار والكهرباء والاشتراكات: يُنشأ المصروف تلقائيًا في تاريخ استحقاقه", "expenses",
@@ -525,6 +563,7 @@ SCREEN_PERMISSIONS = {
     "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL", "frmCostCenters": "JOURNAL", "frmBudget": "BUDGET",
     "frmRecurring": "EXPENSES", "frmAccounting": "", "frmAuditLog": "AUDIT_LOG",
     "frmCurrencies": "CURRENCIES", "frmCurrencyRates": "CURRENCIES",
+    "frmSalesReps": "SALES_REPS", "frmRepTargets": "SALES_REPS", "frmCommissions": "SALES_REPS",
 }
 
 
@@ -633,6 +672,11 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances"),
     ReportEntry("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances"),
     ReportEntry("SUPPLIER_FX", "أرصدة الموردين بالعملات وفروق العملة", "SupplierFxBalanceQuery", "rptSupplierFx"),
+    ReportEntry("REP_PERFORMANCE", "أداء المندوبين: المبيعات والتحصيل والهدف والعمولة", "RepPerformanceQuery",
+                "rptRepPerformance", "P"),
+    ReportEntry("REP_CUSTOMERS", "عملاء المندوبين وأرصدتهم", "RepCustomersQuery", "rptRepCustomers"),
+    ReportEntry("REP_COMMISSION_BALANCE", "عمولات المندوبين المستحقة", "RepCommissionBalanceQuery",
+                "rptRepCommissionBalance"),
     ReportEntry("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck"),
 ]
 
@@ -1209,8 +1253,9 @@ def all_forms() -> List[FormModel]:
     from forms_budget import budget_forms
     from forms_accounting import accounting_forms
     from forms_audit import audit_forms
+    from forms_sales_reps import sales_rep_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
             + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms()
-            + audit_forms())
+            + audit_forms() + sales_rep_forms())

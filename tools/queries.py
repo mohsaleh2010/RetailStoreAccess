@@ -73,7 +73,7 @@ JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournal
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
                           "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
                           "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation",
-                          "qryJournalPayroll"]
+                          "qryJournalPayroll", "qryJournalCommission"]
 
 
 def _sale():
@@ -154,8 +154,8 @@ def _cash_voucher():
          "IIf(v.PartyName Is Null, v.Description, v.PartyName)")
     out_src = "CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID"
     out_account = ("IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', "
-                   "5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, "
-                   "5900))))")
+                   "5400, IIf(v.Category = 'COMMISSION', 2330, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID "
+                   "Is Not Null, 530000 + x.ExpenseTypeID, 5900)))))")
     return with_center(jquery([
         jline(*k, 1, "110000 + v.CashBoxID", "v.Amount", ZERO, "v.PartyName", "CashVouchers AS v",
               "v.VoucherType = 'IN'"),
@@ -300,6 +300,19 @@ def _payroll():
             jline(*kp, 2, paid_from, ZERO, "r.PaidAmount", "'صرف الرواتب'", "PayrollRuns AS r",
                   f"{posted} AND r.PaidAmount <> 0")]
     return jquery(out)
+
+
+def _commission():
+    # the posted commissions of a month on its last day: the commissions expense 5530 (on the cost centre
+    # of each sales rep) against the commissions payable 2330; paid by a cash voucher (category COMMISSION)
+    src = "CommissionRuns AS r INNER JOIN qryCommissionCenterTotals AS t ON r.CommissionRunID = t.CommissionRunID"
+    k = ("'COMMISSION'", "r.CommissionRunID", "r.RunNumber", "r.RunMonth", "'عمولات المندوبين'")
+    posted = "r.Status = 'POSTED' AND t.SumCommission <> 0"
+    return jquery([
+        jline(*k, "1 + 10 * t.CenterKey", 5530, "t.SumCommission", ZERO, "'عمولات المندوبين'", src, posted,
+              center="t.CenterKey"),
+        jline(*k, "2 + 10 * t.CenterKey", 2330, ZERO, "t.SumCommission", "'عمولات مستحقة'", src, posted,
+              center="t.CenterKey")])
 
 
 def _year_close():
@@ -1111,6 +1124,70 @@ SELECT (SELECT {nz("Sum(d.GrossAmount)")} FROM qrySalesDocuments AS d
 FROM Settings AS st
 WHERE st.SettingID = 1""", ["DashDay", "DashMonth", "DashEnd"]),
 
+    # ======================================================= SALES REPS (modSalesReps)
+    # each operation of a sales rep: net sales before VAT and what was collected (cash part of
+    # the invoices, minus refunds, plus the customer payments)
+    Query("qryRepDocs", "عمليات المندوبين: صافي المبيعات بدون الضريبة والتحصيل", """
+SELECT h.SalesRepID, h.InvoiceDate AS DocDate, h.TaxableAmount AS NetSales, h.PaidAmount AS Collected
+FROM SalesInvoices AS h
+WHERE h.SalesRepID Is Not Null
+UNION ALL
+SELECT r.SalesRepID, r.ReturnDate, -r.TaxableAmount, -r.RefundedAmount
+FROM SalesReturns AS r
+WHERE r.SalesRepID Is Not Null
+UNION ALL
+SELECT p.SalesRepID, p.PaymentDate, CCur(0), p.Amount
+FROM CustomerPayments AS p
+WHERE p.SalesRepID Is Not Null"""),
+    Query("qryRepPeriodTotals", "مبيعات وتحصيل كل مندوب في الفترة", f"""
+SELECT SalesRepID, Sum(NetSales) AS SumSales, Sum(Collected) AS SumCollected
+FROM qryRepDocs
+WHERE {period("DocDate")}
+GROUP BY SalesRepID""", P),
+    Query("qryRepTargetTotals", "أهداف كل مندوب في أشهر الفترة", """
+SELECT SalesRepID, Sum(TargetAmount) AS SumTarget
+FROM SalesRepTargets
+WHERE TargetYear * 100 + TargetMonth >= Year(QDate('PeriodStart')) * 100 + Month(QDate('PeriodStart'))
+  AND TargetYear * 100 + TargetMonth <= Year(DateAdd('d', -1, QDate('PeriodEnd'))) * 100
+                                        + Month(DateAdd('d', -1, QDate('PeriodEnd')))
+GROUP BY SalesRepID""", P),
+    Query("qryRepCommissionPaid", "ما صُرف لكل مندوب من عمولاته (سندات صرف النقدية)", """
+SELECT SalesRepID, Sum(Amount) AS SumPaid
+FROM CashVouchers
+WHERE Category = 'COMMISSION' AND SalesRepID Is Not Null
+GROUP BY SalesRepID"""),
+    Query("qryRepCommissionPosted", "العمولات المرحَّلة لكل مندوب", """
+SELECT l.SalesRepID, Sum(l.Commission) AS SumPosted
+FROM CommissionLines AS l INNER JOIN CommissionRuns AS r ON l.CommissionRunID = r.CommissionRunID
+WHERE r.Status = 'POSTED'
+GROUP BY l.SalesRepID"""),
+    Query("RepPerformanceQuery", "أداء المندوبين في الفترة: المبيعات والتحصيل والهدف والإنجاز والعمولة المتوقعة", f"""
+SELECT s.SalesRepID, s.RepCode, s.RepName, s.Region, s.IsActive, s.CommissionRate, s.CommissionBase,
+       {nz("t.SumSales")} AS NetSales, {nz("t.SumCollected")} AS Collections, {nz("g.SumTarget")} AS Target,
+       IIf({nz("g.SumTarget")} = 0, Null, {nz("t.SumSales")} / {nz("g.SumTarget")}) AS Achievement,
+       IIf(s.CommissionBase = 'COLLECTION', {nz("t.SumCollected")}, {nz("t.SumSales")}) AS BaseAmount,
+       IIf(IIf(s.CommissionBase = 'COLLECTION', {nz("t.SumCollected")}, {nz("t.SumSales")}) > 0,
+           Round(IIf(s.CommissionBase = 'COLLECTION', {nz("t.SumCollected")}, {nz("t.SumSales")}) * s.CommissionRate, 2),
+           0) AS Commission
+FROM (SalesReps AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)
+     LEFT JOIN qryRepTargetTotals AS g ON s.SalesRepID = g.SalesRepID
+WHERE s.IsActive = True OR {nz("t.SumSales")} <> 0 OR {nz("t.SumCollected")} <> 0""", P),
+    Query("RepCustomersQuery", "عملاء كل مندوب وأرصدتهم", f"""
+SELECT s.SalesRepID, s.RepName, c.CustomerID, c.CustomerName, c.Mobile, b.Balance
+FROM (Customers AS c INNER JOIN SalesReps AS s ON c.SalesRepID = s.SalesRepID)
+     INNER JOIN CustomerBalanceQuery AS b ON c.CustomerID = b.CustomerID"""),
+    Query("RepCommissionBalanceQuery", "العمولات المستحقة لكل مندوب: المرحَّل والمصروف والباقي", f"""
+SELECT s.SalesRepID, s.RepCode, s.RepName, {nz("p.SumPosted")} AS Posted, {nz("d.SumPaid")} AS Paid,
+       {nz("p.SumPosted")} - {nz("d.SumPaid")} AS Payable
+FROM (SalesReps AS s LEFT JOIN qryRepCommissionPosted AS p ON s.SalesRepID = p.SalesRepID)
+     LEFT JOIN qryRepCommissionPaid AS d ON s.SalesRepID = d.SalesRepID"""),
+    Query("CommissionSheetQuery", "مسير العمولات المختار بأسطر المندوبين", """
+SELECT r.CommissionRunID, r.RunNumber, r.RunMonth, r.Status, l.SalesRepID, l.RepName, l.NetSales, l.Collections,
+       IIf(l.CommissionBase = 'COLLECTION', 'التحصيل', 'المبيعات') AS BaseName, l.BaseAmount, l.CommissionRate,
+       l.Adjustment, l.Commission, l.Notes
+FROM CommissionRuns AS r INNER JOIN CommissionLines AS l ON r.CommissionRunID = l.CommissionRunID
+WHERE r.CommissionRunID = QLong('CommissionRunID')""", ["CommissionRunID"]),
+
     # Financial indicators (modIndicators): from the journal, so they agree with the financial
     # statements. IndEnd = the day after AsOf (exclusive); IndMonth / IndPrevMonth = first day of this /
     # the previous month; IndYear = AsOf - 364 (the last 365 days); Ind90 = AsOf - 89 (the last 90 days).
@@ -1460,6 +1537,11 @@ SELECT PayrollRunID, IIf(CostCenterID Is Null, 0, CostCenterID) AS CenterKey,
 FROM PayrollLines
 GROUP BY PayrollRunID, IIf(CostCenterID Is Null, 0, CostCenterID)"""),
     Query("qryJournalPayroll", "أسطر قيود مسيرات الرواتب المرحَّلة وصرفها", _payroll()),
+    Query("qryCommissionCenterTotals", "عمولات كل مسير لكل مركز تكلفة لقيده", """
+SELECT CommissionRunID, IIf(CostCenterID Is Null, 0, CostCenterID) AS CenterKey, Sum(Commission) AS SumCommission
+FROM CommissionLines
+GROUP BY CommissionRunID, IIf(CostCenterID Is Null, 0, CostCenterID)"""),
+    Query("qryJournalCommission", "أسطر قيود مسيرات العمولات المرحَّلة", _commission()),
     Query("qryJournalBankTx", "أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى", _bank_tx()),
 
     # ================================================================ BANKS (modBank)

@@ -124,11 +124,12 @@ Journal entries are rebuilt from the documents by `SyncJournal` (`modJournal`), 
 document type; an entry's signature decides whether it changed. Key accounts: cash boxes 110000+box,
 banks 120000+bank, 1200 Mada/wallet clearing, 1300 customers, 2100 suppliers, 1500 input VAT,
 1250 cheques under collection, 2110 notes payable, 1790/5600 depreciation, 2310/2320 payroll,
-1600 employee advances. Cost centres travel on `JournalLines.CostCenterID`.
+1600 employee advances, 2330/5530 sales rep commissions. Cost centres travel on `JournalLines.CostCenterID`.
 
 ## Status and roadmap
 Phases 1–12, accounting, VAT return, aging, banks, cheques, fixed assets, payroll, cost centres,
-budget, recurring expenses, the audit trail and the financial indicators of the dashboard are done
+budget, recurring expenses, the audit trail, the financial indicators of the dashboard, multiple
+currencies and sales reps with commissions are done
 (see `README.md` for approval status): phase 3 is complete. Next steps are decided by the owner.
 
 ## Standard procedures

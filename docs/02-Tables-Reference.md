@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **65** | عدد الحقول: **828**
+عدد الجداول: **69** | عدد الحقول: **873**
 
 ## الفهرس
 
@@ -41,36 +41,40 @@
 33. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
 34. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
 35. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
-36. [`Budgets`](#budgets) – الموازنات التقديرية
-37. [`BudgetLines`](#budgetlines) – أسطر الموازنة
-38. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
-39. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
-40. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-41. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-42. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-43. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-44. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-45. [`Expenses`](#expenses) – المصروفات
-46. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
-47. [`CashVouchers`](#cashvouchers) – سندات النقدية
-48. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-49. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-50. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-51. [`JournalEntries`](#journalentries) – قيود اليومية
-52. [`JournalLines`](#journallines) – أسطر القيود
-53. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-54. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-55. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-56. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-57. [`ManualEntries`](#manualentries) – القيود اليدوية
-58. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-59. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-60. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-61. [`StockCounts`](#stockcounts) – جلسات الجرد
-62. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-63. [`AuditLog`](#auditlog) – سجل العمليات
-64. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-65. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+36. [`SalesReps`](#salesreps) – المندوبين
+37. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
+38. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
+39. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
+40. [`Budgets`](#budgets) – الموازنات التقديرية
+41. [`BudgetLines`](#budgetlines) – أسطر الموازنة
+42. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+43. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+44. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+45. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+46. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+47. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+48. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+49. [`Expenses`](#expenses) – المصروفات
+50. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
+51. [`CashVouchers`](#cashvouchers) – سندات النقدية
+52. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+53. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+54. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+55. [`JournalEntries`](#journalentries) – قيود اليومية
+56. [`JournalLines`](#journallines) – أسطر القيود
+57. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+58. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+59. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+60. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+61. [`ManualEntries`](#manualentries) – القيود اليدوية
+62. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+63. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+64. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+65. [`StockCounts`](#stockcounts) – جلسات الجرد
+66. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+67. [`AuditLog`](#auditlog) – سجل العمليات
+68. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+69. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 
 ## Settings
 
@@ -134,7 +138,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 23 سجل
+- بيانات أساسية: 25 سجل
 
 ## Roles
 
@@ -163,7 +167,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 35 سجل
+- بيانات أساسية: 36 سجل
 
 ## RolePermissions
 
@@ -175,7 +179,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 69 سجل
+- بيانات أساسية: 71 سجل
 
 ## Employees
 
@@ -234,7 +238,7 @@
 | 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 55 سجل
+- بيانات أساسية: 58 سجل
 
 ## UserScreens
 
@@ -427,6 +431,7 @@
 | 20 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
 | 21 | Notes | Long Text |  |  |  |  |  | ملاحظات |
 | 22 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 23 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – المندوب المسؤول عن العميل: تُنسب له فواتيره وتحصيلاته |
 
 - المفتاح الأساسي: `CustomerID`
 - فهرس عادي: `CustomerName`
@@ -512,6 +517,7 @@
 | 36 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
 | 37 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 | 38 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
+| 39 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -581,6 +587,7 @@
 | 29 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
 | 30 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 | 31 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
+| 32 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -743,6 +750,7 @@
 | 13 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
 | 14 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
 | 15 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
+| 16 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – المحصِّل: مندوب العميل، وإلا مندوب المستخدم |
 
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
@@ -937,6 +945,88 @@
 - المفتاح الأساسي: `CostCenterID`
 - فهرس فريد: `CenterCode`
 - فهرس فريد: `CenterName`
+
+## SalesReps
+
+**المندوبين** – مندوبو المبيعات: العملاء المسندون لكل مندوب، ومبيعاته وتحصيلاته وهدفه الشهري وعمولته.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **SalesRepID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | RepCode | Short Text | 20 | ✔ |  |  |  | كود المندوب |
+| 3 | RepName | Short Text | 100 | ✔ |  |  |  | اسم المندوب |
+| 4 | RepNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية |
+| 5 | Mobile | Short Text | 20 |  |  |  |  | الجوال |
+| 6 | EmployeeID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | مستخدم البرنامج – مبيعات هذا المستخدم لعميل بلا مندوب تُنسب لهذا المندوب |
+| 7 | Region | Short Text | 50 |  |  |  |  | المنطقة / خط السير |
+| 8 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز قيد عمولته |
+| 9 | CommissionRate | Currency (نسبة) |  | ✔ | `0` | `>=0 And <1` |  | نسبة العمولة |
+| 10 | CommissionBase | Short Text | 10 | ✔ | `"SALES"` | `In ("SALES","COLLECTION")` |  | أساس العمولة |
+| 11 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 12 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `SalesRepID`
+- فهرس فريد: `RepCode`
+- فهرس فريد: `RepName`
+
+## SalesRepTargets
+
+**أهداف المندوبين** – الهدف الشهري لمبيعات كل مندوب (صافي المبيعات بدون الضريبة).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **TargetID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | SalesRepID | Number (Long) |  | ✔ |  |  | `SalesReps.SalesRepID` | المندوب |
+| 3 | TargetYear | Number (Integer) |  | ✔ |  | `Between 2000 And 2100` |  | السنة |
+| 4 | TargetMonth | Number (Byte) |  | ✔ | `1` | `Between 1 And 12` |  | الشهر |
+| 5 | TargetAmount | Currency |  | ✔ | `0` | `>=0` |  | الهدف |
+
+- المفتاح الأساسي: `TargetID`
+- فهرس فريد: `SalesRepID, TargetYear, TargetMonth`
+
+## CommissionRuns
+
+**مسيرات العمولات** – عمولات المندوبين لشهر: مسودة تُعدَّل، ثم يُرحَّل قيدها (مصروف العمولات 5530 على عمولات مستحقة 2330)، وتُصرف بسند صرف نقدية من بند «صرف عمولة مندوب».
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **CommissionRunID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | RunNumber | Short Text | 20 | ✔ |  |  |  | رقم المسير |
+| 3 | RunMonth | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | الشهر (آخر يوم) |
+| 4 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","POSTED")` |  | الحالة |
+| 5 | TotalAmount | Currency |  | ✔ | `0` | `>=0` |  | إجمالي العمولات |
+| 6 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 7 | PostedAt | Date/Time |  |  |  |  |  | تاريخ الترحيل |
+| 8 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `CommissionRunID`
+- فهرس فريد: `RunNumber`
+- فهرس فريد: `RunMonth`
+
+## CommissionLines
+
+**أسطر مسير العمولات** – عمولة كل مندوب في الشهر: صافي مبيعاته وتحصيلاته، والأساس والنسبة، والتعديل اليدوي.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **CommissionLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | CommissionRunID | Number (Long) |  | ✔ |  |  | `CommissionRuns.CommissionRunID` | المسير |
+| 3 | SalesRepID | Number (Long) |  | ✔ |  |  | `SalesReps.SalesRepID` | المندوب |
+| 4 | RepName | Short Text | 100 |  |  |  |  | اسم المندوب |
+| 5 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
+| 6 | NetSales | Currency |  | ✔ | `0` |  |  | صافي المبيعات |
+| 7 | Collections | Currency |  | ✔ | `0` |  |  | التحصيل |
+| 8 | CommissionBase | Short Text | 10 | ✔ | `"SALES"` |  |  | الأساس |
+| 9 | BaseAmount | Currency |  | ✔ | `0` |  |  | مبلغ الأساس |
+| 10 | CommissionRate | Currency (نسبة) |  | ✔ | `0` | `>=0 And <1` |  | النسبة |
+| 11 | Adjustment | Currency |  | ✔ | `0` |  |  | تعديل (+/-) |
+| 12 | Commission | Currency |  | ✔ | `0` | `>=0` |  | العمولة – الأساس × النسبة + التعديل، ولا تقل عن صفر |
+| 13 | Notes | Short Text | 150 |  |  |  |  | ملاحظات |
+
+- المفتاح الأساسي: `CommissionLineID`
+- فهرس فريد: `CommissionRunID, SalesRepID`
 
 ## Budgets
 
@@ -1195,7 +1285,7 @@
 | 4 | VoucherType | Short Text | 10 | ✔ |  | `In ("IN","OUT","TRANSFER")` |  | نوع السند |
 | 5 | CashBoxID | Number (Long) |  | ✔ |  |  | `CashBoxes.CashBoxID` | الصندوق – القبض يدخله، والصرف والتحويل يخرجان منه |
 | 6 | ToCashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | إلى صندوق – للتحويل فقط |
-| 7 | Category | Short Text | 10 | ✔ | `"OTHER"` | `In ("OTHER","OWNER","EXPENSE","ADVANCE","SHORTAGE","OVERAGE","TRANSFER")` |  | البند |
+| 7 | Category | Short Text | 10 | ✔ | `"OTHER"` | `In ("OTHER","OWNER","EXPENSE","ADVANCE","SHORTAGE","OVERAGE","TRANSFER","COMMISSION")` |  | البند |
 | 8 | Amount | Currency |  | ✔ | `0` | `>0` |  | المبلغ |
 | 9 | PartyName | Short Text | 100 |  |  |  |  | المستلم / المسلِّم |
 | 10 | Description | Short Text | 255 |  |  |  |  | البيان |
@@ -1205,6 +1295,7 @@
 | 14 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
 | 15 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
 | 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 17 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – صرف عمولة المندوب |
 
 - المفتاح الأساسي: `CashVoucherID`
 - فهرس فريد: `VoucherNumber`
@@ -1266,7 +1357,7 @@
 - المفتاح الأساسي: `AccountCode`
 - فهرس عادي: `ParentCode`
 - فهرس عادي: `TreeKey`
-- بيانات أساسية: 78 سجل
+- بيانات أساسية: 80 سجل
 
 ## JournalSourceTypes
 
@@ -1279,7 +1370,7 @@
 | 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 26 سجل
+- بيانات أساسية: 27 سجل
 
 ## JournalEntries
 

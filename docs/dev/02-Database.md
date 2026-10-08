@@ -27,6 +27,7 @@
 | **النظام** | `Settings` (سجل واحد)، `Sequences`، `Roles`، `Permissions`، `RolePermissions`، `Employees`، `Screens`، `UserScreens`، `Activations`، `AuditLog`، `AuditChanges`، `LabelSettings` | كل مستخدم هو موظف. المبرمج (`IsDeveloper`) مخفي. كلمات المرور SHA-256 مع salt |
 | **البيانات الأساسية** | `Categories`، `Units`، `PaymentMethods`، `Products`، `Customers`، `Suppliers`، `ExpenseTypes`، `CashBoxes`، `Banks`، `CostCenters` | العميل رقم 1 هو «عميل نقدي» |
 | **المبيعات** | `SalesInvoices` + `SalesInvoiceDetails`، `SalesReturns` + `SalesReturnDetails`، `CustomerPayments`، `CustomerAllocations` | تكلفة الصنف تُحفظ في السطر لحظة البيع |
+| **المندوبين** | `SalesReps`، `SalesRepTargets`، `CommissionRuns` + `CommissionLines` | `SalesRepID` على العملاء والفواتير والمرتجعات وسندات القبض وسندات النقدية |
 | **المشتريات والمخزون** | `PurchaseInvoices` + `Details`، `PurchaseReturns` + `Details`، `SupplierPayments`، `SupplierAllocations`، `TransactionTypes`، `InventoryTransactions`، `StockCounts` + `StockCountDetails` | المخزون دفتر أستاذ بالكمية وإشارتها |
 | **الخزينة والبنوك** | `CashVouchers`، `CashClosings`، `BankTransactions`، `BankReconciliations` + `BankClearings`، `Cheques` | الصناديق والبنوك لها حسابات في الدليل |
 | **المحاسبة** | `Accounts` (شجرة 5 مستويات)، `JournalSourceTypes`، `JournalEntries` + `JournalLines`، `ManualEntries` + `ManualEntryLines`، `PeriodClosings`، `FiscalYearClosings` + `Lines`، `VatReturns` | القيود الآلية تُبنى من المستندات |
@@ -54,6 +55,7 @@
   | الموردون | 2100 |
   | أوراق الدفع | 2110 |
   | الرواتب والتأمينات | 2310 / 2320 |
+  | عمولات المندوبين المستحقة / مصروفها | 2330 / 5530 |
   | الأرباح المحتجزة | 3300 |
   | الإيرادات | فئة 4 |
   | المصروفات | فئة 5 |

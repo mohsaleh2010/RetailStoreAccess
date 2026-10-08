@@ -26,7 +26,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptAging,rptPayroll,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -53,6 +53,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptVatReturn
     BuildReport_rptAging
     BuildReport_rptPayroll
+    BuildReport_rptCommissionRun
     BuildReport_rptDailySales
     BuildReport_rptMonthlySales
     BuildReport_rptSalesByPeriod
@@ -85,6 +86,9 @@ Public Function BuildReports() As Boolean
     BuildReport_rptCustomerBalances
     BuildReport_rptSupplierBalances
     BuildReport_rptSupplierFx
+    BuildReport_rptRepPerformance
+    BuildReport_rptRepCustomers
+    BuildReport_rptRepCommissionBalance
     BuildReport_rptIntegrityCheck
     BuildReport_rptProfit
     BuildReport_rptVatSummary
@@ -1428,6 +1432,72 @@ Private Sub BuildReport_rptPayroll()
     Exit Sub
 EH:
     AbortReport "rptPayroll", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptCommissionRun()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptCommissionRun", "مسير عمولات المندوبين", "CommissionSheetQuery", 15536, "", "RepName", True, True
+    SetSection 3, 1701
+    SetSection 4, 340
+    SetSection 2, 1361
+    SetSection 0, 340
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 7768, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 7768, 28, 7768, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "مسير عمولات المندوبين", 0, 397, 15536, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 15536, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 15536, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "المندوب", 0, 1292, 2835, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "صافي المبيعات", 2835, 1292, 1701, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "التحصيل", 4536, 1292, 1701, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "الأساس", 6237, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "مبلغ الأساس", 7371, 1292, 1701, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "النسبة", 9072, 1292, 1021, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "التعديل", 10093, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol8", "العمولة", 11567, 1292, 1701, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol9", "ملاحظات", 13268, 1292, 2268, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
+    Set c = RText(2, "txtSum2", "=Sum([NetSales])", 2835, 85, 1701, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum3", "=Sum([Collections])", 4536, 85, 1701, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum7", "=Sum([Adjustment])", 10093, 85, 1474, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtSum8", "=Sum([Commission])", 11567, 85, 1701, 312, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 15536)
+    Set c = RText(2, "txtSumCaption", "=""الإجمالي""", 0, 85, 2835, 312, 9, True, 0)
+    Set c = RLabel(2, "lblSign1", "أعدّه: ....................", 0, 737, 3591, 312, 10, False, 0)
+    Set c = RLabel(2, "lblSign2", "راجعه: ....................", 3591, 737, 3591, 312, 10, False, 0)
+    Set c = RLabel(2, "lblSign3", "اعتمده: ....................", 7182, 737, 3591, 312, 10, False, 0)
+    Set c = RText(0, "txtCol1", "RepName", 0, 17, 2835, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "NetSales", 2835, 17, 1701, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol3", "Collections", 4536, 17, 1701, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol4", "BaseName", 6237, 17, 1134, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "BaseAmount", 7371, 17, 1701, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol6", "CommissionRate", 9072, 17, 1021, 284, 8, False, 2)
+    SetCtl c, "Format", "0.0%"
+    Set c = RText(0, "txtCol7", "Adjustment", 10093, 17, 1474, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol8", "Commission", 11567, 17, 1701, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol9", "Notes", 13268, 17, 2268, 284, 8, False, 0)
+    m_rpt.OnNoData = EP
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""المسير بلا أسطر.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptCommissionRun", s
+    Exit Sub
+EH:
+    AbortReport "rptCommissionRun", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptDailySales()
@@ -3356,6 +3426,164 @@ Private Sub BuildReport_rptSupplierFx()
     Exit Sub
 EH:
     AbortReport "rptSupplierFx", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptRepPerformance()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptRepPerformance", "أداء المندوبين: المبيعات والتحصيل والهدف والعمولة", "RepPerformanceQuery", 10773, "", "-NetSales", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "أداء المندوبين: المبيعات والتحصيل والهدف والعمولة", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "الكود", 0, 1292, 907, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "المندوب", 907, 1292, 2268, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "المنطقة", 3175, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "صافي المبيعات", 4422, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "التحصيل", 5783, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "الهدف", 7144, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "الإنجاز", 8391, 1292, 907, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol8", "العمولة المتوقعة", 9298, 1292, 1475, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal4", "=Sum([NetSales])", 4422, 85, 1361, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal5", "=Sum([Collections])", 5783, 85, 1361, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal6", "=Sum([Target])", 7144, 85, 1247, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal8", "=Sum([Commission])", 9298, 85, 1475, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 4422, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "RepCode", 0, 17, 907, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "RepName", 907, 17, 2268, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol3", "Region", 3175, 17, 1247, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "NetSales", 4422, 17, 1361, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol5", "Collections", 5783, 17, 1361, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol6", "Target", 7144, 17, 1247, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol7", "Achievement", 8391, 17, 907, 284, 8, False, 2)
+    SetCtl c, "Format", "0.0%"
+    Set c = RText(0, "txtCol8", "Commission", 9298, 17, 1475, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا يوجد مندوبون.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptRepPerformance", s
+    Exit Sub
+EH:
+    AbortReport "rptRepPerformance", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptRepCustomers()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptRepCustomers", "عملاء المندوبين وأرصدتهم", "RepCustomersQuery", 10773, "", "RepName,CustomerName", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "عملاء المندوبين وأرصدتهم", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "المندوب", 0, 1292, 2552, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "العميل", 2552, 1292, 3686, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "الجوال", 6238, 1292, 1701, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "الرصيد", 7939, 1292, 2834, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal4", "=Sum([Balance])", 7939, 85, 2834, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 7939, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "RepName", 0, 17, 2552, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "CustomerName", 2552, 17, 3686, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol3", "Mobile", 6238, 17, 1701, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "Balance", 7939, 17, 2834, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا يوجد عملاء مسندون لمندوبين.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptRepCustomers", s
+    Exit Sub
+EH:
+    AbortReport "rptRepCustomers", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptRepCommissionBalance()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptRepCommissionBalance", "عمولات المندوبين المستحقة", "RepCommissionBalanceQuery", 10773, "", "RepName", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "عمولات المندوبين المستحقة", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "الكود", 0, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "المندوب", 1134, 1292, 3402, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "العمولات المرحَّلة", 4536, 1292, 2041, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "المصروف", 6577, 1292, 2041, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "المستحق", 8618, 1292, 2155, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal3", "=Sum([Posted])", 4536, 85, 2041, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal4", "=Sum([Paid])", 6577, 85, 2041, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal5", "=Sum([Payable])", 8618, 85, 2155, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 4536, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "RepCode", 0, 17, 1134, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "RepName", 1134, 17, 3402, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol3", "Posted", 4536, 17, 2041, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol4", "Paid", 6577, 17, 2041, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol5", "Payable", 8618, 17, 2155, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا يوجد مندوبون.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptRepCommissionBalance", s
+    Exit Sub
+EH:
+    AbortReport "rptRepCommissionBalance", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptIntegrityCheck()

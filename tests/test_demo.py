@@ -106,6 +106,8 @@ class ReplayTests(unittest.TestCase):
                     continue                          # needs a budget, entered by the user (not demo data)
                 if rep.key == "SUPPLIER_FX":
                     continue                          # needs a document in a foreign currency (not demo data)
+                if rep.key.startswith("REP_"):
+                    continue                          # needs sales reps, entered by the user (not demo data)
                 if rep.key == "AUDIT_TRAIL":
                     continue                          # written by the screens in Access, not by the replay
                 self.assertGreater(rows, 0, rep.query)

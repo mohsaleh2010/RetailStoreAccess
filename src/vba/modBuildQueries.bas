@@ -23,11 +23,11 @@ Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
     "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerI" & _
     "nvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatR" & _
-    "eturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue," & _
-    "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayr" & _
-    "oll,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,q" & _
-    "ryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoi" & _
-    "ceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "eturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBa" & _
+    "lanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearClos" & _
+    "eLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBal" & _
+    "anceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths," & _
+    "qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -726,6 +726,15 @@ Private Sub CreateAllQueries()
     Q_qryVatReturnHead
     Q_VatReturnQuery
     Q_DashboardQuery
+    Q_qryRepDocs
+    Q_qryRepPeriodTotals
+    Q_qryRepTargetTotals
+    Q_qryRepCommissionPaid
+    Q_qryRepCommissionPosted
+    Q_RepPerformanceQuery
+    Q_RepCustomersQuery
+    Q_RepCommissionBalanceQuery
+    Q_CommissionSheetQuery
     Q_qryIndicatorLines
     Q_FinancialIndicatorsQuery
     Q_qryDashboardTopProducts
@@ -766,6 +775,8 @@ Private Sub CreateAllQueries()
     Q_qryPayrollTotals
     Q_qryPayrollCenterTotals
     Q_qryJournalPayroll
+    Q_qryCommissionCenterTotals
+    Q_qryJournalCommission
     Q_qryJournalBankTx
     Q_qryBankItemSums
     Q_qryBankItems
@@ -1666,6 +1677,102 @@ Private Sub Q_DashboardQuery()
     SaveQuery "DashboardQuery", "مؤشرات لوحة التحكم في سجل واحد (اليوم، الشهر، الأرصدة، المخزون)", s
 End Sub
 
+Private Sub Q_qryRepDocs()
+    Dim s As String
+    s = "SELECT h.SalesRepID, h.InvoiceDate AS DocDate, h.TaxableAmount AS NetSales, h.PaidAmount AS Collected" & vbCrLf
+    s = s & "FROM SalesInvoices AS h" & vbCrLf
+    s = s & "WHERE h.SalesRepID Is Not Null" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT r.SalesRepID, r.ReturnDate, -r.TaxableAmount, -r.RefundedAmount" & vbCrLf
+    s = s & "FROM SalesReturns AS r" & vbCrLf
+    s = s & "WHERE r.SalesRepID Is Not Null" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT p.SalesRepID, p.PaymentDate, CCur(0), p.Amount" & vbCrLf
+    s = s & "FROM CustomerPayments AS p" & vbCrLf
+    s = s & "WHERE p.SalesRepID Is Not Null" & vbCrLf
+    SaveQuery "qryRepDocs", "عمليات المندوبين: صافي المبيعات بدون الضريبة والتحصيل", s
+End Sub
+
+Private Sub Q_qryRepPeriodTotals()
+    Dim s As String
+    s = "SELECT SalesRepID, Sum(NetSales) AS SumSales, Sum(Collected) AS SumCollected" & vbCrLf
+    s = s & "FROM qryRepDocs" & vbCrLf
+    s = s & "WHERE DocDate >= QDate('PeriodStart') AND DocDate < QDate('PeriodEnd')" & vbCrLf
+    s = s & "GROUP BY SalesRepID" & vbCrLf
+    SaveQuery "qryRepPeriodTotals", "مبيعات وتحصيل كل مندوب في الفترة", s
+End Sub
+
+Private Sub Q_qryRepTargetTotals()
+    Dim s As String
+    s = "SELECT SalesRepID, Sum(TargetAmount) AS SumTarget" & vbCrLf
+    s = s & "FROM SalesRepTargets" & vbCrLf
+    s = s & "WHERE TargetYear * 100 + TargetMonth >= Year(QDate('PeriodStart')) * 100 + Month(QDate('PeriodStart'))" & vbCrLf
+    s = s & "  AND TargetYear * 100 + TargetMonth <= Year(DateAdd('d', -1, QDate('PeriodEnd'))) * 100" & vbCrLf
+    s = s & "                                        + Month(DateAdd('d', -1, QDate('PeriodEnd')))" & vbCrLf
+    s = s & "GROUP BY SalesRepID" & vbCrLf
+    SaveQuery "qryRepTargetTotals", "أهداف كل مندوب في أشهر الفترة", s
+End Sub
+
+Private Sub Q_qryRepCommissionPaid()
+    Dim s As String
+    s = "SELECT SalesRepID, Sum(Amount) AS SumPaid" & vbCrLf
+    s = s & "FROM CashVouchers" & vbCrLf
+    s = s & "WHERE Category = 'COMMISSION' AND SalesRepID Is Not Null" & vbCrLf
+    s = s & "GROUP BY SalesRepID" & vbCrLf
+    SaveQuery "qryRepCommissionPaid", "ما صُرف لكل مندوب من عمولاته (سندات صرف النقدية)", s
+End Sub
+
+Private Sub Q_qryRepCommissionPosted()
+    Dim s As String
+    s = "SELECT l.SalesRepID, Sum(l.Commission) AS SumPosted" & vbCrLf
+    s = s & "FROM CommissionLines AS l INNER JOIN CommissionRuns AS r ON l.CommissionRunID = r.CommissionRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED'" & vbCrLf
+    s = s & "GROUP BY l.SalesRepID" & vbCrLf
+    SaveQuery "qryRepCommissionPosted", "العمولات المرحَّلة لكل مندوب", s
+End Sub
+
+Private Sub Q_RepPerformanceQuery()
+    Dim s As String
+    s = "SELECT s.SalesRepID, s.RepCode, s.RepName, s.Region, s.IsActive, s.CommissionRate, s.CommissionBase," & vbCrLf
+    s = s & "       CCur(Nz(t.SumSales, 0)) AS NetSales, CCur(Nz(t.SumCollected, 0)) AS Collections, CCur(Nz(g.SumTarget, 0)) AS Target," & vbCrLf
+    s = s & "       IIf(CCur(Nz(g.SumTarget, 0)) = 0, Null, CCur(Nz(t.SumSales, 0)) / CCur(Nz(g.SumTarget, 0))) AS Achievement," & vbCrLf
+    s = s & "       IIf(s.CommissionBase = 'COLLECTION', CCur(Nz(t.SumCollected, 0)), CCur(Nz(t.SumSales, 0))) AS BaseAmount," & vbCrLf
+    s = s & "       IIf(IIf(s.CommissionBase = 'COLLECTION', CCur(Nz(t.SumCollected, 0)), CCur(Nz(t.SumSales, 0))) > 0," & vbCrLf
+    s = s & "           Round(IIf(s.CommissionBase = 'COLLECTION', CCur(Nz(t.SumCollected, 0)), CCur(Nz(t.SumSales, 0))) * s.CommissionRate, 2)," & vbCrLf
+    s = s & "           0) AS Commission" & vbCrLf
+    s = s & "FROM (SalesReps AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)" & vbCrLf
+    s = s & "     LEFT JOIN qryRepTargetTotals AS g ON s.SalesRepID = g.SalesRepID" & vbCrLf
+    s = s & "WHERE s.IsActive = True OR CCur(Nz(t.SumSales, 0)) <> 0 OR CCur(Nz(t.SumCollected, 0)) <> 0" & vbCrLf
+    SaveQuery "RepPerformanceQuery", "أداء المندوبين في الفترة: المبيعات والتحصيل والهدف والإنجاز والعمولة المتوقعة", s
+End Sub
+
+Private Sub Q_RepCustomersQuery()
+    Dim s As String
+    s = "SELECT s.SalesRepID, s.RepName, c.CustomerID, c.CustomerName, c.Mobile, b.Balance" & vbCrLf
+    s = s & "FROM (Customers AS c INNER JOIN SalesReps AS s ON c.SalesRepID = s.SalesRepID)" & vbCrLf
+    s = s & "     INNER JOIN CustomerBalanceQuery AS b ON c.CustomerID = b.CustomerID" & vbCrLf
+    SaveQuery "RepCustomersQuery", "عملاء كل مندوب وأرصدتهم", s
+End Sub
+
+Private Sub Q_RepCommissionBalanceQuery()
+    Dim s As String
+    s = "SELECT s.SalesRepID, s.RepCode, s.RepName, CCur(Nz(p.SumPosted, 0)) AS Posted, CCur(Nz(d.SumPaid, 0)) AS Paid," & vbCrLf
+    s = s & "       CCur(Nz(p.SumPosted, 0)) - CCur(Nz(d.SumPaid, 0)) AS Payable" & vbCrLf
+    s = s & "FROM (SalesReps AS s LEFT JOIN qryRepCommissionPosted AS p ON s.SalesRepID = p.SalesRepID)" & vbCrLf
+    s = s & "     LEFT JOIN qryRepCommissionPaid AS d ON s.SalesRepID = d.SalesRepID" & vbCrLf
+    SaveQuery "RepCommissionBalanceQuery", "العمولات المستحقة لكل مندوب: المرحَّل والمصروف والباقي", s
+End Sub
+
+Private Sub Q_CommissionSheetQuery()
+    Dim s As String
+    s = "SELECT r.CommissionRunID, r.RunNumber, r.RunMonth, r.Status, l.SalesRepID, l.RepName, l.NetSales, l.Collections," & vbCrLf
+    s = s & "       IIf(l.CommissionBase = 'COLLECTION', 'التحصيل', 'المبيعات') AS BaseName, l.BaseAmount, l.CommissionRate," & vbCrLf
+    s = s & "       l.Adjustment, l.Commission, l.Notes" & vbCrLf
+    s = s & "FROM CommissionRuns AS r INNER JOIN CommissionLines AS l ON r.CommissionRunID = l.CommissionRunID" & vbCrLf
+    s = s & "WHERE r.CommissionRunID = QLong('CommissionRunID')" & vbCrLf
+    SaveQuery "CommissionSheetQuery", "مسير العمولات المختار بأسطر المندوبين", s
+End Sub
+
 Private Sub Q_qryIndicatorLines()
     Dim s As String
     s = "SELECT l.AccountCode, a.Level2Code, e.EntryDate, e.SourceType, l.Debit, l.Credit" & vbCrLf
@@ -2162,7 +2269,7 @@ Private Sub Q_qryJournalCashVoucher()
     s = s & "FROM CashVouchers AS v" & vbCrLf
     s = s & "WHERE v.VoucherType = 'IN'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', 5400, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, 5900)))) AS AccountCode, v.Amount - CCur(Nz(x.Tax, 0)) AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', 5400, IIf(v.Category = 'COMMISSION', 2330, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID Is Not Null, 530000 + x.ExpenseTypeID, 5900))))) AS AccountCode, v.Amount - CCur(Nz(x.Tax, 0)) AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter" & vbCrLf
     s = s & "FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID" & vbCrLf
     s = s & "WHERE v.VoucherType = 'OUT'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
@@ -2474,6 +2581,26 @@ Private Sub Q_qryJournalPayroll()
     s = s & "FROM PayrollRuns AS r" & vbCrLf
     s = s & "WHERE r.Status = 'POSTED' AND r.PaidAmount <> 0" & vbCrLf
     SaveQuery "qryJournalPayroll", "أسطر قيود مسيرات الرواتب المرحَّلة وصرفها", s
+End Sub
+
+Private Sub Q_qryCommissionCenterTotals()
+    Dim s As String
+    s = "SELECT CommissionRunID, IIf(CostCenterID Is Null, 0, CostCenterID) AS CenterKey, Sum(Commission) AS SumCommission" & vbCrLf
+    s = s & "FROM CommissionLines" & vbCrLf
+    s = s & "GROUP BY CommissionRunID, IIf(CostCenterID Is Null, 0, CostCenterID)" & vbCrLf
+    SaveQuery "qryCommissionCenterTotals", "عمولات كل مسير لكل مركز تكلفة لقيده", s
+End Sub
+
+Private Sub Q_qryJournalCommission()
+    Dim s As String
+    s = "SELECT 'COMMISSION' AS SourceType, r.CommissionRunID AS SourceID, r.RunNumber AS SourceNumber, r.RunMonth AS SourceDate, 'عمولات المندوبين' AS Party, 1 + 10 * t.CenterKey AS LineOrder, 5530 AS AccountCode, t.SumCommission AS Debit, CCur(0) AS Credit, 'عمولات المندوبين' AS LineText, t.CenterKey AS CostCenter" & vbCrLf
+    s = s & "FROM CommissionRuns AS r INNER JOIN qryCommissionCenterTotals AS t ON r.CommissionRunID = t.CommissionRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumCommission <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'COMMISSION' AS SourceType, r.CommissionRunID AS SourceID, r.RunNumber AS SourceNumber, r.RunMonth AS SourceDate, 'عمولات المندوبين' AS Party, 2 + 10 * t.CenterKey AS LineOrder, 2330 AS AccountCode, CCur(0) AS Debit, t.SumCommission AS Credit, 'عمولات مستحقة' AS LineText, t.CenterKey AS CostCenter" & vbCrLf
+    s = s & "FROM CommissionRuns AS r INNER JOIN qryCommissionCenterTotals AS t ON r.CommissionRunID = t.CommissionRunID" & vbCrLf
+    s = s & "WHERE r.Status = 'POSTED' AND t.SumCommission <> 0" & vbCrLf
+    SaveQuery "qryJournalCommission", "أسطر قيود مسيرات العمولات المرحَّلة", s
 End Sub
 
 Private Sub Q_qryJournalBankTx()

@@ -19,7 +19,7 @@ Option Explicit
 
 Private Const SOURCE_QUERIES As String = "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase," & _
     "qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock," & _
-    "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn,qryJournalBankTx,qryJournalCheque,qryJournalAsset,qryJournalDepreciation,qryJournalPayroll"
+    "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn,qryJournalBankTx,qryJournalCheque,qryJournalAsset,qryJournalDepreciation,qryJournalPayroll,qryJournalCommission"
 
 '==============================================================================
 ' Accounts and synchronisation
@@ -236,6 +236,7 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "DEPRECIATION":     OpenScreen "frmDepreciation", 0
         Case "PAYROLL":          OpenScreen "frmPayroll"
         Case "PAYROLL_PAYMENT":  OpenScreen "frmPayroll"
+        Case "COMMISSION":       OpenScreen "frmCommissions", 0, id
         Case "CHEQUE":           OpenScreen "frmCheques", 0, Nz(DbValue("SELECT Direction FROM Cheques WHERE ChequeID = " & id), "IN")
         Case "CHEQUE_STATUS":    OpenScreen "frmCheques", 0, Nz(DbValue("SELECT Direction FROM Cheques WHERE ChequeID = " & id), "IN")
         Case "BANK_TX":          OpenScreen "frmBankTx", 0, DbValue("SELECT BankID FROM BankTransactions WHERE BankTxID = " & id)

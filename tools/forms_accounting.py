@@ -25,6 +25,8 @@ HUB_TILES = [
     ("Budget", "الموازنة", "الموازنة مقابل الفعلي", "frmBudget", "", "reports", (121, 85, 72)),
     ("Recurring", "المصروفات المتكررة", "الإيجار والكهرباء والاشتراكات", "frmRecurring", "", "expenses", (198, 40, 40)),
     ("Currencies", "العملات", "العملات وأسعار التحويل", "frmCurrencies", "", "treasury", (46, 125, 50)),
+    ("SalesReps", "المندوبين", "العملاء والأهداف والعمولات", "frmSalesReps", "", "customers", (0, 105, 92)),
+    ("Commissions", "عمولات المندوبين", "مسير العمولات الشهري", "frmCommissions", ", 0", "customers", (106, 27, 154)),
     ("Audit", "سجل التدقيق", "من أضاف أو عدّل أو حذف", "frmAuditLog", ", 0", "users", (69, 90, 100)),
 ]
 

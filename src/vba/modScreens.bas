@@ -148,6 +148,7 @@ Public Sub ReportCenterLoad(ByVal frm As Access.Form)
     frm!lstReports.RowSource = rows
     frm!txtFrom.Value = DateSerial(Year(Date), Month(Date), 1)
     frm!txtTo.Value = Date
+    If Not IsNull(frm.OpenArgs) Then frm!lstReports.Value = CStr(frm.OpenArgs)     ' a report chosen by the caller
     ReportSelected frm
 End Sub
 

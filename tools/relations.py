@@ -57,6 +57,7 @@ UNENFORCED = {
     ("PeriodClosings", "EmployeeID"),
     ("FiscalYearClosings", "EmployeeID"),
     ("VatReturns", "EmployeeID"),
+    ("CommissionRuns", "EmployeeID"),
 }
 
 ACCESS_MAX_INDEXES = 32

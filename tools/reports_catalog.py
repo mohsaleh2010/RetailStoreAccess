@@ -263,6 +263,21 @@ LIST_SPECS: List[ListSpec] = [
         Col("آخر معامل", "LastRate", 2.0, "0.0000"), Col("بآخر سعر (ريال)", "RevaluedBalance", 2.8, MONEY, True),
         Col("فرق العملة", "FxDifference", 2.6, MONEY, True)],
         [("CurrencyCode", False), ("SupplierName", False)], no_data="لا توجد أرصدة موردين بعملات أجنبية."),
+    ListSpec("REP_PERFORMANCE", [
+        Col("الكود", "RepCode", 1.6), Col("المندوب", "RepName", 4.0, grow=True), Col("المنطقة", "Region", 2.2),
+        Col("صافي المبيعات", "NetSales", 2.4, MONEY, True), Col("التحصيل", "Collections", 2.4, MONEY, True),
+        Col("الهدف", "Target", 2.2, MONEY, True), Col("الإنجاز", "Achievement", 1.6, PCT),
+        Col("العمولة المتوقعة", "Commission", 2.6, MONEY, True)],
+        [("NetSales", True)], no_data="لا يوجد مندوبون."),
+    ListSpec("REP_CUSTOMERS", [
+        Col("المندوب", "RepName", 4.5), Col("العميل", "CustomerName", 6.5, grow=True), Col("الجوال", "Mobile", 3.0),
+        Col("الرصيد", "Balance", 5.0, MONEY, True)],
+        [("RepName", False), ("CustomerName", False)], no_data="لا يوجد عملاء مسندون لمندوبين."),
+    ListSpec("REP_COMMISSION_BALANCE", [
+        Col("الكود", "RepCode", 2.0), Col("المندوب", "RepName", 6.0, grow=True),
+        Col("العمولات المرحَّلة", "Posted", 3.6, MONEY, True), Col("المصروف", "Paid", 3.6, MONEY, True),
+        Col("المستحق", "Payable", 3.8, MONEY, True)],
+        [("RepName", False)], no_data="لا يوجد مندوبون."),
     ListSpec("INTEGRITY", [
         Col("الرمز", "IssueCode", 3.4), Col("المشكلة", "IssueText", 6.8, grow=True),
         Col("الجدول", "SourceTable", 3.0), Col("السجل", "RecordID", 1.6, INT),

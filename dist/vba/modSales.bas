@@ -363,6 +363,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), paid)      ' modCash
     rs!BankID = BankFor(PaymentMethodID, paid)                                 ' modBank
     rs!CostCenterID = CostCenterFor()                                          ' modCostCenters
+    rs!SalesRepID = SalesRepFor(CustomerID)                                    ' modSalesReps
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     If Len(OrderType) > 0 Then rs!OrderType = OrderType
     If Len(Trim$(TableNo)) > 0 Then rs!TableNo = Left$(Trim$(TableNo), 10)
@@ -505,6 +506,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     rs!ReturnDate = retDate
     rs!SalesInvoiceID = SalesInvoiceID
     rs!CostCenterID = DbValue("SELECT CostCenterID FROM SalesInvoices WHERE SalesInvoiceID = " & SalesInvoiceID)
+    rs!SalesRepID = DbValue("SELECT SalesRepID FROM SalesInvoices WHERE SalesInvoiceID = " & SalesInvoiceID)   ' modSalesReps
     rs!CustomerID = customerID
     rs!EmployeeID = CurrentUserID()
     rs!Reason = Left$(Reason, 255)
@@ -614,6 +616,7 @@ Public Function PostCustomerPayment(ByVal CustomerID As Long, ByVal Amount As Cu
     rs!CurrencyCode = CurrencyCode
     rs!ExchangeRate = FxRate
     rs!ForeignAmount = foreign
+    rs!SalesRepID = SalesRepFor(CustomerID)                                    ' the collector (modSalesReps)
     rs!PaymentMethodID = PaymentMethodID
     rs!CashBoxID = CashBoxFor(PaymentMethodID, Amount)
     rs!BankID = BankFor(PaymentMethodID, Amount)

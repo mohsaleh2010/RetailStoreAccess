@@ -28,7 +28,9 @@ Private Const VOUCHER_TYPES As String = "IN;سند قبض نقدية;OUT;سند 
 Private Const IN_CATEGORIES As String = "OTHER;قبض نقدية (إيرادات أخرى);OWNER;إيداع من المالك;" & _
                                         "ADVANCE;سداد سلفة موظف"
 Private Const OUT_CATEGORIES As String = "EXPENSE;مصروف (يُسجل في المصروفات);OWNER;تسوية / مسحوبات المالك;" & _
-                                         "ADVANCE;سلفة موظف;OTHER;صرف آخر"
+                                         "ADVANCE;سلفة موظف;COMMISSION;صرف عمولة مندوب;OTHER;صرف آخر"
+Private Const EMPLOYEE_ROWS As String = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
+Private Const REP_ROWS As String = "SELECT SalesRepID, RepName FROM SalesReps WHERE IsActive = True ORDER BY RepName"
 Private Const DESTINATIONS As String = "MAIN;ترحيل إلى الخزينة الرئيسية;OWNER;تسليم للمالك (تسوية);" & _
                                        "KEEP;يبقى في الصندوق"
 
@@ -486,8 +488,25 @@ Public Sub VoucherCategoryChanged(ByVal frm As Access.Form)
     frm!cboExpenseType.Visible = isExpense
     frm!lblExpenseType.Visible = isExpense
     frm!btnNewExpenseType.Visible = isExpense
-    ' an employee advance (or its payback): the employee (modPayroll)
-    frm!cboEmployee.Visible = (Nz(frm!cboCategory.Value, "") = "ADVANCE")
+    ' an employee advance (or its payback): the employee (modPayroll); a commission: the sales rep (modSalesReps)
+    Select Case Nz(frm!cboCategory.Value, "")
+        Case "ADVANCE"
+            If frm!cboEmployee.RowSource <> EMPLOYEE_ROWS Then
+                frm!cboEmployee.RowSource = EMPLOYEE_ROWS
+                frm!cboEmployee.Value = Null
+            End If
+            frm!lblEmployee.Caption = "الموظف صاحب السلفة *"
+            frm!cboEmployee.Visible = True
+        Case "COMMISSION"
+            If frm!cboEmployee.RowSource <> REP_ROWS Then
+                frm!cboEmployee.RowSource = REP_ROWS
+                frm!cboEmployee.Value = Null
+            End If
+            frm!lblEmployee.Caption = "المندوب *"
+            frm!cboEmployee.Visible = True
+        Case Else
+            frm!cboEmployee.Visible = False
+    End Select
     frm!lblEmployee.Visible = frm!cboEmployee.Visible
 End Sub
 
@@ -516,6 +535,9 @@ Public Function SaveCashVoucher(ByVal frm As Access.Form, Optional ByVal PrintAf
     If Not CanScreenAction(frm.Name, "ADD") Then Exit Function      ' frmUserScreens
     kind = Nz(frm!cboVoucherType.Value, "")
     msg = AdvanceEmployeeProblem(kind, Nz(frm!cboCategory.Value, ""), frm!cboEmployee.Value, Nz(frm!txtAmount.Value, 0))
+    If Len(msg) = 0 Then
+        msg = CommissionVoucherProblem(kind, Nz(frm!cboCategory.Value, ""), frm!cboEmployee.Value, Nz(frm!txtAmount.Value, 0))
+    End If
     If Len(msg) > 0 Then
         ShowWarning msg
         Exit Function
@@ -530,6 +552,9 @@ Public Function SaveCashVoucher(ByVal frm As Access.Form, Optional ByVal PrintAf
     If Nz(frm!cboCategory.Value, "") = "ADVANCE" Then
         CurrentDb.Execute "UPDATE CashVouchers SET AdvanceEmployeeID = " & CLng(frm!cboEmployee.Value) & _
                           " WHERE CashVoucherID = " & newID, dbFailOnError
+    ElseIf Nz(frm!cboCategory.Value, "") = "COMMISSION" Then
+        CurrentDb.Execute "UPDATE CashVouchers SET SalesRepID = " & CLng(frm!cboEmployee.Value) & _
+                          " WHERE CashVoucherID = " & newID, dbFailOnError                  ' modSalesReps
     End If
     ShowInfo "تم حفظ " & DLookupList(VOUCHER_TYPES, kind) & " رقم " & _
              DLookup("VoucherNumber", "CashVouchers", "CashVoucherID = " & newID)

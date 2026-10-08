@@ -59,7 +59,7 @@ Public Function SearchColumnWidths(ByVal Kind As String) As String
 End Function
 
 Public Function ReportCount() As Long
-    ReportCount = 39
+    ReportCount = 42
 End Function
 
 Public Function ScreenPermission(ByVal FormName As String) As String
@@ -122,6 +122,9 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmAuditLog": ScreenPermission = "AUDIT_LOG"
         Case "frmCurrencies": ScreenPermission = "CURRENCIES"
         Case "frmCurrencyRates": ScreenPermission = "CURRENCIES"
+        Case "frmSalesReps": ScreenPermission = "SALES_REPS"
+        Case "frmRepTargets": ScreenPermission = "SALES_REPS"
+        Case "frmCommissions": ScreenPermission = "SALES_REPS"
     End Select
 End Function
 
@@ -166,6 +169,9 @@ Public Function ReportRow(ByVal Index As Long) As Variant
         Case 36: ReportRow = Array("CUSTOMER_BALANCES", "√—’œ… «·⁄„·«¡", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
         Case 37: ReportRow = Array("SUPPLIER_BALANCES", "√—’œ… «·„Ê—œÌ‰", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
         Case 38: ReportRow = Array("SUPPLIER_FX", "√—’œ… «·„Ê—œÌ‰ »«·⁄„·«  Ê›—Êﬁ «·⁄„·…", "SupplierFxBalanceQuery", "rptSupplierFx", "", "")
-        Case 39: ReportRow = Array("INTEGRITY", "›Õ’ ”·«„… «·»Ì«‰« ", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
+        Case 39: ReportRow = Array("REP_PERFORMANCE", "√œ«¡ «·„‰œÊ»Ì‰: «·„»Ì⁄«  Ê«· Õ’Ì· Ê«·Âœ› Ê«·⁄„Ê·…", "RepPerformanceQuery", "rptRepPerformance", "P", "")
+        Case 40: ReportRow = Array("REP_CUSTOMERS", "⁄„·«¡ «·„‰œÊ»Ì‰ Ê√—’œ Â„", "RepCustomersQuery", "rptRepCustomers", "", "")
+        Case 41: ReportRow = Array("REP_COMMISSION_BALANCE", "⁄„Ê·«  «·„‰œÊ»Ì‰ «·„” Õﬁ…", "RepCommissionBalanceQuery", "rptRepCommissionBalance", "", "")
+        Case 42: ReportRow = Array("INTEGRITY", "›Õ’ ”·«„… «·»Ì«‰« ", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
     End Select
 End Function
