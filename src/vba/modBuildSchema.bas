@@ -28,11 +28,11 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
-    "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+    "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=41;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=41;SalesInvoiceDetails=14;SalesReturns=34;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
     "CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=8;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;" & _
-    "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=36;RolePermissions=71;Employees=1;Screens=59;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
+    "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=37;RolePermissions=73;Employees=1;Screens=60;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -659,6 +659,7 @@ Private Sub CreateAllTables()
     CreateTable_AuditLog
     CreateTable_AuditChanges
     CreateTable_LabelSettings
+    CreateTable_EInvoiceLog
 End Sub
 
 Private Sub CreateTable_Settings()
@@ -705,7 +706,7 @@ Private Sub CreateTable_Settings()
     AddField tdf, "ZatcaPhase", "BYTE", 0, True, "1", _
              "In (1,2)", "المرحلة 1 أو 2", "مرحلة فاتورة", ""
     AddField tdf, "ZatcaEnvironment", "TEXT", 20, False, "", _
-             "", "", "بيئة الربط مع الهيئة", ""
+             "", "", "بيئة الربط مع الهيئة", "غير مستخدم: EInvoiceEnvironment"
     AddField tdf, "LastInvoiceHash", "TEXT", 255, False, "", _
              "", "", "بصمة آخر مستند", "تبدأ بالقيمة الافتراضية التي تحددها الهيئة لأول فاتورة"
     AddField tdf, "BackupFolder", "TEXT", 255, False, "", _
@@ -742,6 +743,10 @@ Private Sub CreateTable_Settings()
              ">=0", "المبلغ لا يمكن أن يكون سالبًا", "التأمينات: الحد الأعلى للأجر الخاضع", ""
     AddField tdf, "CreditBlockDays", "INT", 0, False, "0", _
              ">=0", "عدد الأيام لا يكون سالبًا", "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم)", ""
+    AddField tdf, "EInvoiceEnabled", "BOOL", 0, False, "False", _
+             "", "", "تفعيل الفاتورة الإلكترونية", ""
+    AddField tdf, "EInvoiceEnvironment", "TEXT", 12, True, """TEST""", _
+             "In (""TEST"",""SIMULATION"",""PRODUCTION"")", "TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية", "بيئة الفاتورة الإلكترونية", "السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45)"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
     EndTable tdf, "إعدادات المحل: سجل واحد فقط يحتوي بيانات المحل الضريبية وإعدادات التشغيل.", "", ""
 End Sub
@@ -1289,13 +1294,17 @@ Private Sub CreateTable_SalesInvoices()
     AddField tdf, "QRCodeData", "MEMO", 0, False, "", _
              "", "", "بيانات رمز QR", ""
     AddField tdf, "ZatcaStatus", "TEXT", 20, True, """NOT_SENT""", _
-             "In (""NOT_SENT"",""PENDING"",""REPORTED"",""CLEARED"",""WARNING"",""REJECTED"")", "حالة غير معروفة", "حالة الإرسال للهيئة", ""
+             "In (""NOT_SENT"",""PENDING"",""REPORTED"",""CLEARED"",""WARNING"",""REJECTED"",""SUBMITTED"",""VALID"",""INVALID"",""CANCELLED"")", "حالة غير معروفة", "حالة الفاتورة الإلكترونية", "السعودية: REPORTED / CLEARED، مصر: SUBMITTED / VALID / INVALID (docs/45)"
     AddField tdf, "ZatcaSubmittedAt", "DATETIME", 0, False, "", _
              "", "", "تاريخ الإرسال للهيئة", ""
     AddField tdf, "ZatcaResponse", "MEMO", 0, False, "", _
              "", "", "رد الهيئة", ""
     AddField tdf, "SignedXmlPath", "TEXT", 255, False, "", _
              "", "", "مسار ملف XML الموقّع", ""
+    AddField tdf, "EInvoiceAttempts", "INT", 0, False, "0", _
+             "", "", "محاولات الإرسال", ""
+    AddField tdf, "EInvoiceError", "TEXT", 255, False, "", _
+             "", "", "آخر خطأ في الإرسال", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
     AddField tdf, "OrderType", "TEXT", 10, False, "", _
@@ -1410,13 +1419,17 @@ Private Sub CreateTable_SalesReturns()
     AddField tdf, "QRCodeData", "MEMO", 0, False, "", _
              "", "", "بيانات رمز QR", ""
     AddField tdf, "ZatcaStatus", "TEXT", 20, True, """NOT_SENT""", _
-             "In (""NOT_SENT"",""PENDING"",""REPORTED"",""CLEARED"",""WARNING"",""REJECTED"")", "حالة غير معروفة", "حالة الإرسال للهيئة", ""
+             "In (""NOT_SENT"",""PENDING"",""REPORTED"",""CLEARED"",""WARNING"",""REJECTED"",""SUBMITTED"",""VALID"",""INVALID"",""CANCELLED"")", "حالة غير معروفة", "حالة الفاتورة الإلكترونية", "السعودية: REPORTED / CLEARED، مصر: SUBMITTED / VALID / INVALID (docs/45)"
     AddField tdf, "ZatcaSubmittedAt", "DATETIME", 0, False, "", _
              "", "", "تاريخ الإرسال للهيئة", ""
     AddField tdf, "ZatcaResponse", "MEMO", 0, False, "", _
              "", "", "رد الهيئة", ""
     AddField tdf, "SignedXmlPath", "TEXT", 255, False, "", _
              "", "", "مسار ملف XML الموقّع", ""
+    AddField tdf, "EInvoiceAttempts", "INT", 0, False, "0", _
+             "", "", "محاولات الإرسال", ""
+    AddField tdf, "EInvoiceError", "TEXT", 255, False, "", _
+             "", "", "آخر خطأ في الإرسال", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
@@ -3025,6 +3038,45 @@ Private Sub CreateTable_LabelSettings()
     EndTable tdf, "إعدادات ملصقات الباركود: سجل واحد: مقاس الملصق والورق والهوامش، وحجم الباركود، والنصوص أعلاه وأسفله.", "", ""
 End Sub
 
+Private Sub CreateTable_EInvoiceLog()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "EInvoiceLog") Then Exit Sub
+    AddField tdf, "LogID", "AUTO", 0, False, "", _
+             "", "", "رقم السجل", ""
+    AddField tdf, "LoggedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "الوقت", ""
+    AddField tdf, "Country", "TEXT", 2, True, "", _
+             "", "", "الدولة", ""
+    AddField tdf, "DocKind", "TEXT", 10, False, "", _
+             "", "", "نوع المستند", "SALE أو RETURN، فارغ لطلبات الجهاز"
+    AddField tdf, "DocID", "LONG", 0, False, "", _
+             "", "", "رقم المستند الداخلي", ""
+    AddField tdf, "DocNumber", "TEXT", 30, False, "", _
+             "", "", "رقم المستند", ""
+    AddField tdf, "Action", "TEXT", 20, True, "", _
+             "", "", "العملية", "SEND، STATUS، TOKEN، ONBOARD..."
+    AddField tdf, "Endpoint", "TEXT", 255, False, "", _
+             "", "", "العنوان", ""
+    AddField tdf, "HttpStatus", "INT", 0, False, "0", _
+             "", "", "رمز الرد", ""
+    AddField tdf, "Result", "TEXT", 12, True, "", _
+             "In (""OK"",""WARNING"",""REJECTED"",""ERROR"",""NETWORK"")", "نتيجة غير معروفة", "النتيجة", ""
+    AddField tdf, "Message", "TEXT", 255, False, "", _
+             "", "", "الرسالة", ""
+    AddField tdf, "RequestBody", "MEMO", 0, False, "", _
+             "", "", "الطلب", ""
+    AddField tdf, "ResponseBody", "MEMO", 0, False, "", _
+             "", "", "الرد", ""
+    AddField tdf, "DurationMs", "LONG", 0, False, "0", _
+             "", "", "المدة (مللي ثانية)", ""
+    AddField tdf, "EmployeeID", "LONG", 0, False, "", _
+             "", "", "الموظف", "بدون علاقة: Employees قريب من حد الفهارس"
+    AddIndex tdf, "PrimaryKey", "LogID", True, True, False
+    AddIndex tdf, "IX_LoggedAt", "LoggedAt", False, False, False
+    AddIndex tdf, "IX_DocKind_DocID", "DocKind,DocID", False, False, False
+    EndTable tdf, "سجل الفاتورة الإلكترونية: كل طلب للمنظومة الإلكترونية (هيئة الزكاة والضريبة والجمارك أو مصلحة الضرائب المصرية) ورده: الإرسال والاستعلام وتسجيل الجهاز.", "", ""
+End Sub
+
 '------------------------------------------------------------------------------
 ' Generated: lookup / initial data
 '------------------------------------------------------------------------------
@@ -3132,7 +3184,8 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', 'المستخدمون والصلاحيات', 'النظام', 81)") Then GrantNewPermission "USERS", "1"
     If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', 'النسخ الاحتياطي', 'النظام', 82)") Then GrantNewPermission "BACKUP", "1"
     If SeedRow("[PermissionKey] = 'AUDIT_LOG'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('AUDIT_LOG', 'سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد', 'النظام', 83)") Then GrantNewPermission "AUDIT_LOG", "1"
-    EndSeed "Permissions", 36
+    If SeedRow("[PermissionKey] = 'EINVOICE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EINVOICE', 'الفاتورة الإلكترونية: المتابعة وإعادة الإرسال', 'المبيعات', 16)") Then GrantNewPermission "EINVOICE", "1,2"
+    EndSeed "Permissions", 37
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -3173,6 +3226,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'USERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'BACKUP')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'AUDIT_LOG')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'EINVOICE')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'SALES_POS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'SALES_VIEW')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'SALES_RETURN')"
@@ -3203,12 +3257,13 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REPORTS_PROFIT')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'DASHBOARD_FINANCIAL')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'EINVOICE')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'SALES_POS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'SALES_VIEW')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 71
+    EndSeed "RolePermissions", 73
 End Sub
 
 Private Sub Seed_Employees()
@@ -3278,7 +3333,8 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmAuditLog'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAuditLog', 'سجل التدقيق', 'النظام', 570, 'AUDIT_LOG', False, False, False)"
     SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 580, 'BACKUP', False, False, False)"
     SeedRow "[ScreenName] = 'frmEnglishNames'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEnglishNames', 'الأسماء الإنجليزية', 'النظام', 590, 'SETTINGS', False, True, False)"
-    EndSeed "Screens", 59
+    SeedRow "[ScreenName] = 'frmEInvoices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEInvoices', 'الفاتورة الإلكترونية', 'المبيعات', 600, 'EINVOICE', False, True, False)"
+    EndSeed "Screens", 60
 End Sub
 
 Private Sub Seed_Categories()
@@ -3738,6 +3794,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Users and permissions' WHERE [PermissionKey] = 'USERS' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Backup' WHERE [PermissionKey] = 'BACKUP' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Audit trail: who added, edited or deleted, with the values before and after' WHERE [PermissionKey] = 'AUDIT_LOG' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'E-invoicing: follow-up and resending' WHERE [PermissionKey] = 'EINVOICE' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Sales' WHERE [ModuleName] = 'المبيعات' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Customers' WHERE [ModuleName] = 'العملاء' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Purchases' WHERE [ModuleName] = 'المشتريات' AND [ModuleNameEn] Is Null", dbFailOnError
@@ -3807,6 +3864,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Audit trail' WHERE [ScreenName] = 'frmAuditLog' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Backup' WHERE [ScreenName] = 'frmBackup' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'English names' WHERE [ScreenName] = 'frmEnglishNames' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'E-invoicing' WHERE [ScreenName] = 'frmEInvoices' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Sales' WHERE [ModuleName] = 'المبيعات' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Customers' WHERE [ModuleName] = 'العملاء' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Purchases' WHERE [ModuleName] = 'المشتريات' AND [ModuleNameEn] Is Null", dbFailOnError
@@ -3845,4 +3903,6 @@ Private Sub UpgradeFieldRules()
     SetFieldRule "Settings", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)"
     SetFieldRule "Customers", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)"
     SetFieldRule "Suppliers", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)"
+    SetFieldRule "SalesInvoices", "ZatcaStatus", "In (""NOT_SENT"",""PENDING"",""REPORTED"",""CLEARED"",""WARNING"",""REJECTED"",""SUBMITTED"",""VALID"",""INVALID"",""CANCELLED"")", "حالة غير معروفة"
+    SetFieldRule "SalesReturns", "ZatcaStatus", "In (""NOT_SENT"",""PENDING"",""REPORTED"",""CLEARED"",""WARNING"",""REJECTED"",""SUBMITTED"",""VALID"",""INVALID"",""CANCELLED"")", "حالة غير معروفة"
 End Sub

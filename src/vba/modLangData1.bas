@@ -98,6 +98,7 @@ Private Sub D1_1()
     LangAdd "معامل كل عملة في تاريخ؛ المستند يأخذ آخر سعر في تاريخه أو قبله", "The rate of each currency on a date, a document takes the last rate on or before its date"
     LangAdd "يُفضَّل الجرد والمحل مغلق أو بعد آخر فاتورة، ثم الترحيل مباشرة", "Count preferably while the store is closed or after the last invoice, then post at once"
     LangAdd "الرصيد لا يُكتب يدويًا: يُحسب من المبيعات والسندات والمصروفات", "The balance is not typed by hand: it is calculated from sales, vouchers and expenses"
+    LangAdd "تغيير إعدادات الفاتورة الإلكترونية يحتاج صلاحية إعدادات المحل", "Changing the e-invoicing settings needs the store settings permission"
     LangAdd "تُحذف المسودة فقط. لإقرار معتمد استخدم «إلغاء الاعتماد» أولًا", "Only the draft is deleted. For an approved return use Cancel approval first"
     LangAdd "غير موجودة على هذا الجهاز. اخترها من جديد في إعدادات الملصقات", "does not exist on this computer. Choose it again in the label settings"
     LangAdd "لا تملك صلاحية تعديل أسعار البيع. امسح عمود «سعر البيع الجديد", "You do not have the permission to change sale prices. Clear the column New sale price"
@@ -111,6 +112,7 @@ Private Sub D1_1()
     LangAdd "التحويل البنكي يُخصم من هذا البنك (البنك الافتراضي تلقائيًا", "A bank transfer is taken from this bank (the default bank automatically"
     LangAdd "المصروف النقدي يُخصم من هذا الصندوق (يُختار صندوقك تلقائيًا", "A cash expense is taken from this box (your box is chosen automatically"
     LangAdd "تأكد أن البرنامج مغلق على كل الأجهزة الأخرى ثم أعد المحاولة", "Make sure the program is closed on all other computers, then try again"
+    LangAdd "حالة إرسال فواتير البيع والمرتجعات للمنظومة، وإعادة الإرسال", "Sending status of sales invoices and returns, and resending"
     LangAdd "حساب رئيسي أو معطّل: القيود على الحسابات الفرعية النشطة فقط", "A main or inactive account: entries go to active sub-accounts only"
     LangAdd "صورة الزر في شاشة اللمس: مسار كامل أو اسم ملف في مجلد الصور", "Button picture on the touch screen: a full path or a file name in the pictures folder"
     LangAdd "قائمة الدخل والميزانية العمومية من القيود، مع فترة المقارنة", "Income statement and balance sheet from the entries, with a comparison period"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "اكتب سبب الحركة في الملاحظات (مثال: تالف، هدية من المورد", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
     LangAdd "المبلغ المدفوع (F8) - اتركه فارغًا إذا دفع المبلغ بالضبط", "Amount paid (F8) - leave it empty if the exact amount is paid"
     LangAdd "المتبقي من كل فاتورة آجلة حسب تأخيرها عن تاريخ الاستحقاق", "The remainder of each credit invoice by its delay after the due date"
-    LangAdd "دور مدير النظام يملك كل الصلاحيات دائمًا ولا يمكن تقييده", "The system administrator role always has all the permissions and cannot be restricted"
-    LangAdd "على الأصل قيود إهلاك: لا تتغير بياناته المالية ولا يُحذف", "The asset has depreciation entries: its financial data do not change and it is not deleted"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "دور مدير النظام يملك كل الصلاحيات دائمًا ولا يمكن تقييده", "The system administrator role always has all the permissions and cannot be restricted"
+    LangAdd "على الأصل قيود إهلاك: لا تتغير بياناته المالية ولا يُحذف", "The asset has depreciation entries: its financial data do not change and it is not deleted"
     LangAdd "لا يتغير رقم حساب محفوظ. أنشئ حسابًا جديدًا وعطّل القديم", "A saved account number does not change. Create a new account and deactivate the old one"
     LangAdd "لكل عملة سعر واحد في اليوم؛ عملة البرنامج لا تحتاج سعرًا", "Each currency has one rate a day, the program currency needs no rate"
     LangAdd "لم تُعيَّن كلمة مرور بعد، ولا يستطيع هذا المستخدم الدخول", "No password is set yet, and this user cannot log in"
@@ -240,6 +242,8 @@ Private Sub D1_2()
     LangAdd "للعمل في الدولة الأخرى ابدأ ملف بيانات جديدًا", "To work in the other country start a new data file"
     LangAdd "أدخل تاريخ اعتماد الإقرار (يوم تقديمه للهيئة", "Enter the approval date of the return (the day it is filed with the Authority"
     LangAdd "أضف صنفًا واحدًا على الأقل إلى قائمة الطباعة", "Add at least one item to the print list"
+    LangAdd "الفاتورة الإلكترونية غير مفعّلة في الإعدادات", "E-invoicing is not enabled in the settings"
+    LangAdd "تحتاج متابعة (بانتظار الإرسال، مرفوضة، تحذير", "Need follow-up (waiting, rejected, warning"
     LangAdd "عمليات الدفاتر غير المطابقة (حتى تاريخ الكشف", "Book transactions not matched (up to the statement date"
     LangAdd "كلمة المرور لا يجوز أن تكون نفس اسم المستخدم", "The password may not be the same as the user name"
     LangAdd "لا مبيعات ولا تحصيلات للمندوبين في هذا الشهر", "No sales and no collections by the sales reps in this month"
@@ -253,20 +257,22 @@ Private Sub D1_2()
     LangAdd "تنبيه: سعر البيع الجديد أقل من تكلفة الشراء", "Warning: the new sale price is below the purchase cost"
     LangAdd "سبب الإرجاع مطلوب (إلزامي في الإشعار الدائن", "The return reason is required (mandatory on the credit note"
     LangAdd "عمليات غير متوازنة لم يُنشأ لها قيد (راجعها", "Unbalanced transactions with no entry created (review them"
+End Sub
+
+Private Sub D1_3()
     LangAdd "عميل المرتجع يختلف عن عميل الفاتورة الأصلية", "The customer of the return differs from the customer of the original invoice"
     LangAdd "مقفلة: صافي الربح المرحَّل للأرباح المحتجزة", "Closed: net profit carried to retained earnings"
     LangAdd "منتج سطر المرتجع يختلف عن منتج السطر الأصلي", "The product of the return line differs from the product of the original line"
     LangAdd "إجمالي فاتورة الشراء لا يساوي مجموع أسطرها", "The purchase invoice total does not equal the sum of its lines"
-End Sub
-
-Private Sub D1_3()
     LangAdd "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم", "Stop credit sales to a customer late more than (days"
     LangAdd "اسم المستخدم 3 أحرف على الأقل وبدون مسافات", "The user name has at least 3 characters and no spaces"
     LangAdd "الرصيد المرحَّل (الخانة 15) لا يكون سالبًا", "The carried balance (box 15) is never negative"
+    LangAdd "الفاتورة الإلكترونية غير مفعّلة (الإعدادات", "E-invoicing is not enabled (settings"
     LangAdd "بياناتك الحالية لم تتغير، ونسختها الوقائية", "Your current data did not change, and its safety copy"
     LangAdd "تاريخ الفاتورة لا يمكن أن يكون في المستقبل", "The invoice date cannot be in the future"
     LangAdd "كلمة مرور مؤقتة: سيُطلب تغييرها عند الدخول", "Temporary password: the user is asked to change it at login"
     LangAdd "مشكلة في البيانات - راجع تقرير فحص السلامة", "A data problem - check the integrity report"
+    LangAdd "منصة فاتورة (هيئة الزكاة والضريبة والجمارك", "the Fatoora platform (ZATCA"
     LangAdd "يوجد حقل مطلوب فارغ. أكمل البيانات ثم احفظ", "A required field is empty. Complete the data, then save"
     LangAdd "يُسجَّل إهلاك الشهر في آخر يوم منه أو بعده", "The depreciation of a month is recorded on its last day or later"
     LangAdd "إجمالي فاتورة البيع لا يساوي مجموع أسطرها", "The sales invoice total does not equal the sum of its lines"
@@ -315,6 +321,7 @@ Private Sub D1_3()
     LangAdd "عدّل الإضافي والخصومات ثم «ترحيل المسير", "Edit the overtime and deductions, then Post the run"
     LangAdd "كلمة البحث (اسم، كود، باركود، رقم، جوال", "Search text (name, code, barcode, number, mobile"
     LangAdd "لا توجد مصروفات متكررة مستحقة حتى اليوم", "There are no recurring expenses due up to today"
+    LangAdd "لا يمكن تفعيل الفاتورة الإلكترونية الآن", "E-invoicing cannot be enabled now"
     LangAdd "يجب أن يفعّله مدير النظام قبل الاستخدام", "The system administrator must activate it before use"
     LangAdd "أحرف على الأقل، ولا تساوي اسم المستخدم", "characters at least, and not equal to the user name"
     LangAdd "أدخل النقدية الموجودة فعلًا في الصندوق", "Enter the cash actually in the box"
@@ -323,11 +330,4 @@ Private Sub D1_3()
     LangAdd "الإقرارات المحفوظة (اختر إقرارًا لعرضه", "Saved returns (choose a return to show it"
     LangAdd "الجرد غير موجود أو تم ترحيله أو إلغاؤه", "The count does not exist or was posted or cancelled"
     LangAdd "الكمية المرتجعة أكبر من الكمية المباعة", "The returned quantity is more than the quantity sold"
-    LangAdd "الكمية المرتجعة أكبر من المتاح للإرجاع", "The returned quantity is more than what can be returned"
-    LangAdd "المبلغ أكبر من عمولات المندوب المستحقة", "The amount is more than the commissions payable to the sales rep"
-    LangAdd "بيانات المحل الضريبية وإعدادات التشغيل", "Tax data of the store and operating settings"
-    LangAdd "ترتيب الزر في شاشة اللمس (الأصغر أولًا", "Order of the button on the touch screen (smallest first"
-    LangAdd "ديون العملاء ÷ المبيعات الآجلة اليومية", "Customer receivables / daily credit sales"
-    LangAdd "سطر لا ينتمي إلى فاتورة الشراء الأصلية", "A line that does not belong to the original purchase invoice"
-    LangAdd "سعودي (التأمينات بحصتي الموظف والمنشأة", "Saudi (social insurance with the employee and employer shares"
 End Sub

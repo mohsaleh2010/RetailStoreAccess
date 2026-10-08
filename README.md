@@ -65,7 +65,8 @@
 | + | أسماء المجموعات بالإنجليزية في شاشتي الصلاحيات (المبيعات، الحسابات…) | ✅ تمت الموافقة | [docs/41-English-Permission-Groups.md](docs/41-English-Permission-Groups.md) |
 | + | شاشة الأسماء الإنجليزية: كل الأسماء الناقصة في قائمة واحدة، واقتراح بحروف لاتينية، وحفظ دفعة واحدة | ✅ تمت الموافقة | [docs/42-English-Names-Screen.md](docs/42-English-Names-Screen.md) |
 | + | خطة الفوترة الإلكترونية السعودية والمصرية حسب دولة التشغيل | 📋 خطة | [docs/43-Plan-EInvoicing-SA-EG.md](docs/43-Plan-EInvoicing-SA-EG.md) |
-| + | دولة التشغيل (السعودية أو مصر) من الإعدادات: العملة والضريبة والرقم الضريبي والمبلغ بالحروف وعنوان الفاتورة | ✅ بانتظار الموافقة | [docs/44-Operating-Country.md](docs/44-Operating-Country.md) |
+| + | دولة التشغيل (السعودية أو مصر) من الإعدادات: العملة والضريبة والرقم الضريبي والمبلغ بالحروف وعنوان الفاتورة | ✅ تمت الموافقة | [docs/44-Operating-Country.md](docs/44-Operating-Country.md) |
+| + | أساس الفاتورة الإلكترونية: حالة كل مستند، وسجل الإرسال، وشاشة المتابعة وإعادة الإرسال، والتفعيل والبيئة | ✅ بانتظار الموافقة | [docs/45-EInvoice-Foundation.md](docs/45-EInvoice-Foundation.md) |
 
 ## هيكل المستودع
 
@@ -157,6 +158,7 @@
 | 38 | `modBuildSchema` و`modBuildQueries` (مولَّدتان؛ أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries` | `TestLang` |
 | 39 | `modEnglishNames` (دائمة، جديدة)، واستبدال `modPOS` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildForms` | `TestEnglishNames` |
 | 40 | `modCountry` (دائمة، جديدة)، واستبدال `modForms` و`modSales` و`modReports` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestCountry` |
+| 41 | `modHttp` و`modEInvoice` (دائمتان، جديدتان)، واستبدال `modSales` و`modZatca` و`modForms` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestEInvoice` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

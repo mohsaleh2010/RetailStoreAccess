@@ -1237,6 +1237,19 @@ WHERE l.DocDate >= QDate('DashMonth') AND l.DocDate < QDate('DashEnd')
 GROUP BY l.ProductID, p.ProductName
 HAVING Sum(l.SignedQty) > 0""", ["DashMonth", "DashEnd"]),
 
+    # ============================================================ E-INVOICING (docs/45)
+    Query("qryEInvoiceDocs", "مستندات البيع وحالة الفاتورة الإلكترونية (الفواتير والمرتجعات)", """
+SELECT 'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber, h.InvoiceDate AS DocDate,
+       'فاتورة بيع' AS DocKindName, c.CustomerName, h.TotalAmount, h.ZatcaStatus AS EStatus,
+       IIf(h.ZatcaStatus = 'PENDING', 'بانتظار الإرسال', IIf(h.ZatcaStatus = 'REPORTED', 'مُبلَّغ', IIf(h.ZatcaStatus = 'CLEARED', 'معتمد', IIf(h.ZatcaStatus = 'WARNING', 'مقبول مع تحذير', IIf(h.ZatcaStatus = 'REJECTED', 'مرفوض', IIf(h.ZatcaStatus = 'SUBMITTED', 'مُرسل', IIf(h.ZatcaStatus = 'VALID', 'صالح', IIf(h.ZatcaStatus = 'INVALID', 'غير صالح', IIf(h.ZatcaStatus = 'CANCELLED', 'ملغى', 'لا يُرسل'))))))))) AS StatusName,
+       Nz(h.EInvoiceAttempts, 0) AS Attempts, h.EInvoiceError AS LastError, h.ICV, h.InvoiceSubType
+FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID
+UNION ALL
+SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, 'مرتجع بيع', c.CustomerName, r.TotalAmount,
+       r.ZatcaStatus, IIf(r.ZatcaStatus = 'PENDING', 'بانتظار الإرسال', IIf(r.ZatcaStatus = 'REPORTED', 'مُبلَّغ', IIf(r.ZatcaStatus = 'CLEARED', 'معتمد', IIf(r.ZatcaStatus = 'WARNING', 'مقبول مع تحذير', IIf(r.ZatcaStatus = 'REJECTED', 'مرفوض', IIf(r.ZatcaStatus = 'SUBMITTED', 'مُرسل', IIf(r.ZatcaStatus = 'VALID', 'صالح', IIf(r.ZatcaStatus = 'INVALID', 'غير صالح', IIf(r.ZatcaStatus = 'CANCELLED', 'ملغى', 'لا يُرسل'))))))))),
+       Nz(r.EInvoiceAttempts, 0), r.EInvoiceError, r.ICV, r.InvoiceSubType
+FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID"""),
+
     # ============================================================ PRINTING
     Query("qrySalesDocPrint", "بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف)", """
 SELECT 'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber,

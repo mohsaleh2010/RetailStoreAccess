@@ -405,6 +405,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     inTrans = False
     LogAction "SALE", "SalesInvoices", invNo, "Total=" & CalcTotal("TOTAL")
     NewInvoiceID = invoiceID
+    EInvoiceAfterSave "SALE", invoiceID                 ' sent at once when e-invoicing is ready (modEInvoice)
     Exit Function
 
 EH:
@@ -558,6 +559,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     inTrans = False
     LogAction "SALES_RETURN", "SalesReturns", retNo, "Invoice=" & SalesInvoiceID & " Total=" & sumTotal
     NewReturnID = retID
+    EInvoiceAfterSave "RETURN", retID                   ' modEInvoice
     Exit Function
 
 EH:

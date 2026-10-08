@@ -98,6 +98,7 @@ Private Sub D1_1()
     LangAdd "ãÚÇãá ßá ÚãáÉ İí ÊÇÑíÎº ÇáãÓÊäÏ íÃÎĞ ÂÎÑ ÓÚÑ İí ÊÇÑíÎå Ãæ ŞÈáå", "The rate of each currency on a date, a document takes the last rate on or before its date"
     LangAdd "íõİÖóøá ÇáÌÑÏ æÇáãÍá ãÛáŞ Ãæ ÈÚÏ ÂÎÑ İÇÊæÑÉ¡ Ëã ÇáÊÑÍíá ãÈÇÔÑÉ", "Count preferably while the store is closed or after the last invoice, then post at once"
     LangAdd "ÇáÑÕíÏ áÇ íõßÊÈ íÏæíğÇ: íõÍÓÈ ãä ÇáãÈíÚÇÊ æÇáÓäÏÇÊ æÇáãÕÑæİÇÊ", "The balance is not typed by hand: it is calculated from sales, vouchers and expenses"
+    LangAdd "ÊÛííÑ ÅÚÏÇÏÇÊ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ íÍÊÇÌ ÕáÇÍíÉ ÅÚÏÇÏÇÊ ÇáãÍá", "Changing the e-invoicing settings needs the store settings permission"
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. áÅŞÑÇÑ ãÚÊãÏ ÇÓÊÎÏã «ÅáÛÇÁ ÇáÇÚÊãÇÏ» ÃæáğÇ", "Only the draft is deleted. For an approved return use Cancel approval first"
     LangAdd "ÛíÑ ãæÌæÏÉ Úáì åĞÇ ÇáÌåÇÒ. ÇÎÊÑåÇ ãä ÌÏíÏ İí ÅÚÏÇÏÇÊ ÇáãáÕŞÇÊ", "does not exist on this computer. Choose it again in the label settings"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÃÓÚÇÑ ÇáÈíÚ. ÇãÓÍ ÚãæÏ «ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ", "You do not have the permission to change sale prices. Clear the column New sale price"
@@ -111,6 +112,7 @@ Private Sub D1_1()
     LangAdd "ÇáÊÍæíá ÇáÈäßí íõÎÕã ãä åĞÇ ÇáÈäß (ÇáÈäß ÇáÇİÊÑÇÖí ÊáŞÇÆíğÇ", "A bank transfer is taken from this bank (the default bank automatically"
     LangAdd "ÇáãÕÑæİ ÇáäŞÏí íõÎÕã ãä åĞÇ ÇáÕäÏæŞ (íõÎÊÇÑ ÕäÏæŞß ÊáŞÇÆíğÇ", "A cash expense is taken from this box (your box is chosen automatically"
     LangAdd "ÊÃßÏ Ãä ÇáÈÑäÇãÌ ãÛáŞ Úáì ßá ÇáÃÌåÒÉ ÇáÃÎÑì Ëã ÃÚÏ ÇáãÍÇæáÉ", "Make sure the program is closed on all other computers, then try again"
+    LangAdd "ÍÇáÉ ÅÑÓÇá İæÇÊíÑ ÇáÈíÚ æÇáãÑÊÌÚÇÊ ááãäÙæãÉ¡ æÅÚÇÏÉ ÇáÅÑÓÇá", "Sending status of sales invoices and returns, and resending"
     LangAdd "ÍÓÇÈ ÑÆíÓí Ãæ ãÚØøá: ÇáŞíæÏ Úáì ÇáÍÓÇÈÇÊ ÇáİÑÚíÉ ÇáäÔØÉ İŞØ", "A main or inactive account: entries go to active sub-accounts only"
     LangAdd "ÕæÑÉ ÇáÒÑ İí ÔÇÔÉ ÇááãÓ: ãÓÇÑ ßÇãá Ãæ ÇÓã ãáİ İí ãÌáÏ ÇáÕæÑ", "Button picture on the touch screen: a full path or a file name in the pictures folder"
     LangAdd "ŞÇÆãÉ ÇáÏÎá æÇáãíÒÇäíÉ ÇáÚãæãíÉ ãä ÇáŞíæÏ¡ ãÚ İÊÑÉ ÇáãŞÇÑäÉ", "Income statement and balance sheet from the entries, with a comparison period"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "ÇßÊÈ ÓÈÈ ÇáÍÑßÉ İí ÇáãáÇÍÙÇÊ (ãËÇá: ÊÇáİ¡ åÏíÉ ãä ÇáãæÑÏ", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
     LangAdd "ÇáãÈáÛ ÇáãÏİæÚ (F8) - ÇÊÑßå İÇÑÛğÇ ÅĞÇ ÏİÚ ÇáãÈáÛ ÈÇáÖÈØ", "Amount paid (F8) - leave it empty if the exact amount is paid"
     LangAdd "ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ", "The remainder of each credit invoice by its delay after the due date"
-    LangAdd "ÏæÑ ãÏíÑ ÇáäÙÇã íãáß ßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ æáÇ íãßä ÊŞííÏå", "The system administrator role always has all the permissions and cannot be restricted"
-    LangAdd "Úáì ÇáÃÕá ŞíæÏ ÅåáÇß: áÇ ÊÊÛíÑ ÈíÇäÇÊå ÇáãÇáíÉ æáÇ íõÍĞİ", "The asset has depreciation entries: its financial data do not change and it is not deleted"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "ÏæÑ ãÏíÑ ÇáäÙÇã íãáß ßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ æáÇ íãßä ÊŞííÏå", "The system administrator role always has all the permissions and cannot be restricted"
+    LangAdd "Úáì ÇáÃÕá ŞíæÏ ÅåáÇß: áÇ ÊÊÛíÑ ÈíÇäÇÊå ÇáãÇáíÉ æáÇ íõÍĞİ", "The asset has depreciation entries: its financial data do not change and it is not deleted"
     LangAdd "áÇ íÊÛíÑ ÑŞã ÍÓÇÈ ãÍİæÙ. ÃäÔÆ ÍÓÇÈğÇ ÌÏíÏğÇ æÚØøá ÇáŞÏíã", "A saved account number does not change. Create a new account and deactivate the old one"
     LangAdd "áßá ÚãáÉ ÓÚÑ æÇÍÏ İí Çáíæãº ÚãáÉ ÇáÈÑäÇãÌ áÇ ÊÍÊÇÌ ÓÚÑğÇ", "Each currency has one rate a day, the program currency needs no rate"
     LangAdd "áã ÊõÚíóøä ßáãÉ ãÑæÑ ÈÚÏ¡ æáÇ íÓÊØíÚ åĞÇ ÇáãÓÊÎÏã ÇáÏÎæá", "No password is set yet, and this user cannot log in"
@@ -240,6 +242,8 @@ Private Sub D1_2()
     LangAdd "ááÚãá İí ÇáÏæáÉ ÇáÃÎÑì ÇÈÏÃ ãáİ ÈíÇäÇÊ ÌÏíÏğÇ", "To work in the other country start a new data file"
     LangAdd "ÃÏÎá ÊÇÑíÎ ÇÚÊãÇÏ ÇáÅŞÑÇÑ (íæã ÊŞÏíãå ááåíÆÉ", "Enter the approval date of the return (the day it is filed with the Authority"
     LangAdd "ÃÖİ ÕäİğÇ æÇÍÏğÇ Úáì ÇáÃŞá Åáì ŞÇÆãÉ ÇáØÈÇÚÉ", "Add at least one item to the print list"
+    LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ İí ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled in the settings"
+    LangAdd "ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ", "Need follow-up (waiting, rejected, warning"
     LangAdd "ÚãáíÇÊ ÇáÏİÇÊÑ ÛíÑ ÇáãØÇÈŞÉ (ÍÊì ÊÇÑíÎ ÇáßÔİ", "Book transactions not matched (up to the statement date"
     LangAdd "ßáãÉ ÇáãÑæÑ áÇ íÌæÒ Ãä Êßæä äİÓ ÇÓã ÇáãÓÊÎÏã", "The password may not be the same as the user name"
     LangAdd "áÇ ãÈíÚÇÊ æáÇ ÊÍÕíáÇÊ ááãäÏæÈíä İí åĞÇ ÇáÔåÑ", "No sales and no collections by the sales reps in this month"
@@ -253,20 +257,22 @@ Private Sub D1_2()
     LangAdd "ÊäÈíå: ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ ÃŞá ãä ÊßáİÉ ÇáÔÑÇÁ", "Warning: the new sale price is below the purchase cost"
     LangAdd "ÓÈÈ ÇáÅÑÌÇÚ ãØáæÈ (ÅáÒÇãí İí ÇáÅÔÚÇÑ ÇáÏÇÆä", "The return reason is required (mandatory on the credit note"
     LangAdd "ÚãáíÇÊ ÛíÑ ãÊæÇÒäÉ áã íõäÔÃ áåÇ ŞíÏ (ÑÇÌÚåÇ", "Unbalanced transactions with no entry created (review them"
+End Sub
+
+Private Sub D1_3()
     LangAdd "Úãíá ÇáãÑÊÌÚ íÎÊáİ Úä Úãíá ÇáİÇÊæÑÉ ÇáÃÕáíÉ", "The customer of the return differs from the customer of the original invoice"
     LangAdd "ãŞİáÉ: ÕÇİí ÇáÑÈÍ ÇáãÑÍóøá ááÃÑÈÇÍ ÇáãÍÊÌÒÉ", "Closed: net profit carried to retained earnings"
     LangAdd "ãäÊÌ ÓØÑ ÇáãÑÊÌÚ íÎÊáİ Úä ãäÊÌ ÇáÓØÑ ÇáÃÕáí", "The product of the return line differs from the product of the original line"
     LangAdd "ÅÌãÇáí İÇÊæÑÉ ÇáÔÑÇÁ áÇ íÓÇæí ãÌãæÚ ÃÓØÑåÇ", "The purchase invoice total does not equal the sum of its lines"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÅíŞÇİ ÇáÈíÚ ÇáÂÌá áÚãíá ãÊÃÎÑ ÃßËÑ ãä (íæã", "Stop credit sales to a customer late more than (days"
     LangAdd "ÇÓã ÇáãÓÊÎÏã 3 ÃÍÑİ Úáì ÇáÃŞá æÈÏæä ãÓÇİÇÊ", "The user name has at least 3 characters and no spaces"
     LangAdd "ÇáÑÕíÏ ÇáãÑÍóøá (ÇáÎÇäÉ 15) áÇ íßæä ÓÇáÈğÇ", "The carried balance (box 15) is never negative"
+    LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ (ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled (settings"
     LangAdd "ÈíÇäÇÊß ÇáÍÇáíÉ áã ÊÊÛíÑ¡ æäÓÎÊåÇ ÇáæŞÇÆíÉ", "Your current data did not change, and its safety copy"
     LangAdd "ÊÇÑíÎ ÇáİÇÊæÑÉ áÇ íãßä Ãä íßæä İí ÇáãÓÊŞÈá", "The invoice date cannot be in the future"
     LangAdd "ßáãÉ ãÑæÑ ãÄŞÊÉ: ÓíõØáÈ ÊÛííÑåÇ ÚäÏ ÇáÏÎæá", "Temporary password: the user is asked to change it at login"
     LangAdd "ãÔßáÉ İí ÇáÈíÇäÇÊ - ÑÇÌÚ ÊŞÑíÑ İÍÕ ÇáÓáÇãÉ", "A data problem - check the integrity report"
+    LangAdd "ãäÕÉ İÇÊæÑÉ (åíÆÉ ÇáÒßÇÉ æÇáÖÑíÈÉ æÇáÌãÇÑß", "the Fatoora platform (ZATCA"
     LangAdd "íæÌÏ ÍŞá ãØáæÈ İÇÑÛ. Ãßãá ÇáÈíÇäÇÊ Ëã ÇÍİÙ", "A required field is empty. Complete the data, then save"
     LangAdd "íõÓÌóøá ÅåáÇß ÇáÔåÑ İí ÂÎÑ íæã ãäå Ãæ ÈÚÏå", "The depreciation of a month is recorded on its last day or later"
     LangAdd "ÅÌãÇáí İÇÊæÑÉ ÇáÈíÚ áÇ íÓÇæí ãÌãæÚ ÃÓØÑåÇ", "The sales invoice total does not equal the sum of its lines"
@@ -315,6 +321,7 @@ Private Sub D1_3()
     LangAdd "ÚÏøá ÇáÅÖÇİí æÇáÎÕæãÇÊ Ëã «ÊÑÍíá ÇáãÓíÑ", "Edit the overtime and deductions, then Post the run"
     LangAdd "ßáãÉ ÇáÈÍË (ÇÓã¡ ßæÏ¡ ÈÇÑßæÏ¡ ÑŞã¡ ÌæÇá", "Search text (name, code, barcode, number, mobile"
     LangAdd "áÇ ÊæÌÏ ãÕÑæİÇÊ ãÊßÑÑÉ ãÓÊÍŞÉ ÍÊì Çáíæã", "There are no recurring expenses due up to today"
+    LangAdd "áÇ íãßä ÊİÚíá ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÇáÂä", "E-invoicing cannot be enabled now"
     LangAdd "íÌÈ Ãä íİÚøáå ãÏíÑ ÇáäÙÇã ŞÈá ÇáÇÓÊÎÏÇã", "The system administrator must activate it before use"
     LangAdd "ÃÍÑİ Úáì ÇáÃŞá¡ æáÇ ÊÓÇæí ÇÓã ÇáãÓÊÎÏã", "characters at least, and not equal to the user name"
     LangAdd "ÃÏÎá ÇáäŞÏíÉ ÇáãæÌæÏÉ İÚáğÇ İí ÇáÕäÏæŞ", "Enter the cash actually in the box"
@@ -323,11 +330,4 @@ Private Sub D1_3()
     LangAdd "ÇáÅŞÑÇÑÇÊ ÇáãÍİæÙÉ (ÇÎÊÑ ÅŞÑÇÑğÇ áÚÑÖå", "Saved returns (choose a return to show it"
     LangAdd "ÇáÌÑÏ ÛíÑ ãæÌæÏ Ãæ Êã ÊÑÍíáå Ãæ ÅáÛÇÄå", "The count does not exist or was posted or cancelled"
     LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ÃßÈÑ ãä ÇáßãíÉ ÇáãÈÇÚÉ", "The returned quantity is more than the quantity sold"
-    LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ÃßÈÑ ãä ÇáãÊÇÍ ááÅÑÌÇÚ", "The returned quantity is more than what can be returned"
-    LangAdd "ÇáãÈáÛ ÃßÈÑ ãä ÚãæáÇÊ ÇáãäÏæÈ ÇáãÓÊÍŞÉ", "The amount is more than the commissions payable to the sales rep"
-    LangAdd "ÈíÇäÇÊ ÇáãÍá ÇáÖÑíÈíÉ æÅÚÏÇÏÇÊ ÇáÊÔÛíá", "Tax data of the store and operating settings"
-    LangAdd "ÊÑÊíÈ ÇáÒÑ İí ÔÇÔÉ ÇááãÓ (ÇáÃÕÛÑ ÃæáğÇ", "Order of the button on the touch screen (smallest first"
-    LangAdd "Ïíæä ÇáÚãáÇÁ ÷ ÇáãÈíÚÇÊ ÇáÂÌáÉ ÇáíæãíÉ", "Customer receivables / daily credit sales"
-    LangAdd "ÓØÑ áÇ íäÊãí Åáì İÇÊæÑÉ ÇáÔÑÇÁ ÇáÃÕáíÉ", "A line that does not belong to the original purchase invoice"
-    LangAdd "ÓÚæÏí (ÇáÊÃãíäÇÊ ÈÍÕÊí ÇáãæÙİ æÇáãäÔÃÉ", "Saudi (social insurance with the employee and employer shares"
 End Sub

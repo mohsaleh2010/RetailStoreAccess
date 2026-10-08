@@ -132,6 +132,7 @@ PERMISSION_NAMES_EN = {
     "REPORTS_PROFIT": "Profit and VAT reports", "DASHBOARD_FINANCIAL": "Financial figures on the dashboard",
     "SETTINGS": "Store settings", "USERS": "Users and permissions", "BACKUP": "Backup",
     "AUDIT_LOG": "Audit trail: who added, edited or deleted, with the values before and after",
+    "EINVOICE": "E-invoicing: follow-up and resending",
 }
 
 SCREEN_TITLES_EN = {
@@ -156,7 +157,7 @@ SCREEN_TITLES_EN = {
     "frmAllocation": "Match payments to invoices", "frmReportCenter": "Reports", "frmSearch": "Search",
     "frmSettings": "Store settings", "frmUsers": "Users", "frmRoles": "Roles and permissions",
     "frmUserScreens": "Screen permissions of users", "frmAuditLog": "Audit trail", "frmBackup": "Backup",
-    "frmEnglishNames": "English names",
+    "frmEnglishNames": "English names", "frmEInvoices": "E-invoicing",
 }
 
 CATEGORY_NAMES_EN = {1: "General"}

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **69** | عدد الحقول: **890**
+عدد الجداول: **70** | عدد الحقول: **911**
 
 ## الفهرس
 
@@ -75,6 +75,7 @@
 67. [`AuditLog`](#auditlog) – سجل العمليات
 68. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
 69. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+70. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -102,7 +103,7 @@
 | 18 | CurrencyCode | Short Text | 3 | ✔ | `"SAR"` |  |  | العملة |
 | 19 | DefaultCustomerID | Number (Long) |  | ✔ | `1` |  | `Customers.CustomerID` | العميل الافتراضي |
 | 20 | ZatcaPhase | Number (Byte) |  | ✔ | `1` | `In (1,2)` |  | مرحلة فاتورة |
-| 21 | ZatcaEnvironment | Short Text | 20 |  |  |  |  | بيئة الربط مع الهيئة |
+| 21 | ZatcaEnvironment | Short Text | 20 |  |  |  |  | بيئة الربط مع الهيئة – غير مستخدم: EInvoiceEnvironment |
 | 22 | LastInvoiceHash | Short Text | 255 |  |  |  |  | بصمة آخر مستند – تبدأ بالقيمة الافتراضية التي تحددها الهيئة لأول فاتورة |
 | 23 | BackupFolder | Short Text | 255 |  |  |  |  | مجلد النسخ الاحتياطي |
 | 24 | BackupKeepCount | Number (Integer) |  | ✔ | `30` | `>=1` |  | عدد النسخ المحتفظ بها |
@@ -121,6 +122,8 @@
 | 37 | GosiNonSaudiRate | Currency (نسبة) |  | ✔ | `0.02` | `>=0 And <1` |  | التأمينات: حصة المنشأة عن غير السعودي (الأخطار المهنية) |
 | 38 | GosiMaxWage | Currency |  | ✔ | `45000` | `>=0` |  | التأمينات: الحد الأعلى للأجر الخاضع |
 | 39 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
+| 40 | EInvoiceEnabled | Yes/No |  |  | `False` |  |  | تفعيل الفاتورة الإلكترونية |
+| 41 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -170,7 +173,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 36 سجل
+- بيانات أساسية: 37 سجل
 
 ## RolePermissions
 
@@ -182,7 +185,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 71 سجل
+- بيانات أساسية: 73 سجل
 
 ## Employees
 
@@ -243,7 +246,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 59 سجل
+- بيانات أساسية: 60 سجل
 
 ## UserScreens
 
@@ -515,20 +518,22 @@
 | 23 | InvoiceHash | Short Text | 255 |  |  |  |  | بصمة المستند |
 | 24 | PreviousInvoiceHash | Short Text | 255 |  |  |  |  | بصمة المستند السابق |
 | 25 | QRCodeData | Long Text |  |  |  |  |  | بيانات رمز QR |
-| 26 | ZatcaStatus | Short Text | 20 | ✔ | `"NOT_SENT"` | `In ("NOT_SENT","PENDING","REPORTED","CLEARED","WARNING","REJECTED")` |  | حالة الإرسال للهيئة |
+| 26 | ZatcaStatus | Short Text | 20 | ✔ | `"NOT_SENT"` | `In ("NOT_SENT","PENDING","REPORTED","CLEARED","WARNING","REJECTED","SUBMITTED","VALID","INVALID","CANCELLED")` |  | حالة الفاتورة الإلكترونية – السعودية: REPORTED / CLEARED، مصر: SUBMITTED / VALID / INVALID (docs/45) |
 | 27 | ZatcaSubmittedAt | Date/Time |  |  |  |  |  | تاريخ الإرسال للهيئة |
 | 28 | ZatcaResponse | Long Text |  |  |  |  |  | رد الهيئة |
 | 29 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
-| 30 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 31 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
-| 32 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
-| 33 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
-| 34 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
-| 35 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
-| 36 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
-| 37 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
-| 38 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
-| 39 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
+| 30 | EInvoiceAttempts | Number (Integer) |  |  | `0` |  |  | محاولات الإرسال |
+| 31 | EInvoiceError | Short Text | 255 |  |  |  |  | آخر خطأ في الإرسال |
+| 32 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 33 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
+| 34 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
+| 35 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
+| 36 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
+| 37 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
+| 38 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
+| 39 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 40 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
+| 41 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -590,15 +595,17 @@
 | 21 | InvoiceHash | Short Text | 255 |  |  |  |  | بصمة المستند |
 | 22 | PreviousInvoiceHash | Short Text | 255 |  |  |  |  | بصمة المستند السابق |
 | 23 | QRCodeData | Long Text |  |  |  |  |  | بيانات رمز QR |
-| 24 | ZatcaStatus | Short Text | 20 | ✔ | `"NOT_SENT"` | `In ("NOT_SENT","PENDING","REPORTED","CLEARED","WARNING","REJECTED")` |  | حالة الإرسال للهيئة |
+| 24 | ZatcaStatus | Short Text | 20 | ✔ | `"NOT_SENT"` | `In ("NOT_SENT","PENDING","REPORTED","CLEARED","WARNING","REJECTED","SUBMITTED","VALID","INVALID","CANCELLED")` |  | حالة الفاتورة الإلكترونية – السعودية: REPORTED / CLEARED، مصر: SUBMITTED / VALID / INVALID (docs/45) |
 | 25 | ZatcaSubmittedAt | Date/Time |  |  |  |  |  | تاريخ الإرسال للهيئة |
 | 26 | ZatcaResponse | Long Text |  |  |  |  |  | رد الهيئة |
 | 27 | SignedXmlPath | Short Text | 255 |  |  |  |  | مسار ملف XML الموقّع |
-| 28 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 29 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
-| 30 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
-| 31 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
-| 32 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
+| 28 | EInvoiceAttempts | Number (Integer) |  |  | `0` |  |  | محاولات الإرسال |
+| 29 | EInvoiceError | Short Text | 255 |  |  |  |  | آخر خطأ في الإرسال |
+| 30 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 31 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
+| 32 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 33 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
+| 34 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -1719,3 +1726,29 @@
 
 - المفتاح الأساسي: `LabelSettingID`
 - بيانات أساسية: 1 سجل
+
+## EInvoiceLog
+
+**سجل الفاتورة الإلكترونية** – كل طلب للمنظومة الإلكترونية (هيئة الزكاة والضريبة والجمارك أو مصلحة الضرائب المصرية) ورده: الإرسال والاستعلام وتسجيل الجهاز.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **LogID** 🔑 | AutoNumber |  |  |  |  |  | رقم السجل |
+| 2 | LoggedAt | Date/Time |  | ✔ | `Now()` |  |  | الوقت |
+| 3 | Country | Short Text | 2 | ✔ |  |  |  | الدولة |
+| 4 | DocKind | Short Text | 10 |  |  |  |  | نوع المستند – SALE أو RETURN، فارغ لطلبات الجهاز |
+| 5 | DocID | Number (Long) |  |  |  |  |  | رقم المستند الداخلي |
+| 6 | DocNumber | Short Text | 30 |  |  |  |  | رقم المستند |
+| 7 | Action | Short Text | 20 | ✔ |  |  |  | العملية – SEND، STATUS، TOKEN، ONBOARD... |
+| 8 | Endpoint | Short Text | 255 |  |  |  |  | العنوان |
+| 9 | HttpStatus | Number (Integer) |  |  | `0` |  |  | رمز الرد |
+| 10 | Result | Short Text | 12 | ✔ |  | `In ("OK","WARNING","REJECTED","ERROR","NETWORK")` |  | النتيجة |
+| 11 | Message | Short Text | 255 |  |  |  |  | الرسالة |
+| 12 | RequestBody | Long Text |  |  |  |  |  | الطلب |
+| 13 | ResponseBody | Long Text |  |  |  |  |  | الرد |
+| 14 | DurationMs | Number (Long) |  |  | `0` |  |  | المدة (مللي ثانية) |
+| 15 | EmployeeID | Number (Long) |  |  |  |  |  | الموظف – بدون علاقة: Employees قريب من حد الفهارس |
+
+- المفتاح الأساسي: `LogID`
+- فهرس عادي: `LoggedAt`
+- فهرس عادي: `DocKind, DocID`

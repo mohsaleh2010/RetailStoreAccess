@@ -193,8 +193,8 @@ Public Function InvoiceSubType(ByVal CustomerID As Long) As String
 End Function
 
 Public Function ZatcaInitialStatus() As String
-    ' Phase 2 integration picks up PENDING documents; phase 1 needs no submission.
-    If Nz(SettingValue("ZatcaPhase"), 1) = 2 Then
+    ' With e-invoicing enabled (modEInvoice, docs/45) a new document waits to be sent; before, nothing is sent.
+    If Nz(SettingValue("EInvoiceEnabled"), False) Or Nz(SettingValue("ZatcaPhase"), 1) = 2 Then
         ZatcaInitialStatus = "PENDING"
     Else
         ZatcaInitialStatus = "NOT_SENT"

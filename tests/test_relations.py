@@ -77,9 +77,10 @@ class RelationDefinitionTests(unittest.TestCase):
 
     def test_every_table_except_roots_is_connected(self):
         connected = {r.parent for r in self.rels} | {r.child for r in self.rels}
-        # PeriodClosings points only to Employees, without an enforced relationship
+        # PeriodClosings points only to Employees, without an enforced relationship; EInvoiceLog.DocID points
+        # to an invoice or a return (DocKind), so it has no relationship either (docs/45)
         self.assertEqual({t.name for t in TABLES} - connected,
-                         {"Sequences", "LabelSettings", "PeriodClosings"})
+                         {"Sequences", "LabelSettings", "PeriodClosings", "EInvoiceLog"})
 
     def test_attribute_values(self):
         by_name = {r.name: r for r in self.rels}

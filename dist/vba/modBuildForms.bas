@@ -27,7 +27,7 @@ Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines," & _
     "frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal," & _
-    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames"
+    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -655,6 +655,7 @@ Private Sub BuildAllForms()
     BuildForm_frmCommissions
     BuildForm_frmEnglishNameLines
     BuildForm_frmEnglishNames
+    BuildForm_frmEInvoices
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -3538,10 +3539,12 @@ Private Sub BuildForm_frmSettings()
     Set c = AddLabel("lblStoreNameEn", "«”„ «·„Õ· »«·≈‰Ã·Ì“Ì…", 7768, 1701, 2268, 425, 10, False, CLR_MUTED, "StoreNameEn", 0)
     Set c = AddButton("btnEnglishNames", "»«ﬁÌ «·√”„«¡", 13835, 1701, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddCombo("CountryCode", "CountryCode", 2552, 2268, 4989, 425, "SA;«·„„·ﬂ… «·⁄—»Ì… «·”⁄ÊœÌ…;EG;Ã„ÂÊ—Ì… „’— «·⁄—»Ì…", 2, "0;3402")
+    Set c = AddCombo("CountryCode", "CountryCode", 2552, 2268, 3685, 425, "SA;«·„„·ﬂ… «·⁄—»Ì… «·”⁄ÊœÌ…;EG;Ã„ÂÊ—Ì… „’— «·⁄—»Ì…", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "«·⁄„·… Ê«·÷—Ì»… Ê«·—ﬁ„ «·÷—Ì»Ì Ê«·›« Ê—… «·≈·ﬂ —Ê‰Ì….   €Ì— ﬁ»·  ”ÃÌ· √Ì ⁄„·Ì… ›ﬁÿ"
     SetCtlProp c, "StatusBarText", "«·⁄„·… Ê«·÷—Ì»… Ê«·—ﬁ„ «·÷—Ì»Ì Ê«·›« Ê—… «·≈·ﬂ —Ê‰Ì….   €Ì— ﬁ»·  ”ÃÌ· √Ì ⁄„·Ì… ›ﬁÿ"
     Set c = AddLabel("lblCountryCode", "œÊ·… «· ‘€Ì·", 227, 2268, 2268, 425, 10, False, CLR_MUTED, "CountryCode", 0)
+    Set c = AddButton("btnEInvoices", "«·›« Ê—… «·≈·ﬂ —Ê‰Ì…", 6294, 2268, 1247, 425, "secondary")
+    c.OnClick = EP
     Set c = AddText("VATNumber", "VATNumber", 10093, 2268, 4989, 425)
     SetCtlProp c, "ControlTipText", "15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »‹ 3"
     SetCtlProp c, "StatusBarText", "15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »‹ 3"
@@ -3668,6 +3671,9 @@ Private Sub BuildForm_frmSettings()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnEnglishNames_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmEnglishNames""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnEInvoices_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmEInvoices""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnBrowseBackup_Click()" & vbCrLf
     s = s & "    BrowseFolder Me, ""BackupFolder""" & vbCrLf
@@ -9430,4 +9436,78 @@ Private Sub BuildForm_frmEnglishNames()
     Exit Sub
 EH:
     AbortForm "frmEnglishNames", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmEInvoices()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmEInvoices", "«·›« Ê—… «·≈·ﬂ —Ê‰Ì…", "", 15309, 10433, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "«·›« Ê—… «·≈·ﬂ —Ê‰Ì…", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "Õ«·… ≈—”«· ›Ê« Ì— «·»Ì⁄ Ê«·„— Ã⁄«  ··„‰ŸÊ„…° Ê≈⁄«œ… «·≈—”«·", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtFrom", "", 227, 1304, 1588, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblFrom", "„‰", 227, 992, 1588, 284, 9, False, CLR_MUTED, "txtFrom", 0)
+    Set c = AddText("txtTo", "", 1928, 1304, 1588, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblTo", "≈·Ï", 1928, 992, 1588, 284, 9, False, CLR_MUTED, "txtTo", 0)
+    Set c = AddCombo("cboStatus", "", 3629, 1304, 4536, 454, "ATTENTION; Õ «Ã „ «»⁄… (»«‰ Ÿ«— «·≈—”«·° „—›Ê÷…°  Õ–Ì—);SENT;√ı—”· ;NOT_SENT;ﬁ»· «· ›⁄Ì·;ALL;«·ﬂ·", 2, "0;4423")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblStatus", "«·„” ‰œ« ", 3629, 992, 4536, 284, 9, False, CLR_MUTED, "cboStatus", 0)
+    Set c = AddButton("btnShow", "⁄—÷", 8278, 1304, 1701, 454, "primary")
+    c.OnClick = EP
+    Set c = AddCombo("cboEnvironment", "", 10206, 1304, 2495, 454, "TEST; Ã—Ì»Ì…;SIMULATION;„Õ«ﬂ«… («·”⁄ÊœÌ…);PRODUCTION;›⁄·Ì…", 2, "0;2381")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblEnvironment", "«·»Ì∆…", 10206, 992, 2495, 284, 9, False, CLR_MUTED, "cboEnvironment", 0)
+    Set c = AddCheck("chkEnabled", "", 12928, 1389)
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblEnabled", " ›⁄Ì· «·≈—”«·", 13297, 1304, 1786, 454, 10, False, CLR_TEXT, "chkEnabled", 0)
+    Set c = AddLabel("lblSummary", " ", 227, 1871, 14855, 312, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddList("lstDocs", 227, 2268, 14855, 4196, 9, "0;1588;1814;1474;2495;1474;1814;1021;3175", True)
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblLogTitle", "ÿ·»«  «·„” ‰œ «·„Œ «— Ê—œÊœ «·„‰ŸÊ„…", 227, 6520, 14855, 312, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstLog", 227, 6861, 14855, 2268, 6, "0;2041;1361;1361;1021;8732", True)
+    Set c = AddButton("btnSendPicked", "≈—”«· «·„Œ «—", 227, 9412, 2041, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnSendAll", "≈—”«· ﬂ· «·„⁄·¯ﬁ", 2381, 9412, 2155, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13608, 9412, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    EInvoicesLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboStatus_AfterUpdate()" & vbCrLf
+    s = s & "    EInvoicesShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstDocs_AfterUpdate()" & vbCrLf
+    s = s & "    EInvoicesPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboEnvironment_AfterUpdate()" & vbCrLf
+    s = s & "    EInvoiceSettingChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub chkEnabled_AfterUpdate()" & vbCrLf
+    s = s & "    EInvoiceSettingChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnShow_Click()" & vbCrLf
+    s = s & "    EInvoicesShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSendPicked_Click()" & vbCrLf
+    s = s & "    EInvoicesSendPicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSendAll_Click()" & vbCrLf
+    s = s & "    EInvoicesSendAll Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmEInvoices", s
+    Exit Sub
+EH:
+    AbortForm "frmEInvoices", Err.Number, Err.Description
 End Sub

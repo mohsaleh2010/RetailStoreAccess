@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2322
+Private Const ENTRY_COUNT As Long = 2373
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -225,13 +225,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=IIf([DocKind]=""RECEIPT"",""الرصيد المتبقي على العميل حاليًا: "",""الرصيد المستحق للمورد حاليًا: "") & Format([PartyBalance],""#,##0.00"")") = "=IIf([DocKind]=""RECEIPT"",""Balance currently due from the customer: "",""Balance currently due to the supplier: "") & Format([PartyBalance],""#,##0.00"")", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إجمالي الداخل") = "Total in", "Tr sample 2", passed, failed, report
-    CheckLang Tr("الانحراف") = "Variance", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المبلغ (") = "Amount (", "Tr sample 4", passed, failed, report
+    CheckLang Tr("=IIf([DocKind]=""RECEIPT"",""استلمنا من: "",""صرفنا إلى: "") & [PartyName]") = "=IIf([DocKind]=""RECEIPT"",""Received from: "",""Paid to: "") & [PartyName]", "Tr sample 1", passed, failed, report
+    CheckLang Tr("أُنشئت الموازنة بسطر لكل حساب إيرادات ومصروفات (") = "The budget was created with a line for each revenue and expense account (", "Tr sample 2", passed, failed, report
+    CheckLang Tr("الاسم بالإنجليزية") = "English name", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المباع") = "Sold", "Tr sample 4", passed, failed, report
     CheckLang Tr("تعذر الحذف (خطأ ") = "Could not delete (error ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("سطر لا ينتمي إلى الفاتورة الأصلية.") = "A line that does not belong to the original invoice.", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا توجد فترة مقفلة.") = "There is no closed period.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("سجل التدقيق") = "Audit trail", "Tr sample 6", passed, failed, report
+    CheckLang Tr("لا توجد فترة مقفلة") = "There is no closed period", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("زر الاقتراح يكتب الاسم العربي بحروف لاتينية في الخانات الفارغة فقط. راجعه وعدّله ثم احفظ. الاسم الفارغ يظهر بالعربية في الواجهة الإنجليزية") = "زر الاقتراح يكتب الاسم العربي بحروف لاتينية في الخانات الفارغة فقط. راجعه وعدّله ثم احفظ. الاسم الفارغ يظهر بالعربية في الواجهة الإنجليزية", "العربية: من اليمين ولا ترجمة", _

@@ -179,6 +179,13 @@ def doc_totals():
     ]
 
 
+# the e-invoicing status of a sales document (docs/45): NOT_SENT before e-invoicing is enabled, PENDING
+# until sent; Saudi Arabia REPORTED (simplified) / CLEARED (standard), Egypt SUBMITTED then VALID / INVALID
+EINVOICE_STATUSES = ["NOT_SENT", "PENDING", "REPORTED", "CLEARED", "WARNING", "REJECTED", "SUBMITTED", "VALID",
+                     "INVALID", "CANCELLED"]
+EINVOICE_STATUS_RULE = "In (" + ",".join(f'"{s}"' for s in EINVOICE_STATUSES) + ")"
+
+
 def zatca_fields(type_code_default):
     """Fields needed for ZATCA e-invoicing (phase 1 now, phase 2 later)."""
     return [
@@ -193,12 +200,14 @@ def zatca_fields(type_code_default):
         text("InvoiceHash", 255, "بصمة المستند"),
         text("PreviousInvoiceHash", 255, "بصمة المستند السابق"),
         memo("QRCodeData", "بيانات رمز QR"),
-        text("ZatcaStatus", 20, "حالة الإرسال للهيئة", required=True, default='"NOT_SENT"',
-             rule='In ("NOT_SENT","PENDING","REPORTED","CLEARED","WARNING","REJECTED")',
-             rule_text="حالة غير معروفة"),
+        text("ZatcaStatus", 20, "حالة الفاتورة الإلكترونية", required=True, default='"NOT_SENT"',
+             rule=EINVOICE_STATUS_RULE, rule_text="حالة غير معروفة",
+             note="السعودية: REPORTED / CLEARED، مصر: SUBMITTED / VALID / INVALID (docs/45)"),
         datetime_("ZatcaSubmittedAt", "تاريخ الإرسال للهيئة"),
         memo("ZatcaResponse", "رد الهيئة"),
         text("SignedXmlPath", 255, "مسار ملف XML الموقّع"),
+        int_("EInvoiceAttempts", "محاولات الإرسال", default="0"),
+        text("EInvoiceError", 255, "آخر خطأ في الإرسال"),
     ]
 
 
@@ -246,7 +255,7 @@ TABLES: List[Table] = [
                   fk="Customers.CustomerID"),
             byte_("ZatcaPhase", "مرحلة فاتورة", default="1", rule="In (1,2)",
                   rule_text="المرحلة 1 أو 2"),
-            text("ZatcaEnvironment", 20, "بيئة الربط مع الهيئة"),
+            text("ZatcaEnvironment", 20, "بيئة الربط مع الهيئة", note="غير مستخدم: EInvoiceEnvironment"),
             text("LastInvoiceHash", 255, "بصمة آخر مستند",
                  note="تبدأ بالقيمة الافتراضية التي تحددها الهيئة لأول فاتورة"),
             text("BackupFolder", 255, "مجلد النسخ الاحتياطي"),
@@ -276,6 +285,11 @@ TABLES: List[Table] = [
             money("GosiMaxWage", "التأمينات: الحد الأعلى للأجر الخاضع", default="45000"),
             int_("CreditBlockDays", "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم)", default="0", rule=">=0",
                  rule_text="عدد الأيام لا يكون سالبًا"),
+            bool_("EInvoiceEnabled", "تفعيل الفاتورة الإلكترونية", "False"),
+            text("EInvoiceEnvironment", 12, "بيئة الفاتورة الإلكترونية", required=True, default='"TEST"',
+                 rule='In ("TEST","SIMULATION","PRODUCTION")',
+                 rule_text="TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية",
+                 note="السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45)"),
         ],
         pk=["SettingID"],
         seed_columns=["SettingID", "StoreName", "CountryCode", "VATRate", "PricesIncludeVAT",
@@ -399,6 +413,7 @@ TABLES: List[Table] = [
             ("USERS", "المستخدمون والصلاحيات", "النظام", 81),
             ("BACKUP", "النسخ الاحتياطي", "النظام", 82),
             ("AUDIT_LOG", "سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد", "النظام", 83),
+            ("EINVOICE", "الفاتورة الإلكترونية: المتابعة وإعادة الإرسال", "المبيعات", 16),
         ],
         seed_missing=True,
     ),
@@ -2031,6 +2046,33 @@ TABLES: List[Table] = [
         seed_columns=["LabelSettingID"],
         seed_rows=[(1,)],
     ),
+
+    # ------------------------------------------------------- E-invoicing (docs/45)
+    Table(
+        "EInvoiceLog", "سجل الفاتورة الإلكترونية",
+        "كل طلب للمنظومة الإلكترونية (هيئة الزكاة والضريبة والجمارك أو مصلحة الضرائب المصرية) ورده: "
+        "الإرسال والاستعلام وتسجيل الجهاز.",
+        [
+            auto("LogID", "رقم السجل"),
+            datetime_("LoggedAt", "الوقت", required=True, default="Now()"),
+            text("Country", 2, "الدولة", required=True),
+            text("DocKind", 10, "نوع المستند", note="SALE أو RETURN، فارغ لطلبات الجهاز"),
+            long_("DocID", "رقم المستند الداخلي"),
+            text("DocNumber", 30, "رقم المستند"),
+            text("Action", 20, "العملية", required=True, note="SEND، STATUS، TOKEN، ONBOARD..."),
+            text("Endpoint", 255, "العنوان"),
+            int_("HttpStatus", "رمز الرد", default="0"),
+            text("Result", 12, "النتيجة", required=True,
+                 rule='In ("OK","WARNING","REJECTED","ERROR","NETWORK")', rule_text="نتيجة غير معروفة"),
+            text("Message", 255, "الرسالة"),
+            memo("RequestBody", "الطلب"),
+            memo("ResponseBody", "الرد"),
+            long_("DurationMs", "المدة (مللي ثانية)", default="0"),
+            long_("EmployeeID", "الموظف", note="بدون علاقة: Employees قريب من حد الفهارس"),
+        ],
+        pk=["LogID"],
+        indexes=[ix("LoggedAt"), ix("DocKind", "DocID")],
+    ),
 ]
 
 
@@ -2111,6 +2153,7 @@ SCREEN_LIST = [
     ("frmAuditLog", "سجل التدقيق", "النظام", "AUDIT_LOG", False, False, False),
     ("frmBackup", "النسخ الاحتياطي", "النظام", "BACKUP", False, False, False),
     ("frmEnglishNames", "الأسماء الإنجليزية", "النظام", "SETTINGS", False, True, False),
+    ("frmEInvoices", "الفاتورة الإلكترونية", "المبيعات", "EINVOICE", False, True, False),
 ]
 
 
@@ -2208,7 +2251,7 @@ ACCOUNT_TREE = [
 # Field rules changed after the first release: BuildSchema sets them on an existing back-end too
 # (generate.rule_upgrade_sub). Only looser rules go here: the existing rows already satisfy them.
 RULE_UPGRADES = [("Settings", "CountryCode"), ("Settings", "VATNumber"), ("Customers", "VATNumber"),
-                 ("Suppliers", "VATNumber")]
+                 ("Suppliers", "VATNumber"), ("SalesInvoices", "ZatcaStatus"), ("SalesReturns", "ZatcaStatus")]
 
 
 def table(name: str) -> Table:

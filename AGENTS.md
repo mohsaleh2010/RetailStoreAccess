@@ -68,6 +68,7 @@ Optional test dependencies (tests skip when missing): `pip install -r requiremen
 | `dist/tools/BuildFrontEnd.vbs` | Builds the whole front-end in Access in one step; `EnableShiftKey.vbs` re-enables SHIFT |
 | `tests/` | `access_sqlite.py` (SQLite mirror of Access SQL: `Nz`, `IIf`, `DateAdd`, `Year` …), `helpers.py` (`VbaModuleChecks`), `vba_harness.py` (LibreOffice Basic runner) |
 | `tools/i18n.py`, `tools/i18n_en.py`, `tools/gen_lang.py` | The English interface: Arabic -> English dictionary, its Python mirror of `Tr`, and the generated `modLang` + `modLangData*` |
+| `src/vba/modEInvoice.bas`, `src/vba/modHttp.bas`, `tools/json_reference.py` | E-invoicing foundation (`docs/45`): status of each sales document, `EInvoiceLog`, `frmEInvoices`, HTTPS and `JsonGet`; each country's platform is a module called by name (`ZatcaSendDocument` / `EtaSendDocument`) |
 | `src/vba/modCountry.bas`, `tools/country_reference.py` | The operating country (`Settings.CountryCode` SA / EG): currency, VAT rate, tax number, document title (`docs/44`); e-invoicing plan `docs/43` |
 | `tools/master_en.py`, `tools/translit.py` | English names of the master data (`qryLoc*`, `docs/39`-`41`) and the transliteration suggested by the English names screen (mirror of `modEnglishNames.Transliterate`, `docs/42`) |
 | `docs/NN-*.md` | One Arabic document per feature; `README.md` lists them with their approval status |
