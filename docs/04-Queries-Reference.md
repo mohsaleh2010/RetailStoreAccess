@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **172**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **184**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -14,170 +14,182 @@
 | 6 | [`qryLocJournalSourceTypes`](#qrylocjournalsourcetypes) | JournalSourceTypes بالأسماء الإنجليزية (الواجهة الإنجليزية) |  |
 | 7 | [`qryLocTransactionTypes1`](#qryloctransactiontypes1) | TransactionTypes للواجهة الإنجليزية (خطوة 1) |  |
 | 8 | [`qryLocTransactionTypes`](#qryloctransactiontypes) | TransactionTypes بالأسماء الإنجليزية (الواجهة الإنجليزية) |  |
-| 9 | [`qrySalesDocuments`](#qrysalesdocuments) | مستندات البيع: الفواتير (+) والمرتجعات (−) بقيم موقّعة |  |
-| 10 | [`qrySalesLineItems`](#qrysaleslineitems) | أسطر البيع والمرتجعات مع التكلفة (أساس تحليل المنتجات والأرباح) |  |
-| 11 | [`qrySalesLinesInPeriod`](#qrysaleslinesinperiod) | أسطر البيع والمرتجعات داخل الفترة | `PeriodStart`, `PeriodEnd` |
-| 12 | [`DailySalesQuery`](#dailysalesquery) ⭐ | المبيعات اليومية: عدد الفواتير والمرتجعات والصافي والنقدي والآجل |  |
-| 13 | [`qrySalesMonthlyDocs`](#qrysalesmonthlydocs) | تجميع شهري لمستندات البيع |  |
-| 14 | [`qrySalesMonthlyCost`](#qrysalesmonthlycost) | تكلفة البضاعة المباعة شهريًا |  |
-| 15 | [`MonthlySalesQuery`](#monthlysalesquery) ⭐ | المبيعات الشهرية مع التكلفة ومجمل الربح |  |
-| 16 | [`SalesByPeriodQuery`](#salesbyperiodquery) | فواتير ومرتجعات البيع خلال فترة مع العميل والكاشير | `PeriodStart`, `PeriodEnd` |
-| 17 | [`SalesByProductQuery`](#salesbyproductquery) | المبيعات حسب المنتج خلال فترة (كمية، صافي، تكلفة، ربح) | `PeriodStart`, `PeriodEnd` |
-| 18 | [`BestSellingProductsQuery`](#bestsellingproductsquery) ⭐ | أفضل المنتجات مبيعًا خلال فترة (حسب صافي الكمية) | `PeriodStart`, `PeriodEnd` |
-| 19 | [`SalesByCategoryQuery`](#salesbycategoryquery) | المبيعات حسب التصنيف خلال فترة (للرسم الدائري) | `PeriodStart`, `PeriodEnd` |
-| 20 | [`LeastSellingProductsQuery`](#leastsellingproductsquery) | أقل المنتجات مبيعًا خلال فترة (تشمل المنتجات التي لم تُبع) | `PeriodStart`, `PeriodEnd` |
-| 21 | [`qryPurchaseDocuments`](#qrypurchasedocuments) | مستندات الشراء: الفواتير (+) والمرتجعات (−) |  |
-| 22 | [`PurchasesQuery`](#purchasesquery) | فواتير ومرتجعات الشراء خلال فترة مع المورد | `PeriodStart`, `PeriodEnd` |
-| 23 | [`qryProductLedger`](#qryproductledger) | رصيد كل منتج من دفتر حركة المخزون |  |
-| 24 | [`qryProductLastSale`](#qryproductlastsale) | تاريخ آخر بيع لكل منتج |  |
-| 25 | [`StockBalanceQuery`](#stockbalancequery) ⭐ | المخزون الحالي: الكمية والقيمة بالتكلفة وبسعر البيع ومطابقتها مع الحركات |  |
-| 26 | [`LowStockQuery`](#lowstockquery) ⭐ | المنتجات منخفضة المخزون: CurrentQuantity <= MinimumQuantity |  |
-| 27 | [`ProductMovementQuery`](#productmovementquery) | حركة منتج خلال فترة مع رصيد أول المدة (الرصيد التراكمي في التقرير) | `PeriodStart`, `PeriodEnd`, `ProductID` |
-| 28 | [`SlowMovingProductsQuery`](#slowmovingproductsquery) ⭐ | المنتجات غير المتحركة: لها رصيد ولم تُبع منذ عدد الأيام المحدد في الإعدادات |  |
-| 29 | [`StockByCategoryQuery`](#stockbycategoryquery) | المخزون حسب التصنيف: عدد المنتجات والكمية والقيمة |  |
-| 30 | [`StockCountQuery`](#stockcountquery) | تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته |  |
-| 31 | [`qryCustomerLedger`](#qrycustomerledger) | دفتر حساب العملاء: مدين (عليه) / دائن (له) |  |
-| 32 | [`qryCustomerLedgerTotals`](#qrycustomerledgertotals) | مجاميع حساب كل عميل |  |
-| 33 | [`CustomerBalanceQuery`](#customerbalancequery) ⭐ | رصيد كل عميل محسوبًا من الحركات (موجب = عليه للمحل) |  |
-| 34 | [`CustomersWithDebtQuery`](#customerswithdebtquery) | العملاء الذين عليهم مبالغ مستحقة |  |
-| 35 | [`CustomerStatementQuery`](#customerstatementquery) | كشف حساب عميل لفترة: رصيد سابق ثم الحركات | `PeriodStart`, `PeriodEnd`, `CustomerID` |
-| 36 | [`qrySupplierLedger`](#qrysupplierledger) | دفتر حساب الموردين: دائن (للمورد) / مدين (سُدِّد له) |  |
-| 37 | [`qrySupplierLedgerTotals`](#qrysupplierledgertotals) | مجاميع حساب كل مورد |  |
-| 38 | [`SupplierBalanceQuery`](#supplierbalancequery) ⭐ | رصيد كل مورد محسوبًا من الحركات (موجب = مستحق للمورد) |  |
-| 39 | [`qrySupplierFxMoves`](#qrysupplierfxmoves) | حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بالريال) |  |
-| 40 | [`qryLatestRateDates`](#qrylatestratedates) | تاريخ آخر سعر لكل عملة |  |
-| 41 | [`qryLatestRates`](#qrylatestrates) | آخر معامل لكل عملة |  |
-| 42 | [`qrySupplierFxTotals`](#qrysupplierfxtotals) | رصيد كل مورد بكل عملة |  |
-| 43 | [`SupplierFxBalanceQuery`](#supplierfxbalancequery) | أرصدة الموردين بالعملات الأجنبية: بالدفاتر، وبآخر سعر، وفرق العملة غير المحقق |  |
-| 44 | [`SupplierStatementQuery`](#supplierstatementquery) | كشف حساب مورد لفترة: رصيد سابق ثم الحركات | `PeriodStart`, `PeriodEnd`, `SupplierID` |
-| 45 | [`qryCustomerAllocSums`](#qrycustomerallocsums) | مجموع ما رُبط من كل سند بالفواتير |  |
-| 46 | [`qryCustomerPaymentFree`](#qrycustomerpaymentfree) | سندات القبض: المربوط بالفواتير والباقي غير المربوط |  |
-| 47 | [`qryCustomerInvoiceAlloc`](#qrycustomerinvoicealloc) | مجموع ما رُبط بكل فاتورة من السندات |  |
-| 48 | [`qryCustomerInvoiceReturns`](#qrycustomerinvoicereturns) | مرتجعات كل فاتورة المخصومة من رصيد الحساب |  |
-| 49 | [`qryCustomerInvoiceFree`](#qrycustomerinvoicefree) | الفواتير الآجلة: المتبقي وما رُبط بها وما يمكن ربطه |  |
-| 50 | [`qrySupplierAllocSums`](#qrysupplierallocsums) | مجموع ما رُبط من كل سند بالفواتير |  |
-| 51 | [`qrySupplierPaymentFree`](#qrysupplierpaymentfree) | سندات الصرف: المربوط بالفواتير والباقي غير المربوط |  |
-| 52 | [`qrySupplierInvoiceAlloc`](#qrysupplierinvoicealloc) | مجموع ما رُبط بكل فاتورة من السندات |  |
-| 53 | [`qrySupplierInvoiceReturns`](#qrysupplierinvoicereturns) | مرتجعات كل فاتورة المخصومة من رصيد الحساب |  |
-| 54 | [`qrySupplierInvoiceFree`](#qrysupplierinvoicefree) | الفواتير الآجلة: المتبقي وما رُبط بها وما يمكن ربطه |  |
-| 55 | [`qryAgingDebits`](#qryagingdebits) | المستحق على كل عميل وللمورد بالمستند: الفواتير الآجلة والرصيد الافتتاحي |  |
-| 56 | [`qryAgingCredits`](#qryagingcredits) | ما يسدد المستحق: المرتجعات (على فاتورتها أولًا) والسندات والرصيد الافتتاحي الدائن |  |
-| 57 | [`qryAgingAllocations`](#qryagingallocations) | ربط السندات بالفواتير (ومنها السند المسجل عن فاتورة قبل الربط) |  |
-| 58 | [`ExpensesQuery`](#expensesquery) | المصروفات خلال فترة | `PeriodStart`, `PeriodEnd` |
-| 59 | [`ExpensesByTypeQuery`](#expensesbytypequery) | المصروفات مجمّعة حسب النوع خلال فترة | `PeriodStart`, `PeriodEnd` |
-| 60 | [`qryProfitSales`](#qryprofitsales) | صافي المبيعات وتكلفتها خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 61 | [`qryProfitAdjustments`](#qryprofitadjustments) | قيمة فروقات المخزون (جرد، إضافة، خصم) خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 62 | [`qryProfitExpenses`](#qryprofitexpenses) | المصروفات (بدون ضريبة) خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 63 | [`ProfitQuery`](#profitquery) ⭐ | الأرباح: صافي المبيعات − التكلفة = مجمل الربح؛ ثم ± فروقات المخزون − المصروفات = صافي الربح | `PeriodStart`, `PeriodEnd` |
-| 64 | [`qryVatOutput`](#qryvatoutput) | ضريبة المخرجات (المبيعات ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
-| 65 | [`qryVatInputPurchases`](#qryvatinputpurchases) | ضريبة المدخلات من المشتريات (ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
-| 66 | [`qryVatInputExpenses`](#qryvatinputexpenses) | ضريبة المدخلات من المصروفات | `PeriodStart`, `PeriodEnd` |
-| 67 | [`VatSummaryQuery`](#vatsummaryquery) | ملخص ضريبة القيمة المضافة للفترة (للإقرار الضريبي) | `PeriodStart`, `PeriodEnd` |
-| 68 | [`qryVatReturnLines`](#qryvatreturnlines) | أسطر الإقرار الضريبي: المبيعات والمشتريات والمصروفات بفئتها الضريبية |  |
-| 69 | [`qryVatReturnTotals`](#qryvatreturntotals) | خانات الإقرار الضريبي للفترة محسوبة من المستندات (صف واحد) | `PeriodStart`, `PeriodEnd` |
-| 70 | [`qryVatReturnHead`](#qryvatreturnhead) | الإقرار الضريبي المختار | `VatReturnID` |
-| 71 | [`VatReturnQuery`](#vatreturnquery) | إقرار ضريبة القيمة المضافة بخانات نموذج الهيئة (1 إلى 16) | `VatReturnID` |
-| 72 | [`DashboardQuery`](#dashboardquery) | مؤشرات لوحة التحكم في سجل واحد (اليوم، الشهر، الأرصدة، المخزون) | `DashDay`, `DashMonth`, `DashEnd` |
-| 73 | [`qryRepDocs`](#qryrepdocs) | عمليات المندوبين: صافي المبيعات بدون الضريبة والتحصيل |  |
-| 74 | [`qryRepPeriodTotals`](#qryrepperiodtotals) | مبيعات وتحصيل كل مندوب في الفترة | `PeriodStart`, `PeriodEnd` |
-| 75 | [`qryRepTargetTotals`](#qryreptargettotals) | أهداف كل مندوب في أشهر الفترة | `PeriodStart`, `PeriodEnd` |
-| 76 | [`qryRepCommissionPaid`](#qryrepcommissionpaid) | ما صُرف لكل مندوب من عمولاته (سندات صرف النقدية) |  |
-| 77 | [`qryRepCommissionPosted`](#qryrepcommissionposted) | العمولات المرحَّلة لكل مندوب |  |
-| 78 | [`RepPerformanceQuery`](#repperformancequery) | أداء المندوبين في الفترة: المبيعات والتحصيل والهدف والإنجاز والعمولة المتوقعة | `PeriodStart`, `PeriodEnd` |
-| 79 | [`RepCustomersQuery`](#repcustomersquery) | عملاء كل مندوب وأرصدتهم |  |
-| 80 | [`RepCommissionBalanceQuery`](#repcommissionbalancequery) | العمولات المستحقة لكل مندوب: المرحَّل والمصروف والباقي |  |
-| 81 | [`CommissionSheetQuery`](#commissionsheetquery) | مسير العمولات المختار بأسطر المندوبين | `CommissionRunID` |
-| 82 | [`qryIndicatorLines`](#qryindicatorlines) | أسطر القيود مع مجموعة الحساب (المستوى 2) لحساب المؤشرات المالية |  |
-| 83 | [`FinancialIndicatorsQuery`](#financialindicatorsquery) | المؤشرات المالية (صف واحد): هامش الربح، دوران المخزون، فترة التحصيل، السيولة | `IndEnd`, `IndMonth`, `IndPrevMonth`, `IndYear`, `Ind90` |
-| 84 | [`qryDashboardTopProducts`](#qrydashboardtopproducts) | صافي الكمية المباعة لكل منتج منذ بداية الشهر (لوحة التحكم) | `DashMonth`, `DashEnd` |
-| 85 | [`qrySalesDocPrint`](#qrysalesdocprint) | بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف) |  |
-| 86 | [`qryPurchaseDocPrint`](#qrypurchasedocprint) | بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف) |  |
-| 87 | [`qryVoucherPrint`](#qryvoucherprint) | بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين) |  |
-| 88 | [`qryCashMovements`](#qrycashmovements) | كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (−) |  |
-| 89 | [`qryCashBoxTotals`](#qrycashboxtotals) | إجمالي الداخل والخارج لكل صندوق |  |
-| 90 | [`CashBoxBalanceQuery`](#cashboxbalancequery) | أرصدة الخزينة والصناديق الآن |  |
-| 91 | [`CashStatementQuery`](#cashstatementquery) | حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 92 | [`qryCashDays`](#qrycashdays) | مقبوضات ومدفوعات كل يوم داخل الفترة | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 93 | [`qryCashDayOpening`](#qrycashdayopening) | رصيد أول كل يوم من أيام الحركة (كل الحركات قبل ذلك اليوم) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 94 | [`CashDailyQuery`](#cashdailyquery) | حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 95 | [`CashClosingsQuery`](#cashclosingsquery) | تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
-| 96 | [`qryCashClosingPrint`](#qrycashclosingprint) | بيانات طباعة تصفية الكاشير |  |
-| 97 | [`qryCashVoucherPrint`](#qrycashvoucherprint) | بيانات طباعة سندات قبض وصرف وتحويل النقدية |  |
-| 98 | [`qrySaleCost`](#qrysalecost) | تكلفة كل فاتورة بيع |  |
-| 99 | [`qryReturnCost`](#qryreturncost) | تكلفة ما عاد للمخزون من كل مرتجع بيع |  |
-| 100 | [`qryStockCountValue`](#qrystockcountvalue) | قيمة فروقات كل جرد مُرحّل |  |
-| 101 | [`qryJournalSale`](#qryjournalsale) | أسطر قيود فواتير البيع |  |
-| 102 | [`qryJournalSalesReturn`](#qryjournalsalesreturn) | أسطر قيود مرتجعات البيع |  |
-| 103 | [`qryJournalPurchase`](#qryjournalpurchase) | أسطر قيود فواتير الشراء |  |
-| 104 | [`qryJournalPurchaseReturn`](#qryjournalpurchasereturn) | أسطر قيود مرتجعات الشراء |  |
-| 105 | [`qryJournalPayments`](#qryjournalpayments) | أسطر قيود سندات القبض من العملاء والصرف للموردين |  |
-| 106 | [`qryJournalExpense`](#qryjournalexpense) | أسطر قيود المصروفات (عدا المسجلة بسند نقدية) |  |
-| 107 | [`qryJournalCashVoucher`](#qryjournalcashvoucher) | أسطر قيود سندات النقدية (قبض وصرف وتحويل) |  |
-| 108 | [`qryJournalStock`](#qryjournalstock) | أسطر قيود حركات المخزون اليدوية وتسويات الجرد |  |
-| 109 | [`qryJournalOpening`](#qryjournalopening) | أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين |  |
-| 110 | [`qryManualEntryLines`](#qrymanualentrylines) | أسطر القيود اليدوية مع رأس كل قيد |  |
-| 111 | [`qryJournalManual`](#qryjournalmanual) | أسطر القيود اليدوية |  |
-| 112 | [`qryYearCloseLines`](#qryyearcloselines) | أسطر قيود إقفال السنوات مع رأس كل إقفال |  |
-| 113 | [`qryJournalYearClose`](#qryjournalyearclose) | أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة |  |
-| 114 | [`qryJournalVatReturn`](#qryjournalvatreturn) | أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده |  |
-| 115 | [`qryJournalCheque`](#qryjournalcheque) | أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد |  |
-| 116 | [`qryJournalAsset`](#qryjournalasset) | أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها |  |
-| 117 | [`qryDepreciationLines`](#qrydepreciationlines) | أسطر قيود الإهلاك الشهرية مع اسم الأصل |  |
-| 118 | [`qryJournalDepreciation`](#qryjournaldepreciation) | أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل |  |
-| 119 | [`qryPayrollTotals`](#qrypayrolltotals) | مجاميع كل مسير رواتب لقيده |  |
-| 120 | [`qryPayrollCenterTotals`](#qrypayrollcentertotals) | مجاميع كل مسير رواتب لكل مركز تكلفة لقيده |  |
-| 121 | [`qryJournalPayroll`](#qryjournalpayroll) | أسطر قيود مسيرات الرواتب المرحَّلة وصرفها |  |
-| 122 | [`qryCommissionCenterTotals`](#qrycommissioncentertotals) | عمولات كل مسير لكل مركز تكلفة لقيده |  |
-| 123 | [`qryJournalCommission`](#qryjournalcommission) | أسطر قيود مسيرات العمولات المرحَّلة |  |
-| 124 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
-| 125 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
-| 126 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
-| 127 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
-| 128 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
-| 129 | [`qryAssetDepTotals`](#qryassetdeptotals) | مجموع إهلاك كل أصل في القيود الشهرية |  |
-| 130 | [`FixedAssetsQuery`](#fixedassetsquery) | سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري |  |
-| 131 | [`AuditTrailQuery`](#audittrailquery) | سجل التدقيق: كل عملية بمن قام بها ووقتها، وحقولها بالقيمة قبل وبعد |  |
-| 132 | [`qryAdvanceMoves`](#qryadvancemoves) | حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب |  |
-| 133 | [`qryAdvanceTotals`](#qryadvancetotals) | رصيد سلف كل موظف |  |
-| 134 | [`AdvanceBalanceQuery`](#advancebalancequery) | أرصدة سلف الموظفين |  |
-| 135 | [`PayrollSheetQuery`](#payrollsheetquery) | مسير الرواتب المختار بأسطر الموظفين | `PayrollRunID` |
-| 136 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
-| 137 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 138 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 139 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 140 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 141 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 142 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
-| 143 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 144 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 145 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
-| 146 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 147 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
-| 148 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
-| 149 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 150 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 151 | [`qryCenterMoves`](#qrycentermoves) | صافي حركة كل حساب إيرادات أو مصروفات لكل مركز تكلفة في الفترة | `PeriodStart`, `PeriodEnd` |
-| 152 | [`qryCenterNames`](#qrycenternames) | مراكز التكلفة ومعها «غير موزع» |  |
-| 153 | [`qryCenterSums`](#qrycentersums) | الإيرادات وتكلفة المبيعات والمصروفات لكل مركز تكلفة |  |
-| 154 | [`CostCenterProfitQuery`](#costcenterprofitquery) | قائمة الدخل لكل مركز تكلفة: الإيرادات، تكلفة المبيعات، مجمل الربح، المصروفات، صافي الربح | `PeriodStart`, `PeriodEnd` |
-| 155 | [`CostCenterAccountsQuery`](#costcenteraccountsquery) | إيرادات ومصروفات كل مركز تكلفة بالحسابات | `PeriodStart`, `PeriodEnd` |
-| 156 | [`qryBudgetMonths`](#qrybudgetmonths) | أشهر الموازنة: سطر لكل شهر من كل سطر موازنة |  |
-| 157 | [`qryBudgetPlanned`](#qrybudgetplanned) | مبلغ الموازنة لكل سطر في أشهر الفترة | `PeriodStart`, `PeriodEnd` |
-| 158 | [`qryBudgetActual`](#qrybudgetactual) | الفعلي لكل سطر موازنة في الفترة من القيود | `PeriodStart`, `PeriodEnd` |
-| 159 | [`BudgetVsActualQuery`](#budgetvsactualquery) | الموازنة مقابل الفعلي في الفترة: الانحراف ونسبته، وهل هو ملائم | `PeriodStart`, `PeriodEnd` |
-| 160 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 161 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 162 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 163 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 164 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 165 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 166 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 167 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 168 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 169 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 170 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 171 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 172 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 9 | [`qryLocRoles1`](#qrylocroles1) | Roles للواجهة الإنجليزية (خطوة 1) |  |
+| 10 | [`qryLocRoles`](#qrylocroles) | Roles بالأسماء الإنجليزية (الواجهة الإنجليزية) |  |
+| 11 | [`qryLocPermissions1`](#qrylocpermissions1) | Permissions للواجهة الإنجليزية (خطوة 1) |  |
+| 12 | [`qryLocPermissions`](#qrylocpermissions) | Permissions بالأسماء الإنجليزية (الواجهة الإنجليزية) |  |
+| 13 | [`qryLocScreens1`](#qrylocscreens1) | Screens للواجهة الإنجليزية (خطوة 1) |  |
+| 14 | [`qryLocScreens`](#qrylocscreens) | Screens بالأسماء الإنجليزية (الواجهة الإنجليزية) |  |
+| 15 | [`qryLocCategories1`](#qryloccategories1) | Categories للواجهة الإنجليزية (خطوة 1) |  |
+| 16 | [`qryLocCategories`](#qryloccategories) | Categories بالأسماء الإنجليزية (الواجهة الإنجليزية) |  |
+| 17 | [`qryLocUnits1`](#qrylocunits1) | Units للواجهة الإنجليزية (خطوة 1) |  |
+| 18 | [`qryLocUnits`](#qrylocunits) | Units بالأسماء الإنجليزية (الواجهة الإنجليزية) |  |
+| 19 | [`qryLocExpenseTypes1`](#qrylocexpensetypes1) | ExpenseTypes للواجهة الإنجليزية (خطوة 1) |  |
+| 20 | [`qryLocExpenseTypes`](#qrylocexpensetypes) | ExpenseTypes بالأسماء الإنجليزية (الواجهة الإنجليزية) |  |
+| 21 | [`qrySalesDocuments`](#qrysalesdocuments) | مستندات البيع: الفواتير (+) والمرتجعات (−) بقيم موقّعة |  |
+| 22 | [`qrySalesLineItems`](#qrysaleslineitems) | أسطر البيع والمرتجعات مع التكلفة (أساس تحليل المنتجات والأرباح) |  |
+| 23 | [`qrySalesLinesInPeriod`](#qrysaleslinesinperiod) | أسطر البيع والمرتجعات داخل الفترة | `PeriodStart`, `PeriodEnd` |
+| 24 | [`DailySalesQuery`](#dailysalesquery) ⭐ | المبيعات اليومية: عدد الفواتير والمرتجعات والصافي والنقدي والآجل |  |
+| 25 | [`qrySalesMonthlyDocs`](#qrysalesmonthlydocs) | تجميع شهري لمستندات البيع |  |
+| 26 | [`qrySalesMonthlyCost`](#qrysalesmonthlycost) | تكلفة البضاعة المباعة شهريًا |  |
+| 27 | [`MonthlySalesQuery`](#monthlysalesquery) ⭐ | المبيعات الشهرية مع التكلفة ومجمل الربح |  |
+| 28 | [`SalesByPeriodQuery`](#salesbyperiodquery) | فواتير ومرتجعات البيع خلال فترة مع العميل والكاشير | `PeriodStart`, `PeriodEnd` |
+| 29 | [`SalesByProductQuery`](#salesbyproductquery) | المبيعات حسب المنتج خلال فترة (كمية، صافي، تكلفة، ربح) | `PeriodStart`, `PeriodEnd` |
+| 30 | [`BestSellingProductsQuery`](#bestsellingproductsquery) ⭐ | أفضل المنتجات مبيعًا خلال فترة (حسب صافي الكمية) | `PeriodStart`, `PeriodEnd` |
+| 31 | [`SalesByCategoryQuery`](#salesbycategoryquery) | المبيعات حسب التصنيف خلال فترة (للرسم الدائري) | `PeriodStart`, `PeriodEnd` |
+| 32 | [`LeastSellingProductsQuery`](#leastsellingproductsquery) | أقل المنتجات مبيعًا خلال فترة (تشمل المنتجات التي لم تُبع) | `PeriodStart`, `PeriodEnd` |
+| 33 | [`qryPurchaseDocuments`](#qrypurchasedocuments) | مستندات الشراء: الفواتير (+) والمرتجعات (−) |  |
+| 34 | [`PurchasesQuery`](#purchasesquery) | فواتير ومرتجعات الشراء خلال فترة مع المورد | `PeriodStart`, `PeriodEnd` |
+| 35 | [`qryProductLedger`](#qryproductledger) | رصيد كل منتج من دفتر حركة المخزون |  |
+| 36 | [`qryProductLastSale`](#qryproductlastsale) | تاريخ آخر بيع لكل منتج |  |
+| 37 | [`StockBalanceQuery`](#stockbalancequery) ⭐ | المخزون الحالي: الكمية والقيمة بالتكلفة وبسعر البيع ومطابقتها مع الحركات |  |
+| 38 | [`LowStockQuery`](#lowstockquery) ⭐ | المنتجات منخفضة المخزون: CurrentQuantity <= MinimumQuantity |  |
+| 39 | [`ProductMovementQuery`](#productmovementquery) | حركة منتج خلال فترة مع رصيد أول المدة (الرصيد التراكمي في التقرير) | `PeriodStart`, `PeriodEnd`, `ProductID` |
+| 40 | [`SlowMovingProductsQuery`](#slowmovingproductsquery) ⭐ | المنتجات غير المتحركة: لها رصيد ولم تُبع منذ عدد الأيام المحدد في الإعدادات |  |
+| 41 | [`StockByCategoryQuery`](#stockbycategoryquery) | المخزون حسب التصنيف: عدد المنتجات والكمية والقيمة |  |
+| 42 | [`StockCountQuery`](#stockcountquery) | تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته |  |
+| 43 | [`qryCustomerLedger`](#qrycustomerledger) | دفتر حساب العملاء: مدين (عليه) / دائن (له) |  |
+| 44 | [`qryCustomerLedgerTotals`](#qrycustomerledgertotals) | مجاميع حساب كل عميل |  |
+| 45 | [`CustomerBalanceQuery`](#customerbalancequery) ⭐ | رصيد كل عميل محسوبًا من الحركات (موجب = عليه للمحل) |  |
+| 46 | [`CustomersWithDebtQuery`](#customerswithdebtquery) | العملاء الذين عليهم مبالغ مستحقة |  |
+| 47 | [`CustomerStatementQuery`](#customerstatementquery) | كشف حساب عميل لفترة: رصيد سابق ثم الحركات | `PeriodStart`, `PeriodEnd`, `CustomerID` |
+| 48 | [`qrySupplierLedger`](#qrysupplierledger) | دفتر حساب الموردين: دائن (للمورد) / مدين (سُدِّد له) |  |
+| 49 | [`qrySupplierLedgerTotals`](#qrysupplierledgertotals) | مجاميع حساب كل مورد |  |
+| 50 | [`SupplierBalanceQuery`](#supplierbalancequery) ⭐ | رصيد كل مورد محسوبًا من الحركات (موجب = مستحق للمورد) |  |
+| 51 | [`qrySupplierFxMoves`](#qrysupplierfxmoves) | حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بالريال) |  |
+| 52 | [`qryLatestRateDates`](#qrylatestratedates) | تاريخ آخر سعر لكل عملة |  |
+| 53 | [`qryLatestRates`](#qrylatestrates) | آخر معامل لكل عملة |  |
+| 54 | [`qrySupplierFxTotals`](#qrysupplierfxtotals) | رصيد كل مورد بكل عملة |  |
+| 55 | [`SupplierFxBalanceQuery`](#supplierfxbalancequery) | أرصدة الموردين بالعملات الأجنبية: بالدفاتر، وبآخر سعر، وفرق العملة غير المحقق |  |
+| 56 | [`SupplierStatementQuery`](#supplierstatementquery) | كشف حساب مورد لفترة: رصيد سابق ثم الحركات | `PeriodStart`, `PeriodEnd`, `SupplierID` |
+| 57 | [`qryCustomerAllocSums`](#qrycustomerallocsums) | مجموع ما رُبط من كل سند بالفواتير |  |
+| 58 | [`qryCustomerPaymentFree`](#qrycustomerpaymentfree) | سندات القبض: المربوط بالفواتير والباقي غير المربوط |  |
+| 59 | [`qryCustomerInvoiceAlloc`](#qrycustomerinvoicealloc) | مجموع ما رُبط بكل فاتورة من السندات |  |
+| 60 | [`qryCustomerInvoiceReturns`](#qrycustomerinvoicereturns) | مرتجعات كل فاتورة المخصومة من رصيد الحساب |  |
+| 61 | [`qryCustomerInvoiceFree`](#qrycustomerinvoicefree) | الفواتير الآجلة: المتبقي وما رُبط بها وما يمكن ربطه |  |
+| 62 | [`qrySupplierAllocSums`](#qrysupplierallocsums) | مجموع ما رُبط من كل سند بالفواتير |  |
+| 63 | [`qrySupplierPaymentFree`](#qrysupplierpaymentfree) | سندات الصرف: المربوط بالفواتير والباقي غير المربوط |  |
+| 64 | [`qrySupplierInvoiceAlloc`](#qrysupplierinvoicealloc) | مجموع ما رُبط بكل فاتورة من السندات |  |
+| 65 | [`qrySupplierInvoiceReturns`](#qrysupplierinvoicereturns) | مرتجعات كل فاتورة المخصومة من رصيد الحساب |  |
+| 66 | [`qrySupplierInvoiceFree`](#qrysupplierinvoicefree) | الفواتير الآجلة: المتبقي وما رُبط بها وما يمكن ربطه |  |
+| 67 | [`qryAgingDebits`](#qryagingdebits) | المستحق على كل عميل وللمورد بالمستند: الفواتير الآجلة والرصيد الافتتاحي |  |
+| 68 | [`qryAgingCredits`](#qryagingcredits) | ما يسدد المستحق: المرتجعات (على فاتورتها أولًا) والسندات والرصيد الافتتاحي الدائن |  |
+| 69 | [`qryAgingAllocations`](#qryagingallocations) | ربط السندات بالفواتير (ومنها السند المسجل عن فاتورة قبل الربط) |  |
+| 70 | [`ExpensesQuery`](#expensesquery) | المصروفات خلال فترة | `PeriodStart`, `PeriodEnd` |
+| 71 | [`ExpensesByTypeQuery`](#expensesbytypequery) | المصروفات مجمّعة حسب النوع خلال فترة | `PeriodStart`, `PeriodEnd` |
+| 72 | [`qryProfitSales`](#qryprofitsales) | صافي المبيعات وتكلفتها خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 73 | [`qryProfitAdjustments`](#qryprofitadjustments) | قيمة فروقات المخزون (جرد، إضافة، خصم) خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 74 | [`qryProfitExpenses`](#qryprofitexpenses) | المصروفات (بدون ضريبة) خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 75 | [`ProfitQuery`](#profitquery) ⭐ | الأرباح: صافي المبيعات − التكلفة = مجمل الربح؛ ثم ± فروقات المخزون − المصروفات = صافي الربح | `PeriodStart`, `PeriodEnd` |
+| 76 | [`qryVatOutput`](#qryvatoutput) | ضريبة المخرجات (المبيعات ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
+| 77 | [`qryVatInputPurchases`](#qryvatinputpurchases) | ضريبة المدخلات من المشتريات (ناقص المرتجعات) | `PeriodStart`, `PeriodEnd` |
+| 78 | [`qryVatInputExpenses`](#qryvatinputexpenses) | ضريبة المدخلات من المصروفات | `PeriodStart`, `PeriodEnd` |
+| 79 | [`VatSummaryQuery`](#vatsummaryquery) | ملخص ضريبة القيمة المضافة للفترة (للإقرار الضريبي) | `PeriodStart`, `PeriodEnd` |
+| 80 | [`qryVatReturnLines`](#qryvatreturnlines) | أسطر الإقرار الضريبي: المبيعات والمشتريات والمصروفات بفئتها الضريبية |  |
+| 81 | [`qryVatReturnTotals`](#qryvatreturntotals) | خانات الإقرار الضريبي للفترة محسوبة من المستندات (صف واحد) | `PeriodStart`, `PeriodEnd` |
+| 82 | [`qryVatReturnHead`](#qryvatreturnhead) | الإقرار الضريبي المختار | `VatReturnID` |
+| 83 | [`VatReturnQuery`](#vatreturnquery) | إقرار ضريبة القيمة المضافة بخانات نموذج الهيئة (1 إلى 16) | `VatReturnID` |
+| 84 | [`DashboardQuery`](#dashboardquery) | مؤشرات لوحة التحكم في سجل واحد (اليوم، الشهر، الأرصدة، المخزون) | `DashDay`, `DashMonth`, `DashEnd` |
+| 85 | [`qryRepDocs`](#qryrepdocs) | عمليات المندوبين: صافي المبيعات بدون الضريبة والتحصيل |  |
+| 86 | [`qryRepPeriodTotals`](#qryrepperiodtotals) | مبيعات وتحصيل كل مندوب في الفترة | `PeriodStart`, `PeriodEnd` |
+| 87 | [`qryRepTargetTotals`](#qryreptargettotals) | أهداف كل مندوب في أشهر الفترة | `PeriodStart`, `PeriodEnd` |
+| 88 | [`qryRepCommissionPaid`](#qryrepcommissionpaid) | ما صُرف لكل مندوب من عمولاته (سندات صرف النقدية) |  |
+| 89 | [`qryRepCommissionPosted`](#qryrepcommissionposted) | العمولات المرحَّلة لكل مندوب |  |
+| 90 | [`RepPerformanceQuery`](#repperformancequery) | أداء المندوبين في الفترة: المبيعات والتحصيل والهدف والإنجاز والعمولة المتوقعة | `PeriodStart`, `PeriodEnd` |
+| 91 | [`RepCustomersQuery`](#repcustomersquery) | عملاء كل مندوب وأرصدتهم |  |
+| 92 | [`RepCommissionBalanceQuery`](#repcommissionbalancequery) | العمولات المستحقة لكل مندوب: المرحَّل والمصروف والباقي |  |
+| 93 | [`CommissionSheetQuery`](#commissionsheetquery) | مسير العمولات المختار بأسطر المندوبين | `CommissionRunID` |
+| 94 | [`qryIndicatorLines`](#qryindicatorlines) | أسطر القيود مع مجموعة الحساب (المستوى 2) لحساب المؤشرات المالية |  |
+| 95 | [`FinancialIndicatorsQuery`](#financialindicatorsquery) | المؤشرات المالية (صف واحد): هامش الربح، دوران المخزون، فترة التحصيل، السيولة | `IndEnd`, `IndMonth`, `IndPrevMonth`, `IndYear`, `Ind90` |
+| 96 | [`qryDashboardTopProducts`](#qrydashboardtopproducts) | صافي الكمية المباعة لكل منتج منذ بداية الشهر (لوحة التحكم) | `DashMonth`, `DashEnd` |
+| 97 | [`qrySalesDocPrint`](#qrysalesdocprint) | بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف) |  |
+| 98 | [`qryPurchaseDocPrint`](#qrypurchasedocprint) | بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف) |  |
+| 99 | [`qryVoucherPrint`](#qryvoucherprint) | بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين) |  |
+| 100 | [`qryCashMovements`](#qrycashmovements) | كل حركات النقدية في الخزينة والصناديق: داخل (+) وخارج (−) |  |
+| 101 | [`qryCashBoxTotals`](#qrycashboxtotals) | إجمالي الداخل والخارج لكل صندوق |  |
+| 102 | [`CashBoxBalanceQuery`](#cashboxbalancequery) | أرصدة الخزينة والصناديق الآن |  |
+| 103 | [`CashStatementQuery`](#cashstatementquery) | حركة الخزينة / الصندوق لفترة: رصيد أول المدة ثم الحركات (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 104 | [`qryCashDays`](#qrycashdays) | مقبوضات ومدفوعات كل يوم داخل الفترة | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 105 | [`qryCashDayOpening`](#qrycashdayopening) | رصيد أول كل يوم من أيام الحركة (كل الحركات قبل ذلك اليوم) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 106 | [`CashDailyQuery`](#cashdailyquery) | حركة الخزينة اليومية: رصيد أول اليوم والمقبوضات والمدفوعات ورصيد آخر اليوم | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 107 | [`CashClosingsQuery`](#cashclosingsquery) | تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق) | `PeriodStart`, `PeriodEnd`, `CashBoxID` |
+| 108 | [`qryCashClosingPrint`](#qrycashclosingprint) | بيانات طباعة تصفية الكاشير |  |
+| 109 | [`qryCashVoucherPrint`](#qrycashvoucherprint) | بيانات طباعة سندات قبض وصرف وتحويل النقدية |  |
+| 110 | [`qrySaleCost`](#qrysalecost) | تكلفة كل فاتورة بيع |  |
+| 111 | [`qryReturnCost`](#qryreturncost) | تكلفة ما عاد للمخزون من كل مرتجع بيع |  |
+| 112 | [`qryStockCountValue`](#qrystockcountvalue) | قيمة فروقات كل جرد مُرحّل |  |
+| 113 | [`qryJournalSale`](#qryjournalsale) | أسطر قيود فواتير البيع |  |
+| 114 | [`qryJournalSalesReturn`](#qryjournalsalesreturn) | أسطر قيود مرتجعات البيع |  |
+| 115 | [`qryJournalPurchase`](#qryjournalpurchase) | أسطر قيود فواتير الشراء |  |
+| 116 | [`qryJournalPurchaseReturn`](#qryjournalpurchasereturn) | أسطر قيود مرتجعات الشراء |  |
+| 117 | [`qryJournalPayments`](#qryjournalpayments) | أسطر قيود سندات القبض من العملاء والصرف للموردين |  |
+| 118 | [`qryJournalExpense`](#qryjournalexpense) | أسطر قيود المصروفات (عدا المسجلة بسند نقدية) |  |
+| 119 | [`qryJournalCashVoucher`](#qryjournalcashvoucher) | أسطر قيود سندات النقدية (قبض وصرف وتحويل) |  |
+| 120 | [`qryJournalStock`](#qryjournalstock) | أسطر قيود حركات المخزون اليدوية وتسويات الجرد |  |
+| 121 | [`qryJournalOpening`](#qryjournalopening) | أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين |  |
+| 122 | [`qryManualEntryLines`](#qrymanualentrylines) | أسطر القيود اليدوية مع رأس كل قيد |  |
+| 123 | [`qryJournalManual`](#qryjournalmanual) | أسطر القيود اليدوية |  |
+| 124 | [`qryYearCloseLines`](#qryyearcloselines) | أسطر قيود إقفال السنوات مع رأس كل إقفال |  |
+| 125 | [`qryJournalYearClose`](#qryjournalyearclose) | أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة |  |
+| 126 | [`qryJournalVatReturn`](#qryjournalvatreturn) | أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده |  |
+| 127 | [`qryJournalCheque`](#qryjournalcheque) | أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد |  |
+| 128 | [`qryJournalAsset`](#qryjournalasset) | أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها |  |
+| 129 | [`qryDepreciationLines`](#qrydepreciationlines) | أسطر قيود الإهلاك الشهرية مع اسم الأصل |  |
+| 130 | [`qryJournalDepreciation`](#qryjournaldepreciation) | أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل |  |
+| 131 | [`qryPayrollTotals`](#qrypayrolltotals) | مجاميع كل مسير رواتب لقيده |  |
+| 132 | [`qryPayrollCenterTotals`](#qrypayrollcentertotals) | مجاميع كل مسير رواتب لكل مركز تكلفة لقيده |  |
+| 133 | [`qryJournalPayroll`](#qryjournalpayroll) | أسطر قيود مسيرات الرواتب المرحَّلة وصرفها |  |
+| 134 | [`qryCommissionCenterTotals`](#qrycommissioncentertotals) | عمولات كل مسير لكل مركز تكلفة لقيده |  |
+| 135 | [`qryJournalCommission`](#qryjournalcommission) | أسطر قيود مسيرات العمولات المرحَّلة |  |
+| 136 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
+| 137 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
+| 138 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
+| 139 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
+| 140 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
+| 141 | [`qryAssetDepTotals`](#qryassetdeptotals) | مجموع إهلاك كل أصل في القيود الشهرية |  |
+| 142 | [`FixedAssetsQuery`](#fixedassetsquery) | سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري |  |
+| 143 | [`AuditTrailQuery`](#audittrailquery) | سجل التدقيق: كل عملية بمن قام بها ووقتها، وحقولها بالقيمة قبل وبعد |  |
+| 144 | [`qryAdvanceMoves`](#qryadvancemoves) | حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب |  |
+| 145 | [`qryAdvanceTotals`](#qryadvancetotals) | رصيد سلف كل موظف |  |
+| 146 | [`AdvanceBalanceQuery`](#advancebalancequery) | أرصدة سلف الموظفين |  |
+| 147 | [`PayrollSheetQuery`](#payrollsheetquery) | مسير الرواتب المختار بأسطر الموظفين | `PayrollRunID` |
+| 148 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
+| 149 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 150 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 151 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 152 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 153 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 154 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
+| 155 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 156 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 157 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 158 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 159 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
+| 160 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
+| 161 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 162 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 163 | [`qryCenterMoves`](#qrycentermoves) | صافي حركة كل حساب إيرادات أو مصروفات لكل مركز تكلفة في الفترة | `PeriodStart`, `PeriodEnd` |
+| 164 | [`qryCenterNames`](#qrycenternames) | مراكز التكلفة ومعها «غير موزع» |  |
+| 165 | [`qryCenterSums`](#qrycentersums) | الإيرادات وتكلفة المبيعات والمصروفات لكل مركز تكلفة |  |
+| 166 | [`CostCenterProfitQuery`](#costcenterprofitquery) | قائمة الدخل لكل مركز تكلفة: الإيرادات، تكلفة المبيعات، مجمل الربح، المصروفات، صافي الربح | `PeriodStart`, `PeriodEnd` |
+| 167 | [`CostCenterAccountsQuery`](#costcenteraccountsquery) | إيرادات ومصروفات كل مركز تكلفة بالحسابات | `PeriodStart`, `PeriodEnd` |
+| 168 | [`qryBudgetMonths`](#qrybudgetmonths) | أشهر الموازنة: سطر لكل شهر من كل سطر موازنة |  |
+| 169 | [`qryBudgetPlanned`](#qrybudgetplanned) | مبلغ الموازنة لكل سطر في أشهر الفترة | `PeriodStart`, `PeriodEnd` |
+| 170 | [`qryBudgetActual`](#qrybudgetactual) | الفعلي لكل سطر موازنة في الفترة من القيود | `PeriodStart`, `PeriodEnd` |
+| 171 | [`BudgetVsActualQuery`](#budgetvsactualquery) | الموازنة مقابل الفعلي في الفترة: الانحراف ونسبته، وهل هو ملائم | `PeriodStart`, `PeriodEnd` |
+| 172 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 173 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 174 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 175 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 176 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 177 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 178 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 179 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 180 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 181 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 182 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 183 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 184 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -353,6 +365,102 @@ TransactionTypes بالأسماء الإنجليزية (الواجهة الإن�
 SELECT TransactionTypeID, TypeCode, Nz(TypeNameEn, LocArabicName) AS TypeName, TypeNameEn, Direction, IsManual FROM qryLocTransactionTypes1
 ```
 
+## qryLocRoles1
+
+Roles للواجهة الإنجليزية (خطوة 1)
+
+```sql
+SELECT t.RoleID, t.RoleCode, t.RoleName AS LocArabicName, t.RoleNameEn, t.Description FROM Roles AS t
+```
+
+## qryLocRoles
+
+Roles بالأسماء الإنجليزية (الواجهة الإنجليزية)
+
+```sql
+SELECT RoleID, RoleCode, Nz(RoleNameEn, LocArabicName) AS RoleName, RoleNameEn, Description FROM qryLocRoles1
+```
+
+## qryLocPermissions1
+
+Permissions للواجهة الإنجليزية (خطوة 1)
+
+```sql
+SELECT t.PermissionKey, t.PermissionName AS LocArabicName, t.PermissionNameEn, t.ModuleName, t.SortOrder FROM Permissions AS t
+```
+
+## qryLocPermissions
+
+Permissions بالأسماء الإنجليزية (الواجهة الإنجليزية)
+
+```sql
+SELECT PermissionKey, Nz(PermissionNameEn, LocArabicName) AS PermissionName, PermissionNameEn, ModuleName, SortOrder FROM qryLocPermissions1
+```
+
+## qryLocScreens1
+
+Screens للواجهة الإنجليزية (خطوة 1)
+
+```sql
+SELECT t.ScreenName, t.ScreenTitle AS LocArabicName, t.ScreenTitleEn, t.ModuleName, t.SortOrder, t.PermissionKey, t.HasAdd, t.HasEdit, t.HasDelete FROM Screens AS t
+```
+
+## qryLocScreens
+
+Screens بالأسماء الإنجليزية (الواجهة الإنجليزية)
+
+```sql
+SELECT ScreenName, Nz(ScreenTitleEn, LocArabicName) AS ScreenTitle, ScreenTitleEn, ModuleName, SortOrder, PermissionKey, HasAdd, HasEdit, HasDelete FROM qryLocScreens1
+```
+
+## qryLocCategories1
+
+Categories للواجهة الإنجليزية (خطوة 1)
+
+```sql
+SELECT t.CategoryID, t.CategoryName AS LocArabicName, t.CategoryNameEn, t.Description, t.IsActive, t.ImagePath, t.TileColor, t.SortOrder, t.IsAddOn FROM Categories AS t
+```
+
+## qryLocCategories
+
+Categories بالأسماء الإنجليزية (الواجهة الإنجليزية)
+
+```sql
+SELECT CategoryID, Nz(CategoryNameEn, LocArabicName) AS CategoryName, CategoryNameEn, Description, IsActive, ImagePath, TileColor, SortOrder, IsAddOn FROM qryLocCategories1
+```
+
+## qryLocUnits1
+
+Units للواجهة الإنجليزية (خطوة 1)
+
+```sql
+SELECT t.UnitID, t.UnitName AS LocArabicName, t.UnitNameEn, t.ZatcaUnitCode, t.IsActive FROM Units AS t
+```
+
+## qryLocUnits
+
+Units بالأسماء الإنجليزية (الواجهة الإنجليزية)
+
+```sql
+SELECT UnitID, Nz(UnitNameEn, LocArabicName) AS UnitName, UnitNameEn, ZatcaUnitCode, IsActive FROM qryLocUnits1
+```
+
+## qryLocExpenseTypes1
+
+ExpenseTypes للواجهة الإنجليزية (خطوة 1)
+
+```sql
+SELECT t.ExpenseTypeID, t.ExpenseTypeName AS LocArabicName, t.ExpenseTypeNameEn, t.IsActive FROM ExpenseTypes AS t
+```
+
+## qryLocExpenseTypes
+
+ExpenseTypes بالأسماء الإنجليزية (الواجهة الإنجليزية)
+
+```sql
+SELECT ExpenseTypeID, Nz(ExpenseTypeNameEn, LocArabicName) AS ExpenseTypeName, ExpenseTypeNameEn, IsActive FROM qryLocExpenseTypes1
+```
+
 ## qrySalesDocuments
 
 مستندات البيع: الفواتير (+) والمرتجعات (−) بقيم موقّعة
@@ -485,7 +593,7 @@ SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName,
        Sum(l.LineNet) AS NetSales, Sum(l.LineVAT) AS SalesVAT, Sum(l.LineGross) AS SalesTotal,
        Sum(l.LineCost) AS CostOfSales, Sum(l.LineNet) - Sum(l.LineCost) AS GrossProfit
 FROM (qrySalesLinesInPeriod AS l INNER JOIN Products AS p ON l.ProductID = p.ProductID)
-     INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID
+     INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID
 GROUP BY p.ProductID, p.ProductCode, p.ProductName, c.CategoryName
 ORDER BY p.ProductName
 ```
@@ -524,7 +632,7 @@ ORDER BY Sum(SalesTotal) DESC
 ```sql
 SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity,
        CCur(Nz(s.NetQty, 0)) AS NetQtySold, CCur(Nz(s.NetSales, 0)) AS NetSalesAmount
-FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
+FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN SalesByProductQuery AS s ON p.ProductID = s.ProductID
 WHERE p.IsActive = True
 ORDER BY CCur(Nz(s.NetQty, 0)), p.ProductName
@@ -596,8 +704,8 @@ SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName, u.U
        CCur(Nz(l.LedgerQty, 0)) AS LedgerQuantity,
        p.CurrentQuantity - CCur(Nz(l.LedgerQty, 0)) AS QuantityMismatch,
        IIf(p.CurrentQuantity <= p.MinimumQuantity, True, False) AS IsLowStock, p.IsActive
-FROM ((Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
-      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+FROM ((Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
+      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
      LEFT JOIN qryProductLedger AS l ON p.ProductID = l.ProductID
 ORDER BY p.ProductName
 ```
@@ -610,7 +718,7 @@ ORDER BY p.ProductName
 SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName,
        p.CurrentQuantity, p.MinimumQuantity, p.MinimumQuantity - p.CurrentQuantity AS ShortageQty,
        s.SupplierName, s.Mobile AS SupplierMobile
-FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
+FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
 WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity
 ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName
@@ -648,7 +756,7 @@ ORDER BY SortKey, MovementDate, TransactionID
 SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity,
        p.AverageCost, p.CurrentQuantity * p.AverageCost AS StockCostValue, ls.LastSaleDate,
        DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) AS DaysWithoutSale
-FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
+FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN qryProductLastSale AS ls ON p.ProductID = ls.ProductID
 WHERE p.IsActive = True AND p.CurrentQuantity > 0
   AND DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) >=
@@ -665,7 +773,7 @@ SELECT c.CategoryID, c.CategoryName, Count(*) AS ProductCount,
        Sum(p.CurrentQuantity) AS TotalQuantity,
        Sum(p.CurrentQuantity * p.AverageCost) AS StockCostValue,
        Sum(p.CurrentQuantity * p.SellingPrice) AS StockSalesValue
-FROM Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID
+FROM Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID
 WHERE p.IsActive = True
 GROUP BY c.CategoryID, c.CategoryName
 ORDER BY c.CategoryName
@@ -681,7 +789,7 @@ SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, g.Cat
        d.UnitCost, d.DifferenceValue, d.Notes
 FROM ((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)
       INNER JOIN Products AS p ON d.ProductID = p.ProductID)
-     LEFT JOIN Categories AS g ON c.CategoryID = g.CategoryID
+     LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID
 ORDER BY c.StockCountID, p.ProductName
 ```
 
@@ -1114,7 +1222,7 @@ WHERE p.PurchaseInvoiceID Is Not Null AND s.PaymentID Is Null
 ```sql
 SELECT e.ExpenseID, e.ExpenseNumber, e.ExpenseDate, t.ExpenseTypeName, e.Amount, e.Tax,
        e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName, e.ExpenseTypeID
-FROM ((Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID)
+FROM ((Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID)
       INNER JOIN Employees AS em ON e.EmployeeID = em.EmployeeID)
      LEFT JOIN [@PaymentMethods] AS pm ON e.PaymentMethodID = pm.PaymentMethodID
 WHERE e.ExpenseDate >= QDate('PeriodStart') AND e.ExpenseDate < QDate('PeriodEnd')
@@ -1130,7 +1238,7 @@ ORDER BY e.ExpenseDate
 ```sql
 SELECT t.ExpenseTypeName, Count(*) AS ExpenseCount, Sum(e.Amount) AS AmountExVAT,
        Sum(e.Tax) AS InputVAT, Sum(e.TotalAmount) AS AmountTotal
-FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID
+FROM Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID
 WHERE e.ExpenseDate >= QDate('PeriodStart') AND e.ExpenseDate < QDate('PeriodEnd')
 GROUP BY t.ExpenseTypeName
 ORDER BY Sum(e.TotalAmount) DESC
@@ -1598,7 +1706,7 @@ SELECT 'PURCHASE' AS DocKind, h.PurchaseInvoiceID AS DocID, h.InvoiceNumber AS D
 FROM ((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d
          ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)
        INNER JOIN Products AS p ON d.ProductID = p.ProductID)
-      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID)
     INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID
 UNION ALL
@@ -1613,7 +1721,7 @@ FROM ((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd
          INNER JOIN PurchaseInvoiceDetails AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)
         INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)
        INNER JOIN Products AS p ON rd.ProductID = p.ProductID)
-      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID)
     INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID
 ```
@@ -1676,7 +1784,7 @@ WHERE p.CashBoxID Is Not Null
 UNION ALL
 SELECT e.CashBoxID, e.ExpenseDate, 'EXPENSE', 'مصروف', e.ExpenseNumber,
        t.ExpenseTypeName, e.Description, CCur(0), e.TotalAmount, e.EmployeeID
-FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID
+FROM Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID
 WHERE e.CashBoxID Is Not Null
 UNION ALL
 SELECT v.CashBoxID, v.VoucherDate, 'CASH_IN',
@@ -1871,7 +1979,7 @@ FROM ((((CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxI
         INNER JOIN Employees AS e ON v.EmployeeID = e.EmployeeID)
        LEFT JOIN CashBoxes AS t ON v.ToCashBoxID = t.CashBoxID)
       LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)
-     LEFT JOIN ExpenseTypes AS x ON ex.ExpenseTypeID = x.ExpenseTypeID
+     LEFT JOIN [@ExpenseTypes] AS x ON ex.ExpenseTypeID = x.ExpenseTypeID
 ```
 
 ## qrySaleCost
@@ -2038,15 +2146,15 @@ WHERE p.Amount <> 0
 
 ```sql
 SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 1 AS LineOrder, 530000 + e.ExpenseTypeID AS AccountCode, e.Amount AS Debit, CCur(0) AS Credit, t.ExpenseTypeName AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter
-FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
+FROM (Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
 WHERE v.CashVoucherID Is Null AND e.Amount <> 0
 UNION ALL
 SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 2 AS LineOrder, 1500 AS AccountCode, e.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter
-FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
+FROM (Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
 WHERE v.CashVoucherID Is Null AND e.Tax <> 0
 UNION ALL
 SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 3 AS LineOrder, IIf(e.CashBoxID Is Null, IIf(e.PaymentMethodID Is Null Or e.PaymentMethodID = 1, 1190, IIf(e.BankID Is Null, 1200, 120000 + e.BankID)), 110000 + e.CashBoxID) AS AccountCode, CCur(0) AS Debit, e.TotalAmount AS Credit, e.Description AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter
-FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
+FROM (Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID
 WHERE v.CashVoucherID Is Null AND e.TotalAmount <> 0
 ```
 

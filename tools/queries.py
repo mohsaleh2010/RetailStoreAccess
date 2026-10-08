@@ -138,7 +138,7 @@ def _payments():
 
 def _expense():
     # an expense recorded by a cash voucher is booked by the voucher's entry
-    src = ("(Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) "
+    src = ("(Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID) "
            "LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID")
     k = ("'EXPENSE'", "e.ExpenseID", "e.ExpenseNumber", "e.ExpenseDate", "t.ExpenseTypeName")
     return with_center(jquery([
@@ -636,7 +636,7 @@ SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName,
        Sum(l.LineNet) AS NetSales, Sum(l.LineVAT) AS SalesVAT, Sum(l.LineGross) AS SalesTotal,
        Sum(l.LineCost) AS CostOfSales, Sum(l.LineNet) - Sum(l.LineCost) AS GrossProfit
 FROM (qrySalesLinesInPeriod AS l INNER JOIN Products AS p ON l.ProductID = p.ProductID)
-     INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID
+     INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID
 GROUP BY p.ProductID, p.ProductCode, p.ProductName, c.CategoryName
 ORDER BY p.ProductName""", P),
 
@@ -654,7 +654,7 @@ ORDER BY Sum(SalesTotal) DESC""", P),
     Query("LeastSellingProductsQuery", "أقل المنتجات مبيعًا خلال فترة (تشمل المنتجات التي لم تُبع)", f"""
 SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity,
        {nz("s.NetQty")} AS NetQtySold, {nz("s.NetSales")} AS NetSalesAmount
-FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
+FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN SalesByProductQuery AS s ON p.ProductID = s.ProductID
 WHERE p.IsActive = True
 ORDER BY {nz("s.NetQty")}, p.ProductName""", P),
@@ -701,8 +701,8 @@ SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName, u.U
        {nz("l.LedgerQty")} AS LedgerQuantity,
        p.CurrentQuantity - {nz("l.LedgerQty")} AS QuantityMismatch,
        IIf(p.CurrentQuantity <= p.MinimumQuantity, True, False) AS IsLowStock, p.IsActive
-FROM ((Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
-      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+FROM ((Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
+      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
      LEFT JOIN qryProductLedger AS l ON p.ProductID = l.ProductID
 ORDER BY p.ProductName"""),
 
@@ -710,7 +710,7 @@ ORDER BY p.ProductName"""),
 SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName,
        p.CurrentQuantity, p.MinimumQuantity, p.MinimumQuantity - p.CurrentQuantity AS ShortageQty,
        s.SupplierName, s.Mobile AS SupplierMobile
-FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
+FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN Suppliers AS s ON p.SupplierID = s.SupplierID
 WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity
 ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName"""),
@@ -736,7 +736,7 @@ ORDER BY SortKey, MovementDate, TransactionID""", P + ["ProductID"]),
 SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity,
        p.AverageCost, p.CurrentQuantity * p.AverageCost AS StockCostValue, ls.LastSaleDate,
        DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) AS DaysWithoutSale
-FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)
+FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN qryProductLastSale AS ls ON p.ProductID = ls.ProductID
 WHERE p.IsActive = True AND p.CurrentQuantity > 0
   AND DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) >=
@@ -748,7 +748,7 @@ SELECT c.CategoryID, c.CategoryName, Count(*) AS ProductCount,
        Sum(p.CurrentQuantity) AS TotalQuantity,
        Sum(p.CurrentQuantity * p.AverageCost) AS StockCostValue,
        Sum(p.CurrentQuantity * p.SellingPrice) AS StockSalesValue
-FROM Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID
+FROM Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID
 WHERE p.IsActive = True
 GROUP BY c.CategoryID, c.CategoryName
 ORDER BY c.CategoryName"""),
@@ -759,7 +759,7 @@ SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, g.Cat
        d.UnitCost, d.DifferenceValue, d.Notes
 FROM ((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)
       INNER JOIN Products AS p ON d.ProductID = p.ProductID)
-     LEFT JOIN Categories AS g ON c.CategoryID = g.CategoryID
+     LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID
 ORDER BY c.StockCountID, p.ProductName"""),
 
     # ============================================================ CUSTOMERS
@@ -1047,7 +1047,7 @@ WHERE p.PurchaseInvoiceID Is Not Null AND s.PaymentID Is Null"""),
     Query("ExpensesQuery", "المصروفات خلال فترة", f"""
 SELECT e.ExpenseID, e.ExpenseNumber, e.ExpenseDate, t.ExpenseTypeName, e.Amount, e.Tax,
        e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName, e.ExpenseTypeID
-FROM ((Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID)
+FROM ((Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID)
       INNER JOIN Employees AS em ON e.EmployeeID = em.EmployeeID)
      LEFT JOIN [@PaymentMethods] AS pm ON e.PaymentMethodID = pm.PaymentMethodID
 WHERE {period("e.ExpenseDate")}
@@ -1056,7 +1056,7 @@ ORDER BY e.ExpenseDate""", P),
     Query("ExpensesByTypeQuery", "المصروفات مجمّعة حسب النوع خلال فترة", f"""
 SELECT t.ExpenseTypeName, Count(*) AS ExpenseCount, Sum(e.Amount) AS AmountExVAT,
        Sum(e.Tax) AS InputVAT, Sum(e.TotalAmount) AS AmountTotal
-FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID
+FROM Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID
 WHERE {period("e.ExpenseDate")}
 GROUP BY t.ExpenseTypeName
 ORDER BY Sum(e.TotalAmount) DESC""", P),
@@ -1280,7 +1280,7 @@ SELECT 'PURCHASE' AS DocKind, h.PurchaseInvoiceID AS DocID, h.InvoiceNumber AS D
 FROM ((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d
          ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)
        INNER JOIN Products AS p ON d.ProductID = p.ProductID)
-      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID)
     INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID
 UNION ALL
@@ -1295,7 +1295,7 @@ FROM ((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd
          INNER JOIN PurchaseInvoiceDetails AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)
         INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)
        INNER JOIN Products AS p ON rd.ProductID = p.ProductID)
-      INNER JOIN Units AS u ON p.UnitID = u.UnitID)
+      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID)
     INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID"""),
 
@@ -1349,7 +1349,7 @@ WHERE p.CashBoxID Is Not Null
 UNION ALL
 SELECT e.CashBoxID, e.ExpenseDate, 'EXPENSE', 'مصروف', e.ExpenseNumber,
        t.ExpenseTypeName, e.Description, CCur(0), e.TotalAmount, e.EmployeeID
-FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID
+FROM Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID
 WHERE e.CashBoxID Is Not Null
 UNION ALL
 SELECT v.CashBoxID, v.VoucherDate, 'CASH_IN',
@@ -1491,7 +1491,7 @@ FROM ((((CashVouchers AS v INNER JOIN CashBoxes AS b ON v.CashBoxID = b.CashBoxI
         INNER JOIN Employees AS e ON v.EmployeeID = e.EmployeeID)
        LEFT JOIN CashBoxes AS t ON v.ToCashBoxID = t.CashBoxID)
       LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)
-     LEFT JOIN ExpenseTypes AS x ON ex.ExpenseTypeID = x.ExpenseTypeID"""),
+     LEFT JOIN [@ExpenseTypes] AS x ON ex.ExpenseTypeID = x.ExpenseTypeID"""),
 
     # ============================================================ JOURNAL
     Query("qrySaleCost", "تكلفة كل فاتورة بيع", """

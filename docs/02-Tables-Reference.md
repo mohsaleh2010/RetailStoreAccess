@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **69** | عدد الحقول: **877**
+عدد الجداول: **69** | عدد الحقول: **883**
 
 ## الفهرس
 
@@ -149,7 +149,8 @@
 | 1 | **RoleID** 🔑 | Number (Long) |  | ✔ |  |  |  | رقم الدور |
 | 2 | RoleCode | Short Text | 20 | ✔ |  |  |  | رمز الدور |
 | 3 | RoleName | Short Text | 50 | ✔ |  |  |  | اسم الدور |
-| 4 | Description | Short Text | 255 |  |  |  |  | الوصف |
+| 4 | RoleNameEn | Short Text | 50 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 5 | Description | Short Text | 255 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `RoleID`
 - فهرس فريد: `RoleCode`
@@ -163,8 +164,9 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  |  | رمز الصلاحية |
 | 2 | PermissionName | Short Text | 100 | ✔ |  |  |  | اسم الصلاحية |
-| 3 | ModuleName | Short Text | 50 |  |  |  |  | القسم |
-| 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 3 | PermissionNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | ModuleName | Short Text | 50 |  |  |  |  | القسم |
+| 5 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
 - بيانات أساسية: 36 سجل
@@ -230,12 +232,13 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **ScreenName** 🔑 | Short Text | 64 | ✔ |  |  |  | اسم الشاشة في Access |
 | 2 | ScreenTitle | Short Text | 100 | ✔ |  |  |  | الشاشة |
-| 3 | ModuleName | Short Text | 50 |  |  |  |  | القسم |
-| 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
-| 5 | PermissionKey | Short Text | 50 |  |  |  |  | صلاحية الدور – فارغ = متاحة لكل المستخدمين؛ تُستخدم للمستخدم الذي ليست له صلاحيات شاشات خاصة |
-| 6 | HasAdd | Yes/No |  |  | `False` |  |  | فيها إضافة / حفظ مستند |
-| 7 | HasEdit | Yes/No |  |  | `False` |  |  | فيها تعديل |
-| 8 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
+| 3 | ScreenTitleEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | ModuleName | Short Text | 50 |  |  |  |  | القسم |
+| 5 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 6 | PermissionKey | Short Text | 50 |  |  |  |  | صلاحية الدور – فارغ = متاحة لكل المستخدمين؛ تُستخدم للمستخدم الذي ليست له صلاحيات شاشات خاصة |
+| 7 | HasAdd | Yes/No |  |  | `False` |  |  | فيها إضافة / حفظ مستند |
+| 8 | HasEdit | Yes/No |  |  | `False` |  |  | فيها تعديل |
+| 9 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
 - بيانات أساسية: 58 سجل
@@ -279,12 +282,13 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **CategoryID** 🔑 | AutoNumber |  |  |  |  |  | رقم التصنيف |
 | 2 | CategoryName | Short Text | 100 | ✔ |  |  |  | اسم التصنيف |
-| 3 | Description | Short Text | 255 |  |  |  |  | الوصف |
-| 4 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 5 | ImagePath | Short Text | 255 |  |  |  |  | صورة التصنيف |
-| 6 | TileColor | Short Text | 10 | ✔ | `"BLUE"` | `In ("BLUE","GREEN","ORANGE","PURPLE","RED","INDIGO","TEAL","PINK","BROWN","GREY")` |  | لون الزر |
-| 7 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | ترتيب العرض |
-| 8 | IsAddOn | Yes/No |  |  | `False` |  |  | فئة إضافات |
+| 3 | CategoryNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | Description | Short Text | 255 |  |  |  |  | الوصف |
+| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 6 | ImagePath | Short Text | 255 |  |  |  |  | صورة التصنيف |
+| 7 | TileColor | Short Text | 10 | ✔ | `"BLUE"` | `In ("BLUE","GREEN","ORANGE","PURPLE","RED","INDIGO","TEAL","PINK","BROWN","GREY")` |  | لون الزر |
+| 8 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | ترتيب العرض |
+| 9 | IsAddOn | Yes/No |  |  | `False` |  |  | فئة إضافات |
 
 - المفتاح الأساسي: `CategoryID`
 - فهرس فريد: `CategoryName`
@@ -298,8 +302,9 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **UnitID** 🔑 | AutoNumber |  |  |  |  |  | رقم الوحدة |
 | 2 | UnitName | Short Text | 30 | ✔ |  |  |  | اسم الوحدة |
-| 3 | ZatcaUnitCode | Short Text | 10 |  |  |  |  | رمز الوحدة (UN/ECE) |
-| 4 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 3 | UnitNameEn | Short Text | 30 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | ZatcaUnitCode | Short Text | 10 |  |  |  |  | رمز الوحدة (UN/ECE) |
+| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
 
 - المفتاح الأساسي: `UnitID`
 - فهرس فريد: `UnitName`
@@ -1207,7 +1212,8 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **ExpenseTypeID** 🔑 | AutoNumber |  |  |  |  |  | رقم النوع |
 | 2 | ExpenseTypeName | Short Text | 50 | ✔ |  |  |  | نوع المصروف |
-| 3 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 3 | ExpenseTypeNameEn | Short Text | 50 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
 
 - المفتاح الأساسي: `ExpenseTypeID`
 - فهرس فريد: `ExpenseTypeName`

@@ -125,8 +125,9 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   (`Format(q.Cost, ...) AS [التكلفة]` becomes `AS [Cost]`: circular reference) - choose a caption whose
   English differs (`[تكلفة الأصل]` = Asset cost). `test_i18n` checks it.
 - Master data names: SQL that shows the name of an account, payment method, journal source or stock move
-  type reads `[@Accounts] AS a` (also `[@PaymentMethods]`, `[@JournalSourceTypes]`, `[@TransactionTypes]`)
-  and goes through `Tr`: an English front-end reads `qryLocAccounts` (same columns, English name). A new
+  type, role, permission, screen, category, unit or expense type reads `[@Accounts] AS a` (also
+  `[@PaymentMethods]`, `[@JournalSourceTypes]`, `[@TransactionTypes]`, `[@Roles]`, `[@Permissions]`, `[@Screens]`,
+  `[@Categories]`, `[@Units]`, `[@ExpenseTypes]`; not for a look-up by the typed name) and goes through `Tr`: an English front-end reads `qryLocAccounts` (same columns, English name). A new
   master table with an English name goes into `tools/master_en.py` (`docs/39-English-Master-Data.md`).
   `MSG_RTL` is a function of `modLang` (0 in English). The English texts contain no `" ' [ ] ; | & = < >`.
 - Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness

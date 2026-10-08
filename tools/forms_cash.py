@@ -6,8 +6,8 @@ from typing import List
 
 from forms import Control, FormModel, Sym, button, cm, fit_window, labelled, shrink_area, title_band
 
-ACTIVE_EXPENSE_TYPES = ("SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes WHERE IsActive = True "
-                        "ORDER BY ExpenseTypeName")
+ACTIVE_EXPENSE_TYPES = ("SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x WHERE x.IsActive = True "
+                        "ORDER BY x.ExpenseTypeName")
 
 
 def value_list_combo(m: FormModel, name, x, y, w, h=cm(0.8), events=("AfterUpdate",), font=None):

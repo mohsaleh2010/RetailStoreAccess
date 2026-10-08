@@ -332,6 +332,7 @@ TABLES: List[Table] = [
             long_("RoleID", "رقم الدور", required=True),
             text("RoleCode", 20, "رمز الدور", required=True),
             text("RoleName", 50, "اسم الدور", required=True),
+            text("RoleNameEn", 50, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("Description", 255, "الوصف"),
         ],
         pk=["RoleID"],
@@ -350,6 +351,7 @@ TABLES: List[Table] = [
         [
             text("PermissionKey", 50, "رمز الصلاحية", required=True),
             text("PermissionName", 100, "اسم الصلاحية", required=True),
+            text("PermissionNameEn", 100, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("ModuleName", 50, "القسم"),
             int_("SortOrder", "الترتيب", required=True, default="0"),
         ],
@@ -460,6 +462,7 @@ TABLES: List[Table] = [
         [
             text("ScreenName", 64, "اسم الشاشة في Access", required=True),
             text("ScreenTitle", 100, "الشاشة", required=True),
+            text("ScreenTitleEn", 100, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("ModuleName", 50, "القسم"),
             int_("SortOrder", "الترتيب", required=True, default="0"),
             text("PermissionKey", 50, "صلاحية الدور",
@@ -512,6 +515,7 @@ TABLES: List[Table] = [
         [
             auto("CategoryID", "رقم التصنيف"),
             text("CategoryName", 100, "اسم التصنيف", required=True),
+            text("CategoryNameEn", 100, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("Description", 255, "الوصف"),
             is_active(),
             # touch screens (restaurant / café)
@@ -534,6 +538,7 @@ TABLES: List[Table] = [
         [
             auto("UnitID", "رقم الوحدة"),
             text("UnitName", 30, "اسم الوحدة", required=True),
+            text("UnitNameEn", 30, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("ZatcaUnitCode", 10, "رمز الوحدة (UN/ECE)"),
             is_active(),
         ],
@@ -1456,6 +1461,7 @@ TABLES: List[Table] = [
         [
             auto("ExpenseTypeID", "رقم النوع"),
             text("ExpenseTypeName", 50, "نوع المصروف", required=True),
+            text("ExpenseTypeNameEn", 50, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             is_active(),
         ],
         pk=["ExpenseTypeID"],

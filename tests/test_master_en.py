@@ -79,10 +79,17 @@ class MarkerTests(unittest.TestCase):
         for s in self.all_sql():
             if s.lstrip().upper().startswith(("INSERT", "UPDATE", "DELETE")) or "AS LocArabicName" in s:
                 continue                                 # writing, or the first step of qryLoc<Table>
+            if "'SALE' AS DocKind" in s:
+                continue                                 # qrySalesDocPrint: the tax invoice stays Arabic (ZATCA)
+            if re.search(r"Name =\s*$|Name = \w", s):
+                continue                                 # a look-up by the name the user typed (the table itself)
             for tbl, (_, ar_field, _, _) in ENGLISH_NAMES.items():
                 for m in re.finditer(rf"(?<![@\w\[]){tbl}\s+AS\s+(\w+)", s):
                     with self.subTest(sql=s[:90]):
                         self.assertIsNone(re.search(rf"(?<![\w.]){m.group(1)}\.{ar_field}\b", s))
+                if re.search(rf"\b(?:FROM|JOIN)\s+{tbl}\b(?!\s+AS)", s) and re.search(rf"(?<![\w.]){ar_field}\b", s):
+                    with self.subTest(sql=s[:90]):
+                        self.fail(f"reads {tbl}.{ar_field} without [@{tbl}] AS x: {s[:120]}")
 
     def test_resolution(self):
         sql = "SELECT a.AccountName FROM [@Accounts] AS a"

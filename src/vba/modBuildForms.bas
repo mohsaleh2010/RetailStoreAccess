@@ -1180,9 +1180,9 @@ Private Sub BuildForm_frmProducts()
     Set c = AddLabel("lblProductName", "اسم المنتج *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ProductName", 0)
     Set c = AddText("ProductNameEn", "ProductNameEn", 7201, 2835, 7881, 425)
     Set c = AddLabel("lblProductNameEn", "الاسم بالإنجليزية", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "ProductNameEn", 0)
-    Set c = AddCombo("CategoryID", "CategoryID", 7201, 3402, 2948, 425, "SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryName", 2, "0;3402")
+    Set c = AddCombo("CategoryID", "CategoryID", 7201, 3402, 2948, 425, "SELECT c.CategoryID, c.CategoryName FROM [@Categories] AS c ORDER BY c.CategoryName", 2, "0;3402")
     Set c = AddLabel("lblCategoryID", "التصنيف", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "CategoryID", 0)
-    Set c = AddCombo("UnitID", "UnitID", 12134, 3402, 2948, 425, "SELECT UnitID, UnitName FROM Units ORDER BY UnitName", 2, "0;3402")
+    Set c = AddCombo("UnitID", "UnitID", 12134, 3402, 2948, 425, "SELECT u.UnitID, u.UnitName FROM [@Units] AS u ORDER BY u.UnitName", 2, "0;3402")
     Set c = AddLabel("lblUnitID", "الوحدة", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "UnitID", 0)
     Set c = AddCombo("SupplierID", "SupplierID", 7201, 3969, 2948, 425, "SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName", 2, "0;3402")
     Set c = AddLabel("lblSupplierID", "المورد الافتراضي", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "SupplierID", 0)
@@ -1634,7 +1634,7 @@ Private Sub BuildForm_frmExpenses()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmExpenses", "المصروفات", "SELECT * FROM Expenses", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=Expenses|PK=ExpenseID|LIST=SELECT t.ExpenseID, t.ExpenseNumber AS [الرقم], t.ExpenseDate AS [التاريخ], x.ExpenseTypeName AS [النوع], t.TotalAmount AS [المبلغ] FROM Expenses AS t INNER JOIN ExpenseTypes AS x ON t.ExpenseTypeID = x.ExpenseTypeID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.ExpenseDate DESC, t.ExpenseID DESC|SEARCH=t.ExpenseNumber,t.Description,x.ExpenseTypeName,t.SupplierInvoiceRef|SEQ=EXPENSE:ExpenseNumber|UNIQUE=ExpenseNumber"
+              "KIND=LIST|TABLE=Expenses|PK=ExpenseID|LIST=SELECT t.ExpenseID, t.ExpenseNumber AS [الرقم], t.ExpenseDate AS [التاريخ], x.ExpenseTypeName AS [النوع], t.TotalAmount AS [المبلغ] FROM Expenses AS t INNER JOIN [@ExpenseTypes] AS x ON t.ExpenseTypeID = x.ExpenseTypeID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.ExpenseDate DESC, t.ExpenseID DESC|SEARCH=t.ExpenseNumber,t.Description,x.ExpenseTypeName,t.SupplierInvoiceRef|SEQ=EXPENSE:ExpenseNumber|UNIQUE=ExpenseNumber"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8C7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "المصروفات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -1689,7 +1689,7 @@ Private Sub BuildForm_frmExpenses()
     SetCtlProp c, "Format", "#,##0.00"
     c.AfterUpdate = EP
     Set c = AddLabel("lblForeignTax", "الضريبة بالعملة", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "ForeignTax", 0)
-    Set c = AddCombo("ExpenseTypeID", "ExpenseTypeID", 7201, 3402, 1644, 425, "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName", 2, "0;3402")
+    Set c = AddCombo("ExpenseTypeID", "ExpenseTypeID", 7201, 3402, 1644, 425, "SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x ORDER BY x.ExpenseTypeName", 2, "0;3402")
     Set c = AddLabel("lblExpenseTypeID", "نوع المصروف *", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "ExpenseTypeID", 0)
     Set c = AddButton("btnNewType", "نوع جديد", 8902, 3402, 1247, 425, "secondary")
     c.OnClick = EP
@@ -2292,7 +2292,7 @@ Private Sub BuildForm_frmRecurring()
     c.AfterUpdate = EP
     Set c = AddText("RecurringName", "RecurringName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblRecurringName", "اسم المصروف *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "RecurringName", 0)
-    Set c = AddCombo("ExpenseTypeID", "ExpenseTypeID", 7201, 2268, 2948, 425, "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName", 2, "0;3402")
+    Set c = AddCombo("ExpenseTypeID", "ExpenseTypeID", 7201, 2268, 2948, 425, "SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x ORDER BY x.ExpenseTypeName", 2, "0;3402")
     Set c = AddLabel("lblExpenseTypeID", "نوع المصروف *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ExpenseTypeID", 0)
     Set c = AddCombo("PaymentMethodID", "PaymentMethodID", 12134, 2268, 2948, 425, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p ORDER BY p.SortOrder", 2, "0;3402")
     Set c = AddLabel("lblPaymentMethodID", "طريقة الدفع *", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "PaymentMethodID", 0)
@@ -2424,7 +2424,7 @@ Private Sub BuildForm_frmUsers()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmUsers", "المستخدمون", "SELECT * FROM Employees", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=Employees|PK=EmployeeID|LIST=SELECT t.EmployeeID, t.Username AS [المستخدم], t.EmployeeName AS [الاسم], r.RoleName AS [الدور] FROM Employees AS t INNER JOIN Roles AS r ON t.RoleID = r.RoleID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.EmployeeName|SEARCH=t.EmployeeName,t.Username,t.Mobile|ACTIVE=t.IsActive|UNIQUE=Username"
+              "KIND=LIST|TABLE=Employees|PK=EmployeeID|LIST=SELECT t.EmployeeID, t.Username AS [المستخدم], t.EmployeeName AS [الاسم], r.RoleName AS [الدور] FROM Employees AS t INNER JOIN [@Roles] AS r ON t.RoleID = r.RoleID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.EmployeeName|SEARCH=t.EmployeeName,t.Username,t.Mobile|ACTIVE=t.IsActive|UNIQUE=Username"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8D7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "المستخدمون", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2463,7 +2463,7 @@ Private Sub BuildForm_frmUsers()
     SetCtlProp c, "ControlTipText", "بدون مسافات، 3 أحرف على الأقل"
     SetCtlProp c, "StatusBarText", "بدون مسافات، 3 أحرف على الأقل"
     Set c = AddLabel("lblUsername", "اسم المستخدم *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "Username", 0)
-    Set c = AddCombo("RoleID", "RoleID", 12134, 2268, 2948, 425, "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID", 2, "0;2268")
+    Set c = AddCombo("RoleID", "RoleID", 12134, 2268, 2948, 425, "SELECT r.RoleID, r.RoleName FROM [@Roles] AS r ORDER BY r.RoleID", 2, "0;2268")
     Set c = AddLabel("lblRoleID", "الدور *", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "RoleID", 0)
     Set c = AddText("JobTitle", "JobTitle", 7201, 2835, 2948, 425)
     Set c = AddLabel("lblJobTitle", "المسمى الوظيفي", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "JobTitle", 0)
@@ -2805,7 +2805,7 @@ Private Sub BuildForm_frmCategories()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmCategories", "التصنيفات", "SELECT * FROM Categories", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=Categories|PK=CategoryID|LIST=SELECT t.CategoryID, t.CategoryName AS [التصنيف] FROM Categories AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CategoryName|SEARCH=t.CategoryName,t.Description|ACTIVE=t.IsActive|UNIQUE=CategoryName"
+              "KIND=LIST|TABLE=Categories|PK=CategoryID|LIST=SELECT t.CategoryID, t.CategoryName AS [التصنيف] FROM [@Categories] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CategoryName|SEARCH=t.CategoryName,t.Description|ACTIVE=t.IsActive|UNIQUE=CategoryName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8FD), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "التصنيفات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2832,29 +2832,31 @@ Private Sub BuildForm_frmCategories()
     c.AfterUpdate = EP
     Set c = AddText("CategoryName", "CategoryName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblCategoryName", "اسم التصنيف *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "CategoryName", 0)
-    Set c = AddText("Description", "Description", 7201, 2268, 7881, 907)
+    Set c = AddText("CategoryNameEn", "CategoryNameEn", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblCategoryNameEn", "الاسم بالإنجليزية", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "CategoryNameEn", 0)
+    Set c = AddText("Description", "Description", 7201, 2835, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
-    Set c = AddLabel("lblDescription", "الوصف", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "Description", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 3402)
-    Set c = AddLabel("lblIsActive", "نشط", 5443, 3317, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddText("SortOrder", "SortOrder", 12134, 3317, 2948, 425)
+    Set c = AddLabel("lblDescription", "الوصف", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "Description", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 3969)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 3884, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddText("SortOrder", "SortOrder", 12134, 3884, 2948, 425)
     SetCtlProp c, "ControlTipText", "ترتيب الزر في شاشة اللمس (الأصغر أولًا)"
     SetCtlProp c, "StatusBarText", "ترتيب الزر في شاشة اللمس (الأصغر أولًا)"
-    Set c = AddLabel("lblSortOrder", "ترتيب العرض", 10376, 3317, 1701, 425, 10, False, CLR_MUTED, "SortOrder", 0)
-    Set c = AddCheck("IsAddOn", "IsAddOn", 7201, 3969)
+    Set c = AddLabel("lblSortOrder", "ترتيب العرض", 10376, 3884, 1701, 425, 10, False, CLR_MUTED, "SortOrder", 0)
+    Set c = AddCheck("IsAddOn", "IsAddOn", 7201, 4536)
     SetCtlProp c, "ControlTipText", "الكافيه: أصناف هذه الفئة تظهر كإضافات للمشروب (حليب، شوت إضافي...)"
     SetCtlProp c, "StatusBarText", "الكافيه: أصناف هذه الفئة تظهر كإضافات للمشروب (حليب، شوت إضافي...)"
-    Set c = AddLabel("lblIsAddOn", "فئة إضافات", 5443, 3884, 1701, 425, 10, False, CLR_MUTED, "IsAddOn", 0)
-    Set c = AddCombo("TileColor", "TileColor", 12134, 3884, 2948, 425, "BLUE;أزرق;GREEN;أخضر;ORANGE;برتقالي;PURPLE;بنفسجي;RED;أحمر;INDIGO;نيلي;TEAL;فيروزي;PINK;وردي;BROWN;بني;GREY;رمادي", 2, "0;3402")
-    Set c = AddLabel("lblTileColor", "لون الزر", 10376, 3884, 1701, 425, 10, False, CLR_MUTED, "TileColor", 0)
-    Set c = AddText("ImagePath", "ImagePath", 7201, 4451, 1644, 425)
+    Set c = AddLabel("lblIsAddOn", "فئة إضافات", 5443, 4451, 1701, 425, 10, False, CLR_MUTED, "IsAddOn", 0)
+    Set c = AddCombo("TileColor", "TileColor", 12134, 4451, 2948, 425, "BLUE;أزرق;GREEN;أخضر;ORANGE;برتقالي;PURPLE;بنفسجي;RED;أحمر;INDIGO;نيلي;TEAL;فيروزي;PINK;وردي;BROWN;بني;GREY;رمادي", 2, "0;3402")
+    Set c = AddLabel("lblTileColor", "لون الزر", 10376, 4451, 1701, 425, 10, False, CLR_MUTED, "TileColor", 0)
+    Set c = AddText("ImagePath", "ImagePath", 7201, 5018, 1644, 425)
     SetCtlProp c, "ControlTipText", "صورة الزر في شاشة اللمس"
     SetCtlProp c, "StatusBarText", "صورة الزر في شاشة اللمس"
-    Set c = AddLabel("lblImagePath", "صورة التصنيف", 5443, 4451, 1701, 425, 10, False, CLR_MUTED, "ImagePath", 0)
-    Set c = AddButton("btnBrowseImage", "استعراض", 8902, 4451, 1247, 425, "secondary")
+    Set c = AddLabel("lblImagePath", "صورة التصنيف", 5443, 5018, 1701, 425, 10, False, CLR_MUTED, "ImagePath", 0)
+    Set c = AddButton("btnBrowseImage", "استعراض", 8902, 5018, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddLabel("lblStatus", " ", 5443, 5131, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 5698, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -2921,7 +2923,7 @@ Private Sub BuildForm_frmUnits()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmUnits", "وحدات القياس", "SELECT * FROM Units", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=Units|PK=UnitID|LIST=SELECT t.UnitID, t.UnitName AS [الوحدة], t.ZatcaUnitCode AS [الرمز] FROM Units AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.UnitName|SEARCH=t.UnitName,t.ZatcaUnitCode|ACTIVE=t.IsActive|UNIQUE=UnitName"
+              "KIND=LIST|TABLE=Units|PK=UnitID|LIST=SELECT t.UnitID, t.UnitName AS [الوحدة], t.ZatcaUnitCode AS [الرمز] FROM [@Units] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.UnitName|SEARCH=t.UnitName,t.ZatcaUnitCode|ACTIVE=t.IsActive|UNIQUE=UnitName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8FD), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "وحدات القياس", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2948,12 +2950,14 @@ Private Sub BuildForm_frmUnits()
     c.AfterUpdate = EP
     Set c = AddText("UnitName", "UnitName", 7201, 1701, 2948, 425)
     Set c = AddLabel("lblUnitName", "اسم الوحدة *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "UnitName", 0)
-    Set c = AddText("ZatcaUnitCode", "ZatcaUnitCode", 12134, 1701, 2948, 425)
+    Set c = AddText("UnitNameEn", "UnitNameEn", 12134, 1701, 2948, 425)
+    Set c = AddLabel("lblUnitNameEn", "الاسم بالإنجليزية", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "UnitNameEn", 0)
+    Set c = AddText("ZatcaUnitCode", "ZatcaUnitCode", 7201, 2268, 2948, 425)
     SetCtlProp c, "ControlTipText", "مثال: PCE للحبة، KGM للكيلو"
     SetCtlProp c, "StatusBarText", "مثال: PCE للحبة، KGM للكيلو"
-    Set c = AddLabel("lblZatcaUnitCode", "رمز الوحدة (UN/ECE)", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "ZatcaUnitCode", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 2353)
-    Set c = AddLabel("lblIsActive", "نشط", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblZatcaUnitCode", "رمز الوحدة (UN/ECE)", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ZatcaUnitCode", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 2353)
+    Set c = AddLabel("lblIsActive", "نشط", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
     Set c = AddLabel("lblStatus", " ", 5443, 2948, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
@@ -3018,7 +3022,7 @@ Private Sub BuildForm_frmExpenseTypes()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmExpenseTypes", "أنواع المصروفات", "SELECT * FROM ExpenseTypes", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=ExpenseTypes|PK=ExpenseTypeID|LIST=SELECT t.ExpenseTypeID, t.ExpenseTypeName AS [النوع] FROM ExpenseTypes AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.ExpenseTypeName|SEARCH=t.ExpenseTypeName|ACTIVE=t.IsActive|UNIQUE=ExpenseTypeName"
+              "KIND=LIST|TABLE=ExpenseTypes|PK=ExpenseTypeID|LIST=SELECT t.ExpenseTypeID, t.ExpenseTypeName AS [النوع] FROM [@ExpenseTypes] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.ExpenseTypeName|SEARCH=t.ExpenseTypeName|ACTIVE=t.IsActive|UNIQUE=ExpenseTypeName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8C7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "أنواع المصروفات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -3045,9 +3049,11 @@ Private Sub BuildForm_frmExpenseTypes()
     c.AfterUpdate = EP
     Set c = AddText("ExpenseTypeName", "ExpenseTypeName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblExpenseTypeName", "نوع المصروف *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "ExpenseTypeName", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 2353)
-    Set c = AddLabel("lblIsActive", "نشط", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 2948, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddText("ExpenseTypeNameEn", "ExpenseTypeNameEn", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblExpenseTypeNameEn", "الاسم بالإنجليزية", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ExpenseTypeNameEn", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 2920)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 3515, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -3881,7 +3887,7 @@ Private Sub BuildForm_frmReportCenter()
     Set c = AddLabel("lblProduct", "المنتج", 5670, 4422, 4593, 284, 9, False, CLR_MUTED, "cboProduct", 0)
     Set c = AddCombo("cboCashBox", "", 10490, 4734, 4593, 454, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;4536")
     Set c = AddLabel("lblCashBox", "الخزينة / الصندوق", 10490, 4422, 4593, 284, 9, False, CLR_MUTED, "cboCashBox", 0)
-    Set c = AddCombo("cboExpenseType", "", 5670, 5556, 4593, 454, "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName", 2, "0;4536")
+    Set c = AddCombo("cboExpenseType", "", 5670, 5556, 4593, 454, "SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x ORDER BY x.ExpenseTypeName", 2, "0;4536")
     Set c = AddLabel("lblExpenseType", "نوع المصروف", 5670, 5244, 4593, 284, 9, False, CLR_MUTED, "cboExpenseType", 0)
     Set c = AddButton("btnRun", "عرض التقرير", 5670, 6548, 2835, 567, "primary")
     c.OnClick = EP
@@ -4873,7 +4879,7 @@ Private Sub BuildForm_frmInventory()
     Set c = AddText("txtSearch", "", 227, 1304, 3969, 454)
     c.AfterUpdate = EP
     Set c = AddLabel("lblSearch", "بحث بالاسم أو الكود أو الباركود", 227, 992, 3969, 284, 9, False, CLR_MUTED, "txtSearch", 0)
-    Set c = AddCombo("cboCategory", "", 4366, 1304, 2608, 454, "SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryName", 2, "0;2552")
+    Set c = AddCombo("cboCategory", "", 4366, 1304, 2608, 454, "SELECT c.CategoryID, c.CategoryName FROM [@Categories] AS c ORDER BY c.CategoryName", 2, "0;2552")
     c.AfterUpdate = EP
     Set c = AddLabel("lblCategory", "التصنيف", 4366, 992, 2608, 284, 9, False, CLR_MUTED, "cboCategory", 0)
     Set c = AddCheck("chkLowOnly", "", 7144, 1389)
@@ -5035,7 +5041,7 @@ Private Sub BuildForm_frmStockCount()
     Set c = AddCombo("cboCount", "", 227, 1304, 5103, 454, "SELECT StockCountID, CountNumber, CountDate, IIf(Status = 'OPEN', 'مفتوح', IIf(Status = 'POSTED', 'مُرحّل', 'ملغى')) AS StatusName FROM StockCounts ORDER BY StockCountID DESC", 4, "0;1701;1984;1304")
     c.AfterUpdate = EP
     Set c = AddLabel("lblCount", "جلسة الجرد (الأحدث أولًا)", 227, 992, 5103, 284, 9, False, CLR_MUTED, "cboCount", 0)
-    Set c = AddCombo("cboCategory", "", 5500, 1304, 2835, 454, "SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryName", 2, "0;2835")
+    Set c = AddCombo("cboCategory", "", 5500, 1304, 2835, 454, "SELECT c.CategoryID, c.CategoryName FROM [@Categories] AS c ORDER BY c.CategoryName", 2, "0;2835")
     Set c = AddLabel("lblCategory", "تصنيف الجرد الجديد (فارغ = الكل)", 5500, 992, 2835, 284, 9, False, CLR_MUTED, "cboCategory", 0)
     Set c = AddButton("btnNewCount", "جرد جديد", 8505, 1287, 1701, 482, "primary")
     c.OnClick = EP
@@ -5237,7 +5243,7 @@ Private Sub BuildForm_frmRoles()
     Set c = AddIcon("icoTitle", ChrW(&HE8D7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "الأدوار والصلاحيات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", "حدد ما يستطيع كل دور فعله", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddCombo("cboRole", "", 227, 1304, 3969, 454, "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID", 2, "0;3402")
+    Set c = AddCombo("cboRole", "", 227, 1304, 3969, 454, "SELECT r.RoleID, r.RoleName FROM [@Roles] AS r ORDER BY r.RoleID", 2, "0;3402")
     c.AfterUpdate = EP
     Set c = AddLabel("lblRole", "الدور", 227, 992, 3969, 284, 9, False, CLR_MUTED, "cboRole", 0)
     Set c = AddLabel("lblRoleInfo", " ", 4366, 1332, 4479, 397, 9, False, CLR_MUTED, "", 0)
@@ -5337,7 +5343,7 @@ Private Sub BuildForm_frmUserScreens()
     Set c = AddIcon("icoTitle", ChrW(&HE8D7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "صلاحيات الشاشات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", "الشاشات التي يفتحها كل مستخدم، والإضافة والتعديل والحذف في كل شاشة", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddCombo("cboUser", "", 227, 1304, 4536, 454, "SELECT e.EmployeeID, e.EmployeeName & '  (' & e.Username & ')', r.RoleName FROM Employees AS e INNER JOIN Roles AS r ON e.RoleID = r.RoleID WHERE e.IsDeveloper = False ORDER BY e.EmployeeName", 3, "0;3402;1418")
+    Set c = AddCombo("cboUser", "", 227, 1304, 4536, 454, "SELECT e.EmployeeID, e.EmployeeName & '  (' & e.Username & ')', r.RoleName FROM Employees AS e INNER JOIN [@Roles] AS r ON e.RoleID = r.RoleID WHERE e.IsDeveloper = False ORDER BY e.EmployeeName", 3, "0;3402;1418")
     c.AfterUpdate = EP
     Set c = AddLabel("lblUser", "المستخدم", 227, 992, 4536, 284, 9, False, CLR_MUTED, "cboUser", 0)
     Set c = AddLabel("lblUserInfo", " ", 4933, 1332, 6407, 397, 9, False, CLR_MUTED, "", 0)
@@ -6920,7 +6926,7 @@ Private Sub BuildForm_frmCashVoucher()
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblToBox", "إلى صندوق", 4649, 1899, 4196, 284, 9, False, CLR_MUTED, "cboToBox", 0)
     Set c = AddLabel("lblBoxBalance", " ", 227, 2722, 8618, 340, 10, True, CLR_PRIMARY, "", 0)
-    Set c = AddCombo("cboExpenseType", "", 227, 3402, 2948, 454, "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes WHERE IsActive = True ORDER BY ExpenseTypeName", 2, "0;3969")
+    Set c = AddCombo("cboExpenseType", "", 227, 3402, 2948, 454, "SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x WHERE x.IsActive = True ORDER BY x.ExpenseTypeName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblExpenseType", "نوع المصروف *", 227, 3090, 2948, 284, 9, False, CLR_MUTED, "cboExpenseType", 0)
     Set c = AddButton("btnNewExpenseType", "نوع جديد", 3289, 3402, 1134, 454, "secondary")

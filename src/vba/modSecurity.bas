@@ -388,7 +388,7 @@ Public Function UsesCustomScreens(Optional ByVal EmployeeID As Long = -1) As Boo
 End Function
 
 Private Function ScreenTitle(ByVal FormName As String) As Variant
-    ScreenTitle = DbValue("SELECT ScreenTitle FROM Screens WHERE ScreenName = " & SqlText(FormName))
+    ScreenTitle = DbValue(Tr("SELECT s.ScreenTitle FROM [@Screens] AS s WHERE s.ScreenName = " & SqlText(FormName)))
 End Function
 
 Public Function CanOpenScreen(ByVal FormName As String, Optional ByVal Quiet As Boolean = False) As Boolean

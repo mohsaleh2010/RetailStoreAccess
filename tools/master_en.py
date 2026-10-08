@@ -1,7 +1,7 @@
 """English names of the system rows that BuildSchema seeds (docs/39-English-Master-Data.md).
 
-They fill the optional English name fields (Accounts.AccountNameEn, PaymentMethods.MethodNameEn,
-JournalSourceTypes.TypeNameEn, TransactionTypes.TypeNameEn). An English front-end shows
+They fill the optional English name fields of the tables in ENGLISH_NAMES (Accounts.AccountNameEn,
+PaymentMethods.MethodNameEn, ..., Units.UnitNameEn). An English front-end shows
 Nz(English name, Arabic name), so a row the user added without an English name keeps its Arabic one.
 BuildSchema fills only the English names that are still empty (a name the user changed is kept)."""
 
@@ -110,10 +110,71 @@ TRANSACTION_TYPES_EN = {
     "OPENING": "Opening balance",
 }
 
+ROLE_NAMES_EN = {1: "System administrator", 2: "Manager", 3: "Cashier"}
+
+PERMISSION_NAMES_EN = {
+    "SALES_POS": "Point of sale", "SALES_VIEW": "View and reprint invoices", "SALES_RETURN": "Sales returns",
+    "PRICE_OVERRIDE": "Change the sale price in the invoice", "DISCOUNT_OVERRIDE": "Discount above the allowed limit",
+    "ALLOW_NEGATIVE_STOCK": "Sell more than the available quantity", "CUSTOMERS": "Manage customers",
+    "CUSTOMER_PAYMENTS": "Receipt vouchers", "PURCHASES": "Purchase invoices", "PURCHASE_RETURN": "Purchase returns",
+    "SUPPLIERS": "Manage suppliers", "SUPPLIER_PAYMENTS": "Payment vouchers", "PRODUCTS": "Manage products and prices",
+    "INVENTORY_ADJUST": "Manual stock addition and deduction", "STOCK_COUNT": "Stock count", "EXPENSES": "Expenses",
+    "CASH_BOX": "Treasury: receipt, payment and transfer vouchers and boxes", "CASH_CLOSING": "Daily cashier closing",
+    "JOURNAL": "Journal entries, chart of accounts and trial balance",
+    "MANUAL_ENTRY": "Manual entries: add, edit and delete",
+    "PERIOD_CLOSE": "Close and reopen periods and the fiscal year",
+    "VAT_RETURN": "VAT return: approval and payment",
+    "BANKS": "Banks: accounts, bank transactions and reconciliation",
+    "CHEQUES": "Received and issued cheques: recording, collection and bounce",
+    "FIXED_ASSETS": "Fixed assets and depreciation", "PAYROLL": "Payroll: preparation, posting and payment",
+    "BUDGET": "Budget: preparation and comparison with actuals", "CURRENCIES": "Currencies and exchange rates",
+    "SALES_REPS": "Sales reps: data, targets, commissions and reports", "REPORTS": "Operating reports",
+    "REPORTS_PROFIT": "Profit and VAT reports", "DASHBOARD_FINANCIAL": "Financial figures on the dashboard",
+    "SETTINGS": "Store settings", "USERS": "Users and permissions", "BACKUP": "Backup",
+    "AUDIT_LOG": "Audit trail: who added, edited or deleted, with the values before and after",
+}
+
+SCREEN_TITLES_EN = {
+    "frmPOS": "Point of sale (shops)", "frmTouchPOS": "Point of sale (restaurants)",
+    "frmCafePOS": "Point of sale (cafes)", "frmSalesInvoice": "View and reprint invoices",
+    "frmSalesReturn": "Sales returns", "frmCustomers": "Customers", "frmCustomerPayment": "Customer receipt vouchers",
+    "frmPurchaseInvoice": "Purchase invoices", "frmPurchaseView": "View purchase invoices",
+    "frmPurchaseReturn": "Purchase returns", "frmSuppliers": "Suppliers", "frmSupplierPayment": "Supplier payment vouchers",
+    "frmProducts": "Products and prices", "frmCategories": "Categories", "frmUnits": "Units",
+    "frmInventory": "Stock and manual moves", "frmStockCount": "Stock count", "frmBarcodeLabels": "Barcode labels",
+    "frmLabelSettings": "Label settings", "frmExpenses": "Expenses", "frmExpenseTypes": "Expense types",
+    "frmRecurring": "Recurring expenses", "frmTreasury": "Treasury", "frmCashVoucher": "Cash and transfer vouchers",
+    "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmAccounting": "Accounting and finance",
+    "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
+    "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
+    "frmPeriodClosing": "Period and fiscal year closing", "frmVatReturn": "VAT return",
+    "frmAging": "Aging (customers and suppliers)", "frmBanks": "Banks", "frmBankTx": "Bank transactions",
+    "frmBankRecon": "Bank reconciliation", "frmCheques": "Received and issued cheques", "frmAssets": "Fixed assets",
+    "frmDepreciation": "Monthly depreciation", "frmPayroll": "Payroll", "frmCostCenters": "Cost centers and branches",
+    "frmBudget": "Budget", "frmCurrencies": "Currencies", "frmSalesReps": "Sales reps",
+    "frmRepTargets": "Sales rep targets", "frmCommissions": "Sales rep commissions", "frmCurrencyRates": "Exchange rates",
+    "frmAllocation": "Match payments to invoices", "frmReportCenter": "Reports", "frmSearch": "Search",
+    "frmSettings": "Store settings", "frmUsers": "Users", "frmRoles": "Roles and permissions",
+    "frmUserScreens": "Screen permissions of users", "frmAuditLog": "Audit trail", "frmBackup": "Backup",
+}
+
+CATEGORY_NAMES_EN = {1: "General"}
+
+UNIT_NAMES_EN = {1: "Piece", 2: "Box", 3: "Carton", 4: "Pack", 5: "Kilo", 6: "Litre", 7: "Metre", 8: "Set"}
+
+EXPENSE_TYPE_NAMES_EN = {1: "Rent", 2: "Electricity", 3: "Water", 4: "Internet and telecom", 5: "Transport",
+                         6: "Maintenance", 7: "Salaries", 8: "Supplies", 9: "Other expenses"}
+
 # table: (English field, Arabic field, key field, names by key)
 ENGLISH_NAMES = {
     "Accounts": ("AccountNameEn", "AccountName", "AccountCode", ACCOUNT_NAMES_EN),
     "PaymentMethods": ("MethodNameEn", "MethodName", "PaymentMethodID", PAYMENT_METHODS_EN),
     "JournalSourceTypes": ("TypeNameEn", "TypeName", "SourceType", SOURCE_TYPES_EN),
     "TransactionTypes": ("TypeNameEn", "TypeName", "TypeCode", TRANSACTION_TYPES_EN),
+    "Roles": ("RoleNameEn", "RoleName", "RoleID", ROLE_NAMES_EN),
+    "Permissions": ("PermissionNameEn", "PermissionName", "PermissionKey", PERMISSION_NAMES_EN),
+    "Screens": ("ScreenTitleEn", "ScreenTitle", "ScreenName", SCREEN_TITLES_EN),
+    "Categories": ("CategoryNameEn", "CategoryName", "CategoryID", CATEGORY_NAMES_EN),
+    "Units": ("UnitNameEn", "UnitName", "UnitID", UNIT_NAMES_EN),
+    "ExpenseTypes": ("ExpenseTypeNameEn", "ExpenseTypeName", "ExpenseTypeID", EXPENSE_TYPE_NAMES_EN),
 }

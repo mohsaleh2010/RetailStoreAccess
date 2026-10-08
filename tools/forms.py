@@ -117,13 +117,14 @@ class DataScreen:
         return "|".join(parts)
 
 
-CATEGORY_ROWS = "SELECT CategoryID, CategoryName FROM Categories ORDER BY CategoryName"
-UNIT_ROWS = "SELECT UnitID, UnitName FROM Units ORDER BY UnitName"
+CATEGORY_ROWS = "SELECT c.CategoryID, c.CategoryName FROM [@Categories] AS c ORDER BY c.CategoryName"
+UNIT_ROWS = "SELECT u.UnitID, u.UnitName FROM [@Units] AS u ORDER BY u.UnitName"
 SUPPLIER_ROWS = "SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName"
 CUSTOMER_ROWS = "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName"
 PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Item "
                 "FROM Products ORDER BY ProductName")
-EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName"
+EXPENSE_TYPE_ROWS = ("SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x "
+                     "ORDER BY x.ExpenseTypeName")
 PAYMENT_ROWS = "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p ORDER BY p.SortOrder"
 BANK_ROWS = "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName"
 CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
@@ -139,7 +140,7 @@ ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;RE
 # main (summary) accounts only: a sub-account always hangs under a main account
 ACCOUNT_ROWS = ("SELECT a.AccountCode, Space((a.AccountLevel - 1) * 3) & a.AccountName AS Account FROM [@Accounts] AS a "
                 "WHERE a.IsPosting = False ORDER BY a.TreeKey")
-ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
+ROLE_ROWS = "SELECT r.RoleID, r.RoleName FROM [@Roles] AS r ORDER BY r.RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 
 
@@ -226,7 +227,7 @@ DATA_SCREENS: List[DataScreen] = [
         "frmExpenses", "Expenses", "المصروفات", "تسجيل مصروفات المحل", "expenses",
         list_select=("t.ExpenseNumber AS [الرقم], t.ExpenseDate AS [التاريخ], "
                      "x.ExpenseTypeName AS [النوع], t.TotalAmount AS [المبلغ]"),
-        list_from="Expenses AS t INNER JOIN ExpenseTypes AS x ON t.ExpenseTypeID = x.ExpenseTypeID",
+        list_from="Expenses AS t INNER JOIN [@ExpenseTypes] AS x ON t.ExpenseTypeID = x.ExpenseTypeID",
         list_order="t.ExpenseDate DESC, t.ExpenseID DESC",
         list_headers=[("الرقم", 2.0), ("التاريخ", 2.1), ("النوع", 2.6), ("المبلغ", 1.7)],
         search=["t.ExpenseNumber", "t.Description", "x.ExpenseTypeName", "t.SupplierInvoiceRef"],
@@ -334,7 +335,7 @@ DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmUsers", "Employees", "المستخدمون", "الموظفون وأسماء الدخول والأدوار", "users",
         list_select="t.Username AS [المستخدم], t.EmployeeName AS [الاسم], r.RoleName AS [الدور]",
-        list_from="Employees AS t INNER JOIN Roles AS r ON t.RoleID = r.RoleID",
+        list_from="Employees AS t INNER JOIN [@Roles] AS r ON t.RoleID = r.RoleID",
         list_order="t.EmployeeName",
         list_headers=[("المستخدم", 2.4), ("الاسم", 3.8), ("الدور", 2.2)],
         search=["t.EmployeeName", "t.Username", "t.Mobile"], active="t.IsActive", unique=["Username"],
@@ -384,10 +385,10 @@ DATA_SCREENS: List[DataScreen] = [
         ]),
     DataScreen(
         "frmCategories", "Categories", "التصنيفات", "تصنيفات المنتجات", "category",
-        list_select="t.CategoryName AS [التصنيف]", list_from="Categories AS t",
+        list_select="t.CategoryName AS [التصنيف]", list_from="[@Categories] AS t",
         list_order="t.CategoryName", list_headers=[("التصنيف", 8.4)],
         search=["t.CategoryName", "t.Description"], active="t.IsActive", unique=["CategoryName"],
-        fields=[Fld("CategoryName", span=2), Fld("Description", span=2), Fld("IsActive"),
+        fields=[Fld("CategoryName", span=2), Fld("CategoryNameEn", span=2), Fld("Description", span=2), Fld("IsActive"),
                 Fld("SortOrder", hint="ترتيب الزر في شاشة اللمس (الأصغر أولًا)"),
                 Fld("IsAddOn", hint="الكافيه: أصناف هذه الفئة تظهر كإضافات للمشروب (حليب، شوت إضافي...)"),
                 Fld("TileColor", rows=TILE_COLORS),
@@ -395,17 +396,17 @@ DATA_SCREENS: List[DataScreen] = [
                     button=("btnBrowseImage", "استعراض", 'BrowseFile Me, "ImagePath"'))]),
     DataScreen(
         "frmUnits", "Units", "وحدات القياس", "وحدات بيع المنتجات", "category",
-        list_select="t.UnitName AS [الوحدة], t.ZatcaUnitCode AS [الرمز]", list_from="Units AS t",
+        list_select="t.UnitName AS [الوحدة], t.ZatcaUnitCode AS [الرمز]", list_from="[@Units] AS t",
         list_order="t.UnitName", list_headers=[("الوحدة", 5.4), ("الرمز", 3.0)],
         search=["t.UnitName", "t.ZatcaUnitCode"], active="t.IsActive", unique=["UnitName"],
-        fields=[Fld("UnitName"), Fld("ZatcaUnitCode", hint="مثال: PCE للحبة، KGM للكيلو"),
+        fields=[Fld("UnitName"), Fld("UnitNameEn"), Fld("ZatcaUnitCode", hint="مثال: PCE للحبة، KGM للكيلو"),
                 Fld("IsActive")]),
     DataScreen(
         "frmExpenseTypes", "ExpenseTypes", "أنواع المصروفات", "قائمة أنواع المصروفات", "expenses",
-        list_select="t.ExpenseTypeName AS [النوع]", list_from="ExpenseTypes AS t",
+        list_select="t.ExpenseTypeName AS [النوع]", list_from="[@ExpenseTypes] AS t",
         list_order="t.ExpenseTypeName", list_headers=[("النوع", 8.4)],
         search=["t.ExpenseTypeName"], active="t.IsActive", unique=["ExpenseTypeName"],
-        fields=[Fld("ExpenseTypeName", span=2), Fld("IsActive")]),
+        fields=[Fld("ExpenseTypeName", span=2), Fld("ExpenseTypeNameEn", span=2), Fld("IsActive")]),
     DataScreen(
         "frmCashBoxes", "CashBoxes", "الصناديق", "الخزينة الرئيسية وصناديق الكاشير", "treasury",
         list_select="t.BoxName AS [الصندوق], IIf(t.BoxType = 'MAIN', 'خزينة', 'كاشير') AS [النوع]",

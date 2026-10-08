@@ -59,7 +59,8 @@
 | + | العملات المتعددة: عملة ومعامل لكل مستند، والترحيل بالمكافئ بالريال | ✅ تمت الموافقة | [docs/36-Currencies.md](docs/36-Currencies.md) |
 | + | المندوبين: عملاء المندوب، والأهداف الشهرية، ومسير العمولات وقيده وصرفه، وتقارير الأداء | ✅ تمت الموافقة | [docs/37-Sales-Reps.md](docs/37-Sales-Reps.md) |
 | + | الواجهة الإنجليزية: ملف واجهة بالإنجليزية من اليسار لليمين على نفس البيانات، والرسائل والتقارير مترجمة | ✅ تمت الموافقة | [docs/38-English-Interface.md](docs/38-English-Interface.md) |
-| + | الأسماء الإنجليزية للحسابات وطرق الدفع وأنواع القيود وحركات المخزون: القوائم المالية والقيود بالإنجليزية | ✅ بانتظار الموافقة | [docs/39-English-Master-Data.md](docs/39-English-Master-Data.md) |
+| + | الأسماء الإنجليزية للحسابات وطرق الدفع وأنواع القيود وحركات المخزون: القوائم المالية والقيود بالإنجليزية | ✅ تمت الموافقة | [docs/39-English-Master-Data.md](docs/39-English-Master-Data.md) |
+| + | الأسماء الإنجليزية للأدوار والصلاحيات والشاشات والتصنيفات والوحدات وأنواع المصروفات | ✅ بانتظار الموافقة | [docs/39-English-Master-Data.md](docs/39-English-Master-Data.md) |
 
 ## هيكل المستودع
 
@@ -146,6 +147,7 @@
 | 33 | `modSalesReps` (دائمة)، واستبدال `modSales` و`modCash` و`modJournal` و`modForms` و`modScreens` | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestSalesReps` |
 | 34 | `modLang` و`modLangData1..4` (مولَّدة، جديدة)، واستبدال كل الوحدات (الأسهل: `BuildFrontEnd.vbs`) | `BuildQueries`, `BuildForms`, `BuildReports` (وللإنجليزية قبلها `SetInterfaceLanguage "EN"`) | `TestLang` |
 | 35 | `modJournal`، `modVat`، `modPurchaseScreens`، `modAging`، `modCash`، `modCheque`، `modBank`، `modBudget`، `modPOS`، `modLang` والوحدات المولَّدة (الأسهل: `BuildFrontEnd.vbs`) | `BuildSchema` (يملأ الأسماء الإنجليزية)، `BuildQueries`, `BuildForms`, `BuildReports` | `TestLang` |
+| 36 | `modPurchaseScreens`، `modScreens`، `modSecurity`، `modSecurityScreens`، `modTouchPOS` والوحدات المولَّدة (الأسهل: `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestLang` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

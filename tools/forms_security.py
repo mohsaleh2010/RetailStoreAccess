@@ -6,7 +6,7 @@ from typing import List, Tuple
 from forms import Control, FormModel, Sym, button, cm, labelled, title_band
 from forms_sales import LOCKED, grid_row, header_labels
 
-ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
+ROLE_ROWS = "SELECT r.RoleID, r.RoleName FROM [@Roles] AS r ORDER BY r.RoleID"
 PASSWORD = {"InputMask": "Password"}
 
 
@@ -115,7 +115,7 @@ def layout_roles(heads) -> FormModel:
 
 # ------------------------------------------------------------- screens of a user
 USER_ROWS = ("SELECT e.EmployeeID, e.EmployeeName & '  (' & e.Username & ')', r.RoleName FROM Employees AS e "
-             "INNER JOIN Roles AS r ON e.RoleID = r.RoleID WHERE e.IsDeveloper = False ORDER BY e.EmployeeName")
+             "INNER JOIN [@Roles] AS r ON e.RoleID = r.RoleID WHERE e.IsDeveloper = False ORDER BY e.EmployeeName")
 USER_SCREEN_TITLES = ["فتح", "الشاشة", "القسم", "إضافة / حفظ", "تعديل", "حذف", "ما ينطبق عليها"]
 USER_SCREEN_CHECKS = ("CanOpen", "CanAdd", "CanEdit", "CanDelete")
 

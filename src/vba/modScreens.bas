@@ -22,8 +22,8 @@ Public Sub MainLoad(ByVal frm As Access.Form)
     frm!lblStoreName.Caption = Tr(Nz(SettingValue("StoreName"), APP_TITLE))
     frm!lblToday.Caption = Tr(Format$(Date, "dddd  yyyy/mm/dd"))
     frm!lblUser.Caption = Tr("المستخدم: " & CurrentUserName() & "  (" & _
-        Nz(DbValue("SELECT r.RoleName FROM Employees AS e INNER JOIN Roles AS r ON e.RoleID = r.RoleID " & _
-                   "WHERE e.EmployeeID = " & CurrentUserID()), "") & ")")
+        Nz(DbValue(Tr("SELECT r.RoleName FROM Employees AS e INNER JOIN [@Roles] AS r ON e.RoleID = r.RoleID " & _
+                   "WHERE e.EmployeeID = " & CurrentUserID())), "") & ")")
     ApplyNavPermissions frm                   ' modSecurityScreens
     DashboardRefresh frm                      ' tiles, lists and the integrity line (modDashboard)
     If Not g_SilentMode Then

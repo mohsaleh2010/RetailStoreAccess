@@ -255,11 +255,11 @@ Public Sub RolePicked(ByVal frm As Access.Form)
     Dim roleID As Long, locked As Boolean
     roleID = Nz(frm!cboRole.Value, 0)
     CurrentDb.Execute "DELETE FROM tmpRolePermissions", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpRolePermissions (PermissionKey, PermissionName, ModuleName, SortOrder, Granted) " & _
+    CurrentDb.Execute Tr("INSERT INTO tmpRolePermissions (PermissionKey, PermissionName, ModuleName, SortOrder, Granted) " & _
         "SELECT p.PermissionKey, p.PermissionName, p.ModuleName, p.SortOrder, " & _
-        "IIf(r.PermissionKey Is Null, False, True) FROM Permissions AS p LEFT JOIN " & _
+        "IIf(r.PermissionKey Is Null, False, True) FROM [@Permissions] AS p LEFT JOIN " & _
         "(SELECT PermissionKey FROM RolePermissions WHERE RoleID = " & roleID & ") AS r " & _
-        "ON p.PermissionKey = r.PermissionKey", dbFailOnError
+        "ON p.PermissionKey = r.PermissionKey"), dbFailOnError      ' the names in the interface language
     frm!subPermissions.Form.Requery
     frm!lblRoleInfo.Caption = Tr(Nz(DLookup("Description", "Roles", "RoleID = " & roleID), " ") & "   (" & _
         DCount("*", "Employees", "RoleID = " & roleID & " AND IsActive = True AND IsDeveloper = False") & " „” Œœ„)")
@@ -399,9 +399,9 @@ Public Sub FillUserScreens(ByVal EmployeeID As Long, ByVal FromRole As Boolean)
     Set db = CurrentDb
     roleID = Nz(DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & EmployeeID), 0)
     db.Execute "DELETE FROM tmpUserScreens", dbFailOnError
-    db.Execute "INSERT INTO tmpUserScreens (ScreenName, ScreenTitle, ModuleName, SortOrder, HasAdd, HasEdit, " & _
-        "HasDelete, CanOpen, CanAdd, CanEdit, CanDelete) SELECT ScreenName, ScreenTitle, ModuleName, SortOrder, " & _
-        "HasAdd, HasEdit, HasDelete, False, False, False, False FROM Screens", dbFailOnError
+    db.Execute Tr("INSERT INTO tmpUserScreens (ScreenName, ScreenTitle, ModuleName, SortOrder, HasAdd, HasEdit, " & _
+        "HasDelete, CanOpen, CanAdd, CanEdit, CanDelete) SELECT s.ScreenName, s.ScreenTitle, s.ModuleName, s.SortOrder, " & _
+        "s.HasAdd, s.HasEdit, s.HasDelete, False, False, False, False FROM [@Screens] AS s"), dbFailOnError
     If Not FromRole Then
         db.Execute "UPDATE tmpUserScreens AS t INNER JOIN UserScreens AS u ON t.ScreenName = u.ScreenName " & _
             "SET t.CanOpen = u.CanOpen, t.CanAdd = u.CanAdd AND t.HasAdd, t.CanEdit = u.CanEdit AND t.HasEdit, " & _
@@ -434,8 +434,8 @@ Private Sub ShowUserScreensState(ByVal frm As Access.Form)
     frm!btnAll.Enabled = custom
     frm!btnNone.Enabled = custom
     frm!btnSaveScreens.Enabled = Not isAdmin
-    frm!lblUserInfo.Caption = Tr("«·œÊ—: " & Nz(DbValue("SELECT r.RoleName FROM Employees AS e INNER JOIN Roles AS r " & _
-                              "ON e.RoleID = r.RoleID WHERE e.EmployeeID = " & uid), "-"))
+    frm!lblUserInfo.Caption = Tr("«·œÊ—: " & Nz(DbValue(Tr("SELECT r.RoleName FROM Employees AS e INNER JOIN [@Roles] AS r " & _
+                              "ON e.RoleID = r.RoleID WHERE e.EmployeeID = " & uid)), "-"))
     If isAdmin Then
         frm!lblNote.Caption = Tr("„œÌ— «·‰Ÿ«„ Ì› Õ ﬂ· «·‘«‘«  »ﬂ· «·’·«ÕÌ«  œ«∆„«.")
     ElseIf custom Then

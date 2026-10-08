@@ -132,10 +132,10 @@ Public Sub TouchLoad(ByVal frm As Access.Form)
     ResetSaleHeader frm                                   ' modPOS: also resets the order (ResetTouchOrder)
     m_catPage = 0
     m_prodPage = 0
-    m_catID = Nz(DbValue("SELECT TOP 1 c.CategoryID FROM Categories AS c WHERE c.IsActive = True AND " & _
+    m_catID = Nz(DbValue(Tr("SELECT TOP 1 c.CategoryID FROM [@Categories] AS c WHERE c.IsActive = True AND " & _
                          "c.IsAddOn = False AND " & _
                          "EXISTS (SELECT 1 FROM Products AS p WHERE p.CategoryID = c.CategoryID AND p.IsActive = True) " & _
-                         "ORDER BY c.SortOrder, c.CategoryName"), 0)
+                         "ORDER BY c.SortOrder, c.CategoryName")), 0)          ' the same order as the tiles
     LoadCategories frm
     LoadProducts frm
     RecalcPOS frm
@@ -254,9 +254,9 @@ End Sub
 Public Sub LoadCategories(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset, n As Long, i As Long, k As String, sel As Boolean, tiles As Long
     tiles = TileCount(frm, "btnCat")
-    Set rs = CurrentDb.OpenRecordset("SELECT c.CategoryID, c.CategoryName, c.ImagePath, c.TileColor " & _
-        "FROM Categories AS c WHERE c.IsActive = True AND c.IsAddOn = False AND EXISTS (SELECT 1 FROM Products AS p " & _
-        "WHERE p.CategoryID = c.CategoryID AND p.IsActive = True) ORDER BY c.SortOrder, c.CategoryName", dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT c.CategoryID, c.CategoryName, c.ImagePath, c.TileColor " & _
+        "FROM [@Categories] AS c WHERE c.IsActive = True AND c.IsAddOn = False AND EXISTS (SELECT 1 FROM Products AS p " & _
+        "WHERE p.CategoryID = c.CategoryID AND p.IsActive = True) ORDER BY c.SortOrder, c.CategoryName"), dbOpenSnapshot)
     If Not rs.EOF Then
         rs.MoveLast
         n = rs.RecordCount
@@ -298,7 +298,7 @@ Public Sub LoadProducts(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset, n As Long, i As Long, k As String, color As Long, tiles As Long
     tiles = TileCount(frm, "btnProd")
     color = TileColorValue(DbValue("SELECT TileColor FROM Categories WHERE CategoryID = " & m_catID))
-    frm!lblCategoryTitle.Caption = Tr(Nz(DbValue("SELECT CategoryName FROM Categories WHERE CategoryID = " & m_catID), " "))
+    frm!lblCategoryTitle.Caption = Tr(Nz(DbValue(Tr("SELECT c.CategoryName FROM [@Categories] AS c WHERE c.CategoryID = " & m_catID)), " "))
     Set rs = CurrentDb.OpenRecordset("SELECT ProductID, ProductName, SellingPrice, ImagePath FROM Products " & _
         "WHERE IsActive = True AND CategoryID = " & m_catID & " ORDER BY ProductName", dbOpenSnapshot)
     If Not rs.EOF Then

@@ -20,15 +20,15 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellin" & _
-    "gProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLates" & _
-    "tRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesB" & _
-    "yTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSh" & _
-    "eetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPur" & _
-    "chase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission" & _
-    ",qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryI" & _
-    "ncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceL" & _
-    "ineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qryLocRoles1,qryLocRoles,qryLocPermissions1,qryLocPermissions,qryLocScreens1,qryLocScreens,qryLocCategories1,qryLocCategories,qryLocUnits1,qryLocUnits,qryLocExpenseTypes1,qryLocExpenseTypes,qrySalesDocuments,qrySalesLineItems,qr" & _
+    "ySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustom" & _
+    "erLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,q" & _
+    "rySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturn" & _
+    "Query,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashD" & _
+    "ays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalV" & _
+    "atReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQue" & _
+    "ry,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,Budge" & _
+    "tVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -672,6 +672,18 @@ Private Sub CreateAllQueries()
     Q_qryLocJournalSourceTypes
     Q_qryLocTransactionTypes1
     Q_qryLocTransactionTypes
+    Q_qryLocRoles1
+    Q_qryLocRoles
+    Q_qryLocPermissions1
+    Q_qryLocPermissions
+    Q_qryLocScreens1
+    Q_qryLocScreens
+    Q_qryLocCategories1
+    Q_qryLocCategories
+    Q_qryLocUnits1
+    Q_qryLocUnits
+    Q_qryLocExpenseTypes1
+    Q_qryLocExpenseTypes
     Q_qrySalesDocuments
     Q_qrySalesLineItems
     Q_qrySalesLinesInPeriod
@@ -886,6 +898,78 @@ Private Sub Q_qryLocTransactionTypes()
     SaveQuery "qryLocTransactionTypes", "TransactionTypes »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
 End Sub
 
+Private Sub Q_qryLocRoles1()
+    Dim s As String
+    s = "SELECT t.RoleID, t.RoleCode, t.RoleName AS LocArabicName, t.RoleNameEn, t.Description FROM Roles AS t" & vbCrLf
+    SaveQuery "qryLocRoles1", "Roles ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
+End Sub
+
+Private Sub Q_qryLocRoles()
+    Dim s As String
+    s = "SELECT RoleID, RoleCode, Nz(RoleNameEn, LocArabicName) AS RoleName, RoleNameEn, Description FROM qryLocRoles1" & vbCrLf
+    SaveQuery "qryLocRoles", "Roles »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
+End Sub
+
+Private Sub Q_qryLocPermissions1()
+    Dim s As String
+    s = "SELECT t.PermissionKey, t.PermissionName AS LocArabicName, t.PermissionNameEn, t.ModuleName, t.SortOrder FROM Permissions AS t" & vbCrLf
+    SaveQuery "qryLocPermissions1", "Permissions ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
+End Sub
+
+Private Sub Q_qryLocPermissions()
+    Dim s As String
+    s = "SELECT PermissionKey, Nz(PermissionNameEn, LocArabicName) AS PermissionName, PermissionNameEn, ModuleName, SortOrder FROM qryLocPermissions1" & vbCrLf
+    SaveQuery "qryLocPermissions", "Permissions »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
+End Sub
+
+Private Sub Q_qryLocScreens1()
+    Dim s As String
+    s = "SELECT t.ScreenName, t.ScreenTitle AS LocArabicName, t.ScreenTitleEn, t.ModuleName, t.SortOrder, t.PermissionKey, t.HasAdd, t.HasEdit, t.HasDelete FROM Screens AS t" & vbCrLf
+    SaveQuery "qryLocScreens1", "Screens ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
+End Sub
+
+Private Sub Q_qryLocScreens()
+    Dim s As String
+    s = "SELECT ScreenName, Nz(ScreenTitleEn, LocArabicName) AS ScreenTitle, ScreenTitleEn, ModuleName, SortOrder, PermissionKey, HasAdd, HasEdit, HasDelete FROM qryLocScreens1" & vbCrLf
+    SaveQuery "qryLocScreens", "Screens »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
+End Sub
+
+Private Sub Q_qryLocCategories1()
+    Dim s As String
+    s = "SELECT t.CategoryID, t.CategoryName AS LocArabicName, t.CategoryNameEn, t.Description, t.IsActive, t.ImagePath, t.TileColor, t.SortOrder, t.IsAddOn FROM Categories AS t" & vbCrLf
+    SaveQuery "qryLocCategories1", "Categories ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
+End Sub
+
+Private Sub Q_qryLocCategories()
+    Dim s As String
+    s = "SELECT CategoryID, Nz(CategoryNameEn, LocArabicName) AS CategoryName, CategoryNameEn, Description, IsActive, ImagePath, TileColor, SortOrder, IsAddOn FROM qryLocCategories1" & vbCrLf
+    SaveQuery "qryLocCategories", "Categories »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
+End Sub
+
+Private Sub Q_qryLocUnits1()
+    Dim s As String
+    s = "SELECT t.UnitID, t.UnitName AS LocArabicName, t.UnitNameEn, t.ZatcaUnitCode, t.IsActive FROM Units AS t" & vbCrLf
+    SaveQuery "qryLocUnits1", "Units ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
+End Sub
+
+Private Sub Q_qryLocUnits()
+    Dim s As String
+    s = "SELECT UnitID, Nz(UnitNameEn, LocArabicName) AS UnitName, UnitNameEn, ZatcaUnitCode, IsActive FROM qryLocUnits1" & vbCrLf
+    SaveQuery "qryLocUnits", "Units »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
+End Sub
+
+Private Sub Q_qryLocExpenseTypes1()
+    Dim s As String
+    s = "SELECT t.ExpenseTypeID, t.ExpenseTypeName AS LocArabicName, t.ExpenseTypeNameEn, t.IsActive FROM ExpenseTypes AS t" & vbCrLf
+    SaveQuery "qryLocExpenseTypes1", "ExpenseTypes ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
+End Sub
+
+Private Sub Q_qryLocExpenseTypes()
+    Dim s As String
+    s = "SELECT ExpenseTypeID, Nz(ExpenseTypeNameEn, LocArabicName) AS ExpenseTypeName, ExpenseTypeNameEn, IsActive FROM qryLocExpenseTypes1" & vbCrLf
+    SaveQuery "qryLocExpenseTypes", "ExpenseTypes »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
+End Sub
+
 Private Sub Q_qrySalesDocuments()
     Dim s As String
     s = "SELECT 'SALE' AS DocType, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber," & vbCrLf
@@ -993,7 +1077,7 @@ Private Sub Q_SalesByProductQuery()
     s = s & "       Sum(l.LineNet) AS NetSales, Sum(l.LineVAT) AS SalesVAT, Sum(l.LineGross) AS SalesTotal," & vbCrLf
     s = s & "       Sum(l.LineCost) AS CostOfSales, Sum(l.LineNet) - Sum(l.LineCost) AS GrossProfit" & vbCrLf
     s = s & "FROM (qrySalesLinesInPeriod AS l INNER JOIN Products AS p ON l.ProductID = p.ProductID)" & vbCrLf
-    s = s & "     INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID" & vbCrLf
+    s = s & "     INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID" & vbCrLf
     s = s & "GROUP BY p.ProductID, p.ProductCode, p.ProductName, c.CategoryName" & vbCrLf
     s = s & "ORDER BY p.ProductName" & vbCrLf
     SaveQuery "SalesByProductQuery", "«·„»Ì⁄«  Õ”» «·„‰ Ã Œ·«· › —… (ﬂ„Ì…° ’«›Ì°  ﬂ·›…° —»Õ)", s
@@ -1020,7 +1104,7 @@ Private Sub Q_LeastSellingProductsQuery()
     Dim s As String
     s = "SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity," & vbCrLf
     s = s & "       CCur(Nz(s.NetQty, 0)) AS NetQtySold, CCur(Nz(s.NetSales, 0)) AS NetSalesAmount" & vbCrLf
-    s = s & "FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
+    s = s & "FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
     s = s & "     LEFT JOIN SalesByProductQuery AS s ON p.ProductID = s.ProductID" & vbCrLf
     s = s & "WHERE p.IsActive = True" & vbCrLf
     s = s & "ORDER BY CCur(Nz(s.NetQty, 0)), p.ProductName" & vbCrLf
@@ -1080,8 +1164,8 @@ Private Sub Q_StockBalanceQuery()
     s = s & "       CCur(Nz(l.LedgerQty, 0)) AS LedgerQuantity," & vbCrLf
     s = s & "       p.CurrentQuantity - CCur(Nz(l.LedgerQty, 0)) AS QuantityMismatch," & vbCrLf
     s = s & "       IIf(p.CurrentQuantity <= p.MinimumQuantity, True, False) AS IsLowStock, p.IsActive" & vbCrLf
-    s = s & "FROM ((Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
-    s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
+    s = s & "FROM ((Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
+    s = s & "      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)" & vbCrLf
     s = s & "     LEFT JOIN qryProductLedger AS l ON p.ProductID = l.ProductID" & vbCrLf
     s = s & "ORDER BY p.ProductName" & vbCrLf
     SaveQuery "StockBalanceQuery", "«·„Œ“Ê‰ «·Õ«·Ì: «·ﬂ„Ì… Ê«·ﬁÌ„… »«· ﬂ·›… Ê»”⁄— «·»Ì⁄ Ê„ÿ«»ﬁ Â« „⁄ «·Õ—ﬂ« ", s
@@ -1092,7 +1176,7 @@ Private Sub Q_LowStockQuery()
     s = "SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName," & vbCrLf
     s = s & "       p.CurrentQuantity, p.MinimumQuantity, p.MinimumQuantity - p.CurrentQuantity AS ShortageQty," & vbCrLf
     s = s & "       s.SupplierName, s.Mobile AS SupplierMobile" & vbCrLf
-    s = s & "FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
+    s = s & "FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
     s = s & "     LEFT JOIN Suppliers AS s ON p.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity" & vbCrLf
     s = s & "ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName" & vbCrLf
@@ -1124,7 +1208,7 @@ Private Sub Q_SlowMovingProductsQuery()
     s = "SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity," & vbCrLf
     s = s & "       p.AverageCost, p.CurrentQuantity * p.AverageCost AS StockCostValue, ls.LastSaleDate," & vbCrLf
     s = s & "       DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) AS DaysWithoutSale" & vbCrLf
-    s = s & "FROM (Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
+    s = s & "FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
     s = s & "     LEFT JOIN qryProductLastSale AS ls ON p.ProductID = ls.ProductID" & vbCrLf
     s = s & "WHERE p.IsActive = True AND p.CurrentQuantity > 0" & vbCrLf
     s = s & "  AND DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) >=" & vbCrLf
@@ -1139,7 +1223,7 @@ Private Sub Q_StockByCategoryQuery()
     s = s & "       Sum(p.CurrentQuantity) AS TotalQuantity," & vbCrLf
     s = s & "       Sum(p.CurrentQuantity * p.AverageCost) AS StockCostValue," & vbCrLf
     s = s & "       Sum(p.CurrentQuantity * p.SellingPrice) AS StockSalesValue" & vbCrLf
-    s = s & "FROM Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID" & vbCrLf
+    s = s & "FROM Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID" & vbCrLf
     s = s & "WHERE p.IsActive = True" & vbCrLf
     s = s & "GROUP BY c.CategoryID, c.CategoryName" & vbCrLf
     s = s & "ORDER BY c.CategoryName" & vbCrLf
@@ -1153,7 +1237,7 @@ Private Sub Q_StockCountQuery()
     s = s & "       d.UnitCost, d.DifferenceValue, d.Notes" & vbCrLf
     s = s & "FROM ((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)" & vbCrLf
     s = s & "      INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
-    s = s & "     LEFT JOIN Categories AS g ON c.CategoryID = g.CategoryID" & vbCrLf
+    s = s & "     LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID" & vbCrLf
     s = s & "ORDER BY c.StockCountID, p.ProductName" & vbCrLf
     SaveQuery "StockCountQuery", " ›«’Ì· Ã·”«  «·Ã—œ: «·ﬂ„Ì… «·„”Ã·… Ê«·›⁄·Ì… Ê«·›—ﬁ ÊﬁÌ„ Â", s
 End Sub
@@ -1524,7 +1608,7 @@ Private Sub Q_ExpensesQuery()
     Dim s As String
     s = "SELECT e.ExpenseID, e.ExpenseNumber, e.ExpenseDate, t.ExpenseTypeName, e.Amount, e.Tax," & vbCrLf
     s = s & "       e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName, e.ExpenseTypeID" & vbCrLf
-    s = s & "FROM ((Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID)" & vbCrLf
+    s = s & "FROM ((Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID)" & vbCrLf
     s = s & "      INNER JOIN Employees AS em ON e.EmployeeID = em.EmployeeID)" & vbCrLf
     s = s & "     LEFT JOIN [@PaymentMethods] AS pm ON e.PaymentMethodID = pm.PaymentMethodID" & vbCrLf
     s = s & "WHERE e.ExpenseDate >= QDate('PeriodStart') AND e.ExpenseDate < QDate('PeriodEnd')" & vbCrLf
@@ -1536,7 +1620,7 @@ Private Sub Q_ExpensesByTypeQuery()
     Dim s As String
     s = "SELECT t.ExpenseTypeName, Count(*) AS ExpenseCount, Sum(e.Amount) AS AmountExVAT," & vbCrLf
     s = s & "       Sum(e.Tax) AS InputVAT, Sum(e.TotalAmount) AS AmountTotal" & vbCrLf
-    s = s & "FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID" & vbCrLf
+    s = s & "FROM Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID" & vbCrLf
     s = s & "WHERE e.ExpenseDate >= QDate('PeriodStart') AND e.ExpenseDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "GROUP BY t.ExpenseTypeName" & vbCrLf
     s = s & "ORDER BY Sum(e.TotalAmount) DESC" & vbCrLf
@@ -1914,7 +1998,7 @@ Private Sub Q_qryPurchaseDocPrint()
     s = s & "FROM ((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d" & vbCrLf
     s = s & "         ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
-    s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
+    s = s & "      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)" & vbCrLf
     s = s & "     INNER JOIN Suppliers AS s ON h.SupplierID = s.SupplierID)" & vbCrLf
     s = s & "    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
@@ -1929,7 +2013,7 @@ Private Sub Q_qryPurchaseDocPrint()
     s = s & "         INNER JOIN PurchaseInvoiceDetails AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)" & vbCrLf
     s = s & "        INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)" & vbCrLf
-    s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
+    s = s & "      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)" & vbCrLf
     s = s & "     INNER JOIN Suppliers AS s ON r.SupplierID = s.SupplierID)" & vbCrLf
     s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID" & vbCrLf
     SaveQuery "qryPurchaseDocPrint", "»Ì«‰«  ÿ»«⁄… ›Ê« Ì— «·‘—«¡ Ê„— Ã⁄« Â« (”ÿ— ·ﬂ· ’‰›)", s
@@ -1988,7 +2072,7 @@ Private Sub Q_qryCashMovements()
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT e.CashBoxID, e.ExpenseDate, 'EXPENSE', '„’—Ê›', e.ExpenseNumber," & vbCrLf
     s = s & "       t.ExpenseTypeName, e.Description, CCur(0), e.TotalAmount, e.EmployeeID" & vbCrLf
-    s = s & "FROM Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID" & vbCrLf
+    s = s & "FROM Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID" & vbCrLf
     s = s & "WHERE e.CashBoxID Is Not Null" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT v.CashBoxID, v.VoucherDate, 'CASH_IN'," & vbCrLf
@@ -2155,7 +2239,7 @@ Private Sub Q_qryCashVoucherPrint()
     s = s & "        INNER JOIN Employees AS e ON v.EmployeeID = e.EmployeeID)" & vbCrLf
     s = s & "       LEFT JOIN CashBoxes AS t ON v.ToCashBoxID = t.CashBoxID)" & vbCrLf
     s = s & "      LEFT JOIN Expenses AS ex ON v.ExpenseID = ex.ExpenseID)" & vbCrLf
-    s = s & "     LEFT JOIN ExpenseTypes AS x ON ex.ExpenseTypeID = x.ExpenseTypeID" & vbCrLf
+    s = s & "     LEFT JOIN [@ExpenseTypes] AS x ON ex.ExpenseTypeID = x.ExpenseTypeID" & vbCrLf
     SaveQuery "qryCashVoucherPrint", "»Ì«‰«  ÿ»«⁄… ”‰œ«  ﬁ»÷ Ê’—› Ê ÕÊÌ· «·‰ﬁœÌ…", s
 End Sub
 
@@ -2304,15 +2388,15 @@ End Sub
 Private Sub Q_qryJournalExpense()
     Dim s As String
     s = "SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 1 AS LineOrder, 530000 + e.ExpenseTypeID AS AccountCode, e.Amount AS Debit, CCur(0) AS Credit, t.ExpenseTypeName AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID" & vbCrLf
+    s = s & "FROM (Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID" & vbCrLf
     s = s & "WHERE v.CashVoucherID Is Null AND e.Amount <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 2 AS LineOrder, 1500 AS AccountCode, e.Tax AS Debit, CCur(0) AS Credit, '÷—Ì»… «·„œŒ·« ' AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID" & vbCrLf
+    s = s & "FROM (Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID" & vbCrLf
     s = s & "WHERE v.CashVoucherID Is Null AND e.Tax <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'EXPENSE' AS SourceType, e.ExpenseID AS SourceID, e.ExpenseNumber AS SourceNumber, e.ExpenseDate AS SourceDate, t.ExpenseTypeName AS Party, 3 AS LineOrder, IIf(e.CashBoxID Is Null, IIf(e.PaymentMethodID Is Null Or e.PaymentMethodID = 1, 1190, IIf(e.BankID Is Null, 1200, 120000 + e.BankID)), 110000 + e.CashBoxID) AS AccountCode, CCur(0) AS Debit, e.TotalAmount AS Credit, e.Description AS LineText, IIf(e.CostCenterID Is Null, 0, e.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID" & vbCrLf
+    s = s & "FROM (Expenses AS e INNER JOIN [@ExpenseTypes] AS t ON e.ExpenseTypeID = t.ExpenseTypeID) LEFT JOIN CashVouchers AS v ON e.ExpenseID = v.ExpenseID" & vbCrLf
     s = s & "WHERE v.CashVoucherID Is Null AND e.TotalAmount <> 0" & vbCrLf
     SaveQuery "qryJournalExpense", "√”ÿ— ﬁÌÊœ «·„’—Ê›«  (⁄œ« «·„”Ã·… »”‰œ ‰ﬁœÌ…)", s
 End Sub

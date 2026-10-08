@@ -555,7 +555,7 @@ Public Sub InventoryRefresh(ByVal frm As Access.Form)
     frm!lstProducts.RowSource = Tr("SELECT p.ProductID, p.ProductCode AS [الكود], p.ProductName AS [المنتج], " & _
         "c.CategoryName AS [التصنيف], p.CurrentQuantity AS [الكمية], p.MinimumQuantity AS [الحد الأدنى], " & _
         "p.AverageCost AS [متوسط التكلفة], CCur(p.CurrentQuantity * p.AverageCost) AS [قيمة المخزون] " & _
-        "FROM Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID " & _
+        "FROM Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID " & _
         "WHERE " & where & " ORDER BY p.ProductName")
     Set rs = CurrentDb.OpenRecordset("SELECT Count(*) AS N, Sum(p.CurrentQuantity * p.AverageCost) AS V, " & _
         "Sum(IIf(p.CurrentQuantity <= p.MinimumQuantity, 1, 0)) AS L FROM Products AS p WHERE " & where, dbOpenSnapshot)
@@ -656,8 +656,8 @@ Private Sub ShowStockCount(ByVal frm As Access.Form)
     sql = COUNT_LINES_SQL & " WHERE d.StockCountID = " & id
     If Nz(frm!chkDiffOnly.Value, False) Then sql = sql & " AND d.ActualQuantity Is Not Null AND d.Difference <> 0"
     frm!subCountLines.Form.RecordSource = sql & " ORDER BY p.ProductName"
-    Set rs = CurrentDb.OpenRecordset("SELECT c.*, g.CategoryName FROM StockCounts AS c LEFT JOIN Categories AS g " & _
-                                     "ON c.CategoryID = g.CategoryID WHERE c.StockCountID = " & id, dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT c.*, g.CategoryName FROM StockCounts AS c LEFT JOIN [@Categories] AS g " & _
+                                     "ON c.CategoryID = g.CategoryID WHERE c.StockCountID = " & id), dbOpenSnapshot)
     If rs.EOF Then
         frm!lblCountInfo.Caption = Tr("لا يوجد جرد. اختر التصنيف (أو اتركه للكل) ثم اضغط «جرد جديد».")
     Else

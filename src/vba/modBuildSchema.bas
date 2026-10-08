@@ -29,8 +29,8 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
     "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=30;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=8;Suppliers=17;Customers=23;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
-    "CustomerPayments=16;SupplierPayments=15;Banks=9;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=7;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=3;Expenses=20;RecurringExpenses=18;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=5;Permissions=5;RolePermissions=2;Employees=30;Screens=9;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=8;Suppliers=17;Customers=23;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+    "CustomerPayments=16;SupplierPayments=15;Banks=9;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=7;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;" & _
     "CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=36;RolePermissions=71;Employees=1;Screens=58;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
 
@@ -754,6 +754,8 @@ Private Sub CreateTable_Roles()
              "", "", "رمز الدور", ""
     AddField tdf, "RoleName", "TEXT", 50, True, "", _
              "", "", "اسم الدور", ""
+    AddField tdf, "RoleNameEn", "TEXT", 50, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "Description", "TEXT", 255, False, "", _
              "", "", "الوصف", ""
     AddIndex tdf, "PrimaryKey", "RoleID", True, True, False
@@ -768,6 +770,8 @@ Private Sub CreateTable_Permissions()
              "", "", "رمز الصلاحية", ""
     AddField tdf, "PermissionName", "TEXT", 100, True, "", _
              "", "", "اسم الصلاحية", ""
+    AddField tdf, "PermissionNameEn", "TEXT", 100, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "ModuleName", "TEXT", 50, False, "", _
              "", "", "القسم", ""
     AddField tdf, "SortOrder", "INT", 0, True, "0", _
@@ -862,6 +866,8 @@ Private Sub CreateTable_Screens()
              "", "", "اسم الشاشة في Access", ""
     AddField tdf, "ScreenTitle", "TEXT", 100, True, "", _
              "", "", "الشاشة", ""
+    AddField tdf, "ScreenTitleEn", "TEXT", 100, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "ModuleName", "TEXT", 50, False, "", _
              "", "", "القسم", ""
     AddField tdf, "SortOrder", "INT", 0, True, "0", _
@@ -924,6 +930,8 @@ Private Sub CreateTable_Categories()
              "", "", "رقم التصنيف", ""
     AddField tdf, "CategoryName", "TEXT", 100, True, "", _
              "", "", "اسم التصنيف", ""
+    AddField tdf, "CategoryNameEn", "TEXT", 100, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "Description", "TEXT", 255, False, "", _
              "", "", "الوصف", ""
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
@@ -948,6 +956,8 @@ Private Sub CreateTable_Units()
              "", "", "رقم الوحدة", ""
     AddField tdf, "UnitName", "TEXT", 30, True, "", _
              "", "", "اسم الوحدة", ""
+    AddField tdf, "UnitNameEn", "TEXT", 30, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "ZatcaUnitCode", "TEXT", 10, False, "", _
              "", "", "رمز الوحدة (UN/ECE)", ""
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
@@ -2270,6 +2280,8 @@ Private Sub CreateTable_ExpenseTypes()
              "", "", "رقم النوع", ""
     AddField tdf, "ExpenseTypeName", "TEXT", 50, True, "", _
              "", "", "نوع المصروف", ""
+    AddField tdf, "ExpenseTypeNameEn", "TEXT", 50, False, "", _
+             "", "", "الاسم بالإنجليزية", "يظهر في الواجهة الإنجليزية"
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
              "", "", "نشط", ""
     AddIndex tdf, "PrimaryKey", "ExpenseTypeID", True, True, False
@@ -3654,4 +3666,119 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Stock deduction' WHERE [TypeCode] = 'STOCK_OUT' AND [TypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Count adjustment' WHERE [TypeCode] = 'ADJUSTMENT' AND [TypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Opening balance' WHERE [TypeCode] = 'OPENING' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Roles] SET [RoleNameEn] = 'System administrator' WHERE [RoleID] = 1 AND [RoleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Roles] SET [RoleNameEn] = 'Manager' WHERE [RoleID] = 2 AND [RoleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Roles] SET [RoleNameEn] = 'Cashier' WHERE [RoleID] = 3 AND [RoleNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Point of sale' WHERE [PermissionKey] = 'SALES_POS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'View and reprint invoices' WHERE [PermissionKey] = 'SALES_VIEW' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Sales returns' WHERE [PermissionKey] = 'SALES_RETURN' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Change the sale price in the invoice' WHERE [PermissionKey] = 'PRICE_OVERRIDE' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Discount above the allowed limit' WHERE [PermissionKey] = 'DISCOUNT_OVERRIDE' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Sell more than the available quantity' WHERE [PermissionKey] = 'ALLOW_NEGATIVE_STOCK' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Manage customers' WHERE [PermissionKey] = 'CUSTOMERS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Receipt vouchers' WHERE [PermissionKey] = 'CUSTOMER_PAYMENTS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Purchase invoices' WHERE [PermissionKey] = 'PURCHASES' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Purchase returns' WHERE [PermissionKey] = 'PURCHASE_RETURN' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Manage suppliers' WHERE [PermissionKey] = 'SUPPLIERS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Payment vouchers' WHERE [PermissionKey] = 'SUPPLIER_PAYMENTS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Manage products and prices' WHERE [PermissionKey] = 'PRODUCTS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Manual stock addition and deduction' WHERE [PermissionKey] = 'INVENTORY_ADJUST' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Stock count' WHERE [PermissionKey] = 'STOCK_COUNT' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Expenses' WHERE [PermissionKey] = 'EXPENSES' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Treasury: receipt, payment and transfer vouchers and boxes' WHERE [PermissionKey] = 'CASH_BOX' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Daily cashier closing' WHERE [PermissionKey] = 'CASH_CLOSING' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Journal entries, chart of accounts and trial balance' WHERE [PermissionKey] = 'JOURNAL' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Manual entries: add, edit and delete' WHERE [PermissionKey] = 'MANUAL_ENTRY' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Close and reopen periods and the fiscal year' WHERE [PermissionKey] = 'PERIOD_CLOSE' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'VAT return: approval and payment' WHERE [PermissionKey] = 'VAT_RETURN' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Banks: accounts, bank transactions and reconciliation' WHERE [PermissionKey] = 'BANKS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Received and issued cheques: recording, collection and bounce' WHERE [PermissionKey] = 'CHEQUES' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Fixed assets and depreciation' WHERE [PermissionKey] = 'FIXED_ASSETS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Payroll: preparation, posting and payment' WHERE [PermissionKey] = 'PAYROLL' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Budget: preparation and comparison with actuals' WHERE [PermissionKey] = 'BUDGET' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Currencies and exchange rates' WHERE [PermissionKey] = 'CURRENCIES' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Sales reps: data, targets, commissions and reports' WHERE [PermissionKey] = 'SALES_REPS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Operating reports' WHERE [PermissionKey] = 'REPORTS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Profit and VAT reports' WHERE [PermissionKey] = 'REPORTS_PROFIT' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Financial figures on the dashboard' WHERE [PermissionKey] = 'DASHBOARD_FINANCIAL' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Store settings' WHERE [PermissionKey] = 'SETTINGS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Users and permissions' WHERE [PermissionKey] = 'USERS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Backup' WHERE [PermissionKey] = 'BACKUP' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Audit trail: who added, edited or deleted, with the values before and after' WHERE [PermissionKey] = 'AUDIT_LOG' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Point of sale (shops)' WHERE [ScreenName] = 'frmPOS' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Point of sale (restaurants)' WHERE [ScreenName] = 'frmTouchPOS' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Point of sale (cafes)' WHERE [ScreenName] = 'frmCafePOS' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'View and reprint invoices' WHERE [ScreenName] = 'frmSalesInvoice' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Sales returns' WHERE [ScreenName] = 'frmSalesReturn' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Customers' WHERE [ScreenName] = 'frmCustomers' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Customer receipt vouchers' WHERE [ScreenName] = 'frmCustomerPayment' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Purchase invoices' WHERE [ScreenName] = 'frmPurchaseInvoice' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'View purchase invoices' WHERE [ScreenName] = 'frmPurchaseView' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Purchase returns' WHERE [ScreenName] = 'frmPurchaseReturn' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Suppliers' WHERE [ScreenName] = 'frmSuppliers' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Supplier payment vouchers' WHERE [ScreenName] = 'frmSupplierPayment' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Products and prices' WHERE [ScreenName] = 'frmProducts' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Categories' WHERE [ScreenName] = 'frmCategories' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Units' WHERE [ScreenName] = 'frmUnits' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Stock and manual moves' WHERE [ScreenName] = 'frmInventory' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Stock count' WHERE [ScreenName] = 'frmStockCount' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Barcode labels' WHERE [ScreenName] = 'frmBarcodeLabels' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Label settings' WHERE [ScreenName] = 'frmLabelSettings' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Expenses' WHERE [ScreenName] = 'frmExpenses' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Expense types' WHERE [ScreenName] = 'frmExpenseTypes' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Recurring expenses' WHERE [ScreenName] = 'frmRecurring' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Treasury' WHERE [ScreenName] = 'frmTreasury' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Cash and transfer vouchers' WHERE [ScreenName] = 'frmCashVoucher' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Daily cashier closing' WHERE [ScreenName] = 'frmCashClosing' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Boxes' WHERE [ScreenName] = 'frmCashBoxes' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Accounting and finance' WHERE [ScreenName] = 'frmAccounting' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Journal entries' WHERE [ScreenName] = 'frmJournal' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Chart of accounts' WHERE [ScreenName] = 'frmAccounts' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Manual entries' WHERE [ScreenName] = 'frmManualEntry' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Account statement and general ledger' WHERE [ScreenName] = 'frmLedger' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Financial statements' WHERE [ScreenName] = 'frmFinancials' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Period and fiscal year closing' WHERE [ScreenName] = 'frmPeriodClosing' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'VAT return' WHERE [ScreenName] = 'frmVatReturn' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Aging (customers and suppliers)' WHERE [ScreenName] = 'frmAging' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Banks' WHERE [ScreenName] = 'frmBanks' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Bank transactions' WHERE [ScreenName] = 'frmBankTx' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Bank reconciliation' WHERE [ScreenName] = 'frmBankRecon' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Received and issued cheques' WHERE [ScreenName] = 'frmCheques' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Fixed assets' WHERE [ScreenName] = 'frmAssets' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Monthly depreciation' WHERE [ScreenName] = 'frmDepreciation' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Payroll' WHERE [ScreenName] = 'frmPayroll' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Cost centers and branches' WHERE [ScreenName] = 'frmCostCenters' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Budget' WHERE [ScreenName] = 'frmBudget' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Currencies' WHERE [ScreenName] = 'frmCurrencies' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Sales reps' WHERE [ScreenName] = 'frmSalesReps' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Sales rep targets' WHERE [ScreenName] = 'frmRepTargets' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Sales rep commissions' WHERE [ScreenName] = 'frmCommissions' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Exchange rates' WHERE [ScreenName] = 'frmCurrencyRates' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Match payments to invoices' WHERE [ScreenName] = 'frmAllocation' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Reports' WHERE [ScreenName] = 'frmReportCenter' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Search' WHERE [ScreenName] = 'frmSearch' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Store settings' WHERE [ScreenName] = 'frmSettings' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Users' WHERE [ScreenName] = 'frmUsers' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Roles and permissions' WHERE [ScreenName] = 'frmRoles' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Screen permissions of users' WHERE [ScreenName] = 'frmUserScreens' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Audit trail' WHERE [ScreenName] = 'frmAuditLog' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Backup' WHERE [ScreenName] = 'frmBackup' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Categories] SET [CategoryNameEn] = 'General' WHERE [CategoryID] = 1 AND [CategoryNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Piece' WHERE [UnitID] = 1 AND [UnitNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Box' WHERE [UnitID] = 2 AND [UnitNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Carton' WHERE [UnitID] = 3 AND [UnitNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Pack' WHERE [UnitID] = 4 AND [UnitNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Kilo' WHERE [UnitID] = 5 AND [UnitNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Litre' WHERE [UnitID] = 6 AND [UnitNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Metre' WHERE [UnitID] = 7 AND [UnitNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Units] SET [UnitNameEn] = 'Set' WHERE [UnitID] = 8 AND [UnitNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Rent' WHERE [ExpenseTypeID] = 1 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Electricity' WHERE [ExpenseTypeID] = 2 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Water' WHERE [ExpenseTypeID] = 3 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Internet and telecom' WHERE [ExpenseTypeID] = 4 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Transport' WHERE [ExpenseTypeID] = 5 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Maintenance' WHERE [ExpenseTypeID] = 6 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Salaries' WHERE [ExpenseTypeID] = 7 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Supplies' WHERE [ExpenseTypeID] = 8 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [ExpenseTypes] SET [ExpenseTypeNameEn] = 'Other expenses' WHERE [ExpenseTypeID] = 9 AND [ExpenseTypeNameEn] Is Null", dbFailOnError
 End Sub
