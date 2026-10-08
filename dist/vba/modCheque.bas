@@ -239,14 +239,14 @@ End Sub
 
 Public Sub ChequesDirectionChanged(ByVal frm As Access.Form)
     If frm!cboDirection.Value = "IN" Then
-        frm!cboParty.RowSource = "SELECT CustomerID, CustomerName FROM Customers WHERE IsActive = True AND CustomerID <> " & _
-                                 Nz(SettingValue("DefaultCustomerID"), 1) & " ORDER BY CustomerName"
-        frm!lblParty.Caption = "«·⁄„Ì·"
-        frm!btnCollect.Caption = " Õ’Ì· ›Ì «·»‰ﬂ"
+        frm!cboParty.RowSource = Tr("SELECT CustomerID, CustomerName FROM Customers WHERE IsActive = True AND CustomerID <> " & _
+                                 Nz(SettingValue("DefaultCustomerID"), 1) & " ORDER BY CustomerName")
+        frm!lblParty.Caption = Tr("«·⁄„Ì·")
+        frm!btnCollect.Caption = Tr(" Õ’Ì· ›Ì «·»‰ﬂ")
     Else
-        frm!cboParty.RowSource = "SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName"
-        frm!lblParty.Caption = "«·„Ê—œ"
-        frm!btnCollect.Caption = "’—›Â «·»‰ﬂ"
+        frm!cboParty.RowSource = Tr("SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName")
+        frm!lblParty.Caption = Tr("«·„Ê—œ")
+        frm!btnCollect.Caption = Tr("’—›Â «·»‰ﬂ")
     End If
     frm!cboParty.Value = Null
     frm!txtDrawerBank.Enabled = (frm!cboDirection.Value = "IN")
@@ -263,17 +263,17 @@ Public Sub ChequesRefresh(ByVal frm As Access.Form)
         Case "COLLECTED": where = where & " AND Status = 'COLLECTED'"
         Case "BOUNCED": where = where & " AND Status = 'BOUNCED'"
     End Select
-    frm!lstCheques.RowSource = "SELECT ChequeID, ChequeRef AS [«·ﬁÌœ], ChequeNo AS [—ﬁ„ «·‘Ìﬂ], PartyName AS [" & _
-        IIf(kind = "IN", "«·⁄„Ì·", "«·„Ê—œ") & "], Format(DueDate, 'yyyy/mm/dd') AS [«·«” Õﬁ«ﬁ], Format(Amount, '#,##0.00') " & _
+    frm!lstCheques.RowSource = Tr("SELECT ChequeID, ChequeRef AS [«·ﬁÌœ], ChequeNo AS [—ﬁ„ «·‘Ìﬂ], PartyName AS [" & _
+        IIf(kind = "IN", "«·⁄„Ì·", "«·„Ê—œ") & "], Format(DueDate, 'yyyy/mm/dd') AS [«·«” Õﬁ«ﬁ], Format(q.Amount, '#,##0.00') " & _
         "AS [«·„»·€], StatusName AS [«·Õ«·…], Format(StatusDate, 'yyyy/mm/dd') AS [›Ì], Nz(BankName, DrawerBank) AS [«·»‰ﬂ] " & _
-        "FROM ChequesQuery WHERE " & where & " ORDER BY DueDate, ChequeID"
+        "FROM ChequesQuery AS q WHERE " & where & " ORDER BY DueDate, ChequeID")
     pending = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind)), 0)
     soon = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind) & _
                       " AND DueDate <= " & SqlDate(Date + 7)), 0)
     late = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind) & _
                       " AND DueDate < " & SqlDate(Date)), 0)
-    frm!lblTotals.Caption = IIf(kind = "IN", "‘Ìﬂ«   Õ  «· Õ’Ì·: ", "‘Ìﬂ«  ’«œ—… ·„  ı’—›: ") & Format$(pending, "#,##0.00") & _
-        "    „” Õﬁ… Œ·«· 7 √Ì«„: " & Format$(soon, "#,##0.00") & "    ›«  «” Õﬁ«ﬁÂ«: " & Format$(late, "#,##0.00")
+    frm!lblTotals.Caption = Tr(IIf(kind = "IN", "‘Ìﬂ«   Õ  «· Õ’Ì·: ", "‘Ìﬂ«  ’«œ—… ·„  ı’—›: ") & Format$(pending, "#,##0.00") & _
+        "    „” Õﬁ… Œ·«· 7 √Ì«„: " & Format$(soon, "#,##0.00") & "    ›«  «” Õﬁ«ﬁÂ«: " & Format$(late, "#,##0.00"))
     frm!lblTotals.ForeColor = IIf(late > 0, CLR_DANGER, CLR_PRIMARY)
 End Sub
 

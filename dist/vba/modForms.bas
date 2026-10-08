@@ -324,9 +324,9 @@ Public Sub RefreshList(ByVal frm As Access.Form)
     End If
     sql = Replace(TagValue(frm, "LIST"), "{ACTIVE}", activeCond)
     sql = Replace(sql, "{SEARCH}", searchCond)
-    frm!lstItems.RowSource = sql
+    frm!lstItems.RowSource = Tr(sql)
     n = frm!lstItems.ListCount + (frm!lstItems.ColumnHeads * 1)   ' ColumnHeads True = -1
-    If ControlExists(frm, "lblCount") Then frm!lblCount.Caption = n & " ”Ã·"
+    If ControlExists(frm, "lblCount") Then frm!lblCount.Caption = Tr(n & " ”Ã·")
     If Not frm.NewRecord Then frm!lstItems.Value = frm(TagValue(frm, "PK")).Value
 End Sub
 
@@ -506,7 +506,7 @@ Public Sub SettingsScreenLoad(ByVal frm As Access.Form)
     frm!StoreName.Locked = Not allowed
     frm!StoreNameEn.Locked = Not allowed
     If ControlExists(frm, "lblStoreNameNote") Then
-        frm!lblStoreNameNote.Caption = IIf(allowed, " ", " €ÌÌ— «”„ «·„Õ· Ì „ ⁄‰ ÿ—Ìﬁ «·„»—„Ã.")
+        frm!lblStoreNameNote.Caption = Tr(IIf(allowed, " ", " €ÌÌ— «”„ «·„Õ· Ì „ ⁄‰ ÿ—Ìﬁ «·„»—„Ã."))
     End If
     frm!AllowAdminCompanyName.Visible = IsDeveloper()
 End Sub
@@ -620,9 +620,9 @@ Private Sub UpdatePriceInfo(ByVal frm As Access.Form)
         net = price
         tax = RoundMoney(price * rate)
     End If
-    frm!lblPriceInfo.Caption = "«·”⁄— »œÊ‰ ÷—Ì»…: " & Format$(net, "#,##0.00") & _
+    frm!lblPriceInfo.Caption = Tr("«·”⁄— »œÊ‰ ÷—Ì»…: " & Format$(net, "#,##0.00") & _
                                "    «·÷—Ì»…: " & Format$(tax, "#,##0.00") & _
-                               "    «·”⁄— ··⁄„Ì·: " & Format$(net + tax, "#,##0.00")
+                               "    «·”⁄— ··⁄„Ì·: " & Format$(net + tax, "#,##0.00"))
 End Sub
 
 '------------------------------------------------------------------------------
@@ -703,7 +703,7 @@ End Function
 Private Sub SetStatus(ByVal frm As Access.Form, ByVal Text As String, ByVal Color As Long)
     If Not ControlExists(frm, "lblStatus") Then Exit Sub
     If Len(Text) = 0 Then Text = " "      ' an empty label caption is not allowed
-    frm!lblStatus.Caption = Text
+    frm!lblStatus.Caption = Tr(Text)
     frm!lblStatus.ForeColor = Color
 End Sub
 

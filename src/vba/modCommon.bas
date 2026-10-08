@@ -34,7 +34,7 @@ Public Const CLR_SECONDARY_HOVER As Long = 15129555  ' #D3DBE6
 Public Const FONT_NAME As String = "Segoe UI"
 Public Const ICON_FONT As String = "Segoe MDL2 Assets"   ' Windows 10/11 icon font
 Public Const APP_TITLE As String = "نظام إدارة المحل"
-Public Const MSG_RTL As Long = &H180000                  ' vbMsgBoxRight + vbMsgBoxRtlReading
+' MSG_RTL (the right-to-left flags of MsgBox) and Tr (the interface language) are in modLang
 
 '------------------------------------------------------------------------------
 ' Test support: when g_SilentMode is True no message box is shown, the text
@@ -72,7 +72,7 @@ Public Function AskYesNo(ByVal Text As String, Optional ByVal Title As String = 
         Exit Function
     End If
     If Len(Title) = 0 Then Title = APP_TITLE
-    AskYesNo = (MsgBox(Text, vbQuestion + vbYesNo + vbDefaultButton2 + MSG_RTL, Title) = vbYes)
+    AskYesNo = (MsgBox(Tr(Text), vbQuestion + vbYesNo + vbDefaultButton2 + MSG_RTL, Tr(Title)) = vbYes)
 End Function
 
 Public Sub TestMsg(ByVal Text As String, ByVal Style As Long, Optional ByVal Title As String = "")
@@ -80,7 +80,7 @@ Public Sub TestMsg(ByVal Text As String, ByVal Style As Long, Optional ByVal Tit
     If g_CollectTests Then
         g_TestSummary = g_TestSummary & "- " & Title & ": " & Replace(Left$(Text, 3000), vbCrLf, " | ") & vbCrLf
     Else
-        MsgBox Text, Style, Title
+        MsgBox Tr(Text), Style, Tr(Title)
     End If
 End Sub
 
@@ -91,7 +91,7 @@ Private Sub ShowMessage(ByVal Text As String, ByVal Icon As VbMsgBoxStyle, ByVal
         Exit Sub
     End If
     If Len(Title) = 0 Then Title = APP_TITLE
-    MsgBox Text, Icon + MSG_RTL, Title
+    MsgBox Tr(Text), Icon + MSG_RTL, Tr(Title)                  ' modLang
 End Sub
 
 '------------------------------------------------------------------------------

@@ -466,8 +466,8 @@ Public Sub AssetRefresh(ByVal frm As Access.Form)
     id = ShownAsset(frm)
     frm!lstAssets.Requery
     If id = 0 Then
-        frm!lblAssetInfo.Caption = "أصل جديد: القسط الشهري " & Format$(MonthlyDepreciation(Nz(frm!txtCost.Value, 0), _
-            Nz(frm!txtSalvage.Value, 0), Nz(frm!txtLife.Value, 0)), "#,##0.00")
+        frm!lblAssetInfo.Caption = Tr("أصل جديد: القسط الشهري " & Format$(MonthlyDepreciation(Nz(frm!txtCost.Value, 0), _
+            Nz(frm!txtSalvage.Value, 0), Nz(frm!txtLife.Value, 0)), "#,##0.00"))
         frm!lblAssetInfo.ForeColor = CLR_PRIMARY
         Exit Sub
     End If
@@ -483,7 +483,7 @@ Public Sub AssetRefresh(ByVal frm As Access.Form)
         frm!lblAssetInfo.ForeColor = IIf(rs!Status = "DISPOSED", CLR_MUTED, CLR_PRIMARY)
     End If
     rs.Close
-    frm!lblAssetInfo.Caption = info
+    frm!lblAssetInfo.Caption = Tr(info)
 End Sub
 
 Public Sub AssetPick(ByVal frm As Access.Form)
@@ -566,8 +566,8 @@ Public Sub DepreciationRefresh(ByVal frm As Access.Form)
     Dim nextMonth As Variant, rows As String, rs As DAO.Recordset, amount As Currency, total As Currency
     nextMonth = NextRunMonth()
     If IsNull(nextMonth) Then
-        frm!lblNext.Caption = "لا توجد أصول ثابتة."
-        frm!lstPreview.RowSource = ""
+        frm!lblNext.Caption = Tr("لا توجد أصول ثابتة.")
+        frm!lstPreview.RowSource = Tr("")
     Else
         ' what the next month will record
         rows = """الأصل"";""الإهلاك"""
@@ -581,9 +581,9 @@ Public Sub DepreciationRefresh(ByVal frm As Access.Form)
             rs.MoveNext
         Loop
         rs.Close
-        frm!lstPreview.RowSource = rows
-        frm!lblNext.Caption = "الشهر التالي للتسجيل: " & Format$(nextMonth, "yyyy/mm") & "   الإجمالي " & Format$(total, "#,##0.00") & _
-                              IIf(IsNull(LastRunMonth()), "", "   (آخر شهر مسجل " & Format$(Nz(LastRunMonth(), 0), "yyyy/mm") & ")")
+        frm!lstPreview.RowSource = Tr(rows)
+        frm!lblNext.Caption = Tr("الشهر التالي للتسجيل: " & Format$(nextMonth, "yyyy/mm") & "   الإجمالي " & Format$(total, "#,##0.00") & _
+                              IIf(IsNull(LastRunMonth()), "", "   (آخر شهر مسجل " & Format$(Nz(LastRunMonth(), 0), "yyyy/mm") & ")"))
     End If
     frm!lstRuns.Requery
 End Sub

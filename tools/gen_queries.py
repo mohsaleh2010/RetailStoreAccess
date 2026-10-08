@@ -229,6 +229,7 @@ End Sub
 Private Sub SaveQuery(ByVal QueryName As String, ByVal Description As String, ByVal Sql As String)
     Dim qdf As DAO.QueryDef
     On Error GoTo EH
+    Sql = Tr(Sql)                                   ' the captions and texts of an English file (modLang)
     If QueryExists(m_db, QueryName) Then
         Set qdf = m_db.QueryDefs(QueryName)
         qdf.SQL = Sql

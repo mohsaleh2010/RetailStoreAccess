@@ -47,7 +47,7 @@ Private Sub ResetPurchaseHeader(ByVal frm As Access.Form)
     frm!txtPaid.Locked = True                ' a cash purchase is paid in full
     frm!txtNotes.Value = Null
     frm!txtQty.Value = 1
-    frm!lblSupplierInfo.Caption = " "
+    frm!lblSupplierInfo.Caption = Tr(" ")
     CurrencyReset frm                                       ' modCurrency
 End Sub
 
@@ -193,43 +193,43 @@ Public Sub RecalcPurchase(ByVal frm As Access.Form)
         rs.Close
     End If
     frm!subLines.Form.Requery
-    frm!lblItems.Caption = n & " صنف"
+    frm!lblItems.Caption = Tr(n & " صنف")
 
     If n = 0 Or Len(msg) > 0 Then
-        frm!lblSubTotal.Caption = "0.00"
-        frm!lblDiscount.Caption = "0.00"
-        frm!lblTax.Caption = "0.00"
-        frm!lblTotal.Caption = "0.00"
-        frm!lblRemaining.Caption = " "
+        frm!lblSubTotal.Caption = Tr("0.00")
+        frm!lblDiscount.Caption = Tr("0.00")
+        frm!lblTax.Caption = Tr("0.00")
+        frm!lblTotal.Caption = Tr("0.00")
+        frm!lblRemaining.Caption = Tr(" ")
         If Len(msg) > 0 Then SetPurStatus frm, msg, CLR_DANGER
         Exit Sub
     End If
     total = CalcTotal("TOTAL")
-    frm!lblSubTotal.Caption = Format$(CalcTotal("SUBTOTAL"), "#,##0.00")
-    frm!lblDiscount.Caption = Format$(CalcTotal("DISCOUNT"), "#,##0.00")
-    frm!lblTax.Caption = Format$(CalcTotal("TAX"), "#,##0.00")
-    frm!lblTotal.Caption = Format$(total, "#,##0.00")
+    frm!lblSubTotal.Caption = Tr(Format$(CalcTotal("SUBTOTAL"), "#,##0.00"))
+    frm!lblDiscount.Caption = Tr(Format$(CalcTotal("DISCOUNT"), "#,##0.00"))
+    frm!lblTax.Caption = Tr(Format$(CalcTotal("TAX"), "#,##0.00"))
+    frm!lblTotal.Caption = Tr(Format$(total, "#,##0.00"))
     If Not IsBaseCurrency(frm!cboCurrency.Value) And IsNumeric(Nz(frm!txtRate.Value, "")) Then
-        frm!lblItems.Caption = n & " صنف    " & CurrencyNote(frm!cboCurrency.Value, frm!txtRate.Value, total)
+        frm!lblItems.Caption = Tr(n & " صنف    " & CurrencyNote(frm!cboCurrency.Value, frm!txtRate.Value, total))
     End If
     If frm!cboPaymentType.Value = "CREDIT" Then
-        frm!lblRemaining.Caption = "على الحساب: " & Format$(total - Nz(frm!txtPaid.Value, 0), "#,##0.00")
+        frm!lblRemaining.Caption = Tr("على الحساب: " & Format$(total - Nz(frm!txtPaid.Value, 0), "#,##0.00"))
     Else
-        frm!lblRemaining.Caption = "تُدفع بالكامل"
+        frm!lblRemaining.Caption = Tr("تُدفع بالكامل")
     End If
 End Sub
 
 Public Sub PurSupplierChanged(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset
     If IsNull(frm!cboSupplier.Value) Then
-        frm!lblSupplierInfo.Caption = " "
+        frm!lblSupplierInfo.Caption = Tr(" ")
         Exit Sub
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT CurrentBalance, VATNumber FROM Suppliers WHERE SupplierID = " & _
                                      frm!cboSupplier.Value, dbOpenSnapshot)
     If Not rs.EOF Then
-        frm!lblSupplierInfo.Caption = "المستحق للمورد: " & Format$(rs!CurrentBalance, "#,##0.00") & "    " & _
-            IIf(IsNull(rs!VATNumber), "غير مسجل بالضريبة", "الرقم الضريبي: " & rs!VATNumber)
+        frm!lblSupplierInfo.Caption = Tr("المستحق للمورد: " & Format$(rs!CurrentBalance, "#,##0.00") & "    " & _
+            IIf(IsNull(rs!VATNumber), "غير مسجل بالضريبة", "الرقم الضريبي: " & rs!VATNumber))
         ' an unregistered supplier cannot charge VAT
         frm!chkChargeVAT.Value = Not IsNull(rs!VATNumber)
     End If
@@ -314,7 +314,7 @@ Public Sub PurShowLast(ByVal frm As Access.Form)
 End Sub
 
 Private Sub SetPurStatus(ByVal frm As Access.Form, ByVal Text As String, ByVal Color As Long)
-    frm!lblStatus.Caption = IIf(Len(Text) = 0, " ", Text)
+    frm!lblStatus.Caption = Tr(IIf(Len(Text) = 0, " ", Text))
     frm!lblStatus.ForeColor = Color
 End Sub
 
@@ -369,9 +369,9 @@ Public Sub LoadPurchaseForReturn(ByVal frm As Access.Form, ByVal PurchaseInvoice
                                      PurchaseInvoiceID, dbOpenSnapshot)
     frm!txtInvoiceID.Value = PurchaseInvoiceID
     frm!txtInvoiceNo.Value = rs!InvoiceNumber
-    frm!lblInvoiceInfo.Caption = "التاريخ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd") & "    المورد: " & _
+    frm!lblInvoiceInfo.Caption = Tr("التاريخ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd") & "    المورد: " & _
         rs!SupplierName & "    فاتورة المورد: " & Nz(rs!SupplierInvoiceNo, "-") & "    الإجمالي: " & _
-        Format$(rs!TotalAmount, "#,##0.00") & "    " & IIf(rs!PaymentType = "CREDIT", "آجل", "نقدي")
+        Format$(rs!TotalAmount, "#,##0.00") & "    " & IIf(rs!PaymentType = "CREDIT", "آجل", "نقدي"))
     ' still owed on the invoice -> deduct from the account; paid in cash -> cash refund by default
     frm!cboRefundType.Value = IIf(rs!RemainingAmount > 0, "CREDIT", "CASH")
     rs.Close
@@ -418,7 +418,7 @@ Public Sub RecalcPurchaseReturn(ByVal frm As Access.Form)
     Loop
     rs.Close
     frm!subReturnLines.Form.Requery
-    frm!lblReturnTotal.Caption = Format$(total, "#,##0.00")
+    frm!lblReturnTotal.Caption = Tr(Format$(total, "#,##0.00"))
 End Sub
 
 Public Function SavePurchaseReturn(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean
@@ -460,10 +460,10 @@ Public Sub SupplierPaymentChanged(ByVal frm As Access.Form)
         CurrencyReset frm, DbValue("SELECT CurrencyCode FROM Suppliers WHERE SupplierID = " & frm!cboSupplier.Value)
     End If
     If IsNull(frm!cboSupplier.Value) Then
-        frm!lblBalance.Caption = " "
+        frm!lblBalance.Caption = Tr(" ")
     Else
-        frm!lblBalance.Caption = "المستحق للمورد: " & Format$(Nz(DLookup("CurrentBalance", "Suppliers", _
-                                 "SupplierID = " & frm!cboSupplier.Value), 0), "#,##0.00")
+        frm!lblBalance.Caption = Tr("المستحق للمورد: " & Format$(Nz(DLookup("CurrentBalance", "Suppliers", _
+                                 "SupplierID = " & frm!cboSupplier.Value), 0), "#,##0.00"))
     End If
 End Sub
 
@@ -513,21 +513,21 @@ Public Sub PurchaseViewLoad(ByVal frm As Access.Form)
     End If
     frm!txtInvoiceID.Value = id
     frm!txtSupplierID.Value = rs!SupplierID
-    frm!lblTitle.Caption = "فاتورة شراء " & rs!InvoiceNumber
-    frm!lblHeader.Caption = "التاريخ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd") & "    المورد: " & rs!SupplierName & _
+    frm!lblTitle.Caption = Tr("فاتورة شراء " & rs!InvoiceNumber)
+    frm!lblHeader.Caption = Tr("التاريخ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd") & "    المورد: " & rs!SupplierName & _
         "    فاتورة المورد: " & Nz(rs!SupplierInvoiceNo, "-") & "    الموظف: " & rs!EmployeeName & "    " & _
-        IIf(rs!PaymentType = "CREDIT", "آجل", "نقدي")
-    frm!lblTotals.Caption = "قبل الضريبة: " & Format$(rs!TaxableAmount, "#,##0.00") & "    الضريبة: " & _
+        IIf(rs!PaymentType = "CREDIT", "آجل", "نقدي"))
+    frm!lblTotals.Caption = Tr("قبل الضريبة: " & Format$(rs!TaxableAmount, "#,##0.00") & "    الضريبة: " & _
         Format$(rs!Tax, "#,##0.00") & "    الإجمالي: " & Format$(rs!TotalAmount, "#,##0.00") & _
-        "    المدفوع: " & Format$(rs!PaidAmount, "#,##0.00") & "    المتبقي: " & Format$(rs!RemainingAmount, "#,##0.00")
+        "    المدفوع: " & Format$(rs!PaidAmount, "#,##0.00") & "    المتبقي: " & Format$(rs!RemainingAmount, "#,##0.00"))
     rs.Close
-    frm!lstLines.RowSource = "SELECT d.LineNumber AS [#], p.ProductName AS [الصنف], d.Quantity AS [الكمية], " & _
+    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [الصنف], d.Quantity AS [الكمية], " & _
         "d.UnitCost AS [تكلفة الوحدة], d.Discount AS [الخصم], d.Tax AS [الضريبة], d.LineTotal AS [الإجمالي] " & _
         "FROM PurchaseInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID " & _
-        "WHERE d.PurchaseInvoiceID = " & id & " ORDER BY d.LineNumber"
-    frm!lstReturns.RowSource = "SELECT PurchaseReturnID, ReturnNumber AS [المرتجع], ReturnDate AS [التاريخ], " & _
-        "TotalAmount AS [القيمة], Reason AS [السبب] FROM PurchaseReturns WHERE PurchaseInvoiceID = " & id & _
-        " ORDER BY ReturnDate"
+        "WHERE d.PurchaseInvoiceID = " & id & " ORDER BY d.LineNumber")
+    frm!lstReturns.RowSource = Tr("SELECT PurchaseReturnID, ReturnNumber AS [المرتجع], ReturnDate AS [التاريخ], " & _
+        "TotalAmount AS [القيمة], r.Reason AS [السبب] FROM PurchaseReturns AS r WHERE PurchaseInvoiceID = " & id & _
+        " ORDER BY ReturnDate")
 End Sub
 
 '==============================================================================
@@ -552,15 +552,15 @@ Public Sub InventoryRefresh(ByVal frm As Access.Form)
     End If
     If Not IsNull(frm!cboCategory.Value) Then where = where & " AND p.CategoryID = " & CLng(frm!cboCategory.Value)
     If Nz(frm!chkLowOnly.Value, False) Then where = where & " AND p.CurrentQuantity <= p.MinimumQuantity"
-    frm!lstProducts.RowSource = "SELECT p.ProductID, p.ProductCode AS [الكود], p.ProductName AS [المنتج], " & _
+    frm!lstProducts.RowSource = Tr("SELECT p.ProductID, p.ProductCode AS [الكود], p.ProductName AS [المنتج], " & _
         "c.CategoryName AS [التصنيف], p.CurrentQuantity AS [الكمية], p.MinimumQuantity AS [الحد الأدنى], " & _
         "p.AverageCost AS [متوسط التكلفة], CCur(p.CurrentQuantity * p.AverageCost) AS [قيمة المخزون] " & _
         "FROM Products AS p INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID " & _
-        "WHERE " & where & " ORDER BY p.ProductName"
+        "WHERE " & where & " ORDER BY p.ProductName")
     Set rs = CurrentDb.OpenRecordset("SELECT Count(*) AS N, Sum(p.CurrentQuantity * p.AverageCost) AS V, " & _
         "Sum(IIf(p.CurrentQuantity <= p.MinimumQuantity, 1, 0)) AS L FROM Products AS p WHERE " & where, dbOpenSnapshot)
-    frm!lblInvTotals.Caption = "عدد المنتجات: " & rs!N & "    قيمة المخزون بالتكلفة: " & _
-        Format$(Nz(rs!V, 0), "#,##0.00") & "    منخفضة المخزون: " & Nz(rs!L, 0)
+    frm!lblInvTotals.Caption = Tr("عدد المنتجات: " & rs!N & "    قيمة المخزون بالتكلفة: " & _
+        Format$(Nz(rs!V, 0), "#,##0.00") & "    منخفضة المخزون: " & Nz(rs!L, 0))
     rs.Close
     If Not IsNull(keep) Then
         frm!lstProducts.Value = keep
@@ -578,11 +578,11 @@ Public Sub InventoryProductPicked(ByVal frm As Access.Form)
         rs.Close
         Exit Sub
     End If
-    frm!lblProductName.Caption = rs!ProductName & "  (" & rs!ProductCode & ")"
-    frm!lblProductStock.Caption = "الكمية: " & Format$(rs!CurrentQuantity, "#,##0.###") & "    متوسط التكلفة: " & _
+    frm!lblProductName.Caption = Tr(rs!ProductName & "  (" & rs!ProductCode & ")")
+    frm!lblProductStock.Caption = Tr("الكمية: " & Format$(rs!CurrentQuantity, "#,##0.###") & "    متوسط التكلفة: " & _
         Format$(rs!AverageCost, "#,##0.00##") & "    القيمة: " & _
         Format$(RoundMoney(CDec(rs!CurrentQuantity) * CDec(rs!AverageCost)), "#,##0.00") & _
-        IIf(rs!CurrentQuantity <= rs!MinimumQuantity, "    (منخفض: الحد " & rs!MinimumQuantity & ")", "")
+        IIf(rs!CurrentQuantity <= rs!MinimumQuantity, "    (منخفض: الحد " & rs!MinimumQuantity & ")", ""))
     frm!lblProductStock.ForeColor = IIf(rs!CurrentQuantity <= rs!MinimumQuantity, CLR_DANGER, CLR_TEXT)
     If Nz(frm!cboMoveType.Value, 0) <> TT_STOCK_OUT Then
         frm!txtMoveCost.Value = IIf(rs!AverageCost > 0, rs!AverageCost, rs!PurchasePrice)
@@ -590,11 +590,11 @@ Public Sub InventoryProductPicked(ByVal frm As Access.Form)
         frm!txtMoveCost.Value = rs!AverageCost
     End If
     rs.Close
-    frm!lstMoves.RowSource = "SELECT TOP 50 t.TransactionDate AS [التاريخ], tt.TypeName AS [النوع], " & _
+    frm!lstMoves.RowSource = Tr("SELECT TOP 50 t.TransactionDate AS [التاريخ], tt.TypeName AS [النوع], " & _
         "t.Quantity AS [الكمية], t.QuantityAfter AS [الرصيد بعدها], t.ReferenceNumber AS [المستند] " & _
         "FROM InventoryTransactions AS t INNER JOIN TransactionTypes AS tt " & _
         "ON t.TransactionTypeID = tt.TransactionTypeID WHERE t.ProductID = " & id & _
-        " ORDER BY t.TransactionID DESC"
+        " ORDER BY t.TransactionID DESC")
 End Sub
 
 Public Sub InventoryMoveTypeChanged(ByVal frm As Access.Form)
@@ -659,12 +659,12 @@ Private Sub ShowStockCount(ByVal frm As Access.Form)
     Set rs = CurrentDb.OpenRecordset("SELECT c.*, g.CategoryName FROM StockCounts AS c LEFT JOIN Categories AS g " & _
                                      "ON c.CategoryID = g.CategoryID WHERE c.StockCountID = " & id, dbOpenSnapshot)
     If rs.EOF Then
-        frm!lblCountInfo.Caption = "لا يوجد جرد. اختر التصنيف (أو اتركه للكل) ثم اضغط «جرد جديد»."
+        frm!lblCountInfo.Caption = Tr("لا يوجد جرد. اختر التصنيف (أو اتركه للكل) ثم اضغط «جرد جديد».")
     Else
         isOpen = (rs!Status = "OPEN")
-        frm!lblCountInfo.Caption = rs!CountNumber & "    " & Format$(rs!CountDate, "yyyy/mm/dd") & "    " & _
+        frm!lblCountInfo.Caption = Tr(rs!CountNumber & "    " & Format$(rs!CountDate, "yyyy/mm/dd") & "    " & _
             IIf(isOpen, "مفتوح", IIf(rs!Status = "POSTED", "مُرحّل " & Format$(Nz(rs!PostedAt, rs!CountDate), _
-            "yyyy/mm/dd"), "ملغى")) & "    التصنيف: " & Nz(rs!CategoryName, "الكل")
+            "yyyy/mm/dd"), "ملغى")) & "    التصنيف: " & Nz(rs!CategoryName, "الكل"))
     End If
     rs.Close
     frm!subCountLines.Form.AllowEdits = isOpen
@@ -682,11 +682,11 @@ Private Sub RefreshCountSummary(ByVal frm As Access.Form)
         "Sum(IIf(DifferenceValue < 0, DifferenceValue, 0)) AS S, Sum(IIf(DifferenceValue > 0, DifferenceValue, 0)) AS P " & _
         "FROM StockCountDetails WHERE StockCountID = " & Nz(frm!cboCount.Value, 0), dbOpenSnapshot)
     If Nz(rs!N, 0) = 0 Then
-        frm!lblCountSummary.Caption = " "
+        frm!lblCountSummary.Caption = Tr(" ")
     Else
-        frm!lblCountSummary.Caption = "تم عدّ " & Nz(rs!C, 0) & " من " & rs!N & " صنف    العجز: " & _
+        frm!lblCountSummary.Caption = Tr("تم عدّ " & Nz(rs!C, 0) & " من " & rs!N & " صنف    العجز: " & _
             Format$(-Nz(rs!S, 0), "#,##0.00") & "    الزيادة: " & Format$(Nz(rs!P, 0), "#,##0.00") & _
-            "    الصافي: " & Format$(Nz(rs!S, 0) + Nz(rs!P, 0), "#,##0.00")
+            "    الصافي: " & Format$(Nz(rs!S, 0) + Nz(rs!P, 0), "#,##0.00"))
     End If
     rs.Close
 End Sub

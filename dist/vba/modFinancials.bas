@@ -65,10 +65,10 @@ End Function
 Public Sub FinancialsRefresh(ByVal frm As Access.Form)
     Dim kind As String, order As String, amounts As String
     Calendar = vbCalGreg
-    frm!lstRows.RowSource = ""
+    frm!lstRows.RowSource = Tr("")
     If Not DatesOK(frm) Then Exit Sub
     kind = Nz(frm!cboStatement.Value, "INCOME")
-    frm!lblCompare.Caption = PrepareFinancials(kind, DateValue(frm!txtFrom.Value), DateValue(frm!txtTo.Value))
+    frm!lblCompare.Caption = Tr(PrepareFinancials(kind, DateValue(frm!txtFrom.Value), DateValue(frm!txtTo.Value)))
     amounts = "IIf(RowKind = 'A', Format(CurrentValue, '#,##0.00'), Null) AS [«·› —…: «·Õ”«»], " & _
               "IIf(RowKind IN ('S', 'T', 'R'), Format(CurrentValue, '#,##0.00'), Null) AS [«·› —…: «·„Ã„Ê⁄], " & _
               "IIf(RowKind = 'A', Format(PriorValue, '#,##0.00'), Null) AS [«·„ﬁ«—‰…: «·Õ”«»], " & _
@@ -78,8 +78,8 @@ Public Sub FinancialsRefresh(ByVal frm As Access.Form)
     Else
         order = "Block, AccountKey"
     End If
-    frm!lstRows.RowSource = "SELECT LineAccount, IIf(RowKind = 'A', '      ' & Caption, IIf(RowKind = 'S', " & _
-        "'≈Ã„«·Ì ' & Caption, Caption)) AS [«·»‰œ], " & amounts & " FROM " & StatementQuery(kind) & " ORDER BY " & order
+    frm!lstRows.RowSource = Tr("SELECT LineAccount, IIf(RowKind = 'A', '      ' & Caption, IIf(RowKind = 'S', " & _
+        "'≈Ã„«·Ì ' & Caption, Caption)) AS [«·»‰œ], " & amounts & " FROM " & StatementQuery(kind) & " ORDER BY " & order)
     If kind = "BALANCE" Then
         ShowFigure frm, 1, "≈Ã„«·Ì «·√’Ê·", DbValue("SELECT CurrentValue FROM BalanceSheetQuery WHERE ClassNo = 1 AND RowKind = 'T'")
         ShowFigure frm, 2, "≈Ã„«·Ì «·Œ’Ê„ ÊÕﬁÊﬁ «·„·ﬂÌ…", DbValue("SELECT CurrentValue FROM BalanceSheetQuery WHERE ClassNo = 4")
@@ -93,8 +93,8 @@ Public Sub FinancialsRefresh(ByVal frm As Access.Form)
 End Sub
 
 Private Sub ShowFigure(ByVal frm As Access.Form, ByVal Index As Long, ByVal Caption As String, ByVal Amount As Variant)
-    frm.Controls("lblCap" & Index).Caption = Caption
-    frm.Controls("lblVal" & Index).Caption = Format$(Nz(Amount, 0), "#,##0.00")
+    frm.Controls("lblCap" & Index).Caption = Tr(Caption)
+    frm.Controls("lblVal" & Index).Caption = Tr(Format$(Nz(Amount, 0), "#,##0.00"))
     frm.Controls("lblVal" & Index).ForeColor = IIf(Nz(Amount, 0) < 0, CLR_DANGER, CLR_PRIMARY)
 End Sub
 

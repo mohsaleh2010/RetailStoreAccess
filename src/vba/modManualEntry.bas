@@ -230,7 +230,7 @@ Public Sub ManualNew(ByVal frm As Access.Form)
     frm!subLines.Form.Requery
     ManualRecalc frm
     ManualButtons frm
-    frm!lblStatus.Caption = "اكتب التاريخ والبيان، ثم سطرًا لكل حساب: المبلغ في المدين أو في الدائن."
+    frm!lblStatus.Caption = Tr("اكتب التاريخ والبيان، ثم سطرًا لكل حساب: المبلغ في المدين أو في الدائن.")
     SafeFocus frm!txtDescription
 End Sub
 
@@ -261,9 +261,9 @@ Public Sub ManualOpen(ByVal frm As Access.Form, ByVal ManualEntryID As Long)
     ManualRecalc frm
     ManualButtons frm
     If Len(ClosedPeriodProblem(frm!txtDate.Value)) > 0 Then
-        frm!lblStatus.Caption = "قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح."
+        frm!lblStatus.Caption = Tr("قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح.")
     Else
-        frm!lblStatus.Caption = "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه."
+        frm!lblStatus.Caption = Tr("قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه.")
     End If
 End Sub
 
@@ -311,8 +311,8 @@ Public Sub ManualRecalc(ByVal frm As Access.Form)
     Dim debit As Currency, credit As Currency
     debit = Nz(DbValue("SELECT Sum(Debit) FROM tmpManualLines"), 0)
     credit = Nz(DbValue("SELECT Sum(Credit) FROM tmpManualLines"), 0)
-    frm!lblTotals.Caption = "المدين: " & Format$(debit, "#,##0.00") & "     الدائن: " & Format$(credit, "#,##0.00") & _
-                            "     " & IIf(debit = credit And debit > 0, "متوازن", "الفرق: " & Format$(Abs(debit - credit), "#,##0.00"))
+    frm!lblTotals.Caption = Tr("المدين: " & Format$(debit, "#,##0.00") & "     الدائن: " & Format$(credit, "#,##0.00") & _
+                            "     " & IIf(debit = credit And debit > 0, "متوازن", "الفرق: " & Format$(Abs(debit - credit), "#,##0.00")))
     frm!lblTotals.ForeColor = IIf(debit = credit And debit > 0, CLR_SUCCESS, CLR_DANGER)
 End Sub
 
@@ -359,7 +359,7 @@ Public Sub DeleteManualEntry(ByVal frm As Access.Form)
     SyncJournal
     frm!cboFind.Requery
     ManualNew frm
-    frm!lblStatus.Caption = "تم حذف القيد."
+    frm!lblStatus.Caption = Tr("تم حذف القيد.")
 End Sub
 
 Public Sub ReverseManualEntry(ByVal frm As Access.Form)
@@ -381,7 +381,7 @@ Public Sub ReverseManualEntry(ByVal frm As Access.Form)
     frm!subLines.Form.Requery
     ManualRecalc frm
     ManualButtons frm
-    frm!lblStatus.Caption = "قيد عكسي جديد للقيد " & number & ": راجع التاريخ والأسطر ثم اضغط «حفظ القيد»."
+    frm!lblStatus.Caption = Tr("قيد عكسي جديد للقيد " & number & ": راجع التاريخ والأسطر ثم اضغط «حفظ القيد».")
 End Sub
 
 Public Sub PrintManualEntry(ByVal frm As Access.Form)

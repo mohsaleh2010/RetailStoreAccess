@@ -212,11 +212,26 @@ class AmountInWordsReference(unittest.TestCase):
         self.assertEqual(T.amount_in_words(0.05), "فقط خمسة هللة لا غير")
         self.assertEqual(T.amount_in_words(3500000), "فقط ثلاثة ملايين وخمسمائة ألف ريال سعودي لا غير")
 
+    def test_known_english_texts(self):
+        self.assertEqual(T.amount_in_words_en(1250.5),
+                         "Only one thousand two hundred fifty Saudi Riyals and fifty Halalas")
+        self.assertEqual(T.amount_in_words_en(1), "Only one Saudi Riyal")
+        self.assertEqual(T.amount_in_words_en(0.01), "Only one Halala")
+        self.assertEqual(T.amount_in_words_en(3500000), "Only three million five hundred thousand Saudi Riyals")
+        self.assertEqual(T.amount_in_words_en(0), "Zero Saudi Riyals")
+
 
 DRIVER = r'''
 Option VBASupport 1
 Public Function RunWords(ByVal v As Double) As String
-    RunWords = AmountInWords(CCur(v))
+    RunWords = AmountInWordsAr(CCur(v))
+End Function
+Public Function RunWordsEn(ByVal v As Double) As String
+    RunWordsEn = AmountInWordsEn(CCur(v))
+End Function
+Public Function RunWordsIn(ByVal LangCode As String, ByVal v As Double) As String
+    UseLanguage LangCode
+    RunWordsIn = AmountInWords(CCur(v))
 End Function
 '''
 
@@ -228,7 +243,7 @@ class AmountInWordsRuntime(unittest.TestCase):
     def setUpClass(cls):
         cls.h = H.Harness()
         cls.h.load({"modCommon": H.read_module("modCommon"), "modReports": H.read_module("modReports"),
-                    "Driver": DRIVER})
+                    "modLang": H.read_module("modLang"), "Driver": DRIVER})
 
     @classmethod
     def tearDownClass(cls):
@@ -241,6 +256,11 @@ class AmountInWordsRuntime(unittest.TestCase):
         for a in amounts:
             with self.subTest(a):
                 self.assertEqual(self.h.call("Driver", "RunWords", float(a)), T.amount_in_words(a))
+                self.assertEqual(self.h.call("Driver", "RunWordsEn", float(a)), T.amount_in_words_en(a))
+
+    def test_words_follow_the_interface_language(self):
+        self.assertEqual(self.h.call("Driver", "RunWordsIn", "EN", 1250.5), T.amount_in_words_en(1250.5))
+        self.assertEqual(self.h.call("Driver", "RunWordsIn", "AR", 1250.5), T.amount_in_words(1250.5))
 
 
 class StaticModReports(VbaModuleChecks, unittest.TestCase):

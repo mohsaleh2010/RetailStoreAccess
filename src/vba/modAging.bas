@@ -323,30 +323,30 @@ Public Sub AgingRefresh(ByVal frm As Access.Form)
         Exit Sub
     End If
     n = FillAging(frm!cboKind.Value, DateValue(frm!txtAsOf.Value))
-    frm!lstParties.RowSource = "SELECT PartyID, PartyName AS [" & IIf(frm!cboKind.Value = "C", "العميل", "المورد") & "], " & _
+    frm!lstParties.RowSource = Tr("SELECT PartyID, PartyName AS [" & IIf(frm!cboKind.Value = "C", "العميل", "المورد") & "], " & _
         "Format(Sum(OpenAmount), '#,##0.00') AS [الرصيد], Format(Sum(NotDue), '#,##0.00') AS [غير مستحق], " & _
         "Format(Sum(Days30), '#,##0.00') AS [1-30], Format(Sum(Days60), '#,##0.00') AS [31-60], " & _
         "Format(Sum(Days90), '#,##0.00') AS [61-90], Format(Sum(Over90), '#,##0.00') AS [+90], " & _
-        "Format(Sum(Credit), '#,##0.00') AS [دائن], Max(DaysLate) AS [أقصى تأخير] FROM tmpAging " & _
-        "GROUP BY PartyID, PartyName ORDER BY Sum(Over90) DESC, Sum(Days90) DESC, Sum(OpenAmount) DESC"
-    frm!lstDocs.RowSource = ""
+        "Format(Sum(a.Credit), '#,##0.00') AS [دائن], Max(DaysLate) AS [أقصى تأخير] FROM tmpAging AS a " & _
+        "GROUP BY PartyID, PartyName ORDER BY Sum(Over90) DESC, Sum(Days90) DESC, Sum(OpenAmount) DESC")
+    frm!lstDocs.RowSource = Tr("")
     total = DbValue("SELECT Sum(OpenAmount) FROM tmpAging")
-    frm!lblTotals.Caption = "الإجمالي " & Money(total) & "   غير مستحق " & Money(DbValue("SELECT Sum(NotDue) FROM tmpAging")) & _
+    frm!lblTotals.Caption = Tr("الإجمالي " & Money(total) & "   غير مستحق " & Money(DbValue("SELECT Sum(NotDue) FROM tmpAging")) & _
         "   1-30 " & Money(DbValue("SELECT Sum(Days30) FROM tmpAging")) & "   31-60 " & _
         Money(DbValue("SELECT Sum(Days60) FROM tmpAging")) & "   61-90 " & Money(DbValue("SELECT Sum(Days90) FROM tmpAging")) & _
-        "   أكثر من 90 " & Money(DbValue("SELECT Sum(Over90) FROM tmpAging"))
-    frm!lblInfo.Caption = n & " مستند مفتوح. اختر " & IIf(frm!cboKind.Value = "C", "عميلًا", "موردًا") & " لعرض فواتيره."
+        "   أكثر من 90 " & Money(DbValue("SELECT Sum(Over90) FROM tmpAging")))
+    frm!lblInfo.Caption = Tr(n & " مستند مفتوح. اختر " & IIf(frm!cboKind.Value = "C", "عميلًا", "موردًا") & " لعرض فواتيره.")
 End Sub
 
 Public Sub AgingPartyChanged(ByVal frm As Access.Form)
     If IsNull(frm!lstParties.Value) Then
-        frm!lstDocs.RowSource = ""
+        frm!lstDocs.RowSource = Tr("")
         Exit Sub
     End If
-    frm!lstDocs.RowSource = "SELECT DocID, DocTypeName AS [المستند], DocNo AS [الرقم], Format(DocDate, 'yyyy/mm/dd') AS " & _
+    frm!lstDocs.RowSource = Tr("SELECT DocID, DocTypeName AS [المستند], DocNo AS [الرقم], Format(DocDate, 'yyyy/mm/dd') AS " & _
         "[التاريخ], Format(DueDate, 'yyyy/mm/dd') AS [الاستحقاق], DaysLate AS [أيام التأخير], " & _
         "Format(OpenAmount, '#,##0.00') AS [المتبقي] FROM tmpAging WHERE PartyID = " & frm!lstParties.Value & _
-        " ORDER BY DueDate, LineNo"
+        " ORDER BY DueDate, LineNo")
 End Sub
 
 Private Function PickedParty(ByVal frm As Access.Form) As Long
@@ -391,10 +391,10 @@ End Sub
 
 Public Sub AllocationKindChanged(ByVal frm As Access.Form)
     If frm!cboKind.Value = "C" Then
-        frm!cboParty.RowSource = "SELECT CustomerID, CustomerName FROM Customers WHERE AllowCredit = True Or " & _
-                                 "CurrentBalance <> 0 ORDER BY CustomerName"
+        frm!cboParty.RowSource = Tr("SELECT CustomerID, CustomerName FROM Customers WHERE AllowCredit = True Or " & _
+                                 "CurrentBalance <> 0 ORDER BY CustomerName")
     Else
-        frm!cboParty.RowSource = "SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName"
+        frm!cboParty.RowSource = Tr("SELECT SupplierID, SupplierName FROM Suppliers ORDER BY SupplierName")
     End If
     frm!cboParty.Value = Null
     AllocationRefresh frm
@@ -411,18 +411,18 @@ Public Sub AllocationRefresh(ByVal frm As Access.Form)
         prefix = "qrySupplier": allocTable = "SupplierAllocations": invoiceCol = "PurchaseInvoiceID"
         payTable = "SupplierPayments": invTable = "PurchaseInvoices"
     End If
-    frm!lstPayments.RowSource = "SELECT PaymentID, PaymentNumber AS [السند], Format(PaymentDate, 'yyyy/mm/dd') AS [التاريخ], " & _
-        "Format(Amount, '#,##0.00') AS [المبلغ], Format(Allocated, '#,##0.00') AS [مربوط], Format(Free, '#,##0.00') AS " & _
-        "[غير مربوط] FROM " & prefix & "PaymentFree WHERE PartyID = " & party & " ORDER BY PaymentDate DESC"
-    frm!lstInvoices.RowSource = "SELECT InvoiceID, InvoiceNumber AS [الفاتورة], Format(InvoiceDate, 'yyyy/mm/dd') AS " & _
+    frm!lstPayments.RowSource = Tr("SELECT PaymentID, PaymentNumber AS [السند], Format(PaymentDate, 'yyyy/mm/dd') AS [التاريخ], " & _
+        "Format(f.Amount, '#,##0.00') AS [المبلغ], Format(Allocated, '#,##0.00') AS [مربوط], Format(Free, '#,##0.00') AS " & _
+        "[غير مربوط] FROM " & prefix & "PaymentFree AS f WHERE PartyID = " & party & " ORDER BY PaymentDate DESC")
+    frm!lstInvoices.RowSource = Tr("SELECT InvoiceID, InvoiceNumber AS [الفاتورة], Format(InvoiceDate, 'yyyy/mm/dd') AS " & _
         "[التاريخ], Format(DueDate, 'yyyy/mm/dd') AS [الاستحقاق], Format(RemainingAmount, '#,##0.00') AS [المتبقي], " & _
         "Format(Allocated + Returned, '#,##0.00') AS [مربوط ومرتجع], Format(Free, '#,##0.00') AS [يمكن ربطه] FROM " & _
-        prefix & "InvoiceFree WHERE PartyID = " & party & " AND Free > 0 ORDER BY IIf(DueDate Is Null, InvoiceDate, DueDate)"
-    frm!lstAllocations.RowSource = "SELECT a.AllocationID, p.PaymentNumber AS [السند], h.InvoiceNumber AS [الفاتورة], " & _
+        prefix & "InvoiceFree WHERE PartyID = " & party & " AND Free > 0 ORDER BY IIf(DueDate Is Null, InvoiceDate, DueDate)")
+    frm!lstAllocations.RowSource = Tr("SELECT a.AllocationID, p.PaymentNumber AS [السند], h.InvoiceNumber AS [الفاتورة], " & _
         "Format(a.Amount, '#,##0.00') AS [المبلغ], Format(a.CreatedAt, 'yyyy/mm/dd') AS [في] FROM (" & allocTable & _
         " AS a INNER JOIN " & payTable & " AS p ON a.PaymentID = p.PaymentID) INNER JOIN " & invTable & " AS h ON a." & _
         invoiceCol & " = h." & invoiceCol & " WHERE p." & IIf(frm!cboKind.Value = "C", "CustomerID", "SupplierID") & _
-        " = " & party & " ORDER BY a.AllocationID DESC"
+        " = " & party & " ORDER BY a.AllocationID DESC")
     frm!txtAmount.Value = Null
 End Sub
 

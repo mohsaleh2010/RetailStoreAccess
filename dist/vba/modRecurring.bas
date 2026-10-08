@@ -235,7 +235,7 @@ Public Sub RecurringCurrent(ByVal frm As Access.Form)
             If frm!NextDueDate.Value <= Date Then info = info & "   - ãÓÊÍÞ ÇáÂä: ÇÖÛØ «ÅäÔÇÁ ÇáãÓÊÍÞ ÇáÂä»"
         End If
     End If
-    frm!lblRecurringInfo.Caption = info
+    frm!lblRecurringInfo.Caption = Tr(info)
 End Sub
 
 Public Sub RecurringCreateNow(ByVal frm As Access.Form)

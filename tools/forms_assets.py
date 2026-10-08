@@ -12,9 +12,9 @@ ASSET_ACCOUNTS = ("SELECT AccountCode, AccountCode & '  ' & AccountName FROM Acc
 SOURCES = "BANK;من البنك;CASHBOX;من صندوق;ACCOUNT;على حساب آخر (مستحقات أو قرض...);OPENING;موجود قبل البرنامج (رصيد افتتاحي)"
 DISPOSAL_TO = "BANK;بيع - الثمن في البنك;CASHBOX;بيع - الثمن في صندوق;NONE;استبعاد بدون ثمن (تلف أو فقد)"
 ASSET_LIST = ("SELECT AssetID, AssetCode AS [الرقم], AssetName AS [الأصل], AssetGroup AS [المجموعة], "
-              "Format(PurchaseDate, 'yyyy/mm/dd') AS [الشراء], Format(Cost, '#,##0.00') AS [التكلفة], "
+              "Format(PurchaseDate, 'yyyy/mm/dd') AS [الشراء], Format(q.Cost, '#,##0.00') AS [التكلفة], "
               "Format(AccumDep, '#,##0.00') AS [مجمع الإهلاك], Format(BookValue, '#,##0.00') AS [القيمة الدفترية], "
-              "StatusName AS [الحالة] FROM FixedAssetsQuery ORDER BY Status, AssetCode")
+              "q.StatusName AS [الحالة] FROM FixedAssetsQuery AS q ORDER BY q.Status, q.AssetCode")
 RUN_LIST = ("SELECT RunID, RunNumber AS [القيد], Format(RunMonth, 'yyyy/mm') AS [الشهر], "
             "Format(TotalAmount, '#,##0.00') AS [الإهلاك], Format(CreatedAt, 'yyyy/mm/dd') AS [سُجِّل في] "
             "FROM DepreciationRuns ORDER BY RunMonth DESC")

@@ -359,7 +359,7 @@ Public Sub AuditScreenLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     frm!txtFrom.Value = Date - 7
     frm!txtTo.Value = Date
-    frm!cboTable.RowSource = "SELECT DISTINCT ObjectName FROM AuditLog WHERE ObjectName Is Not Null ORDER BY ObjectName"
+    frm!cboTable.RowSource = Tr("SELECT DISTINCT ObjectName FROM AuditLog WHERE ObjectName Is Not Null ORDER BY ObjectName")
     AuditScreenShow frm
 End Sub
 
@@ -386,24 +386,24 @@ Public Sub AuditScreenShow(ByVal frm As Access.Form)
         where = where & " AND (a.RecordID = " & SqlText(txt) & " OR a.RecordLabel LIKE " & SqlText("*" & txt & "*") & _
                 " OR a.Details LIKE " & SqlText("*" & txt & "*") & ")"
     End If
-    frm!lstLog.RowSource = "SELECT a.LogID, GDate(a.LogDate, True) AS [«·Êﬁ ], Nz(e.EmployeeName, '-') AS [«·„” Œœ„], " & _
+    frm!lstLog.RowSource = Tr("SELECT a.LogID, GDate(a.LogDate, True) AS [«·Êﬁ ], Nz(e.EmployeeName, '-') AS [«·„” Œœ„], " & _
         "ActionName(a.ActionType) AS [«·⁄„·Ì…], a.ObjectName AS [«·ÃœÊ·], a.RecordID AS [«·—ﬁ„], " & _
         "a.RecordLabel AS [«·”Ã·], a.ComputerName AS [«·ÃÂ«“] FROM AuditLog AS a LEFT JOIN Employees AS e ON " & _
-        "a.EmployeeID = e.EmployeeID WHERE " & where & " ORDER BY a.LogID DESC"
-    frm!lstChanges.RowSource = ""
+        "a.EmployeeID = e.EmployeeID WHERE " & where & " ORDER BY a.LogID DESC")
+    frm!lstChanges.RowSource = Tr("")
     n = frm!lstLog.ListCount - 1
     If n < 0 Then n = 0
-    frm!lblCount.Caption = n & " ⁄„·Ì…"
+    frm!lblCount.Caption = Tr(n & " ⁄„·Ì…")
 End Sub
 
 Public Sub AuditScreenPick(ByVal frm As Access.Form)
     Dim id As Variant, details As String
     id = frm!lstLog.Value
     If IsNull(id) Then Exit Sub
-    frm!lstChanges.RowSource = "SELECT ChangeID, FieldCaption AS [«·Õﬁ·], Nz(OldValue, '-') AS [ﬁ»·], " & _
-        "Nz(NewValue, '-') AS [»⁄œ] FROM AuditChanges WHERE LogID = " & CLng(id) & " ORDER BY LineNo"
+    frm!lstChanges.RowSource = Tr("SELECT ChangeID, FieldCaption AS [«·Õﬁ·], Nz(OldValue, '-') AS [ﬁ»·], " & _
+        "Nz(NewValue, '-') AS [»⁄œ] FROM AuditChanges WHERE LogID = " & CLng(id) & " ORDER BY LineNo")
     details = Nz(DbValue("SELECT Details FROM AuditLog WHERE LogID = " & CLng(id)), "")
-    frm!lblDetails.Caption = IIf(Len(details) = 0, " ", Left$(details, 250))
+    frm!lblDetails.Caption = Tr(IIf(Len(details) = 0, " ", Left$(details, 250)))
 End Sub
 
 Public Function ActionName(ByVal ActionType As Variant) As String

@@ -152,10 +152,10 @@ End Sub
 Private Sub ShowActivationState(ByVal frm As Access.Form)
     frm!lstMachines.Requery
     If IsActivated() Then
-        frm!lblState.Caption = "البرنامج مفعّل على هذا الجهاز."
+        frm!lblState.Caption = Tr("البرنامج مفعّل على هذا الجهاز.")
         frm!lblState.ForeColor = CLR_SUCCESS
     Else
-        frm!lblState.Caption = "البرنامج غير مفعّل على هذا الجهاز: أرسل رقم الجهاز للمبرمج واكتب الكود الذي يرسله."
+        frm!lblState.Caption = Tr("البرنامج غير مفعّل على هذا الجهاز: أرسل رقم الجهاز للمبرمج واكتب الكود الذي يرسله.")
         frm!lblState.ForeColor = CLR_DANGER
     End If
 End Sub

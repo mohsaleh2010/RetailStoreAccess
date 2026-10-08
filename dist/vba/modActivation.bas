@@ -152,10 +152,10 @@ End Sub
 Private Sub ShowActivationState(ByVal frm As Access.Form)
     frm!lstMachines.Requery
     If IsActivated() Then
-        frm!lblState.Caption = "╟с╚╤ф╟у╠ у▌┌°с ┌сь х╨╟ ╟с╠х╟╥."
+        frm!lblState.Caption = Tr("╟с╚╤ф╟у╠ у▌┌°с ┌сь х╨╟ ╟с╠х╟╥.")
         frm!lblState.ForeColor = CLR_SUCCESS
     Else
-        frm!lblState.Caption = "╟с╚╤ф╟у╠ █э╤ у▌┌°с ┌сь х╨╟ ╟с╠х╟╥: ├╤╙с ╤▐у ╟с╠х╟╥ ссу╚╤у╠ ц╟▀╩╚ ╟с▀ц╧ ╟с╨э э╤╙сх."
+        frm!lblState.Caption = Tr("╟с╚╤ф╟у╠ █э╤ у▌┌°с ┌сь х╨╟ ╟с╠х╟╥: ├╤╙с ╤▐у ╟с╠х╟╥ ссу╚╤у╠ ц╟▀╩╚ ╟с▀ц╧ ╟с╨э э╤╙сх.")
         frm!lblState.ForeColor = CLR_DANGER
     End If
 End Sub

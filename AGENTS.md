@@ -8,7 +8,8 @@ human developers working in this repository. Claude reads it through `CLAUDE.md`
 reason) and the generated indexes `docs/02-Tables-Reference.md`, `docs/dev/Screens-Index.md`.
 
 ## What this project is
-A retail-store ERP built on **Microsoft Access** (split front-end / back-end), Arabic and right-to-left,
+A retail-store ERP built on **Microsoft Access** (split front-end / back-end), Arabic and right-to-left
+(each front-end can also be built in English, left-to-right: `docs/38-English-Interface.md`),
 Saudi VAT 15 % and ZATCA QR. Nothing is drawn by hand in Access: **Python generates VBA modules**, the
 user imports them into Access and runs the `Build*` procedures, which create the tables, relationships,
 queries, screens and reports. Logic that Access cannot run outside Windows is mirrored in Python and
@@ -66,6 +67,7 @@ Optional test dependencies (tests skip when missing): `pip install -r requiremen
 | `dist/vba/*.bas` | The same modules in **Windows-1256 with CRLF** — what the user imports. Written by the generator only (`.gitattributes`: binary) |
 | `dist/tools/BuildFrontEnd.vbs` | Builds the whole front-end in Access in one step; `EnableShiftKey.vbs` re-enables SHIFT |
 | `tests/` | `access_sqlite.py` (SQLite mirror of Access SQL: `Nz`, `IIf`, `DateAdd`, `Year` …), `helpers.py` (`VbaModuleChecks`), `vba_harness.py` (LibreOffice Basic runner) |
+| `tools/i18n.py`, `tools/i18n_en.py`, `tools/gen_lang.py` | The English interface: Arabic -> English dictionary, its Python mirror of `Tr`, and the generated `modLang` + `modLangData*` |
 | `docs/NN-*.md` | One Arabic document per feature; `README.md` lists them with their approval status |
 
 ## Adding a feature (checklist)
@@ -83,15 +85,17 @@ Optional test dependencies (tests skip when missing): `pip install -r requiremen
    also stores `CurrencyCode`, `ExchangeRate`, `ForeignAmount` (`tools/schema.fx_fields`); its screen uses
    `currency_pair` + `CurrencyChoice`, and posting converts with `ToBase` (`modCurrency`). Add the
    document to `StampJournalCurrencies` so its journal entry carries the currency.
-6. Audit trail (`modAudit`): data screens and bound grids are audited by `modForms` /
+6. Every new Arabic text shown to the user needs its English text in `tools/i18n_en.py` (`test_i18n` lists the
+   missing keys). Text set by code in a `.Caption`, `.RowSource`, `MsgBox` or `InputBox` goes through `Tr(...)`.
+7. Audit trail (`modAudit`): data screens and bound grids are audited by `modForms` /
    `AuditFormBefore` + `AuditFormAfter`. Code that deletes a document takes
    `Set auditBefore = AuditSnapshot(table, key, id)` before the `DELETE` and calls
    `AuditDeleted "X_DELETE", table, id, auditBefore` after it; code that edits a saved record uses
    `AuditSnapshot` + `AuditEdited`. A test checks every document delete.
-7. `python3 tools/generate.py`, add `tests/test_x.py` (Python mirror + code checks + `VbaModuleChecks`),
+8. `python3 tools/generate.py`, add `tests/test_x.py` (Python mirror + code checks + `VbaModuleChecks`),
    run all tests. Update tests that check exact code text when the change is intentional
    (relation count in `test_relations.py`, document-screen set in `test_permissions.py` …).
-8. Write `docs/NN-Name.md` (Arabic) and add the row to `README.md` with "✅ بانتظار الموافقة";
+9. Write `docs/NN-Name.md` (Arabic) and add the row to `README.md` with "✅ بانتظار الموافقة";
    update `docs/dev/*.md` when tables, screens, modules or rules changed.
 
 ## Access / VBA rules (each one was a real failure in Access)
@@ -116,6 +120,10 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
 - Two screens on one table (`frmUsers` / `frmEmployeePay` on `Employees`): table handlers in
   `modForms` must check `frm.Name`.
 - Dates: set `Calendar = vbCalGreg` (Saudi PCs may default to Hijri); show dates with `GDate`.
+- English interface: never compare SQL with an Arabic literal (`= 'نقدي'`), the literals are translated.
+  A list column alias must not equal, once translated, a field used unqualified in its own expression
+  (`Format(Cost, ...) AS [التكلفة]` becomes `AS [Cost]`: circular reference) - qualify it: `q.Cost`.
+  `MSG_RTL` is a function of `modLang` (0 in English). The English texts contain no `" ' [ ] ; | & = < >`.
 - Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness
   cannot return a `Currency` either — wrap it in a `Double` function, see `tests/test_indicators.py`).
 
@@ -129,7 +137,7 @@ banks 120000+bank, 1200 Mada/wallet clearing, 1300 customers, 2100 suppliers, 15
 ## Status and roadmap
 Phases 1–12, accounting, VAT return, aging, banks, cheques, fixed assets, payroll, cost centres,
 budget, recurring expenses, the audit trail, the financial indicators of the dashboard, multiple
-currencies and sales reps with commissions are done
+currencies, sales reps with commissions and the English interface are done
 (see `README.md` for approval status): phase 3 is complete. Next steps are decided by the owner.
 
 ## Standard procedures

@@ -65,22 +65,22 @@ End Sub
 '------------------------------------------------------------------------------
 Public Sub InstallUserMode()
     ApplyStartupProperties False
-    MsgBox "Êã ÖÈØ æÖÚ ÇáãÓÊÎÏã ÇáäåÇÆí." & vbCrLf & vbCrLf & _
+    MsgBox Tr("Êã ÖÈØ æÖÚ ÇáãÓÊÎÏã ÇáäåÇÆí." & vbCrLf & vbCrLf & _
            "ÃÛáŞ Çáãáİ æÇİÊÍå ãä ÌÏíÏ áíÙåÑ ÇáäÙÇã ÈÏæä ÃÏæÇÊ Access." & vbCrLf & _
-           "ááÚæÏÉ áæÖÚ ÇáÊØæíÑ: ÇİÊÍ Çáãáİ ãÚ ÇáÖÛØ Úáì ãİÊÇÍ SHIFT Ëã ÔÛøá InstallDeveloperMode.", _
-           vbInformation + MSG_RTL, APP_TITLE
+           "ááÚæÏÉ áæÖÚ ÇáÊØæíÑ: ÇİÊÍ Çáãáİ ãÚ ÇáÖÛØ Úáì ãİÊÇÍ SHIFT Ëã ÔÛøá InstallDeveloperMode."), _
+           vbInformation + MSG_RTL, Tr(APP_TITLE)
 End Sub
 
 Public Sub InstallDeveloperMode()
     ApplyStartupProperties True
     ShowAccessUI
-    MsgBox "Êã ÖÈØ æÖÚ ÇáÊØæíÑ: ßá ÃÏæÇÊ Access ÙÇåÑÉ.", vbInformation + MSG_RTL, APP_TITLE
+    MsgBox Tr("Êã ÖÈØ æÖÚ ÇáÊØæíÑ: ßá ÃÏæÇÊ Access ÙÇåÑÉ."), vbInformation + MSG_RTL, Tr(APP_TITLE)
 End Sub
 
 Private Sub ApplyStartupProperties(ByVal Developer As Boolean)
     Dim db As DAO.Database
     Set db = CurrentDb
-    SetDbProp db, "AppTitle", dbText, APP_TITLE
+    SetDbProp db, "AppTitle", dbText, Tr(APP_TITLE)
     SetDbProp db, "StartupForm", dbText, "frmLogin"
     SetDbProp db, "AllowBypassKey", dbBoolean, Developer   ' user mode: SHIFT no longer skips the start-up
     SetDbProp db, "StartupShowDBWindow", dbBoolean, Developer

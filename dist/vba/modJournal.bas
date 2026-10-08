@@ -257,7 +257,7 @@ Public Sub JournalLoad(ByVal frm As Access.Form)
         rs.MoveNext
     Loop
     rs.Close
-    frm!cboSourceType.RowSource = rows
+    frm!cboSourceType.RowSource = Tr(rows)
     frm!cboSourceType.Value = "ALL"
     frm!txtFrom.Value = DateSerial(Year(Date), Month(Date), 1)
     frm!txtTo.Value = Date
@@ -270,8 +270,8 @@ Public Sub JournalSync(ByVal frm As Access.Form)
     msg = SyncJournal(added, updated, removed)
     DoCmd.Hourglass False
     If Len(msg) > 0 Then ShowWarning msg
-    frm!lblSync.Caption = "ÊÍÏíË ÇáŞíæÏ ãä ÇáÚãáíÇÊ: " & added & " ŞíÏ ÌÏíÏ¡ æ" & updated & " ŞíÏ ãõÍÏóøË¡ æ" & _
-                          removed & " ŞíÏ ãÍĞæİ  (" & GDate(Now, True) & ")"
+    frm!lblSync.Caption = Tr("ÊÍÏíË ÇáŞíæÏ ãä ÇáÚãáíÇÊ: " & added & " ŞíÏ ÌÏíÏ¡ æ" & updated & " ŞíÏ ãõÍÏóøË¡ æ" & _
+                          removed & " ŞíÏ ãÍĞæİ  (" & GDate(Now, True) & ")")
     JournalRefresh frm
 End Sub
 
@@ -302,15 +302,15 @@ Public Sub JournalRefresh(ByVal frm As Access.Form)
         ShowWarning "ÃÏÎá ÊÇÑíÎ ÇáÈÏÇíÉ æÊÇÑíÎ ÇáäåÇíÉ."
         Exit Sub
     End If
-    frm!lstEntries.RowSource = "SELECT e.EntryID, e.EntryNumber AS [ÑŞã ÇáŞíÏ], GDate(e.EntryDate) AS [ÇáÊÇÑíÎ], " & _
+    frm!lstEntries.RowSource = Tr("SELECT e.EntryID, e.EntryNumber AS [ÑŞã ÇáŞíÏ], GDate(e.EntryDate) AS [ÇáÊÇÑíÎ], " & _
         "t.TypeName AS [ÇáÚãáíÉ], e.SourceNumber AS [ÇáãÓÊäÏ], e.Description AS [ÇáÈíÇä], " & _
         "Format(e.TotalDebit, '#,##0.00') AS [ÇáãÈáÛ] FROM JournalEntries AS e INNER JOIN JournalSourceTypes AS t " & _
-        "ON e.SourceType = t.SourceType WHERE " & w & " ORDER BY e.EntryDate, e.EntryNumber"
+        "ON e.SourceType = t.SourceType WHERE " & w & " ORDER BY e.EntryDate, e.EntryNumber")
     Set rs = CurrentDb.OpenRecordset("SELECT Count(*) AS N, Sum(e.TotalDebit) AS D, Sum(e.TotalCredit) AS C " & _
                                      "FROM JournalEntries AS e WHERE " & w, dbOpenSnapshot)
-    frm!lblTotals.Caption = "ÚÏÏ ÇáŞíæÏ: " & rs!N & "    ÅÌãÇáí ÇáãÏíä: " & Format$(Nz(rs!D, 0), "#,##0.00") & _
+    frm!lblTotals.Caption = Tr("ÚÏÏ ÇáŞíæÏ: " & rs!N & "    ÅÌãÇáí ÇáãÏíä: " & Format$(Nz(rs!D, 0), "#,##0.00") & _
                             "    ÅÌãÇáí ÇáÏÇÆä: " & Format$(Nz(rs!C, 0), "#,##0.00") & _
-                            IIf(Nz(rs!D, 0) = Nz(rs!C, 0), "    (ãÊæÇÒä)", "    (ÛíÑ ãÊæÇÒä!)")
+                            IIf(Nz(rs!D, 0) = Nz(rs!C, 0), "    (ãÊæÇÒä)", "    (ÛíÑ ãÊæÇÒä!)"))
     rs.Close
     If frm!lstEntries.ListCount > 1 Then frm!lstEntries.Value = frm!lstEntries.ItemData(1) Else frm!lstEntries.Value = Null
     JournalEntryPicked frm
@@ -318,10 +318,10 @@ End Sub
 
 Public Sub JournalEntryPicked(ByVal frm As Access.Form)
     If IsNull(frm!lstEntries.Value) Then
-        frm!lstLines.RowSource = ""
+        frm!lstLines.RowSource = Tr("")
         Exit Sub
     End If
-    frm!lstLines.RowSource = EntryLinesSql(frm!lstEntries.Value)
+    frm!lstLines.RowSource = Tr(EntryLinesSql(frm!lstEntries.Value))
 End Sub
 
 Private Function EntryLinesSql(ByVal EntryID As Variant) As String
@@ -371,21 +371,21 @@ Public Sub JournalEntryLoad(ByVal frm As Access.Form)
                                      "ON e.SourceType = t.SourceType WHERE e.EntryID = " & CLng(frm.OpenArgs), dbOpenSnapshot)
     If rs.EOF Then
         rs.Close
-        frm!lblHeader.Caption = "ÇáŞíÏ ÛíÑ ãæÌæÏ (ÑÈãÇ ÍõĞİÊ ÇáÚãáíÉ). ÍÏøË ÇáŞíæÏ."
+        frm!lblHeader.Caption = Tr("ÇáŞíÏ ÛíÑ ãæÌæÏ (ÑÈãÇ ÍõĞİÊ ÇáÚãáíÉ). ÍÏøË ÇáŞíæÏ.")
         Exit Sub
     End If
-    frm!lblTitle.Caption = "ŞíÏ íæãíÉ ÑŞã " & rs!EntryNumber
-    frm!lblHeader.Caption = "ÇáÊÇÑíÎ: " & GDate(rs!EntryDate, True) & "    ÇáÚãáíÉ: " & rs!TypeName & " " & _
-                            Nz(rs!SourceNumber, "") & IIf(IsNull(rs!UpdatedAt), "", "    (ÍõÏöøË İí " & GDate(rs!UpdatedAt, True) & ")")
-    frm!lblDescription.Caption = "ÇáÈíÇä: " & Nz(rs!Description, "-")
-    frm!lblTotals.Caption = "ÇáÅÌãÇáí: ãÏíä " & Format$(rs!TotalDebit, "#,##0.00") & " = ÏÇÆä " & _
-                            Format$(rs!TotalCredit, "#,##0.00")
+    frm!lblTitle.Caption = Tr("ŞíÏ íæãíÉ ÑŞã " & rs!EntryNumber)
+    frm!lblHeader.Caption = Tr("ÇáÊÇÑíÎ: " & GDate(rs!EntryDate, True) & "    ÇáÚãáíÉ: " & rs!TypeName & " " & _
+                            Nz(rs!SourceNumber, "") & IIf(IsNull(rs!UpdatedAt), "", "    (ÍõÏöøË İí " & GDate(rs!UpdatedAt, True) & ")"))
+    frm!lblDescription.Caption = Tr("ÇáÈíÇä: " & Nz(rs!Description, "-"))
+    frm!lblTotals.Caption = Tr("ÇáÅÌãÇáí: ãÏíä " & Format$(rs!TotalDebit, "#,##0.00") & " = ÏÇÆä " & _
+                            Format$(rs!TotalCredit, "#,##0.00"))
     If Not IsBaseCurrency(rs!CurrencyCode) Then             ' posted in SAR from a document in a currency (modCurrency)
-        frm!lblTotals.Caption = frm!lblTotals.Caption & "    |    ÇáÚãáÉ " & rs!CurrencyCode & "  ÇáãÚÇãá " & _
-            Format$(rs!ExchangeRate, "0.0000") & "  ãÈáÛ ÇáãÓÊäÏ " & Format$(rs!ForeignAmount, "#,##0.00") & " " & rs!CurrencyCode
+        frm!lblTotals.Caption = Tr(frm!lblTotals.Caption & "    |    ÇáÚãáÉ " & rs!CurrencyCode & "  ÇáãÚÇãá " & _
+            Format$(rs!ExchangeRate, "0.0000") & "  ãÈáÛ ÇáãÓÊäÏ " & Format$(rs!ForeignAmount, "#,##0.00") & " " & rs!CurrencyCode)
     End If
     rs.Close
-    frm!lstLines.RowSource = EntryLinesSql(frm.OpenArgs)
+    frm!lstLines.RowSource = Tr(EntryLinesSql(frm.OpenArgs))
 End Sub
 
 Public Sub PrintJournalEntry(ByVal EntryID As Variant)

@@ -74,3 +74,52 @@ def amount_in_words(amount) -> str:
 CASES = [0.5, 1, 2, 3, 10, 11, 12, 19, 20, 21, 99, 100, 101, 115, 200, 999, 1000, 1001, 1250.5, 2000,
          2500, 3000, 10000, 11000, 12345.67, 100000, 101000, 999999.99, 1000000, 2000000, 3500000,
          11000000, 123456789.01, 0.05, 0.11, 4750, 3175]
+
+
+# ---------------------------------------------------------------- English (modReports.AmountInWordsEn)
+ONES_EN = ("zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen "
+           "sixteen seventeen eighteen nineteen").split()
+TENS_EN = "- - twenty thirty forty fifty sixty seventy eighty ninety".split()
+
+
+def below_1000_en(n: int) -> str:
+    parts = ""
+    if n >= 100:
+        parts = ONES_EN[n // 100] + " hundred"
+    r = n % 100
+    if r >= 20:
+        parts = (parts + " " + TENS_EN[r // 10]).strip()
+        if r % 10:
+            parts += "-" + ONES_EN[r % 10]
+    elif r:
+        parts = (parts + " " + ONES_EN[r]).strip()
+    return parts
+
+
+def number_words_en(n: int) -> str:
+    parts = ""
+    if n >= 1000000:
+        parts = below_1000_en(n // 1000000) + " million"
+    if (n // 1000) % 1000:
+        parts = (parts + " " + below_1000_en((n // 1000) % 1000) + " thousand").strip()
+    if n % 1000:
+        parts = (parts + " " + below_1000_en(n % 1000)).strip()
+    return parts
+
+
+def amount_in_words_en(amount) -> str:
+    a = Decimal(str(abs(amount))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    if a >= 1000000000:
+        return f"{a:,.2f} Saudi Riyals"
+    riyals = int(a)
+    halalas = int((a - riyals) * 100)
+    if riyals == 0 and halalas == 0:
+        return "Zero Saudi Riyals"
+    words = ""
+    if riyals:
+        words = number_words_en(riyals) + (" Saudi Riyal" if riyals == 1 else " Saudi Riyals")
+    if halalas:
+        if words:
+            words += " and "
+        words += number_words_en(halalas) + (" Halala" if halalas == 1 else " Halalas")
+    return "Only " + words

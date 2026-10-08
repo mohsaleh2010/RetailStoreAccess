@@ -257,7 +257,7 @@ Public Sub JournalLoad(ByVal frm As Access.Form)
         rs.MoveNext
     Loop
     rs.Close
-    frm!cboSourceType.RowSource = rows
+    frm!cboSourceType.RowSource = Tr(rows)
     frm!cboSourceType.Value = "ALL"
     frm!txtFrom.Value = DateSerial(Year(Date), Month(Date), 1)
     frm!txtTo.Value = Date
@@ -270,8 +270,8 @@ Public Sub JournalSync(ByVal frm As Access.Form)
     msg = SyncJournal(added, updated, removed)
     DoCmd.Hourglass False
     If Len(msg) > 0 Then ShowWarning msg
-    frm!lblSync.Caption = "تحديث القيود من العمليات: " & added & " قيد جديد، و" & updated & " قيد مُحدَّث، و" & _
-                          removed & " قيد محذوف  (" & GDate(Now, True) & ")"
+    frm!lblSync.Caption = Tr("تحديث القيود من العمليات: " & added & " قيد جديد، و" & updated & " قيد مُحدَّث، و" & _
+                          removed & " قيد محذوف  (" & GDate(Now, True) & ")")
     JournalRefresh frm
 End Sub
 
@@ -302,15 +302,15 @@ Public Sub JournalRefresh(ByVal frm As Access.Form)
         ShowWarning "أدخل تاريخ البداية وتاريخ النهاية."
         Exit Sub
     End If
-    frm!lstEntries.RowSource = "SELECT e.EntryID, e.EntryNumber AS [رقم القيد], GDate(e.EntryDate) AS [التاريخ], " & _
+    frm!lstEntries.RowSource = Tr("SELECT e.EntryID, e.EntryNumber AS [رقم القيد], GDate(e.EntryDate) AS [التاريخ], " & _
         "t.TypeName AS [العملية], e.SourceNumber AS [المستند], e.Description AS [البيان], " & _
         "Format(e.TotalDebit, '#,##0.00') AS [المبلغ] FROM JournalEntries AS e INNER JOIN JournalSourceTypes AS t " & _
-        "ON e.SourceType = t.SourceType WHERE " & w & " ORDER BY e.EntryDate, e.EntryNumber"
+        "ON e.SourceType = t.SourceType WHERE " & w & " ORDER BY e.EntryDate, e.EntryNumber")
     Set rs = CurrentDb.OpenRecordset("SELECT Count(*) AS N, Sum(e.TotalDebit) AS D, Sum(e.TotalCredit) AS C " & _
                                      "FROM JournalEntries AS e WHERE " & w, dbOpenSnapshot)
-    frm!lblTotals.Caption = "عدد القيود: " & rs!N & "    إجمالي المدين: " & Format$(Nz(rs!D, 0), "#,##0.00") & _
+    frm!lblTotals.Caption = Tr("عدد القيود: " & rs!N & "    إجمالي المدين: " & Format$(Nz(rs!D, 0), "#,##0.00") & _
                             "    إجمالي الدائن: " & Format$(Nz(rs!C, 0), "#,##0.00") & _
-                            IIf(Nz(rs!D, 0) = Nz(rs!C, 0), "    (متوازن)", "    (غير متوازن!)")
+                            IIf(Nz(rs!D, 0) = Nz(rs!C, 0), "    (متوازن)", "    (غير متوازن!)"))
     rs.Close
     If frm!lstEntries.ListCount > 1 Then frm!lstEntries.Value = frm!lstEntries.ItemData(1) Else frm!lstEntries.Value = Null
     JournalEntryPicked frm
@@ -318,10 +318,10 @@ End Sub
 
 Public Sub JournalEntryPicked(ByVal frm As Access.Form)
     If IsNull(frm!lstEntries.Value) Then
-        frm!lstLines.RowSource = ""
+        frm!lstLines.RowSource = Tr("")
         Exit Sub
     End If
-    frm!lstLines.RowSource = EntryLinesSql(frm!lstEntries.Value)
+    frm!lstLines.RowSource = Tr(EntryLinesSql(frm!lstEntries.Value))
 End Sub
 
 Private Function EntryLinesSql(ByVal EntryID As Variant) As String
@@ -371,21 +371,21 @@ Public Sub JournalEntryLoad(ByVal frm As Access.Form)
                                      "ON e.SourceType = t.SourceType WHERE e.EntryID = " & CLng(frm.OpenArgs), dbOpenSnapshot)
     If rs.EOF Then
         rs.Close
-        frm!lblHeader.Caption = "القيد غير موجود (ربما حُذفت العملية). حدّث القيود."
+        frm!lblHeader.Caption = Tr("القيد غير موجود (ربما حُذفت العملية). حدّث القيود.")
         Exit Sub
     End If
-    frm!lblTitle.Caption = "قيد يومية رقم " & rs!EntryNumber
-    frm!lblHeader.Caption = "التاريخ: " & GDate(rs!EntryDate, True) & "    العملية: " & rs!TypeName & " " & _
-                            Nz(rs!SourceNumber, "") & IIf(IsNull(rs!UpdatedAt), "", "    (حُدِّث في " & GDate(rs!UpdatedAt, True) & ")")
-    frm!lblDescription.Caption = "البيان: " & Nz(rs!Description, "-")
-    frm!lblTotals.Caption = "الإجمالي: مدين " & Format$(rs!TotalDebit, "#,##0.00") & " = دائن " & _
-                            Format$(rs!TotalCredit, "#,##0.00")
+    frm!lblTitle.Caption = Tr("قيد يومية رقم " & rs!EntryNumber)
+    frm!lblHeader.Caption = Tr("التاريخ: " & GDate(rs!EntryDate, True) & "    العملية: " & rs!TypeName & " " & _
+                            Nz(rs!SourceNumber, "") & IIf(IsNull(rs!UpdatedAt), "", "    (حُدِّث في " & GDate(rs!UpdatedAt, True) & ")"))
+    frm!lblDescription.Caption = Tr("البيان: " & Nz(rs!Description, "-"))
+    frm!lblTotals.Caption = Tr("الإجمالي: مدين " & Format$(rs!TotalDebit, "#,##0.00") & " = دائن " & _
+                            Format$(rs!TotalCredit, "#,##0.00"))
     If Not IsBaseCurrency(rs!CurrencyCode) Then             ' posted in SAR from a document in a currency (modCurrency)
-        frm!lblTotals.Caption = frm!lblTotals.Caption & "    |    العملة " & rs!CurrencyCode & "  المعامل " & _
-            Format$(rs!ExchangeRate, "0.0000") & "  مبلغ المستند " & Format$(rs!ForeignAmount, "#,##0.00") & " " & rs!CurrencyCode
+        frm!lblTotals.Caption = Tr(frm!lblTotals.Caption & "    |    العملة " & rs!CurrencyCode & "  المعامل " & _
+            Format$(rs!ExchangeRate, "0.0000") & "  مبلغ المستند " & Format$(rs!ForeignAmount, "#,##0.00") & " " & rs!CurrencyCode)
     End If
     rs.Close
-    frm!lstLines.RowSource = EntryLinesSql(frm.OpenArgs)
+    frm!lstLines.RowSource = Tr(EntryLinesSql(frm.OpenArgs))
 End Sub
 
 Public Sub PrintJournalEntry(ByVal EntryID As Variant)

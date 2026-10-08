@@ -204,11 +204,11 @@ Private Sub ShowOrderType(ByVal frm As Access.Form)
     frm!txtDeliveryPhone.Visible = (t = "DELIVERY")
     frm!lblDeliveryAddress.Visible = (t = "DELIVERY")
     frm!txtDeliveryAddress.Visible = (t = "DELIVERY")
-    frm!lblOrderTitle.Caption = OrderTypeText(t, frm!cboTable.Value)
+    frm!lblOrderTitle.Caption = Tr(OrderTypeText(t, frm!cboTable.Value))
 End Sub
 
 Public Sub TableChanged(ByVal frm As Access.Form)
-    frm!lblOrderTitle.Caption = OrderTypeText(frm!txtOrderType.Value, frm!cboTable.Value)
+    frm!lblOrderTitle.Caption = Tr(OrderTypeText(frm!txtOrderType.Value, frm!cboTable.Value))
 End Sub
 
 Public Sub DeliveryCustomerChanged(ByVal frm As Access.Form)
@@ -281,7 +281,7 @@ Public Sub LoadCategories(ByVal frm As Access.Form)
                 .BorderColor = CLR_TEXT
             End With
             ShowPicture frm.Controls("imgCat" & k), rs!ImagePath
-            frm.Controls("lblCat" & k).Caption = rs!CategoryName
+            frm.Controls("lblCat" & k).Caption = Tr(rs!CategoryName)
             frm.Controls("lblCat" & k).FontBold = sel
             frm.Controls("lblCat" & k).Visible = True
             frm.Controls("btnCat" & k).Tag = CStr(rs!CategoryID)
@@ -298,7 +298,7 @@ Public Sub LoadProducts(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset, n As Long, i As Long, k As String, color As Long, tiles As Long
     tiles = TileCount(frm, "btnProd")
     color = TileColorValue(DbValue("SELECT TileColor FROM Categories WHERE CategoryID = " & m_catID))
-    frm!lblCategoryTitle.Caption = Nz(DbValue("SELECT CategoryName FROM Categories WHERE CategoryID = " & m_catID), " ")
+    frm!lblCategoryTitle.Caption = Tr(Nz(DbValue("SELECT CategoryName FROM Categories WHERE CategoryID = " & m_catID), " "))
     Set rs = CurrentDb.OpenRecordset("SELECT ProductID, ProductName, SellingPrice, ImagePath FROM Products " & _
         "WHERE IsActive = True AND CategoryID = " & m_catID & " ORDER BY ProductName", dbOpenSnapshot)
     If Not rs.EOF Then
@@ -322,9 +322,9 @@ Public Sub LoadProducts(ByVal frm As Access.Form)
             frm.Controls("boxProdStrip" & k).BackColor = color
             frm.Controls("boxProdStrip" & k).Visible = True
             ShowPicture frm.Controls("imgProd" & k), rs!ImagePath
-            frm.Controls("lblProd" & k).Caption = rs!ProductName
+            frm.Controls("lblProd" & k).Caption = Tr(rs!ProductName)
             frm.Controls("lblProd" & k).Visible = True
-            frm.Controls("lblPrice" & k).Caption = Format$(Nz(rs!SellingPrice, 0), "#,##0.00") & " —.”"
+            frm.Controls("lblPrice" & k).Caption = Tr(Format$(Nz(rs!SellingPrice, 0), "#,##0.00") & " —.”")
             frm.Controls("lblPrice" & k).Visible = True
             frm.Controls("btnProd" & k).Tag = CStr(rs!ProductID)
             frm.Controls("btnProd" & k).Visible = True
@@ -332,8 +332,8 @@ Public Sub LoadProducts(ByVal frm As Access.Form)
         End If
     Next
     rs.Close
-    frm!lblProdPage.Caption = "’›Õ… " & (m_prodPage + 1) & " „‰ " & PageCount(n, tiles) & _
-                              "   (" & n & " ’‰›)"
+    frm!lblProdPage.Caption = Tr("’›Õ… " & (m_prodPage + 1) & " „‰ " & PageCount(n, tiles) & _
+                              "   (" & n & " ’‰›)")
     frm!btnProdPrev.Enabled = (m_prodPage > 0)
     frm!btnProdNext.Enabled = (m_prodPage < PageCount(n, tiles) - 1)
 End Sub
@@ -394,7 +394,7 @@ End Sub
 '------------------------------------------------------------------------------
 Public Sub TouchPayCash(ByVal frm As Access.Form)
     If DCount("*", "tmpPOSLines") = 0 Then
-        frm!lblStatus.Caption = "√÷› ’‰›« Ê«Õœ« ⁄·Ï «·√ﬁ·."
+        frm!lblStatus.Caption = Tr("√÷› ’‰›« Ê«Õœ« ⁄·Ï «·√ﬁ·.")
         Exit Sub
     End If
     RecalcPOS frm
@@ -411,7 +411,7 @@ End Sub
 
 Public Sub TouchPayCard(ByVal frm As Access.Form)
     If DCount("*", "tmpPOSLines") = 0 Then
-        frm!lblStatus.Caption = "√÷› ’‰›« Ê«Õœ« ⁄·Ï «·√ﬁ·."
+        frm!lblStatus.Caption = Tr("√÷› ’‰›« Ê«Õœ« ⁄·Ï «·√ﬁ·.")
         Exit Sub
     End If
     frm!cboPaymentType.Value = "CASH"
@@ -423,7 +423,7 @@ End Sub
 
 ' --- frmTouchPay: number pad --------------------------------------------------
 Public Sub PayLoad(ByVal frm As Access.Form)
-    frm!lblPayTotal.Caption = Format$(Nz(TempVars("TouchPayTotal"), 0), "#,##0.00")
+    frm!lblPayTotal.Caption = Tr(Format$(Nz(TempVars("TouchPayTotal"), 0), "#,##0.00"))
     frm!txtPayInput.Value = ""
     PayShow frm
 End Sub
@@ -483,12 +483,12 @@ Private Sub PayShow(ByVal frm As Access.Form)
     Dim total As Double, amount As Double
     total = Nz(TempVars("TouchPayTotal"), 0)
     amount = PayAmountOf(Nz(frm!txtPayInput.Value, ""), total)
-    frm!lblPayAmount.Caption = Format$(amount, "#,##0.00")
+    frm!lblPayAmount.Caption = Tr(Format$(amount, "#,##0.00"))
     If amount >= total Then
-        frm!lblPayChange.Caption = "«·»«ﬁÌ ··⁄„Ì·: " & Format$(amount - total, "#,##0.00")
+        frm!lblPayChange.Caption = Tr("«·»«ﬁÌ ··⁄„Ì·: " & Format$(amount - total, "#,##0.00"))
         frm!lblPayChange.ForeColor = CLR_SUCCESS
     Else
-        frm!lblPayChange.Caption = "«·„»·€ √ﬁ· „‰ «·≈Ã„«·Ì »‹ " & Format$(total - amount, "#,##0.00")
+        frm!lblPayChange.Caption = Tr("«·„»·€ √ﬁ· „‰ «·≈Ã„«·Ì »‹ " & Format$(total - amount, "#,##0.00"))
         frm!lblPayChange.ForeColor = CLR_DANGER
     End If
 End Sub
@@ -523,7 +523,7 @@ Private Sub ShowCafeOrder(ByVal frm As Access.Form)
     frm!btnTypeDineIn.ForeColor = IIf(t = "DINE_IN", CLR_SURFACE, CLR_TEXT)
     frm!btnTypeTakeaway.BackColor = IIf(t = "TAKEAWAY", CLR_PRIMARY, CLR_SECONDARY)
     frm!btnTypeTakeaway.ForeColor = IIf(t = "TAKEAWAY", CLR_SURFACE, CLR_TEXT)
-    frm!lblOrderTitle.Caption = OrderTypeText(t, Null, frm!txtOrderName.Value)
+    frm!lblOrderTitle.Caption = Tr(OrderTypeText(t, Null, frm!txtOrderName.Value))
 End Sub
 
 Public Sub OrderNameChanged(ByVal frm As Access.Form)
@@ -618,7 +618,7 @@ Private Sub CafeOpenItem(ByVal frm As Access.Form, ByVal ProductID As Long)
     TempVars.Add "CafeItemAdded", False
     DoCmd.OpenForm "frmCafeItem", acNormal, , , , acDialog
     RecalcPOS frm
-    If Nz(TempVars("CafeItemAdded"), False) Then frm!lblStatus.Caption = " „  «·≈÷«›… ··ÿ·»"
+    If Nz(TempVars("CafeItemAdded"), False) Then frm!lblStatus.Caption = Tr(" „  «·≈÷«›… ··ÿ·»")
 End Sub
 
 ' --- frmCafeItem ---------------------------------------------------------------
@@ -632,14 +632,14 @@ Public Sub ItemLoad(ByVal frm As Access.Form)
         Exit Sub
     End If
     frm!txtItemProduct.Value = rs!ProductID
-    frm!lblTitle.Caption = rs!ProductName
+    frm!lblTitle.Caption = Tr(rs!ProductName)
     ShowPicture frm!imgItem, rs!ImagePath
     For Each code In Array("S", "M", "L")
         price = SizePrice(CStr(code), rs!SellingPrice, rs!SizePriceM, rs!SizePriceL)
         With frm.Controls("btnSize" & code)
             .Visible = Not IsNull(price)
             If IsNull(price) Then .Tag = "" Else .Tag = Trim$(Str$(price))   ' "." decimals, any locale
-            .Caption = SizeName(CStr(code)) & vbCrLf & Format$(Nz(price, 0), "#,##0.00")
+            .Caption = Tr(SizeName(CStr(code)) & vbCrLf & Format$(Nz(price, 0), "#,##0.00"))
         End With
     Next
     rs.Close
@@ -655,7 +655,7 @@ Public Sub ItemLoad(ByVal frm As Access.Form)
         If rs.EOF Then
             frm.Controls("btnAdd" & k).Visible = False
         Else
-            frm.Controls("btnAdd" & k).Caption = rs!ProductName & vbCrLf & "+" & Format$(Nz(rs!SellingPrice, 0), "#,##0.00")
+            frm.Controls("btnAdd" & k).Caption = Tr(rs!ProductName & vbCrLf & "+" & Format$(Nz(rs!SellingPrice, 0), "#,##0.00"))
             frm.Controls("btnAdd" & k).Tag = CStr(rs!ProductID)
             frm.Controls("btnAdd" & k).Visible = True
             rs.MoveNext
@@ -664,7 +664,7 @@ Public Sub ItemLoad(ByVal frm As Access.Form)
     rs.Close
     frm!lblCapAddOns.Visible = frm!btnAdd1.Visible
     For i = 1 To 4
-        frm.Controls("btnNote" & i).Caption = CafeNote(i)
+        frm.Controls("btnNote" & i).Caption = Tr(CafeNote(i))
     Next
     ItemShow frm
 End Sub
@@ -717,8 +717,8 @@ Private Sub ItemShow(ByVal frm As Access.Form)
     For i = 1 To 4
         Highlight frm.Controls("btnNote" & i), InList(Nz(frm!txtNoteFlags.Value, ","), CStr(i))
     Next
-    frm!lblItemQty.Caption = CStr(Nz(frm!txtItemQty.Value, 1))
-    frm!lblItemTotal.Caption = "«·≈Ã„«·Ì: " & Format$(total * Nz(frm!txtItemQty.Value, 1), "#,##0.00") & " —.”"
+    frm!lblItemQty.Caption = Tr(CStr(Nz(frm!txtItemQty.Value, 1)))
+    frm!lblItemTotal.Caption = Tr("«·≈Ã„«·Ì: " & Format$(total * Nz(frm!txtItemQty.Value, 1), "#,##0.00") & " —.”")
 End Sub
 
 Public Sub ItemConfirm(ByVal frm As Access.Form)

@@ -341,10 +341,10 @@ End Function
 Public Sub TreasuryLoad(ByVal frm As Access.Form)
     Dim sql As String
     Calendar = vbCalGreg
-    sql = "SELECT CashBoxID, BoxName AS [«·’‰œÊﬁ], BoxTypeName AS [«·‰Ê⁄], Format(Balance, '#,##0.00') AS [«·—’Ìœ] " & _
-          "FROM CashBoxBalanceQuery WHERE IsActive = True"
-    If Not HasPermission("CASH_BOX") Then sql = sql & " AND CashBoxID = " & CurrentCashBoxID()   ' a cashier sees his box
-    frm!lstBoxes.RowSource = sql & " ORDER BY BoxType DESC, BoxName"
+    sql = "SELECT CashBoxID, BoxName AS [«·’‰œÊﬁ], BoxTypeName AS [«·‰Ê⁄], Format(q.Balance, '#,##0.00') AS [«·—’Ìœ] " & _
+          "FROM CashBoxBalanceQuery AS q WHERE q.IsActive = True"
+    If Not HasPermission("CASH_BOX") Then sql = sql & " AND q.CashBoxID = " & CurrentCashBoxID()   ' a cashier sees his box
+    frm!lstBoxes.RowSource = Tr(sql & " ORDER BY q.BoxType DESC, q.BoxName")
     frm!btnCashIn.Enabled = HasPermission("CASH_BOX")
     frm!btnCashOut.Enabled = frm!btnCashIn.Enabled
     frm!btnTransfer.Enabled = frm!btnCashIn.Enabled
@@ -370,8 +370,8 @@ End Sub
 Public Sub TreasuryShow(ByVal frm As Access.Form)
     Dim box As Long, d As Date, opening As Currency, cashIn As Currency, cashOut As Currency
     If IsNull(frm!lstBoxes.Value) Or Not IsDate(frm!txtDay.Value) Then
-        frm!lblBoxName.Caption = "·« ÌÊÃœ ’‰œÊﬁ"
-        frm!lstMoves.RowSource = ""
+        frm!lblBoxName.Caption = Tr("·« ÌÊÃœ ’‰œÊﬁ")
+        frm!lstMoves.RowSource = Tr("")
         Exit Sub
     End If
     box = CLng(frm!lstBoxes.Value)
@@ -379,19 +379,19 @@ Public Sub TreasuryShow(ByVal frm As Access.Form)
     opening = CashBoxBalance(box, d)
     cashIn = DayTotal(box, d, "AmountIn")
     cashOut = DayTotal(box, d, "AmountOut")
-    frm!lblBoxName.Caption = BoxName(box) & "  -  " & GDate(d)
-    frm!lblOpening.Caption = Money(opening)
-    frm!lblIn.Caption = Money(cashIn)
-    frm!lblOut.Caption = Money(cashOut)
-    frm!lblClosing.Caption = Money(opening + cashIn - cashOut)
-    frm!lblCurrent.Caption = "«·—’Ìœ «·Õ«·Ì ··’‰œÊﬁ: " & Money(CashBoxBalance(box)) & _
-                             "    ¬Œ—  ’›Ì…: " & IIf(IsNull(LastClosingDate(box)), "·«  ÊÃœ", GDate(LastClosingDate(box), True))
-    frm!lstMoves.RowSource = "SELECT Format(MoveDate, 'hh:nn') AS [«·Êﬁ ], MoveTypeName AS [«·Õ—ﬂ…], " & _
+    frm!lblBoxName.Caption = Tr(BoxName(box) & "  -  " & GDate(d))
+    frm!lblOpening.Caption = Tr(Money(opening))
+    frm!lblIn.Caption = Tr(Money(cashIn))
+    frm!lblOut.Caption = Tr(Money(cashOut))
+    frm!lblClosing.Caption = Tr(Money(opening + cashIn - cashOut))
+    frm!lblCurrent.Caption = Tr("«·—’Ìœ «·Õ«·Ì ··’‰œÊﬁ: " & Money(CashBoxBalance(box)) & _
+                             "    ¬Œ—  ’›Ì…: " & IIf(IsNull(LastClosingDate(box)), "·«  ÊÃœ", GDate(LastClosingDate(box), True)))
+    frm!lstMoves.RowSource = Tr("SELECT Format(MoveDate, 'hh:nn') AS [«·Êﬁ ], MoveTypeName AS [«·Õ—ﬂ…], " & _
         "DocNumber AS [«·„” ‰œ], PartyName AS [«·ÃÂ… / «·»Ì«‰], " & _
         "IIf(AmountIn = 0, Null, Format(AmountIn, '#,##0.00')) AS [„ﬁ»Ê÷], " & _
         "IIf(AmountOut = 0, Null, Format(AmountOut, '#,##0.00')) AS [„œ›Ê⁄] " & _
         "FROM qryCashMovements WHERE CashBoxID = " & box & " AND MoveDate >= " & SqlDate(d) & _
-        " AND MoveDate < " & SqlDate(DateAdd("d", 1, d)) & " ORDER BY MoveDate"
+        " AND MoveDate < " & SqlDate(DateAdd("d", 1, d)) & " ORDER BY MoveDate")
 End Sub
 
 Private Function DayTotal(ByVal BoxID As Long, ByVal d As Date, ByVal FieldName As String) As Currency
@@ -440,9 +440,9 @@ End Sub
 '==============================================================================
 Public Sub VoucherLoad(ByVal frm As Access.Form)
     Dim parts() As String, kind As String
-    frm!cboVoucherType.RowSource = VOUCHER_TYPES
-    frm!cboBox.RowSource = BOX_ROWS & " ORDER BY BoxType DESC, BoxName"
-    frm!cboToBox.RowSource = frm!cboBox.RowSource
+    frm!cboVoucherType.RowSource = Tr(VOUCHER_TYPES)
+    frm!cboBox.RowSource = Tr(BOX_ROWS & " ORDER BY BoxType DESC, BoxName")
+    frm!cboToBox.RowSource = Tr(frm!cboBox.RowSource)
     kind = "OUT"
     If Not IsNull(frm.OpenArgs) Then
         parts = Split(CStr(frm.OpenArgs) & "|", "|")
@@ -459,22 +459,22 @@ Public Sub VoucherTypeChanged(ByVal frm As Access.Form)
     kind = Nz(frm!cboVoucherType.Value, "OUT")
     Select Case kind
         Case "IN"
-            frm!cboCategory.RowSource = IN_CATEGORIES
+            frm!cboCategory.RowSource = Tr(IN_CATEGORIES)
             frm!cboCategory.Value = "OTHER"
-            frm!lblBox.Caption = "Ìıﬁ»÷ ›Ì ’‰œÊﬁ"
-            frm!lblParty.Caption = "«” ·„‰« „‰"
+            frm!lblBox.Caption = Tr("Ìıﬁ»÷ ›Ì ’‰œÊﬁ")
+            frm!lblParty.Caption = Tr("«” ·„‰« „‰")
         Case "OUT"
-            frm!cboCategory.RowSource = OUT_CATEGORIES
+            frm!cboCategory.RowSource = Tr(OUT_CATEGORIES)
             frm!cboCategory.Value = "EXPENSE"
-            frm!lblBox.Caption = "Ìı’—› „‰ ’‰œÊﬁ"
-            frm!lblParty.Caption = "Ìı’—› ≈·Ï"
+            frm!lblBox.Caption = Tr("Ìı’—› „‰ ’‰œÊﬁ")
+            frm!lblParty.Caption = Tr("Ìı’—› ≈·Ï")
         Case Else
-            frm!cboCategory.RowSource = "TRANSFER; ÕÊÌ· »Ì‰ «·’‰«œÌﬁ"
+            frm!cboCategory.RowSource = Tr("TRANSFER; ÕÊÌ· »Ì‰ «·’‰«œÌﬁ")
             frm!cboCategory.Value = "TRANSFER"
-            frm!lblBox.Caption = "„‰ ’‰œÊﬁ"
-            frm!lblParty.Caption = "«·„” ·„"
+            frm!lblBox.Caption = Tr("„‰ ’‰œÊﬁ")
+            frm!lblParty.Caption = Tr("«·„” ·„")
     End Select
-    frm!lblTitle.Caption = DLookupList(VOUCHER_TYPES, kind)
+    frm!lblTitle.Caption = Tr(DLookupList(VOUCHER_TYPES, kind))
     frm!cboToBox.Visible = (kind = "TRANSFER")
     frm!lblToBox.Visible = frm!cboToBox.Visible
     frm!cboCategory.Enabled = (kind <> "TRANSFER")
@@ -492,17 +492,17 @@ Public Sub VoucherCategoryChanged(ByVal frm As Access.Form)
     Select Case Nz(frm!cboCategory.Value, "")
         Case "ADVANCE"
             If frm!cboEmployee.RowSource <> EMPLOYEE_ROWS Then
-                frm!cboEmployee.RowSource = EMPLOYEE_ROWS
+                frm!cboEmployee.RowSource = Tr(EMPLOYEE_ROWS)
                 frm!cboEmployee.Value = Null
             End If
-            frm!lblEmployee.Caption = "«·„ÊŸ› ’«Õ» «·”·›… *"
+            frm!lblEmployee.Caption = Tr("«·„ÊŸ› ’«Õ» «·”·›… *")
             frm!cboEmployee.Visible = True
         Case "COMMISSION"
             If frm!cboEmployee.RowSource <> REP_ROWS Then
-                frm!cboEmployee.RowSource = REP_ROWS
+                frm!cboEmployee.RowSource = Tr(REP_ROWS)
                 frm!cboEmployee.Value = Null
             End If
-            frm!lblEmployee.Caption = "«·„‰œÊ» *"
+            frm!lblEmployee.Caption = Tr("«·„‰œÊ» *")
             frm!cboEmployee.Visible = True
         Case Else
             frm!cboEmployee.Visible = False
@@ -512,9 +512,9 @@ End Sub
 
 Public Sub VoucherBoxChanged(ByVal frm As Access.Form)
     If IsNull(frm!cboBox.Value) Then
-        frm!lblBoxBalance.Caption = " "
+        frm!lblBoxBalance.Caption = Tr(" ")
     Else
-        frm!lblBoxBalance.Caption = "—’Ìœ «·’‰œÊﬁ «·¬‰: " & Money(CashBoxBalance(CLng(frm!cboBox.Value)))
+        frm!lblBoxBalance.Caption = Tr("—’Ìœ «·’‰œÊﬁ «·¬‰: " & Money(CashBoxBalance(CLng(frm!cboBox.Value))))
     End If
 End Sub
 
@@ -569,7 +569,7 @@ End Function
 Public Sub AddExpenseType(ByVal frm As Access.Form, ByVal ControlName As String)
     ' Adds a new expense type to the list and selects it (frmCashVoucher, frmExpenses).
     Dim typeName As String, id As Variant
-    typeName = Trim$(InputBox("«”„ ‰Ê⁄ «·„’—Ê› «·ÃœÌœ:", "‰Ê⁄ „’—Ê› ÃœÌœ"))
+    typeName = Trim$(InputBox(Tr("«”„ ‰Ê⁄ «·„’—Ê› «·ÃœÌœ:"), Tr("‰Ê⁄ „’—Ê› ÃœÌœ")))
     If Len(typeName) = 0 Then Exit Sub
     id = DbValue("SELECT ExpenseTypeID FROM ExpenseTypes WHERE ExpenseTypeName = " & SqlText(Left$(typeName, 50)))
     If IsNull(id) Then
@@ -589,10 +589,10 @@ Public Sub ClosingLoad(ByVal frm As Access.Form)
     Dim sql As String
     Calendar = vbCalGreg
     sql = BOX_ROWS
-    If Not HasPermission("CASH_BOX") Then sql = sql & " AND CashBoxID = " & CurrentCashBoxID()
-    frm!cboBox.RowSource = sql & " ORDER BY BoxType, BoxName"
-    frm!cboToBox.RowSource = BOX_ROWS & " AND BoxType = 'MAIN' ORDER BY BoxName"
-    frm!cboDestination.RowSource = DESTINATIONS
+    If Not HasPermission("CASH_BOX") Then sql = sql & " AND q.CashBoxID = " & CurrentCashBoxID()
+    frm!cboBox.RowSource = Tr(sql & " ORDER BY BoxType, BoxName")
+    frm!cboToBox.RowSource = Tr(BOX_ROWS & " AND BoxType = 'MAIN' ORDER BY BoxName")
+    frm!cboDestination.RowSource = Tr(DESTINATIONS)
     frm!cboDestination.Value = "MAIN"
     If Not IsNull(frm.OpenArgs) Then
         If IsNumeric(frm.OpenArgs) Then frm!cboBox.Value = CLng(frm.OpenArgs)
@@ -608,8 +608,8 @@ Public Sub ClosingBoxChanged(ByVal frm As Access.Form)
     frm!txtCounted.Value = Null
     frm!txtTransfer.Value = Null
     If IsNull(frm!cboBox.Value) Then
-        frm!lstBreakdown.RowSource = ""
-        frm!lblPeriod.Caption = " "
+        frm!lstBreakdown.RowSource = Tr("")
+        frm!lblPeriod.Caption = Tr(" ")
         frm!lblOpening.Caption = "-": frm!lblCashIn.Caption = "-"
         frm!lblCashOut.Caption = "-": frm!lblExpected.Caption = "-"
         frm!txtExpected.Value = Null
@@ -621,18 +621,18 @@ Public Sub ClosingBoxChanged(ByVal frm As Access.Form)
     If Not IsNull(since) Then opening = CashBoxBalance(box, since, True)
     cashIn = CashMovesTotal(box, "IN", since)
     cashOut = CashMovesTotal(box, "OUT", since)
-    frm!lblPeriod.Caption = IIf(IsNull(since), "„‰ »œ«Ì… «·’‰œÊﬁ (·«  ÊÃœ  ’›Ì… ”«»ﬁ…)", _
-                                "„‰ ¬Œ—  ’›Ì…: " & GDate(since, True)) & "  Õ Ï «·¬‰"
-    frm!lblOpening.Caption = Money(opening)
-    frm!lblCashIn.Caption = Money(cashIn)
-    frm!lblCashOut.Caption = Money(cashOut)
-    frm!lblExpected.Caption = Money(opening + cashIn - cashOut)
+    frm!lblPeriod.Caption = Tr(IIf(IsNull(since), "„‰ »œ«Ì… «·’‰œÊﬁ (·«  ÊÃœ  ’›Ì… ”«»ﬁ…)", _
+                                "„‰ ¬Œ—  ’›Ì…: " & GDate(since, True)) & "  Õ Ï «·¬‰")
+    frm!lblOpening.Caption = Tr(Money(opening))
+    frm!lblCashIn.Caption = Tr(Money(cashIn))
+    frm!lblCashOut.Caption = Tr(Money(cashOut))
+    frm!lblExpected.Caption = Tr(Money(opening + cashIn - cashOut))
     frm!txtExpected.Value = opening + cashIn - cashOut
-    frm!lstBreakdown.RowSource = "SELECT MoveTypeName AS [«·»‰œ], Count(*) AS [«·⁄œœ], " & _
+    frm!lstBreakdown.RowSource = Tr("SELECT MoveTypeName AS [«·»‰œ], Count(*) AS [«·⁄œœ], " & _
         "Format(Sum(AmountIn), '#,##0.00') AS [„ﬁ»Ê÷], Format(Sum(AmountOut), '#,##0.00') AS [„œ›Ê⁄] " & _
         "FROM qryCashMovements WHERE CashBoxID = " & box & _
         IIf(IsNull(since), "", " AND MoveDate > " & SqlDate(CDate(Nz(since, Now)))) & _
-        " GROUP BY MoveTypeName ORDER BY MoveTypeName"
+        " GROUP BY MoveTypeName ORDER BY MoveTypeName")
     ClosingRecalc frm
 End Sub
 
@@ -656,26 +656,26 @@ End Sub
 Public Sub ClosingRecalc(ByVal frm As Access.Form)
     Dim expected As Currency, counted As Currency, diff As Currency, kept As Currency
     If IsNull(frm!txtCounted.Value) Or IsNull(frm!cboBox.Value) Then
-        frm!lblDifference.Caption = "√œŒ· «·‰ﬁœÌ… «·„ÊÃÊœ… ›⁄·« ›Ì «·’‰œÊﬁ"
+        frm!lblDifference.Caption = Tr("√œŒ· «·‰ﬁœÌ… «·„ÊÃÊœ… ›⁄·« ›Ì «·’‰œÊﬁ")
         frm!lblDifference.ForeColor = CLR_MUTED
-        frm!lblKept.Caption = " "
+        frm!lblKept.Caption = Tr(" ")
         Exit Sub
     End If
     expected = Nz(frm!txtExpected.Value, 0)
     counted = Nz(frm!txtCounted.Value, 0)
     diff = counted - expected
     If diff < 0 Then
-        frm!lblDifference.Caption = "⁄Ã“: " & Money(-diff)
+        frm!lblDifference.Caption = Tr("⁄Ã“: " & Money(-diff))
         frm!lblDifference.ForeColor = CLR_DANGER
     ElseIf diff > 0 Then
-        frm!lblDifference.Caption = "“Ì«œ…: " & Money(diff)
+        frm!lblDifference.Caption = Tr("“Ì«œ…: " & Money(diff))
         frm!lblDifference.ForeColor = CLR_WARNING
     Else
-        frm!lblDifference.Caption = "„ÿ«»ﬁ: ·« ÌÊÃœ ⁄Ã“ Ê·« “Ì«œ…"
+        frm!lblDifference.Caption = Tr("„ÿ«»ﬁ: ·« ÌÊÃœ ⁄Ã“ Ê·« “Ì«œ…")
         frm!lblDifference.ForeColor = CLR_SUCCESS
     End If
     kept = counted - Nz(frm!txtTransfer.Value, 0)
-    frm!lblKept.Caption = "Ì»ﬁÏ ›Ì «·’‰œÊﬁ (⁄Âœ… «·ﬂ«‘Ì—): " & Money(kept)
+    frm!lblKept.Caption = Tr("Ì»ﬁÏ ›Ì «·’‰œÊﬁ (⁄Âœ… «·ﬂ«‘Ì—): " & Money(kept))
 End Sub
 
 Public Function SaveCashClosing(ByVal frm As Access.Form, Optional ByVal PrintAfter As Boolean = False) As Boolean

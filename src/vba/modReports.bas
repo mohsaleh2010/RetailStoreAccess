@@ -26,7 +26,7 @@ Private Const HUNDREDS_TEXT As String = "|مائة|مائتان|ثلاثمائة
 Public Function ReportCriteria() As String
     ' Set by OpenReportOrQuery before a report opens ("" when the report has no choices).
     On Error Resume Next
-    ReportCriteria = Nz(TempVars("ReportCriteria"), "")
+    ReportCriteria = Tr(Nz(TempVars("ReportCriteria"), ""))
 End Function
 
 Public Function GDate(ByVal Value As Variant, Optional ByVal WithTime As Boolean = False) As String
@@ -45,7 +45,7 @@ Public Function GDate(ByVal Value As Variant, Optional ByVal WithTime As Boolean
 End Function
 
 Public Function ReportPrintedAt() As String
-    ReportPrintedAt = "طُبع في " & GDate(Now, True) & "  بواسطة " & CurrentUserName()
+    ReportPrintedAt = Tr("طُبع في " & GDate(Now, True) & "  بواسطة ") & CurrentUserName()
 End Function
 
 Public Sub ReportNoData(ByRef Cancel As Integer, ByVal Message As String)
@@ -57,18 +57,27 @@ End Sub
 ' Amount in words (Arabic)
 '------------------------------------------------------------------------------
 Public Function AmountInWords(ByVal Amount As Variant) As String
+    ' In the language of the interface (modLang).
+    If UiEnglish() Then
+        AmountInWords = AmountInWordsEn(Amount)
+    Else
+        AmountInWords = AmountInWordsAr(Amount)
+    End If
+End Function
+
+Public Function AmountInWordsAr(ByVal Amount As Variant) As String
     ' 1250.5 -> "فقط ألف ومائتان وخمسون ريال سعودي وخمسون هللة لا غير"
     Dim a As Currency, riyals As Long, halalas As Long, text As String
     If IsNull(Amount) Then Exit Function
     a = RoundMoney(Abs(CCur(Amount)))
     If a >= 1000000000 Then
-        AmountInWords = Format$(a, "#,##0.00") & " ريال سعودي"
+        AmountInWordsAr = Format$(a, "#,##0.00") & " ريال سعودي"
         Exit Function
     End If
     riyals = CLng(Fix(a))
     halalas = CLng((a - riyals) * 100)
     If riyals = 0 And halalas = 0 Then
-        AmountInWords = "صفر ريال"
+        AmountInWordsAr = "صفر ريال"
         Exit Function
     End If
     If riyals > 0 Then text = NumberWords(riyals) & " ريال سعودي"
@@ -76,7 +85,54 @@ Public Function AmountInWords(ByVal Amount As Variant) As String
         If Len(text) > 0 Then text = text & " و"
         text = text & NumberWords(halalas) & " هللة"
     End If
-    AmountInWords = "فقط " & text & " لا غير"
+    AmountInWordsAr = "فقط " & text & " لا غير"
+End Function
+
+Public Function AmountInWordsEn(ByVal Amount As Variant) As String
+    ' 1250.5 -> "Only one thousand two hundred fifty Saudi Riyals and fifty Halalas" (tools/tafqeet.py)
+    Dim a As Currency, riyals As Long, halalas As Long, words As String
+    If IsNull(Amount) Then Exit Function
+    a = RoundMoney(Abs(CCur(Amount)))
+    If a >= 1000000000 Then
+        AmountInWordsEn = Format$(a, "#,##0.00") & " Saudi Riyals"
+        Exit Function
+    End If
+    riyals = CLng(Fix(a))
+    halalas = CLng((a - riyals) * 100)
+    If riyals = 0 And halalas = 0 Then
+        AmountInWordsEn = "Zero Saudi Riyals"
+        Exit Function
+    End If
+    If riyals > 0 Then words = NumberWordsEn(riyals) & IIf(riyals = 1, " Saudi Riyal", " Saudi Riyals")
+    If halalas > 0 Then
+        If Len(words) > 0 Then words = words & " and "
+        words = words & NumberWordsEn(halalas) & IIf(halalas = 1, " Halala", " Halalas")
+    End If
+    AmountInWordsEn = "Only " & words
+End Function
+
+Private Function NumberWordsEn(ByVal n As Long) As String
+    Dim parts As String
+    If n >= 1000000 Then parts = Below1000En(n \ 1000000) & " million"
+    If (n \ 1000) Mod 1000 > 0 Then parts = Trim$(parts & " " & Below1000En((n \ 1000) Mod 1000) & " thousand")
+    If n Mod 1000 > 0 Then parts = Trim$(parts & " " & Below1000En(n Mod 1000))
+    NumberWordsEn = parts
+End Function
+
+Private Function Below1000En(ByVal n As Long) As String
+    Dim ones As Variant, tens As Variant, parts As String, r As Long
+    ones = Split("zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen " & _
+                 "sixteen seventeen eighteen nineteen", " ")
+    tens = Split("- - twenty thirty forty fifty sixty seventy eighty ninety", " ")
+    If n >= 100 Then parts = ones(n \ 100) & " hundred"
+    r = n Mod 100
+    If r >= 20 Then
+        parts = Trim$(parts & " " & tens(r \ 10))
+        If r Mod 10 > 0 Then parts = parts & "-" & ones(r Mod 10)
+    ElseIf r > 0 Then
+        parts = Trim$(parts & " " & ones(r))
+    End If
+    Below1000En = parts
 End Function
 
 Private Function NumberWords(ByVal n As Long) As String

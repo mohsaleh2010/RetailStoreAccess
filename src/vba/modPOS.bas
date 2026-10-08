@@ -287,33 +287,33 @@ Public Sub RecalcPOS(ByVal frm As Access.Form)
     frm!subLines.Form.Requery
 
     If n = 0 Or Len(msg) > 0 Then
-        frm!lblSubTotal.Caption = "0.00"
-        frm!lblDiscount.Caption = "0.00"
-        frm!lblTax.Caption = "0.00"
-        frm!lblTotal.Caption = "0.00"
-        frm!lblChange.Caption = " "
-        frm!lblItems.Caption = n & " صنف"
+        frm!lblSubTotal.Caption = Tr("0.00")
+        frm!lblDiscount.Caption = Tr("0.00")
+        frm!lblTax.Caption = Tr("0.00")
+        frm!lblTotal.Caption = Tr("0.00")
+        frm!lblChange.Caption = Tr(" ")
+        frm!lblItems.Caption = Tr(n & " صنف")
         If Len(msg) > 0 Then SetPOSStatus frm, msg, CLR_DANGER
         Exit Sub
     End If
     total = CalcTotal("TOTAL")
-    frm!lblSubTotal.Caption = Format$(CalcTotal("SUBTOTAL"), "#,##0.00")
-    frm!lblDiscount.Caption = Format$(CalcTotal("DISCOUNT"), "#,##0.00")
-    frm!lblTax.Caption = Format$(CalcTotal("TAX"), "#,##0.00")
-    frm!lblTotal.Caption = Format$(total, "#,##0.00")
-    frm!lblItems.Caption = n & " صنف"
+    frm!lblSubTotal.Caption = Tr(Format$(CalcTotal("SUBTOTAL"), "#,##0.00"))
+    frm!lblDiscount.Caption = Tr(Format$(CalcTotal("DISCOUNT"), "#,##0.00"))
+    frm!lblTax.Caption = Tr(Format$(CalcTotal("TAX"), "#,##0.00"))
+    frm!lblTotal.Caption = Tr(Format$(total, "#,##0.00"))
+    frm!lblItems.Caption = Tr(n & " صنف")
     If IsNull(frm!txtTendered.Value) Then
-        frm!lblChange.Caption = " "
+        frm!lblChange.Caption = Tr(" ")
     Else
         tendered = frm!txtTendered.Value
         If frm!cboPaymentType.Value = "CREDIT" Then
-            frm!lblChange.Caption = "على الحساب: " & Format$(total - tendered, "#,##0.00")
+            frm!lblChange.Caption = Tr("على الحساب: " & Format$(total - tendered, "#,##0.00"))
             frm!lblChange.ForeColor = CLR_WARNING
         ElseIf tendered >= total Then
-            frm!lblChange.Caption = "الباقي للعميل: " & Format$(tendered - total, "#,##0.00")
+            frm!lblChange.Caption = Tr("الباقي للعميل: " & Format$(tendered - total, "#,##0.00"))
             frm!lblChange.ForeColor = CLR_SUCCESS
         Else
-            frm!lblChange.Caption = "ناقص: " & Format$(total - tendered, "#,##0.00")
+            frm!lblChange.Caption = Tr("ناقص: " & Format$(total - tendered, "#,##0.00"))
             frm!lblChange.ForeColor = CLR_DANGER
         End If
     End If
@@ -325,14 +325,14 @@ Public Sub CustomerChanged(ByVal frm As Access.Form)
     Set rs = CurrentDb.OpenRecordset("SELECT CurrentBalance, CreditLimit, AllowCredit FROM Customers " & _
                                      "WHERE CustomerID = " & frm!cboCustomer.Value, dbOpenSnapshot)
     If rs.EOF Then
-        frm!lblCustomerInfo.Caption = " "
+        frm!lblCustomerInfo.Caption = Tr(" ")
     ElseIf frm!cboCustomer.Value = Nz(SettingValue("DefaultCustomerID"), 1) Then
-        frm!lblCustomerInfo.Caption = "بيع نقدي"
+        frm!lblCustomerInfo.Caption = Tr("بيع نقدي")
         frm!cboPaymentType.Value = "CASH"
     Else
-        frm!lblCustomerInfo.Caption = "الرصيد: " & Format$(rs!CurrentBalance, "#,##0.00") & _
+        frm!lblCustomerInfo.Caption = Tr("الرصيد: " & Format$(rs!CurrentBalance, "#,##0.00") & _
             IIf(rs!CreditLimit > 0, "   حد الائتمان: " & Format$(rs!CreditLimit, "#,##0.00"), "") & _
-            IIf(rs!AllowCredit, "", "   (غير مسموح بالآجل)")
+            IIf(rs!AllowCredit, "", "   (غير مسموح بالآجل)"))
         If Not rs!AllowCredit Then frm!cboPaymentType.Value = "CASH"
     End If
     rs.Close
@@ -388,7 +388,7 @@ Public Function SavePOS(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) A
     RecalcPOS frm
     SetPOSStatus frm, "تم حفظ الفاتورة " & invNo & IIf(change > 0, "  -  الباقي للعميل: " & _
                  Format$(change, "#,##0.00"), ""), CLR_SUCCESS
-    frm!lblLastInvoice.Caption = invNo
+    frm!lblLastInvoice.Caption = Tr(invNo)
     If PrintAfter Then PrintAfterSave "SALE", newID
     SafeFocus frm!txtBarcode
     SavePOS = True
@@ -424,7 +424,7 @@ Public Sub ReprintLast(ByVal frm As Access.Form)
 End Sub
 
 Private Sub SetPOSStatus(ByVal frm As Access.Form, ByVal Text As String, ByVal Color As Long)
-    frm!lblStatus.Caption = IIf(Len(Text) = 0, " ", Text)
+    frm!lblStatus.Caption = Tr(IIf(Len(Text) = 0, " ", Text))
     frm!lblStatus.ForeColor = Color
 End Sub
 
@@ -465,9 +465,9 @@ Public Sub LoadInvoiceForReturn(ByVal frm As Access.Form, ByVal SalesInvoiceID A
                                      SalesInvoiceID, dbOpenSnapshot)
     frm!txtInvoiceID.Value = SalesInvoiceID
     frm!txtInvoiceNo.Value = rs!InvoiceNumber
-    frm!lblInvoiceInfo.Caption = "التاريخ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    العميل: " & _
+    frm!lblInvoiceInfo.Caption = Tr("التاريخ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    العميل: " & _
         rs!CustomerName & "    الإجمالي: " & Format$(rs!TotalAmount, "#,##0.00") & "    النوع: " & _
-        IIf(rs!PaymentType = "CREDIT", "آجل", "نقدي")
+        IIf(rs!PaymentType = "CREDIT", "آجل", "نقدي"))
     If rs!CustomerID = Nz(SettingValue("DefaultCustomerID"), 1) Then
         frm!cboRefundType.Value = "CASH"
         frm!cboRefundType.Locked = True
@@ -520,7 +520,7 @@ Public Sub RecalcReturn(ByVal frm As Access.Form)
     Loop
     rs.Close
     frm!subReturnLines.Form.Requery
-    frm!lblReturnTotal.Caption = Format$(total, "#,##0.00")
+    frm!lblReturnTotal.Caption = Tr(Format$(total, "#,##0.00"))
 End Sub
 
 Public Function SaveReturn(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) As Boolean
@@ -558,10 +558,10 @@ End Sub
 
 Public Sub PaymentCustomerChanged(ByVal frm As Access.Form)
     If IsNull(frm!cboCustomer.Value) Then
-        frm!lblBalance.Caption = " "
+        frm!lblBalance.Caption = Tr(" ")
     Else
-        frm!lblBalance.Caption = "الرصيد المستحق: " & Format$(Nz(DLookup("CurrentBalance", "Customers", _
-                                 "CustomerID = " & frm!cboCustomer.Value), 0), "#,##0.00")
+        frm!lblBalance.Caption = Tr("الرصيد المستحق: " & Format$(Nz(DLookup("CurrentBalance", "Customers", _
+                                 "CustomerID = " & frm!cboCustomer.Value), 0), "#,##0.00"))
     End If
 End Sub
 
@@ -609,20 +609,20 @@ Public Sub InvoiceViewLoad(ByVal frm As Access.Form)
         Exit Sub
     End If
     frm!txtInvoiceID.Value = id
-    frm!lblTitle.Caption = "فاتورة " & rs!InvoiceNumber
-    frm!lblHeader.Caption = "التاريخ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    العميل: " & _
+    frm!lblTitle.Caption = Tr("فاتورة " & rs!InvoiceNumber)
+    frm!lblHeader.Caption = Tr("التاريخ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    العميل: " & _
         rs!CustomerName & "    الكاشير: " & rs!EmployeeName & "    " & IIf(rs!PaymentType = "CREDIT", "آجل", "نقدي") & _
-        "    " & IIf(rs!InvoiceSubType = "STANDARD", "فاتورة ضريبية", "فاتورة ضريبية مبسطة")
-    frm!lblTotals.Caption = "قبل الضريبة: " & Format$(rs!TaxableAmount, "#,##0.00") & "    الضريبة: " & _
+        "    " & IIf(rs!InvoiceSubType = "STANDARD", "فاتورة ضريبية", "فاتورة ضريبية مبسطة"))
+    frm!lblTotals.Caption = Tr("قبل الضريبة: " & Format$(rs!TaxableAmount, "#,##0.00") & "    الضريبة: " & _
         Format$(rs!Tax, "#,##0.00") & "    الإجمالي: " & Format$(rs!TotalAmount, "#,##0.00") & _
-        "    المدفوع: " & Format$(rs!PaidAmount, "#,##0.00") & "    المتبقي: " & Format$(rs!RemainingAmount, "#,##0.00")
+        "    المدفوع: " & Format$(rs!PaidAmount, "#,##0.00") & "    المتبقي: " & Format$(rs!RemainingAmount, "#,##0.00"))
     rs.Close
-    frm!lstLines.RowSource = "SELECT d.LineNumber AS [#], p.ProductName AS [الصنف], d.Quantity AS [الكمية], " & _
+    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [الصنف], d.Quantity AS [الكمية], " & _
         "d.UnitPrice AS [السعر بدون ضريبة], d.Discount AS [الخصم], d.Tax AS [الضريبة], d.LineTotal AS [الإجمالي] " & _
         "FROM SalesInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID " & _
-        "WHERE d.SalesInvoiceID = " & id & " ORDER BY d.LineNumber"
-    frm!lstReturns.RowSource = "SELECT ReturnNumber AS [المرتجع], ReturnDate AS [التاريخ], TotalAmount AS [القيمة], " & _
-        "Reason AS [السبب] FROM SalesReturns WHERE SalesInvoiceID = " & id & " ORDER BY ReturnDate"
+        "WHERE d.SalesInvoiceID = " & id & " ORDER BY d.LineNumber")
+    frm!lstReturns.RowSource = Tr("SELECT ReturnNumber AS [المرتجع], ReturnDate AS [التاريخ], TotalAmount AS [القيمة], " & _
+        "r.Reason AS [السبب] FROM SalesReturns AS r WHERE SalesInvoiceID = " & id & " ORDER BY ReturnDate")
 End Sub
 
 '==============================================================================

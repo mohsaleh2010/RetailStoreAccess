@@ -19,11 +19,11 @@ Public Sub MainLoad(ByVal frm As Access.Form)
         AppStartup
         DoCmd.Maximize
     End If
-    frm!lblStoreName.Caption = Nz(SettingValue("StoreName"), APP_TITLE)
-    frm!lblToday.Caption = Format$(Date, "dddd  yyyy/mm/dd")
-    frm!lblUser.Caption = "«·„” Œœ„: " & CurrentUserName() & "  (" & _
+    frm!lblStoreName.Caption = Tr(Nz(SettingValue("StoreName"), APP_TITLE))
+    frm!lblToday.Caption = Tr(Format$(Date, "dddd  yyyy/mm/dd"))
+    frm!lblUser.Caption = Tr("«·„” Œœ„: " & CurrentUserName() & "  (" & _
         Nz(DbValue("SELECT r.RoleName FROM Employees AS e INNER JOIN Roles AS r ON e.RoleID = r.RoleID " & _
-                   "WHERE e.EmployeeID = " & CurrentUserID()), "") & ")"
+                   "WHERE e.EmployeeID = " & CurrentUserID()), "") & ")")
     ApplyNavPermissions frm                   ' modSecurityScreens
     DashboardRefresh frm                      ' tiles, lists and the integrity line (modDashboard)
     If Not g_SilentMode Then
@@ -35,19 +35,19 @@ End Sub
 Public Sub RefreshIntegrityStatus(ByVal frm As Access.Form)
     Dim n As Long
     If Not HasPermission("REPORTS") Then
-        frm!lblIntegrity.Caption = " "
+        frm!lblIntegrity.Caption = Tr(" ")
         Exit Sub
     End If
     On Error Resume Next
     n = DCount("*", "IntegrityCheckQuery")
     If Err.Number <> 0 Then
-        frm!lblIntegrity.Caption = " ⁄–— ›Õ’ ”·«„… «·»Ì«‰«  (" & Err.Description & ")"
+        frm!lblIntegrity.Caption = Tr(" ⁄–— ›Õ’ ”·«„… «·»Ì«‰«  (" & Err.Description & ")")
         frm!lblIntegrity.ForeColor = CLR_WARNING
     ElseIf n = 0 Then
-        frm!lblIntegrity.Caption = "›Õ’ ”·«„… «·»Ì«‰« : ·«  ÊÃœ „‘ﬂ·« "
+        frm!lblIntegrity.Caption = Tr("›Õ’ ”·«„… «·»Ì«‰« : ·«  ÊÃœ „‘ﬂ·« ")
         frm!lblIntegrity.ForeColor = CLR_SUCCESS
     Else
-        frm!lblIntegrity.Caption = " ‰»ÌÂ: ÌÊÃœ " & n & " „‘ﬂ·… ›Ì «·»Ì«‰«  - —«Ã⁄  ﬁ—Ì— ›Õ’ «·”·«„…"
+        frm!lblIntegrity.Caption = Tr(" ‰»ÌÂ: ÌÊÃœ " & n & " „‘ﬂ·… ›Ì «·»Ì«‰«  - —«Ã⁄  ﬁ—Ì— ›Õ’ «·”·«„…")
         frm!lblIntegrity.ForeColor = CLR_DANGER
     End If
 End Sub
@@ -67,10 +67,10 @@ Public Sub SearchKindChanged(ByVal frm As Access.Form)
     dated = (kind = "SALE" Or kind = "PURCHASE")
     frm!txtFrom.Enabled = dated
     frm!txtTo.Enabled = dated
-    frm!lstResults.RowSource = ""
+    frm!lstResults.RowSource = Tr("")
     frm!lstResults.ColumnCount = SearchColumnCount(kind)
     frm!lstResults.ColumnWidths = SearchColumnWidths(kind)
-    frm!lblCount.Caption = " "
+    frm!lblCount.Caption = Tr(" ")
 End Sub
 
 Public Sub RunSearch(ByVal frm As Access.Form)
@@ -95,10 +95,10 @@ Public Sub RunSearch(ByVal frm As Access.Form)
         sql = Replace(sql, "{TO}", SqlDate(#12/31/9999#))
     End If
 
-    frm!lstResults.RowSource = sql
+    frm!lstResults.RowSource = Tr(sql)
     n = frm!lstResults.ListCount - 1           ' first row = column headings
     If n < 0 Then n = 0
-    frm!lblCount.Caption = n & " ‰ ÌÃ…" & IIf(n > 0, " - «‰ﬁ— „— Ì‰ ⁄·Ï «·‰ ÌÃ… ·› ÕÂ«", "")
+    frm!lblCount.Caption = Tr(n & " ‰ ÌÃ…" & IIf(n > 0, " - «‰ﬁ— „— Ì‰ ⁄·Ï «·‰ ÌÃ… ·› ÕÂ«", ""))
 End Sub
 
 Public Sub SearchOpen(ByVal frm As Access.Form)
@@ -145,7 +145,7 @@ Public Sub ReportCenterLoad(ByVal frm As Access.Form)
         If Len(rows) > 0 Then rows = rows & ";"
         rows = rows & """" & r(0) & """;""" & r(1) & """"
     Next
-    frm!lstReports.RowSource = rows
+    frm!lstReports.RowSource = Tr(rows)
     frm!txtFrom.Value = DateSerial(Year(Date), Month(Date), 1)
     frm!txtTo.Value = Date
     If Not IsNull(frm.OpenArgs) Then frm!lstReports.Value = CStr(frm.OpenArgs)     ' a report chosen by the caller
@@ -156,9 +156,9 @@ Public Sub ReportSelected(ByVal frm As Access.Form)
     Dim r As Variant, needs As String, dated As Boolean, hint As String
     r = SelectedReport(frm)
     If IsEmpty(r) Then
-        frm!lblReportTitle.Caption = "«Œ —  ﬁ—Ì—« „‰ «·ﬁ«∆„…"
+        frm!lblReportTitle.Caption = Tr("«Œ —  ﬁ—Ì—« „‰ «·ﬁ«∆„…")
     Else
-        frm!lblReportTitle.Caption = r(1)
+        frm!lblReportTitle.Caption = Tr(r(1))
         needs = r(4)
     End If
     dated = HasNeed(needs, "P") Or HasNeed(needs, "D")
@@ -184,7 +184,7 @@ Public Sub ReportSelected(ByVal frm As Access.Form)
         hint = hint & IIf(Len(hint) > 0, "° ", "") & "ÊÌ„ﬂ‰ﬂ «· ’›Ì… Õ”» «·«Œ Ì«— («Œ Ì«—Ì)"
     End If
     If Len(hint) = 0 And Not IsEmpty(r) Then hint = "·« ÌÕ «Ã Â–« «· ﬁ—Ì— √Ì «Œ Ì«—« "
-    frm!lblNeeds.Caption = IIf(Len(hint) = 0, " ", hint)
+    frm!lblNeeds.Caption = Tr(IIf(Len(hint) = 0, " ", hint))
 End Sub
 
 Public Sub SetQuickPeriod(ByVal frm As Access.Form, ByVal Which As String)

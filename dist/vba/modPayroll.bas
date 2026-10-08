@@ -348,17 +348,17 @@ Public Sub PayrollTotals(ByVal frm As Access.Form)
     Dim id As Long, rs As DAO.Recordset, state As String
     id = ShownRun(frm)
     If id = 0 Then
-        frm!lblState.Caption = "«Œ — «·‘Â— À„ ´≈‰‘«¡ „”Ì— «·‘Â—ª."
-        frm!lblTotals.Caption = " "
+        frm!lblState.Caption = Tr("«Œ — «·‘Â— À„ ´≈‰‘«¡ „”Ì— «·‘Â—ª.")
+        frm!lblTotals.Caption = Tr(" ")
         Exit Sub
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM qryPayrollTotals WHERE PayrollRunID = " & id, dbOpenSnapshot)
     If Not rs.EOF Then
-        frm!lblTotals.Caption = rs!LineCount & " „ÊŸ›   «·—Ê« » " & Format$(rs!SumSalaries, "#,##0.00") & "   «·»œ·«  " & _
+        frm!lblTotals.Caption = Tr(rs!LineCount & " „ÊŸ›   «·—Ê« » " & Format$(rs!SumSalaries, "#,##0.00") & "   «·»œ·«  " & _
             Format$(rs!SumAllowances, "#,##0.00") & "   Œ’„ «·”·› " & Format$(rs!SumAdvance, "#,##0.00") & "   «· √„Ì‰«  " & _
-            Format$(rs!SumGosi, "#,##0.00") & "   ’«›Ì «·—Ê« » " & Format$(rs!SumNet, "#,##0.00")
+            Format$(rs!SumGosi, "#,##0.00") & "   ’«›Ì «·—Ê« » " & Format$(rs!SumNet, "#,##0.00"))
     Else
-        frm!lblTotals.Caption = "«·„”Ì— »·« √”ÿ—."
+        frm!lblTotals.Caption = Tr("«·„”Ì— »·« √”ÿ—.")
     End If
     rs.Close
     Select Case Nz(RunField(id, "Status"), "")
@@ -372,7 +372,7 @@ Public Sub PayrollTotals(ByVal frm As Access.Form)
                 state = state & "° ·„ Ìı’—› »⁄œ"
             End If
     End Select
-    frm!lblState.Caption = state
+    frm!lblState.Caption = Tr(state)
 End Sub
 
 Public Sub PayrollLineChanged(ByVal lines As Access.Form)

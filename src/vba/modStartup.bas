@@ -65,22 +65,22 @@ End Sub
 '------------------------------------------------------------------------------
 Public Sub InstallUserMode()
     ApplyStartupProperties False
-    MsgBox "تم ضبط وضع المستخدم النهائي." & vbCrLf & vbCrLf & _
+    MsgBox Tr("تم ضبط وضع المستخدم النهائي." & vbCrLf & vbCrLf & _
            "أغلق الملف وافتحه من جديد ليظهر النظام بدون أدوات Access." & vbCrLf & _
-           "للعودة لوضع التطوير: افتح الملف مع الضغط على مفتاح SHIFT ثم شغّل InstallDeveloperMode.", _
-           vbInformation + MSG_RTL, APP_TITLE
+           "للعودة لوضع التطوير: افتح الملف مع الضغط على مفتاح SHIFT ثم شغّل InstallDeveloperMode."), _
+           vbInformation + MSG_RTL, Tr(APP_TITLE)
 End Sub
 
 Public Sub InstallDeveloperMode()
     ApplyStartupProperties True
     ShowAccessUI
-    MsgBox "تم ضبط وضع التطوير: كل أدوات Access ظاهرة.", vbInformation + MSG_RTL, APP_TITLE
+    MsgBox Tr("تم ضبط وضع التطوير: كل أدوات Access ظاهرة."), vbInformation + MSG_RTL, Tr(APP_TITLE)
 End Sub
 
 Private Sub ApplyStartupProperties(ByVal Developer As Boolean)
     Dim db As DAO.Database
     Set db = CurrentDb
-    SetDbProp db, "AppTitle", dbText, APP_TITLE
+    SetDbProp db, "AppTitle", dbText, Tr(APP_TITLE)
     SetDbProp db, "StartupForm", dbText, "frmLogin"
     SetDbProp db, "AllowBypassKey", dbBoolean, Developer   ' user mode: SHIFT no longer skips the start-up
     SetDbProp db, "StartupShowDBWindow", dbBoolean, Developer

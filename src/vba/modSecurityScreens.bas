@@ -28,10 +28,10 @@ Public Sub LoginLoad(ByVal frm As Access.Form)
         TempVars.Remove "UserID"
         On Error GoTo 0
     End If
-    frm!lblStoreName.Caption = Nz(SettingValue("StoreName"), APP_TITLE)
+    frm!lblStoreName.Caption = Tr(Nz(SettingValue("StoreName"), APP_TITLE))
     frm!txtUsername.Value = GetSetting("RetailStore", "Login", "LastUser", "")
     If IsNull(DbValue("SELECT PasswordHash FROM Employees WHERE EmployeeID = 1")) Then
-        frm!lblMessage.Caption = "الدخول الأول: اسم المستخدم admin بدون كلمة مرور، وسيُطلب منك تعيينها."
+        frm!lblMessage.Caption = Tr("الدخول الأول: اسم المستخدم admin بدون كلمة مرور، وسيُطلب منك تعيينها.")
         frm!lblMessage.ForeColor = CLR_PRIMARY
         frm!txtUsername.Value = "admin"
     End If
@@ -56,14 +56,14 @@ Public Function DoLogin(ByVal frm As Access.Form) As Boolean
     Dim msg As String, id As Long, user As String
     user = Trim$(Nz(frm!txtUsername.Value, ""))
     If Len(user) = 0 Then
-        frm!lblMessage.Caption = "اكتب اسم المستخدم."
+        frm!lblMessage.Caption = Tr("اكتب اسم المستخدم.")
         SafeFocus frm!txtUsername
         Exit Function
     End If
     msg = LoginUser(user, Nz(frm!txtPassword.Value, ""), id)
     frm!txtPassword.Value = Null
     If Len(msg) > 0 Then
-        frm!lblMessage.Caption = msg
+        frm!lblMessage.Caption = Tr(msg)
         frm!lblMessage.ForeColor = CLR_DANGER
         SafeFocus frm!txtPassword
         Exit Function
@@ -161,21 +161,21 @@ Public Sub ChangePasswordLoad(ByVal frm As Access.Form)
             Exit Sub
         End If
         SafeFocus frm!txtNew                       ' a focused control cannot be hidden
-        frm!lblFor.Caption = "تعيين كلمة مرور: " & Nz(DLookup("EmployeeName & ' (' & Username & ')'", "Employees", _
-                             "EmployeeID = " & target), "")
+        frm!lblFor.Caption = Tr("تعيين كلمة مرور: " & Nz(DLookup("EmployeeName & ' (' & Username & ')'", "Employees", _
+                             "EmployeeID = " & target), ""))
         frm!txtOld.Visible = False
         frm!lblOld.Visible = False
         frm!chkMustChange.Value = True
     Else
         SafeFocus frm!txtNew
-        frm!lblFor.Caption = IIf(forced, "اختر كلمة مرور جديدة للمتابعة: ", "تغيير كلمة المرور: ") & CurrentUserName()
+        frm!lblFor.Caption = Tr(IIf(forced, "اختر كلمة مرور جديدة للمتابعة: ", "تغيير كلمة المرور: ") & CurrentUserName())
         frm!txtOld.Visible = Not forced And Not IsNull(DbValue("SELECT PasswordHash FROM Employees WHERE EmployeeID = " & _
                                                               CurrentUserID()))
         frm!lblOld.Visible = frm!txtOld.Visible
         frm!chkMustChange.Visible = False
         frm!lblMustChange.Visible = False
     End If
-    frm!lblRules.Caption = MIN_PASSWORD_LENGTH & " أحرف على الأقل، ولا تساوي اسم المستخدم"
+    frm!lblRules.Caption = Tr(MIN_PASSWORD_LENGTH & " أحرف على الأقل، ولا تساوي اسم المستخدم")
 End Sub
 
 Public Function SaveChangedPassword(ByVal frm As Access.Form) As Boolean
@@ -225,7 +225,7 @@ Public Sub UserCurrent(ByVal frm As Access.Form)
     Else
         state = "كلمة المرور معيّنة."
     End If
-    frm!lblPasswordState.Caption = state
+    frm!lblPasswordState.Caption = Tr(state)
 End Sub
 
 Public Sub UnlockUser(ByVal frm As Access.Form)
@@ -261,15 +261,15 @@ Public Sub RolePicked(ByVal frm As Access.Form)
         "(SELECT PermissionKey FROM RolePermissions WHERE RoleID = " & roleID & ") AS r " & _
         "ON p.PermissionKey = r.PermissionKey", dbFailOnError
     frm!subPermissions.Form.Requery
-    frm!lblRoleInfo.Caption = Nz(DLookup("Description", "Roles", "RoleID = " & roleID), " ") & "   (" & _
-        DCount("*", "Employees", "RoleID = " & roleID & " AND IsActive = True AND IsDeveloper = False") & " مستخدم)"
+    frm!lblRoleInfo.Caption = Tr(Nz(DLookup("Description", "Roles", "RoleID = " & roleID), " ") & "   (" & _
+        DCount("*", "Employees", "RoleID = " & roleID & " AND IsActive = True AND IsDeveloper = False") & " مستخدم)")
     locked = (roleID = ADMIN_ROLE_ID)
     frm!subPermissions.Form.AllowEdits = Not locked
     SafeFocus frm!cboRole
     frm!btnSaveRole.Enabled = Not locked
     frm!btnAll.Enabled = Not locked
     frm!btnNone.Enabled = Not locked
-    frm!lblLockedNote.Caption = IIf(locked, "دور مدير النظام يملك كل الصلاحيات دائمًا ولا يمكن تقييده.", " ")
+    frm!lblLockedNote.Caption = Tr(IIf(locked, "دور مدير النظام يملك كل الصلاحيات دائمًا ولا يمكن تقييده.", " "))
 End Sub
 
 Public Sub RoleSelectAll(ByVal frm As Access.Form, ByVal Granted As Boolean)
@@ -434,15 +434,15 @@ Private Sub ShowUserScreensState(ByVal frm As Access.Form)
     frm!btnAll.Enabled = custom
     frm!btnNone.Enabled = custom
     frm!btnSaveScreens.Enabled = Not isAdmin
-    frm!lblUserInfo.Caption = "الدور: " & Nz(DbValue("SELECT r.RoleName FROM Employees AS e INNER JOIN Roles AS r " & _
-                              "ON e.RoleID = r.RoleID WHERE e.EmployeeID = " & uid), "-")
+    frm!lblUserInfo.Caption = Tr("الدور: " & Nz(DbValue("SELECT r.RoleName FROM Employees AS e INNER JOIN Roles AS r " & _
+                              "ON e.RoleID = r.RoleID WHERE e.EmployeeID = " & uid), "-"))
     If isAdmin Then
-        frm!lblNote.Caption = "مدير النظام يفتح كل الشاشات بكل الصلاحيات دائمًا."
+        frm!lblNote.Caption = Tr("مدير النظام يفتح كل الشاشات بكل الصلاحيات دائمًا.")
     ElseIf custom Then
-        frm!lblNote.Caption = "حدد الشاشات والإجراءات ثم اضغط «حفظ». الصلاحيات الخاصة (تقارير الأرباح، تعديل السعر، " & _
-                              "الخصم...) تبقى من دور المستخدم في شاشة الأدوار."
+        frm!lblNote.Caption = Tr("حدد الشاشات والإجراءات ثم اضغط «حفظ». الصلاحيات الخاصة (تقارير الأرباح، تعديل السعر، " & _
+                              "الخصم...) تبقى من دور المستخدم في شاشة الأدوار.")
     Else
-        frm!lblNote.Caption = "المستخدم يتبع صلاحيات دوره كما في القائمة. فعّل «صلاحيات شاشات خاصة» لتحديد شاشاته وحده."
+        frm!lblNote.Caption = Tr("المستخدم يتبع صلاحيات دوره كما في القائمة. فعّل «صلاحيات شاشات خاصة» لتحديد شاشاته وحده.")
     End If
 End Sub
 
@@ -505,7 +505,7 @@ End Function
 '==============================================================================
 Public Sub BackupLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
-    frm!lblDataFile.Caption = "ملف البيانات: " & BackendFilePath()
+    frm!lblDataFile.Caption = Tr("ملف البيانات: " & BackendFilePath())
     BackupRefreshList frm
 End Sub
 
@@ -513,10 +513,10 @@ Public Sub BackupRefreshList(ByVal frm As Access.Form)
     Dim folder As String, names As String, v As Variant, rows As String, i As Long, arr() As String
     Dim lastDate As Variant
     folder = BackupFolderPath()
-    frm!lblFolder.Caption = "المجلد: " & folder
+    frm!lblFolder.Caption = Tr("المجلد: " & folder)
     lastDate = LastBackupDate()
-    frm!lblLast.Caption = "آخر نسخة: " & IIf(IsNull(lastDate), "لا توجد", GDate(lastDate, True)) & _
-        "    يُحتفظ بآخر " & Nz(SettingValue("BackupKeepCount"), 30) & " نسخة"
+    frm!lblLast.Caption = Tr("آخر نسخة: " & IIf(IsNull(lastDate), "لا توجد", GDate(lastDate, True)) & _
+        "    يُحتفظ بآخر " & Nz(SettingValue("BackupKeepCount"), 30) & " نسخة")
     names = BackupList(folder, BaseNameOfFile(BackendFilePath()))
     rows = """الملف"";""التاريخ"";""الحجم"""
     If Len(names) > 0 Then
@@ -527,7 +527,7 @@ Public Sub BackupRefreshList(ByVal frm As Access.Form)
                    Format$(FileLen(v) / 1048576, "0.0") & " MB"""
         Next
     End If
-    frm!lstBackups.RowSource = rows
+    frm!lstBackups.RowSource = Tr(rows)
 End Sub
 
 Private Function BaseNameOfFile(ByVal FullPath As String) As String

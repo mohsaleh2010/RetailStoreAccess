@@ -287,33 +287,33 @@ Public Sub RecalcPOS(ByVal frm As Access.Form)
     frm!subLines.Form.Requery
 
     If n = 0 Or Len(msg) > 0 Then
-        frm!lblSubTotal.Caption = "0.00"
-        frm!lblDiscount.Caption = "0.00"
-        frm!lblTax.Caption = "0.00"
-        frm!lblTotal.Caption = "0.00"
-        frm!lblChange.Caption = " "
-        frm!lblItems.Caption = n & " ’‰›"
+        frm!lblSubTotal.Caption = Tr("0.00")
+        frm!lblDiscount.Caption = Tr("0.00")
+        frm!lblTax.Caption = Tr("0.00")
+        frm!lblTotal.Caption = Tr("0.00")
+        frm!lblChange.Caption = Tr(" ")
+        frm!lblItems.Caption = Tr(n & " ’‰›")
         If Len(msg) > 0 Then SetPOSStatus frm, msg, CLR_DANGER
         Exit Sub
     End If
     total = CalcTotal("TOTAL")
-    frm!lblSubTotal.Caption = Format$(CalcTotal("SUBTOTAL"), "#,##0.00")
-    frm!lblDiscount.Caption = Format$(CalcTotal("DISCOUNT"), "#,##0.00")
-    frm!lblTax.Caption = Format$(CalcTotal("TAX"), "#,##0.00")
-    frm!lblTotal.Caption = Format$(total, "#,##0.00")
-    frm!lblItems.Caption = n & " ’‰›"
+    frm!lblSubTotal.Caption = Tr(Format$(CalcTotal("SUBTOTAL"), "#,##0.00"))
+    frm!lblDiscount.Caption = Tr(Format$(CalcTotal("DISCOUNT"), "#,##0.00"))
+    frm!lblTax.Caption = Tr(Format$(CalcTotal("TAX"), "#,##0.00"))
+    frm!lblTotal.Caption = Tr(Format$(total, "#,##0.00"))
+    frm!lblItems.Caption = Tr(n & " ’‰›")
     If IsNull(frm!txtTendered.Value) Then
-        frm!lblChange.Caption = " "
+        frm!lblChange.Caption = Tr(" ")
     Else
         tendered = frm!txtTendered.Value
         If frm!cboPaymentType.Value = "CREDIT" Then
-            frm!lblChange.Caption = "⁄·Ï «·Õ”«»: " & Format$(total - tendered, "#,##0.00")
+            frm!lblChange.Caption = Tr("⁄·Ï «·Õ”«»: " & Format$(total - tendered, "#,##0.00"))
             frm!lblChange.ForeColor = CLR_WARNING
         ElseIf tendered >= total Then
-            frm!lblChange.Caption = "«·»«ﬁÌ ··⁄„Ì·: " & Format$(tendered - total, "#,##0.00")
+            frm!lblChange.Caption = Tr("«·»«ﬁÌ ··⁄„Ì·: " & Format$(tendered - total, "#,##0.00"))
             frm!lblChange.ForeColor = CLR_SUCCESS
         Else
-            frm!lblChange.Caption = "‰«ﬁ’: " & Format$(total - tendered, "#,##0.00")
+            frm!lblChange.Caption = Tr("‰«ﬁ’: " & Format$(total - tendered, "#,##0.00"))
             frm!lblChange.ForeColor = CLR_DANGER
         End If
     End If
@@ -325,14 +325,14 @@ Public Sub CustomerChanged(ByVal frm As Access.Form)
     Set rs = CurrentDb.OpenRecordset("SELECT CurrentBalance, CreditLimit, AllowCredit FROM Customers " & _
                                      "WHERE CustomerID = " & frm!cboCustomer.Value, dbOpenSnapshot)
     If rs.EOF Then
-        frm!lblCustomerInfo.Caption = " "
+        frm!lblCustomerInfo.Caption = Tr(" ")
     ElseIf frm!cboCustomer.Value = Nz(SettingValue("DefaultCustomerID"), 1) Then
-        frm!lblCustomerInfo.Caption = "»Ì⁄ ‰ﬁœÌ"
+        frm!lblCustomerInfo.Caption = Tr("»Ì⁄ ‰ﬁœÌ")
         frm!cboPaymentType.Value = "CASH"
     Else
-        frm!lblCustomerInfo.Caption = "«·—’Ìœ: " & Format$(rs!CurrentBalance, "#,##0.00") & _
+        frm!lblCustomerInfo.Caption = Tr("«·—’Ìœ: " & Format$(rs!CurrentBalance, "#,##0.00") & _
             IIf(rs!CreditLimit > 0, "   Õœ «·«∆ „«‰: " & Format$(rs!CreditLimit, "#,##0.00"), "") & _
-            IIf(rs!AllowCredit, "", "   (€Ì— „”„ÊÕ »«·¬Ã·)")
+            IIf(rs!AllowCredit, "", "   (€Ì— „”„ÊÕ »«·¬Ã·)"))
         If Not rs!AllowCredit Then frm!cboPaymentType.Value = "CASH"
     End If
     rs.Close
@@ -388,7 +388,7 @@ Public Function SavePOS(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) A
     RecalcPOS frm
     SetPOSStatus frm, " „ Õ›Ÿ «·›« Ê—… " & invNo & IIf(change > 0, "  -  «·»«ﬁÌ ··⁄„Ì·: " & _
                  Format$(change, "#,##0.00"), ""), CLR_SUCCESS
-    frm!lblLastInvoice.Caption = invNo
+    frm!lblLastInvoice.Caption = Tr(invNo)
     If PrintAfter Then PrintAfterSave "SALE", newID
     SafeFocus frm!txtBarcode
     SavePOS = True
@@ -424,7 +424,7 @@ Public Sub ReprintLast(ByVal frm As Access.Form)
 End Sub
 
 Private Sub SetPOSStatus(ByVal frm As Access.Form, ByVal Text As String, ByVal Color As Long)
-    frm!lblStatus.Caption = IIf(Len(Text) = 0, " ", Text)
+    frm!lblStatus.Caption = Tr(IIf(Len(Text) = 0, " ", Text))
     frm!lblStatus.ForeColor = Color
 End Sub
 
@@ -465,9 +465,9 @@ Public Sub LoadInvoiceForReturn(ByVal frm As Access.Form, ByVal SalesInvoiceID A
                                      SalesInvoiceID, dbOpenSnapshot)
     frm!txtInvoiceID.Value = SalesInvoiceID
     frm!txtInvoiceNo.Value = rs!InvoiceNumber
-    frm!lblInvoiceInfo.Caption = "«· «—ÌŒ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    «·⁄„Ì·: " & _
+    frm!lblInvoiceInfo.Caption = Tr("«· «—ÌŒ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    «·⁄„Ì·: " & _
         rs!CustomerName & "    «·≈Ã„«·Ì: " & Format$(rs!TotalAmount, "#,##0.00") & "    «·‰Ê⁄: " & _
-        IIf(rs!PaymentType = "CREDIT", "¬Ã·", "‰ﬁœÌ")
+        IIf(rs!PaymentType = "CREDIT", "¬Ã·", "‰ﬁœÌ"))
     If rs!CustomerID = Nz(SettingValue("DefaultCustomerID"), 1) Then
         frm!cboRefundType.Value = "CASH"
         frm!cboRefundType.Locked = True
@@ -520,7 +520,7 @@ Public Sub RecalcReturn(ByVal frm As Access.Form)
     Loop
     rs.Close
     frm!subReturnLines.Form.Requery
-    frm!lblReturnTotal.Caption = Format$(total, "#,##0.00")
+    frm!lblReturnTotal.Caption = Tr(Format$(total, "#,##0.00"))
 End Sub
 
 Public Function SaveReturn(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) As Boolean
@@ -558,10 +558,10 @@ End Sub
 
 Public Sub PaymentCustomerChanged(ByVal frm As Access.Form)
     If IsNull(frm!cboCustomer.Value) Then
-        frm!lblBalance.Caption = " "
+        frm!lblBalance.Caption = Tr(" ")
     Else
-        frm!lblBalance.Caption = "«·—’Ìœ «·„” Õﬁ: " & Format$(Nz(DLookup("CurrentBalance", "Customers", _
-                                 "CustomerID = " & frm!cboCustomer.Value), 0), "#,##0.00")
+        frm!lblBalance.Caption = Tr("«·—’Ìœ «·„” Õﬁ: " & Format$(Nz(DLookup("CurrentBalance", "Customers", _
+                                 "CustomerID = " & frm!cboCustomer.Value), 0), "#,##0.00"))
     End If
 End Sub
 
@@ -609,20 +609,20 @@ Public Sub InvoiceViewLoad(ByVal frm As Access.Form)
         Exit Sub
     End If
     frm!txtInvoiceID.Value = id
-    frm!lblTitle.Caption = "›« Ê—… " & rs!InvoiceNumber
-    frm!lblHeader.Caption = "«· «—ÌŒ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    «·⁄„Ì·: " & _
+    frm!lblTitle.Caption = Tr("›« Ê—… " & rs!InvoiceNumber)
+    frm!lblHeader.Caption = Tr("«· «—ÌŒ: " & Format$(rs!InvoiceDate, "yyyy/mm/dd hh:nn") & "    «·⁄„Ì·: " & _
         rs!CustomerName & "    «·ﬂ«‘Ì—: " & rs!EmployeeName & "    " & IIf(rs!PaymentType = "CREDIT", "¬Ã·", "‰ﬁœÌ") & _
-        "    " & IIf(rs!InvoiceSubType = "STANDARD", "›« Ê—… ÷—Ì»Ì…", "›« Ê—… ÷—Ì»Ì… „»”ÿ…")
-    frm!lblTotals.Caption = "ﬁ»· «·÷—Ì»…: " & Format$(rs!TaxableAmount, "#,##0.00") & "    «·÷—Ì»…: " & _
+        "    " & IIf(rs!InvoiceSubType = "STANDARD", "›« Ê—… ÷—Ì»Ì…", "›« Ê—… ÷—Ì»Ì… „»”ÿ…"))
+    frm!lblTotals.Caption = Tr("ﬁ»· «·÷—Ì»…: " & Format$(rs!TaxableAmount, "#,##0.00") & "    «·÷—Ì»…: " & _
         Format$(rs!Tax, "#,##0.00") & "    «·≈Ã„«·Ì: " & Format$(rs!TotalAmount, "#,##0.00") & _
-        "    «·„œ›Ê⁄: " & Format$(rs!PaidAmount, "#,##0.00") & "    «·„ »ﬁÌ: " & Format$(rs!RemainingAmount, "#,##0.00")
+        "    «·„œ›Ê⁄: " & Format$(rs!PaidAmount, "#,##0.00") & "    «·„ »ﬁÌ: " & Format$(rs!RemainingAmount, "#,##0.00"))
     rs.Close
-    frm!lstLines.RowSource = "SELECT d.LineNumber AS [#], p.ProductName AS [«·’‰›], d.Quantity AS [«·ﬂ„Ì…], " & _
+    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [«·’‰›], d.Quantity AS [«·ﬂ„Ì…], " & _
         "d.UnitPrice AS [«·”⁄— »œÊ‰ ÷—Ì»…], d.Discount AS [«·Œ’„], d.Tax AS [«·÷—Ì»…], d.LineTotal AS [«·≈Ã„«·Ì] " & _
         "FROM SalesInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID " & _
-        "WHERE d.SalesInvoiceID = " & id & " ORDER BY d.LineNumber"
-    frm!lstReturns.RowSource = "SELECT ReturnNumber AS [«·„— Ã⁄], ReturnDate AS [«· «—ÌŒ], TotalAmount AS [«·ﬁÌ„…], " & _
-        "Reason AS [«·”»»] FROM SalesReturns WHERE SalesInvoiceID = " & id & " ORDER BY ReturnDate"
+        "WHERE d.SalesInvoiceID = " & id & " ORDER BY d.LineNumber")
+    frm!lstReturns.RowSource = Tr("SELECT ReturnNumber AS [«·„— Ã⁄], ReturnDate AS [«· «—ÌŒ], TotalAmount AS [«·ﬁÌ„…], " & _
+        "r.Reason AS [«·”»»] FROM SalesReturns AS r WHERE SalesInvoiceID = " & id & " ORDER BY ReturnDate")
 End Sub
 
 '==============================================================================

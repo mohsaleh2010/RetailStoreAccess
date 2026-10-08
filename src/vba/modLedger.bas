@@ -90,10 +90,10 @@ End Function
 Public Sub LedgerRefresh(ByVal frm As Access.Form)
     Dim n As Long, opening As Currency, debit As Currency, credit As Currency, isMain As Boolean
     Calendar = vbCalGreg
-    frm!lstLines.RowSource = ""
+    frm!lstLines.RowSource = Tr("")
     If IsNull(frm!cboAccount.Value) Then
         LedgerFigures frm, Null, Null, Null, Null
-        frm!lblInfo.Caption = "اختر الحساب، ثم الفترة."
+        frm!lblInfo.Caption = Tr("اختر الحساب، ثم الفترة.")
         Exit Sub
     End If
     If Not IsDate(frm!txtFrom.Value) Or Not IsDate(frm!txtTo.Value) Then
@@ -105,21 +105,21 @@ Public Sub LedgerRefresh(ByVal frm As Access.Form)
         Exit Sub
     End If
     n = FillLedger(frm!cboAccount.Value, DateValue(frm!txtFrom.Value), DateValue(frm!txtTo.Value), opening, debit, credit)
-    frm!lstLines.RowSource = "SELECT EntryRef, DateText AS [التاريخ], EntryNo AS [القيد], KindName AS [العملية], " & _
+    frm!lstLines.RowSource = Tr("SELECT EntryRef, DateText AS [التاريخ], EntryNo AS [القيد], KindName AS [العملية], " & _
         "DocNo AS [المستند], Details AS [البيان], SubName AS [الحساب], DebitText AS [مدين], CreditText AS [دائن], " & _
-        "BalanceText AS [الرصيد] FROM tmpLedger ORDER BY LineNo"
+        "BalanceText AS [الرصيد] FROM tmpLedger ORDER BY LineNo")
     LedgerFigures frm, opening, debit, credit, opening + debit - credit
     isMain = Not Nz(DbValue("SELECT IsPosting FROM Accounts WHERE AccountCode = " & frm!cboAccount.Value), True)
-    frm!lblInfo.Caption = n & " سطر قيد" & IIf(isMain, "   (حساب رئيسي: يشمل كل حساباته التابعة)", "") & _
-                          "   نقر مزدوج على السطر يفتح القيد"
+    frm!lblInfo.Caption = Tr(n & " سطر قيد" & IIf(isMain, "   (حساب رئيسي: يشمل كل حساباته التابعة)", "") & _
+                          "   نقر مزدوج على السطر يفتح القيد")
 End Sub
 
 Private Sub LedgerFigures(ByVal frm As Access.Form, ByVal Opening As Variant, ByVal Debit As Variant, _
                           ByVal Credit As Variant, ByVal Closing As Variant)
-    frm!lblOpening.Caption = IIf(IsNull(Opening), "-", BalanceText(Nz(Opening, 0)))
-    frm!lblDebit.Caption = IIf(IsNull(Debit), "-", Format$(Nz(Debit, 0), "#,##0.00"))
-    frm!lblCredit.Caption = IIf(IsNull(Credit), "-", Format$(Nz(Credit, 0), "#,##0.00"))
-    frm!lblClosing.Caption = IIf(IsNull(Closing), "-", BalanceText(Nz(Closing, 0)))
+    frm!lblOpening.Caption = Tr(IIf(IsNull(Opening), "-", BalanceText(Nz(Opening, 0))))
+    frm!lblDebit.Caption = Tr(IIf(IsNull(Debit), "-", Format$(Nz(Debit, 0), "#,##0.00")))
+    frm!lblCredit.Caption = Tr(IIf(IsNull(Credit), "-", Format$(Nz(Credit, 0), "#,##0.00")))
+    frm!lblClosing.Caption = Tr(IIf(IsNull(Closing), "-", BalanceText(Nz(Closing, 0))))
 End Sub
 
 Private Function PickedEntry(ByVal frm As Access.Form) As Long

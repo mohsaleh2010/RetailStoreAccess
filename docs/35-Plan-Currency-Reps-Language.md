@@ -59,4 +59,4 @@
 |---|---|---|
 | 1. العملات | ✅ نُفّذت | `docs/36-Currencies.md` |
 | 2. المندوبين | ✅ نُفّذت | `docs/37-Sales-Reps.md` |
-| 3. اللغة الإنجليزية | لم تبدأ | `docs/38-English-Interface.md` |
+| 3. اللغة الإنجليزية | ✅ نُفّذت | `docs/38-English-Interface.md` |

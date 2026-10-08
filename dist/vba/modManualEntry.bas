@@ -230,7 +230,7 @@ Public Sub ManualNew(ByVal frm As Access.Form)
     frm!subLines.Form.Requery
     ManualRecalc frm
     ManualButtons frm
-    frm!lblStatus.Caption = "ÇßÊÈ ÇáÊÇÑíÎ æÇáÈíÇä¡ Ëã ÓØÑğÇ áßá ÍÓÇÈ: ÇáãÈáÛ İí ÇáãÏíä Ãæ İí ÇáÏÇÆä."
+    frm!lblStatus.Caption = Tr("ÇßÊÈ ÇáÊÇÑíÎ æÇáÈíÇä¡ Ëã ÓØÑğÇ áßá ÍÓÇÈ: ÇáãÈáÛ İí ÇáãÏíä Ãæ İí ÇáÏÇÆä.")
     SafeFocus frm!txtDescription
 End Sub
 
@@ -261,9 +261,9 @@ Public Sub ManualOpen(ByVal frm As Access.Form, ByVal ManualEntryID As Long)
     ManualRecalc frm
     ManualButtons frm
     If Len(ClosedPeriodProblem(frm!txtDate.Value)) > 0 Then
-        frm!lblStatus.Caption = "ŞíÏ İí İÊÑÉ ãŞİáÉ: ááÚÑÖ İŞØ. íãßä Úãá ŞíÏ ÚßÓí ÈÊÇÑíÎ ãİÊæÍ."
+        frm!lblStatus.Caption = Tr("ŞíÏ İí İÊÑÉ ãŞİáÉ: ááÚÑÖ İŞØ. íãßä Úãá ŞíÏ ÚßÓí ÈÊÇÑíÎ ãİÊæÍ.")
     Else
-        frm!lblStatus.Caption = "ŞíÏ ãÍİæÙ: ÚÏøá Ëã ÇÍİÙ¡ İíÊÍÏË ŞíÏå İí ÇáíæãíÉ ÈäİÓ ÑŞãå."
+        frm!lblStatus.Caption = Tr("ŞíÏ ãÍİæÙ: ÚÏøá Ëã ÇÍİÙ¡ İíÊÍÏË ŞíÏå İí ÇáíæãíÉ ÈäİÓ ÑŞãå.")
     End If
 End Sub
 
@@ -311,8 +311,8 @@ Public Sub ManualRecalc(ByVal frm As Access.Form)
     Dim debit As Currency, credit As Currency
     debit = Nz(DbValue("SELECT Sum(Debit) FROM tmpManualLines"), 0)
     credit = Nz(DbValue("SELECT Sum(Credit) FROM tmpManualLines"), 0)
-    frm!lblTotals.Caption = "ÇáãÏíä: " & Format$(debit, "#,##0.00") & "     ÇáÏÇÆä: " & Format$(credit, "#,##0.00") & _
-                            "     " & IIf(debit = credit And debit > 0, "ãÊæÇÒä", "ÇáİÑŞ: " & Format$(Abs(debit - credit), "#,##0.00"))
+    frm!lblTotals.Caption = Tr("ÇáãÏíä: " & Format$(debit, "#,##0.00") & "     ÇáÏÇÆä: " & Format$(credit, "#,##0.00") & _
+                            "     " & IIf(debit = credit And debit > 0, "ãÊæÇÒä", "ÇáİÑŞ: " & Format$(Abs(debit - credit), "#,##0.00")))
     frm!lblTotals.ForeColor = IIf(debit = credit And debit > 0, CLR_SUCCESS, CLR_DANGER)
 End Sub
 
@@ -359,7 +359,7 @@ Public Sub DeleteManualEntry(ByVal frm As Access.Form)
     SyncJournal
     frm!cboFind.Requery
     ManualNew frm
-    frm!lblStatus.Caption = "Êã ÍĞİ ÇáŞíÏ."
+    frm!lblStatus.Caption = Tr("Êã ÍĞİ ÇáŞíÏ.")
 End Sub
 
 Public Sub ReverseManualEntry(ByVal frm As Access.Form)
@@ -381,7 +381,7 @@ Public Sub ReverseManualEntry(ByVal frm As Access.Form)
     frm!subLines.Form.Requery
     ManualRecalc frm
     ManualButtons frm
-    frm!lblStatus.Caption = "ŞíÏ ÚßÓí ÌÏíÏ ááŞíÏ " & number & ": ÑÇÌÚ ÇáÊÇÑíÎ æÇáÃÓØÑ Ëã ÇÖÛØ «ÍİÙ ÇáŞíÏ»."
+    frm!lblStatus.Caption = Tr("ŞíÏ ÚßÓí ÌÏíÏ ááŞíÏ " & number & ": ÑÇÌÚ ÇáÊÇÑíÎ æÇáÃÓØÑ Ëã ÇÖÛØ «ÍİÙ ÇáŞíÏ».")
 End Sub
 
 Public Sub PrintManualEntry(ByVal frm As Access.Form)

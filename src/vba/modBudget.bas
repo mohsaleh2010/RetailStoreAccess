@@ -182,7 +182,7 @@ Public Sub BudgetTotals(ByVal frm As Access.Form)
     Dim id As Long, rev As Currency, costs As Currency, sumSql As String
     id = ShownBudget(frm)
     If id = 0 Then
-        frm!lblTotals.Caption = "أنشئ موازنة للسنة."
+        frm!lblTotals.Caption = Tr("أنشئ موازنة للسنة.")
         Exit Sub
     End If
     sumSql = "Sum(b.M1 + b.M2 + b.M3 + b.M4 + b.M5 + b.M6 + b.M7 + b.M8 + b.M9 + b.M10 + b.M11 + b.M12)"
@@ -190,8 +190,8 @@ Public Sub BudgetTotals(ByVal frm As Access.Form)
                      "WHERE b.BudgetID = " & id & " AND a.AccountType = 'REVENUE'"), 0)
     costs = Nz(DbValue("SELECT " & sumSql & " FROM BudgetLines AS b INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode " & _
                       "WHERE b.BudgetID = " & id & " AND a.AccountType = 'EXPENSE'"), 0)
-    frm!lblTotals.Caption = "موازنة السنة: الإيرادات " & Format$(rev, "#,##0") & "   المصروفات " & Format$(costs, "#,##0") & _
-                            "   صافي الربح المتوقع " & Format$(rev - costs, "#,##0")
+    frm!lblTotals.Caption = Tr("موازنة السنة: الإيرادات " & Format$(rev, "#,##0") & "   المصروفات " & Format$(costs, "#,##0") & _
+                            "   صافي الربح المتوقع " & Format$(rev - costs, "#,##0"))
 End Sub
 
 Public Sub BudgetLineInsert(ByVal lines As Access.Form)
@@ -307,14 +307,14 @@ Public Sub BudgetCompare(ByVal frm As Access.Form)
     If Not ComparePeriodOK(frm) Then Exit Sub
     SyncJournal
     SetPeriod DateValue(frm!txtFrom.Value), DateValue(frm!txtTo.Value)
-    frm!lstVariance.RowSource = "SELECT BudgetLineID, AccountCode AS [الحساب], AccountName AS [اسم الحساب], BudgetCenter " & _
+    frm!lstVariance.RowSource = Tr("SELECT BudgetLineID, AccountCode AS [الحساب], AccountName AS [اسم الحساب], BudgetCenter " & _
         "AS [المركز], Format(BudgetAmount, '#,##0') AS [الموازنة], Format(ActualAmount, '#,##0') AS [الفعلي], " & _
-        "Format(Variance, '#,##0') AS [الانحراف], Format(VariancePct, '0%') AS [النسبة], VarianceNote AS [التقييم] " & _
-        "FROM BudgetVsActualQuery WHERE BudgetAmount <> 0 OR ActualAmount <> 0 ORDER BY AccountType DESC, TreeKey"
+        "Format(q.Variance, '#,##0') AS [الانحراف], Format(VariancePct, '0%') AS [النسبة], VarianceNote AS [التقييم] " & _
+        "FROM BudgetVsActualQuery AS q WHERE BudgetAmount <> 0 OR ActualAmount <> 0 ORDER BY AccountType DESC, TreeKey")
     budget = Nz(DbValue("SELECT Sum(IIf(AccountType = 'REVENUE', BudgetAmount, -BudgetAmount)) FROM BudgetVsActualQuery"), 0)
     actual = Nz(DbValue("SELECT Sum(IIf(AccountType = 'REVENUE', ActualAmount, -ActualAmount)) FROM BudgetVsActualQuery"), 0)
-    frm!lblVariance.Caption = "صافي الربح: الموازنة " & Format$(budget, "#,##0") & "   الفعلي " & Format$(actual, "#,##0") & _
-                              "   الانحراف " & Format$(actual - budget, "#,##0")
+    frm!lblVariance.Caption = Tr("صافي الربح: الموازنة " & Format$(budget, "#,##0") & "   الفعلي " & Format$(actual, "#,##0") & _
+                              "   الانحراف " & Format$(actual - budget, "#,##0"))
     frm!lblVariance.ForeColor = IIf(actual >= budget, CLR_SUCCESS, CLR_DANGER)
 End Sub
 

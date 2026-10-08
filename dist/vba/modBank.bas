@@ -411,7 +411,7 @@ Public Sub BankTxRefresh(ByVal frm As Access.Form)
         net = Nz(frm!txtAmount.Value, 0) - Nz(frm!txtFee.Value, 0) - Nz(frm!txtFeeVAT.Value, 0)
         info = info & vbCrLf & "’«›Ì „« ÌœŒ· «·»‰ﬂ: " & Format$(net, "#,##0.00")
     End If
-    frm!lblInfo.Caption = info
+    frm!lblInfo.Caption = Tr(info)
     frm!lstTx.Requery
 End Sub
 
@@ -484,9 +484,9 @@ Public Sub BankReconBankChanged(ByVal frm As Access.Form)
             frm!txtStatementDate.Value = DateSerial(Year(Date), Month(Date), 0)
             frm!txtStatementBalance.Value = Null
         End If
-        frm!lstRecons.RowSource = "SELECT ReconciliationID, ReconNumber AS [«· ”ÊÌ…], Format(StatementDate, 'yyyy/mm/dd') " & _
-            "AS [ «—ÌŒ «·ﬂ‘›], Format(StatementBalance, '#,##0.00') AS [—’Ìœ «·ﬂ‘›], IIf(Status = 'DONE', '„⁄ „œ…', " & _
-            "'Ã«—Ì…') AS [«·Õ«·…] FROM BankReconciliations WHERE BankID = " & frm!cboBank.Value & " ORDER BY StatementDate DESC"
+        frm!lstRecons.RowSource = Tr("SELECT ReconciliationID, ReconNumber AS [«· ”ÊÌ…], Format(StatementDate, 'yyyy/mm/dd') " & _
+            "AS [ «—ÌŒ «·ﬂ‘›], Format(StatementBalance, '#,##0.00') AS [—’Ìœ «·ﬂ‘›], IIf(r.Status = 'DONE', '„⁄ „œ…', " & _
+            "'Ã«—Ì…') AS [«·Õ«·…] FROM BankReconciliations AS r WHERE r.BankID = " & frm!cboBank.Value & " ORDER BY StatementDate DESC")
     End If
     BankReconRefresh frm
 End Sub
@@ -517,34 +517,34 @@ Public Sub BankReconRefresh(ByVal frm As Access.Form)
     Dim changed As Long, state As String
     id = ShownRecon(frm)
     bank = Nz(frm!cboBank.Value, 0)
-    frm!lstOpen.RowSource = ""
-    frm!lstCleared.RowSource = ""
+    frm!lstOpen.RowSource = Tr("")
+    frm!lstCleared.RowSource = Tr("")
     If id = 0 Then
         frm!lblBook.Caption = "-": frm!lblOutstanding.Caption = "-": frm!lblAdjusted.Caption = "-": frm!lblDifference.Caption = "-"
-        frm!lblState.Caption = "«Œ — «·»‰ﬂ° Ê«ﬂ »  «—ÌŒ ﬂ‘› «·»‰ﬂ Ê—’ÌœÂ° À„ ´»œ¡ «· ”ÊÌ…ª."
+        frm!lblState.Caption = Tr("«Œ — «·»‰ﬂ° Ê«ﬂ »  «—ÌŒ ﬂ‘› «·»‰ﬂ Ê—’ÌœÂ° À„ ´»œ¡ «· ”ÊÌ…ª.")
         frm!lblState.ForeColor = CLR_PRIMARY
         Exit Sub
     End If
     cutoff = SqlDate(DateValue(ReconField(id, "StatementDate")) + 1)
-    frm!lstOpen.RowSource = "SELECT SourceType & '|' & SourceID AS ItemKey, Format(ItemDate, 'yyyy/mm/dd') AS [«· «—ÌŒ], " & _
+    frm!lstOpen.RowSource = Tr("SELECT SourceType & '|' & SourceID AS ItemKey, Format(ItemDate, 'yyyy/mm/dd') AS [«· «—ÌŒ], " & _
         "TypeName AS [«·⁄„·Ì…], ItemNumber AS [«·—ﬁ„], ItemText AS [«·»Ì«‰], IIf(ItemAmount > 0, Format(ItemAmount, " & _
         "'#,##0.00'), '') AS [Ê«—œ], IIf(ItemAmount < 0, Format(-ItemAmount, '#,##0.00'), '') AS [’«œ—] FROM qryBankItems " & _
-        "WHERE BankID = " & bank & " AND IsCleared = 0 AND ItemDate < " & cutoff & " ORDER BY ItemDate, ItemNumber"
-    frm!lstCleared.RowSource = "SELECT SourceType & '|' & SourceID AS ItemKey, Format(ItemDate, 'yyyy/mm/dd') AS [«· «—ÌŒ], " & _
+        "WHERE BankID = " & bank & " AND IsCleared = 0 AND ItemDate < " & cutoff & " ORDER BY ItemDate, ItemNumber")
+    frm!lstCleared.RowSource = Tr("SELECT SourceType & '|' & SourceID AS ItemKey, Format(ItemDate, 'yyyy/mm/dd') AS [«· «—ÌŒ], " & _
         "TypeName AS [«·⁄„·Ì…], ItemNumber AS [«·—ﬁ„], IIf(ItemAmount > 0, Format(ItemAmount, '#,##0.00'), '') AS [Ê«—œ], " & _
         "IIf(ItemAmount < 0, Format(-ItemAmount, '#,##0.00'), '') AS [’«œ—] FROM qryBankItems WHERE BankID = " & bank & _
-        " AND ReconciliationID = " & id & " ORDER BY ItemDate, ItemNumber"
+        " AND ReconciliationID = " & id & " ORDER BY ItemDate, ItemNumber")
     ReconFigures id, book, outstanding, diff
-    frm!lblBook.Caption = Format$(book, "#,##0.00")
-    frm!lblOutstanding.Caption = Format$(outstanding, "#,##0.00")
-    frm!lblAdjusted.Caption = Format$(book - outstanding, "#,##0.00")
-    frm!lblDifference.Caption = Format$(diff, "#,##0.00")
+    frm!lblBook.Caption = Tr(Format$(book, "#,##0.00"))
+    frm!lblOutstanding.Caption = Tr(Format$(outstanding, "#,##0.00"))
+    frm!lblAdjusted.Caption = Tr(Format$(book - outstanding, "#,##0.00"))
+    frm!lblDifference.Caption = Tr(Format$(diff, "#,##0.00"))
     frm!lblDifference.ForeColor = IIf(diff = 0, CLR_SUCCESS, CLR_DANGER)
     state = "«· ”ÊÌ… " & ReconField(id, "ReconNumber") & IIf(ReconIsOpen(id), " Ã«—Ì…", " „⁄ „œ…") & _
             ": «Œ — «·⁄„·Ì«  «·Ÿ«Â—… ›Ì ﬂ‘› «·»‰ﬂ À„ ´„ÿ«»ﬁ…ª."
     changed = ChangedClearings(bank)
     If changed > 0 Then state = state & vbCrLf & changed & " ⁄„·Ì… „ÿ«»ﬁ…  €Ì¯— „»·€Â« ›Ì «·œ›« — »⁄œ «·„ÿ«»ﬁ…: —«Ã⁄Â«."
-    frm!lblState.Caption = state
+    frm!lblState.Caption = Tr(state)
     frm!lblState.ForeColor = IIf(changed > 0, CLR_WARNING, CLR_PRIMARY)
 End Sub
 

@@ -506,7 +506,7 @@ Public Sub LabelsRefresh(ByVal frm As Access.Form)
 End Sub
 
 Public Sub UpdateLabelStatus(ByVal frm As Access.Form)
-    frm!lblStatus.Caption = "الأصناف: " & LabelLineCount() & "    عدد الملصقات: " & LabelTotalCopies()
+    frm!lblStatus.Caption = Tr("الأصناف: " & LabelLineCount() & "    عدد الملصقات: " & LabelTotalCopies())
 End Sub
 
 Private Function LabelCopiesTyped(ByVal frm As Access.Form) As Long
@@ -524,7 +524,7 @@ Public Sub LabelBarcodeKeyDown(ByVal frm As Access.Form, ByRef KeyCode As Intege
     If Len(code) = 0 Then Exit Sub
     id = DLookup("ProductID", "Products", "Barcode = " & SqlText(code) & " OR ProductCode = " & SqlText(code))
     If IsNull(id) Then
-        frm!lblStatus.Caption = "لا يوجد منتج بالباركود أو الكود: " & code
+        frm!lblStatus.Caption = Tr("لا يوجد منتج بالباركود أو الكود: " & code)
         frm!txtBarcode.Value = Null
         SafeFocus frm!txtBarcode
         Exit Sub
@@ -612,7 +612,7 @@ Public Sub LabelSettingsLoad(ByVal frm As Access.Form)
     frm!PrinterName.RowSourceType = "Value List"
     frm!PrinterName.ColumnCount = 1
     frm!PrinterName.ColumnWidths = ""
-    frm!PrinterName.RowSource = s
+    frm!PrinterName.RowSource = Tr(s)
 End Sub
 
 '------------------------------------------------------------------------------

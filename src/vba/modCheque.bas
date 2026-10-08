@@ -239,14 +239,14 @@ End Sub
 
 Public Sub ChequesDirectionChanged(ByVal frm As Access.Form)
     If frm!cboDirection.Value = "IN" Then
-        frm!cboParty.RowSource = "SELECT CustomerID, CustomerName FROM Customers WHERE IsActive = True AND CustomerID <> " & _
-                                 Nz(SettingValue("DefaultCustomerID"), 1) & " ORDER BY CustomerName"
-        frm!lblParty.Caption = "العميل"
-        frm!btnCollect.Caption = "تحصيل في البنك"
+        frm!cboParty.RowSource = Tr("SELECT CustomerID, CustomerName FROM Customers WHERE IsActive = True AND CustomerID <> " & _
+                                 Nz(SettingValue("DefaultCustomerID"), 1) & " ORDER BY CustomerName")
+        frm!lblParty.Caption = Tr("العميل")
+        frm!btnCollect.Caption = Tr("تحصيل في البنك")
     Else
-        frm!cboParty.RowSource = "SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName"
-        frm!lblParty.Caption = "المورد"
-        frm!btnCollect.Caption = "صرفه البنك"
+        frm!cboParty.RowSource = Tr("SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True ORDER BY SupplierName")
+        frm!lblParty.Caption = Tr("المورد")
+        frm!btnCollect.Caption = Tr("صرفه البنك")
     End If
     frm!cboParty.Value = Null
     frm!txtDrawerBank.Enabled = (frm!cboDirection.Value = "IN")
@@ -263,17 +263,17 @@ Public Sub ChequesRefresh(ByVal frm As Access.Form)
         Case "COLLECTED": where = where & " AND Status = 'COLLECTED'"
         Case "BOUNCED": where = where & " AND Status = 'BOUNCED'"
     End Select
-    frm!lstCheques.RowSource = "SELECT ChequeID, ChequeRef AS [القيد], ChequeNo AS [رقم الشيك], PartyName AS [" & _
-        IIf(kind = "IN", "العميل", "المورد") & "], Format(DueDate, 'yyyy/mm/dd') AS [الاستحقاق], Format(Amount, '#,##0.00') " & _
+    frm!lstCheques.RowSource = Tr("SELECT ChequeID, ChequeRef AS [القيد], ChequeNo AS [رقم الشيك], PartyName AS [" & _
+        IIf(kind = "IN", "العميل", "المورد") & "], Format(DueDate, 'yyyy/mm/dd') AS [الاستحقاق], Format(q.Amount, '#,##0.00') " & _
         "AS [المبلغ], StatusName AS [الحالة], Format(StatusDate, 'yyyy/mm/dd') AS [في], Nz(BankName, DrawerBank) AS [البنك] " & _
-        "FROM ChequesQuery WHERE " & where & " ORDER BY DueDate, ChequeID"
+        "FROM ChequesQuery AS q WHERE " & where & " ORDER BY DueDate, ChequeID")
     pending = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind)), 0)
     soon = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind) & _
                       " AND DueDate <= " & SqlDate(Date + 7)), 0)
     late = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind) & _
                       " AND DueDate < " & SqlDate(Date)), 0)
-    frm!lblTotals.Caption = IIf(kind = "IN", "شيكات تحت التحصيل: ", "شيكات صادرة لم تُصرف: ") & Format$(pending, "#,##0.00") & _
-        "    مستحقة خلال 7 أيام: " & Format$(soon, "#,##0.00") & "    فات استحقاقها: " & Format$(late, "#,##0.00")
+    frm!lblTotals.Caption = Tr(IIf(kind = "IN", "شيكات تحت التحصيل: ", "شيكات صادرة لم تُصرف: ") & Format$(pending, "#,##0.00") & _
+        "    مستحقة خلال 7 أيام: " & Format$(soon, "#,##0.00") & "    فات استحقاقها: " & Format$(late, "#,##0.00"))
     frm!lblTotals.ForeColor = IIf(late > 0, CLR_DANGER, CLR_PRIMARY)
 End Sub
 

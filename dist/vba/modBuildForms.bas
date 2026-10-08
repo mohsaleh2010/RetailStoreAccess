@@ -16,6 +16,9 @@ Attribute VB_Name = "modBuildForms"
 '
 ' If the screens appear mirrored (labels on the wrong side of the inputs),
 ' set MIRROR_LAYOUT = True below and run BuildForms again.
+' The interface language of this file (modLang.UiLanguage) decides the
+' direction: an English file is left-to-right and every screen is mirrored;
+' captions, lists, record sources and the screen code are translated by Tr.
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -121,9 +124,9 @@ Private Sub StartForm(ByVal FinalName As String, ByVal Caption As String, ByVal 
     Set m_frm = CreateForm()
     m_tmpName = m_frm.Name
     m_width = FormWidth
-    SetFormProp "Orientation", 1                 ' right-to-left
-    m_frm.Caption = Caption
-    m_frm.RecordSource = RecordSource
+    SetFormProp "Orientation", IIf(UiEnglish(), 0, 1)     ' right-to-left, or left-to-right in English
+    m_frm.Caption = Tr(Caption)
+    m_frm.RecordSource = Tr(RecordSource)
     m_frm.DefaultView = 0                        ' single form
     m_frm.RecordSelectors = False
     m_frm.NavigationButtons = False
@@ -140,7 +143,7 @@ Private Sub StartForm(ByVal FinalName As String, ByVal Caption As String, ByVal 
     m_frm.AllowAdditions = AllowAdd
     m_frm.AllowEdits = AllowEdit
     m_frm.AllowDeletions = False                 ' deleting goes through the Delete button
-    m_frm.Tag = TagText
+    m_frm.Tag = Tr(TagText)                      ' the list query of a data screen has captions
     SetFormProp "AllowDatasheetView", False
     SetFormProp "AllowLayoutView", False
     m_frm.Width = FormWidth
@@ -156,7 +159,7 @@ Private Sub FinishForm(ByVal FinalName As String, ByVal Code As String)
         If Trim$(mdl.Lines(i, 1)) = "Option Explicit" Then hasExplicit = True
     Next
     If Not hasExplicit Then mdl.InsertLines mdl.CountOfDeclarationLines + 1, "Option Explicit"
-    mdl.AddFromString Code
+    mdl.AddFromString Tr(Code)
     DoCmd.Close acForm, m_tmpName, acSaveYes
     DoCmd.Rename FinalName, acForm, m_tmpName
     m_built = m_built + 1
@@ -174,7 +177,7 @@ Private Function NewCtl(ByVal CtlType As AcControlType, ByVal CtlName As String,
                      Optional ByVal ParentName As String = "", _
                      Optional ByVal ColumnName As String = "") As Access.Control
     Dim x As Long
-    If MIRROR_LAYOUT Then x = m_width - L - W Else x = L
+    If MirrorLayout() Then x = m_width - L - W Else x = L
     Set NewCtl = CreateControl(m_tmpName, CtlType, acDetail, ParentName, ColumnName, x, T, W, H)
     NewCtl.Name = CtlName
 End Function
@@ -197,13 +200,13 @@ Private Function AddLabel(ByVal CtlName As String, ByVal Caption As String, ByVa
     Dim c As Access.Control
     Set c = NewCtl(acLabel, CtlName, L, T, W, H, ParentName)
     If Len(Caption) = 0 Then Caption = " "          ' empty labels are deleted by Access
-    c.Caption = Caption
+    c.Caption = Tr(Caption)
     c.FontName = FONT_NAME
     c.FontSize = FontSize
     c.FontBold = Bold
     c.ForeColor = Color
     c.BackStyle = 0
-    c.TextAlign = TextAlign
+    c.TextAlign = UiAlign(TextAlign)
     Set AddLabel = c
 End Function
 
@@ -246,7 +249,7 @@ Private Function AddCombo(ByVal CtlName As String, ByVal Source As String, ByVal
     Else
         c.RowSourceType = "Value List"
     End If
-    c.RowSource = Rows
+    c.RowSource = Tr(Rows)
     c.ColumnCount = ColumnCount
     c.ColumnWidths = ColumnWidths
     c.BoundColumn = 1
@@ -304,7 +307,7 @@ Private Function AddButton(ByVal CtlName As String, ByVal Caption As String, ByV
                            ByVal Style As String) As Access.Control
     Dim c As Access.Control, back As Long, hover As Long, fore As Long
     Set c = NewCtl(acCommandButton, CtlName, L, T, W, H)
-    c.Caption = Caption
+    c.Caption = Tr(Caption)
     c.FontName = FONT_NAME
     c.FontSize = IIf(Style = "nav", 12, 11)
     c.FontBold = True
@@ -329,12 +332,18 @@ End Function
 
 Private Sub SetCtlProp(ByVal c As Access.Control, ByVal PropName As String, ByVal Value As Variant)
     On Error Resume Next
-    c.Properties(PropName).Value = Value
+    If PropName = "TextAlign" Then Value = UiAlign(Value)
+    c.Properties(PropName).Value = Tr(Value)
     If Err.Number <> 0 Then
         m_warnings = m_warnings & "  " & m_tmpName & "." & c.Name & "." & PropName & _
                      ": " & Err.Description & vbCrLf
     End If
 End Sub
+
+Private Function MirrorLayout() As Boolean
+    ' The design is right-to-left; an English file mirrors every screen.
+    MirrorLayout = (MIRROR_LAYOUT Xor UiEnglish())
+End Function
 
 Private Sub SetFormProp(ByVal PropName As String, ByVal Value As Variant)
     On Error Resume Next
@@ -1124,7 +1133,7 @@ Private Sub BuildForm_frmMain()
     s = s & "    spec = spec & "";lblTileSub8,4139,7143,3132,255,0,250,1000,0;boxTile9,15066,7569,3472,1049,750,250,1000,0;lblTileTitle9,15236,7626,3132,284,750,250,1000,0;lblTileValue9,15236,7921,3132,408,750,250,1000,0;lblTileSub9,15236,8334,3132,255,750,250,1000,0;boxTile10,11367,7569,3472,1049,500,250,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileTitle10,11537,7626,3132,284,500,250,1000,0;lblTileValue10,11537,7921,3132,408,500,250,1000,0;lblTileSub10,11537,8334,3132,255,500,250,1000,0;boxTile11,7668,7569,3472,1049,250,250,1000,0;lblTileTitle11,7838,7626,3132,284,250,250,1000,0;lblTileValue11,7838,7921,3132,408,250,250,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";lblTileSub11,7838,8334,3132,255,250,250,1000,0;boxTile12,3969,7569,3472,1049,0,250,1000,0;lblTileTitle12,4139,7626,3132,284,0,250,1000,0;lblTileValue12,4139,7921,3132,408,0,250,1000,0;lblTileSub12,4139,8334,3132,255,0,250,1000,0;lblIntegrity,3969,9180,14571,312,0,1000,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 9634, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9634, 0, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmMain", s
     Exit Sub
@@ -3824,7 +3833,7 @@ Private Sub BuildForm_frmSearch()
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnSearch,11794,1372,1361,482,1000,0,0,0;btnClear,13268,1372,907,482,1000,0,0,0;btnClose,14175,1372,907,482,1000,0,0,0;lstResults,227,2098,14855,5897,0,1000,0,1000;lblCount,227,8136,14855,340,0,1000,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 15309, 8675, -4422, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 15309, 8675, -4422, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmSearch", s
     Exit Sub
@@ -3920,7 +3929,7 @@ Private Sub BuildForm_frmReportCenter()
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;lstReports,227,1077,5103,7314,0,0,0,1000;lblReportTitle,5670,1077,9412,482,0,1000,0,0;lblNeeds,5670,1588,9412,340,0,1000,0,0;btnClose,13948,6548,1134,567,1000,0,0,0;lblPhaseNote,5670,7342,9412,567,0,1000,0,0""" & vbCrLf
-    s = s & "    FitControls Me, 15309, 8675, -709, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 15309, 8675, -709, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmReportCenter", s
     Exit Sub
@@ -4130,7 +4139,7 @@ Private Sub BuildForm_frmPOS()
     s = s & "    spec = spec & "";lblCapDiscount,12644,4281,3686,340,1000,0,0,0;lblDiscount,16386,4281,2211,340,1000,0,0,0;lblCapTax,12644,4621,3686,340,1000,0,0,0;lblTax,16386,4621,2211,340,1000,0,0,0;lblCapTotal,12644,4990,5954,340,1000,0,0,0;lblTotal,12644,5330,5954,822,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblItems,12644,6180,5954,312,1000,0,0,0;txtTendered,12474,6889,6294,567,1000,0,1000,0;lblTendered,12474,6577,6294,284,1000,0,1000,0;lblChange,12474,7484,6294,369,1000,0,1000,0;lblLastInvoiceCap,12474,7995,1701,312,1000,0,1000,0;lblLastInvoice,14232,7995,2778,312,1000,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnClose,17067,7881,1701,624,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 8675, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 18994, 8675, 0, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmPOS", s
     Exit Sub
@@ -4600,7 +4609,7 @@ Private Sub BuildForm_frmPurchaseInvoice()
     s = s & "    spec = spec & "";lblRate,17322,4593,1445,284,1000,0,0,0;boxTotals,12474,5443,6294,2126,1000,0,0,0;lblCapSubTotal,12644,5500,3686,340,1000,0,0,0;lblSubTotal,16386,5500,2211,340,1000,0,0,0;lblCapDiscount,12644,5840,3686,340,1000,0,0,0;lblDiscount,16386,5840,2211,340,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblCapTax,12644,6180,3686,340,1000,0,0,0;lblTax,16386,6180,2211,340,1000,0,0,0;lblCapTotal,12644,6606,2835,340,1000,0,0,0;lblTotal,15536,6520,3062,567,1000,0,0,0;lblItems,12644,7173,5954,340,1000,0,0,0;txtPaid,12474,7938,3033,510,1000,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";lblPaid,12474,7626,3033,284,1000,0,1000,0;lblRemaining,15735,7966,3033,454,1000,0,1000,0;btnLabels,12474,8448,2268,624,1000,0,1000,0;btnClose,17067,8448,1701,624,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 9242, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9242, 0, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmPurchaseInvoice", s
     Exit Sub
@@ -4958,7 +4967,7 @@ Private Sub BuildForm_frmInventory()
     s = s & "    spec = spec & "";btnStockReport,6009,8221,1928,624,0,0,1000,0;btnLabels,8050,8221,1928,624,0,0,1000,0;lblProductName,12134,1304,6634,454,1000,0,0,0;lblProductStock,12134,1786,6634,340,1000,0,0,0;lblManualCap,12134,2268,6634,340,1000,0,0,0;cboMoveType,12134,2977,3175,454,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblMoveType,12134,2665,3175,284,1000,0,0,0;txtMoveQty,15479,2977,1531,454,1000,0,0,0;lblMoveQty,15479,2665,1531,284,1000,0,0,0;txtMoveCost,17180,2977,1588,454,1000,0,0,0;lblMoveCost,17180,2665,1588,284,1000,0,0,0;txtMoveNotes,12134,3799,4876,454,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblMoveNotes,12134,3487,4876,284,1000,0,0,0;btnPostMove,17180,3782,1588,482,1000,0,0,0;lblMovesCap,12134,4451,6634,340,1000,0,0,0;lstMoves,12134,4820,6634,3232,1000,0,0,1000;btnClose,17067,8221,1701,624,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 9355, -1757, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9355, -1757, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmInventory", s
     Exit Sub
@@ -5092,7 +5101,7 @@ Private Sub BuildForm_frmStockCount()
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;lblCountInfo,10376,1304,8391,454,0,1000,0,0;subCountLines,227,3118,18541,4394,0,1000,0,1000;lblCountSummary,227,7626,18541,397,0,1000,1000,0;btnPostCount,227,8221,1928,624,0,0,1000,0;btnCancelCount,2268,8221,1701,624,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnCountReport,4082,8221,1928,624,0,0,1000,0;btnClose,17066,8221,1701,624,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 9355, -2919, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9355, -2919, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmStockCount", s
     Exit Sub
@@ -5409,7 +5418,7 @@ Private Sub BuildForm_frmActivation()
     c.OnClick = EP
     Set c = AddLabel("lblListCap", "«·√ÃÂ“… «·„›⁄¯·…", 227, 3572, 6804, 340, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstMachines", 227, 3941, 10319, 2041, 4, "0;2835;3118;2268", True)
-    c.RowSource = "SELECT ActivationID, ComputerName AS [«·ÃÂ«“], MachineID AS [—ﬁ„ «·ÃÂ«“], ActivatedAt AS [ «—ÌŒ «· ›⁄Ì·] FROM Activations ORDER BY ActivatedAt"
+    c.RowSource = Tr("SELECT ActivationID, ComputerName AS [«·ÃÂ«“], MachineID AS [—ﬁ„ «·ÃÂ«“], ActivatedAt AS [ «—ÌŒ «· ›⁄Ì·] FROM Activations ORDER BY ActivatedAt")
     Set c = AddButton("btnRemove", "≈·€«¡  ›⁄Ì· «·ÃÂ«“ «·„Õœœ", 227, 6095, 3175, 510, "danger")
     c.OnClick = EP
     Set c = AddRect("boxDeveloper", 227, 6776, 10319, 2126, CLR_SURFACE)
@@ -5626,7 +5635,7 @@ Private Sub BuildForm_frmBarcodeLabels()
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,11340,850,0,1000,0,0;cboProduct,5216,1304,5897,510,0,1000,0,0;subLines,227,2381,10886,4309,0,1000,0,1000;lblStatus,227,6804,10886,340,0,1000,1000,0;btnPreview,227,7428,1588,624,0,0,1000,0;btnPrint,1928,7428,1588,624,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnClear,3629,7428,1701,624,0,0,1000,0;btnSettings,5443,7428,1928,624,0,0,1000,0;btnClose,9639,7428,1474,624,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 11340, 8278, -2834, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 11340, 8278, -2834, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmBarcodeLabels", s
     Exit Sub
@@ -6101,7 +6110,7 @@ Private Sub BuildForm_frmTouchPOS()
     s = s & "    spec = spec & "";imgCat4,18003,4264,737,743,1000,0,0,0;lblCat4,16188,4423,1730,425,1000,0,0,0;btnCat4,16103,4196,2722,879,1000,0,0,0;boxCat5,16103,5160,2722,879,1000,0,0,0;imgCat5,18003,5228,737,743,1000,0,0,0;lblCat5,16188,5387,1730,425,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";btnCat5,16103,5160,2722,879,1000,0,0,0;boxCat6,16103,6124,2722,879,1000,0,0,0;imgCat6,18003,6192,737,743,1000,0,0,0;lblCat6,16188,6351,1730,425,1000,0,0,0;btnCat6,16103,6124,2722,879,1000,0,0,0;boxCat7,16103,7088,2722,879,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";imgCat7,18003,7156,737,743,1000,0,0,0;lblCat7,16188,7315,1730,425,1000,0,0,0;btnCat7,16103,7088,2722,879,1000,0,0,0;btnCatDown,16103,8222,1304,907,1000,0,1000,0;btnCatUp,17520,8222,1304,907,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 9299, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9299, 0, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmTouchPOS", s
     Exit Sub
@@ -6619,7 +6628,7 @@ Private Sub BuildForm_frmCafePOS()
     s = s & "    spec = spec & "";imgProd14,9224,6416,1995,1097,200,200,666,333;lblProd14,9111,7541,2222,284,200,200,666,333;lblPrice14,9111,7824,2222,255,200,200,666,333;btnProd14,9054,6246,2335,1862,200,200,666,333;boxProd15,6577,6246,2335,1862,0,200,666,333;boxProdStrip15,6577,6246,2335,102,0,200,666,333""" & vbCrLf
     s = s & "    spec = spec & "";imgProd15,6747,6416,1995,1097,0,200,666,333;lblProd15,6634,7541,2222,284,0,200,666,333;lblPrice15,6634,7824,2222,255,0,200,666,333;btnProd15,6577,6246,2335,1862,0,200,666,333;btnProdNext,6577,8222,1701,907,0,0,1000,0;lblProdPage,8391,8477,8618,397,0,1000,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnProdPrev,17123,8222,1701,907,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 18994, 9299, 0, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 18994, 9299, 0, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmCafePOS", s
     Exit Sub
@@ -6876,7 +6885,7 @@ Private Sub BuildForm_frmTreasury()
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnClose,13721,1021,1361,482,1000,0,0,0;lstBoxes,227,2041,5103,6690,0,0,0,1000;lblBoxName,5670,1701,9412,454,0,1000,0,0;lblCurrent,5670,4252,9412,340,0,1000,0,0;lstMoves,5670,4649,9412,4082,0,1000,0,1000""" & vbCrLf
-    s = s & "    FitControls Me, 15309, 9015, -2607, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 15309, 9015, -2607, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmTreasury", s
     Exit Sub
@@ -7173,7 +7182,7 @@ Private Sub BuildForm_frmJournal()
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,13665,1304,1418,454,1000,0,0,0;lstEntries,227,1928,14855,2665,0,1000,0,1000;lblTotals,227,4649,14855,340,0,1000,1000,0;lblLinesCap,227,5046,6804,312,0,0,1000,0;lstLines,227,5386,14855,2325,0,1000,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnOpenEntry,227,7881,1588,510,0,0,1000,0;btnOpenSource,1928,7881,2041,510,0,0,1000,0;btnSync,4082,7881,1474,510,0,0,1000,0;btnPrint,5669,7881,1474,510,0,0,1000,0;btnTrial,7256,7881,1588,510,0,0,1000,0;btnAccounts,8957,7881,1588,510,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnLedger,10658,7881,1361,510,0,0,1000,0;btnManual,12132,7881,1247,510,0,0,1000,0;btnClose,13721,7881,1361,510,1000,0,1000,0;lblSync,227,8505,14855,312,0,1000,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 15309, 9015, -1190, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 15309, 9015, -1190, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmJournal", s
     Exit Sub
@@ -7378,7 +7387,7 @@ Private Sub BuildForm_frmManualEntry()
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;txtDescription,6577,2098,5443,454,0,1000,0,0;cboCurrency,12134,2098,1474,454,1000,0,0,0;lblCurrency,12134,1786,1474,284,1000,0,0,0;txtRate,13721,2098,1361,454,1000,0,0,0;lblRate,13721,1786,1361,284,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblCol6,12755,2750,1758,312,1000,0,0,0;subLines,227,3090,14855,4309,0,1000,0,1000;lblTotals,227,7513,14855,369,0,1000,1000,0;lblStatus,227,7910,14855,340,0,1000,1000,0;btnNew,227,8732,1474,510,0,0,1000,0;btnSave,1814,8732,1588,510,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnReverse,3515,8732,1474,510,0,0,1000,0;btnPrint,5102,8732,1247,510,0,0,1000,0;btnInJournal,6462,8732,1814,510,0,0,1000,0;btnAccounts,8389,8732,1701,510,0,0,1000,0;btnDelete,10203,8732,1474,510,0,0,1000,0;btnClose,13721,8732,1361,510,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 15309, 9639, -2834, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 15309, 9639, -2834, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmManualEntry", s
     Exit Sub
@@ -7492,7 +7501,7 @@ Private Sub BuildForm_frmLedger()
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,13041,1304,1418,454,1000,0,0,0;lstLines,227,2807,14855,3969,0,1000,0,1000;lblInfo,227,6861,14855,340,0,1000,1000,0;btnOpenEntry,227,7371,1474,510,0,0,1000,0;btnOpenSource,1814,7371,2041,510,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnPrintStatement,3968,7371,2155,510,0,0,1000,0;btnPrintLedger,6236,7371,1588,510,0,0,1000,0;btnManual,7937,7371,1361,510,0,0,1000,0;btnAccounts,9411,7371,1588,510,0,0,1000,0;btnFinancials,11112,7371,1814,510,0,0,1000,0;btnClose,13721,7371,1361,510,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 15309, 8732, -2494, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 15309, 8732, -2494, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmLedger", s
     Exit Sub
@@ -7616,7 +7625,7 @@ Private Sub BuildForm_frmFinancials()
     s = s & "    spec = ""boxTitle,0,0,15309,850,0,1000,0,0;btnShow,12587,1304,1418,454,1000,0,0,0;lblCompare,227,1871,14855,312,0,1000,0,0;lstRows,227,3090,14855,3856,0,1000,0,1000;lblInfo,227,7031,14855,312,0,1000,1000,0;btnPrint,227,7485,1814,510,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnLedger,2154,7485,1588,510,0,0,1000,0;btnTrial,3855,7485,1588,510,0,0,1000,0;btnClosing,5556,7485,1531,510,0,0,1000,0;btnVat,7200,7485,1644,510,0,0,1000,0;btnAssets,8957,7485,1701,510,0,0,1000,0;btnPayroll,10771,7485,1247,510,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnBudget,12131,7485,1247,510,0,0,1000,0;btnClose,13721,7485,1361,510,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 15309, 8732, -2381, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 15309, 8732, -2381, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmFinancials", s
     Exit Sub
@@ -7656,7 +7665,7 @@ Private Sub BuildForm_frmPeriodClosing()
     c.OnClick = EP
     Set c = AddLabel("lblHistoryCap", "”Ã· «·≈ﬁ›«· Ê≈⁄«œ… «·› Õ", 227, 5642, 6804, 340, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstHistory", 227, 6010, 12020, 2608, 7, "0;1588;1474;794;1928;2041;3402", True)
-    c.RowSource = "SELECT p.PeriodClosingID, IIf(p.ActionType = 'CLOSE', '≈ﬁ›«· › —…', IIf(p.ActionType = 'REOPEN', '≈⁄«œ… › Õ', IIf(p.ActionType = 'YEAR_CLOSE', '≈ﬁ›«· ”‰…', '≈⁄«œ… › Õ ”‰…'))) AS [«·⁄„·Ì…], p.ClosedThrough AS [„ﬁ›·… Õ Ï], p.FiscalYear AS [«·”‰…], e.EmployeeName AS [»Ê«”ÿ…], p.CreatedAt AS [›Ì], p.Notes AS [«·”»»] FROM PeriodClosings AS p INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID ORDER BY p.PeriodClosingID DESC"
+    c.RowSource = Tr("SELECT p.PeriodClosingID, IIf(p.ActionType = 'CLOSE', '≈ﬁ›«· › —…', IIf(p.ActionType = 'REOPEN', '≈⁄«œ… › Õ', IIf(p.ActionType = 'YEAR_CLOSE', '≈ﬁ›«· ”‰…', '≈⁄«œ… › Õ ”‰…'))) AS [«·⁄„·Ì…], p.ClosedThrough AS [„ﬁ›·… Õ Ï], p.FiscalYear AS [«·”‰…], e.EmployeeName AS [»Ê«”ÿ…], p.CreatedAt AS [›Ì], p.Notes AS [«·”»»] FROM PeriodClosings AS p INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID ORDER BY p.PeriodClosingID DESC")
     Set c = AddButton("btnClose", "≈€·«ﬁ", 10773, 8845, 1474, 567, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -7757,7 +7766,7 @@ Private Sub BuildForm_frmVatReturn()
     c.OnClick = EP
     Set c = AddLabel("lblHistoryCap", "«·≈ﬁ—«—«  «·„Õ›ÊŸ… («Œ — ≈ﬁ—«—« ·⁄—÷Â)", 227, 9129, 6804, 312, 9, True, CLR_MUTED, "", 0)
     Set c = AddList("lstReturns", 227, 9469, 12814, 1361, 8, "0;1814;1474;1474;1134;1701;1701;1474", True)
-    c.RowSource = "SELECT VatReturnID, ReturnNumber AS [«·≈ﬁ—«—], Format(PeriodFrom, 'yyyy/mm/dd') AS [„‰], Format(PeriodTo, 'yyyy/mm/dd') AS [≈·Ï], IIf(Status = 'FILED', '„⁄ „œ', '„”Êœ…') AS [«·Õ«·…], Format(NetDue, '#,##0.00') AS [«·’«›Ì], Format(PaidAmount, '#,##0.00') AS [«·„”œœ], Format(FiledDate, 'yyyy/mm/dd') AS [«⁄ ı„œ ›Ì] FROM VatReturns ORDER BY PeriodFrom DESC"
+    c.RowSource = Tr("SELECT VatReturnID, ReturnNumber AS [«·≈ﬁ—«—], Format(PeriodFrom, 'yyyy/mm/dd') AS [„‰], Format(PeriodTo, 'yyyy/mm/dd') AS [≈·Ï], IIf(Status = 'FILED', '„⁄ „œ', '„”Êœ…') AS [«·Õ«·…], Format(NetDue, '#,##0.00') AS [«·’«›Ì], Format(PaidAmount, '#,##0.00') AS [«·„”œœ], Format(FiledDate, 'yyyy/mm/dd') AS [«⁄ ı„œ ›Ì] FROM VatReturns ORDER BY PeriodFrom DESC")
     c.AfterUpdate = EP
     Set c = AddButton("btnClose", "≈€·«ﬁ", 13041, 10263, 1474, 567, "secondary")
     c.OnClick = EP
@@ -8007,7 +8016,7 @@ Private Sub BuildForm_frmBankTx()
     c.OnClick = EP
     Set c = AddLabel("lblListCap", "«·Õ—ﬂ«  «·„”Ã·…", 227, 3515, 6804, 312, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstTx", 227, 3856, 14288, 5443, 7, "0;1474;1361;1361;2268;1701;5670", True)
-    c.RowSource = "SELECT t.BankTxID, t.TxNumber AS [«·—ﬁ„], Format(t.TxDate, 'yyyy/mm/dd') AS [«· «—ÌŒ], IIf(t.TxType = 'DEPOSIT', '≈Ìœ«⁄', IIf(t.TxType = 'WITHDRAW', '”Õ»', IIf(t.TxType = 'SETTLEMENT', ' ”ÊÌ… „œÏ', IIf(t.TxType = 'TRANSFER', ' ÕÊÌ·', IIf(t.TxType = 'OTHER_IN', 'Ê«—œ', '’«œ—'))))) AS [«·‰Ê⁄], k.BankName AS [«·»‰ﬂ], Format(t.Amount, '#,##0.00') AS [«·„»·€], t.Description AS [«·»Ì«‰] FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID ORDER BY t.TxDate DESC, t.BankTxID DESC"
+    c.RowSource = Tr("SELECT t.BankTxID, t.TxNumber AS [«·—ﬁ„], Format(t.TxDate, 'yyyy/mm/dd') AS [«· «—ÌŒ], IIf(t.TxType = 'DEPOSIT', '≈Ìœ«⁄', IIf(t.TxType = 'WITHDRAW', '”Õ»', IIf(t.TxType = 'SETTLEMENT', ' ”ÊÌ… „œÏ', IIf(t.TxType = 'TRANSFER', ' ÕÊÌ·', IIf(t.TxType = 'OTHER_IN', 'Ê«—œ', '’«œ—'))))) AS [«·‰Ê⁄], k.BankName AS [«·»‰ﬂ], Format(t.Amount, '#,##0.00') AS [«·„»·€], t.Description AS [«·»Ì«‰] FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID ORDER BY t.TxDate DESC, t.BankTxID DESC")
     Set c = AddButton("btnDelete", "Õ–› «·Õ—ﬂ…", 227, 9469, 1701, 510, "danger")
     c.OnClick = EP
     Set c = AddButton("btnRecon", "«· ”ÊÌ… «·»‰ﬂÌ…", 2041, 9469, 1928, 510, "secondary")
@@ -8335,7 +8344,7 @@ Private Sub BuildForm_frmAssets()
     c.OnClick = EP
     Set c = AddLabel("lblAssetInfo", " ", 227, 3515, 14855, 567, 10, True, CLR_PRIMARY, "", 0)
     Set c = AddList("lstAssets", 227, 4139, 14855, 4536, 9, "0;1247;3402;2495;1361;1588;1588;1701;1021", True)
-    c.RowSource = "SELECT AssetID, AssetCode AS [«·—ﬁ„], AssetName AS [«·√’·], AssetGroup AS [«·„Ã„Ê⁄…], Format(PurchaseDate, 'yyyy/mm/dd') AS [«·‘—«¡], Format(Cost, '#,##0.00') AS [«· ﬂ·›…], Format(AccumDep, '#,##0.00') AS [„Ã„⁄ «·≈Â·«ﬂ], Format(BookValue, '#,##0.00') AS [«·ﬁÌ„… «·œ› —Ì…], StatusName AS [«·Õ«·…] FROM FixedAssetsQuery ORDER BY Status, AssetCode"
+    c.RowSource = Tr("SELECT AssetID, AssetCode AS [«·—ﬁ„], AssetName AS [«·√’·], AssetGroup AS [«·„Ã„Ê⁄…], Format(PurchaseDate, 'yyyy/mm/dd') AS [«·‘—«¡], Format(q.Cost, '#,##0.00') AS [«· ﬂ·›…], Format(AccumDep, '#,##0.00') AS [„Ã„⁄ «·≈Â·«ﬂ], Format(BookValue, '#,##0.00') AS [«·ﬁÌ„… «·œ› —Ì…], q.StatusName AS [«·Õ«·…] FROM FixedAssetsQuery AS q ORDER BY q.Status, q.AssetCode")
     c.AfterUpdate = EP
     Set c = AddLabel("lblDisposeCap", "»Ì⁄ «·√’· «·„⁄—Ê÷ √Ê «” »⁄«œÂ", 227, 8788, 6804, 312, 10, True, CLR_TEXT, "", 0)
     Set c = AddText("txtDisposalDate", "", 227, 9497, 1588, 454)
@@ -8432,7 +8441,7 @@ Private Sub BuildForm_frmDepreciation()
     c.RowSourceType = "Value List"
     Set c = AddLabel("lblRunsCap", "ﬁÌÊœ «·≈Â·«ﬂ «·„”Ã·…", 227, 5557, 6804, 312, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstRuns", 227, 5897, 10886, 2495, 5, "0;1928;1701;2268;2268", True)
-    c.RowSource = "SELECT RunID, RunNumber AS [«·ﬁÌœ], Format(RunMonth, 'yyyy/mm') AS [«·‘Â—], Format(TotalAmount, '#,##0.00') AS [«·≈Â·«ﬂ], Format(CreatedAt, 'yyyy/mm/dd') AS [”ıÃˆ¯· ›Ì] FROM DepreciationRuns ORDER BY RunMonth DESC"
+    c.RowSource = Tr("SELECT RunID, RunNumber AS [«·ﬁÌœ], Format(RunMonth, 'yyyy/mm') AS [«·‘Â—], Format(TotalAmount, '#,##0.00') AS [«·≈Â·«ﬂ], Format(CreatedAt, 'yyyy/mm/dd') AS [”ıÃˆ¯· ›Ì] FROM DepreciationRuns ORDER BY RunMonth DESC")
     Set c = AddButton("btnClose", "≈€·«ﬁ", 9639, 8562, 1474, 510, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -9086,7 +9095,7 @@ Private Sub BuildForm_frmAccounting()
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,14882,850,0,1000,0,0;btnClose,13181,8757,1361,454,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 14882, 9381, -254, " & IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf
+    s = s & "    FitControls Me, 14882, 9381, -254, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmAccounting", s
     Exit Sub

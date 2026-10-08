@@ -81,7 +81,7 @@ def control_lines(c: F.Control):
             out.append('    c.RowSourceType = "Value List"')
         if p.get("RowSource"):                  # a fixed row source (the screen code may change it)
             assert len(p["RowSource"]) < 900, c.name
-            out.append(f"    c.RowSource = {vba_str(p['RowSource'])}")
+            out.append(f"    c.RowSource = Tr({vba_str(p['RowSource'])})")
         if "FontSize" in p:
             out.append(f"    c.FontSize = {p['FontSize']}")
     elif c.kind == "subform":
@@ -144,7 +144,7 @@ def fit_code_lines(m: F.FormModel) -> list:
         code.append(f'    spec = "{chunk}"' if i == 0 else f'    spec = spec & ";{chunk}"')
     lines = [f"    s = s & {vba_str(line)} & vbCrLf" for line in code]
     lines.append(f'    s = s & "    FitControls Me, {m.width}, {m.height}, {fit_min_dh(m)}, " & '
-                 'IIf(MIRROR_LAYOUT, "True", "False") & ", spec" & vbCrLf')
+                 'IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf')
     lines.append('    s = s & "End Sub" & vbCrLf')
     return lines
 
@@ -190,6 +190,9 @@ BUILDER_TEMPLATE = r'''Attribute VB_Name = "modBuildForms"
 '
 ' If the screens appear mirrored (labels on the wrong side of the inputs),
 ' set MIRROR_LAYOUT = True below and run BuildForms again.
+' The interface language of this file (modLang.UiLanguage) decides the
+' direction: an English file is left-to-right and every screen is mirrored;
+' captions, lists, record sources and the screen code are translated by Tr.
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -293,9 +296,9 @@ Private Sub StartForm(ByVal FinalName As String, ByVal Caption As String, ByVal 
     Set m_frm = CreateForm()
     m_tmpName = m_frm.Name
     m_width = FormWidth
-    SetFormProp "Orientation", 1                 ' right-to-left
-    m_frm.Caption = Caption
-    m_frm.RecordSource = RecordSource
+    SetFormProp "Orientation", IIf(UiEnglish(), 0, 1)     ' right-to-left, or left-to-right in English
+    m_frm.Caption = Tr(Caption)
+    m_frm.RecordSource = Tr(RecordSource)
     m_frm.DefaultView = 0                        ' single form
     m_frm.RecordSelectors = False
     m_frm.NavigationButtons = False
@@ -312,7 +315,7 @@ Private Sub StartForm(ByVal FinalName As String, ByVal Caption As String, ByVal 
     m_frm.AllowAdditions = AllowAdd
     m_frm.AllowEdits = AllowEdit
     m_frm.AllowDeletions = False                 ' deleting goes through the Delete button
-    m_frm.Tag = TagText
+    m_frm.Tag = Tr(TagText)                      ' the list query of a data screen has captions
     SetFormProp "AllowDatasheetView", False
     SetFormProp "AllowLayoutView", False
     m_frm.Width = FormWidth
@@ -328,7 +331,7 @@ Private Sub FinishForm(ByVal FinalName As String, ByVal Code As String)
         If Trim$(mdl.Lines(i, 1)) = "Option Explicit" Then hasExplicit = True
     Next
     If Not hasExplicit Then mdl.InsertLines mdl.CountOfDeclarationLines + 1, "Option Explicit"
-    mdl.AddFromString Code
+    mdl.AddFromString Tr(Code)
     DoCmd.Close acForm, m_tmpName, acSaveYes
     DoCmd.Rename FinalName, acForm, m_tmpName
     m_built = m_built + 1
@@ -346,7 +349,7 @@ Private Function NewCtl(ByVal CtlType As AcControlType, ByVal CtlName As String,
                      Optional ByVal ParentName As String = "", _
                      Optional ByVal ColumnName As String = "") As Access.Control
     Dim x As Long
-    If MIRROR_LAYOUT Then x = m_width - L - W Else x = L
+    If MirrorLayout() Then x = m_width - L - W Else x = L
     Set NewCtl = CreateControl(m_tmpName, CtlType, acDetail, ParentName, ColumnName, x, T, W, H)
     NewCtl.Name = CtlName
 End Function
@@ -369,13 +372,13 @@ Private Function AddLabel(ByVal CtlName As String, ByVal Caption As String, ByVa
     Dim c As Access.Control
     Set c = NewCtl(acLabel, CtlName, L, T, W, H, ParentName)
     If Len(Caption) = 0 Then Caption = " "          ' empty labels are deleted by Access
-    c.Caption = Caption
+    c.Caption = Tr(Caption)
     c.FontName = FONT_NAME
     c.FontSize = FontSize
     c.FontBold = Bold
     c.ForeColor = Color
     c.BackStyle = 0
-    c.TextAlign = TextAlign
+    c.TextAlign = UiAlign(TextAlign)
     Set AddLabel = c
 End Function
 
@@ -418,7 +421,7 @@ Private Function AddCombo(ByVal CtlName As String, ByVal Source As String, ByVal
     Else
         c.RowSourceType = "Value List"
     End If
-    c.RowSource = Rows
+    c.RowSource = Tr(Rows)
     c.ColumnCount = ColumnCount
     c.ColumnWidths = ColumnWidths
     c.BoundColumn = 1
@@ -476,7 +479,7 @@ Private Function AddButton(ByVal CtlName As String, ByVal Caption As String, ByV
                            ByVal Style As String) As Access.Control
     Dim c As Access.Control, back As Long, hover As Long, fore As Long
     Set c = NewCtl(acCommandButton, CtlName, L, T, W, H)
-    c.Caption = Caption
+    c.Caption = Tr(Caption)
     c.FontName = FONT_NAME
     c.FontSize = IIf(Style = "nav", 12, 11)
     c.FontBold = True
@@ -501,12 +504,18 @@ End Function
 
 Private Sub SetCtlProp(ByVal c As Access.Control, ByVal PropName As String, ByVal Value As Variant)
     On Error Resume Next
-    c.Properties(PropName).Value = Value
+    If PropName = "TextAlign" Then Value = UiAlign(Value)
+    c.Properties(PropName).Value = Tr(Value)
     If Err.Number <> 0 Then
         m_warnings = m_warnings & "  " & m_tmpName & "." & c.Name & "." & PropName & _
                      ": " & Err.Description & vbCrLf
     End If
 End Sub
+
+Private Function MirrorLayout() As Boolean
+    ' The design is right-to-left; an English file mirrors every screen.
+    MirrorLayout = (MIRROR_LAYOUT Xor UiEnglish())
+End Function
 
 Private Sub SetFormProp(ByVal PropName As String, ByVal Value As Variant)
     On Error Resume Next

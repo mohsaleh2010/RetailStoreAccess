@@ -291,19 +291,19 @@ Public Sub CommissionsTotals(ByVal frm As Access.Form)
     Dim id As Long, rs As DAO.Recordset, state As String
     id = ShownCommissionRun(frm)
     If id = 0 Then
-        frm!lblState.Caption = "اختر الشهر ثم «إنشاء مسير الشهر»."
-        frm!lblTotals.Caption = " "
+        frm!lblState.Caption = Tr("اختر الشهر ثم «إنشاء مسير الشهر».")
+        frm!lblTotals.Caption = Tr(" ")
         Exit Sub
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT COUNT(*) AS LineCount, Sum(NetSales) AS SumSales, Sum(Collections) AS SumCollected, " & _
                                      "Sum(Commission) AS SumCommission FROM CommissionLines WHERE CommissionRunID = " & id, _
                                      dbOpenSnapshot)
     If Nz(rs!LineCount, 0) > 0 Then
-        frm!lblTotals.Caption = rs!LineCount & " مندوب   صافي المبيعات " & Format$(Nz(rs!SumSales, 0), "#,##0.00") & _
+        frm!lblTotals.Caption = Tr(rs!LineCount & " مندوب   صافي المبيعات " & Format$(Nz(rs!SumSales, 0), "#,##0.00") & _
             "   التحصيل " & Format$(Nz(rs!SumCollected, 0), "#,##0.00") & "   إجمالي العمولات " & _
-            Format$(Nz(rs!SumCommission, 0), "#,##0.00")
+            Format$(Nz(rs!SumCommission, 0), "#,##0.00"))
     Else
-        frm!lblTotals.Caption = "لا مبيعات ولا تحصيلات للمندوبين في هذا الشهر."
+        frm!lblTotals.Caption = Tr("لا مبيعات ولا تحصيلات للمندوبين في هذا الشهر.")
     End If
     rs.Close
     Select Case Nz(CommissionRunField(id, "Status"), "")
@@ -314,7 +314,7 @@ Public Sub CommissionsTotals(ByVal frm As Access.Form)
             state = "عمولات " & Format$(CommissionRunField(id, "RunMonth"), "yyyy/mm") & " مرحَّلة في " & _
                     GDate(CommissionRunField(id, "PostedAt"))
     End Select
-    frm!lblState.Caption = state
+    frm!lblState.Caption = Tr(state)
 End Sub
 
 Public Sub CommissionLineChanged(ByVal lines As Access.Form)
@@ -404,7 +404,7 @@ End Sub
 Public Sub SalesRepCurrent(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset, info As String
     If frm.NewRecord Or IsNull(frm!SalesRepID.Value) Then
-        frm!lblRepInfo.Caption = " "
+        frm!lblRepInfo.Caption = Tr(" ")
         Exit Sub
     End If
     SetPeriod DateSerial(Year(Date), Month(Date), 1), Date
@@ -418,7 +418,7 @@ Public Sub SalesRepCurrent(ByVal frm As Access.Form)
     rs.Close
     info = info & "   العمولات المستحقة " & Format$(RepPayable(frm!SalesRepID.Value), "#,##0.00") & _
            "   العملاء " & Nz(DbValue("SELECT COUNT(*) FROM Customers WHERE SalesRepID = " & frm!SalesRepID.Value), 0)
-    frm!lblRepInfo.Caption = Trim$(info)
+    frm!lblRepInfo.Caption = Tr(Trim$(info))
 End Sub
 
 '------------------------------------------------------------------------------

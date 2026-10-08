@@ -17,6 +17,9 @@ Option Compare Database
 Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False      ' same switch as modBuildForms
+' The tax invoice and the credit note stay Arabic / bilingual and right-to-left in an English file (ZATCA)
+Private Const ARABIC_REPORTS As String = ",rptSalesInvoiceA4,rptSalesReceipt,"
+Private m_english As Boolean                          ' this report is built in English (modLang)
 Private Const EP As String = "[Event Procedure]"
 
 Private m_rpt As Access.Report
@@ -122,43 +125,80 @@ Public Function TestReports() As Boolean
     For Each f In Split(REPORT_NAMES, ",")
         CheckReportOpens CStr(f)
     Next
-    RecordR AmountInWords(0.5) = "ÝÞØ ÎãÓæä åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 0.5"
-    RecordR AmountInWords(1) = "ÝÞØ æÇÍÏ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1"
-    RecordR AmountInWords(2) = "ÝÞØ ÇËäÇä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 2"
-    RecordR AmountInWords(3) = "ÝÞØ ËáÇËÉ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 3"
-    RecordR AmountInWords(10) = "ÝÞØ ÚÔÑÉ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 10"
-    RecordR AmountInWords(11) = "ÝÞØ ÃÍÏ ÚÔÑ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 11"
-    RecordR AmountInWords(12) = "ÝÞØ ÇËäÇ ÚÔÑ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 12"
-    RecordR AmountInWords(19) = "ÝÞØ ÊÓÚÉ ÚÔÑ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 19"
-    RecordR AmountInWords(20) = "ÝÞØ ÚÔÑæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 20"
-    RecordR AmountInWords(21) = "ÝÞØ æÇÍÏ æÚÔÑæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 21"
-    RecordR AmountInWords(99) = "ÝÞØ ÊÓÚÉ æÊÓÚæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 99"
-    RecordR AmountInWords(100) = "ÝÞØ ãÇÆÉ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 100"
-    RecordR AmountInWords(101) = "ÝÞØ ãÇÆÉ ææÇÍÏ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 101"
-    RecordR AmountInWords(115) = "ÝÞØ ãÇÆÉ æÎãÓÉ ÚÔÑ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 115"
-    RecordR AmountInWords(200) = "ÝÞØ ãÇÆÊÇä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 200"
-    RecordR AmountInWords(999) = "ÝÞØ ÊÓÚãÇÆÉ æÊÓÚÉ æÊÓÚæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 999"
-    RecordR AmountInWords(1000) = "ÝÞØ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1000"
-    RecordR AmountInWords(1001) = "ÝÞØ ÃáÝ ææÇÍÏ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1001"
-    RecordR AmountInWords(1250.5) = "ÝÞØ ÃáÝ æãÇÆÊÇä æÎãÓæä ÑíÇá ÓÚæÏí æÎãÓæä åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1250.5"
-    RecordR AmountInWords(2000) = "ÝÞØ ÃáÝÇä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 2000"
-    RecordR AmountInWords(2500) = "ÝÞØ ÃáÝÇä æÎãÓãÇÆÉ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 2500"
-    RecordR AmountInWords(3000) = "ÝÞØ ËáÇËÉ ÂáÇÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 3000"
-    RecordR AmountInWords(10000) = "ÝÞØ ÚÔÑÉ ÂáÇÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 10000"
-    RecordR AmountInWords(11000) = "ÝÞØ ÃÍÏ ÚÔÑ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 11000"
-    RecordR AmountInWords(12345.67) = "ÝÞØ ÇËäÇ ÚÔÑ ÃáÝ æËáÇËãÇÆÉ æÎãÓÉ æÃÑÈÚæä ÑíÇá ÓÚæÏí æÓÈÚÉ æÓÊæä åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 12345.67"
-    RecordR AmountInWords(100000) = "ÝÞØ ãÇÆÉ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 100000"
-    RecordR AmountInWords(101000) = "ÝÞØ ãÇÆÉ ææÇÍÏ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 101000"
-    RecordR AmountInWords(999999.99) = "ÝÞØ ÊÓÚãÇÆÉ æÊÓÚÉ æÊÓÚæä ÃáÝ æÊÓÚãÇÆÉ æÊÓÚÉ æÊÓÚæä ÑíÇá ÓÚæÏí æÊÓÚÉ æÊÓÚæä åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 999999.99"
-    RecordR AmountInWords(1000000) = "ÝÞØ ãáíæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1000000"
-    RecordR AmountInWords(2000000) = "ÝÞØ ãáíæäÇä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 2000000"
-    RecordR AmountInWords(3500000) = "ÝÞØ ËáÇËÉ ãáÇííä æÎãÓãÇÆÉ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 3500000"
-    RecordR AmountInWords(11000000) = "ÝÞØ ÃÍÏ ÚÔÑ ãáíæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 11000000"
-    RecordR AmountInWords(123456789.01) = "ÝÞØ ãÇÆÉ æËáÇËÉ æÚÔÑæä ãáíæä æÃÑÈÚãÇÆÉ æÓÊÉ æÎãÓæä ÃáÝ æÓÈÚãÇÆÉ æÊÓÚÉ æËãÇäæä ÑíÇá ÓÚæÏí ææÇÍÏ åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 123456789.01"
-    RecordR AmountInWords(0.05) = "ÝÞØ ÎãÓÉ åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 0.05"
-    RecordR AmountInWords(0.11) = "ÝÞØ ÃÍÏ ÚÔÑ åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 0.11"
-    RecordR AmountInWords(4750) = "ÝÞØ ÃÑÈÚÉ ÂáÇÝ æÓÈÚãÇÆÉ æÎãÓæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 4750"
-    RecordR AmountInWords(3175) = "ÝÞØ ËáÇËÉ ÂáÇÝ æãÇÆÉ æÎãÓÉ æÓÈÚæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 3175"
+    RecordR AmountInWordsAr(0.5) = "ÝÞØ ÎãÓæä åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 0.5"
+    RecordR AmountInWordsEn(0.5) = "Only fifty Halalas", "Amount in words: 0.5"
+    RecordR AmountInWordsAr(1) = "ÝÞØ æÇÍÏ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1"
+    RecordR AmountInWordsEn(1) = "Only one Saudi Riyal", "Amount in words: 1"
+    RecordR AmountInWordsAr(2) = "ÝÞØ ÇËäÇä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 2"
+    RecordR AmountInWordsEn(2) = "Only two Saudi Riyals", "Amount in words: 2"
+    RecordR AmountInWordsAr(3) = "ÝÞØ ËáÇËÉ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 3"
+    RecordR AmountInWordsEn(3) = "Only three Saudi Riyals", "Amount in words: 3"
+    RecordR AmountInWordsAr(10) = "ÝÞØ ÚÔÑÉ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 10"
+    RecordR AmountInWordsEn(10) = "Only ten Saudi Riyals", "Amount in words: 10"
+    RecordR AmountInWordsAr(11) = "ÝÞØ ÃÍÏ ÚÔÑ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 11"
+    RecordR AmountInWordsEn(11) = "Only eleven Saudi Riyals", "Amount in words: 11"
+    RecordR AmountInWordsAr(12) = "ÝÞØ ÇËäÇ ÚÔÑ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 12"
+    RecordR AmountInWordsEn(12) = "Only twelve Saudi Riyals", "Amount in words: 12"
+    RecordR AmountInWordsAr(19) = "ÝÞØ ÊÓÚÉ ÚÔÑ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 19"
+    RecordR AmountInWordsEn(19) = "Only nineteen Saudi Riyals", "Amount in words: 19"
+    RecordR AmountInWordsAr(20) = "ÝÞØ ÚÔÑæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 20"
+    RecordR AmountInWordsEn(20) = "Only twenty Saudi Riyals", "Amount in words: 20"
+    RecordR AmountInWordsAr(21) = "ÝÞØ æÇÍÏ æÚÔÑæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 21"
+    RecordR AmountInWordsEn(21) = "Only twenty-one Saudi Riyals", "Amount in words: 21"
+    RecordR AmountInWordsAr(99) = "ÝÞØ ÊÓÚÉ æÊÓÚæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 99"
+    RecordR AmountInWordsEn(99) = "Only ninety-nine Saudi Riyals", "Amount in words: 99"
+    RecordR AmountInWordsAr(100) = "ÝÞØ ãÇÆÉ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 100"
+    RecordR AmountInWordsEn(100) = "Only one hundred Saudi Riyals", "Amount in words: 100"
+    RecordR AmountInWordsAr(101) = "ÝÞØ ãÇÆÉ ææÇÍÏ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 101"
+    RecordR AmountInWordsEn(101) = "Only one hundred one Saudi Riyals", "Amount in words: 101"
+    RecordR AmountInWordsAr(115) = "ÝÞØ ãÇÆÉ æÎãÓÉ ÚÔÑ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 115"
+    RecordR AmountInWordsEn(115) = "Only one hundred fifteen Saudi Riyals", "Amount in words: 115"
+    RecordR AmountInWordsAr(200) = "ÝÞØ ãÇÆÊÇä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 200"
+    RecordR AmountInWordsEn(200) = "Only two hundred Saudi Riyals", "Amount in words: 200"
+    RecordR AmountInWordsAr(999) = "ÝÞØ ÊÓÚãÇÆÉ æÊÓÚÉ æÊÓÚæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 999"
+    RecordR AmountInWordsEn(999) = "Only nine hundred ninety-nine Saudi Riyals", "Amount in words: 999"
+    RecordR AmountInWordsAr(1000) = "ÝÞØ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1000"
+    RecordR AmountInWordsEn(1000) = "Only one thousand Saudi Riyals", "Amount in words: 1000"
+    RecordR AmountInWordsAr(1001) = "ÝÞØ ÃáÝ ææÇÍÏ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1001"
+    RecordR AmountInWordsEn(1001) = "Only one thousand one Saudi Riyals", "Amount in words: 1001"
+    RecordR AmountInWordsAr(1250.5) = "ÝÞØ ÃáÝ æãÇÆÊÇä æÎãÓæä ÑíÇá ÓÚæÏí æÎãÓæä åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1250.5"
+    RecordR AmountInWordsEn(1250.5) = "Only one thousand two hundred fifty Saudi Riyals and fifty Halalas", "Amount in words: 1250.5"
+    RecordR AmountInWordsAr(2000) = "ÝÞØ ÃáÝÇä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 2000"
+    RecordR AmountInWordsEn(2000) = "Only two thousand Saudi Riyals", "Amount in words: 2000"
+    RecordR AmountInWordsAr(2500) = "ÝÞØ ÃáÝÇä æÎãÓãÇÆÉ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 2500"
+    RecordR AmountInWordsEn(2500) = "Only two thousand five hundred Saudi Riyals", "Amount in words: 2500"
+    RecordR AmountInWordsAr(3000) = "ÝÞØ ËáÇËÉ ÂáÇÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 3000"
+    RecordR AmountInWordsEn(3000) = "Only three thousand Saudi Riyals", "Amount in words: 3000"
+    RecordR AmountInWordsAr(10000) = "ÝÞØ ÚÔÑÉ ÂáÇÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 10000"
+    RecordR AmountInWordsEn(10000) = "Only ten thousand Saudi Riyals", "Amount in words: 10000"
+    RecordR AmountInWordsAr(11000) = "ÝÞØ ÃÍÏ ÚÔÑ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 11000"
+    RecordR AmountInWordsEn(11000) = "Only eleven thousand Saudi Riyals", "Amount in words: 11000"
+    RecordR AmountInWordsAr(12345.67) = "ÝÞØ ÇËäÇ ÚÔÑ ÃáÝ æËáÇËãÇÆÉ æÎãÓÉ æÃÑÈÚæä ÑíÇá ÓÚæÏí æÓÈÚÉ æÓÊæä åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 12345.67"
+    RecordR AmountInWordsEn(12345.67) = "Only twelve thousand three hundred forty-five Saudi Riyals and sixty-seven Halalas", "Amount in words: 12345.67"
+    RecordR AmountInWordsAr(100000) = "ÝÞØ ãÇÆÉ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 100000"
+    RecordR AmountInWordsEn(100000) = "Only one hundred thousand Saudi Riyals", "Amount in words: 100000"
+    RecordR AmountInWordsAr(101000) = "ÝÞØ ãÇÆÉ ææÇÍÏ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 101000"
+    RecordR AmountInWordsEn(101000) = "Only one hundred one thousand Saudi Riyals", "Amount in words: 101000"
+    RecordR AmountInWordsAr(999999.99) = "ÝÞØ ÊÓÚãÇÆÉ æÊÓÚÉ æÊÓÚæä ÃáÝ æÊÓÚãÇÆÉ æÊÓÚÉ æÊÓÚæä ÑíÇá ÓÚæÏí æÊÓÚÉ æÊÓÚæä åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 999999.99"
+    RecordR AmountInWordsEn(999999.99) = "Only nine hundred ninety-nine thousand nine hundred ninety-nine Saudi Riyals and ninety-nine Halalas", "Amount in words: 999999.99"
+    RecordR AmountInWordsAr(1000000) = "ÝÞØ ãáíæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 1000000"
+    RecordR AmountInWordsEn(1000000) = "Only one million Saudi Riyals", "Amount in words: 1000000"
+    RecordR AmountInWordsAr(2000000) = "ÝÞØ ãáíæäÇä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 2000000"
+    RecordR AmountInWordsEn(2000000) = "Only two million Saudi Riyals", "Amount in words: 2000000"
+    RecordR AmountInWordsAr(3500000) = "ÝÞØ ËáÇËÉ ãáÇííä æÎãÓãÇÆÉ ÃáÝ ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 3500000"
+    RecordR AmountInWordsEn(3500000) = "Only three million five hundred thousand Saudi Riyals", "Amount in words: 3500000"
+    RecordR AmountInWordsAr(11000000) = "ÝÞØ ÃÍÏ ÚÔÑ ãáíæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 11000000"
+    RecordR AmountInWordsEn(11000000) = "Only eleven million Saudi Riyals", "Amount in words: 11000000"
+    RecordR AmountInWordsAr(123456789.01) = "ÝÞØ ãÇÆÉ æËáÇËÉ æÚÔÑæä ãáíæä æÃÑÈÚãÇÆÉ æÓÊÉ æÎãÓæä ÃáÝ æÓÈÚãÇÆÉ æÊÓÚÉ æËãÇäæä ÑíÇá ÓÚæÏí ææÇÍÏ åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 123456789.01"
+    RecordR AmountInWordsEn(123456789.01) = "Only one hundred twenty-three million four hundred fifty-six thousand seven hundred eighty-nine Saudi Riyals and one Halala", "Amount in words: 123456789.01"
+    RecordR AmountInWordsAr(0.05) = "ÝÞØ ÎãÓÉ åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 0.05"
+    RecordR AmountInWordsEn(0.05) = "Only five Halalas", "Amount in words: 0.05"
+    RecordR AmountInWordsAr(0.11) = "ÝÞØ ÃÍÏ ÚÔÑ åááÉ áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 0.11"
+    RecordR AmountInWordsEn(0.11) = "Only eleven Halalas", "Amount in words: 0.11"
+    RecordR AmountInWordsAr(4750) = "ÝÞØ ÃÑÈÚÉ ÂáÇÝ æÓÈÚãÇÆÉ æÎãÓæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 4750"
+    RecordR AmountInWordsEn(4750) = "Only four thousand seven hundred fifty Saudi Riyals", "Amount in words: 4750"
+    RecordR AmountInWordsAr(3175) = "ÝÞØ ËáÇËÉ ÂáÇÝ æãÇÆÉ æÎãÓÉ æÓÈÚæä ÑíÇá ÓÚæÏí áÇ ÛíÑ", "ÇáãÈáÛ ÈÇáÍÑæÝ: 3175"
+    RecordR AmountInWordsEn(3175) = "Only three thousand one hundred seventy-five Saudi Riyals", "Amount in words: 3175"
     TempVars.Add "ReportCriteria", ""
     g_SilentMode = False
     Debug.Print "--- äÌÍ: " & m_passed & " | ÝÔá: " & m_failed
@@ -216,9 +256,10 @@ Private Sub StartReport(ByVal FinalName As String, ByVal Caption As String, ByVa
     Set m_rpt = CreateReport()
     m_tmp = m_rpt.Name
     m_width = ReportWidth
-    SetRptProp "Orientation", 1                     ' right-to-left
-    m_rpt.RecordSource = RecordSource
-    m_rpt.Caption = Caption
+    m_english = UiEnglish() And InStr(ARABIC_REPORTS, "," & FinalName & ",") = 0
+    SetRptProp "Orientation", IIf(m_english, 0, 1)  ' right-to-left, or left-to-right in English
+    m_rpt.RecordSource = RT(RecordSource)
+    m_rpt.Caption = RT(Caption)
     If Len(GroupField) > 0 Then
         CreateGroupLevel m_tmp, GroupField, True, True
         level = 1
@@ -290,7 +331,7 @@ Private Function NewRptCtl(ByVal CtlType As AcControlType, ByVal SectionIndex As
                            ByVal CtlName As String, ByVal L As Long, ByVal T As Long, ByVal W As Long, _
                            ByVal H As Long, Optional ByVal ColumnName As String = "") As Access.Control
     Dim x As Long
-    If MIRROR_LAYOUT Then x = m_width - L - W Else x = L
+    If MIRROR_LAYOUT Xor m_english Then x = m_width - L - W Else x = L
     Set NewRptCtl = CreateReportControl(m_tmp, CtlType, SectionIndex, "", ColumnName, x, T, W, H)
     NewRptCtl.Name = CtlName
 End Function
@@ -299,6 +340,7 @@ Private Function RText(ByVal SectionIndex As Integer, ByVal CtlName As String, B
                        ByVal L As Long, ByVal T As Long, ByVal W As Long, ByVal H As Long, _
                        ByVal FontSize As Integer, ByVal Bold As Boolean, ByVal TextAlign As Integer) As Access.Control
     Dim c As Access.Control
+    Source = RT(Source)                              ' an Arabic column name or text in an expression
     If Left$(Source, 1) = "=" Then
         Set c = NewRptCtl(acTextBox, SectionIndex, CtlName, L, T, W, H)
         c.ControlSource = Source
@@ -308,7 +350,7 @@ Private Function RText(ByVal SectionIndex As Integer, ByVal CtlName As String, B
     c.FontName = FONT_NAME
     c.FontSize = FontSize
     c.FontBold = Bold
-    c.TextAlign = TextAlign
+    c.TextAlign = RAlign(TextAlign)
     c.BorderStyle = 0
     c.BackStyle = 0
     c.ForeColor = 0
@@ -320,11 +362,11 @@ Private Function RLabel(ByVal SectionIndex As Integer, ByVal CtlName As String, 
                         ByVal FontSize As Integer, ByVal Bold As Boolean, ByVal TextAlign As Integer) As Access.Control
     Dim c As Access.Control
     Set c = NewRptCtl(acLabel, SectionIndex, CtlName, L, T, W, H)
-    c.Caption = Caption
+    c.Caption = RT(Caption)
     c.FontName = FONT_NAME
     c.FontSize = FontSize
     c.FontBold = Bold
-    c.TextAlign = TextAlign
+    c.TextAlign = RAlign(TextAlign)
     c.ForeColor = 0
     Set RLabel = c
 End Function
@@ -341,6 +383,20 @@ Private Function RBox(ByVal SectionIndex As Integer, ByVal CtlName As String, By
     c.BorderStyle = 0
     c.BackStyle = 0
     Set RBox = c
+End Function
+
+Private Function RT(ByVal Text As String) As String
+    ' Tr (modLang) for the reports built in English
+    If m_english Then
+        RT = Tr(Text)
+    Else
+        RT = Text
+    End If
+End Function
+
+Private Function RAlign(ByVal TextAlign As Integer) As Integer
+    RAlign = TextAlign
+    If m_english Then RAlign = UiAlign(TextAlign)
 End Function
 
 Private Sub SetRptProp(ByVal PropName As String, ByVal Value As Variant)
@@ -360,7 +416,7 @@ Private Sub FinishReport(ByVal FinalName As String, ByVal Code As String)
         If Trim$(mdl.Lines(i, 1)) = "Option Explicit" Then hasExplicit = True
     Next
     If Not hasExplicit Then mdl.InsertLines mdl.CountOfDeclarationLines + 1, "Option Explicit"
-    mdl.AddFromString Code
+    mdl.AddFromString RT(Code)
     DoCmd.Close acReport, m_tmp, acSaveYes
     DoCmd.Rename FinalName, acReport, m_tmp
     m_built = m_built + 1

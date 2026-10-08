@@ -291,19 +291,19 @@ Public Sub CommissionsTotals(ByVal frm As Access.Form)
     Dim id As Long, rs As DAO.Recordset, state As String
     id = ShownCommissionRun(frm)
     If id = 0 Then
-        frm!lblState.Caption = "«Œ — «·‘Â— À„ ´≈‰‘«¡ „”Ì— «·‘Â—ª."
-        frm!lblTotals.Caption = " "
+        frm!lblState.Caption = Tr("«Œ — «·‘Â— À„ ´≈‰‘«¡ „”Ì— «·‘Â—ª.")
+        frm!lblTotals.Caption = Tr(" ")
         Exit Sub
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT COUNT(*) AS LineCount, Sum(NetSales) AS SumSales, Sum(Collections) AS SumCollected, " & _
                                      "Sum(Commission) AS SumCommission FROM CommissionLines WHERE CommissionRunID = " & id, _
                                      dbOpenSnapshot)
     If Nz(rs!LineCount, 0) > 0 Then
-        frm!lblTotals.Caption = rs!LineCount & " „‰œÊ»   ’«›Ì «·„»Ì⁄«  " & Format$(Nz(rs!SumSales, 0), "#,##0.00") & _
+        frm!lblTotals.Caption = Tr(rs!LineCount & " „‰œÊ»   ’«›Ì «·„»Ì⁄«  " & Format$(Nz(rs!SumSales, 0), "#,##0.00") & _
             "   «· Õ’Ì· " & Format$(Nz(rs!SumCollected, 0), "#,##0.00") & "   ≈Ã„«·Ì «·⁄„Ê·«  " & _
-            Format$(Nz(rs!SumCommission, 0), "#,##0.00")
+            Format$(Nz(rs!SumCommission, 0), "#,##0.00"))
     Else
-        frm!lblTotals.Caption = "·« „»Ì⁄«  Ê·«  Õ’Ì·«  ··„‰œÊ»Ì‰ ›Ì Â–« «·‘Â—."
+        frm!lblTotals.Caption = Tr("·« „»Ì⁄«  Ê·«  Õ’Ì·«  ··„‰œÊ»Ì‰ ›Ì Â–« «·‘Â—.")
     End If
     rs.Close
     Select Case Nz(CommissionRunField(id, "Status"), "")
@@ -314,7 +314,7 @@ Public Sub CommissionsTotals(ByVal frm As Access.Form)
             state = "⁄„Ê·«  " & Format$(CommissionRunField(id, "RunMonth"), "yyyy/mm") & " „—ÕÛ¯·… ›Ì " & _
                     GDate(CommissionRunField(id, "PostedAt"))
     End Select
-    frm!lblState.Caption = state
+    frm!lblState.Caption = Tr(state)
 End Sub
 
 Public Sub CommissionLineChanged(ByVal lines As Access.Form)
@@ -404,7 +404,7 @@ End Sub
 Public Sub SalesRepCurrent(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset, info As String
     If frm.NewRecord Or IsNull(frm!SalesRepID.Value) Then
-        frm!lblRepInfo.Caption = " "
+        frm!lblRepInfo.Caption = Tr(" ")
         Exit Sub
     End If
     SetPeriod DateSerial(Year(Date), Month(Date), 1), Date
@@ -418,7 +418,7 @@ Public Sub SalesRepCurrent(ByVal frm As Access.Form)
     rs.Close
     info = info & "   «·⁄„Ê·«  «·„” Õﬁ… " & Format$(RepPayable(frm!SalesRepID.Value), "#,##0.00") & _
            "   «·⁄„·«¡ " & Nz(DbValue("SELECT COUNT(*) FROM Customers WHERE SalesRepID = " & frm!SalesRepID.Value), 0)
-    frm!lblRepInfo.Caption = Trim$(info)
+    frm!lblRepInfo.Caption = Tr(Trim$(info))
 End Sub
 
 '------------------------------------------------------------------------------

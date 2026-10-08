@@ -5,7 +5,7 @@ Attribute VB_Name = "modTestAll"
 '   RunAllTests   runs every in-Access test in order and shows ONE summary:
 '                 VerifySchema, TestRelationships, TestQueries (empty database
 '                 only), TestForms, TestSales, TestPurchases, TestReports,
-'                 TestDashboard, TestSecurity, TestLabels, TestTouchPOS, TestCash, TestJournal, TestAging, TestBank, TestCheques, TestAssets, TestPayroll, TestCostCenters, TestBudget, TestRecurring, TestAudit, TestIndicators, TestCurrency, TestSalesReps and VerifyDemoData right after the
+'                 TestDashboard, TestSecurity, TestLabels, TestTouchPOS, TestCash, TestJournal, TestAging, TestBank, TestCheques, TestAssets, TestPayroll, TestCostCenters, TestBudget, TestRecurring, TestAudit, TestIndicators, TestCurrency, TestSalesReps, TestLang and VerifyDemoData right after the
 '                 demo data was loaded. Each test leaves no data behind.
 '                 The summary is also written to the Immediate window (Ctrl+G).
 '==============================================================================
@@ -14,15 +14,17 @@ Option Explicit
 
 Public Function RunAllTests() As Boolean
     Dim names As Variant, i As Long, ok As Boolean, passed As Long, failed As Long, skipped As Long
-    Dim lines As String, started As Single, result As Variant, demoState As String
+    Dim lines As String, started As Single, result As Variant, demoState As String, uiLang As String
     Calendar = vbCalGreg
+    uiLang = UiLanguage()
+    UseLanguage "AR"                       ' the tests check the Arabic texts, also in an English file (modLang)
     EnsureTestUser
     started = Timer
     g_TestSummary = ""
     g_CollectTests = True
     DoCmd.Hourglass True
     names = Array("VerifySchema", "TestRelationships", "TestQueries", "TestForms", "TestSales", "TestPurchases", _
-                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "TestTouchPOS", "TestCash", "TestJournal", "TestAging", "TestBank", "TestCheques", "TestAssets", "TestPayroll", "TestCostCenters", "TestBudget", "TestRecurring", "TestAudit", "TestIndicators", "TestCurrency", "TestSalesReps", _
+                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "TestTouchPOS", "TestCash", "TestJournal", "TestAging", "TestBank", "TestCheques", "TestAssets", "TestPayroll", "TestCostCenters", "TestBudget", "TestRecurring", "TestAudit", "TestIndicators", "TestCurrency", "TestSalesReps", "TestLang", _
                   "VerifyDemoData")
     For i = LBound(names) To UBound(names)
         If SkipReason(CStr(names(i))) <> "" Then
@@ -46,6 +48,7 @@ Public Function RunAllTests() As Boolean
         g_SilentMode = False
     Next
     g_CollectTests = False
+    UseLanguage uiLang
     DoCmd.Hourglass False
     Debug.Print "=== RunAllTests ===" & vbCrLf & lines & vbCrLf & g_TestSummary
     WriteTestLog "=== RunAllTests " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ===" & vbCrLf & lines & vbCrLf & _

@@ -332,27 +332,27 @@ Public Sub ResetDeveloperPassword()
     ' (Ctrl+G) of the programmer's own .accdb copy. Refused in an ACCDE (the client's file).
     Dim id As Variant, pwd As String, again As String, msg As String
     If IsCompiledFile() Then
-        MsgBox "€Ì— „ «Õ ›Ì „·› ACCDE. €Ì¯— ﬂ·„… «·„—Ê— „‰ ‰”Œ ﬂ ACCDB.", vbExclamation + MSG_RTL, APP_TITLE
+        MsgBox Tr("€Ì— „ «Õ ›Ì „·› ACCDE. €Ì¯— ﬂ·„… «·„—Ê— „‰ ‰”Œ ﬂ ACCDB."), vbExclamation + MSG_RTL, Tr(APP_TITLE)
         Exit Sub
     End If
     id = DbValue("SELECT EmployeeID FROM Employees WHERE IsDeveloper = True")
     If IsNull(id) Then
-        MsgBox "·« ÌÊÃœ Õ”«» „»—„Ã »⁄œ. ‘€¯· BuildSchema: Ìÿ·» ﬂ·„… „—Ê—Â ÊÌ‰‘∆Â.", vbExclamation + MSG_RTL, APP_TITLE
+        MsgBox Tr("·« ÌÊÃœ Õ”«» „»—„Ã »⁄œ. ‘€¯· BuildSchema: Ìÿ·» ﬂ·„… „—Ê—Â ÊÌ‰‘∆Â."), vbExclamation + MSG_RTL, Tr(APP_TITLE)
         Exit Sub
     End If
-    pwd = InputBox("ﬂ·„… „—Ê— ÃœÌœ… ·Õ”«» «·„»—„Ã developer (" & MIN_PASSWORD_LENGTH & " √Õ—› ⁄·Ï «·√ﬁ·):", APP_TITLE)
+    pwd = InputBox(Tr("ﬂ·„… „—Ê— ÃœÌœ… ·Õ”«» «·„»—„Ã developer (" & MIN_PASSWORD_LENGTH & " √Õ—› ⁄·Ï «·√ﬁ·):"), Tr(APP_TITLE))
     If Len(pwd) = 0 Then Exit Sub
-    again = InputBox("«ﬂ » ﬂ·„… «·„—Ê— „—… √Œ—Ï ·· √ﬂÌœ:", APP_TITLE)
+    again = InputBox(Tr("«ﬂ » ﬂ·„… «·„—Ê— „—… √Œ—Ï ·· √ﬂÌœ:"), Tr(APP_TITLE))
     If again <> pwd Then
-        MsgBox "ﬂ·„ « «·„—Ê— €Ì— „ ÿ«»ﬁ Ì‰. ·„ Ì €Ì— ‘Ì¡.", vbExclamation + MSG_RTL, APP_TITLE
+        MsgBox Tr("ﬂ·„ « «·„—Ê— €Ì— „ ÿ«»ﬁ Ì‰. ·„ Ì €Ì— ‘Ì¡."), vbExclamation + MSG_RTL, Tr(APP_TITLE)
         Exit Sub
     End If
     msg = SetUserPassword(CLng(id), pwd, False)
     If Len(msg) = 0 Then
         CurrentDb.Execute "UPDATE Employees SET IsActive = True WHERE EmployeeID = " & CLng(id), dbFailOnError
-        MsgBox " „  €ÌÌ— ﬂ·„… „—Ê— «·„»—„Ã. «œŒ· »«”„ developer Êﬂ·„… «·„—Ê— «·ÃœÌœ….", vbInformation + MSG_RTL, APP_TITLE
+        MsgBox Tr(" „  €ÌÌ— ﬂ·„… „—Ê— «·„»—„Ã. «œŒ· »«”„ developer Êﬂ·„… «·„—Ê— «·ÃœÌœ…."), vbInformation + MSG_RTL, Tr(APP_TITLE)
     Else
-        MsgBox msg & vbCrLf & "·„ Ì €Ì— ‘Ì¡.", vbExclamation + MSG_RTL, APP_TITLE
+        MsgBox Tr(msg & vbCrLf & "·„ Ì €Ì— ‘Ì¡."), vbExclamation + MSG_RTL, Tr(APP_TITLE)
     End If
 End Sub
 

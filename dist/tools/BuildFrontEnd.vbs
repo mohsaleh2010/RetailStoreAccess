@@ -4,7 +4,8 @@
 '   1. creates a new, empty RetailStore_FE.accdb (default: the dist folder),
 '   2. imports every module from dist\vba,
 '   3. compiles and saves the VBA (Debug > Compile),
-'   4. runs BuildSchema, BuildRelationships, BuildQueries, BuildForms, BuildReports
+'   4. sets the interface language (Arabic, or English = left-to-right) and runs
+'      BuildSchema, BuildRelationships, BuildQueries, BuildForms, BuildReports
 '      (RetailStore_BE.accdb is created next to the front-end, or upgraded if it exists),
 '   5. compiles again (the screens carry their own code),
 '   6. optionally loads the demo data and runs RunAllTests,
@@ -12,7 +13,8 @@
 ' Access shows a message after each build step: read it and press OK.
 ' Every step is written to BuildFrontEnd.log next to the new file.
 '
-' Command line: wscript BuildFrontEnd.vbs "D:\Shop\RetailStore_FE.accdb"
+' Command line: wscript BuildFrontEnd.vbs "D:\Shop\RetailStore_FE.accdb" [AR|EN]
+' Two front-end files (one Arabic, one English) can work on the same RetailStore_BE.accdb.
 ' Arabic text: Windows "Language for non-Unicode programs" must be Arabic.
 ' First login: admin with no password; the program then asks for a new one.
 Option Explicit
@@ -21,7 +23,7 @@ Const TITLE = "RetailStore - build front-end"
 Const acModule = 5
 Const acCmdCompileAndSaveAllModules = 126
 
-Dim fso, here, vbaDir, fePath, logPath, logFile, app, failures
+Dim fso, here, vbaDir, fePath, logPath, logFile, app, failures, uiLang
 
 Set fso = CreateObject("Scripting.FileSystemObject")
 here = fso.GetParentFolderName(WScript.ScriptFullName)
@@ -39,6 +41,16 @@ Else
                       TITLE, fso.BuildPath(fso.GetParentFolderName(here), "RetailStore_FE.accdb"))
 End If
 If fePath = "" Then WScript.Quit 0
+If WScript.Arguments.Count > 1 Then
+    uiLang = UCase(WScript.Arguments(1))
+ElseIf MsgBox("Interface language of this front-end:" & vbCrLf & vbCrLf & _
+              "Yes: English (left to right)" & vbCrLf & "No:  Arabic (right to left)", _
+              vbYesNo + vbQuestion + vbDefaultButton2, TITLE) = vbYes Then
+    uiLang = "EN"
+Else
+    uiLang = "AR"
+End If
+If uiLang <> "EN" Then uiLang = "AR"
 fePath = fso.GetAbsolutePathName(fePath)
 If LCase(fso.GetExtensionName(fePath)) <> "accdb" Then fePath = fePath & ".accdb"
 If Not fso.FolderExists(fso.GetParentFolderName(fePath)) Then
@@ -64,6 +76,7 @@ Set logFile = fso.CreateTextFile(logPath, True, True)
 LogLine "=== BuildFrontEnd " & Now & " ==="
 LogLine "Front-end: " & fePath
 LogLine "Modules:   " & vbaDir
+LogLine "Language:  " & uiLang
 failures = 0
 
 ' --- 1. new database -----------------------------------------------------------
@@ -93,6 +106,11 @@ LogLine "[OK] " & count & " modules imported"
 Compile "modules"
 
 ' --- 4. build -----------------------------------------------------------------
+On Error Resume Next
+app.Run "SetInterfaceLanguage", uiLang         ' modLang: the screens, reports and queries follow it
+If Err.Number <> 0 Then Fail "SetInterfaceLanguage failed: " & Err.Description
+On Error GoTo 0
+LogLine "[OK] interface language " & uiLang
 RunStep "BuildSchema", True
 RunStep "BuildRelationships", True
 RunStep "BuildQueries", True

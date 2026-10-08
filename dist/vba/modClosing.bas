@@ -288,7 +288,7 @@ Public Sub PeriodClosingLoad(ByVal frm As Access.Form)
     Next
     If Len(rows) = 0 Then rows = CStr(Year(Date) - 1)
     frm!cboYear.RowSourceType = "Value List"
-    frm!cboYear.RowSource = rows
+    frm!cboYear.RowSource = Tr(rows)
     frm!cboYear.Value = CLng(Split(rows, ";")(0))
     frm!txtThrough.Value = DateSerial(Year(Date), Month(Date), 0)          ' end of last month
     PeriodClosingRefresh frm
@@ -298,19 +298,19 @@ Public Sub PeriodClosingRefresh(ByVal frm As Access.Form)
     Dim closed As Date, y As Long
     closed = ClosedThroughDate()
     If closed > 0 Then
-        frm!lblState.Caption = "«·› —… „ﬁ›·… Õ Ï " & GDate(closed)
+        frm!lblState.Caption = Tr("«·› —… „ﬁ›·… Õ Ï " & GDate(closed))
         frm!lblState.ForeColor = CLR_WARNING
     Else
-        frm!lblState.Caption = "·«  ÊÃœ › —… „ﬁ›·…"
+        frm!lblState.Caption = Tr("·«  ÊÃœ › —… „ﬁ›·…")
         frm!lblState.ForeColor = CLR_SUCCESS
     End If
     y = Nz(frm!cboYear.Value, Year(Date) - 1)
     If YearIsClosed(y) Then
-        frm!lblYearInfo.Caption = "«·”‰… " & y & " „ﬁ›·…: ’«›Ì «·—»Õ «·„—ÕÛ¯· ··√—»«Õ «·„Õ Ã“… " & _
-            Format$(Nz(DbValue("SELECT NetProfit FROM FiscalYearClosings WHERE FiscalYear = " & y), 0), "#,##0.00")
+        frm!lblYearInfo.Caption = Tr("«·”‰… " & y & " „ﬁ›·…: ’«›Ì «·—»Õ «·„—ÕÛ¯· ··√—»«Õ «·„Õ Ã“… " & _
+            Format$(Nz(DbValue("SELECT NetProfit FROM FiscalYearClosings WHERE FiscalYear = " & y), 0), "#,##0.00"))
     Else
-        frm!lblYearInfo.Caption = "«·”‰… " & y & " €Ì— „ﬁ›·…: ’«›Ì «·—»Õ («·Œ”«—…) Õ Ï 31 œÌ”„»— " & _
-                                  Format$(YearNetProfit(y), "#,##0.00")
+        frm!lblYearInfo.Caption = Tr("«·”‰… " & y & " €Ì— „ﬁ›·…: ’«›Ì «·—»Õ («·Œ”«—…) Õ Ï 31 œÌ”„»— " & _
+                                  Format$(YearNetProfit(y), "#,##0.00"))
     End If
     frm!lstHistory.Requery
 End Sub

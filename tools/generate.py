@@ -4,6 +4,7 @@ Usage:  python3 tools/generate.py
 """
 
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(__file__))
@@ -13,6 +14,7 @@ import gen_relations  # noqa: E402
 import gen_queries  # noqa: E402
 import gen_forms  # noqa: E402
 import gen_qr  # noqa: E402
+import gen_lang  # noqa: E402
 import gen_reports  # noqa: E402
 import gen_test_sales  # noqa: E402
 import gen_test_purchases  # noqa: E402
@@ -805,9 +807,18 @@ def main():
                        ("modTestSales", gen_test_sales.build_test_sales_vba()),
                        ("modTestPurchases", gen_test_purchases.build_test_purchases_vba()),
                        ("modTestSecurity", gen_test_security.build_test_security_vba()),
-                       ("modDemoData", gen_demo.build_demo_vba())):
+                       ("modDemoData", gen_demo.build_demo_vba()),
+                       ("modLang", gen_lang.build_lang_vba())):
         write(f"src/vba/{name}.bas", text)
         write(f"dist/vba/{name}.bas", text, encoding="cp1256", newline="\r\n")
+    for n, text in enumerate(gen_lang.data_modules(), 1):      # the dictionary of modLang
+        write(f"src/vba/modLangData{n}.bas", text)
+        write(f"dist/vba/modLangData{n}.bas", text, encoding="cp1256", newline="\r\n")
+    for folder in ("src/vba", "dist/vba"):                      # parts left over from a longer dictionary
+        for name in os.listdir(os.path.join(ROOT, folder)):
+            m = re.fullmatch(r"modLangData(\d+)\.bas", name)
+            if m and int(m.group(1)) > n:
+                os.remove(os.path.join(ROOT, folder, name))
 
     # hand-written modules: readable copy in src/, import copy in dist/
     for name in STATIC_MODULES:

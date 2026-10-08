@@ -25,6 +25,9 @@ Option Compare Database
 Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False      ' same switch as modBuildForms
+' The tax invoice and the credit note stay Arabic / bilingual and right-to-left in an English file (ZATCA)
+Private Const ARABIC_REPORTS As String = ",rptSalesInvoiceA4,rptSalesReceipt,"
+Private m_english As Boolean                          ' this report is built in English (modLang)
 Private Const EP As String = "[Event Procedure]"
 
 Private m_rpt As Access.Report
@@ -133,9 +136,10 @@ Private Sub StartReport(ByVal FinalName As String, ByVal Caption As String, ByVa
     Set m_rpt = CreateReport()
     m_tmp = m_rpt.Name
     m_width = ReportWidth
-    SetRptProp "Orientation", 1                     ' right-to-left
-    m_rpt.RecordSource = RecordSource
-    m_rpt.Caption = Caption
+    m_english = UiEnglish() And InStr(ARABIC_REPORTS, "," & FinalName & ",") = 0
+    SetRptProp "Orientation", IIf(m_english, 0, 1)  ' right-to-left, or left-to-right in English
+    m_rpt.RecordSource = RT(RecordSource)
+    m_rpt.Caption = RT(Caption)
     If Len(GroupField) > 0 Then
         CreateGroupLevel m_tmp, GroupField, True, True
         level = 1
@@ -207,7 +211,7 @@ Private Function NewRptCtl(ByVal CtlType As AcControlType, ByVal SectionIndex As
                            ByVal CtlName As String, ByVal L As Long, ByVal T As Long, ByVal W As Long, _
                            ByVal H As Long, Optional ByVal ColumnName As String = "") As Access.Control
     Dim x As Long
-    If MIRROR_LAYOUT Then x = m_width - L - W Else x = L
+    If MIRROR_LAYOUT Xor m_english Then x = m_width - L - W Else x = L
     Set NewRptCtl = CreateReportControl(m_tmp, CtlType, SectionIndex, "", ColumnName, x, T, W, H)
     NewRptCtl.Name = CtlName
 End Function
@@ -216,6 +220,7 @@ Private Function RText(ByVal SectionIndex As Integer, ByVal CtlName As String, B
                        ByVal L As Long, ByVal T As Long, ByVal W As Long, ByVal H As Long, _
                        ByVal FontSize As Integer, ByVal Bold As Boolean, ByVal TextAlign As Integer) As Access.Control
     Dim c As Access.Control
+    Source = RT(Source)                              ' an Arabic column name or text in an expression
     If Left$(Source, 1) = "=" Then
         Set c = NewRptCtl(acTextBox, SectionIndex, CtlName, L, T, W, H)
         c.ControlSource = Source
@@ -225,7 +230,7 @@ Private Function RText(ByVal SectionIndex As Integer, ByVal CtlName As String, B
     c.FontName = FONT_NAME
     c.FontSize = FontSize
     c.FontBold = Bold
-    c.TextAlign = TextAlign
+    c.TextAlign = RAlign(TextAlign)
     c.BorderStyle = 0
     c.BackStyle = 0
     c.ForeColor = 0
@@ -237,11 +242,11 @@ Private Function RLabel(ByVal SectionIndex As Integer, ByVal CtlName As String, 
                         ByVal FontSize As Integer, ByVal Bold As Boolean, ByVal TextAlign As Integer) As Access.Control
     Dim c As Access.Control
     Set c = NewRptCtl(acLabel, SectionIndex, CtlName, L, T, W, H)
-    c.Caption = Caption
+    c.Caption = RT(Caption)
     c.FontName = FONT_NAME
     c.FontSize = FontSize
     c.FontBold = Bold
-    c.TextAlign = TextAlign
+    c.TextAlign = RAlign(TextAlign)
     c.ForeColor = 0
     Set RLabel = c
 End Function
@@ -258,6 +263,20 @@ Private Function RBox(ByVal SectionIndex As Integer, ByVal CtlName As String, By
     c.BorderStyle = 0
     c.BackStyle = 0
     Set RBox = c
+End Function
+
+Private Function RT(ByVal Text As String) As String
+    ' Tr (modLang) for the reports built in English
+    If m_english Then
+        RT = Tr(Text)
+    Else
+        RT = Text
+    End If
+End Function
+
+Private Function RAlign(ByVal TextAlign As Integer) As Integer
+    RAlign = TextAlign
+    If m_english Then RAlign = UiAlign(TextAlign)
 End Function
 
 Private Sub SetRptProp(ByVal PropName As String, ByVal Value As Variant)
@@ -277,7 +296,7 @@ Private Sub FinishReport(ByVal FinalName As String, ByVal Code As String)
         If Trim$(mdl.Lines(i, 1)) = "Option Explicit" Then hasExplicit = True
     Next
     If Not hasExplicit Then mdl.InsertLines mdl.CountOfDeclarationLines + 1, "Option Explicit"
-    mdl.AddFromString Code
+    mdl.AddFromString RT(Code)
     DoCmd.Close acReport, m_tmp, acSaveYes
     DoCmd.Rename FinalName, acReport, m_tmp
     m_built = m_built + 1
@@ -361,8 +380,10 @@ def words_lines() -> str:
     import tafqeet as T
     out = []
     for amount in T.CASES:
-        out.append(f"    RecordR AmountInWords({amount}) = {vba_str(T.amount_in_words(amount))}, "
+        out.append(f"    RecordR AmountInWordsAr({amount}) = {vba_str(T.amount_in_words(amount))}, "
                    f"{vba_str('المبلغ بالحروف: ' + str(amount))}")
+        out.append(f"    RecordR AmountInWordsEn({amount}) = {vba_str(T.amount_in_words_en(amount))}, "
+                   f"{vba_str('Amount in words: ' + str(amount))}")
     return "\n".join(out)
 
 

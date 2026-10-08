@@ -52,12 +52,12 @@ Public Sub DashboardRefresh(ByVal frm As Access.Form, Optional ByVal Force As Bo
     SetTile frm, 8, Money(rs!MonthExpenses, financial), "ÈÏæä ÇáÖÑíÈÉ"
     rs.Close
     ShowIndicators frm, financial, Force
-    frm!lblUpdated.Caption = "ÂÎÑ ÊÍÏíË: " & Format$(Now, "hh:nn")
+    frm!lblUpdated.Caption = Tr("ÂÎÑ ÊÍÏíË: " & Format$(Now, "hh:nn"))
     m_lastRefresh = Now
     RefreshIntegrityStatus frm
     Exit Sub
 EH:
-    frm!lblUpdated.Caption = "ÊÚĞÑ ÊÍÏíË ÇáãÄÔÑÇÊ: " & Err.Description
+    frm!lblUpdated.Caption = Tr("ÊÚĞÑ ÊÍÏíË ÇáãÄÔÑÇÊ: " & Err.Description)
 End Sub
 
 Private Sub ShowIndicators(ByVal frm As Access.Form, ByVal financial As Boolean, ByVal Force As Boolean)
@@ -168,8 +168,8 @@ End Function
 
 Private Sub SetTile(ByVal frm As Access.Form, ByVal Index As Integer, ByVal ValueText As String, _
                     ByVal SubText As String)
-    frm.Controls("lblTileValue" & Index).Caption = ValueText
-    frm.Controls("lblTileSub" & Index).Caption = IIf(Len(SubText) = 0, " ", SubText)
+    frm.Controls("lblTileValue" & Index).Caption = Tr(ValueText)
+    frm.Controls("lblTileSub" & Index).Caption = Tr(IIf(Len(SubText) = 0, " ", SubText))
 End Sub
 
 Private Function Money(ByVal Value As Variant, ByVal Visible As Boolean) As String

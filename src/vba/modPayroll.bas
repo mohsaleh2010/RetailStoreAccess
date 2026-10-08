@@ -348,17 +348,17 @@ Public Sub PayrollTotals(ByVal frm As Access.Form)
     Dim id As Long, rs As DAO.Recordset, state As String
     id = ShownRun(frm)
     If id = 0 Then
-        frm!lblState.Caption = "اختر الشهر ثم «إنشاء مسير الشهر»."
-        frm!lblTotals.Caption = " "
+        frm!lblState.Caption = Tr("اختر الشهر ثم «إنشاء مسير الشهر».")
+        frm!lblTotals.Caption = Tr(" ")
         Exit Sub
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM qryPayrollTotals WHERE PayrollRunID = " & id, dbOpenSnapshot)
     If Not rs.EOF Then
-        frm!lblTotals.Caption = rs!LineCount & " موظف   الرواتب " & Format$(rs!SumSalaries, "#,##0.00") & "   البدلات " & _
+        frm!lblTotals.Caption = Tr(rs!LineCount & " موظف   الرواتب " & Format$(rs!SumSalaries, "#,##0.00") & "   البدلات " & _
             Format$(rs!SumAllowances, "#,##0.00") & "   خصم السلف " & Format$(rs!SumAdvance, "#,##0.00") & "   التأمينات " & _
-            Format$(rs!SumGosi, "#,##0.00") & "   صافي الرواتب " & Format$(rs!SumNet, "#,##0.00")
+            Format$(rs!SumGosi, "#,##0.00") & "   صافي الرواتب " & Format$(rs!SumNet, "#,##0.00"))
     Else
-        frm!lblTotals.Caption = "المسير بلا أسطر."
+        frm!lblTotals.Caption = Tr("المسير بلا أسطر.")
     End If
     rs.Close
     Select Case Nz(RunField(id, "Status"), "")
@@ -372,7 +372,7 @@ Public Sub PayrollTotals(ByVal frm As Access.Form)
                 state = state & "، لم يُصرف بعد"
             End If
     End Select
-    frm!lblState.Caption = state
+    frm!lblState.Caption = Tr(state)
 End Sub
 
 Public Sub PayrollLineChanged(ByVal lines As Access.Form)

@@ -396,9 +396,9 @@ End Function
 
 Public Sub VatReturnLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
-    frm!cboPayAccount.RowSource = "SELECT AccountCode, AccountName FROM Accounts WHERE IsPosting = True AND " & _
+    frm!cboPayAccount.RowSource = Tr("SELECT AccountCode, AccountName FROM Accounts WHERE IsPosting = True AND " & _
         "AccountType = 'ASSET' AND Level2Code = 11 AND Nz(Level3Code, 0) <> 1100 AND AccountCode NOT IN " & _
-        "(1300, 1400, 1500, 1600) ORDER BY TreeKey"
+        "(1300, 1400, 1500, 1600) ORDER BY TreeKey")
     If Nz(frm.OpenArgs, 0) > 0 Then
         VatShowReturn frm, CLng(frm.OpenArgs)
     Else
@@ -447,7 +447,7 @@ Public Sub VatCalculate(ByVal frm As Access.Form)
     frm!txtReturnID.Value = Null
     frm!txtCorrections.Value = 0
     frm!txtCarried.Value = d("CarriedCredit")
-    frm!lstBoxes.RowSource = VatBoxRows(d)
+    frm!lstBoxes.RowSource = Tr(VatBoxRows(d))
     other = VatOverlap(fromDate, toDate, 0)
     If Len(other) > 0 Then
         VatState frm, "الفترة تتداخل مع الإقرار " & other & ": اختر فترة لا إقرار لها.", CLR_DANGER
@@ -489,7 +489,7 @@ Public Sub VatShowReturn(ByVal frm As Access.Form, ByVal VatReturnID As Long)
         info = "مسودة الإقرار " & rs!ReturnNumber & " (الأرقام من المستندات الآن)"
     End If
     rs.Close
-    frm!lstBoxes.RowSource = VatBoxRows(VatReturnFigures(VatReturnID))
+    frm!lstBoxes.RowSource = Tr(VatBoxRows(VatReturnFigures(VatReturnID)))
     If status = "FILED" Then
         drift = VatDrift(VatReturnID)
         If drift <> 0 Then info = info & vbCrLf & "تغيرت ضريبة مستندات الفترة بعد الاعتماد بمقدار " & _
@@ -502,7 +502,7 @@ Public Sub VatShowReturn(ByVal frm As Access.Form, ByVal VatReturnID As Long)
 End Sub
 
 Private Sub VatState(ByVal frm As Access.Form, ByVal Text As String, ByVal Color As Long)
-    frm!lblState.Caption = Text
+    frm!lblState.Caption = Tr(Text)
     frm!lblState.ForeColor = Color
 End Sub
 
@@ -518,14 +518,14 @@ Public Sub VatShowNet(ByVal frm As Access.Form)
     If ReturnStatus(ShownID(frm)) <> "FILED" Then
         d("Corrections") = CCur(Nz(frm!txtCorrections.Value, 0))
         d("CarriedCredit") = CCur(Nz(frm!txtCarried.Value, 0))
-        frm!lstBoxes.RowSource = VatBoxRows(d)
+        frm!lstBoxes.RowSource = Tr(VatBoxRows(d))
     End If
     net = VatNetDue(d)
     If net >= 0 Then
-        frm!lblNetDue.Caption = "صافي الضريبة المستحقة: " & Format$(net, "#,##0.00")
+        frm!lblNetDue.Caption = Tr("صافي الضريبة المستحقة: " & Format$(net, "#,##0.00"))
         frm!lblNetDue.ForeColor = CLR_DANGER
     Else
-        frm!lblNetDue.Caption = "ضريبة مستردة (تُرحَّل للإقرار التالي): " & Format$(-net, "#,##0.00")
+        frm!lblNetDue.Caption = Tr("ضريبة مستردة (تُرحَّل للإقرار التالي): " & Format$(-net, "#,##0.00"))
         frm!lblNetDue.ForeColor = CLR_SUCCESS
     End If
 End Sub
