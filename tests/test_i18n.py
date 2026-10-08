@@ -116,8 +116,8 @@ class DictionaryTests(unittest.TestCase):
                     self.assertEqual(i18n.translate(s, EN, ORDER).count(";"), s.count(";"))
 
     def test_translated_sql_has_no_duplicate_or_circular_alias(self):
-        """Access refuses two columns with one name, and an alias used in its own expression
-        (error: circular reference caused by alias): qualify the field (q.Cost AS [Cost])."""
+        """Access refuses two columns with one name, and an alias used in its own expression, even as
+        q.Cost (error: circular reference caused by alias): choose a caption whose English differs."""
         for sql in [s for s in STRINGS if re.search(r"\bSELECT\b", s)] + runtime_sql():
             english = i18n.translate(sql, EN, ORDER)
             for cols in select_lists(english):
@@ -129,8 +129,8 @@ class DictionaryTests(unittest.TestCase):
                     alias = m.group(1).strip("[]")
                     names.append(alias.lower())
                     expr = col[:m.start()]
-                    with self.subTest(col=col.strip()[:80]):
-                        self.assertIsNone(re.search(r"(?<![\.\w\[])\[?" + re.escape(alias) + r"\]?(?![\w(])",
+                    with self.subTest(col=col.strip()[:80]):     # also t.Cost (the rule of test_queries)
+                        self.assertIsNone(re.search(r"(?<![\w\[])\[?" + re.escape(alias) + r"\]?(?![\w(])",
                                                     expr, re.I))
                 self.assertEqual(len(names), len(set(names)), cols)
 
@@ -287,8 +287,8 @@ class LangRuntimeTests(unittest.TestCase):
                 self.assertEqual(self.h.call("Driver", "RunTr", "EN", text), i18n.translate(text, EN, ORDER))
 
     def test_arabic_file_is_unchanged(self):
-        for text in STRINGS[:20]:
-            self.assertEqual(self.h.call("Driver", "RunTr", "AR", text), text)
+        for text in STRINGS[:20] + [s for s in STRINGS if "[@" in s][:5]:
+            self.assertEqual(self.h.call("Driver", "RunTr", "AR", text), i18n.resolve_names(text))
 
     def test_direction(self):
         self.assertEqual([self.h.call("Driver", "RunAlign", "EN", a) for a in (0, 1, 2, 3)], [0, 3, 2, 1])

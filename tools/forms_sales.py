@@ -8,7 +8,8 @@ from forms import (Control, FormModel, Sym, ICONS, button, cm, currency_pair, fi
 
 PAYMENT_TYPES = "CASH;نقدي;CREDIT;آجل"
 REFUND_TYPES = "CASH;رد نقدي;CREDIT;خصم من رصيد العميل"
-PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder"
+PAYMENT_ROWS = ("SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True "
+                "ORDER BY p.SortOrder")
 POS_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, SellingPrice "
                     "FROM Products WHERE IsActive = True ORDER BY ProductName")
 CREDIT_CUSTOMER_ROWS = ("SELECT CustomerID, CustomerName FROM Customers WHERE IsSystem = False "

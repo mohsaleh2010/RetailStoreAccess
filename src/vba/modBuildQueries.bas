@@ -20,14 +20,15 @@ Option Explicit
 Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtlReading
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
-Private Const QUERY_NAMES As String = "qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByC" & _
-    "ategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerI" & _
-    "nvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatR" & _
-    "eturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBa" & _
-    "lanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearClos" & _
-    "eLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBal" & _
-    "anceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths," & _
-    "qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellin" & _
+    "gProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLates" & _
+    "tRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesB" & _
+    "yTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSh" & _
+    "eetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPur" & _
+    "chase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission" & _
+    ",qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryI" & _
+    "ncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceL" & _
+    "ineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -663,6 +664,14 @@ End Sub
 ' Generated: query definitions (in dependency order)
 '------------------------------------------------------------------------------
 Private Sub CreateAllQueries()
+    Q_qryLocAccounts1
+    Q_qryLocAccounts
+    Q_qryLocPaymentMethods1
+    Q_qryLocPaymentMethods
+    Q_qryLocJournalSourceTypes1
+    Q_qryLocJournalSourceTypes
+    Q_qryLocTransactionTypes1
+    Q_qryLocTransactionTypes
     Q_qrySalesDocuments
     Q_qrySalesLineItems
     Q_qrySalesLinesInPeriod
@@ -827,6 +836,54 @@ Private Sub CreateAllQueries()
     Q_qrySalesReturnedQty
     Q_qryPurchaseReturnedQty
     Q_IntegrityCheckQuery
+End Sub
+
+Private Sub Q_qryLocAccounts1()
+    Dim s As String
+    s = "SELECT t.AccountCode, t.AccountName AS LocArabicName, t.AccountNameEn, t.AccountType, t.ParentCode, t.IsActive, t.IsPosting, t.IsSystem, t.AccountLevel, t.TreeKey, t.Level1Code, t.Level2Code, t.Level3Code, t.Level4Code, t.Level5Code FROM Accounts AS t" & vbCrLf
+    SaveQuery "qryLocAccounts1", "Accounts للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocAccounts()
+    Dim s As String
+    s = "SELECT AccountCode, Nz(AccountNameEn, LocArabicName) AS AccountName, AccountNameEn, AccountType, ParentCode, IsActive, IsPosting, IsSystem, AccountLevel, TreeKey, Level1Code, Level2Code, Level3Code, Level4Code, Level5Code FROM qryLocAccounts1" & vbCrLf
+    SaveQuery "qryLocAccounts", "Accounts بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocPaymentMethods1()
+    Dim s As String
+    s = "SELECT t.PaymentMethodID, t.MethodName AS LocArabicName, t.MethodNameEn, t.ZatcaCode, t.SortOrder, t.IsActive FROM PaymentMethods AS t" & vbCrLf
+    SaveQuery "qryLocPaymentMethods1", "PaymentMethods للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocPaymentMethods()
+    Dim s As String
+    s = "SELECT PaymentMethodID, Nz(MethodNameEn, LocArabicName) AS MethodName, MethodNameEn, ZatcaCode, SortOrder, IsActive FROM qryLocPaymentMethods1" & vbCrLf
+    SaveQuery "qryLocPaymentMethods", "PaymentMethods بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocJournalSourceTypes1()
+    Dim s As String
+    s = "SELECT t.SourceType, t.TypeName AS LocArabicName, t.TypeNameEn, t.SortOrder FROM JournalSourceTypes AS t" & vbCrLf
+    SaveQuery "qryLocJournalSourceTypes1", "JournalSourceTypes للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocJournalSourceTypes()
+    Dim s As String
+    s = "SELECT SourceType, Nz(TypeNameEn, LocArabicName) AS TypeName, TypeNameEn, SortOrder FROM qryLocJournalSourceTypes1" & vbCrLf
+    SaveQuery "qryLocJournalSourceTypes", "JournalSourceTypes بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocTransactionTypes1()
+    Dim s As String
+    s = "SELECT t.TransactionTypeID, t.TypeCode, t.TypeName AS LocArabicName, t.TypeNameEn, t.Direction, t.IsManual FROM TransactionTypes AS t" & vbCrLf
+    SaveQuery "qryLocTransactionTypes1", "TransactionTypes للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocTransactionTypes()
+    Dim s As String
+    s = "SELECT TransactionTypeID, TypeCode, Nz(TypeNameEn, LocArabicName) AS TypeName, TypeNameEn, Direction, IsManual FROM qryLocTransactionTypes1" & vbCrLf
+    SaveQuery "qryLocTransactionTypes", "TransactionTypes بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
 End Sub
 
 Private Sub Q_qrySalesDocuments()
@@ -1048,7 +1105,7 @@ Private Sub Q_ProductMovementQuery()
     s = s & "       tt.TypeName AS MovementType, t.ReferenceNumber," & vbCrLf
     s = s & "       IIf(t.Quantity > 0, t.Quantity, 0) AS QtyIn, IIf(t.Quantity < 0, -t.Quantity, 0) AS QtyOut," & vbCrLf
     s = s & "       t.Quantity AS NetQty, t.UnitCost, t.Notes" & vbCrLf
-    s = s & "FROM InventoryTransactions AS t INNER JOIN TransactionTypes AS tt" & vbCrLf
+    s = s & "FROM InventoryTransactions AS t INNER JOIN [@TransactionTypes] AS tt" & vbCrLf
     s = s & "     ON t.TransactionTypeID = tt.TransactionTypeID" & vbCrLf
     s = s & "WHERE t.ProductID = QLong('ProductID') AND t.TransactionDate >= QDate('PeriodStart') AND t.TransactionDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
@@ -1469,7 +1526,7 @@ Private Sub Q_ExpensesQuery()
     s = s & "       e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName, e.ExpenseTypeID" & vbCrLf
     s = s & "FROM ((Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID)" & vbCrLf
     s = s & "      INNER JOIN Employees AS em ON e.EmployeeID = em.EmployeeID)" & vbCrLf
-    s = s & "     LEFT JOIN PaymentMethods AS pm ON e.PaymentMethodID = pm.PaymentMethodID" & vbCrLf
+    s = s & "     LEFT JOIN [@PaymentMethods] AS pm ON e.PaymentMethodID = pm.PaymentMethodID" & vbCrLf
     s = s & "WHERE e.ExpenseDate >= QDate('PeriodStart') AND e.ExpenseDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "ORDER BY e.ExpenseDate" & vbCrLf
     SaveQuery "ExpensesQuery", "المصروفات خلال فترة", s
@@ -1885,13 +1942,13 @@ Private Sub Q_qryVoucherPrint()
     s = s & "       c.Mobile AS PartyMobile, p.Amount, m.MethodName, p.Notes, e.EmployeeName," & vbCrLf
     s = s & "       c.CurrentBalance AS PartyBalance" & vbCrLf
     s = s & "FROM ((CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID)" & vbCrLf
-    s = s & "      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
+    s = s & "      INNER JOIN [@PaymentMethods] AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
     s = s & "     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, 1, s.SupplierName, s.Mobile," & vbCrLf
     s = s & "       p.Amount, m.MethodName, p.Notes, e.EmployeeName, s.CurrentBalance" & vbCrLf
     s = s & "FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID)" & vbCrLf
-    s = s & "      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
+    s = s & "      INNER JOIN [@PaymentMethods] AS m ON p.PaymentMethodID = m.PaymentMethodID)" & vbCrLf
     s = s & "     INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID" & vbCrLf
     SaveQuery "qryVoucherPrint", "بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين)", s
 End Sub
@@ -2678,7 +2735,7 @@ Private Sub Q_qryBankItems()
     Dim s As String
     s = "SELECT i.BankID, i.SourceType, i.SourceID, i.ItemDate, i.ItemNumber, i.ItemText, i.ItemAmount," & vbCrLf
     s = s & "       t.TypeName, c.ReconciliationID, c.ClearedAmount, IIf(c.ClearingID Is Null, 0, 1) AS IsCleared" & vbCrLf
-    s = s & "FROM (qryBankItemSums AS i INNER JOIN JournalSourceTypes AS t ON i.SourceType = t.SourceType)" & vbCrLf
+    s = s & "FROM (qryBankItemSums AS i INNER JOIN [@JournalSourceTypes] AS t ON i.SourceType = t.SourceType)" & vbCrLf
     s = s & "     LEFT JOIN BankClearings AS c ON (i.BankID = c.BankID AND i.SourceType = c.SourceType AND i.SourceID = c.SourceID)" & vbCrLf
     s = s & "WHERE i.ItemAmount <> 0" & vbCrLf
     SaveQuery "qryBankItems", "عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة", s
@@ -2715,7 +2772,7 @@ Private Sub Q_FixedAssetsQuery()
     s = s & "       a.OpeningAccumDep + CCur(Nz(t.SumDep, 0)) AS AccumDep, a.Cost - a.OpeningAccumDep - CCur(Nz(t.SumDep, 0)) AS BookValue," & vbCrLf
     s = s & "       Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2) AS MonthlyDep, CCur(Nz(t.DepCount, 0)) AS DepMonths," & vbCrLf
     s = s & "       a.DisposalDate, a.DisposalProceeds" & vbCrLf
-    s = s & "FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)" & vbCrLf
+    s = s & "FROM (FixedAssets AS a INNER JOIN [@Accounts] AS c ON a.AssetAccount = c.AccountCode)" & vbCrLf
     s = s & "     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID" & vbCrLf
     SaveQuery "FixedAssetsQuery", "سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري", s
 End Sub
@@ -2787,9 +2844,9 @@ Private Sub Q_JournalLinesQuery()
     Dim s As String
     s = "SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber," & vbCrLf
     s = s & "       e.Description, l.LineNumber, l.AccountCode, a.AccountName, l.LineText, l.Debit, l.Credit" & vbCrLf
-    s = s & "FROM ((JournalEntries AS e INNER JOIN JournalSourceTypes AS t ON e.SourceType = t.SourceType)" & vbCrLf
+    s = s & "FROM ((JournalEntries AS e INNER JOIN [@JournalSourceTypes] AS t ON e.SourceType = t.SourceType)" & vbCrLf
     s = s & "      INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)" & vbCrLf
-    s = s & "     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode" & vbCrLf
+    s = s & "     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode" & vbCrLf
     s = s & "WHERE e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "ORDER BY e.EntryDate, e.EntryNumber, l.LineNumber" & vbCrLf
     SaveQuery "JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", s
@@ -2799,9 +2856,9 @@ Private Sub Q_qryJournalEntryPrint()
     Dim s As String
     s = "SELECT e.EntryID, e.EntryNumber, e.EntryDate, t.TypeName, e.SourceNumber, e.Description, e.TotalDebit," & vbCrLf
     s = s & "       l.LineNumber, l.AccountCode, a.AccountName, l.LineText, l.Debit, l.Credit" & vbCrLf
-    s = s & "FROM ((JournalEntries AS e INNER JOIN JournalSourceTypes AS t ON e.SourceType = t.SourceType)" & vbCrLf
+    s = s & "FROM ((JournalEntries AS e INNER JOIN [@JournalSourceTypes] AS t ON e.SourceType = t.SourceType)" & vbCrLf
     s = s & "      INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)" & vbCrLf
-    s = s & "     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode" & vbCrLf
+    s = s & "     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode" & vbCrLf
     SaveQuery "qryJournalEntryPrint", "بيانات طباعة قيد", s
 End Sub
 
@@ -2829,7 +2886,7 @@ Private Sub Q_TrialBalanceQuery()
     s = s & "       CCur(Nz(b.DebitBefore, 0)) - CCur(Nz(b.CreditBefore, 0)) AS OpeningBalance," & vbCrLf
     s = s & "       CCur(Nz(p.SumDebit, 0)) AS PeriodDebit, CCur(Nz(p.SumCredit, 0)) AS PeriodCredit," & vbCrLf
     s = s & "       CCur(Nz(b.DebitBefore, 0)) - CCur(Nz(b.CreditBefore, 0)) + CCur(Nz(p.SumDebit, 0)) - CCur(Nz(p.SumCredit, 0)) AS ClosingBalance" & vbCrLf
-    s = s & "FROM (Accounts AS a LEFT JOIN qryTrialBefore AS b ON a.AccountCode = b.AccountCode)" & vbCrLf
+    s = s & "FROM ([@Accounts] AS a LEFT JOIN qryTrialBefore AS b ON a.AccountCode = b.AccountCode)" & vbCrLf
     s = s & "     LEFT JOIN qryTrialPeriod AS p ON a.AccountCode = p.AccountCode" & vbCrLf
     s = s & "WHERE b.AccountCode Is Not Null OR p.AccountCode Is Not Null" & vbCrLf
     s = s & "ORDER BY a.AccountCode" & vbCrLf
@@ -2852,13 +2909,13 @@ Private Sub Q_AccountStatementQuery()
     s = s & "       e.Description AS Details, a.AccountCode AS SubCode, a.AccountName AS SubName, l.Debit AS LineDebit," & vbCrLf
     s = s & "       l.Credit AS LineCredit" & vbCrLf
     s = s & "FROM (((JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)" & vbCrLf
-    s = s & "      INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode)" & vbCrLf
-    s = s & "     INNER JOIN JournalSourceTypes AS k ON e.SourceType = k.SourceType), Accounts AS s" & vbCrLf
+    s = s & "      INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode)" & vbCrLf
+    s = s & "     INNER JOIN [@JournalSourceTypes] AS k ON e.SourceType = k.SourceType), [@Accounts] AS s" & vbCrLf
     s = s & "WHERE s.AccountCode = QLong('AccountCode') AND (a.Level1Code = QLong('AccountCode') OR a.Level2Code = QLong('AccountCode') OR a.Level3Code = QLong('AccountCode') OR a.Level4Code = QLong('AccountCode') OR a.Level5Code = QLong('AccountCode')) AND e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 0, s.AccountCode, s.AccountName, QDate('PeriodStart'), '-', 0, 'رصيد أول المدة', Null, Null, Null, Null," & vbCrLf
     s = s & "       IIf(x.SumBefore > 0, x.SumBefore, 0), IIf(x.SumBefore < 0, -x.SumBefore, 0)" & vbCrLf
-    s = s & "FROM Accounts AS s, qryStatementBefore AS x" & vbCrLf
+    s = s & "FROM [@Accounts] AS s, qryStatementBefore AS x" & vbCrLf
     s = s & "WHERE s.AccountCode = QLong('AccountCode')" & vbCrLf
     s = s & "ORDER BY SortKey, LineDate, EntryNo" & vbCrLf
     SaveQuery "AccountStatementQuery", "كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة)", s
@@ -2870,13 +2927,13 @@ Private Sub Q_GeneralLedgerQuery()
     s = s & "       e.EntryDate AS LineDate, e.EntryNumber AS EntryNo, e.EntryID AS EntryRef, k.TypeName AS KindName," & vbCrLf
     s = s & "       e.SourceNumber AS DocNo, e.Description AS Details, l.Debit AS LineDebit, l.Credit AS LineCredit" & vbCrLf
     s = s & "FROM ((JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)" & vbCrLf
-    s = s & "      INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode)" & vbCrLf
-    s = s & "     INNER JOIN JournalSourceTypes AS k ON e.SourceType = k.SourceType" & vbCrLf
+    s = s & "      INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode)" & vbCrLf
+    s = s & "     INNER JOIN [@JournalSourceTypes] AS k ON e.SourceType = k.SourceType" & vbCrLf
     s = s & "WHERE (QLong('AccountCode') = 0 OR (a.Level1Code = QLong('AccountCode') OR a.Level2Code = QLong('AccountCode') OR a.Level3Code = QLong('AccountCode') OR a.Level4Code = QLong('AccountCode') OR a.Level5Code = QLong('AccountCode'))) AND e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd')" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 0, b.TreeKey, b.AccountCode, b.AccountName, QDate('PeriodStart'), '-', 0, 'رصيد أول المدة', Null, Null," & vbCrLf
     s = s & "       IIf(t.OpeningBalance > 0, t.OpeningBalance, 0), IIf(t.OpeningBalance < 0, -t.OpeningBalance, 0)" & vbCrLf
-    s = s & "FROM TrialBalanceQuery AS t INNER JOIN Accounts AS b ON t.AccountCode = b.AccountCode" & vbCrLf
+    s = s & "FROM TrialBalanceQuery AS t INNER JOIN [@Accounts] AS b ON t.AccountCode = b.AccountCode" & vbCrLf
     s = s & "WHERE QLong('AccountCode') = 0 OR (b.Level1Code = QLong('AccountCode') OR b.Level2Code = QLong('AccountCode') OR b.Level3Code = QLong('AccountCode') OR b.Level4Code = QLong('AccountCode') OR b.Level5Code = QLong('AccountCode'))" & vbCrLf
     s = s & "ORDER BY AccountKey, SortKey, LineDate, EntryNo" & vbCrLf
     SaveQuery "GeneralLedgerQuery", "دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات)", s
@@ -2921,7 +2978,7 @@ Private Sub Q_TrialBalanceTreeQuery()
     s = "SELECT a.AccountCode, a.AccountName, IIf(a.AccountType = 'ASSET', 'أصول', IIf(a.AccountType = 'LIABILITY', 'خصوم', IIf(a.AccountType = 'EQUITY', 'حقوق ملكية', IIf(a.AccountType = 'REVENUE', 'إيرادات', 'مصروفات')))) AS TypeName, a.AccountLevel, a.TreeKey, a.IsPosting," & vbCrLf
     s = s & "       r.SumOpening AS OpeningBalance, r.SumDebit AS PeriodDebit, r.SumCredit AS PeriodCredit," & vbCrLf
     s = s & "       r.SumClosing AS ClosingBalance" & vbCrLf
-    s = s & "FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode" & vbCrLf
+    s = s & "FROM [@Accounts] AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode" & vbCrLf
     s = s & "ORDER BY a.TreeKey" & vbCrLf
     SaveQuery "TrialBalanceTreeQuery", "ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة", s
 End Sub
@@ -2951,7 +3008,7 @@ Private Sub Q_qryIncomeAccounts()
     s = s & "           IIf(a.AccountType = 'REVENUE', 4, 5)))) AS SectionNo," & vbCrLf
     s = s & "       IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(c.SumCredit, 0)) - CCur(Nz(c.SumDebit, 0))) AS CurrentAmount," & vbCrLf
     s = s & "       IIf(a.AccountType = 'REVENUE', 1, -1) * (CCur(Nz(p.SumCredit, 0)) - CCur(Nz(p.SumDebit, 0))) AS PriorAmount" & vbCrLf
-    s = s & "FROM (Accounts AS a LEFT JOIN qryIncomeMoves AS c ON a.AccountCode = c.AccountCode)" & vbCrLf
+    s = s & "FROM ([@Accounts] AS a LEFT JOIN qryIncomeMoves AS c ON a.AccountCode = c.AccountCode)" & vbCrLf
     s = s & "     LEFT JOIN qryCompareMoves AS p ON a.AccountCode = p.AccountCode" & vbCrLf
     s = s & "WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR p.AccountCode Is Not Null)" & vbCrLf
     SaveQuery "qryIncomeAccounts", "حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة", s
@@ -3010,7 +3067,7 @@ Private Sub Q_qryCenterMoves()
     s = "SELECT IIf(l.CostCenterID Is Null, 0, l.CostCenterID) AS CenterKey, l.AccountCode, a.AccountName, a.TreeKey," & vbCrLf
     s = s & "       a.Level2Code, IIf(a.AccountType = 'REVENUE', 1, -1) * (Sum(l.Credit) - Sum(l.Debit)) AS CenterAmount" & vbCrLf
     s = s & "FROM (JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)" & vbCrLf
-    s = s & "     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode" & vbCrLf
+    s = s & "     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode" & vbCrLf
     s = s & "WHERE e.EntryDate >= QDate('PeriodStart') AND e.EntryDate < QDate('PeriodEnd') AND e.SourceType <> 'YEAR_CLOSE' AND a.AccountType IN ('REVENUE', 'EXPENSE')" & vbCrLf
     s = s & "GROUP BY IIf(l.CostCenterID Is Null, 0, l.CostCenterID), l.AccountCode, a.AccountName, a.TreeKey, a.Level2Code," & vbCrLf
     s = s & "         a.AccountType" & vbCrLf
@@ -3129,7 +3186,7 @@ Private Sub Q_BudgetVsActualQuery()
     s = s & "       IIf(CCur(Nz(x.SumActual, 0)) = CCur(Nz(p.SumPlan, 0)), 'مطابق', IIf((a.AccountType = 'REVENUE') = (CCur(Nz(x.SumActual, 0)) > CCur(Nz(p.SumPlan, 0)))," & vbCrLf
     s = s & "           'ملائم', 'غير ملائم')) AS VarianceNote" & vbCrLf
     s = s & "FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)" & vbCrLf
-    s = s & "       INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode)" & vbCrLf
+    s = s & "       INNER JOIN [@Accounts] AS a ON b.AccountCode = a.AccountCode)" & vbCrLf
     s = s & "      LEFT JOIN CostCenters AS c ON b.CostCenterID = c.CostCenterID)" & vbCrLf
     s = s & "     LEFT JOIN qryBudgetPlanned AS p ON b.BudgetLineID = p.BudgetLineID)" & vbCrLf
     s = s & "     LEFT JOIN qryBudgetActual AS x ON b.BudgetLineID = x.BudgetLineID" & vbCrLf
@@ -3160,7 +3217,7 @@ Private Sub Q_qryBalanceAccounts()
     s = "SELECT a.AccountCode, a.AccountName, a.TreeKey, a.Level1Code, a.Level2Code," & vbCrLf
     s = s & "       IIf(a.AccountType = 'ASSET', 1, -1) * CCur(Nz(b.NetAt, 0)) AS CurrentAmount," & vbCrLf
     s = s & "       IIf(a.AccountType = 'ASSET', 1, -1) * CCur(Nz(c.NetCompare, 0)) AS PriorAmount" & vbCrLf
-    s = s & "FROM (Accounts AS a LEFT JOIN qryBalanceAt AS b ON a.AccountCode = b.AccountCode)" & vbCrLf
+    s = s & "FROM ([@Accounts] AS a LEFT JOIN qryBalanceAt AS b ON a.AccountCode = b.AccountCode)" & vbCrLf
     s = s & "     LEFT JOIN qryBalanceCompare AS c ON a.AccountCode = c.AccountCode" & vbCrLf
     s = s & "WHERE a.AccountType IN ('ASSET', 'LIABILITY', 'EQUITY') AND (CCur(Nz(b.NetAt, 0)) <> 0 OR CCur(Nz(c.NetCompare, 0)) <> 0)" & vbCrLf
     SaveQuery "qryBalanceAccounts", "حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب)", s
@@ -3197,22 +3254,22 @@ Private Sub Q_BalanceSheetQuery()
     s = "SELECT q.Level1Code AS ClassNo, g.TreeKey AS GroupKey, 1 AS Pos, q.TreeKey AS AccountKey, 'A' AS RowKind," & vbCrLf
     s = s & "       q.AccountName AS Caption, q.AccountCode AS LineAccount, q.CurrentAmount AS CurrentValue," & vbCrLf
     s = s & "       q.PriorAmount AS PriorValue" & vbCrLf
-    s = s & "FROM qryBalanceAccounts AS q INNER JOIN Accounts AS g ON q.Level2Code = g.AccountCode" & vbCrLf
+    s = s & "FROM qryBalanceAccounts AS q INNER JOIN [@Accounts] AS g ON q.Level2Code = g.AccountCode" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 3, g.TreeKey, 1, 'Z', 'A', 'صافي ربح (خسارة) الفترات غير المقفلة', Null, -x.NetProfitSum, -y.NetCompareSum" & vbCrLf
-    s = s & "FROM Accounts AS g, qryProfitAt AS x, qryProfitCompare AS y" & vbCrLf
+    s = s & "FROM [@Accounts] AS g, qryProfitAt AS x, qryProfitCompare AS y" & vbCrLf
     s = s & "WHERE g.AccountCode = 32" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT c.AccountCode, '', 0, '', 'C', c.AccountName, Null, Null, Null" & vbCrLf
-    s = s & "FROM Accounts AS c" & vbCrLf
+    s = s & "FROM [@Accounts] AS c" & vbCrLf
     s = s & "WHERE c.AccountCode IN (1, 2, 3)" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT g.Level1Code, g.TreeKey, 0, '', 'G', g.AccountName, Null, Null, Null" & vbCrLf
-    s = s & "FROM Accounts AS g" & vbCrLf
+    s = s & "FROM [@Accounts] AS g" & vbCrLf
     s = s & "WHERE g.AccountCode IN (SELECT GroupCode FROM qryBalanceItems)" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT g.Level1Code, g.TreeKey, 2, '', 'S', g.AccountName, Null, Sum(i.CurrentValue), Sum(i.PriorValue)" & vbCrLf
-    s = s & "FROM Accounts AS g INNER JOIN qryBalanceItems AS i ON g.AccountCode = i.GroupCode" & vbCrLf
+    s = s & "FROM [@Accounts] AS g INNER JOIN qryBalanceItems AS i ON g.AccountCode = i.GroupCode" & vbCrLf
     s = s & "GROUP BY g.Level1Code, g.TreeKey, g.AccountName" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT i.ClassNo, '~', 9, '', 'T', IIf(i.ClassNo = 1, 'إجمالي الأصول', IIf(i.ClassNo = 2, 'إجمالي الخصوم', 'إجمالي حقوق الملكية')), Null, Sum(i.CurrentValue), Sum(i.PriorValue)" & vbCrLf
@@ -3230,7 +3287,7 @@ Private Sub Q_AccountTreeQuery()
     Dim s As String
     s = "SELECT a.AccountCode, a.AccountName, IIf(a.AccountType = 'ASSET', 'أصول', IIf(a.AccountType = 'LIABILITY', 'خصوم', IIf(a.AccountType = 'EQUITY', 'حقوق ملكية', IIf(a.AccountType = 'REVENUE', 'إيرادات', 'مصروفات')))) AS TypeName, a.AccountLevel, a.TreeKey," & vbCrLf
     s = s & "       a.ParentCode, IIf(a.IsPosting, 'فرعي', 'رئيسي') AS KindName, a.IsPosting, a.IsActive" & vbCrLf
-    s = s & "FROM Accounts AS a" & vbCrLf
+    s = s & "FROM [@Accounts] AS a" & vbCrLf
     s = s & "ORDER BY a.TreeKey" & vbCrLf
     SaveQuery "AccountTreeQuery", "شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود", s
 End Sub

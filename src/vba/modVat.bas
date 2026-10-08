@@ -396,7 +396,7 @@ End Function
 
 Public Sub VatReturnLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
-    frm!cboPayAccount.RowSource = Tr("SELECT AccountCode, AccountName FROM Accounts WHERE IsPosting = True AND " & _
+    frm!cboPayAccount.RowSource = Tr("SELECT a.AccountCode, a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND " & _
         "AccountType = 'ASSET' AND Level2Code = 11 AND Nz(Level3Code, 0) <> 1100 AND AccountCode NOT IN " & _
         "(1300, 1400, 1500, 1600) ORDER BY TreeKey")
     If Nz(frm.OpenArgs, 0) > 0 Then

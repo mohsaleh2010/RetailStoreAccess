@@ -309,7 +309,7 @@ Public Sub BudgetCompare(ByVal frm As Access.Form)
     SetPeriod DateValue(frm!txtFrom.Value), DateValue(frm!txtTo.Value)
     frm!lstVariance.RowSource = Tr("SELECT BudgetLineID, AccountCode AS [الحساب], AccountName AS [اسم الحساب], BudgetCenter " & _
         "AS [المركز], Format(BudgetAmount, '#,##0') AS [الموازنة], Format(ActualAmount, '#,##0') AS [الفعلي], " & _
-        "Format(q.Variance, '#,##0') AS [الانحراف], Format(VariancePct, '0%') AS [النسبة], VarianceNote AS [التقييم] " & _
+        "Format(q.Variance, '#,##0') AS [الفرق عن الموازنة], Format(VariancePct, '0%') AS [النسبة], VarianceNote AS [التقييم] " & _
         "FROM BudgetVsActualQuery AS q WHERE BudgetAmount <> 0 OR ActualAmount <> 0 ORDER BY AccountType DESC, TreeKey")
     budget = Nz(DbValue("SELECT Sum(IIf(AccountType = 'REVENUE', BudgetAmount, -BudgetAmount)) FROM BudgetVsActualQuery"), 0)
     actual = Nz(DbValue("SELECT Sum(IIf(AccountType = 'REVENUE', ActualAmount, -ActualAmount)) FROM BudgetVsActualQuery"), 0)

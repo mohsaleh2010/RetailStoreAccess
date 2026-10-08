@@ -12,8 +12,8 @@ PURCHASE_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS
 ACTIVE_SUPPLIER_ROWS = ("SELECT SupplierID, SupplierName FROM Suppliers WHERE IsActive = True "
                         "ORDER BY SupplierName")
 PURCHASE_REFUND_TYPES = "CREDIT;خصم من رصيد المورد;CASH;استرداد نقدي من المورد"
-MANUAL_TYPE_ROWS = ("SELECT TransactionTypeID, TypeName FROM TransactionTypes WHERE IsManual = True "
-                    "ORDER BY TransactionTypeID")
+MANUAL_TYPE_ROWS = ("SELECT t.TransactionTypeID, t.TypeName FROM [@TransactionTypes] AS t WHERE t.IsManual = True "
+                    "ORDER BY t.TransactionTypeID")
 COUNT_ROWS = ("SELECT StockCountID, CountNumber, CountDate, IIf(Status = 'OPEN', 'مفتوح', "
               "IIf(Status = 'POSTED', 'مُرحّل', 'ملغى')) AS StatusName FROM StockCounts "
               "ORDER BY StockCountID DESC")

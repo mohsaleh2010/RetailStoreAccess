@@ -521,12 +521,12 @@ Public Sub PurchaseViewLoad(ByVal frm As Access.Form)
         Format$(rs!Tax, "#,##0.00") & "    «·≈Ã„«·Ì: " & Format$(rs!TotalAmount, "#,##0.00") & _
         "    «·„œ›Ê⁄: " & Format$(rs!PaidAmount, "#,##0.00") & "    «·„ »ﬁÌ: " & Format$(rs!RemainingAmount, "#,##0.00"))
     rs.Close
-    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [«·’‰›], d.Quantity AS [«·ﬂ„Ì…], " & _
-        "d.UnitCost AS [ ﬂ·›… «·ÊÕœ…], d.Discount AS [«·Œ’„], d.Tax AS [«·÷—Ì»…], d.LineTotal AS [«·≈Ã„«·Ì] " & _
+    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [«·’‰›], d.Quantity AS [ﬂ„Ì… «·’‰›], " & _
+        "d.UnitCost AS [ ﬂ·›… «·ÊÕœ…], d.Discount AS [Œ’„ «·”ÿ—], d.Tax AS [«·÷—Ì»…], d.LineTotal AS [«·≈Ã„«·Ì] " & _
         "FROM PurchaseInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID " & _
         "WHERE d.PurchaseInvoiceID = " & id & " ORDER BY d.LineNumber")
     frm!lstReturns.RowSource = Tr("SELECT PurchaseReturnID, ReturnNumber AS [«·„— Ã⁄], ReturnDate AS [«· «—ÌŒ], " & _
-        "TotalAmount AS [«·ﬁÌ„…], r.Reason AS [«·”»»] FROM PurchaseReturns AS r WHERE PurchaseInvoiceID = " & id & _
+        "TotalAmount AS [«·ﬁÌ„…], r.Reason AS [”»» «·≈—Ã«⁄] FROM PurchaseReturns AS r WHERE PurchaseInvoiceID = " & id & _
         " ORDER BY ReturnDate")
 End Sub
 
@@ -591,8 +591,8 @@ Public Sub InventoryProductPicked(ByVal frm As Access.Form)
     End If
     rs.Close
     frm!lstMoves.RowSource = Tr("SELECT TOP 50 t.TransactionDate AS [«· «—ÌŒ], tt.TypeName AS [«·‰Ê⁄], " & _
-        "t.Quantity AS [«·ﬂ„Ì…], t.QuantityAfter AS [«·—’Ìœ »⁄œÂ«], t.ReferenceNumber AS [«·„” ‰œ] " & _
-        "FROM InventoryTransactions AS t INNER JOIN TransactionTypes AS tt " & _
+        "t.Quantity AS [ﬂ„Ì… «·’‰›], t.QuantityAfter AS [«·—’Ìœ »⁄œÂ«], t.ReferenceNumber AS [«·„” ‰œ] " & _
+        "FROM InventoryTransactions AS t INNER JOIN [@TransactionTypes] AS tt " & _
         "ON t.TransactionTypeID = tt.TransactionTypeID WHERE t.ProductID = " & id & _
         " ORDER BY t.TransactionID DESC")
 End Sub

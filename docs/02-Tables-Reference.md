@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **69** | عدد الحقول: **873**
+عدد الجداول: **69** | عدد الحقول: **877**
 
 ## الفهرس
 
@@ -313,9 +313,10 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **PaymentMethodID** 🔑 | Number (Long) |  | ✔ |  |  |  | رقم الطريقة |
 | 2 | MethodName | Short Text | 50 | ✔ |  |  |  | طريقة الدفع |
-| 3 | ZatcaCode | Short Text | 5 |  |  |  |  | رمز الهيئة |
-| 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
-| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 3 | MethodNameEn | Short Text | 50 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | ZatcaCode | Short Text | 5 |  |  |  |  | رمز الهيئة |
+| 5 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 6 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
 
 - المفتاح الأساسي: `PaymentMethodID`
 - فهرس فريد: `MethodName`
@@ -1341,18 +1342,19 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **AccountCode** 🔑 | Number (Long) |  | ✔ |  | `>0` |  | رقم الحساب |
 | 2 | AccountName | Short Text | 100 | ✔ |  |  |  | اسم الحساب |
-| 3 | AccountType | Short Text | 10 | ✔ |  | `In ("ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE")` |  | نوع الحساب |
-| 4 | ParentCode | Number (Long) |  |  |  |  |  | الحساب الرئيسي – فارغ للحسابات الخمسة في المستوى الأول فقط |
-| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 6 | IsPosting | Yes/No |  |  | `True` |  |  | حساب فرعي (يقبل القيود) |
-| 7 | IsSystem | Yes/No |  |  | `False` |  |  | حساب أساسي في النظام |
-| 8 | AccountLevel | Number (Byte) |  | ✔ | `1` |  |  | المستوى |
-| 9 | TreeKey | Short Text | 60 |  |  |  |  | مفتاح الترتيب في الشجرة – يحسبه البرنامج (modAccounts.RebuildAccountTree): رقم كل مستوى بعشر خانات |
-| 10 | Level1Code | Number (Long) |  |  |  |  |  | حساب المستوى 1 |
-| 11 | Level2Code | Number (Long) |  |  |  |  |  | حساب المستوى 2 |
-| 12 | Level3Code | Number (Long) |  |  |  |  |  | حساب المستوى 3 |
-| 13 | Level4Code | Number (Long) |  |  |  |  |  | حساب المستوى 4 |
-| 14 | Level5Code | Number (Long) |  |  |  |  |  | حساب المستوى 5 |
+| 3 | AccountNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية والقوائم المالية بها |
+| 4 | AccountType | Short Text | 10 | ✔ |  | `In ("ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE")` |  | نوع الحساب |
+| 5 | ParentCode | Number (Long) |  |  |  |  |  | الحساب الرئيسي – فارغ للحسابات الخمسة في المستوى الأول فقط |
+| 6 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 7 | IsPosting | Yes/No |  |  | `True` |  |  | حساب فرعي (يقبل القيود) |
+| 8 | IsSystem | Yes/No |  |  | `False` |  |  | حساب أساسي في النظام |
+| 9 | AccountLevel | Number (Byte) |  | ✔ | `1` |  |  | المستوى |
+| 10 | TreeKey | Short Text | 60 |  |  |  |  | مفتاح الترتيب في الشجرة – يحسبه البرنامج (modAccounts.RebuildAccountTree): رقم كل مستوى بعشر خانات |
+| 11 | Level1Code | Number (Long) |  |  |  |  |  | حساب المستوى 1 |
+| 12 | Level2Code | Number (Long) |  |  |  |  |  | حساب المستوى 2 |
+| 13 | Level3Code | Number (Long) |  |  |  |  |  | حساب المستوى 3 |
+| 14 | Level4Code | Number (Long) |  |  |  |  |  | حساب المستوى 4 |
+| 15 | Level5Code | Number (Long) |  |  |  |  |  | حساب المستوى 5 |
 
 - المفتاح الأساسي: `AccountCode`
 - فهرس عادي: `ParentCode`
@@ -1367,7 +1369,8 @@
 |---|---|---|---|---|---|---|---|---|
 | 1 | **SourceType** 🔑 | Short Text | 20 | ✔ |  |  |  | نوع العملية |
 | 2 | TypeName | Short Text | 50 | ✔ |  |  |  | الاسم |
-| 3 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 3 | TypeNameEn | Short Text | 50 |  |  |  |  | الاسم بالإنجليزية |
+| 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
 - بيانات أساسية: 27 سجل
@@ -1568,8 +1571,9 @@
 | 1 | **TransactionTypeID** 🔑 | Number (Long) |  | ✔ |  |  |  | رقم النوع |
 | 2 | TypeCode | Short Text | 20 | ✔ |  |  |  | رمز النوع |
 | 3 | TypeName | Short Text | 50 | ✔ |  |  |  | نوع الحركة |
-| 4 | Direction | Number (Integer) |  | ✔ |  | `In (-1,0,1)` |  | الاتجاه |
-| 5 | IsManual | Yes/No |  |  | `False` |  |  | متاح للإدخال اليدوي |
+| 4 | TypeNameEn | Short Text | 50 |  |  |  |  | الاسم بالإنجليزية |
+| 5 | Direction | Number (Integer) |  | ✔ |  | `In (-1,0,1)` |  | الاتجاه |
+| 6 | IsManual | Yes/No |  |  | `False` |  |  | متاح للإدخال اليدوي |
 
 - المفتاح الأساسي: `TransactionTypeID`
 - فهرس فريد: `TypeCode`

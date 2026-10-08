@@ -29,9 +29,9 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
     "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=30;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=5;Currencies=7;CurrencyRates=6;CashBoxes=8;Suppliers=17;Customers=23;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=39;Sequences=5;Roles=4;Permissions=4;RolePermissions=2;Employees=30;Screens=8;UserScreens=6;Activations=6;Categories=8;Units=4;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=8;Suppliers=17;Customers=23;Products=23;SalesInvoices=39;SalesInvoiceDetails=14;SalesReturns=32;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
     "CustomerPayments=16;SupplierPayments=15;Banks=9;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=7;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=3;Expenses=20;RecurringExpenses=18;" & _
-    "CashVouchers=17;CashClosings=18;Accounts=14;JournalSourceTypes=3;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=5;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19"
+    "CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=36;RolePermissions=71;Employees=1;Screens=58;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
@@ -77,6 +77,8 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     EnsureDeveloperUser
     m_currentStep = "account tree"
     UpgradeAccountTree
+    m_currentStep = "english names"
+    SeedEnglishNames
 
     m_db.Close
     Set m_db = Nothing
@@ -962,6 +964,8 @@ Private Sub CreateTable_PaymentMethods()
              "", "", "—ﬁ„ «·ÿ—Ìﬁ…", ""
     AddField tdf, "MethodName", "TEXT", 50, True, "", _
              "", "", "ÿ—Ìﬁ… «·œ›⁄", ""
+    AddField tdf, "MethodNameEn", "TEXT", 50, False, "", _
+             "", "", "«·«”„ »«·≈‰Ã·Ì“Ì…", "ÌŸÂ— ›Ì «·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…"
     AddField tdf, "ZatcaCode", "TEXT", 5, False, "", _
              "", "", "—„“ «·ÂÌ∆…", ""
     AddField tdf, "SortOrder", "INT", 0, True, "0", _
@@ -2463,6 +2467,8 @@ Private Sub CreateTable_Accounts()
              ">0", "—ﬁ„ «·Õ”«» √ﬂ»— „‰ ’›—", "—ﬁ„ «·Õ”«»", ""
     AddField tdf, "AccountName", "TEXT", 100, True, "", _
              "", "", "«”„ «·Õ”«»", ""
+    AddField tdf, "AccountNameEn", "TEXT", 100, False, "", _
+             "", "", "«·«”„ »«·≈‰Ã·Ì“Ì…", "ÌŸÂ— ›Ì «·Ê«ÃÂ… «·≈‰Ã·Ì“Ì… Ê«·ﬁÊ«∆„ «·„«·Ì… »Â«"
     AddField tdf, "AccountType", "TEXT", 10, True, "", _
              "In (""ASSET"",""LIABILITY"",""EQUITY"",""REVENUE"",""EXPENSE"")", "√’Ê·° Œ’Ê„° ÕﬁÊﬁ „·ﬂÌ…° ≈Ì—«œ« ° „’—Ê›« ", "‰Ê⁄ «·Õ”«»", ""
     AddField tdf, "ParentCode", "LONG", 0, False, "", _
@@ -2500,6 +2506,8 @@ Private Sub CreateTable_JournalSourceTypes()
              "", "", "‰Ê⁄ «·⁄„·Ì…", ""
     AddField tdf, "TypeName", "TEXT", 50, True, "", _
              "", "", "«·«”„", ""
+    AddField tdf, "TypeNameEn", "TEXT", 50, False, "", _
+             "", "", "«·«”„ »«·≈‰Ã·Ì“Ì…", ""
     AddField tdf, "SortOrder", "INT", 0, True, "0", _
              "", "", "«· — Ì»", ""
     AddIndex tdf, "PrimaryKey", "SourceType", True, True, False
@@ -2781,6 +2789,8 @@ Private Sub CreateTable_TransactionTypes()
              "", "", "—„“ «·‰Ê⁄", ""
     AddField tdf, "TypeName", "TEXT", 50, True, "", _
              "", "", "‰Ê⁄ «·Õ—ﬂ…", ""
+    AddField tdf, "TypeNameEn", "TEXT", 50, False, "", _
+             "", "", "«·«”„ »«·≈‰Ã·Ì“Ì…", ""
     AddField tdf, "Direction", "INT", 0, True, "", _
              "In (-1,0,1)", "«·« Ã«Â 1 √Ê -1 √Ê 0", "«·« Ã«Â", ""
     AddField tdf, "IsManual", "BOOL", 0, False, "False", _
@@ -3522,4 +3532,126 @@ Private Sub UpgradeAccountTree()
     m_db.Execute "UPDATE [Accounts] SET [ParentCode] = 53 WHERE [AccountCode] = 5900 AND [ParentCode] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [IsPosting] = False WHERE [AccountCode] IN (1, 11, 1100, 1210, 12, 2, 21, 22, 3, 31, 32, 4, 41, 42, 5, 51, 52, 5300, 53)", dbFailOnError
     m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN (1, 11, 1100, 110001, 110002, 1190, 1200, 1210, 1250, 1300, 1400, 1500, 1600, 12, 1790, 2, 21, 2100, 2110, 2200, 2250, 2310, 2320, 2330, 22, 3, 31, 3100, 3900, 32, 3300, 4, 41, 4100, 4110, 42, 4200, 4300, 4500, 5, 51, 5100, 5200, 52, 5300, 5500, 5510, 5520, 5530, 5600, 5610, 53, 5400, 5650, 5900) OR [AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 120001 AND 129999 OR [AccountCode] BETWEEN 530001 AND 539999", dbFailOnError
+End Sub
+
+Private Sub SeedEnglishNames()
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Assets' WHERE [AccountCode] = 1 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Current assets' WHERE [AccountCode] = 11 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cash in treasury and boxes' WHERE [AccountCode] = 1100 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Main treasury' WHERE [AccountCode] = 110001 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cashier box' WHERE [AccountCode] = 110002 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cash not allocated to a box' WHERE [AccountCode] = 1190 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Mada and wallets under settlement (bank and network)' WHERE [AccountCode] = 1200 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Bank accounts' WHERE [AccountCode] = 1210 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cheques under collection' WHERE [AccountCode] = 1250 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Accounts receivable' WHERE [AccountCode] = 1300 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Notes receivable' WHERE [AccountCode] = 1310 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Allowance for doubtful debts' WHERE [AccountCode] = 1350 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Inventory' WHERE [AccountCode] = 1400 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'VAT - input' WHERE [AccountCode] = 1500 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Employee advances' WHERE [AccountCode] = 1600 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cash floats' WHERE [AccountCode] = 1610 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Prepaid expenses' WHERE [AccountCode] = 1650 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Accrued revenue' WHERE [AccountCode] = 1660 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Deposits with others' WHERE [AccountCode] = 1690 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Non-current assets' WHERE [AccountCode] = 12 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Furniture and fixtures' WHERE [AccountCode] = 1710 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Computers, devices and POS systems' WHERE [AccountCode] = 1720 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Vehicles' WHERE [AccountCode] = 1730 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Decorations and store improvements' WHERE [AccountCode] = 1740 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Accumulated depreciation of fixed assets' WHERE [AccountCode] = 1790 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Software and licenses' WHERE [AccountCode] = 1800 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Liabilities' WHERE [AccountCode] = 2 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Current liabilities' WHERE [AccountCode] = 21 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Accounts payable' WHERE [AccountCode] = 2100 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Notes payable (issued cheques)' WHERE [AccountCode] = 2110 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'VAT - output' WHERE [AccountCode] = 2200 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'VAT - settlement and payment' WHERE [AccountCode] = 2250 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Accrued expenses' WHERE [AccountCode] = 2300 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Salaries and wages payable' WHERE [AccountCode] = 2310 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Social insurance payable' WHERE [AccountCode] = 2320 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Sales rep commissions payable' WHERE [AccountCode] = 2330 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Customer advances' WHERE [AccountCode] = 2400 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Short-term loans' WHERE [AccountCode] = 2500 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Zakat payable' WHERE [AccountCode] = 2600 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Non-current liabilities' WHERE [AccountCode] = 22 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Long-term loans' WHERE [AccountCode] = 2700 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'End-of-service benefits provision' WHERE [AccountCode] = 2800 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Equity' WHERE [AccountCode] = 3 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Capital and owner current account' WHERE [AccountCode] = 31 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Capital' WHERE [AccountCode] = 3200 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Owner current account' WHERE [AccountCode] = 3100 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Opening balances' WHERE [AccountCode] = 3900 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Retained earnings and results' WHERE [AccountCode] = 32 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Retained earnings' WHERE [AccountCode] = 3300 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Net profit (loss) of the year' WHERE [AccountCode] = 3400 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Revenue' WHERE [AccountCode] = 4 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Operating revenue' WHERE [AccountCode] = 41 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Sales' WHERE [AccountCode] = 4100 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Sales returns' WHERE [AccountCode] = 4110 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Discounts allowed' WHERE [AccountCode] = 4120 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Other revenue' WHERE [AccountCode] = 42 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Miscellaneous revenue' WHERE [AccountCode] = 4200 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cash overages' WHERE [AccountCode] = 4300 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Discounts received' WHERE [AccountCode] = 4400 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Gain on sale of fixed assets' WHERE [AccountCode] = 4500 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Expenses' WHERE [AccountCode] = 5 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cost of sales' WHERE [AccountCode] = 51 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cost of goods sold' WHERE [AccountCode] = 5100 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Stock differences and adjustments' WHERE [AccountCode] = 5200 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Operating and administrative expenses' WHERE [AccountCode] = 52 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Expenses by type' WHERE [AccountCode] = 5300 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Salaries and wages' WHERE [AccountCode] = 5500 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Allowances and incentives' WHERE [AccountCode] = 5510 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Social insurance' WHERE [AccountCode] = 5520 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Sales rep commissions' WHERE [AccountCode] = 5530 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Depreciation of fixed assets' WHERE [AccountCode] = 5600 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Bank and POS fees' WHERE [AccountCode] = 5610 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Government fees and licenses' WHERE [AccountCode] = 5620 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Advertising' WHERE [AccountCode] = 5630 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Other expenses' WHERE [AccountCode] = 53 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Cash shortages' WHERE [AccountCode] = 5400 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Loss on sale and disposal of fixed assets' WHERE [AccountCode] = 5650 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Bad debts' WHERE [AccountCode] = 5700 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Zakat' WHERE [AccountCode] = 5800 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Accounts] SET [AccountNameEn] = 'Miscellaneous expenses' WHERE [AccountCode] = 5900 AND [AccountNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [PaymentMethods] SET [MethodNameEn] = 'Cash' WHERE [PaymentMethodID] = 1 AND [MethodNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [PaymentMethods] SET [MethodNameEn] = 'Mada / card' WHERE [PaymentMethodID] = 2 AND [MethodNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [PaymentMethods] SET [MethodNameEn] = 'Bank transfer' WHERE [PaymentMethodID] = 3 AND [MethodNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [PaymentMethods] SET [MethodNameEn] = 'E-wallet' WHERE [PaymentMethodID] = 4 AND [MethodNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Sales invoice' WHERE [SourceType] = 'SALE' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Sales return' WHERE [SourceType] = 'SALES_RETURN' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Purchase invoice' WHERE [SourceType] = 'PURCHASE' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Purchase return' WHERE [SourceType] = 'PURCHASE_RETURN' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Customer receipt' WHERE [SourceType] = 'CUSTOMER_PAYMENT' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Supplier payment' WHERE [SourceType] = 'SUPPLIER_PAYMENT' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Expense' WHERE [SourceType] = 'EXPENSE' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Cash voucher' WHERE [SourceType] = 'CASH_VOUCHER' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Manual stock move' WHERE [SourceType] = 'STOCK_MOVE' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Stock count adjustment' WHERE [SourceType] = 'STOCK_COUNT' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Box opening balance' WHERE [SourceType] = 'BOX_OPENING' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Customer opening balance' WHERE [SourceType] = 'CUSTOMER_OPENING' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Supplier opening balance' WHERE [SourceType] = 'SUPPLIER_OPENING' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Manual entry' WHERE [SourceType] = 'MANUAL' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Year closing entry' WHERE [SourceType] = 'YEAR_CLOSE' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'VAT return settlement' WHERE [SourceType] = 'VAT_RETURN' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'VAT payment' WHERE [SourceType] = 'VAT_PAYMENT' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Bank opening balance' WHERE [SourceType] = 'BANK_OPENING' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Bank transaction' WHERE [SourceType] = 'BANK_TX' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Received or issued cheque' WHERE [SourceType] = 'CHEQUE' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Cheque collection or bounce' WHERE [SourceType] = 'CHEQUE_STATUS' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Fixed asset purchase' WHERE [SourceType] = 'ASSET' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Fixed asset sale or disposal' WHERE [SourceType] = 'ASSET_DISPOSAL' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Monthly depreciation entry' WHERE [SourceType] = 'DEPRECIATION' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Payroll entry' WHERE [SourceType] = 'PAYROLL' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Salary payment' WHERE [SourceType] = 'PAYROLL_PAYMENT' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Sales rep commissions entry' WHERE [SourceType] = 'COMMISSION' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Purchase' WHERE [TypeCode] = 'PURCHASE' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Sale' WHERE [TypeCode] = 'SALE' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Purchase return' WHERE [TypeCode] = 'PURCHASE_RETURN' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Sales return' WHERE [TypeCode] = 'SALES_RETURN' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Stock addition' WHERE [TypeCode] = 'STOCK_IN' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Stock deduction' WHERE [TypeCode] = 'STOCK_OUT' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Count adjustment' WHERE [TypeCode] = 'ADJUSTMENT' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Opening balance' WHERE [TypeCode] = 'OPENING' AND [TypeNameEn] Is Null", dbFailOnError
 End Sub

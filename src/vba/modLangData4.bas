@@ -16,6 +16,18 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "الإيرادات", "Revenue"
+    LangAdd "الاستحقاق", "Due date"
+    LangAdd "التأمينات", "Social insurance"
+    LangAdd "التصنيفات", "Categories"
+    LangAdd "التعديلات", "Changes"
+    LangAdd "المدفوعات", "Payments"
+    LangAdd "المرتجعات", "Returns"
+    LangAdd "المشتريات", "Purchases"
+    LangAdd "المصروفات", "Expenses"
+    LangAdd "المقبوضات", "Receipts"
+    LangAdd "المندوبين", "Sales reps"
+    LangAdd "بدل السكن", "Housing allowance"
     LangAdd "بدل النقل", "Transport allowance"
     LangAdd "بعد اليوم", "after today"
     LangAdd "بلا نهاية", "No end"
@@ -124,6 +136,9 @@ Private Sub D4_1()
     LangAdd "سكر قليل", "Little sugar"
     LangAdd "شراء آجل", "Credit purchase"
     LangAdd "شهر جديد", "New month"
+End Sub
+
+Private Sub D4_2()
     LangAdd "شيك صادر", "Issued cheque"
     LangAdd "شيك مرتد", "Bounced cheque"
     LangAdd "شيك وارد", "Received cheque"
@@ -136,9 +151,6 @@ Private Sub D4_1()
     LangAdd "قيد جديد", "New entry"
     LangAdd "قيد عكسي", "Reversing entry"
     LangAdd "قيد يدوي", "Manual entry"
-End Sub
-
-Private Sub D4_2()
     LangAdd "كشف حساب", "Account statement"
     LangAdd "لم يُنشأ", "Not created"
     LangAdd "لون الزر", "Button color"
@@ -247,6 +259,9 @@ Private Sub D4_2()
     LangAdd "مرة/سنة", "times/year"
     LangAdd "مستويات", "levels"
     LangAdd "مصروفات", "Expenses"
+End Sub
+
+Private Sub D4_3()
     LangAdd "ملاحظات", "Notes"
     LangAdd "مليونان", "two million"
     LangAdd "والدائن", "and credit"
@@ -259,9 +274,6 @@ Private Sub D4_2()
     LangAdd "اعتمده", "Approved by"
     LangAdd "الأساس", "Base"
     LangAdd "الأصول", "Assets"
-End Sub
-
-Private Sub D4_3()
     LangAdd "البنوك", "Banks"
     LangAdd "البيان", "Description"
     LangAdd "التالي", "Next"
@@ -370,6 +382,9 @@ Private Sub D4_3()
     LangAdd "الدور", "Role"
     LangAdd "الربح", "Profit"
     LangAdd "الرقم", "Number"
+End Sub
+
+Private Sub D4_4()
     LangAdd "الرمز", "Code"
     LangAdd "السبب", "Reason"
     LangAdd "السجل", "Record"
@@ -382,9 +397,6 @@ Private Sub D4_3()
     LangAdd "الصنف", "Item"
     LangAdd "الصور", "Pictures"
     LangAdd "العجز", "Shortage"
-End Sub
-
-Private Sub D4_4()
     LangAdd "العدد", "Count"
     LangAdd "الفرق", "Difference"
     LangAdd "القسم", "Department"
@@ -493,6 +505,9 @@ Private Sub D4_4()
     LangAdd "مرتد", "Bounced"
     LangAdd "مسدد", "Paid"
     LangAdd "مسير", "Run"
+End Sub
+
+Private Sub D4_5()
     LangAdd "ملغى", "Cancelled"
     LangAdd "ناقص", "Missing"
     LangAdd "نسخة", "Backup"
@@ -505,9 +520,6 @@ Private Sub D4_4()
     LangAdd "وردي", "Pink"
     LangAdd "يوجد", "There are"
     LangAdd "آجل", "Credit"
-End Sub
-
-Private Sub D4_5()
     LangAdd "ألف", "thousand"
     LangAdd "إلى", "To"
     LangAdd "بحث", "Search"

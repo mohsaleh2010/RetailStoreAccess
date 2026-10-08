@@ -83,8 +83,17 @@ def ordered(dictionary: Dict[str, str]) -> List[str]:
     return sorted(dictionary, key=lambda k: (-len(k), k))
 
 
+_NAME_MARK = re.compile(r"\[@(\w+)\]")
+
+
+def resolve_names(s: str, english: bool = False) -> str:
+    """[@Accounts] -> Accounts, or in English the saved query qryLocAccounts (modLang.LangSql)."""
+    return _NAME_MARK.sub(lambda m: ("qryLoc" if english else "") + m.group(1), s)
+
+
 def translate(s: str, dictionary: Dict[str, str], keys: List[str] = None) -> str:
     """Python mirror of modLang.Tr in an English front-end."""
+    s = resolve_names(s, True)
     if not has_arabic(s):
         return s
     out = s

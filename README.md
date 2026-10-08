@@ -56,9 +56,10 @@
 | + | سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد | ✅ تمت الموافقة | [docs/33-Audit-Trail.md](docs/33-Audit-Trail.md) |
 | + | المؤشرات المالية في لوحة التحكم: هامش الربح، دوران المخزون، فترة التحصيل، السيولة | ✅ بانتظار الموافقة | [docs/34-Financial-Indicators.md](docs/34-Financial-Indicators.md) |
 | + | خطة العملات المتعددة والمندوبين والواجهة الإنجليزية | 📋 خطة | [docs/35-Plan-Currency-Reps-Language.md](docs/35-Plan-Currency-Reps-Language.md) |
-| + | العملات المتعددة: عملة ومعامل لكل مستند، والترحيل بالمكافئ بالريال | ✅ بانتظار الموافقة | [docs/36-Currencies.md](docs/36-Currencies.md) |
-| + | المندوبين: عملاء المندوب، والأهداف الشهرية، ومسير العمولات وقيده وصرفه، وتقارير الأداء | ✅ بانتظار الموافقة | [docs/37-Sales-Reps.md](docs/37-Sales-Reps.md) |
-| + | الواجهة الإنجليزية: ملف واجهة بالإنجليزية من اليسار لليمين على نفس البيانات، والرسائل والتقارير مترجمة | ✅ بانتظار الموافقة | [docs/38-English-Interface.md](docs/38-English-Interface.md) |
+| + | العملات المتعددة: عملة ومعامل لكل مستند، والترحيل بالمكافئ بالريال | ✅ تمت الموافقة | [docs/36-Currencies.md](docs/36-Currencies.md) |
+| + | المندوبين: عملاء المندوب، والأهداف الشهرية، ومسير العمولات وقيده وصرفه، وتقارير الأداء | ✅ تمت الموافقة | [docs/37-Sales-Reps.md](docs/37-Sales-Reps.md) |
+| + | الواجهة الإنجليزية: ملف واجهة بالإنجليزية من اليسار لليمين على نفس البيانات، والرسائل والتقارير مترجمة | ✅ تمت الموافقة | [docs/38-English-Interface.md](docs/38-English-Interface.md) |
+| + | الأسماء الإنجليزية للحسابات وطرق الدفع وأنواع القيود وحركات المخزون: القوائم المالية والقيود بالإنجليزية | ✅ بانتظار الموافقة | [docs/39-English-Master-Data.md](docs/39-English-Master-Data.md) |
 
 ## هيكل المستودع
 
@@ -144,6 +145,7 @@
 | 32 | `modCurrency` (دائمة) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestCurrency` |
 | 33 | `modSalesReps` (دائمة)، واستبدال `modSales` و`modCash` و`modJournal` و`modForms` و`modScreens` | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestSalesReps` |
 | 34 | `modLang` و`modLangData1..4` (مولَّدة، جديدة)، واستبدال كل الوحدات (الأسهل: `BuildFrontEnd.vbs`) | `BuildQueries`, `BuildForms`, `BuildReports` (وللإنجليزية قبلها `SetInterfaceLanguage "EN"`) | `TestLang` |
+| 35 | `modJournal`، `modVat`، `modPurchaseScreens`، `modAging`، `modCash`، `modCheque`، `modBank`، `modBudget`، `modPOS`، `modLang` والوحدات المولَّدة (الأسهل: `BuildFrontEnd.vbs`) | `BuildSchema` (يملأ الأسماء الإنجليزية)، `BuildQueries`, `BuildForms`, `BuildReports` | `TestLang` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

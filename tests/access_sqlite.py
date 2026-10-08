@@ -27,13 +27,15 @@ def _date(s):
 
 class AccessOnSqlite:
 
-    def __init__(self):
+    def __init__(self, english=False):
+        """english: the saved queries of an English front-end (master data names in English)."""
+        from i18n import resolve_names
         self.con = build_sqlite(with_relationship_rules=True)
         self.params = {}
         self.ids = {}
         self._register_functions()
         for q in Q.QUERIES:
-            self.con.execute(f'CREATE VIEW "{q.name}" AS {q.sql}')
+            self.con.execute(f'CREATE VIEW "{q.name}" AS {resolve_names(q.sql, english)}')
         self.set_period(Q.PERIOD_START_DAYS_AGO)
 
     # ---------------------------------------------------------------- setup

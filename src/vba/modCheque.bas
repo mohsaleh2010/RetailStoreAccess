@@ -265,7 +265,7 @@ Public Sub ChequesRefresh(ByVal frm As Access.Form)
     End Select
     frm!lstCheques.RowSource = Tr("SELECT ChequeID, ChequeRef AS [القيد], ChequeNo AS [رقم الشيك], PartyName AS [" & _
         IIf(kind = "IN", "العميل", "المورد") & "], Format(DueDate, 'yyyy/mm/dd') AS [الاستحقاق], Format(q.Amount, '#,##0.00') " & _
-        "AS [المبلغ], StatusName AS [الحالة], Format(StatusDate, 'yyyy/mm/dd') AS [في], Nz(BankName, DrawerBank) AS [البنك] " & _
+        "AS [مبلغ الشيك], StatusName AS [الحالة], Format(StatusDate, 'yyyy/mm/dd') AS [في], Nz(BankName, DrawerBank) AS [البنك] " & _
         "FROM ChequesQuery AS q WHERE " & where & " ORDER BY DueDate, ChequeID")
     pending = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind)), 0)
     soon = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind) & _

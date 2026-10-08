@@ -16,6 +16,18 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "«·≈Ì—«œ« ", "Revenue"
+    LangAdd "«·«” Õﬁ«ﬁ", "Due date"
+    LangAdd "«· √„Ì‰« ", "Social insurance"
+    LangAdd "«· ’‰Ì›« ", "Categories"
+    LangAdd "«· ⁄œÌ·« ", "Changes"
+    LangAdd "«·„œ›Ê⁄« ", "Payments"
+    LangAdd "«·„— Ã⁄« ", "Returns"
+    LangAdd "«·„‘ —Ì« ", "Purchases"
+    LangAdd "«·„’—Ê›« ", "Expenses"
+    LangAdd "«·„ﬁ»Ê÷« ", "Receipts"
+    LangAdd "«·„‰œÊ»Ì‰", "Sales reps"
+    LangAdd "»œ· «·”ﬂ‰", "Housing allowance"
     LangAdd "»œ· «·‰ﬁ·", "Transport allowance"
     LangAdd "»⁄œ «·ÌÊ„", "after today"
     LangAdd "»·« ‰Â«Ì…", "No end"
@@ -124,6 +136,9 @@ Private Sub D4_1()
     LangAdd "”ﬂ— ﬁ·Ì·", "Little sugar"
     LangAdd "‘—«¡ ¬Ã·", "Credit purchase"
     LangAdd "‘Â— ÃœÌœ", "New month"
+End Sub
+
+Private Sub D4_2()
     LangAdd "‘Ìﬂ ’«œ—", "Issued cheque"
     LangAdd "‘Ìﬂ „— œ", "Bounced cheque"
     LangAdd "‘Ìﬂ Ê«—œ", "Received cheque"
@@ -136,9 +151,6 @@ Private Sub D4_1()
     LangAdd "ﬁÌœ ÃœÌœ", "New entry"
     LangAdd "ﬁÌœ ⁄ﬂ”Ì", "Reversing entry"
     LangAdd "ﬁÌœ ÌœÊÌ", "Manual entry"
-End Sub
-
-Private Sub D4_2()
     LangAdd "ﬂ‘› Õ”«»", "Account statement"
     LangAdd "·„ Ìı‰‘√", "Not created"
     LangAdd "·Ê‰ «·“—", "Button color"
@@ -247,6 +259,9 @@ Private Sub D4_2()
     LangAdd "„—…/”‰…", "times/year"
     LangAdd "„” ÊÌ« ", "levels"
     LangAdd "„’—Ê›« ", "Expenses"
+End Sub
+
+Private Sub D4_3()
     LangAdd "„·«ÕŸ« ", "Notes"
     LangAdd "„·ÌÊ‰«‰", "two million"
     LangAdd "Ê«·œ«∆‰", "and credit"
@@ -259,9 +274,6 @@ Private Sub D4_2()
     LangAdd "«⁄ „œÂ", "Approved by"
     LangAdd "«·√”«”", "Base"
     LangAdd "«·√’Ê·", "Assets"
-End Sub
-
-Private Sub D4_3()
     LangAdd "«·»‰Êﬂ", "Banks"
     LangAdd "«·»Ì«‰", "Description"
     LangAdd "«· «·Ì", "Next"
@@ -370,6 +382,9 @@ Private Sub D4_3()
     LangAdd "«·œÊ—", "Role"
     LangAdd "«·—»Õ", "Profit"
     LangAdd "«·—ﬁ„", "Number"
+End Sub
+
+Private Sub D4_4()
     LangAdd "«·—„“", "Code"
     LangAdd "«·”»»", "Reason"
     LangAdd "«·”Ã·", "Record"
@@ -382,9 +397,6 @@ Private Sub D4_3()
     LangAdd "«·’‰›", "Item"
     LangAdd "«·’Ê—", "Pictures"
     LangAdd "«·⁄Ã“", "Shortage"
-End Sub
-
-Private Sub D4_4()
     LangAdd "«·⁄œœ", "Count"
     LangAdd "«·›—ﬁ", "Difference"
     LangAdd "«·ﬁ”„", "Department"
@@ -493,6 +505,9 @@ Private Sub D4_4()
     LangAdd "„— œ", "Bounced"
     LangAdd "„”œœ", "Paid"
     LangAdd "„”Ì—", "Run"
+End Sub
+
+Private Sub D4_5()
     LangAdd "„·€Ï", "Cancelled"
     LangAdd "‰«ﬁ’", "Missing"
     LangAdd "‰”Œ…", "Backup"
@@ -505,9 +520,6 @@ Private Sub D4_4()
     LangAdd "Ê—œÌ", "Pink"
     LangAdd "ÌÊÃœ", "There are"
     LangAdd "¬Ã·", "Credit"
-End Sub
-
-Private Sub D4_5()
     LangAdd "√·›", "thousand"
     LangAdd "≈·Ï", "To"
     LangAdd "»ÕÀ", "Search"

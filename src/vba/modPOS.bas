@@ -617,12 +617,12 @@ Public Sub InvoiceViewLoad(ByVal frm As Access.Form)
         Format$(rs!Tax, "#,##0.00") & "    الإجمالي: " & Format$(rs!TotalAmount, "#,##0.00") & _
         "    المدفوع: " & Format$(rs!PaidAmount, "#,##0.00") & "    المتبقي: " & Format$(rs!RemainingAmount, "#,##0.00"))
     rs.Close
-    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [الصنف], d.Quantity AS [الكمية], " & _
-        "d.UnitPrice AS [السعر بدون ضريبة], d.Discount AS [الخصم], d.Tax AS [الضريبة], d.LineTotal AS [الإجمالي] " & _
+    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [الصنف], d.Quantity AS [كمية الصنف], " & _
+        "d.UnitPrice AS [السعر بدون ضريبة], d.Discount AS [خصم السطر], d.Tax AS [الضريبة], d.LineTotal AS [الإجمالي] " & _
         "FROM SalesInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID " & _
         "WHERE d.SalesInvoiceID = " & id & " ORDER BY d.LineNumber")
     frm!lstReturns.RowSource = Tr("SELECT ReturnNumber AS [المرتجع], ReturnDate AS [التاريخ], TotalAmount AS [القيمة], " & _
-        "r.Reason AS [السبب] FROM SalesReturns AS r WHERE SalesInvoiceID = " & id & " ORDER BY ReturnDate")
+        "r.Reason AS [سبب الإرجاع] FROM SalesReturns AS r WHERE SalesInvoiceID = " & id & " ORDER BY ReturnDate")
 End Sub
 
 '==============================================================================

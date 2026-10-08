@@ -7,7 +7,7 @@ from forms import CENTER_ROWS, Control, FormModel, Sym, button, cm, labelled, ti
 from forms_cash import table_combo
 from forms_sales import grid_row, header_labels
 
-BUDGET_ACCOUNTS = ("SELECT AccountCode, AccountCode & '  ' & AccountName FROM Accounts WHERE AccountType IN "
+BUDGET_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE AccountType IN "
                    "('REVENUE', 'EXPENSE') AND IsActive = True ORDER BY TreeKey")
 BUDGET_ROWS = "SELECT BudgetID, BudgetYear & '  ' & BudgetName FROM Budgets ORDER BY BudgetYear DESC"
 MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]

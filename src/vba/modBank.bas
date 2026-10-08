@@ -486,7 +486,7 @@ Public Sub BankReconBankChanged(ByVal frm As Access.Form)
         End If
         frm!lstRecons.RowSource = Tr("SELECT ReconciliationID, ReconNumber AS [التسوية], Format(StatementDate, 'yyyy/mm/dd') " & _
             "AS [تاريخ الكشف], Format(StatementBalance, '#,##0.00') AS [رصيد الكشف], IIf(r.Status = 'DONE', 'معتمدة', " & _
-            "'جارية') AS [الحالة] FROM BankReconciliations AS r WHERE r.BankID = " & frm!cboBank.Value & " ORDER BY StatementDate DESC")
+            "'جارية') AS [حالة التسوية] FROM BankReconciliations AS r WHERE r.BankID = " & frm!cboBank.Value & " ORDER BY StatementDate DESC")
     End If
     BankReconRefresh frm
 End Sub

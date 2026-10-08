@@ -552,6 +552,7 @@ TABLES: List[Table] = [
         [
             long_("PaymentMethodID", "رقم الطريقة", required=True),
             text("MethodName", 50, "طريقة الدفع", required=True),
+            text("MethodNameEn", 50, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("ZatcaCode", 5, "رمز الهيئة"),
             int_("SortOrder", "الترتيب", required=True, default="0"),
             is_active(),
@@ -1604,6 +1605,7 @@ TABLES: List[Table] = [
         [
             long_("AccountCode", "رقم الحساب", required=True, rule=">0", rule_text="رقم الحساب أكبر من صفر"),
             text("AccountName", 100, "اسم الحساب", required=True),
+            text("AccountNameEn", 100, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية والقوائم المالية بها"),
             text("AccountType", 10, "نوع الحساب", required=True,
                  rule='In ("ASSET","LIABILITY","EQUITY","REVENUE","EXPENSE")',
                  rule_text="أصول، خصوم، حقوق ملكية، إيرادات، مصروفات"),
@@ -1633,6 +1635,7 @@ TABLES: List[Table] = [
         [
             text("SourceType", 20, "نوع العملية", required=True),
             text("TypeName", 50, "الاسم", required=True),
+            text("TypeNameEn", 50, "الاسم بالإنجليزية"),
             int_("SortOrder", "الترتيب", required=True, default="0"),
         ],
         pk=["SourceType"],
@@ -1844,6 +1847,7 @@ TABLES: List[Table] = [
             long_("TransactionTypeID", "رقم النوع", required=True),
             text("TypeCode", 20, "رمز النوع", required=True),
             text("TypeName", 50, "نوع الحركة", required=True),
+            text("TypeNameEn", 50, "الاسم بالإنجليزية"),
             int_("Direction", "الاتجاه", required=True, rule="In (-1,0,1)",
                  rule_text="الاتجاه 1 أو -1 أو 0"),
             bool_("IsManual", "متاح للإدخال اليدوي", "False"),

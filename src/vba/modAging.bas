@@ -327,7 +327,7 @@ Public Sub AgingRefresh(ByVal frm As Access.Form)
         "Format(Sum(OpenAmount), '#,##0.00') AS [الرصيد], Format(Sum(NotDue), '#,##0.00') AS [غير مستحق], " & _
         "Format(Sum(Days30), '#,##0.00') AS [1-30], Format(Sum(Days60), '#,##0.00') AS [31-60], " & _
         "Format(Sum(Days90), '#,##0.00') AS [61-90], Format(Sum(Over90), '#,##0.00') AS [+90], " & _
-        "Format(Sum(a.Credit), '#,##0.00') AS [دائن], Max(DaysLate) AS [أقصى تأخير] FROM tmpAging AS a " & _
+        "Format(Sum(a.Credit), '#,##0.00') AS [رصيد دائن], Max(DaysLate) AS [أقصى تأخير] FROM tmpAging AS a " & _
         "GROUP BY PartyID, PartyName ORDER BY Sum(Over90) DESC, Sum(Days90) DESC, Sum(OpenAmount) DESC")
     frm!lstDocs.RowSource = Tr("")
     total = DbValue("SELECT Sum(OpenAmount) FROM tmpAging")
@@ -412,14 +412,14 @@ Public Sub AllocationRefresh(ByVal frm As Access.Form)
         payTable = "SupplierPayments": invTable = "PurchaseInvoices"
     End If
     frm!lstPayments.RowSource = Tr("SELECT PaymentID, PaymentNumber AS [السند], Format(PaymentDate, 'yyyy/mm/dd') AS [التاريخ], " & _
-        "Format(f.Amount, '#,##0.00') AS [المبلغ], Format(Allocated, '#,##0.00') AS [مربوط], Format(Free, '#,##0.00') AS " & _
+        "Format(f.Amount, '#,##0.00') AS [مبلغ السند], Format(Allocated, '#,##0.00') AS [مربوط], Format(Free, '#,##0.00') AS " & _
         "[غير مربوط] FROM " & prefix & "PaymentFree AS f WHERE PartyID = " & party & " ORDER BY PaymentDate DESC")
     frm!lstInvoices.RowSource = Tr("SELECT InvoiceID, InvoiceNumber AS [الفاتورة], Format(InvoiceDate, 'yyyy/mm/dd') AS " & _
         "[التاريخ], Format(DueDate, 'yyyy/mm/dd') AS [الاستحقاق], Format(RemainingAmount, '#,##0.00') AS [المتبقي], " & _
         "Format(Allocated + Returned, '#,##0.00') AS [مربوط ومرتجع], Format(Free, '#,##0.00') AS [يمكن ربطه] FROM " & _
         prefix & "InvoiceFree WHERE PartyID = " & party & " AND Free > 0 ORDER BY IIf(DueDate Is Null, InvoiceDate, DueDate)")
     frm!lstAllocations.RowSource = Tr("SELECT a.AllocationID, p.PaymentNumber AS [السند], h.InvoiceNumber AS [الفاتورة], " & _
-        "Format(a.Amount, '#,##0.00') AS [المبلغ], Format(a.CreatedAt, 'yyyy/mm/dd') AS [في] FROM (" & allocTable & _
+        "Format(a.Amount, '#,##0.00') AS [المبلغ المربوط], Format(a.CreatedAt, 'yyyy/mm/dd') AS [في] FROM (" & allocTable & _
         " AS a INNER JOIN " & payTable & " AS p ON a.PaymentID = p.PaymentID) INNER JOIN " & invTable & " AS h ON a." & _
         invoiceCol & " = h." & invoiceCol & " WHERE p." & IIf(frm!cboKind.Value = "C", "CustomerID", "SupplierID") & _
         " = " & party & " ORDER BY a.AllocationID DESC")

@@ -121,8 +121,13 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   `modForms` must check `frm.Name`.
 - Dates: set `Calendar = vbCalGreg` (Saudi PCs may default to Hijri); show dates with `GDate`.
 - English interface: never compare SQL with an Arabic literal (`= 'نقدي'`), the literals are translated.
-  A list column alias must not equal, once translated, a field used unqualified in its own expression
-  (`Format(Cost, ...) AS [التكلفة]` becomes `AS [Cost]`: circular reference) - qualify it: `q.Cost`.
+  A list column alias must not equal, once translated, a field of its own expression, even qualified
+  (`Format(q.Cost, ...) AS [التكلفة]` becomes `AS [Cost]`: circular reference) - choose a caption whose
+  English differs (`[تكلفة الأصل]` = Asset cost). `test_i18n` checks it.
+- Master data names: SQL that shows the name of an account, payment method, journal source or stock move
+  type reads `[@Accounts] AS a` (also `[@PaymentMethods]`, `[@JournalSourceTypes]`, `[@TransactionTypes]`)
+  and goes through `Tr`: an English front-end reads `qryLocAccounts` (same columns, English name). A new
+  master table with an English name goes into `tools/master_en.py` (`docs/39-English-Master-Data.md`).
   `MSG_RTL` is a function of `modLang` (0 in English). The English texts contain no `" ' [ ] ; | & = < >`.
 - Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness
   cannot return a `Currency` either — wrap it in a `Double` function, see `tests/test_indicators.py`).

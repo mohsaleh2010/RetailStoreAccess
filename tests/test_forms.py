@@ -31,7 +31,8 @@ def read(name):
 
 def to_sqlite(sql: str) -> str:
     """Access-only syntax used by row sources -> SQLite."""
-    sql = sql.replace(" & ", " || ")
+    from i18n import resolve_names
+    sql = resolve_names(sql).replace(" & ", " || ")
 
     def like(m):
         pattern = m.group(1).replace("*", "%").replace("[%]", "*")

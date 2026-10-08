@@ -477,22 +477,22 @@ def _balance_sheet():
     return f"""SELECT q.Level1Code AS ClassNo, g.TreeKey AS GroupKey, 1 AS Pos, q.TreeKey AS AccountKey, 'A' AS RowKind,
        q.AccountName AS Caption, q.AccountCode AS LineAccount, q.CurrentAmount AS CurrentValue,
        q.PriorAmount AS PriorValue
-FROM qryBalanceAccounts AS q INNER JOIN Accounts AS g ON q.Level2Code = g.AccountCode
+FROM qryBalanceAccounts AS q INNER JOIN [@Accounts] AS g ON q.Level2Code = g.AccountCode
 UNION ALL
 SELECT 3, g.TreeKey, 1, 'Z', 'A', 'صافي ربح (خسارة) الفترات غير المقفلة', Null, -x.NetProfitSum, -y.NetCompareSum
-FROM Accounts AS g, qryProfitAt AS x, qryProfitCompare AS y
+FROM [@Accounts] AS g, qryProfitAt AS x, qryProfitCompare AS y
 WHERE g.AccountCode = 32
 UNION ALL
 SELECT c.AccountCode, '', 0, '', 'C', c.AccountName, Null, Null, Null
-FROM Accounts AS c
+FROM [@Accounts] AS c
 WHERE c.AccountCode IN (1, 2, 3)
 UNION ALL
 SELECT g.Level1Code, g.TreeKey, 0, '', 'G', g.AccountName, Null, Null, Null
-FROM Accounts AS g
+FROM [@Accounts] AS g
 WHERE g.AccountCode IN (SELECT GroupCode FROM qryBalanceItems)
 UNION ALL
 SELECT g.Level1Code, g.TreeKey, 2, '', 'S', g.AccountName, Null, Sum(i.CurrentValue), Sum(i.PriorValue)
-FROM Accounts AS g INNER JOIN qryBalanceItems AS i ON g.AccountCode = i.GroupCode
+FROM [@Accounts] AS g INNER JOIN qryBalanceItems AS i ON g.AccountCode = i.GroupCode
 GROUP BY g.Level1Code, g.TreeKey, g.AccountName
 UNION ALL
 SELECT i.ClassNo, '~', 9, '', 'T', {CLASS_TOTALS}, Null, Sum(i.CurrentValue), Sum(i.PriorValue)
@@ -533,7 +533,25 @@ def _opening():
         jline(*kk, 2, 3900, neg.format("k"), pos.format("k"), "'رصيد افتتاحي'", "Banks AS k",
               "k.OpeningBalance <> 0")])
 
-QUERIES: List[Query] = [
+def localized_queries() -> List[Query]:
+    """The English names of the master data (docs/39-English-Master-Data.md): for each table with an English
+    name field, qryLoc<Table> has the same columns as the table, with the English name of each row (else its
+    Arabic name) in the name column. An English front-end reads it where the SQL says [@Table] (modLang.LangSql).
+    Two steps, so that no alias repeats a field of its own expression (Access: circular reference)."""
+    from master_en import ENGLISH_NAMES
+    from schema import table
+    out = []
+    for tbl, (en_field, ar_field, _, _) in ENGLISH_NAMES.items():
+        names = [f.name for f in table(tbl).fields]
+        step1 = ", ".join(f"t.{n} AS LocArabicName" if n == ar_field else f"t.{n}" for n in names)
+        step2 = ", ".join(f"Nz({en_field}, LocArabicName) AS {n}" if n == ar_field else n for n in names)
+        out.append(Query(f"qryLoc{tbl}1", f"{tbl} للواجهة الإنجليزية (خطوة 1)", f"SELECT {step1} FROM {tbl} AS t"))
+        out.append(Query(f"qryLoc{tbl}", f"{tbl} بالأسماء الإنجليزية (الواجهة الإنجليزية)",
+                         f"SELECT {step2} FROM qryLoc{tbl}1"))
+    return out
+
+
+QUERIES: List[Query] = localized_queries() + [
 
     # ================================================================ SALES
     Query("qrySalesDocuments", "مستندات البيع: الفواتير (+) والمرتجعات (−) بقيم موقّعة", """
@@ -702,7 +720,7 @@ SELECT 1 AS SortKey, t.TransactionID, t.TransactionDate AS MovementDate,
        tt.TypeName AS MovementType, t.ReferenceNumber,
        IIf(t.Quantity > 0, t.Quantity, 0) AS QtyIn, IIf(t.Quantity < 0, -t.Quantity, 0) AS QtyOut,
        t.Quantity AS NetQty, t.UnitCost, t.Notes
-FROM InventoryTransactions AS t INNER JOIN TransactionTypes AS tt
+FROM InventoryTransactions AS t INNER JOIN [@TransactionTypes] AS tt
      ON t.TransactionTypeID = tt.TransactionTypeID
 WHERE t.ProductID = QLong('ProductID') AND {period("t.TransactionDate")}
 UNION ALL
@@ -1031,7 +1049,7 @@ SELECT e.ExpenseID, e.ExpenseNumber, e.ExpenseDate, t.ExpenseTypeName, e.Amount,
        e.TotalAmount, pm.MethodName, e.Description, em.EmployeeName, e.ExpenseTypeID
 FROM ((Expenses AS e INNER JOIN ExpenseTypes AS t ON e.ExpenseTypeID = t.ExpenseTypeID)
       INNER JOIN Employees AS em ON e.EmployeeID = em.EmployeeID)
-     LEFT JOIN PaymentMethods AS pm ON e.PaymentMethodID = pm.PaymentMethodID
+     LEFT JOIN [@PaymentMethods] AS pm ON e.PaymentMethodID = pm.PaymentMethodID
 WHERE {period("e.ExpenseDate")}
 ORDER BY e.ExpenseDate""", P),
 
@@ -1287,13 +1305,13 @@ SELECT 'RECEIPT' AS DocKind, p.PaymentID AS DocID, p.PaymentNumber AS DocNumber,
        c.Mobile AS PartyMobile, p.Amount, m.MethodName, p.Notes, e.EmployeeName,
        c.CurrentBalance AS PartyBalance
 FROM ((CustomerPayments AS p INNER JOIN Customers AS c ON p.CustomerID = c.CustomerID)
-      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)
+      INNER JOIN [@PaymentMethods] AS m ON p.PaymentMethodID = m.PaymentMethodID)
      INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID
 UNION ALL
 SELECT 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, 1, s.SupplierName, s.Mobile,
        p.Amount, m.MethodName, p.Notes, e.EmployeeName, s.CurrentBalance
 FROM ((SupplierPayments AS p INNER JOIN Suppliers AS s ON p.SupplierID = s.SupplierID)
-      INNER JOIN PaymentMethods AS m ON p.PaymentMethodID = m.PaymentMethodID)
+      INNER JOIN [@PaymentMethods] AS m ON p.PaymentMethodID = m.PaymentMethodID)
      INNER JOIN Employees AS e ON p.EmployeeID = e.EmployeeID"""),
 
     # ============================================================= TREASURY
@@ -1557,7 +1575,7 @@ GROUP BY l.AccountCode, e.SourceType, e.SourceID"""),
     Query("qryBankItems", "عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة", """
 SELECT i.BankID, i.SourceType, i.SourceID, i.ItemDate, i.ItemNumber, i.ItemText, i.ItemAmount,
        t.TypeName, c.ReconciliationID, c.ClearedAmount, IIf(c.ClearingID Is Null, 0, 1) AS IsCleared
-FROM (qryBankItemSums AS i INNER JOIN JournalSourceTypes AS t ON i.SourceType = t.SourceType)
+FROM (qryBankItemSums AS i INNER JOIN [@JournalSourceTypes] AS t ON i.SourceType = t.SourceType)
      LEFT JOIN BankClearings AS c ON (i.BankID = c.BankID AND i.SourceType = c.SourceType AND i.SourceID = c.SourceID)
 WHERE i.ItemAmount <> 0"""),
 
@@ -1582,7 +1600,7 @@ SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS Ass
        a.OpeningAccumDep + {nz("t.SumDep")} AS AccumDep, a.Cost - a.OpeningAccumDep - {nz("t.SumDep")} AS BookValue,
        Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2) AS MonthlyDep, {nz("t.DepCount")} AS DepMonths,
        a.DisposalDate, a.DisposalProceeds
-FROM (FixedAssets AS a INNER JOIN Accounts AS c ON a.AssetAccount = c.AccountCode)
+FROM (FixedAssets AS a INNER JOIN [@Accounts] AS c ON a.AssetAccount = c.AccountCode)
      LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID"""),
 
     Query("AuditTrailQuery", "سجل التدقيق: كل عملية بمن قام بها ووقتها، وحقولها بالقيمة قبل وبعد", """
@@ -1635,18 +1653,18 @@ FROM ((Cheques AS q LEFT JOIN Customers AS c ON q.CustomerID = c.CustomerID)
     Query("JournalLinesQuery", "قيود اليومية خلال فترة بأسطرها", f"""
 SELECT e.EntryID, e.EntryNumber, e.EntryDate, e.SourceType, t.TypeName, e.SourceID, e.SourceNumber,
        e.Description, l.LineNumber, l.AccountCode, a.AccountName, l.LineText, l.Debit, l.Credit
-FROM ((JournalEntries AS e INNER JOIN JournalSourceTypes AS t ON e.SourceType = t.SourceType)
+FROM ((JournalEntries AS e INNER JOIN [@JournalSourceTypes] AS t ON e.SourceType = t.SourceType)
       INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)
-     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode
+     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode
 WHERE {period("e.EntryDate")}
 ORDER BY e.EntryDate, e.EntryNumber, l.LineNumber""", P),
 
     Query("qryJournalEntryPrint", "بيانات طباعة قيد", """
 SELECT e.EntryID, e.EntryNumber, e.EntryDate, t.TypeName, e.SourceNumber, e.Description, e.TotalDebit,
        l.LineNumber, l.AccountCode, a.AccountName, l.LineText, l.Debit, l.Credit
-FROM ((JournalEntries AS e INNER JOIN JournalSourceTypes AS t ON e.SourceType = t.SourceType)
+FROM ((JournalEntries AS e INNER JOIN [@JournalSourceTypes] AS t ON e.SourceType = t.SourceType)
       INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)
-     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode"""),
+     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode"""),
 
     Query("qryTrialBefore", "مجموع الحسابات قبل الفترة", """
 SELECT l.AccountCode, Sum(l.Debit) AS DebitBefore, Sum(l.Credit) AS CreditBefore
@@ -1665,7 +1683,7 @@ SELECT a.AccountCode, a.AccountName, a.AccountType,
        {nz("b.DebitBefore")} - {nz("b.CreditBefore")} AS OpeningBalance,
        {nz("p.SumDebit")} AS PeriodDebit, {nz("p.SumCredit")} AS PeriodCredit,
        {nz("b.DebitBefore")} - {nz("b.CreditBefore")} + {nz("p.SumDebit")} - {nz("p.SumCredit")} AS ClosingBalance
-FROM (Accounts AS a LEFT JOIN qryTrialBefore AS b ON a.AccountCode = b.AccountCode)
+FROM ([@Accounts] AS a LEFT JOIN qryTrialBefore AS b ON a.AccountCode = b.AccountCode)
      LEFT JOIN qryTrialPeriod AS p ON a.AccountCode = p.AccountCode
 WHERE b.AccountCode Is Not Null OR p.AccountCode Is Not Null
 ORDER BY a.AccountCode""", P),
@@ -1683,13 +1701,13 @@ SELECT 1 AS SortKey, s.AccountCode AS StatementAccount, s.AccountName AS Stateme
        e.Description AS Details, a.AccountCode AS SubCode, a.AccountName AS SubName, l.Debit AS LineDebit,
        l.Credit AS LineCredit
 FROM (((JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)
-      INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode)
-     INNER JOIN JournalSourceTypes AS k ON e.SourceType = k.SourceType), Accounts AS s
+      INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode)
+     INNER JOIN [@JournalSourceTypes] AS k ON e.SourceType = k.SourceType), [@Accounts] AS s
 WHERE s.AccountCode = QLong('AccountCode') AND {IN_TREE("a")} AND {period("e.EntryDate")}
 UNION ALL
 SELECT 0, s.AccountCode, s.AccountName, QDate('PeriodStart'), '-', 0, 'رصيد أول المدة', Null, Null, Null, Null,
        IIf(x.SumBefore > 0, x.SumBefore, 0), IIf(x.SumBefore < 0, -x.SumBefore, 0)
-FROM Accounts AS s, qryStatementBefore AS x
+FROM [@Accounts] AS s, qryStatementBefore AS x
 WHERE s.AccountCode = QLong('AccountCode')
 ORDER BY SortKey, LineDate, EntryNo""", P + ["AccountCode"]),
 
@@ -1698,13 +1716,13 @@ SELECT 1 AS SortKey, a.TreeKey AS AccountKey, a.AccountCode AS LedgerCode, a.Acc
        e.EntryDate AS LineDate, e.EntryNumber AS EntryNo, e.EntryID AS EntryRef, k.TypeName AS KindName,
        e.SourceNumber AS DocNo, e.Description AS Details, l.Debit AS LineDebit, l.Credit AS LineCredit
 FROM ((JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)
-      INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode)
-     INNER JOIN JournalSourceTypes AS k ON e.SourceType = k.SourceType
+      INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode)
+     INNER JOIN [@JournalSourceTypes] AS k ON e.SourceType = k.SourceType
 WHERE (QLong('AccountCode') = 0 OR {IN_TREE("a")}) AND {period("e.EntryDate")}
 UNION ALL
 SELECT 0, b.TreeKey, b.AccountCode, b.AccountName, QDate('PeriodStart'), '-', 0, 'رصيد أول المدة', Null, Null,
        IIf(t.OpeningBalance > 0, t.OpeningBalance, 0), IIf(t.OpeningBalance < 0, -t.OpeningBalance, 0)
-FROM TrialBalanceQuery AS t INNER JOIN Accounts AS b ON t.AccountCode = b.AccountCode
+FROM TrialBalanceQuery AS t INNER JOIN [@Accounts] AS b ON t.AccountCode = b.AccountCode
 WHERE QLong('AccountCode') = 0 OR {IN_TREE("b")}
 ORDER BY AccountKey, SortKey, LineDate, EntryNo""", P + ["AccountCode"]),
 
@@ -1714,7 +1732,7 @@ ORDER BY AccountKey, SortKey, LineDate, EntryNo""", P + ["AccountCode"]),
 SELECT a.AccountCode, a.AccountName, {ACCOUNT_TYPE_NAME} AS TypeName, a.AccountLevel, a.TreeKey, a.IsPosting,
        r.SumOpening AS OpeningBalance, r.SumDebit AS PeriodDebit, r.SumCredit AS PeriodCredit,
        r.SumClosing AS ClosingBalance
-FROM Accounts AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode
+FROM [@Accounts] AS a INNER JOIN qryTreeRollup AS r ON a.AccountCode = r.TreeCode
 ORDER BY a.TreeKey""", P),
 
     # ======================================================= FINANCIAL STATEMENTS
@@ -1739,7 +1757,7 @@ SELECT a.AccountCode, a.AccountName, a.TreeKey,
            IIf(a.AccountType = 'REVENUE', 4, 5)))) AS SectionNo,
        IIf(a.AccountType = 'REVENUE', 1, -1) * ({nz("c.SumCredit")} - {nz("c.SumDebit")}) AS CurrentAmount,
        IIf(a.AccountType = 'REVENUE', 1, -1) * ({nz("p.SumCredit")} - {nz("p.SumDebit")}) AS PriorAmount
-FROM (Accounts AS a LEFT JOIN qryIncomeMoves AS c ON a.AccountCode = c.AccountCode)
+FROM ([@Accounts] AS a LEFT JOIN qryIncomeMoves AS c ON a.AccountCode = c.AccountCode)
      LEFT JOIN qryCompareMoves AS p ON a.AccountCode = p.AccountCode
 WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR p.AccountCode Is Not Null)""",
           P + ["CompareStart", "CompareEnd"]),
@@ -1753,7 +1771,7 @@ WHERE a.AccountType IN ('REVENUE', 'EXPENSE') AND (c.AccountCode Is Not Null OR 
 SELECT IIf(l.CostCenterID Is Null, 0, l.CostCenterID) AS CenterKey, l.AccountCode, a.AccountName, a.TreeKey,
        a.Level2Code, IIf(a.AccountType = 'REVENUE', 1, -1) * (Sum(l.Credit) - Sum(l.Debit)) AS CenterAmount
 FROM (JournalEntries AS e INNER JOIN JournalLines AS l ON e.EntryID = l.EntryID)
-     INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode
+     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode
 WHERE {period("e.EntryDate")} AND e.SourceType <> 'YEAR_CLOSE' AND a.AccountType IN ('REVENUE', 'EXPENSE')
 GROUP BY IIf(l.CostCenterID Is Null, 0, l.CostCenterID), l.AccountCode, a.AccountName, a.TreeKey, a.Level2Code,
          a.AccountType""", P),
@@ -1852,7 +1870,7 @@ SELECT b.BudgetLineID, b.AccountCode, a.AccountName, a.TreeKey, a.AccountType,
        IIf({nz("x.SumActual")} = {nz("p.SumPlan")}, 'مطابق', IIf((a.AccountType = 'REVENUE') = ({nz("x.SumActual")} > {nz("p.SumPlan")}),
            'ملائم', 'غير ملائم')) AS VarianceNote
 FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)
-       INNER JOIN Accounts AS a ON b.AccountCode = a.AccountCode)
+       INNER JOIN [@Accounts] AS a ON b.AccountCode = a.AccountCode)
       LEFT JOIN CostCenters AS c ON b.CostCenterID = c.CostCenterID)
      LEFT JOIN qryBudgetPlanned AS p ON b.BudgetLineID = p.BudgetLineID)
      LEFT JOIN qryBudgetActual AS x ON b.BudgetLineID = x.BudgetLineID
@@ -1874,7 +1892,7 @@ GROUP BY l.AccountCode""", ["CompareEnd"]),
 SELECT a.AccountCode, a.AccountName, a.TreeKey, a.Level1Code, a.Level2Code,
        IIf(a.AccountType = 'ASSET', 1, -1) * {nz("b.NetAt")} AS CurrentAmount,
        IIf(a.AccountType = 'ASSET', 1, -1) * {nz("c.NetCompare")} AS PriorAmount
-FROM (Accounts AS a LEFT JOIN qryBalanceAt AS b ON a.AccountCode = b.AccountCode)
+FROM ([@Accounts] AS a LEFT JOIN qryBalanceAt AS b ON a.AccountCode = b.AccountCode)
      LEFT JOIN qryBalanceCompare AS c ON a.AccountCode = c.AccountCode
 WHERE a.AccountType IN ('ASSET', 'LIABILITY', 'EQUITY') AND ({nz("b.NetAt")} <> 0 OR {nz("c.NetCompare")} <> 0)""",
           ["PeriodEnd", "CompareEnd"]),
@@ -1902,7 +1920,7 @@ FROM qryProfitAt AS x, qryProfitCompare AS y""", ["PeriodEnd", "CompareEnd"]),
     Query("AccountTreeQuery", "شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود", f"""
 SELECT a.AccountCode, a.AccountName, {ACCOUNT_TYPE_NAME} AS TypeName, a.AccountLevel, a.TreeKey,
        a.ParentCode, IIf(a.IsPosting, 'فرعي', 'رئيسي') AS KindName, a.IsPosting, a.IsActive
-FROM Accounts AS a
+FROM [@Accounts] AS a
 ORDER BY a.TreeKey"""),
 
     # ============================================================ INTEGRITY

@@ -265,7 +265,7 @@ Public Sub ChequesRefresh(ByVal frm As Access.Form)
     End Select
     frm!lstCheques.RowSource = Tr("SELECT ChequeID, ChequeRef AS [«·ﬁÌœ], ChequeNo AS [—ﬁ„ «·‘Ìﬂ], PartyName AS [" & _
         IIf(kind = "IN", "«·⁄„Ì·", "«·„Ê—œ") & "], Format(DueDate, 'yyyy/mm/dd') AS [«·«” Õﬁ«ﬁ], Format(q.Amount, '#,##0.00') " & _
-        "AS [«·„»·€], StatusName AS [«·Õ«·…], Format(StatusDate, 'yyyy/mm/dd') AS [›Ì], Nz(BankName, DrawerBank) AS [«·»‰ﬂ] " & _
+        "AS [„»·€ «·‘Ìﬂ], StatusName AS [«·Õ«·…], Format(StatusDate, 'yyyy/mm/dd') AS [›Ì], Nz(BankName, DrawerBank) AS [«·»‰ﬂ] " & _
         "FROM ChequesQuery AS q WHERE " & where & " ORDER BY DueDate, ChequeID")
     pending = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind)), 0)
     soon = Nz(DbValue("SELECT Sum(Amount) FROM Cheques WHERE Status = 'PENDING' AND Direction = " & SqlText(kind) & _

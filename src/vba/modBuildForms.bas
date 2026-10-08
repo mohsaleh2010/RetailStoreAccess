@@ -1312,7 +1312,7 @@ Private Sub BuildForm_frmCustomers()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmCustomers", "العملاء", "SELECT * FROM Customers", 15309, 9780, True, True, True, _
-              "KIND=LIST|TABLE=Customers|PK=CustomerID|LIST=SELECT t.CustomerID, t.CustomerName AS [العميل], t.Mobile AS [الجوال], t.CurrentBalance AS [الرصيد] FROM Customers AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CustomerName|SEARCH=t.CustomerName,t.Mobile,t.Phone,t.VATNumber|ACTIVE=t.IsActive"
+              "KIND=LIST|TABLE=Customers|PK=CustomerID|LIST=SELECT t.CustomerID, t.CustomerName AS [العميل], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد] FROM Customers AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CustomerName|SEARCH=t.CustomerName,t.Mobile,t.Phone,t.VATNumber|ACTIVE=t.IsActive"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "العملاء", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -1480,7 +1480,7 @@ Private Sub BuildForm_frmSuppliers()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmSuppliers", "الموردون", "SELECT * FROM Suppliers", 15309, 8646, True, True, True, _
-              "KIND=LIST|TABLE=Suppliers|PK=SupplierID|LIST=SELECT t.SupplierID, t.SupplierName AS [المورد], t.Mobile AS [الجوال], t.CurrentBalance AS [الرصيد] FROM Suppliers AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.SupplierName|SEARCH=t.SupplierName,t.ContactPerson,t.Mobile,t.VATNumber|ACTIVE=t.IsActive"
+              "KIND=LIST|TABLE=Suppliers|PK=SupplierID|LIST=SELECT t.SupplierID, t.SupplierName AS [المورد], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد] FROM Suppliers AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.SupplierName|SEARCH=t.SupplierName,t.ContactPerson,t.Mobile,t.VATNumber|ACTIVE=t.IsActive"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE77B), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "الموردون", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -1693,7 +1693,7 @@ Private Sub BuildForm_frmExpenses()
     Set c = AddLabel("lblExpenseTypeID", "نوع المصروف *", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "ExpenseTypeID", 0)
     Set c = AddButton("btnNewType", "نوع جديد", 8902, 3402, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddCombo("PaymentMethodID", "PaymentMethodID", 12134, 3402, 2948, 425, "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder", 2, "0;3402")
+    Set c = AddCombo("PaymentMethodID", "PaymentMethodID", 12134, 3402, 2948, 425, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p ORDER BY p.SortOrder", 2, "0;3402")
     c.AfterUpdate = EP
     Set c = AddLabel("lblPaymentMethodID", "طريقة الدفع", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "PaymentMethodID", 0)
     Set c = AddText("Amount", "Amount", 7201, 3969, 2948, 425)
@@ -1938,7 +1938,7 @@ Private Sub BuildForm_frmCurrencyRates()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmCurrencyRates", "أسعار العملات", "SELECT * FROM CurrencyRates", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=CurrencyRates|PK=CurrencyRateID|LIST=SELECT t.CurrencyRateID, t.CurrencyCode AS [العملة], t.RateDate AS [التاريخ], t.Rate AS [المعامل] FROM CurrencyRates AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.RateDate DESC, t.CurrencyCode|SEARCH=t.CurrencyCode,t.Notes"
+              "KIND=LIST|TABLE=CurrencyRates|PK=CurrencyRateID|LIST=SELECT t.CurrencyRateID, t.CurrencyCode AS [العملة], t.RateDate AS [التاريخ], t.Rate AS [معامل التحويل] FROM CurrencyRates AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.RateDate DESC, t.CurrencyCode|SEARCH=t.CurrencyCode,t.Notes"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "أسعار العملات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2033,7 +2033,7 @@ Private Sub BuildForm_frmSalesReps()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmSalesReps", "المندوبين", "SELECT * FROM SalesReps", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=SalesReps|PK=SalesRepID|LIST=SELECT t.SalesRepID, t.RepCode AS [الكود], t.RepName AS [المندوب], t.Region AS [المنطقة] FROM SalesReps AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.RepName|SEARCH=t.RepCode,t.RepName,t.RepNameEn,t.Mobile,t.Region|ACTIVE=t.IsActive|SEQ=SALES_REP:RepCode|UNIQUE=RepCode,RepName"
+              "KIND=LIST|TABLE=SalesReps|PK=SalesRepID|LIST=SELECT t.SalesRepID, t.RepCode AS [الكود], t.RepName AS [المندوب], t.Region AS [المنطقة / خط السير] FROM SalesReps AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.RepName|SEARCH=t.RepCode,t.RepName,t.RepNameEn,t.Mobile,t.Region|ACTIVE=t.IsActive|SEQ=SALES_REP:RepCode|UNIQUE=RepCode,RepName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "المندوبين", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2261,7 +2261,7 @@ Private Sub BuildForm_frmRecurring()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmRecurring", "المصروفات المتكررة", "SELECT * FROM RecurringExpenses", 15309, 8646, True, True, True, _
-              "KIND=LIST|TABLE=RecurringExpenses|PK=RecurringID|LIST=SELECT t.RecurringID, t.RecurringName AS [المصروف], IIf(t.Frequency = 'MONTHLY', 'شهري', IIf(t.Frequency = 'QUARTERLY', 'ربع سنوي', 'سنوي')) AS [التكرار], t.Amount + t.Tax AS [المبلغ], t.NextDueDate AS [المستحق] FROM RecurringExpenses AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.NextDueDate, t.RecurringName|SEARCH=t.RecurringName,t.Description|ACTIVE=t.IsActive|UNIQUE=RecurringName"
+              "KIND=LIST|TABLE=RecurringExpenses|PK=RecurringID|LIST=SELECT t.RecurringID, t.RecurringName AS [المصروف], IIf(t.Frequency = 'MONTHLY', 'شهري', IIf(t.Frequency = 'QUARTERLY', 'ربع سنوي', 'سنوي')) AS [مدة التكرار], t.Amount + t.Tax AS [المبلغ مع الضريبة], t.NextDueDate AS [المستحق] FROM RecurringExpenses AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.NextDueDate, t.RecurringName|SEARCH=t.RecurringName,t.Description|ACTIVE=t.IsActive|UNIQUE=RecurringName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8C7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "المصروفات المتكررة", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -2294,7 +2294,7 @@ Private Sub BuildForm_frmRecurring()
     Set c = AddLabel("lblRecurringName", "اسم المصروف *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "RecurringName", 0)
     Set c = AddCombo("ExpenseTypeID", "ExpenseTypeID", 7201, 2268, 2948, 425, "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName", 2, "0;3402")
     Set c = AddLabel("lblExpenseTypeID", "نوع المصروف *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ExpenseTypeID", 0)
-    Set c = AddCombo("PaymentMethodID", "PaymentMethodID", 12134, 2268, 2948, 425, "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder", 2, "0;3402")
+    Set c = AddCombo("PaymentMethodID", "PaymentMethodID", 12134, 2268, 2948, 425, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p ORDER BY p.SortOrder", 2, "0;3402")
     Set c = AddLabel("lblPaymentMethodID", "طريقة الدفع *", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "PaymentMethodID", 0)
     Set c = AddText("Amount", "Amount", 7201, 2835, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
@@ -3350,7 +3350,7 @@ Private Sub BuildForm_frmAccounts()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmAccounts", "دليل الحسابات", "SELECT * FROM Accounts", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=Accounts|PK=AccountCode|LIST=SELECT t.AccountCode, t.AccountCode AS [الرقم], Space((t.AccountLevel - 1) * 3) & t.AccountName AS [الحساب], IIf(t.IsPosting, 'فرعي', 'رئيسي') AS [النوع] FROM Accounts AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.TreeKey|SEARCH=t.AccountName|ACTIVE=t.IsActive|UNIQUE=AccountCode"
+              "KIND=LIST|TABLE=Accounts|PK=AccountCode|LIST=SELECT t.AccountCode, t.AccountCode AS [الرقم], Space((t.AccountLevel - 1) * 3) & t.AccountName AS [الحساب], IIf(t.IsPosting, 'فرعي', 'رئيسي') AS [النوع] FROM [@Accounts] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.TreeKey|SEARCH=t.AccountName,t.AccountNameEn|ACTIVE=t.IsActive|UNIQUE=AccountCode"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "دليل الحسابات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -3387,32 +3387,34 @@ Private Sub BuildForm_frmAccounts()
     SetCtlProp c, "ControlTipText", "رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ"
     SetCtlProp c, "StatusBarText", "رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ"
     Set c = AddLabel("lblAccountCode", "رقم الحساب *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "AccountCode", 0)
-    Set c = AddCombo("ParentCode", "ParentCode", 12134, 1701, 2948, 425, "SELECT AccountCode, Space((AccountLevel - 1) * 3) & AccountName AS Account FROM Accounts WHERE IsPosting = False ORDER BY TreeKey", 2, "0;3969")
+    Set c = AddCombo("ParentCode", "ParentCode", 12134, 1701, 2948, 425, "SELECT a.AccountCode, Space((a.AccountLevel - 1) * 3) & a.AccountName AS Account FROM [@Accounts] AS a WHERE a.IsPosting = False ORDER BY a.TreeKey", 2, "0;3969")
     SetCtlProp c, "ControlTipText", "الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا)"
     SetCtlProp c, "StatusBarText", "الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا)"
     c.AfterUpdate = EP
     Set c = AddLabel("lblParentCode", "الحساب الرئيسي", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "ParentCode", 0)
     Set c = AddText("AccountName", "AccountName", 7201, 2268, 7881, 425)
     Set c = AddLabel("lblAccountName", "اسم الحساب *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "AccountName", 0)
-    Set c = AddCombo("AccountType", "AccountType", 7201, 2835, 2948, 425, "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات", 2, "0;2835")
-    Set c = AddLabel("lblAccountType", "نوع الحساب *", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "AccountType", 0)
-    Set c = AddCheck("IsPosting", "IsPosting", 12134, 2920)
+    Set c = AddText("AccountNameEn", "AccountNameEn", 7201, 2835, 7881, 425)
+    Set c = AddLabel("lblAccountNameEn", "الاسم بالإنجليزية", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "AccountNameEn", 0)
+    Set c = AddCombo("AccountType", "AccountType", 7201, 3402, 2948, 425, "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات", 2, "0;2835")
+    Set c = AddLabel("lblAccountType", "نوع الحساب *", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "AccountType", 0)
+    Set c = AddCheck("IsPosting", "IsPosting", 12134, 3487)
     SetCtlProp c, "ControlTipText", "فرعي = تُكتب عليه القيود؛ رئيسي = يجمع حساباته التابعة فقط"
     SetCtlProp c, "StatusBarText", "فرعي = تُكتب عليه القيود؛ رئيسي = يجمع حساباته التابعة فقط"
-    Set c = AddLabel("lblIsPosting", "حساب فرعي (يقبل القيود)", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "IsPosting", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 3487)
-    Set c = AddLabel("lblIsActive", "نشط", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddCheck("IsSystem", "IsSystem", 12134, 3487)
+    Set c = AddLabel("lblIsPosting", "حساب فرعي (يقبل القيود)", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "IsPosting", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 4054)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddCheck("IsSystem", "IsSystem", 12134, 4054)
     SetCtlProp c, "Locked", True
     SetCtlProp c, "TabStop", False
-    Set c = AddLabel("lblIsSystem", "حساب أساسي في النظام", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "IsSystem", 0)
-    Set c = AddText("AccountLevel", "AccountLevel", 7201, 3969, 2948, 425)
+    Set c = AddLabel("lblIsSystem", "حساب أساسي في النظام", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "IsSystem", 0)
+    Set c = AddText("AccountLevel", "AccountLevel", 7201, 4536, 2948, 425)
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddLabel("lblAccountLevel", "المستوى", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "AccountLevel", 0)
-    Set c = AddLabel("lblAccountNote", "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي».", 10376, 3969, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 4649, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblAccountLevel", "المستوى", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "AccountLevel", 0)
+    Set c = AddLabel("lblAccountNote", "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي».", 10376, 4536, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 5216, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -4045,7 +4047,7 @@ Private Sub BuildForm_frmPOS()
     Set c = AddCombo("cboPaymentType", "", 12474, 2438, 3033, 454, "CASH;نقدي;CREDIT;آجل", 2, "0;2835")
     c.AfterUpdate = EP
     Set c = AddLabel("lblPaymentType", "نوع البيع", 12474, 2126, 3033, 284, 9, False, CLR_MUTED, "cboPaymentType", 0)
-    Set c = AddCombo("cboPaymentMethod", "", 15735, 2438, 3033, 454, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;2835")
+    Set c = AddCombo("cboPaymentMethod", "", 15735, 2438, 3033, 454, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;2835")
     c.AfterUpdate = EP
     Set c = AddLabel("lblPaymentMethod", "طريقة الدفع", 15735, 2126, 3033, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
     Set c = AddText("txtInvoiceDiscount", "", 12474, 3260, 3033, 454)
@@ -4229,7 +4231,7 @@ Private Sub BuildForm_frmSalesReturn()
     Set c = AddLabel("lblReason", "سبب الإرجاع *", 227, 6690, 6577, 284, 9, False, CLR_MUTED, "txtReason", 0)
     Set c = AddCombo("cboRefundType", "", 6974, 7002, 3742, 454, "CASH;رد نقدي;CREDIT;خصم من رصيد العميل", 2, "0;3402")
     Set c = AddLabel("lblRefundType", "طريقة رد المبلغ", 6974, 6690, 3742, 284, 9, False, CLR_MUTED, "cboRefundType", 0)
-    Set c = AddCombo("cboPaymentMethod", "", 10886, 7002, 4196, 454, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;3402")
+    Set c = AddCombo("cboPaymentMethod", "", 10886, 7002, 4196, 454, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;3402")
     Set c = AddLabel("lblPaymentMethod", "طريقة الرد", 10886, 6690, 4196, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
     Set c = AddLabel("lblReturnTotalCap", "قيمة المرتجع:", 227, 7711, 2268, 454, 13, False, CLR_MUTED, "", 0)
     Set c = AddLabel("lblReturnTotal", "0.00", 2552, 7598, 3402, 624, 20, True, CLR_DANGER, "", 0)
@@ -4295,7 +4297,7 @@ Private Sub BuildForm_frmCustomerPayment()
     Set c = AddText("txtRate", "", 4422, 2608, 1361, 510)
     SetCtlProp c, "Format", "0.0000"
     Set c = AddLabel("lblRate", "المعامل", 4422, 2296, 1361, 284, 9, False, CLR_MUTED, "txtRate", 0)
-    Set c = AddCombo("cboPaymentMethod", "", 5897, 2608, 2948, 510, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;3402")
+    Set c = AddCombo("cboPaymentMethod", "", 5897, 2608, 2948, 510, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;3402")
     Set c = AddLabel("lblPaymentMethod", "طريقة الدفع", 5897, 2296, 2948, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
     Set c = AddText("txtNotes", "", 227, 3515, 8618, 454)
     Set c = AddLabel("lblNotes", "ملاحظات", 227, 3203, 8618, 284, 9, False, CLR_MUTED, "txtNotes", 0)
@@ -4498,7 +4500,7 @@ Private Sub BuildForm_frmPurchaseInvoice()
     Set c = AddCombo("cboPaymentType", "", 12474, 3260, 3033, 454, "CASH;نقدي;CREDIT;آجل", 2, "0;2835")
     c.AfterUpdate = EP
     Set c = AddLabel("lblPaymentType", "نوع الشراء", 12474, 2948, 3033, 284, 9, False, CLR_MUTED, "cboPaymentType", 0)
-    Set c = AddCombo("cboPaymentMethod", "", 15735, 3260, 3033, 454, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;2835")
+    Set c = AddCombo("cboPaymentMethod", "", 15735, 3260, 3033, 454, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;2835")
     Set c = AddLabel("lblPaymentMethod", "طريقة الدفع", 15735, 2948, 3033, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
     Set c = AddText("txtInvoiceDiscount", "", 12474, 4082, 3033, 454)
     SetCtlProp c, "Format", "#,##0.00"
@@ -4699,7 +4701,7 @@ Private Sub BuildForm_frmPurchaseReturn()
     Set c = AddLabel("lblReason", "سبب الإرجاع *", 227, 6690, 6577, 284, 9, False, CLR_MUTED, "txtReason", 0)
     Set c = AddCombo("cboRefundType", "", 6974, 7002, 3742, 454, "CREDIT;خصم من رصيد المورد;CASH;استرداد نقدي من المورد", 2, "0;3402")
     Set c = AddLabel("lblRefundType", "طريقة الاسترداد", 6974, 6690, 3742, 284, 9, False, CLR_MUTED, "cboRefundType", 0)
-    Set c = AddCombo("cboPaymentMethod", "", 10886, 7002, 4196, 454, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;3402")
+    Set c = AddCombo("cboPaymentMethod", "", 10886, 7002, 4196, 454, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;3402")
     Set c = AddLabel("lblPaymentMethod", "طريقة الاستلام", 10886, 6690, 4196, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
     Set c = AddLabel("lblReturnTotalCap", "قيمة المرتجع:", 227, 7711, 2268, 454, 13, False, CLR_MUTED, "", 0)
     Set c = AddLabel("lblReturnTotal", "0.00", 2552, 7598, 3402, 624, 20, True, CLR_DANGER, "", 0)
@@ -4765,7 +4767,7 @@ Private Sub BuildForm_frmSupplierPayment()
     Set c = AddText("txtRate", "", 4422, 2608, 1361, 510)
     SetCtlProp c, "Format", "0.0000"
     Set c = AddLabel("lblRate", "المعامل", 4422, 2296, 1361, 284, 9, False, CLR_MUTED, "txtRate", 0)
-    Set c = AddCombo("cboPaymentMethod", "", 5897, 2608, 2948, 510, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;3402")
+    Set c = AddCombo("cboPaymentMethod", "", 5897, 2608, 2948, 510, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;3402")
     Set c = AddLabel("lblPaymentMethod", "طريقة الدفع", 5897, 2296, 2948, 284, 9, False, CLR_MUTED, "cboPaymentMethod", 0)
     Set c = AddText("txtNotes", "", 227, 3515, 8618, 454)
     Set c = AddLabel("lblNotes", "ملاحظات", 227, 3203, 8618, 284, 9, False, CLR_MUTED, "txtNotes", 0)
@@ -4896,7 +4898,7 @@ Private Sub BuildForm_frmInventory()
     Set c = AddLabel("lblProductName", "اختر منتجًا من القائمة", 12134, 1304, 6634, 454, 14, True, CLR_PRIMARY, "", 0)
     Set c = AddLabel("lblProductStock", " ", 12134, 1786, 6634, 340, 10, False, CLR_TEXT, "", 0)
     Set c = AddLabel("lblManualCap", "حركة يدوية على المنتج المحدد", 12134, 2268, 6634, 340, 11, True, CLR_MUTED, "", 0)
-    Set c = AddCombo("cboMoveType", "", 12134, 2977, 3175, 454, "SELECT TransactionTypeID, TypeName FROM TransactionTypes WHERE IsManual = True ORDER BY TransactionTypeID", 2, "0;2835")
+    Set c = AddCombo("cboMoveType", "", 12134, 2977, 3175, 454, "SELECT t.TransactionTypeID, t.TypeName FROM [@TransactionTypes] AS t WHERE t.IsManual = True ORDER BY t.TransactionTypeID", 2, "0;2835")
     c.AfterUpdate = EP
     Set c = AddLabel("lblMoveType", "نوع الحركة", 12134, 2665, 3175, 284, 9, False, CLR_MUTED, "cboMoveType", 0)
     Set c = AddText("txtMoveQty", "", 15479, 2977, 1531, 454)
@@ -5723,7 +5725,7 @@ Private Sub BuildForm_frmTouchPOS()
     SetCtlProp c, "Visible", False
     Set c = AddCombo("cboPaymentType", "", 10260, 57, 170, 170, "CASH;نقدي;CREDIT;آجل", 2, "0;2835")
     SetCtlProp c, "Visible", False
-    Set c = AddCombo("cboPaymentMethod", "", 10458, 57, 170, 170, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;2835")
+    Set c = AddCombo("cboPaymentMethod", "", 10458, 57, 170, 170, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;2835")
     SetCtlProp c, "Visible", False
     Set c = AddLabel("lblChange", " ", 10656, 57, 170, 170, 10, False, CLR_TEXT, "", 0)
     SetCtlProp c, "Visible", False
@@ -6292,7 +6294,7 @@ Private Sub BuildForm_frmCafePOS()
     SetCtlProp c, "Visible", False
     Set c = AddCombo("cboPaymentType", "", 10260, 57, 170, 170, "CASH;نقدي;CREDIT;آجل", 2, "0;2835")
     SetCtlProp c, "Visible", False
-    Set c = AddCombo("cboPaymentMethod", "", 10458, 57, 170, 170, "SELECT PaymentMethodID, MethodName FROM PaymentMethods WHERE IsActive = True ORDER BY SortOrder", 2, "0;2835")
+    Set c = AddCombo("cboPaymentMethod", "", 10458, 57, 170, 170, "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True ORDER BY p.SortOrder", 2, "0;2835")
     SetCtlProp c, "Visible", False
     Set c = AddCombo("cboCustomer", "", 10656, 57, 170, 170, "SELECT CustomerID, CustomerName FROM Customers ORDER BY CustomerName", 2, "0;5670")
     SetCtlProp c, "Visible", False
@@ -7243,7 +7245,7 @@ Private Sub BuildForm_frmManualLines()
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddCombo("AccountCode", "AccountCode", 566, 0, 5273, 425, "SELECT AccountCode, AccountCode & '  ' & AccountName AS Account FROM Accounts WHERE IsPosting = True AND IsActive = True ORDER BY TreeKey", 2, "0;5103")
+    Set c = AddCombo("AccountCode", "AccountCode", 566, 0, 5273, 425, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True ORDER BY TreeKey", 2, "0;5103")
     SetCtlProp c, "BoundColumn", 1
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
@@ -7404,7 +7406,7 @@ Private Sub BuildForm_frmLedger()
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "كشف حساب ودفتر الأستاذ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", "حركة أي حساب برصيد أول المدة والرصيد بعد كل قيد؛ الحساب الرئيسي يشمل حساباته التابعة", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddCombo("cboAccount", "", 227, 1304, 5103, 454, "SELECT AccountCode, AccountCode & '  ' & Space((AccountLevel - 1) * 2) & AccountName AS Account FROM Accounts ORDER BY TreeKey", 2, "0;5103")
+    Set c = AddCombo("cboAccount", "", 227, 1304, 5103, 454, "SELECT a.AccountCode, a.AccountCode & '  ' & Space((a.AccountLevel - 1) * 2) & a.AccountName AS Account FROM [@Accounts] AS a ORDER BY a.TreeKey", 2, "0;5103")
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
     Set c = AddLabel("lblAccount", "الحساب", 227, 992, 5103, 284, 9, False, CLR_MUTED, "cboAccount", 0)
@@ -8004,7 +8006,7 @@ Private Sub BuildForm_frmBankTx()
     SetCtlProp c, "Format", "#,##0.00"
     c.AfterUpdate = EP
     Set c = AddLabel("lblFeeVAT", "ضريبة العمولة / الرسوم", 3856, 1871, 1588, 284, 9, False, CLR_MUTED, "txtFeeVAT", 0)
-    Set c = AddCombo("cboCounter", "", 5557, 2183, 3969, 454, "SELECT AccountCode, AccountCode & '  ' & AccountName FROM Accounts WHERE IsPosting = True AND IsActive = True AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, 2100) ORDER BY TreeKey", 2, "0;3856")
+    Set c = AddCombo("cboCounter", "", 5557, 2183, 3969, 454, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, 2100) ORDER BY TreeKey", 2, "0;3856")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblCounter", "الحساب المقابل (الحركات الأخرى)", 5557, 1871, 3969, 284, 9, False, CLR_MUTED, "cboCounter", 0)
     Set c = AddText("txtReference", "", 9639, 2183, 1814, 454)
@@ -8016,7 +8018,7 @@ Private Sub BuildForm_frmBankTx()
     c.OnClick = EP
     Set c = AddLabel("lblListCap", "الحركات المسجلة", 227, 3515, 6804, 312, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstTx", 227, 3856, 14288, 5443, 7, "0;1474;1361;1361;2268;1701;5670", True)
-    c.RowSource = Tr("SELECT t.BankTxID, t.TxNumber AS [الرقم], Format(t.TxDate, 'yyyy/mm/dd') AS [التاريخ], IIf(t.TxType = 'DEPOSIT', 'إيداع', IIf(t.TxType = 'WITHDRAW', 'سحب', IIf(t.TxType = 'SETTLEMENT', 'تسوية مدى', IIf(t.TxType = 'TRANSFER', 'تحويل', IIf(t.TxType = 'OTHER_IN', 'وارد', 'صادر'))))) AS [النوع], k.BankName AS [البنك], Format(t.Amount, '#,##0.00') AS [المبلغ], t.Description AS [البيان] FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID ORDER BY t.TxDate DESC, t.BankTxID DESC")
+    c.RowSource = Tr("SELECT t.BankTxID, t.TxNumber AS [الرقم], Format(t.TxDate, 'yyyy/mm/dd') AS [التاريخ], IIf(t.TxType = 'DEPOSIT', 'إيداع', IIf(t.TxType = 'WITHDRAW', 'سحب', IIf(t.TxType = 'SETTLEMENT', 'تسوية مدى', IIf(t.TxType = 'TRANSFER', 'تحويل', IIf(t.TxType = 'OTHER_IN', 'وارد', 'صادر'))))) AS [النوع], k.BankName AS [البنك], Format(t.Amount, '#,##0.00') AS [مبلغ الحركة], t.Description AS [تفاصيل العملية] FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID ORDER BY t.TxDate DESC, t.BankTxID DESC")
     Set c = AddButton("btnDelete", "حذف الحركة", 227, 9469, 1701, 510, "danger")
     c.OnClick = EP
     Set c = AddButton("btnRecon", "التسوية البنكية", 2041, 9469, 1928, 510, "secondary")
@@ -8285,7 +8287,7 @@ Private Sub BuildForm_frmAssets()
     Set c = AddLabel("lblSubtitle", "سجل الأصول وقيد شرائها، والإهلاك بالقسط الثابت، والبيع أو الاستبعاد", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
     Set c = AddText("txtAssetName", "", 227, 1304, 3629, 454)
     Set c = AddLabel("lblAssetName", "اسم الأصل", 227, 992, 3629, 284, 9, False, CLR_MUTED, "txtAssetName", 0)
-    Set c = AddCombo("cboAssetAccount", "", 3969, 1304, 3062, 454, "SELECT AccountCode, AccountCode & '  ' & AccountName FROM Accounts WHERE IsPosting = True AND IsActive = True AND AccountType = 'ASSET' AND Level2Code = 12 AND AccountCode <> 1790 ORDER BY TreeKey", 2, "0;2948")
+    Set c = AddCombo("cboAssetAccount", "", 3969, 1304, 3062, 454, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True AND AccountType = 'ASSET' AND Level2Code = 12 AND AccountCode <> 1790 ORDER BY TreeKey", 2, "0;2948")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblAssetAccount", "حساب الأصل (المجموعة)", 3969, 992, 3062, 284, 9, False, CLR_MUTED, "cboAssetAccount", 0)
     Set c = AddText("txtPurchaseDate", "", 7144, 1304, 1588, 454)
@@ -8321,7 +8323,7 @@ Private Sub BuildForm_frmAssets()
     Set c = AddCombo("cboBox", "", 7371, 2126, 1928, 454, "SELECT CashBoxID, BoxName FROM CashBoxes ORDER BY BoxType DESC, BoxName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblBox", "الصندوق", 7371, 1814, 1928, 284, 9, False, CLR_MUTED, "cboBox", 0)
-    Set c = AddCombo("cboCounter", "", 9412, 2126, 3175, 454, "SELECT AccountCode, AccountCode & '  ' & AccountName FROM Accounts WHERE IsPosting = True AND IsActive = True AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, 2100) ORDER BY TreeKey", 2, "0;3062")
+    Set c = AddCombo("cboCounter", "", 9412, 2126, 3175, 454, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, 2100) ORDER BY TreeKey", 2, "0;3062")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblCounter", "الحساب الدائن", 9412, 1814, 3175, 284, 9, False, CLR_MUTED, "cboCounter", 0)
     Set c = AddText("txtOpeningAccum", "", 12701, 2126, 2381, 454)
@@ -8344,7 +8346,7 @@ Private Sub BuildForm_frmAssets()
     c.OnClick = EP
     Set c = AddLabel("lblAssetInfo", " ", 227, 3515, 14855, 567, 10, True, CLR_PRIMARY, "", 0)
     Set c = AddList("lstAssets", 227, 4139, 14855, 4536, 9, "0;1247;3402;2495;1361;1588;1588;1701;1021", True)
-    c.RowSource = Tr("SELECT AssetID, AssetCode AS [الرقم], AssetName AS [الأصل], AssetGroup AS [المجموعة], Format(PurchaseDate, 'yyyy/mm/dd') AS [الشراء], Format(q.Cost, '#,##0.00') AS [التكلفة], Format(AccumDep, '#,##0.00') AS [مجمع الإهلاك], Format(BookValue, '#,##0.00') AS [القيمة الدفترية], q.StatusName AS [الحالة] FROM FixedAssetsQuery AS q ORDER BY q.Status, q.AssetCode")
+    c.RowSource = Tr("SELECT AssetID, AssetCode AS [الرقم], AssetName AS [الأصل], AssetGroup AS [المجموعة], Format(PurchaseDate, 'yyyy/mm/dd') AS [الشراء], Format(q.Cost, '#,##0.00') AS [تكلفة الأصل], Format(AccumDep, '#,##0.00') AS [مجمع الإهلاك], Format(BookValue, '#,##0.00') AS [القيمة الدفترية], q.StatusName AS [الحالة] FROM FixedAssetsQuery AS q ORDER BY q.Status, q.AssetCode")
     c.AfterUpdate = EP
     Set c = AddLabel("lblDisposeCap", "بيع الأصل المعروض أو استبعاده", 227, 8788, 6804, 312, 10, True, CLR_TEXT, "", 0)
     Set c = AddText("txtDisposalDate", "", 227, 9497, 1588, 454)
@@ -8689,7 +8691,7 @@ Private Sub BuildForm_frmBudgetLines()
     SetFormProp "DefaultView", 1
     SetFormProp "ScrollBars", 2
     SetFormProp "Cycle", 0
-    Set c = AddCombo("AccountCode", "AccountCode", 28, 0, 2211, 397, "SELECT AccountCode, AccountCode & '  ' & AccountName FROM Accounts WHERE AccountType IN ('REVENUE', 'EXPENSE') AND IsActive = True ORDER BY TreeKey", 2, "0;3118")
+    Set c = AddCombo("AccountCode", "AccountCode", 28, 0, 2211, 397, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE AccountType IN ('REVENUE', 'EXPENSE') AND IsActive = True ORDER BY TreeKey", 2, "0;3118")
     SetCtlProp c, "BoundColumn", 1
     SetCtlProp c, "LimitToList", True
     Set c = AddCombo("CostCenterID", "CostCenterID", 2267, 0, 1191, 397, "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode", 2, "0;1701")

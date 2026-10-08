@@ -486,7 +486,7 @@ Public Sub BankReconBankChanged(ByVal frm As Access.Form)
         End If
         frm!lstRecons.RowSource = Tr("SELECT ReconciliationID, ReconNumber AS [«· ”ÊÌ…], Format(StatementDate, 'yyyy/mm/dd') " & _
             "AS [ «—ÌŒ «·ﬂ‘›], Format(StatementBalance, '#,##0.00') AS [—’Ìœ «·ﬂ‘›], IIf(r.Status = 'DONE', '„⁄ „œ…', " & _
-            "'Ã«—Ì…') AS [«·Õ«·…] FROM BankReconciliations AS r WHERE r.BankID = " & frm!cboBank.Value & " ORDER BY StatementDate DESC")
+            "'Ã«—Ì…') AS [Õ«·… «· ”ÊÌ…] FROM BankReconciliations AS r WHERE r.BankID = " & frm!cboBank.Value & " ORDER BY StatementDate DESC")
     End If
     BankReconRefresh frm
 End Sub

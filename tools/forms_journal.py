@@ -99,7 +99,7 @@ def layout_journal_entry() -> FormModel:
 
 
 # ------------------------------------------------------------- manual entries
-POSTING_ACCOUNTS = ("SELECT AccountCode, AccountCode & '  ' & AccountName AS Account FROM Accounts "
+POSTING_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a "
                     "WHERE IsPosting = True AND IsActive = True ORDER BY TreeKey")
 MANUAL_FIND_ROWS = ("SELECT ManualEntryID, EntryNumber, EntryDate, Description FROM ManualEntries "
                     "ORDER BY EntryDate DESC, ManualEntryID DESC")
@@ -185,8 +185,8 @@ def layout_manual_entry(heads) -> FormModel:
 
 
 # ------------------------------------------------------------- account statement
-LEDGER_ACCOUNTS = ("SELECT AccountCode, AccountCode & '  ' & Space((AccountLevel - 1) * 2) & AccountName AS Account "
-                   "FROM Accounts ORDER BY TreeKey")
+LEDGER_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & Space((a.AccountLevel - 1) * 2) & a.AccountName "
+                   "AS Account FROM [@Accounts] AS a ORDER BY a.TreeKey")
 LEDGER_LIST_WIDTHS = "0;2.2;2.4;3.0;2.6;5.6;3.0;2.4;2.4;2.6"
 
 

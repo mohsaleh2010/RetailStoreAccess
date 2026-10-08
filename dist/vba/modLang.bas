@@ -15,13 +15,15 @@ Attribute VB_Name = "modLang"
 '               screens and reports with it; ShowMessage, AskYesNo and the
 '               captions set by code translate at run time.
 '   UiAlign     left / right text alignment for the interface direction.
+'   LangSql     [@Accounts] in SQL -> Accounts, or in English qryLocAccounts: the
+'               names of the master data in English (Tr calls it in both languages).
 '   MSG_RTL     the right-to-left flags of MsgBox (0 in English).
 ' The tax invoice and the credit note stay bilingual in both languages (ZATCA).
 '==============================================================================
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2269
+Private Const ENTRY_COUNT As Long = 2279
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -98,8 +100,12 @@ Public Function Tr(ByVal Text As Variant) As Variant
     Dim s As String, i As Long
     Tr = Text
     If VarType(Text) <> vbString Then Exit Function
-    If Not UiEnglish() Then Exit Function
     s = Text
+    If InStr(1, s, "[@", vbBinaryCompare) > 0 Then         ' a master table with English names (both languages)
+        s = LangSql(s)
+        Tr = s
+    End If
+    If Not UiEnglish() Then Exit Function
     If Not HasArabic(s) Then Exit Function
     If Not m_loaded Then LoadDictionary
     For i = 1 To m_count
@@ -114,6 +120,24 @@ Public Function Tr(ByVal Text As Variant) As Variant
     s = Replace(s, ChrW(&HAB), "", 1, -1, vbBinaryCompare)          ' the Arabic quotes
     s = Replace(s, ChrW(&HBB), "", 1, -1, vbBinaryCompare)
     Tr = s
+End Function
+
+Public Function LangSql(ByVal Text As String) As String
+    ' [@Accounts] in SQL: the table Accounts, or in English the saved query qryLocAccounts (the same
+    ' columns, with the English name of each row in the name column). tools/i18n.py resolve_names.
+    Dim out As String, pos As Long, i As Long, j As Long
+    pos = 1
+    Do
+        i = InStr(pos, Text, "[@", vbBinaryCompare)
+        If i = 0 Then Exit Do
+        j = InStr(i, Text, "]", vbBinaryCompare)
+        If j = 0 Then Exit Do
+        out = out & Mid$(Text, pos, i - pos)
+        If UiEnglish() Then out = out & "qryLoc"
+        out = out & Mid$(Text, i + 2, j - i - 2)
+        pos = j + 1
+    Loop
+    LangSql = out & Mid$(Text, pos)
 End Function
 
 Public Function IsArabicCode(ByVal Code As Long) As Boolean

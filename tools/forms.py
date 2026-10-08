@@ -124,7 +124,7 @@ CUSTOMER_ROWS = "SELECT CustomerID, CustomerName FROM Customers ORDER BY Custome
 PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Item "
                 "FROM Products ORDER BY ProductName")
 EXPENSE_TYPE_ROWS = "SELECT ExpenseTypeID, ExpenseTypeName FROM ExpenseTypes ORDER BY ExpenseTypeName"
-PAYMENT_ROWS = "SELECT PaymentMethodID, MethodName FROM PaymentMethods ORDER BY SortOrder"
+PAYMENT_ROWS = "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p ORDER BY p.SortOrder"
 BANK_ROWS = "SELECT BankID, BankName FROM Banks WHERE IsActive = True ORDER BY BankName"
 CENTER_ROWS = "SELECT CostCenterID, CenterName FROM CostCenters WHERE IsActive = True ORDER BY CenterCode"
 CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies "
@@ -137,8 +137,8 @@ EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive =
 FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
 ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
 # main (summary) accounts only: a sub-account always hangs under a main account
-ACCOUNT_ROWS = ("SELECT AccountCode, Space((AccountLevel - 1) * 3) & AccountName AS Account FROM Accounts "
-                "WHERE IsPosting = False ORDER BY TreeKey")
+ACCOUNT_ROWS = ("SELECT a.AccountCode, Space((a.AccountLevel - 1) * 3) & a.AccountName AS Account FROM [@Accounts] AS a "
+                "WHERE a.IsPosting = False ORDER BY a.TreeKey")
 ROLE_ROWS = "SELECT RoleID, RoleName FROM Roles ORDER BY RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 
@@ -180,7 +180,7 @@ DATA_SCREENS: List[DataScreen] = [
         ]),
     DataScreen(
         "frmCustomers", "Customers", "العملاء", "بيانات العملاء وأرصدتهم", "customers",
-        list_select="t.CustomerName AS [العميل], t.Mobile AS [الجوال], t.CurrentBalance AS [الرصيد]",
+        list_select="t.CustomerName AS [العميل], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد]",
         list_from="Customers AS t", list_order="t.CustomerName",
         list_headers=[("العميل", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
         search=["t.CustomerName", "t.Mobile", "t.Phone", "t.VATNumber"],
@@ -203,7 +203,7 @@ DATA_SCREENS: List[DataScreen] = [
         ]),
     DataScreen(
         "frmSuppliers", "Suppliers", "الموردون", "بيانات الموردين وأرصدتهم", "suppliers",
-        list_select="t.SupplierName AS [المورد], t.Mobile AS [الجوال], t.CurrentBalance AS [الرصيد]",
+        list_select="t.SupplierName AS [المورد], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد]",
         list_from="Suppliers AS t", list_order="t.SupplierName",
         list_headers=[("المورد", 4.4), ("الجوال", 2.4), ("الرصيد", 1.6)],
         search=["t.SupplierName", "t.ContactPerson", "t.Mobile", "t.VATNumber"],
@@ -264,7 +264,7 @@ DATA_SCREENS: List[DataScreen] = [
     DataScreen(
         "frmCurrencyRates", "CurrencyRates", "أسعار العملات", "معامل كل عملة في تاريخ؛ المستند يأخذ آخر سعر في تاريخه أو قبله",
         "treasury",
-        list_select="t.CurrencyCode AS [العملة], t.RateDate AS [التاريخ], t.Rate AS [المعامل]",
+        list_select="t.CurrencyCode AS [العملة], t.RateDate AS [التاريخ], t.Rate AS [معامل التحويل]",
         list_from="CurrencyRates AS t", list_order="t.RateDate DESC, t.CurrencyCode",
         list_headers=[("العملة", 1.8), ("التاريخ", 2.6), ("المعامل", 2.2)],
         search=["t.CurrencyCode", "t.Notes"],
@@ -273,7 +273,7 @@ DATA_SCREENS: List[DataScreen] = [
                 Info("lblRateNote", "لكل عملة سعر واحد في اليوم؛ عملة البرنامج لا تحتاج سعرًا")]),
     DataScreen(
         "frmSalesReps", "SalesReps", "المندوبين", "مندوبو المبيعات: عملاؤهم ونسبة عمولتهم ومركز تكلفتهم", "customers",
-        list_select="t.RepCode AS [الكود], t.RepName AS [المندوب], t.Region AS [المنطقة]",
+        list_select="t.RepCode AS [الكود], t.RepName AS [المندوب], t.Region AS [المنطقة / خط السير]",
         list_from="SalesReps AS t", list_order="t.RepName",
         list_headers=[("الكود", 1.8), ("المندوب", 4.2), ("المنطقة", 2.4)],
         search=["t.RepCode", "t.RepName", "t.RepNameEn", "t.Mobile", "t.Region"], active="t.IsActive",
@@ -309,7 +309,7 @@ DATA_SCREENS: List[DataScreen] = [
         "frmRecurring", "RecurringExpenses", "المصروفات المتكررة",
         "الإيجار والكهرباء والاشتراكات: يُنشأ المصروف تلقائيًا في تاريخ استحقاقه", "expenses",
         list_select=("t.RecurringName AS [المصروف], IIf(t.Frequency = 'MONTHLY', 'شهري', IIf(t.Frequency = 'QUARTERLY', "
-                     "'ربع سنوي', 'سنوي')) AS [التكرار], t.Amount + t.Tax AS [المبلغ], t.NextDueDate AS [المستحق]"),
+                     "'ربع سنوي', 'سنوي')) AS [مدة التكرار], t.Amount + t.Tax AS [المبلغ مع الضريبة], t.NextDueDate AS [المستحق]"),
         list_from="RecurringExpenses AS t", list_order="t.NextDueDate, t.RecurringName",
         list_headers=[("المصروف", 3.4), ("التكرار", 1.6), ("المبلغ", 1.6), ("المستحق", 2.0)],
         search=["t.RecurringName", "t.Description"], active="t.IsActive", unique=["RecurringName"],
@@ -438,9 +438,9 @@ DATA_SCREENS: List[DataScreen] = [
         "frmAccounts", "Accounts", "دليل الحسابات", "شجرة الحسابات: الحسابات الرئيسية والفرعية", "journal",
         list_select="t.AccountCode AS [الرقم], Space((t.AccountLevel - 1) * 3) & t.AccountName AS [الحساب], "
                     "IIf(t.IsPosting, 'فرعي', 'رئيسي') AS [النوع]",
-        list_from="Accounts AS t", list_order="t.TreeKey",
+        list_from="[@Accounts] AS t", list_order="t.TreeKey",
         list_headers=[("الرقم", 1.8), ("الحساب", 5.4), ("النوع", 1.2)],
-        search=["t.AccountName"], active="t.IsActive", unique=["AccountCode"],
+        search=["t.AccountName", "t.AccountNameEn"], active="t.IsActive", unique=["AccountCode"],
         extra_buttons=[("btnJournal", "قيود اليومية", 'OpenScreen "frmJournal"'),
                        ("btnStatement", "كشف حساب", 'OpenScreen "frmLedger", 0, Me!AccountCode'),
                        ("btnManual", "قيد يدوي", 'OpenScreen "frmManualEntry"'),
@@ -448,7 +448,7 @@ DATA_SCREENS: List[DataScreen] = [
         fields=[Fld("AccountCode", hint="رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ"),
                 Fld("ParentCode", rows=ACCOUNT_ROWS, widths="0;7", hook=True,
                     hint="الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا)"),
-                Fld("AccountName", span=2),
+                Fld("AccountName", span=2), Fld("AccountNameEn", span=2),
                 Fld("AccountType", rows=ACCOUNT_TYPES, widths="0;5"),
                 Fld("IsPosting", hint="فرعي = تُكتب عليه القيود؛ رئيسي = يجمع حساباته التابعة فقط"),
                 Fld("IsActive"), Fld("IsSystem", locked=True), Fld("AccountLevel", locked=True),
@@ -581,14 +581,14 @@ class SearchKind:
 
 SEARCH_KINDS: List[SearchKind] = [
     SearchKind("PRODUCT", "المنتجات",
-               "SELECT p.ProductID, p.ProductCode AS [الكود], p.Barcode AS [الباركود], "
+               "SELECT p.ProductID, p.ProductCode AS [الكود], p.Barcode AS [رقم الباركود], "
                "p.ProductName AS [المنتج], p.CurrentQuantity AS [الكمية], p.SellingPrice AS [السعر] "
                "FROM Products AS p WHERE p.ProductName Like {LIKE} OR p.ProductCode Like {LIKE} "
                "OR p.Barcode Like {LIKE} OR p.ProductNameEn Like {LIKE} OR p.ProductID = {NUM} "
                "ORDER BY p.ProductName",
                [0, 2.5, 3.5, 9, 2.5, 2.5]),
     SearchKind("CUSTOMER", "العملاء",
-               "SELECT c.CustomerID, c.CustomerName AS [العميل], c.Mobile AS [الجوال], "
+               "SELECT c.CustomerID, c.CustomerName AS [العميل], c.Mobile AS [رقم الجوال], "
                "c.VATNumber AS [الرقم الضريبي], c.CurrentBalance AS [الرصيد] "
                "FROM Customers AS c WHERE c.CustomerName Like {LIKE} OR c.Mobile Like {LIKE} "
                "OR c.Phone Like {LIKE} OR c.VATNumber Like {LIKE} OR c.CustomerID = {NUM} "
@@ -596,7 +596,7 @@ SEARCH_KINDS: List[SearchKind] = [
                [0, 9, 3.5, 4.5, 3]),
     SearchKind("SUPPLIER", "الموردون",
                "SELECT s.SupplierID, s.SupplierName AS [المورد], s.ContactPerson AS [المسؤول], "
-               "s.Mobile AS [الجوال], s.CurrentBalance AS [الرصيد] "
+               "s.Mobile AS [رقم الجوال], s.CurrentBalance AS [الرصيد] "
                "FROM Suppliers AS s WHERE s.SupplierName Like {LIKE} OR s.ContactPerson Like {LIKE} "
                "OR s.Mobile Like {LIKE} OR s.VATNumber Like {LIKE} OR s.SupplierID = {NUM} "
                "ORDER BY s.SupplierName",

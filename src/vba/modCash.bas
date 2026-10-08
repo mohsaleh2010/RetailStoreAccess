@@ -341,7 +341,7 @@ End Function
 Public Sub TreasuryLoad(ByVal frm As Access.Form)
     Dim sql As String
     Calendar = vbCalGreg
-    sql = "SELECT CashBoxID, BoxName AS [الصندوق], BoxTypeName AS [النوع], Format(q.Balance, '#,##0.00') AS [الرصيد] " & _
+    sql = "SELECT CashBoxID, BoxName AS [الصندوق], BoxTypeName AS [النوع], Format(q.Balance, '#,##0.00') AS [رصيد الصندوق] " & _
           "FROM CashBoxBalanceQuery AS q WHERE q.IsActive = True"
     If Not HasPermission("CASH_BOX") Then sql = sql & " AND q.CashBoxID = " & CurrentCashBoxID()   ' a cashier sees his box
     frm!lstBoxes.RowSource = Tr(sql & " ORDER BY q.BoxType DESC, q.BoxName")

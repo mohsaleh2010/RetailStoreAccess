@@ -172,6 +172,8 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     EnsureDeveloperUser
     m_currentStep = "account tree"
     UpgradeAccountTree
+    m_currentStep = "english names"
+    SeedEnglishNames
 
     m_db.Close
     Set m_db = Nothing
@@ -687,6 +689,20 @@ def account_upgrade_sub() -> str:
     return "\n".join(out)
 
 
+def english_names_sub() -> str:
+    """The English names of the system rows (tools/master_en.py), for a new or an older back-end:
+    only the names still empty are filled, so a name the user changed is kept. Safe to run every time."""
+    from master_en import ENGLISH_NAMES
+    out = ["Private Sub SeedEnglishNames()"]
+    for tbl, (en_field, _, key, names) in ENGLISH_NAMES.items():
+        for k, en in names.items():
+            sql = (f"UPDATE [{tbl}] SET [{en_field}] = {sql_value(en)} WHERE [{key}] = {sql_value(k)} "
+                   f"AND [{en_field}] Is Null")
+            out.append(f"    m_db.Execute {vba_str(sql)}, dbFailOnError")
+    out.append("End Sub")
+    return "\n".join(out)
+
+
 def long_const(name: str, text: str, sep: str) -> str:
     """A string constant split at sep into pieces joined with & (a VBA line stays under 1000 characters)."""
     pieces, cur = [], ""
@@ -723,6 +739,7 @@ def build_vba() -> str:
     for t in seeded:
         parts.append(vba_seed_sub(t) + "\n")
     parts.append(account_upgrade_sub() + "\n")
+    parts.append(english_names_sub() + "\n")
     return "\n".join(parts)
 
 

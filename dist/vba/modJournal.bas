@@ -53,7 +53,8 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
     closed = ClosedThroughDate()            ' entries until this day never change (modClosing); 0 = none
     EnsureAccounts
     Set kinds = CreateObject("Scripting.Dictionary")
-    Set rs = db.OpenRecordset("SELECT SourceType, TypeName FROM JournalSourceTypes", dbOpenSnapshot)
+    Set rs = db.OpenRecordset(Tr("SELECT j.SourceType, j.TypeName FROM [@JournalSourceTypes] AS j"), _
+                              dbOpenSnapshot)                                ' the name in the interface language (modLang)
     Do Until rs.EOF
         kinds(CStr(rs!SourceType)) = CStr(rs!TypeName)
         rs.MoveNext
@@ -251,7 +252,8 @@ Public Sub JournalLoad(ByVal frm As Access.Form)
     Dim rows As String, rs As DAO.Recordset
     Calendar = vbCalGreg
     rows = """ALL"";""ﬂ· «·⁄„·Ì« """
-    Set rs = CurrentDb.OpenRecordset("SELECT SourceType, TypeName FROM JournalSourceTypes ORDER BY SortOrder", dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT j.SourceType, j.TypeName FROM [@JournalSourceTypes] AS j " & _
+                                     "ORDER BY j.SortOrder"), dbOpenSnapshot)
     Do Until rs.EOF
         rows = rows & ";""" & rs!SourceType & """;""" & rs!TypeName & """"
         rs.MoveNext
@@ -303,8 +305,8 @@ Public Sub JournalRefresh(ByVal frm As Access.Form)
         Exit Sub
     End If
     frm!lstEntries.RowSource = Tr("SELECT e.EntryID, e.EntryNumber AS [—ﬁ„ «·ﬁÌœ], GDate(e.EntryDate) AS [«· «—ÌŒ], " & _
-        "t.TypeName AS [«·⁄„·Ì…], e.SourceNumber AS [«·„” ‰œ], e.Description AS [«·»Ì«‰], " & _
-        "Format(e.TotalDebit, '#,##0.00') AS [«·„»·€] FROM JournalEntries AS e INNER JOIN JournalSourceTypes AS t " & _
+        "t.TypeName AS [«·⁄„·Ì…], e.SourceNumber AS [«·„” ‰œ], e.Description AS [ ›«’Ì· «·⁄„·Ì…], " & _
+        "Format(e.TotalDebit, '#,##0.00') AS [«·„»·€] FROM JournalEntries AS e INNER JOIN [@JournalSourceTypes] AS t " & _
         "ON e.SourceType = t.SourceType WHERE " & w & " ORDER BY e.EntryDate, e.EntryNumber")
     Set rs = CurrentDb.OpenRecordset("SELECT Count(*) AS N, Sum(e.TotalDebit) AS D, Sum(e.TotalCredit) AS C " & _
                                      "FROM JournalEntries AS e WHERE " & w, dbOpenSnapshot)
@@ -328,7 +330,7 @@ Private Function EntryLinesSql(ByVal EntryID As Variant) As String
     EntryLinesSql = "SELECT l.AccountCode AS [«·Õ”«»], a.AccountName AS [«”„ «·Õ”«»], l.LineText AS [«·»Ì«‰], " & _
         "IIf(l.Debit = 0, Null, Format(l.Debit, '#,##0.00')) AS [„œÌ‰], " & _
         "IIf(l.Credit = 0, Null, Format(l.Credit, '#,##0.00')) AS [œ«∆‰] " & _
-        "FROM JournalLines AS l INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode " & _
+        "FROM JournalLines AS l INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode " & _
         "WHERE l.EntryID = " & CLng(EntryID) & " ORDER BY l.LineNumber"
 End Function
 
@@ -367,8 +369,9 @@ Public Sub JournalEntryLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     If IsNull(frm.OpenArgs) Then Exit Sub
     frm!txtEntryID.Value = CLng(frm.OpenArgs)
-    Set rs = CurrentDb.OpenRecordset("SELECT e.*, t.TypeName FROM JournalEntries AS e INNER JOIN JournalSourceTypes AS t " & _
-                                     "ON e.SourceType = t.SourceType WHERE e.EntryID = " & CLng(frm.OpenArgs), dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT e.*, t.TypeName FROM JournalEntries AS e INNER JOIN " & _
+                                     "[@JournalSourceTypes] AS t ON e.SourceType = t.SourceType WHERE e.EntryID = " & _
+                                     CLng(frm.OpenArgs)), dbOpenSnapshot)
     If rs.EOF Then
         rs.Close
         frm!lblHeader.Caption = Tr("«·ﬁÌœ €Ì— „ÊÃÊœ (—»„« Õı–›  «·⁄„·Ì…). Õœ¯À «·ﬁÌÊœ.")

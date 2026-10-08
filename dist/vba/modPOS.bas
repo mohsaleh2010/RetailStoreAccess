@@ -617,12 +617,12 @@ Public Sub InvoiceViewLoad(ByVal frm As Access.Form)
         Format$(rs!Tax, "#,##0.00") & "    «·≈Ã„«·Ì: " & Format$(rs!TotalAmount, "#,##0.00") & _
         "    «·„œ›Ê⁄: " & Format$(rs!PaidAmount, "#,##0.00") & "    «·„ »ﬁÌ: " & Format$(rs!RemainingAmount, "#,##0.00"))
     rs.Close
-    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [«·’‰›], d.Quantity AS [«·ﬂ„Ì…], " & _
-        "d.UnitPrice AS [«·”⁄— »œÊ‰ ÷—Ì»…], d.Discount AS [«·Œ’„], d.Tax AS [«·÷—Ì»…], d.LineTotal AS [«·≈Ã„«·Ì] " & _
+    frm!lstLines.RowSource = Tr("SELECT d.LineNumber AS [#], p.ProductName AS [«·’‰›], d.Quantity AS [ﬂ„Ì… «·’‰›], " & _
+        "d.UnitPrice AS [«·”⁄— »œÊ‰ ÷—Ì»…], d.Discount AS [Œ’„ «·”ÿ—], d.Tax AS [«·÷—Ì»…], d.LineTotal AS [«·≈Ã„«·Ì] " & _
         "FROM SalesInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID " & _
         "WHERE d.SalesInvoiceID = " & id & " ORDER BY d.LineNumber")
     frm!lstReturns.RowSource = Tr("SELECT ReturnNumber AS [«·„— Ã⁄], ReturnDate AS [«· «—ÌŒ], TotalAmount AS [«·ﬁÌ„…], " & _
-        "r.Reason AS [«·”»»] FROM SalesReturns AS r WHERE SalesInvoiceID = " & id & " ORDER BY ReturnDate")
+        "r.Reason AS [”»» «·≈—Ã«⁄] FROM SalesReturns AS r WHERE SalesInvoiceID = " & id & " ORDER BY ReturnDate")
 End Sub
 
 '==============================================================================

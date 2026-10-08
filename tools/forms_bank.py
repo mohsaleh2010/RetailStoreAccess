@@ -9,13 +9,13 @@ from forms_cash import figure, table_combo, value_list_combo
 
 TX_TYPES = ("DEPOSIT;إيداع نقدية من صندوق;WITHDRAW;سحب نقدية إلى صندوق;SETTLEMENT;تسوية تحصيلات مدى;"
             "TRANSFER;تحويل إلى بنك آخر;OTHER_IN;وارد آخر (فوائد أو قرض);OTHER_OUT;صادر آخر (رسوم بنكية وغيرها)")
-COUNTER_ROWS = ("SELECT AccountCode, AccountCode & '  ' & AccountName FROM Accounts WHERE IsPosting = True AND "
+COUNTER_ROWS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND "
                 "IsActive = True AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, "
                 "2100) ORDER BY TreeKey")
 TX_LIST = ("SELECT t.BankTxID, t.TxNumber AS [الرقم], Format(t.TxDate, 'yyyy/mm/dd') AS [التاريخ], "
            "IIf(t.TxType = 'DEPOSIT', 'إيداع', IIf(t.TxType = 'WITHDRAW', 'سحب', IIf(t.TxType = 'SETTLEMENT', "
            "'تسوية مدى', IIf(t.TxType = 'TRANSFER', 'تحويل', IIf(t.TxType = 'OTHER_IN', 'وارد', 'صادر'))))) AS [النوع], "
-           "k.BankName AS [البنك], Format(t.Amount, '#,##0.00') AS [المبلغ], t.Description AS [البيان] "
+           "k.BankName AS [البنك], Format(t.Amount, '#,##0.00') AS [مبلغ الحركة], t.Description AS [تفاصيل العملية] "
            "FROM BankTransactions AS t INNER JOIN Banks AS k ON t.BankID = k.BankID "
            "ORDER BY t.TxDate DESC, t.BankTxID DESC")
 
