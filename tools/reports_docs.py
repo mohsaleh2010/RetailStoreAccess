@@ -118,7 +118,7 @@ def voucher() -> ReportModel:
     txt(m, H, "txtParty", '=IIf([DocKind]="RECEIPT","استلمنا من: ","صرفنا إلى: ") & [PartyName]', 0, cm(2.6),
         W, cm(0.7), 13, True)
     m.add(H, Control("rect", "boxAmount", 0, cm(3.5), cm(6.0), cm(1.2), {"BorderStyle": 1}, decorative=True))
-    txt(m, H, "txtAmount", '=Format([Amount],"#,##0.00") & " ريال"', cm(0.1), cm(3.6), cm(5.8), cm(1.0), 18,
+    txt(m, H, "txtAmount", '=Format([Amount],"#,##0.00") & " " & CurrencyWord()', cm(0.1), cm(3.6), cm(5.8), cm(1.0), 18,
         True, align=2)
     txt(m, H, "txtWords", "=AmountInWords([Amount])", cm(6.3), cm(3.65), W - cm(6.3), cm(1.0), 11, grow=True)
     txt(m, H, "txtMethod", '="طريقة الدفع: " & [MethodName]', 0, cm(5.0), half, cm(0.5), 10)

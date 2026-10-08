@@ -17,10 +17,10 @@ SEC_DETAIL, SEC_RPT_HEADER, SEC_RPT_FOOTER, SEC_PAGE_HEADER, SEC_PAGE_FOOTER = 0
 SEC_HEADER, SEC_FOOTER = 5, 6
 SECTION_NAMES = {SEC_DETAIL: "Detail", SEC_HEADER: "secHeader", SEC_FOOTER: "secTotals"}
 
-TITLE_AR = ('=IIf([DocKind]="RETURN","إشعار دائن",IIf([InvoiceSubType]="STANDARD",'
-            '"فاتورة ضريبية","فاتورة ضريبية مبسطة"))')
-TITLE_EN = ('=IIf([DocKind]="RETURN","Credit Note",IIf([InvoiceSubType]="STANDARD",'
-            '"Tax Invoice","Simplified Tax Invoice"))')
+# by the operating country (modCountry.DocTitleFor): a simplified tax invoice in Saudi Arabia, a sales
+# receipt in Egypt; a tax invoice (B2B) and a credit note in both
+TITLE_AR = "=DocTitleAr([DocKind],[InvoiceSubType])"
+TITLE_EN = "=DocTitleEn([DocKind],[InvoiceSubType])"
 MONEY = "#,##0.00"
 
 

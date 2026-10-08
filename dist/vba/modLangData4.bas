@@ -13,9 +13,50 @@ Public Sub LangData4()
     D4_3
     D4_4
     D4_5
+    D4_6
 End Sub
 
 Private Sub D4_1()
+    LangAdd "ÈÏáÇÊ ÃÎÑì", "Other allowances"
+    LangAdd "ÈÏæä ÖÑíÈÉ", "Without VAT"
+    LangAdd "ÈÏæä ØÈÇÚÉ", "No printing"
+    LangAdd "ÈíÇä ÇáÓØÑ", "Line description"
+    LangAdd "ÊÍÏíÏ Çáßá", "Select all"
+    LangAdd "ÊÍæíá ÕÇÏÑ", "Outgoing transfer"
+    LangAdd "ÊÍæíá æÇÑÏ", "Incoming transfer"
+    LangAdd "ÊÚĞÑ ÇáÍİÙ", "Could not save"
+    LangAdd "Êã ÇáÅáÛÇÁ", "Cancelled"
+    LangAdd "ËãÇäíÉ ÚÔÑ", "eighteen"
+    LangAdd "ÍÏÏ ÇáİÊÑÉ", "Set the period"
+    LangAdd "ÍĞİ ÇáÍÑßÉ", "Delete the move"
+    LangAdd "ÍİÙ ÇáÍÑßÉ", "Save the move"
+    LangAdd "ÍİÙ æØÈÇÚÉ", "Save and print"
+    LangAdd "ÍŞæŞ ãáßíÉ", "Equity"
+    LangAdd "Íõæöøá Åáì", "Transferred to"
+    LangAdd "ÑÈØ ÇáÓÏÇÏ", "Payment matching"
+    LangAdd "ÑÕíÏ ÇáßÔİ", "Statement balance"
+    LangAdd "ÑŞã ÇáÌåÇÒ", "Computer number"
+    LangAdd "ÑŞã ÇáÌæÇá", "Mobile number"
+    LangAdd "ÑŞã ÇáÍÓÇÈ", "Account number"
+    LangAdd "ÑŞã ÇáãÈäì", "Building number"
+    LangAdd "ÑãÒ ÇáÚãáÉ", "Currency code"
+    LangAdd "ÑãÒ ÇáãÑßÒ", "Center code"
+    LangAdd "ÑãÒ ÇáæÍÏÉ", "Unit code"
+    LangAdd "ÑíÇá ÓÚæÏí", "Saudi riyal"
+    LangAdd "ÔÇÔÉ ÇáÈíÚ", "Sales screen"
+    LangAdd "ÕÇİí ÇáÑÈÍ", "Net profit"
+    LangAdd "ÕÑİå ÇáÈäß", "Cashed by the bank"
+    LangAdd "ØÑíŞÉ ÇáÑÏ", "Refund method"
+    LangAdd "ÚÏÏ ÇáŞíæÏ", "Number of entries"
+    LangAdd "Úáì ÇáÍÓÇÈ", "On account"
+    LangAdd "Úáì ÇáÚãíá", "The customer"
+    LangAdd "ÛíÑ ãÊæÇÒä", "Not balanced"
+    LangAdd "İÆÉ ÅÖÇİÇÊ", "Extras category"
+    LangAdd "İÇÊæÑÉ ÈíÚ", "Sales invoice"
+    LangAdd "İÊÍ ÇáãÌáÏ", "Open the folder"
+    LangAdd "İÑŞ ÇáÚãáÉ", "Exchange difference"
+    LangAdd "ŞíãÉ ÇáİÑŞ", "Difference value"
+    LangAdd "ßá ÇáÌÏÇæá", "All tables"
     LangAdd "ßá ÇáÔÇÔÇÊ", "All screens"
     LangAdd "ßá ÇáãÑÇßÒ", "All centers"
     LangAdd "ßãíÉ ÇáÕäİ", "Item quantity"
@@ -44,6 +85,7 @@ Private Sub D4_1()
     LangAdd "ÅŞİÇá ÓäÉ", "Close a year"
     LangAdd "Åáì ÊÇÑíÎ", "To date"
     LangAdd "Åáì ÕäÏæŞ", "To box"
+    LangAdd "ÅíÕÇá ÈíÚ", "Sales receipt"
     LangAdd "ÇÓã ÇáÃÕá", "Asset name"
     LangAdd "ÇÓã ÇáãÍá", "Store name"
     LangAdd "ÇÚÊõãÏ İí", "Approved on"
@@ -68,6 +110,7 @@ Private Sub D4_1()
     LangAdd "ÊãÊ ÅÖÇİÉ", "Added"
     LangAdd "ËáÇËÉ ÚÔÑ", "thirteen"
     LangAdd "Ëãä ÇáÈíÚ", "Sale price"
+    LangAdd "Ìäíå ãÕÑí", "Egyptian pound"
     LangAdd "ÍĞİ ÇáŞíÏ", "Delete the entry"
     LangAdd "ÍÑßÉ ãäÊÌ", "Product moves"
     LangAdd "ÍİÙ ÇáÃÕá", "Save the asset"
@@ -94,6 +137,9 @@ Private Sub D4_1()
     LangAdd "ÓõÌöøá İí", "Recorded on"
     LangAdd "ÔÑÇÁ äŞÏí", "Cash purchase"
     LangAdd "ÕÑİäÇ Åáì", "Paid to"
+End Sub
+
+Private Sub D4_2()
     LangAdd "ØÑŞ ÇáÏİÚ", "Payment methods"
     LangAdd "ØáÈ ÊæÕíá", "Delivery order"
     LangAdd "ØáÈ ÏÇÎáí", "Dine-in order"
@@ -109,6 +155,7 @@ Private Sub D4_1()
     LangAdd "ŞíÏ ãÍĞæİ", "Deleted entry"
     LangAdd "ŞíÏ íæãíÉ", "Journal entry"
     LangAdd "ßá 3 ÃÔåÑ", "Every 3 months"
+    LangAdd "áíÓ ÈÕíÛÉ", "is not in the format of"
     LangAdd "ãÈáÛ Óäæí", "Yearly amount"
     LangAdd "ãÑÊÌÚ ÈíÚ", "Sales return"
     LangAdd "ãÓÊÈÚÏ İí", "Disposed on"
@@ -136,9 +183,7 @@ Private Sub D4_1()
     LangAdd "ÇáÇäÍÑÇİ", "Variance"
     LangAdd "ÇáÈÇÑßæÏ", "Barcode"
     LangAdd "ÇáÊŞÇÑíÑ", "Reports"
-End Sub
-
-Private Sub D4_2()
+    LangAdd "ÇáÓÚæÏíÉ", "Saudi Arabia"
     LangAdd "ÇáÕÇÏÑÇÊ", "Exports"
     LangAdd "ÇáÕáÇÍíÉ", "Permission"
     LangAdd "ÇáÕäÇÏíŞ", "Boxes"
@@ -175,6 +220,7 @@ Private Sub D4_2()
     LangAdd "Ôíß ÕÇÏÑ", "Issued cheque"
     LangAdd "Ôíß ãÑÊÏ", "Bounced cheque"
     LangAdd "Ôíß æÇÑÏ", "Received cheque"
+    LangAdd "ÕİÑ Ìäíå", "zero pounds"
     LangAdd "ÕİÑ ÑíÇá", "zero riyals"
     LangAdd "ØáÈ ÓİÑí", "Takeaway order"
     LangAdd "ÛíÑ ãÓÏÏ", "Unpaid"
@@ -214,6 +260,9 @@ Private Sub D4_2()
     LangAdd "ÇáÅÕÏÇÑ", "Version"
     LangAdd "ÇáÅÖÇİí", "Overtime"
     LangAdd "ÇáÅŞÑÇÑ", "Return"
+End Sub
+
+Private Sub D4_3()
     LangAdd "ÇáÅäÌÇÒ", "Achievement"
     LangAdd "ÇáÅåáÇß", "Depreciation"
     LangAdd "ÇáÈÏáÇÊ", "Allowances"
@@ -259,9 +308,6 @@ Private Sub D4_2()
     LangAdd "ÇáãÑÇÌÚ", "Reviewer"
     LangAdd "ÇáãÑÊÌÚ", "Return"
     LangAdd "ÇáãÑÊÏÉ", "Bounced"
-End Sub
-
-Private Sub D4_3()
     LangAdd "ÇáãÓÄæá", "Manager"
     LangAdd "ÇáãÓÊÍŞ", "Due"
     LangAdd "ÇáãÓÊáã", "Recipient"
@@ -337,6 +383,9 @@ Private Sub D4_3()
     LangAdd "ÇáãÊÌÑ", "Store"
     LangAdd "ÇáãÌáÏ", "Folder"
     LangAdd "ÇáãÏíÑ", "Manager"
+End Sub
+
+Private Sub D4_4()
     LangAdd "ÇáãÏíä", "Debit"
     LangAdd "ÇáãÑßÒ", "Center"
     LangAdd "ÇáãÓÌá", "Recorded"
@@ -382,9 +431,6 @@ Private Sub D4_3()
     LangAdd "ãÚÇíäÉ", "Preview"
     LangAdd "ãÚÊãÏÉ", "Approved"
     LangAdd "ãßÇİÂÊ", "Bonuses"
-End Sub
-
-Private Sub D4_4()
     LangAdd "ãáÇííä", "million"
     LangAdd "ããäæÍÉ", "Granted"
     LangAdd "ãä Èäß", "From a bank"
@@ -460,6 +506,9 @@ Private Sub D4_4()
     LangAdd "ÎãÓæä", "fifty"
     LangAdd "ÏÇÎáí", "Internal"
     LangAdd "ÏŞíŞÉ", "minutes"
+End Sub
+
+Private Sub D4_5()
     LangAdd "ÑÆíÓí", "Main"
     LangAdd "ÑÇÌÚå", "Reviewed by"
     LangAdd "ÑãÇÏí", "Grey"
@@ -505,11 +554,9 @@ Private Sub D4_4()
     LangAdd "Çáßá", "All"
     LangAdd "ÈËãä", "for a price"
     LangAdd "ÈÏæä", "None"
-End Sub
-
-Private Sub D4_5()
     LangAdd "ÊÓÚÉ", "nine"
     LangAdd "ÌÏíÏ", "New"
+    LangAdd "Ìäíå", "EGP"
     LangAdd "ÍÓÇÈ", "Account"
     LangAdd "ÎÑæÌ", "Exit"
     LangAdd "ÎÕæã", "Liabilities"
@@ -577,9 +624,14 @@ Private Sub D4_5()
     LangAdd "İÑŞ", "Difference"
     LangAdd "İŞØ", "Only"
     LangAdd "ŞÈá", "Before"
+    LangAdd "ŞÑÔ", "piasters"
     LangAdd "ãÓÍ", "Clear"
+    LangAdd "ãÕÑ", "Egypt"
     LangAdd "äÔØ", "Active"
     LangAdd "äÚã", "Yes"
+End Sub
+
+Private Sub D4_6()
     LangAdd "æÓØ", "Medium"
     LangAdd "İí", "in"
     LangAdd "áÇ", "No"

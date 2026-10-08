@@ -868,8 +868,8 @@ FROM [@Suppliers] AS s LEFT JOIN qrySupplierLedgerTotals AS l ON s.SupplierID = 
 ORDER BY s.SupplierName"""),
 
     # ------------------------------------------------- currencies (modCurrency)
-    # each operation on a supplier's balance in SAR and in the currency of its document
-    Query("qrySupplierFxMoves", "حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بالريال)", """
+    # each operation on a supplier's balance in the program currency and in the currency of its document
+    Query("qrySupplierFxMoves", "حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بعملة البرنامج)", """
 SELECT h.SupplierID, h.CurrencyCode, h.TotalAmount - h.PaidAmount AS BaseAmount,
        Round((h.TotalAmount - h.PaidAmount) / h.ExchangeRate, 2) AS FxAmount
 FROM PurchaseInvoices AS h
@@ -880,13 +880,13 @@ UNION ALL
 SELECT p.SupplierID, p.CurrencyCode, -p.Amount, Round(-p.Amount / p.ExchangeRate, 2)
 FROM SupplierPayments AS p
 UNION ALL
-SELECT s.SupplierID, 'SAR', s.OpeningBalance, s.OpeningBalance
-FROM [@Suppliers] AS s
-WHERE s.OpeningBalance <> 0
+SELECT s.SupplierID, z.CurrencyCode, s.OpeningBalance, s.OpeningBalance
+FROM Suppliers AS s, Settings AS z
+WHERE z.SettingID = 1 AND s.OpeningBalance <> 0
 UNION ALL
-SELECT q.SupplierID, 'SAR', IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)
-FROM Cheques AS q
-WHERE q.Direction = 'OUT'"""),
+SELECT q.SupplierID, z.CurrencyCode, IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)
+FROM Cheques AS q, Settings AS z
+WHERE z.SettingID = 1 AND q.Direction = 'OUT'"""),
     Query("qryLatestRateDates", "تاريخ آخر سعر لكل عملة", """
 SELECT CurrencyCode, Max(RateDate) AS LastRateDate
 FROM CurrencyRates

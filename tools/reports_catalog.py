@@ -259,8 +259,8 @@ LIST_SPECS: List[ListSpec] = [
         [("SupplierName", False)]),
     ListSpec("SUPPLIER_FX", [
         Col("المورد", "SupplierName", 5.0, grow=True), Col("العملة", "CurrencyCode", 1.4),
-        Col("الرصيد بالعملة", "FxBalance", 2.8, MONEY), Col("بالدفاتر (ريال)", "BookBalance", 2.8, MONEY, True),
-        Col("آخر معامل", "LastRate", 2.0, "0.0000"), Col("بآخر سعر (ريال)", "RevaluedBalance", 2.8, MONEY, True),
+        Col("الرصيد بالعملة", "FxBalance", 2.8, MONEY), Col("بالدفاتر (عملة البرنامج)", "BookBalance", 2.8, MONEY, True),
+        Col("آخر معامل", "LastRate", 2.0, "0.0000"), Col("بآخر سعر (عملة البرنامج)", "RevaluedBalance", 2.8, MONEY, True),
         Col("فرق العملة", "FxDifference", 2.6, MONEY, True)],
         [("CurrencyCode", False), ("SupplierName", False)], no_data="لا توجد أرصدة موردين بعملات أجنبية."),
     ListSpec("REP_PERFORMANCE", [

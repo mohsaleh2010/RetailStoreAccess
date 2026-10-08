@@ -1559,7 +1559,7 @@ Private Sub BuildForm_frmSuppliers()
     Set c = AddLabel("lblCurrencyCode", "⁄„·… «· ⁄«„·", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "CurrencyCode", 0)
     Set c = AddCheck("IsActive", "IsActive", 7201, 6889)
     Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ··„Ê—œ (»«·—Ì«· œ«∆„«)", 10376, 6804, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblBalanceNote", "«·—’Ìœ «·„ÊÃ» = „»·€ „” Õﬁ ··„Ê—œ (»⁄„·… «·»—‰«„Ã œ«∆„«)", 10376, 6804, 4706, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddText("Notes", "Notes", 7201, 7371, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
@@ -1683,8 +1683,8 @@ Private Sub BuildForm_frmExpenses()
     Set c = AddLabel("lblCurrencyCode", "«·⁄„·…", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "CurrencyCode", 0)
     Set c = AddText("ExchangeRate", "ExchangeRate", 12134, 2268, 2948, 425)
     SetCtlProp c, "Format", "0.00%"
-    SetCtlProp c, "ControlTipText", "ﬁÌ„… ÊÕœ… Ê«Õœ… »«·—Ì«·"
-    SetCtlProp c, "StatusBarText", "ﬁÌ„… ÊÕœ… Ê«Õœ… »«·—Ì«·"
+    SetCtlProp c, "ControlTipText", "ﬁÌ„… ÊÕœ… Ê«Õœ… »⁄„·… «·»—‰«„Ã"
+    SetCtlProp c, "StatusBarText", "ﬁÌ„… ÊÕœ… Ê«Õœ… »⁄„·… «·»—‰«„Ã"
     c.AfterUpdate = EP
     Set c = AddLabel("lblExchangeRate", "„⁄«„· «· ÕÊÌ·", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "ExchangeRate", 0)
     Set c = AddText("ForeignAmount", "ForeignAmount", 7201, 2835, 2948, 425)
@@ -1837,7 +1837,7 @@ Private Sub BuildForm_frmCurrencies()
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«·⁄„·« ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
-    Set c = AddLabel("lblSubtitle", "⁄„·«  «· ⁄«„·∫ ⁄„·… «·»—‰«„Ã «·—Ì«· Êﬂ· «·„»«·€  ıÕ›Ÿ »Â", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblSubtitle", "⁄„·«  «· ⁄«„·∫ ﬂ· «·„»«·€  ıÕ›Ÿ »⁄„·… «·»—‰«„Ã (Õ”» œÊ·… «· ‘€Ì· ›Ì «·≈⁄œ«œ« )", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
     Set c = AddButton("btnNew", "ÃœÌœ", 227, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnSave", "Õ›Ÿ", 1701, 1021, 1361, 482, "primary")
@@ -1876,7 +1876,7 @@ Private Sub BuildForm_frmCurrencies()
     Set c = AddLabel("lblSortOrder", "«· — Ì»", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "SortOrder", 0)
     Set c = AddCheck("IsActive", "IsActive", 7201, 3487)
     Set c = AddLabel("lblIsActive", "‰‘ÿ", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblCurrencyNote", "«·„⁄«„· = ﬁÌ„… ÊÕœ… Ê«Õœ… „‰ «·⁄„·… »«·—Ì«·∫ Ìı”ÃÛ¯· ·ﬂ·  «—ÌŒ ›Ì ´√”⁄«— «·⁄„·« ª", 10376, 3402, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCurrencyNote", "«·„⁄«„· = ﬁÌ„… ÊÕœ… Ê«Õœ… „‰ «·⁄„·… »⁄„·… «·»—‰«„Ã∫ Ìı”ÃÛ¯· ·ﬂ·  «—ÌŒ ›Ì ´√”⁄«— «·⁄„·« ª", 10376, 3402, 4706, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddLabel("lblStatus", " ", 5443, 4082, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
@@ -3510,7 +3510,7 @@ End Sub
 Private Sub BuildForm_frmSettings()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmSettings", "«·≈⁄œ«œ« ", "SELECT * FROM Settings WHERE SettingID = 1", 15309, 10432, True, False, True, _
+    StartForm "frmSettings", "«·≈⁄œ«œ« ", "SELECT * FROM Settings WHERE SettingID = 1", 15309, 10999, True, False, True, _
               "KIND=SINGLE|TABLE=Settings|PK=SettingID"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -3538,77 +3538,81 @@ Private Sub BuildForm_frmSettings()
     Set c = AddLabel("lblStoreNameEn", "«”„ «·„Õ· »«·≈‰Ã·Ì“Ì…", 7768, 1701, 2268, 425, 10, False, CLR_MUTED, "StoreNameEn", 0)
     Set c = AddButton("btnEnglishNames", "»«ﬁÌ «·√”„«¡", 13835, 1701, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddText("VATNumber", "VATNumber", 2552, 2268, 4989, 425)
+    Set c = AddCombo("CountryCode", "CountryCode", 2552, 2268, 4989, 425, "SA;«·„„·ﬂ… «·⁄—»Ì… «·”⁄ÊœÌ…;EG;Ã„ÂÊ—Ì… „’— «·⁄—»Ì…", 2, "0;3402")
+    SetCtlProp c, "ControlTipText", "«·⁄„·… Ê«·÷—Ì»… Ê«·—ﬁ„ «·÷—Ì»Ì Ê«·›« Ê—… «·≈·ﬂ —Ê‰Ì….   €Ì— ﬁ»·  ”ÃÌ· √Ì ⁄„·Ì… ›ﬁÿ"
+    SetCtlProp c, "StatusBarText", "«·⁄„·… Ê«·÷—Ì»… Ê«·—ﬁ„ «·÷—Ì»Ì Ê«·›« Ê—… «·≈·ﬂ —Ê‰Ì….   €Ì— ﬁ»·  ”ÃÌ· √Ì ⁄„·Ì… ›ﬁÿ"
+    Set c = AddLabel("lblCountryCode", "œÊ·… «· ‘€Ì·", 227, 2268, 2268, 425, 10, False, CLR_MUTED, "CountryCode", 0)
+    Set c = AddText("VATNumber", "VATNumber", 10093, 2268, 4989, 425)
     SetCtlProp c, "ControlTipText", "15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »‹ 3"
     SetCtlProp c, "StatusBarText", "15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »‹ 3"
-    Set c = AddLabel("lblVATNumber", "«·—ﬁ„ «·÷—Ì»Ì", 227, 2268, 2268, 425, 10, False, CLR_MUTED, "VATNumber", 0)
-    Set c = AddText("CRNumber", "CRNumber", 10093, 2268, 4989, 425)
-    Set c = AddLabel("lblCRNumber", "«·”Ã· «· Ã«—Ì", 7768, 2268, 2268, 425, 10, False, CLR_MUTED, "CRNumber", 0)
-    Set c = AddText("BuildingNo", "BuildingNo", 2552, 2835, 4989, 425)
-    Set c = AddLabel("lblBuildingNo", "—ﬁ„ «·„»‰Ï", 227, 2835, 2268, 425, 10, False, CLR_MUTED, "BuildingNo", 0)
-    Set c = AddText("StreetName", "StreetName", 10093, 2835, 4989, 425)
-    Set c = AddLabel("lblStreetName", "«·‘«—⁄", 7768, 2835, 2268, 425, 10, False, CLR_MUTED, "StreetName", 0)
-    Set c = AddText("District", "District", 2552, 3402, 4989, 425)
-    Set c = AddLabel("lblDistrict", "«·ÕÌ", 227, 3402, 2268, 425, 10, False, CLR_MUTED, "District", 0)
-    Set c = AddText("City", "City", 10093, 3402, 4989, 425)
-    Set c = AddLabel("lblCity", "«·„œÌ‰…", 7768, 3402, 2268, 425, 10, False, CLR_MUTED, "City", 0)
-    Set c = AddText("PostalCode", "PostalCode", 2552, 3969, 4989, 425)
-    Set c = AddLabel("lblPostalCode", "«·—„“ «·»—ÌœÌ", 227, 3969, 2268, 425, 10, False, CLR_MUTED, "PostalCode", 0)
-    Set c = AddText("AdditionalNo", "AdditionalNo", 10093, 3969, 4989, 425)
-    Set c = AddLabel("lblAdditionalNo", "«·—ﬁ„ «·≈÷«›Ì", 7768, 3969, 2268, 425, 10, False, CLR_MUTED, "AdditionalNo", 0)
-    Set c = AddText("Phone", "Phone", 2552, 4536, 4989, 425)
-    Set c = AddLabel("lblPhone", "«·Â« ›", 227, 4536, 2268, 425, 10, False, CLR_MUTED, "Phone", 0)
-    Set c = AddText("Email", "Email", 10093, 4536, 4989, 425)
-    Set c = AddLabel("lblEmail", "«·»—Ìœ «·≈·ﬂ —Ê‰Ì", 7768, 4536, 2268, 425, 10, False, CLR_MUTED, "Email", 0)
-    Set c = AddText("VATRate", "VATRate", 2552, 5103, 4989, 425)
+    Set c = AddLabel("lblVATNumber", "«·—ﬁ„ «·÷—Ì»Ì", 7768, 2268, 2268, 425, 10, False, CLR_MUTED, "VATNumber", 0)
+    Set c = AddText("CRNumber", "CRNumber", 2552, 2835, 4989, 425)
+    Set c = AddLabel("lblCRNumber", "«·”Ã· «· Ã«—Ì", 227, 2835, 2268, 425, 10, False, CLR_MUTED, "CRNumber", 0)
+    Set c = AddText("BuildingNo", "BuildingNo", 10093, 2835, 4989, 425)
+    Set c = AddLabel("lblBuildingNo", "—ﬁ„ «·„»‰Ï", 7768, 2835, 2268, 425, 10, False, CLR_MUTED, "BuildingNo", 0)
+    Set c = AddText("StreetName", "StreetName", 2552, 3402, 4989, 425)
+    Set c = AddLabel("lblStreetName", "«·‘«—⁄", 227, 3402, 2268, 425, 10, False, CLR_MUTED, "StreetName", 0)
+    Set c = AddText("District", "District", 10093, 3402, 4989, 425)
+    Set c = AddLabel("lblDistrict", "«·ÕÌ", 7768, 3402, 2268, 425, 10, False, CLR_MUTED, "District", 0)
+    Set c = AddText("City", "City", 2552, 3969, 4989, 425)
+    Set c = AddLabel("lblCity", "«·„œÌ‰…", 227, 3969, 2268, 425, 10, False, CLR_MUTED, "City", 0)
+    Set c = AddText("PostalCode", "PostalCode", 10093, 3969, 4989, 425)
+    Set c = AddLabel("lblPostalCode", "«·—„“ «·»—ÌœÌ", 7768, 3969, 2268, 425, 10, False, CLR_MUTED, "PostalCode", 0)
+    Set c = AddText("AdditionalNo", "AdditionalNo", 2552, 4536, 4989, 425)
+    Set c = AddLabel("lblAdditionalNo", "«·—ﬁ„ «·≈÷«›Ì", 227, 4536, 2268, 425, 10, False, CLR_MUTED, "AdditionalNo", 0)
+    Set c = AddText("Phone", "Phone", 10093, 4536, 4989, 425)
+    Set c = AddLabel("lblPhone", "«·Â« ›", 7768, 4536, 2268, 425, 10, False, CLR_MUTED, "Phone", 0)
+    Set c = AddText("Email", "Email", 2552, 5103, 4989, 425)
+    Set c = AddLabel("lblEmail", "«·»—Ìœ «·≈·ﬂ —Ê‰Ì", 227, 5103, 2268, 425, 10, False, CLR_MUTED, "Email", 0)
+    Set c = AddText("VATRate", "VATRate", 10093, 5103, 4989, 425)
     SetCtlProp c, "Format", "0.00%"
-    Set c = AddLabel("lblVATRate", "‰”»… «·÷—Ì»…", 227, 5103, 2268, 425, 10, False, CLR_MUTED, "VATRate", 0)
-    Set c = AddCheck("PricesIncludeVAT", "PricesIncludeVAT", 10093, 5188)
-    Set c = AddLabel("lblPricesIncludeVAT", "«·√”⁄«— ‘«„·… «·÷—Ì»…", 7768, 5103, 2268, 425, 10, False, CLR_MUTED, "PricesIncludeVAT", 0)
-    Set c = AddCheck("AllowNegativeStock", "AllowNegativeStock", 2552, 5755)
-    Set c = AddLabel("lblAllowNegativeStock", "«·”„«Õ »«·»Ì⁄ »«·”«·»", 227, 5670, 2268, 425, 10, False, CLR_MUTED, "AllowNegativeStock", 0)
-    Set c = AddText("SlowMovingDays", "SlowMovingDays", 10093, 5670, 4989, 425)
-    Set c = AddLabel("lblSlowMovingDays", "√Ì«„ ⁄œ„ «·Õ—ﬂ…", 7768, 5670, 2268, 425, 10, False, CLR_MUTED, "SlowMovingDays", 0)
-    Set c = AddText("BackupFolder", "BackupFolder", 2552, 6237, 3685, 425)
-    Set c = AddLabel("lblBackupFolder", "„Ã·œ «·‰”Œ «·«Õ Ì«ÿÌ", 227, 6237, 2268, 425, 10, False, CLR_MUTED, "BackupFolder", 0)
-    Set c = AddButton("btnBrowseBackup", "«” ⁄—«÷", 6294, 6237, 1247, 425, "secondary")
+    Set c = AddLabel("lblVATRate", "‰”»… «·÷—Ì»…", 7768, 5103, 2268, 425, 10, False, CLR_MUTED, "VATRate", 0)
+    Set c = AddCheck("PricesIncludeVAT", "PricesIncludeVAT", 2552, 5755)
+    Set c = AddLabel("lblPricesIncludeVAT", "«·√”⁄«— ‘«„·… «·÷—Ì»…", 227, 5670, 2268, 425, 10, False, CLR_MUTED, "PricesIncludeVAT", 0)
+    Set c = AddCheck("AllowNegativeStock", "AllowNegativeStock", 10093, 5755)
+    Set c = AddLabel("lblAllowNegativeStock", "«·”„«Õ »«·»Ì⁄ »«·”«·»", 7768, 5670, 2268, 425, 10, False, CLR_MUTED, "AllowNegativeStock", 0)
+    Set c = AddText("SlowMovingDays", "SlowMovingDays", 2552, 6237, 4989, 425)
+    Set c = AddLabel("lblSlowMovingDays", "√Ì«„ ⁄œ„ «·Õ—ﬂ…", 227, 6237, 2268, 425, 10, False, CLR_MUTED, "SlowMovingDays", 0)
+    Set c = AddText("BackupFolder", "BackupFolder", 10093, 6237, 3685, 425)
+    Set c = AddLabel("lblBackupFolder", "„Ã·œ «·‰”Œ «·«Õ Ì«ÿÌ", 7768, 6237, 2268, 425, 10, False, CLR_MUTED, "BackupFolder", 0)
+    Set c = AddButton("btnBrowseBackup", "«” ⁄—«÷", 13835, 6237, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddText("BackupKeepCount", "BackupKeepCount", 10093, 6237, 4989, 425)
-    Set c = AddLabel("lblBackupKeepCount", "⁄œœ «·‰”Œ «·„Õ ›Ÿ »Â«", 7768, 6237, 2268, 425, 10, False, CLR_MUTED, "BackupKeepCount", 0)
-    Set c = AddText("LogoPath", "LogoPath", 2552, 6804, 3685, 425)
-    Set c = AddLabel("lblLogoPath", "„”«— «·‘⁄«—", 227, 6804, 2268, 425, 10, False, CLR_MUTED, "LogoPath", 0)
-    Set c = AddButton("btnBrowseLogo", "«” ⁄—«÷", 6294, 6804, 1247, 425, "secondary")
+    Set c = AddText("BackupKeepCount", "BackupKeepCount", 2552, 6804, 4989, 425)
+    Set c = AddLabel("lblBackupKeepCount", "⁄œœ «·‰”Œ «·„Õ ›Ÿ »Â«", 227, 6804, 2268, 425, 10, False, CLR_MUTED, "BackupKeepCount", 0)
+    Set c = AddText("LogoPath", "LogoPath", 10093, 6804, 3685, 425)
+    Set c = AddLabel("lblLogoPath", "„”«— «·‘⁄«—", 7768, 6804, 2268, 425, 10, False, CLR_MUTED, "LogoPath", 0)
+    Set c = AddButton("btnBrowseLogo", "«” ⁄—«÷", 13835, 6804, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddText("ReceiptFooter", "ReceiptFooter", 10093, 6804, 4989, 425)
-    Set c = AddLabel("lblReceiptFooter", " –ÌÌ· «·›« Ê—…", 7768, 6804, 2268, 425, 10, False, CLR_MUTED, "ReceiptFooter", 0)
-    Set c = AddCombo("POSMode", "POSMode", 2552, 7371, 4989, 425, "RETAIL;«·„Õ·«  (»«—ﬂÊœ);RESTAURANT;«·„ÿ«⁄„ (‘«‘… ·„”);CAFE;«·ﬂ«›ÌÂ«  (‘«‘… ·„”)", 2, "0;3402")
+    Set c = AddText("ReceiptFooter", "ReceiptFooter", 2552, 7371, 4989, 425)
+    Set c = AddLabel("lblReceiptFooter", " –ÌÌ· «·›« Ê—…", 227, 7371, 2268, 425, 10, False, CLR_MUTED, "ReceiptFooter", 0)
+    Set c = AddCombo("POSMode", "POSMode", 10093, 7371, 4989, 425, "RETAIL;«·„Õ·«  (»«—ﬂÊœ);RESTAURANT;«·„ÿ«⁄„ (‘«‘… ·„”);CAFE;«·ﬂ«›ÌÂ«  (‘«‘… ·„”)", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "«·‘«‘… «· Ì Ì› ÕÂ« “— «·„»Ì⁄« "
     SetCtlProp c, "StatusBarText", "«·‘«‘… «· Ì Ì› ÕÂ« “— «·„»Ì⁄« "
-    Set c = AddLabel("lblPOSMode", "‘«‘… «·»Ì⁄", 227, 7371, 2268, 425, 10, False, CLR_MUTED, "POSMode", 0)
-    Set c = AddText("ImagesFolder", "ImagesFolder", 10093, 7371, 3685, 425)
+    Set c = AddLabel("lblPOSMode", "‘«‘… «·»Ì⁄", 7768, 7371, 2268, 425, 10, False, CLR_MUTED, "POSMode", 0)
+    Set c = AddText("ImagesFolder", "ImagesFolder", 2552, 7938, 3685, 425)
     SetCtlProp c, "ControlTipText", "›«—€ = „Ã·œ Images »Ã«‰» „·› «·»Ì«‰« "
     SetCtlProp c, "StatusBarText", "›«—€ = „Ã·œ Images »Ã«‰» „·› «·»Ì«‰« "
-    Set c = AddLabel("lblImagesFolder", "„Ã·œ ’Ê— «·„‰ Ã« ", 7768, 7371, 2268, 425, 10, False, CLR_MUTED, "ImagesFolder", 0)
-    Set c = AddButton("btnBrowseImages", "«” ⁄—«÷", 13835, 7371, 1247, 425, "secondary")
+    Set c = AddLabel("lblImagesFolder", "„Ã·œ ’Ê— «·„‰ Ã« ", 227, 7938, 2268, 425, 10, False, CLR_MUTED, "ImagesFolder", 0)
+    Set c = AddButton("btnBrowseImages", "«” ⁄—«÷", 6294, 7938, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddCombo("InvoicePrintMode", "InvoicePrintMode", 2552, 7938, 4989, 425, "DIRECT;ÿ»«⁄… „»«‘—… »œÊ‰ „⁄«Ì‰…;PREVIEW;⁄—÷ „⁄«Ì‰… «·ÿ»«⁄…;NONE;»œÊ‰ ÿ»«⁄…", 2, "0;3402")
+    Set c = AddCombo("InvoicePrintMode", "InvoicePrintMode", 10093, 7938, 4989, 425, "DIRECT;ÿ»«⁄… „»«‘—… »œÊ‰ „⁄«Ì‰…;PREVIEW;⁄—÷ „⁄«Ì‰… «·ÿ»«⁄…;NONE;»œÊ‰ ÿ»«⁄…", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "⁄‰œ Õ›Ÿ ›« Ê—… «·»Ì⁄ √Ê «·„— Ã⁄"
     SetCtlProp c, "StatusBarText", "⁄‰œ Õ›Ÿ ›« Ê—… «·»Ì⁄ √Ê «·„— Ã⁄"
-    Set c = AddLabel("lblInvoicePrintMode", "«·ÿ»«⁄… ⁄‰œ Õ›Ÿ «·›« Ê—…", 227, 7938, 2268, 425, 10, False, CLR_MUTED, "InvoicePrintMode", 0)
-    Set c = AddText("CreditBlockDays", "CreditBlockDays", 10093, 7938, 4989, 425)
+    Set c = AddLabel("lblInvoicePrintMode", "«·ÿ»«⁄… ⁄‰œ Õ›Ÿ «·›« Ê—…", 7768, 7938, 2268, 425, 10, False, CLR_MUTED, "InvoicePrintMode", 0)
+    Set c = AddText("CreditBlockDays", "CreditBlockDays", 2552, 8505, 4989, 425)
     SetCtlProp c, "ControlTipText", "0 = ·« Ì Êﬁ› «·»Ì⁄ «·¬Ã· »”»» «· √ŒÌ—"
     SetCtlProp c, "StatusBarText", "0 = ·« Ì Êﬁ› «·»Ì⁄ «·¬Ã· »”»» «· √ŒÌ—"
-    Set c = AddLabel("lblCreditBlockDays", "≈Ìﬁ«› «·»Ì⁄ «·¬Ã· ·⁄„Ì· „ √Œ— √ﬂÀ— „‰ (ÌÊ„)", 7768, 7938, 2268, 425, 10, False, CLR_MUTED, "CreditBlockDays", 0)
-    Set c = AddCombo("DefaultBankID", "DefaultBankID", 2552, 8505, 4989, 425, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3402")
+    Set c = AddLabel("lblCreditBlockDays", "≈Ìﬁ«› «·»Ì⁄ «·¬Ã· ·⁄„Ì· „ √Œ— √ﬂÀ— „‰ (ÌÊ„)", 227, 8505, 2268, 425, 10, False, CLR_MUTED, "CreditBlockDays", 0)
+    Set c = AddCombo("DefaultBankID", "DefaultBankID", 10093, 8505, 4989, 425, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "«· ÕÊÌ·«  «·»‰ﬂÌ… ›Ì «·›Ê« Ì— Ê«·”‰œ«   ıﬁÌÛ¯œ ›ÌÂ"
     SetCtlProp c, "StatusBarText", "«· ÕÊÌ·«  «·»‰ﬂÌ… ›Ì «·›Ê« Ì— Ê«·”‰œ«   ıﬁÌÛ¯œ ›ÌÂ"
-    Set c = AddLabel("lblDefaultBankID", "«·»‰ﬂ «·«› —«÷Ì ·· ÕÊÌ·«  «·»‰ﬂÌ…", 227, 8505, 2268, 425, 10, False, CLR_MUTED, "DefaultBankID", 0)
-    Set c = AddLabel("lblStoreNameNote", " ", 7768, 8505, 7314, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddCheck("AllowAdminCompanyName", "AllowAdminCompanyName", 2552, 9157)
+    Set c = AddLabel("lblDefaultBankID", "«·»‰ﬂ «·«› —«÷Ì ·· ÕÊÌ·«  «·»‰ﬂÌ…", 7768, 8505, 2268, 425, 10, False, CLR_MUTED, "DefaultBankID", 0)
+    Set c = AddLabel("lblStoreNameNote", " ", 227, 9072, 14855, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddCheck("AllowAdminCompanyName", "AllowAdminCompanyName", 2552, 9724)
     SetCtlProp c, "ControlTipText", "ÌŸÂ— ··„»—„Ã ›ﬁÿ"
     SetCtlProp c, "StatusBarText", "ÌŸÂ— ··„»—„Ã ›ﬁÿ"
-    Set c = AddLabel("lblAllowAdminCompanyName", "«·”„«Õ ·„œÌ— «·‰Ÿ«„ » €ÌÌ— «”„ «·„Õ·", 227, 9072, 2268, 425, 10, False, CLR_MUTED, "AllowAdminCompanyName", 0)
-    Set c = AddLabel("lblStatus", " ", 227, 9752, 14855, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblAllowAdminCompanyName", "«·”„«Õ ·„œÌ— «·‰Ÿ«„ » €ÌÌ— «”„ «·„Õ·", 227, 9639, 2268, 425, 10, False, CLR_MUTED, "AllowAdminCompanyName", 0)
+    Set c = AddLabel("lblStatus", " ", 227, 10319, 14855, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP

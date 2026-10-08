@@ -1559,7 +1559,7 @@ Private Sub BuildForm_frmSuppliers()
     Set c = AddLabel("lblCurrencyCode", "عملة التعامل", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "CurrencyCode", 0)
     Set c = AddCheck("IsActive", "IsActive", 7201, 6889)
     Set c = AddLabel("lblIsActive", "نشط", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق للمورد (بالريال دائمًا)", 10376, 6804, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق للمورد (بعملة البرنامج دائمًا)", 10376, 6804, 4706, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddText("Notes", "Notes", 7201, 7371, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
@@ -1683,8 +1683,8 @@ Private Sub BuildForm_frmExpenses()
     Set c = AddLabel("lblCurrencyCode", "العملة", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "CurrencyCode", 0)
     Set c = AddText("ExchangeRate", "ExchangeRate", 12134, 2268, 2948, 425)
     SetCtlProp c, "Format", "0.00%"
-    SetCtlProp c, "ControlTipText", "قيمة وحدة واحدة بالريال"
-    SetCtlProp c, "StatusBarText", "قيمة وحدة واحدة بالريال"
+    SetCtlProp c, "ControlTipText", "قيمة وحدة واحدة بعملة البرنامج"
+    SetCtlProp c, "StatusBarText", "قيمة وحدة واحدة بعملة البرنامج"
     c.AfterUpdate = EP
     Set c = AddLabel("lblExchangeRate", "معامل التحويل", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "ExchangeRate", 0)
     Set c = AddText("ForeignAmount", "ForeignAmount", 7201, 2835, 2948, 425)
@@ -1837,7 +1837,7 @@ Private Sub BuildForm_frmCurrencies()
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "العملات", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
-    Set c = AddLabel("lblSubtitle", "عملات التعامل؛ عملة البرنامج الريال وكل المبالغ تُحفظ به", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblSubtitle", "عملات التعامل؛ كل المبالغ تُحفظ بعملة البرنامج (حسب دولة التشغيل في الإعدادات)", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
     Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
@@ -1876,7 +1876,7 @@ Private Sub BuildForm_frmCurrencies()
     Set c = AddLabel("lblSortOrder", "الترتيب", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "SortOrder", 0)
     Set c = AddCheck("IsActive", "IsActive", 7201, 3487)
     Set c = AddLabel("lblIsActive", "نشط", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblCurrencyNote", "المعامل = قيمة وحدة واحدة من العملة بالريال؛ يُسجَّل لكل تاريخ في «أسعار العملات»", 10376, 3402, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCurrencyNote", "المعامل = قيمة وحدة واحدة من العملة بعملة البرنامج؛ يُسجَّل لكل تاريخ في «أسعار العملات»", 10376, 3402, 4706, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddLabel("lblStatus", " ", 5443, 4082, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
@@ -3510,7 +3510,7 @@ End Sub
 Private Sub BuildForm_frmSettings()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmSettings", "الإعدادات", "SELECT * FROM Settings WHERE SettingID = 1", 15309, 10432, True, False, True, _
+    StartForm "frmSettings", "الإعدادات", "SELECT * FROM Settings WHERE SettingID = 1", 15309, 10999, True, False, True, _
               "KIND=SINGLE|TABLE=Settings|PK=SettingID"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -3538,77 +3538,81 @@ Private Sub BuildForm_frmSettings()
     Set c = AddLabel("lblStoreNameEn", "اسم المحل بالإنجليزية", 7768, 1701, 2268, 425, 10, False, CLR_MUTED, "StoreNameEn", 0)
     Set c = AddButton("btnEnglishNames", "باقي الأسماء", 13835, 1701, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddText("VATNumber", "VATNumber", 2552, 2268, 4989, 425)
+    Set c = AddCombo("CountryCode", "CountryCode", 2552, 2268, 4989, 425, "SA;المملكة العربية السعودية;EG;جمهورية مصر العربية", 2, "0;3402")
+    SetCtlProp c, "ControlTipText", "العملة والضريبة والرقم الضريبي والفاتورة الإلكترونية. تتغير قبل تسجيل أي عملية فقط"
+    SetCtlProp c, "StatusBarText", "العملة والضريبة والرقم الضريبي والفاتورة الإلكترونية. تتغير قبل تسجيل أي عملية فقط"
+    Set c = AddLabel("lblCountryCode", "دولة التشغيل", 227, 2268, 2268, 425, 10, False, CLR_MUTED, "CountryCode", 0)
+    Set c = AddText("VATNumber", "VATNumber", 10093, 2268, 4989, 425)
     SetCtlProp c, "ControlTipText", "15 رقمًا يبدأ وينتهي بـ 3"
     SetCtlProp c, "StatusBarText", "15 رقمًا يبدأ وينتهي بـ 3"
-    Set c = AddLabel("lblVATNumber", "الرقم الضريبي", 227, 2268, 2268, 425, 10, False, CLR_MUTED, "VATNumber", 0)
-    Set c = AddText("CRNumber", "CRNumber", 10093, 2268, 4989, 425)
-    Set c = AddLabel("lblCRNumber", "السجل التجاري", 7768, 2268, 2268, 425, 10, False, CLR_MUTED, "CRNumber", 0)
-    Set c = AddText("BuildingNo", "BuildingNo", 2552, 2835, 4989, 425)
-    Set c = AddLabel("lblBuildingNo", "رقم المبنى", 227, 2835, 2268, 425, 10, False, CLR_MUTED, "BuildingNo", 0)
-    Set c = AddText("StreetName", "StreetName", 10093, 2835, 4989, 425)
-    Set c = AddLabel("lblStreetName", "الشارع", 7768, 2835, 2268, 425, 10, False, CLR_MUTED, "StreetName", 0)
-    Set c = AddText("District", "District", 2552, 3402, 4989, 425)
-    Set c = AddLabel("lblDistrict", "الحي", 227, 3402, 2268, 425, 10, False, CLR_MUTED, "District", 0)
-    Set c = AddText("City", "City", 10093, 3402, 4989, 425)
-    Set c = AddLabel("lblCity", "المدينة", 7768, 3402, 2268, 425, 10, False, CLR_MUTED, "City", 0)
-    Set c = AddText("PostalCode", "PostalCode", 2552, 3969, 4989, 425)
-    Set c = AddLabel("lblPostalCode", "الرمز البريدي", 227, 3969, 2268, 425, 10, False, CLR_MUTED, "PostalCode", 0)
-    Set c = AddText("AdditionalNo", "AdditionalNo", 10093, 3969, 4989, 425)
-    Set c = AddLabel("lblAdditionalNo", "الرقم الإضافي", 7768, 3969, 2268, 425, 10, False, CLR_MUTED, "AdditionalNo", 0)
-    Set c = AddText("Phone", "Phone", 2552, 4536, 4989, 425)
-    Set c = AddLabel("lblPhone", "الهاتف", 227, 4536, 2268, 425, 10, False, CLR_MUTED, "Phone", 0)
-    Set c = AddText("Email", "Email", 10093, 4536, 4989, 425)
-    Set c = AddLabel("lblEmail", "البريد الإلكتروني", 7768, 4536, 2268, 425, 10, False, CLR_MUTED, "Email", 0)
-    Set c = AddText("VATRate", "VATRate", 2552, 5103, 4989, 425)
+    Set c = AddLabel("lblVATNumber", "الرقم الضريبي", 7768, 2268, 2268, 425, 10, False, CLR_MUTED, "VATNumber", 0)
+    Set c = AddText("CRNumber", "CRNumber", 2552, 2835, 4989, 425)
+    Set c = AddLabel("lblCRNumber", "السجل التجاري", 227, 2835, 2268, 425, 10, False, CLR_MUTED, "CRNumber", 0)
+    Set c = AddText("BuildingNo", "BuildingNo", 10093, 2835, 4989, 425)
+    Set c = AddLabel("lblBuildingNo", "رقم المبنى", 7768, 2835, 2268, 425, 10, False, CLR_MUTED, "BuildingNo", 0)
+    Set c = AddText("StreetName", "StreetName", 2552, 3402, 4989, 425)
+    Set c = AddLabel("lblStreetName", "الشارع", 227, 3402, 2268, 425, 10, False, CLR_MUTED, "StreetName", 0)
+    Set c = AddText("District", "District", 10093, 3402, 4989, 425)
+    Set c = AddLabel("lblDistrict", "الحي", 7768, 3402, 2268, 425, 10, False, CLR_MUTED, "District", 0)
+    Set c = AddText("City", "City", 2552, 3969, 4989, 425)
+    Set c = AddLabel("lblCity", "المدينة", 227, 3969, 2268, 425, 10, False, CLR_MUTED, "City", 0)
+    Set c = AddText("PostalCode", "PostalCode", 10093, 3969, 4989, 425)
+    Set c = AddLabel("lblPostalCode", "الرمز البريدي", 7768, 3969, 2268, 425, 10, False, CLR_MUTED, "PostalCode", 0)
+    Set c = AddText("AdditionalNo", "AdditionalNo", 2552, 4536, 4989, 425)
+    Set c = AddLabel("lblAdditionalNo", "الرقم الإضافي", 227, 4536, 2268, 425, 10, False, CLR_MUTED, "AdditionalNo", 0)
+    Set c = AddText("Phone", "Phone", 10093, 4536, 4989, 425)
+    Set c = AddLabel("lblPhone", "الهاتف", 7768, 4536, 2268, 425, 10, False, CLR_MUTED, "Phone", 0)
+    Set c = AddText("Email", "Email", 2552, 5103, 4989, 425)
+    Set c = AddLabel("lblEmail", "البريد الإلكتروني", 227, 5103, 2268, 425, 10, False, CLR_MUTED, "Email", 0)
+    Set c = AddText("VATRate", "VATRate", 10093, 5103, 4989, 425)
     SetCtlProp c, "Format", "0.00%"
-    Set c = AddLabel("lblVATRate", "نسبة الضريبة", 227, 5103, 2268, 425, 10, False, CLR_MUTED, "VATRate", 0)
-    Set c = AddCheck("PricesIncludeVAT", "PricesIncludeVAT", 10093, 5188)
-    Set c = AddLabel("lblPricesIncludeVAT", "الأسعار شاملة الضريبة", 7768, 5103, 2268, 425, 10, False, CLR_MUTED, "PricesIncludeVAT", 0)
-    Set c = AddCheck("AllowNegativeStock", "AllowNegativeStock", 2552, 5755)
-    Set c = AddLabel("lblAllowNegativeStock", "السماح بالبيع بالسالب", 227, 5670, 2268, 425, 10, False, CLR_MUTED, "AllowNegativeStock", 0)
-    Set c = AddText("SlowMovingDays", "SlowMovingDays", 10093, 5670, 4989, 425)
-    Set c = AddLabel("lblSlowMovingDays", "أيام عدم الحركة", 7768, 5670, 2268, 425, 10, False, CLR_MUTED, "SlowMovingDays", 0)
-    Set c = AddText("BackupFolder", "BackupFolder", 2552, 6237, 3685, 425)
-    Set c = AddLabel("lblBackupFolder", "مجلد النسخ الاحتياطي", 227, 6237, 2268, 425, 10, False, CLR_MUTED, "BackupFolder", 0)
-    Set c = AddButton("btnBrowseBackup", "استعراض", 6294, 6237, 1247, 425, "secondary")
+    Set c = AddLabel("lblVATRate", "نسبة الضريبة", 7768, 5103, 2268, 425, 10, False, CLR_MUTED, "VATRate", 0)
+    Set c = AddCheck("PricesIncludeVAT", "PricesIncludeVAT", 2552, 5755)
+    Set c = AddLabel("lblPricesIncludeVAT", "الأسعار شاملة الضريبة", 227, 5670, 2268, 425, 10, False, CLR_MUTED, "PricesIncludeVAT", 0)
+    Set c = AddCheck("AllowNegativeStock", "AllowNegativeStock", 10093, 5755)
+    Set c = AddLabel("lblAllowNegativeStock", "السماح بالبيع بالسالب", 7768, 5670, 2268, 425, 10, False, CLR_MUTED, "AllowNegativeStock", 0)
+    Set c = AddText("SlowMovingDays", "SlowMovingDays", 2552, 6237, 4989, 425)
+    Set c = AddLabel("lblSlowMovingDays", "أيام عدم الحركة", 227, 6237, 2268, 425, 10, False, CLR_MUTED, "SlowMovingDays", 0)
+    Set c = AddText("BackupFolder", "BackupFolder", 10093, 6237, 3685, 425)
+    Set c = AddLabel("lblBackupFolder", "مجلد النسخ الاحتياطي", 7768, 6237, 2268, 425, 10, False, CLR_MUTED, "BackupFolder", 0)
+    Set c = AddButton("btnBrowseBackup", "استعراض", 13835, 6237, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddText("BackupKeepCount", "BackupKeepCount", 10093, 6237, 4989, 425)
-    Set c = AddLabel("lblBackupKeepCount", "عدد النسخ المحتفظ بها", 7768, 6237, 2268, 425, 10, False, CLR_MUTED, "BackupKeepCount", 0)
-    Set c = AddText("LogoPath", "LogoPath", 2552, 6804, 3685, 425)
-    Set c = AddLabel("lblLogoPath", "مسار الشعار", 227, 6804, 2268, 425, 10, False, CLR_MUTED, "LogoPath", 0)
-    Set c = AddButton("btnBrowseLogo", "استعراض", 6294, 6804, 1247, 425, "secondary")
+    Set c = AddText("BackupKeepCount", "BackupKeepCount", 2552, 6804, 4989, 425)
+    Set c = AddLabel("lblBackupKeepCount", "عدد النسخ المحتفظ بها", 227, 6804, 2268, 425, 10, False, CLR_MUTED, "BackupKeepCount", 0)
+    Set c = AddText("LogoPath", "LogoPath", 10093, 6804, 3685, 425)
+    Set c = AddLabel("lblLogoPath", "مسار الشعار", 7768, 6804, 2268, 425, 10, False, CLR_MUTED, "LogoPath", 0)
+    Set c = AddButton("btnBrowseLogo", "استعراض", 13835, 6804, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddText("ReceiptFooter", "ReceiptFooter", 10093, 6804, 4989, 425)
-    Set c = AddLabel("lblReceiptFooter", "تذييل الفاتورة", 7768, 6804, 2268, 425, 10, False, CLR_MUTED, "ReceiptFooter", 0)
-    Set c = AddCombo("POSMode", "POSMode", 2552, 7371, 4989, 425, "RETAIL;المحلات (باركود);RESTAURANT;المطاعم (شاشة لمس);CAFE;الكافيهات (شاشة لمس)", 2, "0;3402")
+    Set c = AddText("ReceiptFooter", "ReceiptFooter", 2552, 7371, 4989, 425)
+    Set c = AddLabel("lblReceiptFooter", "تذييل الفاتورة", 227, 7371, 2268, 425, 10, False, CLR_MUTED, "ReceiptFooter", 0)
+    Set c = AddCombo("POSMode", "POSMode", 10093, 7371, 4989, 425, "RETAIL;المحلات (باركود);RESTAURANT;المطاعم (شاشة لمس);CAFE;الكافيهات (شاشة لمس)", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "الشاشة التي يفتحها زر المبيعات"
     SetCtlProp c, "StatusBarText", "الشاشة التي يفتحها زر المبيعات"
-    Set c = AddLabel("lblPOSMode", "شاشة البيع", 227, 7371, 2268, 425, 10, False, CLR_MUTED, "POSMode", 0)
-    Set c = AddText("ImagesFolder", "ImagesFolder", 10093, 7371, 3685, 425)
+    Set c = AddLabel("lblPOSMode", "شاشة البيع", 7768, 7371, 2268, 425, 10, False, CLR_MUTED, "POSMode", 0)
+    Set c = AddText("ImagesFolder", "ImagesFolder", 2552, 7938, 3685, 425)
     SetCtlProp c, "ControlTipText", "فارغ = مجلد Images بجانب ملف البيانات"
     SetCtlProp c, "StatusBarText", "فارغ = مجلد Images بجانب ملف البيانات"
-    Set c = AddLabel("lblImagesFolder", "مجلد صور المنتجات", 7768, 7371, 2268, 425, 10, False, CLR_MUTED, "ImagesFolder", 0)
-    Set c = AddButton("btnBrowseImages", "استعراض", 13835, 7371, 1247, 425, "secondary")
+    Set c = AddLabel("lblImagesFolder", "مجلد صور المنتجات", 227, 7938, 2268, 425, 10, False, CLR_MUTED, "ImagesFolder", 0)
+    Set c = AddButton("btnBrowseImages", "استعراض", 6294, 7938, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddCombo("InvoicePrintMode", "InvoicePrintMode", 2552, 7938, 4989, 425, "DIRECT;طباعة مباشرة بدون معاينة;PREVIEW;عرض معاينة الطباعة;NONE;بدون طباعة", 2, "0;3402")
+    Set c = AddCombo("InvoicePrintMode", "InvoicePrintMode", 10093, 7938, 4989, 425, "DIRECT;طباعة مباشرة بدون معاينة;PREVIEW;عرض معاينة الطباعة;NONE;بدون طباعة", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "عند حفظ فاتورة البيع أو المرتجع"
     SetCtlProp c, "StatusBarText", "عند حفظ فاتورة البيع أو المرتجع"
-    Set c = AddLabel("lblInvoicePrintMode", "الطباعة عند حفظ الفاتورة", 227, 7938, 2268, 425, 10, False, CLR_MUTED, "InvoicePrintMode", 0)
-    Set c = AddText("CreditBlockDays", "CreditBlockDays", 10093, 7938, 4989, 425)
+    Set c = AddLabel("lblInvoicePrintMode", "الطباعة عند حفظ الفاتورة", 7768, 7938, 2268, 425, 10, False, CLR_MUTED, "InvoicePrintMode", 0)
+    Set c = AddText("CreditBlockDays", "CreditBlockDays", 2552, 8505, 4989, 425)
     SetCtlProp c, "ControlTipText", "0 = لا يتوقف البيع الآجل بسبب التأخير"
     SetCtlProp c, "StatusBarText", "0 = لا يتوقف البيع الآجل بسبب التأخير"
-    Set c = AddLabel("lblCreditBlockDays", "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم)", 7768, 7938, 2268, 425, 10, False, CLR_MUTED, "CreditBlockDays", 0)
-    Set c = AddCombo("DefaultBankID", "DefaultBankID", 2552, 8505, 4989, 425, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3402")
+    Set c = AddLabel("lblCreditBlockDays", "إيقاف البيع الآجل لعميل متأخر أكثر من (يوم)", 227, 8505, 2268, 425, 10, False, CLR_MUTED, "CreditBlockDays", 0)
+    Set c = AddCombo("DefaultBankID", "DefaultBankID", 10093, 8505, 4989, 425, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "التحويلات البنكية في الفواتير والسندات تُقيَّد فيه"
     SetCtlProp c, "StatusBarText", "التحويلات البنكية في الفواتير والسندات تُقيَّد فيه"
-    Set c = AddLabel("lblDefaultBankID", "البنك الافتراضي للتحويلات البنكية", 227, 8505, 2268, 425, 10, False, CLR_MUTED, "DefaultBankID", 0)
-    Set c = AddLabel("lblStoreNameNote", " ", 7768, 8505, 7314, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddCheck("AllowAdminCompanyName", "AllowAdminCompanyName", 2552, 9157)
+    Set c = AddLabel("lblDefaultBankID", "البنك الافتراضي للتحويلات البنكية", 7768, 8505, 2268, 425, 10, False, CLR_MUTED, "DefaultBankID", 0)
+    Set c = AddLabel("lblStoreNameNote", " ", 227, 9072, 14855, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddCheck("AllowAdminCompanyName", "AllowAdminCompanyName", 2552, 9724)
     SetCtlProp c, "ControlTipText", "يظهر للمبرمج فقط"
     SetCtlProp c, "StatusBarText", "يظهر للمبرمج فقط"
-    Set c = AddLabel("lblAllowAdminCompanyName", "السماح لمدير النظام بتغيير اسم المحل", 227, 9072, 2268, 425, 10, False, CLR_MUTED, "AllowAdminCompanyName", 0)
-    Set c = AddLabel("lblStatus", " ", 227, 9752, 14855, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblAllowAdminCompanyName", "السماح لمدير النظام بتغيير اسم المحل", 227, 9639, 2268, 425, 10, False, CLR_MUTED, "AllowAdminCompanyName", 0)
+    Set c = AddLabel("lblStatus", " ", 227, 10319, 14855, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP

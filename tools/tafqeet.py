@@ -57,17 +57,28 @@ def number_words(n: int) -> str:
     return " و".join(parts)
 
 
-def amount_in_words(amount) -> str:
+# Arabic unit, Arabic sub-unit, Arabic zero, English unit (one, many), English sub-unit (one, many):
+# the program currency of the operating country (modCountry, docs/44)
+CURRENCY_NAMES = {
+    "SAR": ("ريال سعودي", "هللة", "صفر ريال", "Saudi Riyal", "Saudi Riyals", "Halala", "Halalas"),
+    "EGP": ("جنيه مصري", "قرش", "صفر جنيه", "Egyptian Pound", "Egyptian Pounds", "Piaster", "Piasters"),
+}
+
+
+def amount_in_words(amount, currency="SAR") -> str:
+    names = CURRENCY_NAMES.get(currency, CURRENCY_NAMES["SAR"])
     a = abs(Decimal(str(amount))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-    riyals = int(a)
-    halalas = int((a - riyals) * 100)
-    if riyals == 0 and halalas == 0:
-        return "صفر ريال"
+    if a >= 1000000000:
+        return f"{a:,.2f} {names[0]}"
+    units = int(a)
+    cents = int((a - units) * 100)
+    if units == 0 and cents == 0:
+        return names[2]
     text = ""
-    if riyals:
-        text = number_words(riyals) + " ريال سعودي"
-    if halalas:
-        text += (" و" if text else "") + number_words(halalas) + " هللة"
+    if units:
+        text = number_words(units) + " " + names[0]
+    if cents:
+        text += (" و" if text else "") + number_words(cents) + " " + names[1]
     return "فقط " + text + " لا غير"
 
 
@@ -107,19 +118,20 @@ def number_words_en(n: int) -> str:
     return parts
 
 
-def amount_in_words_en(amount) -> str:
+def amount_in_words_en(amount, currency="SAR") -> str:
+    names = CURRENCY_NAMES.get(currency, CURRENCY_NAMES["SAR"])
     a = Decimal(str(abs(amount))).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
     if a >= 1000000000:
-        return f"{a:,.2f} Saudi Riyals"
-    riyals = int(a)
-    halalas = int((a - riyals) * 100)
-    if riyals == 0 and halalas == 0:
-        return "Zero Saudi Riyals"
+        return f"{a:,.2f} {names[4]}"
+    units = int(a)
+    cents = int((a - units) * 100)
+    if units == 0 and cents == 0:
+        return "Zero " + names[4]
     words = ""
-    if riyals:
-        words = number_words_en(riyals) + (" Saudi Riyal" if riyals == 1 else " Saudi Riyals")
-    if halalas:
+    if units:
+        words = number_words_en(units) + " " + (names[3] if units == 1 else names[4])
+    if cents:
         if words:
             words += " and "
-        words += number_words_en(halalas) + (" Halala" if halalas == 1 else " Halalas")
+        words += number_words_en(cents) + " " + (names[5] if cents == 1 else names[6])
     return "Only " + words

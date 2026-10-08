@@ -30,8 +30,10 @@ ZATCA_INITIAL_PIH = (
     "NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ=="
 )
 
-VAT_RULE = 'Is Null Or Like "3#############3"'
-VAT_TEXT = "الرقم الضريبي 15 رقمًا ويبدأ وينتهي بالرقم 3"
+# the tax number of the operating country (docs/44): Saudi Arabia 15 digits from 3 to 3, Egypt 9 digits;
+# the country itself is checked in code (modCountry.TaxNumberProblem)
+VAT_RULE = 'Is Null Or Like "3#############3" Or Like "#########"'
+VAT_TEXT = "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)"
 
 
 @dataclass
@@ -231,7 +233,9 @@ TABLES: List[Table] = [
             text("City", 50, "المدينة"),
             text("PostalCode", 10, "الرمز البريدي"),
             text("AdditionalNo", 10, "الرقم الإضافي"),
-            text("CountryCode", 2, "رمز الدولة", required=True, default='"SA"'),
+            text("CountryCode", 2, "دولة التشغيل", required=True, default='"SA"', rule='In ("SA","EG")',
+                 rule_text="SA = السعودية، EG = مصر",
+                 note="تحدد عملة البرنامج والضريبة والرقم الضريبي والفاتورة الإلكترونية (docs/44)"),
             text("Phone", 20, "الهاتف"),
             text("Email", 100, "البريد الإلكتروني"),
             rate("VATRate", "نسبة الضريبة", default="0.15"),
@@ -2199,6 +2203,12 @@ ACCOUNT_TREE = [
     (5800, "الزكاة", X, 53, True, False),
     (5900, "مصروفات متنوعة", X, 53, True, True),
 ]
+
+
+# Field rules changed after the first release: BuildSchema sets them on an existing back-end too
+# (generate.rule_upgrade_sub). Only looser rules go here: the existing rows already satisfy them.
+RULE_UPGRADES = [("Settings", "CountryCode"), ("Settings", "VATNumber"), ("Customers", "VATNumber"),
+                 ("Suppliers", "VATNumber")]
 
 
 def table(name: str) -> Table:

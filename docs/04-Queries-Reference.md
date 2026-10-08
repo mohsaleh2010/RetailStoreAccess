@@ -68,7 +68,7 @@
 | 60 | [`qrySupplierLedger`](#qrysupplierledger) | دفتر حساب الموردين: دائن (للمورد) / مدين (سُدِّد له) |  |
 | 61 | [`qrySupplierLedgerTotals`](#qrysupplierledgertotals) | مجاميع حساب كل مورد |  |
 | 62 | [`SupplierBalanceQuery`](#supplierbalancequery) ⭐ | رصيد كل مورد محسوبًا من الحركات (موجب = مستحق للمورد) |  |
-| 63 | [`qrySupplierFxMoves`](#qrysupplierfxmoves) | حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بالريال) |  |
+| 63 | [`qrySupplierFxMoves`](#qrysupplierfxmoves) | حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بعملة البرنامج) |  |
 | 64 | [`qryLatestRateDates`](#qrylatestratedates) | تاريخ آخر سعر لكل عملة |  |
 | 65 | [`qryLatestRates`](#qrylatestrates) | آخر معامل لكل عملة |  |
 | 66 | [`qrySupplierFxTotals`](#qrysupplierfxtotals) | رصيد كل مورد بكل عملة |  |
@@ -1046,7 +1046,7 @@ ORDER BY s.SupplierName
 
 ## qrySupplierFxMoves
 
-حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بالريال)
+حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بعملة البرنامج)
 
 ```sql
 SELECT h.SupplierID, h.CurrencyCode, h.TotalAmount - h.PaidAmount AS BaseAmount,
@@ -1059,13 +1059,13 @@ UNION ALL
 SELECT p.SupplierID, p.CurrencyCode, -p.Amount, Round(-p.Amount / p.ExchangeRate, 2)
 FROM SupplierPayments AS p
 UNION ALL
-SELECT s.SupplierID, 'SAR', s.OpeningBalance, s.OpeningBalance
-FROM [@Suppliers] AS s
-WHERE s.OpeningBalance <> 0
+SELECT s.SupplierID, z.CurrencyCode, s.OpeningBalance, s.OpeningBalance
+FROM Suppliers AS s, Settings AS z
+WHERE z.SettingID = 1 AND s.OpeningBalance <> 0
 UNION ALL
-SELECT q.SupplierID, 'SAR', IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)
-FROM Cheques AS q
-WHERE q.Direction = 'OUT'
+SELECT q.SupplierID, z.CurrencyCode, IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)
+FROM Cheques AS q, Settings AS z
+WHERE z.SettingID = 1 AND q.Direction = 'OUT'
 ```
 
 ## qryLatestRateDates

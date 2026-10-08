@@ -25,7 +25,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modSalesReps", "modEnglishNames", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modSalesReps", "modEnglishNames", "modCountry", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -174,6 +174,8 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     UpgradeAccountTree
     m_currentStep = "english names"
     SeedEnglishNames
+    m_currentStep = "field rules"
+    UpgradeFieldRules
 
     m_db.Close
     Set m_db = Nothing
@@ -657,6 +659,22 @@ Private Function InSchema(ByVal TableName As String) As Boolean
     InSchema = InStr(1, "," & SCHEMA_TABLES & ",", "," & TableName & ",", vbTextCompare) > 0
 End Function
 
+Private Sub SetFieldRule(ByVal TableName As String, ByVal FieldName As String, ByVal Rule As String, _
+                         ByVal RuleText As String)
+    ' A rule the schema changed on a field that already exists (schema.RULE_UPGRADES, looser rules only).
+    Dim fld As DAO.Field
+    On Error GoTo Failed
+    Set fld = m_db.TableDefs(TableName).Fields(FieldName)
+    If fld.ValidationRule <> Rule Then
+        fld.ValidationRule = Rule
+        fld.ValidationText = RuleText
+        LogLine "  ~ تغيّر شرط الحقل: " & TableName & "." & FieldName
+    End If
+    Exit Sub
+Failed:
+    LogLine "  ! تعذّر تغيير شرط الحقل " & TableName & "." & FieldName & ": " & Err.Description
+End Sub
+
 Private Sub LogLine(ByVal Msg As String)
     m_log = m_log & Msg & vbCrLf
     Debug.Print Msg
@@ -685,6 +703,18 @@ def account_upgrade_sub() -> str:
     out.append(f'    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN ({system}) OR '
                f'[AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 120001 AND 129999 OR '
                f'[AccountCode] BETWEEN 530001 AND 539999", dbFailOnError')
+    out.append("End Sub")
+    return "\n".join(out)
+
+
+def rule_upgrade_sub() -> str:
+    """The rules of schema.RULE_UPGRADES, set again on an existing back-end (BuildSchema keeps the
+    fields that exist, so a changed rule would otherwise stay as it was)."""
+    from schema import RULE_UPGRADES
+    out = ["Private Sub UpgradeFieldRules()"]
+    for tbl, name in RULE_UPGRADES:
+        f = next(x for x in table(tbl).fields if x.name == name)
+        out.append(f"    SetFieldRule {vba_str(tbl)}, {vba_str(name)}, {vba_str(f.rule)}, {vba_str(f.rule_text)}")
     out.append("End Sub")
     return "\n".join(out)
 
@@ -745,6 +775,7 @@ def build_vba() -> str:
         parts.append(vba_seed_sub(t) + "\n")
     parts.append(account_upgrade_sub() + "\n")
     parts.append(english_names_sub() + "\n")
+    parts.append(rule_upgrade_sub() + "\n")
     return "\n".join(parts)
 
 

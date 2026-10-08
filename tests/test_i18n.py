@@ -178,7 +178,7 @@ class CodeTests(unittest.TestCase):
     def test_reports_text_functions(self):
         reports = read("modReports")
         self.assertIn('ReportCriteria = Tr(Nz(TempVars("ReportCriteria"), ""))', reports)
-        self.assertIn("AmountInWords = AmountInWordsEn(Amount)", reports)
+        self.assertIn("AmountInWords = AmountInWordsEn(Amount, CurrencyCode)", reports)
 
     def test_tests_run_in_arabic(self):
         test_all = read("modTestAll")

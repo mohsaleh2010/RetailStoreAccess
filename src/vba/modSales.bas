@@ -808,7 +808,7 @@ Private Sub SetZatcaFields(ByVal rs As DAO.Recordset, ByVal SubType As String, B
     rs!ICV = CLng(NextNumber("ZATCA_ICV"))
     rs!ZatcaStatus = ZatcaInitialStatus()
     vatNo = Nz(SettingValue("VATNumber"), "")
-    If Len(vatNo) > 0 Then          ' a QR code is only required from VAT-registered sellers
+    If Len(vatNo) > 0 And AppCountry() = "SA" Then      ' the ZATCA QR code: VAT-registered Saudi sellers
         rs!QRCodeData = BuildZatcaQR(Nz(SettingValue("StoreName"), ""), vatNo, DocDate, Total, Tax)
     End If
 End Sub

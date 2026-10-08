@@ -85,7 +85,7 @@
 | 1 | **SettingID** 🔑 | Number (Long) |  | ✔ | `1` | `=1` |  | رقم الإعداد |
 | 2 | StoreName | Short Text | 150 | ✔ |  |  |  | اسم المحل |
 | 3 | StoreNameEn | Short Text | 150 |  |  |  |  | اسم المحل بالإنجليزية |
-| 4 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3"` |  | الرقم الضريبي |
+| 4 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3" Or Like "#########"` |  | الرقم الضريبي |
 | 5 | CRNumber | Short Text | 20 |  |  |  |  | السجل التجاري |
 | 6 | BuildingNo | Short Text | 10 |  |  |  |  | رقم المبنى |
 | 7 | StreetName | Short Text | 100 |  |  |  |  | الشارع |
@@ -93,7 +93,7 @@
 | 9 | City | Short Text | 50 |  |  |  |  | المدينة |
 | 10 | PostalCode | Short Text | 10 |  |  |  |  | الرمز البريدي |
 | 11 | AdditionalNo | Short Text | 10 |  |  |  |  | الرقم الإضافي |
-| 12 | CountryCode | Short Text | 2 | ✔ | `"SA"` |  |  | رمز الدولة |
+| 12 | CountryCode | Short Text | 2 | ✔ | `"SA"` | `In ("SA","EG")` |  | دولة التشغيل – تحدد عملة البرنامج والضريبة والرقم الضريبي والفاتورة الإلكترونية (docs/44) |
 | 13 | Phone | Short Text | 20 |  |  |  |  | الهاتف |
 | 14 | Email | Short Text | 100 |  |  |  |  | البريد الإلكتروني |
 | 15 | VATRate | Currency (نسبة) |  | ✔ | `0.15` | `>=0 And <1` |  | نسبة الضريبة |
@@ -397,7 +397,7 @@
 | 5 | Mobile | Short Text | 20 |  |  |  |  | الجوال |
 | 6 | Phone | Short Text | 20 |  |  |  |  | الهاتف |
 | 7 | Email | Short Text | 100 |  |  |  |  | البريد الإلكتروني |
-| 8 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3"` |  | الرقم الضريبي |
+| 8 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3" Or Like "#########"` |  | الرقم الضريبي |
 | 9 | CRNumber | Short Text | 20 |  |  |  |  | السجل التجاري |
 | 10 | Address | Short Text | 255 |  |  |  |  | العنوان |
 | 11 | City | Short Text | 50 |  |  |  |  | المدينة |
@@ -425,7 +425,7 @@
 | 4 | Mobile | Short Text | 20 |  |  |  |  | الجوال |
 | 5 | Phone | Short Text | 20 |  |  |  |  | الهاتف |
 | 6 | Email | Short Text | 100 |  |  |  |  | البريد الإلكتروني |
-| 7 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3"` |  | الرقم الضريبي – إذا وُجد تصدر للعميل فاتورة ضريبية B2B |
+| 7 | VATNumber | Short Text | 15 |  |  | `Is Null Or Like "3#############3" Or Like "#########"` |  | الرقم الضريبي – إذا وُجد تصدر للعميل فاتورة ضريبية B2B |
 | 8 | CRNumber | Short Text | 20 |  |  |  |  | السجل التجاري |
 | 9 | BuildingNo | Short Text | 10 |  |  |  |  | رقم المبنى |
 | 10 | StreetName | Short Text | 100 |  |  |  |  | الشارع |

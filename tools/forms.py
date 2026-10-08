@@ -147,6 +147,7 @@ VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;مع�
 
 TILE_COLORS = ("BLUE;أزرق;GREEN;أخضر;ORANGE;برتقالي;PURPLE;بنفسجي;RED;أحمر;INDIGO;نيلي;TEAL;فيروزي;"
                "PINK;وردي;BROWN;بني;GREY;رمادي")
+COUNTRIES = "SA;المملكة العربية السعودية;EG;جمهورية مصر العربية"
 POS_MODES = "RETAIL;المحلات (باركود);RESTAURANT;المطاعم (شاشة لمس);CAFE;الكافيهات (شاشة لمس)"
 
 INVOICE_PRINT_MODES = ("DIRECT;طباعة مباشرة بدون معاينة;PREVIEW;عرض معاينة الطباعة;"
@@ -221,7 +222,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
             Fld("PaymentTermsDays", hint="استحقاق فاتورة الشراء الآجلة = تاريخها + هذه المدة"),
             Fld("CurrencyCode", rows=CURRENCY_ROWS, widths="1.2;4", hint="تُقترح في فواتيره وسنداته"),
-            Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق للمورد (بالريال دائمًا)"),
+            Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق للمورد (بعملة البرنامج دائمًا)"),
             Fld("Notes", span=2),
         ]),
     DataScreen(
@@ -238,7 +239,7 @@ DATA_SCREENS: List[DataScreen] = [
         fields=[
             Fld("ExpenseNumber", locked=True, hint="يُولَّد عند الحفظ"), Fld("ExpenseDate", hook=True),
             Fld("CurrencyCode", rows=CURRENCY_ROWS, widths="1.2;4", hook=True, hint="المصروف بعملة أخرى: اكتب مبلغه بها"),
-            Fld("ExchangeRate", hook=True, hint="قيمة وحدة واحدة بالريال"),
+            Fld("ExchangeRate", hook=True, hint="قيمة وحدة واحدة بعملة البرنامج"),
             Fld("ForeignAmount", hook=True), Fld("ForeignTax", hook=True),
             Fld("ExpenseTypeID", rows=EXPENSE_TYPE_ROWS,
                 button=("btnNewType", "نوع جديد", 'AddExpenseType Me, "ExpenseTypeID"')),
@@ -253,7 +254,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("Description", span=2),
         ]),
     DataScreen(
-        "frmCurrencies", "Currencies", "العملات", "عملات التعامل؛ عملة البرنامج الريال وكل المبالغ تُحفظ به", "treasury",
+        "frmCurrencies", "Currencies", "العملات", "عملات التعامل؛ كل المبالغ تُحفظ بعملة البرنامج (حسب دولة التشغيل في الإعدادات)", "treasury",
         list_select="t.CurrencyCode AS [الرمز], t.CurrencyName AS [العملة]",
         list_from="Currencies AS t", list_order="t.SortOrder, t.CurrencyCode",
         list_headers=[("الرمز", 1.6), ("العملة", 6.8)],
@@ -262,7 +263,7 @@ DATA_SCREENS: List[DataScreen] = [
         extra_buttons=[("btnRates", "أسعار العملات", 'OpenScreen "frmCurrencyRates", 0')],
         fields=[Fld("CurrencyCode", hint="3 أحرف (ISO) مثل USD"), Fld("CurrencyName"), Fld("CurrencyNameEn"),
                 Fld("Symbol"), Fld("DecimalPlaces"), Fld("SortOrder"), Fld("IsActive"),
-                Info("lblCurrencyNote", "المعامل = قيمة وحدة واحدة من العملة بالريال؛ يُسجَّل لكل تاريخ في «أسعار العملات»")]),
+                Info("lblCurrencyNote", "المعامل = قيمة وحدة واحدة من العملة بعملة البرنامج؛ يُسجَّل لكل تاريخ في «أسعار العملات»")]),
     DataScreen(
         "frmCurrencyRates", "CurrencyRates", "أسعار العملات", "معامل كل عملة في تاريخ؛ المستند يأخذ آخر سعر في تاريخه أو قبله",
         "treasury",
@@ -468,6 +469,8 @@ DATA_SCREENS: List[DataScreen] = [
         fields=[
             Fld("StoreName"),
             Fld("StoreNameEn", button=("btnEnglishNames", "باقي الأسماء", 'OpenScreen "frmEnglishNames"')),
+            Fld("CountryCode", rows=COUNTRIES, widths="0;6",
+                hint="العملة والضريبة والرقم الضريبي والفاتورة الإلكترونية. تتغير قبل تسجيل أي عملية فقط"),
             Fld("VATNumber", hint="15 رقمًا يبدأ وينتهي بـ 3"), Fld("CRNumber"),
             Fld("BuildingNo"), Fld("StreetName"), Fld("District"), Fld("City"),
             Fld("PostalCode"), Fld("AdditionalNo"), Fld("Phone"), Fld("Email"),

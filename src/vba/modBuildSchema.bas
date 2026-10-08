@@ -79,6 +79,8 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     UpgradeAccountTree
     m_currentStep = "english names"
     SeedEnglishNames
+    m_currentStep = "field rules"
+    UpgradeFieldRules
 
     m_db.Close
     Set m_db = Nothing
@@ -562,6 +564,22 @@ Private Function InSchema(ByVal TableName As String) As Boolean
     InSchema = InStr(1, "," & SCHEMA_TABLES & ",", "," & TableName & ",", vbTextCompare) > 0
 End Function
 
+Private Sub SetFieldRule(ByVal TableName As String, ByVal FieldName As String, ByVal Rule As String, _
+                         ByVal RuleText As String)
+    ' A rule the schema changed on a field that already exists (schema.RULE_UPGRADES, looser rules only).
+    Dim fld As DAO.Field
+    On Error GoTo Failed
+    Set fld = m_db.TableDefs(TableName).Fields(FieldName)
+    If fld.ValidationRule <> Rule Then
+        fld.ValidationRule = Rule
+        fld.ValidationText = RuleText
+        LogLine "  ~ تغيّر شرط الحقل: " & TableName & "." & FieldName
+    End If
+    Exit Sub
+Failed:
+    LogLine "  ! تعذّر تغيير شرط الحقل " & TableName & "." & FieldName & ": " & Err.Description
+End Sub
+
 Private Sub LogLine(ByVal Msg As String)
     m_log = m_log & Msg & vbCrLf
     Debug.Print Msg
@@ -653,7 +671,7 @@ Private Sub CreateTable_Settings()
     AddField tdf, "StoreNameEn", "TEXT", 150, False, "", _
              "", "", "اسم المحل بالإنجليزية", ""
     AddField tdf, "VATNumber", "TEXT", 15, False, "", _
-             "Is Null Or Like ""3#############3""", "الرقم الضريبي 15 رقمًا ويبدأ وينتهي بالرقم 3", "الرقم الضريبي", ""
+             "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)", "الرقم الضريبي", ""
     AddField tdf, "CRNumber", "TEXT", 20, False, "", _
              "", "", "السجل التجاري", ""
     AddField tdf, "BuildingNo", "TEXT", 10, False, "", _
@@ -669,7 +687,7 @@ Private Sub CreateTable_Settings()
     AddField tdf, "AdditionalNo", "TEXT", 10, False, "", _
              "", "", "الرقم الإضافي", ""
     AddField tdf, "CountryCode", "TEXT", 2, True, """SA""", _
-             "", "", "رمز الدولة", ""
+             "In (""SA"",""EG"")", "SA = السعودية، EG = مصر", "دولة التشغيل", "تحدد عملة البرنامج والضريبة والرقم الضريبي والفاتورة الإلكترونية (docs/44)"
     AddField tdf, "Phone", "TEXT", 20, False, "", _
              "", "", "الهاتف", ""
     AddField tdf, "Email", "TEXT", 100, False, "", _
@@ -1077,7 +1095,7 @@ Private Sub CreateTable_Suppliers()
     AddField tdf, "Email", "TEXT", 100, False, "", _
              "", "", "البريد الإلكتروني", ""
     AddField tdf, "VATNumber", "TEXT", 15, False, "", _
-             "Is Null Or Like ""3#############3""", "الرقم الضريبي 15 رقمًا ويبدأ وينتهي بالرقم 3", "الرقم الضريبي", ""
+             "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)", "الرقم الضريبي", ""
     AddField tdf, "CRNumber", "TEXT", 20, False, "", _
              "", "", "السجل التجاري", ""
     AddField tdf, "Address", "TEXT", 255, False, "", _
@@ -1120,7 +1138,7 @@ Private Sub CreateTable_Customers()
     AddField tdf, "Email", "TEXT", 100, False, "", _
              "", "", "البريد الإلكتروني", ""
     AddField tdf, "VATNumber", "TEXT", 15, False, "", _
-             "Is Null Or Like ""3#############3""", "الرقم الضريبي 15 رقمًا ويبدأ وينتهي بالرقم 3", "الرقم الضريبي", "إذا وُجد تصدر للعميل فاتورة ضريبية B2B"
+             "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)", "الرقم الضريبي", "إذا وُجد تصدر للعميل فاتورة ضريبية B2B"
     AddField tdf, "CRNumber", "TEXT", 20, False, "", _
              "", "", "السجل التجاري", ""
     AddField tdf, "BuildingNo", "TEXT", 10, False, "", _
@@ -3820,4 +3838,11 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Customers] SET [CustomerNameEn] = 'Cash customer' WHERE [CustomerID] = 1 AND [CustomerNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [CashBoxes] SET [BoxNameEn] = 'Main treasury' WHERE [CashBoxID] = 1 AND [BoxNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [CashBoxes] SET [BoxNameEn] = 'Cashier box' WHERE [CashBoxID] = 2 AND [BoxNameEn] Is Null", dbFailOnError
+End Sub
+
+Private Sub UpgradeFieldRules()
+    SetFieldRule "Settings", "CountryCode", "In (""SA"",""EG"")", "SA = السعودية، EG = مصر"
+    SetFieldRule "Settings", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)"
+    SetFieldRule "Customers", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)"
+    SetFieldRule "Suppliers", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "الرقم الضريبي: 15 رقمًا يبدأ وينتهي بالرقم 3 (السعودية)، أو 9 أرقام (مصر)"
 End Sub

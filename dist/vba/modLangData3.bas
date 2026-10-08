@@ -19,6 +19,27 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "ÚÏÏ ÇáäÓÎ ÇáãÍÊİÙ ÈåÇ", "Number of backups kept"
+    LangAdd "ÛíÑ äÔØ æáÇ íãßä ÈíÚå", "is not active and cannot be sold"
+    LangAdd "ŞÇÆãÉ ÃäæÇÚ ÇáãÕÑæİÇÊ", "List of expense types"
+    LangAdd "ŞíãÉ ÇáãÎÒæä ÈÇáÊßáİÉ", "Stock value at cost"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÈäæß", "You do not have the permission for banks"
+    LangAdd "áÇ ÊæÌÏ ÊÚÏíáÇÊ ááÍİÙ", "There are no changes to save"
+    LangAdd "áÇ ãÈíÚÇÊ ÂÌáÉ İí ÂÎÑ", "No credit sales in the last"
+    LangAdd "ãÈáÛ ãÓÊÍŞ Úáì ÇáÚãíá", "an amount due from the customer"
+    LangAdd "ãÑÇßÒ ÇáÊßáİÉ æÇáİÑæÚ", "Cost centers and branches"
+    LangAdd "ãÑßÒ ãä íõäÔÆ ÇáãÕÑæİ", "Center of the user who creates the expense"
+    LangAdd "ãÓíÑ ÚãæáÇÊ ÇáãäÏæÈíä", "Sales rep commission run"
+    LangAdd "ãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "Low-stock products"
+    LangAdd "ãäÏæÈ   ÕÇİí ÇáãÈíÚÇÊ", "sales reps   Net sales"
+    LangAdd "äÓÈÉ ÇáÓíæáÉ (ÇáÊÏÇæá", "Liquidity (current) ratio"
+    LangAdd "äÓÈÉ ÇáÚãæáÉ Èíä 0% æ", "The commission rate is between 0% and"
+    LangAdd "íÌÈ ÊÛííÑ ßáãÉ ÇáãÑæÑ", "The password must be changed"
+    LangAdd "íæÌÏ ãÓíÑ ÚãæáÇÊ áÔåÑ", "A commission run for the month"
+    LangAdd "ÃÓØÑ ãÑÊÌÚ ÇáãÔÊÑíÇÊ", "Purchase return lines"
+    LangAdd "ÃİÖá ÇáãäÊÌÇÊ ãÈíÚğÇ", "Best-selling products"
+    LangAdd "ÅíÏÇÚ äŞÏíÉ İí ÇáÈäß", "Deposit cash in the bank"
+    LangAdd "ÅíÏÇÚ äŞÏíÉ ãä ÕäÏæŞ", "Deposit cash from a box"
     LangAdd "ÇÎÊÑ ÇáÓäÏ æÇáİÇÊæÑÉ", "Choose the voucher and the invoice"
     LangAdd "ÇÎÊÑ ØÑíŞÉ ÇáÇÓÊÈÚÇÏ", "Choose the disposal method"
     LangAdd "ÇÎÊÑ ŞíãÉ ãä ÇáŞÇÆãÉ", "Choose a value from the list"
@@ -96,8 +117,10 @@ Private Sub D3_1()
     LangAdd "ÊÚĞÑ ÊÍÏíË ÇáãÄÔÑÇÊ", "Could not refresh the indicators"
     LangAdd "ÊÚĞÑ ÑÓã ÇáÅÍÕÇÆíÇÊ", "Could not draw the statistics"
     LangAdd "Êã ÅŞİÇá ÇáİÊÑÉ ÍÊì", "The period was closed up to"
+    LangAdd "Êã ÖÈØ ÇáÈÑäÇãÌ Úáì", "The program is now set for"
     LangAdd "ÊãÊ ÅÚÇÏÉ İÊÍ ÇáÓäÉ", "The year was reopened"
     LangAdd "ÊäÈíå ÇáãÎÒæä: íæÌÏ", "Stock alert: there are"
+    LangAdd "ÌãåæÑíÉ ãÕÑ ÇáÚÑÈíÉ", "Arab Republic of Egypt"
     LangAdd "ÍÊì ÔåÑ (Ãí íæã İíå", "Up to month (any day in it"
     LangAdd "ÓÍÈ äŞÏíÉ Åáì ÕäÏæŞ", "Cash withdrawal to a box"
     LangAdd "ÕÇİí ÅíÑÇÏÇÊ ÇáäÔÇØ", "Net operating revenue"
@@ -116,6 +139,9 @@ Private Sub D3_1()
     LangAdd "íõŞİá ÈÚÏ Ãæá ÚãáíÉ", "Locked after the first transaction"
     LangAdd "ÃÓØÑ ÇáŞíÏ ÇáãÎÊÇÑ", "Lines of the selected entry"
     LangAdd "ÃÓØÑ İÇÊæÑÉ ÇáÔÑÇÁ", "Purchase invoice lines"
+End Sub
+
+Private Sub D3_2()
     LangAdd "ÃÓØÑ ãÓíÑ ÇáÚãæáÇÊ", "Commission run lines"
     LangAdd "ÅäÔÇÁ ÇáãÓÊÍŞ ÇáÂä", "Create the due now"
     LangAdd "ÇÈÏÃ ÇáÊÓæíÉ ÃæáğÇ", "Start the reconciliation first"
@@ -139,9 +165,6 @@ Private Sub D3_1()
     LangAdd "ÇáãæÙİ ÕÇÍÈ ÇáÓáİÉ", "Employee taking the advance"
     LangAdd "ÇáãíÒÇäíÉ ÇáÚãæãíÉ", "Balance sheet"
     LangAdd "ÈÓÈÈ ãÍÇæáÇÊ ÎÇØÆÉ", "after wrong attempts"
-End Sub
-
-Private Sub D3_2()
     LangAdd "Èäß ÇáÓÇÍÈ (ÇáæÇÑÏ", "Drawer bank (received"
     LangAdd "ÊÍæíá Èíä ÇáÕäÇÏíŞ", "Transfer between boxes"
     LangAdd "ÊÍæíá ãä ÕäÏæŞ ÂÎÑ", "Transfer from another box"
@@ -239,6 +262,9 @@ Private Sub D3_2()
     LangAdd "ÓäÏ ŞÈÖ / ÓäÏ ÕÑİ", "Receipt voucher / payment voucher"
     LangAdd "ÔíßÇÊ ÊÍÊ ÇáÊÍÕíá", "Cheques under collection"
     LangAdd "ÕÇÏÑ ÂÎÑ ãä ÇáÈäß", "Other outgoing from the bank"
+End Sub
+
+Private Sub D3_3()
     LangAdd "ÕÇİí ÖÑíÈÉ ÇáİÊÑÉ", "Net VAT of the period"
     LangAdd "ÛíÑ ãÓÌá ÈÇáÖÑíÈÉ", "Not registered for VAT"
     LangAdd "İÇÊæÑÉ ÇáãæÑÏ ÑŞã", "Supplier invoice number"
@@ -247,6 +273,7 @@ Private Sub D3_2()
     LangAdd "ãËÇá: 38 Ãæ 40 Ãæ", "Example: 38 or 40 or"
     LangAdd "ãÌáÏ ÕæÑ ÇáãäÊÌÇÊ", "Product pictures folder"
     LangAdd "ãÓÊäÏ ãİÊæÍ. ÇÎÊÑ", "An open document. Choose"
+    LangAdd "äÓÈÉ ÇáÖÑíÈÉ áíÓÊ", "The VAT rate is not"
     LangAdd "æ - áÊÚÏíá ÇáßãíÉ", "and - to change the quantity"
     LangAdd "íÓãÍ ÈÇáÈíÚ ÇáÂÌá", "Allows credit sales"
     LangAdd "íõæáóøÏ ÚäÏ ÇáÍİÙ", "Generated when saved"
@@ -262,9 +289,6 @@ Private Sub D3_2()
     LangAdd "ÇÎÊÑ ãÕÏÑ ÇáÔÑÇÁ", "Choose the purchase source"
     LangAdd "ÇÎÊÑ äæÚ ÇáãÕÑæİ", "Choose the expense type"
     LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáÕÑİ", "Type the payment date"
-End Sub
-
-Private Sub D3_3()
     LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáŞíÏ", "Type the date of the entry"
     LangAdd "ÇáÃÌåÒÉ ÇáãİÚøáÉ", "Activated computers"
     LangAdd "ÇáÃÕá ÛíÑ ãÓÊÈÚÏ", "The asset is not disposed"
@@ -322,7 +346,6 @@ Private Sub D3_3()
     LangAdd "ÚãæáÇÊ ÇáãäÏæÈíä", "Sales rep commissions"
     LangAdd "Úä İÇÊæÑÉ ÇáÔÑÇÁ", "for the purchase invoice"
     LangAdd "ÛíÑ ãÓãæÍ ÈÇáÂÌá", "Credit not allowed"
-    LangAdd "áíÓ ÈÕíÛÉ ÓÚæÏíÉ", "is not in the Saudi format"
     LangAdd "ãÌãÚ ÅåáÇß ÇáÃÕá", "Accumulated depreciation of the asset"
     LangAdd "ãÑÏæÏÇÊ ÇáãÈíÚÇÊ", "Sales returns"
     LangAdd "ãÓÊÍŞÇÊ ÇáãæÑÏíä", "Supplier payables"
@@ -362,6 +385,9 @@ Private Sub D3_3()
     LangAdd "ÇáÔíß ÛíÑ ãæÌæÏ", "The cheque does not exist"
     LangAdd "ÇáÕäÏæŞ ÛíÑ äÔØ", "The box is not active"
     LangAdd "ÇáÖÑíÈÉ ÈÇáÚãáÉ", "VAT in currency"
+End Sub
+
+Private Sub D3_4()
     LangAdd "ÇáÚãíá (ÇÎÊíÇÑí", "Customer (optional"
     LangAdd "ÇáÚãíá / ÇáãæÑÏ", "Customer / supplier"
     LangAdd "ÇáİÊÑÉ: ÇáãÌãæÚ", "Period: total"
@@ -385,9 +411,6 @@ Private Sub D3_3()
     LangAdd "ÊÚĞÑ ÇáÍĞİ (ÎØÃ", "Could not delete (error"
     LangAdd "ÊÚĞÑ ÍİÙ ÇáÍÑßÉ", "Could not save the move"
     LangAdd "ÊÚĞÑÊ ÇáÇÓÊÚÇÏÉ", "Restore failed"
-End Sub
-
-Private Sub D3_4()
     LangAdd "ÊÚííä ßáãÉ ãÑæÑ", "Set a password"
     LangAdd "Êã ÊÑÍíá ÇáãÓíÑ", "The run was posted"
     LangAdd "Êã ÍİÙ ÇáİÇÊæÑÉ", "The invoice was saved"
@@ -466,8 +489,7 @@ Private Sub D3_4()
     LangAdd "ÇáãÓÊÍŞ ááãæÑÏ", "Due to the supplier"
     LangAdd "ÇáãÓÊÎÏã (İÇÑÛ", "User (empty"
     LangAdd "ÇáãÓãì ÇáæÙíİí", "Job title"
-    LangAdd "ÈÂÎÑ ÓÚÑ (ÑíÇá", "At the last rate (SAR"
-    LangAdd "ÈÇáÏİÇÊÑ (ÑíÇá", "In the books (SAR"
+    LangAdd "ÇáãÚãæá ÈåÇ İí", "applied in"
     LangAdd "ÈãÊæÓØ ÇáÊßáİÉ", "at average cost"
     LangAdd "ÊÇÑíÎ ÇáÇÚÊãÇÏ", "Approval date"
     LangAdd "ÊÇÑíÎ ÇáİÇÊæÑÉ", "Invoice date"
@@ -486,6 +508,9 @@ Private Sub D3_4()
     LangAdd "Êã ÊÑÍíá ÇáÌÑÏ", "The count was posted"
     LangAdd "Êã ÊÓÌíá ÅåáÇß", "Depreciation recorded for"
     LangAdd "Êã ÊÓÌíá ÇáÔíß", "The cheque was recorded"
+End Sub
+
+Private Sub D3_5()
     LangAdd "Êã ÊÚØíá ÇáÓÌá", "The record was deactivated"
     LangAdd "Êã ÍİÙ ÇáÊÕİíÉ", "The closing was saved"
     LangAdd "Êã ÍİÙ ÇáÊÚÏíá", "The change was saved"
@@ -508,9 +533,6 @@ Private Sub D3_4()
     LangAdd "ØÈÇÚÉ ÇáÈÇÑßæÏ", "Print barcodes"
     LangAdd "ØÈÇÚÉ ÇáãŞÇÑäÉ", "Print the comparison"
     LangAdd "ØÑíŞÉ ÇáÇÓÊáÇã", "Receipt method"
-End Sub
-
-Private Sub D3_5()
     LangAdd "ÚÌÒ İí ÇáÕäÏæŞ", "Shortage in the box"
     LangAdd "ÚÑÖ ÇáãáÕŞ (ãã", "Label width (mm"
     LangAdd "ÚÑÖ İí ÇáíæãíÉ", "Show in the journal"
@@ -601,6 +623,7 @@ Private Sub D3_5()
     LangAdd "ÖÑíÈÉ ÇáÚãæáÉ", "Fee VAT"
     LangAdd "ØÈÇÚÉ ÇáŞÇÆãÉ", "Print the list"
     LangAdd "ØÈÇÚÉ ÇáíæãíÉ", "Print the journal"
+    LangAdd "ÚãáÉ ÇáÈÑäÇãÌ", "Program currency"
     LangAdd "ÚãæáÇÊ ãÓÊÍŞÉ", "Commissions payable"
     LangAdd "ÚäæÇä ÇáÊæÕíá", "Delivery address"
     LangAdd "İÇÊ ÇÓÊÍŞÇŞåÇ", "Overdue"
@@ -608,6 +631,9 @@ Private Sub D3_5()
     LangAdd "İÇÊæÑÉ ÖÑíÈíÉ", "Tax invoice"
     LangAdd "İÇÊæÑÉ ãÊÃÎÑÉ", "has an invoice late by"
     LangAdd "İÊÍ ŞíÏ ãÍİæÙ", "Open a saved entry"
+End Sub
+
+Private Sub D3_6()
     LangAdd "İÊÑÉ ÇáãŞÇÑäÉ", "Comparison period"
     LangAdd "İæÇÊíÑ ÇáÔÑÇÁ", "Purchase invoices"
     LangAdd "ŞíÏ íæãíÉ ÑŞã", "Journal entry number"
@@ -629,11 +655,9 @@ Private Sub D3_5()
     LangAdd "ãŞİáÉ ÍÊì íæã", "Closed up to the day"
     LangAdd "ãáÁ ãä ÇáİÚáí", "Fill from actuals"
     LangAdd "äÓÎÉ ÇÍÊíÇØíÉ", "Backup"
+    LangAdd "æäÓÈÉ ÇáÖÑíÈÉ", "and the VAT rate"
     LangAdd "íÊÇÈÚ ÇáãÎÒæä", "Tracks stock"
     LangAdd "íæã ÇáÇÓÊÍŞÇŞ", "Due day"
-End Sub
-
-Private Sub D3_6()
     LangAdd "ÂÎÑ ÓÚÑ ÔÑÇÁ", "Last purchase price"
     LangAdd "ÂÎÑ ÔåÑ ãÓÌá", "Last recorded month"
     LangAdd "ÂíÈÇä ÇáãæÙİ", "Employee IBAN"
@@ -688,6 +712,7 @@ Private Sub D3_6()
     LangAdd "ÎÇÖÚ ááÖÑíÈÉ", "Taxable"
     LangAdd "ÎÒíäÉ ÑÆíÓíÉ", "Main treasury"
     LangAdd "ÏİÊÑ ÇáÃÓÊÇĞ", "General ledger"
+    LangAdd "ÏæáÉ ÇáÊÔÛíá", "Operating country"
     LangAdd "Ïíæä ÇáÚãáÇÁ", "Customer receivables"
     LangAdd "ÑÆíÓí / İÑÚí", "Main / sub"
     LangAdd "ÑÕíÏ ÇİÊÊÇÍí", "Opening balance"
@@ -729,6 +754,9 @@ Private Sub D3_6()
     LangAdd "ãÑÊÌÚ ãÈíÚÇÊ", "Sales return"
     LangAdd "ãÑßÒ ÇáÊßáİÉ", "Cost center"
     LangAdd "ãÓæÏÉ ÚãæáÇÊ", "Commission draft"
+End Sub
+
+Private Sub D3_7()
     LangAdd "ãÓíÑ ÇáÑæÇÊÈ", "Payroll"
     LangAdd "ãÕÑæİÇÊ ÃÎÑì", "Other expenses"
     LangAdd "ãŞİáÉ ÈÇáİÚá", "already closed"
@@ -737,6 +765,7 @@ Private Sub D3_6()
     LangAdd "äÓÈÉ ÇáÖÑíÈÉ", "VAT rate"
     LangAdd "äÓÈÉ ÇáÚãæáÉ", "Commission rate"
     LangAdd "äåÇíÉ ÇáİÊÑÉ", "End of the period"
+    LangAdd "åá ÃäÊ ãÊÃßÏ", "Are you sure"
     LangAdd "æÍÏÇÊ ÇáŞíÇÓ", "Units of measure"
     LangAdd "íÚæÏ ááãÎÒæä", "Back to stock"
     LangAdd "Ããíä ÇáãÎÒä", "Storekeeper"
@@ -754,9 +783,6 @@ Private Sub D3_6()
     LangAdd "ÇÎÊÑ ÇáÚãíá", "Choose the customer"
     LangAdd "ÇÎÊÑ ÇáãÌáÏ", "Choose the folder"
     LangAdd "ÇÎÊÑ ÇáãäÊÌ", "Choose the product"
-End Sub
-
-Private Sub D3_7()
     LangAdd "ÇÎÊÑ ÇáãæÑÏ", "Choose the supplier"
     LangAdd "ÇÓã ÇáÊÕäíİ", "Category name"
     LangAdd "ÇÓã ÇáÕäÏæŞ", "Box name"
@@ -849,7 +875,11 @@ Private Sub D3_7()
     LangAdd "ÃŞÕì ÊÃÎíÑ", "Longest delay"
     LangAdd "ÃŞİá ÇáÓäÉ", "Close the year"
     LangAdd "ÅÑÌÇÚ Çáßá", "Return all"
+    LangAdd "ÅÔÚÇÑ ÏÇÆä", "Credit note"
     LangAdd "ÅŞİÇá İÊÑÉ", "Close a period"
+End Sub
+
+Private Sub D3_8()
     LangAdd "ÅáÛÇÁ Çáßá", "Clear all"
     LangAdd "ÅåáÇß ÓÇÈŞ", "Previous depreciation"
     LangAdd "ÇÎÊÑ ÇáÈäß", "Choose the bank"
@@ -873,47 +903,4 @@ Private Sub D3_7()
     LangAdd "ÇáİÑŞ (ÕİÑ", "Difference (zero"
     LangAdd "ÇáãÓÊÎÏãæä", "Users"
     LangAdd "ÈÍË ÈÇáÇÓã", "Search by name"
-    LangAdd "ÈÏáÇÊ ÃÎÑì", "Other allowances"
-    LangAdd "ÈÏæä ÖÑíÈÉ", "Without VAT"
-    LangAdd "ÈÏæä ØÈÇÚÉ", "No printing"
-    LangAdd "ÈíÇä ÇáÓØÑ", "Line description"
-End Sub
-
-Private Sub D3_8()
-    LangAdd "ÊÍÏíÏ Çáßá", "Select all"
-    LangAdd "ÊÍæíá ÕÇÏÑ", "Outgoing transfer"
-    LangAdd "ÊÍæíá æÇÑÏ", "Incoming transfer"
-    LangAdd "ÊÚĞÑ ÇáÍİÙ", "Could not save"
-    LangAdd "Êã ÇáÅáÛÇÁ", "Cancelled"
-    LangAdd "ËãÇäíÉ ÚÔÑ", "eighteen"
-    LangAdd "ÍÏÏ ÇáİÊÑÉ", "Set the period"
-    LangAdd "ÍĞİ ÇáÍÑßÉ", "Delete the move"
-    LangAdd "ÍİÙ ÇáÍÑßÉ", "Save the move"
-    LangAdd "ÍİÙ æØÈÇÚÉ", "Save and print"
-    LangAdd "ÍŞæŞ ãáßíÉ", "Equity"
-    LangAdd "Íõæöøá Åáì", "Transferred to"
-    LangAdd "ÑÈØ ÇáÓÏÇÏ", "Payment matching"
-    LangAdd "ÑÕíÏ ÇáßÔİ", "Statement balance"
-    LangAdd "ÑŞã ÇáÌåÇÒ", "Computer number"
-    LangAdd "ÑŞã ÇáÌæÇá", "Mobile number"
-    LangAdd "ÑŞã ÇáÍÓÇÈ", "Account number"
-    LangAdd "ÑŞã ÇáãÈäì", "Building number"
-    LangAdd "ÑãÒ ÇáÚãáÉ", "Currency code"
-    LangAdd "ÑãÒ ÇáãÑßÒ", "Center code"
-    LangAdd "ÑãÒ ÇáæÍÏÉ", "Unit code"
-    LangAdd "ÑíÇá ÓÚæÏí", "Saudi riyal"
-    LangAdd "ÔÇÔÉ ÇáÈíÚ", "Sales screen"
-    LangAdd "ÕÇİí ÇáÑÈÍ", "Net profit"
-    LangAdd "ÕÑİå ÇáÈäß", "Cashed by the bank"
-    LangAdd "ØÑíŞÉ ÇáÑÏ", "Refund method"
-    LangAdd "ÚÏÏ ÇáŞíæÏ", "Number of entries"
-    LangAdd "Úáì ÇáÍÓÇÈ", "On account"
-    LangAdd "Úáì ÇáÚãíá", "The customer"
-    LangAdd "ÛíÑ ãÊæÇÒä", "Not balanced"
-    LangAdd "İÆÉ ÅÖÇİÇÊ", "Extras category"
-    LangAdd "İÇÊæÑÉ ÈíÚ", "Sales invoice"
-    LangAdd "İÊÍ ÇáãÌáÏ", "Open the folder"
-    LangAdd "İÑŞ ÇáÚãáÉ", "Exchange difference"
-    LangAdd "ŞíãÉ ÇáİÑŞ", "Difference value"
-    LangAdd "ßá ÇáÌÏÇæá", "All tables"
 End Sub

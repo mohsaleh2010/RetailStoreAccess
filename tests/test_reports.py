@@ -28,7 +28,7 @@ import vba_harness as H
 MODELS = RP.all_reports()
 ACCESS_FUNCTIONS = {"Nz", "IIf", "Format", "Sum", "Count", "Len", "IsNull", "Trim", "Space"}
 PROJECT_FUNCTIONS = {"SettingValue", "GDate", "ReportCriteria", "ReportPrintedAt", "AmountInWords",
-                     "LabelCode", "LabelPrice", "OrderTypeText"}
+                     "LabelCode", "LabelPrice", "OrderTypeText", "DocTitleAr", "DocTitleEn", "CurrencyWord"}
 REPORT_PROPERTIES = {"Page", "Pages"}
 
 
@@ -167,7 +167,7 @@ class SourceTests(unittest.TestCase):
 
     def test_functions_exist(self):
         public = set()
-        for name in ("modCommon", "modReports", "modLabels", "modTouchPOS"):
+        for name in ("modCommon", "modReports", "modLabels", "modTouchPOS", "modCountry"):
             public |= set(re.findall(r"^Public Function (\w+)\(", read(name), re.M))
         self.assertTrue(PROJECT_FUNCTIONS <= public, PROJECT_FUNCTIONS - public)
         for m in MODELS:
@@ -220,18 +220,25 @@ class AmountInWordsReference(unittest.TestCase):
         self.assertEqual(T.amount_in_words_en(3500000), "Only three million five hundred thousand Saudi Riyals")
         self.assertEqual(T.amount_in_words_en(0), "Zero Saudi Riyals")
 
+    def test_egyptian_pounds(self):
+        """docs/44: the program currency of an Egyptian data file."""
+        self.assertEqual(T.amount_in_words(1250.5, "EGP"), "فقط ألف ومائتان وخمسون جنيه مصري وخمسون قرش لا غير")
+        self.assertEqual(T.amount_in_words(0, "EGP"), "صفر جنيه")
+        self.assertEqual(T.amount_in_words_en(1.01, "EGP"), "Only one Egyptian Pound and one Piaster")
+        self.assertEqual(T.amount_in_words_en(2, "EGP"), "Only two Egyptian Pounds")
+
 
 DRIVER = r'''
 Option VBASupport 1
-Public Function RunWords(ByVal v As Double) As String
-    RunWords = AmountInWordsAr(CCur(v))
+Public Function RunWords(ByVal v As Double, ByVal Cur As String) As String
+    RunWords = AmountInWordsAr(CCur(v), Cur)
 End Function
-Public Function RunWordsEn(ByVal v As Double) As String
-    RunWordsEn = AmountInWordsEn(CCur(v))
+Public Function RunWordsEn(ByVal v As Double, ByVal Cur As String) As String
+    RunWordsEn = AmountInWordsEn(CCur(v), Cur)
 End Function
 Public Function RunWordsIn(ByVal LangCode As String, ByVal v As Double) As String
     UseLanguage LangCode
-    RunWordsIn = AmountInWords(CCur(v))
+    RunWordsIn = AmountInWords(CCur(v), "SAR")
 End Function
 '''
 
@@ -255,8 +262,9 @@ class AmountInWordsRuntime(unittest.TestCase):
             [rnd.randint(1, 120) for _ in range(40)]
         for a in amounts:
             with self.subTest(a):
-                self.assertEqual(self.h.call("Driver", "RunWords", float(a)), T.amount_in_words(a))
-                self.assertEqual(self.h.call("Driver", "RunWordsEn", float(a)), T.amount_in_words_en(a))
+                for cur in ("SAR", "EGP"):
+                    self.assertEqual(self.h.call("Driver", "RunWords", float(a), cur), T.amount_in_words(a, cur))
+                    self.assertEqual(self.h.call("Driver", "RunWordsEn", float(a), cur), T.amount_in_words_en(a, cur))
 
     def test_words_follow_the_interface_language(self):
         self.assertEqual(self.h.call("Driver", "RunWordsIn", "EN", 1250.5), T.amount_in_words_en(1250.5))

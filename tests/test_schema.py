@@ -172,10 +172,14 @@ class SchemaStructureTests(unittest.TestCase):
                     self.assertIn(f.rule, (">=0", ">0"), f"{t.name}.{f.name}")
 
     def test_vat_number_pattern(self):
+        """Saudi Arabia: 15 digits from 3 to 3; Egypt: 9 digits (docs/44, the country is checked in code)."""
         rule = field("Settings", "VATNumber").rule
-        pattern = re.search(r'"(.*)"', rule).group(1)
-        self.assertEqual(len(pattern), 15)
-        self.assertTrue(pattern.startswith("3") and pattern.endswith("3"))
+        saudi, egypt = re.findall(r'Like "([^"]*)"', rule)
+        self.assertEqual(len(saudi), 15)
+        self.assertTrue(saudi.startswith("3") and saudi.endswith("3"))
+        self.assertEqual(egypt, "#" * 9)
+        for tbl in ("Customers", "Suppliers"):
+            self.assertEqual(field(tbl, "VATNumber").rule, rule)
 
 
 class SeedDataTests(unittest.TestCase):

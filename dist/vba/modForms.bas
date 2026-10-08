@@ -138,6 +138,7 @@ Public Sub FormAfterUpdate(ByVal frm As Access.Form)
     pk = TagValue(frm, "PK")
     AuditFormAfter frm                                    ' who added / changed what (modAudit)
     If TagValue(frm, "TABLE") = "Accounts" Then RebuildAccountTree                    ' level and place in the tree
+    If TagValue(frm, "TABLE") = "Settings" Then SettingsAfterSave                      ' a changed country (modCountry)
     RefreshList frm
     SetStatus frm, " „ «·Õ›Ÿ", CLR_SUCCESS
 End Sub
@@ -439,13 +440,17 @@ End Function
 Private Function ValidatePartner(ByVal frm As Access.Form) As Boolean
     Dim mobile As String, email As String
     mobile = Trim$(Nz(frm!Mobile.Value, ""))
-    If Len(mobile) > 0 And Not (mobile Like "05########" Or mobile Like "+9665########" _
-                                Or mobile Like "9665########") Then
-        If Not AskYesNo("—ﬁ„ «·ÃÊ«· ´" & mobile & "ª ·Ì” »’Ì€… ”⁄ÊœÌ… (05xxxxxxxx)." & vbCrLf & _
-                        "Â·  —Ìœ «·Õ›Ÿ ⁄·Ï √Ì Õ«·ø") Then
+    If Len(mobile) > 0 And Not MobileFits(mobile) Then                    ' the operating country (modCountry)
+        If Not AskYesNo("—ﬁ„ «·ÃÊ«· ´" & mobile & "ª ·Ì” »’Ì€… " & CountryName(AppCountry()) & " (" & _
+                        MobileExample() & ")." & vbCrLf & "Â·  —Ìœ «·Õ›Ÿ ⁄·Ï √Ì Õ«·ø") Then
             SafeFocus frm!Mobile
             Exit Function
         End If
+    End If
+    If Len(TaxNumberProblem(frm!VATNumber.Value)) > 0 Then
+        ShowWarning TaxNumberProblem(frm!VATNumber.Value)
+        SafeFocus frm!VATNumber
+        Exit Function
     End If
     email = Trim$(Nz(frm!Email.Value, ""))
     If Len(email) > 0 And Not email Like "*?@?*.?*" Then
@@ -522,6 +527,12 @@ Private Function ValidateSettings(ByVal frm As Access.Form) As Boolean
         ShowWarning "Â–« «·ŒÌ«— ··„»—„Ã ›ﬁÿ."
         Exit Function
     End If
+    If Not SettingsCountryCheck(frm) Then Exit Function                ' modCountry
+    If Len(TaxNumberProblem(frm!VATNumber.Value, Nz(frm!CountryCode.Value, "SA"))) > 0 Then
+        ShowWarning TaxNumberProblem(frm!VATNumber.Value, Nz(frm!CountryCode.Value, "SA"))
+        SafeFocus frm!VATNumber
+        Exit Function
+    End If
     If Len(Nz(frm!VATNumber.Value, "")) = 0 Then
         If Not AskYesNo("·„ ÌıœŒ· «·—ﬁ„ «·÷—Ì»Ì° Ê·‰  ﬂÊ‰ «·›Ê« Ì— ›Ê« Ì— ÷—Ì»Ì… ‰Ÿ«„Ì…." & vbCrLf & _
                         "Â·  —Ìœ «·Õ›Ÿ ⁄·Ï √Ì Õ«·ø") Then
@@ -529,8 +540,9 @@ Private Function ValidateSettings(ByVal frm As Access.Form) As Boolean
             Exit Function
         End If
     End If
-    If Nz(frm!VATRate.Value, 0) <> 0.15 Then
-        If Not AskYesNo("‰”»… «·÷—Ì»… ·Ì”  15%. Â· √‰  „ √ﬂœø") Then
+    If Nz(frm!VATRate.Value, 0) <> CountryVatRate(Nz(frm!CountryCode.Value, "SA")) Then
+        If Not AskYesNo("‰”»… «·÷—Ì»… ·Ì”  " & Format$(CountryVatRate(Nz(frm!CountryCode.Value, "SA")) * 100, "0") & _
+                        "% «·„⁄„Ê· »Â« ›Ì " & CountryName(Nz(frm!CountryCode.Value, "SA")) & ". Â· √‰  „ √ﬂœø") Then
             SafeFocus frm!VATRate
             Exit Function
         End If

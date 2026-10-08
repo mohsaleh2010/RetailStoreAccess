@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2296
+Private Const ENTRY_COUNT As Long = 2322
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -225,13 +225,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=IIf([Difference]<0,""«·⁄Ã“"",IIf([Difference]>0,""«·“Ì«œ…"",""«·›—ﬁ""))") = "=IIf([Difference]<0,""Shortage"",IIf([Difference]>0,""Overage"",""Difference""))", "Tr sample 1", passed, failed, report
-    CheckLang Tr("≈Ã„«·Ì «·Œ«—Ã") = "Total out", "Tr sample 2", passed, failed, report
-    CheckLang Tr("«·«”„ «·„Œ ’— ··„Õ·") = "Short store name", "Tr sample 3", passed, failed, report
-    CheckLang Tr("«·„«·ﬂ") = "Owner", "Tr sample 4", passed, failed, report
-    CheckLang Tr(" ⁄œÌ·") = "Edit", "Tr sample 5", passed, failed, report
-    CheckLang Tr("”Õ» ‰ﬁœÌ… „‰ «·»‰ﬂ") = "Cash withdrawal from the bank", "Tr sample 6", passed, failed, report
-    CheckLang Tr("·«  ÊÃœ › —… „ﬁ›·…") = "There is no closed period", "Tr sample 7", passed, failed, report
+    CheckLang Tr("=IIf([DocKind]=""RECEIPT"",""«·—’Ìœ «·„ »ﬁÌ ⁄·Ï «·⁄„Ì· Õ«·Ì«: "",""«·—’Ìœ «·„” Õﬁ ··„Ê—œ Õ«·Ì«: "") & Format([PartyBalance],""#,##0.00"")") = "=IIf([DocKind]=""RECEIPT"",""Balance currently due from the customer: "",""Balance currently due to the supplier: "") & Format([PartyBalance],""#,##0.00"")", "Tr sample 1", passed, failed, report
+    CheckLang Tr("≈Ã„«·Ì «·œ«Œ·") = "Total in", "Tr sample 2", passed, failed, report
+    CheckLang Tr("«·«‰Õ—«›") = "Variance", "Tr sample 3", passed, failed, report
+    CheckLang Tr("«·„»·€ (") = "Amount (", "Tr sample 4", passed, failed, report
+    CheckLang Tr(" ⁄–— «·Õ–› (Œÿ√ ") = "Could not delete (error ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("”ÿ— ·« Ì‰ „Ì ≈·Ï «·›« Ê—… «·√’·Ì….") = "A line that does not belong to the original invoice.", "Tr sample 6", passed, failed, report
+    CheckLang Tr("·«  ÊÃœ › —… „ﬁ›·….") = "There is no closed period.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST Ê 12.50: ÊÌ…") = "TEST and 12.50: ÊÌ…", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("“— «·«ﬁ —«Õ Ìﬂ » «·«”„ «·⁄—»Ì »Õ—Ê› ·« Ì‰Ì… ›Ì «·Œ«‰«  «·›«—€… ›ﬁÿ. —«Ã⁄Â Ê⁄œ¯·Â À„ «Õ›Ÿ. «·«”„ «·›«—€ ÌŸÂ— »«·⁄—»Ì… ›Ì «·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…") = "“— «·«ﬁ —«Õ Ìﬂ » «·«”„ «·⁄—»Ì »Õ—Ê› ·« Ì‰Ì… ›Ì «·Œ«‰«  «·›«—€… ›ﬁÿ. —«Ã⁄Â Ê⁄œ¯·Â À„ «Õ›Ÿ. «·«”„ «·›«—€ ÌŸÂ— »«·⁄—»Ì… ›Ì «·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…", "«·⁄—»Ì…: „‰ «·Ì„Ì‰ Ê·«  —Ã„…", _

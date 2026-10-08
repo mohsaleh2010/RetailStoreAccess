@@ -1464,14 +1464,14 @@ Private Sub Q_qrySupplierFxMoves()
     s = s & "SELECT p.SupplierID, p.CurrencyCode, -p.Amount, Round(-p.Amount / p.ExchangeRate, 2)" & vbCrLf
     s = s & "FROM SupplierPayments AS p" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT s.SupplierID, 'SAR', s.OpeningBalance, s.OpeningBalance" & vbCrLf
-    s = s & "FROM [@Suppliers] AS s" & vbCrLf
-    s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
+    s = s & "SELECT s.SupplierID, z.CurrencyCode, s.OpeningBalance, s.OpeningBalance" & vbCrLf
+    s = s & "FROM Suppliers AS s, Settings AS z" & vbCrLf
+    s = s & "WHERE z.SettingID = 1 AND s.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT q.SupplierID, 'SAR', IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)" & vbCrLf
-    s = s & "FROM Cheques AS q" & vbCrLf
-    s = s & "WHERE q.Direction = 'OUT'" & vbCrLf
-    SaveQuery "qrySupplierFxMoves", "حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بالريال)", s
+    s = s & "SELECT q.SupplierID, z.CurrencyCode, IIf(q.Status = 'BOUNCED', 0, -q.Amount), IIf(q.Status = 'BOUNCED', 0, -q.Amount)" & vbCrLf
+    s = s & "FROM Cheques AS q, Settings AS z" & vbCrLf
+    s = s & "WHERE z.SettingID = 1 AND q.Direction = 'OUT'" & vbCrLf
+    SaveQuery "qrySupplierFxMoves", "حركات أرصدة الموردين بعملة كل مستند (الرصيد الافتتاحي والشيكات بعملة البرنامج)", s
 End Sub
 
 Private Sub Q_qryLatestRateDates()

@@ -79,6 +79,8 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     UpgradeAccountTree
     m_currentStep = "english names"
     SeedEnglishNames
+    m_currentStep = "field rules"
+    UpgradeFieldRules
 
     m_db.Close
     Set m_db = Nothing
@@ -562,6 +564,22 @@ Private Function InSchema(ByVal TableName As String) As Boolean
     InSchema = InStr(1, "," & SCHEMA_TABLES & ",", "," & TableName & ",", vbTextCompare) > 0
 End Function
 
+Private Sub SetFieldRule(ByVal TableName As String, ByVal FieldName As String, ByVal Rule As String, _
+                         ByVal RuleText As String)
+    ' A rule the schema changed on a field that already exists (schema.RULE_UPGRADES, looser rules only).
+    Dim fld As DAO.Field
+    On Error GoTo Failed
+    Set fld = m_db.TableDefs(TableName).Fields(FieldName)
+    If fld.ValidationRule <> Rule Then
+        fld.ValidationRule = Rule
+        fld.ValidationText = RuleText
+        LogLine "  ~  €Ì¯— ‘—ÿ «·Õﬁ·: " & TableName & "." & FieldName
+    End If
+    Exit Sub
+Failed:
+    LogLine "  !  ⁄–¯—  €ÌÌ— ‘—ÿ «·Õﬁ· " & TableName & "." & FieldName & ": " & Err.Description
+End Sub
+
 Private Sub LogLine(ByVal Msg As String)
     m_log = m_log & Msg & vbCrLf
     Debug.Print Msg
@@ -653,7 +671,7 @@ Private Sub CreateTable_Settings()
     AddField tdf, "StoreNameEn", "TEXT", 150, False, "", _
              "", "", "«”„ «·„Õ· »«·≈‰Ã·Ì“Ì…", ""
     AddField tdf, "VATNumber", "TEXT", 15, False, "", _
-             "Is Null Or Like ""3#############3""", "«·—ﬁ„ «·÷—Ì»Ì 15 —ﬁ„« ÊÌ»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3", "«·—ﬁ„ «·÷—Ì»Ì", ""
+             "Is Null Or Like ""3#############3"" Or Like ""#########""", "«·—ﬁ„ «·÷—Ì»Ì: 15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3 («·”⁄ÊœÌ…)° √Ê 9 √—ﬁ«„ („’—)", "«·—ﬁ„ «·÷—Ì»Ì", ""
     AddField tdf, "CRNumber", "TEXT", 20, False, "", _
              "", "", "«·”Ã· «· Ã«—Ì", ""
     AddField tdf, "BuildingNo", "TEXT", 10, False, "", _
@@ -669,7 +687,7 @@ Private Sub CreateTable_Settings()
     AddField tdf, "AdditionalNo", "TEXT", 10, False, "", _
              "", "", "«·—ﬁ„ «·≈÷«›Ì", ""
     AddField tdf, "CountryCode", "TEXT", 2, True, """SA""", _
-             "", "", "—„“ «·œÊ·…", ""
+             "In (""SA"",""EG"")", "SA = «·”⁄ÊœÌ…° EG = „’—", "œÊ·… «· ‘€Ì·", " Õœœ ⁄„·… «·»—‰«„Ã Ê«·÷—Ì»… Ê«·—ﬁ„ «·÷—Ì»Ì Ê«·›« Ê—… «·≈·ﬂ —Ê‰Ì… (docs/44)"
     AddField tdf, "Phone", "TEXT", 20, False, "", _
              "", "", "«·Â« ›", ""
     AddField tdf, "Email", "TEXT", 100, False, "", _
@@ -1077,7 +1095,7 @@ Private Sub CreateTable_Suppliers()
     AddField tdf, "Email", "TEXT", 100, False, "", _
              "", "", "«·»—Ìœ «·≈·ﬂ —Ê‰Ì", ""
     AddField tdf, "VATNumber", "TEXT", 15, False, "", _
-             "Is Null Or Like ""3#############3""", "«·—ﬁ„ «·÷—Ì»Ì 15 —ﬁ„« ÊÌ»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3", "«·—ﬁ„ «·÷—Ì»Ì", ""
+             "Is Null Or Like ""3#############3"" Or Like ""#########""", "«·—ﬁ„ «·÷—Ì»Ì: 15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3 («·”⁄ÊœÌ…)° √Ê 9 √—ﬁ«„ („’—)", "«·—ﬁ„ «·÷—Ì»Ì", ""
     AddField tdf, "CRNumber", "TEXT", 20, False, "", _
              "", "", "«·”Ã· «· Ã«—Ì", ""
     AddField tdf, "Address", "TEXT", 255, False, "", _
@@ -1120,7 +1138,7 @@ Private Sub CreateTable_Customers()
     AddField tdf, "Email", "TEXT", 100, False, "", _
              "", "", "«·»—Ìœ «·≈·ﬂ —Ê‰Ì", ""
     AddField tdf, "VATNumber", "TEXT", 15, False, "", _
-             "Is Null Or Like ""3#############3""", "«·—ﬁ„ «·÷—Ì»Ì 15 —ﬁ„« ÊÌ»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3", "«·—ﬁ„ «·÷—Ì»Ì", "≈–« ÊıÃœ  ’œ— ··⁄„Ì· ›« Ê—… ÷—Ì»Ì… B2B"
+             "Is Null Or Like ""3#############3"" Or Like ""#########""", "«·—ﬁ„ «·÷—Ì»Ì: 15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3 («·”⁄ÊœÌ…)° √Ê 9 √—ﬁ«„ („’—)", "«·—ﬁ„ «·÷—Ì»Ì", "≈–« ÊıÃœ  ’œ— ··⁄„Ì· ›« Ê—… ÷—Ì»Ì… B2B"
     AddField tdf, "CRNumber", "TEXT", 20, False, "", _
              "", "", "«·”Ã· «· Ã«—Ì", ""
     AddField tdf, "BuildingNo", "TEXT", 10, False, "", _
@@ -3820,4 +3838,11 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Customers] SET [CustomerNameEn] = 'Cash customer' WHERE [CustomerID] = 1 AND [CustomerNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [CashBoxes] SET [BoxNameEn] = 'Main treasury' WHERE [CashBoxID] = 1 AND [BoxNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [CashBoxes] SET [BoxNameEn] = 'Cashier box' WHERE [CashBoxID] = 2 AND [BoxNameEn] Is Null", dbFailOnError
+End Sub
+
+Private Sub UpgradeFieldRules()
+    SetFieldRule "Settings", "CountryCode", "In (""SA"",""EG"")", "SA = «·”⁄ÊœÌ…° EG = „’—"
+    SetFieldRule "Settings", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "«·—ﬁ„ «·÷—Ì»Ì: 15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3 («·”⁄ÊœÌ…)° √Ê 9 √—ﬁ«„ („’—)"
+    SetFieldRule "Customers", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "«·—ﬁ„ «·÷—Ì»Ì: 15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3 («·”⁄ÊœÌ…)° √Ê 9 √—ﬁ«„ („’—)"
+    SetFieldRule "Suppliers", "VATNumber", "Is Null Or Like ""3#############3"" Or Like ""#########""", "«·—ﬁ„ «·÷—Ì»Ì: 15 —ﬁ„« Ì»œ√ ÊÌ‰ ÂÌ »«·—ﬁ„ 3 («·”⁄ÊœÌ…)° √Ê 9 √—ﬁ«„ („’—)"
 End Sub

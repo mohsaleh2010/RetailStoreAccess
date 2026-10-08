@@ -56,57 +56,69 @@ End Sub
 '------------------------------------------------------------------------------
 ' Amount in words (Arabic)
 '------------------------------------------------------------------------------
-Public Function AmountInWords(ByVal Amount As Variant) As String
-    ' In the language of the interface (modLang).
+Public Function AmountInWords(ByVal Amount As Variant, Optional ByVal CurrencyCode As String = "") As String
+    ' In the language of the interface (modLang) and the program currency (modCountry: riyal or pound).
+    If Len(CurrencyCode) = 0 Then CurrencyCode = BaseCurrency()
     If UiEnglish() Then
-        AmountInWords = AmountInWordsEn(Amount)
+        AmountInWords = AmountInWordsEn(Amount, CurrencyCode)
     Else
-        AmountInWords = AmountInWordsAr(Amount)
+        AmountInWords = AmountInWordsAr(Amount, CurrencyCode)
     End If
 End Function
 
-Public Function AmountInWordsAr(ByVal Amount As Variant) As String
-    ' 1250.5 -> "فقط ألف ومائتان وخمسون ريال سعودي وخمسون هللة لا غير"
-    Dim a As Currency, riyals As Long, halalas As Long, text As String
+Private Function CurrencyNames(ByVal CurrencyCode As String) As Variant
+    ' Arabic unit, Arabic sub-unit, Arabic zero, English unit (one, many), English sub-unit (one, many)
+    If CurrencyCode = "EGP" Then
+        CurrencyNames = Array("جنيه مصري", "قرش", "صفر جنيه", "Egyptian Pound", "Egyptian Pounds", "Piaster", "Piasters")
+    Else
+        CurrencyNames = Array("ريال سعودي", "هللة", "صفر ريال", "Saudi Riyal", "Saudi Riyals", "Halala", "Halalas")
+    End If
+End Function
+
+Public Function AmountInWordsAr(ByVal Amount As Variant, Optional ByVal CurrencyCode As String = "SAR") As String
+    ' 1250.5 -> "فقط ألف ومائتان وخمسون ريال سعودي وخمسون هللة لا غير" (... جنيه مصري وخمسون قرش ... for EGP)
+    Dim a As Currency, units As Long, cents As Long, text As String, names As Variant
     If IsNull(Amount) Then Exit Function
+    names = CurrencyNames(CurrencyCode)
     a = RoundMoney(Abs(CCur(Amount)))
     If a >= 1000000000 Then
-        AmountInWordsAr = Format$(a, "#,##0.00") & " ريال سعودي"
+        AmountInWordsAr = Format$(a, "#,##0.00") & " " & names(0)
         Exit Function
     End If
-    riyals = CLng(Fix(a))
-    halalas = CLng((a - riyals) * 100)
-    If riyals = 0 And halalas = 0 Then
-        AmountInWordsAr = "صفر ريال"
+    units = CLng(Fix(a))
+    cents = CLng((a - units) * 100)
+    If units = 0 And cents = 0 Then
+        AmountInWordsAr = names(2)
         Exit Function
     End If
-    If riyals > 0 Then text = NumberWords(riyals) & " ريال سعودي"
-    If halalas > 0 Then
+    If units > 0 Then text = NumberWords(units) & " " & names(0)
+    If cents > 0 Then
         If Len(text) > 0 Then text = text & " و"
-        text = text & NumberWords(halalas) & " هللة"
+        text = text & NumberWords(cents) & " " & names(1)
     End If
     AmountInWordsAr = "فقط " & text & " لا غير"
 End Function
 
-Public Function AmountInWordsEn(ByVal Amount As Variant) As String
+Public Function AmountInWordsEn(ByVal Amount As Variant, Optional ByVal CurrencyCode As String = "SAR") As String
     ' 1250.5 -> "Only one thousand two hundred fifty Saudi Riyals and fifty Halalas" (tools/tafqeet.py)
-    Dim a As Currency, riyals As Long, halalas As Long, words As String
+    Dim a As Currency, units As Long, cents As Long, words As String, names As Variant
     If IsNull(Amount) Then Exit Function
+    names = CurrencyNames(CurrencyCode)
     a = RoundMoney(Abs(CCur(Amount)))
     If a >= 1000000000 Then
-        AmountInWordsEn = Format$(a, "#,##0.00") & " Saudi Riyals"
+        AmountInWordsEn = Format$(a, "#,##0.00") & " " & names(4)
         Exit Function
     End If
-    riyals = CLng(Fix(a))
-    halalas = CLng((a - riyals) * 100)
-    If riyals = 0 And halalas = 0 Then
-        AmountInWordsEn = "Zero Saudi Riyals"
+    units = CLng(Fix(a))
+    cents = CLng((a - units) * 100)
+    If units = 0 And cents = 0 Then
+        AmountInWordsEn = "Zero " & names(4)
         Exit Function
     End If
-    If riyals > 0 Then words = NumberWordsEn(riyals) & IIf(riyals = 1, " Saudi Riyal", " Saudi Riyals")
-    If halalas > 0 Then
+    If units > 0 Then words = NumberWordsEn(units) & " " & IIf(units = 1, names(3), names(4))
+    If cents > 0 Then
         If Len(words) > 0 Then words = words & " and "
-        words = words & NumberWordsEn(halalas) & IIf(halalas = 1, " Halala", " Halalas")
+        words = words & NumberWordsEn(cents) & " " & IIf(cents = 1, names(5), names(6))
     End If
     AmountInWordsEn = "Only " & words
 End Function

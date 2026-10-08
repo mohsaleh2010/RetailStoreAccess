@@ -68,6 +68,7 @@ Optional test dependencies (tests skip when missing): `pip install -r requiremen
 | `dist/tools/BuildFrontEnd.vbs` | Builds the whole front-end in Access in one step; `EnableShiftKey.vbs` re-enables SHIFT |
 | `tests/` | `access_sqlite.py` (SQLite mirror of Access SQL: `Nz`, `IIf`, `DateAdd`, `Year` …), `helpers.py` (`VbaModuleChecks`), `vba_harness.py` (LibreOffice Basic runner) |
 | `tools/i18n.py`, `tools/i18n_en.py`, `tools/gen_lang.py` | The English interface: Arabic -> English dictionary, its Python mirror of `Tr`, and the generated `modLang` + `modLangData*` |
+| `src/vba/modCountry.bas`, `tools/country_reference.py` | The operating country (`Settings.CountryCode` SA / EG): currency, VAT rate, tax number, document title (`docs/44`); e-invoicing plan `docs/43` |
 | `tools/master_en.py`, `tools/translit.py` | English names of the master data (`qryLoc*`, `docs/39`-`41`) and the transliteration suggested by the English names screen (mirror of `modEnglishNames.Transliterate`, `docs/42`) |
 | `docs/NN-*.md` | One Arabic document per feature; `README.md` lists them with their approval status |
 
@@ -140,6 +141,10 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
 - Text the user typed (a search) is added to SQL **after** `Tr`, never before: `Tr` would translate an Arabic word
   of it (`sql = Tr(template)`, then `Replace(sql, "{LIKE}", ...)`).
   `MSG_RTL` is a function of `modLang` (0 in English). The English texts contain no `" ' [ ] ; | & = < >`.
+- Operating country (`docs/44`): never hard-code the riyal, `SAR` or 15 % in code, screens or reports: use
+  `BaseCurrency()`, `CurrencyWord()`, `SettingValue("VATRate")`, `TaxNumberProblem`, `DocTitleAr`; the ZATCA QR
+  is Saudi only (`AppCountry() = "SA"`). A rule changed on an existing field goes into `schema.RULE_UPGRADES`
+  (looser rules only), else `BuildSchema` keeps the old rule in an existing back-end.
 - Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness
   cannot return a `Currency` either — wrap it in a `Double` function, see `tests/test_indicators.py`).
 

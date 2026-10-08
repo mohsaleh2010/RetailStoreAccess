@@ -64,6 +64,8 @@
 | + | الأسماء الإنجليزية للعملاء والموردين والصناديق والبنوك ومراكز التكلفة والمندوبين | ✅ تمت الموافقة | [docs/40-English-Party-Names.md](docs/40-English-Party-Names.md) |
 | + | أسماء المجموعات بالإنجليزية في شاشتي الصلاحيات (المبيعات، الحسابات…) | ✅ تمت الموافقة | [docs/41-English-Permission-Groups.md](docs/41-English-Permission-Groups.md) |
 | + | شاشة الأسماء الإنجليزية: كل الأسماء الناقصة في قائمة واحدة، واقتراح بحروف لاتينية، وحفظ دفعة واحدة | ✅ تمت الموافقة | [docs/42-English-Names-Screen.md](docs/42-English-Names-Screen.md) |
+| + | خطة الفوترة الإلكترونية السعودية والمصرية حسب دولة التشغيل | 📋 خطة | [docs/43-Plan-EInvoicing-SA-EG.md](docs/43-Plan-EInvoicing-SA-EG.md) |
+| + | دولة التشغيل (السعودية أو مصر) من الإعدادات: العملة والضريبة والرقم الضريبي والمبلغ بالحروف وعنوان الفاتورة | ✅ بانتظار الموافقة | [docs/44-Operating-Country.md](docs/44-Operating-Country.md) |
 
 ## هيكل المستودع
 
@@ -154,6 +156,7 @@
 | 37 | `modAging`، `modCash`، `modCheque`، `modCostCenters`، `modForms`، `modJournal`، `modPOS`، `modPurchaseScreens`، `modPurchases`، `modReports`، `modSales`، `modScreens`، `modSecurity` والوحدات المولَّدة (الأسهل: `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestJournal`, `TestLang` |
 | 38 | `modBuildSchema` و`modBuildQueries` (مولَّدتان؛ أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries` | `TestLang` |
 | 39 | `modEnglishNames` (دائمة، جديدة)، واستبدال `modPOS` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildForms` | `TestEnglishNames` |
+| 40 | `modCountry` (دائمة، جديدة)، واستبدال `modForms` و`modSales` و`modReports` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestCountry` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

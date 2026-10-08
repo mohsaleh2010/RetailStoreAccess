@@ -75,6 +75,8 @@
 | اسم عمود القائمة بعد ترجمته لا يساوي حقلًا في تعبيره، ولو مؤهلًا: `Format(q.Cost, ...) AS [التكلفة]` يصير `AS [Cost]`. اختر عنوانًا ترجمته مختلفة: `[تكلفة الأصل]` | Circular reference caused by alias |
 | SQL يعرض اسمًا من جداول البيانات الأساسية يقرأ `[@Accounts] AS a` (وكذلك `[@PaymentMethods]` و`[@JournalSourceTypes]` و`[@TransactionTypes]` و`[@Roles]` و`[@Permissions]` و`[@Screens]` و`[@Categories]` و`[@Units]` و`[@ExpenseTypes]` و`[@Customers]` و`[@Suppliers]` و`[@CashBoxes]` و`[@Banks]` و`[@CostCenters]` و`[@SalesReps]`) ويمر بـ `Tr`، ولا `DLookup` لهذه الأسماء | الاسم العربي في الواجهة الإنجليزية |
 | النص الذي يكتبه المستخدم (البحث) يُضاف إلى SQL **بعد** `Tr` لا قبله | كلمة عربية يبحث بها المستخدم تُترجم فلا يجد شيئًا |
+| لا «ريال» ولا SAR ولا 15% ثابتة: `BaseCurrency()` و`CurrencyWord()` و`SettingValue("VATRate")` و`TaxNumberProblem`، ورمز QR السعودي بشرط `AppCountry() = "SA"` | البرنامج خطأ في مصر |
+| شرط حقل تغيّر على جدول موجود يوضع في `schema.RULE_UPGRADES` (الأوسع فقط) | `BuildSchema` يُبقي الشرط القديم في ملف البيانات الموجود |
 | `MSG_RTL` دالة في `modLang` (صفر في الإنجليزية)، وليست ثابتًا | رسائل معكوسة الاتجاه |
 
 ## 4) تشخيص خطأ يأتي من Access
