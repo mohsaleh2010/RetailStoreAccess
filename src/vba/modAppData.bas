@@ -60,7 +60,7 @@ Public Function SearchColumnWidths(ByVal Kind As String) As String
 End Function
 
 Public Function ReportCount() As Long
-    ReportCount = 42
+    ReportCount = 43
 End Function
 
 Public Function ScreenPermission(ByVal FormName As String) As String
@@ -171,12 +171,13 @@ Public Function ReportRow(ByVal Index As Long) As Variant
         Case 33: ReportRow = Array("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving", "", "")
         Case 34: ReportRow = Array("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory", "", "")
         Case 35: ReportRow = Array("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$", "")
-        Case 36: ReportRow = Array("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
-        Case 37: ReportRow = Array("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
-        Case 38: ReportRow = Array("SUPPLIER_FX", "أرصدة الموردين بالعملات وفروق العملة", "SupplierFxBalanceQuery", "rptSupplierFx", "", "")
-        Case 39: ReportRow = Array("REP_PERFORMANCE", "أداء المندوبين: المبيعات والتحصيل والهدف والعمولة", "RepPerformanceQuery", "rptRepPerformance", "P", "")
-        Case 40: ReportRow = Array("REP_CUSTOMERS", "عملاء المندوبين وأرصدتهم", "RepCustomersQuery", "rptRepCustomers", "", "")
-        Case 41: ReportRow = Array("REP_COMMISSION_BALANCE", "عمولات المندوبين المستحقة", "RepCommissionBalanceQuery", "rptRepCommissionBalance", "", "")
-        Case 42: ReportRow = Array("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
+        Case 36: ReportRow = Array("EINVOICE_DOCS", "مستندات الفاتورة الإلكترونية (المقبولة والمرفوضة)", "EInvoiceReportQuery", "rptEInvoiceDocs", "D", "DocDate")
+        Case 37: ReportRow = Array("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
+        Case 38: ReportRow = Array("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
+        Case 39: ReportRow = Array("SUPPLIER_FX", "أرصدة الموردين بالعملات وفروق العملة", "SupplierFxBalanceQuery", "rptSupplierFx", "", "")
+        Case 40: ReportRow = Array("REP_PERFORMANCE", "أداء المندوبين: المبيعات والتحصيل والهدف والعمولة", "RepPerformanceQuery", "rptRepPerformance", "P", "")
+        Case 41: ReportRow = Array("REP_CUSTOMERS", "عملاء المندوبين وأرصدتهم", "RepCustomersQuery", "rptRepCustomers", "", "")
+        Case 42: ReportRow = Array("REP_COMMISSION_BALANCE", "عمولات المندوبين المستحقة", "RepCommissionBalanceQuery", "rptRepCommissionBalance", "", "")
+        Case 43: ReportRow = Array("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
     End Select
 End Function

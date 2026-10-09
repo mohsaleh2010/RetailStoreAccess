@@ -5,7 +5,7 @@ Attribute VB_Name = "modTestAll"
 '   RunAllTests   runs every in-Access test in order and shows ONE summary:
 '                 VerifySchema, TestRelationships, TestQueries (empty database
 '                 only), TestForms, TestSales, TestPurchases, TestReports,
-'                 TestDashboard, TestSecurity, TestLabels, TestTouchPOS, TestCash, TestJournal, TestAging, TestBank, TestCheques, TestAssets, TestPayroll, TestCostCenters, TestBudget, TestRecurring, TestAudit, TestIndicators, TestCurrency, TestSalesReps, TestEnglishNames, TestCountry, TestEInvoice, TestZatcaXml, TestZatcaApi, TestEtaReceipt, TestEtaInvoice, TestLang and VerifyDemoData right after the
+'                 TestDashboard, TestSecurity, TestLabels, TestTouchPOS, TestCash, TestJournal, TestAging, TestBank, TestCheques, TestAssets, TestPayroll, TestCostCenters, TestBudget, TestRecurring, TestAudit, TestIndicators, TestCurrency, TestSalesReps, TestEnglishNames, TestCountry, TestEInvoice, TestZatcaXml, TestZatcaApi, TestEtaReceipt, TestEtaInvoice, TestEInvoiceReports, TestLang and VerifyDemoData right after the
 '                 demo data was loaded. Each test leaves no data behind.
 '                 The summary is also written to the Immediate window (Ctrl+G).
 '==============================================================================
@@ -24,7 +24,7 @@ Public Function RunAllTests() As Boolean
     g_CollectTests = True
     DoCmd.Hourglass True
     names = Array("VerifySchema", "TestRelationships", "TestQueries", "TestForms", "TestSales", "TestPurchases", _
-                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "TestTouchPOS", "TestCash", "TestJournal", "TestAging", "TestBank", "TestCheques", "TestAssets", "TestPayroll", "TestCostCenters", "TestBudget", "TestRecurring", "TestAudit", "TestIndicators", "TestCurrency", "TestSalesReps", "TestEnglishNames", "TestCountry", "TestEInvoice", "TestZatcaXml", "TestZatcaApi", "TestEtaReceipt", "TestEtaInvoice", "TestLang", _
+                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "TestTouchPOS", "TestCash", "TestJournal", "TestAging", "TestBank", "TestCheques", "TestAssets", "TestPayroll", "TestCostCenters", "TestBudget", "TestRecurring", "TestAudit", "TestIndicators", "TestCurrency", "TestSalesReps", "TestEnglishNames", "TestCountry", "TestEInvoice", "TestZatcaXml", "TestZatcaApi", "TestEtaReceipt", "TestEtaInvoice", "TestEInvoiceReports", "TestLang", _
                   "VerifyDemoData")
     For i = LBound(names) To UBound(names)
         If SkipReason(CStr(names(i))) <> "" Then

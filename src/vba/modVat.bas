@@ -12,6 +12,8 @@ Attribute VB_Name = "modVat"
 '    13  the VAT of the period, 14 corrections of earlier periods,
 '    15  the credit carried from the return before, 16 net VAT due (negative = refund)
 '   Boxes the shop does not record (2, 4, 8, 9, 11) stay zero.
+'   Egypt (AppCountry() = "EG"): the same figures in the 14 lines of the monthly return of
+'   the Egyptian Tax Authority (form 10, VatBoxKeys, report rptVatReturnEG, docs/50).
 '   SaveVatDraft     the figures of the period saved as a draft (printing needs it)
 '   FileVatReturn    the figures are frozen and the settlement entry is made on
 '                    the filing day (journal source VAT_RETURN): output VAT 2200 and
@@ -24,6 +26,8 @@ Option Compare Database
 Option Explicit
 
 Public Const VAT_SETTLEMENT As Long = 2250
+Private Const VAT_KEYS_SA As String = "SS,0,SZ,0,SE,ST,PS,0,0,PZ,0,PT,DUE,COR,CAR,NET"
+Private Const VAT_KEYS_EG As String = "SS,0,SZ,SE,ST,PS,0,0,PZ,PT,DUE,COR,CAR,NET"
 Private Const VAT_FIELDS As String = "SalesStdAmount,SalesStdAdjust,SalesStdVAT,SalesZeroAmount,SalesZeroAdjust," & _
     "SalesExemptAmount,SalesExemptAdjust,PurchStdAmount,PurchStdAdjust,PurchStdVAT,PurchZeroAmount,PurchZeroAdjust"
 
@@ -134,7 +138,7 @@ Private Function WriteVatDraft(ByVal FromDate As Date, ByVal ToDate As Date, ByV
     End If
     If IsNull(CarriedCredit) Then CarriedCredit = SuggestedCarriedCredit(FromDate, VatReturnID)
     If CarriedCredit < 0 Then
-        WriteVatDraft = "الرصيد المرحَّل (الخانة 15) لا يكون سالبًا."
+        WriteVatDraft = "الرصيد الدائن المرحَّل لا يكون سالبًا."
         Exit Function
     End If
     Set d = VatPeriodTotals(FromDate, ToDate)
@@ -328,7 +332,11 @@ End Function
 ' Screen frmVatReturn (OpenArgs: the return to show)
 '------------------------------------------------------------------------------
 Public Function VatBoxCaption(ByVal Box As Long) As String
-    ' Same captions as VAT_BOXES in tools/queries.py (the report).
+    ' Same captions as VAT_LAYOUT_SA / VAT_LAYOUT_EG in tools/queries.py (the reports).
+    If AppCountry() = "EG" Then
+        VatBoxCaption = VatBoxCaptionEG(Box)
+        Exit Function
+    End If
     Select Case Box
         Case 1: VatBoxCaption = "المبيعات الخاضعة للنسبة الأساسية (15%)"
         Case 2: VatBoxCaption = "المبيعات للمواطنين (الخدمات الصحية الخاصة والتعليم الأهلي والمسكن الأول)"
@@ -349,6 +357,42 @@ Public Function VatBoxCaption(ByVal Box As Long) As String
     End Select
 End Function
 
+Private Function VatBoxCaptionEG(ByVal Box As Long) As String
+    ' The Egyptian return (form 10) in the order of its parts: sales, purchases, the tax.
+    Select Case Box
+        Case 1: VatBoxCaptionEG = "المبيعات المحلية الخاضعة للضريبة بالسعر العام"
+        Case 2: VatBoxCaptionEG = "مبيعات سلع وخدمات الجدول"
+        Case 3: VatBoxCaptionEG = "الصادرات (بسعر صفر)"
+        Case 4: VatBoxCaptionEG = "المبيعات المعفاة"
+        Case 5: VatBoxCaptionEG = "إجمالي المبيعات"
+        Case 6: VatBoxCaptionEG = "المشتريات المحلية الخاضعة للضريبة بالسعر العام (مع المصروفات بفاتورة ضريبية)"
+        Case 7: VatBoxCaptionEG = "الواردات من السلع (المسددة ضريبتها في الجمارك)"
+        Case 8: VatBoxCaptionEG = "الخدمات المستوردة من الخارج"
+        Case 9: VatBoxCaptionEG = "المشتريات المعفاة وغير الخاضعة"
+        Case 10: VatBoxCaptionEG = "إجمالي المشتريات"
+        Case 11: VatBoxCaptionEG = "ضريبة المبيعات ناقص الضريبة القابلة للخصم عن الشهر"
+        Case 12: VatBoxCaptionEG = "تسويات وتصحيحات من الفترات السابقة"
+        Case 13: VatBoxCaptionEG = "الرصيد الدائن المرحَّل من الشهر السابق"
+        Case 14: VatBoxCaptionEG = "صافي الضريبة المستحقة (سالب = رصيد دائن يُرحَّل للشهر التالي)"
+    End Select
+End Function
+
+Public Function VatBoxCount() As Long
+    ' 16 boxes in Saudi Arabia, 14 lines in the Egyptian form 10.
+    VatBoxCount = UBound(Split(VatBoxKeys(), ",")) + 1
+End Function
+
+Public Function VatBoxKeys() As String
+    ' The figure of each box (VAT_LAYOUT_* in tools/queries.py): SS / SZ / SE standard, zero, exempt sales,
+    ' ST total sales, PS / PZ purchases, PT total purchases, DUE the VAT of the period, COR corrections,
+    ' CAR carried credit, NET net due, 0 = a box the shop does not record.
+    If AppCountry() = "EG" Then
+        VatBoxKeys = VAT_KEYS_EG
+    Else
+        VatBoxKeys = VAT_KEYS_SA
+    End If
+End Function
+
 Private Function ListItem(ByVal Value As Variant) As String
     If IsNull(Value) Then
         ListItem = """"""
@@ -360,29 +404,30 @@ Private Function ListItem(ByVal Value As Variant) As String
 End Function
 
 Public Function VatBoxRows(ByVal d As Object) As String
-    ' The value list of the 16 boxes (with the column heads) for the list of the screen.
-    Dim rows As String, box As Long, amount As Variant, adjust As Variant, vat As Variant
+    ' The value list of the boxes of the country (with the column heads) for the list of the screen.
+    Dim rows As String, box As Long, keys As Variant, amount As Variant, adjust As Variant, vat As Variant
     rows = """البند"";""الوصف"";""المبلغ"";""التعديلات"";""الضريبة"""
-    For box = 1 To 16
+    keys = Split(VatBoxKeys(), ",")
+    For box = 1 To UBound(keys) + 1
         amount = CCur(0): adjust = CCur(0): vat = CCur(0)
-        Select Case box
-            Case 1: amount = d("SalesStdAmount"): adjust = d("SalesStdAdjust"): vat = d("SalesStdVAT")
-            Case 3: amount = d("SalesZeroAmount"): adjust = d("SalesZeroAdjust")
-            Case 5: amount = d("SalesExemptAmount"): adjust = d("SalesExemptAdjust")
-            Case 6
+        Select Case keys(box - 1)
+            Case "SS": amount = d("SalesStdAmount"): adjust = d("SalesStdAdjust"): vat = d("SalesStdVAT")
+            Case "SZ": amount = d("SalesZeroAmount"): adjust = d("SalesZeroAdjust")
+            Case "SE": amount = d("SalesExemptAmount"): adjust = d("SalesExemptAdjust")
+            Case "ST"
                 amount = d("SalesStdAmount") + d("SalesZeroAmount") + d("SalesExemptAmount")
                 adjust = d("SalesStdAdjust") + d("SalesZeroAdjust") + d("SalesExemptAdjust")
                 vat = d("SalesStdVAT")
-            Case 7: amount = d("PurchStdAmount"): adjust = d("PurchStdAdjust"): vat = d("PurchStdVAT")
-            Case 10: amount = d("PurchZeroAmount"): adjust = d("PurchZeroAdjust")
-            Case 12
+            Case "PS": amount = d("PurchStdAmount"): adjust = d("PurchStdAdjust"): vat = d("PurchStdVAT")
+            Case "PZ": amount = d("PurchZeroAmount"): adjust = d("PurchZeroAdjust")
+            Case "PT"
                 amount = d("PurchStdAmount") + d("PurchZeroAmount")
                 adjust = d("PurchStdAdjust") + d("PurchZeroAdjust")
                 vat = d("PurchStdVAT")
-            Case 13: amount = Null: adjust = Null: vat = d("SalesStdVAT") - d("PurchStdVAT")
-            Case 14: amount = Null: adjust = Null: vat = d("Corrections")
-            Case 15: amount = Null: adjust = Null: vat = d("CarriedCredit")
-            Case 16: amount = Null: adjust = Null: vat = VatNetDue(d)
+            Case "DUE": amount = Null: adjust = Null: vat = d("SalesStdVAT") - d("PurchStdVAT")
+            Case "COR": amount = Null: adjust = Null: vat = d("Corrections")
+            Case "CAR": amount = Null: adjust = Null: vat = d("CarriedCredit")
+            Case "NET": amount = Null: adjust = Null: vat = VatNetDue(d)
         End Select
         rows = rows & ";" & ListItem(CStr(box)) & ";" & ListItem(VatBoxCaption(box)) & ";" & ListItem(amount) & ";" & _
                ListItem(adjust) & ";" & ListItem(vat)
@@ -399,6 +444,10 @@ Public Sub VatReturnLoad(ByVal frm As Access.Form)
     frm!cboPayAccount.RowSource = Tr("SELECT a.AccountCode, a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND " & _
         "AccountType = 'ASSET' AND Level2Code = 11 AND Nz(Level3Code, 0) <> 1100 AND AccountCode NOT IN " & _
         "(1300, 1400, 1500, 1600) ORDER BY TreeKey")
+    If AppCountry() = "EG" Then                        ' the Egyptian return is monthly
+        frm!btnLastQuarter.Visible = False
+        frm!lblFilingRef.Caption = Tr("رقم الإقرار لدى المصلحة")
+    End If
     If Nz(frm.OpenArgs, 0) > 0 Then
         VatShowReturn frm, CLng(frm.OpenArgs)
     Else
@@ -452,7 +501,8 @@ Public Sub VatCalculate(ByVal frm As Access.Form)
     If Len(other) > 0 Then
         VatState frm, "الفترة تتداخل مع الإقرار " & other & ": اختر فترة لا إقرار لها.", CLR_DANGER
     Else
-        VatState frm, "إقرار غير محفوظ: الأرقام من المستندات الآن. احفظه مسودة أو اعتمده.", CLR_PRIMARY
+        VatState frm, "إقرار غير محفوظ: الأرقام من المستندات الآن. احفظه مسودة أو اعتمده." & _
+                      VatEInvoiceNote(fromDate, toDate), CLR_PRIMARY
     End If
     VatShowNet frm
     VatButtons frm, ""
@@ -493,13 +543,23 @@ Public Sub VatShowReturn(ByVal frm As Access.Form, ByVal VatReturnID As Long)
     If status = "FILED" Then
         drift = VatDrift(VatReturnID)
         If drift <> 0 Then info = info & vbCrLf & "تغيرت ضريبة مستندات الفترة بعد الاعتماد بمقدار " & _
-                                  Format$(drift, "#,##0.00") & ": أضفه في تصحيحات الإقرار التالي (الخانة 14)."
+                                  Format$(drift, "#,##0.00") & ": أضفه في تصحيحات الإقرار التالي."
     End If
+    info = info & VatEInvoiceNote(frm!txtFrom.Value, frm!txtTo.Value)
     VatState frm, info, IIf(status = "FILED", CLR_SUCCESS, CLR_PRIMARY)
     VatShowNet frm
     VatButtons frm, status
     frm!lstReturns.Requery
 End Sub
+
+Private Function VatEInvoiceNote(ByVal FromDate As Date, ByVal ToDate As Date) As String
+    ' A second line when sales documents of the period are not accepted by the e-invoicing platform
+    ' (modEInvoice): the tax authority compares the return with the accepted documents.
+    Dim n As Long
+    n = EInvoiceOpenCount(FromDate, ToDate)
+    If n > 0 Then VatEInvoiceNote = vbCrLf & "تنبيه: " & n & " فاتورة أو مرتجع في الفترة لم تقبلها منظومة " & _
+                                    "الفاتورة الإلكترونية بعد (شاشة الفاتورة الإلكترونية)."
+End Function
 
 Private Sub VatState(ByVal frm As Access.Form, ByVal Text As String, ByVal Color As Long)
     frm!lblState.Caption = Tr(Text)
@@ -588,7 +648,7 @@ End Sub
 Public Sub VatFile(ByVal frm As Access.Form)
     Dim id As Long, msg As String, periodTo As Date, number As String
     If Not IsDate(frm!txtFiledDate.Value) Then
-        ShowWarning "أدخل تاريخ اعتماد الإقرار (يوم تقديمه للهيئة)."
+        ShowWarning "أدخل تاريخ اعتماد الإقرار (يوم تقديمه)."
         SafeFocus frm!txtFiledDate
         Exit Sub
     End If
@@ -675,6 +735,12 @@ Public Sub PrintVatReturn(ByVal frm As Access.Form)
     VatShowReturn frm, id
     SetQueryParam "VatReturnID", id
     LogAction "REPORT", "VAT_RETURN", CStr(id)
+    If AppCountry() = "EG" Then
+        OpenReportOrQuery "rptVatReturnEG", "VatReturnQueryEG", "", _
+                          PeriodText(DbValue("SELECT PeriodFrom FROM VatReturns WHERE VatReturnID = " & id), _
+                                     DbValue("SELECT PeriodTo FROM VatReturns WHERE VatReturnID = " & id))
+        Exit Sub
+    End If
     OpenReportOrQuery "rptVatReturn", "VatReturnQuery", "", _
                       PeriodText(DbValue("SELECT PeriodFrom FROM VatReturns WHERE VatReturnID = " & id), _
                                  DbValue("SELECT PeriodTo FROM VatReturns WHERE VatReturnID = " & id))

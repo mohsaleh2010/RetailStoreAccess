@@ -147,17 +147,19 @@ def balance_sheet() -> ReportModel:
 
 
 # ------------------------------------------------------------------ VAT return
-def vat_return() -> ReportModel:
+def vat_return(name="rptVatReturn", query="VatReturnQuery", title="إقرار ضريبة القيمة المضافة", net_box=16,
+               authority="الهيئة") -> ReportModel:
+    """The printed return: Saudi Arabia (16 boxes), or Egypt (rptVatReturnEG, form 10, 14 boxes)."""
     from reports_catalog import title_block, page_footer
-    m = ReportModel("rptVatReturn", "إقرار ضريبة القيمة المضافة", W,
+    m = ReportModel(name, title, W,
                     {SEC_PAGE_HEADER: cm(3.7), SEC_DETAIL: cm(0.7), SEC_RPT_FOOTER: cm(2.2),
                      SEC_PAGE_FOOTER: cm(0.6)},
-                    record_source="VatReturnQuery", group="", sorts=[("BoxNo", False)], page_setup=True,
+                    record_source=query, group="", sorts=[("BoxNo", False)], page_setup=True,
                     no_data="الإقرار غير موجود.")
-    y = title_block(m, "إقرار ضريبة القيمة المضافة", W, True)
+    y = title_block(m, title, W, True)
     txt(m, SEC_PAGE_HEADER, "txtReturn",
         '="الإقرار: " & [ReturnNumber] & "    الحالة: " & IIf([Status]="FILED","معتمد في " & GDate([FiledDate]),'
-        '"مسودة (غير معتمد)") & IIf(IsNull([FilingRef]),"","    رقم الإقرار لدى الهيئة: " & [FilingRef])',
+        '"مسودة (غير معتمد)") & IIf(IsNull([FilingRef]),"","    رقم الإقرار لدى ' + authority + ': " & [FilingRef])',
         0, y, W, cm(0.55), 10, True)
     y += cm(0.7)
     num_w, amt_w = cm(1.2), cm(3.2)
@@ -177,8 +179,9 @@ def vat_return() -> ReportModel:
     hline(m, SEC_DETAIL, "lnRow", cm(0.66), W)
     F = SEC_RPT_FOOTER
     hline(m, F, "lnNet", cm(0.1), W)
-    txt(m, F, "txtNet", '=IIf(Sum(IIf([BoxNo]=16,[VAT],0))>=0,"صافي الضريبة المستحقة للسداد: ",'
-        '"ضريبة مستردة تُرحَّل للإقرار التالي: ") & Format(IIf(Sum(IIf([BoxNo]=16,[VAT],0))>=0,1,-1)*Sum(IIf([BoxNo]=16,[VAT],0)),"#,##0.00")',
+    net = f"Sum(IIf([BoxNo]={net_box},[VAT],0))"
+    txt(m, F, "txtNet", f'=IIf({net}>=0,"صافي الضريبة المستحقة للسداد: ",'
+        f'"ضريبة مستردة تُرحَّل للإقرار التالي: ") & Format(IIf({net}>=0,1,-1)*{net},"#,##0.00")',
         0, cm(0.3), W, cm(0.7), 13, True)
     signatures(m, F, cm(1.4), ["المحاسب", "المدير"])
     page_footer(m, W)
@@ -186,4 +189,5 @@ def vat_return() -> ReportModel:
 
 
 def journal_reports() -> List[ReportModel]:
-    return [journal_entry(), account_statement(), general_ledger(), income_statement(), balance_sheet(), vat_return()]
+    return [journal_entry(), account_statement(), general_ledger(), income_statement(), balance_sheet(), vat_return(),
+            vat_return("rptVatReturnEG", "VatReturnQueryEG", "إقرار ضريبة القيمة المضافة (نموذج 10)", 14, "المصلحة")]

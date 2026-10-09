@@ -347,39 +347,77 @@ def _vat_return():
         jline(*kp, 2, "v.PaidAccount", ZERO, "v.PaidAmount", "v.FilingRef", src, f"{filed} AND v.PaidAmount <> 0")])
 
 
-# The boxes of the VAT return form (ZATCA): (box, caption, amount, adjustment, VAT, kind)
-# L = a line, T = a total, N = the net figures. Boxes the shop does not record (sales to citizens,
-# exports, imports, exempt purchases) stay zero; the user adds them through the corrections.
+# The boxes of the VAT return form: (box, caption, amount, adjustment, VAT, kind)
+# L = a line, T = a total, N = the net figures. Each box is one of the figures below (its key);
+# "0" = a box the shop does not record (it stays zero, the user adds it through the corrections).
 _SALES = "v.SalesStdAmount + v.SalesZeroAmount + v.SalesExemptAmount"
 _SALES_ADJ = "v.SalesStdAdjust + v.SalesZeroAdjust + v.SalesExemptAdjust"
-VAT_BOXES = [
-    (1, "المبيعات الخاضعة للنسبة الأساسية (15%)", "v.SalesStdAmount", "v.SalesStdAdjust", "v.SalesStdVAT", "L"),
-    (2, "المبيعات للمواطنين (الخدمات الصحية الخاصة والتعليم الأهلي والمسكن الأول)", ZERO, ZERO, ZERO, "L"),
-    (3, "المبيعات المحلية الخاضعة للنسبة الصفرية", "v.SalesZeroAmount", "v.SalesZeroAdjust", ZERO, "L"),
-    (4, "الصادرات", ZERO, ZERO, ZERO, "L"),
-    (5, "المبيعات المعفاة", "v.SalesExemptAmount", "v.SalesExemptAdjust", ZERO, "L"),
-    (6, "إجمالي المبيعات", _SALES, _SALES_ADJ, "v.SalesStdVAT", "T"),
-    (7, "المشتريات الخاضعة للنسبة الأساسية (مع المصروفات بفاتورة ضريبية)", "v.PurchStdAmount", "v.PurchStdAdjust",
-     "v.PurchStdVAT", "L"),
-    (8, "الاستيرادات الخاضعة للنسبة الأساسية والمدفوعة ضريبتها في الجمارك", ZERO, ZERO, ZERO, "L"),
-    (9, "الاستيرادات الخاضعة للضريبة بآلية الاحتساب العكسي", ZERO, ZERO, ZERO, "L"),
-    (10, "المشتريات الخاضعة للنسبة الصفرية", "v.PurchZeroAmount", "v.PurchZeroAdjust", ZERO, "L"),
-    (11, "المشتريات المعفاة", ZERO, ZERO, ZERO, "L"),
-    (12, "إجمالي المشتريات", "v.PurchStdAmount + v.PurchZeroAmount", "v.PurchStdAdjust + v.PurchZeroAdjust",
-     "v.PurchStdVAT", "T"),
-    (13, "إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية", "Null", "Null",
-     "v.SalesStdVAT - v.PurchStdVAT", "N"),
-    (14, "تصحيحات من الفترات السابقة", "Null", "Null", "v.Corrections", "N"),
-    (15, "ضريبة القيمة المضافة المرحَّلة من الفترات السابقة (رصيد دائن)", "Null", "Null", "v.CarriedCredit", "N"),
-    (16, "صافي الضريبة المستحقة (سالب = مستردة)", "Null", "Null", "v.NetDue", "N"),
+VAT_FIGURES = {
+    "SS": ("v.SalesStdAmount", "v.SalesStdAdjust", "v.SalesStdVAT", "L"),
+    "SZ": ("v.SalesZeroAmount", "v.SalesZeroAdjust", ZERO, "L"),
+    "SE": ("v.SalesExemptAmount", "v.SalesExemptAdjust", ZERO, "L"),
+    "ST": (_SALES, _SALES_ADJ, "v.SalesStdVAT", "T"),
+    "PS": ("v.PurchStdAmount", "v.PurchStdAdjust", "v.PurchStdVAT", "L"),
+    "PZ": ("v.PurchZeroAmount", "v.PurchZeroAdjust", ZERO, "L"),
+    "PT": ("v.PurchStdAmount + v.PurchZeroAmount", "v.PurchStdAdjust + v.PurchZeroAdjust", "v.PurchStdVAT", "T"),
+    "0": (ZERO, ZERO, ZERO, "L"),
+    "DUE": ("Null", "Null", "v.SalesStdVAT - v.PurchStdVAT", "N"),
+    "COR": ("Null", "Null", "v.Corrections", "N"),
+    "CAR": ("Null", "Null", "v.CarriedCredit", "N"),
+    "NET": ("Null", "Null", "v.NetDue", "N"),
+}
+# Saudi Arabia: the 16 boxes of the return of the Zakat, Tax and Customs Authority
+VAT_LAYOUT_SA = [
+    ("SS", "المبيعات الخاضعة للنسبة الأساسية (15%)"),
+    ("0", "المبيعات للمواطنين (الخدمات الصحية الخاصة والتعليم الأهلي والمسكن الأول)"),
+    ("SZ", "المبيعات المحلية الخاضعة للنسبة الصفرية"),
+    ("0", "الصادرات"),
+    ("SE", "المبيعات المعفاة"),
+    ("ST", "إجمالي المبيعات"),
+    ("PS", "المشتريات الخاضعة للنسبة الأساسية (مع المصروفات بفاتورة ضريبية)"),
+    ("0", "الاستيرادات الخاضعة للنسبة الأساسية والمدفوعة ضريبتها في الجمارك"),
+    ("0", "الاستيرادات الخاضعة للضريبة بآلية الاحتساب العكسي"),
+    ("PZ", "المشتريات الخاضعة للنسبة الصفرية"),
+    ("0", "المشتريات المعفاة"),
+    ("PT", "إجمالي المشتريات"),
+    ("DUE", "إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية"),
+    ("COR", "تصحيحات من الفترات السابقة"),
+    ("CAR", "ضريبة القيمة المضافة المرحَّلة من الفترات السابقة (رصيد دائن)"),
+    ("NET", "صافي الضريبة المستحقة (سالب = مستردة)"),
+]
+# Egypt: the monthly return of the Egyptian Tax Authority (form 10), in the order of its parts
+# (sales, purchases, the tax); a zero-rated sale is an export, a purchase without VAT is exempt
+VAT_LAYOUT_EG = [
+    ("SS", "المبيعات المحلية الخاضعة للضريبة بالسعر العام"),
+    ("0", "مبيعات سلع وخدمات الجدول"),
+    ("SZ", "الصادرات (بسعر صفر)"),
+    ("SE", "المبيعات المعفاة"),
+    ("ST", "إجمالي المبيعات"),
+    ("PS", "المشتريات المحلية الخاضعة للضريبة بالسعر العام (مع المصروفات بفاتورة ضريبية)"),
+    ("0", "الواردات من السلع (المسددة ضريبتها في الجمارك)"),
+    ("0", "الخدمات المستوردة من الخارج"),
+    ("PZ", "المشتريات المعفاة وغير الخاضعة"),
+    ("PT", "إجمالي المشتريات"),
+    ("DUE", "ضريبة المبيعات ناقص الضريبة القابلة للخصم عن الشهر"),
+    ("COR", "تسويات وتصحيحات من الفترات السابقة"),
+    ("CAR", "الرصيد الدائن المرحَّل من الشهر السابق"),
+    ("NET", "صافي الضريبة المستحقة (سالب = رصيد دائن يُرحَّل للشهر التالي)"),
 ]
 
 
-def _vat_boxes():
+def vat_boxes(layout):
+    return [(i, caption) + VAT_FIGURES[key] for i, (key, caption) in enumerate(layout, 1)]
+
+
+VAT_BOXES = vat_boxes(VAT_LAYOUT_SA)
+VAT_BOXES_EG = vat_boxes(VAT_LAYOUT_EG)
+
+
+def _vat_boxes(boxes=None):
     head = ("v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, "
             "v.PaidDate, v.PaidAmount")
     rows = []
-    for box, caption, amount, adjust, vat, kind in VAT_BOXES:
+    for box, caption, amount, adjust, vat, kind in boxes or VAT_BOXES:
         if box == 1:
             rows.append(f"SELECT {box} AS BoxNo, '{caption}' AS BoxText, {amount} AS Amount, {adjust} AS Adjust, "
                         f"{vat} AS VAT, '{kind}' AS RowKind, {head}\nFROM qryVatReturnHead AS v")
@@ -1117,6 +1155,8 @@ FROM qryVatOutput AS o, qryVatInputPurchases AS p, qryVatInputExpenses AS e""", 
 SELECT * FROM VatReturns
 WHERE VatReturnID = QLong('VatReturnID')""", ["VatReturnID"]),
     Query("VatReturnQuery", "إقرار ضريبة القيمة المضافة بخانات نموذج الهيئة (1 إلى 16)", _vat_boxes(), ["VatReturnID"]),
+    Query("VatReturnQueryEG", "إقرار ضريبة القيمة المضافة المصري (نموذج 10) بنفس أرقام الإقرار", _vat_boxes(VAT_BOXES_EG),
+          ["VatReturnID"]),
 
     # ============================================================ DASHBOARD
     # Own parameters (set by modDashboard), so the dashboard never changes the
@@ -1249,6 +1289,15 @@ SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, 'مرتجع بي
        r.ZatcaStatus, IIf(r.ZatcaStatus = 'PENDING', 'بانتظار الإرسال', IIf(r.ZatcaStatus = 'REPORTED', 'مُبلَّغ', IIf(r.ZatcaStatus = 'CLEARED', 'معتمد', IIf(r.ZatcaStatus = 'WARNING', 'مقبول مع تحذير', IIf(r.ZatcaStatus = 'REJECTED', 'مرفوض', IIf(r.ZatcaStatus = 'SUBMITTED', 'مُرسل', IIf(r.ZatcaStatus = 'VALID', 'صالح', IIf(r.ZatcaStatus = 'INVALID', 'غير صالح', IIf(r.ZatcaStatus = 'CANCELLED', 'ملغى', 'لا يُرسل'))))))))),
        Nz(r.EInvoiceAttempts, 0), r.EInvoiceError, r.ICV, r.InvoiceSubType
 FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID"""),
+    # the report of the e-documents (docs/50): each document with its group, the return negative
+    #   GroupNo 1 rejected / invalid, 2 waiting (pending, submitted), 3 accepted, 4 cancelled, 5 not sent
+    Query("EInvoiceReportQuery", "تقرير مستندات الفاتورة الإلكترونية: الحالة ومجموعتها والمبلغ بإشارته", """
+SELECT d.DocKind, d.DocID, d.DocNumber, d.DocDate, d.DocKindName, d.CustomerName, d.TotalAmount,
+       IIf(d.DocKind = 'RETURN', -d.TotalAmount, d.TotalAmount) AS SignedTotal, d.EStatus, d.StatusName,
+       d.Attempts, d.LastError,
+       IIf(d.EStatus IN ('REJECTED', 'INVALID'), 1, IIf(d.EStatus IN ('PENDING', 'SUBMITTED'), 2,
+       IIf(d.EStatus IN ('REPORTED', 'CLEARED', 'WARNING', 'VALID'), 3, IIf(d.EStatus = 'CANCELLED', 4, 5)))) AS GroupNo
+FROM qryEInvoiceDocs AS d"""),
 
     # ============================================================ PRINTING
     Query("qrySalesDocPrint", "بيانات طباعة فواتير البيع والإشعارات الدائنة (سطر لكل صنف)", """

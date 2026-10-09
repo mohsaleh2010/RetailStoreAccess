@@ -24,12 +24,12 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     "cSuppliers1,qryLocSuppliers,qryLocCashBoxes1,qryLocCashBoxes,qryLocBanks1,qryLocBanks,qryLocCostCenters1,qryLocCostCenters,qryLocSalesReps1,qryLocSalesReps,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,q" & _
     "ryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLa" & _
     "testRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryPr" & _
-    "ofitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndi" & _
-    "catorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPur" & _
-    "chase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission" & _
-    ",qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryI" & _
-    "ncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceL" & _
-    "ineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "ofitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionS" & _
+    "heetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSal" & _
+    "e,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommis" & _
+    "sionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qry" & _
+    "TreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySales" & _
+    "InvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -760,6 +760,7 @@ Private Sub CreateAllQueries()
     Q_qryVatReturnTotals
     Q_qryVatReturnHead
     Q_VatReturnQuery
+    Q_VatReturnQueryEG
     Q_DashboardQuery
     Q_qryRepDocs
     Q_qryRepPeriodTotals
@@ -774,6 +775,7 @@ Private Sub CreateAllQueries()
     Q_FinancialIndicatorsQuery
     Q_qryDashboardTopProducts
     Q_qryEInvoiceDocs
+    Q_EInvoiceReportQuery
     Q_qrySalesDocPrint
     Q_qryPurchaseDocPrint
     Q_qryVoucherPrint
@@ -1880,6 +1882,52 @@ Private Sub Q_VatReturnQuery()
     SaveQuery "VatReturnQuery", "إقرار ضريبة القيمة المضافة بخانات نموذج الهيئة (1 إلى 16)", s
 End Sub
 
+Private Sub Q_VatReturnQueryEG()
+    Dim s As String
+    s = "SELECT 1 AS BoxNo, 'المبيعات المحلية الخاضعة للضريبة بالسعر العام' AS BoxText, v.SalesStdAmount AS Amount, v.SalesStdAdjust AS Adjust, v.SalesStdVAT AS VAT, 'L' AS RowKind, v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 2, 'مبيعات سلع وخدمات الجدول', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 3, 'الصادرات (بسعر صفر)', v.SalesZeroAmount, v.SalesZeroAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 4, 'المبيعات المعفاة', v.SalesExemptAmount, v.SalesExemptAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 5, 'إجمالي المبيعات', v.SalesStdAmount + v.SalesZeroAmount + v.SalesExemptAmount, v.SalesStdAdjust + v.SalesZeroAdjust + v.SalesExemptAdjust, v.SalesStdVAT, 'T', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 6, 'المشتريات المحلية الخاضعة للضريبة بالسعر العام (مع المصروفات بفاتورة ضريبية)', v.PurchStdAmount, v.PurchStdAdjust, v.PurchStdVAT, 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 7, 'الواردات من السلع (المسددة ضريبتها في الجمارك)', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 8, 'الخدمات المستوردة من الخارج', CCur(0), CCur(0), CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 9, 'المشتريات المعفاة وغير الخاضعة', v.PurchZeroAmount, v.PurchZeroAdjust, CCur(0), 'L', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 10, 'إجمالي المشتريات', v.PurchStdAmount + v.PurchZeroAmount, v.PurchStdAdjust + v.PurchZeroAdjust, v.PurchStdVAT, 'T', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 11, 'ضريبة المبيعات ناقص الضريبة القابلة للخصم عن الشهر', Null, Null, v.SalesStdVAT - v.PurchStdVAT, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 12, 'تسويات وتصحيحات من الفترات السابقة', Null, Null, v.Corrections, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 13, 'الرصيد الدائن المرحَّل من الشهر السابق', Null, Null, v.CarriedCredit, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 14, 'صافي الضريبة المستحقة (سالب = رصيد دائن يُرحَّل للشهر التالي)', Null, Null, v.NetDue, 'N', v.VatReturnID, v.ReturnNumber, v.PeriodFrom, v.PeriodTo, v.Status, v.FiledDate, v.FilingRef, v.PaidDate, v.PaidAmount" & vbCrLf
+    s = s & "FROM qryVatReturnHead AS v" & vbCrLf
+    SaveQuery "VatReturnQueryEG", "إقرار ضريبة القيمة المضافة المصري (نموذج 10) بنفس أرقام الإقرار", s
+End Sub
+
 Private Sub Q_DashboardQuery()
     Dim s As String
     s = "SELECT (SELECT CCur(Nz(Sum(d.GrossAmount), 0)) FROM qrySalesDocuments AS d" & vbCrLf
@@ -2049,6 +2097,17 @@ Private Sub Q_qryEInvoiceDocs()
     s = s & "       Nz(r.EInvoiceAttempts, 0), r.EInvoiceError, r.ICV, r.InvoiceSubType" & vbCrLf
     s = s & "FROM SalesReturns AS r INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID" & vbCrLf
     SaveQuery "qryEInvoiceDocs", "مستندات البيع وحالة الفاتورة الإلكترونية (الفواتير والمرتجعات)", s
+End Sub
+
+Private Sub Q_EInvoiceReportQuery()
+    Dim s As String
+    s = "SELECT d.DocKind, d.DocID, d.DocNumber, d.DocDate, d.DocKindName, d.CustomerName, d.TotalAmount," & vbCrLf
+    s = s & "       IIf(d.DocKind = 'RETURN', -d.TotalAmount, d.TotalAmount) AS SignedTotal, d.EStatus, d.StatusName," & vbCrLf
+    s = s & "       d.Attempts, d.LastError," & vbCrLf
+    s = s & "       IIf(d.EStatus IN ('REJECTED', 'INVALID'), 1, IIf(d.EStatus IN ('PENDING', 'SUBMITTED'), 2," & vbCrLf
+    s = s & "       IIf(d.EStatus IN ('REPORTED', 'CLEARED', 'WARNING', 'VALID'), 3, IIf(d.EStatus = 'CANCELLED', 4, 5)))) AS GroupNo" & vbCrLf
+    s = s & "FROM qryEInvoiceDocs AS d" & vbCrLf
+    SaveQuery "EInvoiceReportQuery", "تقرير مستندات الفاتورة الإلكترونية: الحالة ومجموعتها والمبلغ بإشارته", s
 End Sub
 
 Private Sub Q_qrySalesDocPrint()

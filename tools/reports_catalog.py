@@ -182,6 +182,17 @@ LIST_SPECS: List[ListSpec] = [
         Col("الفعلي", "ActualAmount", 3.0, MONEY, True), Col("الانحراف", "Variance", 3.0, MONEY),
         Col("النسبة", "VariancePct", 1.8, PCT), Col("التقييم", "VarianceNote", 4.0)],
         [("AccountType", True), ("TreeKey", False)], landscape=True, no_data="لا توجد موازنة لسنة الفترة."),
+    ListSpec("EINVOICE_DOCS", [
+        Col("الحالة", "StatusName", 2.8), Col("المستند", "DocKindName", 2.4), Col("الرقم", "DocNumber", 2.6),
+        Col("التاريخ", "=GDate([DocDate],True)", 2.9), Col("العميل", "CustomerName", 4.0, grow=True),
+        Col("المبلغ (المرتجع بالسالب)", "SignedTotal", 2.8, MONEY, True), Col("المحاولات", "Attempts", 1.6, INT),
+        Col("آخر خطأ أو سبب الرفض", "LastError", 8.3, grow=True)],
+        [("GroupNo", False), ("DocDate", False), ("DocID", False)], landscape=True,
+        no_data="لا توجد فواتير أو مرتجعات في هذه الفترة.",
+        summary=[("المقبولة (صافي الفواتير والمرتجعات)", "=Sum(IIf([GroupNo]=3,[SignedTotal],0))"),
+                 ("بانتظار الإرسال أو التحقق", "=Sum(IIf([GroupNo]=2,[SignedTotal],0))"),
+                 ("المرفوضة أو غير الصالحة", "=Sum(IIf([GroupNo]=1,[SignedTotal],0))"),
+                 ("الملغاة أو التي لا تُرسل", "=Sum(IIf([GroupNo]>=4,[SignedTotal],0))")]),
     ListSpec("AUDIT_TRAIL", [
         Col("الوقت", "=GDate([LogDate], True)", 2.9), Col("المستخدم", "UserName", 2.6), Col("العملية", "ActionLabel", 2.4),
         Col("الجدول", "ObjectName", 2.6), Col("الرقم", "RecordID", 1.4), Col("السجل", "RecordLabel", 3.2),

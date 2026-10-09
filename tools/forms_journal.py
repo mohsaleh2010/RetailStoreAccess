@@ -376,7 +376,7 @@ def layout_vat_return() -> FormModel:
     width, height = cm(26.0), cm(19.4)
     m = FormModel("frmVatReturn", "إقرار ضريبة القيمة المضافة", width, height, popup=True, allow_add=False)
     title_band(m, "إقرار ضريبة القيمة المضافة",
-               "خانات نموذج هيئة الزكاة والضريبة والجمارك من المستندات، ثم الاعتماد وقيد التسوية والسداد", "reports")
+               "خانات نموذج الإقرار الضريبي من المستندات، ثم الاعتماد وقيد التسوية والسداد", "reports")
     y = cm(2.3)
     c = m.add(Control("text", "txtFrom", cm(0.4), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
     labelled(m, "txtFrom", "بداية الفترة الضريبية", c)
@@ -397,10 +397,10 @@ def layout_vat_return() -> FormModel:
     y = cm(12.0)
     c = m.add(Control("text", "txtCorrections", cm(0.4), y, cm(3.4), cm(0.8), {"Format": "#,##0.00"},
                       events=["AfterUpdate"]))
-    labelled(m, "txtCorrections", "14- تصحيحات سابقة (+/-)", c)
+    labelled(m, "txtCorrections", "تصحيحات سابقة (+/-)", c)
     c = m.add(Control("text", "txtCarried", cm(4.0), y, cm(3.4), cm(0.8), {"Format": "#,##0.00"},
                       events=["AfterUpdate"]))
-    labelled(m, "txtCarried", "15- رصيد دائن مرحَّل", c)
+    labelled(m, "txtCarried", "رصيد دائن مرحَّل", c)
     m.add(Control("label", "lblNetDue", cm(7.6), y, cm(10.0), cm(0.8),
                   {"Caption": " ", "FontSize": 14, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
     button(m, "btnSaveDraft", "حفظ مسودة", cm(17.8), y, "secondary", w=cm(2.6), h=cm(0.8), call="VatSaveDraft Me")

@@ -47,7 +47,8 @@ def layout_einvoices() -> FormModel:
             ("btnSendAll", "إرسال كل المعلّق", "secondary", 3.8, "EInvoicesSendAll Me"),
             ("btnRefresh", "تحديث الحالة", "secondary", 3.2, "EInvoicesRefresh Me"),
             ("btnCancelDoc", "إلغاء المستند", "secondary", 3.2, "EInvoicesCancelPicked Me"),
-            ("btnSetup", "إعداد الربط", "secondary", 3.2, "EInvoiceSetupOpen")]:
+            ("btnSetup", "إعداد الربط", "secondary", 3.2, "EInvoiceSetupOpen"),
+            ("btnPrint", "طباعة التقرير", "secondary", 3.2, "EInvoicesPrint Me")]:
         button(m, name, caption, bx, y, style, w=cm(w), h=cm(0.9), call=call)
         bx += cm(w) + cm(0.2)
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), y, "secondary", w=cm(2.6), h=cm(0.9),

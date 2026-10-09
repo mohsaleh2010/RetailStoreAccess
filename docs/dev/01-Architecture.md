@@ -58,7 +58,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
 | `modReports`، `modLabels` | دوال التقارير وملصقات الباركود |
 | `modSecurity`، `modSecurityScreens`، `modActivation`، `modBackup` | المستخدمون، وكلمات المرور (SHA-256)، والصلاحيات، وتفعيل الجهاز، والنسخ الاحتياطي |
 | `modCash`، `modBank`، `modCheque` | الصناديق، والبنوك، والتسوية البنكية، والشيكات |
-| `modJournal`، `modAccounts`، `modManualEntry`، `modLedger`، `modFinancials`، `modClosing`، `modVat` | المحاسبة: القيود الآلية، وشجرة الحسابات، والقيود اليدوية، وكشف الحساب، والقوائم المالية، والإقفال، والإقرار الضريبي |
+| `modJournal`، `modAccounts`، `modManualEntry`، `modLedger`، `modFinancials`، `modClosing`، `modVat` | المحاسبة: القيود الآلية، وشجرة الحسابات، والقيود اليدوية، وكشف الحساب، والقوائم المالية، والإقفال، والإقرار الضريبي (خانات السعودية أو نموذج 10 المصري حسب الدولة، `docs/50`) |
 | `modAging`، `modAssets`، `modPayroll`، `modCostCenters`، `modBudget`، `modRecurring` | أعمار الديون، والأصول والإهلاك، والرواتب، ومراكز التكلفة، والموازنة، والمصروفات المتكررة |
 | `modAudit` | سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد |
 | `modCurrency` | العملات: عملة البرنامج، وأسعار العملات، والتحويل `ToBase`/`FromBase`، وحقلا العملة والمعامل في الشاشات، وختم القيود بعملة المستند |
@@ -67,7 +67,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
 | `modZatcaApi` | منصة فاتورة: تسجيل الجهاز (CSR بـ OpenSSL، ورمز OTP، وفحوص الامتثال، والشهادة الفعلية)، وإرسال المستندات للتبليغ أو الاعتماد، وقراءة ردود الهيئة (`docs/47`) |
 | `modEtaReceipt` | الإيصال الإلكتروني المصري: بناء الإيصال (JSON) ومعرّفه (SHA-256 لتسلسل المصلحة) وسلسلته، والدخول بحساب جهاز نقطة البيع، والإرسال ومتابعة الحالة، وشاشة `frmEtaSetup` (`docs/48`) |
 | `modEtaInvoice` | الفاتورة الإلكترونية المصرية للمنشآت: المستند (1.0 موقّع أو 0.9 للتجربة)، والتوقيع عبر برنامج التوقيع الخارجي، والإرسال، والإشعار الدائن، والحالة، والإلغاء. يحوّل إليها `modEtaReceipt` كل فاتورة ضريبية (`docs/49`) |
-| `modEInvoice` / `modHttp` | أساس الفاتورة الإلكترونية: حالة المستند، وسجل `EInvoiceLog`، وشاشة `frmEInvoices`، والإرسال عبر منظومة الدولة بالاسم (`Application.Run`)، وHTTPS وقراءة JSON (`docs/45`) |
+| `modEInvoice` / `modHttp` | أساس الفاتورة الإلكترونية: حالة المستند، وسجل `EInvoiceLog`، وشاشة `frmEInvoices`، والإرسال عبر منظومة الدولة بالاسم (`Application.Run`)، وHTTPS وقراءة JSON (`docs/45`)، وتقرير المستندات `rptEInvoiceDocs` وتنبيه الإقرار `EInvoiceOpenCount` (`docs/50`) |
 | `modCountry` | دولة التشغيل (السعودية أو مصر): العملة والضريبة والرقم الضريبي وعنوان المستند، وتغيير الدولة قبل أول عملية فقط (`docs/44`) |
 | `modEnglishNames` | شاشة الأسماء الإنجليزية `frmEnglishNames`: الأسماء الناقصة من كل الجداول، واقتراح `Transliterate` (نسخته بـ Python `tools/translit.py`)، وحفظ مع سجل التدقيق (`docs/42`) |
 | `modLang`، `modLangData1..n` (مولَّدة) | لغة الواجهة: `Tr` يترجم النص بالقاموس، و`UiAlign` و`MSG_RTL` للاتجاه، و`SetInterfaceLanguage` يختار لغة ملف الواجهة |

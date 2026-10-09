@@ -14,6 +14,8 @@ Attribute VB_Name = "modEInvoice"
 ' ...ReadyProblem returns "" when the platform can send (certificate, credentials...); ...SendDocument
 ' returns "RESULT|message" (OK, WARNING, REJECTED, ERROR, NETWORK), sets the status with
 ' SetEInvoiceStatus and writes every request with LogEInvoice. frmEInvoices follows and resends.
+' The report rptEInvoiceDocs (EInvoicesPrint, report centre EINVOICE_DOCS) and EInvoiceOpenCount for the
+' VAT return (docs/50).
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -220,6 +222,43 @@ End Function
 '==============================================================================
 ' frmEInvoices
 '==============================================================================
+Public Function EInvoiceOpenCount(ByVal FromDate As Date, ByVal ToDate As Date) As Long
+    ' The sales documents of the period the platform has not accepted: waiting (pending, submitted),
+    ' rejected or invalid. The VAT return warns about them (docs/50): the Egyptian portal fills the
+    ' return from the accepted documents, and ZATCA compares the return with the reported invoices.
+    EInvoiceOpenCount = Nz(DbValue("SELECT Count(*) FROM qryEInvoiceDocs WHERE EStatus IN " & _
+                                   "('PENDING','SUBMITTED','REJECTED','INVALID') AND DocDate >= " & SqlDate(FromDate) & _
+                                   " AND DocDate < " & SqlDate(DateAdd("d", 1, ToDate))), 0)
+End Function
+
+Public Sub EInvoicesPrint(ByVal frm As Access.Form)
+    ' The report of the documents shown (period and choice of the screen), rptEInvoiceDocs.
+    Dim where As String, criteria As String
+    where = EInvoiceStatusWhere(Nz(frm!cboStatus.Value, "ALL"))
+    If IsDate(frm!txtFrom.Value) Then where = where & " AND [DocDate] >= " & SqlDate(DateValue(frm!txtFrom.Value))
+    If IsDate(frm!txtTo.Value) Then
+        where = where & " AND [DocDate] < " & SqlDate(DateAdd("d", 1, DateValue(frm!txtTo.Value)))
+    End If
+    If IsDate(frm!txtFrom.Value) And IsDate(frm!txtTo.Value) Then
+        criteria = PeriodText(DateValue(frm!txtFrom.Value), DateValue(frm!txtTo.Value))
+    End If
+    If Not IsNull(frm!cboStatus.Value) And Nz(frm!cboStatus.Value, "ALL") <> "ALL" Then
+        criteria = criteria & IIf(Len(criteria) > 0, "    ", "") & frm!cboStatus.Column(1)
+    End If
+    LogAction "REPORT", "EINVOICE_DOCS"
+    OpenReportOrQuery "rptEInvoiceDocs", "EInvoiceReportQuery", where, criteria
+End Sub
+
+Public Function EInvoiceStatusWhere(ByVal Choice As String) As String
+    ' The documents of a choice of the screen: ATTENTION, SENT, NOT_SENT or ALL.
+    Select Case Choice
+        Case "ATTENTION": EInvoiceStatusWhere = "[EStatus] IN ('PENDING','REJECTED','INVALID','WARNING')"
+        Case "SENT": EInvoiceStatusWhere = "[EStatus] IN ('REPORTED','CLEARED','SUBMITTED','VALID')"
+        Case "NOT_SENT": EInvoiceStatusWhere = "[EStatus] = 'NOT_SENT'"
+        Case Else: EInvoiceStatusWhere = "True"
+    End Select
+End Function
+
 Public Sub EInvoicesLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     frm!txtFrom.Value = DateSerial(Year(Date), Month(Date), 1)
@@ -257,12 +296,7 @@ End Sub
 Public Sub EInvoicesShow(ByVal frm As Access.Form)
     Dim sql As String, where As String, n As Long, overdue As Long, info As String
     Calendar = vbCalGreg
-    Select Case Nz(frm!cboStatus.Value, "ALL")
-        Case "ATTENTION": where = "d.EStatus IN ('PENDING','REJECTED','INVALID','WARNING')"
-        Case "SENT": where = "d.EStatus IN ('REPORTED','CLEARED','SUBMITTED','VALID')"
-        Case "NOT_SENT": where = "d.EStatus = 'NOT_SENT'"
-        Case Else: where = "True"
-    End Select
+    where = EInvoiceStatusWhere(Nz(frm!cboStatus.Value, "ALL"))
     If IsDate(frm!txtFrom.Value) Then where = where & " AND d.DocDate >= " & SqlDate(DateValue(frm!txtFrom.Value))
     If IsDate(frm!txtTo.Value) Then
         where = where & " AND d.DocDate < " & SqlDate(DateAdd("d", 1, DateValue(frm!txtTo.Value)))
@@ -491,6 +525,66 @@ Done:
         TestEInvoice = True
     Else
         TestMsg "‰ÃÕ " & passed & " Ê›‘· " & failed & ":" & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, "TestEInvoice"
+    End If
+End Function
+
+Public Function TestEInvoiceReports() As Boolean
+    ' docs/50: the report of the e-documents, the warning of the VAT return and the Egyptian return (form 10).
+    Dim ws As DAO.Workspace, inTrans As Boolean, passed As Long, failed As Long, report As String
+    Dim id As Long, d As Object, n As Long, country As String
+    Calendar = vbCalGreg
+    EnsureTestUser
+    g_SilentMode = True
+    Debug.Print "=== TestEInvoiceReports  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
+    On Error GoTo EH
+    Record ReportExists("rptEInvoiceDocs") And ReportExists("rptVatReturnEG"), " ﬁ—Ì— «·„” ‰œ«  Ê≈ﬁ—«— ‰„Ê–Ã 10", _
+           passed, failed, report
+    Record EInvoiceStatusWhere("ALL") = "True" And InStr(EInvoiceStatusWhere("ATTENTION"), "'REJECTED'") > 0, _
+           " ’›Ì… «·„” ‰œ«  Õ”» «·«Œ Ì«—", passed, failed, report
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    id = Nz(DbValue("SELECT Max(SalesInvoiceID) FROM SalesInvoices"), 0)
+    If id > 0 Then
+        CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'REJECTED' WHERE SalesInvoiceID = " & id, dbFailOnError
+        Record Nz(DbValue("SELECT GroupNo FROM EInvoiceReportQuery WHERE DocKind = 'SALE' AND DocID = " & id), 0) = 1, _
+               "«·„—›Ê÷ ›Ì „Ã„Ê⁄… «·„—›Ê÷…", passed, failed, report
+        n = EInvoiceOpenCount(DateValue(DbValue("SELECT InvoiceDate FROM SalesInvoices WHERE SalesInvoiceID = " & id)), _
+                              DateValue(DbValue("SELECT InvoiceDate FROM SalesInvoices WHERE SalesInvoiceID = " & id)))
+        Record n >= 1, " ‰»ÌÂ «·≈ﬁ—«— »«·„” ‰œ«  €Ì— «·„ﬁ»Ê·…", passed, failed, report
+        CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'VALID' WHERE SalesInvoiceID = " & id, dbFailOnError
+        Record Nz(DbValue("SELECT GroupNo FROM EInvoiceReportQuery WHERE DocKind = 'SALE' AND DocID = " & id), 0) = 3 And _
+               EInvoiceOpenCount(DateValue(DbValue("SELECT InvoiceDate FROM SalesInvoices WHERE SalesInvoiceID = " & id)), _
+                                 DateValue(DbValue("SELECT InvoiceDate FROM SalesInvoices WHERE SalesInvoiceID = " & id))) = n - 1, _
+               "«·’«·Õ ›Ì „Ã„Ê⁄… «·„ﬁ»Ê·…", passed, failed, report
+    Else
+        Debug.Print "[--] ·«  ÊÃœ ›Ê« Ì— »Ì⁄"
+    End If
+    Set d = VatPeriodTotals(DateAdd("m", -1, Date), Date)
+    country = AppCountry()
+    CurrentDb.Execute "UPDATE Settings SET CountryCode = 'EG' WHERE SettingID = 1", dbFailOnError
+    Record VatBoxCount() = 14 And VatBoxCaption(14) <> "" And _
+           UBound(Split(VatBoxRows(d), ";")) + 1 = 15 * 5, "≈ﬁ—«— „’—: 14 »‰œ«", passed, failed, report
+    CurrentDb.Execute "UPDATE Settings SET CountryCode = 'SA' WHERE SettingID = 1", dbFailOnError
+    Record VatBoxCount() = 16 And VatBoxCaption(16) <> "" And _
+           UBound(Split(VatBoxRows(d), ";")) + 1 = 17 * 5, "≈ﬁ—«— «·”⁄ÊœÌ…: 16 Œ«‰…", passed, failed, report
+    ws.Rollback
+    inTrans = False
+    Record AppCountry() = country, "œÊ·… «· ‘€Ì· ·„   €Ì—", passed, failed, report
+    GoTo Done
+EH:
+    Record False, "Œÿ√: " & Err.Description, passed, failed, report
+    If inTrans Then ws.Rollback
+Done:
+    g_SilentMode = False
+    Debug.Print "--- ‰ÃÕ: " & passed & " | ›‘·: " & failed
+    If failed = 0 Then
+        TestMsg "Ã„Ì⁄ «Œ »«—«   ﬁ«—Ì— «·›« Ê—… «·≈·ﬂ —Ê‰Ì… Ê«·≈ﬁ—«— ‰«ÃÕ… (" & passed & " «Œ »«—«).", _
+                vbInformation + MSG_RTL, "TestEInvoiceReports"
+        TestEInvoiceReports = True
+    Else
+        TestMsg "‰ÃÕ " & passed & " Ê›‘· " & failed & ":" & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _
+                "TestEInvoiceReports"
     End If
 End Function
 

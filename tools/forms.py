@@ -683,6 +683,8 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("SLOW_MOVING", "المنتجات غير المتحركة", "SlowMovingProductsQuery", "rptSlowMoving"),
     ReportEntry("STOCK_BY_CATEGORY", "المخزون حسب التصنيف", "StockByCategoryQuery", "rptStockByCategory"),
     ReportEntry("VAT_SUMMARY", "ملخص ضريبة القيمة المضافة", "VatSummaryQuery", "rptVatSummary", "P$"),
+    ReportEntry("EINVOICE_DOCS", "مستندات الفاتورة الإلكترونية (المقبولة والمرفوضة)", "EInvoiceReportQuery",
+                "rptEInvoiceDocs", "D", "DocDate"),
     ReportEntry("CUSTOMER_BALANCES", "أرصدة العملاء", "CustomerBalanceQuery", "rptCustomerBalances"),
     ReportEntry("SUPPLIER_BALANCES", "أرصدة الموردين", "SupplierBalanceQuery", "rptSupplierBalances"),
     ReportEntry("SUPPLIER_FX", "أرصدة الموردين بالعملات وفروق العملة", "SupplierFxBalanceQuery", "rptSupplierFx"),

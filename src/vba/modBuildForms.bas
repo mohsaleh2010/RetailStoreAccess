@@ -7758,7 +7758,7 @@ Private Sub BuildForm_frmVatReturn()
     Set c = AddRect("boxTitle", 0, 0, 14742, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8A5), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "إقرار ضريبة القيمة المضافة", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
-    Set c = AddLabel("lblSubtitle", "خانات نموذج هيئة الزكاة والضريبة والجمارك من المستندات، ثم الاعتماد وقيد التسوية والسداد", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblSubtitle", "خانات نموذج الإقرار الضريبي من المستندات، ثم الاعتماد وقيد التسوية والسداد", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
     Set c = AddText("txtFrom", "", 227, 1304, 1701, 454)
     SetCtlProp c, "Format", "yyyy/mm/dd"
     Set c = AddLabel("lblFrom", "بداية الفترة الضريبية", 227, 992, 1701, 284, 9, False, CLR_MUTED, "txtFrom", 0)
@@ -7779,11 +7779,11 @@ Private Sub BuildForm_frmVatReturn()
     Set c = AddText("txtCorrections", "", 227, 6804, 1928, 454)
     SetCtlProp c, "Format", "#,##0.00"
     c.AfterUpdate = EP
-    Set c = AddLabel("lblCorrections", "14- تصحيحات سابقة (+/-)", 227, 6492, 1928, 284, 9, False, CLR_MUTED, "txtCorrections", 0)
+    Set c = AddLabel("lblCorrections", "تصحيحات سابقة (+/-)", 227, 6492, 1928, 284, 9, False, CLR_MUTED, "txtCorrections", 0)
     Set c = AddText("txtCarried", "", 2268, 6804, 1928, 454)
     SetCtlProp c, "Format", "#,##0.00"
     c.AfterUpdate = EP
-    Set c = AddLabel("lblCarried", "15- رصيد دائن مرحَّل", 2268, 6492, 1928, 284, 9, False, CLR_MUTED, "txtCarried", 0)
+    Set c = AddLabel("lblCarried", "رصيد دائن مرحَّل", 2268, 6492, 1928, 284, 9, False, CLR_MUTED, "txtCarried", 0)
     Set c = AddLabel("lblNetDue", " ", 4309, 6804, 5670, 454, 14, True, CLR_PRIMARY, "", 0)
     Set c = AddButton("btnSaveDraft", "حفظ مسودة", 10093, 6804, 1474, 454, "secondary")
     c.OnClick = EP
@@ -9499,6 +9499,8 @@ Private Sub BuildForm_frmEInvoices()
     c.OnClick = EP
     Set c = AddButton("btnSetup", "إعداد الربط", 8503, 9412, 1814, 510, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnPrint", "طباعة التقرير", 10430, 9412, 1814, 510, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13608, 9412, 1474, 510, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -9535,6 +9537,9 @@ Private Sub BuildForm_frmEInvoices()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSetup_Click()" & vbCrLf
     s = s & "    EInvoiceSetupOpen" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    EInvoicesPrint Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
