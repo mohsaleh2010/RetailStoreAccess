@@ -165,8 +165,9 @@ banks 120000+bank, 1200 Mada/wallet clearing, 1300 customers, 2100 suppliers, 15
 ## Status and roadmap
 Phases 1–12, accounting, VAT return, aging, banks, cheques, fixed assets, payroll, cost centres,
 budget, recurring expenses, the audit trail, the financial indicators of the dashboard, multiple
-currencies, sales reps with commissions and the English interface are done
-(see `README.md` for approval status): phase 3 is complete. Next steps are decided by the owner.
+currencies, sales reps with commissions, the English interface and e-invoicing for Saudi Arabia (ZATCA phase 2)
+and Egypt (e-receipt, B2B e-invoice, form 10 return; plan `docs/43`, phases A-F) are done
+(see `README.md` for approval status). Next steps are decided by the owner.
 
 ## Standard procedures
 **Run the tests:** `python3 tools/generate.py`, then `python3 -m unittest discover -s tests`; report the
