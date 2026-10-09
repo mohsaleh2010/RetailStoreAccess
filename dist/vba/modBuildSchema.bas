@@ -29,7 +29,7 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
     "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=44;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=42;SalesInvoiceDetails=14;SalesReturns=35;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=55;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=42;SalesInvoiceDetails=14;SalesReturns=35;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
     "CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=8;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;" & _
     "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=37;RolePermissions=73;Employees=1;Screens=61;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
@@ -751,6 +751,28 @@ Private Sub CreateTable_Settings()
              "", "", "„·› «·„› «Õ «·Œ«’ ··ÃÂ«“", "secp256k1° ⁄·Ï ÃÂ«“ ¬„‰∫ ·« ÌıÕ›Ÿ ›Ì «·»Ì«‰« "
     AddField tdf, "ZatcaCertificate", "MEMO", 0, False, "", _
              "", "", "‘Â«œ… «·ÃÂ«“ (CSID)", ""
+    AddField tdf, "ZatcaDeviceSerial", "TEXT", 36, False, "", _
+             "", "", "«·—ﬁ„ «· ”·”·Ì ··ÃÂ«“ ·œÏ «·ÂÌ∆…", "UUID Ìı‰‘√ ⁄‰œ √Ê·  ”ÃÌ· (docs/47)"
+    AddField tdf, "ZatcaBranchName", "TEXT", 100, False, "", _
+             "", "", "«”„ «·›—⁄ ›Ì ‘Â«œ… «·ÃÂ«“", ""
+    AddField tdf, "ZatcaIndustry", "TEXT", 100, False, "", _
+             "", "", "‰‘«ÿ «·„‰‘√… ›Ì ‘Â«œ… «·ÃÂ«“", ""
+    AddField tdf, "ZatcaCsr", "MEMO", 0, False, "", _
+             "", "", "ÿ·» ‘Â«œ… «·ÃÂ«“ (CSR)", ""
+    AddField tdf, "ZatcaComplianceToken", "MEMO", 0, False, "", _
+             "", "", "‘Â«œ… «·«„ À«· (binarySecurityToken)", ""
+    AddField tdf, "ZatcaComplianceSecret", "TEXT", 255, False, "", _
+             "", "", "«·ﬂ·„… «·”—Ì… ·‘Â«œ… «·«„ À«·", "·«  ıﬂ » ›Ì ”Ã· «·≈—”«·"
+    AddField tdf, "ZatcaRequestId", "TEXT", 30, False, "", _
+             "", "", "—ﬁ„ ÿ·» ‘Â«œ… «·«„ À«·", ""
+    AddField tdf, "ZatcaProductionToken", "MEMO", 0, False, "", _
+             "", "", "«·‘Â«œ… «·›⁄·Ì… (binarySecurityToken)", ""
+    AddField tdf, "ZatcaProductionSecret", "TEXT", 255, False, "", _
+             "", "", "«·ﬂ·„… «·”—Ì… ··‘Â«œ… «·›⁄·Ì…", "·«  ıﬂ » ›Ì ”Ã· «·≈—”«·"
+    AddField tdf, "ZatcaOnboardEnv", "TEXT", 12, False, "", _
+             "", "", "«·»Ì∆… «· Ì ”ıÃ¯· ›ÌÂ« «·ÃÂ«“", ""
+    AddField tdf, "ZatcaOnboardStage", "TEXT", 20, False, "", _
+             "", "", "„—Õ·…  ”ÃÌ· «·ÃÂ«“", "COMPLIANCE À„ CHECKED À„ PRODUCTION (docs/47)"
     AddField tdf, "EInvoiceEnvironment", "TEXT", 12, True, """TEST""", _
              "In (""TEST"",""SIMULATION"",""PRODUCTION"")", "TEST =  Ã—Ì»Ì…° SIMULATION = „Õ«ﬂ«…° PRODUCTION = ›⁄·Ì…", "»Ì∆… «·›« Ê—… «·≈·ﬂ —Ê‰Ì…", "«·”⁄ÊœÌ…: »Ê«»… «·„ÿÊ—Ì‰ / «·„Õ«ﬂ«… / «·›⁄·Ì…∫ „’—: „« ﬁ»· «·≈‰ «Ã / «·›⁄·Ì… (docs/45)"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False

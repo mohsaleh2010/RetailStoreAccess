@@ -67,7 +67,8 @@
 | + | خطة الفوترة الإلكترونية السعودية والمصرية حسب دولة التشغيل | 📋 خطة | [docs/43-Plan-EInvoicing-SA-EG.md](docs/43-Plan-EInvoicing-SA-EG.md) |
 | + | دولة التشغيل (السعودية أو مصر) من الإعدادات: العملة والضريبة والرقم الضريبي والمبلغ بالحروف وعنوان الفاتورة | ✅ تمت الموافقة | [docs/44-Operating-Country.md](docs/44-Operating-Country.md) |
 | + | أساس الفاتورة الإلكترونية: حالة كل مستند، وسجل الإرسال، وشاشة المتابعة وإعادة الإرسال، والتفعيل والبيئة | ✅ تمت الموافقة | [docs/45-EInvoice-Foundation.md](docs/45-EInvoice-Foundation.md) |
-| + | ملف الفاتورة السعودية الموقّع (UBL 2.1): البصمة والتوقيع بـ OpenSSL ورمز QR بتسعة حقول، وشاشة إعداد الربط | ✅ بانتظار الموافقة | [docs/46-ZATCA-Invoice-XML.md](docs/46-ZATCA-Invoice-XML.md) |
+| + | ملف الفاتورة السعودية الموقّع (UBL 2.1): البصمة والتوقيع بـ OpenSSL ورمز QR بتسعة حقول، وشاشة إعداد الربط | ✅ تمت الموافقة | [docs/46-ZATCA-Invoice-XML.md](docs/46-ZATCA-Invoice-XML.md) |
+| + | تسجيل الجهاز لدى هيئة الزكاة (CSR ورمز OTP وفحوص الامتثال والشهادة الفعلية) وإرسال الفواتير: تبليغ المبسطة واعتماد الضريبية | ✅ بانتظار الموافقة | [docs/47-ZATCA-Onboarding-Sending.md](docs/47-ZATCA-Onboarding-Sending.md) |
 
 ## هيكل المستودع
 
@@ -161,6 +162,7 @@
 | 40 | `modCountry` (دائمة، جديدة)، واستبدال `modForms` و`modSales` و`modReports` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestCountry` |
 | 41 | `modHttp` و`modEInvoice` (دائمتان، جديدتان)، واستبدال `modSales` و`modZatca` و`modForms` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestEInvoice` |
 | 42 | `modZatcaXml` (دائمة، جديدة) و`modZatcaData` (مولَّدة، جديدة)، واستبدال `modEInvoice` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`)؛ وتثبيت OpenSSL | `BuildSchema`, `BuildForms` | `TestZatcaXml` |
+| 43 | `modZatcaApi` (دائمة، جديدة)، واستبدال `modZatcaXml` و`modQRCode` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildForms` | `TestZatcaApi` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

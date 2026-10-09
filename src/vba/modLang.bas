@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2419
+Private Const ENTRY_COUNT As Long = 2458
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -226,15 +226,15 @@ Public Function TestLang() As Boolean
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
     CheckLang Tr("=""ورقة جرد "" & IIf([Status]=""POSTED"",""(مُرحّل)"",IIf([Status]=""CANCELLED"",""(ملغى)"",""(مفتوح)""))") = "=""Count sheet "" & IIf([Status]=""POSTED"",""(Posted)"",IIf([Status]=""CANCELLED"",""(Cancelled)"",""(Open)""))", "Tr sample 1", passed, failed, report
-    CheckLang Tr("أُضيف ") = "Added ", "Tr sample 2", passed, failed, report
-    CheckLang Tr("الاسم الإنجليزي أطول من ") = "The English name is longer than ", "Tr sample 3", passed, failed, report
-    CheckLang Tr("الكود") = "Code", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذر الحساب: ") = "Could not calculate: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("إجمالي الأصول") = "Total assets", "Tr sample 2", passed, failed, report
+    CheckLang Tr("الاسم المختصر للمحل") = "Short store name", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المالك") = "Owner", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعذر تحديث المؤشرات: ") = "Could not refresh the indicators: ", "Tr sample 5", passed, failed, report
     CheckLang Tr("سجل الأصول وقيد شرائها، والإهلاك بالقسط الثابت، والبيع أو الاستبعاد") = "Asset register and purchase entry, straight-line depreciation, and sale or disposal", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا توجد فترة مقفلة") = "There is no closed period", "Tr sample 7", passed, failed, report
+    CheckLang Tr("لا توجد قيود إهلاك.") = "There are no depreciation entries.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
-    CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("الشهادة الفعلية تُطلب من الهيئة في المرحلة التالية (تسجيل الجهاز). للتجربة الآن: «شهادة تجريبية» ثم «ملف XML لفاتورة»، وافحص الملف بأداة الهيئة") = "الشهادة الفعلية تُطلب من الهيئة في المرحلة التالية (تسجيل الجهاز). للتجربة الآن: «شهادة تجريبية» ثم «ملف XML لفاتورة»، وافحص الملف بأداة الهيئة", "العربية: من اليمين ولا ترجمة", _
+    CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة") = "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة", "العربية: من اليمين ولا ترجمة", _
               passed, failed, report
     UseLanguage saved
     Debug.Print "--- passed: " & passed & " | failed: " & failed

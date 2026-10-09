@@ -9533,14 +9533,29 @@ Private Sub BuildForm_frmZatcaSetup()
     Set c = AddLabel("lblKeyFile", "ملف المفتاح الخاص للجهاز (يبقى على جهاز آمن)", 227, 1899, 10093, 284, 9, False, CLR_MUTED, "txtKeyFile", 0)
     Set c = AddButton("btnBrowseKey", "استعراض", 10433, 2211, 1814, 454, "secondary")
     c.OnClick = EP
-    Set c = AddText("txtCertificate", "", 227, 3062, 12020, 2835)
+    Set c = AddText("txtCertificate", "", 227, 3062, 12020, 1247)
     c.FontSize = 8
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
     c.AfterUpdate = EP
-    Set c = AddLabel("lblCertificate", "شهادة الجهاز (CSID) كما تصدرها الهيئة", 227, 2750, 12020, 284, 9, False, CLR_MUTED, "txtCertificate", 0)
-    Set c = AddLabel("lblCertInfo", " ", 227, 6010, 12020, 680, 9, False, CLR_PRIMARY, "", 0)
-    Set c = AddLabel("lblSetupNote", "الشهادة الفعلية تُطلب من الهيئة في المرحلة التالية (تسجيل الجهاز). للتجربة الآن: «شهادة تجريبية» ثم «ملف XML لفاتورة»، وافحص الملف بأداة الهيئة (fatoora -validate).", 227, 6804, 12020, 907, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCertificate", "شهادة الجهاز (CSID): تُملأ من الخطوة 3، أو تُلصق كما تصدرها الهيئة", 227, 2750, 12020, 284, 9, False, CLR_MUTED, "txtCertificate", 0)
+    Set c = AddLabel("lblCertInfo", " ", 227, 4366, 12020, 340, 9, False, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblOnboard", "تسجيل الجهاز لدى الهيئة", 227, 4820, 12020, 340, 11, False, CLR_PRIMARY, "", 0)
+    SetCtlProp c, "FontWeight", 700
+    Set c = AddText("txtBranch", "", 227, 5557, 5953.5, 454)
+    Set c = AddLabel("lblBranch", "اسم الفرع", 227, 5245, 5953.5, 284, 9, False, CLR_MUTED, "txtBranch", 0)
+    Set c = AddText("txtIndustry", "", 6293.5, 5557, 5953.5, 454)
+    Set c = AddLabel("lblIndustry", "نشاط المنشأة (مثل Retail)", 6293.5, 5245, 5953.5, 284, 9, False, CLR_MUTED, "txtIndustry", 0)
+    Set c = AddText("txtOtp", "", 227, 6407, 2268, 510)
+    Set c = AddLabel("lblOtp", "رمز التحقق OTP", 227, 6095, 2268, 284, 9, False, CLR_MUTED, "txtOtp", 0)
+    Set c = AddButton("btnStep1", "1. شهادة الامتثال", 2608, 6407, 2608, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnStep2", "2. فحوص الامتثال", 5329, 6407, 2608, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnStep3", "3. الشهادة الفعلية", 8050, 6407, 2608, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblStage", " ", 227, 7031, 12020, 510, 10, False, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblSetupNote", "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة».", 227, 7598, 12020, 907, 9, False, CLR_MUTED, "", 0)
     Set c = AddButton("btnSave", "حفظ", 227, 8618, 1701, 510, "primary")
     c.OnClick = EP
     Set c = AddButton("btnTestCert", "شهادة تجريبية", 2041, 8618, 1928, 510, "secondary")
@@ -9553,12 +9568,22 @@ Private Sub BuildForm_frmZatcaSetup()
     s = ""
     s = s & "Private Sub Form_Load()" & vbCrLf
     s = s & "    ZatcaSetupLoad Me" & vbCrLf
+    s = s & "    ZatcaOnboardShow Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub txtCertificate_AfterUpdate()" & vbCrLf
     s = s & "    ZatcaSetupShowCert Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnBrowseKey_Click()" & vbCrLf
     s = s & "    ZatcaSetupBrowseKey Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStep1_Click()" & vbCrLf
+    s = s & "    ZatcaOnboardStep Me, 1" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStep2_Click()" & vbCrLf
+    s = s & "    ZatcaOnboardStep Me, 2" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStep3_Click()" & vbCrLf
+    s = s & "    ZatcaOnboardStep Me, 3" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSave_Click()" & vbCrLf
     s = s & "    ZatcaSetupSave Me" & vbCrLf

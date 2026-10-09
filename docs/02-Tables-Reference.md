@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **70** | عدد الحقول: **916**
+عدد الجداول: **70** | عدد الحقول: **927**
 
 ## الفهرس
 
@@ -126,7 +126,18 @@
 | 41 | OpenSslPath | Short Text | 255 |  |  |  |  | مسار برنامج OpenSSL – فارغ = openssl في مسار النظام (docs/46) |
 | 42 | ZatcaKeyFile | Short Text | 255 |  |  |  |  | ملف المفتاح الخاص للجهاز – secp256k1، على جهاز آمن؛ لا يُحفظ في البيانات |
 | 43 | ZatcaCertificate | Long Text |  |  |  |  |  | شهادة الجهاز (CSID) |
-| 44 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
+| 44 | ZatcaDeviceSerial | Short Text | 36 |  |  |  |  | الرقم التسلسلي للجهاز لدى الهيئة – UUID يُنشأ عند أول تسجيل (docs/47) |
+| 45 | ZatcaBranchName | Short Text | 100 |  |  |  |  | اسم الفرع في شهادة الجهاز |
+| 46 | ZatcaIndustry | Short Text | 100 |  |  |  |  | نشاط المنشأة في شهادة الجهاز |
+| 47 | ZatcaCsr | Long Text |  |  |  |  |  | طلب شهادة الجهاز (CSR) |
+| 48 | ZatcaComplianceToken | Long Text |  |  |  |  |  | شهادة الامتثال (binarySecurityToken) |
+| 49 | ZatcaComplianceSecret | Short Text | 255 |  |  |  |  | الكلمة السرية لشهادة الامتثال – لا تُكتب في سجل الإرسال |
+| 50 | ZatcaRequestId | Short Text | 30 |  |  |  |  | رقم طلب شهادة الامتثال |
+| 51 | ZatcaProductionToken | Long Text |  |  |  |  |  | الشهادة الفعلية (binarySecurityToken) |
+| 52 | ZatcaProductionSecret | Short Text | 255 |  |  |  |  | الكلمة السرية للشهادة الفعلية – لا تُكتب في سجل الإرسال |
+| 53 | ZatcaOnboardEnv | Short Text | 12 |  |  |  |  | البيئة التي سُجّل فيها الجهاز |
+| 54 | ZatcaOnboardStage | Short Text | 20 |  |  |  |  | مرحلة تسجيل الجهاز – COMPLIANCE ثم CHECKED ثم PRODUCTION (docs/47) |
+| 55 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل

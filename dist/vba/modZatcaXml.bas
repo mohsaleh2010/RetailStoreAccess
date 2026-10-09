@@ -535,10 +535,9 @@ Private Function Txt(ByVal v As Variant) As String
     Txt = Trim$(Nz(v, ""))
 End Function
 
-Public Function ZatcaDataProblem(ByVal DocKind As String, ByVal DocID As Long) As String
-    ' "" when the data ZATCA requires is complete: the seller's national address and tax number, the buyer's for
-    ' a tax invoice (B2B), standard-rated lines.
-    Dim s As DAO.Recordset, c As DAO.Recordset, msg As String, subType As String
+Public Function ZatcaSellerProblem() As String
+    ' The lines of the seller's missing data (tax number and national address), "" when complete.
+    Dim s As DAO.Recordset, msg As String
     Set s = CurrentDb.OpenRecordset("SELECT * FROM Settings WHERE SettingID = 1", dbOpenSnapshot)
     If Len(TaxNumberProblem(s!VATNumber, "SA")) > 0 Or Len(Txt(s!VATNumber)) = 0 Then
         msg = msg & "- ÇáÑÞã ÇáÖÑíÈí ááãÍá" & vbCrLf
@@ -550,6 +549,14 @@ Public Function ZatcaDataProblem(ByVal DocKind As String, ByVal DocID As Long) A
     If Len(Txt(s!City)) = 0 Then msg = msg & "- ãÏíäÉ ÇáãÍá" & vbCrLf
     If Len(Txt(s!District)) = 0 Then msg = msg & "- Íí ÇáãÍá" & vbCrLf
     s.Close
+    ZatcaSellerProblem = msg
+End Function
+
+Public Function ZatcaDataProblem(ByVal DocKind As String, ByVal DocID As Long) As String
+    ' "" when the data ZATCA requires is complete: the seller's national address and tax number, the buyer's for
+    ' a tax invoice (B2B), standard-rated lines.
+    Dim c As DAO.Recordset, msg As String, subType As String
+    msg = ZatcaSellerProblem()
     subType = Nz(DbValue("SELECT InvoiceSubType FROM " & DocTableOf(DocKind) & " WHERE " & DocKeyOf(DocKind) & " = " & _
                          DocID), "")
     If subType = "STANDARD" Then
@@ -770,8 +777,7 @@ End Function
 Public Function ZatcaBuildSigned(ByVal DocKind As String, ByVal DocID As Long, ByVal Pih As String, _
                                  ByRef SignedXml As String, ByRef InvoiceHash As String, ByRef QR As String) As String
     ' The signed document of a sales invoice or return with this previous hash: "" or the problem.
-    Dim xml As String, totals As Variant, cert As String, issuer As String, serial As String, pub As String
-    Dim certSig As String, certHash As String, signature As String, msg As String
+    Dim xml As String, totals As Variant, cert As String, msg As String
     msg = ZatcaDataProblem(DocKind, DocID)
     If Len(msg) > 0 Then
         ZatcaBuildSigned = msg
@@ -782,21 +788,30 @@ Public Function ZatcaBuildSigned(ByVal DocKind As String, ByVal DocID As Long, B
         ZatcaBuildSigned = "áÇ ÊæÌÏ ÔåÇÏÉ ÇáÌåÇÒ (CSID) Ýí ÅÚÏÇÏ ÇáÑÈØ."
         Exit Function
     End If
-    msg = ZatcaCertInfo(cert, issuer, serial, pub, certSig, certHash)
+    xml = ZatcaDocumentXml(DocKind, DocID, Pih, totals)
+    ZatcaBuildSigned = ZatcaSignXml(xml, cert, totals, SignedXml, InvoiceHash, QR)
+End Function
+
+Public Function ZatcaSignXml(ByVal Xml As String, ByVal CertB64 As String, ByVal Totals As Variant, _
+                             ByRef SignedXml As String, ByRef InvoiceHash As String, ByRef QR As String) As String
+    ' Signs an unsigned document with this certificate and the key file of the settings. Totals = Array(issue
+    ' timestamp, total with VAT, VAT, seller name, seller VAT number). "" or the problem.
+    Dim issuer As String, serial As String, pub As String, certSig As String, certHash As String, signature As String
+    Dim msg As String
+    msg = ZatcaCertInfo(CertB64, issuer, serial, pub, certSig, certHash)
     If Len(msg) > 0 Then
-        ZatcaBuildSigned = msg
+        ZatcaSignXml = msg
         Exit Function
     End If
-    xml = ZatcaDocumentXml(DocKind, DocID, Pih, totals)
-    InvoiceHash = ZatcaInvoiceHash(xml)
+    InvoiceHash = ZatcaInvoiceHash(Xml)
     msg = ZatcaSignHash(InvoiceHash, signature)
     If Len(msg) > 0 Then
-        ZatcaBuildSigned = msg
+        ZatcaSignXml = msg
         Exit Function
     End If
-    QR = ZatcaQRCode(totals(3), totals(4), totals(0), totals(1), totals(2), InvoiceHash, signature, pub, certSig)
-    SignedXml = ZatcaSignedDocument(xml, ZatcaExtensions(InvoiceHash, signature, cert, ZatcaSignNow(), certHash, issuer, _
-                                                         serial), QR)
+    QR = ZatcaQRCode(Totals(3), Totals(4), Totals(0), Totals(1), Totals(2), InvoiceHash, signature, pub, certSig)
+    SignedXml = ZatcaSignedDocument(Xml, ZatcaExtensions(InvoiceHash, signature, CertificateBody(CertB64), ZatcaSignNow(), _
+                                                         certHash, issuer, serial), QR)
 End Function
 
 Public Function ZatcaPrepareDocument(ByVal DocKind As String, ByVal DocID As Long) As String

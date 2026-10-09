@@ -55,7 +55,7 @@ class QrReferenceTests(unittest.TestCase):
     @unittest.skipUnless(HAVE_QRCODE, "qrcode library not installed")
     def test_identical_to_qrcode_library(self):
         random.seed(3)
-        for length in (1, 25, 90, 140, 230, 400, 660):
+        for length in (1, 25, 90, 140, 230, 400, 660, 900, 1500, 2331):
             data = "".join(random.choice(string.ascii_letters + string.digits + "+/=")
                            for _ in range(length)).encode()
             for mask in range(8):
@@ -78,10 +78,27 @@ class QrReferenceTests(unittest.TestCase):
             decoded, _, _ = detector.detectAndDecode(img)
             self.assertEqual(decoded, text)
 
+    def test_large_versions_decodable_by_zxing(self):
+        """The ZATCA phase 2 code (nine tags) needs about 650 characters: versions above 20 (OpenCV misreads some
+        of them, zxing reads them all)."""
+        try:
+            import numpy as np
+            import zxingcpp
+        except ImportError:
+            self.skipTest("zxing-cpp or numpy is not installed")
+        for n in (650, 900, 1300, 2000):
+            text = ("AQ5NeVNob3BWQVQgSW52b2ljZQ" * 100)[:n]
+            mat, version, _ = R.encode(text.encode())
+            img = np.kron(np.pad(1 - np.array(mat, dtype=np.uint8), 4, constant_values=1) * 255,
+                          np.ones((6, 6), dtype=np.uint8))
+            found = zxingcpp.read_barcodes(img)
+            self.assertTrue(found and found[0].text == text, f"{n} characters, version {version}")
+
     def test_capacity_limit(self):
         with self.assertRaises(ValueError):
-            R.choose_version(700)
+            R.choose_version(2332)
         self.assertEqual(R.choose_version(666), 20)
+        self.assertEqual(R.choose_version(2331), 40)
 
 
 class PricingTests(unittest.TestCase):

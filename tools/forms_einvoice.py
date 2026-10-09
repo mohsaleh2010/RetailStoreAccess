@@ -60,7 +60,8 @@ def layout_einvoices() -> FormModel:
 
 
 def layout_zatca_setup() -> FormModel:
-    """frmZatcaSetup (docs/46): OpenSSL, the private key file and the certificate of the device (modZatcaXml)."""
+    """frmZatcaSetup (docs/46, docs/47): OpenSSL, the private key file and the certificate of the device (modZatcaXml),
+    and the three steps of the onboarding of the device (modZatcaApi)."""
     width, height = cm(22.0), cm(16.8)
     m = FormModel("frmZatcaSetup", "إعداد ربط منصة فاتورة", width, height, popup=True, allow_add=False)
     title_band(m, "إعداد ربط منصة فاتورة", "مفتاح الجهاز وشهادته وبرنامج التوقيع (السعودية)", "settings")
@@ -73,15 +74,36 @@ def layout_zatca_setup() -> FormModel:
     button(m, "btnBrowseKey", "استعراض", width - cm(3.6), y, "secondary", w=cm(3.2), h=cm(0.8),
            call="ZatcaSetupBrowseKey Me")
     y = cm(5.4)
-    c = m.add(Control("text", "txtCertificate", cm(0.4), y, width - cm(0.8), cm(5.0),
+    c = m.add(Control("text", "txtCertificate", cm(0.4), y, width - cm(0.8), cm(2.2),
                       {"EnterKeyBehavior": True, "ScrollBars": 2, "FontSize": 8, "TextAlign": 1},
                       events=["AfterUpdate"]))
-    labelled(m, "txtCertificate", "شهادة الجهاز (CSID) كما تصدرها الهيئة", c)
-    m.add(Control("label", "lblCertInfo", cm(0.4), cm(10.6), width - cm(0.8), cm(1.2),
+    labelled(m, "txtCertificate", "شهادة الجهاز (CSID): تُملأ من الخطوة 3، أو تُلصق كما تصدرها الهيئة", c)
+    m.add(Control("label", "lblCertInfo", cm(0.4), cm(7.7), width - cm(0.8), cm(0.6),
                   {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_PRIMARY")}))
-    m.add(Control("label", "lblSetupNote", cm(0.4), cm(12.0), width - cm(0.8), cm(1.6),
-                  {"Caption": "الشهادة الفعلية تُطلب من الهيئة في المرحلة التالية (تسجيل الجهاز). للتجربة الآن: "
-                              "«شهادة تجريبية» ثم «ملف XML لفاتورة»، وافحص الملف بأداة الهيئة (fatoora -validate).",
+    # device onboarding (docs/47): branch and activity in the certificate, the OTP of the Fatoora portal, 3 steps
+    m.add(Control("label", "lblOnboard", cm(0.4), cm(8.5), width - cm(0.8), cm(0.6),
+                  {"Caption": "تسجيل الجهاز لدى الهيئة", "FontSize": 11, "FontWeight": 700,
+                   "ForeColor": Sym("CLR_PRIMARY")}))
+    half = (width - cm(1.0)) / 2
+    c = m.add(Control("text", "txtBranch", cm(0.4), cm(9.8), half, cm(0.8), {}))
+    labelled(m, "txtBranch", "اسم الفرع", c)
+    c = m.add(Control("text", "txtIndustry", cm(0.6) + half, cm(9.8), half, cm(0.8), {}))
+    labelled(m, "txtIndustry", "نشاط المنشأة (مثل Retail)", c)
+    y = cm(11.3)
+    c = m.add(Control("text", "txtOtp", cm(0.4), y, cm(4.0), cm(0.9), {}))
+    labelled(m, "txtOtp", "رمز التحقق OTP", c)
+    bx = cm(4.6)
+    for name, caption, w, step in [("btnStep1", "1. شهادة الامتثال", 4.6, 1),
+                                   ("btnStep2", "2. فحوص الامتثال", 4.6, 2),
+                                   ("btnStep3", "3. الشهادة الفعلية", 4.6, 3)]:
+        button(m, name, caption, bx, y, "secondary", w=cm(w), h=cm(0.9), call=f"ZatcaOnboardStep Me, {step}")
+        bx += cm(w) + cm(0.2)
+    m.add(Control("label", "lblStage", cm(0.4), cm(12.4), width - cm(0.8), cm(0.9),
+                  {"Caption": " ", "FontSize": 10, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("label", "lblSetupNote", cm(0.4), cm(13.4), width - cm(0.8), cm(1.6),
+                  {"Caption": "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ "
+                              "مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة "
+                              "الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة».",
                    "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
     y = cm(15.2)
     bx = cm(0.4)
@@ -94,7 +116,7 @@ def layout_zatca_setup() -> FormModel:
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), y, "secondary", w=cm(2.6), h=cm(0.9),
            call="DoCmd.Close acForm, Me.Name")
     m.form_events = ["Load"]
-    m.code = (["Private Sub Form_Load()", "    ZatcaSetupLoad Me", "End Sub",
+    m.code = (["Private Sub Form_Load()", "    ZatcaSetupLoad Me", "    ZatcaOnboardShow Me", "End Sub",
                "Private Sub txtCertificate_AfterUpdate()", "    ZatcaSetupShowCert Me", "End Sub"] + m.code)
     return m
 

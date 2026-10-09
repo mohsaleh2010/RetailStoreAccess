@@ -14,7 +14,7 @@ Public Sub LangData1()
 End Sub
 
 Private Sub D1_1()
-    LangAdd "ÇáÔåÇÏÉ ÇáİÚáíÉ ÊõØáÈ ãä ÇáåíÆÉ İí ÇáãÑÍáÉ ÇáÊÇáíÉ (ÊÓÌíá ÇáÌåÇÒ). ááÊÌÑÈÉ ÇáÂä: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ»¡ æÇİÍÕ Çáãáİ ÈÃÏÇÉ ÇáåíÆÉ", "The real certificate is requested from ZATCA in the next phase (device registration). To try now: Test certificate then XML file of an invoice, and check the file with the ZATCA tool"
+    LangAdd "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "The verification code comes from the Fatoora portal (in the test environment any number such as 123345). Step 1 creates a new key in the ZATCA folder next to the program. After step 3 enable sending in the e-invoicing screen. To try without ZATCA: Test certificate, then XML file of an invoice"
     LangAdd "ÒÑ ÇáÇŞÊÑÇÍ íßÊÈ ÇáÇÓã ÇáÚÑÈí ÈÍÑæİ áÇÊíäíÉ İí ÇáÎÇäÇÊ ÇáİÇÑÛÉ İŞØ. ÑÇÌÚå æÚÏøáå Ëã ÇÍİÙ. ÇáÇÓã ÇáİÇÑÛ íÙåÑ ÈÇáÚÑÈíÉ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "Suggest writes the Arabic name in Latin letters in the empty boxes only. Review and correct it, then save. An empty name shows in Arabic in the English interface"
     LangAdd "ÇáÍÓÇÈÇÊ ÇáÃÓÇÓíÉ (ÇáãÚáóøãÉ) ÊÓÊÎÏãåÇ ÇáŞíæÏ ÇáÂáíÉ: áÇ ÊõÍĞİ æáÇ íÊÛíÑ äæÚåÇ. ÇáŞíæÏ ÇáíÏæíÉ ãä ÒÑ «ŞíÏ íÏæí", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "íõÚÑÖ ÇáÊŞÑíÑ ááãÚÇíäÉ æãäåÇ ÇáØÈÇÚÉ. «ÍİÙ PDF» æ«ÊÕÏíÑ Excel» íÍİÙÇä Çáãáİ İí ãÌáÏ Reports ÈÌÇäÈ ãáİ ÇáÈÑäÇãÌ", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
@@ -77,9 +77,13 @@ Private Sub D1_1()
     LangAdd "ÇÈÏÃ ÌÑÏğÇ¡ ÃÏÎá ÇáßãíÉ ÇáİÚáíÉ Ãæ ÇãÓÍ ÇáÈÇÑßæÏ¡ Ëã ÑÍøá ÇáİÑæŞÇÊ", "Start a count, enter the actual quantity or scan the barcode, then post the differences"
     LangAdd "ÇáÔÇÔÇÊ ÇáÊí íİÊÍåÇ ßá ãÓÊÎÏã¡ æÇáÅÖÇİÉ æÇáÊÚÏíá æÇáÍĞİ İí ßá ÔÇÔÉ", "The screens each user opens, and add, edit and delete in each screen"
     LangAdd "ÈÚÏåÇ áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ÍÊì åĞÇ Çáíæã", "After that, no document dated up to this day is added, edited or deleted"
+    LangAdd "ÓíõäÔÃ ãİÊÇÍ ÌÏíÏ æíõÚÇÏ ÊÓÌíá ÇáÌåÇÒ ãä ÇáÈÏÇíÉ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "A new key will be created and the device registered again from the start. Continue"
+    LangAdd "ÔåÇÏÉ ÇáÌåÇÒ (CSID): ÊõãáÃ ãä ÇáÎØæÉ 3¡ Ãæ ÊõáÕŞ ßãÇ ÊÕÏÑåÇ ÇáåíÆÉ", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
     LangAdd "ÃÑÕÏÉ ÇáãäÊÌÇÊ æÍÑßÇÊåÇ¡ æÇáÑÕíÏ ÇáÇİÊÊÇÍí æÇáÅÖÇİÉ æÇáÎÕã ÇáíÏæí", "Product balances and moves, opening balance and manual additions and deductions"
     LangAdd "ÅŞÑÇÑ ÛíÑ ãÍİæÙ: ÇáÃÑŞÇã ãä ÇáãÓÊäÏÇÊ ÇáÂä. ÇÍİÙå ãÓæÏÉ Ãæ ÇÚÊãÏå", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
+    LangAdd "ÇáÌåÇÒ ÛíÑ ãÓÌøá. ÇßÊÈ ÑãÒ ÇáÊÍŞŞ (OTP) ãä ÈæÇÈÉ İÇÊæÑÉ Ëã ÇáÎØæÉ", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
     LangAdd "Êã ÍİÙ äÓÈ ÇáÊÃãíäÇÊ. ÊõØÈóøŞ Úáì ÇáãÓæÏÇÊ ÚäÏ ÊÚÏíáåÇ Ãæ ÊÑÍíáåÇ", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
+    LangAdd "ÓõÌøá ÇáÌåÇÒ İí ÈíÆÉ ÃÎÑì. ÓÌøáå İí ÇáÈíÆÉ ÇáÍÇáíÉ ãä ÅÚÏÇÏ ÇáÑÈØ", "The device was registered in another environment. Register it in the current one from the connection setup"
     LangAdd "íõäÔÃ ÇáãÕÑæİ İí íæã ÇáÇÓÊÍŞÇŞ ãä ßá İÊÑÉ¡ ÈÏÁğÇ ãä ÊÇÑíÎ ÇáÈÏÇíÉ", "The expense is created on the due day of each period, starting from the start date"
     LangAdd "ÇáÇÓÊíÑÇÏÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÃÓÇÓíÉ æÇáãÏİæÚÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imports subject to the standard rate with VAT paid at customs"
     LangAdd "áÇ íæÌÏ ÍÓÇÈ ãÈÑãÌ ÈÚÏ. ÔÛøá BuildSchema: íØáÈ ßáãÉ ãÑæÑå æíäÔÆå", "There is no developer account yet. Run BuildSchema: it asks for its password and creates it"
@@ -98,7 +102,9 @@ Private Sub D1_1()
     LangAdd "ŞíÏ ÅåáÇß ßá ÔåÑ ÈÇáÊÑÊíÈ: ãÕÑæİ ÇáÅåáÇß æãÌãÚ ÇáÅåáÇß áßá ÃÕá", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
     LangAdd "áã íõÏÎá ÇáÑŞã ÇáÖÑíÈí¡ æáä Êßæä ÇáİæÇÊíÑ İæÇÊíÑ ÖÑíÈíÉ äÙÇãíÉ", "The VAT number is not entered, and the invoices will not be valid tax invoices"
     LangAdd "ãÚÇãá ßá ÚãáÉ İí ÊÇÑíÎº ÇáãÓÊäÏ íÃÎĞ ÂÎÑ ÓÚÑ İí ÊÇÑíÎå Ãæ ŞÈáå", "The rate of each currency on a date, a document takes the last rate on or before its date"
+    LangAdd "ãäÕÉ İÇÊæÑÉ ááãäÔÂÊ İí ÇáÓÚæÏíÉ İŞØ (ÏæáÉ ÇáÊÔÛíá İí ÇáÅÚÏÇÏÇÊ", "The Fatoora platform is for businesses in Saudi Arabia only (operating country in the settings"
     LangAdd "íõİÖóøá ÇáÌÑÏ æÇáãÍá ãÛáŞ Ãæ ÈÚÏ ÂÎÑ İÇÊæÑÉ¡ Ëã ÇáÊÑÍíá ãÈÇÔÑÉ", "Count preferably while the store is closed or after the last invoice, then post at once"
+    LangAdd "ÇáÌåÇÒ áã íõÓÌóøá ÈÚÏ áÏì ÇáåíÆÉ (ÅÚÏÇÏ ÇáÑÈØ: ÇáÎØæÇÊ 1 æ2 æ", "The device is not registered with ZATCA yet (connection setup: steps 1, 2 and"
     LangAdd "ÇáÑÕíÏ áÇ íõßÊÈ íÏæíğÇ: íõÍÓÈ ãä ÇáãÈíÚÇÊ æÇáÓäÏÇÊ æÇáãÕÑæİÇÊ", "The balance is not typed by hand: it is calculated from sales, vouchers and expenses"
     LangAdd "ÊÛííÑ ÅÚÏÇÏÇÊ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ íÍÊÇÌ ÕáÇÍíÉ ÅÚÏÇÏÇÊ ÇáãÍá", "Changing the e-invoicing settings needs the store settings permission"
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. áÅŞÑÇÑ ãÚÊãÏ ÇÓÊÎÏã «ÅáÛÇÁ ÇáÇÚÊãÇÏ» ÃæáğÇ", "Only the draft is deleted. For an approved return use Cancel approval first"
@@ -113,6 +119,7 @@ Private Sub D1_1()
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì Ëã ÇÍİÙ ÇáÅÚÏÇÏÇÊ ãÑÉ ÃÎÑì", "Close the program on the other computers, then save the settings again"
     LangAdd "ÅáÛÇÁ ÇÚÊãÇÏ ÇáÅŞÑÇÑ¿ íõÍĞİ ŞíÏ ÇáÊÓæíÉ æíÚæÏ ÇáÅŞÑÇÑ ãÓæÏÉ", "Cancel the approval of the return? The settlement entry is deleted and the return becomes a draft"
     LangAdd "ÇáÊÍæíá ÇáÈäßí íõÎÕã ãä åĞÇ ÇáÈäß (ÇáÈäß ÇáÇİÊÑÇÖí ÊáŞÇÆíğÇ", "A bank transfer is taken from this bank (the default bank automatically"
+    LangAdd "ÇáÎØæÉ 2 ÊãÊ: ÇÌÊÇÒÊ ÇáÚíäÇÊ ÇáİÍÕ. ÇáÊÇáí: ÇáÔåÇÏÉ ÇáİÚáíÉ", "Step 2 done: the samples passed the checks. Next: production certificate"
     LangAdd "ÇáãÕÑæİ ÇáäŞÏí íõÎÕã ãä åĞÇ ÇáÕäÏæŞ (íõÎÊÇÑ ÕäÏæŞß ÊáŞÇÆíğÇ", "A cash expense is taken from this box (your box is chosen automatically"
     LangAdd "ÊÃßÏ Ãä ÇáÈÑäÇãÌ ãÛáŞ Úáì ßá ÇáÃÌåÒÉ ÇáÃÎÑì Ëã ÃÚÏ ÇáãÍÇæáÉ", "Make sure the program is closed on all other computers, then try again"
     LangAdd "ÍÇáÉ ÅÑÓÇá İæÇÊíÑ ÇáÈíÚ æÇáãÑÊÌÚÇÊ ááãäÙæãÉ¡ æÅÚÇÏÉ ÇáÅÑÓÇá", "Sending status of sales invoices and returns, and resending"
@@ -127,6 +134,9 @@ Private Sub D1_1()
     LangAdd "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ¡ æãÊì¡ æãä Ãí ÌåÇÒ¡ æÇáŞíã ŞÈá æÈÚÏ", "Who added, edited or deleted, when, from which computer, and the values before and after"
     LangAdd "ÃÍÏ ÇáÃÕäÇİ İí ÇáİÇÊæÑÉ áã íÚÏ ãæÌæÏğÇ. ÇÍĞİå ãä ÇáİÇÊæÑÉ", "An item of the invoice no longer exists. Remove it from the invoice"
     LangAdd "ÃÖİ ÃÕäÇİ ÇáİÇÊæÑÉ Ãæ ÇÍİÙ İÇÊæÑÉ ÃæáğÇ¡ Ëã ÇØÈÚ ÇáÈÇÑßæÏ", "Add the invoice items or save an invoice first, then print the barcodes"
+End Sub
+
+Private Sub D1_2()
     LangAdd "ÇÎÊÑ ÇáÈäß¡ æÇßÊÈ ÊÇÑíÎ ßÔİ ÇáÈäß æÑÕíÏå¡ Ëã «ÈÏÁ ÇáÊÓæíÉ", "Choose the bank, type the date and balance of the bank statement, then Start reconciliation"
     LangAdd "ÇáÑÕíÏ ÇáÇİÊÊÇÍí íõÓÌóøá ãÑÉ æÇÍÏÉ ŞÈá Ãí ÍÑßÉ Úáì ÇáãäÊÌ", "The opening balance is recorded once, before any move on the product"
     LangAdd "ÇáãäÊÌ ãæÌæÏ áßäå áíÓ Öãä åĞÇ ÇáÌÑÏ (ÊÕäíİ ÂÎÑ Ãæ ÛíÑ äÔØ", "The product exists but is not part of this count (another category or inactive"
@@ -134,13 +144,11 @@ Private Sub D1_1()
     LangAdd "ŞíÏ ãÍİæÙ: ÚÏøá Ëã ÇÍİÙ¡ İíÊÍÏË ŞíÏå İí ÇáíæãíÉ ÈäİÓ ÑŞãå", "Saved entry: edit and save, and its journal entry is updated with the same number"
     LangAdd "íõÍĞİ ÇáÔíß ÊÍÊ ÇáÊÍÕíá İŞØ: ÃáÛö ÊÍÕíáå Ãæ ÇÑÊÏÇÏå ÃæáğÇ", "Only a cheque under collection is deleted: cancel its collection or bounce first"
     LangAdd "ÅÑÌÇÚ ÇáÔíß Åáì «ÊÍÊ ÇáÊÍÕíá» æÍĞİ ŞíÏ ÊÍÕíáå Ãæ ÇÑÊÏÇÏå", "Return the cheque to Under collection and delete the entry of its collection or bounce"
-End Sub
-
-Private Sub D1_2()
     LangAdd "ÇßÊÈ ÓÈÈ ÇáÍÑßÉ İí ÇáãáÇÍÙÇÊ (ãËÇá: ÊÇáİ¡ åÏíÉ ãä ÇáãæÑÏ", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
     LangAdd "ÇáãÈáÛ ÇáãÏİæÚ (F8) - ÇÊÑßå İÇÑÛğÇ ÅĞÇ ÏİÚ ÇáãÈáÛ ÈÇáÖÈØ", "Amount paid (F8) - leave it empty if the exact amount is paid"
     LangAdd "ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ", "The remainder of each credit invoice by its delay after the due date"
     LangAdd "ÏæÑ ãÏíÑ ÇáäÙÇã íãáß ßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ æáÇ íãßä ÊŞííÏå", "The system administrator role always has all the permissions and cannot be restricted"
+    LangAdd "ÑİÖÊ ÇáåíÆÉ ÈíÇäÇÊ ÇáÏÎæá (ÔåÇÏÉ ÇáÌåÇÒ Ãæ ÇáßáãÉ ÇáÓÑíÉ", "ZATCA refused the credentials (device certificate or secret"
     LangAdd "Úáì ÇáÃÕá ŞíæÏ ÅåáÇß: áÇ ÊÊÛíÑ ÈíÇäÇÊå ÇáãÇáíÉ æáÇ íõÍĞİ", "The asset has depreciation entries: its financial data do not change and it is not deleted"
     LangAdd "áÇ íÊÛíÑ ÑŞã ÍÓÇÈ ãÍİæÙ. ÃäÔÆ ÍÓÇÈğÇ ÌÏíÏğÇ æÚØøá ÇáŞÏíã", "A saved account number does not change. Create a new account and deactivate the old one"
     LangAdd "áßá ÚãáÉ ÓÚÑ æÇÍÏ İí Çáíæãº ÚãáÉ ÇáÈÑäÇãÌ áÇ ÊÍÊÇÌ ÓÚÑğÇ", "Each currency has one rate a day, the program currency needs no rate"
@@ -174,6 +182,7 @@ Private Sub D1_2()
     LangAdd "ãäÏæÈæ ÇáãÈíÚÇÊ: ÚãáÇÄåã æäÓÈÉ ÚãæáÊåã æãÑßÒ ÊßáİÊåã", "Sales reps: their customers, commission rate and cost center"
     LangAdd "äŞÏíÉ ãÈíÚÇÊ ÇáãÓÊÎÏã æÓäÏÇÊå ÊÏÎá åĞÇ ÇáÕäÏæŞº İÇÑÛ", "The cash of the sales and vouchers of the user goes into this box, empty"
     LangAdd "ÃÑÕÏÉ ÇáÎÒíäÉ ÇáÑÆíÓíÉ æÕäÇÏíŞ ÇáßÇÔíÑ æÍÑßÉ ßá íæã", "Balances of the main treasury and cashier boxes and the moves of each day"
+    LangAdd "ÇáÎØæÉ 1 ÊãÊ: ÔåÇÏÉ ÇáÇãÊËÇá. ÇáÊÇáí: İÍæÕ ÇáÇãÊËÇá", "Step 1 done: compliance certificate. Next: compliance checks"
     LangAdd "ÇáİÑæÚ æÇáÃŞÓÇã: ÊõæÒóøÚ ÚáíåÇ ÇáÅíÑÇÏÇÊ æÇáãÕÑæİÇÊ", "Branches and departments: revenue and expenses are allocated to them"
     LangAdd "ÇáŞíãÉ ÇáãÊÈŞíÉ æÇáÅåáÇß ÇáÓÇÈŞ áÇ íÊÌÇæÒÇä ÇáÊßáİÉ", "The residual value and the previous depreciation do not exceed the cost"
     LangAdd "ÇáãÏíÑ ÇáãÓÄæá Úä ÇáÎÒíäÉ: ÇÎÊÑ áå ÇáÎÒíäÉ ÇáÑÆíÓíÉ", "The manager in charge of the treasury: choose the main treasury for him"
@@ -248,6 +257,9 @@ Private Sub D1_2()
     LangAdd "ÃÏÎá ÊÇÑíÎ ÇÚÊãÇÏ ÇáÅŞÑÇÑ (íæã ÊŞÏíãå ááåíÆÉ", "Enter the approval date of the return (the day it is filed with the Authority"
     LangAdd "ÃÖİ ÕäİğÇ æÇÍÏğÇ Úáì ÇáÃŞá Åáì ŞÇÆãÉ ÇáØÈÇÚÉ", "Add at least one item to the print list"
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ İí ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled in the settings"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ", "Need follow-up (waiting, rejected, warning"
     LangAdd "ÚãáíÇÊ ÇáÏİÇÊÑ ÛíÑ ÇáãØÇÈŞÉ (ÍÊì ÊÇÑíÎ ÇáßÔİ", "Book transactions not matched (up to the statement date"
     LangAdd "ßáãÉ ÇáãÑæÑ áÇ íÌæÒ Ãä Êßæä äİÓ ÇÓã ÇáãÓÊÎÏã", "The password may not be the same as the user name"
@@ -257,9 +269,6 @@ Private Sub D1_2()
     LangAdd "ÇÊÑßå İÇÑÛğÇ ááØÈÇÚÉ Úáì ÇáØÇÈÚÉ ÇáÇİÊÑÇÖíÉ", "Leave it empty to print on the default printer"
     LangAdd "ÇÎÊÑ ÇáãÔÑæÈ: ÇáÍÌã æÇáÅÖÇİÇÊ ÊÙåÑ ÊáŞÇÆíğÇ", "Choose the drink: the size and extras appear automatically"
     LangAdd "ÇáÓÚÑ æÇáÎÕã áÇ íãßä Ãä íßæäÇ ÓÇáÈíä (ÇáÓØÑ", "The price and the discount cannot be negative (line"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÊÇÑíÎ ÇáäåÇíÉ íÌÈ Ãä íßæä ÈÚÏ ÊÇÑíÎ ÇáÈÏÇíÉ", "The end date must be after the start date"
     LangAdd "ÊãÊ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ ÈäÌÇÍ æÊã ÇáÊÍŞŞ ãäåÇ", "The backup was made successfully and checked"
     LangAdd "ÊäÈíå: ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ ÃŞá ãä ÊßáİÉ ÇáÔÑÇÁ", "Warning: the new sale price is below the purchase cost"
@@ -279,6 +288,7 @@ Private Sub D1_3()
     LangAdd "ßáãÉ ãÑæÑ ãÄŞÊÉ: ÓíõØáÈ ÊÛííÑåÇ ÚäÏ ÇáÏÎæá", "Temporary password: the user is asked to change it at login"
     LangAdd "áÇ ÊæÌÏ ÔåÇÏÉ ÇáÌåÇÒ (CSID) İí ÅÚÏÇÏ ÇáÑÈØ", "There is no device certificate (CSID) in the connection setup"
     LangAdd "ãÔßáÉ İí ÇáÈíÇäÇÊ - ÑÇÌÚ ÊŞÑíÑ İÍÕ ÇáÓáÇãÉ", "A data problem - check the integrity report"
+    LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ÛíÑ ãæÌæÏ Úáì åĞÇ ÇáÌåÇÒ", "The private key file is not on this computer"
     LangAdd "ãäÕÉ İÇÊæÑÉ (åíÆÉ ÇáÒßÇÉ æÇáÖÑíÈÉ æÇáÌãÇÑß", "the Fatoora platform (ZATCA"
     LangAdd "íæÌÏ ÍŞá ãØáæÈ İÇÑÛ. Ãßãá ÇáÈíÇäÇÊ Ëã ÇÍİÙ", "A required field is empty. Complete the data, then save"
     LangAdd "íõÓÌóøá ÅåáÇß ÇáÔåÑ İí ÂÎÑ íæã ãäå Ãæ ÈÚÏå", "The depreciation of a month is recorded on its last day or later"
@@ -294,11 +304,13 @@ Private Sub D1_3()
     LangAdd "ÈÃßËÑ ãä ÇáãÊæİÑ íÍÊÇÌ ãæÇİŞÉ ãÏíÑ ÇáäÙÇã", "more than the available quantity needs the approval of the system administrator"
     LangAdd "Êã ÖÈØ æÖÚ ÇáÊØæíÑ: ßá ÃÏæÇÊ Access ÙÇåÑÉ", "Developer mode is set: all the Access tools are shown"
     LangAdd "ÔÌÑÉ ÇáÍÓÇÈÇÊ: ÇáÍÓÇÈÇÊ ÇáÑÆíÓíÉ æÇáİÑÚíÉ", "Account tree: main and sub-accounts"
+    LangAdd "İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Enable sending in the e-invoicing screen"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ãÓíÑ ÇáÑæÇÊÈ", "You do not have this permission in the payroll screen"
     LangAdd "áÇ ÊæÌÏ ãÈÇáÛ ÛíÑ ãÑÈæØÉ Ãæ İæÇÊíÑ ãİÊæÍÉ", "There are no unlinked amounts or open invoices"
     LangAdd "áÇ ÊæÌÏ ãäÊÌÇÊ äÔØÉ ááÌÑÏ İí åĞÇ ÇáÇÎÊíÇÑ", "There are no active products to count in this choice"
     LangAdd "ááÊÕÍíÍ ÇÍĞİ ŞíæÏ ÇáÅåáÇß ÈÏÁğÇ ãä ÇáÃÎíÑ", "To correct, delete the depreciation entries starting from the last"
     LangAdd "áã íÊã ÇáÚËæÑ Úáì ãäÊÌ ÈÇáÈÇÑßæÏ Ãæ ÇáßæÏ", "No product was found with the barcode or the code"
+    LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ÛíÑ ãÍÏÏ İí ÅÚÏÇÏ ÇáÑÈØ", "The private key file is not set in the connection setup"
     LangAdd "ãäÊÌ æÕáÊ ßãíÊå Åáì ÍÏ ÅÚÇÏÉ ÇáØáÈ Ãæ ÃŞá", "products have reached the reorder level or less"
     LangAdd "åá ÊÑíÏ ÚÑÖ ÊŞÑíÑ ÇáãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "Do you want to show the low-stock products report"
     LangAdd "íÛíøÑåÇ ÇáãÓÊÎÏã ÚäÏ Ãæá ÏÎæá (ßáãÉ ãÄŞÊÉ", "The user changes it at the first login (temporary password"
@@ -308,22 +320,4 @@ Private Sub D1_3()
     LangAdd "ÇÎÊÑ ÓØÑğÇ İí ÇáÌÏæá æÇßÊÈ ÇáãÈáÛ ÇáÓäæí", "Choose a line in the table and type the yearly amount"
     LangAdd "ÇáÏÇÆä¡ æíõÑÍóøá áŞíæÏ ÇáíæãíÉ ÚäÏ ÇáÍİÙ", "credit, and is posted to the journal entries when saved"
     LangAdd "ÇáãÔÊÑíÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ (ÈÚÏ ÇáãÑÊÌÚÇÊ", "Taxable purchases (after returns"
-    LangAdd "ÏæÑ ãÏíÑ ÇáäÙÇã íãáß ßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ", "The system administrator role always has all the permissions"
-    LangAdd "ÓØÑ ÇáãÑÊÌÚ ãä İÇÊæÑÉ ÛíÑ İÇÊæÑÉ ÇáãÑÊÌÚ", "A return line from an invoice other than the invoice of the return"
-    LangAdd "Úáì åĞÇ ÇáÍÓÇÈ ŞíæÏ¡ İíÈŞì ÍÓÇÈğÇ İÑÚíğÇ", "This account has entries, so it stays a sub-account"
-    LangAdd "ßáãÊÇ ÇáãÑæÑ ÛíÑ ãÊØÇÈŞÊíä. áã íÊÛíÑ ÔíÁ", "The two passwords do not match. Nothing changed"
-    LangAdd "áÇ íãßäß ÊÚØíá ÍÓÇÈß æÃäÊ ãÓÌá ÇáÏÎæá Èå", "You cannot deactivate your own account while logged in with it"
-    LangAdd "ãÈáÛ ãÓÊÍŞ ááãæÑÏ (ÈÚãáÉ ÇáÈÑäÇãÌ ÏÇÆãğÇ", "an amount due to the supplier (always in the program currency"
-    LangAdd "åĞå ÇáÔÇÔÉ ÓÊßæä ãÊÇÍÉ ÈÚÏ ÊäİíĞ ÇáãÑÍáÉ", "This screen will be available after phase"
-    LangAdd "íÌÈ Ãä íÈŞì ãÏíÑ äÙÇã äÔØ æÇÍÏ Úáì ÇáÃŞá", "At least one active system administrator must remain"
-    LangAdd "íõŞİá ãÇ ŞÈá Çáíæã İŞØ: ÇÎÊÑ ÊÇÑíÎğÇ ŞÈá", "Only the days before today are closed: choose a date before"
-    LangAdd "ÇÎÊÑ Ãíä ÇÓÊõáã Ëãä ÇáÈíÚ (Èäß Ãæ ÕäÏæŞ", "Choose where the sale price was received (bank or box"
-    LangAdd "ÇáãÈíÚÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ (ÈÚÏ ÇáãÑÊÌÚÇÊ", "Taxable sales (after returns"
-    LangAdd "ÇáãÈíÚÇÊ ÇáãÍáíÉ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÕİÑíÉ", "Domestic zero-rated sales"
-    LangAdd "ÇáãíÒÇäíÉ ÇáÚãæãíÉ (ŞÇÆãÉ ÇáãÑßÒ ÇáãÇáí", "Balance sheet (statement of financial position"
-    LangAdd "ÊõŞİá ÇáÓäÉ ÈÚÏ ÇäÊåÇÆåÇ (ÈÚÏ 31 ÏíÓãÈÑ", "The year is closed after it ends (after 31 December"
-    LangAdd "ÍÏÏ ÇáßãíÉ ÇáãÑÊÌÚÉ áÕäİ æÇÍÏ Úáì ÇáÃŞá", "Set the returned quantity of at least one item"
-    LangAdd "ÑÇÌÚ ÇáÊÇÑíÎ æÇáÃÓØÑ Ëã ÇÖÛØ «ÍİÙ ÇáŞíÏ", "Check the date and the lines, then click Save entry"
-    LangAdd "ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "The new sale price cannot be negative"
-    LangAdd "ÚÏøá ÇáÅÖÇİí æÇáÎÕæãÇÊ Ëã «ÊÑÍíá ÇáãÓíÑ", "Edit the overtime and deductions, then Post the run"
 End Sub

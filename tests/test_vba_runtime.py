@@ -149,7 +149,7 @@ class VbaRuntimeTests(unittest.TestCase):
         texts = ["A", "HELLO WORLD", Z.qr_payload("متجر الاختبار", "300000000000003",
                                                   "2026-10-04T09:15:00Z", 1150, 150)]
         texts += ["".join(random.choice(string.ascii_letters + string.digits + "+/=") for _ in range(n))
-                  for n in (17, 42, 77, 106, 134, 180, 213, 260, 330, 380, 470, 560, 666)]
+                  for n in (17, 42, 77, 106, 134, 180, 213, 260, 330, 380, 470, 560, 666, 760, 900, 1250)]
         for t in texts:
             with self.subTest(length=len(t)):
                 matrix, version, mask = R.encode(t.encode())

@@ -4,7 +4,7 @@ Attribute VB_Name = "modQRCode"
 '
 ' GENERATED FILE - do not edit by hand.  Source: tools/gen_qr.py
 ' QR Code encoder (ISO/IEC 18004): byte mode, error correction level M,
-' versions 1-20. VBA port of tools/qr_reference.py, which is verified
+' versions 1-40. VBA port of tools/qr_reference.py, which is verified
 ' module-by-module against the "qrcode" library and decoded with OpenCV.
 '
 '   QRMatrix(Text, M)        builds the code; M(row, col) = 1 for a dark module
@@ -14,7 +14,7 @@ Attribute VB_Name = "modQRCode"
 Option Compare Database
 Option Explicit
 
-Private Const MAX_VERSION As Integer = 20
+Private Const MAX_VERSION As Integer = 40
 
 Private m_exp(0 To 511) As Integer
 Private m_log(0 To 255) As Integer
@@ -177,6 +177,26 @@ Private Sub BlockInfo(ByVal v As Integer, ByRef ec As Integer, ByRef b1 As Integ
         Case 18: t = Array(26, 9, 43, 4, 44)
         Case 19: t = Array(26, 3, 44, 11, 45)
         Case 20: t = Array(26, 3, 41, 13, 42)
+        Case 21: t = Array(26, 17, 42, 0, 0)
+        Case 22: t = Array(28, 17, 46, 0, 0)
+        Case 23: t = Array(28, 4, 47, 14, 48)
+        Case 24: t = Array(28, 6, 45, 14, 46)
+        Case 25: t = Array(28, 8, 47, 13, 48)
+        Case 26: t = Array(28, 19, 46, 4, 47)
+        Case 27: t = Array(28, 22, 45, 3, 46)
+        Case 28: t = Array(28, 3, 45, 23, 46)
+        Case 29: t = Array(28, 21, 45, 7, 46)
+        Case 30: t = Array(28, 19, 47, 10, 48)
+        Case 31: t = Array(28, 2, 46, 29, 47)
+        Case 32: t = Array(28, 10, 46, 23, 47)
+        Case 33: t = Array(28, 14, 46, 21, 47)
+        Case 34: t = Array(28, 14, 46, 23, 47)
+        Case 35: t = Array(28, 12, 47, 26, 48)
+        Case 36: t = Array(28, 6, 47, 34, 48)
+        Case 37: t = Array(28, 29, 46, 14, 47)
+        Case 38: t = Array(28, 13, 46, 32, 47)
+        Case 39: t = Array(28, 40, 47, 7, 48)
+        Case 40: t = Array(28, 18, 47, 31, 48)
     End Select
     ec = t(0): b1 = t(1): d1 = t(2): b2 = t(3): d2 = t(4)
 End Sub
@@ -202,6 +222,26 @@ Private Function AlignPositions(ByVal v As Integer) As Variant
         Case 18: AlignPositions = Array(6, 30, 56, 82)
         Case 19: AlignPositions = Array(6, 30, 58, 86)
         Case 20: AlignPositions = Array(6, 34, 62, 90)
+        Case 21: AlignPositions = Array(6, 28, 50, 72, 94)
+        Case 22: AlignPositions = Array(6, 26, 50, 74, 98)
+        Case 23: AlignPositions = Array(6, 30, 54, 78, 102)
+        Case 24: AlignPositions = Array(6, 28, 54, 80, 106)
+        Case 25: AlignPositions = Array(6, 32, 58, 84, 110)
+        Case 26: AlignPositions = Array(6, 30, 58, 86, 114)
+        Case 27: AlignPositions = Array(6, 34, 62, 90, 118)
+        Case 28: AlignPositions = Array(6, 26, 50, 74, 98, 122)
+        Case 29: AlignPositions = Array(6, 30, 54, 78, 102, 126)
+        Case 30: AlignPositions = Array(6, 26, 52, 78, 104, 130)
+        Case 31: AlignPositions = Array(6, 30, 56, 82, 108, 134)
+        Case 32: AlignPositions = Array(6, 34, 60, 86, 112, 138)
+        Case 33: AlignPositions = Array(6, 30, 58, 86, 114, 142)
+        Case 34: AlignPositions = Array(6, 34, 62, 90, 118, 146)
+        Case 35: AlignPositions = Array(6, 30, 54, 78, 102, 126, 150)
+        Case 36: AlignPositions = Array(6, 24, 50, 76, 102, 128, 154)
+        Case 37: AlignPositions = Array(6, 28, 54, 80, 106, 132, 158)
+        Case 38: AlignPositions = Array(6, 32, 58, 84, 110, 136, 162)
+        Case 39: AlignPositions = Array(6, 26, 54, 82, 110, 138, 166)
+        Case 40: AlignPositions = Array(6, 30, 58, 86, 114, 142, 170)
     End Select
 End Function
 

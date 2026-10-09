@@ -29,7 +29,7 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
     "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=44;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=42;SalesInvoiceDetails=14;SalesReturns=35;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=55;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=42;SalesInvoiceDetails=14;SalesReturns=35;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
     "CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=8;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;" & _
     "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=37;RolePermissions=73;Employees=1;Screens=61;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
@@ -751,6 +751,28 @@ Private Sub CreateTable_Settings()
              "", "", "ملف المفتاح الخاص للجهاز", "secp256k1، على جهاز آمن؛ لا يُحفظ في البيانات"
     AddField tdf, "ZatcaCertificate", "MEMO", 0, False, "", _
              "", "", "شهادة الجهاز (CSID)", ""
+    AddField tdf, "ZatcaDeviceSerial", "TEXT", 36, False, "", _
+             "", "", "الرقم التسلسلي للجهاز لدى الهيئة", "UUID يُنشأ عند أول تسجيل (docs/47)"
+    AddField tdf, "ZatcaBranchName", "TEXT", 100, False, "", _
+             "", "", "اسم الفرع في شهادة الجهاز", ""
+    AddField tdf, "ZatcaIndustry", "TEXT", 100, False, "", _
+             "", "", "نشاط المنشأة في شهادة الجهاز", ""
+    AddField tdf, "ZatcaCsr", "MEMO", 0, False, "", _
+             "", "", "طلب شهادة الجهاز (CSR)", ""
+    AddField tdf, "ZatcaComplianceToken", "MEMO", 0, False, "", _
+             "", "", "شهادة الامتثال (binarySecurityToken)", ""
+    AddField tdf, "ZatcaComplianceSecret", "TEXT", 255, False, "", _
+             "", "", "الكلمة السرية لشهادة الامتثال", "لا تُكتب في سجل الإرسال"
+    AddField tdf, "ZatcaRequestId", "TEXT", 30, False, "", _
+             "", "", "رقم طلب شهادة الامتثال", ""
+    AddField tdf, "ZatcaProductionToken", "MEMO", 0, False, "", _
+             "", "", "الشهادة الفعلية (binarySecurityToken)", ""
+    AddField tdf, "ZatcaProductionSecret", "TEXT", 255, False, "", _
+             "", "", "الكلمة السرية للشهادة الفعلية", "لا تُكتب في سجل الإرسال"
+    AddField tdf, "ZatcaOnboardEnv", "TEXT", 12, False, "", _
+             "", "", "البيئة التي سُجّل فيها الجهاز", ""
+    AddField tdf, "ZatcaOnboardStage", "TEXT", 20, False, "", _
+             "", "", "مرحلة تسجيل الجهاز", "COMPLIANCE ثم CHECKED ثم PRODUCTION (docs/47)"
     AddField tdf, "EInvoiceEnvironment", "TEXT", 12, True, """TEST""", _
              "In (""TEST"",""SIMULATION"",""PRODUCTION"")", "TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية", "بيئة الفاتورة الإلكترونية", "السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45)"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
