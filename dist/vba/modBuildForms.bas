@@ -9495,7 +9495,9 @@ Private Sub BuildForm_frmEInvoices()
     c.OnClick = EP
     Set c = AddButton("btnRefresh", " ÕœÌÀ «·Õ«·…", 4649, 9412, 1814, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnSetup", "≈⁄œ«œ «·—»ÿ", 6576, 9412, 1814, 510, "secondary")
+    Set c = AddButton("btnCancelDoc", "≈·€«¡ «·„” ‰œ", 6576, 9412, 1814, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSetup", "≈⁄œ«œ «·—»ÿ", 8503, 9412, 1814, 510, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "≈€·«ﬁ", 13608, 9412, 1474, 510, "secondary")
     c.OnClick = EP
@@ -9527,6 +9529,9 @@ Private Sub BuildForm_frmEInvoices()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnRefresh_Click()" & vbCrLf
     s = s & "    EInvoicesRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCancelDoc_Click()" & vbCrLf
+    s = s & "    EInvoicesCancelPicked Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSetup_Click()" & vbCrLf
     s = s & "    EInvoiceSetupOpen" & vbCrLf
@@ -9628,7 +9633,7 @@ End Sub
 Private Sub BuildForm_frmEtaSetup()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmEtaSetup", "≈⁄œ«œ —»ÿ „‰ŸÊ„… «·≈Ì’«· «·≈·ﬂ —Ê‰Ì", "", 11340, 7711, True, False, True, _
+    StartForm "frmEtaSetup", "≈⁄œ«œ —»ÿ „‰ŸÊ„… «·≈Ì’«· «·≈·ﬂ —Ê‰Ì", "", 11340, 10546, True, False, True, _
               ""
     Set c = AddRect("boxTitle", 0, 0, 11340, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -9652,13 +9657,25 @@ Private Sub BuildForm_frmEtaSetup()
     Set c = AddLabel("lblActivityCode", "ﬂÊœ «·‰‘«ÿ (4 √—ﬁ«„)", 227, 3712, 5386.5, 284, 9, False, CLR_MUTED, "txtActivityCode", 0)
     Set c = AddText("txtGovernate", "", 5726.5, 4024, 5386.5, 454)
     Set c = AddLabel("lblGovernate", "«·„Õ«›Ÿ…", 5726.5, 3712, 5386.5, 284, 9, False, CLR_MUTED, "txtGovernate", 0)
-    Set c = AddLabel("lblReady", " ", 227, 4763, 10886, 907, 9, False, CLR_PRIMARY, "", 0)
-    Set c = AddLabel("lblSetupNote", "”Ã¯· «·ÃÂ«“ ›Ì »Ê«»… «·„’·Õ… À„ «‰”Œ »Ì«‰« Â Â‰«. «·—ﬁ„ «·÷—Ì»Ì Ê«·⁄‰Ê«‰ „‰ «·≈⁄œ«œ« ° ÊﬂÊœ «·„’·Õ… ·ﬂ· ’‰› „‰ ‘«‘… «·„‰ Ã« ° Ê—„“ «·ÊÕœ… „‰ ÊÕœ«  «·ﬁÌ«”.", 227, 5727, 10886, 794, 9, False, CLR_MUTED, "", 0)
-    Set c = AddButton("btnSave", "Õ›Ÿ", 227, 6917, 1701, 510, "primary")
+    Set c = AddText("txtErpClientId", "", 227, 5044, 5386.5, 454)
+    Set c = AddLabel("lblErpClientId", "«·›« Ê—… «·≈·ﬂ —Ê‰Ì…: Client ID ··»—‰«„Ã", 227, 4732, 5386.5, 284, 9, False, CLR_MUTED, "txtErpClientId", 0)
+    Set c = AddText("txtErpClientSecret", "", 5726.5, 5044, 5386.5, 454)
+    SetCtlProp c, "InputMask", "Password"
+    Set c = AddLabel("lblErpClientSecret", "«·›« Ê—… «·≈·ﬂ —Ê‰Ì…: Client Secret", 5726.5, 4732, 5386.5, 284, 9, False, CLR_MUTED, "txtErpClientSecret", 0)
+    Set c = AddText("txtSignerPath", "", 227, 5894, 5386.5, 454)
+    Set c = AddLabel("lblSignerPath", "»—‰«„Ã «· ÊﬁÌ⁄ (›«—€ = »·«  ÊﬁÌ⁄° ·· Ã—»… ›ﬁÿ)", 227, 5582, 5386.5, 284, 9, False, CLR_MUTED, "txtSignerPath", 0)
+    Set c = AddText("txtTokenPin", "", 5726.5, 5894, 5386.5, 454)
+    SetCtlProp c, "InputMask", "Password"
+    Set c = AddLabel("lblTokenPin", "«·—ﬁ„ «·”—Ì ·›·«‘… «· ÊﬁÌ⁄", 5726.5, 5582, 5386.5, 284, 9, False, CLR_MUTED, "txtTokenPin", 0)
+    Set c = AddText("txtSignerArgs", "", 227, 6804, 10886, 454)
+    Set c = AddLabel("lblSignerArgs", "„⁄«„·«  »—‰«„Ã «· ÊﬁÌ⁄: {IN} „·› «·„” ‰œ° {OUT} „·› «· ÊﬁÌ⁄° {PIN} «·—ﬁ„ «·”—Ì (›«—€ = ""{IN}"" ""{OUT}"" ""{PIN}"")", 227, 6492, 10886, 284, 9, False, CLR_MUTED, "txtSignerArgs", 0)
+    Set c = AddLabel("lblReady", " ", 227, 7484, 10886, 907, 9, False, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblSetupNote", "”Ã¯· «·ÃÂ«“ ›Ì »Ê«»… «·„’·Õ… À„ «‰”Œ »Ì«‰« Â Â‰«. «·—ﬁ„ «·÷—Ì»Ì Ê«·⁄‰Ê«‰ „‰ «·≈⁄œ«œ« ° ÊﬂÊœ «·„’·Õ… ·ﬂ· ’‰› „‰ ‘«‘… «·„‰ Ã« ° Ê—„“ «·ÊÕœ… „‰ ÊÕœ«  «·ﬁÌ«”.", 227, 8448, 10886, 794, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnSave", "Õ›Ÿ", 227, 9752, 1701, 510, "primary")
     c.OnClick = EP
-    Set c = AddButton("btnTestLogin", " Ã—»… «·œŒÊ·", 2041, 6917, 1928, 510, "secondary")
+    Set c = AddButton("btnTestLogin", " Ã—»… «·œŒÊ·", 2041, 9752, 1928, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnClose", "≈€·«ﬁ", 9639, 6917, 1474, 510, "secondary")
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 9639, 9752, 1474, 510, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
     s = ""

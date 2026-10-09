@@ -319,7 +319,7 @@ End Function
 '==============================================================================
 ' ETA replies
 '==============================================================================
-Private Function FirstText(ByVal Json As String, ByVal Path1 As String, ByVal Path2 As String, _
+Public Function EtaFirstText(ByVal Json As String, ByVal Path1 As String, ByVal Path2 As String, _
                            ByVal Path3 As String) As String
     ' The first of these values that is not missing nor empty.
     Dim v As Variant, paths As Variant, i As Long
@@ -329,7 +329,7 @@ Private Function FirstText(ByVal Json As String, ByVal Path1 As String, ByVal Pa
             v = JsonGet(Json, paths(i))
             If Not IsNull(v) Then
                 If Len(CStr(v)) > 0 Then
-                    FirstText = CStr(v)
+                    EtaFirstText = CStr(v)
                     Exit Function
                 End If
             End If
@@ -340,12 +340,12 @@ End Function
 Public Function EtaErrors(ByVal Json As String, ByVal Path As String) As String
     ' "message (path: message; ...)" of the ETA error object at Path (at most 3 details).
     Dim msg As String, d As String, i As Long, p As String
-    msg = FirstText(Json, Path & ".message", Path & ".code", "")
+    msg = EtaFirstText(Json, Path & ".message", Path & ".code", "")
     For i = 0 To 2
         p = Path & ".details[" & i & "]"
         If IsNull(JsonGet(Json, p)) Then Exit For
         If Len(d) > 0 Then d = d & "; "
-        d = d & FirstText(Json, p & ".propertyPath", p & ".target", p & ".code") & ": " & FirstText(Json, p & ".message", "", "")
+        d = d & EtaFirstText(Json, p & ".propertyPath", p & ".target", p & ".code") & ": " & EtaFirstText(Json, p & ".message", "", "")
     Next
     If Len(msg) > 0 And Len(d) > 0 Then
         EtaErrors = msg & " (" & d & ")"
@@ -400,7 +400,7 @@ Public Function EtaStatusResult(ByVal Body As String, ByRef Message As String) A
     ' VALID, INVALID (Message: the errors) or "" (still in progress) from the details of a submission.
     Dim st As String, d As String, i As Long, p As String
     Message = ""
-    st = FirstText(Body, "receipts[0].status", "status", "")
+    st = EtaFirstText(Body, "receipts[0].status", "status", "")
     If LCase$(st) = "valid" Then
         EtaStatusResult = "VALID"
     ElseIf LCase$(st) = "invalid" Then
@@ -409,7 +409,7 @@ Public Function EtaStatusResult(ByVal Body As String, ByRef Message As String) A
             p = "receipts[0].errors[" & i & "]"
             If IsNull(JsonGet(Body, p)) Then Exit For
             If Len(d) > 0 Then d = d & "; "
-            d = d & FirstText(Body, p & ".propertyPath", p & ".target", p & ".code") & ": " & FirstText(Body, p & ".message", "", "")
+            d = d & EtaFirstText(Body, p & ".propertyPath", p & ".target", p & ".code") & ": " & EtaFirstText(Body, p & ".message", "", "")
         Next
         Message = d
     End If
@@ -435,7 +435,15 @@ Private Function LinesOf(ByVal DocKind As String) As String
 End Function
 
 Public Function EtaSellerProblem() As String
-    ' The lines of the missing data of the seller and of the device, "" when complete.
+    ' The lines of the missing data of the seller and of the device (POS), "" when complete.
+    Dim msg As String
+    msg = EtaIssuerProblem()
+    If Len(Txt(SettingValue("EtaPosSerial"))) = 0 Then msg = msg & "- الرقم التسلسلي لجهاز نقطة البيع" & vbCrLf
+    EtaSellerProblem = msg
+End Function
+
+Public Function EtaIssuerProblem() As String
+    ' The lines of the missing data of the seller (receipts and e-invoices), "" when complete.
     Dim s As DAO.Recordset, msg As String
     Set s = CurrentDb.OpenRecordset("SELECT * FROM Settings WHERE SettingID = 1", dbOpenSnapshot)
     If Len(Txt(s!VATNumber)) = 0 Or Len(TaxNumberProblem(s!VATNumber, "EG")) > 0 Then
@@ -447,9 +455,8 @@ Public Function EtaSellerProblem() As String
     If Len(Txt(s!StreetName)) = 0 Then msg = msg & "- شارع المحل" & vbCrLf
     If Len(Txt(s!BuildingNo)) = 0 Then msg = msg & "- رقم مبنى المحل" & vbCrLf
     If Not (Txt(s!EtaActivityCode) Like "####") Then msg = msg & "- كود النشاط (4 أرقام)" & vbCrLf
-    If Len(Txt(s!EtaPosSerial)) = 0 Then msg = msg & "- الرقم التسلسلي لجهاز نقطة البيع" & vbCrLf
     s.Close
-    EtaSellerProblem = msg
+    EtaIssuerProblem = msg
 End Function
 
 Public Function EtaDataProblem(ByVal DocKind As String, ByVal DocID As Long) As String
@@ -656,7 +663,7 @@ Public Function EtaToken(ByRef Token As String) As String
     Else
         result = "ERROR"
         msg = "رفضت المصلحة بيانات جهاز نقطة البيع (رمز " & status & "): " & _
-              FirstText(reply, "error_description", "error", "")
+              EtaFirstText(reply, "error_description", "error", "")
     End If
     ' the request body carries the client secret: it is not logged
     LogEInvoice "", 0, "TOKEN", url, status, result, Left$(msg, 255), "", EtaMaskToken(reply), ms
@@ -664,23 +671,31 @@ Public Function EtaToken(ByRef Token As String) As String
 End Function
 
 Public Function EtaReadyProblem() As String
-    ' "" when the receipts can be sent: Egypt, the credentials of the POS and the data of the seller.
-    Dim msg As String
+    ' "" when Egypt can send: the data of the seller and the credentials of the POS (receipts) or of the program
+    ' (e-invoices, modEtaInvoice); each sending checks its own credentials.
+    Dim msg As String, pos As Boolean, erp As Boolean
     If AppCountry() <> "EG" Then
         EtaReadyProblem = "الإيصال الإلكتروني المصري لدولة التشغيل مصر فقط."
         Exit Function
     End If
-    If Len(Txt(SettingValue("EtaClientId"))) = 0 Or Len(Txt(SettingValue("EtaClientSecret"))) = 0 Then
+    pos = Len(Txt(SettingValue("EtaClientId"))) > 0 And Len(Txt(SettingValue("EtaClientSecret"))) > 0
+    erp = Len(Txt(SettingValue("EtaErpClientId"))) > 0 And Len(Txt(SettingValue("EtaErpClientSecret"))) > 0
+    If Not pos And Not erp Then
         msg = "- بيانات دخول جهاز نقطة البيع (Client ID و Client Secret)" & vbCrLf
     End If
-    msg = msg & EtaSellerProblem()
+    msg = msg & EtaIssuerProblem()
     If Len(msg) > 0 Then EtaReadyProblem = "إعداد الإيصال الإلكتروني ناقص:" & vbCrLf & msg
 End Function
 
 Public Function EtaSendDocument(ByVal DocKind As String, ByVal DocID As Long) As String
-    ' Builds the receipt if it is not yet, then submits it. Returns "RESULT|message" for modEInvoice.
+    ' Builds the receipt if it is not yet, then submits it. Returns "RESULT|message" for modEInvoice. A tax
+    ' invoice (customer with a tax number) and its returns are e-invoices: modEtaInvoice.
     Dim msg As String, json As String, token As String, body As String, status As Long, reply As String
     Dim ms As Long, started As Single, result As String, docStatus As String, subId As String, url As String
+    If EtaIsInvoice(DocKind, DocID) Then
+        EtaSendDocument = EtaInvoiceSend(DocKind, DocID)
+        Exit Function
+    End If
     msg = EtaDataProblem(DocKind, DocID)
     If Len(msg) = 0 Then msg = EtaPrepareDocument(DocKind, DocID)
     If Len(msg) > 0 Then
@@ -714,6 +729,10 @@ Public Function EtaRefreshStatus(ByVal DocKind As String, ByVal DocID As Long) A
     ' The result of a submitted receipt (VALID / INVALID). Returns "RESULT|message"; still in progress = OK.
     Dim subId As String, token As String, msg As String, url As String, status As Long, reply As String
     Dim ms As Long, started As Single, st As String, result As String
+    If EtaIsInvoice(DocKind, DocID) Then
+        EtaRefreshStatus = EtaInvoiceRefresh(DocKind, DocID)
+        Exit Function
+    End If
     subId = Nz(DbValue("SELECT EtaSubmissionId FROM " & DocTableOf(DocKind) & " WHERE " & DocKeyOf(DocKind) & " = " & DocID), "")
     If Len(subId) = 0 Then
         EtaRefreshStatus = "ERROR|" & "لم يُرسل الإيصال بعد."
@@ -751,17 +770,27 @@ End Function
 '==============================================================================
 ' frmEtaSetup
 '==============================================================================
+Private Function SetupControls() As Variant
+    SetupControls = Array("txtClientId", "txtClientSecret", "txtPosSerial", "txtPosOs", "txtPreSharedKey", "txtBranchCode", _
+                          "txtActivityCode", "txtGovernate", "txtErpClientId", "txtErpClientSecret", "txtSignerPath", _
+                          "txtTokenPin", "txtSignerArgs")
+End Function
+
+Private Function SetupFields() As Variant
+    ' the Settings field of each control of SetupControls
+    SetupFields = Array("EtaClientId", "EtaClientSecret", "EtaPosSerial", "EtaPosOsVersion", "EtaPreSharedKey", "EtaBranchCode", _
+                        "EtaActivityCode", "EtaGovernate", "EtaErpClientId", "EtaErpClientSecret", "EtaSignerPath", _
+                        "EtaTokenPin", "EtaSignerArgs")
+End Function
+
 Public Sub EtaSetupLoad(ByVal frm As Access.Form)
-    Dim s As DAO.Recordset
+    Dim s As DAO.Recordset, ctl As Variant, fld As Variant, i As Long
+    ctl = SetupControls()
+    fld = SetupFields()
     Set s = CurrentDb.OpenRecordset("SELECT * FROM Settings WHERE SettingID = 1", dbOpenSnapshot)
-    frm!txtClientId.Value = s!EtaClientId
-    frm!txtClientSecret.Value = s!EtaClientSecret
-    frm!txtPosSerial.Value = s!EtaPosSerial
-    frm!txtPosOs.Value = s!EtaPosOsVersion
-    frm!txtPreSharedKey.Value = s!EtaPreSharedKey
-    frm!txtBranchCode.Value = s!EtaBranchCode
-    frm!txtActivityCode.Value = s!EtaActivityCode
-    frm!txtGovernate.Value = s!EtaGovernate
+    For i = 0 To UBound(ctl)
+        frm(ctl(i)).Value = s(fld(i)).Value
+    Next
     s.Close
     EtaSetupShow frm
 End Sub
@@ -784,10 +813,8 @@ Public Sub EtaSetupSave(ByVal frm As Access.Form)
         ShowWarning "إعداد الربط يحتاج صلاحية إعدادات المحل."
         Exit Sub
     End If
-    ctl = Array("txtClientId", "txtClientSecret", "txtPosSerial", "txtPosOs", "txtPreSharedKey", "txtBranchCode", _
-                "txtActivityCode", "txtGovernate")
-    fld = Array("EtaClientId", "EtaClientSecret", "EtaPosSerial", "EtaPosOsVersion", "EtaPreSharedKey", "EtaBranchCode", _
-                "EtaActivityCode", "EtaGovernate")
+    ctl = SetupControls()
+    fld = SetupFields()
     Set before = AuditSnapshot("Settings", "SettingID", 1)
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM Settings WHERE SettingID = 1", dbOpenDynaset)
     rs.Edit
@@ -801,23 +828,43 @@ Public Sub EtaSetupSave(ByVal frm As Access.Form)
     rs.Update
     rs.Close
     AuditEdited "EDIT", "Settings", "SettingID", 1, before
-    m_token = ""                                          ' the next request logs in with the new data
+    m_token = ""                                          ' the next requests log in with the new data
+    EtaErpTokenReset
     EtaSetupShow frm
     ShowInfo "تم حفظ إعداد الربط."
 End Sub
 
 Public Sub EtaSetupTestLogin(ByVal frm As Access.Form)
-    ' Logs in with the saved credentials of the POS: nothing is sent.
-    Dim msg As String, token As String, reason As String
-    m_token = ""
+    ' Logs in with the saved credentials of the POS and of the program (those that are set): nothing is sent.
+    Dim msg As String, token As String, reason As String, report As String, tried As Boolean
     DoCmd.Hourglass True
-    msg = EtaToken(token)
+    If Len(Txt(SettingValue("EtaClientId"))) > 0 Then
+        tried = True
+        m_token = ""
+        msg = EtaToken(token)
+        If Len(msg) = 0 Then
+            report = report & Tr("جهاز نقطة البيع (الإيصال): تم الدخول.") & vbCrLf
+        Else
+            SplitResult msg, reason
+            report = report & Tr("جهاز نقطة البيع (الإيصال): ") & reason & vbCrLf
+        End If
+    End If
+    If Len(Txt(SettingValue("EtaErpClientId"))) > 0 Then
+        tried = True
+        EtaErpTokenReset
+        msg = EtaErpToken(token)
+        If Len(msg) = 0 Then
+            report = report & Tr("البرنامج (الفاتورة الإلكترونية): تم الدخول.") & vbCrLf
+        Else
+            SplitResult msg, reason
+            report = report & Tr("البرنامج (الفاتورة الإلكترونية): ") & reason & vbCrLf
+        End If
+    End If
     DoCmd.Hourglass False
-    If Len(msg) = 0 Then
-        ShowInfo "تم الدخول إلى منظومة المصلحة بنجاح (" & EnvironmentName() & ")."
+    If Not tried Then
+        ShowWarning "اكتب بيانات الدخول واحفظها أولًا."
     Else
-        SplitResult msg, reason
-        ShowWarning "تعذّر الدخول إلى منظومة المصلحة: " & reason
+        ShowInfo EnvironmentName() & vbCrLf & report
     End If
 End Sub
 

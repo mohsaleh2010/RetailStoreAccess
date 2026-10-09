@@ -326,6 +326,35 @@ Public Function RefreshSubmittedEInvoices(ByRef Checked As Long, ByRef Changed A
     RefreshSubmittedEInvoices = lastProblem
 End Function
 
+Public Sub EInvoicesCancelPicked(ByVal frm As Access.Form)
+    ' Egypt: cancels the chosen valid e-invoice at ETA (modEtaInvoice.EtaCancelDocument).
+    Dim kind As String, id As Long, reason As String, reply As Variant, msg As String, result As String
+    If Not CanScreenAction(frm.Name, "EDIT") Then Exit Sub
+    If AppCountry() <> "EG" Then
+        ShowInfo "في السعودية يُصحَّح المستند بإشعار دائن، ولا يُلغى."
+        Exit Sub
+    End If
+    If Not PickedDoc(frm, kind, id) Then
+        ShowWarning "اختر مستندًا من القائمة."
+        Exit Sub
+    End If
+    reason = Trim$(InputBox(Tr("سبب إلغاء المستند لدى المصلحة:"), Tr("إلغاء المستند")))
+    If Len(reason) = 0 Then Exit Sub
+    DoCmd.Hourglass True
+    On Error Resume Next
+    reply = Application.Run("EtaCancelDocument", kind, id, reason)
+    If Err.Number <> 0 Then reply = "ERROR|" & Err.Description
+    On Error GoTo 0
+    DoCmd.Hourglass False
+    result = SplitResult(Nz(reply, ""), msg)
+    If result = "OK" Then
+        ShowInfo "أُلغي المستند لدى المصلحة. سجّل مرتجعًا في البرنامج إن لزم."
+    Else
+        ShowWarning "لم يُلغَ المستند: " & msg
+    End If
+    EInvoicesShow frm
+End Sub
+
 Public Sub EInvoicesRefresh(ByVal frm As Access.Form)
     Dim checked As Long, changed As Long, msg As String
     If Not CanScreenAction(frm.Name, "EDIT") Then Exit Sub

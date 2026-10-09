@@ -326,6 +326,35 @@ Public Function RefreshSubmittedEInvoices(ByRef Checked As Long, ByRef Changed A
     RefreshSubmittedEInvoices = lastProblem
 End Function
 
+Public Sub EInvoicesCancelPicked(ByVal frm As Access.Form)
+    ' Egypt: cancels the chosen valid e-invoice at ETA (modEtaInvoice.EtaCancelDocument).
+    Dim kind As String, id As Long, reason As String, reply As Variant, msg As String, result As String
+    If Not CanScreenAction(frm.Name, "EDIT") Then Exit Sub
+    If AppCountry() <> "EG" Then
+        ShowInfo "›Ì «·”⁄ÊœÌ… Ìı’ÕÛ¯Õ «·„” ‰œ »≈‘⁄«— œ«∆‰° Ê·« Ìı·€Ï."
+        Exit Sub
+    End If
+    If Not PickedDoc(frm, kind, id) Then
+        ShowWarning "«Œ — „” ‰œ« „‰ «·ﬁ«∆„…."
+        Exit Sub
+    End If
+    reason = Trim$(InputBox(Tr("”»» ≈·€«¡ «·„” ‰œ ·œÏ «·„’·Õ…:"), Tr("≈·€«¡ «·„” ‰œ")))
+    If Len(reason) = 0 Then Exit Sub
+    DoCmd.Hourglass True
+    On Error Resume Next
+    reply = Application.Run("EtaCancelDocument", kind, id, reason)
+    If Err.Number <> 0 Then reply = "ERROR|" & Err.Description
+    On Error GoTo 0
+    DoCmd.Hourglass False
+    result = SplitResult(Nz(reply, ""), msg)
+    If result = "OK" Then
+        ShowInfo "√ı·€Ì «·„” ‰œ ·œÏ «·„’·Õ…. ”Ã¯· „— Ã⁄« ›Ì «·»—‰«„Ã ≈‰ ·“„."
+    Else
+        ShowWarning "·„ Ìı·€Û «·„” ‰œ: " & msg
+    End If
+    EInvoicesShow frm
+End Sub
+
 Public Sub EInvoicesRefresh(ByVal frm As Access.Form)
     Dim checked As Long, changed As Long, msg As String
     If Not CanScreenAction(frm.Name, "EDIT") Then Exit Sub

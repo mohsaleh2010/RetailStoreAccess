@@ -295,7 +295,7 @@ class CodeTests(unittest.TestCase):
         self.assertIn("p.EtaItemCode IS NULL", problem)
         self.assertIn("o.EtaUUID", problem)                                   # a return after its sale
         self.assertIn("BUYER_ID_LIMIT", problem)
-        seller = body("EtaSellerProblem")
+        seller = body("EtaIssuerProblem")
         self.assertIn('TaxNumberProblem(s!VATNumber, "EG")', seller)
         save = body("EtaSetupSave")
         self.assertIn('HasPermission("SETTINGS")', save)

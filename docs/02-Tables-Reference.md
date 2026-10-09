@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **70** | عدد الحقول: **946**
+عدد الجداول: **70** | عدد الحقول: **953**
 
 ## الفهرس
 
@@ -146,7 +146,12 @@
 | 61 | EtaActivityCode | Short Text | 8 |  |  |  |  | مصر: كود النشاط |
 | 62 | EtaGovernate | Short Text | 50 |  |  |  |  | مصر: المحافظة |
 | 63 | EtaLastUUID | Short Text | 64 |  |  |  |  | مصر: معرّف آخر إيصال للجهاز – سلسلة الإيصالات (previousUUID) |
-| 64 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
+| 64 | EtaErpClientId | Short Text | 100 |  |  |  |  | مصر: Client ID للبرنامج (الفاتورة الإلكترونية) – docs/49 |
+| 65 | EtaErpClientSecret | Short Text | 255 |  |  |  |  | مصر: Client Secret للبرنامج – لا يُكتب في سجل الإرسال |
+| 66 | EtaSignerPath | Short Text | 255 |  |  |  |  | مصر: برنامج التوقيع (فلاشة التوقيع) – فارغ = النسخة 0.9 بلا توقيع، في بيئة ما قبل الإنتاج فقط |
+| 67 | EtaSignerArgs | Short Text | 255 |  |  |  |  | مصر: معاملات برنامج التوقيع – فارغ = "{IN}" "{OUT}" "{PIN}" |
+| 68 | EtaTokenPin | Short Text | 50 |  |  |  |  | مصر: الرقم السري لفلاشة التوقيع – فارغ إذا كان برنامج التوقيع يطلبه بنفسه |
+| 69 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -555,16 +560,17 @@
 | 33 | EtaUUID | Short Text | 64 |  |  |  |  | معرّف الإيصال الإلكتروني المصري – SHA-256 للإيصال (docs/48) |
 | 34 | EtaPreviousUUID | Short Text | 64 |  |  |  |  | معرّف الإيصال السابق للجهاز |
 | 35 | EtaSubmissionId | Short Text | 50 |  |  |  |  | رقم الإرسال لدى المصلحة |
-| 36 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 37 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
-| 38 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
-| 39 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
-| 40 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
-| 41 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
-| 42 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
-| 43 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
-| 44 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
-| 45 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
+| 36 | EtaLongId | Short Text | 100 |  |  |  |  | الرقم الطويل للفاتورة الإلكترونية المصرية – لرابط المستند ورمز QR (docs/49) |
+| 37 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 38 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
+| 39 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
+| 40 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
+| 41 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
+| 42 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
+| 43 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
+| 44 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 45 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
+| 46 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -636,11 +642,12 @@
 | 31 | EtaUUID | Short Text | 64 |  |  |  |  | معرّف الإيصال الإلكتروني المصري – SHA-256 للإيصال (docs/48) |
 | 32 | EtaPreviousUUID | Short Text | 64 |  |  |  |  | معرّف الإيصال السابق للجهاز |
 | 33 | EtaSubmissionId | Short Text | 50 |  |  |  |  | رقم الإرسال لدى المصلحة |
-| 34 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 35 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
-| 36 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
-| 37 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
-| 38 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
+| 34 | EtaLongId | Short Text | 100 |  |  |  |  | الرقم الطويل للفاتورة الإلكترونية المصرية – لرابط المستند ورمز QR (docs/49) |
+| 35 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 36 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
+| 37 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 38 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
+| 39 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`

@@ -46,6 +46,7 @@ def layout_einvoices() -> FormModel:
             ("btnSendPicked", "إرسال المختار", "primary", 3.6, "EInvoicesSendPicked Me"),
             ("btnSendAll", "إرسال كل المعلّق", "secondary", 3.8, "EInvoicesSendAll Me"),
             ("btnRefresh", "تحديث الحالة", "secondary", 3.2, "EInvoicesRefresh Me"),
+            ("btnCancelDoc", "إلغاء المستند", "secondary", 3.2, "EInvoicesCancelPicked Me"),
             ("btnSetup", "إعداد الربط", "secondary", 3.2, "EInvoiceSetupOpen")]:
         button(m, name, caption, bx, y, style, w=cm(w), h=cm(0.9), call=call)
         bx += cm(w) + cm(0.2)
@@ -125,7 +126,7 @@ def layout_zatca_setup() -> FormModel:
 def layout_eta_setup() -> FormModel:
     """frmEtaSetup (docs/48): the POS of the Egyptian e-receipt: its credentials and the data of the seller
     (modEtaReceipt)."""
-    width, height = cm(20.0), cm(13.6)
+    width, height = cm(20.0), cm(18.6)
     m = FormModel("frmEtaSetup", "إعداد ربط منظومة الإيصال الإلكتروني", width, height, popup=True, allow_add=False)
     title_band(m, "إعداد ربط منظومة الإيصال الإلكتروني", "جهاز نقطة البيع المسجّل في بوابة مصلحة الضرائب (مصر)",
                "settings")
@@ -133,19 +134,26 @@ def layout_eta_setup() -> FormModel:
     rows = [("txtClientId", "Client ID لجهاز نقطة البيع", {}), ("txtClientSecret", "Client Secret", PASSWORD),
             ("txtPosSerial", "الرقم التسلسلي للجهاز (POS Serial)", {}), ("txtPosOs", "نظام تشغيل الجهاز (فارغ = Windows)", {}),
             ("txtPreSharedKey", "المفتاح المشترك (إن أعطته المصلحة)", PASSWORD), ("txtBranchCode", "كود الفرع (فارغ = 0)", {}),
-            ("txtActivityCode", "كود النشاط (4 أرقام)", {}), ("txtGovernate", "المحافظة", {})]
+            ("txtActivityCode", "كود النشاط (4 أرقام)", {}), ("txtGovernate", "المحافظة", {}),
+            # the e-invoice to businesses (docs/49): the program (ERP) and the signing program of the USB token
+            ("txtErpClientId", "الفاتورة الإلكترونية: Client ID للبرنامج", {}),
+            ("txtErpClientSecret", "الفاتورة الإلكترونية: Client Secret", PASSWORD),
+            ("txtSignerPath", "برنامج التوقيع (فارغ = بلا توقيع، للتجربة فقط)", {}),
+            ("txtTokenPin", "الرقم السري لفلاشة التوقيع", PASSWORD)]
     for i, (name, caption, props) in enumerate(rows):
         x = cm(0.4) if i % 2 == 0 else cm(0.6) + half
-        y = cm(2.6) + (i // 2) * cm(1.5)
+        y = cm(2.6) + (i // 2) * cm(1.5) + (cm(0.3) if i >= 8 else 0)
         c = m.add(Control("text", name, x, y, half, cm(0.8), dict(props)))
         labelled(m, name, caption, c)
-    m.add(Control("label", "lblReady", cm(0.4), cm(8.4), width - cm(0.8), cm(1.6),
+    c = m.add(Control("text", "txtSignerArgs", cm(0.4), cm(12.0), width - cm(0.8), cm(0.8), {}))
+    labelled(m, "txtSignerArgs", 'معاملات برنامج التوقيع: {IN} ملف المستند، {OUT} ملف التوقيع، {PIN} الرقم السري (فارغ = "{IN}" "{OUT}" "{PIN}")', c)
+    m.add(Control("label", "lblReady", cm(0.4), cm(13.2), width - cm(0.8), cm(1.6),
                   {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_PRIMARY")}))
-    m.add(Control("label", "lblSetupNote", cm(0.4), cm(10.1), width - cm(0.8), cm(1.4),
+    m.add(Control("label", "lblSetupNote", cm(0.4), cm(14.9), width - cm(0.8), cm(1.4),
                   {"Caption": "سجّل الجهاز في بوابة المصلحة ثم انسخ بياناته هنا. الرقم الضريبي والعنوان من الإعدادات، "
                               "وكود المصلحة لكل صنف من شاشة المنتجات، ورمز الوحدة من وحدات القياس.",
                    "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
-    y = cm(12.2)
+    y = cm(17.2)
     bx = cm(0.4)
     for name, caption, style, w, call in [
             ("btnSave", "حفظ", "primary", 3.0, "EtaSetupSave Me"),

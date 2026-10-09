@@ -213,6 +213,7 @@ def zatca_fields(type_code_default):
         text("EtaUUID", 64, "معرّف الإيصال الإلكتروني المصري", note="SHA-256 للإيصال (docs/48)"),
         text("EtaPreviousUUID", 64, "معرّف الإيصال السابق للجهاز"),
         text("EtaSubmissionId", 50, "رقم الإرسال لدى المصلحة"),
+        text("EtaLongId", 100, "الرقم الطويل للفاتورة الإلكترونية المصرية", note="لرابط المستند ورمز QR (docs/49)"),
     ]
 
 
@@ -314,6 +315,12 @@ TABLES: List[Table] = [
             text("EtaActivityCode", 8, "مصر: كود النشاط"),
             text("EtaGovernate", 50, "مصر: المحافظة"),
             text("EtaLastUUID", 64, "مصر: معرّف آخر إيصال للجهاز", note="سلسلة الإيصالات (previousUUID)"),
+            text("EtaErpClientId", 100, "مصر: Client ID للبرنامج (الفاتورة الإلكترونية)", note="docs/49"),
+            text("EtaErpClientSecret", 255, "مصر: Client Secret للبرنامج", note="لا يُكتب في سجل الإرسال"),
+            text("EtaSignerPath", 255, "مصر: برنامج التوقيع (فلاشة التوقيع)",
+                 note="فارغ = النسخة 0.9 بلا توقيع، في بيئة ما قبل الإنتاج فقط"),
+            text("EtaSignerArgs", 255, "مصر: معاملات برنامج التوقيع", note='فارغ = "{IN}" "{OUT}" "{PIN}"'),
+            text("EtaTokenPin", 50, "مصر: الرقم السري لفلاشة التوقيع", note="فارغ إذا كان برنامج التوقيع يطلبه بنفسه"),
             text("EInvoiceEnvironment", 12, "بيئة الفاتورة الإلكترونية", required=True, default='"TEST"',
                  rule='In ("TEST","SIMULATION","PRODUCTION")',
                  rule_text="TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية",

@@ -16,9 +16,68 @@ Public Sub LangData4()
     D4_6
     D4_7
     D4_8
+    D4_9
 End Sub
 
 Private Sub D4_1()
+    LangAdd "إجمالي المدين", "Total debit"
+    LangAdd "إرسال المختار", "Send selected"
+    LangAdd "إعادة الإنشاء", "Rebuild"
+    LangAdd "إعادة فتح سنة", "Reopen a year"
+    LangAdd "إقفال الفترات", "Period closing"
+    LangAdd "إلغاء الترحيل", "Unpost"
+    LangAdd "إلغاء المستند", "Cancel document"
+    LangAdd "اختر المستخدم", "Choose the user"
+    LangAdd "اقتراح للفارغ", "Suggest for empty"
+    LangAdd "الباقي للعميل", "Change for the customer"
+    LangAdd "البحث المتقدم", "Advanced search"
+    LangAdd "البنك غير نشط", "The bank is not active"
+    LangAdd "الجهة المصدرة", "Issuer"
+    LangAdd "الحساب الدائن", "Credit account"
+    LangAdd "الرصيد الحالي", "Current balance"
+    LangAdd "الرصيد الموجب", "A positive balance"
+    LangAdd "الرقم الإضافي", "Additional number"
+    LangAdd "الرقم الضريبي", "VAT number"
+    LangAdd "الرمز البريدي", "Postal code"
+    LangAdd "الرمز المختصر", "Symbol"
+    LangAdd "السجل التجاري", "Commercial registration"
+    LangAdd "السنة الماضية", "Last year"
+    LangAdd "الشخص المسؤول", "Contact person"
+    LangAdd "العملية (فارغ", "Transaction (empty"
+    LangAdd "الفرع الرئيسي", "Main branch"
+    LangAdd "القائم بالجرد", "Counted by"
+    LangAdd "المبلغ المسدد", "Amount paid"
+    LangAdd "المسترد نقدًا", "Refunded in cash"
+    LangAdd "المفتاح الخاص", "Private key"
+    LangAdd "بداية الإهلاك", "Depreciation start"
+    LangAdd "بصمة الفاتورة", "Invoice hash"
+    LangAdd "بيئة المحاكاة", "Simulation environment"
+    LangAdd "بيع / استبعاد", "Sale / disposal"
+    LangAdd "تاريخ التعيين", "Hire date"
+    LangAdd "تاريخ التفعيل", "Activation date"
+    LangAdd "تاريخ العملية", "Transaction date"
+    LangAdd "تاريخ المصروف", "Expense date"
+    LangAdd "تحديث القائمة", "Refresh list"
+    LangAdd "تسجيل الشيكات", "Cheque register"
+    LangAdd "تصحيحات سابقة", "Earlier corrections"
+    LangAdd "تعذّر الإرسال", "Could not send"
+    LangAdd "تفعيل الإرسال", "Enable sending"
+    LangAdd "تقرير المخزون", "Stock report"
+    LangAdd "تقرير النواقص", "Shortage report"
+    LangAdd "تم حفظ الحركة", "The move was saved"
+    LangAdd "تُدفع بالكامل", "Paid in full"
+    LangAdd "ثمن بيع الأصل", "Sale price of the asset"
+    LangAdd "حفظ الصلاحيات", "Save the permissions"
+    LangAdd "دليل الحسابات", "Chart of accounts"
+    LangAdd "ربح بيع الأصل", "Gain on sale of the asset"
+    LangAdd "ربط بالفاتورة", "Link to the invoice"
+    LangAdd "سند صرف عمولة", "Commission payment voucher"
+    LangAdd "سند صرف لمورد", "Supplier payment voucher"
+    LangAdd "سند صرف نقدية", "Cash payment voucher"
+    LangAdd "سند قبض نقدية", "Cash receipt voucher"
+    LangAdd "شجرة الحسابات", "Account tree"
+    LangAdd "شراء أصل ثابت", "Purchase of a fixed asset"
+    LangAdd "شهادة تجريبية", "Test certificate"
     LangAdd "صافي المبيعات", "Net sales"
     LangAdd "صلاحيات الدور", "Role permissions"
     LangAdd "صندوق النقدية", "Cash box"
@@ -81,6 +140,9 @@ Private Sub D4_1()
     LangAdd "الربط المسجل", "Recorded link"
     LangAdd "الربع الماضي", "Last quarter"
     LangAdd "الرصيد بعدها", "Balance after it"
+End Sub
+
+Private Sub D4_2()
     LangAdd "السعر للعميل", "Price for the customer"
     LangAdd "الشهر الماضي", "Last month"
     LangAdd "الفروقات فقط", "Differences only"
@@ -126,6 +188,7 @@ Private Sub D4_1()
     LangAdd "رقم الباركود", "Barcode number"
     LangAdd "رقم الفاتورة", "Invoice number"
     LangAdd "رُفض الإيصال", "The receipt was rejected"
+    LangAdd "رُفض المستند", "The document was rejected"
     LangAdd "سحب من البنك", "Withdrawal from the bank"
     LangAdd "سعر بيع جديد", "New sale price"
     LangAdd "شامل الضريبة", "Including VAT"
@@ -139,9 +202,6 @@ Private Sub D4_1()
     LangAdd "عدد المنتجات", "Number of products"
     LangAdd "عملة التعامل", "Trading currency"
     LangAdd "فاتورة اليوم", "Invoice of the day"
-End Sub
-
-Private Sub D4_2()
     LangAdd "فاتورة جديدة", "New invoice"
     LangAdd "فاتورة مبسطة", "Simplified invoice"
     LangAdd "فتح وعرض فقط", "Open and view only"
@@ -203,6 +263,9 @@ Private Sub D4_2()
     LangAdd "الحد الأدنى", "Minimum"
     LangAdd "الدفع نقدًا", "Pay in cash"
     LangAdd "الرصيد دائن", "Credit balance"
+End Sub
+
+Private Sub D4_3()
     LangAdd "الرصيد مدين", "Debit balance"
     LangAdd "تأكيد الدفع", "Confirm payment"
     LangAdd "تاريخ الشيك", "Cheque date"
@@ -262,9 +325,6 @@ Private Sub D4_2()
     LangAdd "كل الصناديق", "All boxes"
     LangAdd "كل العمليات", "All transactions"
     LangAdd "كل المنتجات", "All products"
-End Sub
-
-Private Sub D4_3()
     LangAdd "كلمة المرور", "Password"
     LangAdd "كود التفعيل", "Activation code"
     LangAdd "كود المندوب", "Sales rep code"
@@ -326,6 +386,9 @@ Private Sub D4_3()
     LangAdd "تحويل صادر", "Outgoing transfer"
     LangAdd "تحويل وارد", "Incoming transfer"
     LangAdd "تعذر الحفظ", "Could not save"
+End Sub
+
+Private Sub D4_4()
     LangAdd "تم الإرسال", "Sent"
     LangAdd "تم الإلغاء", "Cancelled"
     LangAdd "تمت الخطوة", "Step done:"
@@ -385,9 +448,6 @@ Private Sub D4_3()
     LangAdd "آخر تصفية", "Last closing"
     LangAdd "آخر معامل", "Last rate"
     LangAdd "أربعة عشر", "fourteen"
-End Sub
-
-Private Sub D4_4()
     LangAdd "أُنشئ منه", "Created from it"
     LangAdd "إعادة فتح", "Reopen"
     LangAdd "إقفال سنة", "Close a year"
@@ -449,6 +509,9 @@ Private Sub D4_4()
     LangAdd "شراء نقدي", "Cash purchase"
     LangAdd "صرفنا إلى", "Paid to"
     LangAdd "طرق الدفع", "Payment methods"
+End Sub
+
+Private Sub D4_5()
     LangAdd "طلب توصيل", "Delivery order"
     LangAdd "طلب داخلي", "Dine-in order"
     LangAdd "عجز تصفية", "Closing shortage"
@@ -508,9 +571,6 @@ Private Sub D4_4()
     LangAdd "المنتجات", "Products"
     LangAdd "الموازنة", "Budget"
     LangAdd "الموردون", "Suppliers"
-End Sub
-
-Private Sub D4_5()
     LangAdd "بدون سكر", "No sugar"
     LangAdd "بيع نقدي", "Cash sale"
     LangAdd "تسعة عشر", "nineteen"
@@ -572,6 +632,9 @@ Private Sub D4_5()
     LangAdd "الآيبان", "IBAN"
     LangAdd "الأدوار", "Roles"
     LangAdd "الأرباح", "Profit"
+End Sub
+
+Private Sub D4_6()
     LangAdd "الأساسي", "Basic"
     LangAdd "الأصناف", "Items"
     LangAdd "الأهداف", "Targets"
@@ -631,9 +694,6 @@ Private Sub D4_5()
     LangAdd "المشروب", "Drink"
     LangAdd "المشكلة", "Problem"
     LangAdd "المصروف", "Expense"
-End Sub
-
-Private Sub D4_6()
     LangAdd "المطلوب", "required"
     LangAdd "المعامل", "Rate"
     LangAdd "المندوب", "Sales rep"
@@ -695,6 +755,9 @@ Private Sub D4_6()
     LangAdd "الصافي", "Net"
     LangAdd "العملة", "Currency"
     LangAdd "العميل", "Customer"
+End Sub
+
+Private Sub D4_7()
     LangAdd "الفئات", "Categories"
     LangAdd "الفترة", "Period"
     LangAdd "الفعلي", "Actual"
@@ -754,9 +817,6 @@ Private Sub D4_6()
     LangAdd "ملايين", "million"
     LangAdd "ممنوحة", "Granted"
     LangAdd "من بنك", "From a bank"
-End Sub
-
-Private Sub D4_7()
     LangAdd "موازنة", "Budget"
     LangAdd "موردًا", "suppliers"
     LangAdd "مُرحّل", "Posted"
@@ -818,6 +878,9 @@ Private Sub D4_7()
     LangAdd "تحديث", "Refresh"
     LangAdd "تحويل", "Transfer"
     LangAdd "تراجع", "Undo"
+End Sub
+
+Private Sub D4_8()
     LangAdd "تسعون", "ninety"
     LangAdd "تصدير", "Export"
     LangAdd "تعديل", "Edit"
@@ -877,9 +940,6 @@ Private Sub D4_7()
     LangAdd "اختر", "Choose"
     LangAdd "الحد", "limit"
     LangAdd "الحي", "District"
-End Sub
-
-Private Sub D4_8()
     LangAdd "الكل", "All"
     LangAdd "بثمن", "for a price"
     LangAdd "بدون", "None"
@@ -941,6 +1001,9 @@ Private Sub D4_8()
     LangAdd "حذف", "Delete"
     LangAdd "حفظ", "Save"
     LangAdd "ر.س", "SAR"
+End Sub
+
+Private Sub D4_9()
     LangAdd "ربط", "The connection to"
     LangAdd "رقم", "Number"
     LangAdd "ستة", "six"
