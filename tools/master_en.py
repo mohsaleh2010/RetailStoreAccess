@@ -158,6 +158,7 @@ SCREEN_TITLES_EN = {
     "frmSettings": "Store settings", "frmUsers": "Users", "frmRoles": "Roles and permissions",
     "frmUserScreens": "Screen permissions of users", "frmAuditLog": "Audit trail", "frmBackup": "Backup",
     "frmEnglishNames": "English names", "frmEInvoices": "E-invoicing", "frmZatcaSetup": "Fatoora connection setup",
+    "frmEtaSetup": "E-receipt connection setup",
 }
 
 CATEGORY_NAMES_EN = {1: "General"}

@@ -129,6 +129,7 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmEnglishNames": ScreenPermission = "SETTINGS"
         Case "frmEInvoices": ScreenPermission = "EINVOICE"
         Case "frmZatcaSetup": ScreenPermission = "SETTINGS"
+        Case "frmEtaSetup": ScreenPermission = "SETTINGS"
     End Select
 End Function
 

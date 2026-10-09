@@ -209,6 +209,10 @@ def zatca_fields(type_code_default):
         int_("EInvoiceAttempts", "محاولات الإرسال", default="0"),
         memo("EInvoiceXml", "ملف الفاتورة الإلكترونية الموقّع"),
         text("EInvoiceError", 255, "آخر خطأ في الإرسال"),
+        # Egypt: the e-receipt (docs/48)
+        text("EtaUUID", 64, "معرّف الإيصال الإلكتروني المصري", note="SHA-256 للإيصال (docs/48)"),
+        text("EtaPreviousUUID", 64, "معرّف الإيصال السابق للجهاز"),
+        text("EtaSubmissionId", 50, "رقم الإرسال لدى المصلحة"),
     ]
 
 
@@ -301,6 +305,15 @@ TABLES: List[Table] = [
             text("ZatcaProductionSecret", 255, "الكلمة السرية للشهادة الفعلية", note="لا تُكتب في سجل الإرسال"),
             text("ZatcaOnboardEnv", 12, "البيئة التي سُجّل فيها الجهاز"),
             text("ZatcaOnboardStage", 20, "مرحلة تسجيل الجهاز", note="COMPLIANCE ثم CHECKED ثم PRODUCTION (docs/47)"),
+            text("EtaClientId", 100, "مصر: Client ID لجهاز نقطة البيع", note="من بوابة المصلحة عند تسجيل الجهاز (docs/48)"),
+            text("EtaClientSecret", 255, "مصر: Client Secret لجهاز نقطة البيع", note="لا يُكتب في سجل الإرسال"),
+            text("EtaPosSerial", 100, "مصر: الرقم التسلسلي لجهاز نقطة البيع"),
+            text("EtaPosOsVersion", 50, "مصر: نظام تشغيل الجهاز", note="فارغ = Windows"),
+            text("EtaPreSharedKey", 255, "مصر: المفتاح المشترك للجهاز (إن وُجد)"),
+            text("EtaBranchCode", 10, "مصر: كود الفرع", note="فارغ = 0 (الفرع الرئيسي)"),
+            text("EtaActivityCode", 8, "مصر: كود النشاط"),
+            text("EtaGovernate", 50, "مصر: المحافظة"),
+            text("EtaLastUUID", 64, "مصر: معرّف آخر إيصال للجهاز", note="سلسلة الإيصالات (previousUUID)"),
             text("EInvoiceEnvironment", 12, "بيئة الفاتورة الإلكترونية", required=True, default='"TEST"',
                  rule='In ("TEST","SIMULATION","PRODUCTION")',
                  rule_text="TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية",
@@ -576,6 +589,7 @@ TABLES: List[Table] = [
             text("UnitName", 30, "اسم الوحدة", required=True),
             text("UnitNameEn", 30, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("ZatcaUnitCode", 10, "رمز الوحدة (UN/ECE)"),
+            text("EtaUnitCode", 10, "رمز الوحدة لدى مصلحة الضرائب المصرية", note="فارغ = EA (docs/48)"),
             is_active(),
         ],
         pk=["UnitID"],
@@ -740,6 +754,7 @@ TABLES: List[Table] = [
             text("City", 50, "المدينة"),
             text("PostalCode", 10, "الرمز البريدي"),
             text("Address", 255, "العنوان"),
+            text("NationalID", 20, "رقم الهوية / الرقم القومي", note="مصر: للإيصال 150 ألف جنيه أو أكثر (docs/48)"),
             money("OpeningBalance", "الرصيد الافتتاحي", rule=None,
                   note="موجب = العميل مدين للمحل"),
             money("CurrentBalance", "الرصيد الحالي", rule=None,
@@ -791,6 +806,8 @@ TABLES: List[Table] = [
             # café sizes: SellingPrice = small; a price for medium / large makes the product sized
             money("SizePriceM", "سعر الحجم الوسط", required=False, default=None),
             money("SizePriceL", "سعر الحجم الكبير", required=False, default=None),
+            text("EtaItemType", 3, "مصر: نوع كود الصنف", note="EGS (كود داخلي مسجّل) أو GS1؛ فارغ = EGS (docs/48)"),
+            text("EtaItemCode", 100, "مصر: كود الصنف لدى المصلحة", note="مثل EG-123456789-1001، مسجّل في بوابة المصلحة"),
         ],
         pk=["ProductID"],
         indexes=[ux("ProductCode"), ux("Barcode", ignore_nulls=True), ix("ProductName")],
@@ -2170,6 +2187,7 @@ SCREEN_LIST = [
     ("frmEnglishNames", "الأسماء الإنجليزية", "النظام", "SETTINGS", False, True, False),
     ("frmEInvoices", "الفاتورة الإلكترونية", "المبيعات", "EINVOICE", False, True, False),
     ("frmZatcaSetup", "إعداد ربط منصة فاتورة", "النظام", "SETTINGS", False, True, False),
+    ("frmEtaSetup", "إعداد ربط منظومة الإيصال الإلكتروني", "النظام", "SETTINGS", False, True, False),
 ]
 
 

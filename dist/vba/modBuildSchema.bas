@@ -29,10 +29,10 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
     "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=55;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=5;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=24;Products=23;SalesInvoices=42;SalesInvoiceDetails=14;SalesReturns=35;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=64;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=25;Products=25;SalesInvoices=45;SalesInvoiceDetails=14;SalesReturns=38;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
     "CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=8;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;" & _
     "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=37;RolePermissions=73;Employees=1;Screens=61;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=37;RolePermissions=73;Employees=1;Screens=62;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=27;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -773,6 +773,24 @@ Private Sub CreateTable_Settings()
              "", "", "«·»Ì∆… «· Ì ”ıÃ¯· ›ÌÂ« «·ÃÂ«“", ""
     AddField tdf, "ZatcaOnboardStage", "TEXT", 20, False, "", _
              "", "", "„—Õ·…  ”ÃÌ· «·ÃÂ«“", "COMPLIANCE À„ CHECKED À„ PRODUCTION (docs/47)"
+    AddField tdf, "EtaClientId", "TEXT", 100, False, "", _
+             "", "", "„’—: Client ID ·ÃÂ«“ ‰ﬁÿ… «·»Ì⁄", "„‰ »Ê«»… «·„’·Õ… ⁄‰œ  ”ÃÌ· «·ÃÂ«“ (docs/48)"
+    AddField tdf, "EtaClientSecret", "TEXT", 255, False, "", _
+             "", "", "„’—: Client Secret ·ÃÂ«“ ‰ﬁÿ… «·»Ì⁄", "·« Ìıﬂ » ›Ì ”Ã· «·≈—”«·"
+    AddField tdf, "EtaPosSerial", "TEXT", 100, False, "", _
+             "", "", "„’—: «·—ﬁ„ «· ”·”·Ì ·ÃÂ«“ ‰ﬁÿ… «·»Ì⁄", ""
+    AddField tdf, "EtaPosOsVersion", "TEXT", 50, False, "", _
+             "", "", "„’—: ‰Ÿ«„  ‘€Ì· «·ÃÂ«“", "›«—€ = Windows"
+    AddField tdf, "EtaPreSharedKey", "TEXT", 255, False, "", _
+             "", "", "„’—: «·„› «Õ «·„‘ —ﬂ ··ÃÂ«“ (≈‰ ÊıÃœ)", ""
+    AddField tdf, "EtaBranchCode", "TEXT", 10, False, "", _
+             "", "", "„’—: ﬂÊœ «·›—⁄", "›«—€ = 0 («·›—⁄ «·—∆Ì”Ì)"
+    AddField tdf, "EtaActivityCode", "TEXT", 8, False, "", _
+             "", "", "„’—: ﬂÊœ «·‰‘«ÿ", ""
+    AddField tdf, "EtaGovernate", "TEXT", 50, False, "", _
+             "", "", "„’—: «·„Õ«›Ÿ…", ""
+    AddField tdf, "EtaLastUUID", "TEXT", 64, False, "", _
+             "", "", "„’—: „⁄—¯› ¬Œ— ≈Ì’«· ··ÃÂ«“", "”·”·… «·≈Ì’«·«  (previousUUID)"
     AddField tdf, "EInvoiceEnvironment", "TEXT", 12, True, """TEST""", _
              "In (""TEST"",""SIMULATION"",""PRODUCTION"")", "TEST =  Ã—Ì»Ì…° SIMULATION = „Õ«ﬂ«…° PRODUCTION = ›⁄·Ì…", "»Ì∆… «·›« Ê—… «·≈·ﬂ —Ê‰Ì…", "«·”⁄ÊœÌ…: »Ê«»… «·„ÿÊ—Ì‰ / «·„Õ«ﬂ«… / «·›⁄·Ì…∫ „’—: „« ﬁ»· «·≈‰ «Ã / «·›⁄·Ì… (docs/45)"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
@@ -1015,6 +1033,8 @@ Private Sub CreateTable_Units()
              "", "", "«·«”„ »«·≈‰Ã·Ì“Ì…", "ÌŸÂ— ›Ì «·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…"
     AddField tdf, "ZatcaUnitCode", "TEXT", 10, False, "", _
              "", "", "—„“ «·ÊÕœ… (UN/ECE)", ""
+    AddField tdf, "EtaUnitCode", "TEXT", 10, False, "", _
+             "", "", "—„“ «·ÊÕœ… ·œÏ „’·Õ… «·÷—«∆» «·„’—Ì…", "›«—€ = EA (docs/48)"
     AddField tdf, "IsActive", "BOOL", 0, False, "True", _
              "", "", "‰‘ÿ", ""
     AddIndex tdf, "PrimaryKey", "UnitID", True, True, False
@@ -1186,6 +1206,8 @@ Private Sub CreateTable_Customers()
              "", "", "«·—„“ «·»—ÌœÌ", ""
     AddField tdf, "Address", "TEXT", 255, False, "", _
              "", "", "«·⁄‰Ê«‰", ""
+    AddField tdf, "NationalID", "TEXT", 20, False, "", _
+             "", "", "—ﬁ„ «·ÂÊÌ… / «·—ﬁ„ «·ﬁÊ„Ì", "„’—: ··≈Ì’«· 150 √·› Ã‰ÌÂ √Ê √ﬂÀ— (docs/48)"
     AddField tdf, "OpeningBalance", "MONEY", 0, True, "0", _
              "", "", "«·—’Ìœ «·«›  «ÕÌ", "„ÊÃ» = «·⁄„Ì· „œÌ‰ ··„Õ·"
     AddField tdf, "CurrentBalance", "MONEY", 0, True, "0", _
@@ -1261,6 +1283,10 @@ Private Sub CreateTable_Products()
              ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "”⁄— «·ÕÃ„ «·Ê”ÿ", ""
     AddField tdf, "SizePriceL", "MONEY", 0, False, "", _
              ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "”⁄— «·ÕÃ„ «·ﬂ»Ì—", ""
+    AddField tdf, "EtaItemType", "TEXT", 3, False, "", _
+             "", "", "„’—: ‰Ê⁄ ﬂÊœ «·’‰›", "EGS (ﬂÊœ œ«Œ·Ì „”Ã¯·) √Ê GS1∫ ›«—€ = EGS (docs/48)"
+    AddField tdf, "EtaItemCode", "TEXT", 100, False, "", _
+             "", "", "„’—: ﬂÊœ «·’‰› ·œÏ «·„’·Õ…", "„À· EG-123456789-1001° „”Ã¯· ›Ì »Ê«»… «·„’·Õ…"
     AddIndex tdf, "PrimaryKey", "ProductID", True, True, False
     AddIndex tdf, "UX_ProductCode", "ProductCode", False, True, False
     AddIndex tdf, "UX_Barcode", "Barcode", False, True, True
@@ -1335,6 +1361,12 @@ Private Sub CreateTable_SalesInvoices()
              "", "", "„·› «·›« Ê—… «·≈·ﬂ —Ê‰Ì… «·„Êﬁ¯⁄", ""
     AddField tdf, "EInvoiceError", "TEXT", 255, False, "", _
              "", "", "¬Œ— Œÿ√ ›Ì «·≈—”«·", ""
+    AddField tdf, "EtaUUID", "TEXT", 64, False, "", _
+             "", "", "„⁄—¯› «·≈Ì’«· «·≈·ﬂ —Ê‰Ì «·„’—Ì", "SHA-256 ··≈Ì’«· (docs/48)"
+    AddField tdf, "EtaPreviousUUID", "TEXT", 64, False, "", _
+             "", "", "„⁄—¯› «·≈Ì’«· «·”«»ﬁ ··ÃÂ«“", ""
+    AddField tdf, "EtaSubmissionId", "TEXT", 50, False, "", _
+             "", "", "—ﬁ„ «·≈—”«· ·œÏ «·„’·Õ…", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
     AddField tdf, "OrderType", "TEXT", 10, False, "", _
@@ -1462,6 +1494,12 @@ Private Sub CreateTable_SalesReturns()
              "", "", "„·› «·›« Ê—… «·≈·ﬂ —Ê‰Ì… «·„Êﬁ¯⁄", ""
     AddField tdf, "EInvoiceError", "TEXT", 255, False, "", _
              "", "", "¬Œ— Œÿ√ ›Ì «·≈—”«·", ""
+    AddField tdf, "EtaUUID", "TEXT", 64, False, "", _
+             "", "", "„⁄—¯› «·≈Ì’«· «·≈·ﬂ —Ê‰Ì «·„’—Ì", "SHA-256 ··≈Ì’«· (docs/48)"
+    AddField tdf, "EtaPreviousUUID", "TEXT", 64, False, "", _
+             "", "", "„⁄—¯› «·≈Ì’«· «·”«»ﬁ ··ÃÂ«“", ""
+    AddField tdf, "EtaSubmissionId", "TEXT", 50, False, "", _
+             "", "", "—ﬁ„ «·≈—”«· ·œÏ «·„’·Õ…", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", " «—ÌŒ «·≈‰‘«¡", ""
     AddField tdf, "CashBoxID", "LONG", 0, False, "", _
@@ -3367,7 +3405,8 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmEnglishNames'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEnglishNames', '«·√”„«¡ «·≈‰Ã·Ì“Ì…', '«·‰Ÿ«„', 590, 'SETTINGS', False, True, False)"
     SeedRow "[ScreenName] = 'frmEInvoices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEInvoices', '«·›« Ê—… «·≈·ﬂ —Ê‰Ì…', '«·„»Ì⁄« ', 600, 'EINVOICE', False, True, False)"
     SeedRow "[ScreenName] = 'frmZatcaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmZatcaSetup', '≈⁄œ«œ —»ÿ „‰’… ›« Ê—…', '«·‰Ÿ«„', 610, 'SETTINGS', False, True, False)"
-    EndSeed "Screens", 61
+    SeedRow "[ScreenName] = 'frmEtaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEtaSetup', '≈⁄œ«œ —»ÿ „‰ŸÊ„… «·≈Ì’«· «·≈·ﬂ —Ê‰Ì', '«·‰Ÿ«„', 620, 'SETTINGS', False, True, False)"
+    EndSeed "Screens", 62
 End Sub
 
 Private Sub Seed_Categories()
@@ -3899,6 +3938,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'English names' WHERE [ScreenName] = 'frmEnglishNames' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'E-invoicing' WHERE [ScreenName] = 'frmEInvoices' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Fatoora connection setup' WHERE [ScreenName] = 'frmZatcaSetup' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'E-receipt connection setup' WHERE [ScreenName] = 'frmEtaSetup' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Sales' WHERE [ModuleName] = '«·„»Ì⁄« ' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Customers' WHERE [ModuleName] = '«·⁄„·«¡' AND [ModuleNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ModuleNameEn] = 'Purchases' WHERE [ModuleName] = '«·„‘ —Ì« ' AND [ModuleNameEn] Is Null", dbFailOnError

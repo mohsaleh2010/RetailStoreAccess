@@ -15,6 +15,7 @@ End Sub
 
 Private Sub D1_1()
     LangAdd "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "The verification code comes from the Fatoora portal (in the test environment any number such as 123345). Step 1 creates a new key in the ZATCA folder next to the program. After step 3 enable sending in the e-invoicing screen. To try without ZATCA: Test certificate, then XML file of an invoice"
+    LangAdd "ÓÌøá ÇáÌåÇÒ İí ÈæÇÈÉ ÇáãÕáÍÉ Ëã ÇäÓÎ ÈíÇäÇÊå åäÇ. ÇáÑŞã ÇáÖÑíÈí æÇáÚäæÇä ãä ÇáÅÚÏÇÏÇÊ¡ æßæÏ ÇáãÕáÍÉ áßá Õäİ ãä ÔÇÔÉ ÇáãäÊÌÇÊ¡ æÑãÒ ÇáæÍÏÉ ãä æÍÏÇÊ ÇáŞíÇÓ", "Register the device on the Tax Authority portal, then copy its data here. The tax number and the address come from the settings, the code of each product from the products screen, the unit code from the units"
     LangAdd "ÒÑ ÇáÇŞÊÑÇÍ íßÊÈ ÇáÇÓã ÇáÚÑÈí ÈÍÑæİ áÇÊíäíÉ İí ÇáÎÇäÇÊ ÇáİÇÑÛÉ İŞØ. ÑÇÌÚå æÚÏøáå Ëã ÇÍİÙ. ÇáÇÓã ÇáİÇÑÛ íÙåÑ ÈÇáÚÑÈíÉ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "Suggest writes the Arabic name in Latin letters in the empty boxes only. Review and correct it, then save. An empty name shows in Arabic in the English interface"
     LangAdd "ÇáÍÓÇÈÇÊ ÇáÃÓÇÓíÉ (ÇáãÚáóøãÉ) ÊÓÊÎÏãåÇ ÇáŞíæÏ ÇáÂáíÉ: áÇ ÊõÍĞİ æáÇ íÊÛíÑ äæÚåÇ. ÇáŞíæÏ ÇáíÏæíÉ ãä ÒÑ «ŞíÏ íÏæí", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "íõÚÑÖ ÇáÊŞÑíÑ ááãÚÇíäÉ æãäåÇ ÇáØÈÇÚÉ. «ÍİÙ PDF» æ«ÊÕÏíÑ Excel» íÍİÙÇä Çáãáİ İí ãÌáÏ Reports ÈÌÇäÈ ãáİ ÇáÈÑäÇãÌ", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
@@ -48,7 +49,6 @@ Private Sub D1_1()
     LangAdd "ÅíÏÇÚ æÓÍÈ¡ ÊÓæíÉ ÊÍÕíáÇÊ ãÏì ÈÚãæáÊåÇ¡ ÇáÊÍæíá Èíä ÇáÈäæß¡ æÇáÍÑßÇÊ ÇáÃÎÑì", "Deposit and withdrawal, settlement of Mada collections with their fee, transfer between banks, and other moves"
     LangAdd "ÇáİÇÊæÑÉ ÇáÍÇáíÉ áã ÊõÍİÙ (ÓÊÈŞì ãÍİæÙÉ ãÄŞÊğÇ áåĞÇ ÇáÌåÇÒ). åá ÊÑíÏ ÇáÎÑæÌ", "The current invoice is not saved (it will stay held for this computer). Do you want to exit"
     LangAdd "ãÈáÛ ÔåÑí áßá ÍÓÇÈ ÅíÑÇÏÇÊ Ãæ ãÕÑæİÇÊ (æíãßä áßá ãÑßÒ)¡ Ëã ÇáãŞÇÑäÉ ÈÇáİÚáí", "A monthly amount for each revenue or expense account (and for each center), then the comparison with the actual"
-    LangAdd "ÅÚÏÇÏ ãäÙæãÉ ãÕáÍÉ ÇáÖÑÇÆÈ ÇáãÕÑíÉ íÃÊí İí ãÑÍáÉ ÇáÅíÕÇá ÇáÅáßÊÑæäí ÇáãÕÑí", "The Egyptian Tax Authority setup comes with the Egyptian e-receipt phase"
     LangAdd "ÇÎÊÑ ãÌáÏ ÇáäÓÎ ÇáÇÍÊíÇØí (íİÖá ŞÑÕ ÂÎÑ Ãæ İáÇÔÉ Ãæ ãÌáÏ ãÊÒÇãä ãÚ ÇáÓÍÇÈÉ", "Choose the backup folder (preferably another disk, a USB drive or a folder synced with the cloud"
     LangAdd "ÇáÅåáÇß ÇáÓÇÈŞ ááÃÕæá ÇáãæÌæÏÉ ŞÈá ÇáÈÑäÇãÌ İŞØ (ãÕÏÑ ÇáÔÑÇÁ: ÑÕíÏ ÇİÊÊÇÍí", "Previous depreciation, only for assets owned before the program (purchase source: opening balance"
     LangAdd "ÊÑÍíá ÇáÌÑÏ íÍæøá ÇáİÑæŞÇÊ Åáì ÍÑßÇÊ ÊÓæíÉ İí ÇáãÎÒæä æáÇ íãßä ÇáÊÑÇÌÚ Úäå", "Posting the count turns the differences into stock adjustment moves and cannot be undone"
@@ -118,6 +118,7 @@ Private Sub D1_1()
     LangAdd "íæÌÏ ãÓíÑ ãÑÍóøá ÈÚÏå: ÎÕæãÇÊ ÇáÓáİ İíå ÊÚÊãÏ Úáì åĞÇ ÇáãÓíÑ", "There is a posted run after it: its advance deductions depend on this run"
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì Ëã ÇÍİÙ ÇáÅÚÏÇÏÇÊ ãÑÉ ÃÎÑì", "Close the program on the other computers, then save the settings again"
     LangAdd "ÅáÛÇÁ ÇÚÊãÇÏ ÇáÅŞÑÇÑ¿ íõÍĞİ ŞíÏ ÇáÊÓæíÉ æíÚæÏ ÇáÅŞÑÇÑ ãÓæÏÉ", "Cancel the approval of the return? The settlement entry is deleted and the return becomes a draft"
+    LangAdd "ÅíÕÇá 150 Ãáİ Ìäíå Ãæ ÃßËÑ: ÇáÑŞã ÇáŞæãí Ãæ ÇáÖÑíÈí ááãÔÊÑí", "Receipt of 150,000 pounds or more: national ID or tax number of the buyer"
     LangAdd "ÇáÊÍæíá ÇáÈäßí íõÎÕã ãä åĞÇ ÇáÈäß (ÇáÈäß ÇáÇİÊÑÇÖí ÊáŞÇÆíğÇ", "A bank transfer is taken from this bank (the default bank automatically"
     LangAdd "ÇáÎØæÉ 2 ÊãÊ: ÇÌÊÇÒÊ ÇáÚíäÇÊ ÇáİÍÕ. ÇáÊÇáí: ÇáÔåÇÏÉ ÇáİÚáíÉ", "Step 2 done: the samples passed the checks. Next: production certificate"
     LangAdd "ÇáãÕÑæİ ÇáäŞÏí íõÎÕã ãä åĞÇ ÇáÕäÏæŞ (íõÎÊÇÑ ÕäÏæŞß ÊáŞÇÆíğÇ", "A cash expense is taken from this box (your box is chosen automatically"
@@ -133,10 +134,10 @@ Private Sub D1_1()
     LangAdd "ÚÏø ÇáäŞÏíÉ æÊÑÍíáåÇ ááÎÒíäÉ ÇáÑÆíÓíÉ Ãæ ÊÓæíÊåÇ ãÚ ÇáãÇáß", "Count the cash and transfer it to the main treasury or settle it with the owner"
     LangAdd "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ¡ æãÊì¡ æãä Ãí ÌåÇÒ¡ æÇáŞíã ŞÈá æÈÚÏ", "Who added, edited or deleted, when, from which computer, and the values before and after"
     LangAdd "ÃÍÏ ÇáÃÕäÇİ İí ÇáİÇÊæÑÉ áã íÚÏ ãæÌæÏğÇ. ÇÍĞİå ãä ÇáİÇÊæÑÉ", "An item of the invoice no longer exists. Remove it from the invoice"
-    LangAdd "ÃÖİ ÃÕäÇİ ÇáİÇÊæÑÉ Ãæ ÇÍİÙ İÇÊæÑÉ ÃæáğÇ¡ Ëã ÇØÈÚ ÇáÈÇÑßæÏ", "Add the invoice items or save an invoice first, then print the barcodes"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "ÃÖİ ÃÕäÇİ ÇáİÇÊæÑÉ Ãæ ÇÍİÙ İÇÊæÑÉ ÃæáğÇ¡ Ëã ÇØÈÚ ÇáÈÇÑßæÏ", "Add the invoice items or save an invoice first, then print the barcodes"
     LangAdd "ÇÎÊÑ ÇáÈäß¡ æÇßÊÈ ÊÇÑíÎ ßÔİ ÇáÈäß æÑÕíÏå¡ Ëã «ÈÏÁ ÇáÊÓæíÉ", "Choose the bank, type the date and balance of the bank statement, then Start reconciliation"
     LangAdd "ÇáÑÕíÏ ÇáÇİÊÊÇÍí íõÓÌóøá ãÑÉ æÇÍÏÉ ŞÈá Ãí ÍÑßÉ Úáì ÇáãäÊÌ", "The opening balance is recorded once, before any move on the product"
     LangAdd "ÇáãäÊÌ ãæÌæÏ áßäå áíÓ Öãä åĞÇ ÇáÌÑÏ (ÊÕäíİ ÂÎÑ Ãæ ÛíÑ äÔØ", "The product exists but is not part of this count (another category or inactive"
@@ -145,6 +146,7 @@ Private Sub D1_2()
     LangAdd "íõÍĞİ ÇáÔíß ÊÍÊ ÇáÊÍÕíá İŞØ: ÃáÛö ÊÍÕíáå Ãæ ÇÑÊÏÇÏå ÃæáğÇ", "Only a cheque under collection is deleted: cancel its collection or bounce first"
     LangAdd "ÅÑÌÇÚ ÇáÔíß Åáì «ÊÍÊ ÇáÊÍÕíá» æÍĞİ ŞíÏ ÊÍÕíáå Ãæ ÇÑÊÏÇÏå", "Return the cheque to Under collection and delete the entry of its collection or bounce"
     LangAdd "ÇßÊÈ ÓÈÈ ÇáÍÑßÉ İí ÇáãáÇÍÙÇÊ (ãËÇá: ÊÇáİ¡ åÏíÉ ãä ÇáãæÑÏ", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
+    LangAdd "ÇáÅÚÏÇÏ ãßÊãá. İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "The setup is complete. Enable sending in the e-invoicing screen"
     LangAdd "ÇáãÈáÛ ÇáãÏİæÚ (F8) - ÇÊÑßå İÇÑÛğÇ ÅĞÇ ÏİÚ ÇáãÈáÛ ÈÇáÖÈØ", "Amount paid (F8) - leave it empty if the exact amount is paid"
     LangAdd "ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ", "The remainder of each credit invoice by its delay after the due date"
     LangAdd "ÏæÑ ãÏíÑ ÇáäÙÇã íãáß ßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ æáÇ íãßä ÊŞííÏå", "The system administrator role always has all the permissions and cannot be restricted"
@@ -188,8 +190,10 @@ Private Sub D1_2()
     LangAdd "ÇáãÏíÑ ÇáãÓÄæá Úä ÇáÎÒíäÉ: ÇÎÊÑ áå ÇáÎÒíäÉ ÇáÑÆíÓíÉ", "The manager in charge of the treasury: choose the main treasury for him"
     LangAdd "ÊÇÑíÎ ÇáãÕÑæİ İí ÇáãÓÊŞÈá. åá ÊÑíÏ ÇáÍİÙ Úáì Ãí ÍÇá", "The expense date is in the future. Do you want to save anyway"
     LangAdd "ÊæÌÏ ÔåÇÏÉ ãÍİæÙÉ. åá ÊÑíÏ ÇÓÊÈÏÇáåÇ ÈÔåÇÏÉ ÊÌÑíÈíÉ", "A certificate is saved. Replace it with a test certificate"
+    LangAdd "ÌåÇÒ äŞØÉ ÇáÈíÚ ÇáãÓÌøá İí ÈæÇÈÉ ãÕáÍÉ ÇáÖÑÇÆÈ (ãÕÑ", "The POS device registered on the Egyptian Tax Authority portal (Egypt"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to add in the payment matching screen"
     LangAdd "áã ÊõÚãá äÓÎÉ ÇÍÊíÇØíÉ Çáíæã. åá ÊÑíÏ Úãá äÓÎÉ ÇáÂä", "No backup was made today. Do you want to make a backup now"
+    LangAdd "ãäÕÉ İÇÊæÑÉ ÊÑÏ ÚäÏ ÇáÅÑÓÇá¡ İáÇ ÍÇÌÉ áÊÍÏíË ÇáÍÇáÉ", "Fatoora answers when a document is sent, there is no status to refresh"
     LangAdd "åá ÊÑíÏ ÅáÛÇÁ ÇáİÇÊæÑÉ ÇáÍÇáíÉ æÇáÈÏÁ ÈİÇÊæÑÉ ÌÏíÏÉ", "Do you want to cancel the current invoice and start a new one"
     LangAdd "ÇÎÊÑ İÇÊæÑÉ ÇáÔÑÇÁ Ëã ÍÏÏ ÇáßãíÇÊ ÇáÊí ÊÚæÏ ááãæÑÏ", "Choose the purchase invoice, then set the quantities going back to the supplier"
     LangAdd "ÇáÈíÚ ÇáÂÌá íÍÊÇÌ ÚãíáğÇ ãÓÌáğÇ. ÇÎÊÑ ÇáÚãíá ÃæáğÇ", "A credit sale needs a registered customer. Choose the customer first"
@@ -198,6 +202,7 @@ Private Sub D1_2()
     LangAdd "ÊÃßÏ Ãä ÇáãÈÑãÌ ÃÕÏÑå áÑŞã ÇáÌåÇÒ ÇáÙÇåÑ İí ÇáÔÇÔÉ", "Make sure the developer issued it for the computer number shown on the screen"
     LangAdd "ÊãÊ ÇáÇÓÊÚÇÏÉ. ÓíõÛáŞ ÇáÈÑäÇãÌ ÇáÂä¡ ÇİÊÍå ãä ÌÏíÏ", "Restored. The program will close now, open it again"
     LangAdd "ÊæÌÏ ÊÚÏíáÇÊ ÛíÑ ãÍİæÙÉ. åá ÊÑíÏ ÍİÙåÇ ŞÈá ÇáÅÛáÇŞ", "There are unsaved changes. Do you want to save them before closing"
+    LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÇáÏÎæá (ÈíÇäÇÊ ÌåÇÒ äŞØÉ ÇáÈíÚ", "The Tax Authority refused the credentials (POS device data"
     LangAdd "ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ ÈåĞÇ ÇáãÓÊÎÏã (ÈÏá ÕáÇÍíÇÊ ÏæÑå", "Custom screen permissions for this user (instead of the permissions of his role"
     LangAdd "ááÊÕÍíÍ ÓÌøá ÓäÏ ŞÈÖ äŞÏíÉ ÈÇáãÈáÛ Ëã ÓäÏ ÕÑİ ÌÏíÏ", "To correct, record a cash receipt voucher with the amount, then a new payment voucher"
     LangAdd "íæÌÏ ØáÈ ÛíÑ ãßÊãá ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáå", "There is an unfinished order from a previous session. Do you want to continue it"
@@ -222,6 +227,7 @@ Private Sub D1_2()
     LangAdd "ÅĞÇ áã Êßä Úáíå ŞíæÏ ÃáÛö «ÍÓÇÈ İÑÚí» İíå ÃæáğÇ", "If it has no entries, clear Sub-account on it first"
     LangAdd "ÅáÛÇÁ ÇáÌÑÏ ÇáÍÇáí¿ áä ÊÊÛíÑ Ãí ßãíÉ İí ÇáãÎÒæä", "Cancel the current count? No stock quantity will change"
     LangAdd "ÇßÊÈ ÇáãÈáÛ ãÏíäğÇ Ãæ ÏÇÆäğÇ İí ßá ÓØÑ İíå ÍÓÇÈ", "Type the amount as debit or credit in every line with an account"
+    LangAdd "ÇáÅíÕÇá ÇáÅáßÊÑæäí ÇáãÕÑí áÏæáÉ ÇáÊÔÛíá ãÕÑ İŞØ", "The Egyptian e-receipt is for the operating country Egypt only"
     LangAdd "ÇáÑÇÊÈ æÇáÈÏáÇÊ æÇáÊÃãíäÇÊ æŞÓØ ÇáÓáİÉ áßá ãæÙİ", "Salary, allowances, social insurance and advance installment of each employee"
     LangAdd "Çáãáİ ÇáãÎÊÇÑ áíÓ äÓÎÉ ÕÇáÍÉ ãä ÈíÇäÇÊ ÇáÈÑäÇãÌ", "The chosen file is not a valid backup of the program data"
     LangAdd "ÊõÍÓÈ ÇáİÑæŞÇÊ Úáì ÇáßãíÇÊ ÇáÍÇáíÉ áÍÙÉ ÇáÊÑÍíá", "The differences are calculated on the current quantities at the time of posting"
@@ -251,15 +257,15 @@ Private Sub D1_2()
     LangAdd "ÇáãÑÊÌÚÇÊ Úáì åĞå ÇáİÇÊæÑÉ (äŞÑ ãÒÏæÌ ááØÈÇÚÉ", "Returns on this invoice (double-click to print"
     LangAdd "ÈÚÏ ÇáÍİÙ Úíøä ßáãÉ ÇáãÑæÑ ãä ÒÑ «ßáãÉ ÇáãÑæÑ", "After saving, set the password with the button Password"
     LangAdd "ÑÕíÏ ÇáÍÓÇÈ İí ÇáÈäß ÚäÏ ÈÏÁ ÇÓÊÎÏÇã ÇáÈÑäÇãÌ", "The account balance in the bank when the program is first used"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ÛíÑ ãŞİáÉ: ÕÇİí ÇáÑÈÍ (ÇáÎÓÇÑÉ) ÍÊì 31 ÏíÓãÈÑ", "Not closed: net profit (loss) up to 31 December"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÚãæáÇÊ ÇáãäÏæÈíä", "You do not have this permission in the sales rep commissions screen"
     LangAdd "ááÚãá İí ÇáÏæáÉ ÇáÃÎÑì ÇÈÏÃ ãáİ ÈíÇäÇÊ ÌÏíÏğÇ", "To work in the other country start a new data file"
     LangAdd "ÃÏÎá ÊÇÑíÎ ÇÚÊãÇÏ ÇáÅŞÑÇÑ (íæã ÊŞÏíãå ááåíÆÉ", "Enter the approval date of the return (the day it is filed with the Authority"
     LangAdd "ÃÖİ ÕäİğÇ æÇÍÏğÇ Úáì ÇáÃŞá Åáì ŞÇÆãÉ ÇáØÈÇÚÉ", "Add at least one item to the print list"
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ İí ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled in the settings"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ", "Need follow-up (waiting, rejected, warning"
     LangAdd "ÚãáíÇÊ ÇáÏİÇÊÑ ÛíÑ ÇáãØÇÈŞÉ (ÍÊì ÊÇÑíÎ ÇáßÔİ", "Book transactions not matched (up to the statement date"
     LangAdd "ßáãÉ ÇáãÑæÑ áÇ íÌæÒ Ãä Êßæä äİÓ ÇÓã ÇáãÓÊÎÏã", "The password may not be the same as the user name"
@@ -288,6 +294,7 @@ Private Sub D1_3()
     LangAdd "ßáãÉ ãÑæÑ ãÄŞÊÉ: ÓíõØáÈ ÊÛííÑåÇ ÚäÏ ÇáÏÎæá", "Temporary password: the user is asked to change it at login"
     LangAdd "áÇ ÊæÌÏ ÔåÇÏÉ ÇáÌåÇÒ (CSID) İí ÅÚÏÇÏ ÇáÑÈØ", "There is no device certificate (CSID) in the connection setup"
     LangAdd "ãÔßáÉ İí ÇáÈíÇäÇÊ - ÑÇÌÚ ÊŞÑíÑ İÍÕ ÇáÓáÇãÉ", "A data problem - check the integrity report"
+    LangAdd "ãÕÑ: íõØáÈ İí ÇáÅíÕÇá 150 Ãáİ Ìäíå Ãæ ÃßËÑ", "Egypt: needed for a receipt of 150,000 pounds or more"
     LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ÛíÑ ãæÌæÏ Úáì åĞÇ ÇáÌåÇÒ", "The private key file is not on this computer"
     LangAdd "ãäÕÉ İÇÊæÑÉ (åíÆÉ ÇáÒßÇÉ æÇáÖÑíÈÉ æÇáÌãÇÑß", "the Fatoora platform (ZATCA"
     LangAdd "íæÌÏ ÍŞá ãØáæÈ İÇÑÛ. Ãßãá ÇáÈíÇäÇÊ Ëã ÇÍİÙ", "A required field is empty. Complete the data, then save"
@@ -309,15 +316,4 @@ Private Sub D1_3()
     LangAdd "áÇ ÊæÌÏ ãÈÇáÛ ÛíÑ ãÑÈæØÉ Ãæ İæÇÊíÑ ãİÊæÍÉ", "There are no unlinked amounts or open invoices"
     LangAdd "áÇ ÊæÌÏ ãäÊÌÇÊ äÔØÉ ááÌÑÏ İí åĞÇ ÇáÇÎÊíÇÑ", "There are no active products to count in this choice"
     LangAdd "ááÊÕÍíÍ ÇÍĞİ ŞíæÏ ÇáÅåáÇß ÈÏÁğÇ ãä ÇáÃÎíÑ", "To correct, delete the depreciation entries starting from the last"
-    LangAdd "áã íÊã ÇáÚËæÑ Úáì ãäÊÌ ÈÇáÈÇÑßæÏ Ãæ ÇáßæÏ", "No product was found with the barcode or the code"
-    LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ÛíÑ ãÍÏÏ İí ÅÚÏÇÏ ÇáÑÈØ", "The private key file is not set in the connection setup"
-    LangAdd "ãäÊÌ æÕáÊ ßãíÊå Åáì ÍÏ ÅÚÇÏÉ ÇáØáÈ Ãæ ÃŞá", "products have reached the reorder level or less"
-    LangAdd "åá ÊÑíÏ ÚÑÖ ÊŞÑíÑ ÇáãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "Do you want to show the low-stock products report"
-    LangAdd "íÛíøÑåÇ ÇáãÓÊÎÏã ÚäÏ Ãæá ÏÎæá (ßáãÉ ãÄŞÊÉ", "The user changes it at the first login (temporary password"
-    LangAdd "ÃÏÎá ÇáäŞÏíÉ ÇáİÚáíÉ ÇáãæÌæÏÉ İí ÇáÕäÏæŞ", "Enter the actual cash in the box"
-    LangAdd "ÇÍĞİ ŞíæÏ ÇáÅåáÇß ãä ÔåÑ ÇáÇÓÊÈÚÇÏ ÃæáğÇ", "Delete the depreciation entries from the month of disposal first"
-    LangAdd "ÇÎÊÑ ÍÓÇÈ ÇáÈäß ÇáĞí ÓõÏöøÏÊ ãäå ÇáÖÑíÈÉ", "Choose the bank account the tax was paid from"
-    LangAdd "ÇÎÊÑ ÓØÑğÇ İí ÇáÌÏæá æÇßÊÈ ÇáãÈáÛ ÇáÓäæí", "Choose a line in the table and type the yearly amount"
-    LangAdd "ÇáÏÇÆä¡ æíõÑÍóøá áŞíæÏ ÇáíæãíÉ ÚäÏ ÇáÍİÙ", "credit, and is posted to the journal entries when saved"
-    LangAdd "ÇáãÔÊÑíÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ (ÈÚÏ ÇáãÑÊÌÚÇÊ", "Taxable purchases (after returns"
 End Sub

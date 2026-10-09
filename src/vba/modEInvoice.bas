@@ -288,12 +288,60 @@ Public Sub EInvoicesShow(ByVal frm As Access.Form)
 End Sub
 
 Public Sub EInvoiceSetupOpen()
-    ' The setup of the platform of the country: Saudi Arabia now (modZatcaXml), Egypt in phase D.
-    If AppCountry() = "SA" Then
-        OpenScreen "frmZatcaSetup"
+    ' The setup of the platform of the country: Saudi Arabia (modZatcaApi), Egypt (modEtaReceipt).
+    If AppCountry() = "EG" Then
+        OpenScreen "frmEtaSetup"
     Else
-        ShowInfo "إعداد منظومة مصلحة الضرائب المصرية يأتي في مرحلة الإيصال الإلكتروني المصري."
+        OpenScreen "frmZatcaSetup"
     End If
+End Sub
+
+Public Function RefreshSubmittedEInvoices(ByRef Checked As Long, ByRef Changed As Long) As String
+    ' Egypt: reads the result of every SUBMITTED receipt (EtaRefreshStatus). Stops at the first network problem.
+    ' Returns "" or the last problem.
+    Dim rs As DAO.Recordset, reply As Variant, msg As String, result As String, lastProblem As String
+    Checked = 0
+    Changed = 0
+    If AppCountry() <> "EG" Then Exit Function          ' Saudi Arabia answers at once: nothing to follow
+    Set rs = CurrentDb.OpenRecordset("SELECT DocKind, DocID FROM qryEInvoiceDocs WHERE EStatus = 'SUBMITTED' " & _
+                                     "ORDER BY DocDate, DocKind DESC, DocID", dbOpenSnapshot)
+    Do Until rs.EOF
+        On Error Resume Next
+        reply = Application.Run("EtaRefreshStatus", CStr(rs!DocKind), CLng(rs!DocID))
+        If Err.Number <> 0 Then
+            reply = "ERROR|" & Err.Description
+        End If
+        On Error GoTo 0
+        result = SplitResult(Nz(reply, ""), msg)
+        Checked = Checked + 1
+        If Nz(DbValue("SELECT EStatus FROM qryEInvoiceDocs WHERE DocKind = '" & rs!DocKind & "' AND DocID = " & _
+                      rs!DocID), "") <> "SUBMITTED" Then Changed = Changed + 1
+        If result = "NETWORK" Or result = "ERROR" Then
+            lastProblem = msg
+            Exit Do
+        End If
+        rs.MoveNext
+    Loop
+    rs.Close
+    RefreshSubmittedEInvoices = lastProblem
+End Function
+
+Public Sub EInvoicesRefresh(ByVal frm As Access.Form)
+    Dim checked As Long, changed As Long, msg As String
+    If Not CanScreenAction(frm.Name, "EDIT") Then Exit Sub
+    If AppCountry() <> "EG" Then
+        ShowInfo "منصة فاتورة ترد عند الإرسال، فلا حاجة لتحديث الحالة."
+        Exit Sub
+    End If
+    DoCmd.Hourglass True
+    msg = RefreshSubmittedEInvoices(checked, changed)
+    DoCmd.Hourglass False
+    If Len(msg) > 0 Then
+        ShowWarning "تعذّر تحديث الحالة: " & msg
+    Else
+        ShowInfo "رُوجع " & checked & " إيصال، وتغيّرت حالة " & changed & "."
+    End If
+    EInvoicesShow frm
 End Sub
 
 Public Function EnvironmentName() As String

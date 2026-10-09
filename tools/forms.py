@@ -179,6 +179,8 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("SizePriceL"),
             Fld("ImagePath", hint="صورة الزر في شاشة اللمس: مسار كامل أو اسم ملف في مجلد الصور",
                 button=("btnBrowseImage", "استعراض", 'BrowseFile Me, "ImagePath"')),
+            Fld("EtaItemType", hint="مصر: EGS أو GS1 (فارغ = EGS)"),
+            Fld("EtaItemCode", hint="مصر: كود الصنف المسجّل في بوابة المصلحة"),
             Fld("Notes", span=2),
         ]),
     DataScreen(
@@ -197,6 +199,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("Email"), Fld("VATNumber", hint="للعملاء المنشآت (فاتورة ضريبية)"),
             Fld("CRNumber"), Fld("City"), Fld("District"), Fld("StreetName"),
             Fld("BuildingNo"), Fld("PostalCode"), Fld("Address", span=2),
+            Fld("NationalID", hint="مصر: يُطلب في الإيصال 150 ألف جنيه أو أكثر"),
             Fld("OpeningBalance", hint="يُقفل بعد أول عملية"), Fld("CurrentBalance", locked=True),
             Fld("AllowCredit"), Fld("CreditLimit", hint="0 = بدون حد"),
             Fld("PaymentTermsDays", hint="استحقاق الفاتورة الآجلة = تاريخها + هذه المدة"),
@@ -402,6 +405,7 @@ DATA_SCREENS: List[DataScreen] = [
         list_order="t.UnitName", list_headers=[("الوحدة", 5.4), ("الرمز", 3.0)],
         search=["t.UnitName", "t.ZatcaUnitCode"], active="t.IsActive", unique=["UnitName"],
         fields=[Fld("UnitName"), Fld("UnitNameEn"), Fld("ZatcaUnitCode", hint="مثال: PCE للحبة، KGM للكيلو"),
+                Fld("EtaUnitCode", hint="مصر: EA للحبة، KGM للكيلو"),
                 Fld("IsActive")]),
     DataScreen(
         "frmExpenseTypes", "ExpenseTypes", "أنواع المصروفات", "قائمة أنواع المصروفات", "expenses",
@@ -571,7 +575,7 @@ SCREEN_PERMISSIONS = {
     "frmRecurring": "EXPENSES", "frmAccounting": "", "frmAuditLog": "AUDIT_LOG",
     "frmCurrencies": "CURRENCIES", "frmCurrencyRates": "CURRENCIES",
     "frmSalesReps": "SALES_REPS", "frmRepTargets": "SALES_REPS", "frmCommissions": "SALES_REPS",
-    "frmEnglishNames": "SETTINGS", "frmEInvoices": "EINVOICE", "frmZatcaSetup": "SETTINGS",
+    "frmEnglishNames": "SETTINGS", "frmEInvoices": "EINVOICE", "frmZatcaSetup": "SETTINGS", "frmEtaSetup": "SETTINGS",
 }
 
 
@@ -1265,9 +1269,9 @@ def all_forms() -> List[FormModel]:
     from forms_audit import audit_forms
     from forms_sales_reps import sales_rep_forms
     from forms_names import names_forms
-    from forms_einvoice import einvoice_forms, layout_zatca_setup
+    from forms_einvoice import einvoice_forms, layout_eta_setup, layout_zatca_setup
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
             + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms()
-            + audit_forms() + sales_rep_forms() + names_forms() + einvoice_forms() + [layout_zatca_setup()])
+            + audit_forms() + sales_rep_forms() + names_forms() + einvoice_forms() + [layout_zatca_setup(), layout_eta_setup()])

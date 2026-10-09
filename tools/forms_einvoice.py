@@ -4,7 +4,7 @@ their e-invoicing status, the requests of the chosen document, and sending again
 from typing import List
 
 from forms import Control, FormModel, Sym, button, cm, labelled, title_band
-from forms_security import check_with_label
+from forms_security import PASSWORD, check_with_label
 
 ENVIRONMENTS = "TEST;تجريبية;SIMULATION;محاكاة (السعودية);PRODUCTION;فعلية"
 STATUS_FILTER = ("ATTENTION;تحتاج متابعة (بانتظار الإرسال، مرفوضة، تحذير);SENT;أُرسلت;"
@@ -45,6 +45,7 @@ def layout_einvoices() -> FormModel:
     for name, caption, style, w, call in [
             ("btnSendPicked", "إرسال المختار", "primary", 3.6, "EInvoicesSendPicked Me"),
             ("btnSendAll", "إرسال كل المعلّق", "secondary", 3.8, "EInvoicesSendAll Me"),
+            ("btnRefresh", "تحديث الحالة", "secondary", 3.2, "EInvoicesRefresh Me"),
             ("btnSetup", "إعداد الربط", "secondary", 3.2, "EInvoiceSetupOpen")]:
         button(m, name, caption, bx, y, style, w=cm(w), h=cm(0.9), call=call)
         bx += cm(w) + cm(0.2)
@@ -118,6 +119,43 @@ def layout_zatca_setup() -> FormModel:
     m.form_events = ["Load"]
     m.code = (["Private Sub Form_Load()", "    ZatcaSetupLoad Me", "    ZatcaOnboardShow Me", "End Sub",
                "Private Sub txtCertificate_AfterUpdate()", "    ZatcaSetupShowCert Me", "End Sub"] + m.code)
+    return m
+
+
+def layout_eta_setup() -> FormModel:
+    """frmEtaSetup (docs/48): the POS of the Egyptian e-receipt: its credentials and the data of the seller
+    (modEtaReceipt)."""
+    width, height = cm(20.0), cm(13.6)
+    m = FormModel("frmEtaSetup", "إعداد ربط منظومة الإيصال الإلكتروني", width, height, popup=True, allow_add=False)
+    title_band(m, "إعداد ربط منظومة الإيصال الإلكتروني", "جهاز نقطة البيع المسجّل في بوابة مصلحة الضرائب (مصر)",
+               "settings")
+    half = (width - cm(1.0)) / 2
+    rows = [("txtClientId", "Client ID لجهاز نقطة البيع", {}), ("txtClientSecret", "Client Secret", PASSWORD),
+            ("txtPosSerial", "الرقم التسلسلي للجهاز (POS Serial)", {}), ("txtPosOs", "نظام تشغيل الجهاز (فارغ = Windows)", {}),
+            ("txtPreSharedKey", "المفتاح المشترك (إن أعطته المصلحة)", PASSWORD), ("txtBranchCode", "كود الفرع (فارغ = 0)", {}),
+            ("txtActivityCode", "كود النشاط (4 أرقام)", {}), ("txtGovernate", "المحافظة", {})]
+    for i, (name, caption, props) in enumerate(rows):
+        x = cm(0.4) if i % 2 == 0 else cm(0.6) + half
+        y = cm(2.6) + (i // 2) * cm(1.5)
+        c = m.add(Control("text", name, x, y, half, cm(0.8), dict(props)))
+        labelled(m, name, caption, c)
+    m.add(Control("label", "lblReady", cm(0.4), cm(8.4), width - cm(0.8), cm(1.6),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("label", "lblSetupNote", cm(0.4), cm(10.1), width - cm(0.8), cm(1.4),
+                  {"Caption": "سجّل الجهاز في بوابة المصلحة ثم انسخ بياناته هنا. الرقم الضريبي والعنوان من الإعدادات، "
+                              "وكود المصلحة لكل صنف من شاشة المنتجات، ورمز الوحدة من وحدات القياس.",
+                   "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+    y = cm(12.2)
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnSave", "حفظ", "primary", 3.0, "EtaSetupSave Me"),
+            ("btnTestLogin", "تجربة الدخول", "secondary", 3.4, "EtaSetupTestLogin Me")]:
+        button(m, name, caption, bx, y, style, w=cm(w), h=cm(0.9), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), y, "secondary", w=cm(2.6), h=cm(0.9),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = ["Private Sub Form_Load()", "    EtaSetupLoad Me", "End Sub"] + m.code
     return m
 
 

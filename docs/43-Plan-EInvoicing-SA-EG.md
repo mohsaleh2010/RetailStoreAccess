@@ -76,4 +76,5 @@
 | أ: دولة التشغيل | ✅ تمت الموافقة (`docs/44-Operating-Country.md`) |
 | ب: أساس الربط المشترك | ✅ تمت الموافقة (`docs/45-EInvoice-Foundation.md`) |
 | ج1: ملف الفاتورة السعودية وبصمته وتوقيعه ورمز QR | ✅ تمت الموافقة (`docs/46-ZATCA-Invoice-XML.md`) |
-| ج2: تسجيل الجهاز والإرسال | ✅ بانتظار الموافقة (`docs/47-ZATCA-Onboarding-Sending.md`) |
+| ج2: تسجيل الجهاز والإرسال | ✅ تمت الموافقة (`docs/47-ZATCA-Onboarding-Sending.md`) |
+| د: الإيصال الإلكتروني المصري | ✅ بانتظار الموافقة (`docs/48-ETA-EReceipt.md`) |

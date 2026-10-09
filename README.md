@@ -68,7 +68,8 @@
 | + | دولة التشغيل (السعودية أو مصر) من الإعدادات: العملة والضريبة والرقم الضريبي والمبلغ بالحروف وعنوان الفاتورة | ✅ تمت الموافقة | [docs/44-Operating-Country.md](docs/44-Operating-Country.md) |
 | + | أساس الفاتورة الإلكترونية: حالة كل مستند، وسجل الإرسال، وشاشة المتابعة وإعادة الإرسال، والتفعيل والبيئة | ✅ تمت الموافقة | [docs/45-EInvoice-Foundation.md](docs/45-EInvoice-Foundation.md) |
 | + | ملف الفاتورة السعودية الموقّع (UBL 2.1): البصمة والتوقيع بـ OpenSSL ورمز QR بتسعة حقول، وشاشة إعداد الربط | ✅ تمت الموافقة | [docs/46-ZATCA-Invoice-XML.md](docs/46-ZATCA-Invoice-XML.md) |
-| + | تسجيل الجهاز لدى هيئة الزكاة (CSR ورمز OTP وفحوص الامتثال والشهادة الفعلية) وإرسال الفواتير: تبليغ المبسطة واعتماد الضريبية | ✅ بانتظار الموافقة | [docs/47-ZATCA-Onboarding-Sending.md](docs/47-ZATCA-Onboarding-Sending.md) |
+| + | تسجيل الجهاز لدى هيئة الزكاة (CSR ورمز OTP وفحوص الامتثال والشهادة الفعلية) وإرسال الفواتير: تبليغ المبسطة واعتماد الضريبية | ✅ تمت الموافقة | [docs/47-ZATCA-Onboarding-Sending.md](docs/47-ZATCA-Onboarding-Sending.md) |
+| + | الإيصال الإلكتروني المصري: كود المصلحة للأصناف والوحدات، وبيانات الجهاز، وبناء الإيصال ومعرّفه وسلسلته، والإرسال ومتابعة الحالة، والمرتجع، ورمز QR | ✅ بانتظار الموافقة | [docs/48-ETA-EReceipt.md](docs/48-ETA-EReceipt.md) |
 
 ## هيكل المستودع
 
@@ -163,6 +164,7 @@
 | 41 | `modHttp` و`modEInvoice` (دائمتان، جديدتان)، واستبدال `modSales` و`modZatca` و`modForms` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestEInvoice` |
 | 42 | `modZatcaXml` (دائمة، جديدة) و`modZatcaData` (مولَّدة، جديدة)، واستبدال `modEInvoice` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`)؛ وتثبيت OpenSSL | `BuildSchema`, `BuildForms` | `TestZatcaXml` |
 | 43 | `modZatcaApi` (دائمة، جديدة)، واستبدال `modZatcaXml` و`modQRCode` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildForms` | `TestZatcaApi` |
+| 44 | `modEtaReceipt` (دائمة، جديدة)، واستبدال `modEInvoice` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildForms` | `TestEtaReceipt` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

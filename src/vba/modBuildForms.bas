@@ -27,7 +27,7 @@ Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines," & _
     "frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal," & _
-    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup"
+    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -657,6 +657,7 @@ Private Sub BuildAllForms()
     BuildForm_frmEnglishNames
     BuildForm_frmEInvoices
     BuildForm_frmZatcaSetup
+    BuildForm_frmEtaSetup
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -1148,7 +1149,7 @@ End Sub
 Private Sub BuildForm_frmProducts()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmProducts", "المنتجات", "SELECT * FROM Products", 15309, 10347, True, True, True, _
+    StartForm "frmProducts", "المنتجات", "SELECT * FROM Products", 15309, 10914, True, True, True, _
               "KIND=LIST|TABLE=Products|PK=ProductID|LIST=SELECT t.ProductID, t.ProductCode AS [الكود], t.ProductName AS [المنتج], t.CurrentQuantity AS [الكمية] FROM Products AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.ProductName|SEARCH=t.ProductName,t.ProductCode,t.Barcode,t.ProductNameEn|ACTIVE=t.IsActive|SEQ=PRODUCT_CODE:ProductCode|UNIQUE=ProductCode,Barcode"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8EC), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -1172,7 +1173,7 @@ Private Sub BuildForm_frmProducts()
     SetCtlProp c, "DefaultValue", "False"
     c.AfterUpdate = EP
     Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
-    Set c = AddList("lstItems", 227, 3005, 4990, 7058, 4, "0;1134;2778;850", True)
+    Set c = AddList("lstItems", 227, 3005, 4990, 7625, 4, "0;1134;2778;850", True)
     c.AfterUpdate = EP
     Set c = AddText("ProductCode", "ProductCode", 7201, 1701, 2948, 425)
     SetCtlProp c, "ControlTipText", "يُولَّد تلقائيًا إذا تُرك فارغًا"
@@ -1239,11 +1240,19 @@ Private Sub BuildForm_frmProducts()
     Set c = AddLabel("lblImagePath", "صورة المنتج", 10376, 7938, 1701, 425, 10, False, CLR_MUTED, "ImagePath", 0)
     Set c = AddButton("btnBrowseImage", "استعراض", 13835, 7938, 1247, 425, "secondary")
     c.OnClick = EP
-    Set c = AddText("Notes", "Notes", 7201, 8505, 7881, 907)
+    Set c = AddText("EtaItemType", "EtaItemType", 7201, 8505, 2948, 425)
+    SetCtlProp c, "ControlTipText", "مصر: EGS أو GS1 (فارغ = EGS)"
+    SetCtlProp c, "StatusBarText", "مصر: EGS أو GS1 (فارغ = EGS)"
+    Set c = AddLabel("lblEtaItemType", "مصر: نوع كود الصنف", 5443, 8505, 1701, 425, 10, False, CLR_MUTED, "EtaItemType", 0)
+    Set c = AddText("EtaItemCode", "EtaItemCode", 12134, 8505, 2948, 425)
+    SetCtlProp c, "ControlTipText", "مصر: كود الصنف المسجّل في بوابة المصلحة"
+    SetCtlProp c, "StatusBarText", "مصر: كود الصنف المسجّل في بوابة المصلحة"
+    Set c = AddLabel("lblEtaItemCode", "مصر: كود الصنف لدى المصلحة", 10376, 8505, 1701, 425, 10, False, CLR_MUTED, "EtaItemCode", 0)
+    Set c = AddText("Notes", "Notes", 7201, 9072, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
-    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 8505, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 9667, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 9072, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 10234, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -1315,7 +1324,7 @@ End Sub
 Private Sub BuildForm_frmCustomers()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmCustomers", "العملاء", "SELECT * FROM Customers", 15309, 10347, True, True, True, _
+    StartForm "frmCustomers", "العملاء", "SELECT * FROM Customers", 15309, 10914, True, True, True, _
               "KIND=LIST|TABLE=Customers|PK=CustomerID|LIST=SELECT t.CustomerID, t.CustomerName AS [العميل], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد] FROM [@Customers] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.CustomerName|SEARCH=t.CustomerName,t.CustomerNameEn,t.Mobile,t.Phone,t.VATNumber|ACTIVE=t.IsActive"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -1347,7 +1356,7 @@ Private Sub BuildForm_frmCustomers()
     SetCtlProp c, "DefaultValue", "False"
     c.AfterUpdate = EP
     Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
-    Set c = AddList("lstItems", 227, 3005, 4990, 7058, 4, "0;2495;1361;907", True)
+    Set c = AddList("lstItems", 227, 3005, 4990, 7625, 4, "0;2495;1361;907", True)
     c.AfterUpdate = EP
     Set c = AddText("CustomerName", "CustomerName", 7201, 1701, 7881, 425)
     Set c = AddLabel("lblCustomerName", "اسم العميل *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "CustomerName", 0)
@@ -1377,40 +1386,44 @@ Private Sub BuildForm_frmCustomers()
     Set c = AddLabel("lblPostalCode", "الرمز البريدي", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "PostalCode", 0)
     Set c = AddText("Address", "Address", 7201, 5670, 7881, 425)
     Set c = AddLabel("lblAddress", "العنوان", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "Address", 0)
-    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 6237, 2948, 425)
+    Set c = AddText("NationalID", "NationalID", 7201, 6237, 2948, 425)
+    SetCtlProp c, "ControlTipText", "مصر: يُطلب في الإيصال 150 ألف جنيه أو أكثر"
+    SetCtlProp c, "StatusBarText", "مصر: يُطلب في الإيصال 150 ألف جنيه أو أكثر"
+    Set c = AddLabel("lblNationalID", "رقم الهوية / الرقم القومي", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "NationalID", 0)
+    Set c = AddText("OpeningBalance", "OpeningBalance", 12134, 6237, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "ControlTipText", "يُقفل بعد أول عملية"
     SetCtlProp c, "StatusBarText", "يُقفل بعد أول عملية"
-    Set c = AddLabel("lblOpeningBalance", "الرصيد الافتتاحي", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
-    Set c = AddText("CurrentBalance", "CurrentBalance", 12134, 6237, 2948, 425)
+    Set c = AddLabel("lblOpeningBalance", "الرصيد الافتتاحي", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
+    Set c = AddText("CurrentBalance", "CurrentBalance", 7201, 6804, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddLabel("lblCurrentBalance", "الرصيد الحالي", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "CurrentBalance", 0)
-    Set c = AddCheck("AllowCredit", "AllowCredit", 7201, 6889)
-    Set c = AddLabel("lblAllowCredit", "يسمح بالبيع الآجل", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "AllowCredit", 0)
-    Set c = AddText("CreditLimit", "CreditLimit", 12134, 6804, 2948, 425)
+    Set c = AddLabel("lblCurrentBalance", "الرصيد الحالي", 5443, 6804, 1701, 425, 10, False, CLR_MUTED, "CurrentBalance", 0)
+    Set c = AddCheck("AllowCredit", "AllowCredit", 12134, 6889)
+    Set c = AddLabel("lblAllowCredit", "يسمح بالبيع الآجل", 10376, 6804, 1701, 425, 10, False, CLR_MUTED, "AllowCredit", 0)
+    Set c = AddText("CreditLimit", "CreditLimit", 7201, 7371, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "ControlTipText", "0 = بدون حد"
     SetCtlProp c, "StatusBarText", "0 = بدون حد"
-    Set c = AddLabel("lblCreditLimit", "حد الائتمان", 10376, 6804, 1701, 425, 10, False, CLR_MUTED, "CreditLimit", 0)
-    Set c = AddText("PaymentTermsDays", "PaymentTermsDays", 7201, 7371, 2948, 425)
+    Set c = AddLabel("lblCreditLimit", "حد الائتمان", 5443, 7371, 1701, 425, 10, False, CLR_MUTED, "CreditLimit", 0)
+    Set c = AddText("PaymentTermsDays", "PaymentTermsDays", 12134, 7371, 2948, 425)
     SetCtlProp c, "ControlTipText", "استحقاق الفاتورة الآجلة = تاريخها + هذه المدة"
     SetCtlProp c, "StatusBarText", "استحقاق الفاتورة الآجلة = تاريخها + هذه المدة"
-    Set c = AddLabel("lblPaymentTermsDays", "مدة السداد (يوم)", 5443, 7371, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
-    Set c = AddCombo("SalesRepID", "SalesRepID", 12134, 7371, 2948, 425, "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName", 2, "0;3402")
+    Set c = AddLabel("lblPaymentTermsDays", "مدة السداد (يوم)", 10376, 7371, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
+    Set c = AddCombo("SalesRepID", "SalesRepID", 7201, 7938, 2948, 425, "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName", 2, "0;3402")
     SetCtlProp c, "ControlTipText", "تُنسب له فواتير العميل وتحصيلاته"
     SetCtlProp c, "StatusBarText", "تُنسب له فواتير العميل وتحصيلاته"
-    Set c = AddLabel("lblSalesRepID", "المندوب", 10376, 7371, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
-    Set c = AddCheck("IsActive", "IsActive", 7201, 8023)
-    Set c = AddLabel("lblIsActive", "نشط", 5443, 7938, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق على العميل", 10376, 7938, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 8505, 7881, 907)
+    Set c = AddLabel("lblSalesRepID", "المندوب", 5443, 7938, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 8023)
+    Set c = AddLabel("lblIsActive", "نشط", 10376, 7938, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق على العميل", 5443, 8505, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 9072, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
-    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 8505, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 9667, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 9072, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 10234, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -2966,9 +2979,13 @@ Private Sub BuildForm_frmUnits()
     SetCtlProp c, "ControlTipText", "مثال: PCE للحبة، KGM للكيلو"
     SetCtlProp c, "StatusBarText", "مثال: PCE للحبة، KGM للكيلو"
     Set c = AddLabel("lblZatcaUnitCode", "رمز الوحدة (UN/ECE)", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ZatcaUnitCode", 0)
-    Set c = AddCheck("IsActive", "IsActive", 12134, 2353)
-    Set c = AddLabel("lblIsActive", "نشط", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 2948, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddText("EtaUnitCode", "EtaUnitCode", 12134, 2268, 2948, 425)
+    SetCtlProp c, "ControlTipText", "مصر: EA للحبة، KGM للكيلو"
+    SetCtlProp c, "StatusBarText", "مصر: EA للحبة، KGM للكيلو"
+    Set c = AddLabel("lblEtaUnitCode", "رمز الوحدة لدى مصلحة الضرائب المصرية", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "EtaUnitCode", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 2920)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 3515, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -9476,7 +9493,9 @@ Private Sub BuildForm_frmEInvoices()
     c.OnClick = EP
     Set c = AddButton("btnSendAll", "إرسال كل المعلّق", 2381, 9412, 2155, 510, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnSetup", "إعداد الربط", 4649, 9412, 1814, 510, "secondary")
+    Set c = AddButton("btnRefresh", "تحديث الحالة", 4649, 9412, 1814, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSetup", "إعداد الربط", 6576, 9412, 1814, 510, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13608, 9412, 1474, 510, "secondary")
     c.OnClick = EP
@@ -9505,6 +9524,9 @@ Private Sub BuildForm_frmEInvoices()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSendAll_Click()" & vbCrLf
     s = s & "    EInvoicesSendAll Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRefresh_Click()" & vbCrLf
+    s = s & "    EInvoicesRefresh Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSetup_Click()" & vbCrLf
     s = s & "    EInvoiceSetupOpen" & vbCrLf
@@ -9601,4 +9623,59 @@ Private Sub BuildForm_frmZatcaSetup()
     Exit Sub
 EH:
     AbortForm "frmZatcaSetup", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmEtaSetup()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmEtaSetup", "إعداد ربط منظومة الإيصال الإلكتروني", "", 11340, 7711, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 11340, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "إعداد ربط منظومة الإيصال الإلكتروني", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "جهاز نقطة البيع المسجّل في بوابة مصلحة الضرائب (مصر)", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtClientId", "", 227, 1474, 5386.5, 454)
+    Set c = AddLabel("lblClientId", "Client ID لجهاز نقطة البيع", 227, 1162, 5386.5, 284, 9, False, CLR_MUTED, "txtClientId", 0)
+    Set c = AddText("txtClientSecret", "", 5726.5, 1474, 5386.5, 454)
+    SetCtlProp c, "InputMask", "Password"
+    Set c = AddLabel("lblClientSecret", "Client Secret", 5726.5, 1162, 5386.5, 284, 9, False, CLR_MUTED, "txtClientSecret", 0)
+    Set c = AddText("txtPosSerial", "", 227, 2324, 5386.5, 454)
+    Set c = AddLabel("lblPosSerial", "الرقم التسلسلي للجهاز (POS Serial)", 227, 2012, 5386.5, 284, 9, False, CLR_MUTED, "txtPosSerial", 0)
+    Set c = AddText("txtPosOs", "", 5726.5, 2324, 5386.5, 454)
+    Set c = AddLabel("lblPosOs", "نظام تشغيل الجهاز (فارغ = Windows)", 5726.5, 2012, 5386.5, 284, 9, False, CLR_MUTED, "txtPosOs", 0)
+    Set c = AddText("txtPreSharedKey", "", 227, 3174, 5386.5, 454)
+    SetCtlProp c, "InputMask", "Password"
+    Set c = AddLabel("lblPreSharedKey", "المفتاح المشترك (إن أعطته المصلحة)", 227, 2862, 5386.5, 284, 9, False, CLR_MUTED, "txtPreSharedKey", 0)
+    Set c = AddText("txtBranchCode", "", 5726.5, 3174, 5386.5, 454)
+    Set c = AddLabel("lblBranchCode", "كود الفرع (فارغ = 0)", 5726.5, 2862, 5386.5, 284, 9, False, CLR_MUTED, "txtBranchCode", 0)
+    Set c = AddText("txtActivityCode", "", 227, 4024, 5386.5, 454)
+    Set c = AddLabel("lblActivityCode", "كود النشاط (4 أرقام)", 227, 3712, 5386.5, 284, 9, False, CLR_MUTED, "txtActivityCode", 0)
+    Set c = AddText("txtGovernate", "", 5726.5, 4024, 5386.5, 454)
+    Set c = AddLabel("lblGovernate", "المحافظة", 5726.5, 3712, 5386.5, 284, 9, False, CLR_MUTED, "txtGovernate", 0)
+    Set c = AddLabel("lblReady", " ", 227, 4763, 10886, 907, 9, False, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblSetupNote", "سجّل الجهاز في بوابة المصلحة ثم انسخ بياناته هنا. الرقم الضريبي والعنوان من الإعدادات، وكود المصلحة لكل صنف من شاشة المنتجات، ورمز الوحدة من وحدات القياس.", 227, 5727, 10886, 794, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnSave", "حفظ", 227, 6917, 1701, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnTestLogin", "تجربة الدخول", 2041, 6917, 1928, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 9639, 6917, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    EtaSetupLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    EtaSetupSave Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTestLogin_Click()" & vbCrLf
+    s = s & "    EtaSetupTestLogin Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmEtaSetup", s
+    Exit Sub
+EH:
+    AbortForm "frmEtaSetup", Err.Number, Err.Description
 End Sub

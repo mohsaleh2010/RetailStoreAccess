@@ -447,7 +447,7 @@ SELECT CategoryID, Nz(CategoryNameEn, LocArabicName) AS CategoryName, CategoryNa
 Units للواجهة الإنجليزية (خطوة 1)
 
 ```sql
-SELECT t.UnitID, t.UnitName AS LocArabicName, t.UnitNameEn, t.ZatcaUnitCode, t.IsActive FROM Units AS t
+SELECT t.UnitID, t.UnitName AS LocArabicName, t.UnitNameEn, t.ZatcaUnitCode, t.EtaUnitCode, t.IsActive FROM Units AS t
 ```
 
 ## qryLocUnits
@@ -455,7 +455,7 @@ SELECT t.UnitID, t.UnitName AS LocArabicName, t.UnitNameEn, t.ZatcaUnitCode, t.I
 Units بالأسماء الإنجليزية (الواجهة الإنجليزية)
 
 ```sql
-SELECT UnitID, Nz(UnitNameEn, LocArabicName) AS UnitName, UnitNameEn, ZatcaUnitCode, IsActive FROM qryLocUnits1
+SELECT UnitID, Nz(UnitNameEn, LocArabicName) AS UnitName, UnitNameEn, ZatcaUnitCode, EtaUnitCode, IsActive FROM qryLocUnits1
 ```
 
 ## qryLocExpenseTypes1
@@ -479,7 +479,7 @@ SELECT ExpenseTypeID, Nz(ExpenseTypeNameEn, LocArabicName) AS ExpenseTypeName, E
 Customers للواجهة الإنجليزية (خطوة 1)
 
 ```sql
-SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID FROM Customers AS t
+SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.NationalID, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID FROM Customers AS t
 ```
 
 ## qryLocCustomers
@@ -487,7 +487,7 @@ SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile
 Customers بالأسماء الإنجليزية (الواجهة الإنجليزية)
 
 ```sql
-SELECT CustomerID, Nz(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID FROM qryLocCustomers1
+SELECT CustomerID, Nz(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, NationalID, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID FROM qryLocCustomers1
 ```
 
 ## qryLocSuppliers1

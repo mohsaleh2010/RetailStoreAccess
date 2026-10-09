@@ -64,6 +64,7 @@
 - **مراكز التكلفة:** على `JournalLines.CostCenterID`.
 - **الفاتورة الإلكترونية:** حالة كل فاتورة ومرتجع في `ZatcaStatus` (السعودية ومصر)، وكل طلب للمنظومة في `EInvoiceLog` (بلا علاقة: `DocKind` + `DocID`). التفعيل والبيئة في `Settings.EInvoiceEnabled` و`EInvoiceEnvironment` (`docs/45`).
 - **تسجيل الجهاز لدى هيئة الزكاة:** حقول `Settings.Zatca*` (الرقم التسلسلي، وطلب الشهادة، وشهادتا الامتثال والفعلية وكلمتاهما السريتان، والبيئة والمرحلة: `COMPLIANCE` ثم `CHECKED` ثم `PRODUCTION`). المفتاح الخاص ملف خارج قاعدة البيانات، والكلمات السرية لا تُكتب في `EInvoiceLog` (`docs/47`).
+- **الإيصال الإلكتروني المصري:** بيانات الجهاز في `Settings.Eta*`، وسلسلة الإيصالات في `Settings.EtaLastUUID`. لكل فاتورة ومرتجع `EtaUUID` و`EtaPreviousUUID` و`EtaSubmissionId`، والإيصال نفسه في `EInvoiceXml`. كود الصنف في `Products.EtaItemType` و`EtaItemCode`، ورمز الوحدة في `Units.EtaUnitCode`، والرقم القومي في `Customers.NationalID` (`docs/48`).
 - **دولة التشغيل:** `Settings.CountryCode` (SA أو EG) تحدد عملة البرنامج ونسبة الضريبة وشكل الرقم الضريبي (`docs/44`). شرط حقل تغيّر بعد الإصدار الأول يوضع في `schema.RULE_UPGRADES` حتى يصل إلى ملف بيانات موجود.
 - **الفترات المقفلة:** `Settings.ClosedThrough`. أي تعديل بتاريخ مقفل يرفضه `ClosedPeriodProblem`.
 

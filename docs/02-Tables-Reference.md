@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **70** | عدد الحقول: **927**
+عدد الجداول: **70** | عدد الحقول: **946**
 
 ## الفهرس
 
@@ -137,7 +137,16 @@
 | 52 | ZatcaProductionSecret | Short Text | 255 |  |  |  |  | الكلمة السرية للشهادة الفعلية – لا تُكتب في سجل الإرسال |
 | 53 | ZatcaOnboardEnv | Short Text | 12 |  |  |  |  | البيئة التي سُجّل فيها الجهاز |
 | 54 | ZatcaOnboardStage | Short Text | 20 |  |  |  |  | مرحلة تسجيل الجهاز – COMPLIANCE ثم CHECKED ثم PRODUCTION (docs/47) |
-| 55 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
+| 55 | EtaClientId | Short Text | 100 |  |  |  |  | مصر: Client ID لجهاز نقطة البيع – من بوابة المصلحة عند تسجيل الجهاز (docs/48) |
+| 56 | EtaClientSecret | Short Text | 255 |  |  |  |  | مصر: Client Secret لجهاز نقطة البيع – لا يُكتب في سجل الإرسال |
+| 57 | EtaPosSerial | Short Text | 100 |  |  |  |  | مصر: الرقم التسلسلي لجهاز نقطة البيع |
+| 58 | EtaPosOsVersion | Short Text | 50 |  |  |  |  | مصر: نظام تشغيل الجهاز – فارغ = Windows |
+| 59 | EtaPreSharedKey | Short Text | 255 |  |  |  |  | مصر: المفتاح المشترك للجهاز (إن وُجد) |
+| 60 | EtaBranchCode | Short Text | 10 |  |  |  |  | مصر: كود الفرع – فارغ = 0 (الفرع الرئيسي) |
+| 61 | EtaActivityCode | Short Text | 8 |  |  |  |  | مصر: كود النشاط |
+| 62 | EtaGovernate | Short Text | 50 |  |  |  |  | مصر: المحافظة |
+| 63 | EtaLastUUID | Short Text | 64 |  |  |  |  | مصر: معرّف آخر إيصال للجهاز – سلسلة الإيصالات (previousUUID) |
+| 64 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -260,7 +269,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 61 سجل
+- بيانات أساسية: 62 سجل
 
 ## UserScreens
 
@@ -323,7 +332,8 @@
 | 2 | UnitName | Short Text | 30 | ✔ |  |  |  | اسم الوحدة |
 | 3 | UnitNameEn | Short Text | 30 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
 | 4 | ZatcaUnitCode | Short Text | 10 |  |  |  |  | رمز الوحدة (UN/ECE) |
-| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 5 | EtaUnitCode | Short Text | 10 |  |  |  |  | رمز الوحدة لدى مصلحة الضرائب المصرية – فارغ = EA (docs/48) |
+| 6 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
 
 - المفتاح الأساسي: `UnitID`
 - فهرس فريد: `UnitName`
@@ -450,16 +460,17 @@
 | 12 | City | Short Text | 50 |  |  |  |  | المدينة |
 | 13 | PostalCode | Short Text | 10 |  |  |  |  | الرمز البريدي |
 | 14 | Address | Short Text | 255 |  |  |  |  | العنوان |
-| 15 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – موجب = العميل مدين للمحل |
-| 16 | CurrentBalance | Currency |  | ✔ | `0` |  |  | الرصيد الحالي – قيمة مساعدة؛ المرجع هو CustomerBalanceQuery |
-| 17 | AllowCredit | Yes/No |  |  | `True` |  |  | يسمح بالبيع الآجل |
-| 18 | CreditLimit | Currency |  | ✔ | `0` | `>=0` |  | حد الائتمان – 0 = بدون حد |
-| 19 | PaymentTermsDays | Number (Integer) |  |  | `30` | `>=0` |  | مدة السداد (يوم) |
-| 20 | IsSystem | Yes/No |  |  | `False` |  |  | سجل نظام |
-| 21 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 22 | Notes | Long Text |  |  |  |  |  | ملاحظات |
-| 23 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 24 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – المندوب المسؤول عن العميل: تُنسب له فواتيره وتحصيلاته |
+| 15 | NationalID | Short Text | 20 |  |  |  |  | رقم الهوية / الرقم القومي – مصر: للإيصال 150 ألف جنيه أو أكثر (docs/48) |
+| 16 | OpeningBalance | Currency |  | ✔ | `0` |  |  | الرصيد الافتتاحي – موجب = العميل مدين للمحل |
+| 17 | CurrentBalance | Currency |  | ✔ | `0` |  |  | الرصيد الحالي – قيمة مساعدة؛ المرجع هو CustomerBalanceQuery |
+| 18 | AllowCredit | Yes/No |  |  | `True` |  |  | يسمح بالبيع الآجل |
+| 19 | CreditLimit | Currency |  | ✔ | `0` | `>=0` |  | حد الائتمان – 0 = بدون حد |
+| 20 | PaymentTermsDays | Number (Integer) |  |  | `30` | `>=0` |  | مدة السداد (يوم) |
+| 21 | IsSystem | Yes/No |  |  | `False` |  |  | سجل نظام |
+| 22 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 23 | Notes | Long Text |  |  |  |  |  | ملاحظات |
+| 24 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 25 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – المندوب المسؤول عن العميل: تُنسب له فواتيره وتحصيلاته |
 
 - المفتاح الأساسي: `CustomerID`
 - فهرس عادي: `CustomerName`
@@ -495,6 +506,8 @@
 | 21 | TrackStock | Yes/No |  |  | `True` |  |  | يتابع المخزون |
 | 22 | SizePriceM | Currency |  |  |  | `>=0` |  | سعر الحجم الوسط |
 | 23 | SizePriceL | Currency |  |  |  | `>=0` |  | سعر الحجم الكبير |
+| 24 | EtaItemType | Short Text | 3 |  |  |  |  | مصر: نوع كود الصنف – EGS (كود داخلي مسجّل) أو GS1؛ فارغ = EGS (docs/48) |
+| 25 | EtaItemCode | Short Text | 100 |  |  |  |  | مصر: كود الصنف لدى المصلحة – مثل EG-123456789-1001، مسجّل في بوابة المصلحة |
 
 - المفتاح الأساسي: `ProductID`
 - فهرس فريد: `ProductCode`
@@ -539,16 +552,19 @@
 | 30 | EInvoiceAttempts | Number (Integer) |  |  | `0` |  |  | محاولات الإرسال |
 | 31 | EInvoiceXml | Long Text |  |  |  |  |  | ملف الفاتورة الإلكترونية الموقّع |
 | 32 | EInvoiceError | Short Text | 255 |  |  |  |  | آخر خطأ في الإرسال |
-| 33 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 34 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
-| 35 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
-| 36 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
-| 37 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
-| 38 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
-| 39 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
-| 40 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
-| 41 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
-| 42 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
+| 33 | EtaUUID | Short Text | 64 |  |  |  |  | معرّف الإيصال الإلكتروني المصري – SHA-256 للإيصال (docs/48) |
+| 34 | EtaPreviousUUID | Short Text | 64 |  |  |  |  | معرّف الإيصال السابق للجهاز |
+| 35 | EtaSubmissionId | Short Text | 50 |  |  |  |  | رقم الإرسال لدى المصلحة |
+| 36 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 37 | OrderType | Short Text | 10 |  |  | `Is Null Or In ("DINE_IN","TAKEAWAY","DELIVERY")` |  | نوع الطلب |
+| 38 | TableNo | Short Text | 10 |  |  |  |  | رقم الطاولة |
+| 39 | DeliveryPhone | Short Text | 20 |  |  |  |  | جوال التوصيل |
+| 40 | DeliveryAddress | Short Text | 255 |  |  |  |  | عنوان التوصيل |
+| 41 | OrderName | Short Text | 50 |  |  |  |  | اسم العميل على الطلب |
+| 42 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – يُملأ عند الدفع النقدي: المبلغ المدفوع يدخل هذا الصندوق |
+| 43 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 44 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
+| 45 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -617,11 +633,14 @@
 | 28 | EInvoiceAttempts | Number (Integer) |  |  | `0` |  |  | محاولات الإرسال |
 | 29 | EInvoiceXml | Long Text |  |  |  |  |  | ملف الفاتورة الإلكترونية الموقّع |
 | 30 | EInvoiceError | Short Text | 255 |  |  |  |  | آخر خطأ في الإرسال |
-| 31 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
-| 32 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
-| 33 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
-| 34 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
-| 35 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
+| 31 | EtaUUID | Short Text | 64 |  |  |  |  | معرّف الإيصال الإلكتروني المصري – SHA-256 للإيصال (docs/48) |
+| 32 | EtaPreviousUUID | Short Text | 64 |  |  |  |  | معرّف الإيصال السابق للجهاز |
+| 33 | EtaSubmissionId | Short Text | 50 |  |  |  |  | رقم الإرسال لدى المصلحة |
+| 34 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 35 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق النقدية – الرد النقدي يخرج من هذا الصندوق |
+| 36 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
+| 37 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
+| 38 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`
