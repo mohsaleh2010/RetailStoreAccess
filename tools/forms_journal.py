@@ -341,15 +341,20 @@ def layout_period_closing() -> FormModel:
     m.add(Control("label", "lblYearCap", cm(0.4), cm(6.4), cm(12.0), cm(0.6),
                   {"Caption": "إقفال السنة المالية (الإيرادات والمصروفات إلى الأرباح المحتجزة)", "FontSize": 11,
                    "FontBold": True, "ForeColor": Sym("CLR_TEXT")}))
-    c = m.add(Control("combo", "cboYear", cm(0.4), cm(7.55), cm(3.4), cm(0.85),
-                      {"RowSourceType": "Value List", "RowSource": "", "ColumnCount": 1, "ColumnWidths": "3",
-                       "LimitToList": True}, events=["AfterUpdate"]))
-    labelled(m, "cboYear", "السنة", c)
-    m.add(Control("label", "lblYearInfo", cm(4.0), cm(7.6), width - cm(4.4), cm(0.75),
+    # the key of a closing is the year its period ends in (modFiscal); the name is shown
+    c = m.add(Control("combo", "cboYear", cm(0.4), cm(7.55), cm(4.6), cm(0.85),
+                      {"RowSourceType": "Value List", "RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4.4",
+                       "BoundColumn": 1, "LimitToList": True}, events=["AfterUpdate"]))
+    labelled(m, "cboYear", "السنة / الفترة المالية", c)
+    m.add(Control("label", "lblYearInfo", cm(5.2), cm(7.6), width - cm(5.6), cm(0.75),
                   {"Caption": " ", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
     button(m, "btnCloseYear", "إقفال السنة", cm(0.4), cm(8.65), "primary", w=cm(4.6), h=cm(0.9), call="DoCloseYear Me")
     button(m, "btnReopenYear", "إعادة فتح السنة", cm(5.2), cm(8.65), "danger", w=cm(5.2), h=cm(0.9),
            call="DoReopenYear Me")
+    button(m, "btnOpeningSheet", "الميزانية الافتتاحية", cm(10.6), cm(8.65), "secondary", w=cm(5.2), h=cm(0.9),
+           call='PrintOpeningBalanceSheet Nz(Me!cboYear.Value, 0)')
+    button(m, "btnFiscalPeriods", "الفترات المالية", cm(16.0), cm(8.65), "secondary", w=cm(5.6), h=cm(0.9),
+           call='OpenScreen "frmFiscalPeriods", 0')
     m.add(Control("label", "lblHistoryCap", cm(0.4), cm(9.95), cm(12.0), cm(0.6),
                   {"Caption": "سجل الإقفال وإعادة الفتح", "FontSize": 10, "FontBold": True,
                    "ForeColor": Sym("CLR_MUTED")}))
@@ -361,6 +366,47 @@ def layout_period_closing() -> FormModel:
     m.form_events = ["Load"]
     m.code = (["Private Sub Form_Load()", "    PeriodClosingLoad Me", "End Sub",
                "Private Sub cboYear_AfterUpdate()", "    PeriodClosingRefresh Me", "End Sub"] + m.code)
+    return m
+
+
+# ------------------------------------------------------------------ fiscal periods (modFiscal, docs/54)
+def layout_fiscal_periods() -> FormModel:
+    width, height = cm(20.0), cm(15.2)
+    m = FormModel("frmFiscalPeriods", "الفترات المالية", width, height, popup=True, allow_add=False)
+    title_band(m, "الفترات المالية",
+               "السنوات أو الفترات المالية بالترتيب، وأرصدة أول كل فترة وميزانيتها الافتتاحية", "journal")
+    m.add(Control("list", "lstPeriods", cm(0.4), cm(2.3), width - cm(0.8), cm(5.6),
+                  {"RowSourceType": "Table/Query", "RowSource": "", "ColumnCount": 5,
+                   "ColumnWidths": "0;7.4;3.2;3.2;3", "ColumnHeads": True}))
+    m.add(Control("label", "lblAddCap", cm(0.4), cm(8.2), cm(12.0), cm(0.6),
+                  {"Caption": "إضافة فترة بعد آخر فترة", "FontSize": 11, "FontBold": True,
+                   "ForeColor": Sym("CLR_TEXT")}))
+    y = cm(9.35)
+    c = m.add(Control("text", "txtName", cm(0.4), y, cm(5.6), cm(0.85), {}))
+    labelled(m, "txtName", "اسم الفترة (مثل 2026 أو 2026/2027)", c)
+    c = m.add(Control("text", "txtStart", cm(6.2), y, cm(3.2), cm(0.85), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtStart", "من", c)
+    c = m.add(Control("text", "txtEnd", cm(9.6), y, cm(3.2), cm(0.85), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtEnd", "إلى", c)
+    button(m, "btnAdd", "إضافة", cm(13.0), y, "primary", w=cm(2.6), h=cm(0.85), call="FiscalAddPeriod Me")
+    button(m, "btnDeleteLast", "حذف آخر فترة", cm(15.8), y, "danger", w=cm(3.8), h=cm(0.85),
+           call="FiscalDeleteLast Me")
+    m.add(Control("label", "lblHint", cm(0.4), cm(10.4), width - cm(0.8), cm(1.3),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+    m.add(Control("label", "lblSelCap", cm(0.4), cm(11.9), cm(12.0), cm(0.6),
+                  {"Caption": "للفترة المختارة في القائمة", "FontSize": 11, "FontBold": True,
+                   "ForeColor": Sym("CLR_TEXT")}))
+    y = cm(12.65)
+    button(m, "btnOpeningReport", "أرصدة أول المدة", cm(0.4), y, "secondary", w=cm(4.6), h=cm(0.9),
+           call="FiscalPrintSelected Me, False")
+    button(m, "btnOpeningSheet", "الميزانية الافتتاحية", cm(5.2), y, "secondary", w=cm(4.6), h=cm(0.9),
+           call="FiscalPrintSelected Me, True")
+    button(m, "btnClosing", "إقفال الفترات", cm(10.0), y, "secondary", w=cm(4.0), h=cm(0.9),
+           call='OpenScreen "frmPeriodClosing", 0')
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(14.0), "secondary", w=cm(2.6), h=cm(0.9),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = ["Private Sub Form_Load()", "    FiscalPeriodsLoad Me", "End Sub"] + m.code
     return m
 
 
@@ -449,4 +495,4 @@ def layout_vat_return() -> FormModel:
 def journal_forms() -> List[FormModel]:
     lines, heads = layout_manual_lines()
     return [layout_journal(), layout_journal_entry(), lines, layout_manual_entry(heads), layout_ledger(),
-            layout_financials(), layout_period_closing(), layout_vat_return()]
+            layout_financials(), layout_period_closing(), layout_fiscal_periods(), layout_vat_return()]

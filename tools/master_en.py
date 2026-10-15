@@ -150,7 +150,7 @@ SCREEN_TITLES_EN = {
     "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmAccounting": "Accounting and finance",
     "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
     "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
-    "frmPeriodClosing": "Period and fiscal year closing", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",
+    "frmPeriodClosing": "Period and fiscal year closing", "frmFiscalPeriods": "Fiscal periods", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",
     "frmAging": "Aging (customers and suppliers)", "frmBanks": "Banks", "frmBankTx": "Bank transactions",
     "frmBankRecon": "Bank reconciliation", "frmCheques": "Received and issued cheques", "frmAssets": "Fixed assets",
     "frmDepreciation": "Monthly depreciation", "frmPayroll": "Payroll", "frmCostCenters": "Cost centers and branches",

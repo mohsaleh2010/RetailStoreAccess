@@ -27,8 +27,8 @@ Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines," & _
     "frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal," & _
-    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines," & _
-    "frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
+    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup," & _
+    "frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -638,6 +638,7 @@ Private Sub BuildAllForms()
     BuildForm_frmLedger
     BuildForm_frmFinancials
     BuildForm_frmPeriodClosing
+    BuildForm_frmFiscalPeriods
     BuildForm_frmVatReturn
     BuildForm_frmAging
     BuildForm_frmAllocation
@@ -7715,14 +7716,19 @@ Private Sub BuildForm_frmPeriodClosing()
     Set c = AddButton("btnReopenPeriod", "إعادة الفتح إلى هذا اليوم", 2948, 2892, 2948, 510, "danger")
     c.OnClick = EP
     Set c = AddLabel("lblYearCap", "إقفال السنة المالية (الإيرادات والمصروفات إلى الأرباح المحتجزة)", 227, 3629, 6804, 340, 11, True, CLR_TEXT, "", 0)
-    Set c = AddCombo("cboYear", "", 227, 4281, 1928, 482, "", 1, "1701")
+    Set c = AddCombo("cboYear", "", 227, 4281, 2608, 482, "", 2, "0;2495")
+    SetCtlProp c, "BoundColumn", 1
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
-    Set c = AddLabel("lblYear", "السنة", 227, 3969, 1928, 284, 9, False, CLR_MUTED, "cboYear", 0)
-    Set c = AddLabel("lblYearInfo", " ", 2268, 4309, 9979, 425, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblYear", "السنة / الفترة المالية", 227, 3969, 2608, 284, 9, False, CLR_MUTED, "cboYear", 0)
+    Set c = AddLabel("lblYearInfo", " ", 2948, 4309, 9299, 425, 10, True, CLR_PRIMARY, "", 0)
     Set c = AddButton("btnCloseYear", "إقفال السنة", 227, 4905, 2608, 510, "primary")
     c.OnClick = EP
     Set c = AddButton("btnReopenYear", "إعادة فتح السنة", 2948, 4905, 2948, 510, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnOpeningSheet", "الميزانية الافتتاحية", 6010, 4905, 2948, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnFiscalPeriods", "الفترات المالية", 9072, 4905, 3175, 510, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblHistoryCap", "سجل الإقفال وإعادة الفتح", 227, 5642, 6804, 340, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstHistory", 227, 6010, 12020, 2608, 7, "0;1588;1474;794;1928;2041;3402", True)
@@ -7749,6 +7755,12 @@ Private Sub BuildForm_frmPeriodClosing()
     s = s & "Private Sub btnReopenYear_Click()" & vbCrLf
     s = s & "    DoReopenYear Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpeningSheet_Click()" & vbCrLf
+    s = s & "    PrintOpeningBalanceSheet Nz(Me!cboYear.Value, 0)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnFiscalPeriods_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmFiscalPeriods"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -7756,6 +7768,68 @@ Private Sub BuildForm_frmPeriodClosing()
     Exit Sub
 EH:
     AbortForm "frmPeriodClosing", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmFiscalPeriods()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmFiscalPeriods", "الفترات المالية", "", 11340, 8618, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 11340, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "الفترات المالية", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "السنوات أو الفترات المالية بالترتيب، وأرصدة أول كل فترة وميزانيتها الافتتاحية", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddList("lstPeriods", 227, 1304, 10886, 3175, 5, "0;4196;1814;1814;1701", True)
+    Set c = AddLabel("lblAddCap", "إضافة فترة بعد آخر فترة", 227, 4649, 6804, 340, 11, True, CLR_TEXT, "", 0)
+    Set c = AddText("txtName", "", 227, 5301, 3175, 482)
+    Set c = AddLabel("lblName", "اسم الفترة (مثل 2026 أو 2026/2027)", 227, 4989, 3175, 284, 9, False, CLR_MUTED, "txtName", 0)
+    Set c = AddText("txtStart", "", 3515, 5301, 1814, 482)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblStart", "من", 3515, 4989, 1814, 284, 9, False, CLR_MUTED, "txtStart", 0)
+    Set c = AddText("txtEnd", "", 5443, 5301, 1814, 482)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblEnd", "إلى", 5443, 4989, 1814, 284, 9, False, CLR_MUTED, "txtEnd", 0)
+    Set c = AddButton("btnAdd", "إضافة", 7371, 5301, 1474, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnDeleteLast", "حذف آخر فترة", 8959, 5301, 2155, 482, "danger")
+    c.OnClick = EP
+    Set c = AddLabel("lblHint", " ", 227, 5897, 10886, 737, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblSelCap", "للفترة المختارة في القائمة", 227, 6747, 6804, 340, 11, True, CLR_TEXT, "", 0)
+    Set c = AddButton("btnOpeningReport", "أرصدة أول المدة", 227, 7173, 2608, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnOpeningSheet", "الميزانية الافتتاحية", 2948, 7173, 2608, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClosing", "إقفال الفترات", 5670, 7173, 2268, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 9639, 7938, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FiscalPeriodsLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAdd_Click()" & vbCrLf
+    s = s & "    FiscalAddPeriod Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDeleteLast_Click()" & vbCrLf
+    s = s & "    FiscalDeleteLast Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpeningReport_Click()" & vbCrLf
+    s = s & "    FiscalPrintSelected Me, False" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpeningSheet_Click()" & vbCrLf
+    s = s & "    FiscalPrintSelected Me, True" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClosing_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmPeriodClosing"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmFiscalPeriods", s
+    Exit Sub
+EH:
+    AbortForm "frmFiscalPeriods", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmVatReturn()

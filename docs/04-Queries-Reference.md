@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **203**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **204**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -203,12 +203,13 @@
 | 195 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
 | 196 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
 | 197 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 198 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 199 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 200 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 201 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 202 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 203 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 198 | [`OpeningBalancesReportQuery`](#openingbalancesreportquery) | أرصدة أول المدة في بداية يوم PeriodStart: الحسابات، والعملاء، والموردون، والمخزون بالكمية والقيمة (docs/54) | `PeriodStart` |
+| 199 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 200 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 201 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 202 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 203 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 204 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -3541,6 +3542,45 @@ SELECT 4, '', 9, '', 'T', 'إجمالي الخصوم وحقوق الملكية',
 FROM qryBalanceItems AS i
 WHERE i.ClassNo IN (2, 3)
 ORDER BY ClassNo, GroupKey, Pos, AccountKey
+```
+
+## OpeningBalancesReportQuery
+
+أرصدة أول المدة في بداية يوم PeriodStart: الحسابات، والعملاء، والموردون، والمخزون بالكمية والقيمة (docs/54)
+
+المعاملات: `PeriodStart`
+
+```sql
+SELECT 1 AS SectionNo, 'الحسابات' AS SectionName, CStr(a.AccountCode) AS ItemCode, a.AccountName AS ItemName,
+       IIf(Sum(l.Debit) - Sum(l.Credit) > 0, Sum(l.Debit) - Sum(l.Credit), 0) AS DebitBalance,
+       IIf(Sum(l.Debit) - Sum(l.Credit) < 0, Sum(l.Credit) - Sum(l.Debit), 0) AS CreditBalance, 0 AS ItemQty
+FROM (JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)
+     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode
+WHERE e.EntryDate < QDate('PeriodStart')
+GROUP BY a.AccountCode, a.AccountName
+HAVING Round(Sum(l.Debit) - Sum(l.Credit), 2) <> 0
+UNION ALL
+SELECT 2, 'العملاء', CStr(c.CustomerID), c.CustomerName,
+       IIf(Sum(g.Debit) - Sum(g.Credit) > 0, Sum(g.Debit) - Sum(g.Credit), 0),
+       IIf(Sum(g.Debit) - Sum(g.Credit) < 0, Sum(g.Credit) - Sum(g.Debit), 0), 0
+FROM qryCustomerLedger AS g INNER JOIN [@Customers] AS c ON g.CustomerID = c.CustomerID
+WHERE g.EntryDate < QDate('PeriodStart')
+GROUP BY c.CustomerID, c.CustomerName
+HAVING Round(Sum(g.Debit) - Sum(g.Credit), 2) <> 0
+UNION ALL
+SELECT 3, 'الموردون', CStr(s.SupplierID), s.SupplierName,
+       IIf(Sum(g.Debit) - Sum(g.Credit) > 0, Sum(g.Debit) - Sum(g.Credit), 0),
+       IIf(Sum(g.Debit) - Sum(g.Credit) < 0, Sum(g.Credit) - Sum(g.Debit), 0), 0
+FROM qrySupplierLedger AS g INNER JOIN [@Suppliers] AS s ON g.SupplierID = s.SupplierID
+WHERE g.EntryDate < QDate('PeriodStart')
+GROUP BY s.SupplierID, s.SupplierName
+HAVING Round(Sum(g.Debit) - Sum(g.Credit), 2) <> 0
+UNION ALL
+SELECT 4, 'المخزون', p.ProductCode, p.ProductName, Round(Sum(t.Quantity * t.UnitCost), 2), 0, Sum(t.Quantity)
+FROM InventoryTransactions AS t INNER JOIN Products AS p ON t.ProductID = p.ProductID
+WHERE t.TransactionDate < QDate('PeriodStart')
+GROUP BY p.ProductID, p.ProductCode, p.ProductName
+HAVING Round(Sum(t.Quantity), 3) <> 0
 ```
 
 ## AccountTreeQuery

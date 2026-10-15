@@ -152,7 +152,7 @@ class ClosingCodeTests(unittest.TestCase):
         self.assertIn("أعد فتح السنة أولًا", reopen)
         self.assertIn("اكتب سبب إعادة الفتح", reopen)
         problem = proc(self.text, "YearCloseProblem")
-        self.assertIn("FiscalYear >= Year(Date)", problem)
+        self.assertIn("FiscalYearEnd(FiscalYear) >= Date", problem)      # the end of its fiscal period (modFiscal)
         self.assertIn("السنوات تُقفل بالترتيب", problem)
         year = proc(self.text, "CloseFiscalYear")
         for part in ("RETAINED_EARNINGS", "SetClosedThrough yearEnd", "ws.BeginTrans", "SyncJournal()",

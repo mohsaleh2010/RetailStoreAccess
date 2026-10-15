@@ -27,6 +27,7 @@ Private Sub D1_1()
     LangAdd "ÚÏøá ÇáäÓÈÉ Ãæ ÇáÊÚÏíá Ëã «ÊÑÍíá ÇáãÓíÑ». ÇáÕÑİ ÈÓäÏ ÕÑİ äŞÏíÉ ãä ÈäÏ «ÕÑİ ÚãæáÉ ãäÏæÈ", "Edit the rate or the adjustment, then Post the run. The payment is a cash payment voucher with the item Sales rep commission payment"
     LangAdd "ßãíÉ ßá Õäİ æÊßáİÉ æÍÏÊå íæã ÈÏÁ ÇáÊÔÛíá¡ Ëã «ÊÑÍíá ÇáÑÕíÏ». «ßá ÇáÃÕäÇİ» íÖíİ ÇáÃÕäÇİ", "The quantity and unit cost of each item on the start-up date, then Post the stock. All items adds the items"
     LangAdd "ÇáÍÓÇÈ ÇáãŞÇÈá ÍÓÇÈ İÑÚí äÔØ¡ æáíÓ ÕäÏæŞğÇ æáÇ ÈäßğÇ æáÇ ãÏì æáÇ ÇáÚãáÇÁ Ãæ ÇáãæÑÏíä", "The contra account is an active sub-account, not a box, a bank, Mada, customers or suppliers"
+    LangAdd "ÇáİÊÑÉ ÇáÌÏíÏÉ ÊÈÏÃ İí Çáíæã ÇáÊÇáí áäåÇíÉ ÂÎÑ İÊÑÉ¡ æáÇ ÊäÊåí İÊÑÊÇä İí ÓäÉ ãíáÇÏíÉ", "A new period starts the day after the end of the last one, and no two periods end in the same calendar"
     LangAdd "ÍÑßÉ Ãí ÍÓÇÈ ÈÑÕíÏ Ãæá ÇáãÏÉ æÇáÑÕíÏ ÈÚÏ ßá ŞíÏº ÇáÍÓÇÈ ÇáÑÆíÓí íÔãá ÍÓÇÈÇÊå ÇáÊÇÈÚÉ", "Moves of any account with the opening balance and the balance after each entry, a main account includes its sub-accounts"
     LangAdd "ßá ãÇ ÓõÌøá ÈÚÏ ÊÇÑíÎ åĞå ÇáäÓÎÉ ÓíõİŞÏ (ÊõÍİÙ äÓÎÉ æŞÇÆíÉ ãä ÇáÈíÇäÇÊ ÇáÍÇáíÉ ÃæáğÇ", "Everything recorded after the date of this backup will be lost (a safety copy of the current data is saved first"
     LangAdd "ãÚÇãáÇÊ ÈÑäÇãÌ ÇáÊæŞíÚ: {IN} ãáİ ÇáãÓÊäÏ¡ {OUT} ãáİ ÇáÊæŞíÚ¡ {PIN} ÇáÑŞã ÇáÓÑí (İÇÑÛ", "Arguments of the signing program: {IN} document file, {OUT} signature file, {PIN} PIN (empty"
@@ -46,6 +47,7 @@ Private Sub D1_1()
     LangAdd "ãÓíÑ ßá ÔåÑ: ÇáÑæÇÊÈ æÇáÈÏáÇÊ æÇáÅÖÇİí æÇáÎÕæãÇÊ æÇáÊÃãíäÇÊ¡ Ëã ÇáÊÑÍíá æÇáÕÑİ", "A run each month: salaries, allowances, overtime, deductions and social insurance, then posting and payment"
     LangAdd "åĞÇ ÍÓÇÈ ÃÓÇÓí ÊÓÊÎÏãå ÇáŞíæÏ ÇáÂáíÉ: áÇ íÊÛíÑ äæÚå¡ æáÇ íÊÍæá Èíä ÑÆíÓí æİÑÚí", "This is a system account used by the automatic entries: its type does not change, and it does not switch between main and sub"
     LangAdd "ÅÚÇÏÉ ÅäÔÇÁ ÃÓØÑ ÇáãÓíÑ ãä ãÈíÚÇÊ æÊÍÕíáÇÊ ÇáÔåÑ¿ ÊÖíÚ ÇáÊÚÏíáÇÊ ÇáãßÊæÈÉ İíå", "Rebuild the run lines from the sales and collections of the month? The changes typed in it are lost"
+    LangAdd "ÇáÓäæÇÊ Ãæ ÇáİÊÑÇÊ ÇáãÇáíÉ ÈÇáÊÑÊíÈ¡ æÃÑÕÏÉ Ãæá ßá İÊÑÉ æãíÒÇäíÊåÇ ÇáÇİÊÊÇÍíÉ", "The fiscal years or periods in order, the opening balances of each period and its opening balance sheet"
     LangAdd "ÚãáÇÊ ÇáÊÚÇãáº ßá ÇáãÈÇáÛ ÊõÍİÙ ÈÚãáÉ ÇáÈÑäÇãÌ (ÍÓÈ ÏæáÉ ÇáÊÔÛíá İí ÇáÅÚÏÇÏÇÊ", "Trading currencies, every amount is kept in the program currency (by the operating country in the settings"
     LangAdd "ŞíãÉ æÍÏÉ æÇÍÏÉ ãä ÇáÚãáÉ ÈÚãáÉ ÇáÈÑäÇãÌº íõÓÌóøá áßá ÊÇÑíÎ İí «ÃÓÚÇÑ ÇáÚãáÇÊ", "Value of one unit of the currency in the program currency, recorded for each date in Exchange rates"
     LangAdd "áã íõäÔÃ ŞíÏ ÇáíæãíÉ áåĞÇ ÇáŞíÏ ÈÚÏ. ÇÖÛØ «ÊÍÏíË ÇáŞíæÏ» İí ÔÇÔÉ ŞíæÏ ÇáíæãíÉ", "The journal entry of this entry is not created yet. Click Refresh entries in the Journal entries screen"
@@ -56,6 +58,7 @@ Private Sub D1_1()
     LangAdd "ÇáİÇÊæÑÉ ÇáÍÇáíÉ áã ÊõÍİÙ (ÓÊÈŞì ãÍİæÙÉ ãÄŞÊğÇ áåĞÇ ÇáÌåÇÒ). åá ÊÑíÏ ÇáÎÑæÌ", "The current invoice is not saved (it will stay held for this computer). Do you want to exit"
     LangAdd "ÇáãÔÊÑíÇÊ ÇáãÍáíÉ ÇáÎÇÖÚÉ ááÖÑíÈÉ ÈÇáÓÚÑ ÇáÚÇã (ãÚ ÇáãÕÑæİÇÊ ÈİÇÊæÑÉ ÖÑíÈíÉ", "Local purchases taxed at the general rate (with expenses on a tax invoice"
     LangAdd "ãÈáÛ ÔåÑí áßá ÍÓÇÈ ÅíÑÇÏÇÊ Ãæ ãÕÑæİÇÊ (æíãßä áßá ãÑßÒ)¡ Ëã ÇáãŞÇÑäÉ ÈÇáİÚáí", "A monthly amount for each revenue or expense account (and for each center), then the comparison with the actual"
+    LangAdd "ÇÈÏÃ ÇáİÊÑÉ ÇáÃæáì İí 1 íäÇíÑ¡ İÊÈŞì ÇáÓäæÇÊ ŞÈáåÇ ãíáÇÏíÉ¡ Ãæ ŞÈá Ãæá ŞíÏ", "Start the first period on 1 January, so the years before it stay calendar years, or before the first entry"
     LangAdd "ÇÎÊÑ ãÌáÏ ÇáäÓÎ ÇáÇÍÊíÇØí (íİÖá ŞÑÕ ÂÎÑ Ãæ İáÇÔÉ Ãæ ãÌáÏ ãÊÒÇãä ãÚ ÇáÓÍÇÈÉ", "Choose the backup folder (preferably another disk, a USB drive or a folder synced with the cloud"
     LangAdd "ÇáÅåáÇß ÇáÓÇÈŞ ááÃÕæá ÇáãæÌæÏÉ ŞÈá ÇáÈÑäÇãÌ İŞØ (ãÕÏÑ ÇáÔÑÇÁ: ÑÕíÏ ÇİÊÊÇÍí", "Previous depreciation, only for assets owned before the program (purchase source: opening balance"
     LangAdd "ÊÑÍíá ÇáÌÑÏ íÍæøá ÇáİÑæŞÇÊ Åáì ÍÑßÇÊ ÊÓæíÉ İí ÇáãÎÒæä æáÇ íãßä ÇáÊÑÇÌÚ Úäå", "Posting the count turns the differences into stock adjustment moves and cannot be undone"
@@ -76,7 +79,9 @@ Private Sub D1_1()
     LangAdd "ÅáÛÇÁ ÊİÚíá ÇáÌåÇÒ ÇáãÍÏÏ¿ áä íÚãá Úáíå ÇáÈÑäÇãÌ ÍÊì íõİÚóøá ÈßæÏ ÌÏíÏ", "Deactivate the selected computer? The program will not run on it until it is activated with a new code"
     LangAdd "ÇßÊÈ ÇáÊÇÑíÎ æÇáÈíÇä¡ Ëã ÓØÑğÇ áßá ÍÓÇÈ: ÇáãÈáÛ İí ÇáãÏíä Ãæ İí ÇáÏÇÆä", "Type the date and the description, then a line for each account: the amount in debit or in credit"
     LangAdd "ÇáÈíÇäÇÊ ÏÇÎá åĞÇ Çáãáİ äİÓå (ÛíÑ ãŞÓãÉ)¡ İáÇ íãßä ÇÓÊÚÇÏÊåÇ æåæ ãİÊæÍ", "The data is inside this same file (not split), so it cannot be restored while it is open"
+    LangAdd "ÇáİÊÑÉ ÇáÃæáì ÊÈÏÃ İí 1 íäÇíÑ (æÇáÓäæÇÊ ŞÈáåÇ ãíáÇÏíÉ) Ãæ ŞÈá Ãæá ŞíÏ", "The first period starts on 1 January (the years before it are calendar years) or before the first entry"
     LangAdd "ÍÓÇÈ ÅÌãÇáí ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ åæ ãŞÇÈá ßá ÇáÃÑÕÏÉ¡ æáÇ íõÏÎá áå ÑÕíÏ", "The total opening balances account is the other side of every balance and takes no balance of its own"
+    LangAdd "áÇ ÊäÊåí İÊÑÊÇä İí ÓäÉ ãíáÇÏíÉ æÇÍÏÉ: ÅŞİÇá ÇáİÊÑÉ íõÚÑİ ÈÓäÉ äåÇíÊåÇ", "No two periods end in the same calendar year: a closing is known by the year of its end"
     LangAdd "ááÕäİ ÍÑßÇÊ ÈÚÏ ÑÕíÏå ÇáÇİÊÊÇÍí¡ İáÇ íõáÛì ÊÑÍíáå. ÕÍøÍ ÇáßãíÉ ÈÇáÌÑÏ", "The item has moves after its opening stock, so it cannot be unposted. Correct the quantity with a stock count"
     LangAdd "ÇáÏÎæá ÇáÃæá: ÇÓã ÇáãÓÊÎÏã admin ÈÏæä ßáãÉ ãÑæÑ¡ æÓíõØáÈ ãäß ÊÚííäåÇ", "First login: user name admin with no password, and you will be asked to set one"
     LangAdd "Êã ÊÛííÑ ßáãÉ ãÑæÑ ÇáãÈÑãÌ. ÇÏÎá ÈÇÓã developer æßáãÉ ÇáãÑæÑ ÇáÌÏíÏÉ", "The developer password was changed. Log in as developer with the new password"
@@ -129,15 +134,16 @@ Private Sub D1_1()
     LangAdd "ááÅíÏÇÚ æÇáÓÍÈ æÇáÊÍæíá æÊÓæíÉ ãÏì ÇÎÊÑ äæÚ ÇáÍÑßÉ ÇáÎÇÕ ÈåÇ", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
     LangAdd "ãØÇÈŞÉ ßÔİ ÇáÈäß ãÚ ÇáÏİÇÊÑ: Úáöøã ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ÇáßÔİ", "Match the bank statement with the books: mark the transactions shown on the statement"
     LangAdd "íæÌÏ ãÓíÑ ãÑÍóøá ÈÚÏå: ÎÕæãÇÊ ÇáÓáİ İíå ÊÚÊãÏ Úáì åĞÇ ÇáãÓíÑ", "There is a posted run after it: its advance deductions depend on this run"
+End Sub
+
+Private Sub D1_2()
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì Ëã ÇÍİÙ ÇáÅÚÏÇÏÇÊ ãÑÉ ÃÎÑì", "Close the program on the other computers, then save the settings again"
     LangAdd "ÅáÛÇÁ ÇÚÊãÇÏ ÇáÅŞÑÇÑ¿ íõÍĞİ ŞíÏ ÇáÊÓæíÉ æíÚæÏ ÇáÅŞÑÇÑ ãÓæÏÉ", "Cancel the approval of the return? The settlement entry is deleted and the return becomes a draft"
     LangAdd "ÅíÕÇá 150 Ãáİ Ìäíå Ãæ ÃßËÑ: ÇáÑŞã ÇáŞæãí Ãæ ÇáÖÑíÈí ááãÔÊÑí", "Receipt of 150,000 pounds or more: national ID or tax number of the buyer"
     LangAdd "ÇáÊÍæíá ÇáÈäßí íõÎÕã ãä åĞÇ ÇáÈäß (ÇáÈäß ÇáÇİÊÑÇÖí ÊáŞÇÆíğÇ", "A bank transfer is taken from this bank (the default bank automatically"
     LangAdd "ÇáÎØæÉ 2 ÊãÊ: ÇÌÊÇÒÊ ÇáÚíäÇÊ ÇáİÍÕ. ÇáÊÇáí: ÇáÔåÇÏÉ ÇáİÚáíÉ", "Step 2 done: the samples passed the checks. Next: production certificate"
-End Sub
-
-Private Sub D1_2()
     LangAdd "ÇáãÕÑæİ ÇáäŞÏí íõÎÕã ãä åĞÇ ÇáÕäÏæŞ (íõÎÊÇÑ ÕäÏæŞß ÊáŞÇÆíğÇ", "A cash expense is taken from this box (your box is chosen automatically"
+    LangAdd "Çáíæã ÇáÊÇáí áäåÇíÉ ÂÎÑ İÊÑÉ: áÇ ÊÏÇÎá æáÇ İÌæÉ Èíä ÇáİÊÑÇÊ", "the day after the end of the last period: no overlap and no gap between periods"
     LangAdd "ÊÃßÏ Ãä ÇáÈÑäÇãÌ ãÛáŞ Úáì ßá ÇáÃÌåÒÉ ÇáÃÎÑì Ëã ÃÚÏ ÇáãÍÇæáÉ", "Make sure the program is closed on all other computers, then try again"
     LangAdd "ÍÇáÉ ÅÑÓÇá İæÇÊíÑ ÇáÈíÚ æÇáãÑÊÌÚÇÊ ááãäÙæãÉ¡ æÅÚÇÏÉ ÇáÅÑÓÇá", "Sending status of sales invoices and returns, and resending"
     LangAdd "ÍÓÇÈ ÑÆíÓí Ãæ ãÚØøá: ÇáŞíæÏ Úáì ÇáÍÓÇÈÇÊ ÇáİÑÚíÉ ÇáäÔØÉ İŞØ", "A main or inactive account: entries go to active sub-accounts only"
@@ -148,6 +154,7 @@ Private Sub D1_2()
     LangAdd "ÃõáÛí ÇáãÓÊäÏ áÏì ÇáãÕáÍÉ. ÓÌøá ãÑÊÌÚğÇ İí ÇáÈÑäÇãÌ Åä áÒã", "The document was cancelled at the Tax Authority. Record a return in the program if needed"
     LangAdd "ÇÈÍË ÈÇáÇÓã Ãæ ÇáßæÏ Ãæ ÇáÈÇÑßæÏ Ãæ ÑŞã ÇáİÇÊæÑÉ Ãæ ÇáÌæÇá", "Search by name, code, barcode, invoice number or mobile"
     LangAdd "ÇáÍÓÇÈ ÇáÑÆíÓí íÌÈ Ãä íßæä ÍÓÇÈğÇ ÊÌãíÚíğÇ (áÇ íŞÈá ÇáŞíæÏ", "The main account must be a summary account (it takes no entries"
+    LangAdd "ÈÚÏåÇ ÊõÖÇİ ÇáİÊÑÇÊ ÈÇáÊÑÊíÈ¡ æáÇ ÊÒíÏ ÇáİÊÑÉ Úáì 24 ÔåÑğÇ", "Then the periods are added in order, each one at most 24 months"
     LangAdd "ÚÏø ÇáäŞÏíÉ æÊÑÍíáåÇ ááÎÒíäÉ ÇáÑÆíÓíÉ Ãæ ÊÓæíÊåÇ ãÚ ÇáãÇáß", "Count the cash and transfer it to the main treasury or settle it with the owner"
     LangAdd "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ¡ æãÊì¡ æãä Ãí ÌåÇÒ¡ æÇáŞíã ŞÈá æÈÚÏ", "Who added, edited or deleted, when, from which computer, and the values before and after"
     LangAdd "ÃÍÏ ÇáÃÕäÇİ İí ÇáİÇÊæÑÉ áã íÚÏ ãæÌæÏğÇ. ÇÍĞİå ãä ÇáİÇÊæÑÉ", "An item of the invoice no longer exists. Remove it from the invoice"
@@ -179,6 +186,7 @@ Private Sub D1_2()
     LangAdd "áÇ ÊæÌÏ ÈíÇäÇÊ áÚÑÖåÇ İí åĞÇ ÇáÊŞÑíÑ ááÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "There is no data to show in this report for the choices made"
     LangAdd "áÇ íãßä ÇáÍĞİ Ãæ ÇáÊÚÏíá áæÌæÏ ÚãáíÇÊ ãÑÊÈØÉ ÈåĞÇ ÇáÓÌá", "Cannot delete or edit because there are transactions linked to this record"
     LangAdd "áÇ íãßä ÊÛííÑ ÏæáÉ ÇáÊÔÛíá ÈÚÏ ÊÓÌíá ÚãáíÇÊ İí ÇáÈÑäÇãÌ", "The operating country cannot change after operations are recorded"
+    LangAdd "áíÓÊ İí ÇáİÊÑÇÊ ÇáãÇáíÉ. ÃÖİåÇ İí ÔÇÔÉ «ÇáİÊÑÇÊ ÇáãÇáíÉ", "is not in the fiscal periods. Add it in the Fiscal periods screen"
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ æÇäÓÎ ãáİ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ ãßÇäå íÏæíğÇ", "Close the program and copy the backup file in its place by hand"
     LangAdd "ÅÌãÇáí ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÓÊÍŞÉ Úä ÇáİÊÑÉ ÇáÍÇáíÉ", "Total VAT due for the current period"
     LangAdd "ÇÎÊÑ ÔÇÔÉ æÇÍÏÉ Úáì ÇáÃŞá¡ Ãæ ÃáÛö «ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ", "Choose at least one screen, or clear Custom screen permissions"
@@ -208,6 +216,7 @@ Private Sub D1_2()
     LangAdd "ÃÑÕÏÉ ÇáÎÒíäÉ ÇáÑÆíÓíÉ æÕäÇÏíŞ ÇáßÇÔíÑ æÍÑßÉ ßá íæã", "Balances of the main treasury and cashier boxes and the moves of each day"
     LangAdd "ÇáÎØæÉ 1 ÊãÊ: ÔåÇÏÉ ÇáÇãÊËÇá. ÇáÊÇáí: İÍæÕ ÇáÇãÊËÇá", "Step 1 done: compliance certificate. Next: compliance checks"
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÈÚÏ (ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "e-invoicing platform yet (see the e-invoicing screen"
+    LangAdd "ÇáİÊÑÉ ãŞİáÉ. ÃÚÏ İÊÍåÇ ÃæáğÇ ãä ÔÇÔÉ ÅŞİÇá ÇáİÊÑÇÊ", "The period is closed. Reopen it first in the period closing screen"
     LangAdd "ÇáİÑæÚ æÇáÃŞÓÇã: ÊõæÒóøÚ ÚáíåÇ ÇáÅíÑÇÏÇÊ æÇáãÕÑæİÇÊ", "Branches and departments: revenue and expenses are allocated to them"
     LangAdd "ÇáŞíãÉ ÇáãÊÈŞíÉ æÇáÅåáÇß ÇáÓÇÈŞ áÇ íÊÌÇæÒÇä ÇáÊßáİÉ", "The residual value and the previous depreciation do not exceed the cost"
     LangAdd "ÇáãÏíÑ ÇáãÓÄæá Úä ÇáÎÒíäÉ: ÇÎÊÑ áå ÇáÎÒíäÉ ÇáÑÆíÓíÉ", "The manager in charge of the treasury: choose the main treasury for him"
@@ -248,6 +257,9 @@ Private Sub D1_2()
     LangAdd "ÇáåÏİ ÇáÔåÑí áÕÇİí ãÈíÚÇÊ ßá ãäÏæÈ (ÈÏæä ÇáÖÑíÈÉ", "The monthly target for the net sales of each sales rep (without VAT"
     LangAdd "ÛíÑ ãÊÇÍ İí ãáİ ACCDE. ÛíøÑ ßáãÉ ÇáãÑæÑ ãä äÓÎÊß", "Not available in an ACCDE file. Change the password from your copy"
     LangAdd "áÊÕÍíÍ ÇáßãíÉ ÇáÂä ÇÓÊÎÏã ÇáÌÑÏ Ãæ ÇáÅÖÇİÉ/ÇáÎÕã", "To correct the quantity now use the stock count or the addition/deduction"
+End Sub
+
+Private Sub D1_3()
     LangAdd "áåĞÇ ÇáÍÓÇÈ ÍÓÇÈÇÊ ÊÇÈÚÉ. ÇÍĞİåÇ Ãæ ÇäŞáåÇ ÃæáğÇ", "This account has sub-accounts. Delete them or move them first"
     LangAdd "ãÏíÑ ÇáäÙÇã íİÊÍ ßá ÇáÔÇÔÇÊ Èßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ", "The system administrator always opens every screen with every permission"
     LangAdd "ãÓÊäÏÇÊ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ (ÇáãŞÈæáÉ æÇáãÑİæÖÉ", "E-invoicing documents (accepted and rejected"
@@ -257,9 +269,6 @@ Private Sub D1_2()
     LangAdd "ÇáÅíÕÇá ÇáÅáßÊÑæäí ÇáãÕÑí áÏæáÉ ÇáÊÔÛíá ãÕÑ İŞØ", "The Egyptian e-receipt is for the operating country Egypt only"
     LangAdd "ÇáÑÇÊÈ æÇáÈÏáÇÊ æÇáÊÃãíäÇÊ æŞÓØ ÇáÓáİÉ áßá ãæÙİ", "Salary, allowances, social insurance and advance installment of each employee"
     LangAdd "Çáãáİ ÇáãÎÊÇÑ áíÓ äÓÎÉ ÕÇáÍÉ ãä ÈíÇäÇÊ ÇáÈÑäÇãÌ", "The chosen file is not a valid backup of the program data"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÈÚÏ ÇáÊÑÍíá áÇ íõÚÏóøá ÇáÑÕíÏ ÅáÇ ÈÅáÛÇÁ ÊÑÍíáå", "Once posted, a balance is changed only by unposting it"
     LangAdd "ÊõÍÓÈ ÇáİÑæŞÇÊ Úáì ÇáßãíÇÊ ÇáÍÇáíÉ áÍÙÉ ÇáÊÑÍíá", "The differences are calculated on the current quantities at the time of posting"
     LangAdd "ÍÓÇÈÇÊ áÇ íãßä æÖÚåÇ İí ÇáÔÌÑÉ (ÍáŞÉ Ãæ ÃßËÑ ãä", "Accounts that cannot be placed in the tree (a loop or more than"
@@ -290,17 +299,4 @@ Private Sub D1_3()
     LangAdd "ÇáÊŞÇÑíÑ ÇáãÍÇÓÈíÉ ÊÍÊÇÌ ÕáÇÍíÉ «ŞíæÏ ÇáíæãíÉ", "The accounting reports need the permission Journal entries"
     LangAdd "ÇáãÈíÚÇÊ ÇáãÍáíÉ ÇáÎÇÖÚÉ ááÖÑíÈÉ ÈÇáÓÚÑ ÇáÚÇã", "Local sales taxed at the general rate"
     LangAdd "ÇáãÑÊÌÚÇÊ Úáì åĞå ÇáİÇÊæÑÉ (äŞÑ ãÒÏæÌ ááØÈÇÚÉ", "Returns on this invoice (double-click to print"
-    LangAdd "ÇáæÇÑÏÇÊ ãä ÇáÓáÚ (ÇáãÓÏÏÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imported goods (VAT paid at customs"
-    LangAdd "ÈÑäÇãÌ ÇáÊæŞíÚ (İáÇÔÉ ÇáÊæŞíÚ) İí ÅÚÏÇÏ ÇáÑÈØ", "Signing program (USB token) in the connection setup"
-    LangAdd "ÈÚÏ ÇáÍİÙ Úíøä ßáãÉ ÇáãÑæÑ ãä ÒÑ «ßáãÉ ÇáãÑæÑ", "After saving, set the password with the button Password"
-    LangAdd "ÑÕíÏ ÇáÍÓÇÈ İí ÇáÈäß ÚäÏ ÈÏÁ ÇÓÊÎÏÇã ÇáÈÑäÇãÌ", "The account balance in the bank when the program is first used"
-    LangAdd "ÛíÑ ãŞİáÉ: ÕÇİí ÇáÑÈÍ (ÇáÎÓÇÑÉ) ÍÊì 31 ÏíÓãÈÑ", "Not closed: net profit (loss) up to 31 December"
-    LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÚãæáÇÊ ÇáãäÏæÈíä", "You do not have this permission in the sales rep commissions screen"
-    LangAdd "ááÚãá İí ÇáÏæáÉ ÇáÃÎÑì ÇÈÏÃ ãáİ ÈíÇäÇÊ ÌÏíÏğÇ", "To work in the other country start a new data file"
-    LangAdd "ÃÖİ ÕäİğÇ æÇÍÏğÇ Úáì ÇáÃŞá Åáì ŞÇÆãÉ ÇáØÈÇÚÉ", "Add at least one item to the print list"
-    LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ İí ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled in the settings"
-    LangAdd "ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ", "Need follow-up (waiting, rejected, warning"
-    LangAdd "ÚãáíÇÊ ÇáÏİÇÊÑ ÛíÑ ÇáãØÇÈŞÉ (ÍÊì ÊÇÑíÎ ÇáßÔİ", "Book transactions not matched (up to the statement date"
-    LangAdd "ßáãÉ ÇáãÑæÑ áÇ íÌæÒ Ãä Êßæä äİÓ ÇÓã ÇáãÓÊÎÏã", "The password may not be the same as the user name"
-    LangAdd "áÇ ãÈíÚÇÊ æáÇ ÊÍÕíáÇÊ ááãäÏæÈíä İí åĞÇ ÇáÔåÑ", "No sales and no collections by the sales reps in this month"
 End Sub

@@ -17,10 +17,71 @@ Public Sub LangData4()
     D4_7
     D4_8
     D4_9
-    D4_10
 End Sub
 
 Private Sub D4_1()
+    LangAdd "ÚãáíÇÊ ÇáãÓÊäÏÇÊ", "Document transactions"
+    LangAdd "ÚãæáÇÊ ÇáãäÏæÈíä", "Sales rep commissions"
+    LangAdd "Úä İÇÊæÑÉ ÇáÔÑÇÁ", "for the purchase invoice"
+    LangAdd "ÛíÑ ãÓãæÍ ÈÇáÂÌá", "Credit not allowed"
+    LangAdd "áÌåÇÒ äŞØÉ ÇáÈíÚ", "of the POS device"
+    LangAdd "áã íõŞÈá ÇáãÓÊäÏ", "The document was not accepted"
+    LangAdd "áã íõáÛó ÇáãÓÊäÏ", "The document was not cancelled"
+    LangAdd "ãÌãÚ ÅåáÇß ÇáÃÕá", "Accumulated depreciation of the asset"
+    LangAdd "ãÍÇßÇÉ (ÇáÓÚæÏíÉ", "Simulation (Saudi Arabia"
+    LangAdd "ãÑÏæÏÇÊ ÇáãÈíÚÇÊ", "Sales returns"
+    LangAdd "ãÓÊÍŞÇÊ ÇáãæÑÏíä", "Supplier payables"
+    LangAdd "ãÓÊÎÏãÉ áÓÌá ÂÎÑ", "is used by another record"
+    LangAdd "ãÓæÏÉ (ÛíÑ ãÚÊãÏ", "Draft (not approved"
+    LangAdd "ãä ÈÏÇíÉ ÇáÕäÏæŞ", "since the box started"
+    LangAdd "ãä ÕáÇÍíÇÊ ÇáÏæÑ", "From the role permissions"
+    LangAdd "äÙÇã ÅÏÇÑÉ ÇáãÍá", "Store management system"
+    LangAdd "äŞØÉ ÈíÚ ÇáßÇİíå", "Cafe point of sale"
+    LangAdd "åá ÊÑíÏ ÇáãÊÇÈÚÉ", "Do you want to continue"
+    LangAdd "æÊÇÑíÎ ÇáÇÓÊÍŞÇŞ", "and the due date"
+    LangAdd "íÙåÑ ááãÈÑãÌ İŞØ", "Shown to the developer only"
+    LangAdd "ÂÎÑ ãÕÑæİ ÃõäÔÆ", "Last expense created"
+    LangAdd "ÃÑÕÏÉ Ãæá ÇáãÏÉ", "Opening balances"
+    LangAdd "ÃßÈÑ ãä ÇáãÊÈŞí", "more than the remaining"
+    LangAdd "ÃäæÇÚ ÇáãÕÑæİÇÊ", "Expense types"
+    LangAdd "ÃåÏÇİ ÇáãäÏæÈíä", "Sales rep targets"
+    LangAdd "Ãæá ÕäÏæŞ ßÇÔíÑ", "First cashier box"
+    LangAdd "ÃíÇã ÚÏã ÇáÍÑßÉ", "Days without moves"
+    LangAdd "ÅÌãÇáí ÇáÚãæáÇÊ", "Total commissions"
+    LangAdd "ÅÌãÇáí ÇáãÈíÚÇÊ", "Total sales"
+    LangAdd "ÅÔÚÇÑ ÏÇÆä ãÈÓØ", "Simplified credit note"
+    LangAdd "ÅÔÚÇÑ ãÏíä ãÈÓØ", "Simplified debit note"
+    LangAdd "ÅÙåÇÑ ÛíÑ ÇáäÔØ", "Show inactive"
+    LangAdd "ÅÚÇÏÉ İÊÍ ÇáÓäÉ", "Reopen the year"
+    LangAdd "ÅáÛÇÁ ÇáÇÓÊÈÚÇÏ", "Cancel the disposal"
+    LangAdd "ÅíÏÇÚ ãä ÇáãÇáß", "Deposit from the owner"
+    LangAdd "ÇÎÊÑ ÍÓÇÈ ÇáÃÕá", "Choose the asset account"
+    LangAdd "ÇÎÊÑ äæÚ ÇáÍÑßÉ", "Choose the move type"
+    LangAdd "ÇßÊÈ ÇÓã ÇáİÊÑÉ", "Write the name of the period"
+    LangAdd "ÇßÊÈ ÈíÇä ÇáŞíÏ", "Type the description of the entry"
+    LangAdd "ÇáÅŞÑÇÑ ÇáÖÑíÈí", "VAT return"
+    LangAdd "ÇáÈäß ÇáÇİÊÑÇÖí", "Default bank"
+    LangAdd "ÇáÊÓæíÉ ÇáÈäßíÉ", "Bank reconciliation"
+    LangAdd "ÇáÍÑßÇÊ ÇáÈäßíÉ", "Bank transactions"
+    LangAdd "ÇáÍÑßÇÊ ÇáãÓÌáÉ", "Recorded moves"
+    LangAdd "ÇáÍÓÇÈ ãŞİá ÍÊì", "The account is locked until"
+    LangAdd "ÇáÍÓÇÈÇÊ ÇáÚÇãÉ", "General accounts"
+    LangAdd "ÇáÍİÙ æÇáÇÚÊãÇÏ", "Save and approve"
+    LangAdd "ÇáÓÈÈ / ãáÇÍÙÇÊ", "Reason / notes"
+    LangAdd "ÇáÓäÏ ÛíÑ ãæÌæÏ", "The voucher does not exist"
+    LangAdd "ÇáÔåÇÏÉ ÇáİÚáíÉ", "Production certificate"
+    LangAdd "ÇáÔíß ÛíÑ ãæÌæÏ", "The cheque does not exist"
+    LangAdd "ÇáÕäÏæŞ ÛíÑ äÔØ", "The box is not active"
+    LangAdd "ÇáÖÑíÈÉ ÈÇáÚãáÉ", "VAT in currency"
+    LangAdd "ÇáÚãíá (ÇÎÊíÇÑí", "Customer (optional"
+    LangAdd "ÇáÚãíá / ÇáãæÑÏ", "Customer / supplier"
+    LangAdd "ÇáİÊÑÇÊ ÇáãÇáíÉ", "Fiscal periods"
+    LangAdd "ÇáİÊÑÉ: ÇáãÌãæÚ", "Period: total"
+    LangAdd "ÇáİÑæÚ æÇáÃŞÓÇã", "Branches and departments"
+    LangAdd "ÇáŞæÇÆã ÇáãÇáíÉ", "Financial statements"
+    LangAdd "ÇáŞíÏ ÛíÑ ãæÌæÏ", "The entry does not exist"
+    LangAdd "ÇáŞíãÉ ÇáÏİÊÑíÉ", "Book value"
+    LangAdd "ÇáŞíãÉ ÇáãÊÈŞíÉ", "Residual value"
     LangAdd "ÇáŞíãÉ ÈÇáÊßáİÉ", "Value at cost"
     LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ", "Quantity returned"
     LangAdd "ÇáßãíÉ ÇáãÔÊÑÇÉ", "Quantity bought"
@@ -79,6 +140,9 @@ Private Sub D4_1()
     LangAdd "ÅÚÏÇÏÇÊ ÇáãáÕŞ", "Label settings"
     LangAdd "ÅáÛÇÁ ÇáÇÚÊãÇÏ", "Cancel approval"
     LangAdd "ÅáÛÇÁ ÇáãØÇÈŞÉ", "Unmatch"
+End Sub
+
+Private Sub D4_2()
     LangAdd "ÅíÏÇÚ İí ÇáÈäß", "Deposit in the bank"
     LangAdd "ÅíÑÇÏÇÊ ÇáäÔÇØ", "Operating revenue"
     LangAdd "ÇÎÊÑ ÈäÏ ÇáÕÑİ", "Choose the payment item"
@@ -141,9 +205,6 @@ Private Sub D4_1()
     LangAdd "Êã ÅŞİÇá ÇáÓäÉ", "The year was closed"
     LangAdd "Êã ÅáÛÇÁ ÇáÕÑİ", "The payment was cancelled"
     LangAdd "Êã ÇáÍİÙ ÈäÌÇÍ", "Saved successfully"
-End Sub
-
-Private Sub D4_2()
     LangAdd "Êã ÊÑÍíá ÇáÌÑÏ", "The count was posted"
     LangAdd "Êã ÊÓÌíá ÅåáÇß", "Depreciation recorded for"
     LangAdd "Êã ÊÓÌíá ÇáÔíß", "The cheque was recorded"
@@ -202,6 +263,9 @@ Private Sub D4_2()
     LangAdd "ÃÓØÑ ÇáãæÇÒäÉ", "Budget lines"
     LangAdd "ÃÓÚÇÑ ÇáÚãáÇÊ", "Exchange rates"
     LangAdd "ÃŞÕì äÓÈÉ ÎÕã", "Maximum discount rate"
+End Sub
+
+Private Sub D4_3()
     LangAdd "ÃŞá ãä ÇáãÈáÛ", "less than the amount"
     LangAdd "ÃßÈÑ ãä ŞíãÊå", "more than its value"
     LangAdd "ÅÌãÇáí ÇáÃÕæá", "Total assets"
@@ -254,6 +318,7 @@ Private Sub D4_2()
     LangAdd "ÊŞÑíÑ ÇáãÎÒæä", "Stock report"
     LangAdd "ÊŞÑíÑ ÇáäæÇŞÕ", "Shortage report"
     LangAdd "Êã ÍİÙ ÇáÍÑßÉ", "The move was saved"
+    LangAdd "ÊæÌÏ ŞíæÏ ŞÈá", "There are entries before"
     LangAdd "ÊõÏİÚ ÈÇáßÇãá", "Paid in full"
     LangAdd "Ëãä ÈíÚ ÇáÃÕá", "Sale price of the asset"
     LangAdd "ÍĞİ åĞÇ ÇáÓØÑ", "Delete this line"
@@ -264,9 +329,6 @@ Private Sub D4_2()
     LangAdd "ÓäÏ ÕÑİ ÚãæáÉ", "Commission payment voucher"
     LangAdd "ÓäÏ ÕÑİ áãæÑÏ", "Supplier payment voucher"
     LangAdd "ÓäÏ ÕÑİ äŞÏíÉ", "Cash payment voucher"
-End Sub
-
-Private Sub D4_3()
     LangAdd "ÓäÏ ŞÈÖ äŞÏíÉ", "Cash receipt voucher"
     LangAdd "ÔÌÑÉ ÇáÍÓÇÈÇÊ", "Account tree"
     LangAdd "ÔÑÇÁ ÃÕá ËÇÈÊ", "Purchase of a fixed asset"
@@ -295,6 +357,7 @@ Private Sub D4_3()
     LangAdd "ŞíÏ íæãíÉ ÑŞã", "Journal entry number"
     LangAdd "ßÔİ ÍÓÇÈ Úãíá", "Customer statement"
     LangAdd "ßÔİ ÍÓÇÈ ãæÑÏ", "Supplier statement"
+    LangAdd "áÇ ÊæÌÏ İÊÑÇÊ", "There are no periods"
     LangAdd "áÇ ÊæÌÏ äæÇŞÕ", "There are no shortages"
     LangAdd "áÇ íæÌÏ ÕäÏæŞ", "No box"
     LangAdd "ãÊæÓØ ÇáÊßáİÉ", "Average cost"
@@ -323,6 +386,9 @@ Private Sub D4_3()
     LangAdd "ÃßÈÑ ãä ÇáÍÏ", "more than the limit"
     LangAdd "Ããíä ÇáÕäÏæŞ", "Cashier"
     LangAdd "ÃíÇã ÇáÊÃÎíÑ", "Days late"
+End Sub
+
+Private Sub D4_4()
     LangAdd "ÅáÛÇÁ ÇáÍÇáÉ", "Cancel the status"
     LangAdd "ÅáÛÇÁ ÇáÓÏÇÏ", "Cancel the payment"
     LangAdd "ÅäÔÇÁ ãæÇÒäÉ", "Create a budget"
@@ -369,6 +435,7 @@ Private Sub D4_3()
     LangAdd "ÌæÇá ÇáÊæÕíá", "Delivery mobile"
     LangAdd "ÍÇáÉ ÇáÅÑÓÇá", "Sending status"
     LangAdd "ÍÇáÉ ÇáÊÓæíÉ", "Reconciliation status"
+    LangAdd "ÍĞİ ÂÎÑ İÊÑÉ", "Delete the last period"
     LangAdd "ÍĞİ ÇáãæÇÒäÉ", "Delete the budget"
     LangAdd "ÎÇÖÚ ááÖÑíÈÉ", "Taxable"
     LangAdd "ÎÒíäÉ ÑÆíÓíÉ", "Main treasury"
@@ -387,9 +454,6 @@ Private Sub D4_3()
     LangAdd "ÓÚÑ ÈíÚ ÌÏíÏ", "New sale price"
     LangAdd "ÔÇãá ÇáÖÑíÈÉ", "Including VAT"
     LangAdd "ÕÇİí ÇáÑæÇÊÈ", "Net salaries"
-End Sub
-
-Private Sub D4_4()
     LangAdd "Õäİ    ÇáÚÌÒ", "Item    Shortage"
     LangAdd "ÕæÑÉ ÇáÊÕäíİ", "Category picture"
     LangAdd "ØÈÇÚÉ ÇáİÊÑÉ", "Print the period"
@@ -404,6 +468,7 @@ Private Sub D4_4()
     LangAdd "İÊÍ æÚÑÖ İŞØ", "Open and view only"
     LangAdd "İÑæŞÇÊ ÇáÌÑÏ", "Count differences"
     LangAdd "İæÇÊíÑ ÇáÈíÚ", "Sales invoices"
+    LangAdd "İí ÈÏÇíÉ íæã", "at the start of"
     LangAdd "ŞíãÉ ÇáãÎÒæä", "Stock value"
     LangAdd "ŞíãÉ ÇáãÑÊÌÚ", "Return value"
     LangAdd "ŞíæÏ ÇáíæãíÉ", "Journal entries"
@@ -444,6 +509,9 @@ Private Sub D4_4()
     LangAdd "ÅáÛÇÁ ÇáÕÑİ", "Cancel the payment"
     LangAdd "ÅíÏÇÚ äŞÏíÉ", "Cash deposit"
     LangAdd "ÇÎÊÑ ÇáÍÓÇÈ", "Choose the account"
+End Sub
+
+Private Sub D4_5()
     LangAdd "ÇÎÊÑ ÇáÕæÑÉ", "Choose the picture"
     LangAdd "ÇÎÊÑ ÇáÚãáÉ", "Choose the currency"
     LangAdd "ÇÎÊÑ ÇáÚãíá", "Choose the customer"
@@ -510,9 +578,6 @@ Private Sub D4_4()
     LangAdd "ØÈÇÚÉ ÇáÓÌá", "Print the log"
     LangAdd "ØÈÇÚÉ ÇáŞíÏ", "Print the entry"
     LangAdd "ØÑíŞÉ ÇáÏİÚ", "Payment method"
-End Sub
-
-Private Sub D4_5()
     LangAdd "ÚÑÖ ÇáÊŞÑíÑ", "Show the report"
     LangAdd "İÇÊæÑÉ ÔÑÇÁ", "Purchase invoice"
     LangAdd "ŞÇÆãÉ ÇáÏÎá", "Income statement"
@@ -567,6 +632,9 @@ Private Sub D4_5()
     LangAdd "ÇÓã ÇáÍÓÇÈ", "Account name"
     LangAdd "ÇÓã ÇáÚãáÉ", "Currency name"
     LangAdd "ÇÓã ÇáÚãíá", "Customer name"
+End Sub
+
+Private Sub D4_6()
     LangAdd "ÇÓã ÇáãÑßÒ", "Center name"
     LangAdd "ÇÓã ÇáãäÊÌ", "Product name"
     LangAdd "ÇÓã ÇáãæÑÏ", "Supplier name"
@@ -633,9 +701,6 @@ Private Sub D4_5()
     LangAdd "ãÈáÛ ÇáÓäÏ", "Voucher amount"
     LangAdd "ãÈáÛ ÇáÔíß", "Cheque amount"
     LangAdd "ãÌãá ÇáÑÈÍ", "Gross profit"
-End Sub
-
-Private Sub D4_6()
     LangAdd "ãÑÊÌÚ ÔÑÇÁ", "Purchase return"
     LangAdd "ãÑÌÚ ÇáÈäß", "Bank reference"
     LangAdd "ãÑÍóøáÉ İí", "posted on"
@@ -690,6 +755,9 @@ Private Sub D4_6()
     LangAdd "ÍĞİ ÇáŞíÏ", "Delete the entry"
     LangAdd "ÍÑßÉ ãäÊÌ", "Product moves"
     LangAdd "ÍİÙ ÇáÃÕá", "Save the asset"
+End Sub
+
+Private Sub D4_7()
     LangAdd "ÍİÙ ÇáÓäÏ", "Save the voucher"
     LangAdd "ÍİÙ ÇáŞíÏ", "Save the entry"
     LangAdd "ÍİÙ ÊÕİíÉ", "Save closing"
@@ -701,6 +769,7 @@ Private Sub D4_6()
     LangAdd "ÏÎæá ÎÇØÆ", "Wrong login"
     LangAdd "ÑÕíÏ ÏÇÆä", "Credit balance"
     LangAdd "ÑÕíÏ ÓÇÈŞ", "Previous balance"
+    LangAdd "ÑÕíÏ ãÏíä", "Debit balance"
     LangAdd "ÑŞã ÇáÌÑÏ", "Count number"
     LangAdd "ÑŞã ÇáÓäÏ", "Voucher number"
     LangAdd "ÑŞã ÇáÔíß", "Cheque number"
@@ -756,13 +825,11 @@ Private Sub D4_6()
     LangAdd "ÇáÅÌãÇáí", "Total"
     LangAdd "ÇáÅÖÇİÇÊ", "Extras"
     LangAdd "ÇáÇÑÊÏÇÏ", "Bounce"
-End Sub
-
-Private Sub D4_7()
     LangAdd "ÇáÇÓÊáÇã", "Receipt"
     LangAdd "ÇáÇäÍÑÇİ", "Variance"
     LangAdd "ÇáÈÇÑßæÏ", "Barcode"
     LangAdd "ÇáÊŞÇÑíÑ", "Reports"
+    LangAdd "ÇáÍÓÇÈÇÊ", "Accounts"
     LangAdd "ÇáÓÚæÏíÉ", "Saudi Arabia"
     LangAdd "ÇáÕÇÏÑÇÊ", "Exports"
     LangAdd "ÇáÕáÇÍíÉ", "Permission"
@@ -811,6 +878,9 @@ Private Sub D4_7()
     LangAdd "ÛíÑ ãÓÏÏ", "Unpaid"
     LangAdd "ÛíÑ ãæÒÚ", "Not allocated"
     LangAdd "İÚáí ÓäÉ", "Actuals of year"
+End Sub
+
+Private Sub D4_8()
     LangAdd "İß ÇáŞİá", "Unlock"
     LangAdd "ŞíÏ ÌÏíÏ", "New entry"
     LangAdd "ŞíÏ ÚßÓí", "Reversing entry"
@@ -879,9 +949,6 @@ Private Sub D4_7()
     LangAdd "ÇáÚãáÇÊ", "Currencies"
     LangAdd "ÇáÚãáíÉ", "Transaction"
     LangAdd "ÇáÚãæáÉ", "Commission"
-End Sub
-
-Private Sub D4_8()
     LangAdd "ÇáÚäæÇä", "Address"
     LangAdd "ÇáŞÇÆãÉ", "List"
     LangAdd "ÇáßÇÔíÑ", "Cashier"
@@ -934,6 +1001,9 @@ Private Sub D4_8()
     LangAdd "ãÓÊæíÇÊ", "levels"
     LangAdd "ãÕÑæİÇÊ", "Expenses"
     LangAdd "ãáÇÍÙÇÊ", "Notes"
+End Sub
+
+Private Sub D4_9()
     LangAdd "ãáíæäÇä", "two million"
     LangAdd "ãõÈáóøÛ", "Reported"
     LangAdd "æÇáÏÇÆä", "and credit"
@@ -1002,9 +1072,6 @@ Private Sub D4_8()
     LangAdd "ËãÇäíÉ", "eight"
     LangAdd "ÌÒÇÁÇÊ", "Penalties"
     LangAdd "ÏíÓãÈÑ", "December"
-End Sub
-
-Private Sub D4_9()
     LangAdd "ÓÈÊãÈÑ", "September"
     LangAdd "ÓÊãÇÆÉ", "six hundred"
     LangAdd "ÚãæáÇÊ", "Commissions"
@@ -1019,126 +1086,4 @@ Private Sub D4_9()
     LangAdd "ãÇÆÊÇä", "two hundred"
     LangAdd "ãÊÇÈÚÉ", "Continue"
     LangAdd "ãÊæÇÒä", "Balanced"
-    LangAdd "ãÍÕóøá", "Collected"
-    LangAdd "ãÑÍóøá", "Posted"
-    LangAdd "ãÓÊÈÚÏ", "Disposed"
-    LangAdd "ãÓÊÎÏã", "User"
-    LangAdd "ãÓÊÑÏÉ", "Refunded"
-    LangAdd "ãÚÇíäÉ", "Preview"
-    LangAdd "ãÚÊãÏÉ", "Approved"
-    LangAdd "ãßÇİÂÊ", "Bonuses"
-    LangAdd "ãáÇííä", "million"
-    LangAdd "ããäæÍÉ", "Granted"
-    LangAdd "ãä Èäß", "From a bank"
-    LangAdd "ãæÇÒäÉ", "Budget"
-    LangAdd "ãæÑÏğÇ", "suppliers"
-    LangAdd "ãõÑÍøá", "Posted"
-    LangAdd "äæİãÈÑ", "November"
-    LangAdd "ÃÈÑíá", "April"
-    LangAdd "ÃÑÈÚÉ", "four"
-    LangAdd "ÃÚÏøå", "Prepared by"
-    LangAdd "ÃÛÓØÓ", "August"
-    LangAdd "ÃáİÇä", "two thousand"
-    LangAdd "ÃõÑÓá", "Sent"
-    LangAdd "ÃõÖíİ", "Added"
-    LangAdd "ÅÖÇİÉ", "Add"
-    LangAdd "ÅÛáÇŞ", "Close"
-    LangAdd "ÅáÛÇÁ", "Cancel"
-    LangAdd "ÅíÏÇÚ", "Deposit"
-    LangAdd "ÇËäÇä", "two"
-    LangAdd "ÇáÃÕá", "Asset"
-    LangAdd "ÇáÇÓã", "Name"
-    LangAdd "ÇáÈÍË", "Search"
-    LangAdd "ÇáÈäÏ", "Item"
-    LangAdd "ÇáÈäß", "Bank"
-    LangAdd "ÇáÈíÚ", "Sale"
-    LangAdd "ÇáÌÑÏ", "Stock count"
-    LangAdd "ÇáÌåÉ", "Party"
-    LangAdd "ÇáÍÌã", "Size"
-    LangAdd "ÇáÍĞİ", "Delete"
-    LangAdd "ÇáÍŞá", "Field"
-    LangAdd "ÇáÎÕã", "Discount"
-    LangAdd "ÇáÏİÚ", "Payment"
-    LangAdd "ÇáÏæÑ", "Role"
-    LangAdd "ÇáÑÈÍ", "Profit"
-    LangAdd "ÇáÑŞã", "Number"
-    LangAdd "ÇáÑãÒ", "Code"
-    LangAdd "ÇáÓÈÈ", "Reason"
-    LangAdd "ÇáÓÌá", "Record"
-    LangAdd "ÇáÓÚÑ", "Price"
-    LangAdd "ÇáÓßä", "Housing"
-    LangAdd "ÇáÓäÉ", "Year"
-    LangAdd "ÇáÓäÏ", "Voucher"
-    LangAdd "ÇáÔåÑ", "Month"
-    LangAdd "ÇáÕÑİ", "Payment"
-    LangAdd "ÇáÕäİ", "Item"
-    LangAdd "ÇáÕæÑ", "Pictures"
-    LangAdd "ÇáÚÌÒ", "Shortage"
-    LangAdd "ÇáÚÏÏ", "Count"
-    LangAdd "ÇáİÑŞ", "Difference"
-    LangAdd "ÇáŞÓã", "Department"
-    LangAdd "ÇáŞíÏ", "Entry"
-    LangAdd "ÇáßæÏ", "Code"
-    LangAdd "Çáãáİ", "File"
-    LangAdd "ÇáäŞÕ", "Shortage"
-    LangAdd "ÇáäæÚ", "Type"
-    LangAdd "ÇáåÏİ", "Target"
-    LangAdd "ÇáæÕİ", "Description"
-    LangAdd "ÇáæŞÊ", "Time"
-    LangAdd "Çáíæã", "Today"
-    LangAdd "ÈŞíãÉ", "worth"
-    LangAdd "ÊÇÑíÎ", "Date"
-    LangAdd "ÊÍÏíË", "Refresh"
-    LangAdd "ÊÍæíá", "Transfer"
-    LangAdd "ÊÑÇÌÚ", "Undo"
-    LangAdd "ÊÓÚæä", "ninety"
-    LangAdd "ÊÕÏíÑ", "Export"
-    LangAdd "ÊÚÏíá", "Edit"
-    LangAdd "ÊŞÑíÑ", "Report"
-    LangAdd "ÊäÈíå", "Warning"
-    LangAdd "ÊæÕíá", "Delivery"
-    LangAdd "ËáÇËÉ", "three"
-    LangAdd "ÌÇÑíÉ", "Open"
-    LangAdd "ÍÑİğÇ", "characters"
-    LangAdd "ÎÒíäÉ", "Treasury"
-    LangAdd "ÎãÓæä", "fifty"
-    LangAdd "ÏÇÎáí", "Internal"
-    LangAdd "ÏŞíŞÉ", "minutes"
-    LangAdd "ÑÆíÓí", "Main"
-    LangAdd "ÑÇÌÚå", "Reviewed by"
-    LangAdd "ÑÕíÏå", "its balance is"
-    LangAdd "ÑãÇÏí", "Grey"
-    LangAdd "ÑõæÌÚ", "Checked:"
-    LangAdd "ÒíÇÏÉ", "Overage"
-    LangAdd "ÓÈÚæä", "seventy"
-    LangAdd "ÕäİğÇ", "items"
-    LangAdd "ØÇæáÉ", "Table"
-    LangAdd "ØÈÇÚÉ", "Print"
-    LangAdd "ÚÔÑæä", "twenty"
-    LangAdd "ÚãáíÉ", "Transaction"
-    LangAdd "İÚáíÉ", "Production"
-    LangAdd "ßÇÔíÑ", "Cashier"
-    LangAdd "ãÊæŞİ", "Stopped"
-    LangAdd "ãÏİæÚ", "Paid"
-    LangAdd "ãÑÈæØ", "Linked"
-    LangAdd "ãÑÊÌÚ", "Return"
-    LangAdd "ãÑİæÖ", "Rejected"
-    LangAdd "ãÓÊäÏ", "documents"
-    LangAdd "ãÓæÏÉ", "Draft"
-End Sub
-
-Private Sub D4_10()
-    LangAdd "ãÕÑæİ", "Expense"
-    LangAdd "ãØÇÈŞ", "Matched"
-    LangAdd "ãØáæÈ", "is required"
-    LangAdd "ãÚÊãÏ", "Approved"
-    LangAdd "ãİÊæÍ", "Open"
-    LangAdd "ãŞÈæÖ", "Received"
-    LangAdd "ãáÇÆã", "Suitable"
-    LangAdd "ãáíæä", "million"
-    LangAdd "ãäÎİÖ", "Low"
-    LangAdd "ãõÑÓá", "Submitted"
-    LangAdd "äÊíÌÉ", "Result"
-    LangAdd "íÓÇæí", "equals"
-    LangAdd "íäÇíÑ", "January"
 End Sub

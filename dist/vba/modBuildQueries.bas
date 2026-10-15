@@ -29,7 +29,7 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     "qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDe" & _
     "preciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,Tri" & _
     "alBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitA" & _
-    "t,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "t,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -862,6 +862,7 @@ Private Sub CreateAllQueries()
     Q_qryProfitCompare
     Q_qryBalanceItems
     Q_BalanceSheetQuery
+    Q_OpeningBalancesReportQuery
     Q_AccountTreeQuery
     Q_qrySalesInvoiceLineTotals
     Q_qryPurchaseInvoiceLineTotals
@@ -3571,6 +3572,41 @@ Private Sub Q_BalanceSheetQuery()
     s = s & "WHERE i.ClassNo IN (2, 3)" & vbCrLf
     s = s & "ORDER BY ClassNo, GroupKey, Pos, AccountKey" & vbCrLf
     SaveQuery "BalanceSheetQuery", "«·„Ì“«‰Ì… «·⁄„Ê„Ì… ›Ì ‰Â«Ì… «·› —…: «·√’Ê· = «·Œ’Ê„ + ÕﬁÊﬁ «·„·ﬂÌ…° „⁄ › —… «·„ﬁ«—‰…", s
+End Sub
+
+Private Sub Q_OpeningBalancesReportQuery()
+    Dim s As String
+    s = "SELECT 1 AS SectionNo, '«·Õ”«»« ' AS SectionName, CStr(a.AccountCode) AS ItemCode, a.AccountName AS ItemName," & vbCrLf
+    s = s & "       IIf(Sum(l.Debit) - Sum(l.Credit) > 0, Sum(l.Debit) - Sum(l.Credit), 0) AS DebitBalance," & vbCrLf
+    s = s & "       IIf(Sum(l.Debit) - Sum(l.Credit) < 0, Sum(l.Credit) - Sum(l.Debit), 0) AS CreditBalance, 0 AS ItemQty" & vbCrLf
+    s = s & "FROM (JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)" & vbCrLf
+    s = s & "     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode" & vbCrLf
+    s = s & "WHERE e.EntryDate < QDate('PeriodStart')" & vbCrLf
+    s = s & "GROUP BY a.AccountCode, a.AccountName" & vbCrLf
+    s = s & "HAVING Round(Sum(l.Debit) - Sum(l.Credit), 2) <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 2, '«·⁄„·«¡', CStr(c.CustomerID), c.CustomerName," & vbCrLf
+    s = s & "       IIf(Sum(g.Debit) - Sum(g.Credit) > 0, Sum(g.Debit) - Sum(g.Credit), 0)," & vbCrLf
+    s = s & "       IIf(Sum(g.Debit) - Sum(g.Credit) < 0, Sum(g.Credit) - Sum(g.Debit), 0), 0" & vbCrLf
+    s = s & "FROM qryCustomerLedger AS g INNER JOIN [@Customers] AS c ON g.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE g.EntryDate < QDate('PeriodStart')" & vbCrLf
+    s = s & "GROUP BY c.CustomerID, c.CustomerName" & vbCrLf
+    s = s & "HAVING Round(Sum(g.Debit) - Sum(g.Credit), 2) <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 3, '«·„Ê—œÊ‰', CStr(s.SupplierID), s.SupplierName," & vbCrLf
+    s = s & "       IIf(Sum(g.Debit) - Sum(g.Credit) > 0, Sum(g.Debit) - Sum(g.Credit), 0)," & vbCrLf
+    s = s & "       IIf(Sum(g.Debit) - Sum(g.Credit) < 0, Sum(g.Credit) - Sum(g.Debit), 0), 0" & vbCrLf
+    s = s & "FROM qrySupplierLedger AS g INNER JOIN [@Suppliers] AS s ON g.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE g.EntryDate < QDate('PeriodStart')" & vbCrLf
+    s = s & "GROUP BY s.SupplierID, s.SupplierName" & vbCrLf
+    s = s & "HAVING Round(Sum(g.Debit) - Sum(g.Credit), 2) <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 4, '«·„Œ“Ê‰', p.ProductCode, p.ProductName, Round(Sum(t.Quantity * t.UnitCost), 2), 0, Sum(t.Quantity)" & vbCrLf
+    s = s & "FROM InventoryTransactions AS t INNER JOIN Products AS p ON t.ProductID = p.ProductID" & vbCrLf
+    s = s & "WHERE t.TransactionDate < QDate('PeriodStart')" & vbCrLf
+    s = s & "GROUP BY p.ProductID, p.ProductCode, p.ProductName" & vbCrLf
+    s = s & "HAVING Round(Sum(t.Quantity), 3) <> 0" & vbCrLf
+    SaveQuery "OpeningBalancesReportQuery", "√—’œ… √Ê· «·„œ… ›Ì »œ«Ì… ÌÊ„ PeriodStart: «·Õ”«»« ° Ê«·⁄„·«¡° Ê«·„Ê—œÊ‰° Ê«·„Œ“Ê‰ »«·ﬂ„Ì… Ê«·ﬁÌ„… (docs/54)", s
 End Sub
 
 Private Sub Q_AccountTreeQuery()

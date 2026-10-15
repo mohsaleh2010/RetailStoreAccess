@@ -2007,6 +2007,38 @@ FROM qryProfitAt AS x, qryProfitCompare AS y""", ["PeriodEnd", "CompareEnd"]),
     Query("BalanceSheetQuery", "الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة", f"""
 {_balance_sheet()}""", P + ["CompareStart", "CompareEnd"]),
 
+    Query("OpeningBalancesReportQuery", "أرصدة أول المدة في بداية يوم PeriodStart: الحسابات، والعملاء، والموردون، والمخزون بالكمية والقيمة (docs/54)", """
+SELECT 1 AS SectionNo, 'الحسابات' AS SectionName, CStr(a.AccountCode) AS ItemCode, a.AccountName AS ItemName,
+       IIf(Sum(l.Debit) - Sum(l.Credit) > 0, Sum(l.Debit) - Sum(l.Credit), 0) AS DebitBalance,
+       IIf(Sum(l.Debit) - Sum(l.Credit) < 0, Sum(l.Credit) - Sum(l.Debit), 0) AS CreditBalance, 0 AS ItemQty
+FROM (JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)
+     INNER JOIN [@Accounts] AS a ON l.AccountCode = a.AccountCode
+WHERE e.EntryDate < QDate('PeriodStart')
+GROUP BY a.AccountCode, a.AccountName
+HAVING Round(Sum(l.Debit) - Sum(l.Credit), 2) <> 0
+UNION ALL
+SELECT 2, 'العملاء', CStr(c.CustomerID), c.CustomerName,
+       IIf(Sum(g.Debit) - Sum(g.Credit) > 0, Sum(g.Debit) - Sum(g.Credit), 0),
+       IIf(Sum(g.Debit) - Sum(g.Credit) < 0, Sum(g.Credit) - Sum(g.Debit), 0), 0
+FROM qryCustomerLedger AS g INNER JOIN [@Customers] AS c ON g.CustomerID = c.CustomerID
+WHERE g.EntryDate < QDate('PeriodStart')
+GROUP BY c.CustomerID, c.CustomerName
+HAVING Round(Sum(g.Debit) - Sum(g.Credit), 2) <> 0
+UNION ALL
+SELECT 3, 'الموردون', CStr(s.SupplierID), s.SupplierName,
+       IIf(Sum(g.Debit) - Sum(g.Credit) > 0, Sum(g.Debit) - Sum(g.Credit), 0),
+       IIf(Sum(g.Debit) - Sum(g.Credit) < 0, Sum(g.Credit) - Sum(g.Debit), 0), 0
+FROM qrySupplierLedger AS g INNER JOIN [@Suppliers] AS s ON g.SupplierID = s.SupplierID
+WHERE g.EntryDate < QDate('PeriodStart')
+GROUP BY s.SupplierID, s.SupplierName
+HAVING Round(Sum(g.Debit) - Sum(g.Credit), 2) <> 0
+UNION ALL
+SELECT 4, 'المخزون', p.ProductCode, p.ProductName, Round(Sum(t.Quantity * t.UnitCost), 2), 0, Sum(t.Quantity)
+FROM InventoryTransactions AS t INNER JOIN Products AS p ON t.ProductID = p.ProductID
+WHERE t.TransactionDate < QDate('PeriodStart')
+GROUP BY p.ProductID, p.ProductCode, p.ProductName
+HAVING Round(Sum(t.Quantity), 3) <> 0""", ["PeriodStart"]),
+
     Query("AccountTreeQuery", "شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود", f"""
 SELECT a.AccountCode, a.AccountName, {ACCOUNT_TYPE_NAME} AS TypeName, a.AccountLevel, a.TreeKey,
        a.ParentCode, IIf(a.IsPosting, 'فرعي', 'رئيسي') AS KindName, a.IsPosting, a.IsActive

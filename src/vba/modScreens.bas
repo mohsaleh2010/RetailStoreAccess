@@ -188,15 +188,23 @@ Public Sub ReportSelected(ByVal frm As Access.Form)
 End Sub
 
 Public Sub SetQuickPeriod(ByVal frm As Access.Form, ByVal Which As String)
-    Dim y As Integer, m As Integer
+    Dim y As Integer, m As Integer, fyStart As Date, fyEnd As Date
     y = Year(Date)
     m = Month(Date)
     Select Case Which
         Case "TODAY":     frm!txtFrom.Value = Date: frm!txtTo.Value = Date
         Case "MONTH":     frm!txtFrom.Value = DateSerial(y, m, 1): frm!txtTo.Value = Date
         Case "LASTMONTH": frm!txtFrom.Value = DateSerial(y, m - 1, 1): frm!txtTo.Value = DateSerial(y, m, 0)
-        Case "YEAR":      frm!txtFrom.Value = DateSerial(y, 1, 1): frm!txtTo.Value = Date
-        Case "LASTYEAR":  frm!txtFrom.Value = DateSerial(y - 1, 1, 1): frm!txtTo.Value = DateSerial(y - 1, 12, 31)
+        Case "YEAR", "LASTYEAR"                          ' the fiscal period (modFiscal), else the calendar year
+            FiscalPeriodOf Date, fyStart, fyEnd
+            If Which = "YEAR" Then
+                frm!txtFrom.Value = fyStart
+                frm!txtTo.Value = Date
+            Else
+                FiscalPeriodOf DateAdd("d", -1, fyStart), fyStart, fyEnd
+                frm!txtFrom.Value = fyStart
+                frm!txtTo.Value = fyEnd
+            End If
     End Select
 End Sub
 
@@ -282,6 +290,7 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
         SetPeriod fromDate, toDate
         criteria = PeriodText(fromDate, toDate)
         If HasNeed(needs, "F") Then criteria = PrepareFinancials(CStr(r(0)), fromDate, toDate)   ' modFinancials
+        If r(0) = "OPENING_BALANCES" Then criteria = "في بداية يوم " & GDate(fromDate)   ' only the start counts
     End If
     If Not RequireChoice(frm!cboCustomer, HasNeed(needs, "C"), "CustomerID", "العميل") Then Exit Function
     If Not RequireChoice(frm!cboSupplier, HasNeed(needs, "S"), "SupplierID", "المورد") Then Exit Function

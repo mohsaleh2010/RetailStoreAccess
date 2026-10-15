@@ -1797,6 +1797,25 @@ TABLES: List[Table] = [
     ),
 
     Table(
+        "FiscalPeriods", "الفترات المالية",
+        "السنوات أو الفترات المالية كما يضيفها المحاسب، بالترتيب: كل فترة تبدأ في اليوم التالي لنهاية التي قبلها، "
+        "فلا تداخل ولا فجوة. إقفال الفترة يكون بتاريخ نهايتها، ومفتاحه في FiscalYearClosings سنة نهايتها "
+        "(فلا تنتهي فترتان في سنة ميلادية واحدة). قبل أول فترة تبقى السنوات الميلادية (docs/54).",
+        [
+            auto("FiscalPeriodID", "رقم داخلي"),
+            text("PeriodName", 50, "اسم الفترة", required=True),
+            date_("StartDate", "بداية الفترة", default=None),
+            date_("EndDate", "نهاية الفترة", default=None),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["FiscalPeriodID"],
+        indexes=[ux("PeriodName"), ux("StartDate"), ux("EndDate")],
+        rule="[EndDate]>=[StartDate]",
+        rule_text="نهاية الفترة لا تكون قبل بدايتها",
+    ),
+
+    Table(
         "FiscalYearClosings", "إقفال السنوات المالية",
         "قيد إقفال كل سنة: أرصدة الإيرادات والمصروفات في 31 ديسمبر تُقفل في الأرباح المحتجزة (3300). "
         "أسطره محفوظة كما كانت يوم الإقفال، ويُرحَّل لليومية كعملية «قيد إقفال السنة».",
@@ -2207,6 +2226,7 @@ SCREEN_LIST = [
     ("frmLedger", "كشف حساب ودفتر الأستاذ", "الحسابات", "JOURNAL", False, False, False),
     ("frmFinancials", "القوائم المالية", "الحسابات", "REPORTS_PROFIT", False, False, False),
     ("frmPeriodClosing", "إقفال الفترات والسنة المالية", "الحسابات", "PERIOD_CLOSE", False, False, False),
+    ("frmFiscalPeriods", "الفترات المالية", "الحسابات", "PERIOD_CLOSE", True, False, True),
     ("frmVatReturn", "إقرار ضريبة القيمة المضافة", "الحسابات", "VAT_RETURN", True, True, True),
     ("frmOpeningBalances", "أرصدة بداية التشغيل", "الحسابات", "OPENING_BALANCES", True, True, True),
     ("frmAging", "أعمار الديون (العملاء والموردون)", "التقارير", "REPORTS", False, False, False),

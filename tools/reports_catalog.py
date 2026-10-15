@@ -225,6 +225,14 @@ LIST_SPECS: List[ListSpec] = [
         Col("دائن", "=IIf([Credit]=0,Null,[Credit])", 3.4, MONEY, True)],
         [("EntryDate", False), ("EntryNumber", False), ("LineNumber", False)], landscape=True,
         no_data="لا توجد قيود في هذه الفترة."),
+    ListSpec("OPENING_BALANCES", [
+        Col("القسم", "SectionName", 2.4), Col("الكود", "ItemCode", 2.4), Col("الاسم", "ItemName", 6.4, grow=True),
+        Col("الكمية", "ItemQty", 2.0, QTY), Col("رصيد مدين", "DebitBalance", 3.0, MONEY),
+        Col("رصيد دائن", "CreditBalance", 3.0, MONEY)],
+        [("SectionNo", False), ("ItemCode", False)], no_data="لا توجد أرصدة قبل هذا التاريخ.",
+        summary=[("الحسابات: مجموع المدين", "=Sum(IIf([SectionNo]=1,[DebitBalance],0))"),
+                 ("الحسابات: مجموع الدائن", "=Sum(IIf([SectionNo]=1,[CreditBalance],0))"),
+                 ("قيمة المخزون", "=Sum(IIf([SectionNo]=4,[DebitBalance],0))")]),
     ListSpec("TRIAL_BALANCE", [
         Col("الحساب", "AccountCode", 2.0), Col("اسم الحساب", "AccountName", 5.6, grow=True),
         Col("رصيد أول المدة", "OpeningBalance", 2.8, MONEY, True), Col("مدين الفترة", "PeriodDebit", 2.8, MONEY, True),

@@ -44,6 +44,8 @@ class AccessOnSqlite:
         c.create_function("Nz", 2, lambda v, d: d if v is None else v)
         c.create_function("Space", 1, lambda n: " " * int(n or 0))
         c.create_function("CCur", 1, lambda v: None if v is None else round(float(v), 4))
+        c.create_function("CStr", 1, lambda v: None if v is None else
+                          (str(int(v)) if isinstance(v, float) and v.is_integer() else str(v)))
         c.create_function("CLng", 1, lambda v: None if v is None else int(round(float(v))))
         c.create_function("DateValue", 1, lambda s: None if s is None else str(s)[:10] + " 00:00:00")
         c.create_function("Year", 1, lambda s: None if s is None else int(str(s)[:4]))

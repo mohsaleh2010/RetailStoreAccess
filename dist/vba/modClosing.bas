@@ -9,11 +9,13 @@ Attribute VB_Name = "modClosing"
 '                            entry dated in the closed period either.
 '   ClosePeriod / ReopenPeriod     move that day forward / back (a reason is kept
 '                            in PeriodClosings).
-'   CloseFiscalYear          the year closing entry on 31 December: every revenue and
+'   CloseFiscalYear          the year closing entry on the last day of the fiscal year
+'                            (31 December, or the end of its fiscal period: modFiscal,
+'                            FiscalYearStart / FiscalYearEnd): every revenue and
 '                            expense account back to zero, the net profit (loss) to
 '                            retained earnings 3300 (FiscalYearClosings + lines,
 '                            journal source YEAR_CLOSE); the year is closed through
-'                            31 December. Years are closed in order.
+'                            its last day. Years are closed in order (FiscalKeys).
 '   ReopenFiscalYear         removes the last year closing and opens that year.
 ' The income statement leaves the year closing entries out (qryIncomeMoves).
 ' Same rules as tools/sim.py (Store.close_year).
@@ -158,26 +160,33 @@ Public Function YearIsClosed(ByVal FiscalYear As Long) As Boolean
 End Function
 
 Public Function YearNetProfit(ByVal FiscalYear As Long) As Currency
-    ' Revenue - expenses still open until 31 December of the year (credit positive).
+    ' Revenue - expenses still open until the last day of the fiscal year (credit positive).
     YearNetProfit = Nz(DbValue("SELECT Sum(l.Credit) - Sum(l.Debit) FROM (JournalLines AS l INNER JOIN JournalEntries AS e " & _
         "ON l.EntryID = e.EntryID) INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode WHERE e.EntryDate < " & _
-        SqlDate(DateSerial(FiscalYear + 1, 1, 1)) & " AND a.AccountType IN ('REVENUE', 'EXPENSE')"), 0)
+        SqlDate(DateAdd("d", 1, FiscalYearEnd(FiscalYear))) & " AND a.AccountType IN ('REVENUE', 'EXPENSE')"), 0)
 End Function
 
 Public Function YearCloseProblem(ByVal FiscalYear As Long) As String
-    Dim y As Long
+    ' FiscalYear: the key of the year (modFiscal): the year its fiscal period ends in.
+    Dim keys As Variant, i As Long, y As Long
     YearCloseProblem = CanClose()
     If Len(YearCloseProblem) > 0 Then Exit Function
     If YearIsClosed(FiscalYear) Then
-        YearCloseProblem = "«·”‰… " & FiscalYear & " „ﬁ›·… »«·›⁄·."
-    ElseIf FiscalYear >= Year(Date) Then
-        YearCloseProblem = " ıﬁ›· «·”‰… »⁄œ «‰ Â«∆Â« (»⁄œ 31 œÌ”„»— " & FiscalYear & ")."
+        YearCloseProblem = "«·”‰… " & FiscalKeyName(FiscalYear) & " „ﬁ›·… »«·›⁄·."
+    ElseIf FiscalYearEnd(FiscalYear) >= Date Then
+        YearCloseProblem = " ıﬁ›· «·”‰… »⁄œ «‰ Â«∆Â« (»⁄œ " & GDate(FiscalYearEnd(FiscalYear)) & ")."
+    ElseIf Not IsNull(FirstPeriodStart()) And Not FiscalKeyKnown(FiscalYear) Then
+        YearCloseProblem = "«·”‰… " & FiscalYear & " ·Ì”  ›Ì «·› —«  «·„«·Ì…. √÷›Â« ›Ì ‘«‘… ´«·› —«  «·„«·Ì…ª."
     Else
-        For y = FirstEntryYear() To FiscalYear - 1
-            If Not YearIsClosed(y) And Nz(DbValue("SELECT COUNT(*) FROM JournalEntries WHERE EntryDate >= " & _
-                    SqlDate(DateSerial(y, 1, 1)) & " AND EntryDate < " & SqlDate(DateSerial(y + 1, 1, 1))), 0) > 0 Then
-                YearCloseProblem = "√ﬁ›· «·”‰… " & y & " √Ê·«: «·”‰Ê«   ıﬁ›· »«· — Ì»."
-                Exit Function
+        keys = Split(FiscalKeys(), ";")
+        For i = 0 To UBound(keys)
+            y = CLng(keys(i))
+            If y < FiscalYear And Not YearIsClosed(y) Then
+                If Nz(DbValue("SELECT COUNT(*) FROM JournalEntries WHERE EntryDate >= " & SqlDate(FiscalYearStart(y)) & _
+                              " AND EntryDate < " & SqlDate(DateAdd("d", 1, FiscalYearEnd(y)))), 0) > 0 Then
+                    YearCloseProblem = "√ﬁ›· «·”‰… " & FiscalKeyName(y) & " √Ê·«: «·”‰Ê«   ıﬁ›· »«· — Ì»."
+                    Exit Function
+                End If
             End If
         Next
     End If
@@ -191,7 +200,7 @@ Public Function CloseFiscalYear(ByVal FiscalYear As Long, ByVal Notes As String)
     CloseFiscalYear = YearCloseProblem(FiscalYear)
     If Len(CloseFiscalYear) = 0 Then CloseFiscalYear = JournalReady()
     If Len(CloseFiscalYear) > 0 Then Exit Function
-    yearEnd = DateSerial(FiscalYear, 12, 31)
+    yearEnd = FiscalYearEnd(FiscalYear)
     previous = ClosedThroughDate()
     Set db = CurrentDb
     Set ws = DBEngine.Workspaces(0)
@@ -204,21 +213,22 @@ Public Function CloseFiscalYear(ByVal FiscalYear As Long, ByVal Notes As String)
     h!ClosingDate = yearEnd
     h!NetProfit = 0
     h!EmployeeID = CurrentUserID()
-    h!Notes = Left$("≈ﬁ›«· «·”‰… " & FiscalYear & IIf(Len(Trim$(Notes)) > 0, " - " & Trim$(Notes), ""), 255)
+    h!Notes = Left$("≈ﬁ›«· «·”‰… " & FiscalKeyName(FiscalYear) & IIf(Len(Trim$(Notes)) > 0, " - " & Trim$(Notes), ""), 255)
     h.Update
     h.Bookmark = h.LastModified
     id = h!YearClosingID
-    ' every revenue / expense account with a balance on 31 December, reversed
+    ' every revenue / expense account with a balance on the last day of the year, reversed
     Set rs = db.OpenRecordset("SELECT l.AccountCode, Sum(l.Debit) - Sum(l.Credit) AS Net FROM (JournalLines AS l " & _
         "INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID) INNER JOIN Accounts AS a ON l.AccountCode = " & _
-        "a.AccountCode WHERE e.EntryDate < " & SqlDate(DateSerial(FiscalYear + 1, 1, 1)) & " AND a.AccountType IN " & _
+        "a.AccountCode WHERE e.EntryDate < " & SqlDate(DateAdd("d", 1, yearEnd)) & " AND a.AccountType IN " & _
         "('REVENUE', 'EXPENSE') GROUP BY l.AccountCode HAVING Sum(l.Debit) <> Sum(l.Credit) ORDER BY l.AccountCode", _
         dbOpenSnapshot)
     Set l = db.OpenRecordset("FiscalYearClosingLines", dbOpenDynaset, dbAppendOnly)
     Do Until rs.EOF
         net = rs!Net
         n = n + 1
-        AddClosingLine l, id, n, rs!AccountCode, IIf(net < 0, -net, 0), IIf(net > 0, net, 0), "≈ﬁ›«· «·”‰… " & FiscalYear
+        AddClosingLine l, id, n, rs!AccountCode, IIf(net < 0, -net, 0), IIf(net > 0, net, 0), _
+                       "≈ﬁ›«· «·”‰… " & FiscalKeyName(FiscalYear)
         profit = profit - net
         rs.MoveNext
     Loop
@@ -226,7 +236,7 @@ Public Function CloseFiscalYear(ByVal FiscalYear As Long, ByVal Notes As String)
     If n > 0 And profit <> 0 Then
         n = n + 1
         AddClosingLine l, id, n, RETAINED_EARNINGS, IIf(profit < 0, -profit, 0), IIf(profit > 0, profit, 0), _
-                       IIf(profit >= 0, "’«›Ì —»Õ «·”‰… ", "’«›Ì Œ”«—… «·”‰… ") & FiscalYear
+                       IIf(profit >= 0, "’«›Ì —»Õ «·”‰… ", "’«›Ì Œ”«—… «·”‰… ") & FiscalKeyName(FiscalYear)
     End If
     l.Close
     h.Edit
@@ -270,7 +280,7 @@ Public Function ReopenFiscalYear(ByVal FiscalYear As Long, ByVal Notes As String
     End If
     If Len(ReopenFiscalYear) > 0 Then Exit Function
     previous = ClosedThroughDate()
-    opened = DateSerial(FiscalYear, 1, 0)              ' 31 December of the year before
+    opened = DateAdd("d", -1, FiscalYearStart(FiscalYear))   ' the last day of the year before
     CurrentDb.Execute "DELETE FROM FiscalYearClosings WHERE FiscalYear = " & FiscalYear, dbFailOnError   ' lines cascade
     If previous > opened Then SetClosedThrough opened
     LogClosing "YEAR_OPEN", IIf(previous > opened, opened, previous), previous, FiscalYear, Notes
@@ -281,15 +291,23 @@ End Function
 ' Screen frmPeriodClosing
 '------------------------------------------------------------------------------
 Public Sub PeriodClosingLoad(ByVal frm As Access.Form)
-    Dim rows As String, y As Long
+    ' The years (key;name), the latest first; the default is the latest one that has ended.
+    Dim rows As String, keys As Variant, i As Long, y As Long, pick As Long
     Calendar = vbCalGreg
-    For y = Year(Date) - 1 To FirstEntryYear() Step -1
-        rows = rows & IIf(Len(rows) > 0, ";", "") & y
+    keys = Split(FiscalKeys(), ";")
+    For i = UBound(keys) To 0 Step -1
+        y = CLng(keys(i))
+        rows = rows & IIf(Len(rows) > 0, ";", "") & y & ";" & Replace(FiscalKeyName(y), ";", ",")
+        If pick = 0 And FiscalYearEnd(y) < Date Then pick = y
     Next
-    If Len(rows) = 0 Then rows = CStr(Year(Date) - 1)
+    If Len(rows) = 0 Then
+        rows = (Year(Date) - 1) & ";" & (Year(Date) - 1)
+        pick = Year(Date) - 1
+    End If
+    If pick = 0 Then pick = CLng(Split(rows, ";")(0))
     frm!cboYear.RowSourceType = "Value List"
     frm!cboYear.RowSource = Tr(rows)
-    frm!cboYear.Value = CLng(Split(rows, ";")(0))
+    frm!cboYear.Value = pick
     frm!txtThrough.Value = DateSerial(Year(Date), Month(Date), 0)          ' end of last month
     PeriodClosingRefresh frm
 End Sub
@@ -306,11 +324,11 @@ Public Sub PeriodClosingRefresh(ByVal frm As Access.Form)
     End If
     y = Nz(frm!cboYear.Value, Year(Date) - 1)
     If YearIsClosed(y) Then
-        frm!lblYearInfo.Caption = Tr("«·”‰… " & y & " „ﬁ›·…: ’«›Ì «·—»Õ «·„—ÕÛ¯· ··√—»«Õ «·„Õ Ã“… " & _
+        frm!lblYearInfo.Caption = Tr("«·”‰… " & FiscalKeyName(y) & " „ﬁ›·…: ’«›Ì «·—»Õ «·„—ÕÛ¯· ··√—»«Õ «·„Õ Ã“… " & _
             Format$(Nz(DbValue("SELECT NetProfit FROM FiscalYearClosings WHERE FiscalYear = " & y), 0), "#,##0.00"))
     Else
-        frm!lblYearInfo.Caption = Tr("«·”‰… " & y & " €Ì— „ﬁ›·…: ’«›Ì «·—»Õ («·Œ”«—…) Õ Ï 31 œÌ”„»— " & _
-                                  Format$(YearNetProfit(y), "#,##0.00"))
+        frm!lblYearInfo.Caption = Tr("«·”‰… " & FiscalKeyName(y) & " €Ì— „ﬁ›·… (" & GDate(FiscalYearStart(y)) & " - " & _
+            GDate(FiscalYearEnd(y)) & "): ’«›Ì «·—»Õ («·Œ”«—…) " & Format$(YearNetProfit(y), "#,##0.00"))
     End If
     frm!lstHistory.Requery
 End Sub
@@ -347,15 +365,16 @@ Public Sub DoCloseYear(ByVal frm As Access.Form)
     Dim y As Long
     y = Nz(frm!cboYear.Value, 0)
     If y = 0 Then Exit Sub
-    If Not AskYesNo("≈ﬁ›«· «·”‰… " & y & "ø" & vbCrLf & "ÌıﬁÌÛ¯œ ’«›Ì «·—»Õ («·Œ”«—…) " & Format$(YearNetProfit(y), "#,##0.00") & _
-                    " ›Ì «·√—»«Õ «·„Õ Ã“…° Ê ıﬁ›· «·”‰… ﬂ·Â«.") Then Exit Sub
-    Done frm, CloseFiscalYear(y, Nz(frm!txtNotes.Value, "")), " „ ≈ﬁ›«· «·”‰… " & y & "."
+    If Not AskYesNo("≈ﬁ›«· «·”‰… " & FiscalKeyName(y) & "ø" & vbCrLf & "ÌıﬁÌÛ¯œ ’«›Ì «·—»Õ («·Œ”«—…) " & _
+                    Format$(YearNetProfit(y), "#,##0.00") & " ›Ì «·√—»«Õ «·„Õ Ã“…° Ê ıﬁ›· «·”‰… ﬂ·Â« Õ Ï " & _
+                    GDate(FiscalYearEnd(y)) & ".") Then Exit Sub
+    Done frm, CloseFiscalYear(y, Nz(frm!txtNotes.Value, "")), " „ ≈ﬁ›«· «·”‰… " & FiscalKeyName(y) & "."
 End Sub
 
 Public Sub DoReopenYear(ByVal frm As Access.Form)
     Dim y As Long
     y = Nz(frm!cboYear.Value, 0)
     If y = 0 Then Exit Sub
-    If Not AskYesNo("≈⁄«œ… › Õ «·”‰… " & y & "ø ÌıÕ–› ﬁÌœ ≈ﬁ›«·Â« Ê ı› Õ › — Â«.") Then Exit Sub
-    Done frm, ReopenFiscalYear(y, Nz(frm!txtNotes.Value, "")), " „  ≈⁄«œ… › Õ «·”‰… " & y & "."
+    If Not AskYesNo("≈⁄«œ… › Õ «·”‰… " & FiscalKeyName(y) & "ø ÌıÕ–› ﬁÌœ ≈ﬁ›«·Â« Ê ı› Õ › — Â«.") Then Exit Sub
+    Done frm, ReopenFiscalYear(y, Nz(frm!txtNotes.Value, "")), " „  ≈⁄«œ… › Õ «·”‰… " & FiscalKeyName(y) & "."
 End Sub

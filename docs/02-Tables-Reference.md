@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **72** | عدد الحقول: **966**
+عدد الجداول: **73** | عدد الحقول: **972**
 
 ## الفهرس
 
@@ -63,21 +63,22 @@
 55. [`JournalEntries`](#journalentries) – قيود اليومية
 56. [`JournalLines`](#journallines) – أسطر القيود
 57. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-58. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-59. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-60. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-61. [`ManualEntries`](#manualentries) – القيود اليدوية
-62. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-63. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
-64. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
-65. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-66. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-67. [`StockCounts`](#stockcounts) – جلسات الجرد
-68. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-69. [`AuditLog`](#auditlog) – سجل العمليات
-70. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-71. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-72. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+58. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
+59. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+60. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+61. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+62. [`ManualEntries`](#manualentries) – القيود اليدوية
+63. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+64. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
+65. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
+66. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+67. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+68. [`StockCounts`](#stockcounts) – جلسات الجرد
+69. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+70. [`AuditLog`](#auditlog) – سجل العمليات
+71. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+72. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+73. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -277,7 +278,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 63 سجل
+- بيانات أساسية: 64 سجل
 
 ## UserScreens
 
@@ -1504,6 +1505,25 @@
 | 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `PeriodClosingID`
+
+## FiscalPeriods
+
+**الفترات المالية** – السنوات أو الفترات المالية كما يضيفها المحاسب، بالترتيب: كل فترة تبدأ في اليوم التالي لنهاية التي قبلها، فلا تداخل ولا فجوة. إقفال الفترة يكون بتاريخ نهايتها، ومفتاحه في FiscalYearClosings سنة نهايتها (فلا تنتهي فترتان في سنة ميلادية واحدة). قبل أول فترة تبقى السنوات الميلادية (docs/54).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **FiscalPeriodID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | PeriodName | Short Text | 50 | ✔ |  |  |  | اسم الفترة |
+| 3 | StartDate | Date/Time (تاريخ) |  | ✔ |  |  |  | بداية الفترة |
+| 4 | EndDate | Date/Time (تاريخ) |  | ✔ |  |  |  | نهاية الفترة |
+| 5 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `FiscalPeriodID`
+- فهرس فريد: `PeriodName`
+- فهرس فريد: `StartDate`
+- فهرس فريد: `EndDate`
+- قاعدة تحقق على مستوى الجدول: `[EndDate]>=[StartDate]` – نهاية الفترة لا تكون قبل بدايتها
 
 ## FiscalYearClosings
 
