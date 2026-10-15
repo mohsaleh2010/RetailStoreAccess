@@ -12,6 +12,7 @@ from helpers import VbaModuleChecks
 import gen_queries
 import queries as Q
 from schema import TABLES
+from forms import all_forms
 
 SPEC_QUERIES = ["DailySalesQuery", "MonthlySalesQuery", "StockBalanceQuery", "LowStockQuery",
                 "CustomerBalanceQuery", "SupplierBalanceQuery", "ProfitQuery",
@@ -109,6 +110,21 @@ class AccessDialectTests(unittest.TestCase):
             for m in re.finditer(r"LEFT JOIN .*? ON (\(.*?\)|[^()]*?)(?= WHERE| GROUP| ORDER| LEFT| INNER|\)|$)",
                                  body):
                 self.assertNotIn("''", m.group(1), f"{q.name}: constant in LEFT JOIN ON")
+
+    def test_join_condition_links_two_tables(self):
+        # Access rejects a join whose ON clause names one table only, such as
+        # "INNER JOIN Settings AS st ON st.SettingID = 1" (error 3296, JOIN expression not supported)
+        sources = [(q.name, q.sql) for q in Q.QUERIES]
+        for m in all_forms():
+            sources.append((m.name, m.record_source or ""))
+            sources += [(f"{m.name}.{c.name}", c.props["RowSource"]) for c in m.controls
+                        if isinstance(c.props.get("RowSource"), str)]
+        for name, sql in sources:
+            body = " ".join(strip_strings(sql).split())
+            for m in re.finditer(r"\bJOIN\s+\S+(?:\s+AS\s+\w+)?\s+ON\s+(.*?)(?=\s(?:WHERE|GROUP BY|ORDER BY|HAVING|"
+                                 r"INNER JOIN|LEFT JOIN|RIGHT JOIN|UNION)\b|$)", body, re.I):
+                tables = set(re.findall(r"\b([A-Za-z_]\w*)\.\w+", m.group(1)))
+                self.assertGreaterEqual(len(tables), 2, f"{name}: JOIN ... ON {m.group(1)} names one table")
 
     def test_no_circular_alias(self):
         for q in Q.QUERIES:

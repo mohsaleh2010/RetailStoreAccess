@@ -1545,10 +1545,9 @@ Private Sub Q_SupplierFxBalanceQuery()
     s = "SELECT s.SupplierName, t.SupplierID, t.CurrencyCode, t.FxBalance, t.BookBalance, l.Rate AS LastRate, l.RateDate AS LastRateDate," & vbCrLf
     s = s & "       Round(t.FxBalance * CCur(Nz(l.Rate, 0)), 2) AS RevaluedBalance," & vbCrLf
     s = s & "       Round(t.FxBalance * CCur(Nz(l.Rate, 0)), 2) - t.BookBalance AS FxDifference" & vbCrLf
-    s = s & "FROM ((qrySupplierFxTotals AS t INNER JOIN [@Suppliers] AS s ON t.SupplierID = s.SupplierID)" & vbCrLf
-    s = s & "      LEFT JOIN qryLatestRates AS l ON t.CurrencyCode = l.CurrencyCode)" & vbCrLf
-    s = s & "      INNER JOIN Settings AS st ON st.SettingID = 1" & vbCrLf
-    s = s & "WHERE t.CurrencyCode <> st.CurrencyCode AND (t.FxBalance <> 0 OR t.BookBalance <> 0)" & vbCrLf
+    s = s & "FROM (qrySupplierFxTotals AS t INNER JOIN [@Suppliers] AS s ON t.SupplierID = s.SupplierID)" & vbCrLf
+    s = s & "      LEFT JOIN qryLatestRates AS l ON t.CurrencyCode = l.CurrencyCode" & vbCrLf
+    s = s & "WHERE t.CurrencyCode <> (SELECT st.CurrencyCode FROM Settings AS st WHERE st.SettingID = 1) AND (t.FxBalance <> 0 OR t.BookBalance <> 0)" & vbCrLf
     SaveQuery "SupplierFxBalanceQuery", "أرصدة الموردين بالعملات الأجنبية: بالدفاتر، وبآخر سعر، وفرق العملة غير المحقق", s
 End Sub
 

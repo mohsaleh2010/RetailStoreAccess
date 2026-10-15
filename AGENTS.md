@@ -123,7 +123,8 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
 - Access SQL: an alias may not be reused inside its own expression; every `UNION` branch needs a
   `FROM`; no `&` in saved queries; no column named `[ ]`; parameters come from
   `QDate`/`QLong` (`modQueryParams`) and must be declared; no subquery in the column list of a
-  totalled report source.
+  totalled report source; every `JOIN ... ON` compares fields of two tables (never `ON st.SettingID = 1`,
+  error 3296: read `Settings` with a subquery in `WHERE` or a comma join).
 - Access allows **32 indexes per table**, and every enforced relationship counts on **both** tables
   (`Employees` "recorded by" fields are in `relations.UNENFORCED`).
 - Controls: a check box has no `BackColor`; set only properties the control type has.

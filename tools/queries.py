@@ -968,10 +968,9 @@ GROUP BY SupplierID, CurrencyCode"""),
 SELECT s.SupplierName, t.SupplierID, t.CurrencyCode, t.FxBalance, t.BookBalance, l.Rate AS LastRate, l.RateDate AS LastRateDate,
        Round(t.FxBalance * {nz("l.Rate")}, 2) AS RevaluedBalance,
        Round(t.FxBalance * {nz("l.Rate")}, 2) - t.BookBalance AS FxDifference
-FROM ((qrySupplierFxTotals AS t INNER JOIN [@Suppliers] AS s ON t.SupplierID = s.SupplierID)
-      LEFT JOIN qryLatestRates AS l ON t.CurrencyCode = l.CurrencyCode)
-      INNER JOIN Settings AS st ON st.SettingID = 1
-WHERE t.CurrencyCode <> st.CurrencyCode AND (t.FxBalance <> 0 OR t.BookBalance <> 0)"""),
+FROM (qrySupplierFxTotals AS t INNER JOIN [@Suppliers] AS s ON t.SupplierID = s.SupplierID)
+      LEFT JOIN qryLatestRates AS l ON t.CurrencyCode = l.CurrencyCode
+WHERE t.CurrencyCode <> (SELECT st.CurrencyCode FROM Settings AS st WHERE st.SettingID = 1) AND (t.FxBalance <> 0 OR t.BookBalance <> 0)"""),
 
     Query("SupplierStatementQuery", "كشف حساب مورد لفترة: رصيد سابق ثم الحركات", f"""
 SELECT 1 AS SortKey, l.EntryDate, l.EntryType, l.EntryTypeName, l.DocNumber, l.Debit, l.Credit
