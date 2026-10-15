@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 156
+Private Const EXPECTED_RELATION_COUNT As Long = 157
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -534,6 +534,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_ManualEntryLines_AccountCode", "Accounts", "AccountCode", "ManualEntryLines", "AccountCode", 0&)
     c.Add Array("FK_ManualEntryLines_CostCenterID", "CostCenters", "CostCenterID", "ManualEntryLines", "CostCenterID", 0&)
     c.Add Array("FK_OpeningBalances_AccountCode", "Accounts", "AccountCode", "OpeningBalances", "AccountCode", 0&)
+    c.Add Array("FK_OpeningStock_ProductID", "Products", "ProductID", "OpeningStock", "ProductID", 0&)
     c.Add Array("FK_InventoryTransactions_ProductID", "Products", "ProductID", "InventoryTransactions", "ProductID", 0&)
     c.Add Array("FK_InventoryTransactions_TransactionTypeID", "TransactionTypes", "TransactionTypeID", "InventoryTransactions", "TransactionTypeID", 0&)
     c.Add Array("FK_InventoryTransactions_EmployeeID", "Employees", "EmployeeID", "InventoryTransactions", "EmployeeID", 0&)

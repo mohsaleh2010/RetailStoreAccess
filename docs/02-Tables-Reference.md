@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **71** | عدد الحقول: **960**
+عدد الجداول: **72** | عدد الحقول: **966**
 
 ## الفهرس
 
@@ -69,14 +69,15 @@
 61. [`ManualEntries`](#manualentries) – القيود اليدوية
 62. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
 63. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
-64. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-65. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-66. [`StockCounts`](#stockcounts) – جلسات الجرد
-67. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-68. [`AuditLog`](#auditlog) – سجل العمليات
-69. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-70. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-71. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+64. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
+65. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+66. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+67. [`StockCounts`](#stockcounts) – جلسات الجرد
+68. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+69. [`AuditLog`](#auditlog) – سجل العمليات
+70. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+71. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+72. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -1642,6 +1643,22 @@
 - المفتاح الأساسي: `OpeningLineID`
 - فهرس عادي: `AccountCode`
 - قاعدة تحقق على مستوى الجدول: `([Debit]=0 Or [Credit]=0) And [Debit]+[Credit]>0` – كل سطر مدين أو دائن فقط، وبمبلغ أكبر من صفر
+
+## OpeningStock
+
+**الرصيد الافتتاحي للمخزون** – كمية وتكلفة كل صنف يوم بدء التشغيل، تُدخل في جدول واحد أو تُستورد من Excel. «ترحيل الرصيد» يسجل لكل سطر حركة مخزون «رصيد افتتاحي» بتاريخ Settings.OpeningDate، وقيدها المخزون 1400 مقابل حساب إجمالي الأرصدة الافتتاحية 3900 (docs/53).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **OpeningStockID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر الداخلي |
+| 2 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 3 | Quantity | Currency (كمية) |  | ✔ | `0` | `>=0` |  | الكمية |
+| 4 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة |
+| 5 | TransactionID | Number (Long) |  |  |  |  |  | حركة المخزون المرحّلة – فارغ = لم يُرحَّل بعد |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `OpeningStockID`
+- فهرس فريد: `ProductID`
 
 ## TransactionTypes
 

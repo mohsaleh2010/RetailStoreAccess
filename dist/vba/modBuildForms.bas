@@ -28,7 +28,7 @@ Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines," & _
     "frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal," & _
     "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines," & _
-    "frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningBalances"
+    "frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -664,6 +664,7 @@ Private Sub BuildAllForms()
     BuildForm_frmOpeningSuppliers
     BuildForm_frmOpeningBoxes
     BuildForm_frmOpeningBanks
+    BuildForm_frmOpeningStock
     BuildForm_frmOpeningBalances
 End Sub
 
@@ -9918,6 +9919,52 @@ EH:
     AbortForm "frmOpeningBanks", Err.Number, Err.Description
 End Sub
 
+Private Sub BuildForm_frmOpeningStock()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmOpeningStock", "«·—’Ìœ «·«›  «ÕÌ ··„Œ“Ê‰", "SELECT * FROM OpeningStock ORDER BY OpeningStockID", 14402, 425, False, True, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("ProductID", "ProductID", 28, 0, 5670, 425, "SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p WHERE p.TrackStock = True ORDER BY p.ProductName", 2, "0;5557")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    Set c = AddText("Quantity", "Quantity", 5726, 0, 1814, 425)
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("UnitCost", "UnitCost", 7568, 0, 1814, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 9410, 0, 2041, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("txtStatus", "=IIf(IsNull([TransactionID]),""·„ Ìı—ÕÛ¯·"",""„—Õ¯·"")", 11479, 0, 2126, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 13633, 17, 454, 391, "danger")
+    SetCtlProp c, "FontName", ICON_FONT
+    c.OnClick = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    OpeningStockBeforeUpdate Me, Cancel" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    OpeningGridAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    OpeningStockRemoveLine Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmOpeningStock", s
+    Exit Sub
+EH:
+    AbortForm "frmOpeningStock", Err.Number, Err.Description
+End Sub
+
 Private Sub BuildForm_frmOpeningBalances()
     Dim c As Access.Control, s As String
     On Error GoTo EH
@@ -9926,7 +9973,7 @@ Private Sub BuildForm_frmOpeningBalances()
     Set c = AddRect("boxTitle", 0, 0, 14855, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "√—’œ… »œ«Ì… «· ‘€Ì·", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
-    Set c = AddLabel("lblSubtitle", "—’Ìœ ﬂ· Õ”«» Ê⁄„Ì· Ê„Ê—œ Ê’‰œÊﬁ Ê»‰ﬂ ÌÊ„ »œ¡ «· ‘€Ì·° Ê„ﬁ«»·Â« Õ”«» ≈Ã„«·Ì «·√—’œ… «·«›  «ÕÌ…", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblSubtitle", "—’Ìœ ﬂ· Õ”«» Ê⁄„Ì· Ê„Ê—œ Ê’‰œÊﬁ Ê»‰ﬂ Ê’‰› ÌÊ„ »œ¡ «· ‘€Ì·° Ê„ﬁ«»·Â« Õ”«» ≈Ã„«·Ì «·√—’œ… «·«›  «ÕÌ…", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
     Set c = AddText("txtOpeningDate", "", 227, 1304, 1814, 454)
     SetCtlProp c, "Format", "yyyy/mm/dd"
     Set c = AddLabel("lblOpeningDate", " «—ÌŒ »œ¡ «· ‘€Ì·", 227, 992, 1814, 284, 9, False, CLR_MUTED, "txtOpeningDate", 0)
@@ -9948,6 +9995,20 @@ Private Sub BuildForm_frmOpeningBalances()
     Set c = AddButton("btnPartBoxes", "«·’‰«œÌﬁ", 6350, 3572, 1928, 454, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnPartBanks", "«·»‰Êﬂ", 8391, 3572, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPartStock", "«·„Œ“Ê‰", 10432, 3572, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnStockFill", "ﬂ· «·√’‰«›", 227, 8845, 1928, 510, "secondary")
+    SetCtlProp c, "Visible", False
+    c.OnClick = EP
+    Set c = AddButton("btnStockImport", "«” Ì—«œ „‰ Excel", 2268, 8845, 1928, 510, "secondary")
+    SetCtlProp c, "Visible", False
+    c.OnClick = EP
+    Set c = AddButton("btnStockTemplate", "ﬁ«·» Excel", 4309, 8845, 1928, 510, "secondary")
+    SetCtlProp c, "Visible", False
+    c.OnClick = EP
+    Set c = AddButton("btnStockPost", " —ÕÌ· «·—’Ìœ", 6350, 8845, 1928, 510, "secondary")
+    SetCtlProp c, "Visible", False
     c.OnClick = EP
     Set c = AddLabel("lblHint", " ", 227, 4111, 14401, 340, 9, False, CLR_MUTED, "", 0)
     Set c = AddLabel("lblCol1", " ", 255, 4508, 5670, 312, 9, True, CLR_MUTED, "", 2)
@@ -9984,12 +10045,28 @@ Private Sub BuildForm_frmOpeningBalances()
     s = s & "Private Sub btnPartBanks_Click()" & vbCrLf
     s = s & "    OpeningShowPart Me, ""BANKS""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPartStock_Click()" & vbCrLf
+    s = s & "    OpeningShowPart Me, ""STOCK""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStockFill_Click()" & vbCrLf
+    s = s & "    OpeningStockFill Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStockImport_Click()" & vbCrLf
+    s = s & "    OpeningStockImport Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStockTemplate_Click()" & vbCrLf
+    s = s & "    OpeningStockTemplate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStockPost_Click()" & vbCrLf
+    s = s & "    OpeningStockPost Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
-    s = s & "    spec = ""boxTitle,0,0,14855,850,0,1000,0,0;subGrid,227,4848,14402,3742,0,0,0,1000;btnClose,13154,8845,1474,510,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,14855,850,0,1000,0,0;btnStockFill,227,8845,1928,510,0,0,1000,0;btnStockImport,2268,8845,1928,510,0,0,1000,0;btnStockTemplate,4309,8845,1928,510,0,0,1000,0;btnStockPost,6350,8845,1928,510,0,0,1000,0;subGrid,227,4848,14402,3742,0,0,0,1000""" & vbCrLf
+    s = s & "    spec = spec & "";btnClose,13154,8845,1474,510,0,0,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 14855, 9639, -2267, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmOpeningBalances", s

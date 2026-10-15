@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2605
+Private Const ENTRY_COUNT As Long = 2646
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -199,6 +199,7 @@ Private Sub LoadDictionary()
     LangData2
     LangData3
     LangData4
+    LangData5
     m_loaded = True
 End Sub
 
@@ -225,13 +226,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=""طريقة الدفع: "" & [MethodName]") = "=""Payment method: "" & [MethodName]", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إجمالي المشتريات") = "Total purchases", "Tr sample 2", passed, failed, report
-    CheckLang Tr("الباركود والنصوص") = "Barcode and texts", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المبلغ المربوط") = "Linked amount", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذر حفظ سند الصرف: ") = "Could not save the payment voucher: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("=""صفحة "" & [Page] & "" من "" & [Pages]") = "=""Page "" & [Page] & "" From "" & [Pages]", "Tr sample 1", passed, failed, report
+    CheckLang Tr("إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية") = "Total VAT due for the current period", "Tr sample 2", passed, failed, report
+    CheckLang Tr("الباقي غير المربوط من السند ") = "The unlinked remainder of the voucher ", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المبلغ المرحَّل") = "Transferred amount", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعذر حفظ المرتجع: ") = "Could not save the return: ", "Tr sample 5", passed, failed, report
     CheckLang Tr("زيادة تصفية ") = "Closing overage ", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا توجد فترة مقفلة.") = "There is no closed period.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("لا توجد قيود إهلاك.") = "There are no depreciation entries.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة") = "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة", "العربية: من اليمين ولا ترجمة", _

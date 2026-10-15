@@ -28,10 +28,10 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,Suppliers,Customers,Products,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails,CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques," & _
     "FixedAssets,DepreciationRuns,AssetDepreciations,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalYearClosings," & _
-    "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,OpeningBalances,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
+    "FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,OpeningBalances,OpeningStock,TransactionTypes,InventoryTransactions,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
 Private Const EXPECTED_FIELD_COUNTS As String = "Settings=70;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=30;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=9;Suppliers=18;Customers=25;Products=25;SalesInvoices=46;SalesInvoiceDetails=14;SalesReturns=39;SalesReturnDetails=14;PurchaseInvoices=23;PurchaseInvoiceDetails=11;PurchaseReturns=22;PurchaseReturnDetails=11;" & _
     "CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=26;DepreciationRuns=6;AssetDepreciations=5;CostCenters=8;SalesReps=13;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;" & _
-    "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
+    "RecurringExpenses=18;CashVouchers=17;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=6;TransactionTypes=6;InventoryTransactions=13;StockCounts=9;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=25;Roles=3;Permissions=38;RolePermissions=75;Employees=1;Screens=63;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Customers=1;ExpenseTypes=9;Accounts=80;JournalSourceTypes=28;TransactionTypes=8;LabelSettings=1"
 
 Private m_db As DAO.Database
@@ -653,6 +653,7 @@ Private Sub CreateAllTables()
     CreateTable_ManualEntries
     CreateTable_ManualEntryLines
     CreateTable_OpeningBalances
+    CreateTable_OpeningStock
     CreateTable_TransactionTypes
     CreateTable_InventoryTransactions
     CreateTable_StockCounts
@@ -2944,6 +2945,26 @@ Private Sub CreateTable_OpeningBalances()
     EndTable tdf, "«·√—’œ… «·«›  «ÕÌ… ··Õ”«»« : —’Ìœ ﬂ· Õ”«» ⁄«„ ⁄‰œ »œ¡ «· ‘€Ì· (—√” «·„«·° Ê«·ﬁ—Ê÷° Ê«·„” Õﬁ« ...). ﬂ· ”ÿ— ﬁÌœ » «—ÌŒ Settings.OpeningDate Ìﬁ«»·Â Õ”«» ≈Ã„«·Ì «·√—’œ… «·«›  «ÕÌ… 3900. «·⁄„·«¡ Ê«·„Ê—œÊ‰ Ê«·’‰«œÌﬁ Ê«·»‰Êﬂ Ê«·„Œ“Ê‰ ·Â« √—’œ Â« ›Ì Ãœ«Ê·Â« (docs/52).", "([Debit]=0 Or [Credit]=0) And [Debit]+[Credit]>0", "ﬂ· ”ÿ— „œÌ‰ √Ê œ«∆‰ ›ﬁÿ° Ê»„»·€ √ﬂ»— „‰ ’›—"
 End Sub
 
+Private Sub CreateTable_OpeningStock()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "OpeningStock") Then Exit Sub
+    AddField tdf, "OpeningStockID", "AUTO", 0, False, "", _
+             "", "", "—ﬁ„ «·”ÿ— «·œ«Œ·Ì", ""
+    AddField tdf, "ProductID", "LONG", 0, True, "", _
+             "", "", "«·’‰›", ""
+    AddField tdf, "Quantity", "QTY", 0, True, "0", _
+             ">=0", "«·ﬂ„Ì… ·«  ﬂÊ‰ ”«·»…", "«·ﬂ„Ì…", ""
+    AddField tdf, "UnitCost", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", " ﬂ·›… «·ÊÕœ…", ""
+    AddField tdf, "TransactionID", "LONG", 0, False, "", _
+             "", "", "Õ—ﬂ… «·„Œ“Ê‰ «·„—Õ¯·…", "›«—€ = ·„ Ìı—ÕÛ¯· »⁄œ"
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", " «—ÌŒ «·≈‰‘«¡", ""
+    AddIndex tdf, "PrimaryKey", "OpeningStockID", True, True, False
+    AddIndex tdf, "UX_ProductID", "ProductID", False, True, False
+    EndTable tdf, "«·—’Ìœ «·«›  «ÕÌ ··„Œ“Ê‰: ﬂ„Ì… Ê ﬂ·›… ﬂ· ’‰› ÌÊ„ »œ¡ «· ‘€Ì·°  ıœŒ· ›Ì ÃœÊ· Ê«Õœ √Ê  ı” Ê—œ „‰ Excel. ´ —ÕÌ· «·—’Ìœª Ì”Ã· ·ﬂ· ”ÿ— Õ—ﬂ… „Œ“Ê‰ ´—’Ìœ «›  «ÕÌª » «—ÌŒ Settings.OpeningDate° ÊﬁÌœÂ« «·„Œ“Ê‰ 1400 „ﬁ«»· Õ”«» ≈Ã„«·Ì «·√—’œ… «·«›  «ÕÌ… 3900 (docs/53).", "", ""
+End Sub
+
 Private Sub CreateTable_TransactionTypes()
     Dim tdf As DAO.TableDef
     If Not BeginTable(tdf, "TransactionTypes") Then Exit Sub
@@ -3283,7 +3304,7 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'PAYROLL'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PAYROLL', '„”Ì— «·—Ê« »: «·≈⁄œ«œ Ê«· —ÕÌ· Ê«·’—›', '«·Õ”«»« ', 80)") Then GrantNewPermission "PAYROLL", "1,2"
     If SeedRow("[PermissionKey] = 'BUDGET'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BUDGET', '«·„Ê«“‰… «· ﬁœÌ—Ì…: «·≈⁄œ«œ Ê«·„ﬁ«—‰… »«·›⁄·Ì', '«·Õ”«»« ', 81)") Then GrantNewPermission "BUDGET", "1,2"
     If SeedRow("[PermissionKey] = 'CURRENCIES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CURRENCIES', '«·⁄„·«  Ê√”⁄«—Â«', '«·Õ”«»« ', 84)") Then GrantNewPermission "CURRENCIES", "1,2"
-    If SeedRow("[PermissionKey] = 'OPENING_BALANCES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('OPENING_BALANCES', '√—’œ… »œ«Ì… «· ‘€Ì·:  «—ÌŒÂ« Ê√—’œ… «·Õ”«»«  Ê«·⁄„·«¡ Ê«·„Ê—œÌ‰ Ê«·’‰«œÌﬁ Ê«·»‰Êﬂ', '«·Õ”«»« ', 85)") Then GrantNewPermission "OPENING_BALANCES", "1,2"
+    If SeedRow("[PermissionKey] = 'OPENING_BALANCES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('OPENING_BALANCES', '√—’œ… »œ«Ì… «· ‘€Ì·:  «—ÌŒÂ« Ê√—’œ… «·Õ”«»«  Ê«·⁄„·«¡ Ê«·„Ê—œÌ‰ Ê«·’‰«œÌﬁ Ê«·»‰Êﬂ Ê«·„Œ“Ê‰', '«·Õ”«»« ', 85)") Then GrantNewPermission "OPENING_BALANCES", "1,2"
     If SeedRow("[PermissionKey] = 'SALES_REPS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_REPS', '«·„‰œÊ»Ì‰: «·»Ì«‰«  Ê«·√Âœ«› Ê«·⁄„Ê·«  Ê ﬁ«—Ì—Â„', '«·„»Ì⁄« ', 15)") Then GrantNewPermission "SALES_REPS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS', '«· ﬁ«—Ì— «· ‘€Ì·Ì…', '«· ﬁ«—Ì—', 70)") Then GrantNewPermission "REPORTS", "1,2"
     If SeedRow("[PermissionKey] = 'REPORTS_PROFIT'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REPORTS_PROFIT', ' ﬁ«—Ì— «·√—»«Õ Ê«·÷—Ì»…', '«· ﬁ«—Ì—', 71)") Then GrantNewPermission "REPORTS_PROFIT", "1,2"
@@ -3902,7 +3923,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Payroll: preparation, posting and payment' WHERE [PermissionKey] = 'PAYROLL' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Budget: preparation and comparison with actuals' WHERE [PermissionKey] = 'BUDGET' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Currencies and exchange rates' WHERE [PermissionKey] = 'CURRENCIES' AND [PermissionNameEn] Is Null", dbFailOnError
-    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Start-up opening balances: date and balances of accounts, customers, suppliers, cash boxes and banks' WHERE [PermissionKey] = 'OPENING_BALANCES' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Start-up opening balances: date, accounts, customers, suppliers, cash boxes, banks and stock' WHERE [PermissionKey] = 'OPENING_BALANCES' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Sales reps: data, targets, commissions and reports' WHERE [PermissionKey] = 'SALES_REPS' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Operating reports' WHERE [PermissionKey] = 'REPORTS' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Profit and VAT reports' WHERE [PermissionKey] = 'REPORTS_PROFIT' AND [PermissionNameEn] Is Null", dbFailOnError

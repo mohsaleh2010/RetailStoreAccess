@@ -212,7 +212,7 @@ Public Sub ExportReport(ByVal frm As Access.Form, ByVal FileKind As String)
     Dim r As Variant, where As String, criteria As String, file As String
     If Not PrepareReport(frm, r, where, criteria) Then Exit Sub
     On Error GoTo EH
-    file = ReportsFolder() & "" & r(0) & "_" & Format$(Now, "yyyymmdd_hhnnss") & "." & LCase$(FileKind)
+    file = ReportsFolder() & "\" & r(0) & "_" & Format$(Now, "yyyymmdd_hhnnss") & "." & LCase$(FileKind)
     If FileKind = "PDF" Then
         If Not ReportExists(CStr(r(3))) Then
             ShowWarning "التقرير غير موجود: " & r(3) & vbCrLf & "شغّل BuildReports."

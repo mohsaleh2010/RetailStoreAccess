@@ -39,7 +39,15 @@ PARTY_GRIDS = [
      '=IIf([OpeningBalance]>0,"مدين (لنا)",IIf([OpeningBalance]<0,"دائن (سحب على المكشوف)",""))'),
 ]
 PARTS = [("ACCOUNTS", "الحسابات العامة"), ("CUSTOMERS", "العملاء"), ("SUPPLIERS", "الموردون"),
-         ("BOXES", "الصناديق"), ("BANKS", "البنوك")]
+         ("BOXES", "الصناديق"), ("BANKS", "البنوك"), ("STOCK", "المخزون")]
+# the stock part (docs/53): the products that track stock, by code and name
+STOCK_PRODUCTS = ("SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p "
+                  "WHERE p.TrackStock = True ORDER BY p.ProductName")
+# its buttons, shown with the stock part only: name, caption, call
+STOCK_BUTTONS = [("btnStockFill", "كل الأصناف", "OpeningStockFill Me"),
+                 ("btnStockImport", "استيراد من Excel", "OpeningStockImport Me"),
+                 ("btnStockTemplate", "قالب Excel", "OpeningStockTemplate Me"),
+                 ("btnStockPost", "ترحيل الرصيد", "OpeningStockPost Me")]
 
 
 def layout_account_lines() -> Tuple[FormModel, list]:
@@ -60,6 +68,27 @@ def layout_account_lines() -> Tuple[FormModel, list]:
               "Private Sub Form_AfterUpdate()", "    OpeningGridAfterUpdate Me", "End Sub",
               "Private Sub btnRemove_Click()", "    OpeningRemoveLine Me", "End Sub"]
     return m, heads
+
+
+def layout_stock_grid() -> FormModel:
+    m = FormModel("frmOpeningStock", "الرصيد الافتتاحي للمخزون", GRID_W, ROW_H, popup=False,
+                  record_source="SELECT * FROM OpeningStock ORDER BY OpeningStockID", allow_add=True)
+    m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0, "AllowDeletions": False}
+    grid_row(m, [
+        ("ProductID", "ProductID", 10.0, {"_kind": "combo", "RowSource": STOCK_PRODUCTS, "ColumnCount": 2,
+                                          "ColumnWidths": "0;9.8", "BoundColumn": 1, "LimitToList": True}, []),
+        ("Quantity", "Quantity", 3.2, {"Format": "#,##0.###"}, []),
+        ("UnitCost", "UnitCost", 3.2, dict(MONEY), []),
+        ("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 3.6, {**LOCKED, **MONEY}, []),
+        ("txtStatus", '=IIf(IsNull([TransactionID]),"لم يُرحَّل","مرحّل")', 3.75, dict(LOCKED), []),
+        ("btnRemove", "", 0.8, {"_kind": "button", "Caption": Sym(f"ChrW(&H{0xE74D:X})"),
+                               "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
+    ], ROW_H)
+    m.form_events = ["BeforeUpdate", "AfterUpdate"]
+    m.code = ["Private Sub Form_BeforeUpdate(Cancel As Integer)", "    OpeningStockBeforeUpdate Me, Cancel", "End Sub",
+              "Private Sub Form_AfterUpdate()", "    OpeningGridAfterUpdate Me", "End Sub",
+              "Private Sub btnRemove_Click()", "    OpeningStockRemoveLine Me", "End Sub"]
+    return m
 
 
 def layout_party_grid(part, name, tbl, key, names, last, sql, side) -> FormModel:
@@ -84,7 +113,7 @@ def layout_opening(heads) -> FormModel:
     width, height = cm(26.2), cm(17.0)
     m = FormModel("frmOpeningBalances", "أرصدة بداية التشغيل", width, height, popup=False, allow_add=False)
     title_band(m, "أرصدة بداية التشغيل",
-               "رصيد كل حساب وعميل ومورد وصندوق وبنك يوم بدء التشغيل، ومقابلها حساب إجمالي الأرصدة الافتتاحية",
+               "رصيد كل حساب وعميل ومورد وصندوق وبنك وصنف يوم بدء التشغيل، ومقابلها حساب إجمالي الأرصدة الافتتاحية",
                "journal")
     y = cm(2.3)
     c = m.add(Control("text", "txtOpeningDate", cm(0.4), y, cm(3.2), cm(0.8), {"Format": "yyyy/mm/dd"}))
@@ -108,6 +137,11 @@ def layout_opening(heads) -> FormModel:
         button(m, f"btnPart{key.title()}", caption, x, y, "secondary", w=cm(3.4), h=cm(0.8),
                call=f'OpeningShowPart Me, "{key}"')
         x += cm(3.6)
+    x = cm(0.4)
+    for name, caption, call in STOCK_BUTTONS:          # the stock part (OpeningShowPart shows them)
+        button(m, name, caption, x, cm(15.6), "secondary", w=cm(3.4), h=cm(0.9), call=call)
+        m.controls[-1].props["Visible"] = False
+        x += cm(3.6)
     m.add(Control("label", "lblHint", cm(0.4), cm(7.25), width - cm(0.8), cm(0.6),
                   {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
     for i, (hx, hw) in enumerate(heads[:4]):
@@ -126,4 +160,4 @@ def layout_opening(heads) -> FormModel:
 
 def opening_forms() -> List[FormModel]:
     lines, heads = layout_account_lines()
-    return [lines] + [layout_party_grid(*g) for g in PARTY_GRIDS] + [layout_opening(heads)]
+    return [lines] + [layout_party_grid(*g) for g in PARTY_GRIDS] + [layout_stock_grid(), layout_opening(heads)]

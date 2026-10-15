@@ -129,7 +129,7 @@ PERMISSION_NAMES_EN = {
     "CHEQUES": "Received and issued cheques: recording, collection and bounce",
     "FIXED_ASSETS": "Fixed assets and depreciation", "PAYROLL": "Payroll: preparation, posting and payment",
     "BUDGET": "Budget: preparation and comparison with actuals", "CURRENCIES": "Currencies and exchange rates",
-    "OPENING_BALANCES": "Start-up opening balances: date and balances of accounts, customers, suppliers, cash boxes and banks",
+    "OPENING_BALANCES": "Start-up opening balances: date, accounts, customers, suppliers, cash boxes, banks and stock",
     "SALES_REPS": "Sales reps: data, targets, commissions and reports", "REPORTS": "Operating reports",
     "REPORTS_PROFIT": "Profit and VAT reports", "DASHBOARD_FINANCIAL": "Financial figures on the dashboard",
     "SETTINGS": "Store settings", "USERS": "Users and permissions", "BACKUP": "Backup",

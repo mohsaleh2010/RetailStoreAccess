@@ -15,6 +15,10 @@ Attribute VB_Name = "modOpening"
 '                         there, visible on the screen by source (qryOpeningTotals).
 ' The customers, suppliers, cash boxes and banks keep their OpeningBalance field; the screen edits it
 ' in one grid per part, with the closed period check and the audit trail.
+'   OpeningStock          the stock (docs/53-Opening-Stock.md): quantity and unit cost of each product, entered
+'                         in one grid or imported from Excel. "Post" records one stock move "opening" (type 8)
+'                         per line on the start-up date (journal: stock 1400 against 3900); a posted line is
+'                         locked, and can be unposted while it is the only move of its product.
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -53,8 +57,11 @@ End Function
 
 Public Function FirstDocumentDate() As Variant
     ' The day of the first operation that is not an opening balance (from the journal), Null when none.
+    ' An opening stock move (type 8) is an opening balance too.
     FirstDocumentDate = DbValue("SELECT Min(EntryDate) FROM JournalEntries WHERE SourceType NOT IN (" & _
-                                OPENING_SOURCES & ")")
+                                OPENING_SOURCES & ") AND NOT (SourceType = 'STOCK_MOVE' AND SourceID IN " & _
+                                "(SELECT TransactionID FROM InventoryTransactions WHERE TransactionTypeID = " & _
+                                TT_OPENING & "))")
 End Function
 
 Public Function OpeningDateProblem(ByVal NewDate As Variant) As String
@@ -88,7 +95,7 @@ Public Function OpeningAccountProblem(ByVal AccountCode As Variant) As String
     Select Case code
         Case 1300: OpeningAccountProblem = "—’Ìœ «·⁄„·«¡ ÌıœŒ· ›Ì ﬁ”„ ´«·⁄„·«¡ª: —’Ìœ ·ﬂ· ⁄„Ì·."
         Case 2100: OpeningAccountProblem = "—’Ìœ «·„Ê—œÌ‰ ÌıœŒ· ›Ì ﬁ”„ ´«·„Ê—œÊ‰ª: —’Ìœ ·ﬂ· „Ê—œ."
-        Case 1400: OpeningAccountProblem = "—’Ìœ «·„Œ“Ê‰ ÌıœŒ· „‰ ‘«‘… «·„Œ“Ê‰: ﬂ„Ì… Ê ﬂ·›… ·ﬂ· ’‰›."
+        Case 1400: OpeningAccountProblem = "—’Ìœ «·„Œ“Ê‰ ÌıœŒ· ›Ì ﬁ”„ ´«·„Œ“Ê‰ª: ﬂ„Ì… Ê ﬂ·›… ·ﬂ· ’‰›."
         Case OPENING_ACCOUNT: OpeningAccountProblem = "Õ”«» ≈Ã„«·Ì «·√—’œ… «·«›  «ÕÌ… ÂÊ „ﬁ«»· ﬂ· «·√—’œ…° Ê·« ÌıœŒ· ·Â —’Ìœ."
         Case 110001 To 119999: OpeningAccountProblem = "—’Ìœ «·’‰œÊﬁ ÌıœŒ· ›Ì ﬁ”„ ´«·’‰«œÌﬁª."
         Case 120001 To 129999: OpeningAccountProblem = "—’Ìœ «·»‰ﬂ ÌıœŒ· ›Ì ﬁ”„ ´«·»‰Êﬂª."
@@ -100,7 +107,8 @@ Public Function OpeningAccountProblem(ByVal AccountCode As Variant) As String
 End Function
 
 Public Function SaveOpeningDate(ByVal NewDate As Variant) As String
-    ' The start-up date; the cash boxes and banks that had the old date (or none) move with it.
+    ' The start-up date; the cash boxes and banks that had the old date (or none) move with it, and so
+    ' does the opening stock posted from the screen.
     Dim old As Variant, before As Collection, cond As String
     SaveOpeningDate = CanOpening("EDIT")
     If Len(SaveOpeningDate) > 0 Then Exit Function
@@ -116,6 +124,8 @@ Public Function SaveOpeningDate(ByVal NewDate As Variant) As String
     If IsDate(old) Then cond = cond & " OR OpeningDate = " & SqlDate(old)
     CurrentDb.Execute "UPDATE CashBoxes SET OpeningDate = " & SqlDate(DateValue(NewDate)) & " WHERE " & cond, dbFailOnError
     CurrentDb.Execute "UPDATE Banks SET OpeningDate = " & SqlDate(DateValue(NewDate)) & " WHERE " & cond, dbFailOnError
+    CurrentDb.Execute "UPDATE InventoryTransactions SET TransactionDate = " & SqlDate(DateValue(NewDate)) & _
+                      " WHERE TransactionID IN (SELECT TransactionID FROM OpeningStock)", dbFailOnError
     AuditEdited "OPENING_DATE", "Settings", "SettingID", 1, before
     SaveOpeningDate = SyncJournal()
 End Function
@@ -200,12 +210,17 @@ Public Sub OpeningShowPart(ByVal frm As Access.Form, ByVal Part As String)
             grid = "frmOpeningBanks"
             caps = Array("«·»‰ﬂ", "«·—’Ìœ «·«›  «ÕÌ", "", " «—ÌŒ «·—’Ìœ")
             hint = "—’Ìœ ﬂ· Õ”«» »‰ﬂÌ ÌÊ„ »œ¡ «· ‘€Ì·: „ÊÃ» = ·‰« ›Ì «·»‰ﬂ° ”«·» = ”Õ» ⁄·Ï «·„ﬂ‘Ê›."
+        Case "STOCK"
+            grid = "frmOpeningStock"
+            caps = Array("«·’‰›", "«·ﬂ„Ì…", " ﬂ·›… «·ÊÕœ…", "«·ﬁÌ„… Ê«·Õ«·…")
+            hint = "ﬂ„Ì… ﬂ· ’‰› Ê ﬂ·›… ÊÕœ Â ÌÊ„ »œ¡ «· ‘€Ì·° À„ ´ —ÕÌ· «·—’Ìœª. ´ﬂ· «·√’‰«›ª Ì÷Ì› «·√’‰«› " & _
+                   "«· Ì ·Ì” ·Â« Õ—ﬂ« ° Ê´ﬁ«·» Excelª Ì’œ¯—Â« · „·√Â« À„  ” Ê—œÂ«."
         Case Else
             Part = "ACCOUNTS"
             grid = "frmOpeningAccountLines"
             caps = Array("«·Õ”«»", "„œÌ‰", "œ«∆‰", "«·»Ì«‰")
             hint = "—’Ìœ ﬂ· Õ”«» ⁄«„ ÌÊ„ »œ¡ «· ‘€Ì·: —√” «·„«·° Ê«·ﬁ—Ê÷° Ê«·„” Õﬁ« ° Ê«·√’Ê· «·√Œ—Ï. " & _
-                   "«·⁄„·«¡ Ê«·„Ê—œÊ‰ Ê«·’‰«œÌﬁ Ê«·»‰Êﬂ ›Ì √ﬁ”«„Â«° Ê«·„Œ“Ê‰ „‰ ‘«‘… «·„Œ“Ê‰."
+                   "«·⁄„·«¡ Ê«·„Ê—œÊ‰ Ê«·’‰«œÌﬁ Ê«·»‰Êﬂ Ê«·„Œ“Ê‰ ›Ì √ﬁ”«„Â«."
     End Select
     frm!txtPart.Value = Part
     If frm!subGrid.SourceObject <> grid Then frm!subGrid.SourceObject = grid
@@ -213,6 +228,10 @@ Public Sub OpeningShowPart(ByVal frm As Access.Form, ByVal Part As String)
     frm!lblCol2.Caption = Tr(caps(1))
     frm!lblCol3.Caption = Tr(IIf(Len(caps(2)) = 0, " ", caps(2)))
     frm!lblCol4.Caption = Tr(caps(3))
+    frm!btnStockFill.Visible = (Part = "STOCK")
+    frm!btnStockImport.Visible = (Part = "STOCK")
+    frm!btnStockTemplate.Visible = (Part = "STOCK")
+    frm!btnStockPost.Visible = (Part = "STOCK")
     If IsNull(OpeningDateValue()) Then
         hint = "«Õ›Ÿ  «—ÌŒ »œ¡ «· ‘€Ì· √Ê·«° À„ √œŒ· «·√—’œ…."
         frm!subGrid.Enabled = False
@@ -311,6 +330,390 @@ Public Sub OpeningRemoveLine(ByVal frm As Access.Form)
 End Sub
 
 '------------------------------------------------------------------------------
+' The opening stock (OpeningStock, grid frmOpeningStock)
+'------------------------------------------------------------------------------
+Public Function ProductHasMoves(ByVal ProductID As Long) As Boolean
+    ProductHasMoves = Nz(DbValue("SELECT COUNT(*) FROM InventoryTransactions WHERE ProductID = " & ProductID), 0) > 0
+End Function
+
+Public Function OpeningStockReady(ByVal Action As String) As String
+    ' "" when the opening stock can be changed now: the permission, the start-up date, its period open.
+    OpeningStockReady = CanOpening(Action)
+    If Len(OpeningStockReady) = 0 And IsNull(OpeningDateValue()) Then
+        OpeningStockReady = "«Õ›Ÿ  «—ÌŒ »œ¡ «· ‘€Ì· √Ê·«."
+    End If
+    If Len(OpeningStockReady) = 0 Then OpeningStockReady = ClosedPeriodProblem(OpeningDateValue())
+End Function
+
+Public Function OpeningStockLineProblem(ByVal LineID As Variant, ByVal ProductID As Variant, ByVal Qty As Variant, _
+                                        ByVal UnitCost As Variant) As String
+    ' "" when a line not posted yet can hold this product, quantity and cost.
+    Dim other As Variant
+    If IsNull(ProductID) Then
+        OpeningStockLineProblem = "«Œ — «·’‰›."
+        Exit Function
+    End If
+    If Not ProductTracksStock(CLng(ProductID)) Then
+        OpeningStockLineProblem = "Â–« «·’‰› ·« Ì «»⁄ «·„Œ“Ê‰° ›·Ì” ·Â —’Ìœ."
+    ElseIf ProductHasMoves(CLng(ProductID)) Then
+        OpeningStockLineProblem = "··’‰› Õ—ﬂ«  „Œ“Ê‰: «·—’Ìœ «·«›  «ÕÌ ÌﬂÊ‰ ﬁ»· √Ì Õ—ﬂ…. ’Õ¯Õ «·ﬂ„Ì… »«·Ã—œ."
+    ElseIf Nz(Qty, 0) < 0 Or Nz(UnitCost, 0) < 0 Then
+        OpeningStockLineProblem = "«·ﬂ„Ì… Ê«· ﬂ·›… ·«  ﬂÊ‰«‰ ”«·» Ì‰."
+    Else
+        other = DbValue("SELECT OpeningStockID FROM OpeningStock WHERE ProductID = " & CLng(ProductID) & _
+                        " AND OpeningStockID <> " & Nz(LineID, 0))
+        If Not IsNull(other) Then OpeningStockLineProblem = "«·’‰› „ÊÃÊœ ›Ì ”ÿ— ¬Œ—."
+    End If
+End Function
+
+Public Sub OpeningStockBeforeUpdate(ByVal frm As Access.Form, ByRef Cancel As Integer)
+    Dim msg As String
+    msg = OpeningStockReady(IIf(frm.NewRecord, "ADD", "EDIT"))
+    If Len(msg) = 0 And Not IsNull(frm!TransactionID.Value) Then
+        msg = "Â–« «·—’Ìœ „—Õ¯·. · ⁄œÌ·Â √·€ˆ  —ÕÌ·Â »“— «·Õ–› ›Ì ”ÿ—Â° À„ ⁄œ¯·Â Ê—Õ¯·Â „‰ ÃœÌœ."
+    End If
+    If Len(msg) = 0 Then
+        msg = OpeningStockLineProblem(frm!OpeningStockID.Value, frm!ProductID.Value, frm!Quantity.Value, _
+                                      frm!UnitCost.Value)
+    End If
+    If Len(msg) > 0 Then
+        ShowWarning msg
+        Cancel = True
+        Exit Sub
+    End If
+    frm!Quantity.Value = Nz(frm!Quantity.Value, 0)
+    frm!UnitCost.Value = Nz(frm!UnitCost.Value, 0)
+    AuditFormBefore frm, "OpeningStock", "OpeningStockID"
+End Sub
+
+Public Function FillOpeningStock() As Long
+    ' Adds a line (quantity 0, the known cost) for every active product that tracks stock and has no move.
+    Dim before As Long
+    before = Nz(DbValue("SELECT COUNT(*) FROM OpeningStock"), 0)
+    CurrentDb.Execute "INSERT INTO OpeningStock (ProductID, Quantity, UnitCost) " & _
+        "SELECT p.ProductID, 0, IIf(p.AverageCost > 0, p.AverageCost, p.PurchasePrice) FROM Products AS p " & _
+        "WHERE p.TrackStock = True AND p.IsActive = True " & _
+        "AND p.ProductID NOT IN (SELECT ProductID FROM OpeningStock) " & _
+        "AND p.ProductID NOT IN (SELECT ProductID FROM InventoryTransactions)", dbFailOnError
+    FillOpeningStock = Nz(DbValue("SELECT COUNT(*) FROM OpeningStock"), 0) - before
+End Function
+
+Public Function PostOpeningStock(ByRef Posted As Long, ByRef Skipped As Long) As String
+    ' One stock move "opening" per line not posted with a quantity, on the start-up date.
+    Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
+    Dim refNo As String, pid As Long, tid As Variant, startDay As Date
+    Posted = 0
+    Skipped = 0
+    PostOpeningStock = OpeningStockReady("ADD")
+    If Len(PostOpeningStock) > 0 Then Exit Function
+    If Nz(DbValue("SELECT COUNT(*) FROM OpeningStock WHERE TransactionID Is Null AND Quantity > 0"), 0) = 0 Then
+        PostOpeningStock = "·«  ÊÃœ √”ÿ— »ﬂ„Ì… ·„  ı—ÕÛ¯·."
+        Exit Function
+    End If
+    On Error GoTo EH
+    startDay = OpeningDateValue()
+    Set db = CurrentDb
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    refNo = NextNumber("STOCK_ADJUST")
+    Set rs = db.OpenRecordset("SELECT OpeningStockID, ProductID, Quantity, UnitCost FROM OpeningStock " & _
+                              "WHERE TransactionID Is Null AND Quantity > 0 ORDER BY OpeningStockID", dbOpenSnapshot)
+    Do Until rs.EOF
+        pid = rs!ProductID
+        If ProductTracksStock(pid) And Not ProductHasMoves(pid) Then
+            ApplyStockMovement db, pid, CCur(rs!Quantity), TT_OPENING, CCur(rs!UnitCost), "MANUAL", 0, refNo, "", True
+            tid = DbValue("SELECT Max(TransactionID) FROM InventoryTransactions WHERE ProductID = " & pid)
+            db.Execute "UPDATE InventoryTransactions SET TransactionDate = " & SqlDate(startDay) & _
+                       " WHERE TransactionID = " & tid, dbFailOnError
+            db.Execute "UPDATE OpeningStock SET TransactionID = " & tid & " WHERE OpeningStockID = " & _
+                       rs!OpeningStockID, dbFailOnError
+            Posted = Posted + 1
+        Else
+            Skipped = Skipped + 1
+        End If
+        rs.MoveNext
+    Loop
+    rs.Close
+    ws.CommitTrans
+    inTrans = False
+    LogAction "OPENING_STOCK_POST", "OpeningStock", refNo, "Posted=" & Posted & " Skipped=" & Skipped
+    PostOpeningStock = SyncJournal()
+    Exit Function
+EH:
+    PostOpeningStock = " ⁄–—  —ÕÌ· «·—’Ìœ: " & Err.Description & " (" & Err.Number & ")"
+    Posted = 0
+    If inTrans Then ws.Rollback
+End Function
+
+Public Function UnpostOpeningStock(ByVal LineID As Long) As String
+    ' Takes back the move of a posted line while it is the only move of its product; the line stays to edit.
+    Dim db As DAO.Database, ws As DAO.Workspace, inTrans As Boolean, tid As Variant, pid As Long
+    Dim before As Collection
+    UnpostOpeningStock = OpeningStockReady("DELETE")
+    If Len(UnpostOpeningStock) > 0 Then Exit Function
+    tid = DbValue("SELECT TransactionID FROM OpeningStock WHERE OpeningStockID = " & LineID)
+    If IsNull(tid) Then Exit Function
+    pid = DbValue("SELECT ProductID FROM OpeningStock WHERE OpeningStockID = " & LineID)
+    If Nz(DbValue("SELECT COUNT(*) FROM InventoryTransactions WHERE ProductID = " & pid & _
+                  " AND TransactionID <> " & tid), 0) > 0 Then
+        UnpostOpeningStock = "··’‰› Õ—ﬂ«  »⁄œ —’ÌœÂ «·«›  «ÕÌ° ›·« Ìı·€Ï  —ÕÌ·Â. ’Õ¯Õ «·ﬂ„Ì… »«·Ã—œ."
+        Exit Function
+    End If
+    On Error GoTo EH
+    Set db = CurrentDb
+    Set before = AuditSnapshot("InventoryTransactions", "TransactionID", tid)
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    db.Execute "DELETE FROM InventoryTransactions WHERE TransactionID = " & tid, dbFailOnError
+    db.Execute "UPDATE Products SET CurrentQuantity = 0, AverageCost = 0, UpdatedAt = Now() WHERE ProductID = " & pid, _
+               dbFailOnError
+    db.Execute "UPDATE OpeningStock SET TransactionID = Null WHERE OpeningStockID = " & LineID, dbFailOnError
+    ws.CommitTrans
+    inTrans = False
+    AuditDeleted "OPENING_STOCK_UNPOST", "InventoryTransactions", tid, before
+    UnpostOpeningStock = SyncJournal()
+    Exit Function
+EH:
+    UnpostOpeningStock = " ⁄–— ≈·€«¡ «· —ÕÌ·: " & Err.Description & " (" & Err.Number & ")"
+    If inTrans Then ws.Rollback
+End Function
+
+Public Function ImportOpeningStockRow(ByVal Code As String, ByVal Qty As Variant, ByVal UnitCost As Variant) As String
+    ' One row of the Excel file: "ADDED", "UPDATED", or the reason it was not taken.
+    Dim pid As Variant, lineID As Variant, cost As Currency
+    Code = Trim$(Code)
+    If Len(Code) = 0 Then
+        ImportOpeningStockRow = "EMPTY"
+        Exit Function
+    End If
+    If Not IsNumeric(Qty) Then
+        ImportOpeningStockRow = "BAD"
+        Exit Function
+    End If
+    If CDbl(Qty) < 0 Then
+        ImportOpeningStockRow = "BAD"
+        Exit Function
+    End If
+    pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = " & SqlText(Code) & " OR Barcode = " & SqlText(Code))
+    If IsNull(pid) Then
+        ImportOpeningStockRow = "UNKNOWN"
+        Exit Function
+    End If
+    If IsNumeric(UnitCost) Then
+        cost = CCur(UnitCost)
+    Else
+        cost = Nz(DbValue("SELECT IIf(AverageCost > 0, AverageCost, PurchasePrice) FROM Products WHERE ProductID = " & pid), 0)
+    End If
+    If cost < 0 Then
+        ImportOpeningStockRow = "BAD"
+        Exit Function
+    End If
+    lineID = DbValue("SELECT OpeningStockID FROM OpeningStock WHERE ProductID = " & pid)
+    If Not IsNull(lineID) Then
+        If Not IsNull(DbValue("SELECT TransactionID FROM OpeningStock WHERE OpeningStockID = " & lineID)) Then
+            ImportOpeningStockRow = "POSTED"
+            Exit Function
+        End If
+    End If
+    If Len(OpeningStockLineProblem(lineID, pid, Qty, cost)) > 0 Then
+        ImportOpeningStockRow = "MOVES"
+        Exit Function
+    End If
+    If IsNull(lineID) Then
+        CurrentDb.Execute "INSERT INTO OpeningStock (ProductID, Quantity, UnitCost) VALUES (" & pid & ", " & _
+                          Str$(CDbl(Qty)) & ", " & Str$(cost) & ")", dbFailOnError
+        ImportOpeningStockRow = "ADDED"
+    Else
+        CurrentDb.Execute "UPDATE OpeningStock SET Quantity = " & Str$(CDbl(Qty)) & ", UnitCost = " & Str$(cost) & _
+                          " WHERE OpeningStockID = " & lineID, dbFailOnError
+        ImportOpeningStockRow = "UPDATED"
+    End If
+End Function
+
+Public Function ImportOpeningStock(ByVal FilePath As String) As String
+    ' The Excel file: first row = titles; columns code (or barcode), quantity, cost, or the template's
+    ' code, name, quantity, cost. Returns the summary.
+    Dim db As DAO.Database, rs As DAO.Recordset, qCol As Integer, cCol As Integer, result As String
+    Dim added As Long, updated As Long, unknown As Long, refused As Long, codes As String, kind As Integer
+    Set db = CurrentDb
+    DropImportTables db
+    If LCase$(Right$(FilePath, 4)) = ".xls" Then
+        kind = acSpreadsheetTypeExcel9
+    Else
+        kind = acSpreadsheetTypeExcel12Xml
+    End If
+    On Error GoTo EH
+    DoCmd.TransferSpreadsheet acImport, kind, "tmpOpeningImport", FilePath, True
+    Set rs = db.OpenRecordset("SELECT * FROM tmpOpeningImport", dbOpenSnapshot)
+    If rs.Fields.Count >= 4 Then
+        qCol = 2
+        cCol = 3
+    Else
+        qCol = 1
+        cCol = 2
+    End If
+    If rs.Fields.Count < 2 Then
+        rs.Close
+        DropImportTables db
+        ImportOpeningStock = "«·„·› ÌÕ «Ã ⁄„ÊœÌ‰ ⁄·Ï «·√ﬁ·: «·ﬂÊœ Ê«·ﬂ„Ì…° À„ «· ﬂ·›…."
+        Exit Function
+    End If
+    Do Until rs.EOF
+        If rs.Fields.Count > cCol Then
+            result = ImportOpeningStockRow(CStr(Nz(rs.Fields(0).Value, "")), rs.Fields(qCol).Value, rs.Fields(cCol).Value)
+        Else
+            result = ImportOpeningStockRow(CStr(Nz(rs.Fields(0).Value, "")), rs.Fields(qCol).Value, Null)
+        End If
+        Select Case result
+            Case "ADDED": added = added + 1
+            Case "UPDATED": updated = updated + 1
+            Case "UNKNOWN"
+                unknown = unknown + 1
+                If unknown <= 10 Then codes = codes & "  " & CStr(rs.Fields(0).Value)
+            Case "EMPTY"
+            Case Else: refused = refused + 1
+        End Select
+        rs.MoveNext
+    Loop
+    rs.Close
+    DropImportTables db
+    LogAction "OPENING_STOCK_IMPORT", "OpeningStock", "", "Added=" & added & " Updated=" & updated & _
+              " Unknown=" & unknown & " Refused=" & refused & " File=" & FilePath
+    ImportOpeningStock = "√ı÷Ì› " & added & " ’‰›«° Ê⁄ıœ¯· " & updated & "."
+    If refused > 0 Then
+        ImportOpeningStock = ImportOpeningStock & vbCrLf & "·„ ÌıƒŒ– " & refused & _
+                             " ”ÿ—«: ﬂ„Ì… €Ì— ’ÕÌÕ…° √Ê ’‰› ·Â Õ—ﬂ« ° √Ê —’ÌœÂ „—Õ¯·."
+    End If
+    If unknown > 0 Then
+        ImportOpeningStock = ImportOpeningStock & vbCrLf & unknown & " ﬂÊœ« €Ì— „ÊÃÊœ:" & codes
+    End If
+    Exit Function
+EH:
+    ImportOpeningStock = " ⁄–— ﬁ—«¡… «·„·›: " & Err.Description & " (" & Err.Number & ")"
+    DropImportTables db
+End Function
+
+Private Sub DropImportTables(ByVal db As DAO.Database)
+    ' The imported sheet and the error tables Access adds next to it.
+    Dim i As Long
+    On Error Resume Next
+    For i = db.TableDefs.Count - 1 To 0 Step -1
+        If db.TableDefs(i).Name = "tmpOpeningImport" Or db.TableDefs(i).Name Like "*_ImportErrors*" Then
+            db.TableDefs.Delete db.TableDefs(i).Name
+        End If
+    Next i
+End Sub
+
+Public Function OpeningStockTemplateSql() As String
+    ' The products still waiting for their opening stock, in the columns the import reads.
+    OpeningStockTemplateSql = "SELECT p.ProductCode AS [ﬂÊœ «·’‰›], p.ProductName AS [«”„ «·’‰›], " & _
+        "Nz(o.Quantity, 0) AS [«·ﬂ„Ì… «·«›  «ÕÌ…], " & _
+        "Nz(o.UnitCost, IIf(p.AverageCost > 0, p.AverageCost, p.PurchasePrice)) AS [ ﬂ·›… «·ÊÕœ… «·«›  «ÕÌ…] " & _
+        "FROM Products AS p LEFT JOIN OpeningStock AS o ON p.ProductID = o.ProductID " & _
+        "WHERE p.TrackStock = True AND p.IsActive = True AND o.TransactionID Is Null " & _
+        "AND p.ProductID NOT IN (SELECT ProductID FROM InventoryTransactions) ORDER BY p.ProductName"
+End Function
+
+'------------------------------------------------------------------------------
+' The stock part of the screen
+'------------------------------------------------------------------------------
+Public Sub OpeningStockFill(ByVal frm As Access.Form)
+    Dim msg As String, n As Long
+    msg = OpeningStockReady("ADD")
+    If Len(msg) > 0 Then
+        ShowWarning msg
+        Exit Sub
+    End If
+    n = FillOpeningStock()
+    LogAction "OPENING_STOCK_FILL", "OpeningStock", "", "Added=" & n
+    frm!subGrid.Form.Requery
+    ShowInfo "√ı÷Ì› " & n & " ’‰›« »ﬂ„Ì… ’›—. «ﬂ » «·ﬂ„Ì« ° À„ ´ —ÕÌ· «·—’Ìœª."
+End Sub
+
+Public Sub OpeningStockPost(ByVal frm As Access.Form)
+    Dim msg As String, posted As Long, skipped As Long
+    If frm!subGrid.Form.Dirty Then frm!subGrid.Form.Dirty = False
+    If Not AskYesNo(" —ÕÌ· «·—’Ìœ «·«›  «ÕÌ ··√’‰«› » «—ÌŒ " & GDate(OpeningDateValue()) & "ø" & vbCrLf & _
+                    "»⁄œ «· —ÕÌ· ·« Ìı⁄œÛ¯· «·—’Ìœ ≈·« »≈·€«¡  —ÕÌ·Â.") Then Exit Sub
+    msg = PostOpeningStock(posted, skipped)
+    frm!subGrid.Form.Requery
+    If Len(msg) > 0 Then
+        ShowWarning msg
+        If posted = 0 Then Exit Sub
+    End If
+    ShowInfo "—ıÕˆ¯· —’Ìœ " & posted & " ’‰›«." & IIf(skipped > 0, vbCrLf & "·„ Ìı—ÕÛ¯· " & skipped & _
+             " ’‰›« ·√‰ ·Â« Õ—ﬂ«  √Ê ·«   «»⁄ «·„Œ“Ê‰.", "")
+    OpeningRefresh frm
+End Sub
+
+Public Sub OpeningStockImport(ByVal frm As Access.Form)
+    Dim msg As String, path As String
+    msg = OpeningStockReady("ADD")
+    If Len(msg) > 0 Then
+        ShowWarning msg
+        Exit Sub
+    End If
+    With Application.FileDialog(3)          ' msoFileDialogFilePicker
+        .Title = Tr("«Œ — „·› Excel")
+        .AllowMultiSelect = False
+        .Filters.Clear
+        .Filters.Add "Excel", "*.xlsx;*.xls"
+        If .Show Then path = .SelectedItems(1)
+    End With
+    If Len(path) = 0 Then Exit Sub
+    msg = ImportOpeningStock(path)
+    frm!subGrid.Form.Requery
+    ShowInfo msg
+End Sub
+
+Public Sub OpeningStockTemplate(ByVal frm As Access.Form)
+    Dim db As DAO.Database, path As String
+    On Error GoTo EH
+    Set db = CurrentDb
+    On Error Resume Next
+    db.QueryDefs.Delete "qryOpeningStockExport"
+    On Error GoTo EH
+    db.CreateQueryDef "qryOpeningStockExport", Tr(OpeningStockTemplateSql())
+    path = ReportsFolder() & "\OpeningStock_" & Format$(Now, "yyyymmdd_hhnnss") & ".xlsx"
+    DoCmd.OutputTo acOutputQuery, "qryOpeningStockExport", acFormatXLSX, path
+    db.QueryDefs.Delete "qryOpeningStockExport"
+    ShowInfo " „ Õ›Ÿ «·ﬁ«·» ›Ì:" & vbCrLf & path & vbCrLf & "«ﬂ » «·ﬂ„Ì«  Ê«· ﬂ·›…° À„ ´«” Ì—«œ „‰ Excelª."
+    If Not g_SilentMode Then Application.FollowHyperlink path
+    Exit Sub
+EH:
+    ShowError " ⁄–— Õ›Ÿ «·ﬁ«·»: " & Err.Description
+End Sub
+
+Public Sub OpeningStockRemoveLine(ByVal frm As Access.Form)
+    ' A line not posted is deleted; a posted line is unposted (it stays, to be corrected and posted again).
+    Dim id As Variant, msg As String, before As Collection
+    If frm.NewRecord Then
+        If frm.Dirty Then frm.Undo
+        Exit Sub
+    End If
+    id = frm!OpeningStockID.Value
+    If IsNull(id) Then Exit Sub
+    If frm.Dirty Then frm.Undo
+    If Not IsNull(frm!TransactionID.Value) Then
+        If Not AskYesNo("≈·€«¡  —ÕÌ· —’Ìœ Â–« «·’‰›ø  ıÕ–› Õ—ﬂ Â ÊÌ⁄Êœ —’ÌœÂ ’›—«.") Then Exit Sub
+        msg = UnpostOpeningStock(CLng(id))
+    Else
+        msg = OpeningStockReady("DELETE")
+        If Len(msg) = 0 Then
+            If Not AskYesNo("Õ–› Â–« «·”ÿ—ø") Then Exit Sub
+            Set before = AuditSnapshot("OpeningStock", "OpeningStockID", id)
+            CurrentDb.Execute "DELETE FROM OpeningStock WHERE OpeningStockID = " & CLng(id), dbFailOnError
+            AuditDeleted "OPENING_STOCK_DELETE", "OpeningStock", id, before
+        End If
+    End If
+    If Len(msg) > 0 Then ShowWarning msg
+    frm.Requery
+    OpeningGridAfterUpdate frm
+End Sub
+
+'------------------------------------------------------------------------------
 ' In-Access test (RunAllTests): inside a transaction that is rolled back
 '------------------------------------------------------------------------------
 Public Function TestOpeningBalances() As Boolean
@@ -358,6 +761,7 @@ Public Function TestOpeningBalances() As Boolean
         Record IsNull(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType IN ('CUSTOMER_OPENING', " & _
                               "'SUPPLIER_OPENING') AND DateValue(EntryDate) <> " & SqlDate(startDay))), _
                "√—’œ… «·⁄„·«¡ Ê«·„Ê—œÌ‰ » «—ÌŒ »œ¡ «· ‘€Ì·", passed, failed, report
+        TestOpeningStockPart startDay, first, passed, failed, report
     End If
     ws.Rollback
     inTrans = False
@@ -377,6 +781,44 @@ Done:
                 "TestOpeningBalances"
     End If
 End Function
+
+Private Sub TestOpeningStockPart(ByVal startDay As Date, ByVal first As Variant, ByRef passed As Long, _
+                                 ByRef failed As Long, ByRef report As String)
+    ' The opening stock of a product without moves: post, entry, unpost, import row.
+    Dim pid As Variant, lineID As Variant, tid As Variant, posted As Long, skipped As Long, code As String
+    pid = DbValue("SELECT TOP 1 ProductID FROM Products WHERE TrackStock = True AND ProductID NOT IN " & _
+                  "(SELECT ProductID FROM InventoryTransactions) AND ProductID NOT IN (SELECT ProductID FROM OpeningStock) " & _
+                  "ORDER BY ProductID")
+    If IsNull(pid) Then
+        Debug.Print "[--] ·« ÌÊÃœ ’‰› »·« Õ—ﬂ« :  ŒÿÌ «Œ »«— —’Ìœ «·„Œ“Ê‰"
+        Exit Sub
+    End If
+    code = Nz(DbValue("SELECT ProductCode FROM Products WHERE ProductID = " & pid), "")
+    Record ImportOpeningStockRow("ZZ-NO-SUCH-CODE-9", 1, 1) = "UNKNOWN", "«” Ì—«œ: ﬂÊœ €Ì— „ÊÃÊœ", passed, failed, report
+    Record ImportOpeningStockRow(code, -1, 1) = "BAD", "«” Ì—«œ: ﬂ„Ì… ”«·»… „—›Ê÷…", passed, failed, report
+    Record ImportOpeningStockRow(code, 4, 3) = "ADDED", "«” Ì—«œ: ≈÷«›… ”ÿ— ··’‰›", passed, failed, report
+    Record ImportOpeningStockRow(code, 10, 5) = "UPDATED", "«” Ì—«œ:  ⁄œÌ· ”ÿ— «·’‰›", passed, failed, report
+    lineID = DbValue("SELECT OpeningStockID FROM OpeningStock WHERE ProductID = " & pid)
+    CurrentDb.Execute "UPDATE OpeningStock SET Quantity = 0 WHERE TransactionID Is Null AND OpeningStockID <> " & lineID, _
+                      dbFailOnError                                   ' only the test line is posted
+    Record PostOpeningStock(posted, skipped) = "" And posted = 1, " —ÕÌ· «·—’Ìœ «·«›  «ÕÌ ··„Œ“Ê‰", _
+           passed, failed, report
+    tid = DbValue("SELECT TransactionID FROM OpeningStock WHERE OpeningStockID = " & lineID)
+    Record Not IsNull(tid), "«·”ÿ— „—»Êÿ »Õ—ﬂ… «·„Œ“Ê‰", passed, failed, report
+    If IsNull(tid) Then Exit Sub
+    Record DateValue(DbValue("SELECT TransactionDate FROM InventoryTransactions WHERE TransactionID = " & tid)) = startDay _
+           And Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & pid), 0) = 10, _
+           "«·Õ—ﬂ… » «—ÌŒ »œ¡ «· ‘€Ì· Ê«·ﬂ„Ì… 10", passed, failed, report
+    Record Nz(DbValue("SELECT l.Credit FROM JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID " & _
+                      "WHERE e.SourceType = 'STOCK_MOVE' AND e.SourceID = " & tid & " AND l.AccountCode = 3900"), 0) = 50, _
+           "ﬁÌœ «·„Œ“Ê‰ „ﬁ«»· ≈Ã„«·Ì «·√—’œ… «·«›  «ÕÌ… (50)", passed, failed, report
+    Record Nz(FirstDocumentDate(), 0) = Nz(first, 0), "—’Ìœ «·„Œ“Ê‰ ·« Ìı⁄œ √Ê· „” ‰œ", passed, failed, report
+    Record ImportOpeningStockRow(code, 1, 1) = "POSTED", "«” Ì—«œ: «·—’Ìœ «·„—Õ¯· ·« Ì €Ì—", passed, failed, report
+    Record UnpostOpeningStock(CLng(lineID)) = "" And _
+           IsNull(DbValue("SELECT TransactionID FROM OpeningStock WHERE OpeningStockID = " & lineID)) And _
+           Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & pid), -1) = 0, _
+           "≈·€«¡ «· —ÕÌ· ÌÕ–› «·Õ—ﬂ… ÊÌ⁄Ìœ «·ﬂ„Ì… ’›—«", passed, failed, report
+End Sub
 
 Private Sub Record(ByVal ok As Boolean, ByVal Title As String, ByRef passed As Long, ByRef failed As Long, _
                    ByRef report As String)
