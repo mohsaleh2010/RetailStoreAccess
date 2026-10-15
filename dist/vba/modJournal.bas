@@ -249,6 +249,7 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "VAT_RETURN":       OpenScreen "frmVatReturn", 0, id
         Case "VAT_PAYMENT":      OpenScreen "frmVatReturn", 0, id
         Case "BANK_OPENING":     OpenScreen "frmBanks", 0, id
+        Case "ACCOUNT_OPENING":  OpenScreen "frmOpeningBalances"
         Case "ASSET":            OpenScreen "frmAssets", 0, id
         Case "ASSET_DISPOSAL":   OpenScreen "frmAssets", 0, id
         Case "DEPRECIATION":     OpenScreen "frmDepreciation", 0

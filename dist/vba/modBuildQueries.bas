@@ -22,14 +22,14 @@ Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qryLocRoles1,qryLocRoles,qryLocPermissions1,qryLocPermissions,qryLocScreens1,qryLocScreens,qryLocCategories1,qryLocCategories,qryLocUnits1,qryLocUnits,qryLocExpenseTypes1,qryLocExpenseTypes,qryLocCustomers1,qryLocCustomers,qryLo" & _
     "cSuppliers1,qryLocSuppliers,qryLocCashBoxes1,qryLocCashBoxes,qryLocBanks1,qryLocBanks,qryLocCostCenters1,qryLocCostCenters,qryLocSalesReps1,qryLocSalesReps,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,q" & _
-    "ryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLa" & _
-    "testRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryPr" & _
-    "ofitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionS" & _
-    "heetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSal" & _
-    "e,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommis" & _
-    "sionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qry" & _
-    "TreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySales" & _
-    "InvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "ryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerOpening,qrySupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplie" & _
+    "rLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebi" & _
+    "ts,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPost" & _
+    "ed,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint," & _
+    "qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDe" & _
+    "preciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,Tri" & _
+    "alBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitA" & _
+    "t,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -719,6 +719,10 @@ Private Sub CreateAllQueries()
     Q_SlowMovingProductsQuery
     Q_StockByCategoryQuery
     Q_StockCountQuery
+    Q_qryCustomerOpening
+    Q_qrySupplierOpening
+    Q_qryOpeningAccountLines
+    Q_qryOpeningTotals
     Q_qryCustomerLedger
     Q_qryCustomerLedgerTotals
     Q_CustomerBalanceQuery
@@ -1330,6 +1334,43 @@ Private Sub Q_StockCountQuery()
     SaveQuery "StockCountQuery", " ›«’Ì· Ã·”«  «·Ã—œ: «·ﬂ„Ì… «·„”Ã·… Ê«·›⁄·Ì… Ê«·›—ﬁ ÊﬁÌ„ Â", s
 End Sub
 
+Private Sub Q_qryCustomerOpening()
+    Dim s As String
+    s = "SELECT c.CustomerID, c.CustomerName, c.OpeningBalance," & vbCrLf
+    s = s & "       IIf(st.OpeningDate Is Null, c.CreatedAt, st.OpeningDate) AS OpeningOn" & vbCrLf
+    s = s & "FROM [@Customers] AS c, Settings AS st" & vbCrLf
+    s = s & "WHERE st.SettingID = 1 AND c.OpeningBalance <> 0" & vbCrLf
+    SaveQuery "qryCustomerOpening", "«·—’Ìœ «·«›  «ÕÌ ·ﬂ· ⁄„Ì· » «—ÌŒ »œ¡ «· ‘€Ì·", s
+End Sub
+
+Private Sub Q_qrySupplierOpening()
+    Dim s As String
+    s = "SELECT s.SupplierID, s.SupplierName, s.OpeningBalance," & vbCrLf
+    s = s & "       IIf(st.OpeningDate Is Null, s.CreatedAt, st.OpeningDate) AS OpeningOn" & vbCrLf
+    s = s & "FROM [@Suppliers] AS s, Settings AS st" & vbCrLf
+    s = s & "WHERE st.SettingID = 1 AND s.OpeningBalance <> 0" & vbCrLf
+    SaveQuery "qrySupplierOpening", "«·—’Ìœ «·«›  «ÕÌ ·ﬂ· „Ê—œ » «—ÌŒ »œ¡ «· ‘€Ì·", s
+End Sub
+
+Private Sub Q_qryOpeningAccountLines()
+    Dim s As String
+    s = "SELECT o.OpeningLineID, o.AccountCode AS LineAccount, o.Debit AS LineDebit, o.Credit AS LineCredit, a.AccountName," & vbCrLf
+    s = s & "       st.OpeningDate AS OpeningOn" & vbCrLf
+    s = s & "FROM (OpeningBalances AS o INNER JOIN [@Accounts] AS a ON o.AccountCode = a.AccountCode), Settings AS st" & vbCrLf
+    s = s & "WHERE st.SettingID = 1 AND st.OpeningDate Is Not Null" & vbCrLf
+    SaveQuery "qryOpeningAccountLines", "«·√—’œ… «·«›  «ÕÌ… ··Õ”«»«  «·⁄«„… » «—ÌŒ »œ¡ «· ‘€Ì· (·« ‘Ì¡ ﬁ»· Õ›Ÿ «· «—ÌŒ)", s
+End Sub
+
+Private Sub Q_qryOpeningTotals()
+    Dim s As String
+    s = "SELECT e.SourceType, t.TypeName, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit" & vbCrLf
+    s = s & "FROM (JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)" & vbCrLf
+    s = s & "     INNER JOIN [@JournalSourceTypes] AS t ON e.SourceType = t.SourceType" & vbCrLf
+    s = s & "WHERE l.AccountCode = 3900" & vbCrLf
+    s = s & "GROUP BY e.SourceType, t.TypeName" & vbCrLf
+    SaveQuery "qryOpeningTotals", "Õ”«» ≈Ã„«·Ì «·√—’œ… «·«›  «ÕÌ… (3900): „œÌ‰Â Êœ«∆‰Â Õ”» „’œ— «·—’Ìœ", s
+End Sub
+
 Private Sub Q_qryCustomerLedger()
     Dim s As String
     s = "SELECT h.CustomerID, h.InvoiceDate AS EntryDate, 'SALE' AS EntryType," & vbCrLf
@@ -1345,11 +1386,10 @@ Private Sub Q_qryCustomerLedger()
     s = s & "       CCur(0), p.Amount" & vbCrLf
     s = s & "FROM CustomerPayments AS p" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT c.CustomerID, c.CreatedAt, 'OPENING', '—’Ìœ «›  «ÕÌ', 0, '-'," & vbCrLf
+    s = s & "SELECT c.CustomerID, c.OpeningOn, 'OPENING', '—’Ìœ «›  «ÕÌ', 0, '-'," & vbCrLf
     s = s & "       IIf(c.OpeningBalance > 0, c.OpeningBalance, 0)," & vbCrLf
     s = s & "       IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0)" & vbCrLf
-    s = s & "FROM [@Customers] AS c" & vbCrLf
-    s = s & "WHERE c.OpeningBalance <> 0" & vbCrLf
+    s = s & "FROM qryCustomerOpening AS c" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT q.CustomerID, q.IssueDate, 'CHEQUE', '‘Ìﬂ Ê«—œ', q.ChequeID, q.ChequeNo, CCur(0), q.Amount" & vbCrLf
     s = s & "FROM Cheques AS q" & vbCrLf
@@ -1419,11 +1459,10 @@ Private Sub Q_qrySupplierLedger()
     s = s & "       p.Amount, CCur(0)" & vbCrLf
     s = s & "FROM SupplierPayments AS p" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT s.SupplierID, s.CreatedAt, 'OPENING', '—’Ìœ «›  «ÕÌ', 0, '-'," & vbCrLf
+    s = s & "SELECT s.SupplierID, s.OpeningOn, 'OPENING', '—’Ìœ «›  «ÕÌ', 0, '-'," & vbCrLf
     s = s & "       IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0)," & vbCrLf
     s = s & "       IIf(s.OpeningBalance > 0, s.OpeningBalance, 0)" & vbCrLf
-    s = s & "FROM [@Suppliers] AS s" & vbCrLf
-    s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
+    s = s & "FROM qrySupplierOpening AS s" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT q.SupplierID, q.IssueDate, 'CHEQUE', '‘Ìﬂ ’«œ—', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)" & vbCrLf
     s = s & "FROM Cheques AS q" & vbCrLf
@@ -1622,8 +1661,8 @@ Private Sub Q_qryAgingDebits()
     s = s & "FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID" & vbCrLf
     s = s & "WHERE h.RemainingAmount > 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, '—’Ìœ «›  «ÕÌ', c.CreatedAt, c.CreatedAt, 0, c.OpeningBalance" & vbCrLf
-    s = s & "FROM [@Customers] AS c" & vbCrLf
+    s = s & "SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, '—’Ìœ «›  «ÕÌ', c.OpeningOn, c.OpeningOn, 0, c.OpeningBalance" & vbCrLf
+    s = s & "FROM qryCustomerOpening AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance > 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'S', h.SupplierID, 'INVOICE', h.PurchaseInvoiceID, h.InvoiceNumber, h.InvoiceDate, h.DueDate," & vbCrLf
@@ -1631,8 +1670,8 @@ Private Sub Q_qryAgingDebits()
     s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
     s = s & "WHERE h.RemainingAmount > 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, '—’Ìœ «›  «ÕÌ', s.CreatedAt, s.CreatedAt, 0, s.OpeningBalance" & vbCrLf
-    s = s & "FROM [@Suppliers] AS s" & vbCrLf
+    s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, '—’Ìœ «›  «ÕÌ', s.OpeningOn, s.OpeningOn, 0, s.OpeningBalance" & vbCrLf
+    s = s & "FROM qrySupplierOpening AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance > 0" & vbCrLf
     SaveQuery "qryAgingDebits", "«·„” Õﬁ ⁄·Ï ﬂ· ⁄„Ì· Ê··„Ê—œ »«·„” ‰œ: «·›Ê« Ì— «·¬Ã·… Ê«·—’Ìœ «·«›  «ÕÌ", s
 End Sub
@@ -1648,8 +1687,8 @@ Private Sub Q_qryAgingCredits()
     s = s & "SELECT 'C', p.CustomerID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, p.Amount, 0" & vbCrLf
     s = s & "FROM CustomerPayments AS p" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, '—’Ìœ «›  «ÕÌ', c.CreatedAt, -c.OpeningBalance, 0" & vbCrLf
-    s = s & "FROM [@Customers] AS c" & vbCrLf
+    s = s & "SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, '—’Ìœ «›  «ÕÌ', c.OpeningOn, -c.OpeningBalance, 0" & vbCrLf
+    s = s & "FROM qryCustomerOpening AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance < 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'S', r.SupplierID, 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, r.TotalAmount - r.RefundedAmount," & vbCrLf
@@ -1660,8 +1699,8 @@ Private Sub Q_qryAgingCredits()
     s = s & "SELECT 'S', p.SupplierID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, p.Amount, 0" & vbCrLf
     s = s & "FROM SupplierPayments AS p" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, '—’Ìœ «›  «ÕÌ', s.CreatedAt, -s.OpeningBalance, 0" & vbCrLf
-    s = s & "FROM [@Suppliers] AS s" & vbCrLf
+    s = s & "SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, '—’Ìœ «›  «ÕÌ', s.OpeningOn, -s.OpeningBalance, 0" & vbCrLf
+    s = s & "FROM qrySupplierOpening AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance < 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'C', q.CustomerID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0" & vbCrLf
@@ -2623,21 +2662,29 @@ Private Sub Q_qryJournalOpening()
     s = s & "FROM [@CashBoxes] AS b" & vbCrLf
     s = s & "WHERE b.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.CreatedAt AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 1300 AS AccountCode, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Credit, c.CustomerName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM [@Customers] AS c" & vbCrLf
+    s = s & "SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.OpeningOn AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 1300 AS AccountCode, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Credit, c.CustomerName AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM qryCustomerOpening AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.CreatedAt AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Credit, '—’Ìœ «›  «ÕÌ' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM [@Customers] AS c" & vbCrLf
+    s = s & "SELECT 'CUSTOMER_OPENING' AS SourceType, c.CustomerID AS SourceID, c.CustomerName AS SourceNumber, c.OpeningOn AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0) AS Debit, IIf(c.OpeningBalance > 0, c.OpeningBalance, 0) AS Credit, '—’Ìœ «›  «ÕÌ' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM qryCustomerOpening AS c" & vbCrLf
     s = s & "WHERE c.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 2100 AS AccountCode, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM [@Suppliers] AS s" & vbCrLf
+    s = s & "SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.OpeningOn AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, 2100 AS AccountCode, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM qrySupplierOpening AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.CreatedAt AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Credit, '—’Ìœ «›  «ÕÌ' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM [@Suppliers] AS s" & vbCrLf
+    s = s & "SELECT 'SUPPLIER_OPENING' AS SourceType, s.SupplierID AS SourceID, s.SupplierName AS SourceNumber, s.OpeningOn AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(s.OpeningBalance > 0, s.OpeningBalance, 0) AS Debit, IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0) AS Credit, '—’Ìœ «›  «ÕÌ' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM qrySupplierOpening AS s" & vbCrLf
     s = s & "WHERE s.OpeningBalance <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ACCOUNT_OPENING' AS SourceType, o.OpeningLineID AS SourceID, o.AccountName AS SourceNumber, o.OpeningOn AS SourceDate, o.AccountName AS Party, 1 AS LineOrder, o.LineAccount AS AccountCode, o.LineDebit AS Debit, o.LineCredit AS Credit, o.AccountName AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM qryOpeningAccountLines AS o" & vbCrLf
+    s = s & "WHERE o.LineDebit + o.LineCredit <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ACCOUNT_OPENING' AS SourceType, o.OpeningLineID AS SourceID, o.AccountName AS SourceNumber, o.OpeningOn AS SourceDate, o.AccountName AS Party, 2 AS LineOrder, 3900 AS AccountCode, o.LineCredit AS Debit, o.LineDebit AS Credit, '—’Ìœ «›  «ÕÌ' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM qryOpeningAccountLines AS o" & vbCrLf
+    s = s & "WHERE o.LineDebit + o.LineCredit <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 1 AS LineOrder, 120000 + k.BankID AS AccountCode, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Credit, k.BankName AS LineText, 0 AS CostCenter" & vbCrLf
     s = s & "FROM [@Banks] AS k" & vbCrLf
@@ -2646,7 +2693,7 @@ Private Sub Q_qryJournalOpening()
     s = s & "SELECT 'BANK_OPENING' AS SourceType, k.BankID AS SourceID, k.BankName AS SourceNumber, k.OpeningDate AS SourceDate, k.BankName AS Party, 2 AS LineOrder, 3900 AS AccountCode, IIf(k.OpeningBalance < 0, -k.OpeningBalance, 0) AS Debit, IIf(k.OpeningBalance > 0, k.OpeningBalance, 0) AS Credit, '—’Ìœ «›  «ÕÌ' AS LineText, 0 AS CostCenter" & vbCrLf
     s = s & "FROM [@Banks] AS k" & vbCrLf
     s = s & "WHERE k.OpeningBalance <> 0" & vbCrLf
-    SaveQuery "qryJournalOpening", "√”ÿ— ﬁÌÊœ «·√—’œ… «·«›  «ÕÌ… ··’‰«œÌﬁ Ê«·⁄„·«¡ Ê«·„Ê—œÌ‰", s
+    SaveQuery "qryJournalOpening", "√”ÿ— ﬁÌÊœ «·√—’œ… «·«›  «ÕÌ… ··’‰«œÌﬁ Ê«·⁄„·«¡ Ê«·„Ê—œÌ‰ Ê«·»‰Êﬂ Ê«·Õ”«»« ", s
 End Sub
 
 Private Sub Q_qryManualEntryLines()

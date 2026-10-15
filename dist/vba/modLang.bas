@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2556
+Private Const ENTRY_COUNT As Long = 2605
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -225,13 +225,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=""ŞíÏ íæãíÉ""") = "=""Journal entry""", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÌãÇáí ÇáãÈíÚÇÊ") = "Total sales", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈÇŞí ááÚãíá: ") = "Change for the customer: ", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÈáÛ ÇáãÏİæÚ (F8) - ÇÊÑßå İÇÑÛğÇ ÅĞÇ ÏİÚ ÇáãÈáÛ ÈÇáÖÈØ") = "Amount paid (F8) - leave it empty if the exact amount is paid", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞÑ ÍİÙ ÇáãÑÊÌÚ: ") = "Could not save the return: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÌá ÇáÃÕæá ÇáËÇÈÊÉ") = "Fixed asset register", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ ÊæÌÏ äæÇŞÕ") = "There are no shortages", "Tr sample 7", passed, failed, report
+    CheckLang Tr("=""ØÑíŞÉ ÇáÏİÚ: "" & [MethodName]") = "=""Payment method: "" & [MethodName]", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÌãÇáí ÇáãÔÊÑíÇÊ") = "Total purchases", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈÇÑßæÏ æÇáäÕæÕ") = "Barcode and texts", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÈáÛ ÇáãÑÈæØ") = "Linked amount", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞÑ ÍİÙ ÓäÏ ÇáÕÑİ: ") = "Could not save the payment voucher: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÒíÇÏÉ ÊÕİíÉ ") = "Closing overage ", "Tr sample 6", passed, failed, report
+    CheckLang Tr("áÇ ÊæÌÏ İÊÑÉ ãŞİáÉ.") = "There is no closed period.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ") = "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _

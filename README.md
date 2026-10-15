@@ -73,6 +73,7 @@
 | + | الفاتورة الإلكترونية المصرية للمنشآت (B2B): بناء المستند وتوقيعه عبر برنامج التوقيع، والإرسال، والإشعار الدائن، ومتابعة الحالة، والإلغاء | ✅ تمت الموافقة | [docs/49-ETA-EInvoice.md](docs/49-ETA-EInvoice.md) |
 | + | تقرير مستندات الفاتورة الإلكترونية (المقبولة والمعلّقة والمرفوضة)، والإقرار الضريبي المصري (نموذج 10)، وتنبيه الإقرار بالمستندات غير المقبولة | ✅ تمت الموافقة | [docs/50-EInvoice-Reports-VAT-EG.md](docs/50-EInvoice-Reports-VAT-EG.md) |
 | + | خطة: أرصدة أول المدة والسنة المالية، والمخازن وكارت الصنف، والخزائن ويومية الصندوق، والمندوبين والبيع من السيارة، وSQL Server، والويب والتطبيقات | 📋 خطة | [docs/51-Plan-Opening-Warehouses-Treasury-Reps-SQL-Web.md](docs/51-Plan-Opening-Warehouses-Treasury-Reps-SQL-Web.md) |
+| + | أرصدة بداية التشغيل: تاريخ بدء التشغيل، وشاشة واحدة لأرصدة الحسابات العامة والعملاء والموردين والصناديق والبنوك، وحساب إجمالي الأرصدة الافتتاحية وتفصيله | ✅ بانتظار الموافقة | [docs/52-Opening-Balances.md](docs/52-Opening-Balances.md) |
 
 ## هيكل المستودع
 
@@ -170,6 +171,7 @@
 | 44 | `modEtaReceipt` (دائمة، جديدة)، واستبدال `modEInvoice` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildForms` | `TestEtaReceipt` |
 | 45 | `modEtaInvoice` (دائمة، جديدة)، واستبدال `modEtaReceipt` و`modEInvoice` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildForms` | `TestEtaInvoice` |
 | 46 | استبدال `modVat` و`modEInvoice` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildQueries`, `BuildForms`, `BuildReports` | `TestEInvoiceReports` |
+| 47 | `modOpening` (دائمة، جديدة)، واستبدال `modClosing` و`modJournal` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestOpeningBalances` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

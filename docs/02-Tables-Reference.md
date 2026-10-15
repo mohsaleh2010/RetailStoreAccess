@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **70** | عدد الحقول: **953**
+عدد الجداول: **71** | عدد الحقول: **960**
 
 ## الفهرس
 
@@ -68,14 +68,15 @@
 60. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
 61. [`ManualEntries`](#manualentries) – القيود اليدوية
 62. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-63. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-64. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-65. [`StockCounts`](#stockcounts) – جلسات الجرد
-66. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-67. [`AuditLog`](#auditlog) – سجل العمليات
-68. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-69. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-70. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+63. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
+64. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+65. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+66. [`StockCounts`](#stockcounts) – جلسات الجرد
+67. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+68. [`AuditLog`](#auditlog) – سجل العمليات
+69. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+70. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+71. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -116,42 +117,43 @@
 | 31 | InvoicePrintMode | Short Text | 10 | ✔ | `"PREVIEW"` | `In ("DIRECT","PREVIEW","NONE")` |  | الطباعة عند حفظ الفاتورة – DIRECT = طباعة مباشرة بدون معاينة، PREVIEW = عرض المعاينة، NONE = بدون طباعة |
 | 32 | AllowAdminCompanyName | Yes/No |  |  | `False` |  |  | السماح لمدير النظام بتغيير اسم المحل |
 | 33 | ClosedThrough | Date/Time |  |  |  |  |  | الفترة مقفلة حتى (لا يُضاف ولا يُعدَّل مستند بتاريخ حتى هذا اليوم) |
-| 34 | DefaultBankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك الافتراضي للتحويلات البنكية – المبالغ المدفوعة أو المستلمة بطريقة «تحويل بنكي» تُقيَّد في حساب هذا البنك |
-| 35 | GosiEmployeeRate | Currency (نسبة) |  | ✔ | `0.0975` | `>=0 And <1` |  | التأمينات: حصة الموظف السعودي |
-| 36 | GosiEmployerRate | Currency (نسبة) |  | ✔ | `0.1175` | `>=0 And <1` |  | التأمينات: حصة المنشأة عن السعودي |
-| 37 | GosiNonSaudiRate | Currency (نسبة) |  | ✔ | `0.02` | `>=0 And <1` |  | التأمينات: حصة المنشأة عن غير السعودي (الأخطار المهنية) |
-| 38 | GosiMaxWage | Currency |  | ✔ | `45000` | `>=0` |  | التأمينات: الحد الأعلى للأجر الخاضع |
-| 39 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
-| 40 | EInvoiceEnabled | Yes/No |  |  | `False` |  |  | تفعيل الفاتورة الإلكترونية |
-| 41 | OpenSslPath | Short Text | 255 |  |  |  |  | مسار برنامج OpenSSL – فارغ = openssl في مسار النظام (docs/46) |
-| 42 | ZatcaKeyFile | Short Text | 255 |  |  |  |  | ملف المفتاح الخاص للجهاز – secp256k1، على جهاز آمن؛ لا يُحفظ في البيانات |
-| 43 | ZatcaCertificate | Long Text |  |  |  |  |  | شهادة الجهاز (CSID) |
-| 44 | ZatcaDeviceSerial | Short Text | 36 |  |  |  |  | الرقم التسلسلي للجهاز لدى الهيئة – UUID يُنشأ عند أول تسجيل (docs/47) |
-| 45 | ZatcaBranchName | Short Text | 100 |  |  |  |  | اسم الفرع في شهادة الجهاز |
-| 46 | ZatcaIndustry | Short Text | 100 |  |  |  |  | نشاط المنشأة في شهادة الجهاز |
-| 47 | ZatcaCsr | Long Text |  |  |  |  |  | طلب شهادة الجهاز (CSR) |
-| 48 | ZatcaComplianceToken | Long Text |  |  |  |  |  | شهادة الامتثال (binarySecurityToken) |
-| 49 | ZatcaComplianceSecret | Short Text | 255 |  |  |  |  | الكلمة السرية لشهادة الامتثال – لا تُكتب في سجل الإرسال |
-| 50 | ZatcaRequestId | Short Text | 30 |  |  |  |  | رقم طلب شهادة الامتثال |
-| 51 | ZatcaProductionToken | Long Text |  |  |  |  |  | الشهادة الفعلية (binarySecurityToken) |
-| 52 | ZatcaProductionSecret | Short Text | 255 |  |  |  |  | الكلمة السرية للشهادة الفعلية – لا تُكتب في سجل الإرسال |
-| 53 | ZatcaOnboardEnv | Short Text | 12 |  |  |  |  | البيئة التي سُجّل فيها الجهاز |
-| 54 | ZatcaOnboardStage | Short Text | 20 |  |  |  |  | مرحلة تسجيل الجهاز – COMPLIANCE ثم CHECKED ثم PRODUCTION (docs/47) |
-| 55 | EtaClientId | Short Text | 100 |  |  |  |  | مصر: Client ID لجهاز نقطة البيع – من بوابة المصلحة عند تسجيل الجهاز (docs/48) |
-| 56 | EtaClientSecret | Short Text | 255 |  |  |  |  | مصر: Client Secret لجهاز نقطة البيع – لا يُكتب في سجل الإرسال |
-| 57 | EtaPosSerial | Short Text | 100 |  |  |  |  | مصر: الرقم التسلسلي لجهاز نقطة البيع |
-| 58 | EtaPosOsVersion | Short Text | 50 |  |  |  |  | مصر: نظام تشغيل الجهاز – فارغ = Windows |
-| 59 | EtaPreSharedKey | Short Text | 255 |  |  |  |  | مصر: المفتاح المشترك للجهاز (إن وُجد) |
-| 60 | EtaBranchCode | Short Text | 10 |  |  |  |  | مصر: كود الفرع – فارغ = 0 (الفرع الرئيسي) |
-| 61 | EtaActivityCode | Short Text | 8 |  |  |  |  | مصر: كود النشاط |
-| 62 | EtaGovernate | Short Text | 50 |  |  |  |  | مصر: المحافظة |
-| 63 | EtaLastUUID | Short Text | 64 |  |  |  |  | مصر: معرّف آخر إيصال للجهاز – سلسلة الإيصالات (previousUUID) |
-| 64 | EtaErpClientId | Short Text | 100 |  |  |  |  | مصر: Client ID للبرنامج (الفاتورة الإلكترونية) – docs/49 |
-| 65 | EtaErpClientSecret | Short Text | 255 |  |  |  |  | مصر: Client Secret للبرنامج – لا يُكتب في سجل الإرسال |
-| 66 | EtaSignerPath | Short Text | 255 |  |  |  |  | مصر: برنامج التوقيع (فلاشة التوقيع) – فارغ = النسخة 0.9 بلا توقيع، في بيئة ما قبل الإنتاج فقط |
-| 67 | EtaSignerArgs | Short Text | 255 |  |  |  |  | مصر: معاملات برنامج التوقيع – فارغ = "{IN}" "{OUT}" "{PIN}" |
-| 68 | EtaTokenPin | Short Text | 50 |  |  |  |  | مصر: الرقم السري لفلاشة التوقيع – فارغ إذا كان برنامج التوقيع يطلبه بنفسه |
-| 69 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
+| 34 | OpeningDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ بدء التشغيل (تاريخ كل الأرصدة الافتتاحية، docs/52) |
+| 35 | DefaultBankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك الافتراضي للتحويلات البنكية – المبالغ المدفوعة أو المستلمة بطريقة «تحويل بنكي» تُقيَّد في حساب هذا البنك |
+| 36 | GosiEmployeeRate | Currency (نسبة) |  | ✔ | `0.0975` | `>=0 And <1` |  | التأمينات: حصة الموظف السعودي |
+| 37 | GosiEmployerRate | Currency (نسبة) |  | ✔ | `0.1175` | `>=0 And <1` |  | التأمينات: حصة المنشأة عن السعودي |
+| 38 | GosiNonSaudiRate | Currency (نسبة) |  | ✔ | `0.02` | `>=0 And <1` |  | التأمينات: حصة المنشأة عن غير السعودي (الأخطار المهنية) |
+| 39 | GosiMaxWage | Currency |  | ✔ | `45000` | `>=0` |  | التأمينات: الحد الأعلى للأجر الخاضع |
+| 40 | CreditBlockDays | Number (Integer) |  |  | `0` | `>=0` |  | إيقاف البيع الآجل لعميل متأخر أكثر من (يوم) |
+| 41 | EInvoiceEnabled | Yes/No |  |  | `False` |  |  | تفعيل الفاتورة الإلكترونية |
+| 42 | OpenSslPath | Short Text | 255 |  |  |  |  | مسار برنامج OpenSSL – فارغ = openssl في مسار النظام (docs/46) |
+| 43 | ZatcaKeyFile | Short Text | 255 |  |  |  |  | ملف المفتاح الخاص للجهاز – secp256k1، على جهاز آمن؛ لا يُحفظ في البيانات |
+| 44 | ZatcaCertificate | Long Text |  |  |  |  |  | شهادة الجهاز (CSID) |
+| 45 | ZatcaDeviceSerial | Short Text | 36 |  |  |  |  | الرقم التسلسلي للجهاز لدى الهيئة – UUID يُنشأ عند أول تسجيل (docs/47) |
+| 46 | ZatcaBranchName | Short Text | 100 |  |  |  |  | اسم الفرع في شهادة الجهاز |
+| 47 | ZatcaIndustry | Short Text | 100 |  |  |  |  | نشاط المنشأة في شهادة الجهاز |
+| 48 | ZatcaCsr | Long Text |  |  |  |  |  | طلب شهادة الجهاز (CSR) |
+| 49 | ZatcaComplianceToken | Long Text |  |  |  |  |  | شهادة الامتثال (binarySecurityToken) |
+| 50 | ZatcaComplianceSecret | Short Text | 255 |  |  |  |  | الكلمة السرية لشهادة الامتثال – لا تُكتب في سجل الإرسال |
+| 51 | ZatcaRequestId | Short Text | 30 |  |  |  |  | رقم طلب شهادة الامتثال |
+| 52 | ZatcaProductionToken | Long Text |  |  |  |  |  | الشهادة الفعلية (binarySecurityToken) |
+| 53 | ZatcaProductionSecret | Short Text | 255 |  |  |  |  | الكلمة السرية للشهادة الفعلية – لا تُكتب في سجل الإرسال |
+| 54 | ZatcaOnboardEnv | Short Text | 12 |  |  |  |  | البيئة التي سُجّل فيها الجهاز |
+| 55 | ZatcaOnboardStage | Short Text | 20 |  |  |  |  | مرحلة تسجيل الجهاز – COMPLIANCE ثم CHECKED ثم PRODUCTION (docs/47) |
+| 56 | EtaClientId | Short Text | 100 |  |  |  |  | مصر: Client ID لجهاز نقطة البيع – من بوابة المصلحة عند تسجيل الجهاز (docs/48) |
+| 57 | EtaClientSecret | Short Text | 255 |  |  |  |  | مصر: Client Secret لجهاز نقطة البيع – لا يُكتب في سجل الإرسال |
+| 58 | EtaPosSerial | Short Text | 100 |  |  |  |  | مصر: الرقم التسلسلي لجهاز نقطة البيع |
+| 59 | EtaPosOsVersion | Short Text | 50 |  |  |  |  | مصر: نظام تشغيل الجهاز – فارغ = Windows |
+| 60 | EtaPreSharedKey | Short Text | 255 |  |  |  |  | مصر: المفتاح المشترك للجهاز (إن وُجد) |
+| 61 | EtaBranchCode | Short Text | 10 |  |  |  |  | مصر: كود الفرع – فارغ = 0 (الفرع الرئيسي) |
+| 62 | EtaActivityCode | Short Text | 8 |  |  |  |  | مصر: كود النشاط |
+| 63 | EtaGovernate | Short Text | 50 |  |  |  |  | مصر: المحافظة |
+| 64 | EtaLastUUID | Short Text | 64 |  |  |  |  | مصر: معرّف آخر إيصال للجهاز – سلسلة الإيصالات (previousUUID) |
+| 65 | EtaErpClientId | Short Text | 100 |  |  |  |  | مصر: Client ID للبرنامج (الفاتورة الإلكترونية) – docs/49 |
+| 66 | EtaErpClientSecret | Short Text | 255 |  |  |  |  | مصر: Client Secret للبرنامج – لا يُكتب في سجل الإرسال |
+| 67 | EtaSignerPath | Short Text | 255 |  |  |  |  | مصر: برنامج التوقيع (فلاشة التوقيع) – فارغ = النسخة 0.9 بلا توقيع، في بيئة ما قبل الإنتاج فقط |
+| 68 | EtaSignerArgs | Short Text | 255 |  |  |  |  | مصر: معاملات برنامج التوقيع – فارغ = "{IN}" "{OUT}" "{PIN}" |
+| 69 | EtaTokenPin | Short Text | 50 |  |  |  |  | مصر: الرقم السري لفلاشة التوقيع – فارغ إذا كان برنامج التوقيع يطلبه بنفسه |
+| 70 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -201,7 +203,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 37 سجل
+- بيانات أساسية: 38 سجل
 
 ## RolePermissions
 
@@ -213,7 +215,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 73 سجل
+- بيانات أساسية: 75 سجل
 
 ## Employees
 
@@ -274,7 +276,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 62 سجل
+- بيانات أساسية: 63 سجل
 
 ## UserScreens
 
@@ -1435,7 +1437,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 27 سجل
+- بيانات أساسية: 28 سجل
 
 ## JournalEntries
 
@@ -1621,6 +1623,23 @@
 
 - المفتاح الأساسي: `ManualLineID`
 - فهرس فريد: `ManualEntryID, LineNumber`
+- فهرس عادي: `AccountCode`
+- قاعدة تحقق على مستوى الجدول: `([Debit]=0 Or [Credit]=0) And [Debit]+[Credit]>0` – كل سطر مدين أو دائن فقط، وبمبلغ أكبر من صفر
+
+## OpeningBalances
+
+**الأرصدة الافتتاحية للحسابات** – رصيد كل حساب عام عند بدء التشغيل (رأس المال، والقروض، والمستحقات...). كل سطر قيد بتاريخ Settings.OpeningDate يقابله حساب إجمالي الأرصدة الافتتاحية 3900. العملاء والموردون والصناديق والبنوك والمخزون لها أرصدتها في جداولها (docs/52).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **OpeningLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر الداخلي |
+| 2 | AccountCode | Number (Long) |  | ✔ |  |  | `Accounts.AccountCode` | الحساب |
+| 3 | Debit | Currency |  | ✔ | `0` | `>=0` |  | مدين |
+| 4 | Credit | Currency |  | ✔ | `0` | `>=0` |  | دائن |
+| 5 | LineText | Short Text | 150 |  |  |  |  | البيان |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `OpeningLineID`
 - فهرس عادي: `AccountCode`
 - قاعدة تحقق على مستوى الجدول: `([Debit]=0 Or [Credit]=0) And [Debit]+[Credit]>0` – كل سطر مدين أو دائن فقط، وبمبلغ أكبر من صفر
 

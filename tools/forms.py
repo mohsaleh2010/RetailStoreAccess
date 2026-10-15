@@ -567,7 +567,9 @@ SCREEN_PERMISSIONS = {
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
-    "frmPeriodClosing": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN",
+    "frmPeriodClosing": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN", "frmOpeningBalances": "OPENING_BALANCES",
+    "frmOpeningCustomers": "OPENING_BALANCES", "frmOpeningSuppliers": "OPENING_BALANCES",
+    "frmOpeningBoxes": "OPENING_BALANCES", "frmOpeningBanks": "OPENING_BALANCES",
     "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
     "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
     "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
@@ -1272,8 +1274,10 @@ def all_forms() -> List[FormModel]:
     from forms_sales_reps import sales_rep_forms
     from forms_names import names_forms
     from forms_einvoice import einvoice_forms, layout_eta_setup, layout_zatca_setup
+    from forms_opening import opening_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
             + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms()
-            + audit_forms() + sales_rep_forms() + names_forms() + einvoice_forms() + [layout_zatca_setup(), layout_eta_setup()])
+            + audit_forms() + sales_rep_forms() + names_forms() + einvoice_forms() + [layout_zatca_setup(), layout_eta_setup()]
+            + opening_forms())

@@ -88,7 +88,7 @@ class EnforcementTests(unittest.TestCase):
                           "frmPurchaseInvoice", "frmPurchaseReturn", "frmSupplierPayment", "frmInventory",
                           "frmStockCount", "frmCashVoucher", "frmCashClosing", "frmManualEntry",
                           "frmVatReturn", "frmAllocation", "frmBankTx", "frmBankRecon", "frmCheques", "frmAssets", "frmDepreciation", "frmPayroll", "frmBudget",
-                          "frmCommissions"})
+                          "frmCommissions", "frmOpeningBalances"})
 
     def test_data_screens_check_add_edit_delete(self):
         text = read("modForms")

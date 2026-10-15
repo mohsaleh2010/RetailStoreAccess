@@ -51,10 +51,10 @@ Public Function ClosedRecordProblem(ByVal frm As Access.Form, Optional ByVal Del
         Case "Expenses"
             If Not frm.NewRecord Then p = ClosedPeriodProblem(frm!ExpenseDate.OldValue)
             If Len(p) = 0 And Not Deleting Then p = ClosedPeriodProblem(frm!ExpenseDate.Value)
-        Case "Customers", "Suppliers"                    ' the opening balance is an entry on CreatedAt
+        Case "Customers", "Suppliers"                    ' the opening balance is an entry on the start-up date
             If Not frm.NewRecord Then
                 If Deleting Or Nz(frm!OpeningBalance.Value, 0) <> Nz(frm!OpeningBalance.OldValue, 0) Then
-                    p = ClosedPeriodProblem(frm!CreatedAt.Value)
+                    p = ClosedPeriodProblem(OpeningEntryDate(frm!CreatedAt.Value))
                 End If
             End If
         Case "CashBoxes", "Banks"

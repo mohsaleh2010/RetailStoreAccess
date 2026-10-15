@@ -52,7 +52,7 @@ ACCOUNT_NAMES_EN = {
     31: "Capital and owner current account",
     3200: "Capital",
     3100: "Owner current account",
-    3900: "Opening balances",
+    3900: "Total opening balances",
     32: "Retained earnings and results",
     3300: "Retained earnings",
     3400: "Net profit (loss) of the year",
@@ -102,6 +102,7 @@ SOURCE_TYPES_EN = {
     "CHEQUE_STATUS": "Cheque collection or bounce", "ASSET": "Fixed asset purchase",
     "ASSET_DISPOSAL": "Fixed asset sale or disposal", "DEPRECIATION": "Monthly depreciation entry",
     "PAYROLL": "Payroll entry", "PAYROLL_PAYMENT": "Salary payment", "COMMISSION": "Sales rep commissions entry",
+    "ACCOUNT_OPENING": "Account opening balance",
 }
 
 TRANSACTION_TYPES_EN = {
@@ -128,6 +129,7 @@ PERMISSION_NAMES_EN = {
     "CHEQUES": "Received and issued cheques: recording, collection and bounce",
     "FIXED_ASSETS": "Fixed assets and depreciation", "PAYROLL": "Payroll: preparation, posting and payment",
     "BUDGET": "Budget: preparation and comparison with actuals", "CURRENCIES": "Currencies and exchange rates",
+    "OPENING_BALANCES": "Start-up opening balances: date and balances of accounts, customers, suppliers, cash boxes and banks",
     "SALES_REPS": "Sales reps: data, targets, commissions and reports", "REPORTS": "Operating reports",
     "REPORTS_PROFIT": "Profit and VAT reports", "DASHBOARD_FINANCIAL": "Financial figures on the dashboard",
     "SETTINGS": "Store settings", "USERS": "Users and permissions", "BACKUP": "Backup",
@@ -148,7 +150,7 @@ SCREEN_TITLES_EN = {
     "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmAccounting": "Accounting and finance",
     "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
     "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
-    "frmPeriodClosing": "Period and fiscal year closing", "frmVatReturn": "VAT return",
+    "frmPeriodClosing": "Period and fiscal year closing", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",
     "frmAging": "Aging (customers and suppliers)", "frmBanks": "Banks", "frmBankTx": "Bank transactions",
     "frmBankRecon": "Bank reconciliation", "frmCheques": "Received and issued cheques", "frmAssets": "Fixed assets",
     "frmDepreciation": "Monthly depreciation", "frmPayroll": "Payroll", "frmCostCenters": "Cost centers and branches",

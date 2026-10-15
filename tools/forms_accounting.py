@@ -11,6 +11,8 @@ HUB_TILES = [
     ("Journal", "قيود اليومية", "كل القيود وميزان المراجعة", "frmJournal", "", "journal", (31, 58, 95)),
     ("Accounts", "دليل الحسابات", "شجرة الحسابات", "frmAccounts", "", "category", (57, 73, 171)),
     ("Manual", "قيد يدوي", "قيود التسوية والافتتاح", "frmManualEntry", "", "journal", (94, 53, 177)),
+    ("Opening", "أرصدة بداية التشغيل", "الحسابات والعملاء والموردون والصناديق", "frmOpeningBalances", "",
+     "journal", (0, 96, 100)),
     ("Ledger", "كشف حساب", "حركة حساب ودفتر الأستاذ", "frmLedger", "", "reports", (30, 136, 229)),
     ("Financials", "الحسابات الختامية", "قائمة الدخل والميزانية", "frmFinancials", "", "reports", (0, 121, 107)),
     ("Closing", "إقفال الفترات", "إقفال الفترة والسنة المالية", "frmPeriodClosing", ", 0", "settings", (84, 110, 122)),
@@ -32,7 +34,7 @@ HUB_TILES = [
 
 
 def layout_accounting() -> FormModel:
-    cols, tile_w, tile_h, gap = 4, cm(6.0), cm(2.3), cm(0.35)
+    cols, tile_w, tile_h, gap = 4, cm(6.0), cm(1.95), cm(0.3)
     width = cm(0.6) * 2 + cols * tile_w + (cols - 1) * gap
     top = cm(2.0)
     rows = (len(HUB_TILES) + cols - 1) // cols
@@ -46,13 +48,13 @@ def layout_accounting() -> FormModel:
         y = top + (i // cols) * (tile_h + gap)
         m.add(Control("rect", f"boxNav{key}", x, y, tile_w, tile_h,
                       {"BackColor": Sym(f"RGB({rgb[0]}, {rgb[1]}, {rgb[2]})")}, decorative=True))
-        m.add(Control("icon", f"icoTile{key}", x, y + cm(0.2), tile_w, cm(0.9),
-                      {"Caption": Sym(f"ChrW(&H{ICONS[icon]:X})"), "FontSize": 20, "TextAlign": 2,
+        m.add(Control("icon", f"icoTile{key}", x, y + cm(0.1), tile_w, cm(0.8),
+                      {"Caption": Sym(f"ChrW(&H{ICONS[icon]:X})"), "FontSize": 18, "TextAlign": 2,
                        "ForeColor": Sym("CLR_SURFACE")}, decorative=True))
-        m.add(Control("label", f"lblTile{key}", x, y + cm(1.1), tile_w, cm(0.6),
+        m.add(Control("label", f"lblTile{key}", x, y + cm(0.88), tile_w, cm(0.55),
                       {"Caption": caption, "FontSize": 12, "FontBold": True, "TextAlign": 2,
                        "ForeColor": Sym("CLR_SURFACE")}, decorative=True))
-        m.add(Control("label", f"lblHint{key}", x, y + cm(1.65), tile_w, cm(0.5),
+        m.add(Control("label", f"lblHint{key}", x, y + cm(1.42), tile_w, cm(0.45),
                       {"Caption": hint, "FontSize": 8, "TextAlign": 2, "ForeColor": Sym("CLR_SURFACE")},
                       decorative=True))
         button(m, f"btnTile{key}", caption, x, y, "secondary", w=tile_w, h=tile_h,

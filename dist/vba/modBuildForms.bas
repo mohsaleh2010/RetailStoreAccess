@@ -27,7 +27,8 @@ Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines," & _
     "frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal," & _
-    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup"
+    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines," & _
+    "frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningBalances"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -658,6 +659,12 @@ Private Sub BuildAllForms()
     BuildForm_frmEInvoices
     BuildForm_frmZatcaSetup
     BuildForm_frmEtaSetup
+    BuildForm_frmOpeningAccountLines
+    BuildForm_frmOpeningCustomers
+    BuildForm_frmOpeningSuppliers
+    BuildForm_frmOpeningBoxes
+    BuildForm_frmOpeningBanks
+    BuildForm_frmOpeningBalances
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -8908,173 +8915,181 @@ End Sub
 Private Sub BuildForm_frmAccounting()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmAccounting", "ÇáãÍÇÓÈÉ æÇáãÇáíÉ", "", 14882, 9381, False, False, False, _
+    StartForm "frmAccounting", "ÇáãÍÇÓÈÉ æÇáãÇáíÉ", "", 14798, 9527, False, False, False, _
               ""
-    Set c = AddRect("boxTitle", 0, 0, 14882, 850, CLR_PRIMARY)
+    Set c = AddRect("boxTitle", 0, 0, 14798, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "ÇáãÍÇÓÈÉ æÇáãÇáíÉ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", "ßá ÔÇÔÇÊ ÇáÍÓÇÈÇÊ İí ãßÇä æÇÍÏ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddRect("boxNavJournal", 11140, 1134, 3402, 1304, RGB(31, 58, 95))
-    Set c = AddIcon("icoTileJournal", ChrW(&HE8F1), 11140, 1247, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileJournal", "ŞíæÏ ÇáíæãíÉ", 11140, 1758, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintJournal", "ßá ÇáŞíæÏ æãíÒÇä ÇáãÑÇÌÚÉ", 11140, 2070, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileJournal", "ŞíæÏ ÇáíæãíÉ", 11140, 1134, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavJournal", 11056, 1134, 3402, 1106, RGB(31, 58, 95))
+    Set c = AddIcon("icoTileJournal", ChrW(&HE8F1), 11056, 1191, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileJournal", "ŞíæÏ ÇáíæãíÉ", 11056, 1633, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintJournal", "ßá ÇáŞíæÏ æãíÒÇä ÇáãÑÇÌÚÉ", 11056, 1939, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileJournal", "ŞíæÏ ÇáíæãíÉ", 11056, 1134, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmJournal"
     c.OnClick = EP
-    Set c = AddRect("boxNavAccounts", 7540, 1134, 3402, 1304, RGB(57, 73, 171))
-    Set c = AddIcon("icoTileAccounts", ChrW(&HE8FD), 7540, 1247, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileAccounts", "Ïáíá ÇáÍÓÇÈÇÊ", 7540, 1758, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintAccounts", "ÔÌÑÉ ÇáÍÓÇÈÇÊ", 7540, 2070, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileAccounts", "Ïáíá ÇáÍÓÇÈÇÊ", 7540, 1134, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavAccounts", 7484, 1134, 3402, 1106, RGB(57, 73, 171))
+    Set c = AddIcon("icoTileAccounts", ChrW(&HE8FD), 7484, 1191, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAccounts", "Ïáíá ÇáÍÓÇÈÇÊ", 7484, 1633, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintAccounts", "ÔÌÑÉ ÇáÍÓÇÈÇÊ", 7484, 1939, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAccounts", "Ïáíá ÇáÍÓÇÈÇÊ", 7484, 1134, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmAccounts"
     c.OnClick = EP
-    Set c = AddRect("boxNavManual", 3940, 1134, 3402, 1304, RGB(94, 53, 177))
-    Set c = AddIcon("icoTileManual", ChrW(&HE8F1), 3940, 1247, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileManual", "ŞíÏ íÏæí", 3940, 1758, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintManual", "ŞíæÏ ÇáÊÓæíÉ æÇáÇİÊÊÇÍ", 3940, 2070, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileManual", "ŞíÏ íÏæí", 3940, 1134, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavManual", 3912, 1134, 3402, 1106, RGB(94, 53, 177))
+    Set c = AddIcon("icoTileManual", ChrW(&HE8F1), 3912, 1191, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileManual", "ŞíÏ íÏæí", 3912, 1633, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintManual", "ŞíæÏ ÇáÊÓæíÉ æÇáÇİÊÊÇÍ", 3912, 1939, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileManual", "ŞíÏ íÏæí", 3912, 1134, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmManualEntry"
     c.OnClick = EP
-    Set c = AddRect("boxNavLedger", 340, 1134, 3402, 1304, RGB(30, 136, 229))
-    Set c = AddIcon("icoTileLedger", ChrW(&HE8A5), 340, 1247, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileLedger", "ßÔİ ÍÓÇÈ", 340, 1758, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintLedger", "ÍÑßÉ ÍÓÇÈ æÏİÊÑ ÇáÃÓÊÇĞ", 340, 2070, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileLedger", "ßÔİ ÍÓÇÈ", 340, 1134, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavOpening", 340, 1134, 3402, 1106, RGB(0, 96, 100))
+    Set c = AddIcon("icoTileOpening", ChrW(&HE8F1), 340, 1191, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileOpening", "ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", 340, 1633, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintOpening", "ÇáÍÓÇÈÇÊ æÇáÚãáÇÁ æÇáãæÑÏæä æÇáÕäÇÏíŞ", 340, 1939, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileOpening", "ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", 340, 1134, 3402, 1106, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmOpeningBalances"
+    c.OnClick = EP
+    Set c = AddRect("boxNavLedger", 11056, 2410, 3402, 1106, RGB(30, 136, 229))
+    Set c = AddIcon("icoTileLedger", ChrW(&HE8A5), 11056, 2467, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileLedger", "ßÔİ ÍÓÇÈ", 11056, 2909, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintLedger", "ÍÑßÉ ÍÓÇÈ æÏİÊÑ ÇáÃÓÊÇĞ", 11056, 3215, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileLedger", "ßÔİ ÍÓÇÈ", 11056, 2410, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmLedger"
     c.OnClick = EP
-    Set c = AddRect("boxNavFinancials", 11140, 2636, 3402, 1304, RGB(0, 121, 107))
-    Set c = AddIcon("icoTileFinancials", ChrW(&HE8A5), 11140, 2749, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileFinancials", "ÇáÍÓÇÈÇÊ ÇáÎÊÇãíÉ", 11140, 3260, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintFinancials", "ŞÇÆãÉ ÇáÏÎá æÇáãíÒÇäíÉ", 11140, 3572, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileFinancials", "ÇáÍÓÇÈÇÊ ÇáÎÊÇãíÉ", 11140, 2636, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavFinancials", 7484, 2410, 3402, 1106, RGB(0, 121, 107))
+    Set c = AddIcon("icoTileFinancials", ChrW(&HE8A5), 7484, 2467, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileFinancials", "ÇáÍÓÇÈÇÊ ÇáÎÊÇãíÉ", 7484, 2909, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintFinancials", "ŞÇÆãÉ ÇáÏÎá æÇáãíÒÇäíÉ", 7484, 3215, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileFinancials", "ÇáÍÓÇÈÇÊ ÇáÎÊÇãíÉ", 7484, 2410, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmFinancials"
     c.OnClick = EP
-    Set c = AddRect("boxNavClosing", 7540, 2636, 3402, 1304, RGB(84, 110, 122))
-    Set c = AddIcon("icoTileClosing", ChrW(&HE713), 7540, 2749, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileClosing", "ÅŞİÇá ÇáİÊÑÇÊ", 7540, 3260, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintClosing", "ÅŞİÇá ÇáİÊÑÉ æÇáÓäÉ ÇáãÇáíÉ", 7540, 3572, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileClosing", "ÅŞİÇá ÇáİÊÑÇÊ", 7540, 2636, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavClosing", 3912, 2410, 3402, 1106, RGB(84, 110, 122))
+    Set c = AddIcon("icoTileClosing", ChrW(&HE713), 3912, 2467, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileClosing", "ÅŞİÇá ÇáİÊÑÇÊ", 3912, 2909, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintClosing", "ÅŞİÇá ÇáİÊÑÉ æÇáÓäÉ ÇáãÇáíÉ", 3912, 3215, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileClosing", "ÅŞİÇá ÇáİÊÑÇÊ", 3912, 2410, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmPeriodClosing"
     c.OnClick = EP
-    Set c = AddRect("boxNavVat", 3940, 2636, 3402, 1304, RGB(216, 27, 96))
-    Set c = AddIcon("icoTileVat", ChrW(&HE8A5), 3940, 2749, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileVat", "ÇáÅŞÑÇÑ ÇáÖÑíÈí", 3940, 3260, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintVat", "ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ", 3940, 3572, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileVat", "ÇáÅŞÑÇÑ ÇáÖÑíÈí", 3940, 2636, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavVat", 340, 2410, 3402, 1106, RGB(216, 27, 96))
+    Set c = AddIcon("icoTileVat", ChrW(&HE8A5), 340, 2467, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileVat", "ÇáÅŞÑÇÑ ÇáÖÑíÈí", 340, 2909, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintVat", "ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ", 340, 3215, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileVat", "ÇáÅŞÑÇÑ ÇáÖÑíÈí", 340, 2410, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmVatReturn"
     c.OnClick = EP
-    Set c = AddRect("boxNavAging", 340, 2636, 3402, 1304, RGB(229, 57, 53))
-    Set c = AddIcon("icoTileAging", ChrW(&HE716), 340, 2749, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileAging", "ÃÚãÇÑ ÇáÏíæä", 340, 3260, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintAging", "ÇáÚãáÇÁ æÇáãæÑÏæä ÍÓÈ ÇáÇÓÊÍŞÇŞ", 340, 3572, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileAging", "ÃÚãÇÑ ÇáÏíæä", 340, 2636, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavAging", 11056, 3686, 3402, 1106, RGB(229, 57, 53))
+    Set c = AddIcon("icoTileAging", ChrW(&HE716), 11056, 3743, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAging", "ÃÚãÇÑ ÇáÏíæä", 11056, 4185, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintAging", "ÇáÚãáÇÁ æÇáãæÑÏæä ÍÓÈ ÇáÇÓÊÍŞÇŞ", 11056, 4491, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAging", "ÃÚãÇÑ ÇáÏíæä", 11056, 3686, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmAging"
     c.OnClick = EP
-    Set c = AddRect("boxNavBanks", 11140, 4138, 3402, 1304, RGB(0, 137, 123))
-    Set c = AddIcon("icoTileBanks", ChrW(&HE825), 11140, 4251, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileBanks", "ÇáÈäæß", 11140, 4762, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintBanks", "ÇáÍÓÇÈÇÊ ÇáÈäßíÉ æÇáÊÓæíÉ", 11140, 5074, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileBanks", "ÇáÈäæß", 11140, 4138, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavBanks", 7484, 3686, 3402, 1106, RGB(0, 137, 123))
+    Set c = AddIcon("icoTileBanks", ChrW(&HE825), 7484, 3743, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileBanks", "ÇáÈäæß", 7484, 4185, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintBanks", "ÇáÍÓÇÈÇÊ ÇáÈäßíÉ æÇáÊÓæíÉ", 7484, 4491, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileBanks", "ÇáÈäæß", 7484, 3686, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmBanks"
     c.OnClick = EP
-    Set c = AddRect("boxNavCheques", 7540, 4138, 3402, 1304, RGB(67, 160, 71))
-    Set c = AddIcon("icoTileCheques", ChrW(&HE825), 7540, 4251, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileCheques", "ÇáÔíßÇÊ", 7540, 4762, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintCheques", "ÇáæÇÑÏÉ æÇáÕÇÏÑÉ", 7540, 5074, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileCheques", "ÇáÔíßÇÊ", 7540, 4138, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavCheques", 3912, 3686, 3402, 1106, RGB(67, 160, 71))
+    Set c = AddIcon("icoTileCheques", ChrW(&HE825), 3912, 3743, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileCheques", "ÇáÔíßÇÊ", 3912, 4185, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintCheques", "ÇáæÇÑÏÉ æÇáÕÇÏÑÉ", 3912, 4491, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileCheques", "ÇáÔíßÇÊ", 3912, 3686, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmCheques"
     c.OnClick = EP
-    Set c = AddRect("boxNavAssets", 3940, 4138, 3402, 1304, RGB(251, 140, 0))
-    Set c = AddIcon("icoTileAssets", ChrW(&HE7B8), 3940, 4251, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileAssets", "ÇáÃÕæá ÇáËÇÈÊÉ", 3940, 4762, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintAssets", "ÇáÔÑÇÁ æÇáÈíÚ æÇáÇÓÊÈÚÇÏ", 3940, 5074, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileAssets", "ÇáÃÕæá ÇáËÇÈÊÉ", 3940, 4138, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavAssets", 340, 3686, 3402, 1106, RGB(251, 140, 0))
+    Set c = AddIcon("icoTileAssets", ChrW(&HE7B8), 340, 3743, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAssets", "ÇáÃÕæá ÇáËÇÈÊÉ", 340, 4185, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintAssets", "ÇáÔÑÇÁ æÇáÈíÚ æÇáÇÓÊÈÚÇÏ", 340, 4491, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAssets", "ÇáÃÕæá ÇáËÇÈÊÉ", 340, 3686, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmAssets"
     c.OnClick = EP
-    Set c = AddRect("boxNavDepreciation", 340, 4138, 3402, 1304, RGB(239, 108, 0))
-    Set c = AddIcon("icoTileDepreciation", ChrW(&HE7B8), 340, 4251, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileDepreciation", "ÇáÅåáÇß ÇáÔåÑí", 340, 4762, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintDepreciation", "ÊÓÌíá ÅåáÇß ÇáÃÕæá", 340, 5074, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileDepreciation", "ÇáÅåáÇß ÇáÔåÑí", 340, 4138, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavDepreciation", 11056, 4962, 3402, 1106, RGB(239, 108, 0))
+    Set c = AddIcon("icoTileDepreciation", ChrW(&HE7B8), 11056, 5019, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileDepreciation", "ÇáÅåáÇß ÇáÔåÑí", 11056, 5461, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintDepreciation", "ÊÓÌíá ÅåáÇß ÇáÃÕæá", 11056, 5767, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileDepreciation", "ÇáÅåáÇß ÇáÔåÑí", 11056, 4962, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmDepreciation"
     c.OnClick = EP
-    Set c = AddRect("boxNavPayroll", 11140, 5640, 3402, 1304, RGB(142, 36, 170))
-    Set c = AddIcon("icoTilePayroll", ChrW(&HE8D7), 11140, 5753, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTilePayroll", "ÇáÑæÇÊÈ", 11140, 6264, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintPayroll", "ãÓíÑ ÇáÑæÇÊÈ æÇáÊÃãíäÇÊ", 11140, 6576, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTilePayroll", "ÇáÑæÇÊÈ", 11140, 5640, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavPayroll", 7484, 4962, 3402, 1106, RGB(142, 36, 170))
+    Set c = AddIcon("icoTilePayroll", ChrW(&HE8D7), 7484, 5019, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTilePayroll", "ÇáÑæÇÊÈ", 7484, 5461, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintPayroll", "ãÓíÑ ÇáÑæÇÊÈ æÇáÊÃãíäÇÊ", 7484, 5767, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTilePayroll", "ÇáÑæÇÊÈ", 7484, 4962, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmPayroll"
     c.OnClick = EP
-    Set c = AddRect("boxNavCenters", 7540, 5640, 3402, 1304, RGB(0, 131, 143))
-    Set c = AddIcon("icoTileCenters", ChrW(&HE8FD), 7540, 5753, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileCenters", "ãÑÇßÒ ÇáÊßáİÉ", 7540, 6264, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintCenters", "ÇáİÑæÚ æÇáÃŞÓÇã", 7540, 6576, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileCenters", "ãÑÇßÒ ÇáÊßáİÉ", 7540, 5640, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavCenters", 3912, 4962, 3402, 1106, RGB(0, 131, 143))
+    Set c = AddIcon("icoTileCenters", ChrW(&HE8FD), 3912, 5019, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileCenters", "ãÑÇßÒ ÇáÊßáİÉ", 3912, 5461, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintCenters", "ÇáİÑæÚ æÇáÃŞÓÇã", 3912, 5767, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileCenters", "ãÑÇßÒ ÇáÊßáİÉ", 3912, 4962, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmCostCenters"
     c.OnClick = EP
-    Set c = AddRect("boxNavBudget", 3940, 5640, 3402, 1304, RGB(121, 85, 72))
-    Set c = AddIcon("icoTileBudget", ChrW(&HE8A5), 3940, 5753, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileBudget", "ÇáãæÇÒäÉ", 3940, 6264, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintBudget", "ÇáãæÇÒäÉ ãŞÇÈá ÇáİÚáí", 3940, 6576, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileBudget", "ÇáãæÇÒäÉ", 3940, 5640, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavBudget", 340, 4962, 3402, 1106, RGB(121, 85, 72))
+    Set c = AddIcon("icoTileBudget", ChrW(&HE8A5), 340, 5019, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileBudget", "ÇáãæÇÒäÉ", 340, 5461, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintBudget", "ÇáãæÇÒäÉ ãŞÇÈá ÇáİÚáí", 340, 5767, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileBudget", "ÇáãæÇÒäÉ", 340, 4962, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmBudget"
     c.OnClick = EP
-    Set c = AddRect("boxNavRecurring", 340, 5640, 3402, 1304, RGB(198, 40, 40))
-    Set c = AddIcon("icoTileRecurring", ChrW(&HE8C7), 340, 5753, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileRecurring", "ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ", 340, 6264, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintRecurring", "ÇáÅíÌÇÑ æÇáßåÑÈÇÁ æÇáÇÔÊÑÇßÇÊ", 340, 6576, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileRecurring", "ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ", 340, 5640, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavRecurring", 11056, 6238, 3402, 1106, RGB(198, 40, 40))
+    Set c = AddIcon("icoTileRecurring", ChrW(&HE8C7), 11056, 6295, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileRecurring", "ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ", 11056, 6737, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintRecurring", "ÇáÅíÌÇÑ æÇáßåÑÈÇÁ æÇáÇÔÊÑÇßÇÊ", 11056, 7043, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileRecurring", "ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ", 11056, 6238, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmRecurring"
     c.OnClick = EP
-    Set c = AddRect("boxNavCurrencies", 11140, 7142, 3402, 1304, RGB(46, 125, 50))
-    Set c = AddIcon("icoTileCurrencies", ChrW(&HE825), 11140, 7255, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileCurrencies", "ÇáÚãáÇÊ", 11140, 7766, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintCurrencies", "ÇáÚãáÇÊ æÃÓÚÇÑ ÇáÊÍæíá", 11140, 8078, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileCurrencies", "ÇáÚãáÇÊ", 11140, 7142, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavCurrencies", 7484, 6238, 3402, 1106, RGB(46, 125, 50))
+    Set c = AddIcon("icoTileCurrencies", ChrW(&HE825), 7484, 6295, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileCurrencies", "ÇáÚãáÇÊ", 7484, 6737, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintCurrencies", "ÇáÚãáÇÊ æÃÓÚÇÑ ÇáÊÍæíá", 7484, 7043, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileCurrencies", "ÇáÚãáÇÊ", 7484, 6238, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmCurrencies"
     c.OnClick = EP
-    Set c = AddRect("boxNavSalesReps", 7540, 7142, 3402, 1304, RGB(0, 105, 92))
-    Set c = AddIcon("icoTileSalesReps", ChrW(&HE716), 7540, 7255, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileSalesReps", "ÇáãäÏæÈíä", 7540, 7766, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintSalesReps", "ÇáÚãáÇÁ æÇáÃåÏÇİ æÇáÚãæáÇÊ", 7540, 8078, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileSalesReps", "ÇáãäÏæÈíä", 7540, 7142, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavSalesReps", 3912, 6238, 3402, 1106, RGB(0, 105, 92))
+    Set c = AddIcon("icoTileSalesReps", ChrW(&HE716), 3912, 6295, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileSalesReps", "ÇáãäÏæÈíä", 3912, 6737, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintSalesReps", "ÇáÚãáÇÁ æÇáÃåÏÇİ æÇáÚãæáÇÊ", 3912, 7043, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileSalesReps", "ÇáãäÏæÈíä", 3912, 6238, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmSalesReps"
     c.OnClick = EP
-    Set c = AddRect("boxNavCommissions", 3940, 7142, 3402, 1304, RGB(106, 27, 154))
-    Set c = AddIcon("icoTileCommissions", ChrW(&HE716), 3940, 7255, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileCommissions", "ÚãæáÇÊ ÇáãäÏæÈíä", 3940, 7766, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintCommissions", "ãÓíÑ ÇáÚãæáÇÊ ÇáÔåÑí", 3940, 8078, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileCommissions", "ÚãæáÇÊ ÇáãäÏæÈíä", 3940, 7142, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavCommissions", 340, 6238, 3402, 1106, RGB(106, 27, 154))
+    Set c = AddIcon("icoTileCommissions", ChrW(&HE716), 340, 6295, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileCommissions", "ÚãæáÇÊ ÇáãäÏæÈíä", 340, 6737, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintCommissions", "ãÓíÑ ÇáÚãæáÇÊ ÇáÔåÑí", 340, 7043, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileCommissions", "ÚãæáÇÊ ÇáãäÏæÈíä", 340, 6238, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmCommissions"
     c.OnClick = EP
-    Set c = AddRect("boxNavAudit", 340, 7142, 3402, 1304, RGB(69, 90, 100))
-    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 340, 7255, 3402, 510, 20, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileAudit", "ÓÌá ÇáÊÏŞíŞ", 340, 7766, 3402, 340, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintAudit", "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ", 340, 8078, 3402, 284, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileAudit", "ÓÌá ÇáÊÏŞíŞ", 340, 7142, 3402, 1304, "secondary")
+    Set c = AddRect("boxNavAudit", 11056, 7514, 3402, 1106, RGB(69, 90, 100))
+    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 11056, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAudit", "ÓÌá ÇáÊÏŞíŞ", 11056, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintAudit", "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ", 11056, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAudit", "ÓÌá ÇáÊÏŞíŞ", 11056, 7514, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmAuditLog"
     c.OnClick = EP
-    Set c = AddButton("btnClose", "ÑÌæÚ", 13181, 8757, 1361, 454, "secondary")
+    Set c = AddButton("btnClose", "ÑÌæÚ", 13097, 8903, 1361, 454, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
     m_frm.OnResize = EP
@@ -9090,6 +9105,9 @@ Private Sub BuildForm_frmAccounting()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnTileManual_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmManualEntry""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileOpening_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmOpeningBalances""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnTileLedger_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmLedger""" & vbCrLf
@@ -9147,8 +9165,8 @@ Private Sub BuildForm_frmAccounting()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
-    s = s & "    spec = ""boxTitle,0,0,14882,850,0,1000,0,0;btnClose,13181,8757,1361,454,1000,0,1000,0""" & vbCrLf
-    s = s & "    FitControls Me, 14882, 9381, -254, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,14798,850,0,1000,0,0;btnClose,13097,8903,1361,454,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 14798, 9527, -226, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmAccounting", s
     Exit Sub
@@ -9700,4 +9718,282 @@ Private Sub BuildForm_frmEtaSetup()
     Exit Sub
 EH:
     AbortForm "frmEtaSetup", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmOpeningAccountLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmOpeningAccountLines", "ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ ááÍÓÇÈÇÊ", "SELECT * FROM OpeningBalances ORDER BY OpeningLineID", 14402, 425, False, True, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("AccountCode", "AccountCode", 28, 0, 5670, 425, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True AND AccountCode NOT IN (1300, 2100, 1400, 3900) AND AccountCode NOT BETWEEN 110001 AND 119999 AND AccountCode NOT BETWEEN 120001 AND 129999 ORDER BY TreeKey", 2, "0;5557")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    Set c = AddText("Debit", "Debit", 5726, 0, 1814, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("Credit", "Credit", 7568, 0, 1814, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("LineText", "LineText", 9410, 0, 4196, 425)
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 13634, 17, 454, 391, "danger")
+    SetCtlProp c, "FontName", ICON_FONT
+    c.OnClick = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    OpeningLineBeforeUpdate Me, Cancel" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    OpeningGridAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    OpeningRemoveLine Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmOpeningAccountLines", s
+    Exit Sub
+EH:
+    AbortForm "frmOpeningAccountLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmOpeningCustomers()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmOpeningCustomers", "ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", "SELECT CustomerID, OpeningBalance, CurrentBalance, CreatedAt FROM Customers WHERE IsSystem = False ORDER BY CustomerID", 14402, 425, False, False, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("cboName", "CustomerID", 28, 0, 5670, 425, "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c", 2, "0;5557")
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "BoundColumn", 1
+    Set c = AddText("OpeningBalance", "OpeningBalance", 5726, 0, 1814, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("txtSide", "=IIf([OpeningBalance]>0,""Úáíå (ãÏíä)"",IIf([OpeningBalance]<0,""áå (ÏÇÆä)"",""""))", 7568, 0, 1814, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("CurrentBalance", "CurrentBalance", 9410, 0, 4196, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    OpeningPartyBeforeUpdate Me, Cancel, ""Customers"", ""CustomerID""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    OpeningGridAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmOpeningCustomers", s
+    Exit Sub
+EH:
+    AbortForm "frmOpeningCustomers", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmOpeningSuppliers()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmOpeningSuppliers", "ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", "SELECT SupplierID, OpeningBalance, CurrentBalance, CreatedAt FROM Suppliers ORDER BY SupplierID", 14402, 425, False, False, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("cboName", "SupplierID", 28, 0, 5670, 425, "SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s", 2, "0;5557")
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "BoundColumn", 1
+    Set c = AddText("OpeningBalance", "OpeningBalance", 5726, 0, 1814, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("txtSide", "=IIf([OpeningBalance]>0,""áå (ÏÇÆä)"",IIf([OpeningBalance]<0,""Úáíå (ãÏíä)"",""""))", 7568, 0, 1814, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("CurrentBalance", "CurrentBalance", 9410, 0, 4196, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    OpeningPartyBeforeUpdate Me, Cancel, ""Suppliers"", ""SupplierID""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    OpeningGridAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmOpeningSuppliers", s
+    Exit Sub
+EH:
+    AbortForm "frmOpeningSuppliers", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmOpeningBoxes()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmOpeningBoxes", "ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", "SELECT CashBoxID, OpeningBalance, OpeningDate FROM CashBoxes ORDER BY CashBoxID", 14402, 425, False, False, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("cboName", "CashBoxID", 28, 0, 5670, 425, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b", 2, "0;5557")
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "BoundColumn", 1
+    Set c = AddText("OpeningBalance", "OpeningBalance", 5726, 0, 1814, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("txtSide", "=IIf([OpeningBalance]>0,""ãÏíä"",IIf([OpeningBalance]<0,""ÏÇÆä"",""""))", 7568, 0, 1814, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("OpeningDate", "OpeningDate", 9410, 0, 4196, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    OpeningPartyBeforeUpdate Me, Cancel, ""CashBoxes"", ""CashBoxID""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    OpeningGridAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmOpeningBoxes", s
+    Exit Sub
+EH:
+    AbortForm "frmOpeningBoxes", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmOpeningBanks()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmOpeningBanks", "ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", "SELECT BankID, OpeningBalance, OpeningDate FROM Banks ORDER BY BankID", 14402, 425, False, False, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("cboName", "BankID", 28, 0, 5670, 425, "SELECT k.BankID, k.BankName FROM [@Banks] AS k", 2, "0;5557")
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "BoundColumn", 1
+    Set c = AddText("OpeningBalance", "OpeningBalance", 5726, 0, 1814, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddText("txtSide", "=IIf([OpeningBalance]>0,""ãÏíä (áäÇ)"",IIf([OpeningBalance]<0,""ÏÇÆä (ÓÍÈ Úáì ÇáãßÔæİ)"",""""))", 7568, 0, 1814, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    Set c = AddText("OpeningDate", "OpeningDate", 9410, 0, 4196, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    OpeningPartyBeforeUpdate Me, Cancel, ""Banks"", ""BankID""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    OpeningGridAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmOpeningBanks", s
+    Exit Sub
+EH:
+    AbortForm "frmOpeningBanks", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmOpeningBalances()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmOpeningBalances", "ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", "", 14855, 9639, False, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 14855, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "ÑÕíÏ ßá ÍÓÇÈ æÚãíá æãæÑÏ æÕäÏæŞ æÈäß íæã ÈÏÁ ÇáÊÔÛíá¡ æãŞÇÈáåÇ ÍÓÇÈ ÅÌãÇáí ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtOpeningDate", "", 227, 1304, 1814, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblOpeningDate", "ÊÇÑíÎ ÈÏÁ ÇáÊÔÛíá", 227, 992, 1814, 284, 9, False, CLR_MUTED, "txtOpeningDate", 0)
+    Set c = AddButton("btnSaveDate", "ÍİÙ ÇáÊÇÑíÎ", 2155, 1304, 1588, 454, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblDateHint", "ßá ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ ÈåĞÇ ÇáÊÇÑíÎ. áÇ íßæä ÈÚÏ Ãæá ãÓÊäÏ¡ æáÇ İí İÊÑÉ ãŞİáÉ.", 3856, 1304, 10319, 454, 9, False, CLR_MUTED, "", 0)
+    Set c = AddText("txtPart", "", 14288, 1304, 284, 454)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblTotal", " ", 227, 1928, 8051, 907, 12, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnRefresh", "ÊÍÏíË ÇáÅÌãÇáí", 227, 2892, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddList("lstSources", 8392, 1928, 6237, 1418, 3, "3062;1474;1474", True)
+    Set c = AddButton("btnPartAccounts", "ÇáÍÓÇÈÇÊ ÇáÚÇãÉ", 227, 3572, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPartCustomers", "ÇáÚãáÇÁ", 2268, 3572, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPartSuppliers", "ÇáãæÑÏæä", 4309, 3572, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPartBoxes", "ÇáÕäÇÏíŞ", 6350, 3572, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPartBanks", "ÇáÈäæß", 8391, 3572, 1928, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblHint", " ", 227, 4111, 14401, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCol1", " ", 255, 4508, 5670, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", " ", 5953, 4508, 1814, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", " ", 7795, 4508, 1814, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", " ", 9637, 4508, 4196, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subGrid", "frmOpeningAccountLines", 227, 4848, 14402, 3742)
+    Set c = AddButton("btnClose", "ÅÛáÇŞ", 13154, 8845, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnResize = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    OpeningLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSaveDate_Click()" & vbCrLf
+    s = s & "    OpeningSaveDate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRefresh_Click()" & vbCrLf
+    s = s & "    OpeningRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPartAccounts_Click()" & vbCrLf
+    s = s & "    OpeningShowPart Me, ""ACCOUNTS""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPartCustomers_Click()" & vbCrLf
+    s = s & "    OpeningShowPart Me, ""CUSTOMERS""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPartSuppliers_Click()" & vbCrLf
+    s = s & "    OpeningShowPart Me, ""SUPPLIERS""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPartBoxes_Click()" & vbCrLf
+    s = s & "    OpeningShowPart Me, ""BOXES""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPartBanks_Click()" & vbCrLf
+    s = s & "    OpeningShowPart Me, ""BANKS""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,14855,850,0,1000,0,0;subGrid,227,4848,14402,3742,0,0,0,1000;btnClose,13154,8845,1474,510,0,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 14855, 9639, -2267, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmOpeningBalances", s
+    Exit Sub
+EH:
+    AbortForm "frmOpeningBalances", Err.Number, Err.Description
 End Sub

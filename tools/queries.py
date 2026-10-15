@@ -550,22 +550,26 @@ ACCOUNT_TYPE_NAME = ("IIf(a.AccountType = 'ASSET', 'أصول', IIf(a.AccountType
 
 def _opening():
     kb = ("'BOX_OPENING'", "b.CashBoxID", "b.BoxName", "b.OpeningDate", "b.BoxName")
-    kc = ("'CUSTOMER_OPENING'", "c.CustomerID", "c.CustomerName", "c.CreatedAt", "c.CustomerName")
-    ks = ("'SUPPLIER_OPENING'", "s.SupplierID", "s.SupplierName", "s.CreatedAt", "s.SupplierName")
+    kc = ("'CUSTOMER_OPENING'", "c.CustomerID", "c.CustomerName", "c.OpeningOn", "c.CustomerName")
+    ks = ("'SUPPLIER_OPENING'", "s.SupplierID", "s.SupplierName", "s.OpeningOn", "s.SupplierName")
+    ka = ("'ACCOUNT_OPENING'", "o.OpeningLineID", "o.AccountName", "o.OpeningOn", "o.AccountName")
+    acc = ("qryOpeningAccountLines AS o", "o.LineDebit + o.LineCredit <> 0")
     kk = ("'BANK_OPENING'", "k.BankID", "k.BankName", "k.OpeningDate", "k.BankName")
     pos, neg = "IIf({0}.OpeningBalance > 0, {0}.OpeningBalance, 0)", "IIf({0}.OpeningBalance < 0, -{0}.OpeningBalance, 0)"
     return jquery([
         jline(*kb, 1, "110000 + b.CashBoxID", "b.OpeningBalance", ZERO, "b.BoxName", "[@CashBoxes] AS b",
               "b.OpeningBalance <> 0"),
         jline(*kb, 2, 3900, ZERO, "b.OpeningBalance", "'رصيد افتتاحي'", "[@CashBoxes] AS b", "b.OpeningBalance <> 0"),
-        jline(*kc, 1, 1300, pos.format("c"), neg.format("c"), "c.CustomerName", "[@Customers] AS c",
+        jline(*kc, 1, 1300, pos.format("c"), neg.format("c"), "c.CustomerName", "qryCustomerOpening AS c",
               "c.OpeningBalance <> 0"),
-        jline(*kc, 2, 3900, neg.format("c"), pos.format("c"), "'رصيد افتتاحي'", "[@Customers] AS c",
+        jline(*kc, 2, 3900, neg.format("c"), pos.format("c"), "'رصيد افتتاحي'", "qryCustomerOpening AS c",
               "c.OpeningBalance <> 0"),
-        jline(*ks, 1, 2100, neg.format("s"), pos.format("s"), "s.SupplierName", "[@Suppliers] AS s",
+        jline(*ks, 1, 2100, neg.format("s"), pos.format("s"), "s.SupplierName", "qrySupplierOpening AS s",
               "s.OpeningBalance <> 0"),
-        jline(*ks, 2, 3900, pos.format("s"), neg.format("s"), "'رصيد افتتاحي'", "[@Suppliers] AS s",
+        jline(*ks, 2, 3900, pos.format("s"), neg.format("s"), "'رصيد افتتاحي'", "qrySupplierOpening AS s",
               "s.OpeningBalance <> 0"),
+        jline(*ka, 1, "o.LineAccount", "o.LineDebit", "o.LineCredit", "o.AccountName", *acc),
+        jline(*ka, 2, 3900, "o.LineCredit", "o.LineDebit", "'رصيد افتتاحي'", *acc),
         jline(*kk, 1, "120000 + k.BankID", pos.format("k"), neg.format("k"), "k.BankName", "[@Banks] AS k",
               "k.OpeningBalance <> 0"),
         jline(*kk, 2, 3900, neg.format("k"), pos.format("k"), "'رصيد افتتاحي'", "[@Banks] AS k",
@@ -802,6 +806,31 @@ FROM ((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.
      LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID
 ORDER BY c.StockCountID, p.ProductName"""),
 
+    # ============================================================ OPENING BALANCES (docs/52)
+    # the opening balance of a customer / supplier is dated Settings.OpeningDate (the start-up date);
+    # an older back-end without that date keeps the day the card was created
+    Query("qryCustomerOpening", "الرصيد الافتتاحي لكل عميل بتاريخ بدء التشغيل", """
+SELECT c.CustomerID, c.CustomerName, c.OpeningBalance,
+       IIf(st.OpeningDate Is Null, c.CreatedAt, st.OpeningDate) AS OpeningOn
+FROM [@Customers] AS c, Settings AS st
+WHERE st.SettingID = 1 AND c.OpeningBalance <> 0"""),
+    Query("qrySupplierOpening", "الرصيد الافتتاحي لكل مورد بتاريخ بدء التشغيل", """
+SELECT s.SupplierID, s.SupplierName, s.OpeningBalance,
+       IIf(st.OpeningDate Is Null, s.CreatedAt, st.OpeningDate) AS OpeningOn
+FROM [@Suppliers] AS s, Settings AS st
+WHERE st.SettingID = 1 AND s.OpeningBalance <> 0"""),
+    Query("qryOpeningAccountLines", "الأرصدة الافتتاحية للحسابات العامة بتاريخ بدء التشغيل (لا شيء قبل حفظ التاريخ)", """
+SELECT o.OpeningLineID, o.AccountCode AS LineAccount, o.Debit AS LineDebit, o.Credit AS LineCredit, a.AccountName,
+       st.OpeningDate AS OpeningOn
+FROM (OpeningBalances AS o INNER JOIN [@Accounts] AS a ON o.AccountCode = a.AccountCode), Settings AS st
+WHERE st.SettingID = 1 AND st.OpeningDate Is Not Null"""),
+    Query("qryOpeningTotals", "حساب إجمالي الأرصدة الافتتاحية (3900): مدينه ودائنه حسب مصدر الرصيد", """
+SELECT e.SourceType, t.TypeName, Sum(l.Debit) AS SumDebit, Sum(l.Credit) AS SumCredit
+FROM (JournalLines AS l INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID)
+     INNER JOIN [@JournalSourceTypes] AS t ON e.SourceType = t.SourceType
+WHERE l.AccountCode = 3900
+GROUP BY e.SourceType, t.TypeName"""),
+
     # ============================================================ CUSTOMERS
     Query("qryCustomerLedger", "دفتر حساب العملاء: مدين (عليه) / دائن (له)", """
 SELECT h.CustomerID, h.InvoiceDate AS EntryDate, 'SALE' AS EntryType,
@@ -817,11 +846,10 @@ SELECT p.CustomerID, p.PaymentDate, 'PAYMENT', 'سند قبض', p.PaymentID, p.P
        CCur(0), p.Amount
 FROM CustomerPayments AS p
 UNION ALL
-SELECT c.CustomerID, c.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-',
+SELECT c.CustomerID, c.OpeningOn, 'OPENING', 'رصيد افتتاحي', 0, '-',
        IIf(c.OpeningBalance > 0, c.OpeningBalance, 0),
        IIf(c.OpeningBalance < 0, -c.OpeningBalance, 0)
-FROM [@Customers] AS c
-WHERE c.OpeningBalance <> 0
+FROM qryCustomerOpening AS c
 UNION ALL
 SELECT q.CustomerID, q.IssueDate, 'CHEQUE', 'شيك وارد', q.ChequeID, q.ChequeNo, CCur(0), q.Amount
 FROM Cheques AS q
@@ -877,11 +905,10 @@ SELECT p.SupplierID, p.PaymentDate, 'PAYMENT', 'سند صرف', p.PaymentID, p.P
        p.Amount, CCur(0)
 FROM SupplierPayments AS p
 UNION ALL
-SELECT s.SupplierID, s.CreatedAt, 'OPENING', 'رصيد افتتاحي', 0, '-',
+SELECT s.SupplierID, s.OpeningOn, 'OPENING', 'رصيد افتتاحي', 0, '-',
        IIf(s.OpeningBalance < 0, -s.OpeningBalance, 0),
        IIf(s.OpeningBalance > 0, s.OpeningBalance, 0)
-FROM [@Suppliers] AS s
-WHERE s.OpeningBalance <> 0
+FROM qrySupplierOpening AS s
 UNION ALL
 SELECT q.SupplierID, q.IssueDate, 'CHEQUE', 'شيك صادر', q.ChequeID, q.ChequeNo, q.Amount, CCur(0)
 FROM Cheques AS q
@@ -1018,8 +1045,8 @@ SELECT 'C' AS PartyKind, h.CustomerID AS PartyID, 'INVOICE' AS DocType, h.SalesI
 FROM SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID
 WHERE h.RemainingAmount > 0
 UNION ALL
-SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, c.CreatedAt, 0, c.OpeningBalance
-FROM [@Customers] AS c
+SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.OpeningOn, c.OpeningOn, 0, c.OpeningBalance
+FROM qryCustomerOpening AS c
 WHERE c.OpeningBalance > 0
 UNION ALL
 SELECT 'S', h.SupplierID, 'INVOICE', h.PurchaseInvoiceID, h.InvoiceNumber, h.InvoiceDate, h.DueDate,
@@ -1027,8 +1054,8 @@ SELECT 'S', h.SupplierID, 'INVOICE', h.PurchaseInvoiceID, h.InvoiceNumber, h.Inv
 FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID
 WHERE h.RemainingAmount > 0
 UNION ALL
-SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, s.CreatedAt, 0, s.OpeningBalance
-FROM [@Suppliers] AS s
+SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.OpeningOn, s.OpeningOn, 0, s.OpeningBalance
+FROM qrySupplierOpening AS s
 WHERE s.OpeningBalance > 0"""),
 
     # what pays it: returns (on their own invoice first), payments, cheques (a bounced one pays nothing:
@@ -1043,8 +1070,8 @@ UNION ALL
 SELECT 'C', p.CustomerID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, p.Amount, 0
 FROM CustomerPayments AS p
 UNION ALL
-SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.CreatedAt, -c.OpeningBalance, 0
-FROM [@Customers] AS c
+SELECT 'C', c.CustomerID, 'OPENING', c.CustomerID, 'رصيد افتتاحي', c.OpeningOn, -c.OpeningBalance, 0
+FROM qryCustomerOpening AS c
 WHERE c.OpeningBalance < 0
 UNION ALL
 SELECT 'S', r.SupplierID, 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, r.TotalAmount - r.RefundedAmount,
@@ -1055,8 +1082,8 @@ UNION ALL
 SELECT 'S', p.SupplierID, 'PAYMENT', p.PaymentID, p.PaymentNumber, p.PaymentDate, p.Amount, 0
 FROM SupplierPayments AS p
 UNION ALL
-SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.CreatedAt, -s.OpeningBalance, 0
-FROM [@Suppliers] AS s
+SELECT 'S', s.SupplierID, 'OPENING', s.SupplierID, 'رصيد افتتاحي', s.OpeningOn, -s.OpeningBalance, 0
+FROM qrySupplierOpening AS s
 WHERE s.OpeningBalance < 0
 UNION ALL
 SELECT 'C', q.CustomerID, 'CHEQUE', q.ChequeID, q.ChequeNo, q.IssueDate, q.Amount, 0
@@ -1583,7 +1610,7 @@ GROUP BY ReferenceID"""),
     Query("qryJournalExpense", "أسطر قيود المصروفات (عدا المسجلة بسند نقدية)", _expense()),
     Query("qryJournalCashVoucher", "أسطر قيود سندات النقدية (قبض وصرف وتحويل)", _cash_voucher()),
     Query("qryJournalStock", "أسطر قيود حركات المخزون اليدوية وتسويات الجرد", _stock()),
-    Query("qryJournalOpening", "أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين", _opening()),
+    Query("qryJournalOpening", "أسطر قيود الأرصدة الافتتاحية للصناديق والعملاء والموردين والبنوك والحسابات", _opening()),
     Query("qryManualEntryLines", "أسطر القيود اليدوية مع رأس كل قيد", """
 SELECT h.ManualEntryID, h.EntryNumber, h.EntryDate, h.Description, l.LineNumber AS LineNo,
        l.AccountCode AS LineAccount, l.Debit AS LineDebit, l.Credit AS LineCredit, l.LineText AS LineNote,
