@@ -30,8 +30,8 @@ Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
 Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptCashDayBook,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptVatReturnEG,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling," & _
-    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree," & _
-    "rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
+    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptStockValueByWarehouse,rptTransfersInTransit,rptStockCountDiff,rptLowStock,rptItemCard,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances," & _
+    "rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -70,7 +70,11 @@ Public Function BuildReports() As Boolean
     BuildReport_rptPurchases
     BuildReport_rptStockBalance
     BuildReport_rptStockByWarehouse
+    BuildReport_rptStockValueByWarehouse
+    BuildReport_rptTransfersInTransit
+    BuildReport_rptStockCountDiff
     BuildReport_rptLowStock
+    BuildReport_rptItemCard
     BuildReport_rptProductMovement
     BuildReport_rptCustomerStatement
     BuildReport_rptSupplierStatement
@@ -779,7 +783,7 @@ Private Sub BuildReport_rptStockCount()
     Set c = RText(5, "txtStorePhone", "=""Â« ›: "" & Nz(SettingValue(""Phone""),""-"") & ""   "" & Nz(SettingValue(""City""),"""")", 0, 794, 5273, 284, 9, False, 0)
     Set c = RText(5, "txtTitle", "=""Ê—ﬁ… Ã—œ "" & IIf([Status]=""POSTED"",""(„ı—Õ¯·)"",IIf([Status]=""CANCELLED"",""(„·€Ï)"",""(„› ÊÕ)""))", 5500, 57, 5273, 482, 16, True, 1)
     Set c = RText(5, "txtCountNumber", "=""—ﬁ„ «·Ã—œ: "" & [CountNumber] & ""    «· «—ÌŒ: "" & GDate([CountDate])", 5500, 567, 5273, 284, 9, False, 1)
-    Set c = RText(5, "txtCategory", "=""«· ’‰Ì›: "" & Nz([CategoryName],""ﬂ· «·„‰ Ã« "")", 5500, 879, 5273, 284, 9, False, 1)
+    Set c = RText(5, "txtCategory", "=""«· ’‰Ì›: "" & Nz([CategoryName],""ﬂ· «·„‰ Ã« "") & ""    «·„Œ“‰: "" & Nz([WarehouseName],""-"")", 5500, 879, 5273, 284, 9, False, 1)
     Set c = RBox(5, "boxColumns", 0, 1644, 10773, 369)
     SetCtl c, "BackStyle", 1
     SetCtl c, "BackColor", CLR_SECONDARY
@@ -2305,6 +2309,174 @@ EH:
     AbortReport "rptStockByWarehouse", Err.Number, Err.Description
 End Sub
 
+Private Sub BuildReport_rptStockValueByWarehouse()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptStockValueByWarehouse", " ﬁÌÌ„ «·„Œ“Ê‰ ·ﬂ· „Œ“‰", "StockValueByWarehouseQuery", 10773, "", "WarehouseID", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", " ﬁÌÌ„ «·„Œ“Ê‰ ·ﬂ· „Œ“‰", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "«·„Œ“‰", 0, 1292, 2835, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "Õ”«» «·„Œ“Ê‰", 2835, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "«·√’‰«›", 4196, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "«·ﬂ„Ì…", 5330, 1292, 1588, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "«·ﬁÌ„… »«· ﬂ·›…", 6918, 1292, 1928, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "«·ﬁÌ„… »”⁄— «·»Ì⁄", 8846, 1292, 1927, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal3", "=Sum([ProductCount])", 4196, 85, 1134, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0"
+    Set c = RText(2, "txtTotal4", "=Sum([TotalQuantity])", 5330, 85, 1588, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(2, "txtTotal5", "=Sum([StockCostValue])", 6918, 85, 1928, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal6", "=Sum([StockSalesValue])", 8846, 85, 1927, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""«·≈Ã„«·Ì ("" & Count(*) & "" ”Ã·)""", 0, 85, 4196, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "WarehouseName", 0, 17, 2835, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "StockAccount", 2835, 17, 1361, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "ProductCount", 4196, 17, 1134, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0"
+    Set c = RText(0, "txtCol4", "TotalQuantity", 5330, 17, 1588, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol5", "StockCostValue", 6918, 17, 1928, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol6", "StockSalesValue", 8846, 17, 1927, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""·«  ÊÃœ »Ì«‰«  ·⁄—÷Â« ›Ì Â–« «· ﬁ—Ì— ··«Œ Ì«—«  «·„Õœœ….""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptStockValueByWarehouse", s
+    Exit Sub
+EH:
+    AbortReport "rptStockValueByWarehouse", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptTransfersInTransit()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptTransfersInTransit", "«· ÕÊÌ·«  »Ì‰ «·„Œ«“‰ »«·ÿ—Ìﬁ", "TransfersInTransitQuery", 10773, "", "TransferDate", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "«· ÕÊÌ·«  »Ì‰ «·„Œ«“‰ »«·ÿ—Ìﬁ", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "—ﬁ„ «· ÕÊÌ·", 0, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", " «—ÌŒ «·≈—”«·", 1474, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "„‰ „Œ“‰", 2835, 1292, 1928, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "≈·Ï „Œ“‰", 4763, 1292, 1928, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "«·ﬁÌ„…", 6691, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "√Ì«„ »«·ÿ—Ìﬁ", 8165, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "„·«ÕŸ« ", 9299, 1292, 1474, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal5", "=Sum([TransferValue])", 6691, 85, 1474, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""«·≈Ã„«·Ì ("" & Count(*) & "" ”Ã·)""", 0, 85, 6691, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "TransferNumber", 0, 17, 1474, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=GDate([TransferDate])", 1474, 17, 1361, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "FromName", 2835, 17, 1928, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "ToName", 4763, 17, 1928, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "TransferValue", 6691, 17, 1474, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol6", "DaysInTransit", 8165, 17, 1134, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0"
+    Set c = RText(0, "txtCol7", "Notes", 9299, 17, 1474, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""·«  ÊÃœ  ÕÊÌ·«  »«·ÿ—Ìﬁ.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptTransfersInTransit", s
+    Exit Sub
+EH:
+    AbortReport "rptTransfersInTransit", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptStockCountDiff()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptStockCountDiff", "›—Êﬁ«  «·Ã—œ «·„—Õ¯·… ·ﬂ· „Œ“‰", "StockCountDiffQuery", 15536, "", "CountDate,CountNumber,ProductName", True, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 7768, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 7768, 28, 7768, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "›—Êﬁ«  «·Ã—œ «·„—Õ¯·… ·ﬂ· „Œ“‰", 0, 397, 15536, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 15536, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 15536, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "—ﬁ„ «·Ã—œ", 0, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "«· «—ÌŒ", 1361, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "«·„Œ“‰", 2608, 1292, 1701, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "«·ﬂÊœ", 4309, 1292, 1304, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "«·’‰›", 5613, 1292, 2835, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "«·⁄Ã“", 8448, 1292, 1077, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "«·“Ì«œ…", 9525, 1292, 1077, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol8", "«· ﬂ·›…", 10602, 1292, 1191, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol9", "ﬁÌ„… «·›—ﬁ", 11793, 1292, 3743, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal6", "=Sum([ShortQty])", 8448, 85, 1077, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(2, "txtTotal7", "=Sum([ExtraQty])", 9525, 85, 1077, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(2, "txtTotal9", "=Sum([DiffValue])", 11793, 85, 3743, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 15536)
+    Set c = RText(2, "txtCount", "=""«·≈Ã„«·Ì ("" & Count(*) & "" ”Ã·)""", 0, 85, 8448, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "CountNumber", 0, 17, 1361, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=GDate([CountDate])", 1361, 17, 1247, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "WarehouseName", 2608, 17, 1701, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "ProductCode", 4309, 17, 1304, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "ProductName", 5613, 17, 2835, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol6", "ShortQty", 8448, 17, 1077, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol7", "ExtraQty", 9525, 17, 1077, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol8", "UnitCost", 10602, 17, 1191, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol9", "DiffValue", 11793, 17, 3743, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""·«  ÊÃœ ›—Êﬁ«  Ã—œ „—Õ¯·… ›Ì Â–Â «·› —….""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptStockCountDiff", s
+    Exit Sub
+EH:
+    AbortReport "rptStockCountDiff", Err.Number, Err.Description
+End Sub
+
 Private Sub BuildReport_rptLowStock()
     Dim c As Access.Control, s As String
     On Error GoTo EH
@@ -2357,6 +2529,90 @@ Private Sub BuildReport_rptLowStock()
     Exit Sub
 EH:
     AbortReport "rptLowStock", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptItemCard()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptItemCard", "ﬂ«—  «·’‰› («·ﬂ„Ì… Ê«·ﬁÌ„… ·ﬂ· „Œ“‰)", "ItemCardQuery", 15536, "", "SortKey,MovementDate,MoveID", True, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 2781
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 7768, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 7768, 28, 7768, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "ﬂ«—  «·’‰› («·ﬂ„Ì… Ê«·ﬁÌ„… ·ﬂ· „Œ“‰)", 0, 397, 15536, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 15536, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 15536, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "«· «—ÌŒ", 0, 1292, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "«·Õ—ﬂ…", 1531, 1292, 1418, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "«·„” ‰œ", 2949, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "«·„Œ“‰", 4196, 1292, 1191, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "«·ÃÂ… / «·»Ì«‰", 5387, 1292, 1814, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "Ê«—œ", 7201, 1292, 850, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "„‰’—›", 8051, 1292, 850, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol8", "«·—’Ìœ", 8901, 1292, 964, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol9", " ﬂ·›… «·ÊÕœ…", 9865, 1292, 1077, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol10", "ﬁÌ„… «·Ê«—œ", 10942, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol11", "ﬁÌ„… «·„‰’—›", 12189, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol12", "—’Ìœ «·ﬁÌ„…", 13436, 1292, 2100, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
+    Set c = RLine(2, "lnTotals", 28, 15536)
+    Set c = RText(2, "txtCount", "=""«·≈Ã„«·Ì ("" & Count(*) & "" ”Ã·)""", 0, 85, 15536, 284, 8, True, 0)
+    Set c = RLabel(2, "lblSum1", "—’Ìœ √Ê· «·„œ… (ﬂ„Ì…)", 9866, 539, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum1", "=Sum(IIf([SortKey]=0,[NetQty],0))", 12984, 539, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(2, "lblSum2", "—’Ìœ √Ê· «·„œ… (ﬁÌ„…)", 9866, 908, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum2", "=Sum(IIf([SortKey]=0,[NetValue],0))", 12984, 908, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(2, "lblSum3", "«·Ê«—œ Œ·«· «·› —… (ﬂ„Ì…)", 9866, 1277, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum3", "=Sum(IIf([SortKey]=1,[QtyIn],0))", 12984, 1277, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(2, "lblSum4", "«·„‰’—› Œ·«· «·› —… (ﬂ„Ì…)", 9866, 1646, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum4", "=Sum(IIf([SortKey]=1,[QtyOut],0))", 12984, 1646, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(2, "lblSum5", "«·—’Ìœ «·‰Â«∆Ì (ﬂ„Ì…)", 9866, 2015, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum5", "=Sum([NetQty])", 12984, 2015, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(2, "lblSum6", "«·—’Ìœ «·‰Â«∆Ì (ﬁÌ„…)", 9866, 2384, 3118, 312, 11, True, 0)
+    Set c = RText(2, "txtSum6", "=Sum([NetValue])", 12984, 2384, 2552, 312, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol1", "=GDate([MovementDate],True)", 0, 17, 1531, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "MovementType", 1531, 17, 1418, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "ReferenceNumber", 2949, 17, 1247, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "WarehouseName", 4196, 17, 1191, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "=Nz([PartyName],[Notes])", 5387, 17, 1814, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol6", "QtyIn", 7201, 17, 850, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol7", "QtyOut", 8051, 17, 850, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol8", "NetQty", 8901, 17, 964, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    SetCtl c, "RunningSum", 2
+    Set c = RText(0, "txtCol9", "MoveCost", 9865, 17, 1077, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol10", "ValueIn", 10942, 17, 1247, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol11", "ValueOut", 12189, 17, 1247, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol12", "NetValue", 13436, 17, 2100, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    SetCtl c, "RunningSum", 2
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""·«  ÊÃœ Õ—ﬂ… ·Â–« «·’‰› ›Ì «·«Œ Ì«—«  «·„Õœœ….""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptItemCard", s
+    Exit Sub
+EH:
+    AbortReport "rptItemCard", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptProductMovement()

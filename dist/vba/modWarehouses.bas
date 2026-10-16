@@ -16,6 +16,9 @@ Attribute VB_Name = "modWarehouses"
 '                        the average cost, into the receiving one, or in transit (account 1410) while the
 '                        receiving warehouse confirms its receipts -> ReceiveStockTransfer; UnpostStockTransfer
 '                        takes back a transfer in transit, DeleteStockTransfer a draft
+'   Reports (docs/60)    the item card ItemCardQuery (quantity and value, one warehouse or all), the
+'                        valuation of each warehouse, the transfers in transit, the posted count differences;
+'                        each warehouse may have its own open stock count (CreateStockCount); TestStockReports
 ' Screens: frmWarehouses, frmStockTransfer (built by modBuildForms).
 '==============================================================================
 Option Compare Database
@@ -574,6 +577,98 @@ Done:
     Else
         TestMsg "‰ÃÕ " & passed & " Ê›‘· " & failed & ":" & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _
                 "TestWarehouses"
+    End If
+End Function
+
+Public Function TestStockReports() As Boolean
+    ' The item card and the warehouse reports (docs/60, plan 2D), and one open count per warehouse.
+    Dim ws As DAO.Workspace, inTrans As Boolean, wh2 As Long, pid As Long, refNo As String, msg As String
+    Dim passed As Long, failed As Long, report As String, countID As Long, tid As Long, branchName As String
+    Calendar = vbCalGreg
+    EnsureTestUser
+    g_SilentMode = True
+    Debug.Print "=== TestStockReports  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
+    On Error GoTo EH
+    Set ws = DBEngine.Workspaces(0)
+    ws.BeginTrans
+    inTrans = True
+    CurrentDb.Execute "INSERT INTO Warehouses (WarehouseCode, WarehouseName, WarehouseType) VALUES " & _
+                      "('TEST-WH', 'TEST „Œ“‰ ›—⁄', 'BRANCH')", dbFailOnError
+    wh2 = DbValue("SELECT Max(WarehouseID) FROM Warehouses")
+    branchName = Nz(DbValue(Tr("SELECT w.WarehouseName FROM [@Warehouses] AS w WHERE w.WarehouseID = " & wh2)), "")
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, UnitID, SellingPrice, " & _
+                      "CurrentQuantity, AverageCost) VALUES ('TEST-CARD-P', 'TEST ﬂ«—  «·’‰›', " & _
+                      Nz(DbValue("SELECT Min(CategoryID) FROM Categories"), 1) & ", " & _
+                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 0, 0)", dbFailOnError
+    pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-CARD-P'")
+    msg = PostManualStock(pid, TT_STOCK_IN, 10, 5, "TEST", refNo, MAIN_WAREHOUSE_ID) & _
+          PostManualStock(pid, TT_STOCK_IN, 4, 5, "TEST", refNo, wh2)
+    CheckWh Len(msg) = 0, "≈÷«›… «·’‰› ··„Œ“‰Ì‰ " & msg, passed, failed, report
+
+    ' the item card: every warehouse, then one, then the opening line of a later period
+    SetPeriod Date, Date
+    SetQueryParam "ProductID", pid
+    SetQueryParam "WarehouseID", 0
+    CheckWh Nz(DbValue("SELECT Sum(NetQty) FROM ItemCardQuery"), 0) = 14 And _
+            Nz(DbValue("SELECT Sum(NetValue) FROM ItemCardQuery"), 0) = 70 And _
+            Nz(DbValue("SELECT Count(*) FROM ItemCardQuery WHERE SortKey = 1"), 0) = 2, _
+            "ﬂ«—  «·’‰› ·ﬂ· «·„Œ«“‰: «·ﬂ„Ì… Ê«·ﬁÌ„…", passed, failed, report
+    SetQueryParam "WarehouseID", wh2
+    CheckWh Nz(DbValue("SELECT Sum(NetQty) FROM ItemCardQuery"), 0) = 4 And _
+            Nz(DbValue("SELECT Sum(ValueIn) FROM ItemCardQuery"), 0) = 20, _
+            "ﬂ«—  «·’‰› ·„Œ“‰ Ê«Õœ", passed, failed, report
+    SetPeriod Date + 1, Date + 1
+    SetQueryParam "WarehouseID", 0
+    CheckWh Nz(DbValue("SELECT NetQty FROM ItemCardQuery WHERE SortKey = 0"), 0) = 14 And _
+            Nz(DbValue("SELECT NetValue FROM ItemCardQuery WHERE SortKey = 0"), 0) = 70 And _
+            Nz(DbValue("SELECT Count(*) FROM ItemCardQuery"), 0) = 1, _
+            "—’Ìœ √Ê· «·„œ… »«·ﬂ„Ì… Ê«·ﬁÌ„…", passed, failed, report
+
+    ' a transfer shows the other warehouse as its party
+    msg = CreateStockTransfer(MAIN_WAREHOUSE_ID, wh2, "TEST", tid)
+    CurrentDb.Execute "INSERT INTO StockTransferLines (StockTransferID, ProductID, Quantity, UnitCost) VALUES (" & _
+                      tid & ", " & pid & ", 3, 0)", dbFailOnError
+    msg = msg & SendStockTransfer(tid)
+    SetPeriod Date, Date
+    CheckWh Len(msg) = 0 And Nz(DbValue("SELECT PartyName FROM ItemCardQuery WHERE NetQty = -3"), "") = branchName, _
+            "«·ÃÂ… ›Ì ﬂ«—  «·’‰›: «·„Œ“‰ «·¬Œ— " & msg, passed, failed, report
+    CheckWh Nz(DbValue("SELECT TotalQuantity FROM StockValueByWarehouseQuery WHERE WarehouseID = " & wh2), 0) = 7 And _
+            Nz(DbValue("SELECT StockCostValue FROM StockValueByWarehouseQuery WHERE WarehouseID = " & wh2), 0) = 35, _
+            " ﬁÌÌ„ «·„Œ“Ê‰ ·ﬂ· „Œ“‰", passed, failed, report
+
+    ' a transfer waiting for its receiver
+    CurrentDb.Execute "UPDATE Warehouses SET ConfirmReceipt = True WHERE WarehouseID = " & wh2, dbFailOnError
+    msg = CreateStockTransfer(MAIN_WAREHOUSE_ID, wh2, "TEST", tid)
+    CurrentDb.Execute "INSERT INTO StockTransferLines (StockTransferID, ProductID, Quantity, UnitCost) VALUES (" & _
+                      tid & ", " & pid & ", 1, 0)", dbFailOnError
+    msg = msg & SendStockTransfer(tid)
+    CheckWh Len(msg) = 0 And Nz(DbValue("SELECT TransferValue FROM TransfersInTransitQuery WHERE StockTransferID = " & _
+            tid), 0) = 5, "«· ÕÊÌ·«  »«·ÿ—Ìﬁ " & msg, passed, failed, report
+
+    ' one open count per warehouse
+    CurrentDb.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE Status = 'OPEN'", dbFailOnError
+    msg = CreateStockCount(Null, "TEST", countID, MAIN_WAREHOUSE_ID)
+    CheckWh Len(msg) = 0, "Ã—œ «·„Œ“‰ «·—∆Ì”Ì " & msg, passed, failed, report
+    msg = CreateStockCount(Null, "TEST", countID, wh2)
+    CheckWh Len(msg) = 0 And Nz(DbValue("SELECT Count(*) FROM StockCounts WHERE Status = 'OPEN'"), 0) = 2, _
+            "Ã—œ «·›—⁄ ›Ì ‰›” «·Êﬁ  " & msg, passed, failed, report
+    CheckWh Len(CreateStockCount(Null, "TEST", countID, wh2)) > 0, "Ã—œ „› ÊÕ Ê«Õœ ·ﬂ· „Œ“‰", passed, failed, report
+    ws.Rollback
+    inTrans = False
+    GoTo Done
+EH:
+    CheckWh False, "Œÿ√: " & Err.Description, passed, failed, report
+    If inTrans Then ws.Rollback
+Done:
+    g_SilentMode = False
+    Debug.Print "--- ‰ÃÕ: " & passed & " | ›‘·: " & failed
+    If failed = 0 Then
+        TestMsg "Ã„Ì⁄ «Œ »«—«  ﬂ«—  «·’‰› Ê ﬁ«—Ì— «·„Œ«“‰ ‰«ÃÕ… (" & passed & " «Œ »«—«).", _
+                vbInformation + MSG_RTL, "TestStockReports"
+        TestStockReports = True
+    Else
+        TestMsg "‰ÃÕ " & passed & " Ê›‘· " & failed & ":" & vbCrLf & vbCrLf & report, vbExclamation + MSG_RTL, _
+                "TestStockReports"
     End If
 End Function
 

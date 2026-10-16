@@ -51,6 +51,7 @@ Private Sub D2_1()
     LangAdd "رصيد الحساب في البنك عند بدء استخدام البرنامج", "The account balance in the bank when the program is first used"
     LangAdd "لا تملك صلاحية الفترات المالية (إقفال الفترات", "You do not have the permission for the fiscal periods (period closing"
     LangAdd "لا تملك هذه الصلاحية في شاشة عمولات المندوبين", "You do not have this permission in the sales rep commissions screen"
+    LangAdd "لا توجد حركة لهذا الصنف في الاختيارات المحددة", "No movement of this item for the selected choices"
     LangAdd "لصندوق عهدة المندوب: مستخدم المندوب أمين عليه", "For a sales rep custody box: the user of the sales rep keeps it"
     LangAdd "للعمل في الدولة الأخرى ابدأ ملف بيانات جديدًا", "To work in the other country start a new data file"
     LangAdd "أضف صنفًا واحدًا على الأقل إلى قائمة الطباعة", "Add at least one item to the print list"
@@ -134,10 +135,10 @@ Private Sub D2_1()
     LangAdd "على هذا الحساب قيود، فيبقى حسابًا فرعيًا", "This account has entries, so it stays a sub-account"
     LangAdd "كلمتا المرور غير متطابقتين. لم يتغير شيء", "The two passwords do not match. Nothing changed"
     LangAdd "لا يمكنك تعطيل حسابك وأنت مسجل الدخول به", "You cannot deactivate your own account while logged in with it"
-    LangAdd "لم يُنشئ برنامج التوقيع ملف التوقيع (رمز", "The signing program did not create the signature file (code"
 End Sub
 
 Private Sub D2_2()
+    LangAdd "لم يُنشئ برنامج التوقيع ملف التوقيع (رمز", "The signing program did not create the signature file (code"
     LangAdd "مبلغ مستحق للمورد (بعملة البرنامج دائمًا", "an amount due to the supplier (always in the program currency"
     LangAdd "هذا الصنف لا يتابع المخزون، فليس له رصيد", "This item does not track stock, so it has no balance"
     LangAdd "هذه الشاشة ستكون متاحة بعد تنفيذ المرحلة", "This screen will be available after phase"
@@ -158,6 +159,7 @@ Private Sub D2_2()
     LangAdd "صنفًا لأن لها حركات أو لا تتابع المخزون", "items, because they have moves or do not track stock"
     LangAdd "عدّل الإضافي والخصومات ثم «ترحيل المسير", "Edit the overtime and deductions, then Post the run"
     LangAdd "كلمة البحث (اسم، كود، باركود، رقم، جوال", "Search text (name, code, barcode, number, mobile"
+    LangAdd "لا توجد فروقات جرد مرحّلة في هذه الفترة", "No posted stock count differences in this period"
     LangAdd "لا توجد فواتير أو مرتجعات في هذه الفترة", "No invoices or returns in this period"
     LangAdd "لا توجد مصروفات متكررة مستحقة حتى اليوم", "There are no recurring expenses due up to today"
     LangAdd "لا يمكن تفعيل الفاتورة الإلكترونية الآن", "E-invoicing cannot be enabled now"
@@ -256,14 +258,15 @@ Private Sub D2_2()
     LangAdd "تغيرت الأرصدة: اضغط «تحديث الإجمالي", "The balances changed: press Refresh total"
     LangAdd "تغيير اسم المحل يتم عن طريق المبرمج", "The store name is changed by the developer"
     LangAdd "حساب رئيسي: يشمل كل حساباته التابعة", "Main account: includes all its sub-accounts"
-    LangAdd "رصيد الصندوق يُدخل في قسم «الصناديق", "The balance of a cash box is entered in the Cash boxes part"
-    LangAdd "رصيد العميل المسجل لا يطابق الحركات", "The recorded customer balance does not match the moves"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "رصيد الصندوق يُدخل في قسم «الصناديق", "The balance of a cash box is entered in the Cash boxes part"
+    LangAdd "رصيد العميل المسجل لا يطابق الحركات", "The recorded customer balance does not match the moves"
     LangAdd "رصيد المورد المسجل لا يطابق الحركات", "The recorded supplier balance does not match the moves"
     LangAdd "رقم التسجيل الضريبي للعميل (9 أرقام", "Tax registration number of the customer (9 digits"
     LangAdd "ضريبة مستردة تُرحَّل للإقرار التالي", "Refundable VAT carried to the next return"
+    LangAdd "كارت الصنف (الكمية والقيمة لكل مخزن", "Item card (quantity and value by warehouse"
     LangAdd "لا تملك صلاحية تعديل المخزون يدويًا", "You do not have the permission to adjust the stock by hand"
     LangAdd "للمبرمج: توليد كود تفعيل لجهاز عميل", "For the developer: generate an activation code for a customer computer"
     LangAdd "مستحقة خلال 7 أيام أو فات استحقاقها", "Due within 7 days or overdue"
@@ -308,6 +311,7 @@ Private Sub D2_3()
     LangAdd "حذف الحركة البنكية المحددة وقيدها", "Delete the selected bank transaction and its entry"
     LangAdd "حسب صافي الكمية خلال فترة التقرير", "By net quantity during the report period"
     LangAdd "خصم الغياب أكبر من الأساسي والسكن", "The absence deduction is more than the basic and housing"
+    LangAdd "رحّله أو ألغه قبل بدء جرد جديد له", "Post or cancel it before starting a new count for it"
     LangAdd "رقمنا (PUR-) أو رقم فاتورة المورد", "Our number (PUR-) or the supplier invoice number"
     LangAdd "سطر لا ينتمي إلى الفاتورة الأصلية", "A line that does not belong to the original invoice"
     LangAdd "طلب سفري: يُغلَّف ويُسلَّم للعميل", "Takeaway order: packed and handed to the customer"
@@ -377,13 +381,13 @@ Private Sub D2_3()
     LangAdd "آخر تسوية معتمدة لهذا البنك في", "Last approved reconciliation of this bank on"
     LangAdd "أضفه في تصحيحات الإقرار التالي", "Add it to the corrections of the next return"
     LangAdd "إعادة الفتح: تصبح الفترة مقفلة", "Reopening: the period becomes closed"
+End Sub
+
+Private Sub D2_4()
     LangAdd "إلغاء التفعيل لمدير النظام فقط", "Deactivation is for the system administrator only"
     LangAdd "إلغاء ربط هذا المبلغ بالفاتورة", "Unlink this amount from the invoice"
     LangAdd "إيرادات ومصروفات كل مركز تكلفة", "Revenue and expenses of each cost center"
     LangAdd "اختر الحساب في كل سطر فيه مبلغ", "Choose the account in every line with an amount"
-End Sub
-
-Private Sub D2_4()
     LangAdd "اختر الخزينة التي تستلم المبلغ", "Choose the treasury that receives the amount"
     LangAdd "البرنامج (الفاتورة الإلكترونية", "Program (e-invoice"
     LangAdd "التحويل غير موجود أو تم ترحيله", "The transfer does not exist or is already posted"
@@ -401,8 +405,8 @@ Private Sub D2_4()
     LangAdd "تقرير الملصقات غير موجود. شغّل", "The labels report does not exist. Run"
     LangAdd "حركة الخزينة / الصندوق (تفصيلي", "Treasury / box moves (detailed"
     LangAdd "حساب إجمالي الأرصدة الافتتاحية", "Total opening balances account"
-    LangAdd "رحّله أو ألغه قبل بدء جرد جديد", "Post it or cancel it before starting a new count"
     LangAdd "رصيد دائن يُرحَّل للشهر التالي", "a credit balance carried to the next month"
+    LangAdd "فروقات الجرد المرحّلة لكل مخزن", "Posted stock count differences by warehouse"
     LangAdd "قيمة وحدة واحدة بعملة البرنامج", "Value of one unit in the program currency"
     LangAdd "كل شاشات الحسابات في مكان واحد", "All the accounting screens in one place"
     LangAdd "لا تملك صلاحية إدارة الصلاحيات", "You do not have the permission to manage permissions"
@@ -433,6 +437,7 @@ Private Sub D2_4()
     LangAdd "اكتب تاريخ البيع أو الاستبعاد", "Type the date of the sale or disposal"
     LangAdd "الإيجار والكهرباء والاشتراكات", "Rent, electricity and subscriptions"
     LangAdd "البرنامج مفعّل على هذا الجهاز", "The program is activated on this computer"
+    LangAdd "التحويلات بين المخازن بالطريق", "Transfers between warehouses in transit"
     LangAdd "التكلفة لا يمكن أن تكون سالبة", "The cost cannot be negative"
     LangAdd "الرمز البريدي للعميل (5 أرقام", "Customer postal code (5 digits"
     LangAdd "المصروفات التشغيلية والإدارية", "Operating and administrative expenses"
@@ -456,10 +461,4 @@ Private Sub D2_4()
     LangAdd "لا تملك صلاحية تقارير الأرباح", "You do not have the permission for profit reports"
     LangAdd "لا توجد أرصدة قبل هذا التاريخ", "There are no balances before this date"
     LangAdd "لا توجد أسطر بكمية لم تُرحَّل", "There is no line with a quantity waiting to be posted"
-    LangAdd "لا توجد منتجات منخفضة المخزون", "There are no low-stock products"
-    LangAdd "لا يمكنك الصرف أو التحويل منه", "you cannot pay or transfer from it"
-    LangAdd "لا يمكنك تغيير صلاحياتك بنفسك", "You cannot change your own permissions"
-    LangAdd "لا يوجد عملاء مسندون لمندوبين", "No customers are assigned to sales reps"
-    LangAdd "موجود في الموازنة لنفس المركز", "already in the budget for the same center"
-    LangAdd "هذا الإجراء غير موجود في شاشة", "This action does not exist in the screen"
 End Sub

@@ -14,9 +14,10 @@ ACTIVE_SUPPLIER_ROWS = ("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] A
 PURCHASE_REFUND_TYPES = "CREDIT;خصم من رصيد المورد;CASH;استرداد نقدي من المورد"
 MANUAL_TYPE_ROWS = ("SELECT t.TransactionTypeID, t.TypeName FROM [@TransactionTypes] AS t WHERE t.IsManual = True "
                     "ORDER BY t.TransactionTypeID")
-COUNT_ROWS = ("SELECT StockCountID, CountNumber, CountDate, IIf(Status = 'OPEN', 'مفتوح', "
-              "IIf(Status = 'POSTED', 'مُرحّل', 'ملغى')) AS StatusName FROM StockCounts "
-              "ORDER BY StockCountID DESC")
+COUNT_ROWS = ("SELECT c.StockCountID, c.CountNumber, c.CountDate, IIf(c.Status = 'OPEN', 'مفتوح', "
+              "IIf(c.Status = 'POSTED', 'مُرحّل', 'ملغى')) AS StatusName, w.WarehouseName "
+              "FROM StockCounts AS c LEFT JOIN [@Warehouses] AS w ON c.WarehouseID = w.WarehouseID "
+              "ORDER BY c.StockCountID DESC")
 COUNT_LINES_SQL = ("SELECT d.StockCountDetailID, d.StockCountID, d.ProductID, d.SystemQuantity, "
                    "d.ActualQuantity, d.Difference, d.UnitCost, d.DifferenceValue, d.Notes, "
                    "p.ProductCode, p.ProductName, p.Barcode FROM StockCountDetails AS d "
@@ -434,7 +435,8 @@ def layout_stock_count(line_heads) -> FormModel:
                "stocktake")
     y = cm(2.3)
     c = m.add(Control("combo", "cboCount", cm(0.4), y, cm(9.0), cm(0.8),
-                      {"RowSource": COUNT_ROWS, "ColumnCount": 4, "ColumnWidths": "0;3;3.5;2.3"},
+                      {"RowSource": COUNT_ROWS, "ColumnCount": 5, "ColumnWidths": "0;2.6;2.8;1.8;2.6",
+                       "ListWidth": "11.8cm"},
                       events=["AfterUpdate"]))
     labelled(m, "cboCount", "جلسة الجرد (الأحدث أولًا)", c)
     c = m.add(Control("combo", "cboCategory", cm(9.7), y, cm(5.0), cm(0.8),

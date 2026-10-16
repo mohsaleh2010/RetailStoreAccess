@@ -22,15 +22,15 @@ Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qryLocRoles1,qryLocRoles,qryLocPermissions1,qryLocPermissions,qryLocScreens1,qryLocScreens,qryLocCategories1,qryLocCategories,qryLocUnits1,qryLocUnits,qryLocExpenseTypes1,qryLocExpenseTypes,qryLocCustomers1,qryLocCustomers,qryLo" & _
     "cSuppliers1,qryLocSuppliers,qryLocCashBoxes1,qryLocCashBoxes,qryLocWarehouses1,qryLocWarehouses,qryLocStockParties1,qryLocStockParties,qryLocBanks1,qryLocBanks,qryLocCostCenters1,qryLocCostCenters,qryLocSalesReps1,qryLocSalesReps,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery" & _
-    ",BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryWarehouseStock,StockByWarehouseQuery,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerOpening,qrySupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCu" & _
-    "stomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllo" & _
-    "cSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatRetur" & _
-    "nQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxB" & _
-    "alanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryJournalStockTransfer,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,q" & _
-    "ryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissio" & _
-    "nCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTre" & _
-    "eRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,A" & _
-    "ccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    ",BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryWarehouseStock,StockByWarehouseQuery,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,qryStockMoveParty,ItemCardQuery,StockValueByWarehouseQuery,StockCountDiffQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerOpening,qry" & _
+    "SupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustom" & _
+    "erInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuer" & _
+    "y,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint" & _
+    ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryJournalStockTransfer,Trans" & _
+    "fersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDeprecia" & _
+    "tionLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBef" & _
+    "ore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBala" & _
+    "nceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -723,6 +723,10 @@ Private Sub CreateAllQueries()
     Q_StockBalanceQuery
     Q_LowStockQuery
     Q_ProductMovementQuery
+    Q_qryStockMoveParty
+    Q_ItemCardQuery
+    Q_StockValueByWarehouseQuery
+    Q_StockCountDiffQuery
     Q_SlowMovingProductsQuery
     Q_StockByCategoryQuery
     Q_StockCountQuery
@@ -810,6 +814,7 @@ Private Sub CreateAllQueries()
     Q_qryStockCountValue
     Q_qryStockTransferValue
     Q_qryJournalStockTransfer
+    Q_TransfersInTransitQuery
     Q_qryStockPartyAccounts
     Q_qryStockDocumentValue
     Q_qryJournalStockDocument
@@ -1357,6 +1362,100 @@ Private Sub Q_ProductMovementQuery()
     SaveQuery "ProductMovementQuery", "حركة منتج خلال فترة مع رصيد أول المدة (الرصيد التراكمي في التقرير)", s
 End Sub
 
+Private Sub Q_qryStockMoveParty()
+    Dim s As String
+    s = "SELECT t.TransactionID, c.CustomerName AS PartyName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN SalesInvoices AS h ON t.ReferenceID = h.SalesInvoiceID)" & vbCrLf
+    s = s & "     INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'SALE'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT t.TransactionID, c.CustomerName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN SalesReturns AS r ON t.ReferenceID = r.SalesReturnID)" & vbCrLf
+    s = s & "     INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'SALES_RETURN'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT t.TransactionID, s.SupplierName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN PurchaseInvoices AS h ON t.ReferenceID = h.PurchaseInvoiceID)" & vbCrLf
+    s = s & "     INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'PURCHASE'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT t.TransactionID, s.SupplierName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN PurchaseReturns AS r ON t.ReferenceID = r.PurchaseReturnID)" & vbCrLf
+    s = s & "     INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'PURCHASE_RETURN'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT t.TransactionID, p.PartyName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN StockDocuments AS d ON t.ReferenceID = d.StockDocumentID)" & vbCrLf
+    s = s & "     INNER JOIN [@StockParties] AS p ON d.StockPartyID = p.StockPartyID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'STOCK_DOC'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT t.TransactionID, w.WarehouseName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN StockTransfers AS x ON t.ReferenceID = x.StockTransferID)" & vbCrLf
+    s = s & "     INNER JOIN [@Warehouses] AS w ON x.ToWarehouseID = w.WarehouseID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'TRANSFER' AND t.Quantity < 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT t.TransactionID, w.WarehouseName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN StockTransfers AS x ON t.ReferenceID = x.StockTransferID)" & vbCrLf
+    s = s & "     INNER JOIN [@Warehouses] AS w ON x.FromWarehouseID = w.WarehouseID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'TRANSFER' AND t.Quantity > 0" & vbCrLf
+    SaveQuery "qryStockMoveParty", "الجهة الأخرى لكل حركة مخزون: العميل، أو المورد، أو جهة السند، أو المخزن الآخر في التحويل", s
+End Sub
+
+Private Sub Q_ItemCardQuery()
+    Dim s As String
+    s = "SELECT 1 AS SortKey, t.TransactionID AS MoveID, t.TransactionDate AS MovementDate, tt.TypeName AS MovementType," & vbCrLf
+    s = s & "       t.ReferenceNumber, w.WarehouseName, m.PartyName," & vbCrLf
+    s = s & "       IIf(t.Quantity > 0, t.Quantity, 0) AS QtyIn, IIf(t.Quantity < 0, -t.Quantity, 0) AS QtyOut," & vbCrLf
+    s = s & "       t.Quantity AS NetQty, CCur(Nz(t.UnitCost, 0)) AS MoveCost," & vbCrLf
+    s = s & "       IIf(t.Quantity > 0, CCur(t.Quantity * CCur(Nz(t.UnitCost, 0))), 0) AS ValueIn," & vbCrLf
+    s = s & "       IIf(t.Quantity < 0, CCur(-t.Quantity * CCur(Nz(t.UnitCost, 0))), 0) AS ValueOut," & vbCrLf
+    s = s & "       CCur(t.Quantity * CCur(Nz(t.UnitCost, 0))) AS NetValue, t.Notes" & vbCrLf
+    s = s & "FROM ((InventoryTransactions AS t INNER JOIN [@TransactionTypes] AS tt ON t.TransactionTypeID = tt.TransactionTypeID)" & vbCrLf
+    s = s & "      INNER JOIN [@Warehouses] AS w ON t.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "     LEFT JOIN qryStockMoveParty AS m ON t.TransactionID = m.TransactionID" & vbCrLf
+    s = s & "WHERE t.ProductID = QLong('ProductID') AND t.TransactionDate >= QDate('PeriodStart') AND t.TransactionDate < QDate('PeriodEnd')" & vbCrLf
+    s = s & "  AND (QLong('WarehouseID') = 0 OR t.WarehouseID = QLong('WarehouseID'))" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 0, 0, QDate('PeriodStart'), 'رصيد أول المدة', Null, Null, Null," & vbCrLf
+    s = s & "       IIf(CCur(Nz(Sum(o.Quantity), 0)) > 0, CCur(Nz(Sum(o.Quantity), 0)), 0)," & vbCrLf
+    s = s & "       IIf(CCur(Nz(Sum(o.Quantity), 0)) < 0, -CCur(Nz(Sum(o.Quantity), 0)), 0)," & vbCrLf
+    s = s & "       CCur(Nz(Sum(o.Quantity), 0)), Null," & vbCrLf
+    s = s & "       IIf(CCur(Nz(Sum(CCur(o.Quantity * o.UnitCost)), 0)) > 0, CCur(Nz(Sum(CCur(o.Quantity * o.UnitCost)), 0)), 0)," & vbCrLf
+    s = s & "       IIf(CCur(Nz(Sum(CCur(o.Quantity * o.UnitCost)), 0)) < 0, -CCur(Nz(Sum(CCur(o.Quantity * o.UnitCost)), 0)), 0)," & vbCrLf
+    s = s & "       CCur(Nz(Sum(CCur(o.Quantity * o.UnitCost)), 0)), Null" & vbCrLf
+    s = s & "FROM InventoryTransactions AS o" & vbCrLf
+    s = s & "WHERE o.ProductID = QLong('ProductID') AND o.TransactionDate < QDate('PeriodStart')" & vbCrLf
+    s = s & "  AND (QLong('WarehouseID') = 0 OR o.WarehouseID = QLong('WarehouseID'))" & vbCrLf
+    s = s & "ORDER BY SortKey, MovementDate, MoveID" & vbCrLf
+    SaveQuery "ItemCardQuery", "كارت الصنف: رصيد أول المدة بالكمية والقيمة، ثم كل حركة في مخزن (أو كل المخازن) خلال فترة", s
+End Sub
+
+Private Sub Q_StockValueByWarehouseQuery()
+    Dim s As String
+    s = "SELECT q.WarehouseID, w.WarehouseName, Min(IIf(q.WarehouseID = 1, 1400, 140000 + q.WarehouseID)) AS StockAccount," & vbCrLf
+    s = s & "       Count(*) AS ProductCount, Sum(q.StockQty) AS TotalQuantity," & vbCrLf
+    s = s & "       Sum(q.StockQty * p.AverageCost) AS StockCostValue, Sum(q.StockQty * p.SellingPrice) AS StockSalesValue" & vbCrLf
+    s = s & "FROM (qryWarehouseStock AS q INNER JOIN [@Warehouses] AS w ON q.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "     INNER JOIN Products AS p ON q.ProductID = p.ProductID" & vbCrLf
+    s = s & "WHERE q.StockQty <> 0" & vbCrLf
+    s = s & "GROUP BY q.WarehouseID, w.WarehouseName" & vbCrLf
+    s = s & "ORDER BY q.WarehouseID" & vbCrLf
+    SaveQuery "StockValueByWarehouseQuery", "تقييم المخزون لكل مخزن: عدد الأصناف والكمية والقيمة بالتكلفة وبسعر البيع", s
+End Sub
+
+Private Sub Q_StockCountDiffQuery()
+    Dim s As String
+    s = "SELECT c.StockCountID, c.CountNumber, c.CountDate, c.WarehouseID, w.WarehouseName, p.ProductID, p.ProductCode," & vbCrLf
+    s = s & "       p.ProductName, IIf(t.Quantity < 0, -t.Quantity, 0) AS ShortQty, IIf(t.Quantity > 0, t.Quantity, 0) AS ExtraQty," & vbCrLf
+    s = s & "       t.UnitCost, CCur(t.Quantity * t.UnitCost) AS DiffValue" & vbCrLf
+    s = s & "FROM ((InventoryTransactions AS t INNER JOIN StockCounts AS c ON t.ReferenceID = c.StockCountID)" & vbCrLf
+    s = s & "      INNER JOIN [@Warehouses] AS w ON c.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "     INNER JOIN Products AS p ON t.ProductID = p.ProductID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'STOCK_COUNT'" & vbCrLf
+    s = s & "ORDER BY c.CountDate, p.ProductName" & vbCrLf
+    SaveQuery "StockCountDiffQuery", "فروقات الجرد المرحّلة لكل مخزن: العجز والزيادة وقيمتهما كما رُحّلت", s
+End Sub
+
 Private Sub Q_SlowMovingProductsQuery()
     Dim s As String
     s = "SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity," & vbCrLf
@@ -1387,11 +1486,13 @@ End Sub
 Private Sub Q_StockCountQuery()
     Dim s As String
     s = "SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, g.CategoryName," & vbCrLf
+    s = s & "       c.WarehouseID, w.WarehouseName," & vbCrLf
     s = s & "       d.ProductID, p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference," & vbCrLf
     s = s & "       d.UnitCost, d.DifferenceValue, d.Notes" & vbCrLf
-    s = s & "FROM ((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)" & vbCrLf
-    s = s & "      INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
-    s = s & "     LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID" & vbCrLf
+    s = s & "FROM (((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)" & vbCrLf
+    s = s & "       INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
+    s = s & "      LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID)" & vbCrLf
+    s = s & "     LEFT JOIN [@Warehouses] AS w ON c.WarehouseID = w.WarehouseID" & vbCrLf
     s = s & "ORDER BY c.StockCountID, p.ProductName" & vbCrLf
     SaveQuery "StockCountQuery", "تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته", s
 End Sub
@@ -2605,6 +2706,19 @@ Private Sub Q_qryJournalStockTransfer()
     s = s & "FROM StockTransfers AS t INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID" & vbCrLf
     s = s & "WHERE t.Status = 'RECEIVED' AND t.InTransit = True AND v.TransferValue <> 0" & vbCrLf
     SaveQuery "qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", s
+End Sub
+
+Private Sub Q_TransfersInTransitQuery()
+    Dim s As String
+    s = "SELECT t.StockTransferID, t.TransferNumber, t.TransferDate, t.FromWarehouseID, f.WarehouseName AS FromName," & vbCrLf
+    s = s & "       t.ToWarehouseID, d.WarehouseName AS ToName, v.TransferValue," & vbCrLf
+    s = s & "       DateDiff('d', t.TransferDate, Date()) AS DaysInTransit, t.Notes" & vbCrLf
+    s = s & "FROM ((StockTransfers AS t INNER JOIN [@Warehouses] AS f ON t.FromWarehouseID = f.WarehouseID)" & vbCrLf
+    s = s & "      INNER JOIN [@Warehouses] AS d ON t.ToWarehouseID = d.WarehouseID)" & vbCrLf
+    s = s & "     INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID" & vbCrLf
+    s = s & "WHERE t.Status = 'SENT'" & vbCrLf
+    s = s & "ORDER BY t.TransferDate" & vbCrLf
+    SaveQuery "TransfersInTransitQuery", "التحويلات بين المخازن المرسلة ولم تُستلم بعد، بقيمتها وعدد أيامها بالطريق", s
 End Sub
 
 Private Sub Q_qryStockPartyAccounts()

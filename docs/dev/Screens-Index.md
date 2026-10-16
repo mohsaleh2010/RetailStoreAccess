@@ -31,7 +31,7 @@
 | 23 | `frmSettings` | الإعدادات | نافذة منبثقة | Settings | SETTINGS | frmMain، القائمة الجانبية |
 | 24 | `frmLabelSettings` | إعدادات ملصقات الباركود | نافذة منبثقة | LabelSettings | PRODUCTS | frmBarcodeLabels، frmSettings |
 | 25 | `frmSearch` | البحث المتقدم | شاشة كاملة | - | الكل | frmMain، القائمة الجانبية |
-| 26 | `frmReportCenter` | التقارير | شاشة كاملة | - | REPORTS | frmMain، frmSalesReps، frmWarehouses، القائمة الجانبية |
+| 26 | `frmReportCenter` | التقارير | شاشة كاملة | - | REPORTS | frmMain، frmProducts، frmSalesReps، frmWarehouses، القائمة الجانبية |
 | 27 | `frmPOSLines` | أسطر الفاتورة | شاشة فرعية في frmPOS | tmpPOSLines | مع الشاشة الأم | - |
 | 28 | `frmPOS` | نقطة البيع | شاشة كاملة | - | SALES_POS | frmMain، القائمة الجانبية |
 | 29 | `frmReturnLines` | أسطر المرتجع | شاشة فرعية في frmSalesReturn | tmpReturnLines | مع الشاشة الأم | - |

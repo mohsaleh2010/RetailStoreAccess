@@ -835,6 +835,89 @@ FROM InventoryTransactions AS o
 WHERE o.ProductID = QLong('ProductID') AND o.TransactionDate < QDate('PeriodStart')
 ORDER BY SortKey, MovementDate, TransactionID""", P + ["ProductID"]),
 
+    # ---- item card and warehouse reports (docs/60, plan 2D)
+    Query("qryStockMoveParty", "الجهة الأخرى لكل حركة مخزون: العميل، أو المورد، أو جهة السند، أو المخزن الآخر في التحويل", """
+SELECT t.TransactionID, c.CustomerName AS PartyName
+FROM (InventoryTransactions AS t INNER JOIN SalesInvoices AS h ON t.ReferenceID = h.SalesInvoiceID)
+     INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID
+WHERE t.ReferenceType = 'SALE'
+UNION ALL
+SELECT t.TransactionID, c.CustomerName
+FROM (InventoryTransactions AS t INNER JOIN SalesReturns AS r ON t.ReferenceID = r.SalesReturnID)
+     INNER JOIN [@Customers] AS c ON r.CustomerID = c.CustomerID
+WHERE t.ReferenceType = 'SALES_RETURN'
+UNION ALL
+SELECT t.TransactionID, s.SupplierName
+FROM (InventoryTransactions AS t INNER JOIN PurchaseInvoices AS h ON t.ReferenceID = h.PurchaseInvoiceID)
+     INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID
+WHERE t.ReferenceType = 'PURCHASE'
+UNION ALL
+SELECT t.TransactionID, s.SupplierName
+FROM (InventoryTransactions AS t INNER JOIN PurchaseReturns AS r ON t.ReferenceID = r.PurchaseReturnID)
+     INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID
+WHERE t.ReferenceType = 'PURCHASE_RETURN'
+UNION ALL
+SELECT t.TransactionID, p.PartyName
+FROM (InventoryTransactions AS t INNER JOIN StockDocuments AS d ON t.ReferenceID = d.StockDocumentID)
+     INNER JOIN [@StockParties] AS p ON d.StockPartyID = p.StockPartyID
+WHERE t.ReferenceType = 'STOCK_DOC'
+UNION ALL
+SELECT t.TransactionID, w.WarehouseName
+FROM (InventoryTransactions AS t INNER JOIN StockTransfers AS x ON t.ReferenceID = x.StockTransferID)
+     INNER JOIN [@Warehouses] AS w ON x.ToWarehouseID = w.WarehouseID
+WHERE t.ReferenceType = 'TRANSFER' AND t.Quantity < 0
+UNION ALL
+SELECT t.TransactionID, w.WarehouseName
+FROM (InventoryTransactions AS t INNER JOIN StockTransfers AS x ON t.ReferenceID = x.StockTransferID)
+     INNER JOIN [@Warehouses] AS w ON x.FromWarehouseID = w.WarehouseID
+WHERE t.ReferenceType = 'TRANSFER' AND t.Quantity > 0"""),
+
+    Query("ItemCardQuery", "كارت الصنف: رصيد أول المدة بالكمية والقيمة، ثم كل حركة في مخزن (أو كل المخازن) خلال فترة", f"""
+SELECT 1 AS SortKey, t.TransactionID AS MoveID, t.TransactionDate AS MovementDate, tt.TypeName AS MovementType,
+       t.ReferenceNumber, w.WarehouseName, m.PartyName,
+       IIf(t.Quantity > 0, t.Quantity, 0) AS QtyIn, IIf(t.Quantity < 0, -t.Quantity, 0) AS QtyOut,
+       t.Quantity AS NetQty, {nz("t.UnitCost")} AS MoveCost,
+       IIf(t.Quantity > 0, CCur(t.Quantity * {nz("t.UnitCost")}), 0) AS ValueIn,
+       IIf(t.Quantity < 0, CCur(-t.Quantity * {nz("t.UnitCost")}), 0) AS ValueOut,
+       CCur(t.Quantity * {nz("t.UnitCost")}) AS NetValue, t.Notes
+FROM ((InventoryTransactions AS t INNER JOIN [@TransactionTypes] AS tt ON t.TransactionTypeID = tt.TransactionTypeID)
+      INNER JOIN [@Warehouses] AS w ON t.WarehouseID = w.WarehouseID)
+     LEFT JOIN qryStockMoveParty AS m ON t.TransactionID = m.TransactionID
+WHERE t.ProductID = QLong('ProductID') AND {period("t.TransactionDate")}
+  AND (QLong('WarehouseID') = 0 OR t.WarehouseID = QLong('WarehouseID'))
+UNION ALL
+SELECT 0, 0, QDate('PeriodStart'), 'رصيد أول المدة', Null, Null, Null,
+       IIf({nz("Sum(o.Quantity)")} > 0, {nz("Sum(o.Quantity)")}, 0),
+       IIf({nz("Sum(o.Quantity)")} < 0, -{nz("Sum(o.Quantity)")}, 0),
+       {nz("Sum(o.Quantity)")}, Null,
+       IIf({nz("Sum(CCur(o.Quantity * o.UnitCost))")} > 0, {nz("Sum(CCur(o.Quantity * o.UnitCost))")}, 0),
+       IIf({nz("Sum(CCur(o.Quantity * o.UnitCost))")} < 0, -{nz("Sum(CCur(o.Quantity * o.UnitCost))")}, 0),
+       {nz("Sum(CCur(o.Quantity * o.UnitCost))")}, Null
+FROM InventoryTransactions AS o
+WHERE o.ProductID = QLong('ProductID') AND o.TransactionDate < QDate('PeriodStart')
+  AND (QLong('WarehouseID') = 0 OR o.WarehouseID = QLong('WarehouseID'))
+ORDER BY SortKey, MovementDate, MoveID""", P + ["ProductID", "WarehouseID"]),
+
+    Query("StockValueByWarehouseQuery", "تقييم المخزون لكل مخزن: عدد الأصناف والكمية والقيمة بالتكلفة وبسعر البيع", """
+SELECT q.WarehouseID, w.WarehouseName, Min(IIf(q.WarehouseID = 1, 1400, 140000 + q.WarehouseID)) AS StockAccount,
+       Count(*) AS ProductCount, Sum(q.StockQty) AS TotalQuantity,
+       Sum(q.StockQty * p.AverageCost) AS StockCostValue, Sum(q.StockQty * p.SellingPrice) AS StockSalesValue
+FROM (qryWarehouseStock AS q INNER JOIN [@Warehouses] AS w ON q.WarehouseID = w.WarehouseID)
+     INNER JOIN Products AS p ON q.ProductID = p.ProductID
+WHERE q.StockQty <> 0
+GROUP BY q.WarehouseID, w.WarehouseName
+ORDER BY q.WarehouseID"""),
+
+    Query("StockCountDiffQuery", "فروقات الجرد المرحّلة لكل مخزن: العجز والزيادة وقيمتهما كما رُحّلت", """
+SELECT c.StockCountID, c.CountNumber, c.CountDate, c.WarehouseID, w.WarehouseName, p.ProductID, p.ProductCode,
+       p.ProductName, IIf(t.Quantity < 0, -t.Quantity, 0) AS ShortQty, IIf(t.Quantity > 0, t.Quantity, 0) AS ExtraQty,
+       t.UnitCost, CCur(t.Quantity * t.UnitCost) AS DiffValue
+FROM ((InventoryTransactions AS t INNER JOIN StockCounts AS c ON t.ReferenceID = c.StockCountID)
+      INNER JOIN [@Warehouses] AS w ON c.WarehouseID = w.WarehouseID)
+     INNER JOIN Products AS p ON t.ProductID = p.ProductID
+WHERE t.ReferenceType = 'STOCK_COUNT'
+ORDER BY c.CountDate, p.ProductName"""),
+
     Query("SlowMovingProductsQuery", "المنتجات غير المتحركة: لها رصيد ولم تُبع منذ عدد الأيام المحدد في الإعدادات", """
 SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuantity,
        p.AverageCost, p.CurrentQuantity * p.AverageCost AS StockCostValue, ls.LastSaleDate,
@@ -858,11 +941,13 @@ ORDER BY c.CategoryName"""),
 
     Query("StockCountQuery", "تفاصيل جلسات الجرد: الكمية المسجلة والفعلية والفرق وقيمته", """
 SELECT c.StockCountID, c.CountNumber, c.CountDate, c.Status, c.CategoryID, g.CategoryName,
+       c.WarehouseID, w.WarehouseName,
        d.ProductID, p.ProductCode, p.ProductName, d.SystemQuantity, d.ActualQuantity, d.Difference,
        d.UnitCost, d.DifferenceValue, d.Notes
-FROM ((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)
-      INNER JOIN Products AS p ON d.ProductID = p.ProductID)
-     LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID
+FROM (((StockCountDetails AS d INNER JOIN StockCounts AS c ON d.StockCountID = c.StockCountID)
+       INNER JOIN Products AS p ON d.ProductID = p.ProductID)
+      LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID)
+     LEFT JOIN [@Warehouses] AS w ON c.WarehouseID = w.WarehouseID
 ORDER BY c.StockCountID, p.ProductName"""),
 
     # ============================================================ OPENING BALANCES (docs/52)
@@ -1702,6 +1787,15 @@ SELECT StockTransferID, Sum(CCur(Quantity * UnitCost)) AS TransferValue
 FROM StockTransferLines
 GROUP BY StockTransferID"""),
     Query("qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", _stock_transfer()),
+    Query("TransfersInTransitQuery", "التحويلات بين المخازن المرسلة ولم تُستلم بعد، بقيمتها وعدد أيامها بالطريق", """
+SELECT t.StockTransferID, t.TransferNumber, t.TransferDate, t.FromWarehouseID, f.WarehouseName AS FromName,
+       t.ToWarehouseID, d.WarehouseName AS ToName, v.TransferValue,
+       DateDiff('d', t.TransferDate, Date()) AS DaysInTransit, t.Notes
+FROM ((StockTransfers AS t INNER JOIN [@Warehouses] AS f ON t.FromWarehouseID = f.WarehouseID)
+      INNER JOIN [@Warehouses] AS d ON t.ToWarehouseID = d.WarehouseID)
+     INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID
+WHERE t.Status = 'SENT'
+ORDER BY t.TransferDate"""),
     Query("qryStockPartyAccounts", "حساب كل جهة صرف واستلام: حسابها، وإلا حساب نوعها", """
 SELECT p.StockPartyID, p.PartyName, p.CostCenterID,
        IIf(p.AccountCode Is Null, IIf(p.PartyType = 'PRODUCTION', 1420, IIf(p.PartyType = 'WASTE', 5250,

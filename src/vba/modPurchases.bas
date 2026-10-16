@@ -549,6 +549,7 @@ End Function
 Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As String, _
                                  ByRef NewCountID As Long, Optional ByVal WarehouseID As Long = 0) As String
     ' The count of one warehouse (0 = the user's): its lines start from the stock of that warehouse.
+    ' Each warehouse has at most one open count; several warehouses can be counted at the same time.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim openNo As Variant, countNo As String, scope As String, sysQty As String
 
@@ -559,14 +560,14 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
         CreateStockCount = "لا تملك صلاحية الجرد."
         Exit Function
     End If
-    openNo = DbValue("SELECT CountNumber FROM StockCounts WHERE Status = 'OPEN'")
-    If Not IsNull(openNo) Then
-        CreateStockCount = "يوجد جرد مفتوح (" & openNo & "). رحّله أو ألغه قبل بدء جرد جديد."
-        Exit Function
-    End If
     If WarehouseID = 0 Then WarehouseID = CurrentWarehouseID()
     If Len(WarehouseProblem(WarehouseID)) > 0 Then
         CreateStockCount = WarehouseProblem(WarehouseID)
+        Exit Function
+    End If
+    openNo = DbValue("SELECT CountNumber FROM StockCounts WHERE Status = 'OPEN' AND WarehouseID = " & WarehouseID)
+    If Not IsNull(openNo) Then
+        CreateStockCount = "يوجد جرد مفتوح لهذا المخزن (" & openNo & "). رحّله أو ألغه قبل بدء جرد جديد له."
         Exit Function
     End If
     scope = "IsActive = True AND TrackStock = True"

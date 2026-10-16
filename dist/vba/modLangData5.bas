@@ -16,6 +16,42 @@ Public Sub LangData5()
 End Sub
 
 Private Sub D5_1()
+    LangAdd "«·„Õ«Ê·« ", "Attempts"
+    LangAdd "«·„œ›Ê⁄« ", "Payments"
+    LangAdd "«·„— Ã⁄« ", "Returns"
+    LangAdd "«·„” ‰œ« ", "Documents"
+    LangAdd "«·„‘ —Ì« ", "Purchases"
+    LangAdd "«·„’—Ê›« ", "Expenses"
+    LangAdd "«·„ﬁ»Ê÷« ", "Receipts"
+    LangAdd "«·„‰œÊ»Ì‰", "Sales reps"
+    LangAdd "»œ· «·”ﬂ‰", "Housing allowance"
+    LangAdd "»œ· «·‰ﬁ·", "Transport allowance"
+    LangAdd "»⁄œ «·ÌÊ„", "after today"
+    LangAdd "»·« ‰Â«Ì…", "No end"
+    LangAdd " Õ’Ì· ‘Ìﬂ", "Cheque collection"
+    LangAdd " ”ÊÌ… „œÏ", "Mada settlement"
+    LangAdd " „  ≈÷«›…", "Added"
+    LangAdd "À·«À… ⁄‘—", "thirteen"
+    LangAdd "À„‰ «·»Ì⁄", "Sale price"
+    LangAdd "Ã‰ÌÂ „’—Ì", "Egyptian pound"
+    LangAdd "Õ–› «·ﬁÌœ", "Delete the entry"
+    LangAdd "Õ—ﬂ… „‰ Ã", "Product moves"
+    LangAdd "Õ›Ÿ «·√’·", "Save the asset"
+    LangAdd "Õ›Ÿ «·”‰œ", "Save the voucher"
+    LangAdd "Õ›Ÿ «·ﬁÌœ", "Save the entry"
+    LangAdd "Õ›Ÿ  ’›Ì…", "Save closing"
+    LangAdd "Õ›Ÿ „”Êœ…", "Save draft"
+    LangAdd "ÕÌ «·⁄„Ì·", "Customer district"
+    LangAdd "Õıœˆ¯À ›Ì", "Updated on"
+    LangAdd "Œ’„ «·”ÿ—", "Line discount"
+    LangAdd "Œ’„ «·”·›", "Advance deductions"
+    LangAdd "œŒÊ· Œ«ÿ∆", "Wrong login"
+    LangAdd "—’Ìœ œ«∆‰", "Credit balance"
+    LangAdd "—’Ìœ ”«»ﬁ", "Previous balance"
+    LangAdd "—’Ìœ „œÌ‰", "Debit balance"
+    LangAdd "—ﬁ„ «·Ã—œ", "Count number"
+    LangAdd "—ﬁ„ «·”‰œ", "Voucher number"
+    LangAdd "—ﬁ„ «·‘Ìﬂ", "Cheque number"
     LangAdd "—ﬁ„ «·ﬁÌœ", "Entry number"
     LangAdd "”«Œ‰ Ãœ«", "Extra hot"
     LangAdd "”Õ» ‰ﬁœÌ…", "Cash withdrawal"
@@ -100,6 +136,9 @@ Private Sub D5_1()
     LangAdd " „ «·Õ›Ÿ", "Saved"
     LangAdd " „ «·—»ÿ", "Linked"
     LangAdd "À·«À„«∆…", "three hundred"
+End Sub
+
+Private Sub D5_2()
     LangAdd "À·Ã ﬁ·Ì·", "Little ice"
     LangAdd "À„«‰„«∆…", "eight hundred"
     LangAdd "Ã—œ ÃœÌœ", "New count"
@@ -136,9 +175,6 @@ Private Sub D5_1()
     LangAdd "·„ Ìı‰‘√", "Not created"
     LangAdd "·Ê‰ «·“—", "Button color"
     LangAdd "„Œ“‰ ›—⁄", "Branch warehouse"
-End Sub
-
-Private Sub D5_2()
     LangAdd "„⁄ „œ ›Ì", "Approved on"
     LangAdd "„ﬁ›· Õ Ï", "Closed up to"
     LangAdd "„‰ «·»‰ﬂ", "From the bank"
@@ -223,6 +259,9 @@ Private Sub D5_2()
     LangAdd "«·„‘ﬂ·…", "Problem"
     LangAdd "«·„’—Ê›", "Expense"
     LangAdd "«·„ÿ·Ê»", "required"
+End Sub
+
+Private Sub D5_3()
     LangAdd "«·„⁄«„·", "Rate"
     LangAdd "«·„‰œÊ»", "Sales rep"
     LangAdd "«·„‰ÿﬁ…", "Region"
@@ -259,9 +298,6 @@ Private Sub D5_2()
     LangAdd "„ı” ·Û„", "Received"
     LangAdd "Ê«·œ«∆‰", "and credit"
     LangAdd "Ì»œ√ „‰", "Starts from"
-End Sub
-
-Private Sub D5_3()
     LangAdd "√Ã—«Â«", "Done by"
     LangAdd "√—»⁄Ê‰", "forty"
     LangAdd "√ﬂ Ê»—", "October"
@@ -346,6 +382,9 @@ Private Sub D5_3()
     LangAdd "„ Ê«“‰", "Balanced"
     LangAdd "„Õ’Û¯·", "Collected"
     LangAdd "„—ÕÛ¯·", "Posted"
+End Sub
+
+Private Sub D5_4()
     LangAdd "„” »⁄œ", "Disposed"
     LangAdd "„” Œœ„", "User"
     LangAdd "„” —œ…", "Refunded"
@@ -382,9 +421,6 @@ Private Sub D5_3()
     LangAdd "«·Ã—œ", "Stock count"
     LangAdd "«·ÃÂ…", "Party"
     LangAdd "«·ÕÃ„", "Size"
-End Sub
-
-Private Sub D5_4()
     LangAdd "«·Õ–›", "Delete"
     LangAdd "«·Õﬁ·", "Field"
     LangAdd "«·Œ’„", "Discount"
@@ -466,8 +502,12 @@ Private Sub D5_4()
     LangAdd "„·«∆„", "Suitable"
     LangAdd "„·ÌÊ‰", "million"
     LangAdd "„‰Œ›÷", "Low"
+    LangAdd "„‰’—›", "Out"
     LangAdd "„ı—”·", "Submitted"
     LangAdd "‰ ÌÃ…", "Result"
+End Sub
+
+Private Sub D5_5()
     LangAdd "Ì”«ÊÌ", "equals"
     LangAdd "Ì‰«Ì—", "January"
     LangAdd "ÌÊ·ÌÊ", "July"
@@ -505,9 +545,6 @@ Private Sub D5_4()
     LangAdd "”›—Ì", "Takeaway"
     LangAdd "”·›…", "Advance"
     LangAdd "”‰ÊÌ", "Yearly"
-End Sub
-
-Private Sub D5_5()
     LangAdd "‘€¯·", "Run"
     LangAdd "‘Â—Ì", "Monthly"
     LangAdd "’«œ—", "Issued"

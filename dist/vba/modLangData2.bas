@@ -51,6 +51,7 @@ Private Sub D2_1()
     LangAdd "ÑÕíÏ ÇáÍÓÇÈ İí ÇáÈäß ÚäÏ ÈÏÁ ÇÓÊÎÏÇã ÇáÈÑäÇãÌ", "The account balance in the bank when the program is first used"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáİÊÑÇÊ ÇáãÇáíÉ (ÅŞİÇá ÇáİÊÑÇÊ", "You do not have the permission for the fiscal periods (period closing"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÚãæáÇÊ ÇáãäÏæÈíä", "You do not have this permission in the sales rep commissions screen"
+    LangAdd "áÇ ÊæÌÏ ÍÑßÉ áåĞÇ ÇáÕäİ İí ÇáÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "No movement of this item for the selected choices"
     LangAdd "áÕäÏæŞ ÚåÏÉ ÇáãäÏæÈ: ãÓÊÎÏã ÇáãäÏæÈ Ããíä Úáíå", "For a sales rep custody box: the user of the sales rep keeps it"
     LangAdd "ááÚãá İí ÇáÏæáÉ ÇáÃÎÑì ÇÈÏÃ ãáİ ÈíÇäÇÊ ÌÏíÏğÇ", "To work in the other country start a new data file"
     LangAdd "ÃÖİ ÕäİğÇ æÇÍÏğÇ Úáì ÇáÃŞá Åáì ŞÇÆãÉ ÇáØÈÇÚÉ", "Add at least one item to the print list"
@@ -134,10 +135,10 @@ Private Sub D2_1()
     LangAdd "Úáì åĞÇ ÇáÍÓÇÈ ŞíæÏ¡ İíÈŞì ÍÓÇÈğÇ İÑÚíğÇ", "This account has entries, so it stays a sub-account"
     LangAdd "ßáãÊÇ ÇáãÑæÑ ÛíÑ ãÊØÇÈŞÊíä. áã íÊÛíÑ ÔíÁ", "The two passwords do not match. Nothing changed"
     LangAdd "áÇ íãßäß ÊÚØíá ÍÓÇÈß æÃäÊ ãÓÌá ÇáÏÎæá Èå", "You cannot deactivate your own account while logged in with it"
-    LangAdd "áã íõäÔÆ ÈÑäÇãÌ ÇáÊæŞíÚ ãáİ ÇáÊæŞíÚ (ÑãÒ", "The signing program did not create the signature file (code"
 End Sub
 
 Private Sub D2_2()
+    LangAdd "áã íõäÔÆ ÈÑäÇãÌ ÇáÊæŞíÚ ãáİ ÇáÊæŞíÚ (ÑãÒ", "The signing program did not create the signature file (code"
     LangAdd "ãÈáÛ ãÓÊÍŞ ááãæÑÏ (ÈÚãáÉ ÇáÈÑäÇãÌ ÏÇÆãğÇ", "an amount due to the supplier (always in the program currency"
     LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáíÓ áå ÑÕíÏ", "This item does not track stock, so it has no balance"
     LangAdd "åĞå ÇáÔÇÔÉ ÓÊßæä ãÊÇÍÉ ÈÚÏ ÊäİíĞ ÇáãÑÍáÉ", "This screen will be available after phase"
@@ -158,6 +159,7 @@ Private Sub D2_2()
     LangAdd "ÕäİğÇ áÃä áåÇ ÍÑßÇÊ Ãæ áÇ ÊÊÇÈÚ ÇáãÎÒæä", "items, because they have moves or do not track stock"
     LangAdd "ÚÏøá ÇáÅÖÇİí æÇáÎÕæãÇÊ Ëã «ÊÑÍíá ÇáãÓíÑ", "Edit the overtime and deductions, then Post the run"
     LangAdd "ßáãÉ ÇáÈÍË (ÇÓã¡ ßæÏ¡ ÈÇÑßæÏ¡ ÑŞã¡ ÌæÇá", "Search text (name, code, barcode, number, mobile"
+    LangAdd "áÇ ÊæÌÏ İÑæŞÇÊ ÌÑÏ ãÑÍøáÉ İí åĞå ÇáİÊÑÉ", "No posted stock count differences in this period"
     LangAdd "áÇ ÊæÌÏ İæÇÊíÑ Ãæ ãÑÊÌÚÇÊ İí åĞå ÇáİÊÑÉ", "No invoices or returns in this period"
     LangAdd "áÇ ÊæÌÏ ãÕÑæİÇÊ ãÊßÑÑÉ ãÓÊÍŞÉ ÍÊì Çáíæã", "There are no recurring expenses due up to today"
     LangAdd "áÇ íãßä ÊİÚíá ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÇáÂä", "E-invoicing cannot be enabled now"
@@ -256,14 +258,15 @@ Private Sub D2_2()
     LangAdd "ÊÛíÑÊ ÇáÃÑÕÏÉ: ÇÖÛØ «ÊÍÏíË ÇáÅÌãÇáí", "The balances changed: press Refresh total"
     LangAdd "ÊÛííÑ ÇÓã ÇáãÍá íÊã Úä ØÑíŞ ÇáãÈÑãÌ", "The store name is changed by the developer"
     LangAdd "ÍÓÇÈ ÑÆíÓí: íÔãá ßá ÍÓÇÈÇÊå ÇáÊÇÈÚÉ", "Main account: includes all its sub-accounts"
-    LangAdd "ÑÕíÏ ÇáÕäÏæŞ íõÏÎá İí ŞÓã «ÇáÕäÇÏíŞ", "The balance of a cash box is entered in the Cash boxes part"
-    LangAdd "ÑÕíÏ ÇáÚãíá ÇáãÓÌá áÇ íØÇÈŞ ÇáÍÑßÇÊ", "The recorded customer balance does not match the moves"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "ÑÕíÏ ÇáÕäÏæŞ íõÏÎá İí ŞÓã «ÇáÕäÇÏíŞ", "The balance of a cash box is entered in the Cash boxes part"
+    LangAdd "ÑÕíÏ ÇáÚãíá ÇáãÓÌá áÇ íØÇÈŞ ÇáÍÑßÇÊ", "The recorded customer balance does not match the moves"
     LangAdd "ÑÕíÏ ÇáãæÑÏ ÇáãÓÌá áÇ íØÇÈŞ ÇáÍÑßÇÊ", "The recorded supplier balance does not match the moves"
     LangAdd "ÑŞã ÇáÊÓÌíá ÇáÖÑíÈí ááÚãíá (9 ÃÑŞÇã", "Tax registration number of the customer (9 digits"
     LangAdd "ÖÑíÈÉ ãÓÊÑÏÉ ÊõÑÍóøá ááÅŞÑÇÑ ÇáÊÇáí", "Refundable VAT carried to the next return"
+    LangAdd "ßÇÑÊ ÇáÕäİ (ÇáßãíÉ æÇáŞíãÉ áßá ãÎÒä", "Item card (quantity and value by warehouse"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÇáãÎÒæä íÏæíğÇ", "You do not have the permission to adjust the stock by hand"
     LangAdd "ááãÈÑãÌ: ÊæáíÏ ßæÏ ÊİÚíá áÌåÇÒ Úãíá", "For the developer: generate an activation code for a customer computer"
     LangAdd "ãÓÊÍŞÉ ÎáÇá 7 ÃíÇã Ãæ İÇÊ ÇÓÊÍŞÇŞåÇ", "Due within 7 days or overdue"
@@ -308,6 +311,7 @@ Private Sub D2_3()
     LangAdd "ÍĞİ ÇáÍÑßÉ ÇáÈäßíÉ ÇáãÍÏÏÉ æŞíÏåÇ", "Delete the selected bank transaction and its entry"
     LangAdd "ÍÓÈ ÕÇİí ÇáßãíÉ ÎáÇá İÊÑÉ ÇáÊŞÑíÑ", "By net quantity during the report period"
     LangAdd "ÎÕã ÇáÛíÇÈ ÃßÈÑ ãä ÇáÃÓÇÓí æÇáÓßä", "The absence deduction is more than the basic and housing"
+    LangAdd "ÑÍøáå Ãæ ÃáÛå ŞÈá ÈÏÁ ÌÑÏ ÌÏíÏ áå", "Post or cancel it before starting a new count for it"
     LangAdd "ÑŞãäÇ (PUR-) Ãæ ÑŞã İÇÊæÑÉ ÇáãæÑÏ", "Our number (PUR-) or the supplier invoice number"
     LangAdd "ÓØÑ áÇ íäÊãí Åáì ÇáİÇÊæÑÉ ÇáÃÕáíÉ", "A line that does not belong to the original invoice"
     LangAdd "ØáÈ ÓİÑí: íõÛáóøİ æíõÓáóøã ááÚãíá", "Takeaway order: packed and handed to the customer"
@@ -377,13 +381,13 @@ Private Sub D2_3()
     LangAdd "ÂÎÑ ÊÓæíÉ ãÚÊãÏÉ áåĞÇ ÇáÈäß İí", "Last approved reconciliation of this bank on"
     LangAdd "ÃÖİå İí ÊÕÍíÍÇÊ ÇáÅŞÑÇÑ ÇáÊÇáí", "Add it to the corrections of the next return"
     LangAdd "ÅÚÇÏÉ ÇáİÊÍ: ÊÕÈÍ ÇáİÊÑÉ ãŞİáÉ", "Reopening: the period becomes closed"
+End Sub
+
+Private Sub D2_4()
     LangAdd "ÅáÛÇÁ ÇáÊİÚíá áãÏíÑ ÇáäÙÇã İŞØ", "Deactivation is for the system administrator only"
     LangAdd "ÅáÛÇÁ ÑÈØ åĞÇ ÇáãÈáÛ ÈÇáİÇÊæÑÉ", "Unlink this amount from the invoice"
     LangAdd "ÅíÑÇÏÇÊ æãÕÑæİÇÊ ßá ãÑßÒ ÊßáİÉ", "Revenue and expenses of each cost center"
     LangAdd "ÇÎÊÑ ÇáÍÓÇÈ İí ßá ÓØÑ İíå ãÈáÛ", "Choose the account in every line with an amount"
-End Sub
-
-Private Sub D2_4()
     LangAdd "ÇÎÊÑ ÇáÎÒíäÉ ÇáÊí ÊÓÊáã ÇáãÈáÛ", "Choose the treasury that receives the amount"
     LangAdd "ÇáÈÑäÇãÌ (ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Program (e-invoice"
     LangAdd "ÇáÊÍæíá ÛíÑ ãæÌæÏ Ãæ Êã ÊÑÍíáå", "The transfer does not exist or is already posted"
@@ -401,8 +405,8 @@ Private Sub D2_4()
     LangAdd "ÊŞÑíÑ ÇáãáÕŞÇÊ ÛíÑ ãæÌæÏ. ÔÛøá", "The labels report does not exist. Run"
     LangAdd "ÍÑßÉ ÇáÎÒíäÉ / ÇáÕäÏæŞ (ÊİÕíáí", "Treasury / box moves (detailed"
     LangAdd "ÍÓÇÈ ÅÌãÇáí ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", "Total opening balances account"
-    LangAdd "ÑÍøáå Ãæ ÃáÛå ŞÈá ÈÏÁ ÌÑÏ ÌÏíÏ", "Post it or cancel it before starting a new count"
     LangAdd "ÑÕíÏ ÏÇÆä íõÑÍóøá ááÔåÑ ÇáÊÇáí", "a credit balance carried to the next month"
+    LangAdd "İÑæŞÇÊ ÇáÌÑÏ ÇáãÑÍøáÉ áßá ãÎÒä", "Posted stock count differences by warehouse"
     LangAdd "ŞíãÉ æÍÏÉ æÇÍÏÉ ÈÚãáÉ ÇáÈÑäÇãÌ", "Value of one unit in the program currency"
     LangAdd "ßá ÔÇÔÇÊ ÇáÍÓÇÈÇÊ İí ãßÇä æÇÍÏ", "All the accounting screens in one place"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÅÏÇÑÉ ÇáÕáÇÍíÇÊ", "You do not have the permission to manage permissions"
@@ -433,6 +437,7 @@ Private Sub D2_4()
     LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáÈíÚ Ãæ ÇáÇÓÊÈÚÇÏ", "Type the date of the sale or disposal"
     LangAdd "ÇáÅíÌÇÑ æÇáßåÑÈÇÁ æÇáÇÔÊÑÇßÇÊ", "Rent, electricity and subscriptions"
     LangAdd "ÇáÈÑäÇãÌ ãİÚøá Úáì åĞÇ ÇáÌåÇÒ", "The program is activated on this computer"
+    LangAdd "ÇáÊÍæíáÇÊ Èíä ÇáãÎÇÒä ÈÇáØÑíŞ", "Transfers between warehouses in transit"
     LangAdd "ÇáÊßáİÉ áÇ íãßä Ãä Êßæä ÓÇáÈÉ", "The cost cannot be negative"
     LangAdd "ÇáÑãÒ ÇáÈÑíÏí ááÚãíá (5 ÃÑŞÇã", "Customer postal code (5 digits"
     LangAdd "ÇáãÕÑæİÇÊ ÇáÊÔÛíáíÉ æÇáÅÏÇÑíÉ", "Operating and administrative expenses"
@@ -456,10 +461,4 @@ Private Sub D2_4()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊŞÇÑíÑ ÇáÃÑÈÇÍ", "You do not have the permission for profit reports"
     LangAdd "áÇ ÊæÌÏ ÃÑÕÏÉ ŞÈá åĞÇ ÇáÊÇÑíÎ", "There are no balances before this date"
     LangAdd "áÇ ÊæÌÏ ÃÓØÑ ÈßãíÉ áã ÊõÑÍóøá", "There is no line with a quantity waiting to be posted"
-    LangAdd "áÇ ÊæÌÏ ãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "There are no low-stock products"
-    LangAdd "áÇ íãßäß ÇáÕÑİ Ãæ ÇáÊÍæíá ãäå", "you cannot pay or transfer from it"
-    LangAdd "áÇ íãßäß ÊÛííÑ ÕáÇÍíÇÊß ÈäİÓß", "You cannot change your own permissions"
-    LangAdd "áÇ íæÌÏ ÚãáÇÁ ãÓäÏæä áãäÏæÈíä", "No customers are assigned to sales reps"
-    LangAdd "ãæÌæÏ İí ÇáãæÇÒäÉ áäİÓ ÇáãÑßÒ", "already in the budget for the same center"
-    LangAdd "åĞÇ ÇáÅÌÑÇÁ ÛíÑ ãæÌæÏ İí ÔÇÔÉ", "This action does not exist in the screen"
 End Sub

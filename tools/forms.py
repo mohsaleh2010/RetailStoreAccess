@@ -142,6 +142,7 @@ STOCK_PARTY_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountN
                         "a.AccountCode = 1420) ORDER BY a.TreeKey")
 WAREHOUSE_ROWS = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True "
                   "ORDER BY w.WarehouseID")
+REPORT_WAREHOUSE_ROWS = "SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w ORDER BY w.WarehouseID"
 COMMISSION_BASES = "SALES;صافي المبيعات (بدون الضريبة);COLLECTION;التحصيل"
 EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
 FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
@@ -190,7 +191,8 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("EtaItemType", hint="مصر: EGS أو GS1 (فارغ = EGS)"),
             Fld("EtaItemCode", hint="مصر: كود الصنف المسجّل في بوابة المصلحة"),
             Fld("Notes", span=2),
-        ]),
+        ],
+        extra_buttons=[("btnItemCard", "كارت الصنف", 'OpenScreen "frmReportCenter", 0, "ITEM_CARD|" & Nz(Me!ProductID, 0)')]),
     DataScreen(
         "frmCustomers", "Customers", "العملاء", "بيانات العملاء وأرصدتهم", "customers",
         list_select="t.CustomerName AS [العميل], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد]",
@@ -728,8 +730,15 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("LEAST_SELLING", "أقل المنتجات مبيعًا", "LeastSellingProductsQuery", "rptLeastSelling", "P"),
     ReportEntry("PURCHASES", "المشتريات", "PurchasesQuery", "rptPurchases", "Ps"),
     ReportEntry("STOCK", "المخزون الحالي", "StockBalanceQuery", "rptStockBalance"),
-    ReportEntry("STOCK_WAREHOUSE", "أرصدة الأصناف لكل مخزن", "StockByWarehouseQuery", "rptStockByWarehouse"),
+    ReportEntry("STOCK_WAREHOUSE", "أرصدة الأصناف لكل مخزن", "StockByWarehouseQuery", "rptStockByWarehouse", "w"),
+    ReportEntry("STOCK_VALUE_WAREHOUSE", "تقييم المخزون لكل مخزن", "StockValueByWarehouseQuery",
+                "rptStockValueByWarehouse"),
+    ReportEntry("TRANSFERS_IN_TRANSIT", "التحويلات بين المخازن بالطريق", "TransfersInTransitQuery",
+                "rptTransfersInTransit"),
+    ReportEntry("STOCK_COUNT_DIFF", "فروقات الجرد المرحّلة لكل مخزن", "StockCountDiffQuery", "rptStockCountDiff",
+                "Dw", "CountDate"),
     ReportEntry("LOW_STOCK", "المنتجات منخفضة المخزون", "LowStockQuery", "rptLowStock"),
+    ReportEntry("ITEM_CARD", "كارت الصنف (الكمية والقيمة لكل مخزن)", "ItemCardQuery", "rptItemCard", "PRW"),
     ReportEntry("PRODUCT_MOVEMENT", "حركة منتج", "ProductMovementQuery", "rptProductMovement", "PR"),
     ReportEntry("CUSTOMER_STATEMENT", "كشف حساب عميل", "CustomerStatementQuery", "rptCustomerStatement", "PC"),
     ReportEntry("SUPPLIER_STATEMENT", "كشف حساب مورد", "SupplierStatementQuery", "rptSupplierStatement", "PS"),
@@ -1303,12 +1312,13 @@ def layout_report_center() -> FormModel:
                                                ("cboSupplier", "المورد", SUPPLIER_ROWS),
                                                ("cboProduct", "المنتج", PRODUCT_ROWS),
                                                ("cboCashBox", "الخزينة / الصندوق", CASHBOX_ROWS),
-                                               ("cboExpenseType", "نوع المصروف", EXPENSE_TYPE_ROWS)]):
+                                               ("cboExpenseType", "نوع المصروف", EXPENSE_TYPE_ROWS),
+                                               ("cboWarehouse", "المخزن", REPORT_WAREHOUSE_ROWS)]):
         cx = px if i % 2 == 0 else px + cm(8.5)          # two columns
         c = m.add(Control("combo", name, cx, y, cm(8.1), cm(0.8),
                           {"RowSource": rows, "ColumnCount": 2, "ColumnWidths": "0;8"}))
         labelled(m, name, caption, c)
-        if i % 2 == 1 or i == 4:
+        if i % 2 == 1:
             y += cm(1.45)
     button(m, "btnRun", "عرض التقرير", px, y + cm(0.3), "primary", w=cm(5.0), h=cm(1.0),
            call="RunReport Me")

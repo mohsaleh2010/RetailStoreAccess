@@ -643,7 +643,9 @@ Public Sub StockCountLoad(ByVal frm As Access.Form)
     frm!cboWarehouse.RowSource = WarehouseRows()            ' modWarehouses
     frm!cboWarehouse.Value = CurrentWarehouseID()
     frm!cboCount.Requery
-    id = DbValue("SELECT StockCountID FROM StockCounts WHERE Status = 'OPEN'")
+    id = DbValue("SELECT StockCountID FROM StockCounts WHERE Status = 'OPEN' AND WarehouseID = " & _
+                 CurrentWarehouseID())                              ' the open count of the user's warehouse
+    If IsNull(id) Then id = DbValue("SELECT Max(StockCountID) FROM StockCounts WHERE Status = 'OPEN'")
     If IsNull(id) Then id = DMax("StockCountID", "StockCounts")
     If Not IsNull(frm.OpenArgs) Then id = CLng(frm.OpenArgs)
     frm!cboCount.Value = id
@@ -664,15 +666,18 @@ Private Sub ShowStockCount(ByVal frm As Access.Form)
     sql = COUNT_LINES_SQL & " WHERE d.StockCountID = " & id
     If Nz(frm!chkDiffOnly.Value, False) Then sql = sql & " AND d.ActualQuantity Is Not Null AND d.Difference <> 0"
     frm!subCountLines.Form.RecordSource = sql & " ORDER BY p.ProductName"
-    Set rs = CurrentDb.OpenRecordset(Tr("SELECT c.*, g.CategoryName FROM StockCounts AS c LEFT JOIN [@Categories] AS g " & _
-                                     "ON c.CategoryID = g.CategoryID WHERE c.StockCountID = " & id), dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset(Tr("SELECT c.*, g.CategoryName, w.WarehouseName FROM (StockCounts AS c " & _
+                                     "LEFT JOIN [@Categories] AS g ON c.CategoryID = g.CategoryID) " & _
+                                     "LEFT JOIN [@Warehouses] AS w ON c.WarehouseID = w.WarehouseID " & _
+                                     "WHERE c.StockCountID = " & id), dbOpenSnapshot)
     If rs.EOF Then
         frm!lblCountInfo.Caption = Tr("لا يوجد جرد. اختر التصنيف (أو اتركه للكل) ثم اضغط «جرد جديد».")
     Else
         isOpen = (rs!Status = "OPEN")
         frm!lblCountInfo.Caption = Tr(rs!CountNumber & "    " & Format$(rs!CountDate, "yyyy/mm/dd") & "    " & _
             IIf(isOpen, "مفتوح", IIf(rs!Status = "POSTED", "مُرحّل " & Format$(Nz(rs!PostedAt, rs!CountDate), _
-            "yyyy/mm/dd"), "ملغى")) & "    التصنيف: " & Nz(rs!CategoryName, "الكل"))
+            "yyyy/mm/dd"), "ملغى")) & "    التصنيف: " & Nz(rs!CategoryName, "الكل") & _
+            "    المخزن: " & Nz(rs!WarehouseName, "-"))
     End If
     rs.Close
     frm!subCountLines.Form.AllowEdits = isOpen

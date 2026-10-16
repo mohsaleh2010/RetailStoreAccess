@@ -131,6 +131,8 @@ End Sub
 '                 c / s / r = optional filter on CustomerID / SupplierID / ProductID
 '                 b = optional cash box (query parameter CashBoxID, 0 = all boxes)
 '                 e = optional filter on ExpenseTypeID
+'                 W = optional warehouse (query parameter WarehouseID, 0 = all warehouses)
+'                 w = optional filter on WarehouseID
 '                 # = treasury report: needs the CASH_BOX permission
 '                 J = accounting report: needs the JOURNAL permission; the entries are
 '                     brought up to date first (SyncJournal)
@@ -138,7 +140,8 @@ End Sub
 '                 A = audit trail: needs the AUDIT_LOG permission
 '------------------------------------------------------------------------------
 Public Sub ReportCenterLoad(ByVal frm As Access.Form)
-    Dim i As Long, r As Variant, rows As String
+    ' OpenArgs: a report key, or "KEY|ProductID" (the item card from the product screen).
+    Dim i As Long, r As Variant, rows As String, args As Variant, fyStart As Date, fyEnd As Date
     Calendar = vbCalGreg
     For i = 1 To ReportCount()
         r = ReportRow(i)
@@ -148,7 +151,17 @@ Public Sub ReportCenterLoad(ByVal frm As Access.Form)
     frm!lstReports.RowSource = Tr(rows)
     frm!txtFrom.Value = DateSerial(Year(Date), Month(Date), 1)
     frm!txtTo.Value = Date
-    If Not IsNull(frm.OpenArgs) Then frm!lstReports.Value = CStr(frm.OpenArgs)     ' a report chosen by the caller
+    If Not IsNull(frm.OpenArgs) Then                             ' a report chosen by the caller
+        args = Split(CStr(frm.OpenArgs), "|")
+        frm!lstReports.Value = CStr(args(0))
+        If UBound(args) >= 1 Then
+            If Val(args(1)) > 0 Then
+                frm!cboProduct.Value = CLng(Val(args(1)))
+                FiscalPeriodOf Date, fyStart, fyEnd                  ' a card covers the year so far
+                frm!txtFrom.Value = fyStart
+            End If
+        End If
+    End If
     ReportSelected frm
 End Sub
 
@@ -173,6 +186,7 @@ Public Sub ReportSelected(ByVal frm As Access.Form)
     frm!cboProduct.Enabled = HasNeed(needs, "R") Or HasNeed(needs, "r")
     frm!cboCashBox.Enabled = HasNeed(needs, "b")
     frm!cboExpenseType.Enabled = HasNeed(needs, "e")
+    frm!cboWarehouse.Enabled = HasNeed(needs, "W") Or HasNeed(needs, "w")
     frm!btnRun.Enabled = Not IsEmpty(r)
 
     If dated Then hint = "Õœœ «·› —…"
@@ -180,7 +194,7 @@ Public Sub ReportSelected(ByVal frm As Access.Form)
     If HasNeed(needs, "S") Then hint = hint & IIf(Len(hint) > 0, " Ê", "") & "«Œ — «·„Ê—œ"
     If HasNeed(needs, "R") Then hint = hint & IIf(Len(hint) > 0, " Ê", "") & "«Œ — «·„‰ Ã"
     If HasNeed(needs, "c") Or HasNeed(needs, "s") Or HasNeed(needs, "r") Or HasNeed(needs, "b") Or _
-       HasNeed(needs, "e") Then
+       HasNeed(needs, "e") Or HasNeed(needs, "W") Or HasNeed(needs, "w") Then
         hint = hint & IIf(Len(hint) > 0, "° ", "") & "ÊÌ„ﬂ‰ﬂ «· ’›Ì… Õ”» «·«Œ Ì«— («Œ Ì«—Ì)"
     End If
     If Len(hint) = 0 And Not IsEmpty(r) Then hint = "·« ÌÕ «Ã Â–« «· ﬁ—Ì— √Ì «Œ Ì«—« "
@@ -304,6 +318,8 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
     If HasNeed(needs, "s") Then AddFilter where, frm!cboSupplier, "SupplierID"
     If HasNeed(needs, "r") Then AddFilter where, frm!cboProduct, "ProductID"
     If HasNeed(needs, "e") Then AddFilter where, frm!cboExpenseType, "ExpenseTypeID"
+    If HasNeed(needs, "w") Then AddFilter where, frm!cboWarehouse, "WarehouseID"
+    If HasNeed(needs, "W") Then SetQueryParam "WarehouseID", CLng(Nz(frm!cboWarehouse.Value, 0))   ' 0 = all
     If HasNeed(needs, "b") Then SetQueryParam "CashBoxID", CLng(Nz(frm!cboCashBox.Value, 0))   ' 0 = all boxes
     AddCriteria criteria, frm!cboCustomer, HasNeed(needs, "C") Or HasNeed(needs, "c"), "«·⁄„Ì·"
     AddCriteria criteria, frm!cboSupplier, HasNeed(needs, "S") Or HasNeed(needs, "s"), "«·„Ê—œ"
@@ -311,6 +327,10 @@ Private Function PrepareReport(ByVal frm As Access.Form, ByRef r As Variant, ByR
     AddCriteria criteria, frm!cboCashBox, HasNeed(needs, "b"), "«·’‰œÊﬁ"
     AddCriteria criteria, frm!cboExpenseType, HasNeed(needs, "e"), "‰Ê⁄ «·„’—Ê›"
     If HasNeed(needs, "b") And IsNull(frm!cboCashBox.Value) Then criteria = criteria & "    ﬂ· «·’‰«œÌﬁ"
+    AddCriteria criteria, frm!cboWarehouse, HasNeed(needs, "W") Or HasNeed(needs, "w"), "«·„Œ“‰"
+    If (HasNeed(needs, "W") Or HasNeed(needs, "w")) And IsNull(frm!cboWarehouse.Value) Then
+        criteria = criteria & "    ﬂ· «·„Œ«“‰"
+    End If
     PrepareReport = True
 End Function
 

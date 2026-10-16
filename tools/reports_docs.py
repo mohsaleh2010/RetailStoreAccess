@@ -144,8 +144,8 @@ def stock_count_sheet() -> ReportModel:
                           '"(ملغى)","(مفتوح)"))', x2, cm(0.1), half, cm(0.85), 16, True, align=1)
     txt(m, H, "txtCountNumber", '="رقم الجرد: " & [CountNumber] & "    التاريخ: " & GDate([CountDate])',
         x2, cm(1.0), half, cm(0.5), 9, align=1)
-    txt(m, H, "txtCategory", '="التصنيف: " & Nz([CategoryName],"كل المنتجات")', x2, cm(1.55), half, cm(0.5), 9,
-        align=1)
+    txt(m, H, "txtCategory", '="التصنيف: " & Nz([CategoryName],"كل المنتجات") & "    المخزن: " & '
+                             'Nz([WarehouseName],"-")', x2, cm(1.55), half, cm(0.5), 9, align=1)
     columns(m, cm(2.9), [
         ("#", "=1", 0.9, None, {"RunningSum": 1}), ("الكود", "ProductCode", 2.4, None, {}),
         ("الصنف", "ProductName", 6.0, None, {}), ("المسجل", "SystemQuantity", 2.2, QTY, {}),

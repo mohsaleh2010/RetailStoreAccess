@@ -1180,6 +1180,8 @@ Private Sub BuildForm_frmProducts()
     c.OnClick = EP
     Set c = AddButton("btnDelete", "Õ–›", 4649, 1021, 1361, 482, "danger")
     c.OnClick = EP
+    Set c = AddButton("btnItemCard", "ﬂ«—  «·’‰›", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "≈€·«ﬁ", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "»ÕÀ (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -1310,6 +1312,9 @@ Private Sub BuildForm_frmProducts()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnDelete_Click()" & vbCrLf
     s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnItemCard_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmReportCenter"", 0, ""ITEM_CARD|"" & Nz(Me!ProductID, 0)" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
@@ -4307,6 +4312,8 @@ Private Sub BuildForm_frmReportCenter()
     Set c = AddLabel("lblCashBox", "«·Œ“Ì‰… / «·’‰œÊﬁ", 10490, 4422, 4593, 284, 9, False, CLR_MUTED, "cboCashBox", 0)
     Set c = AddCombo("cboExpenseType", "", 5670, 5556, 4593, 454, "SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x ORDER BY x.ExpenseTypeName", 2, "0;4536")
     Set c = AddLabel("lblExpenseType", "‰Ê⁄ «·„’—Ê›", 5670, 5244, 4593, 284, 9, False, CLR_MUTED, "cboExpenseType", 0)
+    Set c = AddCombo("cboWarehouse", "", 10490, 5556, 4593, 454, "SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w ORDER BY w.WarehouseID", 2, "0;4536")
+    Set c = AddLabel("lblWarehouse", "«·„Œ“‰", 10490, 5244, 4593, 284, 9, False, CLR_MUTED, "cboWarehouse", 0)
     Set c = AddButton("btnRun", "⁄—÷ «· ﬁ—Ì—", 5670, 6548, 2835, 567, "primary")
     c.OnClick = EP
     Set c = AddButton("btnPdf", "Õ›Ÿ PDF", 8618, 6548, 1701, 567, "secondary")
@@ -5482,7 +5489,8 @@ Private Sub BuildForm_frmStockCount()
     Set c = AddIcon("icoTitle", ChrW(&HE8EF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«·Ã—œ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblSubtitle", "«»œ√ Ã—œ«° √œŒ· «·ﬂ„Ì… «·›⁄·Ì… √Ê «„”Õ «·»«—ﬂÊœ° À„ —Õ¯· «·›—Êﬁ« ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
-    Set c = AddCombo("cboCount", "", 227, 1304, 5103, 454, "SELECT StockCountID, CountNumber, CountDate, IIf(Status = 'OPEN', '„› ÊÕ', IIf(Status = 'POSTED', '„ı—Õ¯·', '„·€Ï')) AS StatusName FROM StockCounts ORDER BY StockCountID DESC", 4, "0;1701;1984;1304")
+    Set c = AddCombo("cboCount", "", 227, 1304, 5103, 454, "SELECT c.StockCountID, c.CountNumber, c.CountDate, IIf(c.Status = 'OPEN', '„› ÊÕ', IIf(c.Status = 'POSTED', '„ı—Õ¯·', '„·€Ï')) AS StatusName, w.WarehouseName FROM StockCounts AS c LEFT JOIN [@Warehouses] AS w ON c.WarehouseID = w.WarehouseID ORDER BY c.StockCountID DESC", 5, "0;1474;1588;1021;1474")
+    SetCtlProp c, "ListWidth", "11.8cm"
     c.AfterUpdate = EP
     Set c = AddLabel("lblCount", "Ã·”… «·Ã—œ («·√ÕœÀ √Ê·«)", 227, 992, 5103, 284, 9, False, CLR_MUTED, "cboCount", 0)
     Set c = AddCombo("cboCategory", "", 5500, 1304, 2835, 454, "SELECT c.CategoryID, c.CategoryName FROM [@Categories] AS c ORDER BY c.CategoryName", 2, "0;2835")
