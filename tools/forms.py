@@ -135,6 +135,11 @@ REP_ROWS = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActi
 CASHBOX_ROWS = "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير;CUSTODY;عهدة مندوب"
 WAREHOUSE_TYPES = "MAIN;مخزن رئيسي;BRANCH;مخزن فرع;VAN;سيارة مندوب;WIP;تحت التشغيل"
+STOCK_PARTY_TYPES = "DEPARTMENT;قسم;PRODUCTION;صالة إنتاج;WASTE;هالك;OTHER;أخرى"
+# the account of a stock party: an expense account or work in progress (docs/59)
+STOCK_PARTY_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a "
+                        "WHERE a.IsPosting = True AND a.IsActive = True AND (a.AccountType = 'EXPENSE' OR "
+                        "a.AccountCode = 1420) ORDER BY a.TreeKey")
 WAREHOUSE_ROWS = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True "
                   "ORDER BY w.WarehouseID")
 COMMISSION_BASES = "SALES;صافي المبيعات (بدون الضريبة);COLLECTION;التحصيل"
@@ -459,7 +464,8 @@ DATA_SCREENS: List[DataScreen] = [
         unique=["WarehouseName"],
         extra_buttons=[("btnInventory", "المخزون", 'OpenScreen "frmInventory"'),
                        ("btnStockReport", "أرصدة المخازن", 'OpenScreen "frmReportCenter", 0, "STOCK_WAREHOUSE"'),
-                       ("btnTransfers", "التحويل بين المخازن", 'OpenScreen "frmStockTransfer"')],
+                       ("btnTransfers", "التحويل بين المخازن", 'OpenScreen "frmStockTransfer"'),
+                       ("btnStockDocs", "سندات الصرف والاستلام", 'OpenScreen "frmStockDocument"')],
         fields=[Fld("WarehouseCode"), Fld("WarehouseType", rows=WAREHOUSE_TYPES, widths="0;5"),
                 Fld("WarehouseName", span=2), Fld("WarehouseNameEn", span=2),
                 Fld("KeeperID", rows=EMPLOYEE_ROWS, widths="0;6"),
@@ -469,6 +475,26 @@ DATA_SCREENS: List[DataScreen] = [
                 Fld("IsActive"),
                 Info("lblWarehouseNote", "رصيد الصنف في المخزن يُحسب من حركاته فيه. المستخدم يبيع ويشتري من مخزنه "
                                          "في شاشة المستخدمين، وبدونه من المخزن الرئيسي"),
+                Fld("Notes", span=2)]),
+    DataScreen(
+        "frmStockParties", "StockParties", "جهات الصرف والاستلام المخزني",
+        "الأقسام وصالات الإنتاج والهالك: يُصرف لها من المخزون أو يُستلم منها، ولكل جهة حسابها", "inventory",
+        list_select="t.PartyCode AS [كود الجهة], t.PartyName AS [الجهة], IIf(t.PartyType = 'DEPARTMENT', 'قسم', "
+                    "IIf(t.PartyType = 'PRODUCTION', 'صالة إنتاج', IIf(t.PartyType = 'WASTE', 'هالك', 'أخرى'))) "
+                    "AS [نوع الجهة]",
+        list_from="[@StockParties] AS t", list_order="t.PartyName",
+        list_headers=[("كود الجهة", 2.2), ("الجهة", 4.2), ("نوع الجهة", 2.4)],
+        search=["t.PartyCode", "t.PartyName", "t.PartyNameEn", "t.Notes"], active="t.IsActive",
+        unique=["PartyName"],
+        extra_buttons=[("btnStockDocs", "سندات الصرف والاستلام", 'OpenScreen "frmStockDocument"')],
+        fields=[Fld("PartyCode"), Fld("PartyType", rows=STOCK_PARTY_TYPES, widths="0;5"),
+                Fld("PartyName", span=2), Fld("PartyNameEn", span=2),
+                Fld("AccountCode", rows=STOCK_PARTY_ACCOUNTS, widths="0;7",
+                    hint="فارغ = حساب النوع: القسم 5640، الصالة 1420، الهالك 5250، أخرى 5900"),
+                Fld("CostCenterID", rows=CENTER_ROWS, widths="0;6"),
+                Fld("IsActive"),
+                Info("lblPartyNote", "الصرف لجهة يحمّل حسابها بتكلفة الأصناف، والاستلام منها يعيدها للمخزون. "
+                                     "العملاء والموردون لهم أذونات التسليم والاستلام مع الفواتير"),
                 Fld("Notes", span=2)]),
     DataScreen(
         "frmBanks", "Banks", "البنوك", "الحسابات البنكية للمحل وأرصدتها", "treasury",
@@ -610,7 +636,7 @@ SCREEN_PERMISSIONS = {
     "frmTreasury": "CASH_CLOSING", "frmCashClosing": "CASH_CLOSING",
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX", "frmCashBoxUsers": "CASH_ALL_BOXES",
     "frmCashTransfers": "CASH_CLOSING", "frmWarehouses": "PRODUCTS",
-    "frmStockTransfer": "STOCK_TRANSFER",
+    "frmStockTransfer": "STOCK_TRANSFER", "frmStockParties": "STOCK_DOCS", "frmStockDocument": "STOCK_DOCS",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
     "frmPeriodClosing": "PERIOD_CLOSE", "frmFiscalPeriods": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN", "frmOpeningBalances": "OPENING_BALANCES",

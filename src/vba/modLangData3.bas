@@ -17,7 +17,33 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "هل تريد حذف هذا السجل نهائيًا", "Do you want to delete this record for good"
+    LangAdd "وتحديث المخزون ومتوسط التكلفة", "and the stock and average cost are updated"
+    LangAdd "يبقى في الصندوق (عهدة الكاشير", "Stays in the box (cashier float"
+    LangAdd "إقفال الفترات والسنة المالية", "Period and fiscal year closing"
+    LangAdd "إلغاء ترحيل المسير وحذف قيده", "Unpost the run and delete its entry"
+    LangAdd "احفظ تاريخ بدء التشغيل أولًا", "Save the start-up date first"
+    LangAdd "اختر السنة أو الفترة المالية", "Choose the fiscal year or period"
+    LangAdd "اختر المنتج من القائمة أولًا", "Choose the product from the list first"
+    LangAdd "اختر النسخة من القائمة أولًا", "Choose the backup from the list first"
+    LangAdd "اختر فاتورة آجلة عليها متبقٍ", "Choose a credit invoice with an amount remaining"
+    LangAdd "اختر نوع الشيك: وارد أو صادر", "Choose the cheque type: received or issued"
+    LangAdd "استبعاد بدون ثمن (تلف أو فقد", "Disposal without a price (damage or loss"
+    LangAdd "استحقاق فاتورة الشراء الآجلة", "Due date of a credit purchase invoice"
+    LangAdd "اكتب السنة التي يُنسخ فعليها", "Type the year whose actuals are copied"
+    LangAdd "التسوية غير موجودة أو معتمدة", "The reconciliation does not exist or is approved"
+    LangAdd "الجهة غير موجودة أو غير نشطة", "The party does not exist or is not active"
+    LangAdd "الرصيد المستحق للمورد حاليًا", "Balance currently due to the supplier"
+    LangAdd "الرمز البريدي للمحل (5 أرقام", "Store postal code (5 digits"
+    LangAdd "السند غير موجود أو تم ترحيله", "The voucher does not exist or is already posted"
+    LangAdd "العمر الإنتاجي شهر على الأقل", "The useful life is at least one month"
+    LangAdd "المبلغ بالعملة (بدون الضريبة", "Amount in currency (without VAT"
+    LangAdd "المحل مدين للمورد (له)، سالب", "the shop owes the supplier (credit), negative"
+    LangAdd "المنظومة غير متاحة الآن (رمز", "The platform is not available now (code"
+    LangAdd "النسخ الموجودة (الأحدث أولًا", "Existing backups (newest first"
+    LangAdd "بداية الإهلاك قبل شهر الشراء", "The depreciation starts before the month of purchase"
     LangAdd "تسجيل دفعة من عميل على حسابه", "Record a payment from a customer on his account"
+    LangAdd "جهات الصرف والاستلام المخزني", "Stock issue and receipt parties"
     LangAdd "حتى لا تتغير مستندات الإقرار", "so that the documents of the return do not change"
     LangAdd "حركة يدوية على المنتج المحدد", "A manual move on the selected product"
     LangAdd "خصم السلفة أكبر من رصيد سلفه", "The advance deduction is more than his advance balance"
@@ -103,6 +129,7 @@ Private Sub D3_1()
     LangAdd "تعذر عمل النسخة الاحتياطية", "Could not make the backup"
     LangAdd "تعذّر تشغيل برنامج التوقيع", "Could not run the signing program"
     LangAdd "تغيير أو تعيين كلمة المرور", "Change or set the password"
+    LangAdd "تكلفة الوحدة لا تكون سالبة", "The unit cost cannot be negative"
     LangAdd "دائن الفترة (المستوى الأول", "Period credit (first level"
     LangAdd "رقم الجهاز 16 حرفًا بالشكل", "The computer number has 16 characters in the form"
     LangAdd "في فترة مقفلة (الإقفال حتى", "in a closed period (closed up to"
@@ -110,6 +137,9 @@ Private Sub D3_1()
     LangAdd "لا تملك صلاحية سندات الصرف", "You do not have the permission for payment vouchers"
     LangAdd "لا تملك صلاحية سندات القبض", "You do not have the permission for receipt vouchers"
     LangAdd "لا توجد قيود في هذه الفترة", "There are no entries in this period"
+End Sub
+
+Private Sub D3_2()
     LangAdd "لا توجد موازنة لسنة الفترة", "There is no budget for the year of the period"
     LangAdd "لا يُنشأ مسير لشهر لم يبدأ", "No run is created for a month that has not started"
     LangAdd "لكل فترة ضريبية إقرار واحد", "One return for each tax period"
@@ -137,9 +167,6 @@ Private Sub D3_1()
     LangAdd "المبلغ أقل من الإجمالي بـ", "The amount is less than the total by"
     LangAdd "بانتظار الإرسال أو التحقق", "Waiting to be sent or validated"
     LangAdd "تأكيد كلمة المرور الجديدة", "Confirm the new password"
-End Sub
-
-Private Sub D3_2()
     LangAdd "تاريخ الاستحقاق قبل تاريخ", "The due date is before the date"
     LangAdd "تجاوز حد الائتمان: الرصيد", "Credit limit exceeded: balance"
     LangAdd "تسجيل دفعة لمورد من حسابه", "Record a payment to a supplier on his account"
@@ -173,6 +200,7 @@ Private Sub D3_2()
     LangAdd "ميزان المراجعة بالمستويات", "Trial balance by level"
     LangAdd "أدخل المبلغ (أكبر من صفر", "Enter the amount (greater than zero"
     LangAdd "أعد فتح الشاشات المفتوحة", "Reopen the open screens"
+    LangAdd "إلغاء ترحيل سند الاستلام", "Unposting the receipt voucher"
     LangAdd "اختر البنك الذي دُفع منه", "Choose the bank it was paid from"
     LangAdd "اختر البنك المحوَّل إليه", "Choose the bank transferred to"
     LangAdd "اختر جردًا مفتوحًا أولًا", "Choose an open count first"
@@ -232,6 +260,9 @@ Private Sub D3_2()
     LangAdd "اختر تقريرًا من القائمة", "Choose a report from the list"
     LangAdd "اختر مستندًا من القائمة", "Choose a document from the list"
     LangAdd "استحقاق الفاتورة الآجلة", "Due date of a credit invoice"
+End Sub
+
+Private Sub D3_3()
     LangAdd "اسم الفترة (مثل 2026 أو", "Period name (such as 2026 or"
     LangAdd "الأشهر تُسجَّل بالترتيب", "months are recorded in order"
     LangAdd "الاسم الإنجليزي أطول من", "The English name is longer than"
@@ -260,9 +291,6 @@ Private Sub D3_2()
     LangAdd "تعذّر إنشاء طلب الشهادة", "Could not create the certificate request"
     LangAdd "تعذّر الاتصال بالمنظومة", "Could not connect to the platform"
     LangAdd "تقرير الطباعة غير موجود", "The print report does not exist"
-End Sub
-
-Private Sub D3_3()
     LangAdd "تكلفة الوحدة الافتتاحية", "Opening unit cost"
     LangAdd "تم التراجع عن التعديلات", "The changes were undone"
     LangAdd "تم تحصيل الشيك في البنك", "The cheque was collected in the bank"
@@ -355,6 +383,9 @@ Private Sub D3_3()
     LangAdd "متأخرة أكثر من 20 ساعة", "Late more than 20 hours"
     LangAdd "محاولات الدخول الفاشلة", "Failed login attempts"
     LangAdd "ملاحظات التحويل الجديد", "Notes of the new transfer"
+End Sub
+
+Private Sub D3_4()
     LangAdd "ملف البيانات غير موجود", "The data file does not exist"
     LangAdd "من أضاف أو عدّل أو حذف", "Who added, edited or deleted"
     LangAdd "هذا الخيار للمبرمج فقط", "This option is for the developer only"
@@ -383,9 +414,6 @@ Private Sub D3_3()
     LangAdd "الرقم التسلسلي للجهاز", "Serial number of the device"
     LangAdd "السماح بالبيع بالسالب", "Allow selling below zero stock"
     LangAdd "الشيك ليس تحت التحصيل", "The cheque is not under collection"
-End Sub
-
-Private Sub D3_4()
     LangAdd "المبالغ لا تكون سالبة", "Amounts are never negative"
     LangAdd "المبلغ لا يكون سالبًا", "The amount is never negative"
     LangAdd "المنتجات غير المتحركة", "Slow-moving products"
@@ -402,6 +430,7 @@ Private Sub D3_4()
     LangAdd "تمت النسخة الاحتياطية", "Backup done"
     LangAdd "جلسة الجرد غير موجودة", "The count session does not exist"
     LangAdd "رصيد البنك في الدفاتر", "Bank balance in the books"
+    LangAdd "سندات الصرف والاستلام", "Issue and receipt vouchers"
     LangAdd "شيكات صادرة (للموردين", "Issued cheques (to suppliers"
     LangAdd "صافي الضريبة المستحقة", "Net VAT due"
     LangAdd "ضريبة المخرجات للفترة", "Output VAT of the period"
@@ -477,6 +506,9 @@ Private Sub D3_4()
     LangAdd "ضريبة القيمة المضافة", "VAT"
     LangAdd "عدد الملصقات في الصف", "Labels per row"
     LangAdd "قائمة الملصقات فارغة", "The label list is empty"
+End Sub
+
+Private Sub D3_5()
     LangAdd "قيود الإهلاك المسجلة", "Recorded depreciation entries"
     LangAdd "لا تملك صلاحية الجرد", "You do not have the permission for stock counts"
     LangAdd "لا توجد أرصدة مفتوحة", "There are no open balances"
@@ -506,9 +538,8 @@ Private Sub D3_4()
     LangAdd "التحويل بين المخازن", "Transfers between warehouses"
     LangAdd "التكلفة أكبر من صفر", "Cost greater than zero"
     LangAdd "الرقم الضريبي للمحل", "Store tax number"
-End Sub
-
-Private Sub D3_5()
+    LangAdd "السند (الأحدث أولًا", "Voucher (newest first"
+    LangAdd "السند ليس مُرحَّلًا", "The voucher is not posted"
     LangAdd "الصافي شامل الضريبة", "Net including VAT"
     LangAdd "الفاتورة غير موجودة", "The invoice does not exist"
     LangAdd "القيد الآلي للعملية", "Automatic entry of the transaction"
@@ -555,6 +586,7 @@ Private Sub D3_5()
     LangAdd "نقدي أو بطاقة للدفع", "Cash or card for payment"
     LangAdd "نوع السند غير معروف", "Unknown voucher type"
     LangAdd "يُقفل بعد أول عملية", "Locked after the first transaction"
+    LangAdd "أسطر السند المخزني", "Stock voucher lines"
     LangAdd "أسطر القيد المختار", "Lines of the selected entry"
     LangAdd "أسطر فاتورة الشراء", "Purchase invoice lines"
     LangAdd "أسطر مسير العمولات", "Commission run lines"
@@ -597,6 +629,9 @@ Private Sub D3_5()
     LangAdd "تعذّر تحديث الحالة", "Could not refresh the status"
     LangAdd "تم تسجيل صرف الشيك", "The payment of the cheque was recorded"
     LangAdd "تم حفظ إعداد الربط", "The connection setup was saved"
+End Sub
+
+Private Sub D3_6()
     LangAdd "تم حفظ كلمة المرور", "The password was saved"
     LangAdd "حذف آخر فترة مالية", "Delete the last fiscal period"
     LangAdd "حصة المنشأة (سعودي", "Employer share (Saudi"
@@ -629,9 +664,6 @@ Private Sub D3_5()
     LangAdd "مصر: نوع كود الصنف", "Egypt: product code type"
     LangAdd "منخفضة المخزون فقط", "Low stock only"
     LangAdd "نسخة احتياطية الآن", "Back up now"
-End Sub
-
-Private Sub D3_6()
     LangAdd "وحدات بيع المنتجات", "Product sale units"
     LangAdd "يستلم التحويل أمين", "The transfer is received by the custodian of"
     LangAdd "يومًا عن استحقاقها", "days after its due date"
@@ -641,51 +673,4 @@ Private Sub D3_6()
     LangAdd "إضافة كل الحسابات", "Add all accounts"
     LangAdd "اختر تاريخًا بعده", "Choose a date after it"
     LangAdd "ارتفاع الملصق (مم", "Label height (mm"
-    LangAdd "اضغط لعرض التقرير", "Click to show the report"
-    LangAdd "اكتب اسم المستخدم", "Type the user name"
-    LangAdd "اكتب النسب الثلاث", "Type the three rates"
-    LangAdd "اكتب تاريخ الحركة", "Type the date of the move"
-    LangAdd "الإقرار غير معتمد", "The return is not approved"
-    LangAdd "الإقرار غير موجود", "The return does not exist"
-    LangAdd "الاسم بالإنجليزية", "English name"
-    LangAdd "البريد الإلكتروني", "E-mail"
-    LangAdd "التاريخ بعد اليوم", "The date is after today"
-    LangAdd "التحويلات بالطريق", "Transfers in transit"
-    LangAdd "التقرير غير موجود", "The report does not exist"
-    LangAdd "الحد الأعلى للأجر", "Maximum wage"
-    LangAdd "الحركة غير موجودة", "The move does not exist"
-    LangAdd "الحسابات الختامية", "Financial statements"
-    LangAdd "الخزينة / الصندوق", "Treasury / box"
-    LangAdd "الخزينة والصناديق", "Treasury and boxes"
-    LangAdd "الرصيد في الدفاتر", "Balance in the books"
-    LangAdd "الشاشة غير موجودة", "The screen does not exist"
-    LangAdd "الشيك تحت التحصيل", "Cheque under collection"
-    LangAdd "الصافي بدون ضريبة", "Net without VAT"
-    LangAdd "العمولات المستحقة", "Commissions payable"
-    LangAdd "الفرق عن الموازنة", "Difference from budget"
-    LangAdd "الفواتير المفتوحة", "Open invoices"
-    LangAdd "القيمة بسعر البيع", "Value at sale price"
-    LangAdd "الكمية الافتتاحية", "Opening quantity"
-    LangAdd "المبلغ مع الضريبة", "Amount with VAT"
-    LangAdd "المبيعات حسب فترة", "Sales by period"
-    LangAdd "المحاسبة والمالية", "Accounting and finance"
-    LangAdd "المستند غير موجود", "The document does not exist"
-    LangAdd "المسير غير مرحَّل", "The run is not posted"
-    LangAdd "المشتريات المعفاة", "Exempt purchases"
-    LangAdd "المصروفات (تفصيلي", "Expenses (detailed"
-    LangAdd "المطاعم (شاشة لمس", "Restaurants (touch screen"
-    LangAdd "المقارنة: المجموع", "Comparison: total"
-    LangAdd "الهامش الأيسر (مم", "Left margin (mm"
-    LangAdd "الهامش الأيمن (مم", "Right margin (mm"
-    LangAdd "الهامش السفلي (مم", "Bottom margin (mm"
-    LangAdd "الهامش العلوي (مم", "Top margin (mm"
-    LangAdd "تاريخ بدء التشغيل", "Start-up date"
-    LangAdd "تحويل إلى بنك آخر", "Transfer to another bank"
-    LangAdd "تحويل بين المخازن", "Transfer between warehouses"
-    LangAdd "تسوية تحصيلات مدى", "Settlement of Mada collections"
-    LangAdd "تعذر تحديث القيود", "Could not refresh the entries"
-    LangAdd "تعذر ترحيل الرصيد", "Could not post the stock"
-    LangAdd "تعذر حفظ الفاتورة", "Could not save the invoice"
-    LangAdd "تغيير كلمة المرور", "Change password"
-    LangAdd "تم اعتماد الإقرار", "The return was approved"
 End Sub

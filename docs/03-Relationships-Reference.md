@@ -2,9 +2,9 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` و`tools/relations.py` – لا تعدّله يدويًا.
 
-عدد العلاقات: **174** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **20**، التحديث المتتالي: **12**.
+عدد العلاقات: **180** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **21**، التحديث المتتالي: **12**.
 
-حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، والمستخدمون يُعطَّلون ولا يُحذفون: `AuditLog.EmployeeID`، `BankReconciliations.EmployeeID`، `Budgets.EmployeeID`، `CashVouchers.ReceivedByID`، `CommissionRuns.EmployeeID`، `CustomerAllocations.EmployeeID`، `DepreciationRuns.EmployeeID`، `FiscalYearClosings.EmployeeID`، `PeriodClosings.EmployeeID`، `StockCounts.PostedByID`، `StockTransfers.EmployeeID`، `StockTransfers.ReceivedByID`، `SupplierAllocations.EmployeeID`، `VatReturns.EmployeeID`، `Warehouses.KeeperID`.
+حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، والمستخدمون يُعطَّلون ولا يُحذفون: `AuditLog.EmployeeID`، `BankReconciliations.EmployeeID`، `Budgets.EmployeeID`، `CashVouchers.ReceivedByID`، `CommissionRuns.EmployeeID`، `CustomerAllocations.EmployeeID`، `DepreciationRuns.EmployeeID`، `FiscalYearClosings.EmployeeID`، `PeriodClosings.EmployeeID`، `StockCounts.PostedByID`، `StockDocuments.EmployeeID`، `StockTransfers.EmployeeID`، `StockTransfers.ReceivedByID`، `SupplierAllocations.EmployeeID`، `VatReturns.EmployeeID`، `Warehouses.KeeperID`.
 
 ## مخطط الكيانات والعلاقات
 
@@ -178,6 +178,12 @@ erDiagram
     Warehouses ||--o{ StockTransfers : "ToWarehouseID"
     StockTransfers ||--o{ StockTransferLines : "StockTransferID"
     Products ||--o{ StockTransferLines : "ProductID"
+    Accounts |o--o{ StockParties : "AccountCode"
+    CostCenters |o--o{ StockParties : "CostCenterID"
+    Warehouses ||--o{ StockDocuments : "WarehouseID"
+    StockParties ||--o{ StockDocuments : "StockPartyID"
+    StockDocuments ||--o{ StockDocumentLines : "StockDocumentID"
+    Products ||--o{ StockDocumentLines : "ProductID"
     Categories |o--o{ StockCounts : "CategoryID"
     Employees ||--o{ StockCounts : "EmployeeID"
     Warehouses ||--o{ StockCounts : "WarehouseID"
@@ -360,9 +366,15 @@ erDiagram
 | 166 | `FK_StockTransfers_ToWarehouseID` | Warehouses (المخازن) | `WarehouseID` | StockTransfers (التحويل بين المخازن) | `ToWarehouseID` | ✔ | فرض التكامل |
 | 167 | `FK_StockTransferLines_StockTransferID` | StockTransfers (التحويل بين المخازن) | `StockTransferID` | StockTransferLines (أسطر التحويل بين المخازن) | `StockTransferID` | ✔ | فرض التكامل + حذف متتالٍ |
 | 168 | `FK_StockTransferLines_ProductID` | Products (المنتجات) | `ProductID` | StockTransferLines (أسطر التحويل بين المخازن) | `ProductID` | ✔ | فرض التكامل |
-| 169 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
-| 170 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
-| 171 | `FK_StockCounts_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | StockCounts (جلسات الجرد) | `WarehouseID` | ✔ | فرض التكامل |
-| 172 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 173 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
-| 174 | `FK_AuditChanges_LogID` | AuditLog (سجل العمليات) | `LogID` | AuditChanges (تفاصيل سجل التدقيق) | `LogID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 169 | `FK_StockParties_AccountCode` | Accounts (دليل الحسابات (شجرة الحسابات)) | `AccountCode` | StockParties (جهات الصرف والاستلام المخزني) | `AccountCode` |  | فرض التكامل |
+| 170 | `FK_StockParties_CostCenterID` | CostCenters (مراكز التكلفة والفروع) | `CostCenterID` | StockParties (جهات الصرف والاستلام المخزني) | `CostCenterID` |  | فرض التكامل |
+| 171 | `FK_StockDocuments_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | StockDocuments (سندات الصرف والاستلام المخزني) | `WarehouseID` | ✔ | فرض التكامل |
+| 172 | `FK_StockDocuments_StockPartyID` | StockParties (جهات الصرف والاستلام المخزني) | `StockPartyID` | StockDocuments (سندات الصرف والاستلام المخزني) | `StockPartyID` | ✔ | فرض التكامل |
+| 173 | `FK_StockDocumentLines_StockDocumentID` | StockDocuments (سندات الصرف والاستلام المخزني) | `StockDocumentID` | StockDocumentLines (أسطر سندات الصرف والاستلام المخزني) | `StockDocumentID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 174 | `FK_StockDocumentLines_ProductID` | Products (المنتجات) | `ProductID` | StockDocumentLines (أسطر سندات الصرف والاستلام المخزني) | `ProductID` | ✔ | فرض التكامل |
+| 175 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
+| 176 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
+| 177 | `FK_StockCounts_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | StockCounts (جلسات الجرد) | `WarehouseID` | ✔ | فرض التكامل |
+| 178 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 179 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
+| 180 | `FK_AuditChanges_LogID` | AuditLog (سجل العمليات) | `LogID` | AuditChanges (تفاصيل سجل التدقيق) | `LogID` | ✔ | فرض التكامل + حذف متتالٍ |

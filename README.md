@@ -80,6 +80,7 @@
 | + | أمناء الصناديق (لا يصرف المستخدم من صندوق غيره)، والتحويل بين الصناديق بانتظار الاستلام (نقدية بالطريق)، وصندوق عهدة المندوب | ✅ تمت الموافقة | [docs/56-Cash-Custodians.md](docs/56-Cash-Custodians.md) |
 | + | المخازن المتعددة: جدول المخازن، والمخزن على كل حركة ومستند وجرد ورصيد افتتاحي، ورصيد كل صنف في كل مخزن وتقريره | ✅ تمت الموافقة | [docs/57-Warehouses.md](docs/57-Warehouses.md) |
 | + | التحويل بين المخازن (مسودة، ثم ترحيل، ثم بالطريق حتى الاستلام إن لزم)، وحساب مخزون لكل مخزن، وحساب البضاعة بالطريق | ✅ تمت الموافقة | [docs/58-Stock-Transfers.md](docs/58-Stock-Transfers.md) |
+| + | جهات الصرف والاستلام المخزني (قسم، صالة إنتاج، هالك، أخرى) وسندات الصرف والاستلام وقيودها | ✅ بانتظار الموافقة | [docs/59-Stock-Issue-Receipt.md](docs/59-Stock-Issue-Receipt.md) |
 
 ## هيكل المستودع
 
@@ -184,6 +185,7 @@
 | 51 | استبدال `modCash` و`modBank` و`modPayroll` و`modJournal` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestCash`, `TestJournal` |
 | 52 | `modWarehouses` (دائمة، جديدة)، واستبدال `modSales` و`modPurchases` و`modPurchaseScreens` و`modPOS` و`modTouchPOS` و`modOpening` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestWarehouses`, `TestOpeningBalances`, `TestPurchases`, `TestSales` |
 | 53 | استبدال `modWarehouses` و`modJournal` و`modVat` و`modOpening` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestWarehouses`, `TestJournal` |
+| 54 | `modStockDocs` (دائمة، جديدة)، واستبدال `modJournal` و`modVat` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestStockDocs`, `TestJournal` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

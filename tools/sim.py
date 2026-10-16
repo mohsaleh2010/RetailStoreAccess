@@ -472,6 +472,44 @@ class Store:
         self.c.execute("UPDATE StockTransfers SET Status = 'RECEIVED', ReceivedAt = ?, ReceivedByID = ? "
                        "WHERE StockTransferID = ?", (self.now, self.user, tid))
 
+    # ------------------------------------------------------------- issue / receipt vouchers (modStockDocs, docs/59)
+    def stock_document(self, kind, warehouse, party, lines, notes=None):  # CreateStockDocument + its lines
+        did = self.insert("StockDocuments", DocNumber=self.next_number("STOCK_ISSUE" if kind == "ISSUE" else "STOCK_RECEIPT"),
+                          DocType=kind, DocDate=self.now, WarehouseID=warehouse, StockPartyID=party, Status="DRAFT",
+                          EmployeeID=self.user, Notes=notes)
+        for line in lines:
+            pid, q = line[0], line[1]
+            cost = line[2] if len(line) > 2 else 0
+            self.insert("StockDocumentLines", StockDocumentID=did, ProductID=pid, Quantity=float(q), UnitCost=float(cost))
+        return did
+
+    def post_stock_document(self, did):                              # PostStockDocument
+        kind, wh, no = self.c.execute("SELECT DocType, WarehouseID, DocNumber FROM StockDocuments "
+                                      "WHERE StockDocumentID = ?", (did,)).fetchone()
+        for lid, pid, q, cost in self.c.execute("SELECT StockDocumentLineID, ProductID, Quantity, UnitCost "
+                                                "FROM StockDocumentLines WHERE StockDocumentID = ?", (did,)).fetchall():
+            if kind == "ISSUE":
+                cost = self.avg(pid)
+                self.c.execute("UPDATE StockDocumentLines SET UnitCost = ? WHERE StockDocumentLineID = ?",
+                               (float(cost), lid))
+                self.apply_stock(pid, -dec(q), 11, cost, "STOCK_DOC", did, no, warehouse=wh)
+            else:
+                self.apply_stock(pid, dec(q), 12, dec(cost), "STOCK_DOC", did, no, recalc=True, warehouse=wh)
+        self.c.execute("UPDATE StockDocuments SET DocDate = ?, Status = 'POSTED' WHERE StockDocumentID = ?",
+                       (self.now, did))
+
+    def unpost_stock_document(self, did):                            # UnpostStockDocument
+        kind = self.one("SELECT DocType FROM StockDocuments WHERE StockDocumentID = ?", did)
+        for pid, q, cost in self.c.execute("SELECT ProductID, Quantity, UnitCost FROM InventoryTransactions "
+                                           "WHERE ReferenceType = 'STOCK_DOC' AND ReferenceID = ?", (did,)).fetchall():
+            cur, avg = self.stock(pid), self.avg(pid)
+            if kind == "RECEIPT":
+                avg = P.weighted_average(cur, avg, -dec(q), dec(cost))
+            self.c.execute("UPDATE Products SET CurrentQuantity = ?, AverageCost = ? WHERE ProductID = ?",
+                           (float(cur - dec(q)), float(avg), pid))
+        self.c.execute("DELETE FROM InventoryTransactions WHERE ReferenceType = 'STOCK_DOC' AND ReferenceID = ?", (did,))
+        self.c.execute("UPDATE StockDocuments SET Status = 'DRAFT' WHERE StockDocumentID = ?", (did,))
+
     def adjust(self, table, key, kid, delta):                      # AdjustBalance
         self.c.execute(f"UPDATE {table} SET CurrentBalance = CurrentBalance + ? WHERE {key} = ?",
                        (float(delta), kid))

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **77** | عدد الحقول: **1019**
+عدد الجداول: **80** | عدد الحقول: **1045**
 
 ## الفهرس
 
@@ -77,12 +77,15 @@
 69. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
 70. [`StockTransfers`](#stocktransfers) – التحويل بين المخازن
 71. [`StockTransferLines`](#stocktransferlines) – أسطر التحويل بين المخازن
-72. [`StockCounts`](#stockcounts) – جلسات الجرد
-73. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-74. [`AuditLog`](#auditlog) – سجل العمليات
-75. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-76. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-77. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+72. [`StockParties`](#stockparties) – جهات الصرف والاستلام المخزني
+73. [`StockDocuments`](#stockdocuments) – سندات الصرف والاستلام المخزني
+74. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
+75. [`StockCounts`](#stockcounts) – جلسات الجرد
+76. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+77. [`AuditLog`](#auditlog) – سجل العمليات
+78. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+79. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+80. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -177,7 +180,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 26 سجل
+- بيانات أساسية: 28 سجل
 
 ## Roles
 
@@ -209,7 +212,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 40 سجل
+- بيانات أساسية: 41 سجل
 
 ## RolePermissions
 
@@ -221,7 +224,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 79 سجل
+- بيانات أساسية: 81 سجل
 
 ## Employees
 
@@ -283,7 +286,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 68 سجل
+- بيانات أساسية: 70 سجل
 
 ## UserScreens
 
@@ -1476,7 +1479,7 @@
 - المفتاح الأساسي: `AccountCode`
 - فهرس عادي: `ParentCode`
 - فهرس عادي: `TreeKey`
-- بيانات أساسية: 82 سجل
+- بيانات أساسية: 85 سجل
 
 ## JournalSourceTypes
 
@@ -1490,7 +1493,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 31 سجل
+- بيانات أساسية: 33 سجل
 
 ## JournalEntries
 
@@ -1747,7 +1750,7 @@
 
 - المفتاح الأساسي: `TransactionTypeID`
 - فهرس فريد: `TypeCode`
-- بيانات أساسية: 10 سجل
+- بيانات أساسية: 12 سجل
 
 ## InventoryTransactions
 
@@ -1813,6 +1816,64 @@
 
 - المفتاح الأساسي: `StockTransferLineID`
 - فهرس عادي: `StockTransferID`
+
+## StockParties
+
+**جهات الصرف والاستلام المخزني** – الجهات التي يُصرف لها من المخزون أو يُستلم منها غير العملاء والموردين: قسم، أو صالة إنتاج، أو الهالك، أو أخرى (docs/59). الحساب فارغ = حساب النوع: القسم 5640، وصالة الإنتاج 1420 تحت التشغيل، والهالك 5250، وأخرى 5900.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **StockPartyID** 🔑 | AutoNumber |  |  |  |  |  | رقم الجهة |
+| 2 | PartyCode | Short Text | 20 |  |  |  |  | كود الجهة |
+| 3 | PartyName | Short Text | 50 | ✔ |  |  |  | اسم الجهة |
+| 4 | PartyNameEn | Short Text | 50 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 5 | PartyType | Short Text | 12 | ✔ | `"DEPARTMENT"` | `In ("DEPARTMENT","PRODUCTION","WASTE","OTHER")` |  | النوع |
+| 6 | AccountCode | Number (Long) |  |  |  |  | `Accounts.AccountCode` | الحساب (فارغ = حساب النوع) |
+| 7 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
+| 8 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `StockPartyID`
+- فهرس فريد: `PartyName`
+- بيانات أساسية: 1 سجل
+
+## StockDocuments
+
+**سندات الصرف والاستلام المخزني** – صرف أصناف من مخزن لجهة، أو استلامها من جهة: مسودة، ثم «ترحيل» يحرك المخزون وينشئ القيد (الصرف بمتوسط التكلفة؛ الاستلام بالتكلفة المدخلة ويعيد حساب المتوسط)، ثم «إلغاء الترحيل» (docs/59).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **StockDocumentID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | DocNumber | Short Text | 20 | ✔ |  |  |  | رقم السند |
+| 3 | DocType | Short Text | 10 | ✔ |  | `In ("ISSUE","RECEIPT")` |  | نوع السند |
+| 4 | DocDate | Date/Time |  | ✔ | `Now()` |  |  | تاريخ السند (الترحيل) |
+| 5 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
+| 6 | StockPartyID | Number (Long) |  | ✔ |  |  | `StockParties.StockPartyID` | الجهة |
+| 7 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","POSTED")` |  | الحالة |
+| 8 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أنشأه |
+| 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 10 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `StockDocumentID`
+- فهرس فريد: `DocNumber`
+- فهرس عادي: `DocDate`
+
+## StockDocumentLines
+
+**أسطر سندات الصرف والاستلام المخزني** – الأصناف وكمياتها؛ تكلفة الصرف متوسط تكلفة الصنف عند الترحيل، وتكلفة الاستلام مدخلة.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **StockDocumentLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر |
+| 2 | StockDocumentID | Number (Long) |  | ✔ |  |  | `StockDocuments.StockDocumentID` | السند |
+| 3 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 4 | Quantity | Currency (كمية) |  | ✔ |  | `>0` |  | الكمية |
+| 5 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `StockDocumentLineID`
+- فهرس عادي: `StockDocumentID`
 
 ## StockCounts
 

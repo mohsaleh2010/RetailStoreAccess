@@ -15,6 +15,16 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "تُحسب الفروقات على الكميات الحالية لحظة الترحيل", "The differences are calculated on the current quantities at the time of posting"
+    LangAdd "حسابات لا يمكن وضعها في الشجرة (حلقة أو أكثر من", "Accounts that cannot be placed in the tree (a loop or more than"
+    LangAdd "صنفًا بكمية صفر. اكتب الكميات، ثم «ترحيل الرصيد", "items with a zero quantity. Write the quantities, then Post the stock"
+    LangAdd "لطابعة الملصقات، وأكثر لورق A4 فيه أعمدة ملصقات", "for a label printer, and more for A4 paper with columns of labels"
+    LangAdd "أولًا: رصيده المرحَّل قد يعتمد على هذا الإقرار", "first: its carried balance may depend on this return"
+    LangAdd "أُنشئت الموازنة بسطر لكل حساب إيرادات ومصروفات", "The budget was created with a line for each revenue and expense account"
+    LangAdd "إنشاء كل المصروفات المتكررة المستحقة حتى اليوم", "Create all recurring expenses due up to today"
+    LangAdd "اختر التقرير ثم حدد الفترة أو العميل أو المنتج", "Choose the report, then set the period, the customer or the product"
+    LangAdd "اكتب الرصيد الظاهر في كشف البنك في هذا التاريخ", "Type the balance shown on the bank statement on this date"
+    LangAdd "الخصم...) تبقى من دور المستخدم في شاشة الأدوار", "discount...) come from the role of the user in the Roles screen"
     LangAdd "الصرف مطابق في تسوية بنكية: ألغِ مطابقته أولًا", "The payment is matched in a bank reconciliation: unmatch it first"
     LangAdd "الكمية المرتجعة للمورد أكبر من الكمية المشتراة", "The quantity returned to the supplier is more than the quantity bought"
     LangAdd "الكمية تتغير فقط من المشتريات والمبيعات والجرد", "The quantity changes only through purchases, sales and stock counts"
@@ -25,6 +35,7 @@ Private Sub D2_1()
     LangAdd "لا تملك صلاحية الإضافة في شاشة التسوية البنكية", "You do not have the permission to add in the bank reconciliation screen"
     LangAdd "لا تملك صلاحية الإضافة في شاشة الحركات البنكية", "You do not have the permission to add in the bank transactions screen"
     LangAdd "لهذا الحساب حسابات تابعة، فيبقى حسابًا رئيسيًا", "This account has sub-accounts, so it stays a main account"
+    LangAdd "ليست لديك صلاحية سندات الصرف والاستلام المخزني", "You do not have the permission for stock issue and receipt vouchers"
     LangAdd "مفتاح الجهاز وشهادته وبرنامج التوقيع (السعودية", "Key and certificate of the device and the signing program (Saudi Arabia"
     LangAdd "نقر مزدوج على حساب يفتح كشف حسابه للفترة نفسها", "Double-click an account to open its statement for the same period"
     LangAdd "احفظ تاريخ بدء التشغيل أولًا، ثم أدخل الأرصدة", "Save the start-up date first, then enter the balances"
@@ -96,6 +107,7 @@ Private Sub D2_1()
     LangAdd "الموازنة لحسابات الإيرادات والمصروفات فقط", "The budget is for revenue and expense accounts only"
     LangAdd "بأكثر من المتوفر يحتاج موافقة مدير النظام", "more than the available quantity needs the approval of the system administrator"
     LangAdd "تم ضبط وضع التطوير: كل أدوات Access ظاهرة", "Developer mode is set: all the Access tools are shown"
+    LangAdd "تُحذف المسودة فقط. ألغِ ترحيل السند أولًا", "Only a draft is deleted. Unpost the voucher first"
     LangAdd "شجرة الحسابات: الحسابات الرئيسية والفرعية", "Account tree: main and sub-accounts"
     LangAdd "فعّل الإرسال من شاشة الفاتورة الإلكترونية", "Enable sending in the e-invoicing screen"
     LangAdd "لا تملك هذه الصلاحية في شاشة مسير الرواتب", "You do not have this permission in the payroll screen"
@@ -108,6 +120,7 @@ Private Sub D2_1()
     LangAdd "هل تريد عرض تقرير المنتجات منخفضة المخزون", "Do you want to show the low-stock products report"
     LangAdd "يغيّرها المستخدم عند أول دخول (كلمة مؤقتة", "The user changes it at the first login (temporary password"
     LangAdd "أدخل النقدية الفعلية الموجودة في الصندوق", "Enter the actual cash in the box"
+    LangAdd "إلغاء ترحيل السند وإعادة المخزون كما كان", "Unpost the voucher and put the stock back as it was"
     LangAdd "احذف قيود الإهلاك من شهر الاستبعاد أولًا", "Delete the depreciation entries from the month of disposal first"
     LangAdd "اختر حساب البنك الذي سُدِّدت منه الضريبة", "Choose the bank account the tax was paid from"
     LangAdd "اختر سطرًا في الجدول واكتب المبلغ السنوي", "Choose a line in the table and type the yearly amount"
@@ -122,6 +135,9 @@ Private Sub D2_1()
     LangAdd "كلمتا المرور غير متطابقتين. لم يتغير شيء", "The two passwords do not match. Nothing changed"
     LangAdd "لا يمكنك تعطيل حسابك وأنت مسجل الدخول به", "You cannot deactivate your own account while logged in with it"
     LangAdd "لم يُنشئ برنامج التوقيع ملف التوقيع (رمز", "The signing program did not create the signature file (code"
+End Sub
+
+Private Sub D2_2()
     LangAdd "مبلغ مستحق للمورد (بعملة البرنامج دائمًا", "an amount due to the supplier (always in the program currency"
     LangAdd "هذا الصنف لا يتابع المخزون، فليس له رصيد", "This item does not track stock, so it has no balance"
     LangAdd "هذه الشاشة ستكون متاحة بعد تنفيذ المرحلة", "This screen will be available after phase"
@@ -134,10 +150,8 @@ Private Sub D2_1()
     LangAdd "المبيعات المحلية الخاضعة للنسبة الصفرية", "Domestic zero-rated sales"
     LangAdd "الميزانية العمومية (قائمة المركز المالي", "Balance sheet (statement of financial position"
     LangAdd "تاريخ بدء التشغيل لا يكون بعد أول مستند", "The start-up date cannot be after the first document"
+    LangAdd "ترحيل السند؟ يتحرك المخزون ويُنشأ القيد", "Post the voucher? The stock moves and the entry is created"
     LangAdd "حدد الكمية المرتجعة لصنف واحد على الأقل", "Set the returned quantity of at least one item"
-End Sub
-
-Private Sub D2_2()
     LangAdd "راجع التاريخ والأسطر ثم اضغط «حفظ القيد", "Check the date and the lines, then click Save entry"
     LangAdd "رصيد كل حساب بنكي يوم بدء التشغيل: موجب", "The balance of each bank account on the start-up day: positive"
     LangAdd "سعر البيع الجديد لا يمكن أن يكون سالبًا", "The new sale price cannot be negative"
@@ -244,6 +258,9 @@ Private Sub D2_2()
     LangAdd "حساب رئيسي: يشمل كل حساباته التابعة", "Main account: includes all its sub-accounts"
     LangAdd "رصيد الصندوق يُدخل في قسم «الصناديق", "The balance of a cash box is entered in the Cash boxes part"
     LangAdd "رصيد العميل المسجل لا يطابق الحركات", "The recorded customer balance does not match the moves"
+End Sub
+
+Private Sub D2_3()
     LangAdd "رصيد المورد المسجل لا يطابق الحركات", "The recorded supplier balance does not match the moves"
     LangAdd "رقم التسجيل الضريبي للعميل (9 أرقام", "Tax registration number of the customer (9 digits"
     LangAdd "ضريبة مستردة تُرحَّل للإقرار التالي", "Refundable VAT carried to the next return"
@@ -258,9 +275,6 @@ Private Sub D2_2()
     LangAdd "المقبولة (صافي الفواتير والمرتجعات", "Accepted (invoices net of returns"
     LangAdd "تأكد من فلاشة التوقيع ورقمها السري", "Check the signing token and its PIN"
     LangAdd "تسجيل ارتداد الشيك؟ يعود مبلغه على", "Record the bounce of the cheque? Its amount goes back to"
-End Sub
-
-Private Sub D2_3()
     LangAdd "تسويات وتصحيحات من الفترات السابقة", "Adjustments and corrections of earlier periods"
     LangAdd "رصيد كل عميل يوم بدء التشغيل: موجب", "The balance of each customer on the start-up day: positive"
     LangAdd "رصيد كل مورد يوم بدء التشغيل: موجب", "The balance of each supplier on the start-up day: positive"
@@ -367,6 +381,9 @@ Private Sub D2_3()
     LangAdd "إلغاء ربط هذا المبلغ بالفاتورة", "Unlink this amount from the invoice"
     LangAdd "إيرادات ومصروفات كل مركز تكلفة", "Revenue and expenses of each cost center"
     LangAdd "اختر الحساب في كل سطر فيه مبلغ", "Choose the account in every line with an amount"
+End Sub
+
+Private Sub D2_4()
     LangAdd "اختر الخزينة التي تستلم المبلغ", "Choose the treasury that receives the amount"
     LangAdd "البرنامج (الفاتورة الإلكترونية", "Program (e-invoice"
     LangAdd "التحويل غير موجود أو تم ترحيله", "The transfer does not exist or is already posted"
@@ -381,9 +398,6 @@ Private Sub D2_3()
     LangAdd "المبيعات الشهرية (آخر 12 شهرًا", "Monthly sales (last 12 months"
     LangAdd "المسير مصروف: ألغِ الصرف أولًا", "The run is paid: cancel the payment first"
     LangAdd "المشتريات المعفاة وغير الخاضعة", "Exempt and non-taxable purchases"
-End Sub
-
-Private Sub D2_4()
     LangAdd "تقرير الملصقات غير موجود. شغّل", "The labels report does not exist. Run"
     LangAdd "حركة الخزينة / الصندوق (تفصيلي", "Treasury / box moves (detailed"
     LangAdd "حساب إجمالي الأرصدة الافتتاحية", "Total opening balances account"
@@ -413,6 +427,7 @@ Private Sub D2_4()
     LangAdd "اختر تقريرًا من القائمة أولًا", "Choose a report from the list first"
     LangAdd "اختر عملية أو أكثر من القائمة", "Choose one or more transactions from the list"
     LangAdd "اختر كلمة مرور جديدة للمتابعة", "Choose a new password to continue"
+    LangAdd "اختر نوع السند: صرف أو استلام", "Choose the voucher type: issue or receipt"
     LangAdd "اسم العميل على الكوب (اختياري", "Customer name on the cup (optional"
     LangAdd "اكتب الحد الأعلى للأجر الخاضع", "Type the maximum insurable wage"
     LangAdd "اكتب تاريخ البيع أو الاستبعاد", "Type the date of the sale or disposal"
@@ -431,6 +446,7 @@ Private Sub D2_4()
     LangAdd "رغم ذلك؟ (بصلاحية مدير النظام", "anyway? (with the permission of the system administrator"
     LangAdd "رقم هذا الجهاز (أرسله للمبرمج", "Number of this computer (send it to the developer"
     LangAdd "سبب إلغاء المستند لدى المصلحة", "Reason for cancelling the document at the Tax Authority"
+    LangAdd "سندات الصرف والاستلام المخزني", "Stock issue and receipt vouchers"
     LangAdd "طلب التوصيل يحتاج جوال العميل", "A delivery order needs the customer mobile"
     LangAdd "عرض فقط - التصحيح يكون بمرتجع", "View only - a correction is made with a return"
     LangAdd "كلمة المرور الحالية غير صحيحة", "The current password is wrong"
@@ -446,27 +462,4 @@ Private Sub D2_4()
     LangAdd "لا يوجد عملاء مسندون لمندوبين", "No customers are assigned to sales reps"
     LangAdd "موجود في الموازنة لنفس المركز", "already in the budget for the same center"
     LangAdd "هذا الإجراء غير موجود في شاشة", "This action does not exist in the screen"
-    LangAdd "هل تريد حذف هذا السجل نهائيًا", "Do you want to delete this record for good"
-    LangAdd "وتحديث المخزون ومتوسط التكلفة", "and the stock and average cost are updated"
-    LangAdd "يبقى في الصندوق (عهدة الكاشير", "Stays in the box (cashier float"
-    LangAdd "إقفال الفترات والسنة المالية", "Period and fiscal year closing"
-    LangAdd "إلغاء ترحيل المسير وحذف قيده", "Unpost the run and delete its entry"
-    LangAdd "احفظ تاريخ بدء التشغيل أولًا", "Save the start-up date first"
-    LangAdd "اختر السنة أو الفترة المالية", "Choose the fiscal year or period"
-    LangAdd "اختر المنتج من القائمة أولًا", "Choose the product from the list first"
-    LangAdd "اختر النسخة من القائمة أولًا", "Choose the backup from the list first"
-    LangAdd "اختر فاتورة آجلة عليها متبقٍ", "Choose a credit invoice with an amount remaining"
-    LangAdd "اختر نوع الشيك: وارد أو صادر", "Choose the cheque type: received or issued"
-    LangAdd "استبعاد بدون ثمن (تلف أو فقد", "Disposal without a price (damage or loss"
-    LangAdd "استحقاق فاتورة الشراء الآجلة", "Due date of a credit purchase invoice"
-    LangAdd "اكتب السنة التي يُنسخ فعليها", "Type the year whose actuals are copied"
-    LangAdd "التسوية غير موجودة أو معتمدة", "The reconciliation does not exist or is approved"
-    LangAdd "الرصيد المستحق للمورد حاليًا", "Balance currently due to the supplier"
-    LangAdd "الرمز البريدي للمحل (5 أرقام", "Store postal code (5 digits"
-    LangAdd "العمر الإنتاجي شهر على الأقل", "The useful life is at least one month"
-    LangAdd "المبلغ بالعملة (بدون الضريبة", "Amount in currency (without VAT"
-    LangAdd "المحل مدين للمورد (له)، سالب", "the shop owes the supplier (credit), negative"
-    LangAdd "المنظومة غير متاحة الآن (رمز", "The platform is not available now (code"
-    LangAdd "النسخ الموجودة (الأحدث أولًا", "Existing backups (newest first"
-    LangAdd "بداية الإهلاك قبل شهر الشراء", "The depreciation starts before the month of purchase"
 End Sub

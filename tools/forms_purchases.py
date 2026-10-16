@@ -347,7 +347,8 @@ def layout_inventory() -> FormModel:
             ("btnLabels", "طباعة باركود", "secondary", 3.4,
              'OpenScreen "frmBarcodeLabels", 0, Me!lstProducts.Value'),
             ("btnWarehouses", "المخازن", "secondary", 2.6, 'OpenScreen "frmWarehouses"'),
-            ("btnTransfer", "تحويل مخزني", "secondary", 3.0, 'OpenScreen "frmStockTransfer"')]:
+            ("btnTransfer", "تحويل مخزني", "secondary", 3.0, 'OpenScreen "frmStockTransfer"'),
+            ("btnStockDocs", "صرف واستلام", "secondary", 3.0, 'OpenScreen "frmStockDocument"')]:
         button(m, name, caption, bx, cm(16.6), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
 
@@ -547,12 +548,86 @@ def layout_stock_transfer(line_heads) -> FormModel:
     return m
 
 
+# ------------------------------------------------------------------ stock issue and receipt vouchers (docs/59)
+STOCK_DOC_TITLES = ["الصنف", "الكمية", "تكلفة الوحدة", "قيمة السطر"]
+STOCK_DOC_TYPES = "ISSUE;صرف لجهة;RECEIPT;استلام من جهة"
+
+
+def layout_stock_doc_lines() -> Tuple[FormModel, list]:
+    row_h = cm(0.75)
+    m = FormModel("frmStockDocumentLines", "أسطر السند المخزني", cm(20.6), row_h, popup=False,
+                  record_source="SELECT * FROM StockDocumentLines WHERE StockDocumentID = 0", allow_add=True)
+    m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0, "AllowDeletions": False}
+    heads = grid_row(m, [
+        ("ProductID", "ProductID", 10.0, {"_kind": "combo", "RowSource": TRANSFER_PRODUCTS, "ColumnCount": 2,
+                                          "ColumnWidths": "0;9.8", "BoundColumn": 1, "LimitToList": True}, []),
+        ("Quantity", "Quantity", 3.0, {"Format": "#,##0.###"}, []),
+        ("UnitCost", "UnitCost", 3.0, {"Format": "#,##0.00##"}, []),
+        ("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 3.4, {**LOCKED, "Format": "#,##0.00"}, []),
+        ("btnRemove", "", 0.8, {"_kind": "button", "Caption": Sym(f"ChrW(&H{0xE74D:X})"),
+                               "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
+    ], row_h)
+    m.form_events = ["BeforeUpdate", "AfterUpdate"]
+    m.code = ["Private Sub Form_BeforeUpdate(Cancel As Integer)", "    StockDocLineBeforeUpdate Me, Cancel", "End Sub",
+              "Private Sub Form_AfterUpdate()", "    StockDocLineAfterUpdate Me", "End Sub",
+              "Private Sub btnRemove_Click()", "    StockDocRemoveLine Me", "End Sub"]
+    return m, heads
+
+
+def layout_stock_document(line_heads) -> FormModel:
+    width, height = cm(21.4), cm(16.4)
+    m = FormModel("frmStockDocument", "سندات الصرف والاستلام المخزني", width, height, popup=True, allow_add=False)
+    title_band(m, "سندات الصرف والاستلام المخزني",
+               "صرف أصناف لقسم أو صالة إنتاج أو للهالك، أو استلامها منهم: مسودة، ثم «ترحيل» يحرك المخزون والقيد",
+               "inventory")
+    c = m.add(Control("combo", "cboDoc", cm(0.4), cm(2.3), cm(14.0), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 7, "ColumnWidths": "0;2.4;2.2;1.6;3.4;2.8;1.6", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboDoc", "السند (الأحدث أولًا)", c)
+    button(m, "btnParties", "الجهات", cm(17.4), cm(2.3) - cm(0.03), "secondary", w=cm(3.6),
+           call='OpenScreen "frmStockParties"')
+    y = cm(3.8)
+    c = m.add(Control("combo", "cboType", cm(0.4), y, cm(3.2), cm(0.8),
+                      {"RowSource": STOCK_DOC_TYPES, "RowSourceType": "Value List", "ColumnCount": 2,
+                       "ColumnWidths": "0;3", "LimitToList": True}))
+    labelled(m, "cboType", "نوع السند الجديد", c)
+    c = m.add(Control("combo", "cboWarehouse", cm(3.8), y, cm(3.6), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;3.4", "LimitToList": True}))
+    labelled(m, "cboWarehouse", "المخزن", c)
+    c = m.add(Control("combo", "cboParty", cm(7.6), y, cm(4.4), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4.2", "LimitToList": True}))
+    labelled(m, "cboParty", "الجهة", c)
+    c = m.add(Control("text", "txtNotes", cm(12.2), y, cm(5.0), cm(0.8), {}))
+    labelled(m, "txtNotes", "ملاحظات", c)
+    button(m, "btnNew", "سند جديد", cm(17.4), y - cm(0.03), "primary", w=cm(3.6), call="StockDocNew Me")
+    m.add(Control("label", "lblInfo", cm(0.4), cm(4.9), width - cm(0.8), cm(0.7),
+                  {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    header_labels(m, cm(0.4), cm(5.75), STOCK_DOC_TITLES, line_heads)
+    m.add(Control("subform", "subLines", cm(0.4), cm(6.35), cm(20.6), cm(7.6),
+                  {"SourceObject": "frmStockDocumentLines"}))
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnPost", "ترحيل", "primary", 3.6, 'StockDocAction Me, "POST"'),
+            ("btnUnpost", "إلغاء الترحيل", "danger", 3.4, 'StockDocAction Me, "UNPOST"'),
+            ("btnDelete", "حذف المسودة", "danger", 3.2, 'StockDocAction Me, "DELETE"')]:
+        button(m, name, caption, bx, cm(14.5), style, w=cm(w), h=cm(1.1), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(14.5), "secondary", w=cm(2.6), h=cm(1.1),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    StockDocLoad Me", "End Sub",
+               "Private Sub cboDoc_AfterUpdate()", "    StockDocShow Me", "End Sub"] + m.code)
+    return m
+
+
 def purchase_forms() -> List[FormModel]:
     lines, heads = layout_purchase_lines()
     ret_lines, ret_heads = layout_purchase_return_lines()
     count_lines, count_heads = layout_count_lines()
     transfer_lines, transfer_heads = layout_transfer_lines()
+    doc_lines, doc_heads = layout_stock_doc_lines()
     # subforms first: the parent forms embed them by name
     return [lines, layout_purchase_invoice(heads), ret_lines, layout_purchase_return(ret_heads),
             layout_supplier_payment(), layout_purchase_view(), layout_inventory(),
-            count_lines, layout_stock_count(count_heads), transfer_lines, layout_stock_transfer(transfer_heads)]
+            count_lines, layout_stock_count(count_heads), transfer_lines, layout_stock_transfer(transfer_heads),
+            doc_lines, layout_stock_document(doc_heads)]

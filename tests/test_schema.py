@@ -232,7 +232,8 @@ class SeedDataTests(unittest.TestCase):
         dirs = {r[1]: r[3] for r in table("TransactionTypes").seed_rows}
         self.assertEqual(dirs, {"PURCHASE": 1, "SALE": -1, "PURCHASE_RETURN": -1,
                                 "SALES_RETURN": 1, "STOCK_IN": 1, "STOCK_OUT": -1,
-                                "ADJUSTMENT": 0, "OPENING": 1, "TRANSFER_OUT": -1, "TRANSFER_IN": 1})
+                                "ADJUSTMENT": 0, "OPENING": 1, "TRANSFER_OUT": -1, "TRANSFER_IN": 1,
+                                "PARTY_ISSUE": -1, "PARTY_RECEIPT": 1})
 
     def test_seed_loads_into_relational_db_with_foreign_keys(self):
         con = build_sqlite()

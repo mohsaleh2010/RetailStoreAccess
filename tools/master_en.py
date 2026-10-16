@@ -14,6 +14,7 @@ ACCOUNT_NAMES_EN = {
     1190: "Cash not allocated to a box",
     1195: "Cash in transit between boxes",
     1410: "Goods in transit between warehouses",
+    1420: "Production work in progress",
     1200: "Mada and wallets under settlement (bank and network)",
     1210: "Bank accounts",
     1250: "Cheques under collection",
@@ -72,6 +73,7 @@ ACCOUNT_NAMES_EN = {
     51: "Cost of sales",
     5100: "Cost of goods sold",
     5200: "Stock differences and adjustments",
+    5250: "Stock waste",
     52: "Operating and administrative expenses",
     5300: "Expenses by type",
     5500: "Salaries and wages",
@@ -82,6 +84,7 @@ ACCOUNT_NAMES_EN = {
     5610: "Bank and POS fees",
     5620: "Government fees and licenses",
     5630: "Advertising",
+    5640: "Supplies issued from stock to departments",
     53: "Other expenses",
     5400: "Cash shortages",
     5650: "Loss on sale and disposal of fixed assets",
@@ -107,13 +110,15 @@ SOURCE_TYPES_EN = {
     "ACCOUNT_OPENING": "Account opening balance",
     "CASH_RECEIVE": "Cash transfer received",
     "STOCK_TRANSFER": "Transfer between warehouses", "STOCK_RECEIVE": "Stock transfer received",
+    "STOCK_ISSUE": "Stock issue to a party", "STOCK_RECEIPT": "Stock receipt from a party",
 }
 
 TRANSACTION_TYPES_EN = {
     "PURCHASE": "Purchase", "SALE": "Sale", "PURCHASE_RETURN": "Purchase return", "SALES_RETURN": "Sales return",
     "STOCK_IN": "Stock addition", "STOCK_OUT": "Stock deduction", "ADJUSTMENT": "Count adjustment",
     "OPENING": "Opening balance", "TRANSFER_OUT": "Transfer out to another warehouse",
-    "TRANSFER_IN": "Transfer in from another warehouse",
+    "TRANSFER_IN": "Transfer in from another warehouse", "PARTY_ISSUE": "Issue to a party (issue voucher)",
+    "PARTY_RECEIPT": "Receipt from a party (receipt voucher)",
 }
 
 ROLE_NAMES_EN = {1: "System administrator", 2: "Manager", 3: "Cashier"}
@@ -128,6 +133,7 @@ PERMISSION_NAMES_EN = {
     "CASH_BOX": "Treasury: receipt, payment and transfer vouchers and boxes", "CASH_CLOSING": "Daily cashier closing",
     "CASH_ALL_BOXES": "Pay and transfer from every box, not only own boxes",
     "STOCK_TRANSFER": "Transfers between warehouses: sending and receiving",
+    "STOCK_DOCS": "Stock issue and receipt vouchers and their parties",
     "JOURNAL": "Journal entries, chart of accounts and trial balance",
     "MANUAL_ENTRY": "Manual entries: add, edit and delete",
     "PERIOD_CLOSE": "Close and reopen periods and the fiscal year",
@@ -156,7 +162,8 @@ SCREEN_TITLES_EN = {
     "frmRecurring": "Recurring expenses", "frmTreasury": "Treasury", "frmCashVoucher": "Cash and transfer vouchers",
     "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmCashBoxUsers": "Box custodians",
     "frmCashTransfers": "Receipt of transfers between boxes", "frmWarehouses": "Warehouses",
-    "frmStockTransfer": "Transfers between warehouses", "frmAccounting": "Accounting and finance",
+    "frmStockTransfer": "Transfers between warehouses", "frmStockParties": "Stock issue and receipt parties",
+    "frmStockDocument": "Stock issue and receipt vouchers", "frmAccounting": "Accounting and finance",
     "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
     "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
     "frmPeriodClosing": "Period and fiscal year closing", "frmFiscalPeriods": "Fiscal periods", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",
@@ -183,6 +190,8 @@ CASH_BOX_NAMES_EN = {1: "Main treasury", 2: "Cashier box"}
 
 WAREHOUSE_NAMES_EN = {1: "Main warehouse"}
 
+STOCK_PARTY_NAMES_EN = {1: "Waste and damage"}
+
 CUSTOMER_NAMES_EN = {1: "Cash customer"}
 
 MODULE_NAMES_EN = {"المبيعات": "Sales", "العملاء": "Customers", "المشتريات": "Purchases", "الموردون": "Suppliers",
@@ -206,6 +215,7 @@ ENGLISH_NAMES = {
     "Suppliers": ("SupplierNameEn", "SupplierName", "SupplierID", {}),
     "CashBoxes": ("BoxNameEn", "BoxName", "CashBoxID", CASH_BOX_NAMES_EN),
     "Warehouses": ("WarehouseNameEn", "WarehouseName", "WarehouseID", WAREHOUSE_NAMES_EN),
+    "StockParties": ("PartyNameEn", "PartyName", "StockPartyID", STOCK_PARTY_NAMES_EN),
     "Banks": ("BankNameEn", "BankName", "BankID", {}),
     "CostCenters": ("CenterNameEn", "CenterName", "CostCenterID", {}),
     "SalesReps": ("RepNameEn", "RepName", "SalesRepID", {}),

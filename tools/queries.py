@@ -78,7 +78,8 @@ JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournal
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
                           "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
                           "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation",
-                          "qryJournalPayroll", "qryJournalCommission", "qryJournalStockTransfer"]
+                          "qryJournalPayroll", "qryJournalCommission", "qryJournalStockTransfer",
+                          "qryJournalStockDocument"]
 
 
 def _sale():
@@ -214,6 +215,22 @@ def _stock_transfer():
         jline(*k, 2, stock_account("t.FromWarehouseID"), ZERO, "v.TransferValue", "t.Notes", src, sent),
         jline(*r, 1, stock_account("t.ToWarehouseID"), "v.TransferValue", ZERO, "t.Notes", src, received),
         jline(*r, 2, 1410, ZERO, "v.TransferValue", "'بضاعة بالطريق'", src, received)])
+
+
+def _stock_document():
+    """Issue: the account of the party against the stock of the warehouse; receipt: the reverse (docs/59).
+    Every line on the cost centre of the party."""
+    src = ("(StockDocuments AS d INNER JOIN qryStockDocumentValue AS v ON d.StockDocumentID = v.StockDocumentID) "
+           "INNER JOIN qryStockPartyAccounts AS p ON d.StockPartyID = p.StockPartyID")
+    ki = ("'STOCK_ISSUE'", "d.StockDocumentID", "d.DocNumber", "d.DocDate", "p.PartyName")
+    kr = ("'STOCK_RECEIPT'", "d.StockDocumentID", "d.DocNumber", "d.DocDate", "p.PartyName")
+    issue = "d.Status = 'POSTED' AND d.DocType = 'ISSUE' AND v.DocValue <> 0"
+    receipt = "d.Status = 'POSTED' AND d.DocType = 'RECEIPT' AND v.DocValue <> 0"
+    return with_center(jquery([
+        jline(*ki, 1, "p.PartyAccount", "v.DocValue", ZERO, "d.Notes", src, issue),
+        jline(*ki, 2, stock_account("d.WarehouseID"), ZERO, "v.DocValue", "'المخزون'", src, issue),
+        jline(*kr, 1, stock_account("d.WarehouseID"), "v.DocValue", ZERO, "'المخزون'", src, receipt),
+        jline(*kr, 2, "p.PartyAccount", ZERO, "v.DocValue", "d.Notes", src, receipt)]), cc("p"))
 
 
 def _manual():
@@ -1685,6 +1702,16 @@ SELECT StockTransferID, Sum(CCur(Quantity * UnitCost)) AS TransferValue
 FROM StockTransferLines
 GROUP BY StockTransferID"""),
     Query("qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", _stock_transfer()),
+    Query("qryStockPartyAccounts", "حساب كل جهة صرف واستلام: حسابها، وإلا حساب نوعها", """
+SELECT p.StockPartyID, p.PartyName, p.CostCenterID,
+       IIf(p.AccountCode Is Null, IIf(p.PartyType = 'PRODUCTION', 1420, IIf(p.PartyType = 'WASTE', 5250,
+       IIf(p.PartyType = 'DEPARTMENT', 5640, 5900))), p.AccountCode) AS PartyAccount
+FROM [@StockParties] AS p"""),
+    Query("qryStockDocumentValue", "قيمة كل سند صرف أو استلام مخزني", """
+SELECT StockDocumentID, Sum(CCur(Quantity * UnitCost)) AS DocValue
+FROM StockDocumentLines
+GROUP BY StockDocumentID"""),
+    Query("qryJournalStockDocument", "أسطر قيود سندات الصرف والاستلام المخزني", _stock_document()),
 
     Query("qryJournalSale", "أسطر قيود فواتير البيع", _sale()),
     Query("qryJournalSalesReturn", "أسطر قيود مرتجعات البيع", _sales_return()),

@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 174
+Private Const EXPECTED_RELATION_COUNT As Long = 180
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -554,6 +554,12 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_StockTransfers_ToWarehouseID", "Warehouses", "WarehouseID", "StockTransfers", "ToWarehouseID", 0&)
     c.Add Array("FK_StockTransferLines_StockTransferID", "StockTransfers", "StockTransferID", "StockTransferLines", "StockTransferID", 4096&)
     c.Add Array("FK_StockTransferLines_ProductID", "Products", "ProductID", "StockTransferLines", "ProductID", 0&)
+    c.Add Array("FK_StockParties_AccountCode", "Accounts", "AccountCode", "StockParties", "AccountCode", 0&)
+    c.Add Array("FK_StockParties_CostCenterID", "CostCenters", "CostCenterID", "StockParties", "CostCenterID", 0&)
+    c.Add Array("FK_StockDocuments_WarehouseID", "Warehouses", "WarehouseID", "StockDocuments", "WarehouseID", 0&)
+    c.Add Array("FK_StockDocuments_StockPartyID", "StockParties", "StockPartyID", "StockDocuments", "StockPartyID", 0&)
+    c.Add Array("FK_StockDocumentLines_StockDocumentID", "StockDocuments", "StockDocumentID", "StockDocumentLines", "StockDocumentID", 4096&)
+    c.Add Array("FK_StockDocumentLines_ProductID", "Products", "ProductID", "StockDocumentLines", "ProductID", 0&)
     c.Add Array("FK_StockCounts_CategoryID", "Categories", "CategoryID", "StockCounts", "CategoryID", 0&)
     c.Add Array("FK_StockCounts_EmployeeID", "Employees", "EmployeeID", "StockCounts", "EmployeeID", 0&)
     c.Add Array("FK_StockCounts_WarehouseID", "Warehouses", "WarehouseID", "StockCounts", "WarehouseID", 0&)
@@ -574,6 +580,7 @@ Private Function RetiredRelations() As Variant
                              "FK_FiscalYearClosings_EmployeeID", _
                              "FK_PeriodClosings_EmployeeID", _
                              "FK_StockCounts_PostedByID", _
+                             "FK_StockDocuments_EmployeeID", _
                              "FK_StockTransfers_EmployeeID", _
                              "FK_StockTransfers_ReceivedByID", _
                              "FK_SupplierAllocations_EmployeeID", _

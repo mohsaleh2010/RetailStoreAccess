@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2786
+Private Const ENTRY_COUNT As Long = 2833
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -226,12 +226,12 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=IIf(Len(Nz([Reason],""""))>0,""ÓÈÈ ÇáÅÑÌÇÚ: "" & [Reason],"""")") = "=IIf(Len(Nz([Reason],""""))>0,""Return reason: "" & [Reason],"""")", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅĞÇ áã Êßä Úáíå ŞíæÏ ÃáÛö «ÍÓÇÈ İÑÚí» İíå ÃæáğÇ.") = "If it has no entries, clear Sub-account on it first.", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈÇŞí ãä ÇáİÇÊæÑÉ ÈÚÏ ãÇ ÑõÈØ ÈåÇ æãÑÊÌÚÇÊåÇ ") = "What remains of the invoice after what was linked to it and its returns ", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÈáÛ ÇáãÑÈæØ") = "Linked amount", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞÑ ÊÑÍíá ÇáÑÕíÏ: ") = "Could not post the stock: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÒíÇÏÉ") = "Overage", "Tr sample 6", passed, failed, report
+    CheckLang Tr("=IIf(Sum([LineDebit]-[LineCredit])>=0,""ÇáÑÕíÏ ãÏíä"",""ÇáÑÕíÏ ÏÇÆä"")") = "=IIf(Sum([LineDebit]-[LineCredit])>=0,""Debit balance"",""Credit balance"")", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÑÓÇá ÇáãÎÊÇÑ") = "Send selected", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈÍË") = "Search", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÈáÛ ÇáãÏİæÚ (") = "Amount paid (", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞÑ ÍİÙ ÇáÊÕİíÉ: ") = "Could not save the closing: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÒíÇÏÉ: ") = "Overage: ", "Tr sample 6", passed, failed, report
     CheckLang Tr("áÇ ãÈíÚÇÊ ÂÌáÉ İí ÂÎÑ ") = "No credit sales in the last ", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"

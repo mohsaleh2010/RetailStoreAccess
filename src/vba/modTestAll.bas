@@ -24,7 +24,7 @@ Public Function RunAllTests() As Boolean
     g_CollectTests = True
     DoCmd.Hourglass True
     names = Array("VerifySchema", "TestRelationships", "TestQueries", "TestForms", "TestSales", "TestPurchases", _
-                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "TestTouchPOS", "TestCash", "TestJournal", "TestAging", "TestBank", "TestCheques", "TestAssets", "TestPayroll", "TestCostCenters", "TestBudget", "TestRecurring", "TestAudit", "TestIndicators", "TestCurrency", "TestSalesReps", "TestEnglishNames", "TestCountry", "TestEInvoice", "TestZatcaXml", "TestZatcaApi", "TestEtaReceipt", "TestEtaInvoice", "TestEInvoiceReports", "TestOpeningBalances", "TestFiscalPeriods", "TestWarehouses", "TestLang", _
+                  "TestReports", "TestDashboard", "TestSecurity", "TestLabels", "TestTouchPOS", "TestCash", "TestJournal", "TestAging", "TestBank", "TestCheques", "TestAssets", "TestPayroll", "TestCostCenters", "TestBudget", "TestRecurring", "TestAudit", "TestIndicators", "TestCurrency", "TestSalesReps", "TestEnglishNames", "TestCountry", "TestEInvoice", "TestZatcaXml", "TestZatcaApi", "TestEtaReceipt", "TestEtaInvoice", "TestEInvoiceReports", "TestOpeningBalances", "TestFiscalPeriods", "TestWarehouses", "TestStockDocs", "TestLang", _
                   "VerifyDemoData")
     For i = LBound(names) To UBound(names)
         If SkipReason(CStr(names(i))) <> "" Then

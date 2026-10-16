@@ -20,7 +20,7 @@ Option Explicit
 Private Const SOURCE_QUERIES As String = "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase," & _
     "qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock," & _
     "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn,qryJournalBankTx,qryJournalCheque,qryJournalAsset,qryJournalDepreciation,qryJournalPayroll,qryJournalCommission," & _
-    "qryJournalStockTransfer"
+    "qryJournalStockTransfer,qryJournalStockDocument"
 
 '==============================================================================
 ' Accounts and synchronisation
@@ -251,6 +251,8 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "STOCK_COUNT":      PrintStockCount id
         Case "STOCK_TRANSFER":   OpenScreen "frmStockTransfer", 0, id
         Case "STOCK_RECEIVE":    OpenScreen "frmStockTransfer", 0, id
+        Case "STOCK_ISSUE":      OpenScreen "frmStockDocument", 0, id
+        Case "STOCK_RECEIPT":    OpenScreen "frmStockDocument", 0, id
         Case "BOX_OPENING":      OpenScreen "frmCashBoxes", 0, id
         Case "CUSTOMER_OPENING": OpenScreen "frmCustomers", 0, id
         Case "SUPPLIER_OPENING": OpenScreen "frmSuppliers", 0, id
