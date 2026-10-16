@@ -13,6 +13,17 @@ Public Sub LangData5()
 End Sub
 
 Private Sub D5_1()
+    LangAdd "عميلًا", "customers"
+    LangAdd "فاتورة", "Invoice"
+    LangAdd "فبراير", "February"
+    LangAdd "في حقل", "in the field"
+    LangAdd "في يوم", "on day"
+    LangAdd "فيروزي", "Teal"
+    LangAdd "لا غير", "only"
+    LangAdd "لتصنيف", "for category"
+    LangAdd "مائتان", "two hundred"
+    LangAdd "متابعة", "Continue"
+    LangAdd "متوازن", "Balanced"
     LangAdd "محصَّل", "Collected"
     LangAdd "مرحَّل", "Posted"
     LangAdd "مستبعد", "Disposed"
@@ -122,6 +133,9 @@ Private Sub D5_1()
     LangAdd "مستند", "documents"
     LangAdd "مسودة", "Draft"
     LangAdd "مصروف", "Expense"
+End Sub
+
+Private Sub D5_2()
     LangAdd "مطابق", "Matched"
     LangAdd "مطلوب", "is required"
     LangAdd "معتمد", "Approved"
@@ -133,9 +147,6 @@ Private Sub D5_1()
     LangAdd "منخفض", "Low"
     LangAdd "مُرسل", "Submitted"
     LangAdd "نتيجة", "Result"
-End Sub
-
-Private Sub D5_2()
     LangAdd "يساوي", "equals"
     LangAdd "يناير", "January"
     LangAdd "يوليو", "July"

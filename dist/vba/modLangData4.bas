@@ -20,6 +20,10 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "”⁄— «·ÕÃ„ «·ﬂ»Ì—", "Large size price"
+    LangAdd "’«›Ì Œ”«—… «·”‰…", "Net loss of the year"
+    LangAdd "ÿ»«⁄… ﬂ‘› «·Õ”«»", "Print the statement"
+    LangAdd "⁄«œ «·„”Ì— „”Êœ…", "The run is a draft again"
     LangAdd "⁄„·Ì«  «·„” ‰œ« ", "Document transactions"
     LangAdd "⁄„Ê·«  «·„‰œÊ»Ì‰", "Sales rep commissions"
     LangAdd "⁄‰ ›« Ê—… «·‘—«¡", "for the purchase invoice"
@@ -136,13 +140,13 @@ Private Sub D4_1()
     LangAdd "√Õ—› ⁄·Ï «·√ﬁ·", "characters at least"
     LangAdd "√œ«¡ «·„‰œÊ»Ì‰", "Sales rep performance"
     LangAdd "√—’œ… «·„Ê—œÌ‰", "Supplier balances"
+End Sub
+
+Private Sub D4_2()
     LangAdd "√ﬁ· „‰ «· ﬂ·›…", "below cost"
     LangAdd "≈⁄œ«œ«  «·„·’ﬁ", "Label settings"
     LangAdd "≈·€«¡ «·«⁄ „«œ", "Cancel approval"
     LangAdd "≈·€«¡ «·„ÿ«»ﬁ…", "Unmatch"
-End Sub
-
-Private Sub D4_2()
     LangAdd "≈Ìœ«⁄ ›Ì «·»‰ﬂ", "Deposit in the bank"
     LangAdd "≈Ì—«œ«  «·‰‘«ÿ", "Operating revenue"
     LangAdd "«Œ — »‰œ «·’—›", "Choose the payment item"
@@ -189,6 +193,7 @@ Private Sub D4_2()
     LangAdd "«·„” Œœ„ (›«—€", "User (empty"
     LangAdd "«·„”„Ï «·ÊŸÌ›Ì", "Job title"
     LangAdd "«·„⁄„Ê· »Â« ›Ì", "applied in"
+    LangAdd "«·‰ﬁœÌ… »«·⁄œ¯", "Cash counted"
     LangAdd "»„ Ê”ÿ «· ﬂ·›…", "at average cost"
     LangAdd " «—ÌŒ «·«⁄ „«œ", "Approval date"
     LangAdd " «—ÌŒ «·›« Ê—…", "Invoice date"
@@ -196,6 +201,7 @@ Private Sub D4_2()
     LangAdd " Õ’Ì· ›Ì «·»‰ﬂ", "Collection in the bank"
     LangAdd " –ÌÌ· «·›« Ê—…", "Invoice footer"
     LangAdd " ”ÃÌ· ‘Ìﬂ ÃœÌœ", "Record a new cheque"
+    LangAdd " ’›Ì«  «·ﬂ«‘Ì—", "Cashier closings"
     LangAdd " ⁄–— Õ›Ÿ «·”‰œ", "Could not save the voucher"
     LangAdd " ⁄–— Õ›Ÿ «·‘Ìﬂ", "Could not save the cheque"
     LangAdd " ⁄–— Õ›Ÿ «·ﬁÌœ", "Could not save the entry"
@@ -257,15 +263,15 @@ Private Sub D4_2()
     LangAdd "ÌÊÃœ „”Ì— ·‘Â—", "A run for the month"
     LangAdd "Ìı’—› „‰ ’‰œÊﬁ", "Paid from box"
     LangAdd "Ìıﬁ»÷ ›Ì ’‰œÊﬁ", "Received in box"
+End Sub
+
+Private Sub D4_3()
     LangAdd "√—’œ… «·⁄„·«¡", "Customer balances"
     LangAdd "√”ÿ— «·›« Ê—…", "Invoice lines"
     LangAdd "√”ÿ— «·„·’ﬁ« ", "Label lines"
     LangAdd "√”ÿ— «·„Ê«“‰…", "Budget lines"
     LangAdd "√”⁄«— «·⁄„·« ", "Exchange rates"
     LangAdd "√ﬁ’Ï ‰”»… Œ’„", "Maximum discount rate"
-End Sub
-
-Private Sub D4_3()
     LangAdd "√ﬁ· „‰ «·„»·€", "less than the amount"
     LangAdd "√ﬂ»— „‰ ﬁÌ„ Â", "more than its value"
     LangAdd "≈Ã„«·Ì «·√’Ê·", "Total assets"
@@ -377,8 +383,12 @@ Private Sub D4_3()
     LangAdd "Ê‰”»… «·÷—Ì»…", "and the VAT rate"
     LangAdd "Ì «»⁄ «·„Œ“Ê‰", "Tracks stock"
     LangAdd "ÌÊ„ «·«” Õﬁ«ﬁ", "Due day"
+    LangAdd "ÌÊ„Ì… «·’‰œÊﬁ", "Cash box day book"
     LangAdd "¬Œ— ”⁄— ‘—«¡", "Last purchase price"
     LangAdd "¬Œ— ‘Â— „”Ã·", "Last recorded month"
+End Sub
+
+Private Sub D4_4()
     LangAdd "¬Ì»«‰ «·„ÊŸ›", "Employee IBAN"
     LangAdd "√”«” «·⁄„Ê·…", "Commission base"
     LangAdd "√”ÿ— «·„— Ã⁄", "Return lines"
@@ -386,9 +396,6 @@ Private Sub D4_3()
     LangAdd "√ﬂ»— „‰ «·Õœ", "more than the limit"
     LangAdd "√„Ì‰ «·’‰œÊﬁ", "Cashier"
     LangAdd "√Ì«„ «· √ŒÌ—", "Days late"
-End Sub
-
-Private Sub D4_4()
     LangAdd "≈·€«¡ «·Õ«·…", "Cancel the status"
     LangAdd "≈·€«¡ «·”œ«œ", "Cancel the payment"
     LangAdd "≈‰‘«¡ „Ê«“‰…", "Create a budget"
@@ -502,6 +509,9 @@ Private Sub D4_4()
     LangAdd "≈÷«›… / Õ›Ÿ", "Add / Save"
     LangAdd "≈÷«›… ··ÿ·»", "Add to order"
     LangAdd "≈⁄«œ… ÿ»«⁄…", "Reprint"
+End Sub
+
+Private Sub D4_5()
     LangAdd "≈⁄œ«œ «·—»ÿ", "Connection setup"
     LangAdd "≈ﬁ›«· «·”‰…", "Year closing"
     LangAdd "≈·€«¡ «·Ã—œ", "Cancel the count"
@@ -509,9 +519,6 @@ Private Sub D4_4()
     LangAdd "≈·€«¡ «·’—›", "Cancel the payment"
     LangAdd "≈Ìœ«⁄ ‰ﬁœÌ…", "Cash deposit"
     LangAdd "«Œ — «·Õ”«»", "Choose the account"
-End Sub
-
-Private Sub D4_5()
     LangAdd "«Œ — «·’Ê—…", "Choose the picture"
     LangAdd "«Œ — «·⁄„·…", "Choose the currency"
     LangAdd "«Œ — «·⁄„Ì·", "Choose the customer"
@@ -625,6 +632,9 @@ Private Sub D4_5()
     LangAdd "«Œ — «·œÊ—", "Choose the role"
     LangAdd "«Œ — «·”‰œ", "Choose the voucher"
     LangAdd "«Œ — «·‘Â—", "Choose the month"
+End Sub
+
+Private Sub D4_6()
     LangAdd "«Œ — «·‘Ìﬂ", "Choose the cheque"
     LangAdd "«Œ — «·’‰›", "Choose the item"
     LangAdd "«” ·„‰« „‰", "Received from"
@@ -632,9 +642,6 @@ Private Sub D4_5()
     LangAdd "«”„ «·Õ”«»", "Account name"
     LangAdd "«”„ «·⁄„·…", "Currency name"
     LangAdd "«”„ «·⁄„Ì·", "Customer name"
-End Sub
-
-Private Sub D4_6()
     LangAdd "«”„ «·„—ﬂ“", "Center name"
     LangAdd "«”„ «·„‰ Ã", "Product name"
     LangAdd "«”„ «·„Ê—œ", "Supplier name"
@@ -748,6 +755,9 @@ Private Sub D4_6()
     LangAdd "»·« ‰Â«Ì…", "No end"
     LangAdd " Õ’Ì· ‘Ìﬂ", "Cheque collection"
     LangAdd " ”ÊÌ… „œÏ", "Mada settlement"
+End Sub
+
+Private Sub D4_7()
     LangAdd " „  ≈÷«›…", "Added"
     LangAdd "À·«À… ⁄‘—", "thirteen"
     LangAdd "À„‰ «·»Ì⁄", "Sale price"
@@ -755,9 +765,6 @@ Private Sub D4_6()
     LangAdd "Õ–› «·ﬁÌœ", "Delete the entry"
     LangAdd "Õ—ﬂ… „‰ Ã", "Product moves"
     LangAdd "Õ›Ÿ «·√’·", "Save the asset"
-End Sub
-
-Private Sub D4_7()
     LangAdd "Õ›Ÿ «·”‰œ", "Save the voucher"
     LangAdd "Õ›Ÿ «·ﬁÌœ", "Save the entry"
     LangAdd "Õ›Ÿ  ’›Ì…", "Save closing"
@@ -871,6 +878,9 @@ Private Sub D4_7()
     LangAdd "‘Ìﬂ ’«œ—", "Issued cheque"
     LangAdd "‘Ìﬂ „— œ", "Bounced cheque"
     LangAdd "‘Ìﬂ Ê«—œ", "Received cheque"
+End Sub
+
+Private Sub D4_8()
     LangAdd "’›— Ã‰ÌÂ", "zero pounds"
     LangAdd "’›— —Ì«·", "zero riyals"
     LangAdd "ÿ·» ”›—Ì", "Takeaway order"
@@ -878,9 +888,6 @@ Private Sub D4_7()
     LangAdd "€Ì— „”œœ", "Unpaid"
     LangAdd "€Ì— „Ê“⁄", "Not allocated"
     LangAdd "›⁄·Ì ”‰…", "Actuals of year"
-End Sub
-
-Private Sub D4_8()
     LangAdd "›ﬂ «·ﬁ›·", "Unlock"
     LangAdd "ﬁÌœ ÃœÌœ", "New entry"
     LangAdd "ﬁÌœ ⁄ﬂ”Ì", "Reversing entry"
@@ -994,6 +1001,9 @@ Private Sub D4_8()
     LangAdd "€Ì— ‰‘ÿ", "is not active"
     LangAdd "›Ì ‘«‘…", "in the screen"
     LangAdd "·«  ÊÃœ", "None"
+End Sub
+
+Private Sub D4_9()
     LangAdd "··≈÷«›…", "to add"
     LangAdd "·„  Ã “", "Failed:"
     LangAdd "„ Ê«“‰…", "Balanced"
@@ -1001,9 +1011,6 @@ Private Sub D4_8()
     LangAdd "„” ÊÌ« ", "levels"
     LangAdd "„’—Ê›« ", "Expenses"
     LangAdd "„·«ÕŸ« ", "Notes"
-End Sub
-
-Private Sub D4_9()
     LangAdd "„·ÌÊ‰«‰", "two million"
     LangAdd "„ı»·Û¯€", "Reported"
     LangAdd "Ê«·œ«∆‰", "and credit"
@@ -1075,15 +1082,4 @@ Private Sub D4_9()
     LangAdd "”» „»—", "September"
     LangAdd "” „«∆…", "six hundred"
     LangAdd "⁄„Ê·« ", "Commissions"
-    LangAdd "⁄„Ì·«", "customers"
-    LangAdd "›« Ê—…", "Invoice"
-    LangAdd "›»—«Ì—", "February"
-    LangAdd "›Ì Õﬁ·", "in the field"
-    LangAdd "›Ì ÌÊ„", "on day"
-    LangAdd "›Ì—Ê“Ì", "Teal"
-    LangAdd "·« €Ì—", "only"
-    LangAdd "· ’‰Ì›", "for category"
-    LangAdd "„«∆ «‰", "two hundred"
-    LangAdd "„ «»⁄…", "Continue"
-    LangAdd "„ Ê«“‰", "Balanced"
 End Sub

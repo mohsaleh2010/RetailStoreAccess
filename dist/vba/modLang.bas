@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2689
+Private Const ENTRY_COUNT As Long = 2695
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,12 +227,12 @@ Public Function TestLang() As Boolean
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
     CheckLang Tr("=""ÕİÍÉ "" & [Page] & "" ãä "" & [Pages]") = "=""Page "" & [Page] & "" From "" & [Pages]", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÌãÇáí ÇáãÔÊÑíÇÊ") = "Total purchases", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈÇÑßæÏ ÇáãØÈæÚ") = "Printed barcode", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÅÌãÇáí ÇáãÕÑæİÇÊ") = "Total paid", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈÇÑßæÏ Ãæ ßæÏ ÇáãäÊÌ (Enter)") = "Barcode or product code (Enter)", "Tr sample 3", passed, failed, report
     CheckLang Tr("ÇáãÈáÛ ÃßÈÑ ãä ÑÕíÏ Óáİ ÇáãæÙİ (") = "The amount is more than the advance balance of the employee (", "Tr sample 4", passed, failed, report
     CheckLang Tr("ÊÚĞÑ ÍİÙ ÇáÔíß: ") = "Could not save the cheque: ", "Tr sample 5", passed, failed, report
     CheckLang Tr("ÑõİÖ ÇáãÓÊäÏ.") = "The document was rejected.", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ ÊæÌÏ İÊÑÇÊ.") = "There are no periods.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("áÇ ÊæÌÏ İÊÑÉ ãŞİáÉ.") = "There is no closed period.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ") = "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _

@@ -75,7 +75,8 @@
 | + | خطة: أرصدة أول المدة والسنة المالية، والمخازن وكارت الصنف، والخزائن ويومية الصندوق، والمندوبين والبيع من السيارة، وSQL Server، والويب والتطبيقات | 📋 خطة | [docs/51-Plan-Opening-Warehouses-Treasury-Reps-SQL-Web.md](docs/51-Plan-Opening-Warehouses-Treasury-Reps-SQL-Web.md) |
 | + | أرصدة بداية التشغيل: تاريخ بدء التشغيل، وشاشة واحدة لأرصدة الحسابات العامة والعملاء والموردين والصناديق والبنوك، وحساب إجمالي الأرصدة الافتتاحية وتفصيله | ✅ تمت الموافقة | [docs/52-Opening-Balances.md](docs/52-Opening-Balances.md) |
 | + | الرصيد الافتتاحي للمخزون: كل الأصناف في جدول واحد، واستيراده من Excel وقالبه، وترحيله بتاريخ بدء التشغيل وإلغاء ترحيله | ✅ تمت الموافقة | [docs/53-Opening-Stock.md](docs/53-Opening-Stock.md) |
-| + | الفترات المالية بالترتيب (بلا تداخل ولا فجوة)، وإقفال كل فترة بتاريخ نهايتها، وتقرير أرصدة أول المدة لأي تاريخ، والميزانية الافتتاحية | ✅ بانتظار الموافقة | [docs/54-Fiscal-Periods.md](docs/54-Fiscal-Periods.md) |
+| + | الفترات المالية بالترتيب (بلا تداخل ولا فجوة)، وإقفال كل فترة بتاريخ نهايتها، وتقرير أرصدة أول المدة لأي تاريخ، والميزانية الافتتاحية | ✅ تمت الموافقة | [docs/54-Fiscal-Periods.md](docs/54-Fiscal-Periods.md) |
+| + | يومية الصندوق التفصيلية: صفحة لكل صندوق ويوم، برصيد أول اليوم ثم المقبوضات ثم المصروفات، والإجماليات ورصيد آخر اليوم وتصفيات الكاشير؛ من مركز التقارير ومن شاشة الخزينة | ✅ بانتظار الموافقة | [docs/55-Cash-Day-Book.md](docs/55-Cash-Day-Book.md) |
 
 ## هيكل المستودع
 
@@ -176,6 +177,7 @@
 | 47 | `modOpening` (دائمة، جديدة)، واستبدال `modClosing` و`modJournal` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestOpeningBalances` |
 | 48 | `modLangData5` (مولَّدة، جديدة)، واستبدال `modOpening` و`modScreens` و`modLang` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildForms` | `TestOpeningBalances` |
 | 49 | `modFiscal` (دائمة، جديدة)، واستبدال `modClosing` و`modScreens` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestFiscalPeriods`, `TestJournal` |
+| 50 | استبدال `modCash` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildQueries`, `BuildForms`, `BuildReports` | `TestCash` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

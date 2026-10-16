@@ -422,8 +422,9 @@ Public Sub TreasuryOpen(ByVal frm As Access.Form, ByVal Which As String)
 End Sub
 
 Public Sub PrintCashDay(ByVal frm As Access.Form)
-    ' Movements of the selected box on the shown day: opening balance, receipts, payments, closing balance.
-    Dim d As Date
+    ' The day book of the selected box on the shown day (docs/55): opening of the day, the receipts and the
+    ' payments in detail, the totals, the closing of the day. A day without moves: its opening balance only.
+    Dim d As Date, criteria As String
     If IsNull(frm!lstBoxes.Value) Or Not IsDate(frm!txtDay.Value) Then
         ShowWarning "ÇÎÊÑ ÇáÕäÏæŞ æÇáíæã."
         Exit Sub
@@ -431,8 +432,12 @@ Public Sub PrintCashDay(ByVal frm As Access.Form)
     d = DateValue(frm!txtDay.Value)
     SetPeriod d, d
     SetQueryParam "CashBoxID", CLng(frm!lstBoxes.Value)
-    OpenReportOrQuery "rptCashStatement", "CashStatementQuery", "", _
-                      "Çáíæã: " & GDate(d) & "    ÇáÕäÏæŞ: " & BoxName(frm!lstBoxes.Value)
+    criteria = "Çáíæã: " & GDate(d) & "    ÇáÕäÏæŞ: " & BoxName(frm!lstBoxes.Value)
+    If Nz(DbValue("SELECT COUNT(*) FROM CashDayBookQuery"), 0) > 0 Then
+        OpenReportOrQuery "rptCashDayBook", "CashDayBookQuery", "", criteria
+    Else
+        OpenReportOrQuery "rptCashStatement", "CashStatementQuery", "", criteria
+    End If
 End Sub
 
 '==============================================================================
@@ -773,6 +778,13 @@ Public Function TestCash() As Boolean
     CheckCash CashBoxBalance(box) = before + 295, "ÇáÕäÏæŞ ÈÚÏ ÇáÊÕİíÉ = ÇáãÚÏæÏ - ÇáãÑÍóøá", passed, failed, report
     CheckCash Nz(DbValue("SELECT COUNT(*) FROM CashVouchers WHERE ClosingID = " & id), 0) = 2, _
               "ÇáÊÕİíÉ ÊäÔÆ ÓäÏ ÚÌÒ æÓäÏ ÊÍæíá", passed, failed, report
+    ' the day book of today (docs/55): opening + receipts - payments = the balance now, with the closing
+    SetPeriod Date, Date
+    SetQueryParam "CashBoxID", box
+    CheckCash Nz(DbValue("SELECT Max(DayOpening) + Sum(AmountIn) - Sum(AmountOut) FROM CashDayBookQuery"), 0) = _
+              CashBoxBalance(box), "íæãíÉ ÇáÕäÏæŞ: ÑÕíÏ ÂÎÑ Çáíæã = ÑÕíÏ ÇáÕäÏæŞ", passed, failed, report
+    CheckCash Nz(DbValue("SELECT Max(ClosingCount) FROM CashDayBookQuery"), 0) >= 1, _
+              "íæãíÉ ÇáÕäÏæŞ: ÊÕİíÉ Çáíæã ÊÙåÑ", passed, failed, report
     ws.Rollback
     inTrans = False
     GoTo Done

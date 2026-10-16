@@ -1545,6 +1545,42 @@ SELECT d.CashDay, {nz("o.DayOpening")} AS OpeningBalance, d.Receipts, d.Payments
 FROM qryCashDays AS d LEFT JOIN qryCashDayOpening AS o ON d.CashDay = o.CashDay
 ORDER BY d.CashDay""", P + ["CashBoxID"]),
 
+    # the cash day book (docs/55): one page per box and day; the day key groups the report (box * 100000 + day of the period)
+    Query("qryCashBoxMoves", "حركات النقدية داخل الفترة لكل صندوق، بيومها", f"""
+SELECT m.CashBoxID, DateValue(m.MoveDate) AS CashDay, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber,
+       m.PartyName, m.Details, m.AmountIn, m.AmountOut
+FROM qryCashMovements AS m
+WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND {period("m.MoveDate")}""", P + ["CashBoxID"]),
+
+    Query("qryCashBoxDays", "أيام الحركة لكل صندوق داخل الفترة", """
+SELECT d.CashBoxID, d.CashDay
+FROM qryCashBoxMoves AS d
+GROUP BY d.CashBoxID, d.CashDay""", P + ["CashBoxID"]),
+
+    Query("qryCashBoxDayOpening", "رصيد أول كل يوم لكل صندوق (كل حركاته قبل ذلك اليوم)", """
+SELECT d.CashBoxID, d.CashDay, Sum(x.AmountIn - x.AmountOut) AS BoxOpening
+FROM qryCashBoxDays AS d, qryCashMovements AS x
+WHERE x.CashBoxID = d.CashBoxID AND x.MoveDate < d.CashDay
+GROUP BY d.CashBoxID, d.CashDay""", P + ["CashBoxID"]),
+
+    Query("qryCashBoxDayClosings", "تصفيات الكاشير لكل صندوق في كل يوم: عددها والنقدية بالعدّ والفرق", """
+SELECT c.CashBoxID, DateValue(c.ClosingDate) AS CashDay, Count(*) AS DayClosings,
+       Sum(c.CountedAmount) AS DayCounted, Sum(c.Difference) AS DayDifference
+FROM CashClosings AS c
+GROUP BY c.CashBoxID, DateValue(c.ClosingDate)"""),
+
+    # No subqueries here either: the report totals each day in its group footer.
+    Query("CashDayBookQuery", "يومية الصندوق التفصيلية: لكل صندوق ويوم رصيد أول اليوم ثم المقبوضات ثم المصروفات", f"""
+SELECT m.CashBoxID * 100000 + DateDiff('d', QDate('PeriodStart'), m.CashDay) AS DayKey, m.CashBoxID, b.BoxName, m.CashDay,
+       IIf(m.AmountIn > 0, 1, 2) AS SideNo, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber, m.PartyName,
+       m.Details, m.AmountIn, m.AmountOut, {nz("o.BoxOpening")} AS DayOpening,
+       Nz(k.DayClosings, 0) AS ClosingCount, {nz("k.DayCounted")} AS CountedTotal,
+       {nz("k.DayDifference")} AS DifferenceTotal
+FROM ((qryCashBoxMoves AS m INNER JOIN [@CashBoxes] AS b ON m.CashBoxID = b.CashBoxID)
+      LEFT JOIN qryCashBoxDayOpening AS o ON (m.CashBoxID = o.CashBoxID AND m.CashDay = o.CashDay))
+     LEFT JOIN qryCashBoxDayClosings AS k ON (m.CashBoxID = k.CashBoxID AND m.CashDay = k.CashDay)
+ORDER BY m.CashBoxID, m.CashDay, IIf(m.AmountIn > 0, 1, 2), m.MoveDate""", P + ["CashBoxID"]),
+
     Query("CashClosingsQuery", "تصفيات يومية الكاشير خلال فترة (0 = كل الصناديق)", f"""
 SELECT c.ClosingID, c.ClosingNumber, c.ClosingDate, b.BoxName, e.EmployeeName, c.PeriodStart,
        c.OpeningBalance, c.CashIn, c.CashOut, c.ExpectedBalance, c.CountedAmount, c.Difference,

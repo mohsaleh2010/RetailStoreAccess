@@ -13,6 +13,17 @@ Public Sub LangData5()
 End Sub
 
 Private Sub D5_1()
+    LangAdd "⁄„Ì·«", "customers"
+    LangAdd "›« Ê—…", "Invoice"
+    LangAdd "›»—«Ì—", "February"
+    LangAdd "›Ì Õﬁ·", "in the field"
+    LangAdd "›Ì ÌÊ„", "on day"
+    LangAdd "›Ì—Ê“Ì", "Teal"
+    LangAdd "·« €Ì—", "only"
+    LangAdd "· ’‰Ì›", "for category"
+    LangAdd "„«∆ «‰", "two hundred"
+    LangAdd "„ «»⁄…", "Continue"
+    LangAdd "„ Ê«“‰", "Balanced"
     LangAdd "„Õ’Û¯·", "Collected"
     LangAdd "„—ÕÛ¯·", "Posted"
     LangAdd "„” »⁄œ", "Disposed"
@@ -122,6 +133,9 @@ Private Sub D5_1()
     LangAdd "„” ‰œ", "documents"
     LangAdd "„”Êœ…", "Draft"
     LangAdd "„’—Ê›", "Expense"
+End Sub
+
+Private Sub D5_2()
     LangAdd "„ÿ«»ﬁ", "Matched"
     LangAdd "„ÿ·Ê»", "is required"
     LangAdd "„⁄ „œ", "Approved"
@@ -133,9 +147,6 @@ Private Sub D5_1()
     LangAdd "„‰Œ›÷", "Low"
     LangAdd "„ı—”·", "Submitted"
     LangAdd "‰ ÌÃ…", "Result"
-End Sub
-
-Private Sub D5_2()
     LangAdd "Ì”«ÊÌ", "equals"
     LangAdd "Ì‰«Ì—", "January"
     LangAdd "ÌÊ·ÌÊ", "July"

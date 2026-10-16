@@ -30,6 +30,7 @@ Private Sub D2_1()
     LangAdd "لا مبيعات ولا تحصيلات للمندوبين في هذا الشهر", "No sales and no collections by the sales reps in this month"
     LangAdd "لا يتبع الحساب حسابًا من الحسابات التابعة له", "An account cannot belong to one of its own sub-accounts"
     LangAdd "لتصفير صنف غير موجود اكتب 0 في كميته الفعلية", "To set a missing item to zero type 0 as its actual quantity"
+    LangAdd "يومية الصندوق التفصيلية (صفحة لكل صندوق ويوم", "Detailed cash box day book (a page per box and day"
     LangAdd "اتركه فارغًا للطباعة على الطابعة الافتراضية", "Leave it empty to print on the default printer"
     LangAdd "اختر المشروب: الحجم والإضافات تظهر تلقائيًا", "Choose the drink: the size and extras appear automatically"
     LangAdd "السعر والخصم لا يمكن أن يكونا سالبين (السطر", "The price and the discount cannot be negative (line"
@@ -134,10 +135,10 @@ Private Sub D2_1()
     LangAdd "الكمية المرتجعة أكبر من الكمية المباعة", "The returned quantity is more than the quantity sold"
     LangAdd "الكمية المرتجعة أكبر من المتاح للإرجاع", "The returned quantity is more than what can be returned"
     LangAdd "المبلغ أكبر من عمولات المندوب المستحقة", "The amount is more than the commissions payable to the sales rep"
-    LangAdd "بيانات المحل الضريبية وإعدادات التشغيل", "Tax data of the store and operating settings"
 End Sub
 
 Private Sub D2_2()
+    LangAdd "بيانات المحل الضريبية وإعدادات التشغيل", "Tax data of the store and operating settings"
     LangAdd "ترتيب الزر في شاشة اللمس (الأصغر أولًا", "Order of the button on the touch screen (smallest first"
     LangAdd "ديون العملاء ÷ المبيعات الآجلة اليومية", "Customer receivables / daily credit sales"
     LangAdd "رفضت المصلحة بيانات دخول البرنامج (رمز", "The Tax Authority refused the credentials of the program (code"
@@ -257,10 +258,10 @@ Private Sub D2_2()
     LangAdd "امسح الباركود (يضيف 1) أو 3*الكود", "Scan the barcode (adds 1) or 3*code"
     LangAdd "بيانات ناقصة للفاتورة الإلكترونية", "Missing data for e-invoicing"
     LangAdd "بيع آجل لعميل غير مسموح له بالآجل", "A credit sale to a customer not allowed to buy on credit"
-    LangAdd "حذف التسوية الجارية وكل مطابقاتها", "Delete the open reconciliation and all its matches"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "حذف التسوية الجارية وكل مطابقاتها", "Delete the open reconciliation and all its matches"
     LangAdd "حذف الحركة البنكية المحددة وقيدها", "Delete the selected bank transaction and its entry"
     LangAdd "حسب صافي الكمية خلال فترة التقرير", "By net quantity during the report period"
     LangAdd "خصم الغياب أكبر من الأساسي والسكن", "The absence deduction is more than the basic and housing"
@@ -380,10 +381,10 @@ Private Sub D2_3()
     LangAdd "اختر كلمة مرور جديدة للمتابعة", "Choose a new password to continue"
     LangAdd "اسم العميل على الكوب (اختياري", "Customer name on the cup (optional"
     LangAdd "اكتب الحد الأعلى للأجر الخاضع", "Type the maximum insurable wage"
-    LangAdd "اكتب تاريخ البيع أو الاستبعاد", "Type the date of the sale or disposal"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "اكتب تاريخ البيع أو الاستبعاد", "Type the date of the sale or disposal"
     LangAdd "الإيجار والكهرباء والاشتراكات", "Rent, electricity and subscriptions"
     LangAdd "البرنامج مفعّل على هذا الجهاز", "The program is activated on this computer"
     LangAdd "التكلفة لا يمكن أن تكون سالبة", "The cost cannot be negative"
@@ -483,6 +484,4 @@ Private Sub D2_4()
     LangAdd "رد غير متوقع من الهيئة (رمز", "Unexpected reply from ZATCA (code"
     LangAdd "صادر آخر (رسوم بنكية وغيرها", "Other outgoing (bank fees and others"
     LangAdd "صافي الضريبة المستحقة (سالب", "Net VAT due (negative"
-    LangAdd "صافي المبيعات (بدون الضريبة", "Net sales (without VAT"
-    LangAdd "في شاشة أرصدة بداية التشغيل", "in the start-up opening balances screen"
 End Sub

@@ -17,6 +17,8 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "ÕÇİí ÇáãÈíÚÇÊ (ÈÏæä ÇáÖÑíÈÉ", "Net sales (without VAT"
+    LangAdd "İí ÔÇÔÉ ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", "in the start-up opening balances screen"
     LangAdd "áÇ ÊßáİÉ ãÈíÚÇÊ Ãæ áÇ ãÎÒæä", "No cost of sales or no stock"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ãÓíÑ ÇáÑæÇÊÈ", "You do not have the permission for payroll"
     LangAdd "áÇ ÊæÌÏ ÃÔåÑ áã ÊõÓÌóøá ÍÊì", "There are no unrecorded months up to"
@@ -135,11 +137,11 @@ Private Sub D3_1()
     LangAdd "ÇáãÈáÛ ÇáãÓÏÏ Èíä 0.01 æ", "The amount paid is between 0.01 and"
     LangAdd "ÇáãÊÈŞí İí ÇáÕäÏæŞ (ÚåÏÉ", "Left in the box (float"
     LangAdd "ÇáãáÛÇÉ Ãæ ÇáÊí áÇ ÊõÑÓá", "Cancelled or not sent"
-    LangAdd "ÇáããáßÉ ÇáÚÑÈíÉ ÇáÓÚæÏíÉ", "Kingdom of Saudi Arabia"
-    LangAdd "ÈíÇäÇÊ ÇáãæÑÏíä æÃÑÕÏÊåã", "Supplier data and balances"
 End Sub
 
 Private Sub D3_2()
+    LangAdd "ÇáããáßÉ ÇáÚÑÈíÉ ÇáÓÚæÏíÉ", "Kingdom of Saudi Arabia"
+    LangAdd "ÈíÇäÇÊ ÇáãæÑÏíä æÃÑÕÏÊåã", "Supplier data and balances"
     LangAdd "ÊÇÑíÎ ÇáÇÚÊãÇÏ ÈÚÏ Çáíæã", "The approval date is after today"
     LangAdd "ÊÍÏíË ÇáŞíæÏ ãä ÇáÚãáíÇÊ", "Refresh the entries from the transactions"
     LangAdd "ÊÕäíİ ÇáÌÑÏ ÇáÌÏíÏ (İÇÑÛ", "Category of the new count (empty"
@@ -233,6 +235,7 @@ Private Sub D3_2()
     LangAdd "ãæÇÒäÉ ÇáÓäÉ: ÇáÅíÑÇÏÇÊ", "Budget of the year: revenue"
     LangAdd "äÙÇã ÊÔÛíá ÇáÌåÇÒ (İÇÑÛ", "Operating system of the device (empty"
     LangAdd "æÓíÕÈÍ ááÚãíá ÑÕíÏ ÏÇÆä", "and the customer will have a credit balance"
+    LangAdd "íæãíÉ ÇáÕäÏæŞ ÇáÊİÕíáíÉ", "Detailed cash box day book"
     LangAdd "ÃÏÎá ÊÇÑíÎ ÈÏÁ ÇáÊÔÛíá", "Enter the start-up date"
     LangAdd "ÃÕá ÌÏíÏ: ÇáŞÓØ ÇáÔåÑí", "New asset: monthly installment"
     LangAdd "ÃŞá ãä ÅÌãÇáí ÇáİÇÊæÑÉ", "less than the invoice total"
@@ -257,12 +260,12 @@ Private Sub D3_2()
     LangAdd "ÇáÈäß (ÇáÊÍÕíá / ÇáÕÑİ", "Bank (collection / payment"
     LangAdd "ÇáÍÓÇÈÇÊ: ãÌãæÚ ÇáÏÇÆä", "Accounts: total credit"
     LangAdd "ÇáÍÓÇÈÇÊ: ãÌãæÚ ÇáãÏíä", "Accounts: total debit"
-    LangAdd "ÇáÓäÉ / ÇáİÊÑÉ ÇáãÇáíÉ", "Fiscal year / period"
-    LangAdd "ÇáÕäİ ãæÌæÏ İí ÓØÑ ÂÎÑ", "The item is already on another line"
-    LangAdd "ÇáÚãáÇÊ æÃÓÚÇÑ ÇáÊÍæíá", "Currencies and exchange rates"
 End Sub
 
 Private Sub D3_3()
+    LangAdd "ÇáÓäÉ / ÇáİÊÑÉ ÇáãÇáíÉ", "Fiscal year / period"
+    LangAdd "ÇáÕäİ ãæÌæÏ İí ÓØÑ ÂÎÑ", "The item is already on another line"
+    LangAdd "ÇáÚãáÇÊ æÃÓÚÇÑ ÇáÊÍæíá", "Currencies and exchange rates"
     LangAdd "ÇáãÓÇİÉ Èíä ÇáÕİæİ (ãã", "Space between rows (mm"
     LangAdd "ÇáäŞÏíÉ ÇáİÚáíÉ ÈÇáÚÏø", "Actual cash counted"
     LangAdd "ÈáÇ ÊæŞíÚ¡ ááÊÌÑÈÉ İŞØ", "unsigned, for testing only"
@@ -380,12 +383,12 @@ Private Sub D3_3()
     LangAdd "ÇáÑŞã ÇáÖÑíÈí ááÚãíá", "Customer tax number"
     LangAdd "ÇáÔåÑ ÇáÊÇáí ááÊÓÌíá", "Next month to record"
     LangAdd "ÇáÕäÏæŞ (ÅíÏÇÚ / ÓÍÈ", "Box (deposit / withdrawal"
-    LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "E-invoicing"
-    LangAdd "ÇáãÈáÛ (ÈÏæä ÇáÖÑíÈÉ", "Amount (without VAT"
-    LangAdd "ÇáãÈíÚÇÊ ÍÓÈ ÇáÊÕäíİ", "Sales by category"
 End Sub
 
 Private Sub D3_4()
+    LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "E-invoicing"
+    LangAdd "ÇáãÈáÛ (ÈÏæä ÇáÖÑíÈÉ", "Amount (without VAT"
+    LangAdd "ÇáãÈíÚÇÊ ÍÓÈ ÇáÊÕäíİ", "Sales by category"
     LangAdd "ÇáãÍÕóøáÉ / ÇáãÕÑæİÉ", "Collected / paid"
     LangAdd "ÇáãÏİæÚÇÊ æÇáãÕÑæİÇÊ", "Payments and expenses"
     LangAdd "ÇáãÑÊÌÚÇÊ ÈÏæä ÖÑíÈÉ", "Returns without VAT"
@@ -503,12 +506,12 @@ Private Sub D3_4()
     LangAdd "ÇáÕÇÏÑÇÊ (ÈÓÚÑ ÕİÑ", "Exports (zero rate"
     LangAdd "ÇáÚãæáÇÊ ÇáãÑÍóøáÉ", "Posted commissions"
     LangAdd "ÇáßÇİíå: ÓÚÑ ÇáÈíÚ", "Cafe: sale price"
-    LangAdd "ÇáãÈáÛ ŞÈá ÇáÖÑíÈÉ", "Amount before VAT"
-    LangAdd "ÇáãÊÈŞí Úáì ÇáÍÓÇÈ", "Remaining on account"
-    LangAdd "ÇáãÓÊÎÏã ÛíÑ ãæÌæÏ", "The user does not exist"
 End Sub
 
 Private Sub D3_5()
+    LangAdd "ÇáãÈáÛ ŞÈá ÇáÖÑíÈÉ", "Amount before VAT"
+    LangAdd "ÇáãÊÈŞí Úáì ÇáÍÓÇÈ", "Remaining on account"
+    LangAdd "ÇáãÓÊÎÏã ÛíÑ ãæÌæÏ", "The user does not exist"
     LangAdd "ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ", "Recurring expenses"
     LangAdd "ÇáãäÔÃÉ (ÛíÑ ÓÚæÏí", "Employer (non-Saudi"
     LangAdd "ÇáãäØŞÉ / ÎØ ÇáÓíÑ", "Region / route"
@@ -626,12 +629,12 @@ Private Sub D3_5()
     LangAdd "ÕÇÏÑ ÂÎÑ ãä ÇáÈäß", "Other outgoing from the bank"
     LangAdd "ÕÇİí ÖÑíÈÉ ÇáİÊÑÉ", "Net VAT of the period"
     LangAdd "ÛíÑ ãÓÌá ÈÇáÖÑíÈÉ", "Not registered for VAT"
-    LangAdd "İÇÊæÑÉ ÇáãæÑÏ ÑŞã", "Supplier invoice number"
-    LangAdd "ŞÓØ ÇáÓáİÉ ÇáÔåÑí", "Monthly advance installment"
-    LangAdd "áÇ ÊæÌÏ ÔåÇÏÉ ÈÚÏ", "No certificate yet"
 End Sub
 
 Private Sub D3_6()
+    LangAdd "İÇÊæÑÉ ÇáãæÑÏ ÑŞã", "Supplier invoice number"
+    LangAdd "ŞÓØ ÇáÓáİÉ ÇáÔåÑí", "Monthly advance installment"
+    LangAdd "áÇ ÊæÌÏ ÔåÇÏÉ ÈÚÏ", "No certificate yet"
     LangAdd "áã ÊõÍÏÏ ÇáİÇÊæÑÉ", "The invoice was not set"
     LangAdd "ãËÇá: 38 Ãæ 40 Ãæ", "Example: 38 or 40 or"
     LangAdd "ãÌáÏ ÕæÑ ÇáãäÊÌÇÊ", "Product pictures folder"
@@ -643,6 +646,8 @@ Private Sub D3_6()
     LangAdd "íõæáóøÏ ÚäÏ ÇáÍİÙ", "Generated when saved"
     LangAdd "ÂÎÑ ÍÑßÇÊ ÇáãäÊÌ", "Latest product moves"
     LangAdd "ÅÌãÇáí ÇáãÔÊÑíÇÊ", "Total purchases"
+    LangAdd "ÅÌãÇáí ÇáãÕÑæİÇÊ", "Total paid"
+    LangAdd "ÅÌãÇáí ÇáãŞÈæÖÇÊ", "Total received"
     LangAdd "ÅÑÓÇá ßá ÇáãÚáøŞ", "Send all pending"
     LangAdd "ÅÔÚÇÑ ÏÇÆä ÖÑíÈí", "Standard credit note"
     LangAdd "ÅÔÚÇÑ ãÏíä ÖÑíÈí", "Standard debit note"
@@ -709,9 +714,4 @@ Private Sub D3_6()
     LangAdd "ÑŞã Ãæ ÇÓã ÇáÓÌá", "Number or name of the record"
     LangAdd "ÑŞã İÇÊæÑÉ ÇáÈíÚ", "Sales invoice number"
     LangAdd "ÒíÇÏÉ İí ÇáÕäÏæŞ", "Overage in the box"
-    LangAdd "ÓÚÑ ÇáÍÌã ÇáßÈíÑ", "Large size price"
-    LangAdd "ÕÇİí ÎÓÇÑÉ ÇáÓäÉ", "Net loss of the year"
-    LangAdd "ØÈÇÚÉ ÍÑßÉ Çáíæã", "Print the moves of the day"
-    LangAdd "ØÈÇÚÉ ßÔİ ÇáÍÓÇÈ", "Print the statement"
-    LangAdd "ÚÇÏ ÇáãÓíÑ ãÓæÏÉ", "The run is a draft again"
 End Sub

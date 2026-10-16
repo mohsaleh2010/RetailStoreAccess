@@ -17,6 +17,8 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "صافي المبيعات (بدون الضريبة", "Net sales (without VAT"
+    LangAdd "في شاشة أرصدة بداية التشغيل", "in the start-up opening balances screen"
     LangAdd "لا تكلفة مبيعات أو لا مخزون", "No cost of sales or no stock"
     LangAdd "لا تملك صلاحية مسير الرواتب", "You do not have the permission for payroll"
     LangAdd "لا توجد أشهر لم تُسجَّل حتى", "There are no unrecorded months up to"
@@ -135,11 +137,11 @@ Private Sub D3_1()
     LangAdd "المبلغ المسدد بين 0.01 و", "The amount paid is between 0.01 and"
     LangAdd "المتبقي في الصندوق (عهدة", "Left in the box (float"
     LangAdd "الملغاة أو التي لا تُرسل", "Cancelled or not sent"
-    LangAdd "المملكة العربية السعودية", "Kingdom of Saudi Arabia"
-    LangAdd "بيانات الموردين وأرصدتهم", "Supplier data and balances"
 End Sub
 
 Private Sub D3_2()
+    LangAdd "المملكة العربية السعودية", "Kingdom of Saudi Arabia"
+    LangAdd "بيانات الموردين وأرصدتهم", "Supplier data and balances"
     LangAdd "تاريخ الاعتماد بعد اليوم", "The approval date is after today"
     LangAdd "تحديث القيود من العمليات", "Refresh the entries from the transactions"
     LangAdd "تصنيف الجرد الجديد (فارغ", "Category of the new count (empty"
@@ -233,6 +235,7 @@ Private Sub D3_2()
     LangAdd "موازنة السنة: الإيرادات", "Budget of the year: revenue"
     LangAdd "نظام تشغيل الجهاز (فارغ", "Operating system of the device (empty"
     LangAdd "وسيصبح للعميل رصيد دائن", "and the customer will have a credit balance"
+    LangAdd "يومية الصندوق التفصيلية", "Detailed cash box day book"
     LangAdd "أدخل تاريخ بدء التشغيل", "Enter the start-up date"
     LangAdd "أصل جديد: القسط الشهري", "New asset: monthly installment"
     LangAdd "أقل من إجمالي الفاتورة", "less than the invoice total"
@@ -257,12 +260,12 @@ Private Sub D3_2()
     LangAdd "البنك (التحصيل / الصرف", "Bank (collection / payment"
     LangAdd "الحسابات: مجموع الدائن", "Accounts: total credit"
     LangAdd "الحسابات: مجموع المدين", "Accounts: total debit"
-    LangAdd "السنة / الفترة المالية", "Fiscal year / period"
-    LangAdd "الصنف موجود في سطر آخر", "The item is already on another line"
-    LangAdd "العملات وأسعار التحويل", "Currencies and exchange rates"
 End Sub
 
 Private Sub D3_3()
+    LangAdd "السنة / الفترة المالية", "Fiscal year / period"
+    LangAdd "الصنف موجود في سطر آخر", "The item is already on another line"
+    LangAdd "العملات وأسعار التحويل", "Currencies and exchange rates"
     LangAdd "المسافة بين الصفوف (مم", "Space between rows (mm"
     LangAdd "النقدية الفعلية بالعدّ", "Actual cash counted"
     LangAdd "بلا توقيع، للتجربة فقط", "unsigned, for testing only"
@@ -380,12 +383,12 @@ Private Sub D3_3()
     LangAdd "الرقم الضريبي للعميل", "Customer tax number"
     LangAdd "الشهر التالي للتسجيل", "Next month to record"
     LangAdd "الصندوق (إيداع / سحب", "Box (deposit / withdrawal"
-    LangAdd "الفاتورة الإلكترونية", "E-invoicing"
-    LangAdd "المبلغ (بدون الضريبة", "Amount (without VAT"
-    LangAdd "المبيعات حسب التصنيف", "Sales by category"
 End Sub
 
 Private Sub D3_4()
+    LangAdd "الفاتورة الإلكترونية", "E-invoicing"
+    LangAdd "المبلغ (بدون الضريبة", "Amount (without VAT"
+    LangAdd "المبيعات حسب التصنيف", "Sales by category"
     LangAdd "المحصَّلة / المصروفة", "Collected / paid"
     LangAdd "المدفوعات والمصروفات", "Payments and expenses"
     LangAdd "المرتجعات بدون ضريبة", "Returns without VAT"
@@ -503,12 +506,12 @@ Private Sub D3_4()
     LangAdd "الصادرات (بسعر صفر", "Exports (zero rate"
     LangAdd "العمولات المرحَّلة", "Posted commissions"
     LangAdd "الكافيه: سعر البيع", "Cafe: sale price"
-    LangAdd "المبلغ قبل الضريبة", "Amount before VAT"
-    LangAdd "المتبقي على الحساب", "Remaining on account"
-    LangAdd "المستخدم غير موجود", "The user does not exist"
 End Sub
 
 Private Sub D3_5()
+    LangAdd "المبلغ قبل الضريبة", "Amount before VAT"
+    LangAdd "المتبقي على الحساب", "Remaining on account"
+    LangAdd "المستخدم غير موجود", "The user does not exist"
     LangAdd "المصروفات المتكررة", "Recurring expenses"
     LangAdd "المنشأة (غير سعودي", "Employer (non-Saudi"
     LangAdd "المنطقة / خط السير", "Region / route"
@@ -626,12 +629,12 @@ Private Sub D3_5()
     LangAdd "صادر آخر من البنك", "Other outgoing from the bank"
     LangAdd "صافي ضريبة الفترة", "Net VAT of the period"
     LangAdd "غير مسجل بالضريبة", "Not registered for VAT"
-    LangAdd "فاتورة المورد رقم", "Supplier invoice number"
-    LangAdd "قسط السلفة الشهري", "Monthly advance installment"
-    LangAdd "لا توجد شهادة بعد", "No certificate yet"
 End Sub
 
 Private Sub D3_6()
+    LangAdd "فاتورة المورد رقم", "Supplier invoice number"
+    LangAdd "قسط السلفة الشهري", "Monthly advance installment"
+    LangAdd "لا توجد شهادة بعد", "No certificate yet"
     LangAdd "لم تُحدد الفاتورة", "The invoice was not set"
     LangAdd "مثال: 38 أو 40 أو", "Example: 38 or 40 or"
     LangAdd "مجلد صور المنتجات", "Product pictures folder"
@@ -643,6 +646,8 @@ Private Sub D3_6()
     LangAdd "يُولَّد عند الحفظ", "Generated when saved"
     LangAdd "آخر حركات المنتج", "Latest product moves"
     LangAdd "إجمالي المشتريات", "Total purchases"
+    LangAdd "إجمالي المصروفات", "Total paid"
+    LangAdd "إجمالي المقبوضات", "Total received"
     LangAdd "إرسال كل المعلّق", "Send all pending"
     LangAdd "إشعار دائن ضريبي", "Standard credit note"
     LangAdd "إشعار مدين ضريبي", "Standard debit note"
@@ -709,9 +714,4 @@ Private Sub D3_6()
     LangAdd "رقم أو اسم السجل", "Number or name of the record"
     LangAdd "رقم فاتورة البيع", "Sales invoice number"
     LangAdd "زيادة في الصندوق", "Overage in the box"
-    LangAdd "سعر الحجم الكبير", "Large size price"
-    LangAdd "صافي خسارة السنة", "Net loss of the year"
-    LangAdd "طباعة حركة اليوم", "Print the moves of the day"
-    LangAdd "طباعة كشف الحساب", "Print the statement"
-    LangAdd "عاد المسير مسودة", "The run is a draft again"
 End Sub

@@ -73,7 +73,7 @@ def layout_treasury() -> FormModel:
            call="TreasuryDayStep Me, 1")
     button(m, "btnToday", "اليوم", px + cm(9.0), y, "secondary", w=cm(1.8), h=cm(0.8),
            call="TreasuryToday Me")
-    button(m, "btnPrintDay", "طباعة حركة اليوم", px + cm(11.0), y, "primary", w=cm(3.6), h=cm(0.8),
+    button(m, "btnPrintDay", "يومية الصندوق", px + cm(11.0), y, "primary", w=cm(3.6), h=cm(0.8),
            call="PrintCashDay Me")
 
     gap = cm(0.3)

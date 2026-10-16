@@ -25,11 +25,11 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     "ryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerOpening,qrySupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplie" & _
     "rLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebi" & _
     "ts,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPost" & _
-    "ed,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,CashClosingsQuery,qryCashClosingPrint," & _
-    "qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDe" & _
-    "preciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,Tri" & _
-    "alBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitA" & _
-    "t,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "ed,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCash" & _
+    "BoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearC" & _
+    "lose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheet" & _
+    "Query,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBu" & _
+    "dgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -790,6 +790,11 @@ Private Sub CreateAllQueries()
     Q_qryCashDays
     Q_qryCashDayOpening
     Q_CashDailyQuery
+    Q_qryCashBoxMoves
+    Q_qryCashBoxDays
+    Q_qryCashBoxDayOpening
+    Q_qryCashBoxDayClosings
+    Q_CashDayBookQuery
     Q_CashClosingsQuery
     Q_qryCashClosingPrint
     Q_qryCashVoucherPrint
@@ -2393,6 +2398,55 @@ Private Sub Q_CashDailyQuery()
     s = s & "FROM qryCashDays AS d LEFT JOIN qryCashDayOpening AS o ON d.CashDay = o.CashDay" & vbCrLf
     s = s & "ORDER BY d.CashDay" & vbCrLf
     SaveQuery "CashDailyQuery", "ÍÑßÉ ÇáÎÒíäÉ ÇáíæãíÉ: ÑÕíÏ Ãæá Çáíæã æÇáãŞÈæÖÇÊ æÇáãÏİæÚÇÊ æÑÕíÏ ÂÎÑ Çáíæã", s
+End Sub
+
+Private Sub Q_qryCashBoxMoves()
+    Dim s As String
+    s = "SELECT m.CashBoxID, DateValue(m.MoveDate) AS CashDay, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber," & vbCrLf
+    s = s & "       m.PartyName, m.Details, m.AmountIn, m.AmountOut" & vbCrLf
+    s = s & "FROM qryCashMovements AS m" & vbCrLf
+    s = s & "WHERE (QLong('CashBoxID') = 0 OR m.CashBoxID = QLong('CashBoxID')) AND m.MoveDate >= QDate('PeriodStart') AND m.MoveDate < QDate('PeriodEnd')" & vbCrLf
+    SaveQuery "qryCashBoxMoves", "ÍÑßÇÊ ÇáäŞÏíÉ ÏÇÎá ÇáİÊÑÉ áßá ÕäÏæŞ¡ ÈíæãåÇ", s
+End Sub
+
+Private Sub Q_qryCashBoxDays()
+    Dim s As String
+    s = "SELECT d.CashBoxID, d.CashDay" & vbCrLf
+    s = s & "FROM qryCashBoxMoves AS d" & vbCrLf
+    s = s & "GROUP BY d.CashBoxID, d.CashDay" & vbCrLf
+    SaveQuery "qryCashBoxDays", "ÃíÇã ÇáÍÑßÉ áßá ÕäÏæŞ ÏÇÎá ÇáİÊÑÉ", s
+End Sub
+
+Private Sub Q_qryCashBoxDayOpening()
+    Dim s As String
+    s = "SELECT d.CashBoxID, d.CashDay, Sum(x.AmountIn - x.AmountOut) AS BoxOpening" & vbCrLf
+    s = s & "FROM qryCashBoxDays AS d, qryCashMovements AS x" & vbCrLf
+    s = s & "WHERE x.CashBoxID = d.CashBoxID AND x.MoveDate < d.CashDay" & vbCrLf
+    s = s & "GROUP BY d.CashBoxID, d.CashDay" & vbCrLf
+    SaveQuery "qryCashBoxDayOpening", "ÑÕíÏ Ãæá ßá íæã áßá ÕäÏæŞ (ßá ÍÑßÇÊå ŞÈá Ğáß Çáíæã)", s
+End Sub
+
+Private Sub Q_qryCashBoxDayClosings()
+    Dim s As String
+    s = "SELECT c.CashBoxID, DateValue(c.ClosingDate) AS CashDay, Count(*) AS DayClosings," & vbCrLf
+    s = s & "       Sum(c.CountedAmount) AS DayCounted, Sum(c.Difference) AS DayDifference" & vbCrLf
+    s = s & "FROM CashClosings AS c" & vbCrLf
+    s = s & "GROUP BY c.CashBoxID, DateValue(c.ClosingDate)" & vbCrLf
+    SaveQuery "qryCashBoxDayClosings", "ÊÕİíÇÊ ÇáßÇÔíÑ áßá ÕäÏæŞ İí ßá íæã: ÚÏÏåÇ æÇáäŞÏíÉ ÈÇáÚÏø æÇáİÑŞ", s
+End Sub
+
+Private Sub Q_CashDayBookQuery()
+    Dim s As String
+    s = "SELECT m.CashBoxID * 100000 + DateDiff('d', QDate('PeriodStart'), m.CashDay) AS DayKey, m.CashBoxID, b.BoxName, m.CashDay," & vbCrLf
+    s = s & "       IIf(m.AmountIn > 0, 1, 2) AS SideNo, m.MoveDate, m.MoveType, m.MoveTypeName, m.DocNumber, m.PartyName," & vbCrLf
+    s = s & "       m.Details, m.AmountIn, m.AmountOut, CCur(Nz(o.BoxOpening, 0)) AS DayOpening," & vbCrLf
+    s = s & "       Nz(k.DayClosings, 0) AS ClosingCount, CCur(Nz(k.DayCounted, 0)) AS CountedTotal," & vbCrLf
+    s = s & "       CCur(Nz(k.DayDifference, 0)) AS DifferenceTotal" & vbCrLf
+    s = s & "FROM ((qryCashBoxMoves AS m INNER JOIN [@CashBoxes] AS b ON m.CashBoxID = b.CashBoxID)" & vbCrLf
+    s = s & "      LEFT JOIN qryCashBoxDayOpening AS o ON (m.CashBoxID = o.CashBoxID AND m.CashDay = o.CashDay))" & vbCrLf
+    s = s & "     LEFT JOIN qryCashBoxDayClosings AS k ON (m.CashBoxID = k.CashBoxID AND m.CashDay = k.CashDay)" & vbCrLf
+    s = s & "ORDER BY m.CashBoxID, m.CashDay, IIf(m.AmountIn > 0, 1, 2), m.MoveDate" & vbCrLf
+    SaveQuery "CashDayBookQuery", "íæãíÉ ÇáÕäÏæŞ ÇáÊİÕíáíÉ: áßá ÕäÏæŞ æíæã ÑÕíÏ Ãæá Çáíæã Ëã ÇáãŞÈæÖÇÊ Ëã ÇáãÕÑæİÇÊ", s
 End Sub
 
 Private Sub Q_CashClosingsQuery()

@@ -57,7 +57,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
 | `modPurchases`، `modPurchaseScreens` | المشتريات والمرتجعات والمخزون والجرد |
 | `modReports`، `modLabels` | دوال التقارير وملصقات الباركود |
 | `modSecurity`، `modSecurityScreens`، `modActivation`، `modBackup` | المستخدمون، وكلمات المرور (SHA-256)، والصلاحيات، وتفعيل الجهاز، والنسخ الاحتياطي |
-| `modCash`، `modBank`، `modCheque` | الصناديق، والبنوك، والتسوية البنكية، والشيكات |
+| `modCash`، `modBank`، `modCheque` | الصناديق ويومية الصندوق (`docs/55`)، والبنوك، والتسوية البنكية، والشيكات |
 | `modJournal`، `modAccounts`، `modManualEntry`، `modLedger`، `modFinancials`، `modClosing`، `modVat` | المحاسبة: القيود الآلية، وشجرة الحسابات، والقيود اليدوية، وكشف الحساب، والقوائم المالية، والإقفال، والإقرار الضريبي (خانات السعودية أو نموذج 10 المصري حسب الدولة، `docs/50`) |
 | `modAging`، `modAssets`، `modPayroll`، `modCostCenters`، `modBudget`، `modRecurring` | أعمار الديون، والأصول والإهلاك، والرواتب، ومراكز التكلفة، والموازنة، والمصروفات المتكررة |
 | `modAudit` | سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد |

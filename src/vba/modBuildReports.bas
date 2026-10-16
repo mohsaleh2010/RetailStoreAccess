@@ -29,7 +29,9 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptVatReturnEG,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling,rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptCashDayBook,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptVatReturnEG,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling," & _
+    "rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree," & _
+    "rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -48,6 +50,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptStatistics
     BuildReport_rptCashVoucher
     BuildReport_rptCashClosing
+    BuildReport_rptCashDayBook
     BuildReport_rptJournalEntry
     BuildReport_rptAccountStatement
     BuildReport_rptGeneralLedger
@@ -974,6 +977,73 @@ Private Sub BuildReport_rptCashClosing()
     Exit Sub
 EH:
     AbortReport "rptCashClosing", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptCashDayBook()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptCashDayBook", "يومية الصندوق التفصيلية", "CashDayBookQuery", 10773, "DayKey", "SideNo,MoveDate", False, True
+    SetSection 3, 822
+    SetSection 4, 340
+    SetSection 0, 312
+    SetSection 5, 1332
+    SetSection 6, 1871
+    HideSection 1
+    HideSection 2
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 312, 10, True, 0)
+    Set c = RLabel(3, "lblTitle", "يومية الصندوق", 5386, 0, 5387, 397, 14, True, 1)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 454, 10773, 284, 9, False, 2)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 0, 57, 10773, 255, 8, False, 2)
+    Set c = RText(0, "txtCol1", "=Format([MoveDate],""hh:nn"")", 0, 11, 737, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "MoveTypeName", 765, 11, 1928, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "DocNumber", 2721, 11, 1304, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "PartyName", 4053, 11, 1928, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "Details", 6009, 11, 2211, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol6", "AmountIn", 8248, 11, 1247, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol7", "AmountOut", 9523, 11, 1247, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(5, "txtBoxDay", "=""الصندوق: "" & [BoxName] & ""    اليوم: "" & GDate([CashDay])", 0, 57, 10773, 425, 13, True, 0)
+    Set c = RLabel(5, "lblOpening", "رصيد أول اليوم", 0, 539, 2268, 340, 11, True, 0)
+    Set c = RText(5, "txtOpening", "DayOpening", 2325, 539, 2041, 340, 11, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RBox(5, "boxColumns", 0, 964, 10773, 340)
+    Set c = RLabel(5, "lblCol1", "الوقت", 0, 992, 737, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol2", "الحركة", 765, 992, 1928, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol3", "المستند", 2721, 992, 1304, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol4", "الجهة", 4053, 992, 1928, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol5", "البيان", 6009, 992, 2211, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol6", "مقبوض", 8248, 992, 1247, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol7", "مدفوع", 9523, 992, 1247, 284, 8, True, 2)
+    Set c = RLine(6, "lnTotals", 28, 10773)
+    Set c = RLabel(6, "lblTotal1", "إجمالي المقبوضات", 0, 85, 2835, 312, 10, False, 0)
+    Set c = RText(6, "txtTotal1", "=Sum([AmountIn])", 2892, 85, 2041, 312, 10, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(6, "lblTotal2", "إجمالي المصروفات", 0, 454, 2835, 312, 10, False, 0)
+    Set c = RText(6, "txtTotal2", "=Sum([AmountOut])", 2892, 454, 2041, 312, 10, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(6, "lblTotal3", "رصيد آخر اليوم", 0, 823, 2835, 312, 10, True, 0)
+    Set c = RText(6, "txtTotal3", "=[DayOpening]+Sum([AmountIn])-Sum([AmountOut])", 2892, 823, 2041, 312, 10, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(6, "lblClosing1", "تصفيات الكاشير", 0, 1220, 1701, 312, 9, False, 0)
+    Set c = RText(6, "txtClosing1", "ClosingCount", 1729, 1220, 1644, 312, 9, False, 2)
+    Set c = RLabel(6, "lblClosing2", "النقدية بالعدّ", 3572, 1220, 1701, 312, 9, False, 0)
+    Set c = RText(6, "txtClosing2", "CountedTotal", 5301, 1220, 1644, 312, 9, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(6, "lblClosing3", "الفرق", 7144, 1220, 1701, 312, 9, False, 0)
+    Set c = RText(6, "txtClosing3", "DifferenceTotal", 8873, 1220, 1644, 312, 9, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    m_rpt.Section(6).ForceNewPage = 2      ' a page per box and day (after the day totals)
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا توجد حركة نقدية للاختيارات المحددة.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptCashDayBook", s
+    Exit Sub
+EH:
+    AbortReport "rptCashDayBook", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptJournalEntry()

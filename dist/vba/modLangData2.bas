@@ -30,6 +30,7 @@ Private Sub D2_1()
     LangAdd "áÇ ãÈíÚÇÊ æáÇ ÊÍÕíáÇÊ ááãäÏæÈíä İí åĞÇ ÇáÔåÑ", "No sales and no collections by the sales reps in this month"
     LangAdd "áÇ íÊÈÚ ÇáÍÓÇÈ ÍÓÇÈğÇ ãä ÇáÍÓÇÈÇÊ ÇáÊÇÈÚÉ áå", "An account cannot belong to one of its own sub-accounts"
     LangAdd "áÊÕİíÑ Õäİ ÛíÑ ãæÌæÏ ÇßÊÈ 0 İí ßãíÊå ÇáİÚáíÉ", "To set a missing item to zero type 0 as its actual quantity"
+    LangAdd "íæãíÉ ÇáÕäÏæŞ ÇáÊİÕíáíÉ (ÕİÍÉ áßá ÕäÏæŞ æíæã", "Detailed cash box day book (a page per box and day"
     LangAdd "ÇÊÑßå İÇÑÛğÇ ááØÈÇÚÉ Úáì ÇáØÇÈÚÉ ÇáÇİÊÑÇÖíÉ", "Leave it empty to print on the default printer"
     LangAdd "ÇÎÊÑ ÇáãÔÑæÈ: ÇáÍÌã æÇáÅÖÇİÇÊ ÊÙåÑ ÊáŞÇÆíğÇ", "Choose the drink: the size and extras appear automatically"
     LangAdd "ÇáÓÚÑ æÇáÎÕã áÇ íãßä Ãä íßæäÇ ÓÇáÈíä (ÇáÓØÑ", "The price and the discount cannot be negative (line"
@@ -134,10 +135,10 @@ Private Sub D2_1()
     LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ÃßÈÑ ãä ÇáßãíÉ ÇáãÈÇÚÉ", "The returned quantity is more than the quantity sold"
     LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ÃßÈÑ ãä ÇáãÊÇÍ ááÅÑÌÇÚ", "The returned quantity is more than what can be returned"
     LangAdd "ÇáãÈáÛ ÃßÈÑ ãä ÚãæáÇÊ ÇáãäÏæÈ ÇáãÓÊÍŞÉ", "The amount is more than the commissions payable to the sales rep"
-    LangAdd "ÈíÇäÇÊ ÇáãÍá ÇáÖÑíÈíÉ æÅÚÏÇÏÇÊ ÇáÊÔÛíá", "Tax data of the store and operating settings"
 End Sub
 
 Private Sub D2_2()
+    LangAdd "ÈíÇäÇÊ ÇáãÍá ÇáÖÑíÈíÉ æÅÚÏÇÏÇÊ ÇáÊÔÛíá", "Tax data of the store and operating settings"
     LangAdd "ÊÑÊíÈ ÇáÒÑ İí ÔÇÔÉ ÇááãÓ (ÇáÃÕÛÑ ÃæáğÇ", "Order of the button on the touch screen (smallest first"
     LangAdd "Ïíæä ÇáÚãáÇÁ ÷ ÇáãÈíÚÇÊ ÇáÂÌáÉ ÇáíæãíÉ", "Customer receivables / daily credit sales"
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ (ÑãÒ", "The Tax Authority refused the credentials of the program (code"
@@ -257,10 +258,10 @@ Private Sub D2_2()
     LangAdd "ÇãÓÍ ÇáÈÇÑßæÏ (íÖíİ 1) Ãæ 3*ÇáßæÏ", "Scan the barcode (adds 1) or 3*code"
     LangAdd "ÈíÇäÇÊ äÇŞÕÉ ááİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Missing data for e-invoicing"
     LangAdd "ÈíÚ ÂÌá áÚãíá ÛíÑ ãÓãæÍ áå ÈÇáÂÌá", "A credit sale to a customer not allowed to buy on credit"
-    LangAdd "ÍĞİ ÇáÊÓæíÉ ÇáÌÇÑíÉ æßá ãØÇÈŞÇÊåÇ", "Delete the open reconciliation and all its matches"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "ÍĞİ ÇáÊÓæíÉ ÇáÌÇÑíÉ æßá ãØÇÈŞÇÊåÇ", "Delete the open reconciliation and all its matches"
     LangAdd "ÍĞİ ÇáÍÑßÉ ÇáÈäßíÉ ÇáãÍÏÏÉ æŞíÏåÇ", "Delete the selected bank transaction and its entry"
     LangAdd "ÍÓÈ ÕÇİí ÇáßãíÉ ÎáÇá İÊÑÉ ÇáÊŞÑíÑ", "By net quantity during the report period"
     LangAdd "ÎÕã ÇáÛíÇÈ ÃßÈÑ ãä ÇáÃÓÇÓí æÇáÓßä", "The absence deduction is more than the basic and housing"
@@ -380,10 +381,10 @@ Private Sub D2_3()
     LangAdd "ÇÎÊÑ ßáãÉ ãÑæÑ ÌÏíÏÉ ááãÊÇÈÚÉ", "Choose a new password to continue"
     LangAdd "ÇÓã ÇáÚãíá Úáì ÇáßæÈ (ÇÎÊíÇÑí", "Customer name on the cup (optional"
     LangAdd "ÇßÊÈ ÇáÍÏ ÇáÃÚáì ááÃÌÑ ÇáÎÇÖÚ", "Type the maximum insurable wage"
-    LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáÈíÚ Ãæ ÇáÇÓÊÈÚÇÏ", "Type the date of the sale or disposal"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáÈíÚ Ãæ ÇáÇÓÊÈÚÇÏ", "Type the date of the sale or disposal"
     LangAdd "ÇáÅíÌÇÑ æÇáßåÑÈÇÁ æÇáÇÔÊÑÇßÇÊ", "Rent, electricity and subscriptions"
     LangAdd "ÇáÈÑäÇãÌ ãİÚøá Úáì åĞÇ ÇáÌåÇÒ", "The program is activated on this computer"
     LangAdd "ÇáÊßáİÉ áÇ íãßä Ãä Êßæä ÓÇáÈÉ", "The cost cannot be negative"
@@ -483,6 +484,4 @@ Private Sub D2_4()
     LangAdd "ÑÏ ÛíÑ ãÊæŞÚ ãä ÇáåíÆÉ (ÑãÒ", "Unexpected reply from ZATCA (code"
     LangAdd "ÕÇÏÑ ÂÎÑ (ÑÓæã ÈäßíÉ æÛíÑåÇ", "Other outgoing (bank fees and others"
     LangAdd "ÕÇİí ÇáÖÑíÈÉ ÇáãÓÊÍŞÉ (ÓÇáÈ", "Net VAT due (negative"
-    LangAdd "ÕÇİí ÇáãÈíÚÇÊ (ÈÏæä ÇáÖÑíÈÉ", "Net sales (without VAT"
-    LangAdd "İí ÔÇÔÉ ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", "in the start-up opening balances screen"
 End Sub

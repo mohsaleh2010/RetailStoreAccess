@@ -664,6 +664,8 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("EXPENSES_BY_TYPE", "المصروفات (إجمالي حسب النوع)", "ExpensesByTypeQuery", "rptExpensesByType", "P"),
     ReportEntry("CASH_STATEMENT", "حركة الخزينة / الصندوق (تفصيلي)", "CashStatementQuery", "rptCashStatement", "Pb#"),
     ReportEntry("CASH_DAILY", "حركة الخزينة اليومية (أول اليوم وآخره)", "CashDailyQuery", "rptCashDaily", "Pb#"),
+    ReportEntry("CASH_DAYBOOK", "يومية الصندوق التفصيلية (صفحة لكل صندوق ويوم)", "CashDayBookQuery", "rptCashDayBook",
+                "Pb#"),
     ReportEntry("CASH_BALANCES", "أرصدة الخزينة والصناديق", "CashBoxBalanceQuery", "rptCashBalances", "#"),
     ReportEntry("CASH_CLOSINGS", "تصفيات يومية الكاشير", "CashClosingsQuery", "rptCashClosings", "Pb#"),
     ReportEntry("PROFIT", "الأرباح", "ProfitQuery", "rptProfit", "P$"),

@@ -6876,7 +6876,7 @@ Private Sub BuildForm_frmTreasury()
     c.OnClick = EP
     Set c = AddButton("btnToday", "اليوم", 10773, 2552, 1021, 454, "secondary")
     c.OnClick = EP
-    Set c = AddButton("btnPrintDay", "طباعة حركة اليوم", 11907, 2552, 2041, 454, "primary")
+    Set c = AddButton("btnPrintDay", "يومية الصندوق", 11907, 2552, 2041, 454, "primary")
     c.OnClick = EP
     Set c = AddRect("boxOpening", 5670, 3175, 2225, 964, CLR_SURFACE)
     Set c = AddLabel("lblOpeningCap", "رصيد أول اليوم", 5812, 3260, 1941, 284, 9, False, CLR_MUTED, "", 0)

@@ -3,7 +3,7 @@
 import re
 
 import reports as RP
-from gen_forms import lit
+from gen_forms import form_names_const, lit
 from generate_common import vba_str
 
 TEMPLATE = r'''Attribute VB_Name = "modBuildReports"
@@ -37,7 +37,7 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "@@REPORT_NAMES@@"
+@@REPORT_NAMES@@
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -390,7 +390,8 @@ def words_lines() -> str:
 def build_reports_vba() -> str:
     models = RP.all_reports()
     text = TEMPLATE.replace("@@BUILD_ALL@@", "\n".join(f"    BuildReport_{m.name}" for m in models))
-    text = text.replace("@@REPORT_NAMES@@", ",".join(m.name for m in models))
+    # split into pieces: the list grew past the 1000-character limit of a VBA line
+    text = text.replace("@@REPORT_NAMES@@", form_names_const([m.name for m in models]).replace("FORM_NAMES", "REPORT_NAMES"))
     text = text.replace("@@WORDS@@", words_lines())
     text = text.replace("@@REPORT_SUBS@@", "\n\n".join(report_sub(m) for m in models))
     assert not re.search(r"@@[A-Z_]+@@", text)
