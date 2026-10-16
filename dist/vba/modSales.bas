@@ -251,15 +251,17 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
                                  ByRef NewInvoiceID As Long, Optional ByVal OrderType As String = "", _
                                  Optional ByVal TableNo As String = "", Optional ByVal DeliveryPhone As String = "", _
                                  Optional ByVal DeliveryAddress As String = "", _
-                                 Optional ByVal OrderName As String = "") As String
+                                 Optional ByVal OrderName As String = "", Optional ByVal StockNoteID As Long = 0) As String
     ' OrderType / TableNo / Delivery* / OrderName: restaurant and café orders (touch screens).
     ' A cart line may carry a note (café size and options) and a size price of the product.
+    ' StockNoteID: the invoice of a posted delivery note (modStockNotes, docs/61): the note already took the
+    ' goods out of its warehouse, so no stock moves here; each line keeps the cost of the note line.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim n As Long, i As Long, msg As String, vatRate As Currency, rate As Currency
     Dim productIDs() As Long, costs() As Currency, vatCats() As String
     Dim isCredit As Boolean, tend As Currency, paid As Currency, remaining As Currency, change As Currency
     Dim invoiceID As Long, invNo As String, invDate As Date, subType As String, priceChanged As Boolean
-    Dim lineNotes() As String
+    Dim lineNotes() As String, noteWh As Long
 
     On Error GoTo EH
     NewInvoiceID = 0
@@ -328,7 +330,9 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     End If
     msg = Settle(CalcTotal("TOTAL"), tend, isCredit, paid, remaining, change)
     If Len(msg) = 0 Then msg = CheckCustomer(CustomerID, isCredit, remaining)
-    If Len(msg) = 0 Then msg = CheckStock(productIDs, n)
+    If Len(msg) = 0 And StockNoteID > 0 Then msg = NoteInvoiceProblem(StockNoteID, "DELIVERY", CustomerID, _
+                                                                      productIDs, costs, n, noteWh)   ' modStockNotes
+    If Len(msg) = 0 And StockNoteID = 0 Then msg = CheckStock(productIDs, n)
     If Len(msg) > 0 Then
         PostSaleFromCart = msg
         Exit Function
@@ -364,7 +368,11 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     rs!BankID = BankFor(PaymentMethodID, paid)                                 ' modBank
     rs!CostCenterID = CostCenterFor()                                          ' modCostCenters
     rs!SalesRepID = SalesRepFor(CustomerID)                                    ' modSalesReps
-    rs!WarehouseID = CurrentWarehouseID()                                      ' modWarehouses
+    If StockNoteID > 0 Then
+        rs!WarehouseID = noteWh                                                ' the warehouse of the note
+    Else
+        rs!WarehouseID = CurrentWarehouseID()                                  ' modWarehouses
+    End If
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     If Len(OrderType) > 0 Then rs!OrderType = OrderType
     If Len(Trim$(TableNo)) > 0 Then rs!TableNo = Left$(Trim$(TableNo), 10)
@@ -397,9 +405,13 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     Next
     rs.Close
 
-    For i = 0 To n - 1
-        ApplyStockMovement db, productIDs(i), -CalcLine(i, "QTY"), TT_SALE, costs(i), "SALE", invoiceID, invNo
-    Next
+    If StockNoteID = 0 Then
+        For i = 0 To n - 1
+            ApplyStockMovement db, productIDs(i), -CalcLine(i, "QTY"), TT_SALE, costs(i), "SALE", invoiceID, invNo
+        Next
+    Else
+        MarkNoteInvoiced db, StockNoteID, "SalesInvoiceID", invoiceID                  ' modStockNotes
+    End If
     If remaining <> 0 Then AdjustBalance db, "Customers", "CustomerID", CustomerID, remaining
 
     ws.CommitTrans

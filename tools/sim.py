@@ -510,6 +510,72 @@ class Store:
         self.c.execute("DELETE FROM InventoryTransactions WHERE ReferenceType = 'STOCK_DOC' AND ReferenceID = ?", (did,))
         self.c.execute("UPDATE StockDocuments SET Status = 'DRAFT' WHERE StockDocumentID = ?", (did,))
 
+    # ------------------------------------------------------------- delivery / receipt notes (modStockNotes, docs/61)
+    def stock_note(self, kind, warehouse, party, lines, notes=None):    # CreateStockNote + its lines (pid, qty, price)
+        nid = self.insert("StockNotes", NoteNumber=self.next_number("DELIVERY_NOTE" if kind == "DELIVERY" else "RECEIPT_NOTE"),
+                          NoteType=kind, NoteDate=self.now, WarehouseID=warehouse,
+                          CustomerID=party if kind == "DELIVERY" else None,
+                          SupplierID=party if kind == "RECEIPT" else None, Status="DRAFT", EmployeeID=self.user,
+                          Notes=notes)
+        for pid, q, price in lines:
+            self.insert("StockNoteLines", StockNoteID=nid, ProductID=pid, Quantity=float(q), UnitPrice=float(price),
+                        UnitCost=0)
+        return nid
+
+    def post_stock_note(self, nid):                                  # PostStockNote
+        kind, wh, no = self.c.execute("SELECT NoteType, WarehouseID, NoteNumber FROM StockNotes WHERE StockNoteID = ?",
+                                      (nid,)).fetchone()
+        lines = self.c.execute("SELECT StockNoteLineID, ProductID, Quantity, UnitPrice FROM StockNoteLines "
+                               "WHERE StockNoteID = ? ORDER BY StockNoteLineID", (nid,)).fetchall()
+        if kind == "DELIVERY":
+            needs: Dict[int, D] = {}
+            for _, pid, q, _ in lines:
+                needs[pid] = needs.get(pid, D(0)) + dec(q)
+            self.check_stock(needs)
+        for lid, pid, q, price in lines:
+            cost = self.avg(pid) if kind == "DELIVERY" else dec(price)
+            self.c.execute("UPDATE StockNoteLines SET UnitCost = ? WHERE StockNoteLineID = ?", (float(cost), lid))
+            if kind == "DELIVERY":
+                self.apply_stock(pid, -dec(q), 13, cost, "STOCK_NOTE", nid, no, warehouse=wh)
+            else:
+                self.apply_stock(pid, dec(q), 14, cost, "STOCK_NOTE", nid, no, recalc=True, warehouse=wh)
+        self.c.execute("UPDATE StockNotes SET NoteDate = ?, Status = 'POSTED' WHERE StockNoteID = ?", (self.now, nid))
+
+    def unpost_stock_note(self, nid):                                # UnpostStockNote
+        kind, status = self.c.execute("SELECT NoteType, Status FROM StockNotes WHERE StockNoteID = ?", (nid,)).fetchone()
+        if status != "POSTED":
+            raise SimError("only a posted note that is not invoiced")
+        for pid, q, cost in self.c.execute("SELECT ProductID, Quantity, UnitCost FROM InventoryTransactions "
+                                           "WHERE ReferenceType = 'STOCK_NOTE' AND ReferenceID = ?", (nid,)).fetchall():
+            cur, avg = self.stock(pid), self.avg(pid)
+            if kind == "RECEIPT":
+                avg = P.weighted_average(cur, avg, -dec(q), dec(cost))
+            self.c.execute("UPDATE Products SET CurrentQuantity = ?, AverageCost = ? WHERE ProductID = ?",
+                           (float(cur - dec(q)), float(avg), pid))
+        self.c.execute("DELETE FROM InventoryTransactions WHERE ReferenceType = 'STOCK_NOTE' AND ReferenceID = ?", (nid,))
+        self.c.execute("UPDATE StockNotes SET Status = 'DRAFT' WHERE StockNoteID = ?", (nid,))
+
+    def invoice_note(self, nid, credit=True, charge_vat=True):       # InvoiceStockNote
+        kind, party, status = self.c.execute("SELECT NoteType, IIf(NoteType = 'DELIVERY', CustomerID, SupplierID), "
+                                             "Status FROM StockNotes WHERE StockNoteID = ?", (nid,)).fetchone()
+        if status != "POSTED":
+            raise SimError("the invoice is made from a posted note not yet invoiced")
+        lines = self.c.execute("SELECT ProductID, Quantity, UnitPrice FROM StockNoteLines WHERE StockNoteID = ? "
+                               "ORDER BY StockNoteLineID", (nid,)).fetchall()
+        if kind == "DELIVERY":
+            return self.sale([(pid, q) for pid, q, _ in lines], customer=party, credit=credit, note=nid)
+        return self.purchase(party, [(pid, q, price) for pid, q, price in lines], credit, charge_vat=charge_vat, note=nid)
+
+    def _note_lines(self, nid):
+        return self.c.execute("SELECT UnitPrice, UnitCost FROM StockNoteLines WHERE StockNoteID = ? "
+                              "ORDER BY StockNoteLineID", (nid,)).fetchall()
+
+    def _mark_invoiced(self, nid, field, inv):                       # MarkNoteInvoiced
+        cur = self.c.execute(f"UPDATE StockNotes SET Status = 'INVOICED', {field} = ? "
+                             "WHERE Status = 'POSTED' AND StockNoteID = ?", (inv, nid))
+        if cur.rowcount != 1:
+            raise SimError("the note is no longer posted")
+
     def adjust(self, table, key, kid, delta):                      # AdjustBalance
         self.c.execute(f"UPDATE {table} SET CurrentBalance = CurrentBalance + ? WHERE {key} = ?",
                        (float(delta), kid))
@@ -521,7 +587,7 @@ class Store:
 
     # ------------------------------------------------------------- purchases
     def purchase(self, sid, lines, credit, paid=None, charge_vat=True, supplier_no=None,
-                 discount=0):                                       # PostPurchaseFromCart
+                 discount=0, note=None):                            # PostPurchaseFromCart
         out = P.calc([P.LineIn(dec(q), dec(c), D(0), VAT if charge_vat else D(0)) for _, q, c in lines],
                      dec(discount), False)
         tendered = (D(0) if credit else out.total) if paid is None else dec(paid)
@@ -532,15 +598,20 @@ class Store:
                           PaymentMethodID=1, SubTotal=float(out.subtotal), Discount=float(out.discount),
                           TaxableAmount=float(out.taxable), Tax=float(out.tax), TotalAmount=float(out.total),
                           PaidAmount=float(paid_amt), RemainingAmount=float(remaining),
-                          CashBoxID=self.box_for(1, paid_amt))
+                          CashBoxID=self.box_for(1, paid_amt),
+                          WarehouseID=self.one("SELECT WarehouseID FROM StockNotes WHERE StockNoteID = ?", note)
+                          if note else self.warehouse())
         for i, ((pid, q, c), ln) in enumerate(zip(lines, out.lines)):
             self.insert("PurchaseInvoiceDetails", PurchaseInvoiceID=inv, LineNumber=i + 1, ProductID=pid,
                         Quantity=float(q), UnitCost=float(ln.unit_price), Discount=float(ln.discount),
                         NetAmount=float(ln.net), VATRate=float(VAT if charge_vat else 0), Tax=float(ln.tax),
                         LineTotal=float(ln.total))
-            cost = P.purchase_unit_cost(ln.net, ln.total, dec(q), self.vat_registered)
-            self.apply_stock(pid, dec(q), TT["PURCHASE"], cost, "PURCHASE", inv, no, recalc=True)
+            if not note:                                             # the note brought the goods in already
+                cost = P.purchase_unit_cost(ln.net, ln.total, dec(q), self.vat_registered)
+                self.apply_stock(pid, dec(q), TT["PURCHASE"], cost, "PURCHASE", inv, no, recalc=True)
             self.c.execute("UPDATE Products SET PurchasePrice = ? WHERE ProductID = ?", (float(ln.unit_price), pid))
+        if note:
+            self._mark_invoiced(note, "PurchaseInvoiceID", inv)
         if remaining:
             self.adjust("Suppliers", "SupplierID", sid, remaining)
         return inv
@@ -588,11 +659,14 @@ class Store:
 
     # ------------------------------------------------------------- sales
     def sale(self, lines: List[Tuple[int, object]], customer=1, credit=False, paid=None,
-             invoice_discount=0):                                       # PostSaleFromCart
+             invoice_discount=0, note=None):                            # PostSaleFromCart
         prods = []
-        for pid, q in lines:
+        noted = self._note_lines(note) if note else None
+        for i, (pid, q) in enumerate(lines):
             price, avg, cat = self.c.execute("SELECT SellingPrice, AverageCost, VATCategory FROM Products "
                                              "WHERE ProductID = ?", (pid,)).fetchone()
+            if noted:                                                    # the price and cost of the note line
+                price, avg = noted[i]
             prods.append((pid, dec(q), dec(price), dec(avg), cat or "S"))
         out = P.calc([P.LineIn(q, price, D(0), VAT if cat == "S" else D(0)) for _, q, price, _, cat in prods],
                      dec(invoice_discount), True)
@@ -608,7 +682,8 @@ class Store:
         needs: Dict[int, D] = {}
         for pid, q, *_ in prods:
             needs[pid] = needs.get(pid, D(0)) + q
-        self.check_stock(needs)
+        if not note:
+            self.check_stock(needs)
         no = self.next_number("SALES_INVOICE")
         inv = self.insert("SalesInvoices", InvoiceNumber=no, InvoiceDate=self.now, CustomerID=customer,
                           EmployeeID=self.user, PaymentType="CREDIT" if credit else "CASH", PaymentMethodID=1,
@@ -616,13 +691,18 @@ class Store:
                           TaxableAmount=float(out.taxable), Tax=float(out.tax), TotalAmount=float(out.total),
                           PaidAmount=float(paid_amt), RemainingAmount=float(remaining),
                           AmountTendered=float(tendered), ChangeDue=float(change),
-                          CashBoxID=self.box_for(1, paid_amt))
+                          CashBoxID=self.box_for(1, paid_amt),
+                          WarehouseID=self.one("SELECT WarehouseID FROM StockNotes WHERE StockNoteID = ?", note)
+                          if note else self.warehouse())
         for i, ((pid, q, _, avg, cat), ln) in enumerate(zip(prods, out.lines)):
             self.insert("SalesInvoiceDetails", SalesInvoiceID=inv, LineNumber=i + 1, ProductID=pid,
                         Quantity=float(q), UnitPrice=float(ln.unit_price), Discount=float(ln.discount),
                         NetAmount=float(ln.net), VATCategory=cat, VATRate=float(VAT if cat == "S" else 0),
                         Tax=float(ln.tax), LineTotal=float(ln.total), UnitCost=float(avg))
-            self.apply_stock(pid, -q, TT["SALE"], avg, "SALE", inv, no)
+            if not note:                                                 # the note took the goods out already
+                self.apply_stock(pid, -q, TT["SALE"], avg, "SALE", inv, no)
+        if note:
+            self._mark_invoiced(note, "SalesInvoiceID", inv)
         if remaining:
             self.adjust("Customers", "CustomerID", customer, remaining)
         return inv

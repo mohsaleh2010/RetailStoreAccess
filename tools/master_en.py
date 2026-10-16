@@ -15,6 +15,7 @@ ACCOUNT_NAMES_EN = {
     1195: "Cash in transit between boxes",
     1410: "Goods in transit between warehouses",
     1420: "Production work in progress",
+    1430: "Goods delivered to customers not invoiced",
     1200: "Mada and wallets under settlement (bank and network)",
     1210: "Bank accounts",
     1250: "Cheques under collection",
@@ -39,6 +40,7 @@ ACCOUNT_NAMES_EN = {
     21: "Current liabilities",
     2100: "Accounts payable",
     2110: "Notes payable (issued cheques)",
+    2150: "Goods received from suppliers not invoiced",
     2200: "VAT - output",
     2250: "VAT - settlement and payment",
     2300: "Accrued expenses",
@@ -111,6 +113,7 @@ SOURCE_TYPES_EN = {
     "CASH_RECEIVE": "Cash transfer received",
     "STOCK_TRANSFER": "Transfer between warehouses", "STOCK_RECEIVE": "Stock transfer received",
     "STOCK_ISSUE": "Stock issue to a party", "STOCK_RECEIPT": "Stock receipt from a party",
+    "DELIVERY_NOTE": "Delivery note to a customer", "RECEIPT_NOTE": "Goods receipt note from a supplier",
 }
 
 TRANSACTION_TYPES_EN = {
@@ -119,6 +122,7 @@ TRANSACTION_TYPES_EN = {
     "OPENING": "Opening balance", "TRANSFER_OUT": "Transfer out to another warehouse",
     "TRANSFER_IN": "Transfer in from another warehouse", "PARTY_ISSUE": "Issue to a party (issue voucher)",
     "PARTY_RECEIPT": "Receipt from a party (receipt voucher)",
+    "DELIVERY_NOTE": "Delivery to a customer (delivery note)", "RECEIPT_NOTE": "Receipt from a supplier (receipt note)",
 }
 
 ROLE_NAMES_EN = {1: "System administrator", 2: "Manager", 3: "Cashier"}
@@ -134,6 +138,7 @@ PERMISSION_NAMES_EN = {
     "CASH_ALL_BOXES": "Pay and transfer from every box, not only own boxes",
     "STOCK_TRANSFER": "Transfers between warehouses: sending and receiving",
     "STOCK_DOCS": "Stock issue and receipt vouchers and their parties",
+    "STOCK_NOTES": "Delivery notes to customers and goods receipt notes from suppliers",
     "JOURNAL": "Journal entries, chart of accounts and trial balance",
     "MANUAL_ENTRY": "Manual entries: add, edit and delete",
     "PERIOD_CLOSE": "Close and reopen periods and the fiscal year",
@@ -163,7 +168,7 @@ SCREEN_TITLES_EN = {
     "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmCashBoxUsers": "Box custodians",
     "frmCashTransfers": "Receipt of transfers between boxes", "frmWarehouses": "Warehouses",
     "frmStockTransfer": "Transfers between warehouses", "frmStockParties": "Stock issue and receipt parties",
-    "frmStockDocument": "Stock issue and receipt vouchers", "frmAccounting": "Accounting and finance",
+    "frmStockDocument": "Stock issue and receipt vouchers", "frmStockNote": "Delivery and goods receipt notes", "frmAccounting": "Accounting and finance",
     "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
     "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
     "frmPeriodClosing": "Period and fiscal year closing", "frmFiscalPeriods": "Fiscal periods", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",

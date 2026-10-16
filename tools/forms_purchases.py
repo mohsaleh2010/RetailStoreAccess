@@ -349,7 +349,8 @@ def layout_inventory() -> FormModel:
              'OpenScreen "frmBarcodeLabels", 0, Me!lstProducts.Value'),
             ("btnWarehouses", "المخازن", "secondary", 2.6, 'OpenScreen "frmWarehouses"'),
             ("btnTransfer", "تحويل مخزني", "secondary", 3.0, 'OpenScreen "frmStockTransfer"'),
-            ("btnStockDocs", "صرف واستلام", "secondary", 3.0, 'OpenScreen "frmStockDocument"')]:
+            ("btnStockDocs", "صرف واستلام", "secondary", 3.0, 'OpenScreen "frmStockDocument"'),
+            ("btnStockNotes", "الأذونات", "secondary", 2.4, 'OpenScreen "frmStockNote"')]:
         button(m, name, caption, bx, cm(16.6), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
 
@@ -622,14 +623,97 @@ def layout_stock_document(line_heads) -> FormModel:
     return m
 
 
+# ---------------------------------------------------------------- delivery and receipt notes (docs/61)
+STOCK_NOTE_TITLES = ["الصنف", "الكمية", "السعر في الفاتورة", "التكلفة", "قيمة السطر"]
+STOCK_NOTE_TYPES = "DELIVERY;إذن تسليم لعميل;RECEIPT;إذن استلام من مورد"
+
+
+def layout_stock_note_lines() -> Tuple[FormModel, list]:
+    row_h = cm(0.75)
+    m = FormModel("frmStockNoteLines", "أسطر إذن التسليم أو الاستلام", cm(20.6), row_h, popup=False,
+                  record_source="SELECT * FROM StockNoteLines WHERE StockNoteID = 0", allow_add=True)
+    m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0, "AllowDeletions": False}
+    heads = grid_row(m, [
+        ("ProductID", "ProductID", 7.8, {"_kind": "combo", "RowSource": TRANSFER_PRODUCTS, "ColumnCount": 2,
+                                         "ColumnWidths": "0;7.6", "BoundColumn": 1, "LimitToList": True}, []),
+        ("Quantity", "Quantity", 2.6, {"Format": "#,##0.###"}, []),
+        ("UnitPrice", "UnitPrice", 3.0, {"Format": "#,##0.00##"}, []),
+        ("UnitCost", "UnitCost", 2.6, {**LOCKED, "Format": "#,##0.00##"}, []),
+        ("txtValue", "=Nz([Quantity],0)*Nz([UnitPrice],0)", 3.2, {**LOCKED, "Format": "#,##0.00"}, []),
+        ("btnRemove", "", 0.8, {"_kind": "button", "Caption": Sym(f"ChrW(&H{0xE74D:X})"),
+                               "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
+    ], row_h)
+    m.form_events = ["BeforeUpdate", "AfterUpdate"]
+    m.code = ["Private Sub Form_BeforeUpdate(Cancel As Integer)", "    StockNoteLineBeforeUpdate Me, Cancel", "End Sub",
+              "Private Sub Form_AfterUpdate()", "    StockNoteLineAfterUpdate Me", "End Sub",
+              "Private Sub btnRemove_Click()", "    StockNoteRemoveLine Me", "End Sub"]
+    return m, heads
+
+
+def layout_stock_note(line_heads) -> FormModel:
+    width, height = cm(21.4), cm(18.0)
+    m = FormModel("frmStockNote", "أذونات التسليم والاستلام", width, height, popup=True, allow_add=False)
+    title_band(m, "أذونات التسليم والاستلام",
+               "تسليم أصناف لعميل أو استلامها من مورد قبل الفاتورة: «ترحيل» يحرك المخزون، ثم «إنشاء الفاتورة» منه",
+               "inventory")
+    c = m.add(Control("combo", "cboNote", cm(0.4), cm(2.3), cm(16.6), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 7, "ColumnWidths": "0;2.4;2.2;1.6;4.6;2.8;2.6", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboNote", "الإذن (الأحدث أولًا)", c)
+    y = cm(3.8)
+    c = m.add(Control("combo", "cboType", cm(0.4), y, cm(4.0), cm(0.8),
+                      {"RowSource": STOCK_NOTE_TYPES, "RowSourceType": "Value List", "ColumnCount": 2,
+                       "ColumnWidths": "0;3.8", "LimitToList": True}, events=["AfterUpdate"]))
+    labelled(m, "cboType", "نوع الإذن الجديد", c)
+    c = m.add(Control("combo", "cboWarehouse", cm(4.6), y, cm(3.4), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;3.2", "LimitToList": True}))
+    labelled(m, "cboWarehouse", "المخزن", c)
+    c = m.add(Control("combo", "cboParty", cm(8.2), y, cm(4.6), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4.4", "LimitToList": True}))
+    labelled(m, "cboParty", "العميل / المورد", c)
+    c = m.add(Control("text", "txtNotes", cm(13.0), y, cm(4.2), cm(0.8), {}))
+    labelled(m, "txtNotes", "ملاحظات", c)
+    button(m, "btnNew", "إذن جديد", cm(17.4), y - cm(0.03), "primary", w=cm(3.6), call="StockNoteNew Me")
+    m.add(Control("label", "lblInfo", cm(0.4), cm(4.9), width - cm(0.8), cm(0.7),
+                  {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    header_labels(m, cm(0.4), cm(5.75), STOCK_NOTE_TITLES, line_heads)
+    m.add(Control("subform", "subLines", cm(0.4), cm(6.35), cm(20.6), cm(7.0),
+                  {"SourceObject": "frmStockNoteLines"}))
+    y = cm(14.1)                                        # the invoice made from the note
+    c = m.add(Control("combo", "cboPayType", cm(0.4), y, cm(3.0), cm(0.8),
+                      {"RowSource": PAYMENT_TYPES, "RowSourceType": "Value List", "ColumnCount": 2,
+                       "ColumnWidths": "0;2.8", "LimitToList": True}))
+    labelled(m, "cboPayType", "دفع الفاتورة", c)
+    c = m.add(Control("text", "txtSupplierRef", cm(3.6), y, cm(4.0), cm(0.8), {}))
+    labelled(m, "txtSupplierRef", "رقم فاتورة المورد", c)
+    check_with_label(m, "chkVat", "بضريبة القيمة المضافة", cm(7.8), y, cm(4.2), [])
+    button(m, "btnInvoice", "إنشاء الفاتورة", cm(12.2), y - cm(0.03), "primary", w=cm(4.0),
+           call='StockNoteAction Me, "INVOICE"')
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnPost", "ترحيل", "primary", 3.6, 'StockNoteAction Me, "POST"'),
+            ("btnUnpost", "إلغاء الترحيل", "danger", 3.4, 'StockNoteAction Me, "UNPOST"'),
+            ("btnDelete", "حذف المسودة", "danger", 3.2, 'StockNoteAction Me, "DELETE"')]:
+        button(m, name, caption, bx, cm(16.1), style, w=cm(w), h=cm(1.1), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(16.1), "secondary", w=cm(2.6), h=cm(1.1),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    StockNoteLoad Me", "End Sub",
+               "Private Sub cboNote_AfterUpdate()", "    StockNoteShow Me", "End Sub",
+               "Private Sub cboType_AfterUpdate()", "    StockNoteTypeChanged Me", "End Sub"] + m.code)
+    return m
+
+
 def purchase_forms() -> List[FormModel]:
     lines, heads = layout_purchase_lines()
     ret_lines, ret_heads = layout_purchase_return_lines()
     count_lines, count_heads = layout_count_lines()
     transfer_lines, transfer_heads = layout_transfer_lines()
     doc_lines, doc_heads = layout_stock_doc_lines()
+    note_lines, note_heads = layout_stock_note_lines()
     # subforms first: the parent forms embed them by name
     return [lines, layout_purchase_invoice(heads), ret_lines, layout_purchase_return(ret_heads),
             layout_supplier_payment(), layout_purchase_view(), layout_inventory(),
             count_lines, layout_stock_count(count_heads), transfer_lines, layout_stock_transfer(transfer_heads),
-            doc_lines, layout_stock_document(doc_heads)]
+            doc_lines, layout_stock_document(doc_heads), note_lines, layout_stock_note(note_heads)]

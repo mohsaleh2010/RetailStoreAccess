@@ -13,9 +13,111 @@ Public Sub LangData5()
     D5_3
     D5_4
     D5_5
+    D5_6
 End Sub
 
 Private Sub D5_1()
+    LangAdd "بدلات أخرى", "Other allowances"
+    LangAdd "بدون ضريبة", "Without VAT"
+    LangAdd "بدون طباعة", "No printing"
+    LangAdd "بيان السطر", "Line description"
+    LangAdd "تحديد الكل", "Select all"
+    LangAdd "تحويل جديد", "New transfer"
+    LangAdd "تحويل صادر", "Outgoing transfer"
+    LangAdd "تحويل وارد", "Incoming transfer"
+    LangAdd "تعذر الحفظ", "Could not save"
+    LangAdd "تم الإرسال", "Sent"
+    LangAdd "تم الإلغاء", "Cancelled"
+    LangAdd "تمت الخطوة", "Step done:"
+    LangAdd "ثمانية عشر", "eighteen"
+    LangAdd "حدد الفترة", "Set the period"
+    LangAdd "حذف الحركة", "Delete the move"
+    LangAdd "حساب النوع", "account of the type"
+    LangAdd "حفظ الحركة", "Save the move"
+    LangAdd "حفظ وطباعة", "Save and print"
+    LangAdd "حقوق ملكية", "Equity"
+    LangAdd "حُوِّل إلى", "Transferred to"
+    LangAdd "دائن (عليه", "credit (owes us"
+    LangAdd "ربط السداد", "Payment matching"
+    LangAdd "رصيد الكشف", "Statement balance"
+    LangAdd "رقم الجهاز", "Computer number"
+    LangAdd "رقم الجوال", "Mobile number"
+    LangAdd "رقم الحساب", "Account number"
+    LangAdd "رقم المبنى", "Building number"
+    LangAdd "رمز التحقق", "Verification code"
+    LangAdd "رمز العملة", "Currency code"
+    LangAdd "رمز المركز", "Center code"
+    LangAdd "رمز الوحدة", "Unit code"
+    LangAdd "ريال سعودي", "Saudi riyal"
+    LangAdd "شارع المحل", "Store street"
+    LangAdd "شاشة البيع", "Sales screen"
+    LangAdd "صافي الربح", "Net profit"
+    LangAdd "صالة إنتاج", "Production hall"
+    LangAdd "صرفه البنك", "Cashed by the bank"
+    LangAdd "طريقة الرد", "Refund method"
+    LangAdd "عدد القيود", "Number of entries"
+    LangAdd "على الحساب", "On account"
+    LangAdd "على العميل", "The customer"
+    LangAdd "عهدة مندوب", "Sales rep custody"
+    LangAdd "غير متوازن", "Not balanced"
+    LangAdd "فئة إضافات", "Extras category"
+    LangAdd "فاتورة بيع", "Sales invoice"
+    LangAdd "فتح المجلد", "Open the folder"
+    LangAdd "فرق العملة", "Exchange difference"
+    LangAdd "قيمة السطر", "Line value"
+    LangAdd "قيمة الفرق", "Difference value"
+    LangAdd "كارت الصنف", "Item card"
+    LangAdd "كل الأصناف", "All items"
+    LangAdd "كل الجداول", "All tables"
+    LangAdd "كل الشاشات", "All screens"
+    LangAdd "كل المخازن", "All warehouses"
+    LangAdd "كل المراكز", "All centers"
+    LangAdd "كمية الصنف", "Item quantity"
+    LangAdd "كود المخزن", "Warehouse code"
+    LangAdd "كود المنتج", "Product code"
+    LangAdd "لم يُرحَّل", "Not posted"
+    LangAdd "مبلغ السند", "Voucher amount"
+    LangAdd "مبلغ الشيك", "Cheque amount"
+    LangAdd "مجمل الربح", "Gross profit"
+    LangAdd "مخزن رئيسي", "Main warehouse"
+    LangAdd "مرتجع شراء", "Purchase return"
+    LangAdd "مرجع البنك", "Bank reference"
+    LangAdd "مرحَّلة في", "posted on"
+    LangAdd "مسودة مسير", "Run draft"
+    LangAdd "من القائمة", "from the list"
+    LangAdd "منها ضريبة", "of which VAT"
+    LangAdd "مُرحَّل في", "Posted on"
+    LangAdd "مُستلَم في", "Received on"
+    LangAdd "نسبة صفرية", "Zero rate"
+    LangAdd "نقطة البيع", "Point of sale"
+    LangAdd "نوع الحركة", "Move type"
+    LangAdd "نوع الحساب", "Account type"
+    LangAdd "نوع الشراء", "Purchase type"
+    LangAdd "نوع المخزن", "Warehouse type"
+    LangAdd "ورقة الجرد", "Count sheet"
+    LangAdd "آخر تحديث", "Last update"
+    LangAdd "آخر تصفية", "Last closing"
+    LangAdd "آخر معامل", "Last rate"
+    LangAdd "أربعة عشر", "fourteen"
+    LangAdd "أُنشئ منه", "Created from it"
+    LangAdd "إعادة فتح", "Reopen"
+    LangAdd "إقفال سنة", "Close a year"
+    LangAdd "إلى تاريخ", "To date"
+    LangAdd "إلى صندوق", "To box"
+    LangAdd "إيصال بيع", "Sales receipt"
+    LangAdd "استلام في", "Receipt in"
+    LangAdd "اسم الأصل", "Asset name"
+    LangAdd "اسم الجهة", "Party name"
+    LangAdd "اسم الصنف", "Item name"
+    LangAdd "اسم الفرع", "Branch name"
+    LangAdd "اسم المحل", "Store name"
+    LangAdd "اعتُمد في", "Approved on"
+    LangAdd "الإعدادات", "Settings"
+    LangAdd "الإيرادات", "Revenue"
+    LangAdd "الاستحقاق", "Due date"
+    LangAdd "التأمينات", "Social insurance"
+    LangAdd "التصنيفات", "Categories"
+    LangAdd "التعديلات", "Changes"
     LangAdd "المحاولات", "Attempts"
     LangAdd "المدفوعات", "Payments"
     LangAdd "المرتجعات", "Returns"
@@ -35,6 +137,9 @@ Private Sub D5_1()
     LangAdd "ثمن البيع", "Sale price"
     LangAdd "جنيه مصري", "Egyptian pound"
     LangAdd "حذف القيد", "Delete the entry"
+End Sub
+
+Private Sub D5_2()
     LangAdd "حركة منتج", "Product moves"
     LangAdd "حفظ الأصل", "Save the asset"
     LangAdd "حفظ السند", "Save the voucher"
@@ -49,6 +154,7 @@ Private Sub D5_1()
     LangAdd "رصيد دائن", "Credit balance"
     LangAdd "رصيد سابق", "Previous balance"
     LangAdd "رصيد مدين", "Debit balance"
+    LangAdd "رقم الإذن", "Note number"
     LangAdd "رقم الجرد", "Count number"
     LangAdd "رقم السند", "Voucher number"
     LangAdd "رقم الشيك", "Cheque number"
@@ -101,9 +207,11 @@ Private Sub D5_1()
     LangAdd "آخر نسخة", "Last backup"
     LangAdd "أربعمائة", "four hundred"
     LangAdd "أصل جديد", "New asset"
+    LangAdd "إذن جديد", "New note"
     LangAdd "إلى مخزن", "To warehouse"
     LangAdd "اثنا عشر", "twelve"
     LangAdd "اختر ملف", "Choose the file"
+    LangAdd "الأذونات", "Notes"
     LangAdd "الإجمالي", "Total"
     LangAdd "الإضافات", "Extras"
     LangAdd "الارتداد", "Bounce"
@@ -131,14 +239,12 @@ Private Sub D5_1()
     LangAdd "بدون سكر", "No sugar"
     LangAdd "بيع نقدي", "Cash sale"
     LangAdd "تسعة عشر", "nineteen"
+    LangAdd "تسليم من", "Delivery from"
     LangAdd "تم إنشاء", "Created"
     LangAdd "تم الحذف", "Deleted"
     LangAdd "تم الحفظ", "Saved"
     LangAdd "تم الربط", "Linked"
     LangAdd "ثلاثمائة", "three hundred"
-End Sub
-
-Private Sub D5_2()
     LangAdd "ثلج قليل", "Little ice"
     LangAdd "ثمانمائة", "eight hundred"
     LangAdd "جرد جديد", "New count"
@@ -154,6 +260,9 @@ Private Sub D5_2()
     LangAdd "سند جديد", "New voucher"
     LangAdd "شراء آجل", "Credit purchase"
     LangAdd "شهر جديد", "New month"
+End Sub
+
+Private Sub D5_3()
     LangAdd "شيك صادر", "Issued cheque"
     LangAdd "شيك مرتد", "Bounced cheque"
     LangAdd "شيك وارد", "Received cheque"
@@ -259,9 +368,6 @@ Private Sub D5_2()
     LangAdd "المشكلة", "Problem"
     LangAdd "المصروف", "Expense"
     LangAdd "المطلوب", "required"
-End Sub
-
-Private Sub D5_3()
     LangAdd "المعامل", "Rate"
     LangAdd "المندوب", "Sales rep"
     LangAdd "المنطقة", "Region"
@@ -277,6 +383,9 @@ Private Sub D5_3()
     LangAdd "ستة عشر", "sixteen"
     LangAdd "سطر قيد", "Entry line"
     LangAdd "سند صرف", "Payment voucher"
+End Sub
+
+Private Sub D5_4()
     LangAdd "سند قبض", "Receipt voucher"
     LangAdd "صرف آخر", "Other payment"
     LangAdd "صرف شيك", "Cheque payment"
@@ -382,9 +491,6 @@ Private Sub D5_3()
     LangAdd "متوازن", "Balanced"
     LangAdd "محصَّل", "Collected"
     LangAdd "مرحَّل", "Posted"
-End Sub
-
-Private Sub D5_4()
     LangAdd "مستبعد", "Disposed"
     LangAdd "مستخدم", "User"
     LangAdd "مستردة", "Refunded"
@@ -400,6 +506,9 @@ Private Sub D5_4()
     LangAdd "مُرحّل", "Posted"
     LangAdd "نوفمبر", "November"
     LangAdd "أبريل", "April"
+End Sub
+
+Private Sub D5_5()
     LangAdd "أربعة", "four"
     LangAdd "أعدّه", "Prepared by"
     LangAdd "أغسطس", "August"
@@ -459,6 +568,7 @@ Private Sub D5_4()
     LangAdd "تراجع", "Undo"
     LangAdd "ترحيل", "Post"
     LangAdd "تسعون", "ninety"
+    LangAdd "تسليم", "Delivery"
     LangAdd "تصدير", "Export"
     LangAdd "تعديل", "Edit"
     LangAdd "تقرير", "Report"
@@ -505,9 +615,6 @@ Private Sub D5_4()
     LangAdd "منصرف", "Out"
     LangAdd "مُرسل", "Submitted"
     LangAdd "نتيجة", "Result"
-End Sub
-
-Private Sub D5_5()
     LangAdd "يساوي", "equals"
     LangAdd "يناير", "January"
     LangAdd "يوليو", "July"
@@ -522,6 +629,9 @@ Private Sub D5_5()
     LangAdd "أصول", "Assets"
     LangAdd "أيام", "Days"
     LangAdd "احسب", "Calculate"
+End Sub
+
+Private Sub D5_6()
     LangAdd "اختر", "Choose"
     LangAdd "الحد", "limit"
     LangAdd "الحي", "District"

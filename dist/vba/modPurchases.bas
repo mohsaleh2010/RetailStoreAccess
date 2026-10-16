@@ -29,15 +29,18 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
                                      ByVal InvoiceDiscount As Currency, ByVal PaidAmount As Variant, _
                                      ByVal Notes As String, ByRef NewInvoiceID As Long, _
                                      Optional ByVal CurrencyCode As String = "", Optional ByVal FxRate As Double = 1, _
-                                     Optional ByVal WarehouseID As Long = 0) As String
+                                     Optional ByVal WarehouseID As Long = 0, Optional ByVal StockNoteID As Long = 0) As String
     ' The prices, discounts and the paid amount of the cart are in CurrencyCode (default: the program
     ' currency); the invoice is kept in SAR, with its currency, rate and total there (modCurrency).
     ' The goods enter WarehouseID (0 = the user's warehouse, modWarehouses).
+    ' StockNoteID: the invoice of a posted receipt note (modStockNotes, docs/61): the note already brought the
+    ' goods in at its cost, so no stock moves here; the lines must be those of the note.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim n As Long, i As Long, msg As String, vatRate As Currency, rate As Currency
     Dim productIDs() As Long, newPrices() As Variant, isCredit As Boolean, reclaim As Boolean
     Dim tend As Currency, paid As Currency, remaining As Currency, change As Currency
     Dim invoiceID As Long, invNo As String, docDate As Date, unitCost As Currency, priceChanges As String
+    Dim noteCosts() As Currency, noteWh As Long
 
     On Error GoTo EH
     NewInvoiceID = 0
@@ -109,6 +112,15 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
         Exit Function
     End If
 
+    If StockNoteID > 0 Then
+        msg = NoteInvoiceProblem(StockNoteID, "RECEIPT", SupplierID, productIDs, noteCosts, n, noteWh)  ' modStockNotes
+        If Len(msg) = 0 And Not IsBaseCurrency(CurrencyCode) Then msg = "ÝÇÊæÑÉ ÅÐä ÇáÇÓÊáÇã ÈÚãáÉ ÇáÈÑäÇãÌ."
+        If Len(msg) > 0 Then
+            PostPurchaseFromCart = msg
+            Exit Function
+        End If
+        WarehouseID = noteWh
+    End If
     If WarehouseID = 0 Then WarehouseID = CurrentWarehouseID()
     msg = WarehouseProblem(WarehouseID)
     If Len(msg) > 0 Then
@@ -181,11 +193,14 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     rs.Close
 
     For i = 0 To n - 1
-        unitCost = PurchaseUnitCost(CalcLine(i, "NET"), CalcLine(i, "TOTAL"), CalcLine(i, "QTY"), reclaim)
-        ApplyStockMovement db, productIDs(i), CalcLine(i, "QTY"), TT_PURCHASE, unitCost, "PURCHASE", _
-                           invoiceID, invNo, "", True, WarehouseID
+        If StockNoteID = 0 Then
+            unitCost = PurchaseUnitCost(CalcLine(i, "NET"), CalcLine(i, "TOTAL"), CalcLine(i, "QTY"), reclaim)
+            ApplyStockMovement db, productIDs(i), CalcLine(i, "QTY"), TT_PURCHASE, unitCost, "PURCHASE", _
+                               invoiceID, invNo, "", True, WarehouseID
+        End If
         UpdateProductPrices db, productIDs(i), CalcLine(i, "UNIT"), newPrices(i), SupplierID
     Next
+    If StockNoteID > 0 Then MarkNoteInvoiced db, StockNoteID, "PurchaseInvoiceID", invoiceID   ' modStockNotes
     If remaining <> 0 Then AdjustBalance db, "Suppliers", "SupplierID", SupplierID, remaining
 
     ws.CommitTrans

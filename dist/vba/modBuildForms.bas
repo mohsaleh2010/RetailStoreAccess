@@ -26,9 +26,9 @@ Option Explicit
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmStockParties,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn," & _
-    "frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines," & _
-    "frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget," & _
-    "frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
+    "frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens," & _
+    "frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines," & _
+    "frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -620,6 +620,8 @@ Private Sub BuildAllForms()
     BuildForm_frmStockTransfer
     BuildForm_frmStockDocumentLines
     BuildForm_frmStockDocument
+    BuildForm_frmStockNoteLines
+    BuildForm_frmStockNote
     BuildForm_frmLogin
     BuildForm_frmChangePassword
     BuildForm_frmRolePermLines
@@ -5335,6 +5337,8 @@ Private Sub BuildForm_frmInventory()
     c.OnClick = EP
     Set c = AddButton("btnStockDocs", "’—› Ê«” ·«„", 13492, 8221, 1701, 624, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnStockNotes", "«·√–Ê‰« ", 15306, 8221, 1361, 624, "secondary")
+    c.OnClick = EP
     Set c = AddLabel("lblProductName", "«Œ — „‰ Ã« „‰ «·ﬁ«∆„…", 12134, 1304, 6634, 454, 14, True, CLR_PRIMARY, "", 0)
     Set c = AddLabel("lblProductStock", " ", 12134, 1786, 6634, 340, 10, False, CLR_TEXT, "", 0)
     Set c = AddLabel("lblManualCap", "Õ—ﬂ… ÌœÊÌ… ⁄·Ï «·„‰ Ã «·„Õœœ", 12134, 2268, 6634, 340, 11, True, CLR_MUTED, "", 0)
@@ -5413,6 +5417,9 @@ Private Sub BuildForm_frmInventory()
     s = s & "Private Sub btnStockDocs_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmStockDocument""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStockNotes_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmStockNote""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnPostMove_Click()" & vbCrLf
     s = s & "    PostInventoryMove Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -5422,10 +5429,10 @@ Private Sub BuildForm_frmInventory()
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;lstProducts,227,1984,11680,5613,0,1000,0,1000;lblInvTotals,227,7711,11680,340,0,1000,1000,0;btnStockCount,227,8221,1474,624,0,0,1000,0;btnPurchase,1814,8221,2041,624,0,0,1000,0;btnLowReport,3968,8221,1928,624,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnStockReport,6009,8221,1928,624,0,0,1000,0;btnLabels,8050,8221,1928,624,0,0,1000,0;btnWarehouses,10091,8221,1474,624,0,0,1000,0;btnTransfer,11678,8221,1701,624,0,0,1000,0;btnStockDocs,13492,8221,1701,624,1000,0,1000,0;lblProductName,12134,1304,6634,454,1000,0,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblProductStock,12134,1786,6634,340,1000,0,0,0;lblManualCap,12134,2268,6634,340,1000,0,0,0;cboMoveType,12134,2977,3175,454,1000,0,0,0;lblMoveType,12134,2665,3175,284,1000,0,0,0;txtMoveQty,15479,2977,1531,454,1000,0,0,0;lblMoveQty,15479,2665,1531,284,1000,0,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";txtMoveCost,17180,2977,1588,454,1000,0,0,0;lblMoveCost,17180,2665,1588,284,1000,0,0,0;txtMoveNotes,12134,3799,3062,454,1000,0,0,0;lblMoveNotes,12134,3487,3062,284,1000,0,0,0;cboWarehouse,15309,3799,1758,454,1000,0,0,0;lblWarehouse,15309,3487,1758,284,1000,0,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnPostMove,17180,3782,1588,482,1000,0,0,0;lblMovesCap,12134,4451,6634,340,1000,0,0,0;lstMoves,12134,4820,6634,3232,1000,0,0,1000;btnClose,17067,8221,1701,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnStockReport,6009,8221,1928,624,0,0,1000,0;btnLabels,8050,8221,1928,624,0,0,1000,0;btnWarehouses,10091,8221,1474,624,0,0,1000,0;btnTransfer,11678,8221,1701,624,0,0,1000,0;btnStockDocs,13492,8221,1701,624,1000,0,1000,0;btnStockNotes,15306,8221,1361,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblProductName,12134,1304,6634,454,1000,0,0,0;lblProductStock,12134,1786,6634,340,1000,0,0,0;lblManualCap,12134,2268,6634,340,1000,0,0,0;cboMoveType,12134,2977,3175,454,1000,0,0,0;lblMoveType,12134,2665,3175,284,1000,0,0,0;txtMoveQty,15479,2977,1531,454,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblMoveQty,15479,2665,1531,284,1000,0,0,0;txtMoveCost,17180,2977,1588,454,1000,0,0,0;lblMoveCost,17180,2665,1588,284,1000,0,0,0;txtMoveNotes,12134,3799,3062,454,1000,0,0,0;lblMoveNotes,12134,3487,3062,284,1000,0,0,0;cboWarehouse,15309,3799,1758,454,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblWarehouse,15309,3487,1758,284,1000,0,0,0;btnPostMove,17180,3782,1588,482,1000,0,0,0;lblMovesCap,12134,4451,6634,340,1000,0,0,0;lstMoves,12134,4820,6634,3232,1000,0,0,1000;btnClose,17067,8221,1701,624,1000,0,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 18994, 9355, -1757, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmInventory", s
@@ -5802,6 +5809,139 @@ Private Sub BuildForm_frmStockDocument()
     Exit Sub
 EH:
     AbortForm "frmStockDocument", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmStockNoteLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmStockNoteLines", "√”ÿ— ≈–‰ «· ”·Ì„ √Ê «·«” ·«„", "SELECT * FROM StockNoteLines WHERE StockNoteID = 0", 11680, 425, False, True, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("ProductID", "ProductID", 28, 0, 4423, 425, "SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p WHERE p.TrackStock = True AND p.IsActive = True ORDER BY p.ProductName", 2, "0;4309")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    Set c = AddText("Quantity", "Quantity", 4479, 0, 1474, 425)
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("UnitPrice", "UnitPrice", 5981, 0, 1701, 425)
+    SetCtlProp c, "Format", "#,##0.00##"
+    Set c = AddText("UnitCost", "UnitCost", 7710, 0, 1474, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00##"
+    Set c = AddText("txtValue", "=Nz([Quantity],0)*Nz([UnitPrice],0)", 9212, 0, 1814, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 11054, 17, 454, 391, "danger")
+    SetCtlProp c, "FontName", ICON_FONT
+    c.OnClick = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    StockNoteLineBeforeUpdate Me, Cancel" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    StockNoteLineAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    StockNoteRemoveLine Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmStockNoteLines", s
+    Exit Sub
+EH:
+    AbortForm "frmStockNoteLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmStockNote()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmStockNote", "√–Ê‰«  «· ”·Ì„ Ê«·«” ·«„", "", 12134, 10206, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12134, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7B8), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "√–Ê‰«  «· ”·Ì„ Ê«·«” ·«„", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", " ”·Ì„ √’‰«› ·⁄„Ì· √Ê «” ·«„Â« „‰ „Ê—œ ﬁ»· «·›« Ê—…: ´ —ÕÌ·ª ÌÕ—ﬂ «·„Œ“Ê‰° À„ ´≈‰‘«¡ «·›« Ê—…ª „‰Â", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboNote", "", 227, 1304, 9412, 454, "", 7, "0;1361;1247;907;2608;1588;1474")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblNote", "«·≈–‰ («·√ÕœÀ √Ê·«)", 227, 992, 9412, 284, 9, False, CLR_MUTED, "cboNote", 0)
+    Set c = AddCombo("cboType", "", 227, 2155, 2268, 454, "DELIVERY;≈–‰  ”·Ì„ ·⁄„Ì·;RECEIPT;≈–‰ «” ·«„ „‰ „Ê—œ", 2, "0;2155")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblType", "‰Ê⁄ «·≈–‰ «·ÃœÌœ", 227, 1843, 2268, 284, 9, False, CLR_MUTED, "cboType", 0)
+    Set c = AddCombo("cboWarehouse", "", 2608, 2155, 1928, 454, "", 2, "0;1814")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblWarehouse", "«·„Œ“‰", 2608, 1843, 1928, 284, 9, False, CLR_MUTED, "cboWarehouse", 0)
+    Set c = AddCombo("cboParty", "", 4649, 2155, 2608, 454, "", 2, "0;2495")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblParty", "«·⁄„Ì· / «·„Ê—œ", 4649, 1843, 2608, 284, 9, False, CLR_MUTED, "cboParty", 0)
+    Set c = AddText("txtNotes", "", 7371, 2155, 2381, 454)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 7371, 1843, 2381, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddButton("btnNew", "≈–‰ ÃœÌœ", 9866, 2138, 2041, 482, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblInfo", " ", 227, 2778, 11680, 397, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblCol1", "«·’‰›", 255, 3260, 4423, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "«·ﬂ„Ì…", 4706, 3260, 1474, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "«·”⁄— ›Ì «·›« Ê—…", 6208, 3260, 1701, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "«· ﬂ·›…", 7937, 3260, 1474, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol5", "ﬁÌ„… «·”ÿ—", 9439, 3260, 1814, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subLines", "frmStockNoteLines", 227, 3600, 11680, 3969)
+    Set c = AddCombo("cboPayType", "", 227, 7995, 1701, 454, "CASH;‰ﬁœÌ;CREDIT;¬Ã·", 2, "0;1588")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblPayType", "œ›⁄ «·›« Ê—…", 227, 7683, 1701, 284, 9, False, CLR_MUTED, "cboPayType", 0)
+    Set c = AddText("txtSupplierRef", "", 2041, 7995, 2268, 454)
+    Set c = AddLabel("lblSupplierRef", "—ﬁ„ ›« Ê—… «·„Ê—œ", 2041, 7683, 2268, 284, 9, False, CLR_MUTED, "txtSupplierRef", 0)
+    Set c = AddCheck("chkVat", "", 4423, 8080)
+    Set c = AddLabel("lblVat", "»÷—Ì»… «·ﬁÌ„… «·„÷«›…", 4792, 7995, 2012, 454, 10, False, CLR_TEXT, "chkVat", 0)
+    Set c = AddButton("btnInvoice", "≈‰‘«¡ «·›« Ê—…", 6917, 7978, 2268, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnPost", " —ÕÌ·", 227, 9129, 2041, 624, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnpost", "≈·€«¡ «· —ÕÌ·", 2381, 9129, 1928, 624, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "Õ–› «·„”Êœ…", 4422, 9129, 1814, 624, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 10433, 9129, 1474, 624, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    StockNoteLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboNote_AfterUpdate()" & vbCrLf
+    s = s & "    StockNoteShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboType_AfterUpdate()" & vbCrLf
+    s = s & "    StockNoteTypeChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    StockNoteNew Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnInvoice_Click()" & vbCrLf
+    s = s & "    StockNoteAction Me, ""INVOICE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPost_Click()" & vbCrLf
+    s = s & "    StockNoteAction Me, ""POST""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnpost_Click()" & vbCrLf
+    s = s & "    StockNoteAction Me, ""UNPOST""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    StockNoteAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmStockNote", s
+    Exit Sub
+EH:
+    AbortForm "frmStockNote", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmLogin()

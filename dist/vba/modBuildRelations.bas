@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 180
+Private Const EXPECTED_RELATION_COUNT As Long = 187
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -560,6 +560,13 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_StockDocuments_StockPartyID", "StockParties", "StockPartyID", "StockDocuments", "StockPartyID", 0&)
     c.Add Array("FK_StockDocumentLines_StockDocumentID", "StockDocuments", "StockDocumentID", "StockDocumentLines", "StockDocumentID", 4096&)
     c.Add Array("FK_StockDocumentLines_ProductID", "Products", "ProductID", "StockDocumentLines", "ProductID", 0&)
+    c.Add Array("FK_StockNotes_WarehouseID", "Warehouses", "WarehouseID", "StockNotes", "WarehouseID", 0&)
+    c.Add Array("FK_StockNotes_CustomerID", "Customers", "CustomerID", "StockNotes", "CustomerID", 0&)
+    c.Add Array("FK_StockNotes_SupplierID", "Suppliers", "SupplierID", "StockNotes", "SupplierID", 0&)
+    c.Add Array("FK_StockNotes_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "StockNotes", "SalesInvoiceID", 0&)
+    c.Add Array("FK_StockNotes_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "StockNotes", "PurchaseInvoiceID", 0&)
+    c.Add Array("FK_StockNoteLines_StockNoteID", "StockNotes", "StockNoteID", "StockNoteLines", "StockNoteID", 4096&)
+    c.Add Array("FK_StockNoteLines_ProductID", "Products", "ProductID", "StockNoteLines", "ProductID", 0&)
     c.Add Array("FK_StockCounts_CategoryID", "Categories", "CategoryID", "StockCounts", "CategoryID", 0&)
     c.Add Array("FK_StockCounts_EmployeeID", "Employees", "EmployeeID", "StockCounts", "EmployeeID", 0&)
     c.Add Array("FK_StockCounts_WarehouseID", "Warehouses", "WarehouseID", "StockCounts", "WarehouseID", 0&)
@@ -581,6 +588,7 @@ Private Function RetiredRelations() As Variant
                              "FK_PeriodClosings_EmployeeID", _
                              "FK_StockCounts_PostedByID", _
                              "FK_StockDocuments_EmployeeID", _
+                             "FK_StockNotes_EmployeeID", _
                              "FK_StockTransfers_EmployeeID", _
                              "FK_StockTransfers_ReceivedByID", _
                              "FK_SupplierAllocations_EmployeeID", _

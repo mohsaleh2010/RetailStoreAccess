@@ -26,11 +26,11 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     "SupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustom" & _
     "erInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuer" & _
     "y,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint" & _
-    ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryJournalStockTransfer,Trans" & _
-    "fersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDeprecia" & _
-    "tionLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBef" & _
-    "ore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBala" & _
-    "nceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryStockNoteValue,qryInvoiced" & _
+    "Notes,NotesNotInvoicedQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJour" & _
+    "nalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,Payr" & _
+    "ollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlann" & _
+    "ed,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -813,7 +813,11 @@ Private Sub CreateAllQueries()
     Q_qryReturnCost
     Q_qryStockCountValue
     Q_qryStockTransferValue
+    Q_qryStockNoteValue
+    Q_qryInvoicedNotes
+    Q_NotesNotInvoicedQuery
     Q_qryJournalStockTransfer
+    Q_qryJournalStockNote
     Q_TransfersInTransitQuery
     Q_qryStockPartyAccounts
     Q_qryStockDocumentValue
@@ -1388,6 +1392,16 @@ Private Sub Q_qryStockMoveParty()
     s = s & "FROM (InventoryTransactions AS t INNER JOIN StockDocuments AS d ON t.ReferenceID = d.StockDocumentID)" & vbCrLf
     s = s & "     INNER JOIN [@StockParties] AS p ON d.StockPartyID = p.StockPartyID" & vbCrLf
     s = s & "WHERE t.ReferenceType = 'STOCK_DOC'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT t.TransactionID, c.CustomerName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN StockNotes AS n ON t.ReferenceID = n.StockNoteID)" & vbCrLf
+    s = s & "     INNER JOIN [@Customers] AS c ON n.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'STOCK_NOTE' AND n.NoteType = 'DELIVERY'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT t.TransactionID, s.SupplierName" & vbCrLf
+    s = s & "FROM (InventoryTransactions AS t INNER JOIN StockNotes AS n ON t.ReferenceID = n.StockNoteID)" & vbCrLf
+    s = s & "     INNER JOIN [@Suppliers] AS s ON n.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE t.ReferenceType = 'STOCK_NOTE' AND n.NoteType = 'RECEIPT'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT t.TransactionID, w.WarehouseName" & vbCrLf
     s = s & "FROM (InventoryTransactions AS t INNER JOIN StockTransfers AS x ON t.ReferenceID = x.StockTransferID)" & vbCrLf
@@ -2688,6 +2702,36 @@ Private Sub Q_qryStockTransferValue()
     SaveQuery "qryStockTransferValue", "قيمة كل تحويل بين المخازن بتكلفة الترحيل", s
 End Sub
 
+Private Sub Q_qryStockNoteValue()
+    Dim s As String
+    s = "SELECT StockNoteID, Sum(Quantity * UnitCost) AS NoteValue" & vbCrLf
+    s = s & "FROM StockNoteLines" & vbCrLf
+    s = s & "GROUP BY StockNoteID" & vbCrLf
+    SaveQuery "qryStockNoteValue", "قيمة كل إذن تسليم أو استلام بتكلفته", s
+End Sub
+
+Private Sub Q_qryInvoicedNotes()
+    Dim s As String
+    s = "SELECT n.StockNoteID, n.SalesInvoiceID, n.PurchaseInvoiceID, v.NoteValue" & vbCrLf
+    s = s & "FROM StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID" & vbCrLf
+    s = s & "WHERE n.Status = 'INVOICED'" & vbCrLf
+    SaveQuery "qryInvoicedNotes", "الأذونات التي صدرت منها فواتير: فاتورة البيع أو الشراء وقيمة الإذن", s
+End Sub
+
+Private Sub Q_NotesNotInvoicedQuery()
+    Dim s As String
+    s = "SELECT n.StockNoteID, n.NoteNumber, n.NoteType, n.NoteDate, n.WarehouseID, w.WarehouseName," & vbCrLf
+    s = s & "       IIf(n.NoteType = 'DELIVERY', c.CustomerName, s.SupplierName) AS PartyName, v.NoteValue," & vbCrLf
+    s = s & "       DateDiff('d', n.NoteDate, Date()) AS DaysOpen, n.Notes" & vbCrLf
+    s = s & "FROM (((StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID)" & vbCrLf
+    s = s & "       INNER JOIN [@Warehouses] AS w ON n.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "      LEFT JOIN [@Customers] AS c ON n.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "     LEFT JOIN [@Suppliers] AS s ON n.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE n.Status = 'POSTED'" & vbCrLf
+    s = s & "ORDER BY n.NoteDate" & vbCrLf
+    SaveQuery "NotesNotInvoicedQuery", "أذونات التسليم والاستلام المرحّلة التي لم تصدر فواتيرها بعد", s
+End Sub
+
 Private Sub Q_qryJournalStockTransfer()
     Dim s As String
     s = "SELECT 'STOCK_TRANSFER' AS SourceType, t.StockTransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, 'تحويل بين المخازن' AS Party, 1 AS LineOrder, IIf(t.InTransit, 1410, IIf(t.ToWarehouseID = 1, 1400, 140000 + t.ToWarehouseID)) AS AccountCode, v.TransferValue AS Debit, CCur(0) AS Credit, t.Notes AS LineText, 0 AS CostCenter" & vbCrLf
@@ -2706,6 +2750,26 @@ Private Sub Q_qryJournalStockTransfer()
     s = s & "FROM StockTransfers AS t INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID" & vbCrLf
     s = s & "WHERE t.Status = 'RECEIVED' AND t.InTransit = True AND v.TransferValue <> 0" & vbCrLf
     SaveQuery "qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", s
+End Sub
+
+Private Sub Q_qryJournalStockNote()
+    Dim s As String
+    s = "SELECT 'DELIVERY_NOTE' AS SourceType, n.StockNoteID AS SourceID, n.NoteNumber AS SourceNumber, n.NoteDate AS SourceDate, c.CustomerName AS Party, 1 AS LineOrder, 1430 AS AccountCode, v.NoteValue AS Debit, CCur(0) AS Credit, c.CustomerName AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM (StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID) INNER JOIN [@Customers] AS c ON n.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE n.Status <> 'DRAFT' AND n.NoteType = 'DELIVERY' AND v.NoteValue <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'DELIVERY_NOTE' AS SourceType, n.StockNoteID AS SourceID, n.NoteNumber AS SourceNumber, n.NoteDate AS SourceDate, c.CustomerName AS Party, 2 AS LineOrder, IIf(n.WarehouseID = 1, 1400, 140000 + n.WarehouseID) AS AccountCode, CCur(0) AS Debit, v.NoteValue AS Credit, 'المخزون' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM (StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID) INNER JOIN [@Customers] AS c ON n.CustomerID = c.CustomerID" & vbCrLf
+    s = s & "WHERE n.Status <> 'DRAFT' AND n.NoteType = 'DELIVERY' AND v.NoteValue <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'RECEIPT_NOTE' AS SourceType, n.StockNoteID AS SourceID, n.NoteNumber AS SourceNumber, n.NoteDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, IIf(n.WarehouseID = 1, 1400, 140000 + n.WarehouseID) AS AccountCode, v.NoteValue AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM (StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID) INNER JOIN [@Suppliers] AS s ON n.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE n.Status <> 'DRAFT' AND n.NoteType = 'RECEIPT' AND v.NoteValue <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'RECEIPT_NOTE' AS SourceType, n.StockNoteID AS SourceID, n.NoteNumber AS SourceNumber, n.NoteDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 2150 AS AccountCode, CCur(0) AS Debit, v.NoteValue AS Credit, s.SupplierName AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM (StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID) INNER JOIN [@Suppliers] AS s ON n.SupplierID = s.SupplierID" & vbCrLf
+    s = s & "WHERE n.Status <> 'DRAFT' AND n.NoteType = 'RECEIPT' AND v.NoteValue <> 0" & vbCrLf
+    SaveQuery "qryJournalStockNote", "أسطر قيود أذونات التسليم والاستلام (1430 و2150)", s
 End Sub
 
 Private Sub Q_TransfersInTransitQuery()
@@ -2777,11 +2841,11 @@ Private Sub Q_qryJournalSale()
     s = s & "WHERE h.Tax <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 5 AS LineOrder, 5100 AS AccountCode, k.SaleCost AS Debit, CCur(0) AS Credit, 'تكلفة البضاعة المباعة' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID" & vbCrLf
+    s = s & "FROM ((SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID) LEFT JOIN qryInvoicedNotes AS nv ON h.SalesInvoiceID = nv.SalesInvoiceID" & vbCrLf
     s = s & "WHERE k.SaleCost <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 6 AS LineOrder, IIf(h.WarehouseID = 1, 1400, 140000 + h.WarehouseID) AS AccountCode, CCur(0) AS Debit, k.SaleCost AS Credit, 'المخزون' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM (SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID" & vbCrLf
+    s = s & "SELECT 'SALE' AS SourceType, h.SalesInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, c.CustomerName AS Party, 6 AS LineOrder, IIf(nv.StockNoteID Is Null, IIf(h.WarehouseID = 1, 1400, 140000 + h.WarehouseID), 1430) AS AccountCode, CCur(0) AS Debit, k.SaleCost AS Credit, 'المخزون' AS LineText, IIf(h.CostCenterID Is Null, 0, h.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM ((SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID) LEFT JOIN qryInvoicedNotes AS nv ON h.SalesInvoiceID = nv.SalesInvoiceID" & vbCrLf
     s = s & "WHERE k.SaleCost <> 0" & vbCrLf
     SaveQuery "qryJournalSale", "أسطر قيود فواتير البيع", s
 End Sub
@@ -2816,9 +2880,13 @@ End Sub
 
 Private Sub Q_qryJournalPurchase()
     Dim s As String
-    s = "SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, IIf(h.WarehouseID = 1, 1400, 140000 + h.WarehouseID) AS AccountCode, h.TaxableAmount AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText, 0 AS CostCenter" & vbCrLf
-    s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf
-    s = s & "WHERE h.TaxableAmount <> 0" & vbCrLf
+    s = "SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 1 AS LineOrder, IIf(h.WarehouseID = 1, 1400, 140000 + h.WarehouseID) AS AccountCode, h.TaxableAmount - CCur(Nz(nv.NoteValue, 0)) AS Debit, CCur(0) AS Credit, 'المخزون' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM (PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID) LEFT JOIN qryInvoicedNotes AS nv ON h.PurchaseInvoiceID = nv.PurchaseInvoiceID" & vbCrLf
+    s = s & "WHERE h.TaxableAmount - CCur(Nz(nv.NoteValue, 0)) <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 5 AS LineOrder, 2150 AS AccountCode, nv.NoteValue AS Debit, CCur(0) AS Credit, 'بضاعة مستلمة لم تُفوتر' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM (PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID) LEFT JOIN qryInvoicedNotes AS nv ON h.PurchaseInvoiceID = nv.PurchaseInvoiceID" & vbCrLf
+    s = s & "WHERE nv.NoteValue Is Not Null AND nv.NoteValue <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'PURCHASE' AS SourceType, h.PurchaseInvoiceID AS SourceID, h.InvoiceNumber AS SourceNumber, h.InvoiceDate AS SourceDate, s.SupplierName AS Party, 2 AS LineOrder, 1500 AS AccountCode, h.Tax AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, 0 AS CostCenter" & vbCrLf
     s = s & "FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID" & vbCrLf

@@ -60,7 +60,7 @@ Public Function SearchColumnWidths(ByVal Kind As String) As String
 End Function
 
 Public Function ReportCount() As Long
-    ReportCount = 50
+    ReportCount = 51
 End Function
 
 Public Function ScreenPermission(ByVal FormName As String) As String
@@ -105,6 +105,7 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmStockTransfer": ScreenPermission = "STOCK_TRANSFER"
         Case "frmStockParties": ScreenPermission = "STOCK_DOCS"
         Case "frmStockDocument": ScreenPermission = "STOCK_DOCS"
+        Case "frmStockNote": ScreenPermission = "STOCK_NOTES"
         Case "frmJournal": ScreenPermission = "JOURNAL"
         Case "frmJournalEntry": ScreenPermission = "JOURNAL"
         Case "frmAccounts": ScreenPermission = "JOURNAL"
@@ -161,43 +162,44 @@ Public Function ReportRow(ByVal Index As Long) As Variant
         Case 10: ReportRow = Array("STOCK_WAREHOUSE", "√—’œ… «·√’‰«› ·ﬂ· „Œ“‰", "StockByWarehouseQuery", "rptStockByWarehouse", "w", "")
         Case 11: ReportRow = Array("STOCK_VALUE_WAREHOUSE", " ﬁÌÌ„ «·„Œ“Ê‰ ·ﬂ· „Œ“‰", "StockValueByWarehouseQuery", "rptStockValueByWarehouse", "", "")
         Case 12: ReportRow = Array("TRANSFERS_IN_TRANSIT", "«· ÕÊÌ·«  »Ì‰ «·„Œ«“‰ »«·ÿ—Ìﬁ", "TransfersInTransitQuery", "rptTransfersInTransit", "", "")
-        Case 13: ReportRow = Array("STOCK_COUNT_DIFF", "›—Êﬁ«  «·Ã—œ «·„—Õ¯·… ·ﬂ· „Œ“‰", "StockCountDiffQuery", "rptStockCountDiff", "Dw", "CountDate")
-        Case 14: ReportRow = Array("LOW_STOCK", "«·„‰ Ã«  „‰Œ›÷… «·„Œ“Ê‰", "LowStockQuery", "rptLowStock", "", "")
-        Case 15: ReportRow = Array("ITEM_CARD", "ﬂ«—  «·’‰› («·ﬂ„Ì… Ê«·ﬁÌ„… ·ﬂ· „Œ“‰)", "ItemCardQuery", "rptItemCard", "PRW", "")
-        Case 16: ReportRow = Array("PRODUCT_MOVEMENT", "Õ—ﬂ… „‰ Ã", "ProductMovementQuery", "rptProductMovement", "PR", "")
-        Case 17: ReportRow = Array("CUSTOMER_STATEMENT", "ﬂ‘› Õ”«» ⁄„Ì·", "CustomerStatementQuery", "rptCustomerStatement", "PC", "")
-        Case 18: ReportRow = Array("SUPPLIER_STATEMENT", "ﬂ‘› Õ”«» „Ê—œ", "SupplierStatementQuery", "rptSupplierStatement", "PS", "")
-        Case 19: ReportRow = Array("EXPENSES", "«·„’—Ê›«  ( ›’Ì·Ì)", "ExpensesQuery", "rptExpenses", "Pe", "")
-        Case 20: ReportRow = Array("EXPENSES_BY_TYPE", "«·„’—Ê›«  (≈Ã„«·Ì Õ”» «·‰Ê⁄)", "ExpensesByTypeQuery", "rptExpensesByType", "P", "")
-        Case 21: ReportRow = Array("CASH_STATEMENT", "Õ—ﬂ… «·Œ“Ì‰… / «·’‰œÊﬁ ( ›’Ì·Ì)", "CashStatementQuery", "rptCashStatement", "Pb#", "")
-        Case 22: ReportRow = Array("CASH_DAILY", "Õ—ﬂ… «·Œ“Ì‰… «·ÌÊ„Ì… (√Ê· «·ÌÊ„ Ê¬Œ—Â)", "CashDailyQuery", "rptCashDaily", "Pb#", "")
-        Case 23: ReportRow = Array("CASH_DAYBOOK", "ÌÊ„Ì… «·’‰œÊﬁ «· ›’Ì·Ì… (’›Õ… ·ﬂ· ’‰œÊﬁ ÊÌÊ„)", "CashDayBookQuery", "rptCashDayBook", "Pb#", "")
-        Case 24: ReportRow = Array("CASH_BALANCES", "√—’œ… «·Œ“Ì‰… Ê«·’‰«œÌﬁ", "CashBoxBalanceQuery", "rptCashBalances", "#", "")
-        Case 25: ReportRow = Array("CASH_CLOSINGS", " ’›Ì«  ÌÊ„Ì… «·ﬂ«‘Ì—", "CashClosingsQuery", "rptCashClosings", "Pb#", "")
-        Case 26: ReportRow = Array("PROFIT", "«·√—»«Õ", "ProfitQuery", "rptProfit", "P$", "")
-        Case 27: ReportRow = Array("JOURNAL", "ﬁÌÊœ «·ÌÊ„Ì…", "JournalLinesQuery", "rptJournal", "PJ", "")
-        Case 28: ReportRow = Array("TRIAL_BALANCE", "„Ì“«‰ «·„—«Ã⁄…", "TrialBalanceQuery", "rptTrialBalance", "PJ", "")
-        Case 29: ReportRow = Array("TRIAL_BALANCE_TREE", "„Ì“«‰ «·„—«Ã⁄… »«·„” ÊÌ« ", "TrialBalanceTreeQuery", "rptTrialBalanceTree", "PJ", "")
-        Case 30: ReportRow = Array("ACCOUNT_TREE", "œ·Ì· «·Õ”«»«  (‘Ã—… «·Õ”«»« )", "AccountTreeQuery", "rptAccountTree", "J", "")
-        Case 31: ReportRow = Array("GENERAL_LEDGER", "œ› — «·√” «– (ﬂ· «·Õ”«»« )", "GeneralLedgerQuery", "rptGeneralLedger", "PJ", "")
-        Case 32: ReportRow = Array("INCOME_STATEMENT", "ﬁ«∆„… «·œŒ·", "IncomeStatementQuery", "rptIncomeStatement", "PJ$F", "")
-        Case 33: ReportRow = Array("BALANCE_SHEET", "«·„Ì“«‰Ì… «·⁄„Ê„Ì…", "BalanceSheetQuery", "rptBalanceSheet", "PJ$F", "")
-        Case 34: ReportRow = Array("OPENING_BALANCES", "√—’œ… √Ê· «·„œ… (›Ì »œ«Ì…  «—ÌŒ «·»œ«Ì…)", "OpeningBalancesReportQuery", "rptOpeningBalances", "PJ", "")
-        Case 35: ReportRow = Array("COST_CENTER_PROFIT", "ﬁ«∆„… «·œŒ· Õ”» „—ﬂ“ «· ﬂ·›…", "CostCenterProfitQuery", "rptCostCenterProfit", "PJ", "")
-        Case 36: ReportRow = Array("COST_CENTER_ACCOUNTS", "≈Ì—«œ«  Ê„’—Ê›«  ﬂ· „—ﬂ“  ﬂ·›…", "CostCenterAccountsQuery", "rptCostCenterAccounts", "PJ", "")
-        Case 37: ReportRow = Array("BUDGET_VS_ACTUAL", "«·„Ê«“‰… „ﬁ«»· «·›⁄·Ì", "BudgetVsActualQuery", "rptBudgetVsActual", "PJ", "")
-        Case 38: ReportRow = Array("FIXED_ASSETS", "”Ã· «·√’Ê· «·À«» …", "FixedAssetsQuery", "rptFixedAssets", "J", "")
-        Case 39: ReportRow = Array("AUDIT_TRAIL", "”Ã· «· œﬁÌﬁ", "AuditTrailQuery", "rptAuditTrail", "DA", "LogDate")
-        Case 40: ReportRow = Array("SLOW_MOVING", "«·„‰ Ã«  €Ì— «·„ Õ—ﬂ…", "SlowMovingProductsQuery", "rptSlowMoving", "", "")
-        Case 41: ReportRow = Array("STOCK_BY_CATEGORY", "«·„Œ“Ê‰ Õ”» «· ’‰Ì›", "StockByCategoryQuery", "rptStockByCategory", "", "")
-        Case 42: ReportRow = Array("VAT_SUMMARY", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›…", "VatSummaryQuery", "rptVatSummary", "P$", "")
-        Case 43: ReportRow = Array("EINVOICE_DOCS", "„” ‰œ«  «·›« Ê—… «·≈·ﬂ —Ê‰Ì… («·„ﬁ»Ê·… Ê«·„—›Ê÷…)", "EInvoiceReportQuery", "rptEInvoiceDocs", "D", "DocDate")
-        Case 44: ReportRow = Array("CUSTOMER_BALANCES", "√—’œ… «·⁄„·«¡", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
-        Case 45: ReportRow = Array("SUPPLIER_BALANCES", "√—’œ… «·„Ê—œÌ‰", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
-        Case 46: ReportRow = Array("SUPPLIER_FX", "√—’œ… «·„Ê—œÌ‰ »«·⁄„·«  Ê›—Êﬁ «·⁄„·…", "SupplierFxBalanceQuery", "rptSupplierFx", "", "")
-        Case 47: ReportRow = Array("REP_PERFORMANCE", "√œ«¡ «·„‰œÊ»Ì‰: «·„»Ì⁄«  Ê«· Õ’Ì· Ê«·Âœ› Ê«·⁄„Ê·…", "RepPerformanceQuery", "rptRepPerformance", "P", "")
-        Case 48: ReportRow = Array("REP_CUSTOMERS", "⁄„·«¡ «·„‰œÊ»Ì‰ Ê√—’œ Â„", "RepCustomersQuery", "rptRepCustomers", "", "")
-        Case 49: ReportRow = Array("REP_COMMISSION_BALANCE", "⁄„Ê·«  «·„‰œÊ»Ì‰ «·„” Õﬁ…", "RepCommissionBalanceQuery", "rptRepCommissionBalance", "", "")
-        Case 50: ReportRow = Array("INTEGRITY", "›Õ’ ”·«„… «·»Ì«‰« ", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
+        Case 13: ReportRow = Array("NOTES_NOT_INVOICED", "√–Ê‰«  «· ”·Ì„ Ê«·«” ·«„ «· Ì ·„  ı›Ê —", "NotesNotInvoicedQuery", "rptNotesNotInvoiced", "w", "")
+        Case 14: ReportRow = Array("STOCK_COUNT_DIFF", "›—Êﬁ«  «·Ã—œ «·„—Õ¯·… ·ﬂ· „Œ“‰", "StockCountDiffQuery", "rptStockCountDiff", "Dw", "CountDate")
+        Case 15: ReportRow = Array("LOW_STOCK", "«·„‰ Ã«  „‰Œ›÷… «·„Œ“Ê‰", "LowStockQuery", "rptLowStock", "", "")
+        Case 16: ReportRow = Array("ITEM_CARD", "ﬂ«—  «·’‰› («·ﬂ„Ì… Ê«·ﬁÌ„… ·ﬂ· „Œ“‰)", "ItemCardQuery", "rptItemCard", "PRW", "")
+        Case 17: ReportRow = Array("PRODUCT_MOVEMENT", "Õ—ﬂ… „‰ Ã", "ProductMovementQuery", "rptProductMovement", "PR", "")
+        Case 18: ReportRow = Array("CUSTOMER_STATEMENT", "ﬂ‘› Õ”«» ⁄„Ì·", "CustomerStatementQuery", "rptCustomerStatement", "PC", "")
+        Case 19: ReportRow = Array("SUPPLIER_STATEMENT", "ﬂ‘› Õ”«» „Ê—œ", "SupplierStatementQuery", "rptSupplierStatement", "PS", "")
+        Case 20: ReportRow = Array("EXPENSES", "«·„’—Ê›«  ( ›’Ì·Ì)", "ExpensesQuery", "rptExpenses", "Pe", "")
+        Case 21: ReportRow = Array("EXPENSES_BY_TYPE", "«·„’—Ê›«  (≈Ã„«·Ì Õ”» «·‰Ê⁄)", "ExpensesByTypeQuery", "rptExpensesByType", "P", "")
+        Case 22: ReportRow = Array("CASH_STATEMENT", "Õ—ﬂ… «·Œ“Ì‰… / «·’‰œÊﬁ ( ›’Ì·Ì)", "CashStatementQuery", "rptCashStatement", "Pb#", "")
+        Case 23: ReportRow = Array("CASH_DAILY", "Õ—ﬂ… «·Œ“Ì‰… «·ÌÊ„Ì… (√Ê· «·ÌÊ„ Ê¬Œ—Â)", "CashDailyQuery", "rptCashDaily", "Pb#", "")
+        Case 24: ReportRow = Array("CASH_DAYBOOK", "ÌÊ„Ì… «·’‰œÊﬁ «· ›’Ì·Ì… (’›Õ… ·ﬂ· ’‰œÊﬁ ÊÌÊ„)", "CashDayBookQuery", "rptCashDayBook", "Pb#", "")
+        Case 25: ReportRow = Array("CASH_BALANCES", "√—’œ… «·Œ“Ì‰… Ê«·’‰«œÌﬁ", "CashBoxBalanceQuery", "rptCashBalances", "#", "")
+        Case 26: ReportRow = Array("CASH_CLOSINGS", " ’›Ì«  ÌÊ„Ì… «·ﬂ«‘Ì—", "CashClosingsQuery", "rptCashClosings", "Pb#", "")
+        Case 27: ReportRow = Array("PROFIT", "«·√—»«Õ", "ProfitQuery", "rptProfit", "P$", "")
+        Case 28: ReportRow = Array("JOURNAL", "ﬁÌÊœ «·ÌÊ„Ì…", "JournalLinesQuery", "rptJournal", "PJ", "")
+        Case 29: ReportRow = Array("TRIAL_BALANCE", "„Ì“«‰ «·„—«Ã⁄…", "TrialBalanceQuery", "rptTrialBalance", "PJ", "")
+        Case 30: ReportRow = Array("TRIAL_BALANCE_TREE", "„Ì“«‰ «·„—«Ã⁄… »«·„” ÊÌ« ", "TrialBalanceTreeQuery", "rptTrialBalanceTree", "PJ", "")
+        Case 31: ReportRow = Array("ACCOUNT_TREE", "œ·Ì· «·Õ”«»«  (‘Ã—… «·Õ”«»« )", "AccountTreeQuery", "rptAccountTree", "J", "")
+        Case 32: ReportRow = Array("GENERAL_LEDGER", "œ› — «·√” «– (ﬂ· «·Õ”«»« )", "GeneralLedgerQuery", "rptGeneralLedger", "PJ", "")
+        Case 33: ReportRow = Array("INCOME_STATEMENT", "ﬁ«∆„… «·œŒ·", "IncomeStatementQuery", "rptIncomeStatement", "PJ$F", "")
+        Case 34: ReportRow = Array("BALANCE_SHEET", "«·„Ì“«‰Ì… «·⁄„Ê„Ì…", "BalanceSheetQuery", "rptBalanceSheet", "PJ$F", "")
+        Case 35: ReportRow = Array("OPENING_BALANCES", "√—’œ… √Ê· «·„œ… (›Ì »œ«Ì…  «—ÌŒ «·»œ«Ì…)", "OpeningBalancesReportQuery", "rptOpeningBalances", "PJ", "")
+        Case 36: ReportRow = Array("COST_CENTER_PROFIT", "ﬁ«∆„… «·œŒ· Õ”» „—ﬂ“ «· ﬂ·›…", "CostCenterProfitQuery", "rptCostCenterProfit", "PJ", "")
+        Case 37: ReportRow = Array("COST_CENTER_ACCOUNTS", "≈Ì—«œ«  Ê„’—Ê›«  ﬂ· „—ﬂ“  ﬂ·›…", "CostCenterAccountsQuery", "rptCostCenterAccounts", "PJ", "")
+        Case 38: ReportRow = Array("BUDGET_VS_ACTUAL", "«·„Ê«“‰… „ﬁ«»· «·›⁄·Ì", "BudgetVsActualQuery", "rptBudgetVsActual", "PJ", "")
+        Case 39: ReportRow = Array("FIXED_ASSETS", "”Ã· «·√’Ê· «·À«» …", "FixedAssetsQuery", "rptFixedAssets", "J", "")
+        Case 40: ReportRow = Array("AUDIT_TRAIL", "”Ã· «· œﬁÌﬁ", "AuditTrailQuery", "rptAuditTrail", "DA", "LogDate")
+        Case 41: ReportRow = Array("SLOW_MOVING", "«·„‰ Ã«  €Ì— «·„ Õ—ﬂ…", "SlowMovingProductsQuery", "rptSlowMoving", "", "")
+        Case 42: ReportRow = Array("STOCK_BY_CATEGORY", "«·„Œ“Ê‰ Õ”» «· ’‰Ì›", "StockByCategoryQuery", "rptStockByCategory", "", "")
+        Case 43: ReportRow = Array("VAT_SUMMARY", "„·Œ’ ÷—Ì»… «·ﬁÌ„… «·„÷«›…", "VatSummaryQuery", "rptVatSummary", "P$", "")
+        Case 44: ReportRow = Array("EINVOICE_DOCS", "„” ‰œ«  «·›« Ê—… «·≈·ﬂ —Ê‰Ì… («·„ﬁ»Ê·… Ê«·„—›Ê÷…)", "EInvoiceReportQuery", "rptEInvoiceDocs", "D", "DocDate")
+        Case 45: ReportRow = Array("CUSTOMER_BALANCES", "√—’œ… «·⁄„·«¡", "CustomerBalanceQuery", "rptCustomerBalances", "", "")
+        Case 46: ReportRow = Array("SUPPLIER_BALANCES", "√—’œ… «·„Ê—œÌ‰", "SupplierBalanceQuery", "rptSupplierBalances", "", "")
+        Case 47: ReportRow = Array("SUPPLIER_FX", "√—’œ… «·„Ê—œÌ‰ »«·⁄„·«  Ê›—Êﬁ «·⁄„·…", "SupplierFxBalanceQuery", "rptSupplierFx", "", "")
+        Case 48: ReportRow = Array("REP_PERFORMANCE", "√œ«¡ «·„‰œÊ»Ì‰: «·„»Ì⁄«  Ê«· Õ’Ì· Ê«·Âœ› Ê«·⁄„Ê·…", "RepPerformanceQuery", "rptRepPerformance", "P", "")
+        Case 49: ReportRow = Array("REP_CUSTOMERS", "⁄„·«¡ «·„‰œÊ»Ì‰ Ê√—’œ Â„", "RepCustomersQuery", "rptRepCustomers", "", "")
+        Case 50: ReportRow = Array("REP_COMMISSION_BALANCE", "⁄„Ê·«  «·„‰œÊ»Ì‰ «·„” Õﬁ…", "RepCommissionBalanceQuery", "rptRepCommissionBalance", "", "")
+        Case 51: ReportRow = Array("INTEGRITY", "›Õ’ ”·«„… «·»Ì«‰« ", "IntegrityCheckQuery", "rptIntegrityCheck", "", "")
     End Select
 End Function

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **80** | عدد الحقول: **1045**
+عدد الجداول: **82** | عدد الحقول: **1065**
 
 ## الفهرس
 
@@ -80,12 +80,14 @@
 72. [`StockParties`](#stockparties) – جهات الصرف والاستلام المخزني
 73. [`StockDocuments`](#stockdocuments) – سندات الصرف والاستلام المخزني
 74. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
-75. [`StockCounts`](#stockcounts) – جلسات الجرد
-76. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-77. [`AuditLog`](#auditlog) – سجل العمليات
-78. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-79. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-80. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+75. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
+76. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
+77. [`StockCounts`](#stockcounts) – جلسات الجرد
+78. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+79. [`AuditLog`](#auditlog) – سجل العمليات
+80. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+81. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+82. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -180,7 +182,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 28 سجل
+- بيانات أساسية: 30 سجل
 
 ## Roles
 
@@ -212,7 +214,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 41 سجل
+- بيانات أساسية: 42 سجل
 
 ## RolePermissions
 
@@ -224,7 +226,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 81 سجل
+- بيانات أساسية: 83 سجل
 
 ## Employees
 
@@ -286,7 +288,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 70 سجل
+- بيانات أساسية: 71 سجل
 
 ## UserScreens
 
@@ -1479,7 +1481,7 @@
 - المفتاح الأساسي: `AccountCode`
 - فهرس عادي: `ParentCode`
 - فهرس عادي: `TreeKey`
-- بيانات أساسية: 85 سجل
+- بيانات أساسية: 87 سجل
 
 ## JournalSourceTypes
 
@@ -1493,7 +1495,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 33 سجل
+- بيانات أساسية: 35 سجل
 
 ## JournalEntries
 
@@ -1750,7 +1752,7 @@
 
 - المفتاح الأساسي: `TransactionTypeID`
 - فهرس فريد: `TypeCode`
-- بيانات أساسية: 12 سجل
+- بيانات أساسية: 14 سجل
 
 ## InventoryTransactions
 
@@ -1874,6 +1876,47 @@
 
 - المفتاح الأساسي: `StockDocumentLineID`
 - فهرس عادي: `StockDocumentID`
+
+## StockNotes
+
+**أذونات التسليم والاستلام** – إذن تسليم أصناف لعميل، أو إذن استلامها من مورد (docs/61): مسودة، ثم «ترحيل» يحرك المخزون (التسليم بمتوسط التكلفة على 1430، والاستلام بتكلفته على 2150 ويعيد حساب المتوسط)، ثم «إنشاء الفاتورة» منه فلا يتحرك المخزون مرة ثانية.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **StockNoteID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | NoteNumber | Short Text | 20 | ✔ |  |  |  | رقم الإذن |
+| 3 | NoteType | Short Text | 10 | ✔ |  | `In ("DELIVERY","RECEIPT")` |  | نوع الإذن |
+| 4 | NoteDate | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإذن (الترحيل) |
+| 5 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
+| 6 | CustomerID | Number (Long) |  |  |  |  | `Customers.CustomerID` | العميل (إذن التسليم) |
+| 7 | SupplierID | Number (Long) |  |  |  |  | `Suppliers.SupplierID` | المورد (إذن الاستلام) |
+| 8 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","POSTED","INVOICED")` |  | الحالة |
+| 9 | SalesInvoiceID | Number (Long) |  |  |  |  | `SalesInvoices.SalesInvoiceID` | فاتورة البيع الصادرة منه |
+| 10 | PurchaseInvoiceID | Number (Long) |  |  |  |  | `PurchaseInvoices.PurchaseInvoiceID` | فاتورة الشراء الصادرة منه |
+| 11 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أنشأه |
+| 12 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `StockNoteID`
+- فهرس فريد: `NoteNumber`
+- فهرس عادي: `NoteDate`
+
+## StockNoteLines
+
+**أسطر أذونات التسليم والاستلام** – الأصناف وكمياتها وسعرها في الفاتورة؛ تكلفة التسليم متوسط تكلفة الصنف عند الترحيل، وتكلفة الاستلام = سعر الشراء.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **StockNoteLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر |
+| 2 | StockNoteID | Number (Long) |  | ✔ |  |  | `StockNotes.StockNoteID` | الإذن |
+| 3 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 4 | Quantity | Currency (كمية) |  | ✔ |  | `>0` |  | الكمية |
+| 5 | UnitPrice | Currency |  | ✔ | `0` | `>=0` |  | السعر في الفاتورة (البيع، أو الشراء بدون الضريبة) |
+| 6 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة |
+| 7 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `StockNoteLineID`
+- فهرس عادي: `StockNoteID`
 
 ## StockCounts
 

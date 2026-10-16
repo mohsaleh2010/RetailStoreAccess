@@ -30,8 +30,8 @@ Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
 Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptCashDayBook,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptVatReturnEG,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling," & _
-    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptStockValueByWarehouse,rptTransfersInTransit,rptStockCountDiff,rptLowStock,rptItemCard,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances," & _
-    "rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
+    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptStockValueByWarehouse,rptTransfersInTransit,rptNotesNotInvoiced,rptStockCountDiff,rptLowStock,rptItemCard,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets," & _
+    "rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -72,6 +72,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptStockByWarehouse
     BuildReport_rptStockValueByWarehouse
     BuildReport_rptTransfersInTransit
+    BuildReport_rptNotesNotInvoiced
     BuildReport_rptStockCountDiff
     BuildReport_rptLowStock
     BuildReport_rptItemCard
@@ -2414,6 +2415,57 @@ Private Sub BuildReport_rptTransfersInTransit()
     Exit Sub
 EH:
     AbortReport "rptTransfersInTransit", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptNotesNotInvoiced()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptNotesNotInvoiced", "√–Ê‰«  «· ”·Ì„ Ê«·«” ·«„ «· Ì ·„  ı›Ê —", "NotesNotInvoicedQuery", 10773, "", "NoteDate,NoteNumber", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""«·—ﬁ„ «·÷—Ì»Ì: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "√–Ê‰«  «· ”·Ì„ Ê«·«” ·«„ «· Ì ·„  ı›Ê —", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "—ﬁ„ «·≈–‰", 0, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "«·‰Ê⁄", 1474, 1292, 1588, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "«· «—ÌŒ", 3062, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "«·„Œ“‰", 4309, 1292, 1588, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "«·⁄„Ì· / «·„Ê—œ", 5897, 1292, 2495, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "«·ﬁÌ„… »«· ﬂ·›…", 8392, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "√Ì«„ »·« ›« Ê—…", 9866, 1292, 907, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""’›Õ… "" & [Page] & "" „‰ "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal6", "=Sum([NoteValue])", 8392, 85, 1474, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""«·≈Ã„«·Ì ("" & Count(*) & "" ”Ã·)""", 0, 85, 8392, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "NoteNumber", 0, 17, 1474, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=IIf([NoteType]=""DELIVERY"","" ”·Ì„ ·⁄„Ì·"",""«” ·«„ „‰ „Ê—œ"")", 1474, 17, 1588, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "=GDate([NoteDate])", 3062, 17, 1247, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "WarehouseName", 4309, 17, 1588, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "PartyName", 5897, 17, 2495, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol6", "NoteValue", 8392, 17, 1474, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol7", "DaysOpen", 9866, 17, 907, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""ﬂ· «·√–Ê‰«  «·„—Õ¯·… ’œ—  ›Ê« Ì—Â«.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptNotesNotInvoiced", s
+    Exit Sub
+EH:
+    AbortReport "rptNotesNotInvoiced", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptStockCountDiff()

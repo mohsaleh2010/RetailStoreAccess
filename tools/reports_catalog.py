@@ -139,6 +139,12 @@ LIST_SPECS: List[ListSpec] = [
         Col("القيمة", "TransferValue", 2.6, MONEY, True), Col("أيام بالطريق", "DaysInTransit", 2.0, INT),
         Col("ملاحظات", "Notes", 2.6, grow=True)],
         [("TransferDate", False)], no_data="لا توجد تحويلات بالطريق."),
+    ListSpec("NOTES_NOT_INVOICED", [
+        Col("رقم الإذن", "NoteNumber", 2.6), Col("النوع", '=IIf([NoteType]="DELIVERY","تسليم لعميل","استلام من مورد")', 2.8),
+        Col("التاريخ", "=GDate([NoteDate])", 2.2), Col("المخزن", "WarehouseName", 2.8),
+        Col("العميل / المورد", "PartyName", 4.4, grow=True), Col("القيمة بالتكلفة", "NoteValue", 2.6, MONEY, True),
+        Col("أيام بلا فاتورة", "DaysOpen", 1.6, INT)],
+        [("NoteDate", False), ("NoteNumber", False)], no_data="كل الأذونات المرحّلة صدرت فواتيرها."),
     ListSpec("STOCK_COUNT_DIFF", [
         Col("رقم الجرد", "CountNumber", 2.4), Col("التاريخ", "=GDate([CountDate])", 2.2),
         Col("المخزن", "WarehouseName", 3.0), Col("الكود", "ProductCode", 2.3),

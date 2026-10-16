@@ -79,12 +79,14 @@ JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournal
                           "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
                           "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation",
                           "qryJournalPayroll", "qryJournalCommission", "qryJournalStockTransfer",
-                          "qryJournalStockDocument"]
+                          "qryJournalStockDocument", "qryJournalStockNote"]
 
 
 def _sale():
+    # an invoice made from a delivery note (docs/61) takes its cost out of 1430: the note took the goods out
     src = "SalesInvoices AS h INNER JOIN [@Customers] AS c ON h.CustomerID = c.CustomerID"
-    cost = f"({src}) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID"
+    cost = (f"(({src}) INNER JOIN qrySaleCost AS k ON h.SalesInvoiceID = k.SalesInvoiceID) "
+            "LEFT JOIN qryInvoicedNotes AS nv ON h.SalesInvoiceID = nv.SalesInvoiceID")
     k = ("'SALE'", "h.SalesInvoiceID", "h.InvoiceNumber", "h.InvoiceDate", "c.CustomerName")
     return with_center(jquery([
         jline(*k, 1, cash_account("h"), "h.PaidAmount", ZERO, "c.CustomerName", src, "h.PaidAmount <> 0"),
@@ -92,7 +94,8 @@ def _sale():
         jline(*k, 3, 4100, ZERO, "h.TaxableAmount", "'المبيعات'", src, "h.TaxableAmount <> 0"),
         jline(*k, 4, 2200, ZERO, "h.Tax", "'ضريبة المخرجات'", src, "h.Tax <> 0"),
         jline(*k, 5, 5100, "k.SaleCost", ZERO, "'تكلفة البضاعة المباعة'", cost, "k.SaleCost <> 0"),
-        jline(*k, 6, stock_account("h.WarehouseID"), ZERO, "k.SaleCost", "'المخزون'", cost, "k.SaleCost <> 0")]), cc("h"))
+        jline(*k, 6, f"IIf(nv.StockNoteID Is Null, {stock_account('h.WarehouseID')}, 1430)", ZERO, "k.SaleCost",
+              "'المخزون'", cost, "k.SaleCost <> 0")]), cc("h"))
 
 
 def _sales_return():
@@ -110,10 +113,16 @@ def _sales_return():
 
 
 def _purchase():
+    # an invoice made from a receipt note (docs/61) clears 2150 by the value of the note; only a difference
+    # (rounding) is left on the stock account
     src = "PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID"
+    noted = f"({src}) LEFT JOIN qryInvoicedNotes AS nv ON h.PurchaseInvoiceID = nv.PurchaseInvoiceID"
+    stock_part = f"h.TaxableAmount - {nz('nv.NoteValue')}"
     k = ("'PURCHASE'", "h.PurchaseInvoiceID", "h.InvoiceNumber", "h.InvoiceDate", "s.SupplierName")
     return jquery([
-        jline(*k, 1, stock_account("h.WarehouseID"), "h.TaxableAmount", ZERO, "'المخزون'", src, "h.TaxableAmount <> 0"),
+        jline(*k, 1, stock_account("h.WarehouseID"), stock_part, ZERO, "'المخزون'", noted, f"{stock_part} <> 0"),
+        jline(*k, 5, 2150, "nv.NoteValue", ZERO, "'بضاعة مستلمة لم تُفوتر'", noted,
+              "nv.NoteValue Is Not Null AND nv.NoteValue <> 0"),
         jline(*k, 2, 1500, "h.Tax", ZERO, "'ضريبة المدخلات'", src, "h.Tax <> 0"),
         jline(*k, 3, cash_account("h"), ZERO, "h.PaidAmount", "s.SupplierName", src, "h.PaidAmount <> 0"),
         jline(*k, 4, 2100, ZERO, "h.RemainingAmount", "s.SupplierName", src, "h.RemainingAmount <> 0")])
@@ -231,6 +240,23 @@ def _stock_document():
         jline(*ki, 2, stock_account("d.WarehouseID"), ZERO, "v.DocValue", "'المخزون'", src, issue),
         jline(*kr, 1, stock_account("d.WarehouseID"), "v.DocValue", ZERO, "'المخزون'", src, receipt),
         jline(*kr, 2, "p.PartyAccount", ZERO, "v.DocValue", "d.Notes", src, receipt)]), cc("p"))
+
+
+def _stock_note():
+    """Delivery note: 1430 goods delivered not invoiced / the stock of the warehouse; receipt note: the stock /
+    2150 goods received not invoiced (docs/61). The invoice made from the note clears 1430 / 2150."""
+    base = "StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID"
+    ds = f"({base}) INNER JOIN [@Customers] AS c ON n.CustomerID = c.CustomerID"
+    rs_ = f"({base}) INNER JOIN [@Suppliers] AS s ON n.SupplierID = s.SupplierID"
+    kd = ("'DELIVERY_NOTE'", "n.StockNoteID", "n.NoteNumber", "n.NoteDate", "c.CustomerName")
+    kr = ("'RECEIPT_NOTE'", "n.StockNoteID", "n.NoteNumber", "n.NoteDate", "s.SupplierName")
+    delivery = "n.Status <> 'DRAFT' AND n.NoteType = 'DELIVERY' AND v.NoteValue <> 0"
+    receipt = "n.Status <> 'DRAFT' AND n.NoteType = 'RECEIPT' AND v.NoteValue <> 0"
+    return jquery([
+        jline(*kd, 1, 1430, "v.NoteValue", ZERO, "c.CustomerName", ds, delivery),
+        jline(*kd, 2, stock_account("n.WarehouseID"), ZERO, "v.NoteValue", "'المخزون'", ds, delivery),
+        jline(*kr, 1, stock_account("n.WarehouseID"), "v.NoteValue", ZERO, "'المخزون'", rs_, receipt),
+        jline(*kr, 2, 2150, ZERO, "v.NoteValue", "s.SupplierName", rs_, receipt)])
 
 
 def _manual():
@@ -861,6 +887,16 @@ SELECT t.TransactionID, p.PartyName
 FROM (InventoryTransactions AS t INNER JOIN StockDocuments AS d ON t.ReferenceID = d.StockDocumentID)
      INNER JOIN [@StockParties] AS p ON d.StockPartyID = p.StockPartyID
 WHERE t.ReferenceType = 'STOCK_DOC'
+UNION ALL
+SELECT t.TransactionID, c.CustomerName
+FROM (InventoryTransactions AS t INNER JOIN StockNotes AS n ON t.ReferenceID = n.StockNoteID)
+     INNER JOIN [@Customers] AS c ON n.CustomerID = c.CustomerID
+WHERE t.ReferenceType = 'STOCK_NOTE' AND n.NoteType = 'DELIVERY'
+UNION ALL
+SELECT t.TransactionID, s.SupplierName
+FROM (InventoryTransactions AS t INNER JOIN StockNotes AS n ON t.ReferenceID = n.StockNoteID)
+     INNER JOIN [@Suppliers] AS s ON n.SupplierID = s.SupplierID
+WHERE t.ReferenceType = 'STOCK_NOTE' AND n.NoteType = 'RECEIPT'
 UNION ALL
 SELECT t.TransactionID, w.WarehouseName
 FROM (InventoryTransactions AS t INNER JOIN StockTransfers AS x ON t.ReferenceID = x.StockTransferID)
@@ -1786,7 +1822,26 @@ GROUP BY ReferenceID"""),
 SELECT StockTransferID, Sum(CCur(Quantity * UnitCost)) AS TransferValue
 FROM StockTransferLines
 GROUP BY StockTransferID"""),
+    Query("qryStockNoteValue", "قيمة كل إذن تسليم أو استلام بتكلفته", """
+SELECT StockNoteID, Sum(Quantity * UnitCost) AS NoteValue
+FROM StockNoteLines
+GROUP BY StockNoteID"""),
+    Query("qryInvoicedNotes", "الأذونات التي صدرت منها فواتير: فاتورة البيع أو الشراء وقيمة الإذن", """
+SELECT n.StockNoteID, n.SalesInvoiceID, n.PurchaseInvoiceID, v.NoteValue
+FROM StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID
+WHERE n.Status = 'INVOICED'"""),
+    Query("NotesNotInvoicedQuery", "أذونات التسليم والاستلام المرحّلة التي لم تصدر فواتيرها بعد", """
+SELECT n.StockNoteID, n.NoteNumber, n.NoteType, n.NoteDate, n.WarehouseID, w.WarehouseName,
+       IIf(n.NoteType = 'DELIVERY', c.CustomerName, s.SupplierName) AS PartyName, v.NoteValue,
+       DateDiff('d', n.NoteDate, Date()) AS DaysOpen, n.Notes
+FROM (((StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.StockNoteID)
+       INNER JOIN [@Warehouses] AS w ON n.WarehouseID = w.WarehouseID)
+      LEFT JOIN [@Customers] AS c ON n.CustomerID = c.CustomerID)
+     LEFT JOIN [@Suppliers] AS s ON n.SupplierID = s.SupplierID
+WHERE n.Status = 'POSTED'
+ORDER BY n.NoteDate"""),
     Query("qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", _stock_transfer()),
+    Query("qryJournalStockNote", "أسطر قيود أذونات التسليم والاستلام (1430 و2150)", _stock_note()),
     Query("TransfersInTransitQuery", "التحويلات بين المخازن المرسلة ولم تُستلم بعد، بقيمتها وعدد أيامها بالطريق", """
 SELECT t.StockTransferID, t.TransferNumber, t.TransferDate, t.FromWarehouseID, f.WarehouseName AS FromName,
        t.ToWarehouseID, d.WarehouseName AS ToName, v.TransferValue,

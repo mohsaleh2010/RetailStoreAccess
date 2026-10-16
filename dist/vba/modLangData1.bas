@@ -22,6 +22,7 @@ Private Sub D1_1()
     LangAdd "ÇáÍÓÇÈÇÊ ÇáÃÓÇÓíÉ (ÇáãÚáóøãÉ) ÊÓÊÎÏãåÇ ÇáŞíæÏ ÇáÂáíÉ: áÇ ÊõÍĞİ æáÇ íÊÛíÑ äæÚåÇ. ÇáŞíæÏ ÇáíÏæíÉ ãä ÒÑ «ŞíÏ íÏæí", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "íõÚÑÖ ÇáÊŞÑíÑ ááãÚÇíäÉ æãäåÇ ÇáØÈÇÚÉ. «ÍİÙ PDF» æ«ÊÕÏíÑ Excel» íÍİÙÇä Çáãáİ İí ãÌáÏ Reports ÈÌÇäÈ ãáİ ÇáÈÑäÇãÌ", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
     LangAdd "ÑÕíÏ ßá ÍÓÇÈ æÚãíá æãæÑÏ æÕäÏæŞ æÈäß æÕäİ íæã ÈÏÁ ÇáÊÔÛíá¡ æãŞÇÈáåÇ ÍÓÇÈ ÅÌãÇáí ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", "The balance of every account, customer, supplier, cash box, bank and item on the start-up date, against the total opening balances account"
+    LangAdd "ÊÓáíã ÃÕäÇİ áÚãíá Ãæ ÇÓÊáÇãåÇ ãä ãæÑÏ ŞÈá ÇáİÇÊæÑÉ: «ÊÑÍíá» íÍÑß ÇáãÎÒæä¡ Ëã «ÅäÔÇÁ ÇáİÇÊæÑÉ» ãäå", "Deliver goods to a customer or receive them from a supplier before the invoice: Post moves the stock, then Make the invoice from it"
     LangAdd "ÕÑİ ÃÕäÇİ áŞÓã Ãæ ÕÇáÉ ÅäÊÇÌ Ãæ ááåÇáß¡ Ãæ ÇÓÊáÇãåÇ ãäåã: ãÓæÏÉ¡ Ëã «ÊÑÍíá» íÍÑß ÇáãÎÒæä æÇáŞíÏ", "Issue items to a department, a production hall or the waste, or receive them back: a draft, then Post moves the stock and the entry"
     LangAdd "ÕäÏæŞ ÈáÇ ÃãäÇÁ íÕÑİ ãäå ßá ãä áå ÕáÇÍíÉ ÇáÎÒíäÉ. æÕáÇÍíÉ «ÇáÕÑİ ãä ßá ÇáÕäÇÏíŞ» ÊÊÌÇæÒ ÇáÃãäÇÁ", "Everyone with the treasury permission pays from a box without custodians. The permission to pay from every box goes past the custodians"
     LangAdd "Êã ÇáäÓÎ áßä ÊÚĞÑ İÊÍ ÇáäÓÎÉ ááÊÍŞŞ ãäåÇ. ÃÚÏ ÇáãÍÇæáÉ ÈÚÏ ÅÛáÇŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì", "Copied, but the copy could not be opened to check it. Try again after closing the program on the other computers"
@@ -92,6 +93,7 @@ Private Sub D1_1()
     LangAdd "ááÕäİ ÍÑßÇÊ ÈÚÏ ÑÕíÏå ÇáÇİÊÊÇÍí¡ İáÇ íõáÛì ÊÑÍíáå. ÕÍøÍ ÇáßãíÉ ÈÇáÌÑÏ", "The item has moves after its opening stock, so it cannot be unposted. Correct the quantity with a stock count"
     LangAdd "ÇáÏÎæá ÇáÃæá: ÇÓã ÇáãÓÊÎÏã admin ÈÏæä ßáãÉ ãÑæÑ¡ æÓíõØáÈ ãäß ÊÚííäåÇ", "First login: user name admin with no password, and you will be asked to set one"
     LangAdd "Êã ÊÛííÑ ßáãÉ ãÑæÑ ÇáãÈÑãÌ. ÇÏÎá ÈÇÓã developer æßáãÉ ÇáãÑæÑ ÇáÌÏíÏÉ", "The developer password was changed. Log in as developer with the new password"
+    LangAdd "İí ÔÇÔÉ İÇÊæÑÉ ÇáãÔÊÑíÇÊ İÇÊæÑÉ áã ÊõÍİÙ ÈÚÏ. ÇÍİÙåÇ Ãæ ÇãÓÍåÇ ÃæáğÇ", "The purchase invoice screen has an unsaved invoice. Save or clear it first"
     LangAdd "ÇáÃÑÕÏÉ ÇáÏÇÆäÉ (ÑÃÓ ÇáãÇá æÇáÇáÊÒÇãÇÊ) ÃßÈÑ ãä ÇáãÏíäÉ ÈåĞÇ ÇáãÈáÛ", "The credit balances (capital and liabilities) exceed the debit balances by this amount"
     LangAdd "ÇáÑÕíÏ ÇáÇİÊÊÇÍí íõÓÌóøá ãÑÉ æÇÍÏÉ ŞÈá Ãí ÍÑßÉ Úáì ÇáãäÊÌ İí ÇáãÎÒä", "The opening balance is recorded once, before any move of the product in the warehouse"
     LangAdd "ÊÓÌíá ÇáÔíß íÓÏÏ ÑÕíÏ ÇáÚãíá Ãæ ÇáãæÑÏ¡ Ëã íõÍÕóøá İí ÇáÈäß Ãæ íÑÊÏ", "Recording the cheque pays the balance of the customer or supplier, then it is collected in the bank or bounces"
@@ -119,6 +121,7 @@ Private Sub D1_1()
     LangAdd "ãÑßÒ ÇáãæÙİ ãä ÔÇÔÉ ÑæÇÊÈ ÇáãæÙİíäº ÇáãÓÊäÏÇÊ ÇáŞÏíãÉ «ÛíÑ ãæÒÚÉ", "The center of the employee from the Employee salaries screen, old documents are Not allocated"
     LangAdd "ãŞÇÓ ÇáãáÕŞ æÇáæÑŞ æÇáåæÇãÔ¡ æÍÌã ÇáÈÇÑßæÏ¡ æÇáäÕæÕ ÃÚáÇå æÃÓİáå", "Label and paper size, margins, barcode size, and the texts above and below it"
     LangAdd "åá ÊÑíÏ ÊÚØíáå ÈÏáğÇ ãä Ğáß¿ (íÎÊİí ãä ÇáŞæÇÆã æíÈŞì İí ÇáÊŞÇÑíÑ", "Do you want to deactivate it instead? (It disappears from the lists and stays in the reports"
+    LangAdd "ÅäÔÇÁ ÇáİÇÊæÑÉ ãä åĞÇ ÇáÅĞä ÈÃÓÚÇÑå¿ áÇ íÊÍÑß ÇáãÎÒæä ãÑÉ ËÇäíÉ", "Make the invoice from this note at its prices? The stock does not move a second time"
     LangAdd "ÈÚÏ ÇáÅŞİÇá áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ãŞİá", "After closing, no document dated in a closed period is added, edited or deleted"
     LangAdd "ÊæÌÏ İÇÊæÑÉ ãÔÊÑíÇÊ ÛíÑ ãßÊãáÉ ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáåÇ", "There is an unfinished purchase invoice from a previous session. Do you want to continue it"
     LangAdd "åĞÇ ÇáãÕÑæİ ãÓÌá ãä ÓäÏ ÕÑİ äŞÏíÉ İí ÇáÎÒíäÉ æáÇ íõÚÏóøá ãä åäÇ", "This expense is recorded from a cash payment voucher in the treasury and is not edited from here"
@@ -126,17 +129,19 @@ Private Sub D1_1()
     LangAdd "ÇáÃÕá ÇáãæÌæÏ ŞÈá ÇáÈÑäÇãÌ ÈáÇ ÖÑíÈÉ ãÏÎáÇÊ (ÓõÌöøáÊ æŞÊ ÔÑÇÆå", "An asset owned before the program has no input VAT (it was recorded when bought"
     LangAdd "ÇáßÇİíå: ÃÕäÇİ åĞå ÇáİÆÉ ÊÙåÑ ßÅÖÇİÇÊ ááãÔÑæÈ (ÍáíÈ¡ ÔæÊ ÅÖÇİí", "Cafe: the items of this category appear as extras of the drink (milk, extra shot"
     LangAdd "ÇáãÔÊÑíÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÃÓÇÓíÉ (ãÚ ÇáãÕÑæİÇÊ ÈİÇÊæÑÉ ÖÑíÈíÉ", "Purchases at the standard rate (with expenses with a tax invoice"
+    LangAdd "ÕÏÑÊ İÇÊæÑÉ åĞÇ ÇáÅĞä¡ İáÇ íõáÛì ÊÑÍíáå. ÇÚãá ãÑÊÌÚğÇ ááİÇÊæÑÉ", "This note is invoiced and cannot be unposted. Make a return of the invoice"
     LangAdd "ŞíÏ ÅåáÇß ßá ÔåÑ ÈÇáÊÑÊíÈ: ãÕÑæİ ÇáÅåáÇß æãÌãÚ ÇáÅåáÇß áßá ÃÕá", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
+    LangAdd "áÇ íæÌÏ ÅĞä. ÇÎÊÑ ÇáäæÚ æÇáãÎÒä æÇáÚãíá Ãæ ÇáãæÑÏ Ëã «ÅĞä ÌÏíÏ", "No note. Choose the type, the warehouse and the customer or supplier, then New note"
     LangAdd "áã íõÏÎá ÇáÑŞã ÇáÖÑíÈí¡ æáä Êßæä ÇáİæÇÊíÑ İæÇÊíÑ ÖÑíÈíÉ äÙÇãíÉ", "The VAT number is not entered, and the invoices will not be valid tax invoices"
     LangAdd "ãÚÇãá ßá ÚãáÉ İí ÊÇÑíÎº ÇáãÓÊäÏ íÃÎĞ ÂÎÑ ÓÚÑ İí ÊÇÑíÎå Ãæ ŞÈáå", "The rate of each currency on a date, a document takes the last rate on or before its date"
+End Sub
+
+Private Sub D1_2()
     LangAdd "ãäÕÉ İÇÊæÑÉ ááãäÔÂÊ İí ÇáÓÚæÏíÉ İŞØ (ÏæáÉ ÇáÊÔÛíá İí ÇáÅÚÏÇÏÇÊ", "The Fatoora platform is for businesses in Saudi Arabia only (operating country in the settings"
     LangAdd "íõİÖóøá ÇáÌÑÏ æÇáãÍá ãÛáŞ Ãæ ÈÚÏ ÂÎÑ İÇÊæÑÉ¡ Ëã ÇáÊÑÍíá ãÈÇÔÑÉ", "Count preferably while the store is closed or after the last invoice, then post at once"
     LangAdd "ÇáÊí áíÓ áåÇ ÍÑßÇÊ¡ æ«ŞÇáÈ Excel» íÕÏøÑåÇ áÊãáÃåÇ Ëã ÊÓÊæÑÏåÇ", "that have no moves, and Excel template exports them for you to fill and import"
     LangAdd "ÇáÌåÇÒ áã íõÓÌóøá ÈÚÏ áÏì ÇáåíÆÉ (ÅÚÏÇÏ ÇáÑÈØ: ÇáÎØæÇÊ 1 æ2 æ", "The device is not registered with ZATCA yet (connection setup: steps 1, 2 and"
     LangAdd "ÇáÑÕíÏ áÇ íõßÊÈ íÏæíğÇ: íõÍÓÈ ãä ÇáãÈíÚÇÊ æÇáÓäÏÇÊ æÇáãÕÑæİÇÊ", "The balance is not typed by hand: it is calculated from sales, vouchers and expenses"
-End Sub
-
-Private Sub D1_2()
     LangAdd "ÊÑÍíá ÇáÊÍæíá¿ ÊõÎÕã ÇáÃÕäÇİ ãä ÇáãÎÒä ÇáãÑÓöá ÈãÊæÓØ ÊßáİÊåÇ", "Post the transfer? The products leave the sending warehouse at their average cost"
     LangAdd "ÊÛííÑ ÅÚÏÇÏÇÊ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ íÍÊÇÌ ÕáÇÍíÉ ÅÚÏÇÏÇÊ ÇáãÍá", "Changing the e-invoicing settings needs the store settings permission"
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. áÅŞÑÇÑ ãÚÊãÏ ÇÓÊÎÏã «ÅáÛÇÁ ÇáÇÚÊãÇÏ» ÃæáğÇ", "Only the draft is deleted. For an approved return use Cancel approval first"
@@ -175,6 +180,7 @@ Private Sub D1_2()
     LangAdd "ÇáãäÊÌ ãæÌæÏ áßäå áíÓ Öãä åĞÇ ÇáÌÑÏ (ÊÕäíİ ÂÎÑ Ãæ ÛíÑ äÔØ", "The product exists but is not part of this count (another category or inactive"
     LangAdd "ÊÍæíá ÊÕİíÉ ÇáßÇÔíÑ áÇ íõáÛì: íÓÊáãå Ããíä ÇáÕäÏæŞ ÇáãÓÊáã", "A cashier closing transfer is not cancelled: the custodian of the receiving box receives it"
     LangAdd "ÚãáíÉ ãØÇÈŞÉ ÊÛíøÑ ãÈáÛåÇ İí ÇáÏİÇÊÑ ÈÚÏ ÇáãØÇÈŞÉ: ÑÇÌÚåÇ", "A matched transaction whose amount changed in the books after matching: review it"
+    LangAdd "İí ÔÇÔÉ ÇáÈíÚ İÇÊæÑÉ áã ÊõÍİÙ ÈÚÏ. ÇÍİÙåÇ Ãæ ÇãÓÍåÇ ÃæáğÇ", "The sales screen has an unsaved invoice. Save or clear it first"
     LangAdd "ŞíÏ ãÍİæÙ: ÚÏøá Ëã ÇÍİÙ¡ İíÊÍÏË ŞíÏå İí ÇáíæãíÉ ÈäİÓ ÑŞãå", "Saved entry: edit and save, and its journal entry is updated with the same number"
     LangAdd "íõÍĞİ ÇáÔíß ÊÍÊ ÇáÊÍÕíá İŞØ: ÃáÛö ÊÍÕíáå Ãæ ÇÑÊÏÇÏå ÃæáğÇ", "Only a cheque under collection is deleted: cancel its collection or bounce first"
     LangAdd "ÅÑÌÇÚ ÇáÔíß Åáì «ÊÍÊ ÇáÊÍÕíá» æÍĞİ ŞíÏ ÊÍÕíáå Ãæ ÇÑÊÏÇÏå", "Return the cheque to Under collection and delete the entry of its collection or bounce"
@@ -198,6 +204,7 @@ Private Sub D1_2()
     LangAdd "áÇ íãßä ÇáÍĞİ Ãæ ÇáÊÚÏíá áæÌæÏ ÚãáíÇÊ ãÑÊÈØÉ ÈåĞÇ ÇáÓÌá", "Cannot delete or edit because there are transactions linked to this record"
     LangAdd "áÇ íãßä ÊÛííÑ ÏæáÉ ÇáÊÔÛíá ÈÚÏ ÊÓÌíá ÚãáíÇÊ İí ÇáÈÑäÇãÌ", "The operating country cannot change after operations are recorded"
     LangAdd "áíÓÊ İí ÇáİÊÑÇÊ ÇáãÇáíÉ. ÃÖİåÇ İí ÔÇÔÉ «ÇáİÊÑÇÊ ÇáãÇáíÉ", "is not in the fiscal periods. Add it in the Fiscal periods screen"
+    LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÓáóøã æáÇ íõÓÊáã ÈÅĞä", "This item does not track stock, so it has no delivery or receipt note"
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ æÇäÓÎ ãáİ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ ãßÇäå íÏæíğÇ", "Close the program and copy the backup file in its place by hand"
     LangAdd "ÅÌãÇáí ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÓÊÍŞÉ Úä ÇáİÊÑÉ ÇáÍÇáíÉ", "Total VAT due for the current period"
     LangAdd "ÇÎÊÑ ÔÇÔÉ æÇÍÏÉ Úáì ÇáÃŞá¡ Ãæ ÃáÛö «ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ", "Choose at least one screen, or clear Custom screen permissions"
@@ -250,6 +257,9 @@ Private Sub D1_2()
     LangAdd "ÊÃßÏ Ãä ÇáãÈÑãÌ ÃÕÏÑå áÑŞã ÇáÌåÇÒ ÇáÙÇåÑ İí ÇáÔÇÔÉ", "Make sure the developer issued it for the computer number shown on the screen"
     LangAdd "ÊãÊ ÇáÇÓÊÚÇÏÉ. ÓíõÛáŞ ÇáÈÑäÇãÌ ÇáÂä¡ ÇİÊÍå ãä ÌÏíÏ", "Restored. The program will close now, open it again"
     LangAdd "ÊæÌÏ ÊÚÏíáÇÊ ÛíÑ ãÍİæÙÉ. åá ÊÑíÏ ÍİÙåÇ ŞÈá ÇáÅÛáÇŞ", "There are unsaved changes. Do you want to save them before closing"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ÑÕíÏ ÇáÚãáÇÁ íõÏÎá İí ŞÓã «ÇáÚãáÇÁ»: ÑÕíÏ áßá Úãíá", "The customers balance is entered in the Customers part: one balance per customer"
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÇáÏÎæá (ÈíÇäÇÊ ÌåÇÒ äŞØÉ ÇáÈíÚ", "The Tax Authority refused the credentials (POS device data"
     LangAdd "ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ ÈåĞÇ ÇáãÓÊÎÏã (ÈÏá ÕáÇÍíÇÊ ÏæÑå", "Custom screen permissions for this user (instead of the permissions of his role"
@@ -257,9 +267,6 @@ Private Sub D1_2()
     LangAdd "İí ÇáÓÚæÏíÉ íõÕÍóøÍ ÇáãÓÊäÏ ÈÅÔÚÇÑ ÏÇÆä¡ æáÇ íõáÛì", "In Saudi Arabia a document is corrected by a credit note, not cancelled"
     LangAdd "ááÊÕÍíÍ ÓÌøá ÓäÏ ŞÈÖ äŞÏíÉ ÈÇáãÈáÛ Ëã ÓäÏ ÕÑİ ÌÏíÏ", "To correct, record a cash receipt voucher with the amount, then a new payment voucher"
     LangAdd "íæÌÏ ØáÈ ÛíÑ ãßÊãá ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáå", "There is an unfinished order from a previous session. Do you want to continue it"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÃÏÇÁ ÇáãäÏæÈíä: ÇáãÈíÚÇÊ æÇáÊÍÕíá æÇáåÏİ æÇáÚãæáÉ", "Sales rep performance: sales, collections, target and commission"
     LangAdd "ÃÛáŞ Çáãáİ æÇİÊÍå ãä ÌÏíÏ áíÙåÑ ÇáäÙÇã ÈÏæä ÃÏæÇÊ", "Close the file and open it again to start the system without the tools of"
     LangAdd "ÅáÛÇÁ ÊÑÍíá ÇáÊÍæíá æÅÚÇÏÉ ÇáÃÕäÇİ ááãÎÒä ÇáãÑÓöá", "Unpost the transfer and return the products to the sending warehouse"
@@ -280,13 +287,4 @@ Private Sub D1_3()
     LangAdd "áÊÕÍíÍ ÇáßãíÉ ÇáÂä ÇÓÊÎÏã ÇáÌÑÏ Ãæ ÇáÅÖÇİÉ/ÇáÎÕã", "To correct the quantity now use the stock count or the addition/deduction"
     LangAdd "áåĞÇ ÇáÍÓÇÈ ÍÓÇÈÇÊ ÊÇÈÚÉ. ÇÍĞİåÇ Ãæ ÇäŞáåÇ ÃæáğÇ", "This account has sub-accounts. Delete them or move them first"
     LangAdd "ãÏíÑ ÇáäÙÇã íİÊÍ ßá ÇáÔÇÔÇÊ Èßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ", "The system administrator always opens every screen with every permission"
-    LangAdd "ãÓÊäÏÇÊ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ (ÇáãŞÈæáÉ æÇáãÑİæÖÉ", "E-invoicing documents (accepted and rejected"
-    LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÕÑİ æáÇ íõÓÊáã", "This item does not track stock, so it is not issued or received"
-    LangAdd "ÅĞÇ áã Êßä Úáíå ŞíæÏ ÃáÛö «ÍÓÇÈ İÑÚí» İíå ÃæáğÇ", "If it has no entries, clear Sub-account on it first"
-    LangAdd "ÅáÛÇÁ ÇáÌÑÏ ÇáÍÇáí¿ áä ÊÊÛíÑ Ãí ßãíÉ İí ÇáãÎÒæä", "Cancel the current count? No stock quantity will change"
-    LangAdd "ÇßÊÈ ÇáãÈáÛ ãÏíäğÇ Ãæ ÏÇÆäğÇ İí ßá ÓØÑ İíå ÍÓÇÈ", "Type the amount as debit or credit in every line with an account"
-    LangAdd "ÇáÅíÕÇá ÇáÅáßÊÑæäí ÇáãÕÑí áÏæáÉ ÇáÊÔÛíá ãÕÑ İŞØ", "The Egyptian e-receipt is for the operating country Egypt only"
-    LangAdd "ÇáÑÇÊÈ æÇáÈÏáÇÊ æÇáÊÃãíäÇÊ æŞÓØ ÇáÓáİÉ áßá ãæÙİ", "Salary, allowances, social insurance and advance installment of each employee"
-    LangAdd "Çáãáİ ÇáãÎÊÇÑ áíÓ äÓÎÉ ÕÇáÍÉ ãä ÈíÇäÇÊ ÇáÈÑäÇãÌ", "The chosen file is not a valid backup of the program data"
-    LangAdd "ÈÚÏ ÇáÊÑÍíá áÇ íõÚÏóøá ÇáÑÕíÏ ÅáÇ ÈÅáÛÇÁ ÊÑÍíáå", "Once posted, a balance is changed only by unposting it"
 End Sub
