@@ -1840,6 +1840,43 @@ FROM (((StockNotes AS n INNER JOIN qryStockNoteValue AS v ON n.StockNoteID = v.S
      LEFT JOIN [@Suppliers] AS s ON n.SupplierID = s.SupplierID
 WHERE n.Status = 'POSTED'
 ORDER BY n.NoteDate"""),
+    Query("qryOrderLineNotes", "ما سُلِّم وما فُوتر من كل سطر طلبية: أسطر أذونات التسليم المرحّلة المرتبطة به (docs/62)", """
+SELECT nl.SalesOrderLineID, Sum(nl.Quantity) AS NoteQty,
+       Sum(IIf(n.Status = 'INVOICED', nl.Quantity, 0)) AS InvQty
+FROM StockNoteLines AS nl INNER JOIN StockNotes AS n ON nl.StockNoteID = n.StockNoteID
+WHERE n.Status <> 'DRAFT' AND nl.SalesOrderLineID Is Not Null
+GROUP BY nl.SalesOrderLineID"""),
+    Query("qrySalesOrderLineStatus", "كل سطر طلبية: المطلوب والمُسلَّم والمفوتر والباقي، ومخزن الطلبية وحالتها", """
+SELECT l.SalesOrderLineID, l.SalesOrderID, l.ProductID, o.WarehouseID, o.CustomerID, o.Status AS OrderStatus,
+       l.Quantity, l.UnitPrice, Nz(d.NoteQty, 0) AS DeliveredQty, Nz(d.InvQty, 0) AS InvoicedQty,
+       IIf(l.Quantity > Nz(d.NoteQty, 0), l.Quantity - Nz(d.NoteQty, 0), 0) AS RemainingQty
+FROM (SalesOrderLines AS l INNER JOIN SalesOrders AS o ON l.SalesOrderID = o.SalesOrderID)
+     LEFT JOIN qryOrderLineNotes AS d ON l.SalesOrderLineID = d.SalesOrderLineID"""),
+    Query("qryReservedStock", "الكمية المحجوزة لكل صنف في كل مخزن: باقي الطلبيات المعتمدة التي لم تُسلَّم", """
+SELECT ProductID, WarehouseID, Sum(RemainingQty) AS ReservedQty
+FROM qrySalesOrderLineStatus
+WHERE OrderStatus In ('APPROVED', 'PREPARING', 'PARTIAL') AND RemainingQty > 0
+GROUP BY ProductID, WarehouseID"""),
+    Query("ReservedStockQuery", "الأصناف المحجوزة لطلبيات العملاء: الرصيد والمحجوز والمتاح للبيع في كل مخزن", """
+SELECT r.WarehouseID, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName,
+       Nz(q.StockQty, 0) AS OnHandQty, r.ReservedQty, Nz(q.StockQty, 0) - r.ReservedQty AS FreeQty
+FROM ((qryReservedStock AS r INNER JOIN [@Warehouses] AS w ON r.WarehouseID = w.WarehouseID)
+      INNER JOIN Products AS p ON r.ProductID = p.ProductID)
+     LEFT JOIN qryWarehouseStock AS q ON (r.ProductID = q.ProductID AND r.WarehouseID = q.WarehouseID)
+ORDER BY w.WarehouseName, p.ProductName"""),
+    Query("PendingOrdersQuery", "أسطر طلبيات العملاء المفتوحة التي لم تُسلَّم كلها: الباقي وقيمته والتأخير عن الموعد", """
+SELECT o.SalesOrderID, o.OrderNumber, o.OrderDate, o.RequiredDate, o.CustomerID, c.CustomerName, r.RepName,
+       o.WarehouseID, w.WarehouseName, p.ProductCode, p.ProductName, s.Quantity, s.DeliveredQty, s.RemainingQty,
+       s.RemainingQty * s.UnitPrice AS RemainingValue,
+       IIf(o.Status = 'PARTIAL', 'مُسلَّمة جزئيًا', IIf(o.Status = 'PREPARING', 'قيد التجهيز', 'معتمدة')) AS StatusName,
+       IIf(o.RequiredDate Is Null, 0, IIf(Date() > o.RequiredDate, DateDiff('d', o.RequiredDate, Date()), 0)) AS DaysLate
+FROM ((((qrySalesOrderLineStatus AS s INNER JOIN SalesOrders AS o ON s.SalesOrderID = o.SalesOrderID)
+        INNER JOIN [@Customers] AS c ON o.CustomerID = c.CustomerID)
+       INNER JOIN [@Warehouses] AS w ON o.WarehouseID = w.WarehouseID)
+      INNER JOIN Products AS p ON s.ProductID = p.ProductID)
+     LEFT JOIN [@SalesReps] AS r ON o.SalesRepID = r.SalesRepID
+WHERE o.Status In ('APPROVED', 'PREPARING', 'PARTIAL') AND s.RemainingQty > 0
+ORDER BY o.OrderDate, o.OrderNumber"""),
     Query("qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", _stock_transfer()),
     Query("qryJournalStockNote", "أسطر قيود أذونات التسليم والاستلام (1430 و2150)", _stock_note()),
     Query("TransfersInTransitQuery", "التحويلات بين المخازن المرسلة ولم تُستلم بعد، بقيمتها وعدد أيامها بالطريق", """

@@ -527,11 +527,14 @@ class Store:
                                       (nid,)).fetchone()
         lines = self.c.execute("SELECT StockNoteLineID, ProductID, Quantity, UnitPrice FROM StockNoteLines "
                                "WHERE StockNoteID = ? ORDER BY StockNoteLineID", (nid,)).fetchall()
+        oid = self._note_order(nid)
+        if oid:
+            self.check_order_note(nid, oid)
         if kind == "DELIVERY":
             needs: Dict[int, D] = {}
             for _, pid, q, _ in lines:
                 needs[pid] = needs.get(pid, D(0)) + dec(q)
-            self.check_stock(needs)
+            self.check_stock(needs, wh, oid or 0)
         for lid, pid, q, price in lines:
             cost = self.avg(pid) if kind == "DELIVERY" else dec(price)
             self.c.execute("UPDATE StockNoteLines SET UnitCost = ? WHERE StockNoteLineID = ?", (float(cost), lid))
@@ -540,6 +543,8 @@ class Store:
             else:
                 self.apply_stock(pid, dec(q), 14, cost, "STOCK_NOTE", nid, no, recalc=True, warehouse=wh)
         self.c.execute("UPDATE StockNotes SET NoteDate = ?, Status = 'POSTED' WHERE StockNoteID = ?", (self.now, nid))
+        if oid:
+            self.sync_order(oid)
 
     def unpost_stock_note(self, nid):                                # UnpostStockNote
         kind, status = self.c.execute("SELECT NoteType, Status FROM StockNotes WHERE StockNoteID = ?", (nid,)).fetchone()
@@ -554,6 +559,8 @@ class Store:
                            (float(cur - dec(q)), float(avg), pid))
         self.c.execute("DELETE FROM InventoryTransactions WHERE ReferenceType = 'STOCK_NOTE' AND ReferenceID = ?", (nid,))
         self.c.execute("UPDATE StockNotes SET Status = 'DRAFT' WHERE StockNoteID = ?", (nid,))
+        if self._note_order(nid):
+            self.sync_order(self._note_order(nid))
 
     def invoice_note(self, nid, credit=True, charge_vat=True):       # InvoiceStockNote
         kind, party, status = self.c.execute("SELECT NoteType, IIf(NoteType = 'DELIVERY', CustomerID, SupplierID), "
@@ -575,15 +582,102 @@ class Store:
                              "WHERE Status = 'POSTED' AND StockNoteID = ?", (inv, nid))
         if cur.rowcount != 1:
             raise SimError("the note is no longer posted")
+        if self._note_order(nid):
+            self.sync_order(self._note_order(nid))
 
     def adjust(self, table, key, kid, delta):                      # AdjustBalance
         self.c.execute(f"UPDATE {table} SET CurrentBalance = CurrentBalance + ? WHERE {key} = ?",
                        (float(delta), kid))
 
-    def check_stock(self, needs: Dict[int, D]):                    # CheckStockAvailable (no override)
+    def check_stock(self, needs: Dict[int, D], warehouse=None, except_order=0):   # CheckStockAvailable (no override)
         for pid, need in needs.items():
-            if need > self.stock(pid):
-                raise SimError(f"not enough stock of product {pid}: need {need}, have {self.stock(pid)}")
+            free = self.stock(pid) - self.reserved(pid, warehouse or self.warehouse(), except_order)
+            if need > free:
+                raise SimError(f"not enough stock of product {pid}: need {need}, free {free}")
+
+    # ------------------------------------------------------------- customer orders (modSalesOrders, docs/62)
+    def reserved(self, pid, warehouse, except_order=0) -> D:          # ReservedQty
+        return dec(self.one("SELECT Sum(RemainingQty) FROM qrySalesOrderLineStatus WHERE ProductID = ? AND "
+                            "WarehouseID = ? AND OrderStatus In ('APPROVED', 'PREPARING', 'PARTIAL') AND "
+                            "SalesOrderID <> ?", pid, warehouse, except_order) or 0)
+
+    def sales_order(self, customer, warehouse, lines, required=None):  # CreateSalesOrder + its lines (pid, qty, price)
+        oid = self.insert("SalesOrders", OrderNumber=self.next_number("SALES_ORDER"), OrderDate=self.now,
+                          CustomerID=customer, WarehouseID=warehouse, RequiredDate=required, Status="DRAFT",
+                          EmployeeID=self.user)
+        for pid, q, price in lines:
+            self.insert("SalesOrderLines", SalesOrderID=oid, ProductID=pid, Quantity=float(q), UnitPrice=float(price))
+        return oid
+
+    def order_status(self, oid):
+        return self.one("SELECT Status FROM SalesOrders WHERE SalesOrderID = ?", oid)
+
+    def approve_order(self, oid):                                    # ApproveSalesOrder
+        if self.order_status(oid) != "DRAFT":
+            raise SimError("only a draft order is approved")
+        needs: Dict[int, D] = {}
+        for pid, q in self.c.execute("SELECT ProductID, Quantity FROM SalesOrderLines WHERE SalesOrderID = ?",
+                                     (oid,)).fetchall():
+            needs[pid] = needs.get(pid, D(0)) + dec(q)
+        self.check_stock(needs, self.one("SELECT WarehouseID FROM SalesOrders WHERE SalesOrderID = ?", oid), oid)
+        self.c.execute("UPDATE SalesOrders SET Status = 'APPROVED', ApprovedAt = ? WHERE SalesOrderID = ?", (self.now, oid))
+
+    def order_note(self, oid):                                       # CreateOrderDeliveryNote
+        if self.order_status(oid) not in ("APPROVED", "PREPARING", "PARTIAL"):
+            raise SimError("a delivery note is made from an open order")
+        if self.one("SELECT COUNT(*) FROM StockNotes WHERE SalesOrderID = ? AND Status = 'DRAFT'", oid):
+            raise SimError("the order has a draft delivery note")
+        cust, wh = self.c.execute("SELECT CustomerID, WarehouseID FROM SalesOrders WHERE SalesOrderID = ?",
+                                  (oid,)).fetchone()
+        nid = self.stock_note("DELIVERY", wh, cust, [])
+        self.c.execute("UPDATE StockNotes SET SalesOrderID = ? WHERE StockNoteID = ?", (oid, nid))
+        for lid, pid, q, price in self.c.execute(
+                "SELECT SalesOrderLineID, ProductID, RemainingQty, UnitPrice FROM qrySalesOrderLineStatus "
+                "WHERE SalesOrderID = ? AND RemainingQty > 0 ORDER BY SalesOrderLineID", (oid,)).fetchall():
+            self.insert("StockNoteLines", StockNoteID=nid, ProductID=pid, Quantity=q, UnitPrice=price, UnitCost=0,
+                        SalesOrderLineID=lid)
+        return nid
+
+    def check_order_note(self, nid, oid):                            # OrderNoteProblem
+        if self.order_status(oid) not in ("APPROVED", "PREPARING", "PARTIAL"):
+            raise SimError("the order of this note is not open")
+        for lid, pid, q in self.c.execute("SELECT SalesOrderLineID, ProductID, Sum(Quantity) FROM StockNoteLines "
+                                          "WHERE StockNoteID = ? AND SalesOrderLineID Is Not Null "
+                                          "GROUP BY SalesOrderLineID, ProductID", (nid,)).fetchall():
+            row = self.c.execute("SELECT SalesOrderID, ProductID, RemainingQty FROM qrySalesOrderLineStatus "
+                                 "WHERE SalesOrderLineID = ?", (lid,)).fetchone()
+            if row is None or row[0] != oid or row[1] != pid:
+                raise SimError("a note line does not match its order line")
+            if dec(q) > dec(row[2]):
+                raise SimError(f"more than what is left of the order: {q} > {row[2]}")
+
+    def sync_order(self, oid):                                       # SyncSalesOrder
+        st, prepared = self.c.execute("SELECT Status, PreparedAt FROM SalesOrders WHERE SalesOrderID = ?",
+                                      (oid,)).fetchone()
+        if st not in ("APPROVED", "PREPARING", "PARTIAL", "DELIVERED", "INVOICED"):
+            return
+        delivered, invoiced, remaining = (dec(v or 0) for v in self.c.execute(
+            "SELECT Sum(DeliveredQty), Sum(InvoicedQty), Sum(RemainingQty) FROM qrySalesOrderLineStatus "
+            "WHERE SalesOrderID = ?", (oid,)).fetchone())
+        if delivered == 0:
+            new = "PREPARING" if prepared else "APPROVED"
+        elif remaining > 0:
+            new = "PARTIAL"
+        else:
+            new = "INVOICED" if invoiced >= delivered else "DELIVERED"
+        self.c.execute("UPDATE SalesOrders SET Status = ? WHERE SalesOrderID = ?", (new, oid))
+
+    def cancel_order(self, oid):                                     # CancelSalesOrder
+        if self.order_status(oid) not in ("DRAFT", "APPROVED", "PREPARING", "PARTIAL"):
+            raise SimError("the order is delivered or cancelled")
+        if self.one("SELECT COUNT(*) FROM StockNotes WHERE SalesOrderID = ? AND Status = 'DRAFT'", oid):
+            raise SimError("the order has a draft delivery note")
+        delivered = dec(self.one("SELECT Sum(DeliveredQty) FROM qrySalesOrderLineStatus WHERE SalesOrderID = ?", oid) or 0)
+        self.c.execute("UPDATE SalesOrders SET Status = ? WHERE SalesOrderID = ?",
+                       ("CLOSED" if delivered > 0 else "CANCELLED", oid))
+
+    def _note_order(self, nid):
+        return self.one("SELECT SalesOrderID FROM StockNotes WHERE StockNoteID = ?", nid)
 
     # ------------------------------------------------------------- purchases
     def purchase(self, sid, lines, credit, paid=None, charge_vat=True, supplier_no=None,

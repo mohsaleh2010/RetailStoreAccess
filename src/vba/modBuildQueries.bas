@@ -27,10 +27,11 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     "erInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuer" & _
     "y,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint" & _
     ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryStockNoteValue,qryInvoiced" & _
-    "Notes,NotesNotInvoicedQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJour" & _
-    "nalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,Payr" & _
-    "ollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlann" & _
-    "ed,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "Notes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
+    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDep" & _
+    "Totals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCente" & _
+    "rNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,Integrity" & _
+    "CheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -816,6 +817,11 @@ Private Sub CreateAllQueries()
     Q_qryStockNoteValue
     Q_qryInvoicedNotes
     Q_NotesNotInvoicedQuery
+    Q_qryOrderLineNotes
+    Q_qrySalesOrderLineStatus
+    Q_qryReservedStock
+    Q_ReservedStockQuery
+    Q_PendingOrdersQuery
     Q_qryJournalStockTransfer
     Q_qryJournalStockNote
     Q_TransfersInTransitQuery
@@ -2730,6 +2736,63 @@ Private Sub Q_NotesNotInvoicedQuery()
     s = s & "WHERE n.Status = 'POSTED'" & vbCrLf
     s = s & "ORDER BY n.NoteDate" & vbCrLf
     SaveQuery "NotesNotInvoicedQuery", "أذونات التسليم والاستلام المرحّلة التي لم تصدر فواتيرها بعد", s
+End Sub
+
+Private Sub Q_qryOrderLineNotes()
+    Dim s As String
+    s = "SELECT nl.SalesOrderLineID, Sum(nl.Quantity) AS NoteQty," & vbCrLf
+    s = s & "       Sum(IIf(n.Status = 'INVOICED', nl.Quantity, 0)) AS InvQty" & vbCrLf
+    s = s & "FROM StockNoteLines AS nl INNER JOIN StockNotes AS n ON nl.StockNoteID = n.StockNoteID" & vbCrLf
+    s = s & "WHERE n.Status <> 'DRAFT' AND nl.SalesOrderLineID Is Not Null" & vbCrLf
+    s = s & "GROUP BY nl.SalesOrderLineID" & vbCrLf
+    SaveQuery "qryOrderLineNotes", "ما سُلِّم وما فُوتر من كل سطر طلبية: أسطر أذونات التسليم المرحّلة المرتبطة به (docs/62)", s
+End Sub
+
+Private Sub Q_qrySalesOrderLineStatus()
+    Dim s As String
+    s = "SELECT l.SalesOrderLineID, l.SalesOrderID, l.ProductID, o.WarehouseID, o.CustomerID, o.Status AS OrderStatus," & vbCrLf
+    s = s & "       l.Quantity, l.UnitPrice, Nz(d.NoteQty, 0) AS DeliveredQty, Nz(d.InvQty, 0) AS InvoicedQty," & vbCrLf
+    s = s & "       IIf(l.Quantity > Nz(d.NoteQty, 0), l.Quantity - Nz(d.NoteQty, 0), 0) AS RemainingQty" & vbCrLf
+    s = s & "FROM (SalesOrderLines AS l INNER JOIN SalesOrders AS o ON l.SalesOrderID = o.SalesOrderID)" & vbCrLf
+    s = s & "     LEFT JOIN qryOrderLineNotes AS d ON l.SalesOrderLineID = d.SalesOrderLineID" & vbCrLf
+    SaveQuery "qrySalesOrderLineStatus", "كل سطر طلبية: المطلوب والمُسلَّم والمفوتر والباقي، ومخزن الطلبية وحالتها", s
+End Sub
+
+Private Sub Q_qryReservedStock()
+    Dim s As String
+    s = "SELECT ProductID, WarehouseID, Sum(RemainingQty) AS ReservedQty" & vbCrLf
+    s = s & "FROM qrySalesOrderLineStatus" & vbCrLf
+    s = s & "WHERE OrderStatus In ('APPROVED', 'PREPARING', 'PARTIAL') AND RemainingQty > 0" & vbCrLf
+    s = s & "GROUP BY ProductID, WarehouseID" & vbCrLf
+    SaveQuery "qryReservedStock", "الكمية المحجوزة لكل صنف في كل مخزن: باقي الطلبيات المعتمدة التي لم تُسلَّم", s
+End Sub
+
+Private Sub Q_ReservedStockQuery()
+    Dim s As String
+    s = "SELECT r.WarehouseID, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName," & vbCrLf
+    s = s & "       Nz(q.StockQty, 0) AS OnHandQty, r.ReservedQty, Nz(q.StockQty, 0) - r.ReservedQty AS FreeQty" & vbCrLf
+    s = s & "FROM ((qryReservedStock AS r INNER JOIN [@Warehouses] AS w ON r.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "      INNER JOIN Products AS p ON r.ProductID = p.ProductID)" & vbCrLf
+    s = s & "     LEFT JOIN qryWarehouseStock AS q ON (r.ProductID = q.ProductID AND r.WarehouseID = q.WarehouseID)" & vbCrLf
+    s = s & "ORDER BY w.WarehouseName, p.ProductName" & vbCrLf
+    SaveQuery "ReservedStockQuery", "الأصناف المحجوزة لطلبيات العملاء: الرصيد والمحجوز والمتاح للبيع في كل مخزن", s
+End Sub
+
+Private Sub Q_PendingOrdersQuery()
+    Dim s As String
+    s = "SELECT o.SalesOrderID, o.OrderNumber, o.OrderDate, o.RequiredDate, o.CustomerID, c.CustomerName, r.RepName," & vbCrLf
+    s = s & "       o.WarehouseID, w.WarehouseName, p.ProductCode, p.ProductName, s.Quantity, s.DeliveredQty, s.RemainingQty," & vbCrLf
+    s = s & "       s.RemainingQty * s.UnitPrice AS RemainingValue," & vbCrLf
+    s = s & "       IIf(o.Status = 'PARTIAL', 'مُسلَّمة جزئيًا', IIf(o.Status = 'PREPARING', 'قيد التجهيز', 'معتمدة')) AS StatusName," & vbCrLf
+    s = s & "       IIf(o.RequiredDate Is Null, 0, IIf(Date() > o.RequiredDate, DateDiff('d', o.RequiredDate, Date()), 0)) AS DaysLate" & vbCrLf
+    s = s & "FROM ((((qrySalesOrderLineStatus AS s INNER JOIN SalesOrders AS o ON s.SalesOrderID = o.SalesOrderID)" & vbCrLf
+    s = s & "        INNER JOIN [@Customers] AS c ON o.CustomerID = c.CustomerID)" & vbCrLf
+    s = s & "       INNER JOIN [@Warehouses] AS w ON o.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "      INNER JOIN Products AS p ON s.ProductID = p.ProductID)" & vbCrLf
+    s = s & "     LEFT JOIN [@SalesReps] AS r ON o.SalesRepID = r.SalesRepID" & vbCrLf
+    s = s & "WHERE o.Status In ('APPROVED', 'PREPARING', 'PARTIAL') AND s.RemainingQty > 0" & vbCrLf
+    s = s & "ORDER BY o.OrderDate, o.OrderNumber" & vbCrLf
+    SaveQuery "PendingOrdersQuery", "أسطر طلبيات العملاء المفتوحة التي لم تُسلَّم كلها: الباقي وقيمته والتأخير عن الموعد", s
 End Sub
 
 Private Sub Q_qryJournalStockTransfer()

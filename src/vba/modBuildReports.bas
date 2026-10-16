@@ -30,8 +30,8 @@ Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
 Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptCashDayBook,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptVatReturnEG,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling," & _
-    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptStockValueByWarehouse,rptTransfersInTransit,rptNotesNotInvoiced,rptStockCountDiff,rptLowStock,rptItemCard,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets," & _
-    "rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
+    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptStockValueByWarehouse,rptTransfersInTransit,rptNotesNotInvoiced,rptPendingOrders,rptReservedStock,rptStockCountDiff,rptLowStock,rptItemCard,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual," & _
+    "rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -73,6 +73,8 @@ Public Function BuildReports() As Boolean
     BuildReport_rptStockValueByWarehouse
     BuildReport_rptTransfersInTransit
     BuildReport_rptNotesNotInvoiced
+    BuildReport_rptPendingOrders
+    BuildReport_rptReservedStock
     BuildReport_rptStockCountDiff
     BuildReport_rptLowStock
     BuildReport_rptItemCard
@@ -2466,6 +2468,127 @@ Private Sub BuildReport_rptNotesNotInvoiced()
     Exit Sub
 EH:
     AbortReport "rptNotesNotInvoiced", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptPendingOrders()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptPendingOrders", "طلبيات العملاء المفتوحة: الباقي بلا تسليم", "PendingOrdersQuery", 15536, "", "OrderDate,OrderNumber,ProductName", True, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 7768, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 7768, 28, 7768, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "طلبيات العملاء المفتوحة: الباقي بلا تسليم", 0, 397, 15536, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 15536, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 15536, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "رقم الطلبية", 0, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "التاريخ", 1361, 1292, 1191, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "موعد التسليم", 2552, 1292, 1191, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "العميل", 3743, 1292, 1928, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "المخزن", 5671, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "الصنف", 6918, 1292, 2155, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "المطلوب", 9073, 1292, 907, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol8", "المُسلَّم", 9980, 1292, 907, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol9", "الباقي", 10887, 1292, 907, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol10", "قيمة الباقي", 11794, 1292, 1304, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol11", "الحالة", 13098, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol12", "أيام التأخير", 14232, 1292, 1304, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal9", "=Sum([RemainingQty])", 10887, 85, 907, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(2, "txtTotal10", "=Sum([RemainingValue])", 11794, 85, 1304, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 15536)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 10887, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "OrderNumber", 0, 17, 1361, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=GDate([OrderDate])", 1361, 17, 1191, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "=GDate([RequiredDate])", 2552, 17, 1191, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "CustomerName", 3743, 17, 1928, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol5", "WarehouseName", 5671, 17, 1247, 284, 8, False, 0)
+    Set c = RText(0, "txtCol6", "ProductName", 6918, 17, 2155, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol7", "Quantity", 9073, 17, 907, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol8", "DeliveredQty", 9980, 17, 907, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol9", "RemainingQty", 10887, 17, 907, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol10", "RemainingValue", 11794, 17, 1304, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol11", "StatusName", 13098, 17, 1134, 284, 8, False, 0)
+    Set c = RText(0, "txtCol12", "DaysLate", 14232, 17, 1304, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا توجد طلبيات مفتوحة باقٍ منها شيء.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptPendingOrders", s
+    Exit Sub
+EH:
+    AbortReport "rptPendingOrders", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptReservedStock()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptReservedStock", "الأصناف المحجوزة للطلبيات والمتاح للبيع", "ReservedStockQuery", 10773, "", "WarehouseName,ProductName", False, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 5386, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 5386, 28, 5387, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "الأصناف المحجوزة للطلبيات والمتاح للبيع", 0, 397, 10773, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 10773, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "المخزن", 0, 1292, 1701, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "الكود", 1701, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "الصنف", 3062, 1292, 3175, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "الرصيد", 6237, 1292, 1134, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "المحجوز للطلبيات", 7371, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "المتاح للبيع", 8732, 1292, 2041, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 6463, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 6463, 57, 4310, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal4", "=Sum([OnHandQty])", 6237, 85, 1134, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(2, "txtTotal5", "=Sum([ReservedQty])", 7371, 85, 1361, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(2, "txtTotal6", "=Sum([FreeQty])", 8732, 85, 2041, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RLine(2, "lnTotals", 28, 10773)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 6237, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "WarehouseName", 0, 17, 1701, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "ProductCode", 1701, 17, 1361, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "ProductName", 3062, 17, 3175, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol4", "OnHandQty", 6237, 17, 1134, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol5", "ReservedQty", 7371, 17, 1361, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol6", "FreeQty", 8732, 17, 2041, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا توجد كميات محجوزة لطلبيات.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptReservedStock", s
+    Exit Sub
+EH:
+    AbortReport "rptReservedStock", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptStockCountDiff()

@@ -145,6 +145,20 @@ LIST_SPECS: List[ListSpec] = [
         Col("العميل / المورد", "PartyName", 4.4, grow=True), Col("القيمة بالتكلفة", "NoteValue", 2.6, MONEY, True),
         Col("أيام بلا فاتورة", "DaysOpen", 1.6, INT)],
         [("NoteDate", False), ("NoteNumber", False)], no_data="كل الأذونات المرحّلة صدرت فواتيرها."),
+    ListSpec("PENDING_ORDERS", [
+        Col("رقم الطلبية", "OrderNumber", 2.4), Col("التاريخ", "=GDate([OrderDate])", 2.1),
+        Col("موعد التسليم", "=GDate([RequiredDate])", 2.1), Col("العميل", "CustomerName", 3.4, grow=True),
+        Col("المخزن", "WarehouseName", 2.2), Col("الصنف", "ProductName", 3.8, grow=True),
+        Col("المطلوب", "Quantity", 1.6, QTY), Col("المُسلَّم", "DeliveredQty", 1.6, QTY),
+        Col("الباقي", "RemainingQty", 1.6, QTY, True), Col("قيمة الباقي", "RemainingValue", 2.3, MONEY, True),
+        Col("الحالة", "StatusName", 2.0), Col("أيام التأخير", "DaysLate", 1.4, INT)],
+        [("OrderDate", False), ("OrderNumber", False), ("ProductName", False)], landscape=True,
+        no_data="لا توجد طلبيات مفتوحة باقٍ منها شيء."),
+    ListSpec("RESERVED_STOCK", [
+        Col("المخزن", "WarehouseName", 3.0), Col("الكود", "ProductCode", 2.4),
+        Col("الصنف", "ProductName", 5.6, grow=True), Col("الرصيد", "OnHandQty", 2.0, QTY, True),
+        Col("المحجوز للطلبيات", "ReservedQty", 2.4, QTY, True), Col("المتاح للبيع", "FreeQty", 2.2, QTY, True)],
+        [("WarehouseName", False), ("ProductName", False)], no_data="لا توجد كميات محجوزة لطلبيات."),
     ListSpec("STOCK_COUNT_DIFF", [
         Col("رقم الجرد", "CountNumber", 2.4), Col("التاريخ", "=GDate([CountDate])", 2.2),
         Col("المخزن", "WarehouseName", 3.0), Col("الكود", "ProductCode", 2.3),

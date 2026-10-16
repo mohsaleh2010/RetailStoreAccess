@@ -14,9 +14,120 @@ Public Sub LangData5()
     D5_4
     D5_5
     D5_6
+    D5_7
 End Sub
 
 Private Sub D5_1()
+    LangAdd "Êã ÇáÍİÙ İí", "Saved in"
+    LangAdd "ÊäÈíå: íæÌÏ", "Warning: there are"
+    LangAdd "ÊæáíÏ ÇáßæÏ", "Generate the code"
+    LangAdd "ÌæÇá ÇáãæÑÏ", "Supplier mobile"
+    LangAdd "ÍÏ ÇáÇÆÊãÇä", "Credit limit"
+    LangAdd "ÍĞİ ÂÎÑ ÔåÑ", "Delete the last month"
+    LangAdd "ÍĞİ ÇáÌÇÑíÉ", "Delete the open one"
+    LangAdd "ÍĞİ ÇáÔíßÇÊ", "Delete cheques"
+    LangAdd "ÍĞİ ÇáãÓæÏÉ", "Delete the draft"
+    LangAdd "ÍİÙ ÇáÊÇÑíÎ", "Save date"
+    LangAdd "ÍİÙ ÇáÊÕİíÉ", "Save the closing"
+    LangAdd "ÍİÙ ÇáãÑÊÌÚ", "Save the return"
+    LangAdd "ÎÕã ÇáãÎÒæä", "Stock deduction"
+    LangAdd "ÏÇÆä ÇáİÊÑÉ", "Period credit"
+    LangAdd "ÑÕíÏ ÇáŞíãÉ", "Value balance"
+    LangAdd "ÑŞã ÇáÊÍæíá", "Transfer number"
+    LangAdd "ÑŞã ÇáÊÕİíÉ", "Closing number"
+    LangAdd "ÑŞã ÇáØÇæáÉ", "Table number"
+    LangAdd "ÑŞã ÇáØáÈíÉ", "Order number"
+    LangAdd "ÑŞã ÇáãÓÊäÏ", "Document number"
+    LangAdd "ÑŞã ÇáãÕÑæİ", "Expense number"
+    LangAdd "ÑõÍöøá ÑÕíÏ", "Posted the stock of"
+    LangAdd "ÒíÇÏÉ ÊÕİíÉ", "Closing overage"
+    LangAdd "ÓÈÈ ÇáÅÑÌÇÚ", "Return reason"
+    LangAdd "ÓÌá ÇáÊÏŞíŞ", "Audit trail"
+    LangAdd "ÓíÇÑÉ ãäÏæÈ", "Sales rep van"
+    LangAdd "ÔÇÑÚ ÇáÚãíá", "Customer street"
+    LangAdd "ÔåÑğÇ ãÓÌáÉ", "months recorded"
+    LangAdd "ÕÇİí ÇáãÈÇÚ", "Net sold"
+    LangAdd "ÕÑİ ÇáÑæÇÊÈ", "Salary payment"
+    LangAdd "ÕÑİ æÇÓÊáÇã", "Issue and receipt"
+    LangAdd "ÕäÏæŞ ßÇÔíÑ", "Cashier box"
+    LangAdd "ÕæÑÉ ÇáãäÊÌ", "Product picture"
+    LangAdd "ØÈÇÚÉ ÇáÌÑÏ", "Print the count"
+    LangAdd "ØÈÇÚÉ ÇáÓÌá", "Print the log"
+    LangAdd "ØÈÇÚÉ ÇáÓäÏ", "Print the voucher"
+    LangAdd "ØÈÇÚÉ ÇáŞíÏ", "Print the entry"
+    LangAdd "ØÑíŞÉ ÇáÏİÚ", "Payment method"
+    LangAdd "ØáÈíÉ ÌÏíÏÉ", "New order"
+    LangAdd "ÚÑÖ ÇáÊŞÑíÑ", "Show the report"
+    LangAdd "İÇÊæÑÉ ÔÑÇÁ", "Purchase invoice"
+    LangAdd "ŞÇÆãÉ ÇáÏÎá", "Income statement"
+    LangAdd "ŞÈá ÇáÊİÚíá", "Before enabling"
+    LangAdd "ŞÈá ÇáÖÑíÈÉ", "before VAT"
+    LangAdd "ŞíÏ ÇáÊÌåíÒ", "Being prepared"
+    LangAdd "ŞíÏ ÇáÊÓæíÉ", "Settlement entry"
+    LangAdd "ŞíÏ ÇáíæãíÉ", "Journal entry"
+    LangAdd "ŞíÏ ÌÏíÏ¡ æ", "new entries, and"
+    LangAdd "ŞíãÉ ÇáÈÇŞí", "Remaining value"
+    LangAdd "ŞíãÉ ÇáæÇÑÏ", "Value in"
+    LangAdd "ßá ÇáÕäÇÏíŞ", "All boxes"
+    LangAdd "ßá ÇáÚãáíÇÊ", "All transactions"
+    LangAdd "ßá ÇáãäÊÌÇÊ", "All products"
+    LangAdd "ßáãÉ ÇáãÑæÑ", "Password"
+    LangAdd "ßæÏ ÇáÊİÚíá", "Activation code"
+    LangAdd "ßæÏ ÇáãäÏæÈ", "Sales rep code"
+    LangAdd "áæÍÉ ÇáÊÍßã", "Dashboard"
+    LangAdd "ãÈáÛ ÇáÃÓÇÓ", "Base amount"
+    LangAdd "ãÈáÛ ÇáÍÑßÉ", "Move amount"
+    LangAdd "ãËÇá: 25 Ãæ", "Example: 25 or"
+    LangAdd "ãÏÉ ÇáÊßÑÇÑ", "Repeats"
+    LangAdd "ãÏì / ÈØÇŞÉ", "Mada / card"
+    LangAdd "ãÏíä ÇáİÊÑÉ", "Period debit"
+    LangAdd "ãÏíäÉ ÇáãÍá", "Store city"
+    LangAdd "ãÓÇÑ ÇáÔÚÇÑ", "Logo path"
+    LangAdd "ãÓÍ ÇáŞÇÆãÉ", "Clear the list"
+    LangAdd "ãÕÏÑ ÇáÔÑÇÁ", "Purchase source"
+    LangAdd "ãßÇä ÇáãäÊÌ", "Product location"
+    LangAdd "ãäÎİÖ: ÇáÍÏ", "Low: level"
+    LangAdd "äÊíÌÉ ÇáØáÈ", "Request result"
+    LangAdd "äæÚ ÇáÚãáíÉ", "Transaction type"
+    LangAdd "äæÚ ÇáãÓÊäÏ", "Document type"
+    LangAdd "äæÚ ÇáãÕÑæİ", "Expense type"
+    LangAdd "æÖÚ ÇáãØæøÑ", "Developer mode"
+    LangAdd "íõÍÊİÙ ÈÂÎÑ", "Keeps the last"
+    LangAdd "ÂÎÑ İÇÊæÑÉ", "Last invoice"
+    LangAdd "ÃÓØÑ ÇáÌÑÏ", "Count lines"
+    LangAdd "ÃÓØÑ ÇáØáÈ", "Order lines"
+    LangAdd "ÃŞÕì ÊÃÎíÑ", "Longest delay"
+    LangAdd "ÃŞİá ÇáÓäÉ", "Close the year"
+    LangAdd "ÅÑÌÇÚ Çáßá", "Return all"
+    LangAdd "ÅÔÚÇÑ ÏÇÆä", "Credit note"
+    LangAdd "ÅŞİÇá İÊÑÉ", "Close a period"
+    LangAdd "ÅáÛÇÁ Çáßá", "Clear all"
+    LangAdd "ÅåáÇß ÓÇÈŞ", "Previous depreciation"
+    LangAdd "ÇÎÊÑ ÇáÈäß", "Choose the bank"
+    LangAdd "ÇÎÊÑ ÇáÌåÉ", "Choose the party"
+    LangAdd "ÇÎÊÑ ÇáÏæÑ", "Choose the role"
+    LangAdd "ÇÎÊÑ ÇáÓäÏ", "Choose the voucher"
+    LangAdd "ÇÎÊÑ ÇáÔåÑ", "Choose the month"
+    LangAdd "ÇÎÊÑ ÇáÔíß", "Choose the cheque"
+    LangAdd "ÇÎÊÑ ÇáÕäİ", "Choose the item"
+    LangAdd "ÇÓÊáãäÇ ãä", "Received from"
+    LangAdd "ÇÓÊíÑÇÏ ãä", "Import from"
+    LangAdd "ÇÓã ÇáÍÓÇÈ", "Account name"
+    LangAdd "ÇÓã ÇáÚãáÉ", "Currency name"
+    LangAdd "ÇÓã ÇáÚãíá", "Customer name"
+    LangAdd "ÇÓã ÇáãÎÒä", "Warehouse name"
+    LangAdd "ÇÓã ÇáãÑßÒ", "Center name"
+    LangAdd "ÇÓã ÇáãäÊÌ", "Product name"
+    LangAdd "ÇÓã ÇáãæÑÏ", "Supplier name"
+    LangAdd "ÇÓã ÇáãæÙİ", "Employee name"
+    LangAdd "ÇÓã ÇáæÍÏÉ", "Unit name"
+    LangAdd "ÇßÊÈ ÇáÓäÉ", "Type the year"
+    LangAdd "ÇßÊÈ ÊÇÑíÎ", "Type the date"
+    LangAdd "ÇáÚãÑ (ÔåÑ", "Life (months"
+    LangAdd "ÇáİÊÑÉ: ãä", "Period: from"
+    LangAdd "ÇáİÑŞ (ÕİÑ", "Difference (zero"
+    LangAdd "ÇáãÓÊÎÏãæä", "Users"
+    LangAdd "ÈÍË ÈÇáÇÓã", "Search by name"
     LangAdd "ÈÏáÇÊ ÃÎÑì", "Other allowances"
     LangAdd "ÈÏæä ÖÑíÈÉ", "Without VAT"
     LangAdd "ÈÏæä ØÈÇÚÉ", "No printing"
@@ -27,6 +138,9 @@ Private Sub D5_1()
     LangAdd "ÊÍæíá æÇÑÏ", "Incoming transfer"
     LangAdd "ÊÚĞÑ ÇáÍİÙ", "Could not save"
     LangAdd "Êã ÇáÅÑÓÇá", "Sent"
+End Sub
+
+Private Sub D5_2()
     LangAdd "Êã ÇáÅáÛÇÁ", "Cancelled"
     LangAdd "ÊãÊ ÇáÎØæÉ", "Step done:"
     LangAdd "ËãÇäíÉ ÚÔÑ", "eighteen"
@@ -126,6 +240,7 @@ Private Sub D5_1()
     LangAdd "ÇáãÕÑæİÇÊ", "Expenses"
     LangAdd "ÇáãŞÈæÖÇÊ", "Receipts"
     LangAdd "ÇáãäÏæÈíä", "Sales reps"
+    LangAdd "ÇáãõÓáóøã", "Delivered"
     LangAdd "ÈÏá ÇáÓßä", "Housing allowance"
     LangAdd "ÈÏá ÇáäŞá", "Transport allowance"
     LangAdd "ÈÚÏ Çáíæã", "after today"
@@ -137,9 +252,6 @@ Private Sub D5_1()
     LangAdd "Ëãä ÇáÈíÚ", "Sale price"
     LangAdd "Ìäíå ãÕÑí", "Egyptian pound"
     LangAdd "ÍĞİ ÇáŞíÏ", "Delete the entry"
-End Sub
-
-Private Sub D5_2()
     LangAdd "ÍÑßÉ ãäÊÌ", "Product moves"
     LangAdd "ÍİÙ ÇáÃÕá", "Save the asset"
     LangAdd "ÍİÙ ÇáÓäÏ", "Save the voucher"
@@ -149,6 +261,9 @@ Private Sub D5_2()
     LangAdd "Íí ÇáÚãíá", "Customer district"
     LangAdd "ÍõÏöøË İí", "Updated on"
     LangAdd "ÎÕã ÇáÓØÑ", "Line discount"
+End Sub
+
+Private Sub D5_3()
     LangAdd "ÎÕã ÇáÓáİ", "Advance deductions"
     LangAdd "ÏÎæá ÎÇØÆ", "Wrong login"
     LangAdd "ÑÕíÏ ÏÇÆä", "Credit balance"
@@ -260,9 +375,6 @@ Private Sub D5_2()
     LangAdd "ÓäÏ ÌÏíÏ", "New voucher"
     LangAdd "ÔÑÇÁ ÂÌá", "Credit purchase"
     LangAdd "ÔåÑ ÌÏíÏ", "New month"
-End Sub
-
-Private Sub D5_3()
     LangAdd "Ôíß ÕÇÏÑ", "Issued cheque"
     LangAdd "Ôíß ãÑÊÏ", "Bounced cheque"
     LangAdd "Ôíß æÇÑÏ", "Received cheque"
@@ -272,6 +384,9 @@ Private Sub D5_3()
     LangAdd "ØáÈ ÓİÑí", "Takeaway order"
     LangAdd "ÛíÑ ÕÇáÍ", "Invalid"
     LangAdd "ÛíÑ ãÓÏÏ", "Unpaid"
+End Sub
+
+Private Sub D5_4()
     LangAdd "ÛíÑ ãæÒÚ", "Not allocated"
     LangAdd "İÚáí ÓäÉ", "Actuals of year"
     LangAdd "İß ÇáŞİá", "Unlock"
@@ -289,6 +404,7 @@ Private Sub D5_3()
     LangAdd "ãä ÇáÈäß", "From the bank"
     LangAdd "ãä ÊÇÑíÎ", "From date"
     LangAdd "ãä ÕäÏæŞ", "From a box"
+    LangAdd "ãõÓáóøãÉ", "Delivered"
     LangAdd "äæÚ ÌÏíÏ", "New type"
     LangAdd "æÇáãÊæİÑ", "and available"
     LangAdd "æÑŞÉ ÌÑÏ", "Count sheet"
@@ -339,6 +455,7 @@ Private Sub D5_3()
     LangAdd "ÇáÖÑíÈÉ", "VAT"
     LangAdd "ÇáØÇÈÚÉ", "Printer"
     LangAdd "ÇáØÑíŞÉ", "Method"
+    LangAdd "ÇáØáÈíÉ", "Order"
     LangAdd "ÇáÚãáÇÁ", "Customers"
     LangAdd "ÇáÚãáÇÊ", "Currencies"
     LangAdd "ÇáÚãáíÉ", "Transaction"
@@ -383,9 +500,6 @@ Private Sub D5_3()
     LangAdd "ÓÊÉ ÚÔÑ", "sixteen"
     LangAdd "ÓØÑ ŞíÏ", "Entry line"
     LangAdd "ÓäÏ ÕÑİ", "Payment voucher"
-End Sub
-
-Private Sub D5_4()
     LangAdd "ÓäÏ ŞÈÖ", "Receipt voucher"
     LangAdd "ÕÑİ ÂÎÑ", "Other payment"
     LangAdd "ÕÑİ Ôíß", "Cheque payment"
@@ -393,6 +507,9 @@ Private Sub D5_4()
     LangAdd "ÛíÑ äÔØ", "is not active"
     LangAdd "İí ÔÇÔÉ", "in the screen"
     LangAdd "áÇ ÊæÌÏ", "None"
+End Sub
+
+Private Sub D5_5()
     LangAdd "ááÅÖÇİÉ", "to add"
     LangAdd "áã ÊÌÊÒ", "Failed:"
     LangAdd "ãÊæÇÒäÉ", "Balanced"
@@ -417,6 +534,7 @@ Private Sub D5_4()
     LangAdd "ÇÚÊãÏå", "Approved by"
     LangAdd "ÇáÃÓÇÓ", "Base"
     LangAdd "ÇáÃÕæá", "Assets"
+    LangAdd "ÇáÈÇŞí", "Remaining"
     LangAdd "ÇáÈäæß", "Banks"
     LangAdd "ÇáÈíÆÉ", "Environment"
     LangAdd "ÇáÈíÇä", "Description"
@@ -497,6 +615,7 @@ Private Sub D5_4()
     LangAdd "ãÚÇíäÉ", "Preview"
     LangAdd "ãÚÊãÏÉ", "Approved"
     LangAdd "ãİÊæÍÉ", "Open"
+    LangAdd "ãİæÊÑÉ", "Invoiced"
     LangAdd "ãßÇİÂÊ", "Bonuses"
     LangAdd "ãáÇííä", "million"
     LangAdd "ããäæÍÉ", "Granted"
@@ -506,14 +625,14 @@ Private Sub D5_4()
     LangAdd "ãõÑÍøá", "Posted"
     LangAdd "äæİãÈÑ", "November"
     LangAdd "ÃÈÑíá", "April"
-End Sub
-
-Private Sub D5_5()
     LangAdd "ÃÑÈÚÉ", "four"
     LangAdd "ÃÚÏøå", "Prepared by"
     LangAdd "ÃÛÓØÓ", "August"
     LangAdd "ÃáİÇä", "two thousand"
     LangAdd "ÃæáåÇ", "the first on"
+End Sub
+
+Private Sub D5_6()
     LangAdd "ÃõÑÓá", "Sent"
     LangAdd "ÃõÖíİ", "Added"
     LangAdd "ÅÖÇİÉ", "Add"
@@ -606,10 +725,12 @@ Private Sub D5_5()
     LangAdd "ãØÇÈŞ", "Matched"
     LangAdd "ãØáæÈ", "is required"
     LangAdd "ãÚÊãÏ", "Approved"
+    LangAdd "ãÛáŞÉ", "Closed"
     LangAdd "ãİÊæÍ", "Open"
     LangAdd "ãŞÈæÖ", "Received"
     LangAdd "ãŞİáÉ", "Closed"
     LangAdd "ãáÇÆã", "Suitable"
+    LangAdd "ãáÛÇÉ", "Cancelled"
     LangAdd "ãáíæä", "million"
     LangAdd "ãäÎİÖ", "Low"
     LangAdd "ãäÕÑİ", "Out"
@@ -629,12 +750,12 @@ Private Sub D5_5()
     LangAdd "ÃÕæá", "Assets"
     LangAdd "ÃíÇã", "Days"
     LangAdd "ÇÍÓÈ", "Calculate"
-End Sub
-
-Private Sub D5_6()
     LangAdd "ÇÎÊÑ", "Choose"
     LangAdd "ÇáÍÏ", "limit"
     LangAdd "ÇáÍí", "District"
+End Sub
+
+Private Sub D5_7()
     LangAdd "Çáßá", "All"
     LangAdd "ÈËãä", "for a price"
     LangAdd "ÈÏæä", "None"

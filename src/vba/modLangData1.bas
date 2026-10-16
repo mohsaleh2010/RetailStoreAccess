@@ -46,6 +46,7 @@ Private Sub D1_1()
     LangAdd "الموجب مستحق للهيئة، والسالب رصيد مسترد. راجع الأرقام مع محاسبك قبل تقديم الإقرار", "A positive amount is due to the Authority, a negative one is a refundable balance. Review the figures with your accountant before filing the return"
     LangAdd "عمليات في فترة مقفلة تغيرت ولم يتغير قيدها (أعد فتح الفترة إن كان التغيير مقصودًا", "Transactions in a closed period that changed while their entry did not (reopen the period if the change is intended"
     LangAdd "مسير كل شهر من مبيعات المندوبين أو تحصيلاتهم، ثم ترحيل قيده؛ الصرف بسند صرف نقدية", "A run each month from the sales or collections of the sales reps, then posting its entry, payment with a cash payment voucher"
+    LangAdd "اعتماد» يحجز الكمية في المخزن، ثم «إذن التسليم» من الطلبية، ثم الفاتورة من الإذن", "Approve reserves the quantities in the warehouse, then a delivery note from the order, then the invoice from the note"
     LangAdd "التأمينات على الأساسي + السكن: السعودي بحصتي الموظف والمنشأة، وغيره بحصة المنشأة", "Social insurance on basic + housing: Saudis with the employee and employer shares, others with the employer share"
     LangAdd "رصيد كل حساب عام يوم بدء التشغيل: رأس المال، والقروض، والمستحقات، والأصول الأخرى", "The balance of each general account on the start-up day: capital, loans, accruals and other assets"
     LangAdd "لا توجد ضريبة مستحقة للسداد في هذا الإقرار (الرصيد الدائن يُرحَّل للإقرار التالي", "There is no VAT due for payment in this return (the credit balance is carried to the next return"
@@ -113,6 +114,7 @@ Private Sub D1_1()
     LangAdd "تحويلات بين الصناديق تنتظر تأكيد الاستلام من أمين الصندوق المستلم", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
     LangAdd "تم حفظ نسب التأمينات. تُطبَّق على المسودات عند تعديلها أو ترحيلها", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
     LangAdd "سُجّل الجهاز في بيئة أخرى. سجّله في البيئة الحالية من إعداد الربط", "The device was registered in another environment. Register it in the current one from the connection setup"
+    LangAdd "صدرت من الطلبية أذونات تسليم. احذف المسودات منها، أو ألغِ الطلبية", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
     LangAdd "يُنشأ المصروف في يوم الاستحقاق من كل فترة، بدءًا من تاريخ البداية", "The expense is created on the due day of each period, starting from the start date"
     LangAdd "الاستيرادات الخاضعة للنسبة الأساسية والمدفوعة ضريبتها في الجمارك", "Imports subject to the standard rate with VAT paid at customs"
     LangAdd "لا يوجد حساب مبرمج بعد. شغّل BuildSchema: يطلب كلمة مروره وينشئه", "There is no developer account yet. Run BuildSchema: it asks for its password and creates it"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "صدرت فاتورة هذا الإذن، فلا يُلغى ترحيله. اعمل مرتجعًا للفاتورة", "This note is invoiced and cannot be unposted. Make a return of the invoice"
     LangAdd "قيد إهلاك كل شهر بالترتيب: مصروف الإهلاك ومجمع الإهلاك لكل أصل", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
     LangAdd "لا يوجد إذن. اختر النوع والمخزن والعميل أو المورد ثم «إذن جديد", "No note. Choose the type, the warehouse and the customer or supplier, then New note"
-    LangAdd "لم يُدخل الرقم الضريبي، ولن تكون الفواتير فواتير ضريبية نظامية", "The VAT number is not entered, and the invoices will not be valid tax invoices"
-    LangAdd "معامل كل عملة في تاريخ؛ المستند يأخذ آخر سعر في تاريخه أو قبله", "The rate of each currency on a date, a document takes the last rate on or before its date"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "لم يُدخل الرقم الضريبي، ولن تكون الفواتير فواتير ضريبية نظامية", "The VAT number is not entered, and the invoices will not be valid tax invoices"
+    LangAdd "معامل كل عملة في تاريخ؛ المستند يأخذ آخر سعر في تاريخه أو قبله", "The rate of each currency on a date, a document takes the last rate on or before its date"
     LangAdd "منصة فاتورة للمنشآت في السعودية فقط (دولة التشغيل في الإعدادات", "The Fatoora platform is for businesses in Saudi Arabia only (operating country in the settings"
     LangAdd "يُفضَّل الجرد والمحل مغلق أو بعد آخر فاتورة، ثم الترحيل مباشرة", "Count preferably while the store is closed or after the last invoice, then post at once"
     LangAdd "التي ليس لها حركات، و«قالب Excel» يصدّرها لتملأها ثم تستوردها", "that have no moves, and Excel template exports them for you to fill and import"
@@ -215,6 +217,9 @@ Private Sub D1_2()
     LangAdd "تم حفظ صلاحيات الشاشات. تسري من الدخول التالي للمستخدم", "The screen permissions were saved. They apply from the next login of the user"
     LangAdd "حساب النوع: القسم 5640، الصالة 1420، الهالك 5250، أخرى", "account of the type: department 5640, hall 1420, waste 5250, other"
     LangAdd "سطرًا: كمية غير صحيحة، أو صنف له حركات، أو رصيده مرحّل", "lines: a wrong quantity, an item with moves, or a balance already posted"
+    LangAdd "طلبية هذا الإذن ليست مفتوحة للتسليم (مُسلَّمة أو ملغاة", "The order of this note is not open for delivery (delivered or cancelled"
+    LangAdd "للطلبية إذن تسليم لم يُرحَّل. افتحه من «أذونات الطلبية", "The order has a delivery note not posted yet. Open it from Order notes"
+    LangAdd "هذا الصنف لا يتابع المخزون، فلا يُحجز ولا يُسلَّم بإذن", "This product does not track stock, so it is not reserved or delivered with a note"
     LangAdd "يعمل البرنامج على الأجهزة المفعّلة فقط بكود من المبرمج", "The program runs only on computers activated with a code from the developer"
     LangAdd "اختر سطر قيد من القائمة (سطر رصيد أول المدة ليس قيدًا", "Choose an entry line from the list (the opening balance line is not an entry"
     LangAdd "الحساب مقفل مؤقتًا بسبب محاولات دخول خاطئة حتى الساعة", "The account is locked for a while after wrong login attempts, until"
@@ -252,20 +257,24 @@ Private Sub D1_2()
     LangAdd "هل تريد إلغاء الفاتورة الحالية والبدء بفاتورة جديدة", "Do you want to cancel the current invoice and start a new one"
     LangAdd "اختر فاتورة الشراء ثم حدد الكميات التي تعود للمورد", "Choose the purchase invoice, then set the quantities going back to the supplier"
     LangAdd "البيع الآجل يحتاج عميلًا مسجلًا. اختر العميل أولًا", "A credit sale needs a registered customer. Choose the customer first"
+End Sub
+
+Private Sub D1_3()
     LangAdd "التحويلات البنكية في الفواتير والسندات تُقيَّد فيه", "Bank transfers in invoices and vouchers are recorded in it"
     LangAdd "المبالغ لا تكون سالبة: اكتب المبلغ في الجانب الآخر", "Amounts are never negative: type the amount on the other side"
     LangAdd "تأكد أن المبرمج أصدره لرقم الجهاز الظاهر في الشاشة", "Make sure the developer issued it for the computer number shown on the screen"
     LangAdd "تمت الاستعادة. سيُغلق البرنامج الآن، افتحه من جديد", "Restored. The program will close now, open it again"
     LangAdd "توجد تعديلات غير محفوظة. هل تريد حفظها قبل الإغلاق", "There are unsaved changes. Do you want to save them before closing"
-End Sub
-
-Private Sub D1_3()
+    LangAdd "تُحذف المسودة فقط. ألغِ الطلبية المعتمدة بدل حذفها", "Only a draft is deleted. Cancel an approved order instead"
+    LangAdd "تُعدَّل أسطر المسودة فقط. أعد الطلبية لمسودة أولًا", "Only the lines of a draft are changed. Return the order to draft first"
     LangAdd "رصيد العملاء يُدخل في قسم «العملاء»: رصيد لكل عميل", "The customers balance is entered in the Customers part: one balance per customer"
     LangAdd "رفضت المصلحة بيانات الدخول (بيانات جهاز نقطة البيع", "The Tax Authority refused the credentials (POS device data"
     LangAdd "صلاحيات شاشات خاصة بهذا المستخدم (بدل صلاحيات دوره", "Custom screen permissions for this user (instead of the permissions of his role"
     LangAdd "ضريبة المبيعات ناقص الضريبة القابلة للخصم عن الشهر", "Output VAT less deductible input VAT of the month"
     LangAdd "في السعودية يُصحَّح المستند بإشعار دائن، ولا يُلغى", "In Saudi Arabia a document is corrected by a credit note, not cancelled"
+    LangAdd "لا توجد طلبية. اختر العميل والمخزن ثم «طلبية جديدة", "No order. Choose the customer and the warehouse, then New order"
     LangAdd "للتصحيح سجّل سند قبض نقدية بالمبلغ ثم سند صرف جديد", "To correct, record a cash receipt voucher with the amount, then a new payment voucher"
+    LangAdd "للطلبية إذن تسليم لم يُرحَّل. رحّله أو احذفه أولًا", "The order has a delivery note not posted yet. Post it or delete it first"
     LangAdd "يوجد طلب غير مكتمل من جلسة سابقة. هل تريد استكماله", "There is an unfinished order from a previous session. Do you want to continue it"
     LangAdd "أداء المندوبين: المبيعات والتحصيل والهدف والعمولة", "Sales rep performance: sales, collections, target and commission"
     LangAdd "أغلق الملف وافتحه من جديد ليظهر النظام بدون أدوات", "Close the file and open it again to start the system without the tools of"
@@ -277,14 +286,4 @@ Private Sub D1_3()
     LangAdd "تُحفظ قيمه كما هي الآن، ويُنشأ قيد التسوية بتاريخ", "Its values are kept as they are now, and the settlement entry is created on"
     LangAdd "صُرف له جزء من هذه العمولات. ألغِ سند الصرف أولًا", "Part of these commissions was paid to him. Cancel the payment voucher first"
     LangAdd "لا تملك صلاحية الحذف في شاشة ربط السداد بالفواتير", "You do not have the permission to delete in the payment matching screen"
-    LangAdd "لا يمكن حذف هذا السجل لأنه مستخدم في عمليات سابقة", "This record cannot be deleted because it is used in earlier transactions"
-    LangAdd "مبيعات هذا المستخدم لعميل بلا مندوب تُنسب للمندوب", "The sales of this user to a customer without a sales rep go to the sales rep"
-    LangAdd "من يصرف من كل صندوق ويصفّيه ويستلم التحويلات إليه", "Who pays from each box, closes it and receives the transfers to it"
-    LangAdd "يُعتمد الإقرار بعد انتهاء فترته: اختر تاريخًا بعد", "The return is approved after its period ends: choose a date after"
-    LangAdd "الصغير؛ سعر الوسط أو الكبير يجعل للمشروب أحجامًا", "small, a medium or large price gives the drink sizes"
-    LangAdd "الهدف الشهري لصافي مبيعات كل مندوب (بدون الضريبة", "The monthly target for the net sales of each sales rep (without VAT"
-    LangAdd "غير متاح في ملف ACCDE. غيّر كلمة المرور من نسختك", "Not available in an ACCDE file. Change the password from your copy"
-    LangAdd "لتصحيح الكمية الآن استخدم الجرد أو الإضافة/الخصم", "To correct the quantity now use the stock count or the addition/deduction"
-    LangAdd "لهذا الحساب حسابات تابعة. احذفها أو انقلها أولًا", "This account has sub-accounts. Delete them or move them first"
-    LangAdd "مدير النظام يفتح كل الشاشات بكل الصلاحيات دائمًا", "The system administrator always opens every screen with every permission"
 End Sub

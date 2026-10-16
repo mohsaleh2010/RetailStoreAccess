@@ -114,6 +114,8 @@ class ReplayTests(unittest.TestCase):
                     continue                          # needs a second warehouse that confirms receipts (not demo data)
                 if rep.key == "NOTES_NOT_INVOICED":
                     continue                          # needs a delivery or receipt note (not demo data)
+                if rep.key in ("PENDING_ORDERS", "RESERVED_STOCK"):
+                    continue                          # needs an approved customer order (not demo data)
                 if rep.key == "AUDIT_TRAIL":
                     continue                          # written by the screens in Access, not by the replay
                 self.assertGreater(rows, 0, rep.query)

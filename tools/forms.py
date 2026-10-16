@@ -296,7 +296,8 @@ DATA_SCREENS: List[DataScreen] = [
         seq="SALES_REP:RepCode", unique=["RepCode", "RepName"],
         extra_buttons=[("btnTargets", "الأهداف", 'OpenScreen "frmRepTargets", 0'),
                        ("btnCommissions", "العمولات", 'OpenScreen "frmCommissions", 0'),
-                       ("btnRepReport", "أداء المندوبين", 'OpenScreen "frmReportCenter", 0, "REP_PERFORMANCE"')],
+                       ("btnRepReport", "أداء المندوبين", 'OpenScreen "frmReportCenter", 0, "REP_PERFORMANCE"'),
+                       ("btnOrders", "طلبيات العملاء", 'OpenScreen "frmSalesOrder"')],
         fields=[
             Fld("RepCode", hint="يُولَّد تلقائيًا إذا تُرك فارغًا"), Fld("Mobile"),
             Fld("RepName", span=2), Fld("RepNameEn", span=2),
@@ -639,7 +640,7 @@ SCREEN_PERMISSIONS = {
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX", "frmCashBoxUsers": "CASH_ALL_BOXES",
     "frmCashTransfers": "CASH_CLOSING", "frmWarehouses": "PRODUCTS",
     "frmStockTransfer": "STOCK_TRANSFER", "frmStockParties": "STOCK_DOCS", "frmStockDocument": "STOCK_DOCS",
-    "frmStockNote": "STOCK_NOTES",
+    "frmStockNote": "STOCK_NOTES", "frmSalesOrder": "SALES_ORDERS",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
     "frmPeriodClosing": "PERIOD_CLOSE", "frmFiscalPeriods": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN", "frmOpeningBalances": "OPENING_BALANCES",
@@ -738,6 +739,10 @@ REPORTS: List[ReportEntry] = [
                 "rptTransfersInTransit"),
     ReportEntry("NOTES_NOT_INVOICED", "أذونات التسليم والاستلام التي لم تُفوتر", "NotesNotInvoicedQuery",
                 "rptNotesNotInvoiced", "w"),
+    ReportEntry("PENDING_ORDERS", "طلبيات العملاء المفتوحة: الباقي بلا تسليم", "PendingOrdersQuery",
+                "rptPendingOrders", "Dcw", "OrderDate"),
+    ReportEntry("RESERVED_STOCK", "الأصناف المحجوزة للطلبيات والمتاح للبيع", "ReservedStockQuery",
+                "rptReservedStock", "w"),
     ReportEntry("STOCK_COUNT_DIFF", "فروقات الجرد المرحّلة لكل مخزن", "StockCountDiffQuery", "rptStockCountDiff",
                 "Dw", "CountDate"),
     ReportEntry("LOW_STOCK", "المنتجات منخفضة المخزون", "LowStockQuery", "rptLowStock"),
@@ -1365,9 +1370,10 @@ def all_forms() -> List[FormModel]:
     from forms_names import names_forms
     from forms_einvoice import einvoice_forms, layout_eta_setup, layout_zatca_setup
     from forms_opening import opening_forms
+    from forms_orders import order_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
             + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms()
             + audit_forms() + sales_rep_forms() + names_forms() + einvoice_forms() + [layout_zatca_setup(), layout_eta_setup()]
-            + opening_forms())
+            + opening_forms() + order_forms())

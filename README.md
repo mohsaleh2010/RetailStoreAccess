@@ -83,6 +83,7 @@
 | + | جهات الصرف والاستلام المخزني (قسم، صالة إنتاج، هالك، أخرى) وسندات الصرف والاستلام وقيودها | ✅ تمت الموافقة | [docs/59-Stock-Issue-Receipt.md](docs/59-Stock-Issue-Receipt.md) |
 | + | كارت الصنف بالكمية والقيمة لكل مخزن، وتقييم المخزون لكل مخزن، والتحويلات بالطريق، وفروقات الجرد، وجرد مفتوح لكل مخزن | ✅ تمت الموافقة | [docs/60-Item-Card-Warehouse-Reports.md](docs/60-Item-Card-Warehouse-Reports.md) |
 | + | إذن التسليم للعملاء وإذن الاستلام من الموردين مربوطان بالفواتير (المخزون يتحرك مرة واحدة، والحسابان 1430 و2150) | ✅ تمت الموافقة | [docs/61-Delivery-Receipt-Notes.md](docs/61-Delivery-Receipt-Notes.md) |
+| + | طلبيات العملاء: الاعتماد يحجز الكمية في المخزن، والتجهيز، والتسليم بأذونات من الطلبية كليًا أو جزئيًا ثم الفوترة، والإلغاء، وتقريرا الطلبيات المفتوحة والمحجوز | ✅ بانتظار الموافقة | [docs/62-Sales-Orders.md](docs/62-Sales-Orders.md) |
 
 ## هيكل المستودع
 
@@ -190,6 +191,7 @@
 | 54 | `modStockDocs` (دائمة، جديدة)، واستبدال `modJournal` و`modVat` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestStockDocs`, `TestJournal` |
 | 55 | استبدال `modScreens` و`modPurchases` و`modPurchaseScreens` و`modWarehouses` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildQueries`, `BuildForms`, `BuildReports` | `TestStockReports`, `TestWarehouses` |
 | 56 | `modStockNotes` (دائمة، جديدة)، واستبدال `modSales` و`modPurchases` و`modJournal` و`modVat` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestStockNotes`, `TestSales`, `TestPurchases`, `TestJournal` |
+| 57 | `modSalesOrders` (دائمة، جديدة)، واستبدال `modSales` و`modStockNotes` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestSalesOrders`, `TestStockNotes`, `TestSales` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

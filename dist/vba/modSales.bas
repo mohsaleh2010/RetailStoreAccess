@@ -760,11 +760,13 @@ Public Function ProductTracksStock(ByVal ProductID As Long) As Boolean
 End Function
 
 Public Function CheckStockAvailable(ByRef ProductIDs() As Long, ByRef Qtys() As Currency, ByVal n As Long, _
-                                    ByVal Operation As String, Optional ByVal WarehouseID As Long = 0) As String
+                                    ByVal Operation As String, Optional ByVal WarehouseID As Long = 0, _
+                                    Optional ByVal SalesOrderID As Long = 0) As String
     ' Sums the quantities per product and compares them with the stock of the warehouse (0 = the user's,
-    ' modWarehouses). Taking out more than the stock needs the AllowNegativeStock setting or an
-    ' administrator's approval.
-    Dim i As Long, j As Long, need As Currency, available As Currency, shortList As String
+    ' modWarehouses) less what open customer orders reserve there (docs/62; SalesOrderID = the order being
+    ' delivered, whose own reservation is free for it). Taking out more needs the AllowNegativeStock setting
+    ' or an administrator's approval.
+    Dim i As Long, j As Long, need As Currency, available As Currency, shortList As String, reserved As Currency
     For i = 0 To n - 1
         need = 0
         For j = 0 To n - 1
@@ -773,11 +775,13 @@ Public Function CheckStockAvailable(ByRef ProductIDs() As Long, ByRef Qtys() As 
                 need = need + Qtys(j)
             End If
         Next
-        available = AvailableQty(ProductIDs(i), WarehouseID)
+        reserved = ReservedQty(ProductIDs(i), WarehouseID, SalesOrderID)           ' modSalesOrders
+        available = AvailableQty(ProductIDs(i), WarehouseID) - reserved
         If Not ProductTracksStock(ProductIDs(i)) Then need = 0      ' made to order: no stock limit
         If need > available Then
             shortList = shortList & vbCrLf & "- " & DbValue("SELECT ProductName FROM Products WHERE ProductID = " & _
                         ProductIDs(i)) & ": ÇáãØáæÈ " & need & " æÇáãÊæİÑ " & available
+            If reserved > 0 Then shortList = shortList & " (ÈÚÏ " & reserved & " ãÍÌæÒÉ áØáÈíÇÊ ÇáÚãáÇÁ)"
         End If
 NextLine:
     Next

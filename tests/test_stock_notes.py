@@ -176,7 +176,7 @@ class StockNoteCodeTests(unittest.TestCase):
 
     def test_post_unpost_delete_invoice(self):
         post = proc(VBA, "PostStockNote")
-        for part in ('CheckStockAvailable(ids, qtys, n, "إذن التسليم", wh)', "ClosedPeriodProblem(Date)",
+        for part in ('CheckStockAvailable(ids, qtys, n, "إذن التسليم", wh, orderID)', "ClosedPeriodProblem(Date)",
                      "TT_DELIVERY_NOTE", "TT_RECEIPT_NOTE", '"STOCK_NOTE"'):
             self.assertIn(part, post)
         unpost = proc(VBA, "UnpostStockNote")

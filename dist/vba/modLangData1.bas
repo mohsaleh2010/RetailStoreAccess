@@ -46,6 +46,7 @@ Private Sub D1_1()
     LangAdd "ÇáãæÌÈ ãÓÊÍŞ ááåíÆÉ¡ æÇáÓÇáÈ ÑÕíÏ ãÓÊÑÏ. ÑÇÌÚ ÇáÃÑŞÇã ãÚ ãÍÇÓÈß ŞÈá ÊŞÏíã ÇáÅŞÑÇÑ", "A positive amount is due to the Authority, a negative one is a refundable balance. Review the figures with your accountant before filing the return"
     LangAdd "ÚãáíÇÊ İí İÊÑÉ ãŞİáÉ ÊÛíÑÊ æáã íÊÛíÑ ŞíÏåÇ (ÃÚÏ İÊÍ ÇáİÊÑÉ Åä ßÇä ÇáÊÛííÑ ãŞÕæÏğÇ", "Transactions in a closed period that changed while their entry did not (reopen the period if the change is intended"
     LangAdd "ãÓíÑ ßá ÔåÑ ãä ãÈíÚÇÊ ÇáãäÏæÈíä Ãæ ÊÍÕíáÇÊåã¡ Ëã ÊÑÍíá ŞíÏåº ÇáÕÑİ ÈÓäÏ ÕÑİ äŞÏíÉ", "A run each month from the sales or collections of the sales reps, then posting its entry, payment with a cash payment voucher"
+    LangAdd "ÇÚÊãÇÏ» íÍÌÒ ÇáßãíÉ İí ÇáãÎÒä¡ Ëã «ÅĞä ÇáÊÓáíã» ãä ÇáØáÈíÉ¡ Ëã ÇáİÇÊæÑÉ ãä ÇáÅĞä", "Approve reserves the quantities in the warehouse, then a delivery note from the order, then the invoice from the note"
     LangAdd "ÇáÊÃãíäÇÊ Úáì ÇáÃÓÇÓí + ÇáÓßä: ÇáÓÚæÏí ÈÍÕÊí ÇáãæÙİ æÇáãäÔÃÉ¡ æÛíÑå ÈÍÕÉ ÇáãäÔÃÉ", "Social insurance on basic + housing: Saudis with the employee and employer shares, others with the employer share"
     LangAdd "ÑÕíÏ ßá ÍÓÇÈ ÚÇã íæã ÈÏÁ ÇáÊÔÛíá: ÑÃÓ ÇáãÇá¡ æÇáŞÑæÖ¡ æÇáãÓÊÍŞÇÊ¡ æÇáÃÕæá ÇáÃÎÑì", "The balance of each general account on the start-up day: capital, loans, accruals and other assets"
     LangAdd "áÇ ÊæÌÏ ÖÑíÈÉ ãÓÊÍŞÉ ááÓÏÇÏ İí åĞÇ ÇáÅŞÑÇÑ (ÇáÑÕíÏ ÇáÏÇÆä íõÑÍóøá ááÅŞÑÇÑ ÇáÊÇáí", "There is no VAT due for payment in this return (the credit balance is carried to the next return"
@@ -113,6 +114,7 @@ Private Sub D1_1()
     LangAdd "ÊÍæíáÇÊ Èíä ÇáÕäÇÏíŞ ÊäÊÙÑ ÊÃßíÏ ÇáÇÓÊáÇã ãä Ããíä ÇáÕäÏæŞ ÇáãÓÊáã", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
     LangAdd "Êã ÍİÙ äÓÈ ÇáÊÃãíäÇÊ. ÊõØÈóøŞ Úáì ÇáãÓæÏÇÊ ÚäÏ ÊÚÏíáåÇ Ãæ ÊÑÍíáåÇ", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
     LangAdd "ÓõÌøá ÇáÌåÇÒ İí ÈíÆÉ ÃÎÑì. ÓÌøáå İí ÇáÈíÆÉ ÇáÍÇáíÉ ãä ÅÚÏÇÏ ÇáÑÈØ", "The device was registered in another environment. Register it in the current one from the connection setup"
+    LangAdd "ÕÏÑÊ ãä ÇáØáÈíÉ ÃĞæäÇÊ ÊÓáíã. ÇÍĞİ ÇáãÓæÏÇÊ ãäåÇ¡ Ãæ ÃáÛö ÇáØáÈíÉ", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
     LangAdd "íõäÔÃ ÇáãÕÑæİ İí íæã ÇáÇÓÊÍŞÇŞ ãä ßá İÊÑÉ¡ ÈÏÁğÇ ãä ÊÇÑíÎ ÇáÈÏÇíÉ", "The expense is created on the due day of each period, starting from the start date"
     LangAdd "ÇáÇÓÊíÑÇÏÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÃÓÇÓíÉ æÇáãÏİæÚÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imports subject to the standard rate with VAT paid at customs"
     LangAdd "áÇ íæÌÏ ÍÓÇÈ ãÈÑãÌ ÈÚÏ. ÔÛøá BuildSchema: íØáÈ ßáãÉ ãÑæÑå æíäÔÆå", "There is no developer account yet. Run BuildSchema: it asks for its password and creates it"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "ÕÏÑÊ İÇÊæÑÉ åĞÇ ÇáÅĞä¡ İáÇ íõáÛì ÊÑÍíáå. ÇÚãá ãÑÊÌÚğÇ ááİÇÊæÑÉ", "This note is invoiced and cannot be unposted. Make a return of the invoice"
     LangAdd "ŞíÏ ÅåáÇß ßá ÔåÑ ÈÇáÊÑÊíÈ: ãÕÑæİ ÇáÅåáÇß æãÌãÚ ÇáÅåáÇß áßá ÃÕá", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
     LangAdd "áÇ íæÌÏ ÅĞä. ÇÎÊÑ ÇáäæÚ æÇáãÎÒä æÇáÚãíá Ãæ ÇáãæÑÏ Ëã «ÅĞä ÌÏíÏ", "No note. Choose the type, the warehouse and the customer or supplier, then New note"
-    LangAdd "áã íõÏÎá ÇáÑŞã ÇáÖÑíÈí¡ æáä Êßæä ÇáİæÇÊíÑ İæÇÊíÑ ÖÑíÈíÉ äÙÇãíÉ", "The VAT number is not entered, and the invoices will not be valid tax invoices"
-    LangAdd "ãÚÇãá ßá ÚãáÉ İí ÊÇÑíÎº ÇáãÓÊäÏ íÃÎĞ ÂÎÑ ÓÚÑ İí ÊÇÑíÎå Ãæ ŞÈáå", "The rate of each currency on a date, a document takes the last rate on or before its date"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "áã íõÏÎá ÇáÑŞã ÇáÖÑíÈí¡ æáä Êßæä ÇáİæÇÊíÑ İæÇÊíÑ ÖÑíÈíÉ äÙÇãíÉ", "The VAT number is not entered, and the invoices will not be valid tax invoices"
+    LangAdd "ãÚÇãá ßá ÚãáÉ İí ÊÇÑíÎº ÇáãÓÊäÏ íÃÎĞ ÂÎÑ ÓÚÑ İí ÊÇÑíÎå Ãæ ŞÈáå", "The rate of each currency on a date, a document takes the last rate on or before its date"
     LangAdd "ãäÕÉ İÇÊæÑÉ ááãäÔÂÊ İí ÇáÓÚæÏíÉ İŞØ (ÏæáÉ ÇáÊÔÛíá İí ÇáÅÚÏÇÏÇÊ", "The Fatoora platform is for businesses in Saudi Arabia only (operating country in the settings"
     LangAdd "íõİÖóøá ÇáÌÑÏ æÇáãÍá ãÛáŞ Ãæ ÈÚÏ ÂÎÑ İÇÊæÑÉ¡ Ëã ÇáÊÑÍíá ãÈÇÔÑÉ", "Count preferably while the store is closed or after the last invoice, then post at once"
     LangAdd "ÇáÊí áíÓ áåÇ ÍÑßÇÊ¡ æ«ŞÇáÈ Excel» íÕÏøÑåÇ áÊãáÃåÇ Ëã ÊÓÊæÑÏåÇ", "that have no moves, and Excel template exports them for you to fill and import"
@@ -215,6 +217,9 @@ Private Sub D1_2()
     LangAdd "Êã ÍİÙ ÕáÇÍíÇÊ ÇáÔÇÔÇÊ. ÊÓÑí ãä ÇáÏÎæá ÇáÊÇáí ááãÓÊÎÏã", "The screen permissions were saved. They apply from the next login of the user"
     LangAdd "ÍÓÇÈ ÇáäæÚ: ÇáŞÓã 5640¡ ÇáÕÇáÉ 1420¡ ÇáåÇáß 5250¡ ÃÎÑì", "account of the type: department 5640, hall 1420, waste 5250, other"
     LangAdd "ÓØÑğÇ: ßãíÉ ÛíÑ ÕÍíÍÉ¡ Ãæ Õäİ áå ÍÑßÇÊ¡ Ãæ ÑÕíÏå ãÑÍøá", "lines: a wrong quantity, an item with moves, or a balance already posted"
+    LangAdd "ØáÈíÉ åĞÇ ÇáÅĞä áíÓÊ ãİÊæÍÉ ááÊÓáíã (ãõÓáóøãÉ Ãæ ãáÛÇÉ", "The order of this note is not open for delivery (delivered or cancelled"
+    LangAdd "ááØáÈíÉ ÅĞä ÊÓáíã áã íõÑÍóøá. ÇİÊÍå ãä «ÃĞæäÇÊ ÇáØáÈíÉ", "The order has a delivery note not posted yet. Open it from Order notes"
+    LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÍÌÒ æáÇ íõÓáóøã ÈÅĞä", "This product does not track stock, so it is not reserved or delivered with a note"
     LangAdd "íÚãá ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáãİÚøáÉ İŞØ ÈßæÏ ãä ÇáãÈÑãÌ", "The program runs only on computers activated with a code from the developer"
     LangAdd "ÇÎÊÑ ÓØÑ ŞíÏ ãä ÇáŞÇÆãÉ (ÓØÑ ÑÕíÏ Ãæá ÇáãÏÉ áíÓ ŞíÏğÇ", "Choose an entry line from the list (the opening balance line is not an entry"
     LangAdd "ÇáÍÓÇÈ ãŞİá ãÄŞÊğÇ ÈÓÈÈ ãÍÇæáÇÊ ÏÎæá ÎÇØÆÉ ÍÊì ÇáÓÇÚÉ", "The account is locked for a while after wrong login attempts, until"
@@ -252,20 +257,24 @@ Private Sub D1_2()
     LangAdd "åá ÊÑíÏ ÅáÛÇÁ ÇáİÇÊæÑÉ ÇáÍÇáíÉ æÇáÈÏÁ ÈİÇÊæÑÉ ÌÏíÏÉ", "Do you want to cancel the current invoice and start a new one"
     LangAdd "ÇÎÊÑ İÇÊæÑÉ ÇáÔÑÇÁ Ëã ÍÏÏ ÇáßãíÇÊ ÇáÊí ÊÚæÏ ááãæÑÏ", "Choose the purchase invoice, then set the quantities going back to the supplier"
     LangAdd "ÇáÈíÚ ÇáÂÌá íÍÊÇÌ ÚãíáğÇ ãÓÌáğÇ. ÇÎÊÑ ÇáÚãíá ÃæáğÇ", "A credit sale needs a registered customer. Choose the customer first"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ÇáÊÍæíáÇÊ ÇáÈäßíÉ İí ÇáİæÇÊíÑ æÇáÓäÏÇÊ ÊõŞíóøÏ İíå", "Bank transfers in invoices and vouchers are recorded in it"
     LangAdd "ÇáãÈÇáÛ áÇ Êßæä ÓÇáÈÉ: ÇßÊÈ ÇáãÈáÛ İí ÇáÌÇäÈ ÇáÂÎÑ", "Amounts are never negative: type the amount on the other side"
     LangAdd "ÊÃßÏ Ãä ÇáãÈÑãÌ ÃÕÏÑå áÑŞã ÇáÌåÇÒ ÇáÙÇåÑ İí ÇáÔÇÔÉ", "Make sure the developer issued it for the computer number shown on the screen"
     LangAdd "ÊãÊ ÇáÇÓÊÚÇÏÉ. ÓíõÛáŞ ÇáÈÑäÇãÌ ÇáÂä¡ ÇİÊÍå ãä ÌÏíÏ", "Restored. The program will close now, open it again"
     LangAdd "ÊæÌÏ ÊÚÏíáÇÊ ÛíÑ ãÍİæÙÉ. åá ÊÑíÏ ÍİÙåÇ ŞÈá ÇáÅÛáÇŞ", "There are unsaved changes. Do you want to save them before closing"
-End Sub
-
-Private Sub D1_3()
+    LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÃáÛö ÇáØáÈíÉ ÇáãÚÊãÏÉ ÈÏá ÍĞİåÇ", "Only a draft is deleted. Cancel an approved order instead"
+    LangAdd "ÊõÚÏóøá ÃÓØÑ ÇáãÓæÏÉ İŞØ. ÃÚÏ ÇáØáÈíÉ áãÓæÏÉ ÃæáğÇ", "Only the lines of a draft are changed. Return the order to draft first"
     LangAdd "ÑÕíÏ ÇáÚãáÇÁ íõÏÎá İí ŞÓã «ÇáÚãáÇÁ»: ÑÕíÏ áßá Úãíá", "The customers balance is entered in the Customers part: one balance per customer"
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÇáÏÎæá (ÈíÇäÇÊ ÌåÇÒ äŞØÉ ÇáÈíÚ", "The Tax Authority refused the credentials (POS device data"
     LangAdd "ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ ÈåĞÇ ÇáãÓÊÎÏã (ÈÏá ÕáÇÍíÇÊ ÏæÑå", "Custom screen permissions for this user (instead of the permissions of his role"
     LangAdd "ÖÑíÈÉ ÇáãÈíÚÇÊ äÇŞÕ ÇáÖÑíÈÉ ÇáŞÇÈáÉ ááÎÕã Úä ÇáÔåÑ", "Output VAT less deductible input VAT of the month"
     LangAdd "İí ÇáÓÚæÏíÉ íõÕÍóøÍ ÇáãÓÊäÏ ÈÅÔÚÇÑ ÏÇÆä¡ æáÇ íõáÛì", "In Saudi Arabia a document is corrected by a credit note, not cancelled"
+    LangAdd "áÇ ÊæÌÏ ØáÈíÉ. ÇÎÊÑ ÇáÚãíá æÇáãÎÒä Ëã «ØáÈíÉ ÌÏíÏÉ", "No order. Choose the customer and the warehouse, then New order"
     LangAdd "ááÊÕÍíÍ ÓÌøá ÓäÏ ŞÈÖ äŞÏíÉ ÈÇáãÈáÛ Ëã ÓäÏ ÕÑİ ÌÏíÏ", "To correct, record a cash receipt voucher with the amount, then a new payment voucher"
+    LangAdd "ááØáÈíÉ ÅĞä ÊÓáíã áã íõÑÍóøá. ÑÍøáå Ãæ ÇÍĞİå ÃæáğÇ", "The order has a delivery note not posted yet. Post it or delete it first"
     LangAdd "íæÌÏ ØáÈ ÛíÑ ãßÊãá ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáå", "There is an unfinished order from a previous session. Do you want to continue it"
     LangAdd "ÃÏÇÁ ÇáãäÏæÈíä: ÇáãÈíÚÇÊ æÇáÊÍÕíá æÇáåÏİ æÇáÚãæáÉ", "Sales rep performance: sales, collections, target and commission"
     LangAdd "ÃÛáŞ Çáãáİ æÇİÊÍå ãä ÌÏíÏ áíÙåÑ ÇáäÙÇã ÈÏæä ÃÏæÇÊ", "Close the file and open it again to start the system without the tools of"
@@ -277,14 +286,4 @@ Private Sub D1_3()
     LangAdd "ÊõÍİÙ Şíãå ßãÇ åí ÇáÂä¡ æíõäÔÃ ŞíÏ ÇáÊÓæíÉ ÈÊÇÑíÎ", "Its values are kept as they are now, and the settlement entry is created on"
     LangAdd "ÕõÑİ áå ÌÒÁ ãä åĞå ÇáÚãæáÇÊ. ÃáÛö ÓäÏ ÇáÕÑİ ÃæáğÇ", "Part of these commissions was paid to him. Cancel the payment voucher first"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÍĞİ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to delete in the payment matching screen"
-    LangAdd "áÇ íãßä ÍĞİ åĞÇ ÇáÓÌá áÃäå ãÓÊÎÏã İí ÚãáíÇÊ ÓÇÈŞÉ", "This record cannot be deleted because it is used in earlier transactions"
-    LangAdd "ãÈíÚÇÊ åĞÇ ÇáãÓÊÎÏã áÚãíá ÈáÇ ãäÏæÈ ÊõäÓÈ ááãäÏæÈ", "The sales of this user to a customer without a sales rep go to the sales rep"
-    LangAdd "ãä íÕÑİ ãä ßá ÕäÏæŞ æíÕİøíå æíÓÊáã ÇáÊÍæíáÇÊ Åáíå", "Who pays from each box, closes it and receives the transfers to it"
-    LangAdd "íõÚÊãÏ ÇáÅŞÑÇÑ ÈÚÏ ÇäÊåÇÁ İÊÑÊå: ÇÎÊÑ ÊÇÑíÎğÇ ÈÚÏ", "The return is approved after its period ends: choose a date after"
-    LangAdd "ÇáÕÛíÑº ÓÚÑ ÇáæÓØ Ãæ ÇáßÈíÑ íÌÚá ááãÔÑæÈ ÃÍÌÇãğÇ", "small, a medium or large price gives the drink sizes"
-    LangAdd "ÇáåÏİ ÇáÔåÑí áÕÇİí ãÈíÚÇÊ ßá ãäÏæÈ (ÈÏæä ÇáÖÑíÈÉ", "The monthly target for the net sales of each sales rep (without VAT"
-    LangAdd "ÛíÑ ãÊÇÍ İí ãáİ ACCDE. ÛíøÑ ßáãÉ ÇáãÑæÑ ãä äÓÎÊß", "Not available in an ACCDE file. Change the password from your copy"
-    LangAdd "áÊÕÍíÍ ÇáßãíÉ ÇáÂä ÇÓÊÎÏã ÇáÌÑÏ Ãæ ÇáÅÖÇİÉ/ÇáÎÕã", "To correct the quantity now use the stock count or the addition/deduction"
-    LangAdd "áåĞÇ ÇáÍÓÇÈ ÍÓÇÈÇÊ ÊÇÈÚÉ. ÇÍĞİåÇ Ãæ ÇäŞáåÇ ÃæáğÇ", "This account has sub-accounts. Delete them or move them first"
-    LangAdd "ãÏíÑ ÇáäÙÇã íİÊÍ ßá ÇáÔÇÔÇÊ Èßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ", "The system administrator always opens every screen with every permission"
 End Sub

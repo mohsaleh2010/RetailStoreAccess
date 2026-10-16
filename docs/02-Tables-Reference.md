@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **82** | عدد الحقول: **1065**
+عدد الجداول: **84** | عدد الحقول: **1086**
 
 ## الفهرس
 
@@ -82,12 +82,14 @@
 74. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
 75. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
 76. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
-77. [`StockCounts`](#stockcounts) – جلسات الجرد
-78. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-79. [`AuditLog`](#auditlog) – سجل العمليات
-80. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-81. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-82. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+77. [`SalesOrders`](#salesorders) – طلبيات العملاء
+78. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
+79. [`StockCounts`](#stockcounts) – جلسات الجرد
+80. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+81. [`AuditLog`](#auditlog) – سجل العمليات
+82. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+83. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+84. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -182,7 +184,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 30 سجل
+- بيانات أساسية: 31 سجل
 
 ## Roles
 
@@ -214,7 +216,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 42 سجل
+- بيانات أساسية: 43 سجل
 
 ## RolePermissions
 
@@ -226,7 +228,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 83 سجل
+- بيانات أساسية: 85 سجل
 
 ## Employees
 
@@ -288,7 +290,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 71 سجل
+- بيانات أساسية: 72 سجل
 
 ## UserScreens
 
@@ -1890,12 +1892,13 @@
 | 5 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
 | 6 | CustomerID | Number (Long) |  |  |  |  | `Customers.CustomerID` | العميل (إذن التسليم) |
 | 7 | SupplierID | Number (Long) |  |  |  |  | `Suppliers.SupplierID` | المورد (إذن الاستلام) |
-| 8 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","POSTED","INVOICED")` |  | الحالة |
-| 9 | SalesInvoiceID | Number (Long) |  |  |  |  | `SalesInvoices.SalesInvoiceID` | فاتورة البيع الصادرة منه |
-| 10 | PurchaseInvoiceID | Number (Long) |  |  |  |  | `PurchaseInvoices.PurchaseInvoiceID` | فاتورة الشراء الصادرة منه |
-| 11 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أنشأه |
-| 12 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 8 | SalesOrderID | Number (Long) |  |  |  |  | `SalesOrders.SalesOrderID` | طلبية العميل (إذن تسليم منها) – docs/62: إذن التسليم المنشأ من طلبية |
+| 9 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","POSTED","INVOICED")` |  | الحالة |
+| 10 | SalesInvoiceID | Number (Long) |  |  |  |  | `SalesInvoices.SalesInvoiceID` | فاتورة البيع الصادرة منه |
+| 11 | PurchaseInvoiceID | Number (Long) |  |  |  |  | `PurchaseInvoices.PurchaseInvoiceID` | فاتورة الشراء الصادرة منه |
+| 12 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أنشأه |
+| 13 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 14 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `StockNoteID`
 - فهرس فريد: `NoteNumber`
@@ -1913,10 +1916,52 @@
 | 4 | Quantity | Currency (كمية) |  | ✔ |  | `>0` |  | الكمية |
 | 5 | UnitPrice | Currency |  | ✔ | `0` | `>=0` |  | السعر في الفاتورة (البيع، أو الشراء بدون الضريبة) |
 | 6 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة |
-| 7 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 7 | SalesOrderLineID | Number (Long) |  |  |  |  | `SalesOrderLines.SalesOrderLineID` | سطر الطلبية الذي يسلّمه |
+| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `StockNoteLineID`
 - فهرس عادي: `StockNoteID`
+
+## SalesOrders
+
+**طلبيات العملاء** – طلبية عميل (docs/62): مسودة، ثم «اعتماد» يحجز الكمية في المخزن فلا تُباع لغيرها، ثم «قيد التجهيز»، ثم التسليم بأذونات التسليم (كليًا أو جزئيًا) ثم فوترتها، أو الإلغاء.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **SalesOrderID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | OrderNumber | Short Text | 20 | ✔ |  |  |  | رقم الطلبية |
+| 3 | OrderDate | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الطلبية |
+| 4 | CustomerID | Number (Long) |  | ✔ |  |  | `Customers.CustomerID` | العميل |
+| 5 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن الذي يسلّم |
+| 6 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب العميل، وإلا مندوب المستخدم |
+| 7 | RequiredDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ التسليم المطلوب |
+| 8 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","APPROVED","PREPARING","PARTIAL","DELIVERED","INVOICED","CANCELLED","CLOSED")` |  | الحالة |
+| 9 | ApprovedAt | Date/Time |  |  |  |  |  | وقت الاعتماد |
+| 10 | PreparedAt | Date/Time |  |  |  |  |  | وقت بدء التجهيز |
+| 11 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | سجّلها |
+| 12 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `SalesOrderID`
+- فهرس فريد: `OrderNumber`
+- فهرس عادي: `OrderDate`
+- فهرس عادي: `Status`
+
+## SalesOrderLines
+
+**أسطر طلبيات العملاء** – الأصناف وكمياتها وسعر البيع (شامل الضريبة كما في نقطة البيع). المُسلَّم = أسطر أذونات التسليم المرحّلة المرتبطة بالسطر، والمحجوز = الكمية ناقص المُسلَّم ما دامت الطلبية مفتوحة.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **SalesOrderLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر |
+| 2 | SalesOrderID | Number (Long) |  | ✔ |  |  | `SalesOrders.SalesOrderID` | الطلبية |
+| 3 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 4 | Quantity | Currency (كمية) |  | ✔ |  | `>0` |  | الكمية المطلوبة |
+| 5 | UnitPrice | Currency |  | ✔ | `0` | `>=0` |  | سعر البيع |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `SalesOrderLineID`
+- فهرس عادي: `SalesOrderID`
 
 ## StockCounts
 

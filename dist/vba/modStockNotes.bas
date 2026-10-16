@@ -15,6 +15,9 @@ Attribute VB_Name = "modStockNotes"
 '                      through PostSaleFromCart / PostPurchaseFromCart with StockNoteID: no stock moves, the
 '                      cost of each line is the cost of the note; the invoice clears 1430 / 2150
 '                      (qryInvoicedNotes in qryJournalSale / qryJournalPurchase)
+' A delivery note made from a customer order (docs/62) carries SalesOrderID and, on each line, SalesOrderLineID:
+' posting it checks the order (OrderNoteProblem) and frees its reservation; the order follows its notes
+' (SyncSalesOrder, modSalesOrders).
 ' Screen: frmStockNote (built by modBuildForms).
 '==============================================================================
 Option Compare Database
@@ -29,6 +32,11 @@ End Function
 
 Private Function NoteKind(ByVal StockNoteID As Long) As String
     NoteKind = Nz(DbValue("SELECT NoteType FROM StockNotes WHERE StockNoteID = " & StockNoteID), "")
+End Function
+
+Public Function NoteOrderID(ByVal StockNoteID As Long) As Long
+    ' The customer order a delivery note was made from (docs/62), else 0.
+    NoteOrderID = Nz(DbValue("SELECT SalesOrderID FROM StockNotes WHERE StockNoteID = " & StockNoteID), 0)
 End Function
 
 Private Function NoteParty(ByVal StockNoteID As Long) As Long
@@ -129,7 +137,7 @@ End Function
 Public Function PostStockNote(ByVal StockNoteID As Long) As String
     ' A delivery leaves the warehouse at the average cost; a receipt enters it at its purchase price.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean, msg As String
-    Dim wh As Long, noteNo As String, kind As String, partyName As String
+    Dim wh As Long, noteNo As String, kind As String, partyName As String, orderID As Long
     Dim n As Long, ids() As Long, qtys() As Currency, cost As Currency
     If Not HasPermission("STOCK_NOTES") Then
         PostStockNote = "áíÓÊ áÏíß ÕáÇÍíÉ ÃÐæäÇÊ ÇáÊÓáíã æÇáÇÓÊáÇã."
@@ -142,6 +150,7 @@ Public Function PostStockNote(ByVal StockNoteID As Long) As String
     kind = NoteKind(StockNoteID)
     wh = DbValue("SELECT WarehouseID FROM StockNotes WHERE StockNoteID = " & StockNoteID)
     noteNo = DbValue("SELECT NoteNumber FROM StockNotes WHERE StockNoteID = " & StockNoteID)
+    orderID = NoteOrderID(StockNoteID)
     msg = WarehouseProblem(wh)
     If Len(msg) = 0 Then
         If Not NotePartyIsActive(kind, NoteParty(StockNoteID)) Then
@@ -164,7 +173,8 @@ Public Function PostStockNote(ByVal StockNoteID As Long) As String
         rs.Close
         If Len(msg) = 0 And n = 0 Then msg = "ÃÖÝ ÇáÃÕäÇÝ æßãíÇÊåÇ ÃæáðÇ."
     End If
-    If Len(msg) = 0 And kind = "DELIVERY" Then msg = CheckStockAvailable(ids, qtys, n, "ÅÐä ÇáÊÓáíã", wh)
+    If Len(msg) = 0 And orderID > 0 Then msg = OrderNoteProblem(StockNoteID)          ' modSalesOrders
+    If Len(msg) = 0 And kind = "DELIVERY" Then msg = CheckStockAvailable(ids, qtys, n, "ÅÐä ÇáÊÓáíã", wh, orderID)
     If Len(msg) > 0 Then
         PostStockNote = msg
         Exit Function
@@ -198,6 +208,7 @@ Public Function PostStockNote(ByVal StockNoteID As Long) As String
     Loop
     rs.Close
     db.Execute "UPDATE StockNotes SET NoteDate = Now(), Status = 'POSTED' WHERE StockNoteID = " & StockNoteID, dbFailOnError
+    If orderID > 0 Then SyncSalesOrder db, orderID                      ' partly or fully delivered
     ws.CommitTrans
     inTrans = False
     LogAction "STOCK_NOTE_POST", "StockNotes", noteNo, kind & " Warehouse=" & wh
@@ -271,6 +282,7 @@ Public Function UnpostStockNote(ByVal StockNoteID As Long) As String
     db.Execute "DELETE FROM InventoryTransactions WHERE ReferenceType = 'STOCK_NOTE' AND ReferenceID = " & StockNoteID, _
                dbFailOnError
     db.Execute "UPDATE StockNotes SET Status = 'DRAFT' WHERE StockNoteID = " & StockNoteID, dbFailOnError
+    If NoteOrderID(StockNoteID) > 0 Then SyncSalesOrder db, NoteOrderID(StockNoteID)   ' reserved again
     ws.CommitTrans
     inTrans = False
     AuditEdited "STOCK_NOTE_UNPOST", "StockNotes", "StockNoteID", StockNoteID, before
@@ -335,6 +347,7 @@ Public Sub MarkNoteInvoiced(ByVal db As DAO.Database, ByVal StockNoteID As Long,
     db.Execute "UPDATE StockNotes SET Status = 'INVOICED', " & FieldName & " = " & InvoiceID & _
                " WHERE Status = 'POSTED' AND StockNoteID = " & StockNoteID, dbFailOnError
     If db.RecordsAffected <> 1 Then Err.Raise vbObjectError + 610, "MarkNoteInvoiced", "ÇáÅÐä áã íÚÏ ãõÑÍóøáðÇ"
+    If NoteOrderID(StockNoteID) > 0 Then SyncSalesOrder db, NoteOrderID(StockNoteID)   ' the order may be invoiced now
 End Sub
 
 Public Function InvoiceStockNote(ByVal StockNoteID As Long, ByVal PaymentType As String, ByVal SupplierInvoiceNo As String, _
@@ -453,6 +466,9 @@ Public Sub StockNoteShow(ByVal frm As Access.Form)
                                          "FROM StockNotes WHERE StockNoteID = " & id, dbOpenSnapshot)
         info = rs!NoteNumber & "    " & IIf(kind = "DELIVERY", "ÊÓáíã ãä ", "ÇÓÊáÇã Ýí ") & WarehouseName(rs!WarehouseID) & _
                IIf(kind = "DELIVERY", "  ->  ", "  <-  ") & NotePartyName(id) & "    "
+        If NoteOrderID(id) > 0 Then
+            info = info & "ÇáØáÈíÉ " & DbValue("SELECT OrderNumber FROM SalesOrders WHERE SalesOrderID = " & NoteOrderID(id)) & "    "
+        End If
         If st = "DRAFT" Then
             info = info & "ãÓæÏÉ: ÃÖÝ ÇáÃÕäÇÝ Ëã «ÊÑÍíá»"
         ElseIf st = "POSTED" Then
@@ -478,6 +494,7 @@ Public Sub StockNoteShow(ByVal frm As Access.Form)
     frm!btnDelete.Enabled = (st = "DRAFT")
     frm!btnUnpost.Enabled = (st = "POSTED")
     frm!btnInvoice.Enabled = (st = "POSTED")
+    frm!btnOrder.Enabled = (NoteOrderID(id) > 0)
     frm!txtSupplierRef.Enabled = (st = "POSTED" And kind = "RECEIPT")
     frm!chkVat.Enabled = (st = "POSTED" And kind = "RECEIPT")
 End Sub

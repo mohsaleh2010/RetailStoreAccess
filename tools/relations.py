@@ -64,6 +64,7 @@ UNENFORCED = {
     ("StockTransfers", "EmployeeID"),
     ("StockDocuments", "EmployeeID"),
     ("StockNotes", "EmployeeID"),
+    ("SalesOrders", "EmployeeID"),
 }
 
 ACCESS_MAX_INDEXES = 32

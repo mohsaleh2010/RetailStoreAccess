@@ -28,7 +28,7 @@ Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmStockParties,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn," & _
     "frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens," & _
     "frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines," & _
-    "frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
+    "frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -677,6 +677,8 @@ Private Sub BuildAllForms()
     BuildForm_frmOpeningBanks
     BuildForm_frmOpeningStock
     BuildForm_frmOpeningBalances
+    BuildForm_frmSalesOrderLines
+    BuildForm_frmSalesOrder
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -2097,6 +2099,8 @@ Private Sub BuildForm_frmSalesReps()
     c.OnClick = EP
     Set c = AddButton("btnRepReport", "أداء المندوبين", 9751, 1021, 1701, 482, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnOrders", "طلبيات العملاء", 11565, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -2191,6 +2195,9 @@ Private Sub BuildForm_frmSalesReps()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnRepReport_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmReportCenter"", 0, ""REP_PERFORMANCE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOrders_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmSalesOrder""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
@@ -5907,6 +5914,8 @@ Private Sub BuildForm_frmStockNote()
     c.OnClick = EP
     Set c = AddButton("btnDelete", "حذف المسودة", 4422, 9129, 1814, 624, "danger")
     c.OnClick = EP
+    Set c = AddButton("btnOrder", "الطلبية", 6349, 9129, 1474, 624, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 10433, 9129, 1474, 624, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -5934,6 +5943,9 @@ Private Sub BuildForm_frmStockNote()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnDelete_Click()" & vbCrLf
     s = s & "    StockNoteAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOrder_Click()" & vbCrLf
+    s = s & "    StockNoteOpenOrder Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -9976,11 +9988,19 @@ Private Sub BuildForm_frmAccounting()
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmCommissions"
     c.OnClick = EP
-    Set c = AddRect("boxNavAudit", 11056, 7514, 3402, 1106, RGB(69, 90, 100))
-    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 11056, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileAudit", "سجل التدقيق", 11056, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintAudit", "من أضاف أو عدّل أو حذف", 11056, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileAudit", "سجل التدقيق", 11056, 7514, 3402, 1106, "secondary")
+    Set c = AddRect("boxNavOrders", 11056, 7514, 3402, 1106, RGB(56, 142, 60))
+    Set c = AddIcon("icoTileOrders", ChrW(&HE8FD), 11056, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileOrders", "طلبيات العملاء", 11056, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintOrders", "الحجز والتسليم والفوترة", 11056, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileOrders", "طلبيات العملاء", 11056, 7514, 3402, 1106, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmSalesOrder"
+    c.OnClick = EP
+    Set c = AddRect("boxNavAudit", 7484, 7514, 3402, 1106, RGB(69, 90, 100))
+    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 7484, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAudit", "سجل التدقيق", 7484, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintAudit", "من أضاف أو عدّل أو حذف", 7484, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAudit", "سجل التدقيق", 7484, 7514, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmAuditLog"
     c.OnClick = EP
@@ -10051,6 +10071,9 @@ Private Sub BuildForm_frmAccounting()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnTileCommissions_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmCommissions"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileOrders_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmSalesOrder""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnTileAudit_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmAuditLog"", 0" & vbCrLf
@@ -10971,4 +10994,145 @@ Private Sub BuildForm_frmOpeningBalances()
     Exit Sub
 EH:
     AbortForm "frmOpeningBalances", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmSalesOrderLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmSalesOrderLines", "أسطر طلبية العميل", "SELECT * FROM SalesOrderLines WHERE SalesOrderID = 0", 11680, 425, False, True, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("ProductID", "ProductID", 28, 0, 4423, 425, "SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p WHERE p.TrackStock = True AND p.IsActive = True ORDER BY p.ProductName", 2, "0;4309")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    Set c = AddText("Quantity", "Quantity", 4479, 0, 1361, 425)
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("UnitPrice", "UnitPrice", 5868, 0, 1588, 425)
+    SetCtlProp c, "Format", "#,##0.00##"
+    Set c = AddText("txtDelivered", "=OrderLineDelivered([SalesOrderLineID])", 7484, 0, 1361, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("txtValue", "=Nz([Quantity],0)*Nz([UnitPrice],0)", 8873, 0, 1814, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 10715, 17, 454, 391, "danger")
+    SetCtlProp c, "FontName", ICON_FONT
+    c.OnClick = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    SalesOrderLineBeforeUpdate Me, Cancel" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    SalesOrderLineAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    SalesOrderRemoveLine Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmSalesOrderLines", s
+    Exit Sub
+EH:
+    AbortForm "frmSalesOrderLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmSalesOrder()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmSalesOrder", "طلبيات العملاء", "", 12134, 10206, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12134, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "طلبيات العملاء", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "«اعتماد» يحجز الكمية في المخزن، ثم «إذن التسليم» من الطلبية، ثم الفاتورة من الإذن", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboOrder", "", 227, 1304, 9412, 454, "", 6, "0;1361;1247;3175;1588;1814")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblOrder", "الطلبية (الأحدث أولًا)", 227, 992, 9412, 284, 9, False, CLR_MUTED, "cboOrder", 0)
+    Set c = AddCombo("cboCustomer", "", 227, 2155, 2835, 454, "", 2, "0;2722")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblCustomer", "العميل", 227, 1843, 2835, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
+    Set c = AddCombo("cboWarehouse", "", 3175, 2155, 1928, 454, "", 2, "0;1814")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblWarehouse", "المخزن", 3175, 1843, 1928, 284, 9, False, CLR_MUTED, "cboWarehouse", 0)
+    Set c = AddText("txtRequired", "", 5216, 2155, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblRequired", "موعد التسليم", 5216, 1843, 1701, 284, 9, False, CLR_MUTED, "txtRequired", 0)
+    Set c = AddText("txtNotes", "", 7031, 2155, 2722, 454)
+    Set c = AddLabel("lblNotes", "ملاحظات", 7031, 1843, 2722, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddButton("btnNew", "طلبية جديدة", 9866, 2138, 2041, 482, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblInfo", " ", 227, 2778, 11680, 397, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblCol1", "الصنف", 255, 3260, 4423, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "الكمية المطلوبة", 4706, 3260, 1361, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "سعر البيع", 6095, 3260, 1588, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "المُسلَّم", 7711, 3260, 1361, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol5", "قيمة السطر", 9100, 3260, 1814, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subLines", "frmSalesOrderLines", 227, 3600, 11680, 3969)
+    Set c = AddButton("btnApprove", "اعتماد وحجز", 227, 7995, 1928, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrepare", "بدء التجهيز", 2268, 7995, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDeliver", "إذن التسليم", 4082, 7995, 1928, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnNotes", "أذونات الطلبية", 6123, 7995, 1814, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnapprove", "إعادة لمسودة", 227, 9129, 1814, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnCancel", "إلغاء الطلبية", 2154, 9129, 1814, 624, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف المسودة", 4081, 9129, 1814, 624, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 10433, 9129, 1474, 624, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnActivate = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    SalesOrderLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Activate()" & vbCrLf
+    s = s & "    SalesOrderShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboOrder_AfterUpdate()" & vbCrLf
+    s = s & "    SalesOrderShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    SalesOrderNew Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnApprove_Click()" & vbCrLf
+    s = s & "    SalesOrderAction Me, ""APPROVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrepare_Click()" & vbCrLf
+    s = s & "    SalesOrderAction Me, ""PREPARE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDeliver_Click()" & vbCrLf
+    s = s & "    SalesOrderAction Me, ""DELIVER""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNotes_Click()" & vbCrLf
+    s = s & "    SalesOrderOpenNote Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnapprove_Click()" & vbCrLf
+    s = s & "    SalesOrderAction Me, ""UNAPPROVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCancel_Click()" & vbCrLf
+    s = s & "    SalesOrderAction Me, ""CANCEL""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    SalesOrderAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmSalesOrder", s
+    Exit Sub
+EH:
+    AbortForm "frmSalesOrder", Err.Number, Err.Description
 End Sub
