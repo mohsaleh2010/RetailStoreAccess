@@ -15,6 +15,12 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "ÇáÕÑİ ãØÇÈŞ İí ÊÓæíÉ ÈäßíÉ: ÃáÛö ãØÇÈŞÊå ÃæáğÇ", "The payment is matched in a bank reconciliation: unmatch it first"
+    LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ááãæÑÏ ÃßÈÑ ãä ÇáßãíÉ ÇáãÔÊÑÇÉ", "The quantity returned to the supplier is more than the quantity bought"
+    LangAdd "ÇáßãíÉ ÊÊÛíÑ İŞØ ãä ÇáãÔÊÑíÇÊ æÇáãÈíÚÇÊ æÇáÌÑÏ", "The quantity changes only through purchases, sales and stock counts"
+    LangAdd "ÊÃßíÏ ßáãÉ ÇáãÑæÑ áÇ íØÇÈŞ ßáãÉ ÇáãÑæÑ ÇáÌÏíÏÉ", "The password confirmation does not match the new password"
+    LangAdd "ÊÛíÑÊ ÖÑíÈÉ ãÓÊäÏÇÊ ÇáİÊÑÉ ÈÚÏ ÇáÇÚÊãÇÏ ÈãŞÏÇÑ", "The VAT of the documents of the period changed after approval by"
+    LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ (Client ID æ", "The Tax Authority refused the credentials of the program (Client ID and"
     LangAdd "İí ÇáŞíÏ ÃÕá ãÓÊÈÚÏ ÈÚÏå: ÃáÛö ÇáÇÓÊÈÚÇÏ ÃæáğÇ", "The entry has an asset disposed after it: cancel the disposal first"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to add in the bank reconciliation screen"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to add in the bank transactions screen"
@@ -55,6 +61,7 @@ Private Sub D2_1()
     LangAdd "ÓÈÈ ÇáÅÑÌÇÚ ãØáæÈ (ÅáÒÇãí İí ÇáÅÔÚÇÑ ÇáÏÇÆä", "The return reason is required (mandatory on the credit note"
     LangAdd "ÚãáíÇÊ ÛíÑ ãÊæÇÒäÉ áã íõäÔÃ áåÇ ŞíÏ (ÑÇÌÚåÇ", "Unbalanced transactions with no entry created (review them"
     LangAdd "Úãíá ÇáãÑÊÌÚ íÎÊáİ Úä Úãíá ÇáİÇÊæÑÉ ÇáÃÕáíÉ", "The customer of the return differs from the customer of the original invoice"
+    LangAdd "áÇ íæÌÏ ÊÍæíá. ÇÎÊÑ ÇáãÎÒäíä Ëã «ÊÍæíá ÌÏíÏ", "No transfer. Choose the two warehouses, then New transfer"
     LangAdd "ãŞİáÉ: ÕÇİí ÇáÑÈÍ ÇáãÑÍóøá ááÃÑÈÇÍ ÇáãÍÊÌÒÉ", "Closed: net profit carried to retained earnings"
     LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ááÌåÇÒ (íÈŞì Úáì ÌåÇÒ Âãä", "Private key file of the device (kept on a safe computer"
     LangAdd "ãäÊÌ ÓØÑ ÇáãÑÊÌÚ íÎÊáİ Úä ãäÊÌ ÇáÓØÑ ÇáÃÕáí", "The product of the return line differs from the product of the original line"
@@ -128,6 +135,9 @@ Private Sub D2_1()
     LangAdd "ÇáãíÒÇäíÉ ÇáÚãæãíÉ (ŞÇÆãÉ ÇáãÑßÒ ÇáãÇáí", "Balance sheet (statement of financial position"
     LangAdd "ÊÇÑíÎ ÈÏÁ ÇáÊÔÛíá áÇ íßæä ÈÚÏ Ãæá ãÓÊäÏ", "The start-up date cannot be after the first document"
     LangAdd "ÍÏÏ ÇáßãíÉ ÇáãÑÊÌÚÉ áÕäİ æÇÍÏ Úáì ÇáÃŞá", "Set the returned quantity of at least one item"
+End Sub
+
+Private Sub D2_2()
     LangAdd "ÑÇÌÚ ÇáÊÇÑíÎ æÇáÃÓØÑ Ëã ÇÖÛØ «ÍİÙ ÇáŞíÏ", "Check the date and the lines, then click Save entry"
     LangAdd "ÑÕíÏ ßá ÍÓÇÈ Èäßí íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each bank account on the start-up day: positive"
     LangAdd "ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "The new sale price cannot be negative"
@@ -135,12 +145,10 @@ Private Sub D2_1()
     LangAdd "ÚÏøá ÇáÅÖÇİí æÇáÎÕæãÇÊ Ëã «ÊÑÍíá ÇáãÓíÑ", "Edit the overtime and deductions, then Post the run"
     LangAdd "ßáãÉ ÇáÈÍË (ÇÓã¡ ßæÏ¡ ÈÇÑßæÏ¡ ÑŞã¡ ÌæÇá", "Search text (name, code, barcode, number, mobile"
     LangAdd "áÇ ÊæÌÏ İæÇÊíÑ Ãæ ãÑÊÌÚÇÊ İí åĞå ÇáİÊÑÉ", "No invoices or returns in this period"
-End Sub
-
-Private Sub D2_2()
     LangAdd "áÇ ÊæÌÏ ãÕÑæİÇÊ ãÊßÑÑÉ ãÓÊÍŞÉ ÍÊì Çáíæã", "There are no recurring expenses due up to today"
     LangAdd "áÇ íãßä ÊİÚíá ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÇáÂä", "E-invoicing cannot be enabled now"
     LangAdd "ãÕÑ: ßæÏ ÇáÕäİ ÇáãÓÌøá İí ÈæÇÈÉ ÇáãÕáÍÉ", "Egypt: product code registered on the Tax Authority portal"
+    LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÍæóøá", "This product does not track stock, so it is not transferred"
     LangAdd "íÌÈ Ãä íİÚøáå ãÏíÑ ÇáäÙÇã ŞÈá ÇáÇÓÊÎÏÇã", "The system administrator must activate it before use"
     LangAdd "ÃÍÑİ Úáì ÇáÃŞá¡ æáÇ ÊÓÇæí ÇÓã ÇáãÓÊÎÏã", "characters at least, and not equal to the user name"
     LangAdd "ÃÏÎá ÇáäŞÏíÉ ÇáãæÌæÏÉ İÚáğÇ İí ÇáÕäÏæŞ", "Enter the cash actually in the box"
@@ -217,6 +225,7 @@ Private Sub D2_2()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to edit the bank reconciliation"
     LangAdd "áÇ ÊæÌÏ ÅíÑÇÏÇÊ Ãæ ãÕÑæİÇÊ İí ÇáİÊÑÉ", "There is no revenue or expense in the period"
     LangAdd "áÇ íæÌÏ ŞíÏ ÊÓæíÉ: ÇáÅŞÑÇÑ ÛíÑ ãÚÊãÏ", "No settlement entry: the return is not approved"
+    LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ ÇáÊÍæíá Èíä ÇáãÎÇÒä", "You do not have the permission for transfers between warehouses"
     LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ ÊÕİíÉ íæãíÉ ÇáßÇÔíÑ", "You do not have the permission for the daily cashier closing"
     LangAdd "ãÓÊÍŞ ÇáÂä: ÇÖÛØ «ÅäÔÇÁ ÇáãÓÊÍŞ ÇáÂä", "Due now: click Create the due now"
     LangAdd "äåÇÆíğÇ¿ íõÍĞİ ŞíÏå ãä ÇáíæãíÉ ÃíÖğÇ", "for good? Its journal entry is deleted too"
@@ -249,6 +258,9 @@ Private Sub D2_2()
     LangAdd "ÇáãŞÈæáÉ (ÕÇİí ÇáİæÇÊíÑ æÇáãÑÊÌÚÇÊ", "Accepted (invoices net of returns"
     LangAdd "ÊÃßÏ ãä İáÇÔÉ ÇáÊæŞíÚ æÑŞãåÇ ÇáÓÑí", "Check the signing token and its PIN"
     LangAdd "ÊÓÌíá ÇÑÊÏÇÏ ÇáÔíß¿ íÚæÏ ãÈáÛå Úáì", "Record the bounce of the cheque? Its amount goes back to"
+End Sub
+
+Private Sub D2_3()
     LangAdd "ÊÓæíÇÊ æÊÕÍíÍÇÊ ãä ÇáİÊÑÇÊ ÇáÓÇÈŞÉ", "Adjustments and corrections of earlier periods"
     LangAdd "ÑÕíÏ ßá Úãíá íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each customer on the start-up day: positive"
     LangAdd "ÑÕíÏ ßá ãæÑÏ íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each supplier on the start-up day: positive"
@@ -258,9 +270,6 @@ Private Sub D2_2()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", "You do not have the permission for the start-up opening balances"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãäÏæÈíä æÚãæáÇÊåã", "You do not have the permission for sales reps and their commissions"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÍĞİ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to delete bank transactions"
-End Sub
-
-Private Sub D2_3()
     LangAdd "áÇ ÊæÌÏ ÃÑÕÏÉ ãæÑÏíä ÈÚãáÇÊ ÃÌäÈíÉ", "There are no supplier balances in foreign currencies"
     LangAdd "áÇ ÊõÓÌóøá ÏİÚÇÊ Úáì ÇáÚãíá ÇáäŞÏí", "No payments are recorded on the cash customer"
     LangAdd "ãÈíÚÇÊå æãÓíÑ ÑÇÊÈå Úáì åĞÇ ÇáãÑßÒ", "His sales and payroll are on this center"
@@ -360,6 +369,7 @@ Private Sub D2_3()
     LangAdd "ÇÎÊÑ ÇáÍÓÇÈ İí ßá ÓØÑ İíå ãÈáÛ", "Choose the account in every line with an amount"
     LangAdd "ÇÎÊÑ ÇáÎÒíäÉ ÇáÊí ÊÓÊáã ÇáãÈáÛ", "Choose the treasury that receives the amount"
     LangAdd "ÇáÈÑäÇãÌ (ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Program (e-invoice"
+    LangAdd "ÇáÊÍæíá ÛíÑ ãæÌæÏ Ãæ Êã ÊÑÍíáå", "The transfer does not exist or is already posted"
     LangAdd "ÇáÍÓÇÈ ÇáãŞÇÈá (ÇáÍÑßÇÊ ÇáÃÎÑì", "Contra account (other moves"
     LangAdd "ÇáÎÒíäÉ æÇáÕäÇÏíŞ (ÇáÑÕíÏ ÇáÂä", "Treasury and boxes (balance now"
     LangAdd "ÇáÓäÏ æÇáİÇÊæÑÉ áØÑİíä ãÎÊáİíä", "The voucher and the invoice belong to different parties"
@@ -371,6 +381,9 @@ Private Sub D2_3()
     LangAdd "ÇáãÈíÚÇÊ ÇáÔåÑíÉ (ÂÎÑ 12 ÔåÑğÇ", "Monthly sales (last 12 months"
     LangAdd "ÇáãÓíÑ ãÕÑæİ: ÃáÛö ÇáÕÑİ ÃæáğÇ", "The run is paid: cancel the payment first"
     LangAdd "ÇáãÔÊÑíÇÊ ÇáãÚİÇÉ æÛíÑ ÇáÎÇÖÚÉ", "Exempt and non-taxable purchases"
+End Sub
+
+Private Sub D2_4()
     LangAdd "ÊŞÑíÑ ÇáãáÕŞÇÊ ÛíÑ ãæÌæÏ. ÔÛøá", "The labels report does not exist. Run"
     LangAdd "ÍÑßÉ ÇáÎÒíäÉ / ÇáÕäÏæŞ (ÊİÕíáí", "Treasury / box moves (detailed"
     LangAdd "ÍÓÇÈ ÅÌãÇáí ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", "Total opening balances account"
@@ -381,9 +394,6 @@ Private Sub D2_3()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÅÏÇÑÉ ÇáÕáÇÍíÇÊ", "You do not have the permission to manage permissions"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅŞÑÇÑ ÇáÖÑíÈí", "You do not have the permission for the VAT return"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáäÓÎ ÇáÇÍÊíÇØí", "You do not have the permission for backups"
-End Sub
-
-Private Sub D2_4()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÓÚÑ ÇáÈíÚ", "You do not have the permission to change the sale price"
     LangAdd "áÇ ÊæÌÏ İÇÊæÑÉ ÔÑÇÁ ÈåĞÇ ÇáÑŞã", "There is no purchase invoice with this number"
     LangAdd "áÇ íæÌÏ ÓÏÇÏ ãÓÌá áåĞÇ ÇáÅŞÑÇÑ", "No payment is recorded for this return"
@@ -459,18 +469,4 @@ Private Sub D2_4()
     LangAdd "ÇáãäÙæãÉ ÛíÑ ãÊÇÍÉ ÇáÂä (ÑãÒ", "The platform is not available now (code"
     LangAdd "ÇáäÓÎ ÇáãæÌæÏÉ (ÇáÃÍÏË ÃæáğÇ", "Existing backups (newest first"
     LangAdd "ÈÏÇíÉ ÇáÅåáÇß ŞÈá ÔåÑ ÇáÔÑÇÁ", "The depreciation starts before the month of purchase"
-    LangAdd "ÊÓÌíá ÏİÚÉ ãä Úãíá Úáì ÍÓÇÈå", "Record a payment from a customer on his account"
-    LangAdd "ÍÊì áÇ ÊÊÛíÑ ãÓÊäÏÇÊ ÇáÅŞÑÇÑ", "so that the documents of the return do not change"
-    LangAdd "ÍÑßÉ íÏæíÉ Úáì ÇáãäÊÌ ÇáãÍÏÏ", "A manual move on the selected product"
-    LangAdd "ÎÕã ÇáÓáİÉ ÃßÈÑ ãä ÑÕíÏ Óáİå", "The advance deduction is more than his advance balance"
-    LangAdd "ÎÕã Úáì ÇáİÇÊæÑÉ (ÈÏæä ÖÑíÈÉ", "Invoice discount (without VAT"
-    LangAdd "Ïáíá ÇáÍÓÇÈÇÊ (ÔÌÑÉ ÇáÍÓÇÈÇÊ", "Chart of accounts (account tree"
-    LangAdd "ÑÏ ÛíÑ ãÊæŞÚ ãä ÇáãÕáÍÉ (ÑãÒ", "Unexpected reply from the Tax Authority (code"
-    LangAdd "ÕÇİí ÇáÖÑíÈÉ ÇáãÓÊÍŞÉ ááÓÏÇÏ", "Net VAT due for payment"
-    LangAdd "ÖÑíÈÉ ÇáãÏÎáÇÊ ÃŞá ãä ÇáãÈáÛ", "Input VAT is less than the amount"
-    LangAdd "Úáì ÍÓÇÈ ÂÎÑ (ãÓÊÍŞÇÊ Ãæ ŞÑÖ", "On another account (accruals or a loan"
-    LangAdd "ÚãáÉ ÇáÈÑäÇãÌ áÇ ÊÍÊÇÌ ÓÚÑğÇ", "The program currency needs no rate"
-    LangAdd "ŞÇÆãÉ ÇáÏÎá ÍÓÈ ãÑßÒ ÇáÊßáİÉ", "Income statement by cost center"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÅŞİÇá ÇáİÊÑÇÊ", "You do not have the permission to close periods"
-    LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ", "You do not have this permission in the screen"
 End Sub

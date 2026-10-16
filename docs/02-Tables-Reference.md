@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **75** | عدد الحقول: **1000**
+عدد الجداول: **77** | عدد الحقول: **1019**
 
 ## الفهرس
 
@@ -75,12 +75,14 @@
 67. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
 68. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
 69. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-70. [`StockCounts`](#stockcounts) – جلسات الجرد
-71. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-72. [`AuditLog`](#auditlog) – سجل العمليات
-73. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-74. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-75. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+70. [`StockTransfers`](#stocktransfers) – التحويل بين المخازن
+71. [`StockTransferLines`](#stocktransferlines) – أسطر التحويل بين المخازن
+72. [`StockCounts`](#stockcounts) – جلسات الجرد
+73. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+74. [`AuditLog`](#auditlog) – سجل العمليات
+75. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+76. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+77. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -175,7 +177,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 25 سجل
+- بيانات أساسية: 26 سجل
 
 ## Roles
 
@@ -207,7 +209,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 39 سجل
+- بيانات أساسية: 40 سجل
 
 ## RolePermissions
 
@@ -219,7 +221,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 77 سجل
+- بيانات أساسية: 79 سجل
 
 ## Employees
 
@@ -281,7 +283,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 67 سجل
+- بيانات أساسية: 68 سجل
 
 ## UserScreens
 
@@ -441,7 +443,7 @@
 
 ## Warehouses
 
-**المخازن** – المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل. رصيد الصنف في المخزن = مجموع حركاته فيه (InventoryTransactions.WarehouseID)؛ والتكلفة متوسط واحد للصنف في كل المخازن (docs/57).
+**المخازن** – المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل. رصيد الصنف في المخزن = مجموع حركاته فيه (InventoryTransactions.WarehouseID)؛ والتكلفة متوسط واحد للصنف في كل المخازن (docs/57). حساب مخزون المخزن الرئيسي 1400، وغيره 140000 + رقمه (docs/58).
 
 | # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
 |---|---|---|---|---|---|---|---|---|
@@ -453,9 +455,10 @@
 | 6 | KeeperID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | أمين المخزن |
 | 7 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
 | 8 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب (سيارة) |
-| 9 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 10 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 11 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 9 | ConfirmReceipt | Yes/No |  |  | `False` |  |  | التحويل إليه يحتاج تأكيد الاستلام |
+| 10 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 11 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 12 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `WarehouseID`
 - فهرس فريد: `WarehouseName`
@@ -1473,7 +1476,7 @@
 - المفتاح الأساسي: `AccountCode`
 - فهرس عادي: `ParentCode`
 - فهرس عادي: `TreeKey`
-- بيانات أساسية: 81 سجل
+- بيانات أساسية: 82 سجل
 
 ## JournalSourceTypes
 
@@ -1487,7 +1490,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 29 سجل
+- بيانات أساسية: 31 سجل
 
 ## JournalEntries
 
@@ -1744,7 +1747,7 @@
 
 - المفتاح الأساسي: `TransactionTypeID`
 - فهرس فريد: `TypeCode`
-- بيانات أساسية: 8 سجل
+- بيانات أساسية: 10 سجل
 
 ## InventoryTransactions
 
@@ -1770,6 +1773,46 @@
 - المفتاح الأساسي: `TransactionID`
 - فهرس عادي: `TransactionDate`
 - فهرس عادي: `ReferenceType, ReferenceID`
+
+## StockTransfers
+
+**التحويل بين المخازن** – سند تحويل أصناف من مخزن لآخر: مسودة، ثم «ترحيل» يخصمها من المرسِل بمتوسط التكلفة ويضيفها للمستلم، أو تبقى بالطريق (الحساب 1410) حتى يؤكد المستلم استلامها إذا كان مخزنه يحتاج تأكيد الاستلام (docs/58).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **StockTransferID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | TransferNumber | Short Text | 20 | ✔ |  |  |  | رقم التحويل |
+| 3 | TransferDate | Date/Time |  | ✔ | `Now()` |  |  | تاريخ التحويل (الترحيل) |
+| 4 | FromWarehouseID | Number (Long) |  | ✔ |  |  | `Warehouses.WarehouseID` | من مخزن |
+| 5 | ToWarehouseID | Number (Long) |  | ✔ |  |  | `Warehouses.WarehouseID` | إلى مخزن |
+| 6 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","SENT","RECEIVED")` |  | الحالة |
+| 7 | InTransit | Yes/No |  |  | `False` |  |  | مرّ بالطريق (يحتاج تأكيد الاستلام) |
+| 8 | ReceivedAt | Date/Time |  |  |  |  |  | تاريخ الاستلام |
+| 9 | ReceivedByID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | استلمه |
+| 10 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أنشأه |
+| 11 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 12 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `StockTransferID`
+- فهرس فريد: `TransferNumber`
+- فهرس عادي: `TransferDate`
+- قاعدة تحقق على مستوى الجدول: `[ToWarehouseID]<>[FromWarehouseID]` – المخزن المستلم غير المرسِل
+
+## StockTransferLines
+
+**أسطر التحويل بين المخازن** – الأصناف وكمياتها؛ تكلفة الوحدة متوسط تكلفة الصنف عند الترحيل.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **StockTransferLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر |
+| 2 | StockTransferID | Number (Long) |  | ✔ |  |  | `StockTransfers.StockTransferID` | التحويل |
+| 3 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 4 | Quantity | Currency (كمية) |  | ✔ |  | `>0` |  | الكمية |
+| 5 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `StockTransferLineID`
+- فهرس عادي: `StockTransferID`
 
 ## StockCounts
 

@@ -721,6 +721,7 @@ def account_upgrade_sub() -> str:
                f'dbFailOnError')
     out.append(f'    m_db.Execute "UPDATE [Accounts] SET [IsSystem] = True WHERE [AccountCode] IN ({system}) OR '
                f'[AccountCode] BETWEEN 110001 AND 119999 OR [AccountCode] BETWEEN 120001 AND 129999 OR '
+               f'[AccountCode] BETWEEN 140001 AND 149999 OR '
                f'[AccountCode] BETWEEN 530001 AND 539999", dbFailOnError')
     # docs/52: the opening balances account gets its new name, unless the user renamed it
     out.append('    m_db.Execute "UPDATE [Accounts] SET [AccountName] = \'إجمالي الأرصدة الافتتاحية\' WHERE [AccountCode] = 3900 '

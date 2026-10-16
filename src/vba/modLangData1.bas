@@ -25,6 +25,7 @@ Private Sub D1_1()
     LangAdd "تم النسخ لكن تعذر فتح النسخة للتحقق منها. أعد المحاولة بعد إغلاق البرنامج على الأجهزة الأخرى", "Copied, but the copy could not be opened to check it. Try again after closing the program on the other computers"
     LangAdd "طابق العمليات الظاهرة في الكشف، وسجّل ما في الكشف ولم يُسجَّل (عمولات، فوائد...) كحركة بنكية", "Match the transactions shown on the statement, and record what is on the statement but not in the books (fees, interest...) as a bank transaction"
     LangAdd "لا يوجد موظفون في مسير الرواتب: حدّد «في مسير الرواتب» والراتب الأساسي في شاشة المستخدمين", "No employees on payroll: set On payroll and the basic salary in the Users screen"
+    LangAdd "مسودة بالأصناف، ثم «ترحيل»: تُخصم من المرسِل وتُضاف للمستلم، أو تبقى بالطريق حتى يستلمها", "A draft with the products, then Post: they leave the sender and enter the receiver, or stay in transit until received"
     LangAdd "المستخدم يتبع صلاحيات دوره كما في القائمة. فعّل «صلاحيات شاشات خاصة» لتحديد شاشاته وحده", "The user follows the permissions of his role as in the list. Turn on Custom screen permissions to set his own screens"
     LangAdd "عدّل النسبة أو التعديل ثم «ترحيل المسير». الصرف بسند صرف نقدية من بند «صرف عمولة مندوب", "Edit the rate or the adjustment, then Post the run. The payment is a cash payment voucher with the item Sales rep commission payment"
     LangAdd "كمية كل صنف وتكلفة وحدته يوم بدء التشغيل، ثم «ترحيل الرصيد». «كل الأصناف» يضيف الأصناف", "The quantity and unit cost of each item on the start-up date, then Post the stock. All items adds the items"
@@ -100,6 +101,7 @@ Private Sub D1_1()
     LangAdd "بعدها لا يُضاف ولا يُعدَّل ولا يُحذف أي مستند بتاريخ حتى هذا اليوم", "After that, no document dated up to this day is added, edited or deleted"
     LangAdd "سيُنشأ مفتاح جديد ويُعاد تسجيل الجهاز من البداية. هل تريد المتابعة", "A new key will be created and the device registered again from the start. Continue"
     LangAdd "شهادة الجهاز (CSID): تُملأ من الخطوة 3، أو تُلصق كما تصدرها الهيئة", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
+    LangAdd "يُلغى ترحيل التحويل بالطريق فقط. التحويل المستلم يُعاد بتحويل جديد", "Only a transfer in transit is unposted. A received transfer is sent back with a new transfer"
     LangAdd "أرصدة المنتجات وحركاتها، والرصيد الافتتاحي والإضافة والخصم اليدوي", "Product balances and moves, opening balance and manual additions and deductions"
     LangAdd "إقرار غير محفوظ: الأرقام من المستندات الآن. احفظه مسودة أو اعتمده", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
     LangAdd "الجهاز غير مسجّل. اكتب رمز التحقق (OTP) من بوابة فاتورة ثم الخطوة", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
@@ -129,14 +131,15 @@ Private Sub D1_1()
     LangAdd "التي ليس لها حركات، و«قالب Excel» يصدّرها لتملأها ثم تستوردها", "that have no moves, and Excel template exports them for you to fill and import"
     LangAdd "الجهاز لم يُسجَّل بعد لدى الهيئة (إعداد الربط: الخطوات 1 و2 و", "The device is not registered with ZATCA yet (connection setup: steps 1, 2 and"
     LangAdd "الرصيد لا يُكتب يدويًا: يُحسب من المبيعات والسندات والمصروفات", "The balance is not typed by hand: it is calculated from sales, vouchers and expenses"
+    LangAdd "ترحيل التحويل؟ تُخصم الأصناف من المخزن المرسِل بمتوسط تكلفتها", "Post the transfer? The products leave the sending warehouse at their average cost"
     LangAdd "تغيير إعدادات الفاتورة الإلكترونية يحتاج صلاحية إعدادات المحل", "Changing the e-invoicing settings needs the store settings permission"
     LangAdd "تُحذف المسودة فقط. لإقرار معتمد استخدم «إلغاء الاعتماد» أولًا", "Only the draft is deleted. For an approved return use Cancel approval first"
-    LangAdd "غير موجودة على هذا الجهاز. اخترها من جديد في إعدادات الملصقات", "does not exist on this computer. Choose it again in the label settings"
-    LangAdd "لا تملك صلاحية تعديل أسعار البيع. امسح عمود «سعر البيع الجديد", "You do not have the permission to change sale prices. Clear the column New sale price"
-    LangAdd "أصناف معفاة أو بنسبة صفرية: تحتاج سبب الإعفاء، ولم يُدعم بعد", "Exempt or zero-rated items: they need an exemption reason, not supported yet"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "غير موجودة على هذا الجهاز. اخترها من جديد في إعدادات الملصقات", "does not exist on this computer. Choose it again in the label settings"
+    LangAdd "لا تملك صلاحية تعديل أسعار البيع. امسح عمود «سعر البيع الجديد", "You do not have the permission to change sale prices. Clear the column New sale price"
+    LangAdd "أصناف معفاة أو بنسبة صفرية: تحتاج سبب الإعفاء، ولم يُدعم بعد", "Exempt or zero-rated items: they need an exemption reason, not supported yet"
     LangAdd "ضريبة القيمة المضافة المرحَّلة من الفترات السابقة (رصيد دائن", "VAT carried from previous periods (credit balance"
     LangAdd "قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح", "An entry in a closed period: view only. A reversing entry can be made on an open date"
     LangAdd "للإيداع والسحب والتحويل وتسوية مدى اختر نوع الحركة الخاص بها", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
@@ -229,6 +232,7 @@ Private Sub D1_2()
     LangAdd "المدير المسؤول عن الخزينة: اختر له الخزينة الرئيسية", "The manager in charge of the treasury: choose the main treasury for him"
     LangAdd "تاريخ المصروف في المستقبل. هل تريد الحفظ على أي حال", "The expense date is in the future. Do you want to save anyway"
     LangAdd "توجد شهادة محفوظة. هل تريد استبدالها بشهادة تجريبية", "A certificate is saved. Replace it with a test certificate"
+    LangAdd "تُحذف المسودة فقط. ألغِ ترحيل التحويل بالطريق أولًا", "Only a draft is deleted. Unpost the transfer in transit first"
     LangAdd "جهاز نقطة البيع المسجّل في بوابة مصلحة الضرائب (مصر", "The POS device registered on the Egyptian Tax Authority portal (Egypt"
     LangAdd "لا تملك صلاحية الإضافة في شاشة ربط السداد بالفواتير", "You do not have the permission to add in the payment matching screen"
     LangAdd "لم تُعمل نسخة احتياطية اليوم. هل تريد عمل نسخة الآن", "No backup was made today. Do you want to make a backup now"
@@ -250,16 +254,17 @@ Private Sub D1_2()
     LangAdd "يوجد طلب غير مكتمل من جلسة سابقة. هل تريد استكماله", "There is an unfinished order from a previous session. Do you want to continue it"
     LangAdd "أداء المندوبين: المبيعات والتحصيل والهدف والعمولة", "Sales rep performance: sales, collections, target and commission"
     LangAdd "أغلق الملف وافتحه من جديد ليظهر النظام بدون أدوات", "Close the file and open it again to start the system without the tools of"
+    LangAdd "إلغاء ترحيل التحويل وإعادة الأصناف للمخزن المرسِل", "Unpost the transfer and return the products to the sending warehouse"
     LangAdd "الاستيرادات الخاضعة للضريبة بآلية الاحتساب العكسي", "Imports subject to VAT under the reverse charge"
     LangAdd "الحركة مطابقة في تسوية بنكية: ألغِ مطابقتها أولًا", "The move is matched in a bank reconciliation: unmatch it first"
+End Sub
+
+Private Sub D1_3()
     LangAdd "القيد غير موجود (ربما حُذفت العملية). حدّث القيود", "The entry does not exist (the transaction may have been deleted). Refresh the entries"
     LangAdd "تُحذف التسوية الجارية فقط (أعد فتح المعتمدة أولًا", "Only the open reconciliation is deleted (reopen the approved one first"
     LangAdd "تُحفظ قيمه كما هي الآن، ويُنشأ قيد التسوية بتاريخ", "Its values are kept as they are now, and the settlement entry is created on"
     LangAdd "صُرف له جزء من هذه العمولات. ألغِ سند الصرف أولًا", "Part of these commissions was paid to him. Cancel the payment voucher first"
     LangAdd "لا تملك صلاحية الحذف في شاشة ربط السداد بالفواتير", "You do not have the permission to delete in the payment matching screen"
-End Sub
-
-Private Sub D1_3()
     LangAdd "لا يمكن حذف هذا السجل لأنه مستخدم في عمليات سابقة", "This record cannot be deleted because it is used in earlier transactions"
     LangAdd "مبيعات هذا المستخدم لعميل بلا مندوب تُنسب للمندوب", "The sales of this user to a customer without a sales rep go to the sales rep"
     LangAdd "من يصرف من كل صندوق ويصفّيه ويستلم التحويلات إليه", "Who pays from each box, closes it and receives the transfers to it"
@@ -288,10 +293,4 @@ Private Sub D1_3()
     LangAdd "اختر التقرير ثم حدد الفترة أو العميل أو المنتج", "Choose the report, then set the period, the customer or the product"
     LangAdd "اكتب الرصيد الظاهر في كشف البنك في هذا التاريخ", "Type the balance shown on the bank statement on this date"
     LangAdd "الخصم...) تبقى من دور المستخدم في شاشة الأدوار", "discount...) come from the role of the user in the Roles screen"
-    LangAdd "الصرف مطابق في تسوية بنكية: ألغِ مطابقته أولًا", "The payment is matched in a bank reconciliation: unmatch it first"
-    LangAdd "الكمية المرتجعة للمورد أكبر من الكمية المشتراة", "The quantity returned to the supplier is more than the quantity bought"
-    LangAdd "الكمية تتغير فقط من المشتريات والمبيعات والجرد", "The quantity changes only through purchases, sales and stock counts"
-    LangAdd "تأكيد كلمة المرور لا يطابق كلمة المرور الجديدة", "The password confirmation does not match the new password"
-    LangAdd "تغيرت ضريبة مستندات الفترة بعد الاعتماد بمقدار", "The VAT of the documents of the period changed after approval by"
-    LangAdd "رفضت المصلحة بيانات دخول البرنامج (Client ID و", "The Tax Authority refused the credentials of the program (Client ID and"
 End Sub

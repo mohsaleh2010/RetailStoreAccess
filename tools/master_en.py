@@ -13,6 +13,7 @@ ACCOUNT_NAMES_EN = {
     110002: "Cashier box",
     1190: "Cash not allocated to a box",
     1195: "Cash in transit between boxes",
+    1410: "Goods in transit between warehouses",
     1200: "Mada and wallets under settlement (bank and network)",
     1210: "Bank accounts",
     1250: "Cheques under collection",
@@ -105,12 +106,14 @@ SOURCE_TYPES_EN = {
     "PAYROLL": "Payroll entry", "PAYROLL_PAYMENT": "Salary payment", "COMMISSION": "Sales rep commissions entry",
     "ACCOUNT_OPENING": "Account opening balance",
     "CASH_RECEIVE": "Cash transfer received",
+    "STOCK_TRANSFER": "Transfer between warehouses", "STOCK_RECEIVE": "Stock transfer received",
 }
 
 TRANSACTION_TYPES_EN = {
     "PURCHASE": "Purchase", "SALE": "Sale", "PURCHASE_RETURN": "Purchase return", "SALES_RETURN": "Sales return",
     "STOCK_IN": "Stock addition", "STOCK_OUT": "Stock deduction", "ADJUSTMENT": "Count adjustment",
-    "OPENING": "Opening balance",
+    "OPENING": "Opening balance", "TRANSFER_OUT": "Transfer out to another warehouse",
+    "TRANSFER_IN": "Transfer in from another warehouse",
 }
 
 ROLE_NAMES_EN = {1: "System administrator", 2: "Manager", 3: "Cashier"}
@@ -124,6 +127,7 @@ PERMISSION_NAMES_EN = {
     "INVENTORY_ADJUST": "Manual stock addition and deduction", "STOCK_COUNT": "Stock count", "EXPENSES": "Expenses",
     "CASH_BOX": "Treasury: receipt, payment and transfer vouchers and boxes", "CASH_CLOSING": "Daily cashier closing",
     "CASH_ALL_BOXES": "Pay and transfer from every box, not only own boxes",
+    "STOCK_TRANSFER": "Transfers between warehouses: sending and receiving",
     "JOURNAL": "Journal entries, chart of accounts and trial balance",
     "MANUAL_ENTRY": "Manual entries: add, edit and delete",
     "PERIOD_CLOSE": "Close and reopen periods and the fiscal year",
@@ -151,7 +155,8 @@ SCREEN_TITLES_EN = {
     "frmLabelSettings": "Label settings", "frmExpenses": "Expenses", "frmExpenseTypes": "Expense types",
     "frmRecurring": "Recurring expenses", "frmTreasury": "Treasury", "frmCashVoucher": "Cash and transfer vouchers",
     "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmCashBoxUsers": "Box custodians",
-    "frmCashTransfers": "Receipt of transfers between boxes", "frmWarehouses": "Warehouses", "frmAccounting": "Accounting and finance",
+    "frmCashTransfers": "Receipt of transfers between boxes", "frmWarehouses": "Warehouses",
+    "frmStockTransfer": "Transfers between warehouses", "frmAccounting": "Accounting and finance",
     "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
     "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
     "frmPeriodClosing": "Period and fiscal year closing", "frmFiscalPeriods": "Fiscal periods", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",

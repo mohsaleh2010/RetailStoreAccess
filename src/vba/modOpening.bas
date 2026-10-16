@@ -95,7 +95,7 @@ Public Function OpeningAccountProblem(ByVal AccountCode As Variant) As String
     Select Case code
         Case 1300: OpeningAccountProblem = "رصيد العملاء يُدخل في قسم «العملاء»: رصيد لكل عميل."
         Case 2100: OpeningAccountProblem = "رصيد الموردين يُدخل في قسم «الموردون»: رصيد لكل مورد."
-        Case 1400: OpeningAccountProblem = "رصيد المخزون يُدخل في قسم «المخزون»: كمية وتكلفة لكل صنف."
+        Case 1400, 140001 To 149999: OpeningAccountProblem = "رصيد المخزون يُدخل في قسم «المخزون»: كمية وتكلفة لكل صنف."
         Case OPENING_ACCOUNT: OpeningAccountProblem = "حساب إجمالي الأرصدة الافتتاحية هو مقابل كل الأرصدة، ولا يُدخل له رصيد."
         Case 110001 To 119999: OpeningAccountProblem = "رصيد الصندوق يُدخل في قسم «الصناديق»."
         Case 120001 To 129999: OpeningAccountProblem = "رصيد البنك يُدخل في قسم «البنوك»."

@@ -16,6 +16,7 @@ MONEY = {"Format": "#,##0.00"}
 OPENING_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a "
                     "WHERE IsPosting = True AND IsActive = True AND AccountCode NOT IN (1300, 2100, 1400, 3900) "
                     "AND AccountCode NOT BETWEEN 110001 AND 119999 AND AccountCode NOT BETWEEN 120001 AND 129999 "
+                    "AND AccountCode NOT BETWEEN 140001 AND 149999 "
                     "ORDER BY TreeKey")
 # part key, grid form, table, key field, the names shown (a locked combo on the key, so an English front-end
 # shows the English name), last column, record source (the table itself: the grid edits it), sign text

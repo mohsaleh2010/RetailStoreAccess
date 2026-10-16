@@ -353,6 +353,9 @@ class Store:
         c.execute("INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) "
                   "SELECT 530000 + t.ExpenseTypeID, t.ExpenseTypeName, 'EXPENSE', 5300, 1, 1 FROM ExpenseTypes AS t "
                   "WHERE 530000 + t.ExpenseTypeID NOT IN (SELECT AccountCode FROM Accounts)")
+        c.execute("INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) "
+                  "SELECT 140000 + w.WarehouseID, w.WarehouseName, 'ASSET', 11, 1, 1 FROM Warehouses AS w "
+                  "WHERE w.WarehouseID <> 1 AND 140000 + w.WarehouseID NOT IN (SELECT AccountCode FROM Accounts)")
         self.rebuild_account_tree()
         kinds = dict(c.execute("SELECT SourceType, TypeName FROM JournalSourceTypes").fetchall())
         existing = {(t, i): (eid, dec(sig), when, dec(debit)) for eid, t, i, sig, when, debit in c.execute(
@@ -435,6 +438,39 @@ class Store:
                     Quantity=float(qty), UnitCost=float(cost), QuantityAfter=float(new), ReferenceType=ref_type,
                     ReferenceID=ref_id or None, ReferenceNumber=ref_no, EmployeeID=self.user,
                     WarehouseID=warehouse or self.warehouse())
+
+    # ------------------------------------------------------------- transfers (modWarehouses, docs/58)
+    def stock_transfer(self, src, dst, lines, notes=None):           # CreateStockTransfer + its lines
+        tid = self.insert("StockTransfers", TransferNumber=self.next_number("STOCK_TRANSFER"), TransferDate=self.now,
+                          FromWarehouseID=src, ToWarehouseID=dst, Status="DRAFT", InTransit=0,
+                          EmployeeID=self.user, Notes=notes)
+        for pid, q in lines:
+            self.insert("StockTransferLines", StockTransferID=tid, ProductID=pid, Quantity=float(q), UnitCost=0)
+        return tid
+
+    def send_transfer(self, tid):                                    # SendStockTransfer
+        src, dst, no = self.c.execute("SELECT FromWarehouseID, ToWarehouseID, TransferNumber FROM StockTransfers "
+                                      "WHERE StockTransferID = ?", (tid,)).fetchone()
+        transit = bool(self.one("SELECT ConfirmReceipt FROM Warehouses WHERE WarehouseID = ?", dst))
+        for lid, pid, q in self.c.execute("SELECT StockTransferLineID, ProductID, Quantity FROM StockTransferLines "
+                                          "WHERE StockTransferID = ?", (tid,)).fetchall():
+            cost = self.avg(pid)
+            self.c.execute("UPDATE StockTransferLines SET UnitCost = ? WHERE StockTransferLineID = ?", (float(cost), lid))
+            self.apply_stock(pid, -dec(q), 9, cost, "TRANSFER", tid, no, warehouse=src)
+            if not transit:
+                self.apply_stock(pid, dec(q), 10, cost, "TRANSFER", tid, no, warehouse=dst)
+        self.c.execute("UPDATE StockTransfers SET TransferDate = ?, Status = ?, InTransit = ?, ReceivedAt = ? "
+                       "WHERE StockTransferID = ?", (self.now, "SENT" if transit else "RECEIVED", int(transit),
+                                                     None if transit else self.now, tid))
+
+    def receive_transfer_stock(self, tid):                           # ReceiveStockTransfer
+        dst, no = self.c.execute("SELECT ToWarehouseID, TransferNumber FROM StockTransfers WHERE StockTransferID = ?",
+                                 (tid,)).fetchone()
+        for pid, q, cost in self.c.execute("SELECT ProductID, Quantity, UnitCost FROM StockTransferLines "
+                                           "WHERE StockTransferID = ?", (tid,)).fetchall():
+            self.apply_stock(pid, dec(q), 10, dec(cost), "TRANSFER", tid, no, warehouse=dst)
+        self.c.execute("UPDATE StockTransfers SET Status = 'RECEIVED', ReceivedAt = ?, ReceivedByID = ? "
+                       "WHERE StockTransferID = ?", (self.now, self.user, tid))
 
     def adjust(self, table, key, kid, delta):                      # AdjustBalance
         self.c.execute(f"UPDATE {table} SET CurrentBalance = CurrentBalance + ? WHERE {key} = ?",

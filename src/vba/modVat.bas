@@ -273,7 +273,7 @@ Public Function VatPaymentAccountProblem(ByVal AccountCode As Long) As String
     Dim ok As Variant
     ok = DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & AccountCode & " AND IsPosting = True AND " & _
                  "AccountType = 'ASSET' AND Level2Code = 11 AND Nz(Level3Code, 0) <> 1100 AND AccountCode NOT IN " & _
-                 "(1300, 1400, 1500, 1600)")
+                 "(1300, 1400, 1410, 1500, 1600) AND AccountCode NOT BETWEEN 140001 AND 149999")
     If IsNull(ok) Then VatPaymentAccountProblem = "اختر حساب البنك الذي سُدِّدت منه الضريبة."
 End Function
 
@@ -443,7 +443,7 @@ Public Sub VatReturnLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     frm!cboPayAccount.RowSource = Tr("SELECT a.AccountCode, a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND " & _
         "AccountType = 'ASSET' AND Level2Code = 11 AND Nz(Level3Code, 0) <> 1100 AND AccountCode NOT IN " & _
-        "(1300, 1400, 1500, 1600) ORDER BY TreeKey")
+        "(1300, 1400, 1410, 1500, 1600) AND AccountCode NOT BETWEEN 140001 AND 149999 ORDER BY TreeKey")
     If AppCountry() = "EG" Then                        ' the Egyptian return is monthly
         frm!btnLastQuarter.Visible = False
         frm!lblFilingRef.Caption = Tr("رقم الإقرار لدى المصلحة")

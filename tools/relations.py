@@ -60,6 +60,8 @@ UNENFORCED = {
     ("CommissionRuns", "EmployeeID"),
     ("CashVouchers", "ReceivedByID"),
     ("Warehouses", "KeeperID"),
+    ("StockTransfers", "ReceivedByID"),
+    ("StockTransfers", "EmployeeID"),
 }
 
 ACCESS_MAX_INDEXES = 32

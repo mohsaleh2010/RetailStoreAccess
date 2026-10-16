@@ -79,6 +79,7 @@
 | + | يومية الصندوق التفصيلية: صفحة لكل صندوق ويوم، برصيد أول اليوم ثم المقبوضات ثم المصروفات، والإجماليات ورصيد آخر اليوم وتصفيات الكاشير؛ من مركز التقارير ومن شاشة الخزينة | ✅ تمت الموافقة | [docs/55-Cash-Day-Book.md](docs/55-Cash-Day-Book.md) |
 | + | أمناء الصناديق (لا يصرف المستخدم من صندوق غيره)، والتحويل بين الصناديق بانتظار الاستلام (نقدية بالطريق)، وصندوق عهدة المندوب | ✅ تمت الموافقة | [docs/56-Cash-Custodians.md](docs/56-Cash-Custodians.md) |
 | + | المخازن المتعددة: جدول المخازن، والمخزن على كل حركة ومستند وجرد ورصيد افتتاحي، ورصيد كل صنف في كل مخزن وتقريره | ✅ تمت الموافقة | [docs/57-Warehouses.md](docs/57-Warehouses.md) |
+| + | التحويل بين المخازن (مسودة، ثم ترحيل، ثم بالطريق حتى الاستلام إن لزم)، وحساب مخزون لكل مخزن، وحساب البضاعة بالطريق | ✅ بانتظار الموافقة | [docs/58-Stock-Transfers.md](docs/58-Stock-Transfers.md) |
 
 ## هيكل المستودع
 
@@ -182,6 +183,7 @@
 | 50 | استبدال `modCash` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildQueries`, `BuildForms`, `BuildReports` | `TestCash` |
 | 51 | استبدال `modCash` و`modBank` و`modPayroll` و`modJournal` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestCash`, `TestJournal` |
 | 52 | `modWarehouses` (دائمة، جديدة)، واستبدال `modSales` و`modPurchases` و`modPurchaseScreens` و`modPOS` و`modTouchPOS` و`modOpening` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestWarehouses`, `TestOpeningBalances`, `TestPurchases`, `TestSales` |
+| 53 | استبدال `modWarehouses` و`modJournal` و`modVat` و`modOpening` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms` | `TestWarehouses`, `TestJournal` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

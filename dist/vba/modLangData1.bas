@@ -25,6 +25,7 @@ Private Sub D1_1()
     LangAdd "Êã ÇáäÓÎ áßä ÊÚĞÑ İÊÍ ÇáäÓÎÉ ááÊÍŞŞ ãäåÇ. ÃÚÏ ÇáãÍÇæáÉ ÈÚÏ ÅÛáÇŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì", "Copied, but the copy could not be opened to check it. Try again after closing the program on the other computers"
     LangAdd "ØÇÈŞ ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ÇáßÔİ¡ æÓÌøá ãÇ İí ÇáßÔİ æáã íõÓÌóøá (ÚãæáÇÊ¡ İæÇÆÏ...) ßÍÑßÉ ÈäßíÉ", "Match the transactions shown on the statement, and record what is on the statement but not in the books (fees, interest...) as a bank transaction"
     LangAdd "áÇ íæÌÏ ãæÙİæä İí ãÓíÑ ÇáÑæÇÊÈ: ÍÏøÏ «İí ãÓíÑ ÇáÑæÇÊÈ» æÇáÑÇÊÈ ÇáÃÓÇÓí İí ÔÇÔÉ ÇáãÓÊÎÏãíä", "No employees on payroll: set On payroll and the basic salary in the Users screen"
+    LangAdd "ãÓæÏÉ ÈÇáÃÕäÇİ¡ Ëã «ÊÑÍíá»: ÊõÎÕã ãä ÇáãÑÓöá æÊõÖÇİ ááãÓÊáã¡ Ãæ ÊÈŞì ÈÇáØÑíŞ ÍÊì íÓÊáãåÇ", "A draft with the products, then Post: they leave the sender and enter the receiver, or stay in transit until received"
     LangAdd "ÇáãÓÊÎÏã íÊÈÚ ÕáÇÍíÇÊ ÏæÑå ßãÇ İí ÇáŞÇÆãÉ. İÚøá «ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ» áÊÍÏíÏ ÔÇÔÇÊå æÍÏå", "The user follows the permissions of his role as in the list. Turn on Custom screen permissions to set his own screens"
     LangAdd "ÚÏøá ÇáäÓÈÉ Ãæ ÇáÊÚÏíá Ëã «ÊÑÍíá ÇáãÓíÑ». ÇáÕÑİ ÈÓäÏ ÕÑİ äŞÏíÉ ãä ÈäÏ «ÕÑİ ÚãæáÉ ãäÏæÈ", "Edit the rate or the adjustment, then Post the run. The payment is a cash payment voucher with the item Sales rep commission payment"
     LangAdd "ßãíÉ ßá Õäİ æÊßáİÉ æÍÏÊå íæã ÈÏÁ ÇáÊÔÛíá¡ Ëã «ÊÑÍíá ÇáÑÕíÏ». «ßá ÇáÃÕäÇİ» íÖíİ ÇáÃÕäÇİ", "The quantity and unit cost of each item on the start-up date, then Post the stock. All items adds the items"
@@ -100,6 +101,7 @@ Private Sub D1_1()
     LangAdd "ÈÚÏåÇ áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ÍÊì åĞÇ Çáíæã", "After that, no document dated up to this day is added, edited or deleted"
     LangAdd "ÓíõäÔÃ ãİÊÇÍ ÌÏíÏ æíõÚÇÏ ÊÓÌíá ÇáÌåÇÒ ãä ÇáÈÏÇíÉ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "A new key will be created and the device registered again from the start. Continue"
     LangAdd "ÔåÇÏÉ ÇáÌåÇÒ (CSID): ÊõãáÃ ãä ÇáÎØæÉ 3¡ Ãæ ÊõáÕŞ ßãÇ ÊÕÏÑåÇ ÇáåíÆÉ", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
+    LangAdd "íõáÛì ÊÑÍíá ÇáÊÍæíá ÈÇáØÑíŞ İŞØ. ÇáÊÍæíá ÇáãÓÊáã íõÚÇÏ ÈÊÍæíá ÌÏíÏ", "Only a transfer in transit is unposted. A received transfer is sent back with a new transfer"
     LangAdd "ÃÑÕÏÉ ÇáãäÊÌÇÊ æÍÑßÇÊåÇ¡ æÇáÑÕíÏ ÇáÇİÊÊÇÍí æÇáÅÖÇİÉ æÇáÎÕã ÇáíÏæí", "Product balances and moves, opening balance and manual additions and deductions"
     LangAdd "ÅŞÑÇÑ ÛíÑ ãÍİæÙ: ÇáÃÑŞÇã ãä ÇáãÓÊäÏÇÊ ÇáÂä. ÇÍİÙå ãÓæÏÉ Ãæ ÇÚÊãÏå", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
     LangAdd "ÇáÌåÇÒ ÛíÑ ãÓÌøá. ÇßÊÈ ÑãÒ ÇáÊÍŞŞ (OTP) ãä ÈæÇÈÉ İÇÊæÑÉ Ëã ÇáÎØæÉ", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
@@ -129,14 +131,15 @@ Private Sub D1_1()
     LangAdd "ÇáÊí áíÓ áåÇ ÍÑßÇÊ¡ æ«ŞÇáÈ Excel» íÕÏøÑåÇ áÊãáÃåÇ Ëã ÊÓÊæÑÏåÇ", "that have no moves, and Excel template exports them for you to fill and import"
     LangAdd "ÇáÌåÇÒ áã íõÓÌóøá ÈÚÏ áÏì ÇáåíÆÉ (ÅÚÏÇÏ ÇáÑÈØ: ÇáÎØæÇÊ 1 æ2 æ", "The device is not registered with ZATCA yet (connection setup: steps 1, 2 and"
     LangAdd "ÇáÑÕíÏ áÇ íõßÊÈ íÏæíğÇ: íõÍÓÈ ãä ÇáãÈíÚÇÊ æÇáÓäÏÇÊ æÇáãÕÑæİÇÊ", "The balance is not typed by hand: it is calculated from sales, vouchers and expenses"
+    LangAdd "ÊÑÍíá ÇáÊÍæíá¿ ÊõÎÕã ÇáÃÕäÇİ ãä ÇáãÎÒä ÇáãÑÓöá ÈãÊæÓØ ÊßáİÊåÇ", "Post the transfer? The products leave the sending warehouse at their average cost"
     LangAdd "ÊÛííÑ ÅÚÏÇÏÇÊ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ íÍÊÇÌ ÕáÇÍíÉ ÅÚÏÇÏÇÊ ÇáãÍá", "Changing the e-invoicing settings needs the store settings permission"
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. áÅŞÑÇÑ ãÚÊãÏ ÇÓÊÎÏã «ÅáÛÇÁ ÇáÇÚÊãÇÏ» ÃæáğÇ", "Only the draft is deleted. For an approved return use Cancel approval first"
-    LangAdd "ÛíÑ ãæÌæÏÉ Úáì åĞÇ ÇáÌåÇÒ. ÇÎÊÑåÇ ãä ÌÏíÏ İí ÅÚÏÇÏÇÊ ÇáãáÕŞÇÊ", "does not exist on this computer. Choose it again in the label settings"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÃÓÚÇÑ ÇáÈíÚ. ÇãÓÍ ÚãæÏ «ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ", "You do not have the permission to change sale prices. Clear the column New sale price"
-    LangAdd "ÃÕäÇİ ãÚİÇÉ Ãæ ÈäÓÈÉ ÕİÑíÉ: ÊÍÊÇÌ ÓÈÈ ÇáÅÚİÇÁ¡ æáã íõÏÚã ÈÚÏ", "Exempt or zero-rated items: they need an exemption reason, not supported yet"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "ÛíÑ ãæÌæÏÉ Úáì åĞÇ ÇáÌåÇÒ. ÇÎÊÑåÇ ãä ÌÏíÏ İí ÅÚÏÇÏÇÊ ÇáãáÕŞÇÊ", "does not exist on this computer. Choose it again in the label settings"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÃÓÚÇÑ ÇáÈíÚ. ÇãÓÍ ÚãæÏ «ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ", "You do not have the permission to change sale prices. Clear the column New sale price"
+    LangAdd "ÃÕäÇİ ãÚİÇÉ Ãæ ÈäÓÈÉ ÕİÑíÉ: ÊÍÊÇÌ ÓÈÈ ÇáÅÚİÇÁ¡ æáã íõÏÚã ÈÚÏ", "Exempt or zero-rated items: they need an exemption reason, not supported yet"
     LangAdd "ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÑÍóøáÉ ãä ÇáİÊÑÇÊ ÇáÓÇÈŞÉ (ÑÕíÏ ÏÇÆä", "VAT carried from previous periods (credit balance"
     LangAdd "ŞíÏ İí İÊÑÉ ãŞİáÉ: ááÚÑÖ İŞØ. íãßä Úãá ŞíÏ ÚßÓí ÈÊÇÑíÎ ãİÊæÍ", "An entry in a closed period: view only. A reversing entry can be made on an open date"
     LangAdd "ááÅíÏÇÚ æÇáÓÍÈ æÇáÊÍæíá æÊÓæíÉ ãÏì ÇÎÊÑ äæÚ ÇáÍÑßÉ ÇáÎÇÕ ÈåÇ", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
@@ -229,6 +232,7 @@ Private Sub D1_2()
     LangAdd "ÇáãÏíÑ ÇáãÓÄæá Úä ÇáÎÒíäÉ: ÇÎÊÑ áå ÇáÎÒíäÉ ÇáÑÆíÓíÉ", "The manager in charge of the treasury: choose the main treasury for him"
     LangAdd "ÊÇÑíÎ ÇáãÕÑæİ İí ÇáãÓÊŞÈá. åá ÊÑíÏ ÇáÍİÙ Úáì Ãí ÍÇá", "The expense date is in the future. Do you want to save anyway"
     LangAdd "ÊæÌÏ ÔåÇÏÉ ãÍİæÙÉ. åá ÊÑíÏ ÇÓÊÈÏÇáåÇ ÈÔåÇÏÉ ÊÌÑíÈíÉ", "A certificate is saved. Replace it with a test certificate"
+    LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÃáÛö ÊÑÍíá ÇáÊÍæíá ÈÇáØÑíŞ ÃæáğÇ", "Only a draft is deleted. Unpost the transfer in transit first"
     LangAdd "ÌåÇÒ äŞØÉ ÇáÈíÚ ÇáãÓÌøá İí ÈæÇÈÉ ãÕáÍÉ ÇáÖÑÇÆÈ (ãÕÑ", "The POS device registered on the Egyptian Tax Authority portal (Egypt"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to add in the payment matching screen"
     LangAdd "áã ÊõÚãá äÓÎÉ ÇÍÊíÇØíÉ Çáíæã. åá ÊÑíÏ Úãá äÓÎÉ ÇáÂä", "No backup was made today. Do you want to make a backup now"
@@ -250,16 +254,17 @@ Private Sub D1_2()
     LangAdd "íæÌÏ ØáÈ ÛíÑ ãßÊãá ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáå", "There is an unfinished order from a previous session. Do you want to continue it"
     LangAdd "ÃÏÇÁ ÇáãäÏæÈíä: ÇáãÈíÚÇÊ æÇáÊÍÕíá æÇáåÏİ æÇáÚãæáÉ", "Sales rep performance: sales, collections, target and commission"
     LangAdd "ÃÛáŞ Çáãáİ æÇİÊÍå ãä ÌÏíÏ áíÙåÑ ÇáäÙÇã ÈÏæä ÃÏæÇÊ", "Close the file and open it again to start the system without the tools of"
+    LangAdd "ÅáÛÇÁ ÊÑÍíá ÇáÊÍæíá æÅÚÇÏÉ ÇáÃÕäÇİ ááãÎÒä ÇáãÑÓöá", "Unpost the transfer and return the products to the sending warehouse"
     LangAdd "ÇáÇÓÊíÑÇÏÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ ÈÂáíÉ ÇáÇÍÊÓÇÈ ÇáÚßÓí", "Imports subject to VAT under the reverse charge"
     LangAdd "ÇáÍÑßÉ ãØÇÈŞÉ İí ÊÓæíÉ ÈäßíÉ: ÃáÛö ãØÇÈŞÊåÇ ÃæáğÇ", "The move is matched in a bank reconciliation: unmatch it first"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ÇáŞíÏ ÛíÑ ãæÌæÏ (ÑÈãÇ ÍõĞİÊ ÇáÚãáíÉ). ÍÏøË ÇáŞíæÏ", "The entry does not exist (the transaction may have been deleted). Refresh the entries"
     LangAdd "ÊõÍĞİ ÇáÊÓæíÉ ÇáÌÇÑíÉ İŞØ (ÃÚÏ İÊÍ ÇáãÚÊãÏÉ ÃæáğÇ", "Only the open reconciliation is deleted (reopen the approved one first"
     LangAdd "ÊõÍİÙ Şíãå ßãÇ åí ÇáÂä¡ æíõäÔÃ ŞíÏ ÇáÊÓæíÉ ÈÊÇÑíÎ", "Its values are kept as they are now, and the settlement entry is created on"
     LangAdd "ÕõÑİ áå ÌÒÁ ãä åĞå ÇáÚãæáÇÊ. ÃáÛö ÓäÏ ÇáÕÑİ ÃæáğÇ", "Part of these commissions was paid to him. Cancel the payment voucher first"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÍĞİ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to delete in the payment matching screen"
-End Sub
-
-Private Sub D1_3()
     LangAdd "áÇ íãßä ÍĞİ åĞÇ ÇáÓÌá áÃäå ãÓÊÎÏã İí ÚãáíÇÊ ÓÇÈŞÉ", "This record cannot be deleted because it is used in earlier transactions"
     LangAdd "ãÈíÚÇÊ åĞÇ ÇáãÓÊÎÏã áÚãíá ÈáÇ ãäÏæÈ ÊõäÓÈ ááãäÏæÈ", "The sales of this user to a customer without a sales rep go to the sales rep"
     LangAdd "ãä íÕÑİ ãä ßá ÕäÏæŞ æíÕİøíå æíÓÊáã ÇáÊÍæíáÇÊ Åáíå", "Who pays from each box, closes it and receives the transfers to it"
@@ -288,10 +293,4 @@ Private Sub D1_3()
     LangAdd "ÇÎÊÑ ÇáÊŞÑíÑ Ëã ÍÏÏ ÇáİÊÑÉ Ãæ ÇáÚãíá Ãæ ÇáãäÊÌ", "Choose the report, then set the period, the customer or the product"
     LangAdd "ÇßÊÈ ÇáÑÕíÏ ÇáÙÇåÑ İí ßÔİ ÇáÈäß İí åĞÇ ÇáÊÇÑíÎ", "Type the balance shown on the bank statement on this date"
     LangAdd "ÇáÎÕã...) ÊÈŞì ãä ÏæÑ ÇáãÓÊÎÏã İí ÔÇÔÉ ÇáÃÏæÇÑ", "discount...) come from the role of the user in the Roles screen"
-    LangAdd "ÇáÕÑİ ãØÇÈŞ İí ÊÓæíÉ ÈäßíÉ: ÃáÛö ãØÇÈŞÊå ÃæáğÇ", "The payment is matched in a bank reconciliation: unmatch it first"
-    LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ááãæÑÏ ÃßÈÑ ãä ÇáßãíÉ ÇáãÔÊÑÇÉ", "The quantity returned to the supplier is more than the quantity bought"
-    LangAdd "ÇáßãíÉ ÊÊÛíÑ İŞØ ãä ÇáãÔÊÑíÇÊ æÇáãÈíÚÇÊ æÇáÌÑÏ", "The quantity changes only through purchases, sales and stock counts"
-    LangAdd "ÊÃßíÏ ßáãÉ ÇáãÑæÑ áÇ íØÇÈŞ ßáãÉ ÇáãÑæÑ ÇáÌÏíÏÉ", "The password confirmation does not match the new password"
-    LangAdd "ÊÛíÑÊ ÖÑíÈÉ ãÓÊäÏÇÊ ÇáİÊÑÉ ÈÚÏ ÇáÇÚÊãÇÏ ÈãŞÏÇÑ", "The VAT of the documents of the period changed after approval by"
-    LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ (Client ID æ", "The Tax Authority refused the credentials of the program (Client ID and"
 End Sub

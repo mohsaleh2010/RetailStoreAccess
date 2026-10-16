@@ -362,6 +362,7 @@ TABLES: List[Table] = [
             ("COMMISSION_RUN", "COM-", 1, 5, "مسيرات العمولات"),
             ("STOCK_COUNT", "CNT-", 1, 5, "جلسات الجرد"),
             ("STOCK_ADJUST", "ADJ-", 1, 6, "حركات المخزون اليدوية"),
+            ("STOCK_TRANSFER", "STT-", 1, 6, "التحويل بين المخازن"),
             ("PRODUCT_CODE", "P", 1, 5, "أكواد المنتجات"),
             ("ZATCA_ICV", None, 1, 0, "عدّاد ICV لمستندات فاتورة"),
             ("CASH_IN", "CIN-", 1, 6, "سندات قبض النقدية (الخزينة)"),
@@ -429,6 +430,7 @@ TABLES: List[Table] = [
             ("PRODUCTS", "إدارة المنتجات والأسعار", "المخزون", 50),
             ("INVENTORY_ADJUST", "إضافة وخصم مخزون يدوي", "المخزون", 51),
             ("STOCK_COUNT", "الجرد", "المخزون", 52),
+            ("STOCK_TRANSFER", "التحويل بين المخازن: الإرسال والاستلام", "المخزون", 53),
             ("EXPENSES", "المصروفات", "المصروفات", 60),
             ("CASH_BOX", "الخزينة: سندات القبض والصرف والتحويل والصناديق", "الخزينة", 65),
             ("CASH_CLOSING", "تصفية يومية الكاشير", "الخزينة", 66),
@@ -737,7 +739,8 @@ TABLES: List[Table] = [
     Table(
         "Warehouses", "المخازن",
         "المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل. رصيد الصنف في المخزن = مجموع حركاته فيه "
-        "(InventoryTransactions.WarehouseID)؛ والتكلفة متوسط واحد للصنف في كل المخازن (docs/57).",
+        "(InventoryTransactions.WarehouseID)؛ والتكلفة متوسط واحد للصنف في كل المخازن (docs/57). حساب مخزون "
+        "المخزن الرئيسي 1400، وغيره 140000 + رقمه (docs/58).",
         [
             auto("WarehouseID", "رقم المخزن"),
             text("WarehouseCode", 20, "كود المخزن"),
@@ -749,6 +752,7 @@ TABLES: List[Table] = [
             long_("KeeperID", "أمين المخزن", fk="Employees.EmployeeID"),
             long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID"),
             long_("SalesRepID", "المندوب (سيارة)", fk="SalesReps.SalesRepID"),
+            bool_("ConfirmReceipt", "التحويل إليه يحتاج تأكيد الاستلام"),
             is_active(),
             text("Notes", 255, "ملاحظات"),
             created_at(),
@@ -1784,6 +1788,7 @@ TABLES: List[Table] = [
             ("COMMISSION", "قيد عمولات المندوبين", 27),
             ("ACCOUNT_OPENING", "رصيد افتتاحي لحساب", 28),
             ("CASH_RECEIVE", "استلام تحويل نقدية", 29),
+            ("STOCK_TRANSFER", "تحويل بين المخازن", 30), ("STOCK_RECEIVE", "استلام تحويل مخزني", 31),
         ],
         seed_missing=True,
     ),
@@ -2048,7 +2053,10 @@ TABLES: List[Table] = [
             (6, "STOCK_OUT", "خصم مخزون", -1, True),
             (7, "ADJUSTMENT", "تسوية جرد", 0, False),
             (8, "OPENING", "رصيد افتتاحي", 1, True),
+            (9, "TRANSFER_OUT", "تحويل صادر لمخزن آخر", -1, False),
+            (10, "TRANSFER_IN", "تحويل وارد من مخزن آخر", 1, False),
         ],
+        seed_missing=True,
     ),
 
     Table(
@@ -2075,6 +2083,47 @@ TABLES: List[Table] = [
         ],
         pk=["TransactionID"],
         indexes=[ix("TransactionDate"), ix("ReferenceType", "ReferenceID")],
+    ),
+
+    Table(
+        "StockTransfers", "التحويل بين المخازن",
+        "سند تحويل أصناف من مخزن لآخر: مسودة، ثم «ترحيل» يخصمها من المرسِل بمتوسط التكلفة ويضيفها للمستلم، "
+        "أو تبقى بالطريق (الحساب 1410) حتى يؤكد المستلم استلامها إذا كان مخزنه يحتاج تأكيد الاستلام (docs/58).",
+        [
+            auto("StockTransferID", "رقم داخلي"),
+            text("TransferNumber", 20, "رقم التحويل", required=True),
+            datetime_("TransferDate", "تاريخ التحويل (الترحيل)", required=True, default="Now()"),
+            long_("FromWarehouseID", "من مخزن", required=True, fk="Warehouses.WarehouseID"),
+            long_("ToWarehouseID", "إلى مخزن", required=True, fk="Warehouses.WarehouseID"),
+            text("Status", 10, "الحالة", required=True, default='"DRAFT"',
+                 rule='In ("DRAFT","SENT","RECEIVED")',
+                 rule_text="DRAFT مسودة، SENT بالطريق، RECEIVED مُستلَم"),
+            bool_("InTransit", "مرّ بالطريق (يحتاج تأكيد الاستلام)"),
+            datetime_("ReceivedAt", "تاريخ الاستلام"),
+            long_("ReceivedByID", "استلمه", fk="Employees.EmployeeID"),
+            long_("EmployeeID", "أنشأه", required=True, fk="Employees.EmployeeID"),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["StockTransferID"],
+        indexes=[ux("TransferNumber"), ix("TransferDate")],
+        rule="[ToWarehouseID]<>[FromWarehouseID]",
+        rule_text="المخزن المستلم غير المرسِل",
+    ),
+
+    Table(
+        "StockTransferLines", "أسطر التحويل بين المخازن",
+        "الأصناف وكمياتها؛ تكلفة الوحدة متوسط تكلفة الصنف عند الترحيل.",
+        [
+            auto("StockTransferLineID", "رقم السطر"),
+            long_("StockTransferID", "التحويل", required=True, fk="StockTransfers.StockTransferID", cascade=True),
+            long_("ProductID", "الصنف", required=True, fk="Products.ProductID"),
+            qty("Quantity", "الكمية", rule=">0", rule_text="الكمية أكبر من صفر", default=None),
+            money("UnitCost", "تكلفة الوحدة"),
+            created_at(),
+        ],
+        pk=["StockTransferLineID"],
+        indexes=[ix("StockTransferID")],
     ),
 
     Table(
@@ -2275,6 +2324,7 @@ SCREEN_LIST = [
     ("frmCashClosing", "تصفية يومية الكاشير", "الخزينة", "CASH_CLOSING", True, False, False),
     ("frmCashBoxes", "الصناديق", "الخزينة", "CASH_BOX", True, True, True),
     ("frmWarehouses", "المخازن", "المخزون", "PRODUCTS", True, True, True),
+    ("frmStockTransfer", "التحويل بين المخازن", "المخزون", "STOCK_TRANSFER", True, True, True),
     ("frmCashBoxUsers", "أمناء الصناديق", "الخزينة", "CASH_ALL_BOXES", True, True, True),
     ("frmCashTransfers", "استلام التحويلات بين الصناديق", "الخزينة", "CASH_CLOSING", False, True, True),
     ("frmAccounting", "المحاسبة والمالية", "الحسابات", None, False, False, False),
@@ -2340,6 +2390,7 @@ ACCOUNT_TREE = [
     (1310, "أوراق القبض", A, 11, True, False),
     (1350, "مخصص الديون المشكوك في تحصيلها", A, 11, True, False),
     (1400, "المخزون", A, 11, True, True),
+    (1410, "بضاعة بالطريق بين المخازن", A, 11, True, True),
     (1500, "ضريبة القيمة المضافة - مدخلات", A, 11, True, True),
     (1600, "سلف الموظفين", A, 11, True, True),
     (1610, "العهد النقدية", A, 11, True, False),

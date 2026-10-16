@@ -95,7 +95,7 @@ Public Function OpeningAccountProblem(ByVal AccountCode As Variant) As String
     Select Case code
         Case 1300: OpeningAccountProblem = "беэЯ ЧскусЧС эѕЯЮс нэ огу ЋЧскусЧСЛ: беэЯ спс куэс."
         Case 2100: OpeningAccountProblem = "беэЯ ЧсуцбЯэф эѕЯЮс нэ огу ЋЧсуцбЯцфЛ: беэЯ спс уцбЯ."
-        Case 1400: OpeningAccountProblem = "беэЯ ЧсуЮвцф эѕЯЮс нэ огу ЋЧсуЮвцфЛ: пуэЩ цЪпснЩ спс ефн."
+        Case 1400, 140001 To 149999: OpeningAccountProblem = "беэЯ ЧсуЮвцф эѕЯЮс нэ огу ЋЧсуЮвцфЛ: пуэЩ цЪпснЩ спс ефн."
         Case OPENING_ACCOUNT: OpeningAccountProblem = "ЭгЧШ ХЬуЧсэ ЧсУбеЯЩ ЧсЧнЪЪЧЭэЩ хц уоЧШс пс ЧсУбеЯЩЁ цсЧ эѕЯЮс сх беэЯ."
         Case 110001 To 119999: OpeningAccountProblem = "беэЯ ЧсефЯцо эѕЯЮс нэ огу ЋЧсефЧЯэоЛ."
         Case 120001 To 129999: OpeningAccountProblem = "беэЯ ЧсШфп эѕЯЮс нэ огу ЋЧсШфцпЛ."

@@ -19,13 +19,15 @@ Option Explicit
 
 Private Const SOURCE_QUERIES As String = "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase," & _
     "qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock," & _
-    "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn,qryJournalBankTx,qryJournalCheque,qryJournalAsset,qryJournalDepreciation,qryJournalPayroll,qryJournalCommission"
+    "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn,qryJournalBankTx,qryJournalCheque,qryJournalAsset,qryJournalDepreciation,qryJournalPayroll,qryJournalCommission," & _
+    "qryJournalStockTransfer"
 
 '==============================================================================
 ' Accounts and synchronisation
 '==============================================================================
 Public Sub EnsureAccounts()
-    ' a sub-account for each cash box, each bank and each expense type, then the levels of the tree (modAccounts)
+    ' a sub-account for each cash box, each bank, each expense type and each warehouse but the main one (its
+    ' stock is 1400, docs/58), then the levels of the tree (modAccounts)
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 110000 + b.CashBoxID, b.BoxName, 'ASSET', 1100, True, True FROM CashBoxes AS b " & _
         "WHERE 110000 + b.CashBoxID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
@@ -35,11 +37,16 @@ Public Sub EnsureAccounts()
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 120000 + k.BankID, k.BankName, 'ASSET', 1210, True, True FROM Banks AS k " & _
         "WHERE 120000 + k.BankID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
+        "SELECT 140000 + w.WarehouseID, w.WarehouseName, 'ASSET', 11, True, True FROM Warehouses AS w " & _
+        "WHERE w.WarehouseID <> 1 AND 140000 + w.WarehouseID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
     ' their English names (docs/40-English-Party-Names.md), for the accounts that have none yet
     FillAccountNamesEn "SELECT 110000 + CashBoxID AS SubCode, BoxNameEn AS SubNameEn FROM CashBoxes WHERE BoxNameEn Is Not Null"
     FillAccountNamesEn "SELECT 530000 + ExpenseTypeID AS SubCode, ExpenseTypeNameEn AS SubNameEn FROM ExpenseTypes " & _
                        "WHERE ExpenseTypeNameEn Is Not Null"
     FillAccountNamesEn "SELECT 120000 + BankID AS SubCode, BankNameEn AS SubNameEn FROM Banks WHERE BankNameEn Is Not Null"
+    FillAccountNamesEn "SELECT 140000 + WarehouseID AS SubCode, WarehouseNameEn AS SubNameEn FROM Warehouses " & _
+                       "WHERE WarehouseID <> 1 AND WarehouseNameEn Is Not Null"
     RebuildAccountTree
 End Sub
 
@@ -242,6 +249,8 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "CASH_RECEIVE":     PrintCashVoucher id
         Case "STOCK_MOVE":       OpenScreen "frmInventory"
         Case "STOCK_COUNT":      PrintStockCount id
+        Case "STOCK_TRANSFER":   OpenScreen "frmStockTransfer", 0, id
+        Case "STOCK_RECEIVE":    OpenScreen "frmStockTransfer", 0, id
         Case "BOX_OPENING":      OpenScreen "frmCashBoxes", 0, id
         Case "CUSTOMER_OPENING": OpenScreen "frmCustomers", 0, id
         Case "SUPPLIER_OPENING": OpenScreen "frmSuppliers", 0, id

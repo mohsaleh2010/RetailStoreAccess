@@ -64,6 +64,11 @@ def cc(alias, field="CostCenterID"):
     return f"IIf({alias}.{field} Is Null, 0, {alias}.{field})"
 
 
+def stock_account(warehouse):
+    """The stock account of a warehouse (docs/58): 1400 for the main one, 140000 + its number for the others."""
+    return f"IIf({warehouse} = 1, 1400, 140000 + {warehouse})"
+
+
 def jquery(branches):
     return "\nUNION ALL\n".join(branches)
 
@@ -73,7 +78,7 @@ JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournal
                           "qryJournalPayments", "qryJournalExpense", "qryJournalCashVoucher", "qryJournalStock",
                           "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
                           "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation",
-                          "qryJournalPayroll", "qryJournalCommission"]
+                          "qryJournalPayroll", "qryJournalCommission", "qryJournalStockTransfer"]
 
 
 def _sale():
@@ -86,7 +91,7 @@ def _sale():
         jline(*k, 3, 4100, ZERO, "h.TaxableAmount", "'المبيعات'", src, "h.TaxableAmount <> 0"),
         jline(*k, 4, 2200, ZERO, "h.Tax", "'ضريبة المخرجات'", src, "h.Tax <> 0"),
         jline(*k, 5, 5100, "k.SaleCost", ZERO, "'تكلفة البضاعة المباعة'", cost, "k.SaleCost <> 0"),
-        jline(*k, 6, 1400, ZERO, "k.SaleCost", "'المخزون'", cost, "k.SaleCost <> 0")]), cc("h"))
+        jline(*k, 6, stock_account("h.WarehouseID"), ZERO, "k.SaleCost", "'المخزون'", cost, "k.SaleCost <> 0")]), cc("h"))
 
 
 def _sales_return():
@@ -99,7 +104,7 @@ def _sales_return():
         jline(*k, 3, cash_account("r"), ZERO, "r.RefundedAmount", "c.CustomerName", src, "r.RefundedAmount <> 0"),
         jline(*k, 4, 1300, ZERO, "r.TotalAmount - r.RefundedAmount", "c.CustomerName", src,
               "r.TotalAmount - r.RefundedAmount <> 0"),
-        jline(*k, 5, 1400, "k.ReturnCost", ZERO, "'المخزون'", cost, "k.ReturnCost <> 0"),
+        jline(*k, 5, stock_account("r.WarehouseID"), "k.ReturnCost", ZERO, "'المخزون'", cost, "k.ReturnCost <> 0"),
         jline(*k, 6, 5100, ZERO, "k.ReturnCost", "'تكلفة البضاعة المباعة'", cost, "k.ReturnCost <> 0")]), cc("r"))
 
 
@@ -107,7 +112,7 @@ def _purchase():
     src = "PurchaseInvoices AS h INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID"
     k = ("'PURCHASE'", "h.PurchaseInvoiceID", "h.InvoiceNumber", "h.InvoiceDate", "s.SupplierName")
     return jquery([
-        jline(*k, 1, 1400, "h.TaxableAmount", ZERO, "'المخزون'", src, "h.TaxableAmount <> 0"),
+        jline(*k, 1, stock_account("h.WarehouseID"), "h.TaxableAmount", ZERO, "'المخزون'", src, "h.TaxableAmount <> 0"),
         jline(*k, 2, 1500, "h.Tax", ZERO, "'ضريبة المدخلات'", src, "h.Tax <> 0"),
         jline(*k, 3, cash_account("h"), ZERO, "h.PaidAmount", "s.SupplierName", src, "h.PaidAmount <> 0"),
         jline(*k, 4, 2100, ZERO, "h.RemainingAmount", "s.SupplierName", src, "h.RemainingAmount <> 0")])
@@ -120,7 +125,7 @@ def _purchase_return():
         jline(*k, 1, cash_account("r"), "r.RefundedAmount", ZERO, "s.SupplierName", src, "r.RefundedAmount <> 0"),
         jline(*k, 2, 2100, "r.TotalAmount - r.RefundedAmount", ZERO, "s.SupplierName", src,
               "r.TotalAmount - r.RefundedAmount <> 0"),
-        jline(*k, 3, 1400, ZERO, "r.TaxableAmount", "'المخزون'", src, "r.TaxableAmount <> 0"),
+        jline(*k, 3, stock_account("r.WarehouseID"), ZERO, "r.TaxableAmount", "'المخزون'", src, "r.TaxableAmount <> 0"),
         jline(*k, 4, 1500, ZERO, "r.Tax", "'ضريبة المدخلات'", src, "r.Tax <> 0")])
 
 
@@ -185,12 +190,30 @@ def _stock():
     manual = "i.ReferenceType = 'MANUAL' AND " + val + " <> 0"
     other = "IIf(i.TransactionTypeID = 8, 3900, 5200)"          # 8 = opening stock
     return jquery([
-        jline(*km, 1, 1400, f"IIf({val} > 0, {val}, 0)", f"IIf({val} < 0, -{val}, 0)", "i.Notes", moves, manual),
+        jline(*km, 1, stock_account("i.WarehouseID"), f"IIf({val} > 0, {val}, 0)", f"IIf({val} < 0, -{val}, 0)",
+              "i.Notes", moves, manual),
         jline(*km, 2, other, f"IIf({val} < 0, -{val}, 0)", f"IIf({val} > 0, {val}, 0)", "i.Notes", moves, manual),
-        jline(*kc, 1, 1400, "IIf(k.CountValue > 0, k.CountValue, 0)", "IIf(k.CountValue < 0, -k.CountValue, 0)",
+        jline(*kc, 1, stock_account("k.CountWarehouse"), "IIf(k.CountValue > 0, k.CountValue, 0)",
+              "IIf(k.CountValue < 0, -k.CountValue, 0)",
               "'المخزون'", "qryStockCountValue AS k", "k.CountValue <> 0"),
         jline(*kc, 2, 5200, "IIf(k.CountValue < 0, -k.CountValue, 0)", "IIf(k.CountValue > 0, k.CountValue, 0)",
               "'فروقات الجرد'", "qryStockCountValue AS k", "k.CountValue <> 0")])
+
+
+def _stock_transfer():
+    """Sent: the receiving warehouse (or 1410, goods in transit) against the sending one; received after a
+    transit: the receiving warehouse against 1410, on the day of the receipt (docs/58)."""
+    src = "StockTransfers AS t INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID"
+    k = ("'STOCK_TRANSFER'", "t.StockTransferID", "t.TransferNumber", "t.TransferDate", "'تحويل بين المخازن'")
+    r = ("'STOCK_RECEIVE'", "t.StockTransferID", "t.TransferNumber", "t.ReceivedAt", "'استلام تحويل مخزني'")
+    sent = "t.Status <> 'DRAFT' AND v.TransferValue <> 0"
+    received = "t.Status = 'RECEIVED' AND t.InTransit = True AND v.TransferValue <> 0"
+    return jquery([
+        jline(*k, 1, f"IIf(t.InTransit, 1410, {stock_account('t.ToWarehouseID')})", "v.TransferValue", ZERO,
+              "t.Notes", src, sent),
+        jline(*k, 2, stock_account("t.FromWarehouseID"), ZERO, "v.TransferValue", "t.Notes", src, sent),
+        jline(*r, 1, stock_account("t.ToWarehouseID"), "v.TransferValue", ZERO, "t.Notes", src, received),
+        jline(*r, 2, 1410, ZERO, "v.TransferValue", "'بضاعة بالطريق'", src, received)])
 
 
 def _manual():
@@ -1307,8 +1330,8 @@ SELECT {nz("Sum(IIf(i.Level2Code = 41 AND i.EntryDate >= QDate('IndMonth') AND i
        {nz("Sum(IIf(i.Level2Code = 41 AND i.EntryDate >= QDate('IndPrevMonth') AND i.EntryDate < QDate('IndMonth') AND i.SourceType <> 'YEAR_CLOSE', i.Credit - i.Debit, 0))")} AS PrevSales,
        {nz("Sum(IIf(i.Level2Code = 51 AND i.EntryDate >= QDate('IndPrevMonth') AND i.EntryDate < QDate('IndMonth') AND i.SourceType <> 'YEAR_CLOSE', i.Debit - i.Credit, 0))")} AS PrevCost,
        {nz("Sum(IIf(i.Level2Code = 51 AND i.EntryDate >= QDate('IndYear') AND i.EntryDate < QDate('IndEnd') AND i.SourceType <> 'YEAR_CLOSE', i.Debit - i.Credit, 0))")} AS YearCost,
-       {nz("Sum(IIf(i.AccountCode = 1400 AND i.EntryDate < QDate('IndYear'), i.Debit - i.Credit, 0))")} AS StockStart,
-       {nz("Sum(IIf(i.AccountCode = 1400 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0))")} AS StockEnd,
+       {nz("Sum(IIf((i.AccountCode = 1400 OR i.AccountCode BETWEEN 140001 AND 149999) AND i.EntryDate < QDate('IndYear'), i.Debit - i.Credit, 0))")} AS StockStart,
+       {nz("Sum(IIf((i.AccountCode = 1400 OR i.AccountCode BETWEEN 140001 AND 149999) AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0))")} AS StockEnd,
        {nz("Sum(IIf(i.AccountCode = 1300 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0))")} AS Receivables,
        {nz("Sum(IIf(i.AccountCode = 1300 AND i.SourceType = 'SALE' AND i.EntryDate >= QDate('Ind90') AND i.EntryDate < QDate('IndEnd'), i.Debit, 0))")} AS CreditSales,
        {nz("Sum(IIf(i.Level2Code = 11 AND i.EntryDate < QDate('IndEnd'), i.Debit - i.Credit, 0))")} AS CurrentAssets,
@@ -1652,10 +1675,16 @@ GROUP BY SalesReturnID"""),
 
     Query("qryStockCountValue", "قيمة فروقات كل جرد مُرحّل", """
 SELECT ReferenceID AS StockCountID, Max(ReferenceNumber) AS CountNumber, Max(TransactionDate) AS CountDate,
-       Sum(Quantity * UnitCost) AS CountValue
+       Max(WarehouseID) AS CountWarehouse, Sum(Quantity * UnitCost) AS CountValue
 FROM InventoryTransactions
 WHERE ReferenceType = 'STOCK_COUNT'
 GROUP BY ReferenceID"""),
+
+    Query("qryStockTransferValue", "قيمة كل تحويل بين المخازن بتكلفة الترحيل", """
+SELECT StockTransferID, Sum(CCur(Quantity * UnitCost)) AS TransferValue
+FROM StockTransferLines
+GROUP BY StockTransferID"""),
+    Query("qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", _stock_transfer()),
 
     Query("qryJournalSale", "أسطر قيود فواتير البيع", _sale()),
     Query("qryJournalSalesReturn", "أسطر قيود مرتجعات البيع", _sales_return()),

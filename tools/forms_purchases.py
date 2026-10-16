@@ -346,7 +346,8 @@ def layout_inventory() -> FormModel:
              'OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", ""'),
             ("btnLabels", "طباعة باركود", "secondary", 3.4,
              'OpenScreen "frmBarcodeLabels", 0, Me!lstProducts.Value'),
-            ("btnWarehouses", "المخازن", "secondary", 2.6, 'OpenScreen "frmWarehouses"')]:
+            ("btnWarehouses", "المخازن", "secondary", 2.6, 'OpenScreen "frmWarehouses"'),
+            ("btnTransfer", "تحويل مخزني", "secondary", 3.0, 'OpenScreen "frmStockTransfer"')]:
         button(m, name, caption, bx, cm(16.6), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
 
@@ -479,11 +480,79 @@ def layout_stock_count(line_heads) -> FormModel:
     return m
 
 
+# ------------------------------------------------------------------ transfers between warehouses (docs/58)
+TRANSFER_PRODUCTS = ("SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p "
+                     "WHERE p.TrackStock = True AND p.IsActive = True ORDER BY p.ProductName")
+TRANSFER_TITLES = ["الصنف", "الكمية المحوَّلة", "تكلفة الوحدة", "قيمة السطر"]
+
+
+def layout_transfer_lines() -> Tuple[FormModel, list]:
+    row_h = cm(0.75)
+    m = FormModel("frmStockTransferLines", "أسطر التحويل", cm(20.6), row_h, popup=False,
+                  record_source="SELECT * FROM StockTransferLines WHERE StockTransferID = 0", allow_add=True)
+    m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0, "AllowDeletions": False}
+    heads = grid_row(m, [
+        ("ProductID", "ProductID", 10.0, {"_kind": "combo", "RowSource": TRANSFER_PRODUCTS, "ColumnCount": 2,
+                                          "ColumnWidths": "0;9.8", "BoundColumn": 1, "LimitToList": True}, []),
+        ("Quantity", "Quantity", 3.0, {"Format": "#,##0.###"}, []),
+        ("UnitCost", "UnitCost", 3.0, {**LOCKED, "Format": "#,##0.00##"}, []),
+        ("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 3.4, {**LOCKED, "Format": "#,##0.00"}, []),
+        ("btnRemove", "", 0.8, {"_kind": "button", "Caption": Sym(f"ChrW(&H{0xE74D:X})"),
+                               "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
+    ], row_h)
+    m.form_events = ["BeforeUpdate", "AfterUpdate"]
+    m.code = ["Private Sub Form_BeforeUpdate(Cancel As Integer)", "    TransferLineBeforeUpdate Me, Cancel", "End Sub",
+              "Private Sub Form_AfterUpdate()", "    TransferLineAfterUpdate Me", "End Sub",
+              "Private Sub btnRemove_Click()", "    TransferRemoveLine Me", "End Sub"]
+    return m, heads
+
+
+def layout_stock_transfer(line_heads) -> FormModel:
+    width, height = cm(21.4), cm(16.4)
+    m = FormModel("frmStockTransfer", "التحويل بين المخازن", width, height, popup=True, allow_add=False)
+    title_band(m, "التحويل بين المخازن",
+               "مسودة بالأصناف، ثم «ترحيل»: تُخصم من المرسِل وتُضاف للمستلم، أو تبقى بالطريق حتى يستلمها", "inventory")
+    c = m.add(Control("combo", "cboTransfer", cm(0.4), cm(2.3), cm(12.0), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 6, "ColumnWidths": "0;2.4;2.2;3;3;1.8", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboTransfer", "التحويل (الأحدث أولًا)", c)
+    y = cm(3.8)
+    c = m.add(Control("combo", "cboFrom", cm(0.4), y, cm(4.2), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4", "LimitToList": True}))
+    labelled(m, "cboFrom", "من مخزن", c)
+    c = m.add(Control("combo", "cboTo", cm(4.8), y, cm(4.2), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4", "LimitToList": True}))
+    labelled(m, "cboTo", "إلى مخزن", c)
+    c = m.add(Control("text", "txtNotes", cm(9.2), y, cm(8.0), cm(0.8), {}))
+    labelled(m, "txtNotes", "ملاحظات التحويل الجديد", c)
+    button(m, "btnNew", "تحويل جديد", cm(17.4), y - cm(0.03), "primary", w=cm(3.6), call="TransferNew Me")
+    m.add(Control("label", "lblInfo", cm(0.4), cm(4.9), width - cm(0.8), cm(0.7),
+                  {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    header_labels(m, cm(0.4), cm(5.75), TRANSFER_TITLES, line_heads)
+    m.add(Control("subform", "subLines", cm(0.4), cm(6.35), cm(20.6), cm(7.6),
+                  {"SourceObject": "frmStockTransferLines"}))
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnSend", "ترحيل (إرسال)", "primary", 3.6, 'TransferAction Me, "SEND"'),
+            ("btnReceive", "تأكيد الاستلام", "primary", 3.6, 'TransferAction Me, "RECEIVE"'),
+            ("btnUnpost", "إلغاء الترحيل", "danger", 3.4, 'TransferAction Me, "UNPOST"'),
+            ("btnDelete", "حذف المسودة", "danger", 3.2, 'TransferAction Me, "DELETE"')]:
+        button(m, name, caption, bx, cm(14.5), style, w=cm(w), h=cm(1.1), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(14.5), "secondary", w=cm(2.6), h=cm(1.1),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    TransferLoad Me", "End Sub",
+               "Private Sub cboTransfer_AfterUpdate()", "    TransferShow Me", "End Sub"] + m.code)
+    return m
+
+
 def purchase_forms() -> List[FormModel]:
     lines, heads = layout_purchase_lines()
     ret_lines, ret_heads = layout_purchase_return_lines()
     count_lines, count_heads = layout_count_lines()
+    transfer_lines, transfer_heads = layout_transfer_lines()
     # subforms first: the parent forms embed them by name
     return [lines, layout_purchase_invoice(heads), ret_lines, layout_purchase_return(ret_heads),
             layout_supplier_payment(), layout_purchase_view(), layout_inventory(),
-            count_lines, layout_stock_count(count_heads)]
+            count_lines, layout_stock_count(count_heads), transfer_lines, layout_stock_transfer(transfer_heads)]

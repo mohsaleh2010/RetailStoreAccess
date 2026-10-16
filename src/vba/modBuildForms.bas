@@ -26,9 +26,9 @@ Option Explicit
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment," & _
-    "frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury," & _
-    "frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines," & _
-    "frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
+    "frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay," & _
+    "frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines," & _
+    "frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -615,6 +615,8 @@ Private Sub BuildAllForms()
     BuildForm_frmInventory
     BuildForm_frmStockCountLines
     BuildForm_frmStockCount
+    BuildForm_frmStockTransferLines
+    BuildForm_frmStockTransfer
     BuildForm_frmLogin
     BuildForm_frmChangePassword
     BuildForm_frmRolePermLines
@@ -3395,6 +3397,8 @@ Private Sub BuildForm_frmWarehouses()
     c.OnClick = EP
     Set c = AddButton("btnStockReport", "أرصدة المخازن", 7937, 1021, 1701, 482, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnTransfers", "التحويل بين المخازن", 9751, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -3423,9 +3427,13 @@ Private Sub BuildForm_frmWarehouses()
     SetCtlProp c, "ControlTipText", "لمخزن سيارة المندوب"
     SetCtlProp c, "StatusBarText", "لمخزن سيارة المندوب"
     Set c = AddLabel("lblSalesRepID", "المندوب (سيارة)", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
-    Set c = AddCheck("IsActive", "IsActive", 12134, 4054)
-    Set c = AddLabel("lblIsActive", "نشط", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblWarehouseNote", "رصيد الصنف في المخزن يُحسب من حركاته فيه. المستخدم يبيع ويشتري من مخزنه في شاشة المستخدمين، وبدونه من المخزن الرئيسي", 5443, 4536, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddCheck("ConfirmReceipt", "ConfirmReceipt", 12134, 4054)
+    SetCtlProp c, "ControlTipText", "التحويل إليه يبقى بالطريق حتى يستلمه أمينه"
+    SetCtlProp c, "StatusBarText", "التحويل إليه يبقى بالطريق حتى يستلمه أمينه"
+    Set c = AddLabel("lblConfirmReceipt", "التحويل إليه يحتاج تأكيد الاستلام", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "ConfirmReceipt", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 4621)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblWarehouseNote", "رصيد الصنف في المخزن يُحسب من حركاته فيه. المستخدم يبيع ويشتري من مخزنه في شاشة المستخدمين، وبدونه من المخزن الرئيسي", 10376, 4536, 4706, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddText("Notes", "Notes", 7201, 5103, 7881, 425)
     Set c = AddLabel("lblNotes", "ملاحظات", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
     Set c = AddLabel("lblStatus", " ", 5443, 5783, 9639, 340, 10, True, CLR_MUTED, "", 0)
@@ -3475,6 +3483,9 @@ Private Sub BuildForm_frmWarehouses()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnStockReport_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmReportCenter"", 0, ""STOCK_WAREHOUSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTransfers_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmStockTransfer""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
@@ -5192,6 +5203,8 @@ Private Sub BuildForm_frmInventory()
     c.OnClick = EP
     Set c = AddButton("btnWarehouses", "المخازن", 10091, 8221, 1474, 624, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnTransfer", "تحويل مخزني", 11678, 8221, 1701, 624, "secondary")
+    c.OnClick = EP
     Set c = AddLabel("lblProductName", "اختر منتجًا من القائمة", 12134, 1304, 6634, 454, 14, True, CLR_PRIMARY, "", 0)
     Set c = AddLabel("lblProductStock", " ", 12134, 1786, 6634, 340, 10, False, CLR_TEXT, "", 0)
     Set c = AddLabel("lblManualCap", "حركة يدوية على المنتج المحدد", 12134, 2268, 6634, 340, 11, True, CLR_MUTED, "", 0)
@@ -5264,6 +5277,9 @@ Private Sub BuildForm_frmInventory()
     s = s & "Private Sub btnWarehouses_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmWarehouses""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTransfer_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmStockTransfer""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnPostMove_Click()" & vbCrLf
     s = s & "    PostInventoryMove Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -5273,10 +5289,10 @@ Private Sub BuildForm_frmInventory()
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;lstProducts,227,1984,11680,5613,0,1000,0,1000;lblInvTotals,227,7711,11680,340,0,1000,1000,0;btnStockCount,227,8221,1474,624,0,0,1000,0;btnPurchase,1814,8221,2041,624,0,0,1000,0;btnLowReport,3968,8221,1928,624,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnStockReport,6009,8221,1928,624,0,0,1000,0;btnLabels,8050,8221,1928,624,0,0,1000,0;btnWarehouses,10091,8221,1474,624,0,0,1000,0;lblProductName,12134,1304,6634,454,1000,0,0,0;lblProductStock,12134,1786,6634,340,1000,0,0,0;lblManualCap,12134,2268,6634,340,1000,0,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";cboMoveType,12134,2977,3175,454,1000,0,0,0;lblMoveType,12134,2665,3175,284,1000,0,0,0;txtMoveQty,15479,2977,1531,454,1000,0,0,0;lblMoveQty,15479,2665,1531,284,1000,0,0,0;txtMoveCost,17180,2977,1588,454,1000,0,0,0;lblMoveCost,17180,2665,1588,284,1000,0,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";txtMoveNotes,12134,3799,3062,454,1000,0,0,0;lblMoveNotes,12134,3487,3062,284,1000,0,0,0;cboWarehouse,15309,3799,1758,454,1000,0,0,0;lblWarehouse,15309,3487,1758,284,1000,0,0,0;btnPostMove,17180,3782,1588,482,1000,0,0,0;lblMovesCap,12134,4451,6634,340,1000,0,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lstMoves,12134,4820,6634,3232,1000,0,0,1000;btnClose,17067,8221,1701,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnStockReport,6009,8221,1928,624,0,0,1000,0;btnLabels,8050,8221,1928,624,0,0,1000,0;btnWarehouses,10091,8221,1474,624,0,0,1000,0;btnTransfer,11678,8221,1701,624,0,0,1000,0;lblProductName,12134,1304,6634,454,1000,0,0,0;lblProductStock,12134,1786,6634,340,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblManualCap,12134,2268,6634,340,1000,0,0,0;cboMoveType,12134,2977,3175,454,1000,0,0,0;lblMoveType,12134,2665,3175,284,1000,0,0,0;txtMoveQty,15479,2977,1531,454,1000,0,0,0;lblMoveQty,15479,2665,1531,284,1000,0,0,0;txtMoveCost,17180,2977,1588,454,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblMoveCost,17180,2665,1588,284,1000,0,0,0;txtMoveNotes,12134,3799,3062,454,1000,0,0,0;lblMoveNotes,12134,3487,3062,284,1000,0,0,0;cboWarehouse,15309,3799,1758,454,1000,0,0,0;lblWarehouse,15309,3487,1758,284,1000,0,0,0;btnPostMove,17180,3782,1588,482,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblMovesCap,12134,4451,6634,340,1000,0,0,0;lstMoves,12134,4820,6634,3232,1000,0,0,1000;btnClose,17067,8221,1701,624,1000,0,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 18994, 9355, -1757, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmInventory", s
@@ -5420,6 +5436,122 @@ Private Sub BuildForm_frmStockCount()
     Exit Sub
 EH:
     AbortForm "frmStockCount", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmStockTransferLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmStockTransferLines", "أسطر التحويل", "SELECT * FROM StockTransferLines WHERE StockTransferID = 0", 11680, 425, False, True, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("ProductID", "ProductID", 28, 0, 5670, 425, "SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p WHERE p.TrackStock = True AND p.IsActive = True ORDER BY p.ProductName", 2, "0;5557")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    Set c = AddText("Quantity", "Quantity", 5726, 0, 1701, 425)
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("UnitCost", "UnitCost", 7455, 0, 1701, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00##"
+    Set c = AddText("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 9184, 0, 1928, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 11140, 17, 454, 391, "danger")
+    SetCtlProp c, "FontName", ICON_FONT
+    c.OnClick = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    TransferLineBeforeUpdate Me, Cancel" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    TransferLineAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    TransferRemoveLine Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmStockTransferLines", s
+    Exit Sub
+EH:
+    AbortForm "frmStockTransferLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmStockTransfer()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmStockTransfer", "التحويل بين المخازن", "", 12134, 9299, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12134, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7B8), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "التحويل بين المخازن", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "مسودة بالأصناف، ثم «ترحيل»: تُخصم من المرسِل وتُضاف للمستلم، أو تبقى بالطريق حتى يستلمها", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboTransfer", "", 227, 1304, 6804, 454, "", 6, "0;1361;1247;1701;1701;1021")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblTransfer", "التحويل (الأحدث أولًا)", 227, 992, 6804, 284, 9, False, CLR_MUTED, "cboTransfer", 0)
+    Set c = AddCombo("cboFrom", "", 227, 2155, 2381, 454, "", 2, "0;2268")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblFrom", "من مخزن", 227, 1843, 2381, 284, 9, False, CLR_MUTED, "cboFrom", 0)
+    Set c = AddCombo("cboTo", "", 2722, 2155, 2381, 454, "", 2, "0;2268")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblTo", "إلى مخزن", 2722, 1843, 2381, 284, 9, False, CLR_MUTED, "cboTo", 0)
+    Set c = AddText("txtNotes", "", 5216, 2155, 4536, 454)
+    Set c = AddLabel("lblNotes", "ملاحظات التحويل الجديد", 5216, 1843, 4536, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddButton("btnNew", "تحويل جديد", 9866, 2138, 2041, 482, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblInfo", " ", 227, 2778, 11680, 397, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblCol1", "الصنف", 255, 3260, 5670, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "الكمية المحوَّلة", 5953, 3260, 1701, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "تكلفة الوحدة", 7682, 3260, 1701, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "قيمة السطر", 9411, 3260, 1928, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subLines", "frmStockTransferLines", 227, 3600, 11680, 4309)
+    Set c = AddButton("btnSend", "ترحيل (إرسال)", 227, 8222, 2041, 624, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnReceive", "تأكيد الاستلام", 2381, 8222, 2041, 624, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnpost", "إلغاء الترحيل", 4535, 8222, 1928, 624, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف المسودة", 6576, 8222, 1814, 624, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 10433, 8222, 1474, 624, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    TransferLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboTransfer_AfterUpdate()" & vbCrLf
+    s = s & "    TransferShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    TransferNew Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSend_Click()" & vbCrLf
+    s = s & "    TransferAction Me, ""SEND""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReceive_Click()" & vbCrLf
+    s = s & "    TransferAction Me, ""RECEIVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnpost_Click()" & vbCrLf
+    s = s & "    TransferAction Me, ""UNPOST""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    TransferAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmStockTransfer", s
+    Exit Sub
+EH:
+    AbortForm "frmStockTransfer", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmLogin()
@@ -10102,7 +10234,7 @@ Private Sub BuildForm_frmOpeningAccountLines()
     SetFormProp "ScrollBars", 2
     SetFormProp "Cycle", 0
     SetFormProp "AllowDeletions", False
-    Set c = AddCombo("AccountCode", "AccountCode", 28, 0, 5670, 425, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True AND AccountCode NOT IN (1300, 2100, 1400, 3900) AND AccountCode NOT BETWEEN 110001 AND 119999 AND AccountCode NOT BETWEEN 120001 AND 129999 ORDER BY TreeKey", 2, "0;5557")
+    Set c = AddCombo("AccountCode", "AccountCode", 28, 0, 5670, 425, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True AND AccountCode NOT IN (1300, 2100, 1400, 3900) AND AccountCode NOT BETWEEN 110001 AND 119999 AND AccountCode NOT BETWEEN 120001 AND 129999 AND AccountCode NOT BETWEEN 140001 AND 149999 ORDER BY TreeKey", 2, "0;5557")
     SetCtlProp c, "BoundColumn", 1
     SetCtlProp c, "LimitToList", True
     Set c = AddText("Debit", "Debit", 5726, 0, 1814, 425)
