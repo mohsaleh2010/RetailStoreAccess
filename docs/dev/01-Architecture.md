@@ -59,6 +59,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
 | `modSecurity`، `modSecurityScreens`، `modActivation`، `modBackup` | المستخدمون، وكلمات المرور (SHA-256)، والصلاحيات، وتفعيل الجهاز، والنسخ الاحتياطي |
 | `modCash`، `modBank`، `modCheque` | الصناديق ويومية الصندوق (`docs/55`)، والبنوك، والتسوية البنكية، والشيكات |
 | `modJournal`، `modAccounts`، `modManualEntry`، `modLedger`، `modFinancials`، `modClosing`، `modVat` | المحاسبة: القيود الآلية، وشجرة الحسابات، والقيود اليدوية، وكشف الحساب، والقوائم المالية، والإقفال، والإقرار الضريبي (خانات السعودية أو نموذج 10 المصري حسب الدولة، `docs/50`) |
+| `tools/gen_sql.py` ← `dist/sql/RetailStore_Schema.sql` | سكربت SQL Server للإنشاء والترقية من `tools/schema.py` (الخطة 5أ، `docs/67`) |
 | `modAging`، `modAssets`، `modPayroll`، `modCostCenters`، `modBudget`، `modRecurring` | أعمار الديون، والأصول والإهلاك (القسط الثابت والمتناقص، وإعادة التقييم، والنقل بين مراكز التكلفة، وضريبة بيع الأصل: `docs/65`، شاشة `frmAssetChanges`)، والرواتب، ومراكز التكلفة، والموازنة، والمصروفات المتكررة |
 | `modAudit` | سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد |
 | `modCurrency` | العملات: عملة البرنامج، وأسعار العملات، والتحويل `ToBase`/`FromBase`، وحقلا العملة والمعامل في الشاشات، وختم القيود بعملة المستند |

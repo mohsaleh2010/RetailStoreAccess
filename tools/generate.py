@@ -12,6 +12,7 @@ from schema import TABLES, Table, Field, table  # noqa: E402
 from generate_common import vba_str  # noqa: E402
 import gen_relations  # noqa: E402
 import gen_queries  # noqa: E402
+import gen_sql  # noqa: E402
 import gen_forms  # noqa: E402
 import gen_qr  # noqa: E402
 import gen_lang  # noqa: E402
@@ -881,6 +882,9 @@ def main():
     write("src/vba/modBuildRelations.bas", rel)
     write("dist/vba/modBuildRelations.bas", rel, encoding="cp1256", newline="\r\n")
     write("docs/03-Relationships-Reference.md", gen_relations.build_relations_md())
+
+    # plan 5A (docs/67): the same back-end as a SQL Server script; UTF-8 with BOM + CRLF for SSMS / sqlcmd
+    write("dist/sql/RetailStore_Schema.sql", gen_sql.build_sql(), encoding="utf-8-sig", newline="\r\n")
 
     qry = gen_queries.build_queries_vba()
     write("src/vba/modBuildQueries.bas", qry)

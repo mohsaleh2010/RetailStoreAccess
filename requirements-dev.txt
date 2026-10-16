@@ -6,4 +6,5 @@ opencv-python-headless
 zxing-cpp         # reads the printed barcodes back (test_labels)
 lxml              # canonical XML (C14N) of the ZATCA invoice file (test_zatca_xml)
 cryptography      # secp256k1 certificates and signatures (test_zatca_xml)
+sqlglot           # parses the SQL Server script as T-SQL (test_sql_server)
 # LibreOffice with python3-uno (not on PyPI) runs the VBA modules in tests/vba_harness.py.
