@@ -48,6 +48,8 @@ Private Sub ResetPurchaseHeader(ByVal frm As Access.Form)
     frm!txtNotes.Value = Null
     frm!txtQty.Value = 1
     frm!lblSupplierInfo.Caption = Tr(" ")
+    frm!cboWarehouse.RowSource = WarehouseRows()            ' modWarehouses
+    frm!cboWarehouse.Value = CurrentWarehouseID()
     CurrencyReset frm                                       ' modCurrency
 End Sub
 
@@ -265,7 +267,7 @@ Public Function SavePurchase(ByVal frm As Access.Form) As Boolean
                                    frm!txtInvoiceDate.Value, Nz(frm!cboPaymentType.Value, "CASH"), _
                                    frm!cboPaymentMethod.Value, Nz(frm!chkChargeVAT.Value, True), _
                                    Nz(frm!txtInvoiceDiscount.Value, 0), paidNow, Nz(frm!txtNotes.Value, ""), newID, _
-                                   code, fx)
+                                   code, fx, Nz(frm!cboWarehouse.Value, 0))
     End If
     If Len(msg) > 0 Then
         SetPurStatus frm, msg, CLR_DANGER
@@ -535,6 +537,8 @@ End Sub
 '==============================================================================
 Public Sub InventoryLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
+    frm!cboWarehouse.RowSource = WarehouseRows()            ' modWarehouses
+    frm!cboWarehouse.Value = CurrentWarehouseID()
     frm!cboMoveType.Value = TT_STOCK_IN
     InventoryRefresh frm
     InventoryMoveTypeChanged frm
@@ -582,7 +586,9 @@ Public Sub InventoryProductPicked(ByVal frm As Access.Form)
     frm!lblProductStock.Caption = Tr("«·ﬂ„Ì…: " & Format$(rs!CurrentQuantity, "#,##0.###") & "    „ Ê”ÿ «· ﬂ·›…: " & _
         Format$(rs!AverageCost, "#,##0.00##") & "    «·ﬁÌ„…: " & _
         Format$(RoundMoney(CDec(rs!CurrentQuantity) * CDec(rs!AverageCost)), "#,##0.00") & _
-        IIf(rs!CurrentQuantity <= rs!MinimumQuantity, "    („‰Œ›÷: «·Õœ " & rs!MinimumQuantity & ")", ""))
+        IIf(rs!CurrentQuantity <= rs!MinimumQuantity, "    („‰Œ›÷: «·Õœ " & rs!MinimumQuantity & ")", "")) & _
+        "    " & WarehouseName(Nz(frm!cboWarehouse.Value, CurrentWarehouseID())) & ": " & _
+        Format$(AvailableQty(CLng(id), Nz(frm!cboWarehouse.Value, 0)), "#,##0.###")
     frm!lblProductStock.ForeColor = IIf(rs!CurrentQuantity <= rs!MinimumQuantity, CLR_DANGER, CLR_TEXT)
     If Nz(frm!cboMoveType.Value, 0) <> TT_STOCK_OUT Then
         frm!txtMoveCost.Value = IIf(rs!AverageCost > 0, rs!AverageCost, rs!PurchasePrice)
@@ -616,7 +622,7 @@ Public Function PostInventoryMove(ByVal frm As Access.Form) As Boolean
         Exit Function
     End If
     msg = PostManualStock(frm!lstProducts.Value, frm!cboMoveType.Value, Nz(frm!txtMoveQty.Value, 0), _
-                          frm!txtMoveCost.Value, Nz(frm!txtMoveNotes.Value, ""), refNo)
+                          frm!txtMoveCost.Value, Nz(frm!txtMoveNotes.Value, ""), refNo, Nz(frm!cboWarehouse.Value, 0))
     If Len(msg) > 0 Then
         ShowWarning msg
         Exit Function
@@ -634,6 +640,8 @@ End Function
 Public Sub StockCountLoad(ByVal frm As Access.Form)
     Dim id As Variant
     Calendar = vbCalGreg
+    frm!cboWarehouse.RowSource = WarehouseRows()            ' modWarehouses
+    frm!cboWarehouse.Value = CurrentWarehouseID()
     frm!cboCount.Requery
     id = DbValue("SELECT StockCountID FROM StockCounts WHERE Status = 'OPEN'")
     If IsNull(id) Then id = DMax("StockCountID", "StockCounts")
@@ -697,7 +705,7 @@ Public Function NewStockCount(ByVal frm As Access.Form) As Boolean
     If Not AskYesNo("»œ¡ Ã—œ ÃœÌœ " & IIf(IsNull(frm!cboCategory.Value), "·ﬂ· «·„‰ Ã«  «·‰‘ÿ…", _
                     "· ’‰Ì› ´" & frm!cboCategory.Column(1) & "ª") & "ø" & vbCrLf & _
                     "Ìı›÷Û¯· «·Ã—œ Ê«·„Õ· „€·ﬁ √Ê »⁄œ ¬Œ— ›« Ê—…° À„ «· —ÕÌ· „»«‘—….") Then Exit Function
-    msg = CreateStockCount(frm!cboCategory.Value, "", newID)
+    msg = CreateStockCount(frm!cboCategory.Value, "", newID, Nz(frm!cboWarehouse.Value, 0))
     If Len(msg) > 0 Then
         ShowWarning msg
         Exit Function

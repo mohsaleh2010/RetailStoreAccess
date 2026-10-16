@@ -11,9 +11,61 @@ Public Sub LangData5()
     D5_1
     D5_2
     D5_3
+    D5_4
 End Sub
 
 Private Sub D5_1()
+    LangAdd "ÇáÔíßÇÊ", "Cheques"
+    LangAdd "ÇáÕäÏæŞ", "Box"
+    LangAdd "ÇáÖÑíÈÉ", "VAT"
+    LangAdd "ÇáØÇÈÚÉ", "Printer"
+    LangAdd "ÇáØÑíŞÉ", "Method"
+    LangAdd "ÇáÚãáÇÁ", "Customers"
+    LangAdd "ÇáÚãáÇÊ", "Currencies"
+    LangAdd "ÇáÚãáíÉ", "Transaction"
+    LangAdd "ÇáÚãæáÉ", "Commission"
+    LangAdd "ÇáÚäæÇä", "Address"
+    LangAdd "ÇáŞÇÆãÉ", "List"
+    LangAdd "ÇáßÇÔíÑ", "Cashier"
+    LangAdd "ÇáãÊÈŞí", "Remaining"
+    LangAdd "ÇáãÊæİÑ", "Available"
+    LangAdd "ÇáãÊæŞÚ", "Expected"
+    LangAdd "ÇáãÌãæÚ", "Total"
+    LangAdd "ÇáãÍÇÓÈ", "Accountant"
+    LangAdd "ÇáãÍÕøá", "Collector"
+    LangAdd "ÇáãÎÇÒä", "Warehouses"
+    LangAdd "ÇáãÎÒæä", "Stock"
+    LangAdd "ÇáãÏİæÚ", "Paid"
+    LangAdd "ÇáãÏíäÉ", "City"
+    LangAdd "ÇáãÑÇÌÚ", "Reviewer"
+    LangAdd "ÇáãÑÊÌÚ", "Return"
+    LangAdd "ÇáãÑÊÏÉ", "Bounced"
+    LangAdd "ÇáãÓÄæá", "Manager"
+    LangAdd "ÇáãÓÊÍŞ", "Due"
+    LangAdd "ÇáãÓÊáã", "Recipient"
+    LangAdd "ÇáãÓÊäÏ", "Document"
+    LangAdd "ÇáãÓÊæì", "Level"
+    LangAdd "ÇáãÔÑæÈ", "Drink"
+    LangAdd "ÇáãÔßáÉ", "Problem"
+    LangAdd "ÇáãÕÑæİ", "Expense"
+    LangAdd "ÇáãØáæÈ", "required"
+    LangAdd "ÇáãÚÇãá", "Rate"
+    LangAdd "ÇáãäÏæÈ", "Sales rep"
+    LangAdd "ÇáãäØŞÉ", "Region"
+    LangAdd "ÇáæÍÏÇÊ", "Units"
+    LangAdd "ÈÏæä ÍÏ", "No limit"
+    LangAdd "ÈÑÊŞÇáí", "Orange"
+    LangAdd "ÊÌÑíÈíÉ", "Test"
+    LangAdd "ÊÓÚãÇÆÉ", "nine hundred"
+    LangAdd "ÎãÓãÇÆÉ", "five hundred"
+    LangAdd "ÑÏ äŞÏí", "Cash refund"
+    LangAdd "ÓÈÚãÇÆÉ", "seven hundred"
+    LangAdd "ÓÊÉ ÚÔÑ", "sixteen"
+    LangAdd "ÓØÑ ŞíÏ", "Entry line"
+    LangAdd "ÓäÏ ÕÑİ", "Payment voucher"
+    LangAdd "ÓäÏ ŞÈÖ", "Receipt voucher"
+    LangAdd "ÕÑİ ÂÎÑ", "Other payment"
+    LangAdd "ÕÑİ Ôíß", "Cheque payment"
     LangAdd "ØõÈÚ İí", "Printed on"
     LangAdd "ÛíÑ äÔØ", "is not active"
     LangAdd "İí ÔÇÔÉ", "in the screen"
@@ -67,6 +119,7 @@ Private Sub D5_1()
     LangAdd "ÇáãÈáÛ", "Amount"
     LangAdd "ÇáãÊÌÑ", "Store"
     LangAdd "ÇáãÌáÏ", "Folder"
+    LangAdd "ÇáãÎÒä", "Warehouse"
     LangAdd "ÇáãÏíÑ", "Manager"
     LangAdd "ÇáãÏíä", "Debit"
     LangAdd "ÇáãÑßÒ", "Center"
@@ -82,6 +135,9 @@ Private Sub D5_1()
     LangAdd "ÈÇáÖÈØ", "exactly"
     LangAdd "ÈÇáİÚá", "already exists"
     LangAdd "ÈÒíÇÏÉ", "over by"
+End Sub
+
+Private Sub D5_2()
     LangAdd "ÈáÇ ÍÏ", "No limit"
     LangAdd "ÈäİÓÌí", "Purple"
     LangAdd "ÈæÇÓØÉ", "by"
@@ -134,9 +190,6 @@ Private Sub D5_1()
     LangAdd "ÅÖÇİÉ", "Add"
     LangAdd "ÅÛáÇŞ", "Close"
     LangAdd "ÅáÛÇÁ", "Cancel"
-End Sub
-
-Private Sub D5_2()
     LangAdd "ÅíÏÇÚ", "Deposit"
     LangAdd "ÇËäÇä", "two"
     LangAdd "ÇáÃÕá", "Asset"
@@ -205,6 +258,9 @@ Private Sub D5_2()
     LangAdd "ÒíÇÏÉ", "Overage"
     LangAdd "ÓÈÚæä", "seventy"
     LangAdd "ÕäİğÇ", "items"
+End Sub
+
+Private Sub D5_3()
     LangAdd "ØÇæáÉ", "Table"
     LangAdd "ØÈÇÚÉ", "Print"
     LangAdd "ÚÔÑæä", "twenty"
@@ -257,9 +313,6 @@ Private Sub D5_2()
     LangAdd "ÎÑæÌ", "Exit"
     LangAdd "ÎÕæã", "Liabilities"
     LangAdd "ÎãÓÉ", "five"
-End Sub
-
-Private Sub D5_3()
     LangAdd "ÏÇÆä", "Credit"
     LangAdd "ÏÎæá", "Login"
     LangAdd "ÑÌæÚ", "Back"
@@ -324,9 +377,13 @@ Private Sub D5_3()
     LangAdd "ÚÌÒ", "Shortage"
     LangAdd "ÚÑÖ", "View"
     LangAdd "İÊÍ", "Open"
+    LangAdd "İÑÚ", "Branch"
     LangAdd "İÑŞ", "Difference"
     LangAdd "İŞØ", "Only"
     LangAdd "ŞÈá", "Before"
+End Sub
+
+Private Sub D5_4()
     LangAdd "ŞÑÔ", "piasters"
     LangAdd "ãÓÍ", "Clear"
     LangAdd "ãÕÑ", "Egypt"

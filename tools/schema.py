@@ -508,6 +508,7 @@ TABLES: List[Table] = [
             text("IBAN", 34, "آيبان الموظف"),
             date_("HireDate", "تاريخ التعيين", required=False, default=None),
             long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID", note="مبيعاته ومسير راتبه على هذا المركز"),
+            long_("WarehouseID", "مخزن المستخدم", fk="Warehouses.WarehouseID", note="فارغ = المخزن الرئيسي"),
         ],
         pk=["EmployeeID"],
         indexes=[ux("Username")],
@@ -734,6 +735,31 @@ TABLES: List[Table] = [
     ),
 
     Table(
+        "Warehouses", "المخازن",
+        "المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل. رصيد الصنف في المخزن = مجموع حركاته فيه "
+        "(InventoryTransactions.WarehouseID)؛ والتكلفة متوسط واحد للصنف في كل المخازن (docs/57).",
+        [
+            auto("WarehouseID", "رقم المخزن"),
+            text("WarehouseCode", 20, "كود المخزن"),
+            text("WarehouseName", 50, "اسم المخزن", required=True),
+            text("WarehouseNameEn", 50, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
+            text("WarehouseType", 10, "النوع", required=True, default='"MAIN"',
+                 rule='In ("MAIN","BRANCH","VAN","WIP")',
+                 rule_text="MAIN = رئيسي، BRANCH = فرع، VAN = سيارة مندوب، WIP = تحت التشغيل"),
+            long_("KeeperID", "أمين المخزن", fk="Employees.EmployeeID"),
+            long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID"),
+            long_("SalesRepID", "المندوب (سيارة)", fk="SalesReps.SalesRepID"),
+            is_active(),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["WarehouseID"],
+        indexes=[ux("WarehouseName")],
+        seed_columns=["WarehouseID", "WarehouseCode", "WarehouseName", "WarehouseType"],
+        seed_rows=[(1, "WH-1", "المخزن الرئيسي", "MAIN")],
+    ),
+
+    Table(
         "Suppliers", "الموردون",
         "بيانات الموردين. الرصيد الحالي قيمة مساعدة تُحدَّث بالكود ويمكن إعادة احتسابها من الحركات.",
         [
@@ -876,6 +902,7 @@ TABLES: List[Table] = [
             long_("BankID", "البنك", fk="Banks.BankID", note="المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك"),
             long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID", note="من مركز الكاشير، وإلا المركز الافتراضي"),
             long_("SalesRepID", "المندوب", fk="SalesReps.SalesRepID", note="من مندوب العميل، وإلا مندوب المستخدم"),
+            long_("WarehouseID", "المخزن", required=True, default="1", fk="Warehouses.WarehouseID"),
         ],
         pk=["SalesInvoiceID"],
         indexes=[ux("InvoiceNumber"), ix("InvoiceDate"), ux("InvoiceUUID", ignore_nulls=True),
@@ -936,6 +963,7 @@ TABLES: List[Table] = [
             long_("BankID", "البنك", fk="Banks.BankID", note="المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك"),
             long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID", note="مركز الفاتورة الأصلية"),
             long_("SalesRepID", "المندوب", fk="SalesReps.SalesRepID", note="مندوب الفاتورة الأصلية"),
+            long_("WarehouseID", "المخزن", required=True, default="1", fk="Warehouses.WarehouseID"),
         ],
         pk=["SalesReturnID"],
         indexes=[ux("ReturnNumber"), ix("ReturnDate"), ux("InvoiceUUID", ignore_nulls=True)],
@@ -993,6 +1021,7 @@ TABLES: List[Table] = [
                   note="المدفوع نقدًا يخرج من هذا الصندوق"),
             long_("BankID", "البنك", fk="Banks.BankID", note="المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك"),
             *fx_fields(),
+            long_("WarehouseID", "المخزن", required=True, default="1", fk="Warehouses.WarehouseID"),
         ],
         pk=["PurchaseInvoiceID"],
         indexes=[ux("InvoiceNumber"), ix("InvoiceDate"), ix("SupplierInvoiceNo")],
@@ -1045,6 +1074,7 @@ TABLES: List[Table] = [
                   note="الاسترداد النقدي يدخل هذا الصندوق"),
             long_("BankID", "البنك", fk="Banks.BankID", note="المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك"),
             *fx_fields(),
+            long_("WarehouseID", "المخزن", required=True, default="1", fk="Warehouses.WarehouseID"),
         ],
         pk=["PurchaseReturnID"],
         indexes=[ux("ReturnNumber"), ix("ReturnDate")],
@@ -1987,9 +2017,10 @@ TABLES: List[Table] = [
             money("UnitCost", "تكلفة الوحدة"),
             long_("TransactionID", "حركة المخزون المرحّلة", note="فارغ = لم يُرحَّل بعد"),
             created_at(),
+            long_("WarehouseID", "المخزن", required=True, default="1", fk="Warehouses.WarehouseID"),
         ],
         pk=["OpeningStockID"],
-        indexes=[ux("ProductID")],
+        indexes=[ux("ProductID", "WarehouseID")],
     ),
 
     # ------------------------------------------------------------- Inventory
@@ -2040,6 +2071,7 @@ TABLES: List[Table] = [
             long_("EmployeeID", "الموظف", fk="Employees.EmployeeID"),
             text("Notes", 255, "ملاحظات"),
             created_at(),
+            long_("WarehouseID", "المخزن", required=True, default="1", fk="Warehouses.WarehouseID"),
         ],
         pk=["TransactionID"],
         indexes=[ix("TransactionDate"), ix("ReferenceType", "ReferenceID")],
@@ -2060,6 +2092,7 @@ TABLES: List[Table] = [
             datetime_("PostedAt", "تاريخ الترحيل"),
             long_("PostedByID", "رحّله", fk="Employees.EmployeeID"),
             text("Notes", 255, "ملاحظات"),
+            long_("WarehouseID", "المخزن", required=True, default="1", fk="Warehouses.WarehouseID"),
         ],
         pk=["StockCountID"],
         indexes=[ux("CountNumber")],
@@ -2241,6 +2274,7 @@ SCREEN_LIST = [
     ("frmCashVoucher", "سندات النقدية والتحويل", "الخزينة", "CASH_BOX", True, False, False),
     ("frmCashClosing", "تصفية يومية الكاشير", "الخزينة", "CASH_CLOSING", True, False, False),
     ("frmCashBoxes", "الصناديق", "الخزينة", "CASH_BOX", True, True, True),
+    ("frmWarehouses", "المخازن", "المخزون", "PRODUCTS", True, True, True),
     ("frmCashBoxUsers", "أمناء الصناديق", "الخزينة", "CASH_ALL_BOXES", True, True, True),
     ("frmCashTransfers", "استلام التحويلات بين الصناديق", "الخزينة", "CASH_CLOSING", False, True, True),
     ("frmAccounting", "المحاسبة والمالية", "الحسابات", None, False, False, False),
@@ -2378,6 +2412,10 @@ ACCOUNT_TREE = [
 
 # Field rules changed after the first release: BuildSchema sets them on an existing back-end too
 # (generate.rule_upgrade_sub). Only looser rules go here: the existing rows already satisfy them.
+# Indexes replaced by another one, deleted from an existing back-end: (table, index name)
+# OpeningStock: one line per product and warehouse (docs/57), not per product.
+DROPPED_INDEXES = [("OpeningStock", "UX_ProductID")]
+
 RULE_UPGRADES = [("CashBoxes", "BoxType"), ("Settings", "CountryCode"), ("Settings", "VATNumber"), ("Customers", "VATNumber"),
                  ("Suppliers", "VATNumber"), ("SalesInvoices", "ZatcaStatus"), ("SalesReturns", "ZatcaStatus")]
 

@@ -15,6 +15,11 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "في القيد أصل مستبعد بعده: ألغِ الاستبعاد أولًا", "The entry has an asset disposed after it: cancel the disposal first"
+    LangAdd "لا تملك صلاحية الإضافة في شاشة التسوية البنكية", "You do not have the permission to add in the bank reconciliation screen"
+    LangAdd "لا تملك صلاحية الإضافة في شاشة الحركات البنكية", "You do not have the permission to add in the bank transactions screen"
+    LangAdd "لهذا الحساب حسابات تابعة، فيبقى حسابًا رئيسيًا", "This account has sub-accounts, so it stays a main account"
+    LangAdd "مفتاح الجهاز وشهادته وبرنامج التوقيع (السعودية", "Key and certificate of the device and the signing program (Saudi Arabia"
     LangAdd "نقر مزدوج على حساب يفتح كشف حسابه للفترة نفسها", "Double-click an account to open its statement for the same period"
     LangAdd "احفظ تاريخ بدء التشغيل أولًا، ثم أدخل الأرصدة", "Save the start-up date first, then enter the balances"
     LangAdd "اختر العمليات الظاهرة في كشف البنك ثم «مطابقة", "Choose the transactions shown on the bank statement, then Match"
@@ -130,14 +135,14 @@ Private Sub D2_1()
     LangAdd "عدّل الإضافي والخصومات ثم «ترحيل المسير", "Edit the overtime and deductions, then Post the run"
     LangAdd "كلمة البحث (اسم، كود، باركود، رقم، جوال", "Search text (name, code, barcode, number, mobile"
     LangAdd "لا توجد فواتير أو مرتجعات في هذه الفترة", "No invoices or returns in this period"
+End Sub
+
+Private Sub D2_2()
     LangAdd "لا توجد مصروفات متكررة مستحقة حتى اليوم", "There are no recurring expenses due up to today"
     LangAdd "لا يمكن تفعيل الفاتورة الإلكترونية الآن", "E-invoicing cannot be enabled now"
     LangAdd "مصر: كود الصنف المسجّل في بوابة المصلحة", "Egypt: product code registered on the Tax Authority portal"
     LangAdd "يجب أن يفعّله مدير النظام قبل الاستخدام", "The system administrator must activate it before use"
     LangAdd "أحرف على الأقل، ولا تساوي اسم المستخدم", "characters at least, and not equal to the user name"
-End Sub
-
-Private Sub D2_2()
     LangAdd "أدخل النقدية الموجودة فعلًا في الصندوق", "Enter the cash actually in the box"
     LangAdd "أو اترك التاريخ فارغًا لفتح كل الفترات", "or leave the date empty to open all periods"
     LangAdd "إعداد الربط يحتاج صلاحية إعدادات المحل", "The connection setup needs the store settings permission"
@@ -238,6 +243,7 @@ Private Sub D2_2()
     LangAdd "مستحقة خلال 7 أيام أو فات استحقاقها", "Due within 7 days or overdue"
     LangAdd "اكتب التاريخ والمعامل (أكبر من صفر", "Type the date and the rate (greater than zero"
     LangAdd "الأصل مستبعد: ألغِ الاستبعاد أولًا", "The asset is disposed: cancel the disposal first"
+    LangAdd "الصنف موجود في سطر آخر لنفس المخزن", "The product is in another line of the same warehouse"
     LangAdd "العمولة وضريبتها لا تكونان سالبتين", "The fee and its VAT are never negative"
     LangAdd "المصروف بعملة أخرى: اكتب مبلغه بها", "An expense in another currency: type its amount in it"
     LangAdd "المقبولة (صافي الفواتير والمرتجعات", "Accepted (invoices net of returns"
@@ -252,15 +258,15 @@ Private Sub D2_2()
     LangAdd "لا تملك صلاحية أرصدة بداية التشغيل", "You do not have the permission for the start-up opening balances"
     LangAdd "لا تملك صلاحية المندوبين وعمولاتهم", "You do not have the permission for sales reps and their commissions"
     LangAdd "لا تملك صلاحية حذف الحركات البنكية", "You do not have the permission to delete bank transactions"
+End Sub
+
+Private Sub D2_3()
     LangAdd "لا توجد أرصدة موردين بعملات أجنبية", "There are no supplier balances in foreign currencies"
     LangAdd "لا تُسجَّل دفعات على العميل النقدي", "No payments are recorded on the cash customer"
     LangAdd "مبيعاته ومسير راتبه على هذا المركز", "His sales and payroll are on this center"
     LangAdd "نوع الحركة غير متاح للإدخال اليدوي", "The move type is not available for manual entry"
     LangAdd "هذا الحساب معطّل. راجع مدير النظام", "This account is disabled. Ask the system administrator"
     LangAdd "أدخل تاريخ البداية وتاريخ النهاية", "Enter the start date and the end date"
-End Sub
-
-Private Sub D2_3()
     LangAdd "إقرار ضريبة القيمة المضافة (نموذج", "VAT return (form"
     LangAdd "إلى تاريخ (الميزانية في هذا اليوم", "To date (the balance sheet on this day"
     LangAdd "اختر آخر يوم في الفترة التي تُقفل", "Choose the last day of the period to close"
@@ -375,15 +381,15 @@ Private Sub D2_3()
     LangAdd "لا تملك صلاحية إدارة الصلاحيات", "You do not have the permission to manage permissions"
     LangAdd "لا تملك صلاحية الإقرار الضريبي", "You do not have the permission for the VAT return"
     LangAdd "لا تملك صلاحية النسخ الاحتياطي", "You do not have the permission for backups"
+End Sub
+
+Private Sub D2_4()
     LangAdd "لا تملك صلاحية تعديل سعر البيع", "You do not have the permission to change the sale price"
     LangAdd "لا توجد فاتورة شراء بهذا الرقم", "There is no purchase invoice with this number"
     LangAdd "لا يوجد سداد مسجل لهذا الإقرار", "No payment is recorded for this return"
     LangAdd "للبيع الآجل اختر عميلًا مسجلًا", "For a credit sale choose a registered customer"
     LangAdd "للعملاء المنشآت (فاتورة ضريبية", "For business customers (tax invoice"
     LangAdd "لم تُصدر الهيئة شهادة الامتثال", "ZATCA did not issue the compliance certificate"
-End Sub
-
-Private Sub D2_4()
     LangAdd "ليست لديك صلاحية سندات الخزينة", "You do not have the permission for treasury vouchers"
     LangAdd "مجلد Images بجانب ملف البيانات", "Images folder next to the data file"
     LangAdd "مجموع أرصدة المستوى الأول (صفر", "Total of the first-level balances (zero"
@@ -467,14 +473,4 @@ Private Sub D2_4()
     LangAdd "قائمة الدخل حسب مركز التكلفة", "Income statement by cost center"
     LangAdd "لا تملك صلاحية إقفال الفترات", "You do not have the permission to close periods"
     LangAdd "لا تملك هذه الصلاحية في شاشة", "You do not have this permission in the screen"
-    LangAdd "لا توجد تصفيات في هذه الفترة", "There are no closings in this period"
-    LangAdd "لا توجد مبيعات في هذه الفترة", "There are no sales in this period"
-    LangAdd "لمن لا مركز له من المستخدمين", "for users without a center"
-    LangAdd "مبالغ الموازنة لا تكون سالبة", "Budget amounts are never negative"
-    LangAdd "مطابق: لا يوجد عجز ولا زيادة", "Matched: no shortage and no overage"
-    LangAdd "منظومة مصلحة الضرائب المصرية", "the Egyptian Tax Authority system"
-    LangAdd "وضع المطوّر لمدير النظام فقط", "Developer mode is for the system administrator only"
-    LangAdd "يتطلب صلاحية الأرقام المالية", "Needs the permission Financial figures"
-    LangAdd "أرسل الفاتورة الأصلية أولًا", "Send the original invoice first"
-    LangAdd "إجمالي الخصوم وحقوق الملكية", "Total liabilities and equity"
 End Sub

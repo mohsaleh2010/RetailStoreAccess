@@ -418,7 +418,13 @@ class Store:
     def avg(self, pid) -> D:
         return dec(self.one("SELECT AverageCost FROM Products WHERE ProductID = ?", pid))
 
-    def apply_stock(self, pid, qty, tt, cost, ref_type, ref_id, ref_no, recalc=False):   # ApplyStockMovement
+    def warehouse(self):                                            # CurrentWarehouseID
+        wh = self.one("SELECT e.WarehouseID FROM Employees AS e INNER JOIN Warehouses AS w ON e.WarehouseID = "
+                      "w.WarehouseID WHERE e.EmployeeID = ? AND w.IsActive = 1", self.user)
+        return wh or self.one("SELECT Min(WarehouseID) FROM Warehouses WHERE IsActive = 1 AND WarehouseType = 'MAIN'") or 1
+
+    def apply_stock(self, pid, qty, tt, cost, ref_type, ref_id, ref_no, recalc=False, warehouse=0):
+        """ApplyStockMovement: warehouse 0 = the warehouse of the user."""
         cur, avg = self.stock(pid), self.avg(pid)
         new = cur + qty
         if recalc:
@@ -427,7 +433,8 @@ class Store:
                        (float(new), float(avg), pid))
         self.insert("InventoryTransactions", TransactionDate=self.now, ProductID=pid, TransactionTypeID=tt,
                     Quantity=float(qty), UnitCost=float(cost), QuantityAfter=float(new), ReferenceType=ref_type,
-                    ReferenceID=ref_id or None, ReferenceNumber=ref_no, EmployeeID=self.user)
+                    ReferenceID=ref_id or None, ReferenceNumber=ref_no, EmployeeID=self.user,
+                    WarehouseID=warehouse or self.warehouse())
 
     def adjust(self, table, key, kid, delta):                      # AdjustBalance
         self.c.execute(f"UPDATE {table} SET CurrentBalance = CurrentBalance + ? WHERE {key} = ?",

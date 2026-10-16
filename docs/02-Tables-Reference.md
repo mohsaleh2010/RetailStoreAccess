@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **74** | عدد الحقول: **981**
+عدد الجداول: **75** | عدد الحقول: **1000**
 
 ## الفهرس
 
@@ -22,64 +22,65 @@
 14. [`CurrencyRates`](#currencyrates) – أسعار العملات
 15. [`CashBoxes`](#cashboxes) – الخزينة والصناديق
 16. [`CashBoxUsers`](#cashboxusers) – أمناء الصناديق
-17. [`Suppliers`](#suppliers) – الموردون
-18. [`Customers`](#customers) – العملاء
-19. [`Products`](#products) – المنتجات
-20. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
-21. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
-22. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
-23. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
-24. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
-25. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
-26. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
-27. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
-28. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
-29. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
-30. [`Banks`](#banks) – البنوك
-31. [`BankTransactions`](#banktransactions) – الحركات البنكية
-32. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
-33. [`FixedAssets`](#fixedassets) – الأصول الثابتة
-34. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
-35. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
-36. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
-37. [`SalesReps`](#salesreps) – المندوبين
-38. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
-39. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
-40. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
-41. [`Budgets`](#budgets) – الموازنات التقديرية
-42. [`BudgetLines`](#budgetlines) – أسطر الموازنة
-43. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
-44. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
-45. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-46. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-47. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-48. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-49. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-50. [`Expenses`](#expenses) – المصروفات
-51. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
-52. [`CashVouchers`](#cashvouchers) – سندات النقدية
-53. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-54. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-55. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-56. [`JournalEntries`](#journalentries) – قيود اليومية
-57. [`JournalLines`](#journallines) – أسطر القيود
-58. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-59. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
-60. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-61. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-62. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-63. [`ManualEntries`](#manualentries) – القيود اليدوية
-64. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-65. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
-66. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
-67. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-68. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-69. [`StockCounts`](#stockcounts) – جلسات الجرد
-70. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-71. [`AuditLog`](#auditlog) – سجل العمليات
-72. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-73. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-74. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+17. [`Warehouses`](#warehouses) – المخازن
+18. [`Suppliers`](#suppliers) – الموردون
+19. [`Customers`](#customers) – العملاء
+20. [`Products`](#products) – المنتجات
+21. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
+22. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
+23. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
+24. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
+25. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
+26. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
+27. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
+28. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
+29. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
+30. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
+31. [`Banks`](#banks) – البنوك
+32. [`BankTransactions`](#banktransactions) – الحركات البنكية
+33. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
+34. [`FixedAssets`](#fixedassets) – الأصول الثابتة
+35. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
+36. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
+37. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
+38. [`SalesReps`](#salesreps) – المندوبين
+39. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
+40. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
+41. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
+42. [`Budgets`](#budgets) – الموازنات التقديرية
+43. [`BudgetLines`](#budgetlines) – أسطر الموازنة
+44. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+45. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+46. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+47. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+48. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+49. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+50. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+51. [`Expenses`](#expenses) – المصروفات
+52. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
+53. [`CashVouchers`](#cashvouchers) – سندات النقدية
+54. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+55. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+56. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+57. [`JournalEntries`](#journalentries) – قيود اليومية
+58. [`JournalLines`](#journallines) – أسطر القيود
+59. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+60. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
+61. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+62. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+63. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+64. [`ManualEntries`](#manualentries) – القيود اليدوية
+65. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+66. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
+67. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
+68. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+69. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+70. [`StockCounts`](#stockcounts) – جلسات الجرد
+71. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+72. [`AuditLog`](#auditlog) – سجل العمليات
+73. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+74. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+75. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -256,6 +257,7 @@
 | 28 | IBAN | Short Text | 34 |  |  |  |  | آيبان الموظف |
 | 29 | HireDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ التعيين |
 | 30 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مبيعاته ومسير راتبه على هذا المركز |
+| 31 | WarehouseID | Number (Long) |  |  |  |  | `Warehouses.WarehouseID` | مخزن المستخدم – فارغ = المخزن الرئيسي |
 
 - المفتاح الأساسي: `EmployeeID`
 - فهرس فريد: `Username`
@@ -279,7 +281,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 66 سجل
+- بيانات أساسية: 67 سجل
 
 ## UserScreens
 
@@ -437,6 +439,28 @@
 - المفتاح الأساسي: `CashBoxUserID`
 - فهرس فريد: `CashBoxID, EmployeeID`
 
+## Warehouses
+
+**المخازن** – المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل. رصيد الصنف في المخزن = مجموع حركاته فيه (InventoryTransactions.WarehouseID)؛ والتكلفة متوسط واحد للصنف في كل المخازن (docs/57).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **WarehouseID** 🔑 | AutoNumber |  |  |  |  |  | رقم المخزن |
+| 2 | WarehouseCode | Short Text | 20 |  |  |  |  | كود المخزن |
+| 3 | WarehouseName | Short Text | 50 | ✔ |  |  |  | اسم المخزن |
+| 4 | WarehouseNameEn | Short Text | 50 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 5 | WarehouseType | Short Text | 10 | ✔ | `"MAIN"` | `In ("MAIN","BRANCH","VAN","WIP")` |  | النوع |
+| 6 | KeeperID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | أمين المخزن |
+| 7 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة |
+| 8 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب (سيارة) |
+| 9 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 10 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 11 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `WarehouseID`
+- فهرس فريد: `WarehouseName`
+- بيانات أساسية: 1 سجل
+
 ## Suppliers
 
 **الموردون** – بيانات الموردين. الرصيد الحالي قيمة مساعدة تُحدَّث بالكود ويمكن إعادة احتسابها من الحركات.
@@ -592,6 +616,7 @@
 | 44 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 | 45 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
 | 46 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
+| 47 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -669,6 +694,7 @@
 | 37 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك – المبلغ المحوَّل بنكيًا يُقيَّد في حساب هذا البنك |
 | 38 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
 | 39 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
+| 40 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -728,6 +754,7 @@
 | 21 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
 | 22 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
 | 23 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
+| 24 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
 
 - المفتاح الأساسي: `PurchaseInvoiceID`
 - فهرس فريد: `InvoiceNumber`
@@ -784,6 +811,7 @@
 | 20 | CurrencyCode | Short Text | 3 |  | `"SAR"` |  | `Currencies.CurrencyCode` | العملة – فارغ = عملة البرنامج (Settings.CurrencyCode) |
 | 21 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
 | 22 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
+| 23 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
 
 - المفتاح الأساسي: `PurchaseReturnID`
 - فهرس فريد: `ReturnNumber`
@@ -1696,9 +1724,10 @@
 | 4 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة |
 | 5 | TransactionID | Number (Long) |  |  |  |  |  | حركة المخزون المرحّلة – فارغ = لم يُرحَّل بعد |
 | 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 7 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
 
 - المفتاح الأساسي: `OpeningStockID`
-- فهرس فريد: `ProductID`
+- فهرس فريد: `ProductID, WarehouseID`
 
 ## TransactionTypes
 
@@ -1736,6 +1765,7 @@
 | 11 | EmployeeID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | الموظف |
 | 12 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 14 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
 
 - المفتاح الأساسي: `TransactionID`
 - فهرس عادي: `TransactionDate`
@@ -1756,6 +1786,7 @@
 | 7 | PostedAt | Date/Time |  |  |  |  |  | تاريخ الترحيل |
 | 8 | PostedByID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | رحّله |
 | 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 10 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
 
 - المفتاح الأساسي: `StockCountID`
 - فهرس فريد: `CountNumber`

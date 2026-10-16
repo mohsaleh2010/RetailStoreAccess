@@ -26,7 +26,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modSalesReps", "modEnglishNames", "modCountry", "modHttp", "modEInvoice", "modZatcaXml", "modZatcaApi", "modEtaReceipt", "modEtaInvoice", "modOpening", "modFiscal", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modSalesReps", "modEnglishNames", "modCountry", "modHttp", "modEInvoice", "modZatcaXml", "modZatcaApi", "modEtaReceipt", "modEtaInvoice", "modOpening", "modFiscal", "modWarehouses", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -177,6 +177,8 @@ Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolea
     SeedEnglishNames
     m_currentStep = "field rules"
     UpgradeFieldRules
+    m_currentStep = "old indexes"
+    UpgradeIndexes
 
     m_db.Close
     Set m_db = Nothing
@@ -676,6 +678,22 @@ Failed:
     LogLine "  ! تعذّر تغيير شرط الحقل " & TableName & "." & FieldName & ": " & Err.Description
 End Sub
 
+Private Sub DropOldIndex(ByVal TableName As String, ByVal IndexName As String)
+    ' An index the schema replaced (schema.DROPPED_INDEXES): its new index was added by CreateAllTables.
+    Dim idx As DAO.Index
+    On Error GoTo Failed
+    For Each idx In m_db.TableDefs(TableName).Indexes
+        If StrComp(idx.Name, IndexName, vbTextCompare) = 0 Then
+            m_db.TableDefs(TableName).Indexes.Delete IndexName
+            LogLine "  - أُزيل الفهرس القديم: " & TableName & "." & IndexName
+            Exit Sub
+        End If
+    Next
+    Exit Sub
+Failed:
+    LogLine "  ! تعذّر حذف الفهرس " & TableName & "." & IndexName & ": " & Err.Description
+End Sub
+
 Private Sub LogLine(ByVal Msg As String)
     m_log = m_log & Msg & vbCrLf
     Debug.Print Msg
@@ -719,6 +737,16 @@ def rule_upgrade_sub() -> str:
     for tbl, name in RULE_UPGRADES:
         f = next(x for x in table(tbl).fields if x.name == name)
         out.append(f"    SetFieldRule {vba_str(tbl)}, {vba_str(name)}, {vba_str(f.rule)}, {vba_str(f.rule_text)}")
+    out.append("End Sub")
+    return "\n".join(out)
+
+
+def index_upgrade_sub() -> str:
+    """The indexes of schema.DROPPED_INDEXES, deleted from an existing back-end."""
+    from schema import DROPPED_INDEXES
+    out = ["Private Sub UpgradeIndexes()"]
+    for tbl, name in DROPPED_INDEXES:
+        out.append(f"    DropOldIndex {vba_str(tbl)}, {vba_str(name)}")
     out.append("End Sub")
     return "\n".join(out)
 
@@ -780,6 +808,7 @@ def build_vba() -> str:
     parts.append(account_upgrade_sub() + "\n")
     parts.append(english_names_sub() + "\n")
     parts.append(rule_upgrade_sub() + "\n")
+    parts.append(index_upgrade_sub() + "\n")
     return "\n".join(parts)
 
 

@@ -15,6 +15,11 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "İí ÇáŞíÏ ÃÕá ãÓÊÈÚÏ ÈÚÏå: ÃáÛö ÇáÇÓÊÈÚÇÏ ÃæáğÇ", "The entry has an asset disposed after it: cancel the disposal first"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to add in the bank reconciliation screen"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to add in the bank transactions screen"
+    LangAdd "áåĞÇ ÇáÍÓÇÈ ÍÓÇÈÇÊ ÊÇÈÚÉ¡ İíÈŞì ÍÓÇÈğÇ ÑÆíÓíğÇ", "This account has sub-accounts, so it stays a main account"
+    LangAdd "ãİÊÇÍ ÇáÌåÇÒ æÔåÇÏÊå æÈÑäÇãÌ ÇáÊæŞíÚ (ÇáÓÚæÏíÉ", "Key and certificate of the device and the signing program (Saudi Arabia"
     LangAdd "äŞÑ ãÒÏæÌ Úáì ÍÓÇÈ íİÊÍ ßÔİ ÍÓÇÈå ááİÊÑÉ äİÓåÇ", "Double-click an account to open its statement for the same period"
     LangAdd "ÇÍİÙ ÊÇÑíÎ ÈÏÁ ÇáÊÔÛíá ÃæáğÇ¡ Ëã ÃÏÎá ÇáÃÑÕÏÉ", "Save the start-up date first, then enter the balances"
     LangAdd "ÇÎÊÑ ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ßÔİ ÇáÈäß Ëã «ãØÇÈŞÉ", "Choose the transactions shown on the bank statement, then Match"
@@ -130,14 +135,14 @@ Private Sub D2_1()
     LangAdd "ÚÏøá ÇáÅÖÇİí æÇáÎÕæãÇÊ Ëã «ÊÑÍíá ÇáãÓíÑ", "Edit the overtime and deductions, then Post the run"
     LangAdd "ßáãÉ ÇáÈÍË (ÇÓã¡ ßæÏ¡ ÈÇÑßæÏ¡ ÑŞã¡ ÌæÇá", "Search text (name, code, barcode, number, mobile"
     LangAdd "áÇ ÊæÌÏ İæÇÊíÑ Ãæ ãÑÊÌÚÇÊ İí åĞå ÇáİÊÑÉ", "No invoices or returns in this period"
+End Sub
+
+Private Sub D2_2()
     LangAdd "áÇ ÊæÌÏ ãÕÑæİÇÊ ãÊßÑÑÉ ãÓÊÍŞÉ ÍÊì Çáíæã", "There are no recurring expenses due up to today"
     LangAdd "áÇ íãßä ÊİÚíá ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÇáÂä", "E-invoicing cannot be enabled now"
     LangAdd "ãÕÑ: ßæÏ ÇáÕäİ ÇáãÓÌøá İí ÈæÇÈÉ ÇáãÕáÍÉ", "Egypt: product code registered on the Tax Authority portal"
     LangAdd "íÌÈ Ãä íİÚøáå ãÏíÑ ÇáäÙÇã ŞÈá ÇáÇÓÊÎÏÇã", "The system administrator must activate it before use"
     LangAdd "ÃÍÑİ Úáì ÇáÃŞá¡ æáÇ ÊÓÇæí ÇÓã ÇáãÓÊÎÏã", "characters at least, and not equal to the user name"
-End Sub
-
-Private Sub D2_2()
     LangAdd "ÃÏÎá ÇáäŞÏíÉ ÇáãæÌæÏÉ İÚáğÇ İí ÇáÕäÏæŞ", "Enter the cash actually in the box"
     LangAdd "Ãæ ÇÊÑß ÇáÊÇÑíÎ İÇÑÛğÇ áİÊÍ ßá ÇáİÊÑÇÊ", "or leave the date empty to open all periods"
     LangAdd "ÅÚÏÇÏ ÇáÑÈØ íÍÊÇÌ ÕáÇÍíÉ ÅÚÏÇÏÇÊ ÇáãÍá", "The connection setup needs the store settings permission"
@@ -238,6 +243,7 @@ Private Sub D2_2()
     LangAdd "ãÓÊÍŞÉ ÎáÇá 7 ÃíÇã Ãæ İÇÊ ÇÓÊÍŞÇŞåÇ", "Due within 7 days or overdue"
     LangAdd "ÇßÊÈ ÇáÊÇÑíÎ æÇáãÚÇãá (ÃßÈÑ ãä ÕİÑ", "Type the date and the rate (greater than zero"
     LangAdd "ÇáÃÕá ãÓÊÈÚÏ: ÃáÛö ÇáÇÓÊÈÚÇÏ ÃæáğÇ", "The asset is disposed: cancel the disposal first"
+    LangAdd "ÇáÕäİ ãæÌæÏ İí ÓØÑ ÂÎÑ áäİÓ ÇáãÎÒä", "The product is in another line of the same warehouse"
     LangAdd "ÇáÚãæáÉ æÖÑíÈÊåÇ áÇ ÊßæäÇä ÓÇáÈÊíä", "The fee and its VAT are never negative"
     LangAdd "ÇáãÕÑæİ ÈÚãáÉ ÃÎÑì: ÇßÊÈ ãÈáÛå ÈåÇ", "An expense in another currency: type its amount in it"
     LangAdd "ÇáãŞÈæáÉ (ÕÇİí ÇáİæÇÊíÑ æÇáãÑÊÌÚÇÊ", "Accepted (invoices net of returns"
@@ -252,15 +258,15 @@ Private Sub D2_2()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", "You do not have the permission for the start-up opening balances"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãäÏæÈíä æÚãæáÇÊåã", "You do not have the permission for sales reps and their commissions"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÍĞİ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to delete bank transactions"
+End Sub
+
+Private Sub D2_3()
     LangAdd "áÇ ÊæÌÏ ÃÑÕÏÉ ãæÑÏíä ÈÚãáÇÊ ÃÌäÈíÉ", "There are no supplier balances in foreign currencies"
     LangAdd "áÇ ÊõÓÌóøá ÏİÚÇÊ Úáì ÇáÚãíá ÇáäŞÏí", "No payments are recorded on the cash customer"
     LangAdd "ãÈíÚÇÊå æãÓíÑ ÑÇÊÈå Úáì åĞÇ ÇáãÑßÒ", "His sales and payroll are on this center"
     LangAdd "äæÚ ÇáÍÑßÉ ÛíÑ ãÊÇÍ ááÅÏÎÇá ÇáíÏæí", "The move type is not available for manual entry"
     LangAdd "åĞÇ ÇáÍÓÇÈ ãÚØøá. ÑÇÌÚ ãÏíÑ ÇáäÙÇã", "This account is disabled. Ask the system administrator"
     LangAdd "ÃÏÎá ÊÇÑíÎ ÇáÈÏÇíÉ æÊÇÑíÎ ÇáäåÇíÉ", "Enter the start date and the end date"
-End Sub
-
-Private Sub D2_3()
     LangAdd "ÅŞÑÇÑ ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ (äãæĞÌ", "VAT return (form"
     LangAdd "Åáì ÊÇÑíÎ (ÇáãíÒÇäíÉ İí åĞÇ Çáíæã", "To date (the balance sheet on this day"
     LangAdd "ÇÎÊÑ ÂÎÑ íæã İí ÇáİÊÑÉ ÇáÊí ÊõŞİá", "Choose the last day of the period to close"
@@ -375,15 +381,15 @@ Private Sub D2_3()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÅÏÇÑÉ ÇáÕáÇÍíÇÊ", "You do not have the permission to manage permissions"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅŞÑÇÑ ÇáÖÑíÈí", "You do not have the permission for the VAT return"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáäÓÎ ÇáÇÍÊíÇØí", "You do not have the permission for backups"
+End Sub
+
+Private Sub D2_4()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÓÚÑ ÇáÈíÚ", "You do not have the permission to change the sale price"
     LangAdd "áÇ ÊæÌÏ İÇÊæÑÉ ÔÑÇÁ ÈåĞÇ ÇáÑŞã", "There is no purchase invoice with this number"
     LangAdd "áÇ íæÌÏ ÓÏÇÏ ãÓÌá áåĞÇ ÇáÅŞÑÇÑ", "No payment is recorded for this return"
     LangAdd "ááÈíÚ ÇáÂÌá ÇÎÊÑ ÚãíáğÇ ãÓÌáğÇ", "For a credit sale choose a registered customer"
     LangAdd "ááÚãáÇÁ ÇáãäÔÂÊ (İÇÊæÑÉ ÖÑíÈíÉ", "For business customers (tax invoice"
     LangAdd "áã ÊõÕÏÑ ÇáåíÆÉ ÔåÇÏÉ ÇáÇãÊËÇá", "ZATCA did not issue the compliance certificate"
-End Sub
-
-Private Sub D2_4()
     LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ ÓäÏÇÊ ÇáÎÒíäÉ", "You do not have the permission for treasury vouchers"
     LangAdd "ãÌáÏ Images ÈÌÇäÈ ãáİ ÇáÈíÇäÇÊ", "Images folder next to the data file"
     LangAdd "ãÌãæÚ ÃÑÕÏÉ ÇáãÓÊæì ÇáÃæá (ÕİÑ", "Total of the first-level balances (zero"
@@ -467,14 +473,4 @@ Private Sub D2_4()
     LangAdd "ŞÇÆãÉ ÇáÏÎá ÍÓÈ ãÑßÒ ÇáÊßáİÉ", "Income statement by cost center"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÅŞİÇá ÇáİÊÑÇÊ", "You do not have the permission to close periods"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ", "You do not have this permission in the screen"
-    LangAdd "áÇ ÊæÌÏ ÊÕİíÇÊ İí åĞå ÇáİÊÑÉ", "There are no closings in this period"
-    LangAdd "áÇ ÊæÌÏ ãÈíÚÇÊ İí åĞå ÇáİÊÑÉ", "There are no sales in this period"
-    LangAdd "áãä áÇ ãÑßÒ áå ãä ÇáãÓÊÎÏãíä", "for users without a center"
-    LangAdd "ãÈÇáÛ ÇáãæÇÒäÉ áÇ Êßæä ÓÇáÈÉ", "Budget amounts are never negative"
-    LangAdd "ãØÇÈŞ: áÇ íæÌÏ ÚÌÒ æáÇ ÒíÇÏÉ", "Matched: no shortage and no overage"
-    LangAdd "ãäÙæãÉ ãÕáÍÉ ÇáÖÑÇÆÈ ÇáãÕÑíÉ", "the Egyptian Tax Authority system"
-    LangAdd "æÖÚ ÇáãØæøÑ áãÏíÑ ÇáäÙÇã İŞØ", "Developer mode is for the system administrator only"
-    LangAdd "íÊØáÈ ÕáÇÍíÉ ÇáÃÑŞÇã ÇáãÇáíÉ", "Needs the permission Financial figures"
-    LangAdd "ÃÑÓá ÇáİÇÊæÑÉ ÇáÃÕáíÉ ÃæáğÇ", "Send the original invoice first"
-    LangAdd "ÅÌãÇáí ÇáÎÕæã æÍŞæŞ ÇáãáßíÉ", "Total liabilities and equity"
 End Sub

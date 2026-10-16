@@ -212,7 +212,7 @@ Public Sub OpeningShowPart(ByVal frm As Access.Form, ByVal Part As String)
             hint = "رصيد كل حساب بنكي يوم بدء التشغيل: موجب = لنا في البنك، سالب = سحب على المكشوف."
         Case "STOCK"
             grid = "frmOpeningStock"
-            caps = Array("الصنف", "الكمية", "تكلفة الوحدة", "القيمة والحالة")
+            caps = Array("الصنف والمخزن", "الكمية", "تكلفة الوحدة", "القيمة والحالة")
             hint = "كمية كل صنف وتكلفة وحدته يوم بدء التشغيل، ثم «ترحيل الرصيد». «كل الأصناف» يضيف الأصناف " & _
                    "التي ليس لها حركات، و«قالب Excel» يصدّرها لتملأها ثم تستوردها."
         Case Else
@@ -332,8 +332,12 @@ End Sub
 '------------------------------------------------------------------------------
 ' The opening stock (OpeningStock, grid frmOpeningStock)
 '------------------------------------------------------------------------------
-Public Function ProductHasMoves(ByVal ProductID As Long) As Boolean
-    ProductHasMoves = Nz(DbValue("SELECT COUNT(*) FROM InventoryTransactions WHERE ProductID = " & ProductID), 0) > 0
+Public Function ProductHasMoves(ByVal ProductID As Long, Optional ByVal WarehouseID As Long = 0) As Boolean
+    ' Moves of the product in a warehouse (0 = in any warehouse).
+    Dim sql As String
+    sql = "SELECT COUNT(*) FROM InventoryTransactions WHERE ProductID = " & ProductID
+    If WarehouseID > 0 Then sql = sql & " AND WarehouseID = " & WarehouseID
+    ProductHasMoves = Nz(DbValue(sql), 0) > 0
 End Function
 
 Public Function OpeningStockReady(ByVal Action As String) As String
@@ -346,23 +350,26 @@ Public Function OpeningStockReady(ByVal Action As String) As String
 End Function
 
 Public Function OpeningStockLineProblem(ByVal LineID As Variant, ByVal ProductID As Variant, ByVal Qty As Variant, _
-                                        ByVal UnitCost As Variant) As String
-    ' "" when a line not posted yet can hold this product, quantity and cost.
-    Dim other As Variant
+                                        ByVal UnitCost As Variant, Optional ByVal WarehouseID As Variant = 1) As String
+    ' "" when a line not posted yet can hold this product, quantity and cost in this warehouse (docs/57).
+    Dim other As Variant, wh As Long
     If IsNull(ProductID) Then
         OpeningStockLineProblem = "اختر الصنف."
         Exit Function
     End If
+    wh = Nz(WarehouseID, MAIN_WAREHOUSE_ID)
     If Not ProductTracksStock(CLng(ProductID)) Then
         OpeningStockLineProblem = "هذا الصنف لا يتابع المخزون، فليس له رصيد."
-    ElseIf ProductHasMoves(CLng(ProductID)) Then
-        OpeningStockLineProblem = "للصنف حركات مخزون: الرصيد الافتتاحي يكون قبل أي حركة. صحّح الكمية بالجرد."
+    ElseIf Not WarehouseIsActive(wh) Then
+        OpeningStockLineProblem = WarehouseProblem(wh)
+    ElseIf ProductHasMoves(CLng(ProductID), wh) Then
+        OpeningStockLineProblem = "للصنف حركات في هذا المخزن: الرصيد الافتتاحي يكون قبل أي حركة. صحّح الكمية بالجرد."
     ElseIf Nz(Qty, 0) < 0 Or Nz(UnitCost, 0) < 0 Then
         OpeningStockLineProblem = "الكمية والتكلفة لا تكونان سالبتين."
     Else
         other = DbValue("SELECT OpeningStockID FROM OpeningStock WHERE ProductID = " & CLng(ProductID) & _
-                        " AND OpeningStockID <> " & Nz(LineID, 0))
-        If Not IsNull(other) Then OpeningStockLineProblem = "الصنف موجود في سطر آخر."
+                        " AND WarehouseID = " & wh & " AND OpeningStockID <> " & Nz(LineID, 0))
+        If Not IsNull(other) Then OpeningStockLineProblem = "الصنف موجود في سطر آخر لنفس المخزن."
     End If
 End Function
 
@@ -372,9 +379,10 @@ Public Sub OpeningStockBeforeUpdate(ByVal frm As Access.Form, ByRef Cancel As In
     If Len(msg) = 0 And Not IsNull(frm!TransactionID.Value) Then
         msg = "هذا الرصيد مرحّل. لتعديله ألغِ ترحيله بزر الحذف في سطره، ثم عدّله ورحّله من جديد."
     End If
+    If IsNull(frm!WarehouseID.Value) Then frm!WarehouseID.Value = MAIN_WAREHOUSE_ID
     If Len(msg) = 0 Then
         msg = OpeningStockLineProblem(frm!OpeningStockID.Value, frm!ProductID.Value, frm!Quantity.Value, _
-                                      frm!UnitCost.Value)
+                                      frm!UnitCost.Value, frm!WarehouseID.Value)
     End If
     If Len(msg) > 0 Then
         ShowWarning msg
@@ -386,22 +394,24 @@ Public Sub OpeningStockBeforeUpdate(ByVal frm As Access.Form, ByRef Cancel As In
     AuditFormBefore frm, "OpeningStock", "OpeningStockID"
 End Sub
 
-Public Function FillOpeningStock() As Long
-    ' Adds a line (quantity 0, the known cost) for every active product that tracks stock and has no move.
+Public Function FillOpeningStock(Optional ByVal WarehouseID As Long = 1) As Long
+    ' Adds a line (quantity 0, the known cost) in the warehouse for every active product that tracks
+    ' stock and has no line and no move there.
     Dim before As Long
     before = Nz(DbValue("SELECT COUNT(*) FROM OpeningStock"), 0)
-    CurrentDb.Execute "INSERT INTO OpeningStock (ProductID, Quantity, UnitCost) " & _
-        "SELECT p.ProductID, 0, IIf(p.AverageCost > 0, p.AverageCost, p.PurchasePrice) FROM Products AS p " & _
-        "WHERE p.TrackStock = True AND p.IsActive = True " & _
-        "AND p.ProductID NOT IN (SELECT ProductID FROM OpeningStock) " & _
-        "AND p.ProductID NOT IN (SELECT ProductID FROM InventoryTransactions)", dbFailOnError
+    CurrentDb.Execute "INSERT INTO OpeningStock (ProductID, WarehouseID, Quantity, UnitCost) " & _
+        "SELECT p.ProductID, " & WarehouseID & ", 0, IIf(p.AverageCost > 0, p.AverageCost, p.PurchasePrice) " & _
+        "FROM Products AS p WHERE p.TrackStock = True AND p.IsActive = True " & _
+        "AND p.ProductID NOT IN (SELECT ProductID FROM OpeningStock WHERE WarehouseID = " & WarehouseID & ") " & _
+        "AND p.ProductID NOT IN (SELECT ProductID FROM InventoryTransactions WHERE WarehouseID = " & WarehouseID & ")", _
+        dbFailOnError
     FillOpeningStock = Nz(DbValue("SELECT COUNT(*) FROM OpeningStock"), 0) - before
 End Function
 
 Public Function PostOpeningStock(ByRef Posted As Long, ByRef Skipped As Long) As String
     ' One stock move "opening" per line not posted with a quantity, on the start-up date.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
-    Dim refNo As String, pid As Long, tid As Variant, startDay As Date
+    Dim refNo As String, pid As Long, tid As Variant, startDay As Date, wh As Long
     Posted = 0
     Skipped = 0
     PostOpeningStock = OpeningStockReady("ADD")
@@ -417,13 +427,15 @@ Public Function PostOpeningStock(ByRef Posted As Long, ByRef Skipped As Long) As
     ws.BeginTrans
     inTrans = True
     refNo = NextNumber("STOCK_ADJUST")
-    Set rs = db.OpenRecordset("SELECT OpeningStockID, ProductID, Quantity, UnitCost FROM OpeningStock " & _
+    Set rs = db.OpenRecordset("SELECT OpeningStockID, ProductID, WarehouseID, Quantity, UnitCost FROM OpeningStock " & _
                               "WHERE TransactionID Is Null AND Quantity > 0 ORDER BY OpeningStockID", dbOpenSnapshot)
     Do Until rs.EOF
         pid = rs!ProductID
-        If ProductTracksStock(pid) And Not ProductHasMoves(pid) Then
-            ApplyStockMovement db, pid, CCur(rs!Quantity), TT_OPENING, CCur(rs!UnitCost), "MANUAL", 0, refNo, "", True
-            tid = DbValue("SELECT Max(TransactionID) FROM InventoryTransactions WHERE ProductID = " & pid)
+        wh = Nz(rs!WarehouseID, MAIN_WAREHOUSE_ID)
+        If ProductTracksStock(pid) And Not ProductHasMoves(pid, wh) Then
+            ApplyStockMovement db, pid, CCur(rs!Quantity), TT_OPENING, CCur(rs!UnitCost), "MANUAL", 0, refNo, "", True, wh
+            tid = DbValue("SELECT Max(TransactionID) FROM InventoryTransactions WHERE ProductID = " & pid & _
+                          " AND WarehouseID = " & wh)
             db.Execute "UPDATE InventoryTransactions SET TransactionDate = " & SqlDate(startDay) & _
                        " WHERE TransactionID = " & tid, dbFailOnError
             db.Execute "UPDATE OpeningStock SET TransactionID = " & tid & " WHERE OpeningStockID = " & _
@@ -449,13 +461,15 @@ End Function
 Public Function UnpostOpeningStock(ByVal LineID As Long) As String
     ' Takes back the move of a posted line while it is the only move of its product; the line stays to edit.
     Dim db As DAO.Database, ws As DAO.Workspace, inTrans As Boolean, tid As Variant, pid As Long
-    Dim before As Collection
+    Dim before As Collection, wh As Long, qty As Currency, remainQty As Currency
     UnpostOpeningStock = OpeningStockReady("DELETE")
     If Len(UnpostOpeningStock) > 0 Then Exit Function
     tid = DbValue("SELECT TransactionID FROM OpeningStock WHERE OpeningStockID = " & LineID)
     If IsNull(tid) Then Exit Function
     pid = DbValue("SELECT ProductID FROM OpeningStock WHERE OpeningStockID = " & LineID)
-    If Nz(DbValue("SELECT COUNT(*) FROM InventoryTransactions WHERE ProductID = " & pid & _
+    wh = Nz(DbValue("SELECT WarehouseID FROM InventoryTransactions WHERE TransactionID = " & tid), MAIN_WAREHOUSE_ID)
+    qty = Nz(DbValue("SELECT Quantity FROM InventoryTransactions WHERE TransactionID = " & tid), 0)
+    If Nz(DbValue("SELECT COUNT(*) FROM InventoryTransactions WHERE ProductID = " & pid & " AND WarehouseID = " & wh & _
                   " AND TransactionID <> " & tid), 0) > 0 Then
         UnpostOpeningStock = "للصنف حركات بعد رصيده الافتتاحي، فلا يُلغى ترحيله. صحّح الكمية بالجرد."
         Exit Function
@@ -467,8 +481,15 @@ Public Function UnpostOpeningStock(ByVal LineID As Long) As String
     ws.BeginTrans
     inTrans = True
     db.Execute "DELETE FROM InventoryTransactions WHERE TransactionID = " & tid, dbFailOnError
-    db.Execute "UPDATE Products SET CurrentQuantity = 0, AverageCost = 0, UpdatedAt = Now() WHERE ProductID = " & pid, _
-               dbFailOnError
+    ' the quantity of the other warehouses stays; with nothing left the average cost starts again
+    remainQty = Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & pid), 0) - qty
+    If remainQty = 0 Then
+        db.Execute "UPDATE Products SET CurrentQuantity = 0, AverageCost = 0, UpdatedAt = Now() WHERE ProductID = " & pid, _
+                   dbFailOnError
+    Else
+        db.Execute "UPDATE Products SET CurrentQuantity = " & Str$(remainQty) & ", UpdatedAt = Now() WHERE ProductID = " & pid, _
+                   dbFailOnError
+    End If
     db.Execute "UPDATE OpeningStock SET TransactionID = Null WHERE OpeningStockID = " & LineID, dbFailOnError
     ws.CommitTrans
     inTrans = False
@@ -480,9 +501,11 @@ EH:
     If inTrans Then ws.Rollback
 End Function
 
-Public Function ImportOpeningStockRow(ByVal Code As String, ByVal Qty As Variant, ByVal UnitCost As Variant) As String
-    ' One row of the Excel file: "ADDED", "UPDATED", or the reason it was not taken.
-    Dim pid As Variant, lineID As Variant, cost As Currency
+Public Function ImportOpeningStockRow(ByVal Code As String, ByVal Qty As Variant, ByVal UnitCost As Variant, _
+                                      Optional ByVal WarehouseCode As String = "") As String
+    ' One row of the Excel file: "ADDED", "UPDATED", or the reason it was not taken. WarehouseCode: the code
+    ' or name of the warehouse (empty = the main warehouse, docs/57).
+    Dim pid As Variant, lineID As Variant, cost As Currency, wh As Variant
     Code = Trim$(Code)
     If Len(Code) = 0 Then
         ImportOpeningStockRow = "EMPTY"
@@ -510,20 +533,30 @@ Public Function ImportOpeningStockRow(ByVal Code As String, ByVal Qty As Variant
         ImportOpeningStockRow = "BAD"
         Exit Function
     End If
-    lineID = DbValue("SELECT OpeningStockID FROM OpeningStock WHERE ProductID = " & pid)
+    If Len(Trim$(WarehouseCode)) = 0 Then
+        wh = MAIN_WAREHOUSE_ID
+    Else
+        wh = DbValue("SELECT WarehouseID FROM Warehouses WHERE WarehouseCode = " & SqlText(Trim$(WarehouseCode)) & _
+                     " OR WarehouseName = " & SqlText(Trim$(WarehouseCode)))
+        If IsNull(wh) Then
+            ImportOpeningStockRow = "UNKNOWN"
+            Exit Function
+        End If
+    End If
+    lineID = DbValue("SELECT OpeningStockID FROM OpeningStock WHERE ProductID = " & pid & " AND WarehouseID = " & wh)
     If Not IsNull(lineID) Then
         If Not IsNull(DbValue("SELECT TransactionID FROM OpeningStock WHERE OpeningStockID = " & lineID)) Then
             ImportOpeningStockRow = "POSTED"
             Exit Function
         End If
     End If
-    If Len(OpeningStockLineProblem(lineID, pid, Qty, cost)) > 0 Then
+    If Len(OpeningStockLineProblem(lineID, pid, Qty, cost, wh)) > 0 Then
         ImportOpeningStockRow = "MOVES"
         Exit Function
     End If
     If IsNull(lineID) Then
-        CurrentDb.Execute "INSERT INTO OpeningStock (ProductID, Quantity, UnitCost) VALUES (" & pid & ", " & _
-                          Str$(CDbl(Qty)) & ", " & Str$(cost) & ")", dbFailOnError
+        CurrentDb.Execute "INSERT INTO OpeningStock (ProductID, WarehouseID, Quantity, UnitCost) VALUES (" & pid & ", " & _
+                          wh & ", " & Str$(CDbl(Qty)) & ", " & Str$(cost) & ")", dbFailOnError
         ImportOpeningStockRow = "ADDED"
     Else
         CurrentDb.Execute "UPDATE OpeningStock SET Quantity = " & Str$(CDbl(Qty)) & ", UnitCost = " & Str$(cost) & _
@@ -561,7 +594,10 @@ Public Function ImportOpeningStock(ByVal FilePath As String) As String
         Exit Function
     End If
     Do Until rs.EOF
-        If rs.Fields.Count > cCol Then
+        If rs.Fields.Count > 4 And qCol = 2 Then          ' the template: code, name, quantity, cost, warehouse
+            result = ImportOpeningStockRow(CStr(Nz(rs.Fields(0).Value, "")), rs.Fields(qCol).Value, rs.Fields(cCol).Value, _
+                                           CStr(Nz(rs.Fields(4).Value, "")))
+        ElseIf rs.Fields.Count > cCol Then
             result = ImportOpeningStockRow(CStr(Nz(rs.Fields(0).Value, "")), rs.Fields(qCol).Value, rs.Fields(cCol).Value)
         Else
             result = ImportOpeningStockRow(CStr(Nz(rs.Fields(0).Value, "")), rs.Fields(qCol).Value, Null)
@@ -610,10 +646,13 @@ Public Function OpeningStockTemplateSql() As String
     ' The products still waiting for their opening stock, in the columns the import reads.
     OpeningStockTemplateSql = "SELECT p.ProductCode AS [كود الصنف], p.ProductName AS [اسم الصنف], " & _
         "Nz(o.Quantity, 0) AS [الكمية الافتتاحية], " & _
-        "Nz(o.UnitCost, IIf(p.AverageCost > 0, p.AverageCost, p.PurchasePrice)) AS [تكلفة الوحدة الافتتاحية] " & _
-        "FROM Products AS p LEFT JOIN OpeningStock AS o ON p.ProductID = o.ProductID " & _
-        "WHERE p.TrackStock = True AND p.IsActive = True AND o.TransactionID Is Null " & _
-        "AND p.ProductID NOT IN (SELECT ProductID FROM InventoryTransactions) ORDER BY p.ProductName"
+        "Nz(o.UnitCost, IIf(p.AverageCost > 0, p.AverageCost, p.PurchasePrice)) AS [تكلفة الوحدة الافتتاحية], " & _
+        "w.WarehouseCode AS [كود المخزن] " & _
+        "FROM (Products AS p LEFT JOIN (SELECT * FROM OpeningStock WHERE WarehouseID = 1) AS o " & _
+        "ON p.ProductID = o.ProductID), Warehouses AS w " & _
+        "WHERE w.WarehouseID = 1 AND p.TrackStock = True AND p.IsActive = True AND o.TransactionID Is Null " & _
+        "AND p.ProductID NOT IN (SELECT ProductID FROM InventoryTransactions WHERE WarehouseID = 1) " & _
+        "ORDER BY p.ProductName"
 End Function
 
 '------------------------------------------------------------------------------

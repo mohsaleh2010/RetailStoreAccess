@@ -69,6 +69,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
 | `modEtaInvoice` | الفاتورة الإلكترونية المصرية للمنشآت: المستند (1.0 موقّع أو 0.9 للتجربة)، والتوقيع عبر برنامج التوقيع الخارجي، والإرسال، والإشعار الدائن، والحالة، والإلغاء. يحوّل إليها `modEtaReceipt` كل فاتورة ضريبية (`docs/49`) |
 | `modEInvoice` / `modHttp` | أساس الفاتورة الإلكترونية: حالة المستند، وسجل `EInvoiceLog`، وشاشة `frmEInvoices`، والإرسال عبر منظومة الدولة بالاسم (`Application.Run`)، وHTTPS وقراءة JSON (`docs/45`)، وتقرير المستندات `rptEInvoiceDocs` وتنبيه الإقرار `EInvoiceOpenCount` (`docs/50`) |
 | `modFiscal` | الفترات المالية (`docs/54`): شاشة `frmFiscalPeriods`، وأيام كل سنة أو فترة لإقفالها (`FiscalYearStart` / `FiscalYearEnd`)، والفترات السريعة «هذه السنة / السنة الماضية»، وتقرير أرصدة أول المدة، والميزانية الافتتاحية |
+| `modWarehouses` | المخازن (`docs/57`): مخزن المستخدم `CurrentWarehouseID`، ورصيد الصنف في المخزن `WarehouseStock` / `AvailableQty`، وشاشة `frmWarehouses`، والاختبار `TestWarehouses` |
 | `modOpening` | أرصدة بداية التشغيل: تاريخ بدء التشغيل، وشاشة `frmOpeningBalances` بأقسامها، ورصيد حساب إجمالي الأرصدة الافتتاحية 3900 حسب المصدر (`docs/52`)، والرصيد الافتتاحي للمخزون: الإدخال الجماعي والاستيراد من Excel والترحيل (`docs/53`) |
 | `modCountry` | دولة التشغيل (السعودية أو مصر): العملة والضريبة والرقم الضريبي وعنوان المستند، وتغيير الدولة قبل أول عملية فقط (`docs/44`) |
 | `modEnglishNames` | شاشة الأسماء الإنجليزية `frmEnglishNames`: الأسماء الناقصة من كل الجداول، واقتراح `Transliterate` (نسخته بـ Python `tools/translit.py`)، وحفظ مع سجل التدقيق (`docs/42`) |

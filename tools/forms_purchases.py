@@ -73,10 +73,13 @@ def layout_purchase_invoice(line_heads) -> FormModel:
     q = m.add(Control("text", "txtQty", cm(8.7), y, cm(2.0), cm(1.0),
                       {"FontSize": 16, "Format": "#,##0.###", "DefaultValue": "1"}))
     labelled(m, "txtQty", "الكمية", q)
-    p = m.add(Control("combo", "cboProduct", cm(11.0), y, cm(10.6), cm(1.0),
-                      {"RowSource": PURCHASE_PRODUCT_ROWS, "ColumnCount": 3, "ColumnWidths": "0;8;2",
+    p = m.add(Control("combo", "cboProduct", cm(14.3), y, cm(7.3), cm(1.0),
+                      {"RowSource": PURCHASE_PRODUCT_ROWS, "ColumnCount": 3, "ColumnWidths": "0;6;1.3",
                        "FontSize": 13}, events=["AfterUpdate"]))
     labelled(m, "cboProduct", "أو ابحث باسم المنتج (F4)", p)
+    c = m.add(Control("combo", "cboWarehouse", cm(11.0), y, cm(3.0), cm(1.0),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;3", "LimitToList": True}))
+    labelled(m, "cboWarehouse", "المخزن المستلم", c)
 
     header_labels(m, cm(0.4), cm(3.6), PURCHASE_TITLES, line_heads)
     m.add(Control("subform", "subLines", cm(0.4), cm(4.25), cm(21.2), cm(9.3),
@@ -342,7 +345,8 @@ def layout_inventory() -> FormModel:
             ("btnStockReport", "تقرير المخزون", "secondary", 3.4,
              'OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", ""'),
             ("btnLabels", "طباعة باركود", "secondary", 3.4,
-             'OpenScreen "frmBarcodeLabels", 0, Me!lstProducts.Value')]:
+             'OpenScreen "frmBarcodeLabels", 0, Me!lstProducts.Value'),
+            ("btnWarehouses", "المخازن", "secondary", 2.6, 'OpenScreen "frmWarehouses"')]:
         button(m, name, caption, bx, cm(16.6), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
 
@@ -365,8 +369,12 @@ def layout_inventory() -> FormModel:
     c = m.add(Control("text", "txtMoveCost", px + cm(8.9), cm(5.25), cm(2.8), cm(0.8),
                       {"Format": "#,##0.00##"}))
     labelled(m, "txtMoveCost", "تكلفة الوحدة", c)
-    c = m.add(Control("text", "txtMoveNotes", px, cm(6.7), cm(8.6), cm(0.8), {}))
+    c = m.add(Control("text", "txtMoveNotes", px, cm(6.7), cm(5.4), cm(0.8), {}))
     labelled(m, "txtMoveNotes", "السبب / ملاحظات", c)
+    c = m.add(Control("combo", "cboWarehouse", px + cm(5.6), cm(6.7), cm(3.1), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;3", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboWarehouse", "المخزن", c)
     button(m, "btnPostMove", "حفظ الحركة", px + cm(8.9), cm(6.67), "primary", w=cm(2.8),
            call="PostInventoryMove Me")
     m.add(Control("label", "lblMovesCap", px, cm(7.85), pw, cm(0.6),
@@ -384,7 +392,8 @@ def layout_inventory() -> FormModel:
                "Private Sub lstProducts_AfterUpdate()", "    InventoryProductPicked Me", "End Sub",
                "Private Sub lstProducts_DblClick(Cancel As Integer)",
                '    OpenScreen "frmProducts", 0, Me!lstProducts.Value', "End Sub",
-               "Private Sub cboMoveType_AfterUpdate()", "    InventoryMoveTypeChanged Me", "End Sub"]
+               "Private Sub cboMoveType_AfterUpdate()", "    InventoryMoveTypeChanged Me", "End Sub",
+               "Private Sub cboWarehouse_AfterUpdate()", "    InventoryProductPicked Me", "End Sub"]
               + m.code)
     shrink_area(m, ("lstProducts", "lstMoves"), cm(2.1))
     fit_window(m, split_x=cm(21.2), bottom_y=cm(13.4), stretch_w=("lstProducts", "lblInvTotals"),
@@ -429,9 +438,12 @@ def layout_stock_count(line_heads) -> FormModel:
     c = m.add(Control("combo", "cboCategory", cm(9.7), y, cm(5.0), cm(0.8),
                       {"RowSource": CATEGORY_ROWS, "ColumnCount": 2, "ColumnWidths": "0;5"}))
     labelled(m, "cboCategory", "تصنيف الجرد الجديد (فارغ = الكل)", c)
-    button(m, "btnNewCount", "جرد جديد", cm(15.0), y - cm(0.03), "primary", w=cm(3.0),
+    c = m.add(Control("combo", "cboWarehouse", cm(15.0), y, cm(3.6), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;3.5", "LimitToList": True}))
+    labelled(m, "cboWarehouse", "مخزن الجرد الجديد", c)
+    button(m, "btnNewCount", "جرد جديد", cm(18.9), y - cm(0.03), "primary", w=cm(3.0),
            call="NewStockCount Me")
-    m.add(Control("label", "lblCountInfo", cm(18.3), y, width - cm(18.7), cm(0.8),
+    m.add(Control("label", "lblCountInfo", cm(22.2), y, width - cm(22.6), cm(0.8),
                   {"Caption": " ", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_TEXT")}))
     y = cm(3.85)
     c = m.add(Control("text", "txtCountBarcode", cm(0.4), y, cm(7.0), cm(0.8), {"FontSize": 12},

@@ -134,6 +134,9 @@ CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Cur
 REP_ROWS = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName"
 CASHBOX_ROWS = "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير;CUSTODY;عهدة مندوب"
+WAREHOUSE_TYPES = "MAIN;مخزن رئيسي;BRANCH;مخزن فرع;VAN;سيارة مندوب;WIP;تحت التشغيل"
+WAREHOUSE_ROWS = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True "
+                  "ORDER BY w.WarehouseID")
 COMMISSION_BASES = "SALES;صافي المبيعات (بدون الضريبة);COLLECTION;التحصيل"
 EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
 FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
@@ -358,6 +361,8 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("CashBoxID", rows=CASHBOX_ROWS,
                 hint="نقدية مبيعات المستخدم وسنداته تدخل هذا الصندوق؛ فارغ = أول صندوق كاشير"),
             Info("lblCashBoxNote", "المدير المسؤول عن الخزينة: اختر له الخزينة الرئيسية"),
+            Fld("WarehouseID", rows=WAREHOUSE_ROWS, widths="0;5",
+                hint="مبيعات المستخدم ومشترياته وحركاته من هذا المخزن؛ فارغ = المخزن الرئيسي"),
             Fld("MustChangePassword"), Fld("LastLoginAt", locked=True),
             Fld("FailedLoginCount", locked=True), Fld("LockedUntil", locked=True),
             Info("lblPasswordState"),
@@ -442,6 +447,27 @@ DATA_SCREENS: List[DataScreen] = [
         fields=[Fld("CashBoxID", rows=CASHBOX_ROWS, widths="0;6"), Fld("EmployeeID", rows=EMPLOYEE_ROWS, widths="0;6"),
                 Info("lblBoxUsersNote", "صندوق بلا أمناء يصرف منه كل من له صلاحية الخزينة. "
                                         "وصلاحية «الصرف من كل الصناديق» تتجاوز الأمناء")]),
+    DataScreen(
+        "frmWarehouses", "Warehouses", "المخازن", "المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل",
+        "inventory",
+        list_select="t.WarehouseCode AS [كود المخزن], t.WarehouseName AS [المخزن], IIf(t.WarehouseType = 'MAIN', "
+                    "'رئيسي', IIf(t.WarehouseType = 'BRANCH', 'فرع', IIf(t.WarehouseType = 'VAN', 'سيارة مندوب', "
+                    "'تحت التشغيل'))) AS [نوع المخزن]",
+        list_from="[@Warehouses] AS t", list_order="t.WarehouseID",
+        list_headers=[("كود المخزن", 2.2), ("المخزن", 4.2), ("نوع المخزن", 2.4)],
+        search=["t.WarehouseCode", "t.WarehouseName", "t.WarehouseNameEn", "t.Notes"], active="t.IsActive",
+        unique=["WarehouseName"],
+        extra_buttons=[("btnInventory", "المخزون", 'OpenScreen "frmInventory"'),
+                       ("btnStockReport", "أرصدة المخازن", 'OpenScreen "frmReportCenter", 0, "STOCK_WAREHOUSE"')],
+        fields=[Fld("WarehouseCode"), Fld("WarehouseType", rows=WAREHOUSE_TYPES, widths="0;5"),
+                Fld("WarehouseName", span=2), Fld("WarehouseNameEn", span=2),
+                Fld("KeeperID", rows=EMPLOYEE_ROWS, widths="0;6"),
+                Fld("CostCenterID", rows=CENTER_ROWS, widths="0;6"),
+                Fld("SalesRepID", rows=REP_ROWS, widths="0;6", hint="لمخزن سيارة المندوب"),
+                Fld("IsActive"),
+                Info("lblWarehouseNote", "رصيد الصنف في المخزن يُحسب من حركاته فيه. المستخدم يبيع ويشتري من مخزنه "
+                                         "في شاشة المستخدمين، وبدونه من المخزن الرئيسي"),
+                Fld("Notes", span=2)]),
     DataScreen(
         "frmBanks", "Banks", "البنوك", "الحسابات البنكية للمحل وأرصدتها", "treasury",
         list_select="t.BankName AS [البنك], t.AccountNo AS [رقم الحساب]",
@@ -581,7 +607,7 @@ SCREEN_PERMISSIONS = {
     "frmCafeItem": "SALES_POS",
     "frmTreasury": "CASH_CLOSING", "frmCashClosing": "CASH_CLOSING",
     "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX", "frmCashBoxUsers": "CASH_ALL_BOXES",
-    "frmCashTransfers": "CASH_CLOSING",
+    "frmCashTransfers": "CASH_CLOSING", "frmWarehouses": "PRODUCTS",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
     "frmPeriodClosing": "PERIOD_CLOSE", "frmFiscalPeriods": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN", "frmOpeningBalances": "OPENING_BALANCES",
@@ -673,6 +699,7 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("LEAST_SELLING", "أقل المنتجات مبيعًا", "LeastSellingProductsQuery", "rptLeastSelling", "P"),
     ReportEntry("PURCHASES", "المشتريات", "PurchasesQuery", "rptPurchases", "Ps"),
     ReportEntry("STOCK", "المخزون الحالي", "StockBalanceQuery", "rptStockBalance"),
+    ReportEntry("STOCK_WAREHOUSE", "أرصدة الأصناف لكل مخزن", "StockByWarehouseQuery", "rptStockByWarehouse"),
     ReportEntry("LOW_STOCK", "المنتجات منخفضة المخزون", "LowStockQuery", "rptLowStock"),
     ReportEntry("PRODUCT_MOVEMENT", "حركة منتج", "ProductMovementQuery", "rptProductMovement", "PR"),
     ReportEntry("CUSTOMER_STATEMENT", "كشف حساب عميل", "CustomerStatementQuery", "rptCustomerStatement", "PC"),

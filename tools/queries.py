@@ -736,6 +736,20 @@ SELECT ProductID, Sum(Quantity) AS LedgerQty, Max(TransactionDate) AS LastMoveme
 FROM InventoryTransactions
 GROUP BY ProductID"""),
 
+    Query("qryWarehouseStock", "رصيد كل منتج في كل مخزن من دفتر حركة المخزون (docs/57)", """
+SELECT ProductID, WarehouseID, Sum(Quantity) AS StockQty, Max(TransactionDate) AS LastMovementDate
+FROM InventoryTransactions
+GROUP BY ProductID, WarehouseID"""),
+
+    Query("StockByWarehouseQuery", "أرصدة الأصناف لكل مخزن: الكمية والقيمة بمتوسط التكلفة", """
+SELECT q.WarehouseID, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName, c.CategoryName,
+       q.StockQty, p.AverageCost, q.StockQty * p.AverageCost AS StockCostValue, q.LastMovementDate
+FROM ((qryWarehouseStock AS q INNER JOIN [@Warehouses] AS w ON q.WarehouseID = w.WarehouseID)
+      INNER JOIN Products AS p ON q.ProductID = p.ProductID)
+     INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID
+WHERE q.StockQty <> 0
+ORDER BY w.WarehouseName, p.ProductName"""),
+
     Query("qryProductLastSale", "تاريخ آخر بيع لكل منتج", """
 SELECT d.ProductID, Max(h.InvoiceDate) AS LastSaleDate
 FROM SalesInvoiceDetails AS d INNER JOIN SalesInvoices AS h

@@ -28,9 +28,11 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
                                      ByVal PaymentMethodID As Variant, ByVal ChargeVat As Boolean, _
                                      ByVal InvoiceDiscount As Currency, ByVal PaidAmount As Variant, _
                                      ByVal Notes As String, ByRef NewInvoiceID As Long, _
-                                     Optional ByVal CurrencyCode As String = "", Optional ByVal FxRate As Double = 1) As String
+                                     Optional ByVal CurrencyCode As String = "", Optional ByVal FxRate As Double = 1, _
+                                     Optional ByVal WarehouseID As Long = 0) As String
     ' The prices, discounts and the paid amount of the cart are in CurrencyCode (default: the program
     ' currency); the invoice is kept in SAR, with its currency, rate and total there (modCurrency).
+    ' The goods enter WarehouseID (0 = the user's warehouse, modWarehouses).
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim n As Long, i As Long, msg As String, vatRate As Currency, rate As Currency
     Dim productIDs() As Long, newPrices() As Variant, isCredit As Boolean, reclaim As Boolean
@@ -107,6 +109,13 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
         Exit Function
     End If
 
+    If WarehouseID = 0 Then WarehouseID = CurrentWarehouseID()
+    msg = WarehouseProblem(WarehouseID)
+    If Len(msg) > 0 Then
+        PostPurchaseFromCart = msg
+        Exit Function
+    End If
+
     ' ---- 2. payment: cash = paid in full; credit = whatever was paid now (default 0)
     isCredit = (PaymentType = "CREDIT")
     If IsNull(PaidAmount) Then
@@ -147,6 +156,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     If remaining > 0 Then rs!DueDate = DueDateFor("S", SupplierID, docDate)       ' modAging
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), paid)      ' modCash
     rs!BankID = BankFor(PaymentMethodID, paid)                                 ' modBank
+    rs!WarehouseID = WarehouseID
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     rs.Update
     rs.Bookmark = rs.LastModified
@@ -173,7 +183,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     For i = 0 To n - 1
         unitCost = PurchaseUnitCost(CalcLine(i, "NET"), CalcLine(i, "TOTAL"), CalcLine(i, "QTY"), reclaim)
         ApplyStockMovement db, productIDs(i), CalcLine(i, "QTY"), TT_PURCHASE, unitCost, "PURCHASE", _
-                           invoiceID, invNo, "", True
+                           invoiceID, invNo, "", True, WarehouseID
         UpdateProductPrices db, productIDs(i), CalcLine(i, "UNIT"), newPrices(i), SupplierID
     Next
     If remaining <> 0 Then AdjustBalance db, "Suppliers", "SupplierID", SupplierID, remaining
@@ -217,7 +227,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
     Dim nets() As Currency, taxes() As Currency, totals() As Currency, rates() As Currency
     Dim discs() As Currency, costs() As Currency
     Dim sumNet As Currency, sumTax As Currency, sumTotal As Currency, sumDisc As Currency
-    Dim refunded As Currency, retID As Long, retNo As String
+    Dim refunded As Currency, retID As Long, retNo As String, warehouse As Long
 
     On Error GoTo EH
     NewReturnID = 0
@@ -286,7 +296,9 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
         PostPurchaseReturn = "ÍÏÏ ÇáßãíÉ ÇáãÑÊÌÚÉ áÕäÝ æÇÍÏ Úáì ÇáÃÞá."
         Exit Function
     End If
-    msg = CheckStockAvailable(productIDs, qtys, n, "ÇáÅÑÌÇÚ ááãæÑÏ")
+    warehouse = Nz(DbValue("SELECT WarehouseID FROM PurchaseInvoices WHERE PurchaseInvoiceID = " & PurchaseInvoiceID), _
+                   MAIN_WAREHOUSE_ID)                      ' the goods leave the warehouse they entered
+    msg = CheckStockAvailable(productIDs, qtys, n, "ÇáÅÑÌÇÚ ááãæÑÏ", warehouse)
     If Len(msg) > 0 Then
         PostPurchaseReturn = msg
         Exit Function
@@ -320,6 +332,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
     rs!ForeignAmount = FromBase(sumTotal, rs!ExchangeRate)
     rs!CashBoxID = CashBoxFor(Nz(PaymentMethodID, CASH_METHOD_ID), refunded)
     rs!BankID = BankFor(PaymentMethodID, refunded)
+    rs!WarehouseID = warehouse
     rs.Update
     rs.Bookmark = rs.LastModified
     retID = rs!PurchaseReturnID
@@ -344,7 +357,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
 
     For i = 0 To n - 1
         ApplyStockMovement db, productIDs(i), -qtys(i), TT_PURCHASE_RETURN, costs(i), "PURCHASE_RETURN", _
-                           retID, retNo, "", True
+                           retID, retNo, "", True, warehouse
     Next
     If refunded - sumTotal <> 0 Then AdjustBalance db, "Suppliers", "SupplierID", supplierID, refunded - sumTotal
 
@@ -449,7 +462,8 @@ End Function
 '------------------------------------------------------------------------------
 Public Function PostManualStock(ByVal ProductID As Long, ByVal TransactionTypeID As Long, _
                                 ByVal Qty As Currency, ByVal UnitCost As Variant, ByVal Notes As String, _
-                                ByRef RefNumber As String) As String
+                                ByRef RefNumber As String, Optional ByVal WarehouseID As Long = 0) As String
+    ' WarehouseID 0 = the warehouse of the user (modWarehouses).
     Dim db As DAO.Database, ws As DAO.Workspace, inTrans As Boolean, msg As String
     Dim avgCost As Currency, cost As Currency, ids(0 To 0) As Long, qtys(0 To 0) As Currency
 
@@ -472,6 +486,12 @@ Public Function PostManualStock(ByVal ProductID As Long, ByVal TransactionTypeID
         PostManualStock = "ÇáßãíÉ íÌÈ Ãä Êßæä ÃßÈÑ ãä ÕÝÑ."
         Exit Function
     End If
+    If WarehouseID = 0 Then WarehouseID = CurrentWarehouseID()
+    msg = WarehouseProblem(WarehouseID)
+    If Len(msg) > 0 Then
+        PostManualStock = msg
+        Exit Function
+    End If
     avgCost = Nz(DbValue("SELECT AverageCost FROM Products WHERE ProductID = " & ProductID), 0)
     If IsNull(UnitCost) Then cost = avgCost Else cost = CCur(UnitCost)
     If cost < 0 Then
@@ -481,8 +501,9 @@ Public Function PostManualStock(ByVal ProductID As Long, ByVal TransactionTypeID
 
     Select Case TransactionTypeID
         Case TT_OPENING
-            If Nz(DbValue("SELECT COUNT(*) FROM InventoryTransactions WHERE ProductID = " & ProductID), 0) > 0 Then
-                msg = "ÇáÑÕíÏ ÇáÇÝÊÊÇÍí íõÓÌóøá ãÑÉ æÇÍÏÉ ÞÈá Ãí ÍÑßÉ Úáì ÇáãäÊÌ." & vbCrLf & _
+            If Nz(DbValue("SELECT COUNT(*) FROM InventoryTransactions WHERE ProductID = " & ProductID & _
+                          " AND WarehouseID = " & WarehouseID), 0) > 0 Then
+                msg = "ÇáÑÕíÏ ÇáÇÝÊÊÇÍí íõÓÌóøá ãÑÉ æÇÍÏÉ ÞÈá Ãí ÍÑßÉ Úáì ÇáãäÊÌ Ýí ÇáãÎÒä." & vbCrLf & _
                       "áÊÕÍíÍ ÇáßãíÉ ÇáÂä ÇÓÊÎÏã ÇáÌÑÏ Ãæ ÇáÅÖÇÝÉ/ÇáÎÕã."
             End If
         Case TT_STOCK_IN, TT_STOCK_OUT
@@ -491,7 +512,7 @@ Public Function PostManualStock(ByVal ProductID As Long, ByVal TransactionTypeID
                 cost = avgCost                            ' goods leave at the average cost
                 ids(0) = ProductID
                 qtys(0) = Qty
-                msg = CheckStockAvailable(ids, qtys, 1, "ÎÕã ÇáãÎÒæä")
+                msg = CheckStockAvailable(ids, qtys, 1, "ÎÕã ÇáãÎÒæä", WarehouseID)
             End If
         Case Else
             msg = "äæÚ ÇáÍÑßÉ ÛíÑ ãÊÇÍ ááÅÏÎÇá ÇáíÏæí."
@@ -506,9 +527,9 @@ Public Function PostManualStock(ByVal ProductID As Long, ByVal TransactionTypeID
     inTrans = True
     RefNumber = NextNumber("STOCK_ADJUST")
     If TransactionTypeID = TT_STOCK_OUT Then
-        ApplyStockMovement db, ProductID, -Qty, TT_STOCK_OUT, cost, "MANUAL", 0, RefNumber, Notes
+        ApplyStockMovement db, ProductID, -Qty, TT_STOCK_OUT, cost, "MANUAL", 0, RefNumber, Notes, False, WarehouseID
     Else
-        ApplyStockMovement db, ProductID, Qty, TransactionTypeID, cost, "MANUAL", 0, RefNumber, Notes, True
+        ApplyStockMovement db, ProductID, Qty, TransactionTypeID, cost, "MANUAL", 0, RefNumber, Notes, True, WarehouseID
     End If
     ws.CommitTrans
     inTrans = False
@@ -526,9 +547,10 @@ End Function
 ' Stocktake
 '------------------------------------------------------------------------------
 Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As String, _
-                                 ByRef NewCountID As Long) As String
+                                 ByRef NewCountID As Long, Optional ByVal WarehouseID As Long = 0) As String
+    ' The count of one warehouse (0 = the user's): its lines start from the stock of that warehouse.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
-    Dim openNo As Variant, countNo As String, scope As String
+    Dim openNo As Variant, countNo As String, scope As String, sysQty As String
 
     On Error GoTo EH
     NewCountID = 0
@@ -540,6 +562,11 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
     openNo = DbValue("SELECT CountNumber FROM StockCounts WHERE Status = 'OPEN'")
     If Not IsNull(openNo) Then
         CreateStockCount = "íæÌÏ ÌÑÏ ãÝÊæÍ (" & openNo & "). ÑÍøáå Ãæ ÃáÛå ÞÈá ÈÏÁ ÌÑÏ ÌÏíÏ."
+        Exit Function
+    End If
+    If WarehouseID = 0 Then WarehouseID = CurrentWarehouseID()
+    If Len(WarehouseProblem(WarehouseID)) > 0 Then
+        CreateStockCount = WarehouseProblem(WarehouseID)
         Exit Function
     End If
     scope = "IsActive = True AND TrackStock = True"
@@ -558,6 +585,7 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
     rs!CountNumber = countNo
     rs!CountDate = Now
     If Not IsNull(CategoryID) Then rs!CategoryID = CLng(CategoryID)
+    rs!WarehouseID = WarehouseID
     rs!Status = "OPEN"
     rs!EmployeeID = CurrentUserID()
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
@@ -565,8 +593,14 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
     rs.Bookmark = rs.LastModified
     NewCountID = rs!StockCountID
     rs.Close
+    If WarehouseID = MAIN_WAREHOUSE_ID And OnlyMainWarehouse() Then
+        sysQty = "CurrentQuantity"
+    Else
+        sysQty = "Nz((SELECT Sum(i.Quantity) FROM InventoryTransactions AS i WHERE i.ProductID = Products.ProductID " & _
+                 "AND i.WarehouseID = " & WarehouseID & "), 0)"
+    End If
     db.Execute "INSERT INTO StockCountDetails (StockCountID, ProductID, SystemQuantity, ActualQuantity, " & _
-               "Difference, UnitCost, DifferenceValue) SELECT " & NewCountID & ", ProductID, CurrentQuantity, " & _
+               "Difference, UnitCost, DifferenceValue) SELECT " & NewCountID & ", ProductID, " & sysQty & ", " & _
                "Null, 0, AverageCost, 0 FROM Products WHERE " & scope, dbFailOnError
     ws.CommitTrans
     inTrans = False
@@ -586,6 +620,7 @@ Public Function PostStockCount(ByVal StockCountID As Long, ByVal UncountedAsZero
     ' UncountedAsZero (then the product is treated as not found).
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, p As DAO.Recordset, inTrans As Boolean
     Dim countNo As String, sysQty As Currency, actual As Currency, diff As Currency, cost As Currency
+    Dim warehouse As Long
 
     On Error GoTo EH
     AdjustedLines = 0
@@ -601,6 +636,7 @@ Public Function PostStockCount(ByVal StockCountID As Long, ByVal UncountedAsZero
         Exit Function
     End If
     countNo = DbValue("SELECT CountNumber FROM StockCounts WHERE StockCountID = " & StockCountID)
+    warehouse = Nz(DbValue("SELECT WarehouseID FROM StockCounts WHERE StockCountID = " & StockCountID), MAIN_WAREHOUSE_ID)
 
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
@@ -608,11 +644,10 @@ Public Function PostStockCount(ByVal StockCountID As Long, ByVal UncountedAsZero
     Set rs = db.OpenRecordset("SELECT * FROM StockCountDetails WHERE StockCountID = " & StockCountID & _
                               " ORDER BY StockCountDetailID", dbOpenDynaset)
     Do Until rs.EOF
-        Set p = db.OpenRecordset("SELECT CurrentQuantity, AverageCost FROM Products WHERE ProductID = " & _
-                                 rs!ProductID, dbOpenSnapshot)
-        sysQty = p!CurrentQuantity
+        Set p = db.OpenRecordset("SELECT AverageCost FROM Products WHERE ProductID = " & rs!ProductID, dbOpenSnapshot)
         cost = p!AverageCost
         p.Close
+        sysQty = AvailableQty(rs!ProductID, warehouse)              ' the stock of the counted warehouse
         If IsNull(rs!ActualQuantity) And Not UncountedAsZero Then
             actual = sysQty
         Else
@@ -627,7 +662,8 @@ Public Function PostStockCount(ByVal StockCountID As Long, ByVal UncountedAsZero
         rs!DifferenceValue = RoundMoney(CDec(diff) * CDec(cost))
         rs.Update
         If diff <> 0 Then
-            ApplyStockMovement db, rs!ProductID, diff, TT_ADJUSTMENT, cost, "STOCK_COUNT", StockCountID, countNo
+            ApplyStockMovement db, rs!ProductID, diff, TT_ADJUSTMENT, cost, "STOCK_COUNT", StockCountID, countNo, _
+                               "", False, warehouse
             AdjustedLines = AdjustedLines + 1
             NetValue = NetValue + RoundMoney(CDec(diff) * CDec(cost))
         End If

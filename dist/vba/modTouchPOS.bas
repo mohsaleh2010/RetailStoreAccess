@@ -602,7 +602,7 @@ Public Sub AddCartLine(ByVal ProductID As Long, ByVal Qty As Currency, ByVal Uni
         rs!Quantity = Qty
         rs!UnitPrice = UnitPrice
         rs!LineDiscount = 0
-        rs!Available = p!CurrentQuantity
+        rs!Available = AvailableQty(ProductID)              ' in the warehouse of the user (modWarehouses)
         If Len(LineNote) > 0 Then rs!LineNote = Left$(LineNote, 100)
         p.Close
     Else

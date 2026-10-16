@@ -121,6 +121,12 @@ LIST_SPECS: List[ListSpec] = [
         Col("القيمة بسعر البيع", "StockSalesValue", 2.6, MONEY, True),
         Col("الحالة", '=IIf([IsLowStock],"منخفض","") & IIf([QuantityMismatch]<>0," / فرق!","")', 2.0)],
         [("CategoryName", False), ("ProductName", False)], landscape=True),
+    ListSpec("STOCK_WAREHOUSE", [
+        Col("المخزن", "WarehouseName", 3.4), Col("الكود", "ProductCode", 2.3),
+        Col("المنتج", "ProductName", 5.6, grow=True), Col("التصنيف", "CategoryName", 2.7),
+        Col("الكمية في المخزن", "StockQty", 2.4, QTY, True), Col("متوسط التكلفة", "AverageCost", 2.2, MONEY),
+        Col("القيمة بالتكلفة", "StockCostValue", 2.6, MONEY, True)],
+        [("WarehouseName", False), ("ProductName", False)], landscape=True),
     ListSpec("LOW_STOCK", [
         Col("الكود", "ProductCode", 2.1), Col("المنتج", "ProductName", 4.6, grow=True),
         Col("التصنيف", "CategoryName", 2.3), Col("المتوفر", "CurrentQuantity", 1.7, QTY),

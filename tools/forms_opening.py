@@ -43,6 +43,9 @@ PARTS = [("ACCOUNTS", "الحسابات العامة"), ("CUSTOMERS", "العم�
 # the stock part (docs/53): the products that track stock, by code and name
 STOCK_PRODUCTS = ("SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p "
                   "WHERE p.TrackStock = True ORDER BY p.ProductName")
+# the warehouse of each line (docs/57): empty = the main warehouse
+STOCK_WAREHOUSES = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True "
+                    "ORDER BY w.WarehouseID")
 # its buttons, shown with the stock part only: name, caption, call
 STOCK_BUTTONS = [("btnStockFill", "كل الأصناف", "OpeningStockFill Me"),
                  ("btnStockImport", "استيراد من Excel", "OpeningStockImport Me"),
@@ -75,8 +78,11 @@ def layout_stock_grid() -> FormModel:
                   record_source="SELECT * FROM OpeningStock ORDER BY OpeningStockID", allow_add=True)
     m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0, "AllowDeletions": False}
     grid_row(m, [
-        ("ProductID", "ProductID", 10.0, {"_kind": "combo", "RowSource": STOCK_PRODUCTS, "ColumnCount": 2,
-                                          "ColumnWidths": "0;9.8", "BoundColumn": 1, "LimitToList": True}, []),
+        ("ProductID", "ProductID", 6.9, {"_kind": "combo", "RowSource": STOCK_PRODUCTS, "ColumnCount": 2,
+                                         "ColumnWidths": "0;6.7", "BoundColumn": 1, "LimitToList": True}, []),
+        ("WarehouseID", "WarehouseID", 3.05, {"_kind": "combo", "RowSource": STOCK_WAREHOUSES, "ColumnCount": 2,
+                                              "ColumnWidths": "0;2.9", "BoundColumn": 1, "LimitToList": True,
+                                              "DefaultValue": "1"}, []),
         ("Quantity", "Quantity", 3.2, {"Format": "#,##0.###"}, []),
         ("UnitCost", "UnitCost", 3.2, dict(MONEY), []),
         ("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 3.6, {**LOCKED, **MONEY}, []),

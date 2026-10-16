@@ -21,15 +21,15 @@ Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtl
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qryLocRoles1,qryLocRoles,qryLocPermissions1,qryLocPermissions,qryLocScreens1,qryLocScreens,qryLocCategories1,qryLocCategories,qryLocUnits1,qryLocUnits,qryLocExpenseTypes1,qryLocExpenseTypes,qryLocCustomers1,qryLocCustomers,qryLo" & _
-    "cSuppliers1,qryLocSuppliers,qryLocCashBoxes1,qryLocCashBoxes,qryLocBanks1,qryLocBanks,qryLocCostCenters1,qryLocCostCenters,qryLocSalesReps1,qryLocSalesReps,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,q" & _
-    "ryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerOpening,qrySupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplie" & _
-    "rLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebi" & _
-    "ts,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPost" & _
-    "ed,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCash" & _
-    "BoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearC" & _
-    "lose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheet" & _
-    "Query,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBu" & _
-    "dgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "cSuppliers1,qryLocSuppliers,qryLocCashBoxes1,qryLocCashBoxes,qryLocWarehouses1,qryLocWarehouses,qryLocBanks1,qryLocBanks,qryLocCostCenters1,qryLocCostCenters,qryLocSalesReps1,qryLocSalesReps,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCatego" & _
+    "ryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryWarehouseStock,StockByWarehouseQuery,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerOpening,qrySupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery" & _
+    ",CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplie" & _
+    "rInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryR" & _
+    "epPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashD" & _
+    "ays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpe" & _
+    "ning,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditT" & _
+    "railQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCente" & _
+    "rProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -691,6 +691,8 @@ Private Sub CreateAllQueries()
     Q_qryLocSuppliers
     Q_qryLocCashBoxes1
     Q_qryLocCashBoxes
+    Q_qryLocWarehouses1
+    Q_qryLocWarehouses
     Q_qryLocBanks1
     Q_qryLocBanks
     Q_qryLocCostCenters1
@@ -712,6 +714,8 @@ Private Sub CreateAllQueries()
     Q_qryPurchaseDocuments
     Q_PurchasesQuery
     Q_qryProductLedger
+    Q_qryWarehouseStock
+    Q_StockByWarehouseQuery
     Q_qryProductLastSale
     Q_StockBalanceQuery
     Q_LowStockQuery
@@ -1032,6 +1036,18 @@ Private Sub Q_qryLocCashBoxes()
     SaveQuery "qryLocCashBoxes", "CashBoxes بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
 End Sub
 
+Private Sub Q_qryLocWarehouses1()
+    Dim s As String
+    s = "SELECT t.WarehouseID, t.WarehouseCode, t.WarehouseName AS LocArabicName, t.WarehouseNameEn, t.WarehouseType, t.KeeperID, t.CostCenterID, t.SalesRepID, t.IsActive, t.Notes, t.CreatedAt FROM Warehouses AS t" & vbCrLf
+    SaveQuery "qryLocWarehouses1", "Warehouses للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocWarehouses()
+    Dim s As String
+    s = "SELECT WarehouseID, WarehouseCode, Nz(WarehouseNameEn, LocArabicName) AS WarehouseName, WarehouseNameEn, WarehouseType, KeeperID, CostCenterID, SalesRepID, IsActive, Notes, CreatedAt FROM qryLocWarehouses1" & vbCrLf
+    SaveQuery "qryLocWarehouses", "Warehouses بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
 Private Sub Q_qryLocBanks1()
     Dim s As String
     s = "SELECT t.BankID, t.BankName AS LocArabicName, t.BankNameEn, t.AccountNo, t.IBAN, t.OpeningBalance, t.OpeningDate, t.IsActive, t.Notes, t.CreatedAt FROM Banks AS t" & vbCrLf
@@ -1242,6 +1258,26 @@ Private Sub Q_qryProductLedger()
     s = s & "FROM InventoryTransactions" & vbCrLf
     s = s & "GROUP BY ProductID" & vbCrLf
     SaveQuery "qryProductLedger", "رصيد كل منتج من دفتر حركة المخزون", s
+End Sub
+
+Private Sub Q_qryWarehouseStock()
+    Dim s As String
+    s = "SELECT ProductID, WarehouseID, Sum(Quantity) AS StockQty, Max(TransactionDate) AS LastMovementDate" & vbCrLf
+    s = s & "FROM InventoryTransactions" & vbCrLf
+    s = s & "GROUP BY ProductID, WarehouseID" & vbCrLf
+    SaveQuery "qryWarehouseStock", "رصيد كل منتج في كل مخزن من دفتر حركة المخزون (docs/57)", s
+End Sub
+
+Private Sub Q_StockByWarehouseQuery()
+    Dim s As String
+    s = "SELECT q.WarehouseID, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName, c.CategoryName," & vbCrLf
+    s = s & "       q.StockQty, p.AverageCost, q.StockQty * p.AverageCost AS StockCostValue, q.LastMovementDate" & vbCrLf
+    s = s & "FROM ((qryWarehouseStock AS q INNER JOIN [@Warehouses] AS w ON q.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "      INNER JOIN Products AS p ON q.ProductID = p.ProductID)" & vbCrLf
+    s = s & "     INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID" & vbCrLf
+    s = s & "WHERE q.StockQty <> 0" & vbCrLf
+    s = s & "ORDER BY w.WarehouseName, p.ProductName" & vbCrLf
+    SaveQuery "StockByWarehouseQuery", "أرصدة الأصناف لكل مخزن: الكمية والقيمة بمتوسط التكلفة", s
 End Sub
 
 Private Sub Q_qryProductLastSale()

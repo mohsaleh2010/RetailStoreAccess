@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 160
+Private Const EXPECTED_RELATION_COUNT As Long = 170
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -393,6 +393,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_Employees_RoleID", "Roles", "RoleID", "Employees", "RoleID", 0&)
     c.Add Array("FK_Employees_CashBoxID", "CashBoxes", "CashBoxID", "Employees", "CashBoxID", 0&)
     c.Add Array("FK_Employees_CostCenterID", "CostCenters", "CostCenterID", "Employees", "CostCenterID", 0&)
+    c.Add Array("FK_Employees_WarehouseID", "Warehouses", "WarehouseID", "Employees", "WarehouseID", 0&)
     c.Add Array("FK_UserScreens_EmployeeID", "Employees", "EmployeeID", "UserScreens", "EmployeeID", 0&)
     c.Add Array("FK_UserScreens_ScreenName", "Screens", "ScreenName", "UserScreens", "ScreenName", 256&)
     c.Add Array("FK_Activations_EmployeeID", "Employees", "EmployeeID", "Activations", "EmployeeID", 0&)
@@ -400,6 +401,8 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_CashBoxes_SalesRepID", "SalesReps", "SalesRepID", "CashBoxes", "SalesRepID", 0&)
     c.Add Array("FK_CashBoxUsers_CashBoxID", "CashBoxes", "CashBoxID", "CashBoxUsers", "CashBoxID", 0&)
     c.Add Array("FK_CashBoxUsers_EmployeeID", "Employees", "EmployeeID", "CashBoxUsers", "EmployeeID", 0&)
+    c.Add Array("FK_Warehouses_CostCenterID", "CostCenters", "CostCenterID", "Warehouses", "CostCenterID", 0&)
+    c.Add Array("FK_Warehouses_SalesRepID", "SalesReps", "SalesRepID", "Warehouses", "SalesRepID", 0&)
     c.Add Array("FK_Suppliers_CurrencyCode", "Currencies", "CurrencyCode", "Suppliers", "CurrencyCode", 256&)
     c.Add Array("FK_Customers_SalesRepID", "SalesReps", "SalesRepID", "Customers", "SalesRepID", 0&)
     c.Add Array("FK_Products_CategoryID", "Categories", "CategoryID", "Products", "CategoryID", 0&)
@@ -412,6 +415,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_SalesInvoices_BankID", "Banks", "BankID", "SalesInvoices", "BankID", 0&)
     c.Add Array("FK_SalesInvoices_CostCenterID", "CostCenters", "CostCenterID", "SalesInvoices", "CostCenterID", 0&)
     c.Add Array("FK_SalesInvoices_SalesRepID", "SalesReps", "SalesRepID", "SalesInvoices", "SalesRepID", 0&)
+    c.Add Array("FK_SalesInvoices_WarehouseID", "Warehouses", "WarehouseID", "SalesInvoices", "WarehouseID", 0&)
     c.Add Array("FK_SalesInvoiceDetails_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "SalesInvoiceDetails", "SalesInvoiceID", 4096&)
     c.Add Array("FK_SalesInvoiceDetails_ProductID", "Products", "ProductID", "SalesInvoiceDetails", "ProductID", 0&)
     c.Add Array("FK_SalesReturns_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "SalesReturns", "SalesInvoiceID", 0&)
@@ -422,6 +426,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_SalesReturns_BankID", "Banks", "BankID", "SalesReturns", "BankID", 0&)
     c.Add Array("FK_SalesReturns_CostCenterID", "CostCenters", "CostCenterID", "SalesReturns", "CostCenterID", 0&)
     c.Add Array("FK_SalesReturns_SalesRepID", "SalesReps", "SalesRepID", "SalesReturns", "SalesRepID", 0&)
+    c.Add Array("FK_SalesReturns_WarehouseID", "Warehouses", "WarehouseID", "SalesReturns", "WarehouseID", 0&)
     c.Add Array("FK_SalesReturnDetails_SalesReturnID", "SalesReturns", "SalesReturnID", "SalesReturnDetails", "SalesReturnID", 4096&)
     c.Add Array("FK_SalesReturnDetails_SalesDetailID", "SalesInvoiceDetails", "SalesDetailID", "SalesReturnDetails", "SalesDetailID", 0&)
     c.Add Array("FK_SalesReturnDetails_ProductID", "Products", "ProductID", "SalesReturnDetails", "ProductID", 0&)
@@ -431,6 +436,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_PurchaseInvoices_CashBoxID", "CashBoxes", "CashBoxID", "PurchaseInvoices", "CashBoxID", 0&)
     c.Add Array("FK_PurchaseInvoices_BankID", "Banks", "BankID", "PurchaseInvoices", "BankID", 0&)
     c.Add Array("FK_PurchaseInvoices_CurrencyCode", "Currencies", "CurrencyCode", "PurchaseInvoices", "CurrencyCode", 256&)
+    c.Add Array("FK_PurchaseInvoices_WarehouseID", "Warehouses", "WarehouseID", "PurchaseInvoices", "WarehouseID", 0&)
     c.Add Array("FK_PurchaseInvoiceDetails_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "PurchaseInvoiceDetails", "PurchaseInvoiceID", 4096&)
     c.Add Array("FK_PurchaseInvoiceDetails_ProductID", "Products", "ProductID", "PurchaseInvoiceDetails", "ProductID", 0&)
     c.Add Array("FK_PurchaseReturns_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "PurchaseReturns", "PurchaseInvoiceID", 0&)
@@ -440,6 +446,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_PurchaseReturns_CashBoxID", "CashBoxes", "CashBoxID", "PurchaseReturns", "CashBoxID", 0&)
     c.Add Array("FK_PurchaseReturns_BankID", "Banks", "BankID", "PurchaseReturns", "BankID", 0&)
     c.Add Array("FK_PurchaseReturns_CurrencyCode", "Currencies", "CurrencyCode", "PurchaseReturns", "CurrencyCode", 256&)
+    c.Add Array("FK_PurchaseReturns_WarehouseID", "Warehouses", "WarehouseID", "PurchaseReturns", "WarehouseID", 0&)
     c.Add Array("FK_PurchaseReturnDetails_PurchaseReturnID", "PurchaseReturns", "PurchaseReturnID", "PurchaseReturnDetails", "PurchaseReturnID", 4096&)
     c.Add Array("FK_PurchaseReturnDetails_PurchaseDetailID", "PurchaseInvoiceDetails", "PurchaseDetailID", "PurchaseReturnDetails", "PurchaseDetailID", 0&)
     c.Add Array("FK_PurchaseReturnDetails_ProductID", "Products", "ProductID", "PurchaseReturnDetails", "ProductID", 0&)
@@ -538,11 +545,14 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_ManualEntryLines_CostCenterID", "CostCenters", "CostCenterID", "ManualEntryLines", "CostCenterID", 0&)
     c.Add Array("FK_OpeningBalances_AccountCode", "Accounts", "AccountCode", "OpeningBalances", "AccountCode", 0&)
     c.Add Array("FK_OpeningStock_ProductID", "Products", "ProductID", "OpeningStock", "ProductID", 0&)
+    c.Add Array("FK_OpeningStock_WarehouseID", "Warehouses", "WarehouseID", "OpeningStock", "WarehouseID", 0&)
     c.Add Array("FK_InventoryTransactions_ProductID", "Products", "ProductID", "InventoryTransactions", "ProductID", 0&)
     c.Add Array("FK_InventoryTransactions_TransactionTypeID", "TransactionTypes", "TransactionTypeID", "InventoryTransactions", "TransactionTypeID", 0&)
     c.Add Array("FK_InventoryTransactions_EmployeeID", "Employees", "EmployeeID", "InventoryTransactions", "EmployeeID", 0&)
+    c.Add Array("FK_InventoryTransactions_WarehouseID", "Warehouses", "WarehouseID", "InventoryTransactions", "WarehouseID", 0&)
     c.Add Array("FK_StockCounts_CategoryID", "Categories", "CategoryID", "StockCounts", "CategoryID", 0&)
     c.Add Array("FK_StockCounts_EmployeeID", "Employees", "EmployeeID", "StockCounts", "EmployeeID", 0&)
+    c.Add Array("FK_StockCounts_WarehouseID", "Warehouses", "WarehouseID", "StockCounts", "WarehouseID", 0&)
     c.Add Array("FK_StockCountDetails_StockCountID", "StockCounts", "StockCountID", "StockCountDetails", "StockCountID", 4096&)
     c.Add Array("FK_StockCountDetails_ProductID", "Products", "ProductID", "StockCountDetails", "ProductID", 0&)
     c.Add Array("FK_AuditChanges_LogID", "AuditLog", "LogID", "AuditChanges", "LogID", 4096&)
@@ -561,5 +571,6 @@ Private Function RetiredRelations() As Variant
                              "FK_PeriodClosings_EmployeeID", _
                              "FK_StockCounts_PostedByID", _
                              "FK_SupplierAllocations_EmployeeID", _
-                             "FK_VatReturns_EmployeeID")
+                             "FK_VatReturns_EmployeeID", _
+                             "FK_Warehouses_KeeperID")
 End Function

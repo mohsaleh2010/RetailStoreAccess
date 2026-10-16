@@ -151,7 +151,7 @@ SCREEN_TITLES_EN = {
     "frmLabelSettings": "Label settings", "frmExpenses": "Expenses", "frmExpenseTypes": "Expense types",
     "frmRecurring": "Recurring expenses", "frmTreasury": "Treasury", "frmCashVoucher": "Cash and transfer vouchers",
     "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmCashBoxUsers": "Box custodians",
-    "frmCashTransfers": "Receipt of transfers between boxes", "frmAccounting": "Accounting and finance",
+    "frmCashTransfers": "Receipt of transfers between boxes", "frmWarehouses": "Warehouses", "frmAccounting": "Accounting and finance",
     "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
     "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
     "frmPeriodClosing": "Period and fiscal year closing", "frmFiscalPeriods": "Fiscal periods", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",
@@ -176,6 +176,8 @@ EXPENSE_TYPE_NAMES_EN = {1: "Rent", 2: "Electricity", 3: "Water", 4: "Internet a
 
 CASH_BOX_NAMES_EN = {1: "Main treasury", 2: "Cashier box"}
 
+WAREHOUSE_NAMES_EN = {1: "Main warehouse"}
+
 CUSTOMER_NAMES_EN = {1: "Cash customer"}
 
 MODULE_NAMES_EN = {"المبيعات": "Sales", "العملاء": "Customers", "المشتريات": "Purchases", "الموردون": "Suppliers",
@@ -198,6 +200,7 @@ ENGLISH_NAMES = {
     "Customers": ("CustomerNameEn", "CustomerName", "CustomerID", CUSTOMER_NAMES_EN),
     "Suppliers": ("SupplierNameEn", "SupplierName", "SupplierID", {}),
     "CashBoxes": ("BoxNameEn", "BoxName", "CashBoxID", CASH_BOX_NAMES_EN),
+    "Warehouses": ("WarehouseNameEn", "WarehouseName", "WarehouseID", WAREHOUSE_NAMES_EN),
     "Banks": ("BankNameEn", "BankName", "BankID", {}),
     "CostCenters": ("CenterNameEn", "CenterName", "CostCenterID", {}),
     "SalesReps": ("RepNameEn", "RepName", "SalesRepID", {}),

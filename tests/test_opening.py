@@ -170,7 +170,7 @@ class OpeningStockTests(unittest.TestCase):
 
     def test_vba_rules(self):
         post = proc(VBA, "PostOpeningStock")
-        for part in ('OpeningStockReady("ADD")', "ProductHasMoves(pid)", "TT_OPENING", '"MANUAL"',
+        for part in ('OpeningStockReady("ADD")', "ProductHasMoves(pid, wh)", "TT_OPENING", '"MANUAL"',
                      "SET TransactionDate = \" & SqlDate(startDay)", "UPDATE OpeningStock SET TransactionID",
                      "ws.Rollback", "SyncJournal()"):
             self.assertIn(part, post)

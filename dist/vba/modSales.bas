@@ -364,6 +364,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     rs!BankID = BankFor(PaymentMethodID, paid)                                 ' modBank
     rs!CostCenterID = CostCenterFor()                                          ' modCostCenters
     rs!SalesRepID = SalesRepFor(CustomerID)                                    ' modSalesReps
+    rs!WarehouseID = CurrentWarehouseID()                                      ' modWarehouses
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
     If Len(OrderType) > 0 Then rs!OrderType = OrderType
     If Len(Trim$(TableNo)) > 0 Then rs!TableNo = Left$(Trim$(TableNo), 10)
@@ -508,6 +509,8 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     rs!SalesInvoiceID = SalesInvoiceID
     rs!CostCenterID = DbValue("SELECT CostCenterID FROM SalesInvoices WHERE SalesInvoiceID = " & SalesInvoiceID)
     rs!SalesRepID = DbValue("SELECT SalesRepID FROM SalesInvoices WHERE SalesInvoiceID = " & SalesInvoiceID)   ' modSalesReps
+    rs!WarehouseID = Nz(DbValue("SELECT WarehouseID FROM SalesInvoices WHERE SalesInvoiceID = " & SalesInvoiceID), _
+                        CurrentWarehouseID())                      ' the goods go back to the warehouse they left
     rs!CustomerID = customerID
     rs!EmployeeID = CurrentUserID()
     rs!Reason = Left$(Reason, 255)
@@ -550,7 +553,8 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     For i = 0 To n - 1
         If toStock(i) Then
             ApplyStockMovement db, productIDs(i), qtys(i), TT_SALES_RETURN, costs(i), "SALES_RETURN", _
-                               retID, retNo, "", True
+                               retID, retNo, "", True, _
+                               Nz(DbValue("SELECT WarehouseID FROM SalesReturns WHERE SalesReturnID = " & retID), 0)
         End If
     Next
     If refunded - sumTotal <> 0 Then AdjustBalance db, "Customers", "CustomerID", customerID, refunded - sumTotal
@@ -647,12 +651,15 @@ Public Sub ApplyStockMovement(ByVal db As DAO.Database, ByVal ProductID As Long,
                               ByVal TransactionTypeID As Long, ByVal UnitCost As Currency, _
                               ByVal RefType As String, ByVal RefID As Long, ByVal RefNumber As String, _
                               Optional ByVal Notes As String = "", _
-                              Optional ByVal RecalcAverage As Boolean = False)
+                              Optional ByVal RecalcAverage As Boolean = False, _
+                              Optional ByVal WarehouseID As Long = 0)
     ' Qty is signed (+ in, - out). RecalcAverage: goods coming in (purchase, opening, stock in,
     ' sales return) or going back to the supplier at their purchase cost update the average cost.
     ' A product that does not track stock (a dish made to order) has no stock movements.
+    ' WarehouseID 0 = the warehouse of the user (modWarehouses); QuantityAfter is the total of every warehouse.
     Dim rs As DAO.Recordset, curQty As Currency, newQty As Currency
     If Not ProductTracksStock(ProductID) Then Exit Sub
+    If WarehouseID = 0 Then WarehouseID = CurrentWarehouseID()
     Set rs = db.OpenRecordset("SELECT ProductID, CurrentQuantity, AverageCost, PurchasePrice, UpdatedAt " & _
                               "FROM Products WHERE ProductID = " & ProductID, dbOpenDynaset)
     rs.Edit
@@ -677,6 +684,7 @@ Public Sub ApplyStockMovement(ByVal db As DAO.Database, ByVal ProductID As Long,
     If Len(RefNumber) > 0 Then rs!ReferenceNumber = Left$(RefNumber, 20)
     rs!EmployeeID = CurrentUserID()
     If Len(Notes) > 0 Then rs!Notes = Left$(Notes, 255)
+    rs!WarehouseID = WarehouseID
     rs.Update
     rs.Close
 End Sub
@@ -740,9 +748,10 @@ Public Function ProductTracksStock(ByVal ProductID As Long) As Boolean
 End Function
 
 Public Function CheckStockAvailable(ByRef ProductIDs() As Long, ByRef Qtys() As Currency, ByVal n As Long, _
-                                    ByVal Operation As String) As String
-    ' Sums the quantities per product and compares them with the stock. Taking out more than
-    ' the stock needs the AllowNegativeStock setting or an administrator's approval.
+                                    ByVal Operation As String, Optional ByVal WarehouseID As Long = 0) As String
+    ' Sums the quantities per product and compares them with the stock of the warehouse (0 = the user's,
+    ' modWarehouses). Taking out more than the stock needs the AllowNegativeStock setting or an
+    ' administrator's approval.
     Dim i As Long, j As Long, need As Currency, available As Currency, shortList As String
     For i = 0 To n - 1
         need = 0
@@ -752,7 +761,7 @@ Public Function CheckStockAvailable(ByRef ProductIDs() As Long, ByRef Qtys() As 
                 need = need + Qtys(j)
             End If
         Next
-        available = Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & ProductIDs(i)), 0)
+        available = AvailableQty(ProductIDs(i), WarehouseID)
         If Not ProductTracksStock(ProductIDs(i)) Then need = 0      ' made to order: no stock limit
         If need > available Then
             shortList = shortList & vbCrLf & "- " & DbValue("SELECT ProductName FROM Products WHERE ProductID = " & _

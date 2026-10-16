@@ -25,10 +25,10 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice," & _
-    "frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher," & _
-    "frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames," & _
-    "frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment," & _
+    "frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury," & _
+    "frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines," & _
+    "frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -593,6 +593,7 @@ Private Sub BuildAllForms()
     BuildForm_frmExpenseTypes
     BuildForm_frmCashBoxes
     BuildForm_frmCashBoxUsers
+    BuildForm_frmWarehouses
     BuildForm_frmBanks
     BuildForm_frmAccounts
     BuildForm_frmSettings
@@ -2513,26 +2514,30 @@ Private Sub BuildForm_frmUsers()
     SetCtlProp c, "StatusBarText", "نقدية مبيعات المستخدم وسنداته تدخل هذا الصندوق؛ فارغ = أول صندوق كاشير"
     Set c = AddLabel("lblCashBoxID", "صندوق النقدية", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "CashBoxID", 0)
     Set c = AddLabel("lblCashBoxNote", "المدير المسؤول عن الخزينة: اختر له الخزينة الرئيسية", 10376, 3969, 4706, 425, 9, False, CLR_MUTED, "", 0)
-    Set c = AddCheck("MustChangePassword", "MustChangePassword", 7201, 4621)
-    Set c = AddLabel("lblMustChangePassword", "يجب تغيير كلمة المرور", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "MustChangePassword", 0)
-    Set c = AddText("LastLoginAt", "LastLoginAt", 12134, 4536, 2948, 425)
+    Set c = AddCombo("WarehouseID", "WarehouseID", 7201, 4536, 2948, 425, "SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True ORDER BY w.WarehouseID", 2, "0;2835")
+    SetCtlProp c, "ControlTipText", "مبيعات المستخدم ومشترياته وحركاته من هذا المخزن؛ فارغ = المخزن الرئيسي"
+    SetCtlProp c, "StatusBarText", "مبيعات المستخدم ومشترياته وحركاته من هذا المخزن؛ فارغ = المخزن الرئيسي"
+    Set c = AddLabel("lblWarehouseID", "مخزن المستخدم", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "WarehouseID", 0)
+    Set c = AddCheck("MustChangePassword", "MustChangePassword", 12134, 4621)
+    Set c = AddLabel("lblMustChangePassword", "يجب تغيير كلمة المرور", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "MustChangePassword", 0)
+    Set c = AddText("LastLoginAt", "LastLoginAt", 7201, 5103, 2948, 425)
     SetCtlProp c, "Format", "yyyy/mm/dd"
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddLabel("lblLastLoginAt", "آخر دخول", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "LastLoginAt", 0)
-    Set c = AddText("FailedLoginCount", "FailedLoginCount", 7201, 5103, 2948, 425)
+    Set c = AddLabel("lblLastLoginAt", "آخر دخول", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "LastLoginAt", 0)
+    Set c = AddText("FailedLoginCount", "FailedLoginCount", 12134, 5103, 2948, 425)
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddLabel("lblFailedLoginCount", "محاولات الدخول الفاشلة", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "FailedLoginCount", 0)
-    Set c = AddText("LockedUntil", "LockedUntil", 12134, 5103, 2948, 425)
+    Set c = AddLabel("lblFailedLoginCount", "محاولات الدخول الفاشلة", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "FailedLoginCount", 0)
+    Set c = AddText("LockedUntil", "LockedUntil", 7201, 5670, 2948, 425)
     SetCtlProp c, "Format", "yyyy/mm/dd"
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddLabel("lblLockedUntil", "مقفل حتى", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "LockedUntil", 0)
-    Set c = AddLabel("lblPasswordState", " ", 5443, 5670, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddLabel("lblLockedUntil", "مقفل حتى", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "LockedUntil", 0)
+    Set c = AddLabel("lblPasswordState", " ", 10376, 5670, 4706, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddText("Notes", "Notes", 7201, 6237, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
@@ -3367,6 +3372,126 @@ Private Sub BuildForm_frmCashBoxUsers()
     Exit Sub
 EH:
     AbortForm "frmCashBoxUsers", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmWarehouses()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmWarehouses", "المخازن", "SELECT * FROM Warehouses", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=Warehouses|PK=WarehouseID|LIST=SELECT t.WarehouseID, t.WarehouseCode AS [كود المخزن], t.WarehouseName AS [المخزن], IIf(t.WarehouseType = 'MAIN', 'رئيسي', IIf(t.WarehouseType = 'BRANCH', 'فرع', IIf(t.WarehouseType = 'VAN', 'سيارة مندوب', 'تحت التشغيل'))) AS [نوع المخزن] FROM [@Warehouses] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.WarehouseID|SEARCH=t.WarehouseCode,t.WarehouseName,t.WarehouseNameEn,t.Notes|ACTIVE=t.IsActive|UNIQUE=WarehouseName"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7B8), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "المخازن", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", "تراجع", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnInventory", "المخزون", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnStockReport", "أرصدة المخازن", 7937, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddCheck("chkShowInactive", "", 227, 2579)
+    SetCtlProp c, "DefaultValue", "False"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 4, "0;1247;2381;1361", True)
+    c.AfterUpdate = EP
+    Set c = AddText("WarehouseCode", "WarehouseCode", 7201, 1701, 2948, 425)
+    Set c = AddLabel("lblWarehouseCode", "كود المخزن", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "WarehouseCode", 0)
+    Set c = AddCombo("WarehouseType", "WarehouseType", 12134, 1701, 2948, 425, "MAIN;مخزن رئيسي;BRANCH;مخزن فرع;VAN;سيارة مندوب;WIP;تحت التشغيل", 2, "0;2835")
+    Set c = AddLabel("lblWarehouseType", "النوع", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "WarehouseType", 0)
+    Set c = AddText("WarehouseName", "WarehouseName", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblWarehouseName", "اسم المخزن *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "WarehouseName", 0)
+    Set c = AddText("WarehouseNameEn", "WarehouseNameEn", 7201, 2835, 7881, 425)
+    Set c = AddLabel("lblWarehouseNameEn", "الاسم بالإنجليزية", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "WarehouseNameEn", 0)
+    Set c = AddCombo("KeeperID", "KeeperID", 7201, 3402, 2948, 425, "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName", 2, "0;3402")
+    Set c = AddLabel("lblKeeperID", "أمين المخزن", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "KeeperID", 0)
+    Set c = AddCombo("CostCenterID", "CostCenterID", 12134, 3402, 2948, 425, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;3402")
+    Set c = AddLabel("lblCostCenterID", "مركز التكلفة", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "CostCenterID", 0)
+    Set c = AddCombo("SalesRepID", "SalesRepID", 7201, 3969, 2948, 425, "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName", 2, "0;3402")
+    SetCtlProp c, "ControlTipText", "لمخزن سيارة المندوب"
+    SetCtlProp c, "StatusBarText", "لمخزن سيارة المندوب"
+    Set c = AddLabel("lblSalesRepID", "المندوب (سيارة)", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 4054)
+    Set c = AddLabel("lblIsActive", "نشط", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblWarehouseNote", "رصيد الصنف في المخزن يُحسب من حركاته فيه. المستخدم يبيع ويشتري من مخزنه في شاشة المستخدمين، وبدونه من المخزن الرئيسي", 5443, 4536, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 5103, 7881, 425)
+    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 5783, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnInventory_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmInventory""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnStockReport_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmReportCenter"", 0, ""STOCK_WAREHOUSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub chkShowInactive_AfterUpdate()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmWarehouses", s
+    Exit Sub
+EH:
+    AbortForm "frmWarehouses", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmBanks()
@@ -4629,10 +4754,13 @@ Private Sub BuildForm_frmPurchaseInvoice()
     SetCtlProp c, "Format", "#,##0.###"
     SetCtlProp c, "DefaultValue", "1"
     Set c = AddLabel("lblQty", "الكمية", 4933, 992, 1134, 284, 9, False, CLR_MUTED, "txtQty", 0)
-    Set c = AddCombo("cboProduct", "", 6237, 1304, 6010, 567, "SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, PurchasePrice FROM Products WHERE IsActive = True ORDER BY ProductName", 3, "0;4536;1134")
+    Set c = AddCombo("cboProduct", "", 8108, 1304, 4139, 567, "SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, PurchasePrice FROM Products WHERE IsActive = True ORDER BY ProductName", 3, "0;3402;737")
     c.FontSize = 13
     c.AfterUpdate = EP
-    Set c = AddLabel("lblProduct", "أو ابحث باسم المنتج (F4)", 6237, 992, 6010, 284, 9, False, CLR_MUTED, "cboProduct", 0)
+    Set c = AddLabel("lblProduct", "أو ابحث باسم المنتج (F4)", 8108, 992, 4139, 284, 9, False, CLR_MUTED, "cboProduct", 0)
+    Set c = AddCombo("cboWarehouse", "", 6237, 1304, 1701, 567, "", 2, "0;1701")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblWarehouse", "المخزن المستلم", 6237, 992, 1701, 284, 9, False, CLR_MUTED, "cboWarehouse", 0)
     Set c = AddLabel("lblCol1", "#", 255, 2041, 510, 312, 9, True, CLR_MUTED, "", 2)
     Set c = AddLabel("lblCol2", "الصنف", 793, 2041, 3175, 312, 9, True, CLR_MUTED, "", 2)
     Set c = AddLabel("lblCol3", "الكمية", 3996, 2041, 1077, 312, 9, True, CLR_MUTED, "", 2)
@@ -4770,7 +4898,7 @@ Private Sub BuildForm_frmPurchaseInvoice()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
-    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;cboProduct,6237,1304,6010,567,0,1000,0,0;subLines,227,2410,12020,5273,0,1000,0,1000;lblStatus,227,7796,12020,397,0,1000,1000,0;btnSave,227,8448,1814,624,0,0,1000,0;btnNewInvoice,2154,8448,2155,624,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;cboProduct,8108,1304,4139,567,0,1000,0,0;subLines,227,2410,12020,5273,0,1000,0,1000;lblStatus,227,7796,12020,397,0,1000,1000,0;btnSave,227,8448,1814,624,0,0,1000,0;btnNewInvoice,2154,8448,2155,624,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnReturn,4422,8448,1928,624,0,0,1000,0;btnPayment,6463,8448,1474,624,0,0,1000,0;btnNewProduct,8050,8448,1588,624,0,0,1000,0;btnLastInvoice,9751,8448,1588,624,0,0,1000,0;cboSupplier,12474,1304,6294,454,1000,0,0,0;lblSupplier,12474,992,6294,284,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblSupplierInfo,12474,1786,6294,284,1000,0,0,0;txtSupplierInvoiceNo,12474,2438,3033,454,1000,0,0,0;lblSupplierInvoiceNo,12474,2126,3033,284,1000,0,0,0;txtInvoiceDate,15735,2438,3033,454,1000,0,0,0;lblInvoiceDate,15735,2126,3033,284,1000,0,0,0;cboPaymentType,12474,3260,3033,454,1000,0,0,0""" & vbCrLf
     s = s & "    spec = spec & "";lblPaymentType,12474,2948,3033,284,1000,0,0,0;cboPaymentMethod,15735,3260,3033,454,1000,0,0,0;lblPaymentMethod,15735,2948,3033,284,1000,0,0,0;txtInvoiceDiscount,12474,4082,3033,454,1000,0,0,0;lblInvoiceDiscount,12474,3770,3033,284,1000,0,0,0;chkChargeVAT,15735,4167,284,284,1000,0,0,0""" & vbCrLf
@@ -5062,6 +5190,8 @@ Private Sub BuildForm_frmInventory()
     c.OnClick = EP
     Set c = AddButton("btnLabels", "طباعة باركود", 8050, 8221, 1928, 624, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnWarehouses", "المخازن", 10091, 8221, 1474, 624, "secondary")
+    c.OnClick = EP
     Set c = AddLabel("lblProductName", "اختر منتجًا من القائمة", 12134, 1304, 6634, 454, 14, True, CLR_PRIMARY, "", 0)
     Set c = AddLabel("lblProductStock", " ", 12134, 1786, 6634, 340, 10, False, CLR_TEXT, "", 0)
     Set c = AddLabel("lblManualCap", "حركة يدوية على المنتج المحدد", 12134, 2268, 6634, 340, 11, True, CLR_MUTED, "", 0)
@@ -5074,8 +5204,12 @@ Private Sub BuildForm_frmInventory()
     Set c = AddText("txtMoveCost", "", 17180, 2977, 1588, 454)
     SetCtlProp c, "Format", "#,##0.00##"
     Set c = AddLabel("lblMoveCost", "تكلفة الوحدة", 17180, 2665, 1588, 284, 9, False, CLR_MUTED, "txtMoveCost", 0)
-    Set c = AddText("txtMoveNotes", "", 12134, 3799, 4876, 454)
-    Set c = AddLabel("lblMoveNotes", "السبب / ملاحظات", 12134, 3487, 4876, 284, 9, False, CLR_MUTED, "txtMoveNotes", 0)
+    Set c = AddText("txtMoveNotes", "", 12134, 3799, 3062, 454)
+    Set c = AddLabel("lblMoveNotes", "السبب / ملاحظات", 12134, 3487, 3062, 284, 9, False, CLR_MUTED, "txtMoveNotes", 0)
+    Set c = AddCombo("cboWarehouse", "", 15309, 3799, 1758, 454, "", 2, "0;1701")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblWarehouse", "المخزن", 15309, 3487, 1758, 284, 9, False, CLR_MUTED, "cboWarehouse", 0)
     Set c = AddButton("btnPostMove", "حفظ الحركة", 17180, 3782, 1588, 482, "primary")
     c.OnClick = EP
     Set c = AddLabel("lblMovesCap", "آخر حركات المنتج", 12134, 4451, 6634, 340, 11, True, CLR_MUTED, "", 0)
@@ -5106,6 +5240,9 @@ Private Sub BuildForm_frmInventory()
     s = s & "Private Sub cboMoveType_AfterUpdate()" & vbCrLf
     s = s & "    InventoryMoveTypeChanged Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboWarehouse_AfterUpdate()" & vbCrLf
+    s = s & "    InventoryProductPicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnRefresh_Click()" & vbCrLf
     s = s & "    InventoryRefresh Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -5124,6 +5261,9 @@ Private Sub BuildForm_frmInventory()
     s = s & "Private Sub btnLabels_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmBarcodeLabels"", 0, Me!lstProducts.Value" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnWarehouses_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmWarehouses""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnPostMove_Click()" & vbCrLf
     s = s & "    PostInventoryMove Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -5133,9 +5273,10 @@ Private Sub BuildForm_frmInventory()
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
     s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;lstProducts,227,1984,11680,5613,0,1000,0,1000;lblInvTotals,227,7711,11680,340,0,1000,1000,0;btnStockCount,227,8221,1474,624,0,0,1000,0;btnPurchase,1814,8221,2041,624,0,0,1000,0;btnLowReport,3968,8221,1928,624,0,0,1000,0""" & vbCrLf
-    s = s & "    spec = spec & "";btnStockReport,6009,8221,1928,624,0,0,1000,0;btnLabels,8050,8221,1928,624,0,0,1000,0;lblProductName,12134,1304,6634,454,1000,0,0,0;lblProductStock,12134,1786,6634,340,1000,0,0,0;lblManualCap,12134,2268,6634,340,1000,0,0,0;cboMoveType,12134,2977,3175,454,1000,0,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblMoveType,12134,2665,3175,284,1000,0,0,0;txtMoveQty,15479,2977,1531,454,1000,0,0,0;lblMoveQty,15479,2665,1531,284,1000,0,0,0;txtMoveCost,17180,2977,1588,454,1000,0,0,0;lblMoveCost,17180,2665,1588,284,1000,0,0,0;txtMoveNotes,12134,3799,4876,454,1000,0,0,0""" & vbCrLf
-    s = s & "    spec = spec & "";lblMoveNotes,12134,3487,4876,284,1000,0,0,0;btnPostMove,17180,3782,1588,482,1000,0,0,0;lblMovesCap,12134,4451,6634,340,1000,0,0,0;lstMoves,12134,4820,6634,3232,1000,0,0,1000;btnClose,17067,8221,1701,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnStockReport,6009,8221,1928,624,0,0,1000,0;btnLabels,8050,8221,1928,624,0,0,1000,0;btnWarehouses,10091,8221,1474,624,0,0,1000,0;lblProductName,12134,1304,6634,454,1000,0,0,0;lblProductStock,12134,1786,6634,340,1000,0,0,0;lblManualCap,12134,2268,6634,340,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";cboMoveType,12134,2977,3175,454,1000,0,0,0;lblMoveType,12134,2665,3175,284,1000,0,0,0;txtMoveQty,15479,2977,1531,454,1000,0,0,0;lblMoveQty,15479,2665,1531,284,1000,0,0,0;txtMoveCost,17180,2977,1588,454,1000,0,0,0;lblMoveCost,17180,2665,1588,284,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";txtMoveNotes,12134,3799,3062,454,1000,0,0,0;lblMoveNotes,12134,3487,3062,284,1000,0,0,0;cboWarehouse,15309,3799,1758,454,1000,0,0,0;lblWarehouse,15309,3487,1758,284,1000,0,0,0;btnPostMove,17180,3782,1588,482,1000,0,0,0;lblMovesCap,12134,4451,6634,340,1000,0,0,0""" & vbCrLf
+    s = s & "    spec = spec & "";lstMoves,12134,4820,6634,3232,1000,0,0,1000;btnClose,17067,8221,1701,624,1000,0,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 18994, 9355, -1757, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
     FinishForm "frmInventory", s
@@ -5204,9 +5345,12 @@ Private Sub BuildForm_frmStockCount()
     Set c = AddLabel("lblCount", "جلسة الجرد (الأحدث أولًا)", 227, 992, 5103, 284, 9, False, CLR_MUTED, "cboCount", 0)
     Set c = AddCombo("cboCategory", "", 5500, 1304, 2835, 454, "SELECT c.CategoryID, c.CategoryName FROM [@Categories] AS c ORDER BY c.CategoryName", 2, "0;2835")
     Set c = AddLabel("lblCategory", "تصنيف الجرد الجديد (فارغ = الكل)", 5500, 992, 2835, 284, 9, False, CLR_MUTED, "cboCategory", 0)
-    Set c = AddButton("btnNewCount", "جرد جديد", 8505, 1287, 1701, 482, "primary")
+    Set c = AddCombo("cboWarehouse", "", 8505, 1304, 2041, 454, "", 2, "0;1984")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblWarehouse", "مخزن الجرد الجديد", 8505, 992, 2041, 284, 9, False, CLR_MUTED, "cboWarehouse", 0)
+    Set c = AddButton("btnNewCount", "جرد جديد", 10716, 1287, 1701, 482, "primary")
     c.OnClick = EP
-    Set c = AddLabel("lblCountInfo", " ", 10376, 1304, 8391, 454, 10, True, CLR_TEXT, "", 0)
+    Set c = AddLabel("lblCountInfo", " ", 12587, 1304, 6180, 454, 10, True, CLR_TEXT, "", 0)
     Set c = AddText("txtCountBarcode", "", 227, 2183, 3969, 454)
     c.FontSize = 12
     c.OnKeyDown = EP
@@ -5268,7 +5412,7 @@ Private Sub BuildForm_frmStockCount()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub Form_Resize()" & vbCrLf
     s = s & "    Dim spec As String" & vbCrLf
-    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;lblCountInfo,10376,1304,8391,454,0,1000,0,0;subCountLines,227,3118,18541,4394,0,1000,0,1000;lblCountSummary,227,7626,18541,397,0,1000,1000,0;btnPostCount,227,8221,1928,624,0,0,1000,0;btnCancelCount,2268,8221,1701,624,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,18994,850,0,1000,0,0;lblCountInfo,12587,1304,6180,454,0,1000,0,0;subCountLines,227,3118,18541,4394,0,1000,0,1000;lblCountSummary,227,7626,18541,397,0,1000,1000,0;btnPostCount,227,8221,1928,624,0,0,1000,0;btnCancelCount,2268,8221,1701,624,0,0,1000,0""" & vbCrLf
     s = s & "    spec = spec & "";btnCountReport,4082,8221,1928,624,0,0,1000,0;btnClose,17066,8221,1701,624,1000,0,1000,0""" & vbCrLf
     s = s & "    FitControls Me, 18994, 9355, -2919, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -10156,23 +10300,27 @@ Private Sub BuildForm_frmOpeningStock()
     SetFormProp "ScrollBars", 2
     SetFormProp "Cycle", 0
     SetFormProp "AllowDeletions", False
-    Set c = AddCombo("ProductID", "ProductID", 28, 0, 5670, 425, "SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p WHERE p.TrackStock = True ORDER BY p.ProductName", 2, "0;5557")
+    Set c = AddCombo("ProductID", "ProductID", 28, 0, 3912, 425, "SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p WHERE p.TrackStock = True ORDER BY p.ProductName", 2, "0;3799")
     SetCtlProp c, "BoundColumn", 1
     SetCtlProp c, "LimitToList", True
-    Set c = AddText("Quantity", "Quantity", 5726, 0, 1814, 425)
+    Set c = AddCombo("WarehouseID", "WarehouseID", 3968, 0, 1729, 425, "SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True ORDER BY w.WarehouseID", 2, "0;1644")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    SetCtlProp c, "DefaultValue", "1"
+    Set c = AddText("Quantity", "Quantity", 5725, 0, 1814, 425)
     SetCtlProp c, "Format", "#,##0.###"
-    Set c = AddText("UnitCost", "UnitCost", 7568, 0, 1814, 425)
+    Set c = AddText("UnitCost", "UnitCost", 7567, 0, 1814, 425)
     SetCtlProp c, "Format", "#,##0.00"
-    Set c = AddText("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 9410, 0, 2041, 425)
+    Set c = AddText("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 9409, 0, 2041, 425)
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
     SetCtlProp c, "Format", "#,##0.00"
-    Set c = AddText("txtStatus", "=IIf(IsNull([TransactionID]),""لم يُرحَّل"",""مرحّل"")", 11479, 0, 2126, 425)
+    Set c = AddText("txtStatus", "=IIf(IsNull([TransactionID]),""لم يُرحَّل"",""مرحّل"")", 11478, 0, 2126, 425)
     SetCtlProp c, "Locked", True
     c.BackColor = CLR_LOCKED
     SetCtlProp c, "TabStop", False
-    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 13633, 17, 454, 391, "danger")
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 13632, 17, 454, 391, "danger")
     SetCtlProp c, "FontName", ICON_FONT
     c.OnClick = EP
     m_frm.BeforeUpdate = EP

@@ -11,9 +11,61 @@ Public Sub LangData5()
     D5_1
     D5_2
     D5_3
+    D5_4
 End Sub
 
 Private Sub D5_1()
+    LangAdd "الشيكات", "Cheques"
+    LangAdd "الصندوق", "Box"
+    LangAdd "الضريبة", "VAT"
+    LangAdd "الطابعة", "Printer"
+    LangAdd "الطريقة", "Method"
+    LangAdd "العملاء", "Customers"
+    LangAdd "العملات", "Currencies"
+    LangAdd "العملية", "Transaction"
+    LangAdd "العمولة", "Commission"
+    LangAdd "العنوان", "Address"
+    LangAdd "القائمة", "List"
+    LangAdd "الكاشير", "Cashier"
+    LangAdd "المتبقي", "Remaining"
+    LangAdd "المتوفر", "Available"
+    LangAdd "المتوقع", "Expected"
+    LangAdd "المجموع", "Total"
+    LangAdd "المحاسب", "Accountant"
+    LangAdd "المحصّل", "Collector"
+    LangAdd "المخازن", "Warehouses"
+    LangAdd "المخزون", "Stock"
+    LangAdd "المدفوع", "Paid"
+    LangAdd "المدينة", "City"
+    LangAdd "المراجع", "Reviewer"
+    LangAdd "المرتجع", "Return"
+    LangAdd "المرتدة", "Bounced"
+    LangAdd "المسؤول", "Manager"
+    LangAdd "المستحق", "Due"
+    LangAdd "المستلم", "Recipient"
+    LangAdd "المستند", "Document"
+    LangAdd "المستوى", "Level"
+    LangAdd "المشروب", "Drink"
+    LangAdd "المشكلة", "Problem"
+    LangAdd "المصروف", "Expense"
+    LangAdd "المطلوب", "required"
+    LangAdd "المعامل", "Rate"
+    LangAdd "المندوب", "Sales rep"
+    LangAdd "المنطقة", "Region"
+    LangAdd "الوحدات", "Units"
+    LangAdd "بدون حد", "No limit"
+    LangAdd "برتقالي", "Orange"
+    LangAdd "تجريبية", "Test"
+    LangAdd "تسعمائة", "nine hundred"
+    LangAdd "خمسمائة", "five hundred"
+    LangAdd "رد نقدي", "Cash refund"
+    LangAdd "سبعمائة", "seven hundred"
+    LangAdd "ستة عشر", "sixteen"
+    LangAdd "سطر قيد", "Entry line"
+    LangAdd "سند صرف", "Payment voucher"
+    LangAdd "سند قبض", "Receipt voucher"
+    LangAdd "صرف آخر", "Other payment"
+    LangAdd "صرف شيك", "Cheque payment"
     LangAdd "طُبع في", "Printed on"
     LangAdd "غير نشط", "is not active"
     LangAdd "في شاشة", "in the screen"
@@ -67,6 +119,7 @@ Private Sub D5_1()
     LangAdd "المبلغ", "Amount"
     LangAdd "المتجر", "Store"
     LangAdd "المجلد", "Folder"
+    LangAdd "المخزن", "Warehouse"
     LangAdd "المدير", "Manager"
     LangAdd "المدين", "Debit"
     LangAdd "المركز", "Center"
@@ -82,6 +135,9 @@ Private Sub D5_1()
     LangAdd "بالضبط", "exactly"
     LangAdd "بالفعل", "already exists"
     LangAdd "بزيادة", "over by"
+End Sub
+
+Private Sub D5_2()
     LangAdd "بلا حد", "No limit"
     LangAdd "بنفسجي", "Purple"
     LangAdd "بواسطة", "by"
@@ -134,9 +190,6 @@ Private Sub D5_1()
     LangAdd "إضافة", "Add"
     LangAdd "إغلاق", "Close"
     LangAdd "إلغاء", "Cancel"
-End Sub
-
-Private Sub D5_2()
     LangAdd "إيداع", "Deposit"
     LangAdd "اثنان", "two"
     LangAdd "الأصل", "Asset"
@@ -205,6 +258,9 @@ Private Sub D5_2()
     LangAdd "زيادة", "Overage"
     LangAdd "سبعون", "seventy"
     LangAdd "صنفًا", "items"
+End Sub
+
+Private Sub D5_3()
     LangAdd "طاولة", "Table"
     LangAdd "طباعة", "Print"
     LangAdd "عشرون", "twenty"
@@ -257,9 +313,6 @@ Private Sub D5_2()
     LangAdd "خروج", "Exit"
     LangAdd "خصوم", "Liabilities"
     LangAdd "خمسة", "five"
-End Sub
-
-Private Sub D5_3()
     LangAdd "دائن", "Credit"
     LangAdd "دخول", "Login"
     LangAdd "رجوع", "Back"
@@ -324,9 +377,13 @@ Private Sub D5_3()
     LangAdd "عجز", "Shortage"
     LangAdd "عرض", "View"
     LangAdd "فتح", "Open"
+    LangAdd "فرع", "Branch"
     LangAdd "فرق", "Difference"
     LangAdd "فقط", "Only"
     LangAdd "قبل", "Before"
+End Sub
+
+Private Sub D5_4()
     LangAdd "قرش", "piasters"
     LangAdd "مسح", "Clear"
     LangAdd "مصر", "Egypt"

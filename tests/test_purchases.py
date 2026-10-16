@@ -173,7 +173,7 @@ class PostingCodeTests(unittest.TestCase):
         self.assertIn("CalcRun(ToBase(InvoiceDiscount, FxRate), False)", body)   # prices exclude VAT; in SAR
         body = proc(self.text, "PostPurchaseReturn")
         self.assertRegex(body, r"ApplyStockMovement db, productIDs\(i\), -qtys\(i\), TT_PURCHASE_RETURN")
-        self.assertIn('CheckStockAvailable(productIDs, qtys, n, "الإرجاع للمورد")', body)
+        self.assertIn('CheckStockAvailable(productIDs, qtys, n, "الإرجاع للمورد", warehouse)', body)
         body = proc(self.text, "PostStockCount")
         self.assertIn("TT_ADJUSTMENT", body)
         self.assertNotRegex(body, r"TT_ADJUSTMENT[^\n]*True")            # a count never changes the average

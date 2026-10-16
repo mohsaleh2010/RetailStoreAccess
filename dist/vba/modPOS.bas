@@ -206,7 +206,8 @@ Public Sub ProductPicked(ByVal frm As Access.Form)
 End Sub
 
 Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty As Currency)
-    Dim rs As DAO.Recordset, p As DAO.Recordset, total As Currency
+    Dim rs As DAO.Recordset, p As DAO.Recordset, total As Currency, available As Currency
+    available = AvailableQty(ProductID)                     ' in the warehouse of the user (modWarehouses)
     Set p = CurrentDb.OpenRecordset("SELECT ProductCode, ProductName, SellingPrice, CurrentQuantity " & _
                                     "FROM Products WHERE ProductID = " & ProductID, dbOpenSnapshot)
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPOSLines WHERE ProductID = " & ProductID & _
@@ -223,13 +224,13 @@ Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty 
         rs.Edit
         rs!Quantity = rs!Quantity + Qty
     End If
-    rs!Available = p!CurrentQuantity
+    rs!Available = available
     total = rs!Quantity
     rs.Update
     rs.Close
     RecalcPOS frm
-    If total > p!CurrentQuantity And ProductTracksStock(ProductID) Then
-        SetPOSStatus frm, " ‰»ÌÂ: «·ﬂ„Ì… «·„ Ê›—… „‰ ´" & p!ProductName & "ª ÂÌ " & p!CurrentQuantity, CLR_WARNING
+    If total > available And ProductTracksStock(ProductID) Then
+        SetPOSStatus frm, " ‰»ÌÂ: «·ﬂ„Ì… «·„ Ê›—… „‰ ´" & p!ProductName & "ª ÂÌ " & available, CLR_WARNING
     Else
         SetPOSStatus frm, " „  ≈÷«›…: " & p!ProductName & "  (" & total & ")", CLR_SUCCESS
     End If

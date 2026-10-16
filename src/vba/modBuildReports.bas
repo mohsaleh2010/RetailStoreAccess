@@ -30,8 +30,8 @@ Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
 Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptCashDayBook,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptVatReturnEG,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling," & _
-    "rptLeastSelling,rptPurchases,rptStockBalance,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree," & _
-    "rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
+    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptLowStock,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree," & _
+    "rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers,rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
     Dim i As Long
@@ -69,6 +69,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptLeastSelling
     BuildReport_rptPurchases
     BuildReport_rptStockBalance
+    BuildReport_rptStockByWarehouse
     BuildReport_rptLowStock
     BuildReport_rptProductMovement
     BuildReport_rptCustomerStatement
@@ -2248,6 +2249,60 @@ Private Sub BuildReport_rptStockBalance()
     Exit Sub
 EH:
     AbortReport "rptStockBalance", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptStockByWarehouse()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptStockByWarehouse", "أرصدة الأصناف لكل مخزن", "StockByWarehouseQuery", 15536, "", "WarehouseName,ProductName", True, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 7768, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 7768, 28, 7768, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "أرصدة الأصناف لكل مخزن", 0, 397, 15536, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 15536, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 15536, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "المخزن", 0, 1292, 1928, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "الكود", 1928, 1292, 1304, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "المنتج", 3232, 1292, 3175, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "التصنيف", 6407, 1292, 1531, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "الكمية في المخزن", 7938, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "متوسط التكلفة", 9299, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "القيمة بالتكلفة", 10546, 1292, 4990, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal5", "=Sum([StockQty])", 7938, 85, 1361, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(2, "txtTotal7", "=Sum([StockCostValue])", 10546, 85, 4990, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLine(2, "lnTotals", 28, 15536)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 7938, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "WarehouseName", 0, 17, 1928, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "ProductCode", 1928, 17, 1304, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "ProductName", 3232, 17, 3175, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol4", "CategoryName", 6407, 17, 1531, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "StockQty", 7938, 17, 1361, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol6", "AverageCost", 9299, 17, 1247, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol7", "StockCostValue", 10546, 17, 4990, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا توجد بيانات لعرضها في هذا التقرير للاختيارات المحددة.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptStockByWarehouse", s
+    Exit Sub
+EH:
+    AbortReport "rptStockByWarehouse", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptLowStock()
