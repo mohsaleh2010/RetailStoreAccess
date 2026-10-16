@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2969
+Private Const ENTRY_COUNT As Long = 3031
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -226,13 +226,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=IIf([IsLowStock],""ãäÎİÖ"","""") & IIf([QuantityMismatch]<>0,"" / İÑŞ!"","""")") = "=IIf([IsLowStock],""Low"","""") & IIf([QuantityMismatch]<>0,"" / Difference!"","""")", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÑÓÇá ßá ÇáãÚáøŞ") = "Send all pending", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈÇŞí ÛíÑ ÇáãÑÈæØ ãä ÇáÓäÏ ") = "The unlinked remainder of the voucher ", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÈáÛ ÃßÈÑ ãä ÚãæáÇÊ ÇáãäÏæÈ ÇáãÓÊÍŞÉ (") = "The amount is more than the commissions payable to the sales rep (", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞÑ ÍİÙ ÇáÓäÏ: ") = "Could not save the voucher: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÈÈ ÇáÅÑÌÇÚ ãØáæÈ (ÅáÒÇãí İí ÇáÅÔÚÇÑ ÇáÏÇÆä).") = "The return reason is required (mandatory on the credit note).", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ ãÈíÚÇÊ æáÇ ÊÍÕíáÇÊ ááãäÏæÈíä İí åĞÇ ÇáÔåÑ.") = "No sales and no collections by the sales reps in this month.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("ADD;ÅÖÇİÉ;EDIT;ÊÚÏíá;DELETE;ÍĞİ;DOCS;ÚãáíÇÊ ÇáãÓÊäÏÇÊ;LOGIN;ÇáÏÎæá æÇáÎÑæÌ") = "ADD;Add;EDIT;Edit;DELETE;Delete;DOCS;Document transactions;LOGIN;Login and logout", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÙåÇÑ ÛíÑ ÇáäÔØ") = "Show inactive", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈäß (ÇáÊÍÕíá / ÇáÕÑİ)") = "Bank (collection / payment)", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÈíÚÇÊ ÇáÔåÑíÉ") = "Monthly sales", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞÑ ÍİÙ ÓäÏ ÇáÕÑİ: ") = "Could not save the payment voucher: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÓÊõÓÊÈÏá ßá ÇáÈíÇäÇÊ ÇáÍÇáíÉ ÈÇáäÓÎÉ:") = "All the current data will be replaced by the backup:", "Tr sample 6", passed, failed, report
+    CheckLang Tr("áÇ íÍÊÇÌ åĞÇ ÇáÊŞÑíÑ Ãí ÇÎÊíÇÑÇÊ") = "This report needs no choices", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ") = "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _

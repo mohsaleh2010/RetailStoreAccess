@@ -368,6 +368,7 @@ TABLES: List[Table] = [
             ("DELIVERY_NOTE", "DLV-", 1, 6, "أذونات التسليم للعملاء"),
             ("RECEIPT_NOTE", "GRN-", 1, 6, "أذونات الاستلام من الموردين"),
             ("SALES_ORDER", "SO-", 1, 6, "طلبيات العملاء"),
+            ("REP_DAY", "RD-", 1, 6, "أيام المندوبين (البيع من السيارة)"),
             ("PRODUCT_CODE", "P", 1, 5, "أكواد المنتجات"),
             ("ZATCA_ICV", None, 1, 0, "عدّاد ICV لمستندات فاتورة"),
             ("CASH_IN", "CIN-", 1, 6, "سندات قبض النقدية (الخزينة)"),
@@ -427,6 +428,7 @@ TABLES: List[Table] = [
             ("DISCOUNT_OVERRIDE", "خصم أعلى من الحد المسموح", "المبيعات", 14),
             ("ALLOW_NEGATIVE_STOCK", "البيع بكمية أكبر من المتوفر", "المبيعات", 15),
             ("SALES_ORDERS", "طلبيات العملاء: التسجيل والاعتماد والتجهيز والإلغاء", "المبيعات", 16),
+            ("REP_DAYS", "يوم المندوب: تحميل السيارة والبيع باسمه وتسويته", "المبيعات", 17),
             ("CUSTOMERS", "إدارة العملاء", "العملاء", 20),
             ("CUSTOMER_PAYMENTS", "سندات القبض", "العملاء", 21),
             ("PURCHASES", "فواتير المشتريات", "المشتريات", 30),
@@ -2273,6 +2275,33 @@ TABLES: List[Table] = [
     ),
 
     Table(
+        "RepDays", "أيام المندوبين",
+        "يوم بيع المندوب من السيارة (docs/63): يُفتح لمندوب له مخزن سيارة وصندوق عهدة؛ التحميل والتفريغ تحويلات "
+        "مخزنية، والبيع والمرتجع والتحصيل من مخزن السيارة وصندوق العهدة، ثم التسوية: جرد السيارة وتصفية الصندوق.",
+        [
+            auto("RepDayID", "رقم داخلي"),
+            text("DayNumber", 20, "رقم اليوم", required=True),
+            date_("DayDate", "التاريخ"),
+            long_("SalesRepID", "المندوب", required=True, fk="SalesReps.SalesRepID"),
+            long_("WarehouseID", "مخزن السيارة", required=True, fk="Warehouses.WarehouseID"),
+            long_("CashBoxID", "صندوق العهدة", required=True, fk="CashBoxes.CashBoxID"),
+            long_("StoreID", "المخزن الذي يحمّل منه ويفرّغ فيه", required=True, default="1",
+                  fk="Warehouses.WarehouseID"),
+            text("Status", 10, "الحالة", required=True, default='"OPEN"', rule='In ("OPEN","SETTLED")',
+                 rule_text="OPEN مفتوح، SETTLED تمت تسويته"),
+            datetime_("OpenedAt", "وقت الفتح", required=True, default="Now()"),
+            datetime_("SettledAt", "وقت التسوية"),
+            long_("StockCountID", "جرد السيارة في التسوية", fk="StockCounts.StockCountID"),
+            long_("ClosingID", "تصفية صندوق العهدة في التسوية", fk="CashClosings.ClosingID"),
+            long_("EmployeeID", "فتحه", required=True, fk="Employees.EmployeeID"),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["RepDayID"],
+        indexes=[ux("DayNumber"), ix("DayDate"), ix("Status")],
+    ),
+
+    Table(
         "SalesOrderLines", "أسطر طلبيات العملاء",
         "الأصناف وكمياتها وسعر البيع (شامل الضريبة كما في نقطة البيع). المُسلَّم = أسطر أذونات التسليم المرحّلة "
         "المرتبطة بالسطر، والمحجوز = الكمية ناقص المُسلَّم ما دامت الطلبية مفتوحة.",
@@ -2491,6 +2520,7 @@ SCREEN_LIST = [
     ("frmStockDocument", "سندات الصرف والاستلام المخزني", "المخزون", "STOCK_DOCS", True, True, True),
     ("frmStockNote", "أذونات التسليم والاستلام", "المخزون", "STOCK_NOTES", True, True, True),
     ("frmSalesOrder", "طلبيات العملاء", "المبيعات", "SALES_ORDERS", True, True, True),
+    ("frmRepDay", "يوم المندوب والبيع من السيارة", "المبيعات", "REP_DAYS", True, True, True),
     ("frmCashBoxUsers", "أمناء الصناديق", "الخزينة", "CASH_ALL_BOXES", True, True, True),
     ("frmCashTransfers", "استلام التحويلات بين الصناديق", "الخزينة", "CASH_CLOSING", False, True, True),
     ("frmAccounting", "المحاسبة والمالية", "الحسابات", None, False, False, False),

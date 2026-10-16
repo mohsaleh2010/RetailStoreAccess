@@ -27,11 +27,11 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     "erInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuer" & _
     "y,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint" & _
     ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryStockNoteValue,qryInvoiced" & _
-    "Notes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher" & _
-    ",qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDep" & _
-    "Totals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCente" & _
-    "rNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,Integrity" & _
-    "CheckQuery"
+    "Notes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryRepDayStock,qryRepDaySales,qryRepDayReturns,qryRepDayCollections,RepDaySummaryQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurch" & _
+    "ase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,q" & _
+    "ryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryInc" & _
+    "omeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineT" & _
+    "otals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -822,6 +822,11 @@ Private Sub CreateAllQueries()
     Q_qryReservedStock
     Q_ReservedStockQuery
     Q_PendingOrdersQuery
+    Q_qryRepDayStock
+    Q_qryRepDaySales
+    Q_qryRepDayReturns
+    Q_qryRepDayCollections
+    Q_RepDaySummaryQuery
     Q_qryJournalStockTransfer
     Q_qryJournalStockNote
     Q_TransfersInTransitQuery
@@ -2793,6 +2798,71 @@ Private Sub Q_PendingOrdersQuery()
     s = s & "WHERE o.Status In ('APPROVED', 'PREPARING', 'PARTIAL') AND s.RemainingQty > 0" & vbCrLf
     s = s & "ORDER BY o.OrderDate, o.OrderNumber" & vbCrLf
     SaveQuery "PendingOrdersQuery", "أسطر طلبيات العملاء المفتوحة التي لم تُسلَّم كلها: الباقي وقيمته والتأخير عن الموعد", s
+End Sub
+
+Private Sub Q_qryRepDayStock()
+    Dim s As String
+    s = "SELECT d.RepDayID," & vbCrLf
+    s = s & "       Sum(IIf(t.ReferenceType = 'TRANSFER' AND t.Quantity > 0, t.Quantity * t.UnitCost, 0)) AS LoadedVal," & vbCrLf
+    s = s & "       Sum(IIf(t.ReferenceType = 'TRANSFER' AND t.Quantity < 0, -t.Quantity * t.UnitCost, 0)) AS UnloadedVal," & vbCrLf
+    s = s & "       Sum(IIf(t.ReferenceType = 'SALE', -t.Quantity * t.UnitCost, 0)) AS SoldVal," & vbCrLf
+    s = s & "       Sum(IIf(t.ReferenceType = 'SALES_RETURN', t.Quantity * t.UnitCost, 0)) AS ReturnedVal," & vbCrLf
+    s = s & "       Sum(IIf(t.ReferenceType = 'STOCK_COUNT', t.Quantity * t.UnitCost, 0)) AS CountDiffVal" & vbCrLf
+    s = s & "FROM RepDays AS d, InventoryTransactions AS t" & vbCrLf
+    s = s & "WHERE t.WarehouseID = d.WarehouseID AND t.TransactionDate >= d.OpenedAt AND (d.SettledAt Is Null OR t.TransactionDate <= d.SettledAt)" & vbCrLf
+    s = s & "GROUP BY d.RepDayID" & vbCrLf
+    SaveQuery "qryRepDayStock", "حركة مخزن سيارة المندوب في يومه بالتكلفة: المحمَّل والمفرَّغ والمباع والمرتجع وفرق الجرد (docs/63)", s
+End Sub
+
+Private Sub Q_qryRepDaySales()
+    Dim s As String
+    s = "SELECT d.RepDayID, Count(s.SalesInvoiceID) AS InvCount, Sum(s.TotalAmount) AS SalesAmt," & vbCrLf
+    s = s & "       Sum(IIf(s.CashBoxID = d.CashBoxID, s.PaidAmount, 0)) AS CashSalesAmt" & vbCrLf
+    s = s & "FROM RepDays AS d, SalesInvoices AS s" & vbCrLf
+    s = s & "WHERE s.WarehouseID = d.WarehouseID AND s.InvoiceDate >= d.OpenedAt AND (d.SettledAt Is Null OR s.InvoiceDate <= d.SettledAt)" & vbCrLf
+    s = s & "GROUP BY d.RepDayID" & vbCrLf
+    SaveQuery "qryRepDaySales", "فواتير البيع من سيارة المندوب في يومه: العدد والقيمة وما قُبض نقدًا في صندوق العهدة", s
+End Sub
+
+Private Sub Q_qryRepDayReturns()
+    Dim s As String
+    s = "SELECT d.RepDayID, Sum(r.TotalAmount) AS ReturnsAmt," & vbCrLf
+    s = s & "       Sum(IIf(r.CashBoxID = d.CashBoxID, r.RefundedAmount, 0)) AS RefundsAmt" & vbCrLf
+    s = s & "FROM RepDays AS d, SalesReturns AS r" & vbCrLf
+    s = s & "WHERE r.WarehouseID = d.WarehouseID AND r.ReturnDate >= d.OpenedAt AND (d.SettledAt Is Null OR r.ReturnDate <= d.SettledAt)" & vbCrLf
+    s = s & "GROUP BY d.RepDayID" & vbCrLf
+    SaveQuery "qryRepDayReturns", "مرتجعات المبيعات إلى سيارة المندوب في يومه، وما رُدّ نقدًا من صندوق العهدة", s
+End Sub
+
+Private Sub Q_qryRepDayCollections()
+    Dim s As String
+    s = "SELECT d.RepDayID, Count(p.PaymentID) AS PayCount, Sum(p.Amount) AS CollectedAmt" & vbCrLf
+    s = s & "FROM RepDays AS d, CustomerPayments AS p" & vbCrLf
+    s = s & "WHERE p.CashBoxID = d.CashBoxID AND p.PaymentDate >= d.OpenedAt AND (d.SettledAt Is Null OR p.PaymentDate <= d.SettledAt)" & vbCrLf
+    s = s & "GROUP BY d.RepDayID" & vbCrLf
+    SaveQuery "qryRepDayCollections", "سندات القبض من العملاء في صندوق عهدة المندوب في يومه", s
+End Sub
+
+Private Sub Q_RepDaySummaryQuery()
+    Dim s As String
+    s = "SELECT d.RepDayID, d.DayNumber, d.DayDate, d.SalesRepID, r.RepName, d.WarehouseID, w.WarehouseName, d.CashBoxID," & vbCrLf
+    s = s & "       b.BoxName, d.Status, IIf(d.Status = 'OPEN', 'مفتوح', 'تمت تسويته') AS StatusName," & vbCrLf
+    s = s & "       Nz(k.LoadedVal, 0) AS LoadedValue, Nz(k.SoldVal, 0) AS SoldCost, Nz(k.ReturnedVal, 0) AS ReturnedCost," & vbCrLf
+    s = s & "       Nz(k.UnloadedVal, 0) AS UnloadedValue, Nz(k.CountDiffVal, 0) AS CountDiffValue," & vbCrLf
+    s = s & "       Nz(s.InvCount, 0) AS InvoiceCount, Nz(s.SalesAmt, 0) AS SalesTotal, Nz(s.CashSalesAmt, 0) AS CashSales," & vbCrLf
+    s = s & "       Nz(t.ReturnsAmt, 0) AS ReturnsTotal, Nz(t.RefundsAmt, 0) AS CashRefunds," & vbCrLf
+    s = s & "       Nz(p.CollectedAmt, 0) AS Collections, c.ExpectedBalance AS CashExpected, c.CountedAmount AS CashCounted," & vbCrLf
+    s = s & "       c.Difference AS CashDifference, c.TransferAmount AS CashHandedOver" & vbCrLf
+    s = s & "FROM (((((((RepDays AS d INNER JOIN [@SalesReps] AS r ON d.SalesRepID = r.SalesRepID)" & vbCrLf
+    s = s & "            INNER JOIN [@Warehouses] AS w ON d.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "           INNER JOIN [@CashBoxes] AS b ON d.CashBoxID = b.CashBoxID)" & vbCrLf
+    s = s & "          LEFT JOIN qryRepDayStock AS k ON d.RepDayID = k.RepDayID)" & vbCrLf
+    s = s & "         LEFT JOIN qryRepDaySales AS s ON d.RepDayID = s.RepDayID)" & vbCrLf
+    s = s & "        LEFT JOIN qryRepDayReturns AS t ON d.RepDayID = t.RepDayID)" & vbCrLf
+    s = s & "       LEFT JOIN qryRepDayCollections AS p ON d.RepDayID = p.RepDayID)" & vbCrLf
+    s = s & "      LEFT JOIN CashClosings AS c ON d.ClosingID = c.ClosingID" & vbCrLf
+    s = s & "ORDER BY d.DayDate, d.DayNumber" & vbCrLf
+    SaveQuery "RepDaySummaryQuery", "تسوية يوم المندوب: البضاعة (المحمَّل والمباع والمرتجع والمفرَّغ وفرق الجرد) والنقدية (المبيعات والتحصيل والمتوقع والفعلي والفرق)", s
 End Sub
 
 Private Sub Q_qryJournalStockTransfer()

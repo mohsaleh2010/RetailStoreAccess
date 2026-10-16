@@ -3,7 +3,7 @@ Layout conventions are the same as forms.py (twips, x from the start edge)."""
 
 from typing import List, Tuple
 
-from forms import Control, FormModel, Sym, button, cm, labelled, title_band
+from forms import Control, FormModel, Sym, button, cm, fit_window, labelled, title_band
 from forms_purchases import TRANSFER_PRODUCTS
 from forms_sales import LOCKED, grid_row, header_labels
 
@@ -86,4 +86,60 @@ def layout_sales_order(line_heads) -> FormModel:
 def order_forms() -> List[FormModel]:
     lines, heads = layout_sales_order_lines()
     # the subform first: the parent form embeds it by name
-    return [lines, layout_sales_order(heads)]
+    return [lines, layout_sales_order(heads), layout_rep_day()]
+
+
+# ---------------------------------------------------------------- the rep day and van sales (docs/63)
+def layout_rep_day() -> FormModel:
+    width, height = cm(24.0), cm(16.4)
+    m = FormModel("frmRepDay", "يوم المندوب", width, height, popup=False, allow_add=False)
+    title_band(m, "يوم المندوب والبيع من السيارة",
+               "تحميل السيارة، والبيع والمرتجع والتحصيل باسم المندوب، ثم جرد السيارة وتصفية صندوق العهدة",
+               "customers")
+    c = m.add(Control("combo", "cboDay", cm(0.4), cm(2.3), cm(15.0), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 6, "ColumnWidths": "0;2.4;2.2;4.4;3.4;2.4", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboDay", "اليوم (الأحدث أولًا)", c)
+    y = cm(3.8)
+    c = m.add(Control("combo", "cboRep", cm(0.4), y, cm(5.0), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4.8", "LimitToList": True}))
+    labelled(m, "cboRep", "المندوب", c)
+    c = m.add(Control("combo", "cboStore", cm(5.6), y, cm(4.0), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;3.8", "LimitToList": True}))
+    labelled(m, "cboStore", "يحمّل من المخزن", c)
+    button(m, "btnOpen", "فتح يوم", cm(9.8), y - cm(0.03), "primary", w=cm(3.0), call="RepDayOpen Me")
+    button(m, "btnDeleteDay", "حذف اليوم", cm(13.0), y - cm(0.03), "danger", w=cm(2.8), call='RepDayAction Me, "DELETE"')
+    m.add(Control("label", "lblInfo", cm(0.4), cm(4.9), width - cm(0.8), cm(0.7),
+                  {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("label", "lblActing", cm(0.4), cm(5.6), width - cm(0.8), cm(0.6),
+                  {"Caption": " ", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_DANGER")}))
+    m.add(Control("list", "lstSummary", cm(0.4), cm(6.4), width - cm(0.8), cm(5.8),
+                  {"RowSourceType": "Value List", "ColumnCount": 2, "ColumnWidths": "14;6", "ColumnHeads": False}))
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnLoad", "تحميل السيارة", "primary", 3.4, 'RepDayAction Me, "LOAD"'),
+            ("btnSale", "فاتورة بيع", "secondary", 3.0, 'RepDayAction Me, "SALE"'),
+            ("btnReturn", "مرتجع", "secondary", 2.6, 'RepDayAction Me, "RETURN"'),
+            ("btnPayment", "سند قبض", "secondary", 2.6, 'RepDayAction Me, "PAYMENT"'),
+            ("btnRefresh", "تحديث", "secondary", 2.4, "RepDayShow Me")]:
+        button(m, name, caption, bx, cm(12.6), style, w=cm(w), call=call)
+        bx += cm(w) + cm(0.2)
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnCount", "جرد السيارة", "secondary", 3.2, 'RepDayAction Me, "COUNT"'),
+            ("btnUnload", "تفريغ الباقي", "secondary", 3.2, 'RepDayAction Me, "UNLOAD"'),
+            ("btnCash", "تصفية الصندوق", "secondary", 3.4, 'RepDayAction Me, "CASH"'),
+            ("btnSettle", "إغلاق اليوم", "primary", 3.2, 'RepDayAction Me, "SETTLE"'),
+            ("btnPrint", "طباعة", "secondary", 2.4, "RepDayPrint Me")]:
+        button(m, name, caption, bx, cm(14.4), style, w=cm(w), h=cm(1.1), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(14.4), "secondary", w=cm(2.6), h=cm(1.1),
+           call="DoCmd.Close acForm, Me.Name")
+    fit_window(m, bottom_y=cm(12.5), stretch_w=("lblInfo", "lblActing", "lstSummary"), stretch_h=("lstSummary",),
+               extra={"btnClose": (1000, 0, 1000, 0)})
+    m.form_events = ["Load", "Activate", "Unload"]
+    m.code = (["Private Sub Form_Load()", "    RepDayLoad Me", "End Sub",
+               "Private Sub Form_Activate()", "    RepDayShow Me", "End Sub",          # back from a sale or a count
+               "Private Sub Form_Unload(Cancel As Integer)", "    StopActingAsRep", "End Sub",
+               "Private Sub cboDay_AfterUpdate()", "    RepDayShow Me", "End Sub"] + m.code)
+    return m

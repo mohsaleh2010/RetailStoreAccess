@@ -1877,6 +1877,51 @@ FROM ((((qrySalesOrderLineStatus AS s INNER JOIN SalesOrders AS o ON s.SalesOrde
      LEFT JOIN [@SalesReps] AS r ON o.SalesRepID = r.SalesRepID
 WHERE o.Status In ('APPROVED', 'PREPARING', 'PARTIAL') AND s.RemainingQty > 0
 ORDER BY o.OrderDate, o.OrderNumber"""),
+    Query("qryRepDayStock", "حركة مخزن سيارة المندوب في يومه بالتكلفة: المحمَّل والمفرَّغ والمباع والمرتجع وفرق الجرد (docs/63)", """
+SELECT d.RepDayID,
+       Sum(IIf(t.ReferenceType = 'TRANSFER' AND t.Quantity > 0, t.Quantity * t.UnitCost, 0)) AS LoadedVal,
+       Sum(IIf(t.ReferenceType = 'TRANSFER' AND t.Quantity < 0, -t.Quantity * t.UnitCost, 0)) AS UnloadedVal,
+       Sum(IIf(t.ReferenceType = 'SALE', -t.Quantity * t.UnitCost, 0)) AS SoldVal,
+       Sum(IIf(t.ReferenceType = 'SALES_RETURN', t.Quantity * t.UnitCost, 0)) AS ReturnedVal,
+       Sum(IIf(t.ReferenceType = 'STOCK_COUNT', t.Quantity * t.UnitCost, 0)) AS CountDiffVal
+FROM RepDays AS d, InventoryTransactions AS t
+WHERE t.WarehouseID = d.WarehouseID AND t.TransactionDate >= d.OpenedAt AND (d.SettledAt Is Null OR t.TransactionDate <= d.SettledAt)
+GROUP BY d.RepDayID"""),
+    Query("qryRepDaySales", "فواتير البيع من سيارة المندوب في يومه: العدد والقيمة وما قُبض نقدًا في صندوق العهدة", """
+SELECT d.RepDayID, Count(s.SalesInvoiceID) AS InvCount, Sum(s.TotalAmount) AS SalesAmt,
+       Sum(IIf(s.CashBoxID = d.CashBoxID, s.PaidAmount, 0)) AS CashSalesAmt
+FROM RepDays AS d, SalesInvoices AS s
+WHERE s.WarehouseID = d.WarehouseID AND s.InvoiceDate >= d.OpenedAt AND (d.SettledAt Is Null OR s.InvoiceDate <= d.SettledAt)
+GROUP BY d.RepDayID"""),
+    Query("qryRepDayReturns", "مرتجعات المبيعات إلى سيارة المندوب في يومه، وما رُدّ نقدًا من صندوق العهدة", """
+SELECT d.RepDayID, Sum(r.TotalAmount) AS ReturnsAmt,
+       Sum(IIf(r.CashBoxID = d.CashBoxID, r.RefundedAmount, 0)) AS RefundsAmt
+FROM RepDays AS d, SalesReturns AS r
+WHERE r.WarehouseID = d.WarehouseID AND r.ReturnDate >= d.OpenedAt AND (d.SettledAt Is Null OR r.ReturnDate <= d.SettledAt)
+GROUP BY d.RepDayID"""),
+    Query("qryRepDayCollections", "سندات القبض من العملاء في صندوق عهدة المندوب في يومه", """
+SELECT d.RepDayID, Count(p.PaymentID) AS PayCount, Sum(p.Amount) AS CollectedAmt
+FROM RepDays AS d, CustomerPayments AS p
+WHERE p.CashBoxID = d.CashBoxID AND p.PaymentDate >= d.OpenedAt AND (d.SettledAt Is Null OR p.PaymentDate <= d.SettledAt)
+GROUP BY d.RepDayID"""),
+    Query("RepDaySummaryQuery", "تسوية يوم المندوب: البضاعة (المحمَّل والمباع والمرتجع والمفرَّغ وفرق الجرد) والنقدية (المبيعات والتحصيل والمتوقع والفعلي والفرق)", """
+SELECT d.RepDayID, d.DayNumber, d.DayDate, d.SalesRepID, r.RepName, d.WarehouseID, w.WarehouseName, d.CashBoxID,
+       b.BoxName, d.Status, IIf(d.Status = 'OPEN', 'مفتوح', 'تمت تسويته') AS StatusName,
+       Nz(k.LoadedVal, 0) AS LoadedValue, Nz(k.SoldVal, 0) AS SoldCost, Nz(k.ReturnedVal, 0) AS ReturnedCost,
+       Nz(k.UnloadedVal, 0) AS UnloadedValue, Nz(k.CountDiffVal, 0) AS CountDiffValue,
+       Nz(s.InvCount, 0) AS InvoiceCount, Nz(s.SalesAmt, 0) AS SalesTotal, Nz(s.CashSalesAmt, 0) AS CashSales,
+       Nz(t.ReturnsAmt, 0) AS ReturnsTotal, Nz(t.RefundsAmt, 0) AS CashRefunds,
+       Nz(p.CollectedAmt, 0) AS Collections, c.ExpectedBalance AS CashExpected, c.CountedAmount AS CashCounted,
+       c.Difference AS CashDifference, c.TransferAmount AS CashHandedOver
+FROM (((((((RepDays AS d INNER JOIN [@SalesReps] AS r ON d.SalesRepID = r.SalesRepID)
+            INNER JOIN [@Warehouses] AS w ON d.WarehouseID = w.WarehouseID)
+           INNER JOIN [@CashBoxes] AS b ON d.CashBoxID = b.CashBoxID)
+          LEFT JOIN qryRepDayStock AS k ON d.RepDayID = k.RepDayID)
+         LEFT JOIN qryRepDaySales AS s ON d.RepDayID = s.RepDayID)
+        LEFT JOIN qryRepDayReturns AS t ON d.RepDayID = t.RepDayID)
+       LEFT JOIN qryRepDayCollections AS p ON d.RepDayID = p.RepDayID)
+      LEFT JOIN CashClosings AS c ON d.ClosingID = c.ClosingID
+ORDER BY d.DayDate, d.DayNumber"""),
     Query("qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", _stock_transfer()),
     Query("qryJournalStockNote", "أسطر قيود أذونات التسليم والاستلام (1430 و2150)", _stock_note()),
     Query("TransfersInTransitQuery", "التحويلات بين المخازن المرسلة ولم تُستلم بعد، بقيمتها وعدد أيامها بالطريق", """

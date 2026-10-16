@@ -65,7 +65,11 @@ class Store:
                         "ON e.RoleID = rp.RoleID WHERE e.EmployeeID = ? AND rp.PermissionKey = ?",
                         self.user, key) > 0
 
+    acting = None                     # (warehouse, box, rep) of the rep day the office works for (modVanSales)
+
     def cash_box(self):                                           # CurrentCashBoxID
+        if self.acting:
+            return self.acting[1]
         box = self.one("SELECT e.CashBoxID FROM Employees AS e INNER JOIN CashBoxes AS b "
                        "ON e.CashBoxID = b.CashBoxID WHERE e.EmployeeID = ? AND b.IsActive = 1", self.user)
         if box is None and self.has_permission("CASH_BOX"):
@@ -422,6 +426,8 @@ class Store:
         return dec(self.one("SELECT AverageCost FROM Products WHERE ProductID = ?", pid))
 
     def warehouse(self):                                            # CurrentWarehouseID
+        if self.acting:
+            return self.acting[0]
         wh = self.one("SELECT e.WarehouseID FROM Employees AS e INNER JOIN Warehouses AS w ON e.WarehouseID = "
                       "w.WarehouseID WHERE e.EmployeeID = ? AND w.IsActive = 1", self.user)
         return wh or self.one("SELECT Min(WarehouseID) FROM Warehouses WHERE IsActive = 1 AND WarehouseType = 'MAIN'") or 1
@@ -676,6 +682,39 @@ class Store:
         self.c.execute("UPDATE SalesOrders SET Status = ? WHERE SalesOrderID = ?",
                        ("CLOSED" if delivered > 0 else "CANCELLED", oid))
 
+    # ------------------------------------------------------------- the rep day (modVanSales, docs/63)
+    def open_rep_day(self, rep, store=1):                            # OpenRepDay
+        van = self.one("SELECT Min(WarehouseID) FROM Warehouses WHERE WarehouseType = 'VAN' AND IsActive = 1 "
+                       "AND SalesRepID = ?", rep)
+        box = self.one("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'CUSTODY' AND IsActive = 1 "
+                       "AND SalesRepID = ?", rep)
+        if not van or not box:
+            raise SimError("the rep needs a van warehouse and a custody box")
+        if self.one("SELECT COUNT(*) FROM RepDays WHERE Status = 'OPEN' AND SalesRepID = ?", rep):
+            raise SimError("the rep has an open day")
+        return self.insert("RepDays", DayNumber=self.next_number("REP_DAY"), DayDate=self.now[:10] + " 00:00:00",
+                           SalesRepID=rep, WarehouseID=van, CashBoxID=box, StoreID=store, Status="OPEN",
+                           OpenedAt=self.now, EmployeeID=self.user)
+
+    def act_as_rep(self, did):                                       # StartActingAsRep
+        self.acting = self.c.execute("SELECT WarehouseID, CashBoxID, SalesRepID FROM RepDays WHERE RepDayID = ?",
+                                     (did,)).fetchone()
+
+    def settle_rep_day(self, did):                                   # SettleRepDay
+        van, box, opened = self.c.execute("SELECT WarehouseID, CashBoxID, OpenedAt FROM RepDays WHERE RepDayID = ?",
+                                          (did,)).fetchone()
+        if self.one("SELECT COUNT(*) FROM StockTransfers WHERE Status In ('DRAFT', 'SENT') AND "
+                    "(FromWarehouseID = ? OR ToWarehouseID = ?)", van, van):
+            raise SimError("the van has transfers not complete")
+        count = self.one("SELECT Max(StockCountID) FROM StockCounts WHERE Status = 'POSTED' AND WarehouseID = ? "
+                         "AND PostedAt >= ?", van, opened)
+        closing = self.one("SELECT Max(ClosingID) FROM CashClosings WHERE CashBoxID = ? AND ClosingDate >= ?", box, opened)
+        if count is None or closing is None:
+            raise SimError("count the van and close the custody box first")
+        self.c.execute("UPDATE RepDays SET Status = 'SETTLED', SettledAt = ?, StockCountID = ?, ClosingID = ? "
+                       "WHERE RepDayID = ?", (self.now, count, closing, did))
+        self.acting = None
+
     def _note_order(self, nid):
         return self.one("SELECT SalesOrderID FROM StockNotes WHERE StockNoteID = ?", nid)
 
@@ -821,19 +860,20 @@ class Store:
             disc_sum += disc
         refunded = total_sum if cash_refund else D(0)
         no = self.next_number("SALES_RETURN")
+        wh = self.one("SELECT WarehouseID FROM SalesInvoices WHERE SalesInvoiceID = ?", inv) or self.warehouse()
         net_sum = total_sum - tax_sum
         ret = self.insert("SalesReturns", ReturnNumber=no, ReturnDate=self.now, SalesInvoiceID=inv,
                           CustomerID=customer, EmployeeID=self.user, Reason="DEMO",
                           RefundType="CASH" if cash_refund else "CREDIT", SubTotal=float(net_sum + disc_sum),
                           Discount=float(disc_sum), TaxableAmount=float(net_sum), Tax=float(tax_sum),
                           TotalAmount=float(total_sum), RefundedAmount=float(refunded),
-                          CashBoxID=self.box_for(1, refunded))
+                          CashBoxID=self.box_for(1, refunded), WarehouseID=wh)
         for detail, pid, qty, unit, disc, r_net, cat, r_tax, r_total, cost in rows:
             self.insert("SalesReturnDetails", SalesReturnID=ret, SalesDetailID=detail, ProductID=pid,
                         Quantity=float(qty), UnitPrice=float(unit), Discount=float(disc), NetAmount=float(r_net),
                         VATCategory=cat, VATRate=float(VAT if cat == "S" else 0), Tax=float(r_tax),
                         LineTotal=float(r_total), UnitCost=float(cost), ReturnToStock=1)
-            self.apply_stock(pid, qty, TT["SALES_RETURN"], cost, "SALES_RETURN", ret, no, recalc=True)
+            self.apply_stock(pid, qty, TT["SALES_RETURN"], cost, "SALES_RETURN", ret, no, recalc=True, warehouse=wh)
         if refunded - total_sum:
             self.adjust("Customers", "CustomerID", customer, refunded - total_sum)
         return ret, total_sum

@@ -44,6 +44,10 @@ Private Const DESTINATIONS As String = "MAIN;ÊÑÍíá Åáì ÇáÎÒíäÉ ÇáÑÆíÓíÉ;OWNER;ÊÓ
 '==============================================================================
 Public Function CurrentCashBoxID() As Long
     Dim v As Variant
+    If ActingRepDayID() > 0 Then                    ' the office works in the name of a rep (modVanSales)
+        CurrentCashBoxID = ActingCashBoxID()
+        Exit Function
+    End If
     v = DbValue("SELECT e.CashBoxID FROM Employees AS e INNER JOIN CashBoxes AS b ON e.CashBoxID = b.CashBoxID " & _
                 "WHERE e.EmployeeID = " & CurrentUserID() & " AND b.IsActive = True")
     ' no box of his own: the main safe for who manages the treasury, the cashier box for the others
@@ -146,6 +150,12 @@ Public Function CanUseBox(ByVal BoxID As Variant) As Boolean
     If HasPermission("CASH_ALL_BOXES") Then
         CanUseBox = True
         Exit Function
+    End If
+    If ActingRepDayID() > 0 Then                    ' the custody box of the rep the office works for
+        If CLng(BoxID) = ActingCashBoxID() Then
+            CanUseBox = True
+            Exit Function
+        End If
     End If
     CanUseBox = IsBoxCustodian(BoxID)
     If Not CanUseBox Then CanUseBox = Not BoxHasCustodians(CLng(BoxID))

@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 2969
+Private Const ENTRY_COUNT As Long = 3031
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -226,13 +226,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("=IIf([IsLowStock],""منخفض"","""") & IIf([QuantityMismatch]<>0,"" / فرق!"","""")") = "=IIf([IsLowStock],""Low"","""") & IIf([QuantityMismatch]<>0,"" / Difference!"","""")", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إرسال كل المعلّق") = "Send all pending", "Tr sample 2", passed, failed, report
-    CheckLang Tr("الباقي غير المربوط من السند ") = "The unlinked remainder of the voucher ", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المبلغ أكبر من عمولات المندوب المستحقة (") = "The amount is more than the commissions payable to the sales rep (", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذر حفظ السند: ") = "Could not save the voucher: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("سبب الإرجاع مطلوب (إلزامي في الإشعار الدائن).") = "The return reason is required (mandatory on the credit note).", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا مبيعات ولا تحصيلات للمندوبين في هذا الشهر.") = "No sales and no collections by the sales reps in this month.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("ADD;إضافة;EDIT;تعديل;DELETE;حذف;DOCS;عمليات المستندات;LOGIN;الدخول والخروج") = "ADD;Add;EDIT;Edit;DELETE;Delete;DOCS;Document transactions;LOGIN;Login and logout", "Tr sample 1", passed, failed, report
+    CheckLang Tr("إظهار غير النشط") = "Show inactive", "Tr sample 2", passed, failed, report
+    CheckLang Tr("البنك (التحصيل / الصرف)") = "Bank (collection / payment)", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المبيعات الشهرية") = "Monthly sales", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعذر حفظ سند الصرف: ") = "Could not save the payment voucher: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ستُستبدل كل البيانات الحالية بالنسخة:") = "All the current data will be replaced by the backup:", "Tr sample 6", passed, failed, report
+    CheckLang Tr("لا يحتاج هذا التقرير أي اختيارات") = "This report needs no choices", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة") = "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة", "العربية: من اليمين ولا ترجمة", _

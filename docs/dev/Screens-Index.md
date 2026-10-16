@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/forms*.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الشاشات: **104**. شرح طريقة بناء الشاشات في [03-Forms.md](03-Forms.md).
+عدد الشاشات: **105**. شرح طريقة بناء الشاشات في [03-Forms.md](03-Forms.md).
 
 | # | الشاشة | العنوان | النوع | الجدول | الصلاحية | تُفتح من |
 |---|---|---|---|---|---|---|
@@ -110,3 +110,4 @@
 | 102 | `frmOpeningBalances` | أرصدة بداية التشغيل | شاشة كاملة | - | OPENING_BALANCES | frmAccounting |
 | 103 | `frmSalesOrderLines` | أسطر طلبية العميل | شاشة فرعية في frmSalesOrder | SalesOrderLines | مع الشاشة الأم | - |
 | 104 | `frmSalesOrder` | طلبيات العملاء | نافذة منبثقة | - | SALES_ORDERS | frmAccounting، frmSalesReps |
+| 105 | `frmRepDay` | يوم المندوب | شاشة كاملة | - | REP_DAYS | frmAccounting |

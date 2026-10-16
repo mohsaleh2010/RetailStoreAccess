@@ -159,6 +159,14 @@ LIST_SPECS: List[ListSpec] = [
         Col("الصنف", "ProductName", 5.6, grow=True), Col("الرصيد", "OnHandQty", 2.0, QTY, True),
         Col("المحجوز للطلبيات", "ReservedQty", 2.4, QTY, True), Col("المتاح للبيع", "FreeQty", 2.2, QTY, True)],
         [("WarehouseName", False), ("ProductName", False)], no_data="لا توجد كميات محجوزة لطلبيات."),
+    ListSpec("REP_DAYS", [
+        Col("رقم اليوم", "DayNumber", 2.2), Col("التاريخ", "=GDate([DayDate])", 2.0),
+        Col("المندوب", "RepName", 3.0, grow=True), Col("المحمَّل", "LoadedValue", 2.1, MONEY, True),
+        Col("المبيعات", "SalesTotal", 2.2, MONEY, True), Col("التحصيل", "Collections", 2.0, MONEY, True),
+        Col("المرتجعات", "ReturnsTotal", 2.0, MONEY, True), Col("المفرَّغ", "UnloadedValue", 2.0, MONEY, True),
+        Col("فرق جرد السيارة", "CountDiffValue", 2.1, MONEY, True), Col("النقدية الفعلية", "CashCounted", 2.1, MONEY, True),
+        Col("فرق النقدية", "CashDifference", 1.9, MONEY, True), Col("الحالة", "StatusName", 2.0)],
+        [("DayDate", False), ("DayNumber", False)], landscape=True, no_data="لا توجد أيام مندوبين في هذه الفترة."),
     ListSpec("STOCK_COUNT_DIFF", [
         Col("رقم الجرد", "CountNumber", 2.4), Col("التاريخ", "=GDate([CountDate])", 2.2),
         Col("المخزن", "WarehouseName", 3.0), Col("الكود", "ProductCode", 2.3),

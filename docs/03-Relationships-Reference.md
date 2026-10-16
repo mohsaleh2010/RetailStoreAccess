@@ -2,9 +2,9 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` و`tools/relations.py` – لا تعدّله يدويًا.
 
-عدد العلاقات: **194** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **23**، التحديث المتتالي: **12**.
+عدد العلاقات: **200** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **23**، التحديث المتتالي: **12**.
 
-حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، والمستخدمون يُعطَّلون ولا يُحذفون: `AuditLog.EmployeeID`، `BankReconciliations.EmployeeID`، `Budgets.EmployeeID`، `CashVouchers.ReceivedByID`، `CommissionRuns.EmployeeID`، `CustomerAllocations.EmployeeID`، `DepreciationRuns.EmployeeID`، `FiscalYearClosings.EmployeeID`، `PeriodClosings.EmployeeID`، `SalesOrders.EmployeeID`، `StockCounts.PostedByID`، `StockDocuments.EmployeeID`، `StockNotes.EmployeeID`، `StockTransfers.EmployeeID`، `StockTransfers.ReceivedByID`، `SupplierAllocations.EmployeeID`، `VatReturns.EmployeeID`، `Warehouses.KeeperID`.
+حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، والمستخدمون يُعطَّلون ولا يُحذفون: `AuditLog.EmployeeID`، `BankReconciliations.EmployeeID`، `Budgets.EmployeeID`، `CashVouchers.ReceivedByID`، `CommissionRuns.EmployeeID`، `CustomerAllocations.EmployeeID`، `DepreciationRuns.EmployeeID`، `FiscalYearClosings.EmployeeID`، `PeriodClosings.EmployeeID`، `RepDays.EmployeeID`، `SalesOrders.EmployeeID`، `StockCounts.PostedByID`، `StockDocuments.EmployeeID`، `StockNotes.EmployeeID`، `StockTransfers.EmployeeID`، `StockTransfers.ReceivedByID`، `SupplierAllocations.EmployeeID`، `VatReturns.EmployeeID`، `Warehouses.KeeperID`.
 
 ## مخطط الكيانات والعلاقات
 
@@ -196,6 +196,12 @@ erDiagram
     Customers ||--o{ SalesOrders : "CustomerID"
     Warehouses ||--o{ SalesOrders : "WarehouseID"
     SalesReps |o--o{ SalesOrders : "SalesRepID"
+    SalesReps ||--o{ RepDays : "SalesRepID"
+    Warehouses ||--o{ RepDays : "WarehouseID"
+    CashBoxes ||--o{ RepDays : "CashBoxID"
+    Warehouses ||--o{ RepDays : "StoreID"
+    StockCounts |o--o{ RepDays : "StockCountID"
+    CashClosings |o--o{ RepDays : "ClosingID"
     SalesOrders ||--o{ SalesOrderLines : "SalesOrderID"
     Products ||--o{ SalesOrderLines : "ProductID"
     Categories |o--o{ StockCounts : "CategoryID"
@@ -398,11 +404,17 @@ erDiagram
 | 184 | `FK_SalesOrders_CustomerID` | Customers (العملاء) | `CustomerID` | SalesOrders (طلبيات العملاء) | `CustomerID` | ✔ | فرض التكامل |
 | 185 | `FK_SalesOrders_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | SalesOrders (طلبيات العملاء) | `WarehouseID` | ✔ | فرض التكامل |
 | 186 | `FK_SalesOrders_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | SalesOrders (طلبيات العملاء) | `SalesRepID` |  | فرض التكامل |
-| 187 | `FK_SalesOrderLines_SalesOrderID` | SalesOrders (طلبيات العملاء) | `SalesOrderID` | SalesOrderLines (أسطر طلبيات العملاء) | `SalesOrderID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 188 | `FK_SalesOrderLines_ProductID` | Products (المنتجات) | `ProductID` | SalesOrderLines (أسطر طلبيات العملاء) | `ProductID` | ✔ | فرض التكامل |
-| 189 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
-| 190 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
-| 191 | `FK_StockCounts_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | StockCounts (جلسات الجرد) | `WarehouseID` | ✔ | فرض التكامل |
-| 192 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 193 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
-| 194 | `FK_AuditChanges_LogID` | AuditLog (سجل العمليات) | `LogID` | AuditChanges (تفاصيل سجل التدقيق) | `LogID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 187 | `FK_RepDays_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RepDays (أيام المندوبين) | `SalesRepID` | ✔ | فرض التكامل |
+| 188 | `FK_RepDays_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | RepDays (أيام المندوبين) | `WarehouseID` | ✔ | فرض التكامل |
+| 189 | `FK_RepDays_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | RepDays (أيام المندوبين) | `CashBoxID` | ✔ | فرض التكامل |
+| 190 | `FK_RepDays_StoreID` | Warehouses (المخازن) | `WarehouseID` | RepDays (أيام المندوبين) | `StoreID` | ✔ | فرض التكامل |
+| 191 | `FK_RepDays_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | RepDays (أيام المندوبين) | `StockCountID` |  | فرض التكامل |
+| 192 | `FK_RepDays_ClosingID` | CashClosings (تصفية يومية الكاشير) | `ClosingID` | RepDays (أيام المندوبين) | `ClosingID` |  | فرض التكامل |
+| 193 | `FK_SalesOrderLines_SalesOrderID` | SalesOrders (طلبيات العملاء) | `SalesOrderID` | SalesOrderLines (أسطر طلبيات العملاء) | `SalesOrderID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 194 | `FK_SalesOrderLines_ProductID` | Products (المنتجات) | `ProductID` | SalesOrderLines (أسطر طلبيات العملاء) | `ProductID` | ✔ | فرض التكامل |
+| 195 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
+| 196 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
+| 197 | `FK_StockCounts_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | StockCounts (جلسات الجرد) | `WarehouseID` | ✔ | فرض التكامل |
+| 198 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 199 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
+| 200 | `FK_AuditChanges_LogID` | AuditLog (سجل العمليات) | `LogID` | AuditChanges (تفاصيل سجل التدقيق) | `LogID` | ✔ | فرض التكامل + حذف متتالٍ |

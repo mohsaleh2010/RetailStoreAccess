@@ -15,12 +15,26 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "ááÊÕÍíÍ ÓÌøá ÓäÏ ŞÈÖ äŞÏíÉ ÈÇáãÈáÛ Ëã ÓäÏ ÕÑİ ÌÏíÏ", "To correct, record a cash receipt voucher with the amount, then a new payment voucher"
+    LangAdd "ááØáÈíÉ ÅĞä ÊÓáíã áã íõÑÍóøá. ÑÍøáå Ãæ ÇÍĞİå ÃæáğÇ", "The order has a delivery note not posted yet. Post it or delete it first"
+    LangAdd "íæÌÏ ØáÈ ÛíÑ ãßÊãá ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáå", "There is an unfinished order from a previous session. Do you want to continue it"
+    LangAdd "ÃÏÇÁ ÇáãäÏæÈíä: ÇáãÈíÚÇÊ æÇáÊÍÕíá æÇáåÏİ æÇáÚãæáÉ", "Sales rep performance: sales, collections, target and commission"
+    LangAdd "ÃÛáŞ Çáãáİ æÇİÊÍå ãä ÌÏíÏ áíÙåÑ ÇáäÙÇã ÈÏæä ÃÏæÇÊ", "Close the file and open it again to start the system without the tools of"
+    LangAdd "ÅáÛÇÁ ÊÑÍíá ÇáÊÍæíá æÅÚÇÏÉ ÇáÃÕäÇİ ááãÎÒä ÇáãÑÓöá", "Unpost the transfer and return the products to the sending warehouse"
+    LangAdd "ÇáÇÓÊíÑÇÏÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ ÈÂáíÉ ÇáÇÍÊÓÇÈ ÇáÚßÓí", "Imports subject to VAT under the reverse charge"
+    LangAdd "ÇáÍÑßÉ ãØÇÈŞÉ İí ÊÓæíÉ ÈäßíÉ: ÃáÛö ãØÇÈŞÊåÇ ÃæáğÇ", "The move is matched in a bank reconciliation: unmatch it first"
+    LangAdd "ÇáŞíÏ ÛíÑ ãæÌæÏ (ÑÈãÇ ÍõĞİÊ ÇáÚãáíÉ). ÍÏøË ÇáŞíæÏ", "The entry does not exist (the transaction may have been deleted). Refresh the entries"
+    LangAdd "ÊõÍĞİ ÇáÊÓæíÉ ÇáÌÇÑíÉ İŞØ (ÃÚÏ İÊÍ ÇáãÚÊãÏÉ ÃæáğÇ", "Only the open reconciliation is deleted (reopen the approved one first"
+    LangAdd "ÊõÍİÙ Şíãå ßãÇ åí ÇáÂä¡ æíõäÔÃ ŞíÏ ÇáÊÓæíÉ ÈÊÇÑíÎ", "Its values are kept as they are now, and the settlement entry is created on"
+    LangAdd "ÕõÑİ áå ÌÒÁ ãä åĞå ÇáÚãæáÇÊ. ÃáÛö ÓäÏ ÇáÕÑİ ÃæáğÇ", "Part of these commissions was paid to him. Cancel the payment voucher first"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÍĞİ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to delete in the payment matching screen"
     LangAdd "áÇ íãßä ÍĞİ åĞÇ ÇáÓÌá áÃäå ãÓÊÎÏã İí ÚãáíÇÊ ÓÇÈŞÉ", "This record cannot be deleted because it is used in earlier transactions"
     LangAdd "ãÈíÚÇÊ åĞÇ ÇáãÓÊÎÏã áÚãíá ÈáÇ ãäÏæÈ ÊõäÓÈ ááãäÏæÈ", "The sales of this user to a customer without a sales rep go to the sales rep"
     LangAdd "ãä íÕÑİ ãä ßá ÕäÏæŞ æíÕİøíå æíÓÊáã ÇáÊÍæíáÇÊ Åáíå", "Who pays from each box, closes it and receives the transfers to it"
     LangAdd "íõÚÊãÏ ÇáÅŞÑÇÑ ÈÚÏ ÇäÊåÇÁ İÊÑÊå: ÇÎÊÑ ÊÇÑíÎğÇ ÈÚÏ", "The return is approved after its period ends: choose a date after"
     LangAdd "íõäÔÃ ÅĞä ÇáÊÓáíã ãä ØáÈíÉ ãÚÊãÏÉ áã ÊõÓáóøã ßáåÇ", "A delivery note is made from an approved order not fully delivered"
     LangAdd "ÇáÕÛíÑº ÓÚÑ ÇáæÓØ Ãæ ÇáßÈíÑ íÌÚá ááãÔÑæÈ ÃÍÌÇãğÇ", "small, a medium or large price gives the drink sizes"
+    LangAdd "ÇáãÎÒä ÇáĞí ÊõÍãóøá ãäå ÇáÓíÇÑÉ ÛíÑ ãÎÒä ÇáÓíÇÑÉ", "The van cannot load from itself"
     LangAdd "ÇáåÏİ ÇáÔåÑí áÕÇİí ãÈíÚÇÊ ßá ãäÏæÈ (ÈÏæä ÇáÖÑíÈÉ", "The monthly target for the net sales of each sales rep (without VAT"
     LangAdd "ÛíÑ ãÊÇÍ İí ãáİ ACCDE. ÛíøÑ ßáãÉ ÇáãÑæÑ ãä äÓÎÊß", "Not available in an ACCDE file. Change the password from your copy"
     LangAdd "áÊÕÍíÍ ÇáßãíÉ ÇáÂä ÇÓÊÎÏã ÇáÌÑÏ Ãæ ÇáÅÖÇİÉ/ÇáÎÕã", "To correct the quantity now use the stock count or the addition/deduction"
@@ -121,6 +135,9 @@ Private Sub D2_1()
     LangAdd "íæÌÏ ÍŞá ãØáæÈ İÇÑÛ. Ãßãá ÇáÈíÇäÇÊ Ëã ÇÍİÙ", "A required field is empty. Complete the data, then save"
     LangAdd "íõÓÌóøá ÅåáÇß ÇáÔåÑ İí ÂÎÑ íæã ãäå Ãæ ÈÚÏå", "The depreciation of a month is recorded on its last day or later"
     LangAdd "ÅÌãÇáí İÇÊæÑÉ ÇáÈíÚ áÇ íÓÇæí ãÌãæÚ ÃÓØÑåÇ", "The sales invoice total does not equal the sum of its lines"
+End Sub
+
+Private Sub D2_2()
     LangAdd "ÅáÛÇÁ ÇáÊÍæíá íÚíÏ ÇáãÈáÛ ááÕäÏæŞ ÇáãÑÓöá", "cancelling a transfer returns the amount to the sending box"
     LangAdd "ÇÎÊÑ ÇáÍÓÇÈ ÇáÑÆíÓí ÇáĞí íÊÈÚå åĞÇ ÇáÍÓÇÈ", "Choose the main account this account belongs to"
     LangAdd "ÇßÊÈ ÇáãÈÇáÛ¡ Ãæ ÇäÓÎåÇ ãä İÚáí ÓäÉ ÓÇÈŞÉ", "Type the amounts, or copy them from the actuals of a previous year"
@@ -135,9 +152,6 @@ Private Sub D2_1()
     LangAdd "Êã ÖÈØ æÖÚ ÇáÊØæíÑ: ßá ÃÏæÇÊ Access ÙÇåÑÉ", "Developer mode is set: all the Access tools are shown"
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÃáÛö ÊÑÍíá ÇáÅĞä ÃæáğÇ", "Only a draft can be deleted. Unpost the note first"
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÃáÛö ÊÑÍíá ÇáÓäÏ ÃæáğÇ", "Only a draft is deleted. Unpost the voucher first"
-End Sub
-
-Private Sub D2_2()
     LangAdd "ÓØÑ İí ÇáÅĞä áÇ íØÇÈŞ Õäİ ÓØÑå İí ÇáØáÈíÉ", "A note line does not match the product of its order line"
     LangAdd "ÔÌÑÉ ÇáÍÓÇÈÇÊ: ÇáÍÓÇÈÇÊ ÇáÑÆíÓíÉ æÇáİÑÚíÉ", "Account tree: main and sub-accounts"
     LangAdd "ØáÈíÇÊ ÇáÚãáÇÁ ÇáãİÊæÍÉ: ÇáÈÇŞí ÈáÇ ÊÓáíã", "Open customer orders: what is left to deliver"
@@ -204,6 +218,7 @@ Private Sub D2_2()
     LangAdd "ÃÏÎá ÇáäŞÏíÉ ÇáãæÌæÏÉ İÚáğÇ İí ÇáÕäÏæŞ", "Enter the cash actually in the box"
     LangAdd "Ãæ ÇÊÑß ÇáÊÇÑíÎ İÇÑÛğÇ áİÊÍ ßá ÇáİÊÑÇÊ", "or leave the date empty to open all periods"
     LangAdd "ÅÚÏÇÏ ÇáÑÈØ íÍÊÇÌ ÕáÇÍíÉ ÅÚÏÇÏÇÊ ÇáãÍá", "The connection setup needs the store settings permission"
+    LangAdd "ÅÛáÇŞ íæã ÇáãäÏæÈ¿ áÇ íõİÊÍ ÈÚÏ ÅÛáÇŞå", "Close the rep day? It cannot be opened again"
     LangAdd "ÇßÊÈ ÇáãÈáÛ İí ÇáãÏíä Ãæ İí ÇáÏÇÆä İŞØ", "Enter the amount as a debit or as a credit only"
     LangAdd "ÇáÅŞÑÇÑÇÊ ÇáãÍİæÙÉ (ÇÎÊÑ ÅŞÑÇÑğÇ áÚÑÖå", "Saved returns (choose a return to show it"
     LangAdd "ÇáÌÑÏ ÛíÑ ãæÌæÏ Ãæ Êã ÊÑÍíáå Ãæ ÅáÛÇÄå", "The count does not exist or was posted or cancelled"
@@ -215,6 +230,7 @@ Private Sub D2_2()
     LangAdd "ÇáãÈáÛ ÃßÈÑ ãä ÚãæáÇÊ ÇáãäÏæÈ ÇáãÓÊÍŞÉ", "The amount is more than the commissions payable to the sales rep"
     LangAdd "ÈíÇäÇÊ ÇáãÍá ÇáÖÑíÈíÉ æÅÚÏÇÏÇÊ ÇáÊÔÛíá", "Tax data of the store and operating settings"
     LangAdd "ÊÑÊíÈ ÇáÒÑ İí ÔÇÔÉ ÇááãÓ (ÇáÃÕÛÑ ÃæáğÇ", "Order of the button on the touch screen (smallest first"
+    LangAdd "ÊÓæíÉ ÃíÇã ÇáãäÏæÈíä: ÇáÈÖÇÚÉ æÇáäŞÏíÉ", "Rep day settlements: goods and cash"
     LangAdd "Ïíæä ÇáÚãáÇÁ ÷ ÇáãÈíÚÇÊ ÇáÂÌáÉ ÇáíæãíÉ", "Customer receivables / daily credit sales"
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ (ÑãÒ", "The Tax Authority refused the credentials of the program (code"
     LangAdd "ÓØÑ İí ÇáÅĞä áÇ íØÇÈŞ ÓØÑğÇ İí ÇáØáÈíÉ", "A note line does not match a line of the order"
@@ -242,12 +258,16 @@ Private Sub D2_2()
     LangAdd "ÑŞã ÌÏíÏ áÇ íÊßÑÑº áÇ íÊÛíÑ ÈÚÏ ÇáÍİÙ", "A new number that is not repeated, it does not change after saving"
     LangAdd "ÓÌá ÇáÊÏŞíŞ íÍÊÇÌ ÕáÇÍíÉ «ÓÌá ÇáÊÏŞíŞ", "The audit trail needs the permission Audit trail"
     LangAdd "ÚÑÖ İŞØ - ÇáÊÕÍíÍ íßæä ÈãÑÊÌÚ ãÔÊÑíÇÊ", "View only - a correction is made with a purchase return"
+End Sub
+
+Private Sub D2_3()
     LangAdd "ÛíÑ äÔØ. İÚøáå ãä ÔÇÔÉ ÇáãäÊÌÇÊ ÃæáğÇ", "is not active. Activate it in the Products screen first"
     LangAdd "İÍÕ ÓáÇãÉ ÇáÈíÇäÇÊ: áÇ ÊæÌÏ Ãí ãÔßáÇÊ", "Data integrity check: no problems at all"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇÚÊãÇÏ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to approve the bank reconciliation"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÓÌíá İæÇÊíÑ ÇáãÔÊÑíÇÊ", "You do not have the permission to record purchase invoices"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÇáãæÇÒäÉ", "You do not have this permission in the budget screen"
     LangAdd "áÇ ÊæÌÏ ÍÑßÉ äŞÏíÉ ááÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "There is no cash move for the choices made"
+    LangAdd "áÇ íæÌÏ íæã. ÇÎÊÑ ÇáãäÏæÈ Ëã «İÊÍ íæã", "No day. Choose the rep, then Open day"
     LangAdd "ãŞİáÉ ÈŞíÏ ÅŞİÇá. ÃÚÏ İÊÍ ÇáÓäÉ ÃæáğÇ", "closed with a closing entry. Reopen the year first"
     LangAdd "ãä ÈÏÇíÉ ÇáÕäÏæŞ (áÇ ÊæÌÏ ÊÕİíÉ ÓÇÈŞÉ", "since the box started (no previous closing"
     LangAdd "åĞÇ ÓÌá ÃÓÇÓí İí ÇáäÙÇã æáÇ íãßä ÍĞİå", "This is a system record and cannot be deleted"
@@ -256,11 +276,9 @@ Private Sub D2_2()
     LangAdd "ÃõäÔÆ ãİÊÇÍ æÔåÇÏÉ ÊÌÑíÈíÉ İí ÇáãÌáÏ", "A test key and certificate were created in the folder"
     LangAdd "ÅÌãÇáí ÇáãÕÑæİÇÊ ÇáÊÔÛíáíÉ æÇáÅÏÇÑíÉ", "Total operating and administrative expenses"
     LangAdd "ÅáÛÇÁ ÓÏÇÏ ÇáÅŞÑÇÑ¿ íõÍĞİ ŞíÏ ÇáÓÏÇÏ", "Cancel the payment of the return? The payment entry is deleted"
+    LangAdd "ÇÎÊÑ ÇáãÎÒä ÇáĞí ÊõÍãóøá ãäå ÇáÓíÇÑÉ", "Choose the warehouse the van loads from"
     LangAdd "ÇßÊÈ ÓÈÈ ÅáÛÇÁ ÇáÇÚÊãÇÏ İí ÇáãáÇÍÙÇÊ", "Type the reason for cancelling the approval in the notes"
     LangAdd "ÇáÓãÇÍ áãÏíÑ ÇáäÙÇã ÈÊÛííÑ ÇÓã ÇáãÍá", "Allow the system administrator to change the store name"
-End Sub
-
-Private Sub D2_3()
     LangAdd "ÇáÚãæáÉ æÖÑíÈÊåÇ ÃŞá ãä ãÈáÛ ÇáÊÓæíÉ", "The fee and its VAT are less than the settled amount"
     LangAdd "ÇáßãíÉ ÇáİÚáíÉ áÇ íãßä Ãä Êßæä ÓÇáÈÉ", "The actual quantity cannot be negative"
     LangAdd "ÈÇáİÚá. áÅÑÌÇÚåÇ ÇÓÊÎÏã «ÅÚÇÏÉ ÇáİÊÍ", "already. To undo it use Reopen"
@@ -329,6 +347,7 @@ Private Sub D2_3()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãäÏæÈíä æÚãæáÇÊåã", "You do not have the permission for sales reps and their commissions"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÍĞİ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to delete bank transactions"
     LangAdd "áÇ ÊæÌÏ ÃÑÕÏÉ ãæÑÏíä ÈÚãáÇÊ ÃÌäÈíÉ", "There are no supplier balances in foreign currencies"
+    LangAdd "áÇ ÊæÌÏ ÃíÇã ãäÏæÈíä İí åĞå ÇáİÊÑÉ", "No rep days in this period"
     LangAdd "áÇ ÊõÓÌóøá ÏİÚÇÊ Úáì ÇáÚãíá ÇáäŞÏí", "No payments are recorded on the cash customer"
     LangAdd "ãÈíÚÇÊå æãÓíÑ ÑÇÊÈå Úáì åĞÇ ÇáãÑßÒ", "His sales and payroll are on this center"
     LangAdd "äæÚ ÇáÍÑßÉ ÛíÑ ãÊÇÍ ááÅÏÎÇá ÇáíÏæí", "The move type is not available for manual entry"
@@ -362,6 +381,9 @@ Private Sub D2_3()
     LangAdd "áÇ íÊæŞİ ÇáÈíÚ ÇáÂÌá ÈÓÈÈ ÇáÊÃÎíÑ", "Credit sales are not stopped for delays"
     LangAdd "ãÑßÒ ÇáãÓÊÎÏã Ãæ ÇáãÑßÒ ÇáÇİÊÑÇÖí", "The center of the user or the default center"
     LangAdd "åĞÇ ÇáÔíß ãÓÌá ãä ŞÈá áäİÓ ÇáÚãíá", "This cheque is already recorded for the same customer"
+End Sub
+
+Private Sub D2_4()
     LangAdd "æÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ áåĞå ÇáÏæáÉ", "and the e-invoicing of this country"
     LangAdd "Ãßãá İÍæÕ ÇáÇãÊËÇá ÃæáğÇ (ÇáÎØæÉ", "Complete the compliance checks first (step"
     LangAdd "ÇÎÊÑ ßáãÉ ãÑæÑ ãÎÊáİÉ Úä ÇáÍÇáíÉ", "Choose a password different from the current one"
@@ -381,9 +403,6 @@ Private Sub D2_3()
     LangAdd "İÇÊæÑÉ ÇáÔÑÇÁ ÇáÃÕáíÉ ÛíÑ ãæÌæÏÉ", "The original purchase invoice does not exist"
     LangAdd "ßæÏ ÇáÊİÚíá ÛíÑ ÕÍíÍ áåĞÇ ÇáÌåÇÒ", "The activation code is not valid for this computer"
     LangAdd "ßæÏ ÇáãÕáÍÉ (EGS Ãæ GS1) ááÃÕäÇİ", "Tax Authority code (EGS or GS1) of the products"
-End Sub
-
-Private Sub D2_4()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÓÌíá ÓäÏÇÊ ÇáÕÑİ", "You do not have the permission to record payment vouchers"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÃÓÚÇÑ ÇáÈíÚ", "You do not have the permission to change sale prices"
     LangAdd "áÇ ÊæÌÏ ÍÑßÉ äŞÏíÉ İí åĞå ÇáİÊÑÉ", "There is no cash move in this period"
@@ -420,30 +439,4 @@ Private Sub D2_4()
     LangAdd "áÇ íãßä ÇáÊÑÍíá Åáì äİÓ ÇáÕäÏæŞ", "Cannot transfer to the same box"
     LangAdd "áÇ íãßä ÊÚÏíá ÇáÊÕİíÉ ÈÚÏ ÇáÍİÙ", "The closing cannot be edited after saving"
     LangAdd "áÇ íæÌÏ ãäÊÌ ÈÇáÈÇÑßæÏ Ãæ ÇáßæÏ", "No product with the barcode or the code"
-    LangAdd "áã ÊõÕÏÑ ÇáåíÆÉ ÇáÔåÇÏÉ ÇáİÚáíÉ", "ZATCA did not issue the production certificate"
-    LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ ØáÈíÇÊ ÇáÚãáÇÁ", "You do not have the customer orders permission"
-    LangAdd "íæÌÏ ÅŞÑÇÑ ãÚÊãÏ ÈÚÏ åĞå ÇáİÊÑÉ", "There is an approved return after this period"
-    LangAdd "íõÍĞİ ŞíÏ ÅŞİÇáåÇ æÊõİÊÍ İÊÑÊåÇ", "Its closing entry is deleted and its period opened"
-    LangAdd "íõÎÕã ßá ÑÕíÏ ÇáÓáİ İí Ãæá ãÓíÑ", "The whole advance balance is deducted in the first run"
-    LangAdd "ÂÎÑ ÊÓæíÉ ãÚÊãÏÉ áåĞÇ ÇáÈäß İí", "Last approved reconciliation of this bank on"
-    LangAdd "ÃÖİå İí ÊÕÍíÍÇÊ ÇáÅŞÑÇÑ ÇáÊÇáí", "Add it to the corrections of the next return"
-    LangAdd "ÅÚÇÏÉ ÇáİÊÍ: ÊÕÈÍ ÇáİÊÑÉ ãŞİáÉ", "Reopening: the period becomes closed"
-    LangAdd "ÅáÛÇÁ ÇáÊİÚíá áãÏíÑ ÇáäÙÇã İŞØ", "Deactivation is for the system administrator only"
-    LangAdd "ÅáÛÇÁ ÑÈØ åĞÇ ÇáãÈáÛ ÈÇáİÇÊæÑÉ", "Unlink this amount from the invoice"
-    LangAdd "ÅíÑÇÏÇÊ æãÕÑæİÇÊ ßá ãÑßÒ ÊßáİÉ", "Revenue and expenses of each cost center"
-    LangAdd "ÇÎÊÑ ÇáÍÓÇÈ İí ßá ÓØÑ İíå ãÈáÛ", "Choose the account in every line with an amount"
-    LangAdd "ÇÎÊÑ ÇáÎÒíäÉ ÇáÊí ÊÓÊáã ÇáãÈáÛ", "Choose the treasury that receives the amount"
-    LangAdd "ÇÎÊÑ ÏİÚ ÇáİÇÊæÑÉ: äŞÏí Ãæ ÂÌá", "Choose the invoice payment: cash or credit"
-    LangAdd "ÇáÈÑäÇãÌ (ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Program (e-invoice"
-    LangAdd "ÇáÊÍæíá ÛíÑ ãæÌæÏ Ãæ Êã ÊÑÍíáå", "The transfer does not exist or is already posted"
-    LangAdd "ÇáÍÓÇÈ ÇáãŞÇÈá (ÇáÍÑßÇÊ ÇáÃÎÑì", "Contra account (other moves"
-    LangAdd "ÇáÎÒíäÉ æÇáÕäÇÏíŞ (ÇáÑÕíÏ ÇáÂä", "Treasury and boxes (balance now"
-    LangAdd "ÇáÓäÏ æÇáİÇÊæÑÉ áØÑİíä ãÎÊáİíä", "The voucher and the invoice belong to different parties"
-    LangAdd "ÇáÔÇÔÉ ÇáÊí íİÊÍåÇ ÒÑ ÇáãÈíÚÇÊ", "The screen opened by the Sales button"
-    LangAdd "ÇáÚãíá ãÏíä ááãÍá (Úáíå)¡ ÓÇáÈ", "the customer owes the shop (debit), negative"
-    LangAdd "ÇáßãíÉ íÌÈ Ãä Êßæä ÃßÈÑ ãä ÕİÑ", "The quantity must be greater than zero"
-    LangAdd "ÇáãÈáÛ ÃßÈÑ ãä ÑÕíÏ Óáİ ÇáãæÙİ", "The amount is more than the advance balance of the employee"
-    LangAdd "ÇáãÈáÛ íÌÈ Ãä íßæä ÃßÈÑ ãä ÕİÑ", "The amount must be greater than zero"
-    LangAdd "ÇáãÈíÚÇÊ ÇáÔåÑíÉ (ÂÎÑ 12 ÔåÑğÇ", "Monthly sales (last 12 months"
-    LangAdd "ÇáãÓíÑ ãÕÑæİ: ÃáÛö ÇáÕÑİ ÃæáğÇ", "The run is paid: cancel the payment first"
 End Sub

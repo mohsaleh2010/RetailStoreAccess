@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **84** | عدد الحقول: **1086**
+عدد الجداول: **85** | عدد الحقول: **1101**
 
 ## الفهرس
 
@@ -83,13 +83,14 @@
 75. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
 76. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
 77. [`SalesOrders`](#salesorders) – طلبيات العملاء
-78. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
-79. [`StockCounts`](#stockcounts) – جلسات الجرد
-80. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-81. [`AuditLog`](#auditlog) – سجل العمليات
-82. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-83. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-84. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+78. [`RepDays`](#repdays) – أيام المندوبين
+79. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
+80. [`StockCounts`](#stockcounts) – جلسات الجرد
+81. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+82. [`AuditLog`](#auditlog) – سجل العمليات
+83. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+84. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+85. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -184,7 +185,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 31 سجل
+- بيانات أساسية: 32 سجل
 
 ## Roles
 
@@ -216,7 +217,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 43 سجل
+- بيانات أساسية: 44 سجل
 
 ## RolePermissions
 
@@ -228,7 +229,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 85 سجل
+- بيانات أساسية: 87 سجل
 
 ## Employees
 
@@ -290,7 +291,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 72 سجل
+- بيانات أساسية: 73 سجل
 
 ## UserScreens
 
@@ -1945,6 +1946,33 @@
 - المفتاح الأساسي: `SalesOrderID`
 - فهرس فريد: `OrderNumber`
 - فهرس عادي: `OrderDate`
+- فهرس عادي: `Status`
+
+## RepDays
+
+**أيام المندوبين** – يوم بيع المندوب من السيارة (docs/63): يُفتح لمندوب له مخزن سيارة وصندوق عهدة؛ التحميل والتفريغ تحويلات مخزنية، والبيع والمرتجع والتحصيل من مخزن السيارة وصندوق العهدة، ثم التسوية: جرد السيارة وتصفية الصندوق.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **RepDayID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | DayNumber | Short Text | 20 | ✔ |  |  |  | رقم اليوم |
+| 3 | DayDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | التاريخ |
+| 4 | SalesRepID | Number (Long) |  | ✔ |  |  | `SalesReps.SalesRepID` | المندوب |
+| 5 | WarehouseID | Number (Long) |  | ✔ |  |  | `Warehouses.WarehouseID` | مخزن السيارة |
+| 6 | CashBoxID | Number (Long) |  | ✔ |  |  | `CashBoxes.CashBoxID` | صندوق العهدة |
+| 7 | StoreID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن الذي يحمّل منه ويفرّغ فيه |
+| 8 | Status | Short Text | 10 | ✔ | `"OPEN"` | `In ("OPEN","SETTLED")` |  | الحالة |
+| 9 | OpenedAt | Date/Time |  | ✔ | `Now()` |  |  | وقت الفتح |
+| 10 | SettledAt | Date/Time |  |  |  |  |  | وقت التسوية |
+| 11 | StockCountID | Number (Long) |  |  |  |  | `StockCounts.StockCountID` | جرد السيارة في التسوية |
+| 12 | ClosingID | Number (Long) |  |  |  |  | `CashClosings.ClosingID` | تصفية صندوق العهدة في التسوية |
+| 13 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | فتحه |
+| 14 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 15 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `RepDayID`
+- فهرس فريد: `DayNumber`
+- فهرس عادي: `DayDate`
 - فهرس عادي: `Status`
 
 ## SalesOrderLines

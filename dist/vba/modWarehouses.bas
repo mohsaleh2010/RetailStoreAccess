@@ -30,6 +30,10 @@ Public Const TT_TRANSFER_IN As Long = 10
 
 Public Function CurrentWarehouseID() As Long
     Dim v As Variant
+    If ActingRepDayID() > 0 Then                    ' the office works in the name of a rep (modVanSales)
+        CurrentWarehouseID = ActingWarehouseID()
+        Exit Function
+    End If
     v = DbValue("SELECT e.WarehouseID FROM Employees AS e INNER JOIN Warehouses AS w ON e.WarehouseID = w.WarehouseID " & _
                 "WHERE e.EmployeeID = " & CurrentUserID() & " AND w.IsActive = True")
     If IsNull(v) Then v = DbValue("SELECT Min(WarehouseID) FROM Warehouses WHERE IsActive = True AND WarehouseType = 'MAIN'")

@@ -28,7 +28,7 @@ Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmStockParties,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn," & _
     "frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens," & _
     "frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines," & _
-    "frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder"
+    "frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder,frmRepDay"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -679,6 +679,7 @@ Private Sub BuildAllForms()
     BuildForm_frmOpeningBalances
     BuildForm_frmSalesOrderLines
     BuildForm_frmSalesOrder
+    BuildForm_frmRepDay
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -9996,11 +9997,19 @@ Private Sub BuildForm_frmAccounting()
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmSalesOrder"
     c.OnClick = EP
-    Set c = AddRect("boxNavAudit", 7484, 7514, 3402, 1106, RGB(69, 90, 100))
-    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 7484, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileAudit", "”Ã· «· œﬁÌﬁ", 7484, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintAudit", "„‰ √÷«› √Ê ⁄œ¯· √Ê Õ–›", 7484, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileAudit", "”Ã· «· œﬁÌﬁ", 7484, 7514, 3402, 1106, "secondary")
+    Set c = AddRect("boxNavRepDays", 7484, 7514, 3402, 1106, RGB(0, 96, 100))
+    Set c = AddIcon("icoTileRepDays", ChrW(&HE716), 7484, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileRepDays", "ÌÊ„ «·„‰œÊ»", 7484, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintRepDays", "«·»Ì⁄ „‰ «·”Ì«—… Ê ”ÊÌ Â", 7484, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileRepDays", "ÌÊ„ «·„‰œÊ»", 7484, 7514, 3402, 1106, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmRepDay"
+    c.OnClick = EP
+    Set c = AddRect("boxNavAudit", 3912, 7514, 3402, 1106, RGB(69, 90, 100))
+    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 3912, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAudit", "”Ã· «· œﬁÌﬁ", 3912, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintAudit", "„‰ √÷«› √Ê ⁄œ¯· √Ê Õ–›", 3912, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAudit", "”Ã· «· œﬁÌﬁ", 3912, 7514, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmAuditLog"
     c.OnClick = EP
@@ -10074,6 +10083,9 @@ Private Sub BuildForm_frmAccounting()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnTileOrders_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmSalesOrder""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileRepDays_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmRepDay""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnTileAudit_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmAuditLog"", 0" & vbCrLf
@@ -11135,4 +11147,122 @@ Private Sub BuildForm_frmSalesOrder()
     Exit Sub
 EH:
     AbortForm "frmSalesOrder", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmRepDay()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmRepDay", "ÌÊ„ «·„‰œÊ»", "", 13608, 9299, False, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 13608, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "ÌÊ„ «·„‰œÊ» Ê«·»Ì⁄ „‰ «·”Ì«—…", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", " Õ„Ì· «·”Ì«—…° Ê«·»Ì⁄ Ê«·„— Ã⁄ Ê«· Õ’Ì· »«”„ «·„‰œÊ»° À„ Ã—œ «·”Ì«—… Ê ’›Ì… ’‰œÊﬁ «·⁄Âœ…", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboDay", "", 227, 1304, 8505, 454, "", 6, "0;1361;1247;2495;1928;1361")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblDay", "«·ÌÊ„ («·√ÕœÀ √Ê·«)", 227, 992, 8505, 284, 9, False, CLR_MUTED, "cboDay", 0)
+    Set c = AddCombo("cboRep", "", 227, 2155, 2835, 454, "", 2, "0;2722")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblRep", "«·„‰œÊ»", 227, 1843, 2835, 284, 9, False, CLR_MUTED, "cboRep", 0)
+    Set c = AddCombo("cboStore", "", 3175, 2155, 2268, 454, "", 2, "0;2155")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblStore", "ÌÕ„¯· „‰ «·„Œ“‰", 3175, 1843, 2268, 284, 9, False, CLR_MUTED, "cboStore", 0)
+    Set c = AddButton("btnOpen", "› Õ ÌÊ„", 5557, 2138, 1701, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnDeleteDay", "Õ–› «·ÌÊ„", 7371, 2138, 1588, 482, "danger")
+    c.OnClick = EP
+    Set c = AddLabel("lblInfo", " ", 227, 2778, 13154, 397, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblActing", " ", 227, 3175, 13154, 340, 10, True, CLR_DANGER, "", 0)
+    Set c = AddList("lstSummary", 227, 3629, 13154, 3289, 2, "7938;3402", False)
+    c.RowSourceType = "Value List"
+    Set c = AddButton("btnLoad", " Õ„Ì· «·”Ì«—…", 227, 7144, 1928, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnSale", "›« Ê—… »Ì⁄", 2268, 7144, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnReturn", "„— Ã⁄", 4082, 7144, 1474, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPayment", "”‰œ ﬁ»÷", 5669, 7144, 1474, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnRefresh", " ÕœÌÀ", 7256, 7144, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnCount", "Ã—œ «·”Ì«—…", 227, 8165, 1814, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnload", " ›—Ì€ «·»«ﬁÌ", 2154, 8165, 1814, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnCash", " ’›Ì… «·’‰œÊﬁ", 4081, 8165, 1928, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSettle", "≈€·«ﬁ «·ÌÊ„", 6122, 8165, 1814, 624, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrint", "ÿ»«⁄…", 8049, 8165, 1361, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 11907, 8165, 1474, 624, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnActivate = EP
+    m_frm.OnUnload = EP
+    m_frm.OnResize = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    RepDayLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Activate()" & vbCrLf
+    s = s & "    RepDayShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    StopActingAsRep" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboDay_AfterUpdate()" & vbCrLf
+    s = s & "    RepDayShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpen_Click()" & vbCrLf
+    s = s & "    RepDayOpen Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDeleteDay_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnLoad_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""LOAD""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSale_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""SALE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReturn_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""RETURN""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPayment_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""PAYMENT""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRefresh_Click()" & vbCrLf
+    s = s & "    RepDayShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCount_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""COUNT""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnload_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""UNLOAD""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCash_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""CASH""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSettle_Click()" & vbCrLf
+    s = s & "    RepDayAction Me, ""SETTLE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    RepDayPrint Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,13608,850,0,1000,0,0;lblInfo,227,2778,13154,397,0,1000,0,0;lblActing,227,3175,13154,340,0,1000,0,0;lstSummary,227,3629,13154,3289,0,1000,0,1000;btnLoad,227,7144,1928,482,0,0,1000,0;btnSale,2268,7144,1701,482,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnReturn,4082,7144,1474,482,0,0,1000,0;btnPayment,5669,7144,1474,482,0,0,1000,0;btnRefresh,7256,7144,1361,482,0,0,1000,0;btnCount,227,8165,1814,624,0,0,1000,0;btnUnload,2154,8165,1814,624,0,0,1000,0;btnCash,4081,8165,1928,624,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnSettle,6122,8165,1814,624,0,0,1000,0;btnPrint,8049,8165,1361,624,0,0,1000,0;btnClose,11907,8165,1474,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 13608, 9299, -1814, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmRepDay", s
+    Exit Sub
+EH:
+    AbortForm "frmRepDay", Err.Number, Err.Description
 End Sub

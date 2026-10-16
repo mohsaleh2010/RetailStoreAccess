@@ -37,8 +37,13 @@ End Function
 ' The rep of a document
 '------------------------------------------------------------------------------
 Public Function SalesRepFor(ByVal CustomerID As Long) As Variant
-    ' The active rep of the customer, else the active rep linked to the current user, else Null.
+    ' The rep the office works for (a rep day, modVanSales), else the active rep of the customer, else the active
+    ' rep linked to the current user, else Null.
     Dim v As Variant
+    If ActingRepDayID() > 0 Then
+        SalesRepFor = ActingSalesRepID()
+        Exit Function
+    End If
     v = DbValue("SELECT c.SalesRepID FROM Customers AS c INNER JOIN SalesReps AS s ON c.SalesRepID = s.SalesRepID " & _
                 "WHERE s.IsActive = True AND c.CustomerID = " & CustomerID)
     If IsNull(v) Then
