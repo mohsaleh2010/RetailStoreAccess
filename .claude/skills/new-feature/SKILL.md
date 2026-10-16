@@ -24,7 +24,9 @@ Follow `AGENTS.md` ("Adding a feature" and "Access / VBA rules") and `docs/dev/0
    code checks, `VbaModuleChecks`), run all tests (`/run-tests`) until green.
 6. Re-read the diff against the Access / VBA rules in `AGENTS.md` (IIf / And evaluate both sides,
    Private procedures, reserved names, line length, cp1256, Access SQL limits).
-7. Write `docs/NN-Name.md` in Arabic and add the README row with "✅ بانتظار الموافقة".
+7. Write `docs/NN-Name.md` in Arabic and add the README row with "✅ بانتظار الموافقة" (and its install row),
+   a row in the log of the running plan (`docs/51-...md`), `AGENTS.md` / `docs/dev/*` when tables, modules or
+   rules changed, and `docs/dev/05-Progress.md` (§1 and a line in §5).
 8. Commit (clear English message, no AI model names) and push to the current branch. No pull request.
 9. **Report in Arabic** and stop:
    - ما الذي أُضيف، والمشكلات التي ظهرت وكيف حُلّت

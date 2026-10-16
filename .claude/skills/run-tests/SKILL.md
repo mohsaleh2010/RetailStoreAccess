@@ -8,7 +8,7 @@ description: Regenerate the VBA modules and docs from tools/*.py and run the who
 1. Regenerate everything (the tests compare `src/vba` and `dist/vba` with the generator output):
    `python3 tools/generate.py` (on Windows: `python tools/generate.py`).
 2. Run all tests from the repository root:
-   `python3 -m unittest discover -s tests` — about 750 tests, about 2 minutes.
+   `python3 -m unittest discover -s tests` — about 1220 tests, about 7 minutes.
    To run one file: `python3 -m unittest discover -s tests -p "test_name.py"`;
    one class: `cd tests && python3 -m unittest test_forms.LayoutTests`.
 3. Skipped tests are normal when LibreOffice / python3-uno or the packages of

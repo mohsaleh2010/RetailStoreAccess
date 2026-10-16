@@ -3,7 +3,8 @@
 Instructions for any AI coding assistant (Claude, ChatGPT / Codex, Gemini, Cursor, Copilot …) and for
 human developers working in this repository. Claude reads it through `CLAUDE.md`.
 
-**Read first:** `docs/dev/01-Architecture.md` (how it is built), `docs/dev/02-Database.md`,
+**Read first:** `docs/dev/05-Progress.md` (where the work stopped, what waits for approval, the next step;
+updated after every operation), `docs/dev/01-Architecture.md` (how it is built), `docs/dev/02-Database.md`,
 `docs/dev/03-Forms.md`, `docs/dev/04-Workflow.md` (how to work and think, every Access rule with its
 reason) and the generated indexes `docs/02-Tables-Reference.md`, `docs/dev/Screens-Index.md`.
 
@@ -35,13 +36,18 @@ tested on Linux/macOS/Windows with `unittest`.
   feature updates its document; a new table / screen / module / rule updates `docs/dev/*.md` and this
   file. The references (`docs/02..04-*-Reference.md`, `docs/dev/Screens-Index.md`) are generated —
   run `tools/generate.py`, never edit them.
+- **After every operation** (a feature, a fix, an approval) update `docs/dev/05-Progress.md` (§1 "where we are"
+  and a line in §5) and the log at the end of the running plan (`docs/51-...md`), so the project can be moved
+  to any machine and continued with Claude Code CLI (`docs/00-Claude-CLI.md`) or any other tool.
+  On approval ("موافق"): mark "✅ تمت الموافقة" in `README.md` and the plan log, commit `Mark phase X approved`,
+  push, then start the next phase (`/continue`).
 - **Never publish or print `LICENSE_SECRET`** (in `src/vba/modActivation.bas`). Before delivery the
   owner changes it and delivers an **ACCDE**, keeping an ACCDB for development.
 
 ## Commands
 ```bash
 python3 tools/generate.py                     # regenerate src/vba, dist/vba and the reference docs
-python3 -m unittest discover -s tests         # all tests (~750, about 2 minutes)
+python3 -m unittest discover -s tests         # all tests (~1220, about 7 minutes)
 python3 -m unittest discover -s tests -p "test_budget.py"     # one file
 cd tests && python3 -m unittest test_forms.LayoutTests        # one class (run from tests/)
 ```
@@ -86,6 +92,7 @@ Optional test dependencies (tests skip when missing): `pip install -r requiremen
 | `src/vba/modCountry.bas`, `tools/country_reference.py` | The operating country (`Settings.CountryCode` SA / EG): currency, VAT rate, tax number, document title (`docs/44`); e-invoicing plan `docs/43` |
 | `tools/master_en.py`, `tools/translit.py` | English names of the master data (`qryLoc*`, `docs/39`-`41`) and the transliteration suggested by the English names screen (mirror of `modEnglishNames.Transliterate`, `docs/42`) |
 | `docs/NN-*.md` | One Arabic document per feature; `README.md` lists them with their approval status |
+| `docs/dev/05-Progress.md`, `docs/00-Claude-CLI.md` | The hand-over state (updated after every operation) and the guide to running the project locally with Claude Code CLI |
 
 ## Adding a feature (checklist)
 1. Tables / fields in `tools/schema.py`. New fields on existing tables must be optional or have a
