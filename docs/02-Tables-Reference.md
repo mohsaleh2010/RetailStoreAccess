@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **90** | عدد الحقول: **1156**
+عدد الجداول: **90** | عدد الحقول: **1158**
 
 ## الفهرس
 
@@ -1556,7 +1556,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 37 سجل
+- بيانات أساسية: 38 سجل
 
 ## JournalEntries
 
@@ -2024,9 +2024,11 @@
 | 10 | SettledAt | Date/Time |  |  |  |  |  | وقت التسوية |
 | 11 | StockCountID | Number (Long) |  |  |  |  | `StockCounts.StockCountID` | جرد السيارة في التسوية |
 | 12 | ClosingID | Number (Long) |  |  |  |  | `CashClosings.ClosingID` | تصفية صندوق العهدة في التسوية |
-| 13 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | فتحه |
-| 14 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 15 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 13 | GoodsShortage | Currency |  | ✔ | `0` | `>=0` |  | عجز بضاعة السيارة المحمَّل على المندوب سلفة – صافي فرق جرد السيارة في اليوم إن كان عجزًا وللمندوب مستخدم (docs/66) |
+| 14 | AdvanceEmployeeID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | الموظف المحمَّل عليه العجز – مستخدم المندوب (SalesReps.EmployeeID) |
+| 15 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | فتحه |
+| 16 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 17 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `RepDayID`
 - فهرس فريد: `DayNumber`

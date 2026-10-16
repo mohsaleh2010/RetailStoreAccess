@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3172
+Private Const ENTRY_COUNT As Long = 3176
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -226,12 +226,12 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("AS [«·„—ﬂ“], Format(BudgetAmount, '#,##0') AS [«·„Ê«“‰…], Format(ActualAmount, '#,##0') AS [«·›⁄·Ì], ") = "AS [Center], Format(BudgetAmount, '#,##0') AS [Budget], Format(ActualAmount, '#,##0') AS [Actual], ", "Tr sample 1", passed, failed, report
-    CheckLang Tr("≈⁄«œ… ≈‰‘«¡ √”ÿ— «·„”Ì— „‰ »Ì«‰«  «·„ÊŸ›Ì‰ø  ÷Ì⁄ «· ⁄œÌ·«  «·„ﬂ Ê»… ›ÌÂ.") = "Rebuild the run lines from the employee data? The changes typed in it are lost.", "Tr sample 2", passed, failed, report
-    CheckLang Tr("«·»‰ﬂ") = "Bank", "Tr sample 3", passed, failed, report
+    CheckLang Tr("AS [«· «—ÌŒ], Format(r.BookValueBefore, '#,##0.00') AS [«·ﬁÌ„… «·œ› —Ì… ﬁ»·Â«], Format(r.NewValue, '#,##0.00') AS ") = "AS [Date], Format(r.BookValueBefore, '#,##0.00') AS [Book value before], Format(r.NewValue, '#,##0.00') AS ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("≈ŸÂ«— €Ì— «·‰‘ÿ") = "Show inactive", "Tr sample 2", passed, failed, report
+    CheckLang Tr("«·»‰œ") = "Item", "Tr sample 3", passed, failed, report
     CheckLang Tr("«·„»Ì⁄«  «·Œ«÷⁄… ··÷—Ì»… (»⁄œ «·„— Ã⁄« )") = "Taxable sales (after returns)", "Tr sample 4", passed, failed, report
-    CheckLang Tr(" ⁄–— —”„ «·≈Õ’«∆Ì« : ") = "Could not draw the statistics: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("”»» «·≈—Ã«⁄ „ÿ·Ê».") = "The return reason is required.", "Tr sample 6", passed, failed, report
+    CheckLang Tr(" ⁄–— ÷»ÿ  ﬁ—Ì— «·„·’ﬁ« : ") = "Could not set up the labels report: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("”» „»—") = "September", "Tr sample 6", passed, failed, report
     CheckLang Tr("·« Ì„ﬂ‰ «· —ÕÌ· ≈·Ï ‰›” «·’‰œÊﬁ.") = "Cannot transfer to the same box.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST Ê 12.50: ÊÌ…") = "TEST and 12.50: ÊÌ…", "Tr sample 8", passed, failed, report
     UseLanguage "AR"

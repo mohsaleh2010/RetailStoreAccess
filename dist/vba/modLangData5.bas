@@ -21,6 +21,13 @@ Public Sub LangData5()
 End Sub
 
 Private Sub D5_1()
+    LangAdd "«·⁄„·Ì… (›«—€", "Transaction (empty"
+    LangAdd "«·›—⁄ «·—∆Ì”Ì", "Main branch"
+    LangAdd "«·ﬁ«∆„ »«·Ã—œ", "Counted by"
+    LangAdd "«·„»·€ «·„”œœ", "Amount paid"
+    LangAdd "«·„—œÊœ ‰ﬁœ«", "Refunded in cash"
+    LangAdd "«·„” —œ ‰ﬁœ«", "Refunded in cash"
+    LangAdd "«·„› «Õ «·Œ«’", "Private key"
     LangAdd "»œ«Ì… «·≈Â·«ﬂ", "Depreciation start"
     LangAdd "»’„… «·›« Ê—…", "Invoice hash"
     LangAdd "»÷«⁄… »«·ÿ—Ìﬁ", "Goods in transit"
@@ -134,6 +141,9 @@ Private Sub D5_1()
     LangAdd "«”„ «·„” Œœ„", "User name"
     LangAdd "«ﬂ » «· «—ÌŒ", "Enter the date"
     LangAdd "«·ÃœÊ· (›«—€", "Table (empty"
+End Sub
+
+Private Sub D5_2()
     LangAdd "«·Õ”«» (›«—€", "Account (empty"
     LangAdd "«·—»ÿ «·„”Ã·", "Recorded link"
     LangAdd "«·—»⁄ «·„«÷Ì", "Last quarter"
@@ -141,9 +151,6 @@ Private Sub D5_1()
     LangAdd "«·”⁄— ··⁄„Ì·", "Price for the customer"
     LangAdd "«·‘Â— «·„«÷Ì", "Last month"
     LangAdd "«·⁄„— «·»«ﬁÌ", "Remaining life"
-End Sub
-
-Private Sub D5_2()
     LangAdd "«·›—Êﬁ«  ›ﬁÿ", "Differences only"
     LangAdd "«·ﬁ”ÿ «·À«» ", "Straight line"
     LangAdd "«·ﬁ”ÿ «·‘Â—Ì", "Monthly installment"
@@ -257,6 +264,9 @@ Private Sub D5_2()
     LangAdd "≈÷«›… / Õ›Ÿ", "Add / Save"
     LangAdd "≈÷«›… “Ì«—…", "Add visit"
     LangAdd "≈÷«›… ··ÿ·»", "Add to order"
+End Sub
+
+Private Sub D5_3()
     LangAdd "≈⁄«œ… ÿ»«⁄…", "Reprint"
     LangAdd "≈⁄œ«œ «·—»ÿ", "Connection setup"
     LangAdd "≈€·«ﬁ «·ÌÊ„", "Close the day"
@@ -264,9 +274,6 @@ Private Sub D5_2()
     LangAdd "≈·€«¡ «·Ã—œ", "Cancel the count"
     LangAdd "≈·€«¡ «·—»ÿ", "Unlink"
     LangAdd "≈·€«¡ «·’—›", "Cancel the payment"
-End Sub
-
-Private Sub D5_3()
     LangAdd "≈Ìœ«⁄ ‰ﬁœÌ…", "Cash deposit"
     LangAdd "«Œ — «·Õ”«»", "Choose the account"
     LangAdd "«Œ — «·’Ê—…", "Choose the picture"
@@ -380,6 +387,9 @@ Private Sub D5_3()
     LangAdd "„œ… «· ﬂ—«—", "Repeats"
     LangAdd "„œÏ / »ÿ«ﬁ…", "Mada / card"
     LangAdd "„œÌ‰ «·› —…", "Period debit"
+End Sub
+
+Private Sub D5_4()
     LangAdd "„œÌ‰… «·„Õ·", "Store city"
     LangAdd "„”«— «·‘⁄«—", "Logo path"
     LangAdd "„”Õ «·ﬁ«∆„…", "Clear the list"
@@ -387,9 +397,6 @@ Private Sub D5_3()
     LangAdd "„ﬂ«‰ «·„‰ Ã", "Product location"
     LangAdd "„‰ Œÿ «·”Ì—", "From the route"
     LangAdd "„‰Œ›÷: «·Õœ", "Low: level"
-End Sub
-
-Private Sub D5_4()
     LangAdd "‰ ÌÃ… «·ÿ·»", "Request result"
     LangAdd "‰Ê⁄ «·⁄„·Ì…", "Transaction type"
     LangAdd "‰Ê⁄ «·„” ‰œ", "Document type"
@@ -503,6 +510,9 @@ Private Sub D5_4()
     LangAdd "„Œ“‰ —∆Ì”Ì", "Main warehouse"
     LangAdd "„— Ã⁄ ‘—«¡", "Purchase return"
     LangAdd "„—Ã⁄ «·»‰ﬂ", "Bank reference"
+End Sub
+
+Private Sub D5_5()
     LangAdd "„—ÕÛ¯·… ›Ì", "posted on"
     LangAdd "„”Êœ… „”Ì—", "Run draft"
     LangAdd "„‰ «·ﬁ«∆„…", "from the list"
@@ -510,9 +520,6 @@ Private Sub D5_4()
     LangAdd "„ı—ÕÛ¯· ›Ì", "Posted on"
     LangAdd "„ı” ·Û„ ›Ì", "Received on"
     LangAdd "‰”»… ’›—Ì…", "Zero rate"
-End Sub
-
-Private Sub D5_5()
     LangAdd "‰ﬁÿ… «·»Ì⁄", "Point of sale"
     LangAdd "‰Ê⁄ «·Õ—ﬂ…", "Move type"
     LangAdd "‰Ê⁄ «·Õ”«»", "Account type"
@@ -626,6 +633,9 @@ Private Sub D5_5()
     LangAdd "‰Ê⁄ «·”‰œ", "Voucher type"
     LangAdd "Â–« «·‘Â—", "This month"
     LangAdd "Â–Â «·”‰…", "This year"
+End Sub
+
+Private Sub D5_6()
     LangAdd "Ê·„ Ìı—”·", "and not sent"
     LangAdd "Ê„’—Ê› ›Ì", "and paid on"
     LangAdd "Ì„ﬂ‰ —»ÿÂ", "Can be linked"
@@ -633,9 +643,6 @@ Private Sub D5_5()
     LangAdd "¬Œ— Õ—ﬂ…", "Last move"
     LangAdd "¬Œ— œŒÊ·", "Last login"
     LangAdd "¬Œ— ‰”Œ…", "Last backup"
-End Sub
-
-Private Sub D5_6()
     LangAdd "√—»⁄„«∆…", "four hundred"
     LangAdd "√’· ÃœÌœ", "New asset"
     LangAdd "≈–‰ ÃœÌœ", "New note"
@@ -749,6 +756,9 @@ Private Sub D5_6()
     LangAdd "«·≈÷«›…", "adding"
     LangAdd "«·≈÷«›Ì", "Overtime"
     LangAdd "«·≈ﬁ—«—", "Return"
+End Sub
+
+Private Sub D5_7()
     LangAdd "«·≈‰Ã«“", "Achievement"
     LangAdd "«·≈Â·«ﬂ", "Depreciation"
     LangAdd "«·«À‰Ì‰", "Monday"
@@ -756,9 +766,6 @@ Private Sub D5_6()
     LangAdd "«· «—ÌŒ", "Date"
     LangAdd "«· «·Ì…", "Next"
     LangAdd "«· Õ’Ì·", "Collections"
-End Sub
-
-Private Sub D5_7()
     LangAdd "«· — Ì»", "Order"
     LangAdd "«· —ÕÌ·", "Posting"
     LangAdd "«· ”ÊÌ…", "Reconciliation"
@@ -872,6 +879,9 @@ Private Sub D5_7()
     LangAdd "«·ÃÂ« ", "Parties"
     LangAdd "«·ÃÂ«“", "Computer"
     LangAdd "«·ÃÊ«·", "Mobile"
+End Sub
+
+Private Sub D5_8()
     LangAdd "«·Õ«·…", "Status"
     LangAdd "«·Õ—ﬂ…", "Move"
     LangAdd "«·Õ”«»", "Account"
@@ -879,9 +889,6 @@ Private Sub D5_7()
     LangAdd "«·œ«∆‰", "Credit"
     LangAdd "«·—’Ìœ", "Balance"
     LangAdd "«·”«»ﬁ", "Previous"
-End Sub
-
-Private Sub D5_8()
     LangAdd "«·‘«—⁄", "Street"
     LangAdd "«·‘«‘…", "Screen"
     LangAdd "«·‘—«¡", "Purchase"
@@ -995,6 +1002,9 @@ Private Sub D5_8()
     LangAdd "«·”» ", "Saturday"
     LangAdd "«·”Ã·", "Record"
     LangAdd "«·”⁄—", "Price"
+End Sub
+
+Private Sub D5_9()
     LangAdd "«·”ﬂ‰", "Housing"
     LangAdd "«·”‰…", "Year"
     LangAdd "«·”‰œ", "Voucher"
@@ -1002,9 +1012,6 @@ Private Sub D5_8()
     LangAdd "«·’—›", "Payment"
     LangAdd "«·’‰›", "Item"
     LangAdd "«·’Ê—", "Pictures"
-End Sub
-
-Private Sub D5_9()
     LangAdd "«·⁄Ã“", "Shortage"
     LangAdd "«·⁄œœ", "Count"
     LangAdd "«·›—ﬁ", "Difference"
@@ -1118,6 +1125,9 @@ Private Sub D5_9()
     LangAdd "”‰ÊÌ", "Yearly"
     LangAdd "‘€¯·", "Run"
     LangAdd "‘Â—Ì", "Monthly"
+End Sub
+
+Private Sub D5_10()
     LangAdd "’«œ—", "Issued"
     LangAdd "’«·Õ", "Valid"
     LangAdd "’€Ì—", "Small"
@@ -1125,9 +1135,6 @@ Private Sub D5_9()
     LangAdd "⁄‘—…", "ten"
     LangAdd "⁄Âœ…", "Custody"
     LangAdd "€Ì«»", "Absence"
-End Sub
-
-Private Sub D5_10()
     LangAdd "›«—€", "Empty"
     LangAdd "›—⁄Ì", "Sub"
     LangAdd "ﬁ«∆„", "Open"

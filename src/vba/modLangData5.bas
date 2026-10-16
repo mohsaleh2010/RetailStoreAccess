@@ -21,6 +21,13 @@ Public Sub LangData5()
 End Sub
 
 Private Sub D5_1()
+    LangAdd "العملية (فارغ", "Transaction (empty"
+    LangAdd "الفرع الرئيسي", "Main branch"
+    LangAdd "القائم بالجرد", "Counted by"
+    LangAdd "المبلغ المسدد", "Amount paid"
+    LangAdd "المردود نقدًا", "Refunded in cash"
+    LangAdd "المسترد نقدًا", "Refunded in cash"
+    LangAdd "المفتاح الخاص", "Private key"
     LangAdd "بداية الإهلاك", "Depreciation start"
     LangAdd "بصمة الفاتورة", "Invoice hash"
     LangAdd "بضاعة بالطريق", "Goods in transit"
@@ -134,6 +141,9 @@ Private Sub D5_1()
     LangAdd "اسم المستخدم", "User name"
     LangAdd "اكتب التاريخ", "Enter the date"
     LangAdd "الجدول (فارغ", "Table (empty"
+End Sub
+
+Private Sub D5_2()
     LangAdd "الحساب (فارغ", "Account (empty"
     LangAdd "الربط المسجل", "Recorded link"
     LangAdd "الربع الماضي", "Last quarter"
@@ -141,9 +151,6 @@ Private Sub D5_1()
     LangAdd "السعر للعميل", "Price for the customer"
     LangAdd "الشهر الماضي", "Last month"
     LangAdd "العمر الباقي", "Remaining life"
-End Sub
-
-Private Sub D5_2()
     LangAdd "الفروقات فقط", "Differences only"
     LangAdd "القسط الثابت", "Straight line"
     LangAdd "القسط الشهري", "Monthly installment"
@@ -257,6 +264,9 @@ Private Sub D5_2()
     LangAdd "إضافة / حفظ", "Add / Save"
     LangAdd "إضافة زيارة", "Add visit"
     LangAdd "إضافة للطلب", "Add to order"
+End Sub
+
+Private Sub D5_3()
     LangAdd "إعادة طباعة", "Reprint"
     LangAdd "إعداد الربط", "Connection setup"
     LangAdd "إغلاق اليوم", "Close the day"
@@ -264,9 +274,6 @@ Private Sub D5_2()
     LangAdd "إلغاء الجرد", "Cancel the count"
     LangAdd "إلغاء الربط", "Unlink"
     LangAdd "إلغاء الصرف", "Cancel the payment"
-End Sub
-
-Private Sub D5_3()
     LangAdd "إيداع نقدية", "Cash deposit"
     LangAdd "اختر الحساب", "Choose the account"
     LangAdd "اختر الصورة", "Choose the picture"
@@ -380,6 +387,9 @@ Private Sub D5_3()
     LangAdd "مدة التكرار", "Repeats"
     LangAdd "مدى / بطاقة", "Mada / card"
     LangAdd "مدين الفترة", "Period debit"
+End Sub
+
+Private Sub D5_4()
     LangAdd "مدينة المحل", "Store city"
     LangAdd "مسار الشعار", "Logo path"
     LangAdd "مسح القائمة", "Clear the list"
@@ -387,9 +397,6 @@ Private Sub D5_3()
     LangAdd "مكان المنتج", "Product location"
     LangAdd "من خط السير", "From the route"
     LangAdd "منخفض: الحد", "Low: level"
-End Sub
-
-Private Sub D5_4()
     LangAdd "نتيجة الطلب", "Request result"
     LangAdd "نوع العملية", "Transaction type"
     LangAdd "نوع المستند", "Document type"
@@ -503,6 +510,9 @@ Private Sub D5_4()
     LangAdd "مخزن رئيسي", "Main warehouse"
     LangAdd "مرتجع شراء", "Purchase return"
     LangAdd "مرجع البنك", "Bank reference"
+End Sub
+
+Private Sub D5_5()
     LangAdd "مرحَّلة في", "posted on"
     LangAdd "مسودة مسير", "Run draft"
     LangAdd "من القائمة", "from the list"
@@ -510,9 +520,6 @@ Private Sub D5_4()
     LangAdd "مُرحَّل في", "Posted on"
     LangAdd "مُستلَم في", "Received on"
     LangAdd "نسبة صفرية", "Zero rate"
-End Sub
-
-Private Sub D5_5()
     LangAdd "نقطة البيع", "Point of sale"
     LangAdd "نوع الحركة", "Move type"
     LangAdd "نوع الحساب", "Account type"
@@ -626,6 +633,9 @@ Private Sub D5_5()
     LangAdd "نوع السند", "Voucher type"
     LangAdd "هذا الشهر", "This month"
     LangAdd "هذه السنة", "This year"
+End Sub
+
+Private Sub D5_6()
     LangAdd "ولم يُرسل", "and not sent"
     LangAdd "ومصروف في", "and paid on"
     LangAdd "يمكن ربطه", "Can be linked"
@@ -633,9 +643,6 @@ Private Sub D5_5()
     LangAdd "آخر حركة", "Last move"
     LangAdd "آخر دخول", "Last login"
     LangAdd "آخر نسخة", "Last backup"
-End Sub
-
-Private Sub D5_6()
     LangAdd "أربعمائة", "four hundred"
     LangAdd "أصل جديد", "New asset"
     LangAdd "إذن جديد", "New note"
@@ -749,6 +756,9 @@ Private Sub D5_6()
     LangAdd "الإضافة", "adding"
     LangAdd "الإضافي", "Overtime"
     LangAdd "الإقرار", "Return"
+End Sub
+
+Private Sub D5_7()
     LangAdd "الإنجاز", "Achievement"
     LangAdd "الإهلاك", "Depreciation"
     LangAdd "الاثنين", "Monday"
@@ -756,9 +766,6 @@ Private Sub D5_6()
     LangAdd "التاريخ", "Date"
     LangAdd "التالية", "Next"
     LangAdd "التحصيل", "Collections"
-End Sub
-
-Private Sub D5_7()
     LangAdd "الترتيب", "Order"
     LangAdd "الترحيل", "Posting"
     LangAdd "التسوية", "Reconciliation"
@@ -872,6 +879,9 @@ Private Sub D5_7()
     LangAdd "الجهات", "Parties"
     LangAdd "الجهاز", "Computer"
     LangAdd "الجوال", "Mobile"
+End Sub
+
+Private Sub D5_8()
     LangAdd "الحالة", "Status"
     LangAdd "الحركة", "Move"
     LangAdd "الحساب", "Account"
@@ -879,9 +889,6 @@ Private Sub D5_7()
     LangAdd "الدائن", "Credit"
     LangAdd "الرصيد", "Balance"
     LangAdd "السابق", "Previous"
-End Sub
-
-Private Sub D5_8()
     LangAdd "الشارع", "Street"
     LangAdd "الشاشة", "Screen"
     LangAdd "الشراء", "Purchase"
@@ -995,6 +1002,9 @@ Private Sub D5_8()
     LangAdd "السبت", "Saturday"
     LangAdd "السجل", "Record"
     LangAdd "السعر", "Price"
+End Sub
+
+Private Sub D5_9()
     LangAdd "السكن", "Housing"
     LangAdd "السنة", "Year"
     LangAdd "السند", "Voucher"
@@ -1002,9 +1012,6 @@ Private Sub D5_8()
     LangAdd "الصرف", "Payment"
     LangAdd "الصنف", "Item"
     LangAdd "الصور", "Pictures"
-End Sub
-
-Private Sub D5_9()
     LangAdd "العجز", "Shortage"
     LangAdd "العدد", "Count"
     LangAdd "الفرق", "Difference"
@@ -1118,6 +1125,9 @@ Private Sub D5_9()
     LangAdd "سنوي", "Yearly"
     LangAdd "شغّل", "Run"
     LangAdd "شهري", "Monthly"
+End Sub
+
+Private Sub D5_10()
     LangAdd "صادر", "Issued"
     LangAdd "صالح", "Valid"
     LangAdd "صغير", "Small"
@@ -1125,9 +1135,6 @@ Private Sub D5_9()
     LangAdd "عشرة", "ten"
     LangAdd "عهدة", "Custody"
     LangAdd "غياب", "Absence"
-End Sub
-
-Private Sub D5_10()
     LangAdd "فارغ", "Empty"
     LangAdd "فرعي", "Sub"
     LangAdd "قائم", "Open"

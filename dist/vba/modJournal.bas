@@ -20,7 +20,8 @@ Option Explicit
 Private Const SOURCE_QUERIES As String = "qryJournalSale,qryJournalSalesReturn,qryJournalPurchase," & _
     "qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock," & _
     "qryJournalOpening,qryJournalManual,qryJournalYearClose,qryJournalVatReturn,qryJournalBankTx,qryJournalCheque,qryJournalAsset,qryJournalDepreciation,qryJournalPayroll,qryJournalCommission," & _
-    "qryJournalStockTransfer,qryJournalStockDocument,qryJournalStockNote,qryJournalAssetReval,qryJournalAssetTransfer"
+    "qryJournalStockTransfer,qryJournalStockDocument,qryJournalStockNote,qryJournalAssetReval,qryJournalAssetTransfer," & _
+    "qryJournalRepShortage"
 
 '==============================================================================
 ' Accounts and synchronisation
@@ -268,6 +269,7 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "ASSET_DISPOSAL":   OpenScreen "frmAssets", 0, id
         Case "DEPRECIATION":     OpenScreen "frmDepreciation", 0
         Case "ASSET_REVAL":      OpenScreen "frmAssetChanges", 0, DbValue("SELECT AssetID FROM AssetRevaluations WHERE RevaluationID = " & id)
+        Case "REP_SHORTAGE":     OpenScreen "frmRepDay", 0, id
         Case "ASSET_TRANSFER":   OpenScreen "frmAssetChanges", 0, DbValue("SELECT AssetID FROM AssetTransfers WHERE TransferID = " & id)
         Case "PAYROLL":          OpenScreen "frmPayroll"
         Case "PAYROLL_PAYMENT":  OpenScreen "frmPayroll"

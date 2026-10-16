@@ -16,6 +16,7 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "تم تفعيل البرنامج على هذا الجهاز", "The program was activated on this computer"
     LangAdd "تم نسخ رقم الجهاز. أرسله للمبرمج", "The computer number was copied. Send it to the developer"
     LangAdd "تُنسب له فواتير العميل وتحصيلاته", "The invoices and collections of the customer are credited to him"
     LangAdd "حصّل المتأخر أولًا، أو بِع نقدًا", "Collect the overdue amount first, or sell for cash"
@@ -135,10 +136,10 @@ Private Sub D3_1()
     LangAdd "انقر مرتين على النتيجة لفتحها", "Double-click a result to open it"
     LangAdd "بدون مسافات، 3 أحرف على الأقل", "No spaces, at least 3 characters"
     LangAdd "بعد المصروفات وفروقات المخزون", "after expenses and stock differences"
-    LangAdd "بيع الأصل المعروض أو استبعاده", "Sell or dispose of the asset shown"
 End Sub
 
 Private Sub D3_2()
+    LangAdd "بيع الأصل المعروض أو استبعاده", "Sell or dispose of the asset shown"
     LangAdd "تُعاد فتح آخر تسوية للبنك فقط", "Only the last reconciliation of the bank can be reopened"
     LangAdd "تُقفل السنة بعد انتهائها (بعد", "A year is closed after it ends (after"
     LangAdd "رغم ذلك؟ (بصلاحية مدير النظام", "anyway? (with the permission of the system administrator"
@@ -146,6 +147,8 @@ Private Sub D3_2()
     LangAdd "سبب إلغاء المستند لدى المصلحة", "Reason for cancelling the document at the Tax Authority"
     LangAdd "سندات الصرف والاستلام المخزني", "Stock issue and receipt vouchers"
     LangAdd "طلب التوصيل يحتاج جوال العميل", "A delivery order needs the customer mobile"
+    LangAdd "عجز البضاعة: سلفة على المندوب", "Goods shortage: advance on the rep"
+    LangAdd "عجز النقدية: سلفة على المندوب", "Cash shortage: advance on the rep"
     LangAdd "عرض فقط - التصحيح يكون بمرتجع", "View only - a correction is made with a return"
     LangAdd "كلمة المرور الحالية غير صحيحة", "The current password is wrong"
     LangAdd "كلمة مرور جديدة لحساب المبرمج", "New password for the developer account"
@@ -256,12 +259,12 @@ Private Sub D3_2()
     LangAdd "لا تكلفة مبيعات أو لا مخزون", "No cost of sales or no stock"
     LangAdd "لا تملك صلاحية مسير الرواتب", "You do not have the permission for payroll"
     LangAdd "لا توجد أشهر لم تُسجَّل حتى", "There are no unrecorded months up to"
-    LangAdd "لا توجد قيود للفترة المحددة", "There are no entries for the period set"
-    LangAdd "للأصل إعادة تقييم أو نقل في", "The asset has a revaluation or a transfer on"
-    LangAdd "مثال: PCE للحبة، KGM للكيلو", "Example: PCE for a piece, KGM for a kilo"
 End Sub
 
 Private Sub D3_3()
+    LangAdd "لا توجد قيود للفترة المحددة", "There are no entries for the period set"
+    LangAdd "للأصل إعادة تقييم أو نقل في", "The asset has a revaluation or a transfer on"
+    LangAdd "مثال: PCE للحبة، KGM للكيلو", "Example: PCE for a piece, KGM for a kilo"
     LangAdd "مصروف من المصروفات المتكررة", "An expense from the recurring expenses"
     LangAdd "ملف المفتاح الخاص غير موجود", "The private key file was not found"
     LangAdd "يبدأ تجهيز الطلبية المعتمدة", "Preparing starts from an approved order"
@@ -379,12 +382,12 @@ Private Sub D3_3()
     LangAdd "إلغاء ترحيل إذن الاستلام", "Unposting the receipt note"
     LangAdd "إلغاء ترحيل سند الاستلام", "Unposting the receipt voucher"
     LangAdd "اختر البنك الذي دُفع منه", "Choose the bank it was paid from"
-    LangAdd "اختر البنك المحوَّل إليه", "Choose the bank transferred to"
-    LangAdd "اختر جردًا مفتوحًا أولًا", "Choose an open count first"
-    LangAdd "اختر سطر حساب من القائمة", "Choose an account line from the list"
 End Sub
 
 Private Sub D3_4()
+    LangAdd "اختر البنك المحوَّل إليه", "Choose the bank transferred to"
+    LangAdd "اختر جردًا مفتوحًا أولًا", "Choose an open count first"
+    LangAdd "اختر سطر حساب من القائمة", "Choose an account line from the list"
     LangAdd "اختر فاتورة الشراء أولًا", "Choose the purchase invoice first"
     LangAdd "اكتب سبب إعادة فتح السنة", "Type the reason for reopening the year"
     LangAdd "البيع من السيارة وتسويته", "Van sales and settlement"
@@ -502,12 +505,12 @@ Private Sub D3_4()
     LangAdd "قبض نقدية (إيرادات أخرى", "Cash receipt (other revenue"
     LangAdd "لا تملك صلاحية التقارير", "You do not have the permission for reports"
     LangAdd "لا تملك صلاحية الموازنة", "You do not have the permission for the budget"
-    LangAdd "لا تملك صلاحية فتح شاشة", "You do not have the permission to open the screen"
-    LangAdd "لا توجد تحويلات بالطريق", "No transfers in transit"
-    LangAdd "لا يُحصَّل قبل استحقاقه", "is not collected before its due date"
 End Sub
 
 Private Sub D3_5()
+    LangAdd "لا تملك صلاحية فتح شاشة", "You do not have the permission to open the screen"
+    LangAdd "لا توجد تحويلات بالطريق", "No transfers in transit"
+    LangAdd "لا يُحصَّل قبل استحقاقه", "is not collected before its due date"
     LangAdd "مسير الرواتب والتأمينات", "Payroll and social insurance"
     LangAdd "من العينات فحص الامتثال", "of the samples in the compliance checks"
     LangAdd "موازنة السنة: الإيرادات", "Budget of the year: revenue"
@@ -589,8 +592,4 @@ Private Sub D3_5()
     LangAdd "من أضاف أو عدّل أو حذف", "Who added, edited or deleted"
     LangAdd "هذا الخيار للمبرمج فقط", "This option is for the developer only"
     LangAdd "هل تسمح بإتمام العملية", "Do you allow the transaction to be completed"
-    LangAdd "وارد آخر (فوائد أو قرض", "Other incoming (interest or a loan"
-    LangAdd "أضفه من زر «منتج جديد", "Add it with the button New product"
-    LangAdd "أفضل 10 منتجات مبيعًا", "Top 10 best-selling products"
-    LangAdd "أقل من المبلغ المودَع", "less than the deposited amount"
 End Sub

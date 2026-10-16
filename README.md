@@ -90,6 +90,7 @@
 | + | يوم المندوب والبيع من السيارة: تحميل السيارة، والبيع والمرتجع والتحصيل باسم المندوب من مخزن السيارة وصندوق العهدة، وجرد السيارة وتصفية الصندوق، وإغلاق اليوم وتقريره | ✅ تمت الموافقة | [docs/63-Van-Sales.md](docs/63-Van-Sales.md) |
 | + | خط السير والزيارات وخطة اليوم ونتيجة كل زيارة، وحدود المندوب (حد ائتمان عملائه، وأقصى خصم، وقائمة أسعاره)، وتقارير تنفيذ خط السير والزيارات ورصيد السيارات | ✅ تمت الموافقة | [docs/64-Rep-Routes-Limits.md](docs/64-Rep-Routes-Limits.md) |
 | + | تحسينات الأصول الثابتة: الإهلاك بالقسط المتناقص، وإعادة التقييم (الفائض وخسارة الانخفاض)، وضريبة المخرجات على بيع الأصل في القيد والإقرار، ونقل الأصل بين الفروع ومراكز التكلفة | ✅ تمت الموافقة | [docs/65-Fixed-Assets-Improvements.md](docs/65-Fixed-Assets-Improvements.md) |
+| + | عجز المندوب سلفة عليه: عجز صندوق العهدة عند التصفية، وصافي عجز بضاعة السيارة عند إغلاق اليوم، على سلف مستخدم المندوب فيُخصم من راتبه | ✅ بانتظار الموافقة | [docs/66-Rep-Shortage-Advance.md](docs/66-Rep-Shortage-Advance.md) |
 
 ## هيكل المستودع
 
@@ -201,6 +202,7 @@
 | 58 | `modVanSales` (دائمة، جديدة)، واستبدال `modWarehouses` و`modCash` و`modSalesReps` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestRepDays`, `TestWarehouses`, `TestCash`, `TestSalesReps` |
 | 59 | `modRepRoutes` (دائمة، جديدة)، واستبدال `modSales` و`modPOS` و`modSalesOrders` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestRepRoutes`, `TestSales`, `TestSalesOrders`, `TestRepDays` |
 | 60 | استبدال `modAssets` و`modJournal` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestAssets`, `TestJournal` |
+| 61 | استبدال `modCash` و`modVanSales` و`modJournal` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries` | `TestRepDays`, `TestCash`, `TestPayroll` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

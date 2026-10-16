@@ -55,6 +55,7 @@ UNENFORCED = {
     ("DepreciationRuns", "EmployeeID"),
     ("AssetRevaluations", "EmployeeID"),
     ("AssetTransfers", "EmployeeID"),
+    ("RepDays", "AdvanceEmployeeID"),
     ("Budgets", "EmployeeID"),
     ("PeriodClosings", "EmployeeID"),
     ("FiscalYearClosings", "EmployeeID"),

@@ -80,7 +80,7 @@ JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournal
                           "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation",
                           "qryJournalPayroll", "qryJournalCommission", "qryJournalStockTransfer",
                           "qryJournalStockDocument", "qryJournalStockNote", "qryJournalAssetReval",
-                          "qryJournalAssetTransfer"]
+                          "qryJournalAssetTransfer", "qryJournalRepShortage"]
 
 
 def _sale():
@@ -365,6 +365,16 @@ def _asset_reval():
         jline(*k, 2, 3500, *reversed(_signed("r.SurplusPart")), "'فائض إعادة تقييم الأصول'", src, "r.SurplusPart <> 0"),
         jline(*k, 3, 5660, *_signed("r.LossPart"), "'انخفاض قيمة أصل ثابت'", src, "r.LossPart <> 0")]),
         "IIf(r.RevalCenter Is Null, 0, r.RevalCenter)")
+
+
+def _rep_shortage():
+    # the goods shortage of a rep day charged to the rep (docs/66): an employee advance instead of a stock loss
+    src = "RepDays AS d INNER JOIN [@SalesReps] AS r ON d.SalesRepID = r.SalesRepID"
+    k = ("'REP_SHORTAGE'", "d.RepDayID", "d.DayNumber", "d.SettledAt", "r.RepName")
+    where = "d.Status = 'SETTLED' AND d.GoodsShortage <> 0 AND d.AdvanceEmployeeID Is Not Null"
+    return jquery([
+        jline(*k, 1, 1600, "d.GoodsShortage", ZERO, "'عجز بضاعة السيارة سلفة على المندوب'", src, where),
+        jline(*k, 2, 5200, ZERO, "d.GoodsShortage", "'عجز بضاعة السيارة سلفة على المندوب'", src, where)])
 
 
 def _asset_transfer():
@@ -1957,7 +1967,7 @@ SELECT d.RepDayID, d.DayNumber, d.DayDate, d.SalesRepID, r.RepName, d.WarehouseI
        Nz(s.InvCount, 0) AS InvoiceCount, Nz(s.SalesAmt, 0) AS SalesTotal, Nz(s.CashSalesAmt, 0) AS CashSales,
        Nz(t.ReturnsAmt, 0) AS ReturnsTotal, Nz(t.RefundsAmt, 0) AS CashRefunds,
        Nz(p.CollectedAmt, 0) AS Collections, c.ExpectedBalance AS CashExpected, c.CountedAmount AS CashCounted,
-       c.Difference AS CashDifference, c.TransferAmount AS CashHandedOver
+       c.Difference AS CashDifference, c.TransferAmount AS CashHandedOver, d.ClosingID, d.GoodsShortage
 FROM (((((((RepDays AS d INNER JOIN [@SalesReps] AS r ON d.SalesRepID = r.SalesRepID)
             INNER JOIN [@Warehouses] AS w ON d.WarehouseID = w.WarehouseID)
            INNER JOIN [@CashBoxes] AS b ON d.CashBoxID = b.CashBoxID)
@@ -2057,6 +2067,7 @@ WHERE t.TransferID IN (SELECT Min(x.TransferID) FROM AssetTransfers AS x GROUP B
     Query("qryJournalAsset", "أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها", _asset()),
     Query("qryJournalAssetReval", "أسطر قيود إعادة تقييم الأصول الثابتة", _asset_reval()),
     Query("qryJournalAssetTransfer", "أسطر قيود نقل الأصول الثابتة بين مراكز التكلفة", _asset_transfer()),
+    Query("qryJournalRepShortage", "أسطر قيود عجز بضاعة المندوب المحمَّل عليه سلفة", _rep_shortage()),
     Query("qryDepreciationLines", "أسطر قيود الإهلاك الشهرية مع اسم الأصل", """
 SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName,
        IIf(d.DepCenter Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), d.DepCenter) AS LineCenter
@@ -2141,7 +2152,7 @@ FROM (AuditLog AS a LEFT JOIN Employees AS e ON a.EmployeeID = e.EmployeeID)
      LEFT JOIN AuditChanges AS c ON a.LogID = c.LogID"""),
 
     # employee advances: given by cash voucher (OUT ADVANCE), paid back in cash (IN ADVANCE) or deducted
-    # in a posted payroll
+    # in a posted payroll; a rep's goods shortage charged to him at the settlement of his day (docs/66)
     Query("qryAdvanceMoves", "حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب", """
 SELECT v.AdvanceEmployeeID AS EmployeeID, v.VoucherDate AS MoveDate, IIf(v.VoucherType = 'OUT', v.Amount, -v.Amount) AS MoveAmount
 FROM CashVouchers AS v
@@ -2149,7 +2160,11 @@ WHERE v.Category = 'ADVANCE' AND v.AdvanceEmployeeID Is Not Null
 UNION ALL
 SELECT l.EmployeeID, r.PayMonth, -l.AdvanceDeduction
 FROM PayrollLines AS l INNER JOIN PayrollRuns AS r ON l.PayrollRunID = r.PayrollRunID
-WHERE r.Status = 'POSTED' AND l.AdvanceDeduction <> 0"""),
+WHERE r.Status = 'POSTED' AND l.AdvanceDeduction <> 0
+UNION ALL
+SELECT d.AdvanceEmployeeID, d.SettledAt, d.GoodsShortage
+FROM RepDays AS d
+WHERE d.Status = 'SETTLED' AND d.GoodsShortage <> 0 AND d.AdvanceEmployeeID Is Not Null"""),
 
     Query("qryAdvanceTotals", "رصيد سلف كل موظف", """
 SELECT EmployeeID, Sum(MoveAmount) AS AdvanceBalance

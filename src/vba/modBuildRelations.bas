@@ -611,6 +611,7 @@ Private Function RetiredRelations() As Variant
                              "FK_DepreciationRuns_EmployeeID", _
                              "FK_FiscalYearClosings_EmployeeID", _
                              "FK_PeriodClosings_EmployeeID", _
+                             "FK_RepDays_AdvanceEmployeeID", _
                              "FK_RepDays_EmployeeID", _
                              "FK_RepVisits_EmployeeID", _
                              "FK_SalesOrders_EmployeeID", _

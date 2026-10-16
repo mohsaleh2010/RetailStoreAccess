@@ -117,6 +117,7 @@ SOURCE_TYPES_EN = {
     "STOCK_ISSUE": "Stock issue to a party", "STOCK_RECEIPT": "Stock receipt from a party",
     "DELIVERY_NOTE": "Delivery note to a customer", "RECEIPT_NOTE": "Goods receipt note from a supplier",
     "ASSET_REVAL": "Fixed asset revaluation", "ASSET_TRANSFER": "Fixed asset transfer between cost centres",
+    "REP_SHORTAGE": "Rep goods shortage charged as an advance",
 }
 
 TRANSACTION_TYPES_EN = {

@@ -16,6 +16,7 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "Êã ÊİÚíá ÇáÈÑäÇãÌ Úáì åĞÇ ÇáÌåÇÒ", "The program was activated on this computer"
     LangAdd "Êã äÓÎ ÑŞã ÇáÌåÇÒ. ÃÑÓáå ááãÈÑãÌ", "The computer number was copied. Send it to the developer"
     LangAdd "ÊõäÓÈ áå İæÇÊíÑ ÇáÚãíá æÊÍÕíáÇÊå", "The invoices and collections of the customer are credited to him"
     LangAdd "ÍÕøá ÇáãÊÃÎÑ ÃæáğÇ¡ Ãæ ÈöÚ äŞÏğÇ", "Collect the overdue amount first, or sell for cash"
@@ -135,10 +136,10 @@ Private Sub D3_1()
     LangAdd "ÇäŞÑ ãÑÊíä Úáì ÇáäÊíÌÉ áİÊÍåÇ", "Double-click a result to open it"
     LangAdd "ÈÏæä ãÓÇİÇÊ¡ 3 ÃÍÑİ Úáì ÇáÃŞá", "No spaces, at least 3 characters"
     LangAdd "ÈÚÏ ÇáãÕÑæİÇÊ æİÑæŞÇÊ ÇáãÎÒæä", "after expenses and stock differences"
-    LangAdd "ÈíÚ ÇáÃÕá ÇáãÚÑæÖ Ãæ ÇÓÊÈÚÇÏå", "Sell or dispose of the asset shown"
 End Sub
 
 Private Sub D3_2()
+    LangAdd "ÈíÚ ÇáÃÕá ÇáãÚÑæÖ Ãæ ÇÓÊÈÚÇÏå", "Sell or dispose of the asset shown"
     LangAdd "ÊõÚÇÏ İÊÍ ÂÎÑ ÊÓæíÉ ááÈäß İŞØ", "Only the last reconciliation of the bank can be reopened"
     LangAdd "ÊõŞİá ÇáÓäÉ ÈÚÏ ÇäÊåÇÆåÇ (ÈÚÏ", "A year is closed after it ends (after"
     LangAdd "ÑÛã Ğáß¿ (ÈÕáÇÍíÉ ãÏíÑ ÇáäÙÇã", "anyway? (with the permission of the system administrator"
@@ -146,6 +147,8 @@ Private Sub D3_2()
     LangAdd "ÓÈÈ ÅáÛÇÁ ÇáãÓÊäÏ áÏì ÇáãÕáÍÉ", "Reason for cancelling the document at the Tax Authority"
     LangAdd "ÓäÏÇÊ ÇáÕÑİ æÇáÇÓÊáÇã ÇáãÎÒäí", "Stock issue and receipt vouchers"
     LangAdd "ØáÈ ÇáÊæÕíá íÍÊÇÌ ÌæÇá ÇáÚãíá", "A delivery order needs the customer mobile"
+    LangAdd "ÚÌÒ ÇáÈÖÇÚÉ: ÓáİÉ Úáì ÇáãäÏæÈ", "Goods shortage: advance on the rep"
+    LangAdd "ÚÌÒ ÇáäŞÏíÉ: ÓáİÉ Úáì ÇáãäÏæÈ", "Cash shortage: advance on the rep"
     LangAdd "ÚÑÖ İŞØ - ÇáÊÕÍíÍ íßæä ÈãÑÊÌÚ", "View only - a correction is made with a return"
     LangAdd "ßáãÉ ÇáãÑæÑ ÇáÍÇáíÉ ÛíÑ ÕÍíÍÉ", "The current password is wrong"
     LangAdd "ßáãÉ ãÑæÑ ÌÏíÏÉ áÍÓÇÈ ÇáãÈÑãÌ", "New password for the developer account"
@@ -256,12 +259,12 @@ Private Sub D3_2()
     LangAdd "áÇ ÊßáİÉ ãÈíÚÇÊ Ãæ áÇ ãÎÒæä", "No cost of sales or no stock"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ãÓíÑ ÇáÑæÇÊÈ", "You do not have the permission for payroll"
     LangAdd "áÇ ÊæÌÏ ÃÔåÑ áã ÊõÓÌóøá ÍÊì", "There are no unrecorded months up to"
-    LangAdd "áÇ ÊæÌÏ ŞíæÏ ááİÊÑÉ ÇáãÍÏÏÉ", "There are no entries for the period set"
-    LangAdd "ááÃÕá ÅÚÇÏÉ ÊŞííã Ãæ äŞá İí", "The asset has a revaluation or a transfer on"
-    LangAdd "ãËÇá: PCE ááÍÈÉ¡ KGM ááßíáæ", "Example: PCE for a piece, KGM for a kilo"
 End Sub
 
 Private Sub D3_3()
+    LangAdd "áÇ ÊæÌÏ ŞíæÏ ááİÊÑÉ ÇáãÍÏÏÉ", "There are no entries for the period set"
+    LangAdd "ááÃÕá ÅÚÇÏÉ ÊŞííã Ãæ äŞá İí", "The asset has a revaluation or a transfer on"
+    LangAdd "ãËÇá: PCE ááÍÈÉ¡ KGM ááßíáæ", "Example: PCE for a piece, KGM for a kilo"
     LangAdd "ãÕÑæİ ãä ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ", "An expense from the recurring expenses"
     LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ÛíÑ ãæÌæÏ", "The private key file was not found"
     LangAdd "íÈÏÃ ÊÌåíÒ ÇáØáÈíÉ ÇáãÚÊãÏÉ", "Preparing starts from an approved order"
@@ -379,12 +382,12 @@ Private Sub D3_3()
     LangAdd "ÅáÛÇÁ ÊÑÍíá ÅĞä ÇáÇÓÊáÇã", "Unposting the receipt note"
     LangAdd "ÅáÛÇÁ ÊÑÍíá ÓäÏ ÇáÇÓÊáÇã", "Unposting the receipt voucher"
     LangAdd "ÇÎÊÑ ÇáÈäß ÇáĞí ÏõİÚ ãäå", "Choose the bank it was paid from"
-    LangAdd "ÇÎÊÑ ÇáÈäß ÇáãÍæóøá Åáíå", "Choose the bank transferred to"
-    LangAdd "ÇÎÊÑ ÌÑÏğÇ ãİÊæÍğÇ ÃæáğÇ", "Choose an open count first"
-    LangAdd "ÇÎÊÑ ÓØÑ ÍÓÇÈ ãä ÇáŞÇÆãÉ", "Choose an account line from the list"
 End Sub
 
 Private Sub D3_4()
+    LangAdd "ÇÎÊÑ ÇáÈäß ÇáãÍæóøá Åáíå", "Choose the bank transferred to"
+    LangAdd "ÇÎÊÑ ÌÑÏğÇ ãİÊæÍğÇ ÃæáğÇ", "Choose an open count first"
+    LangAdd "ÇÎÊÑ ÓØÑ ÍÓÇÈ ãä ÇáŞÇÆãÉ", "Choose an account line from the list"
     LangAdd "ÇÎÊÑ İÇÊæÑÉ ÇáÔÑÇÁ ÃæáğÇ", "Choose the purchase invoice first"
     LangAdd "ÇßÊÈ ÓÈÈ ÅÚÇÏÉ İÊÍ ÇáÓäÉ", "Type the reason for reopening the year"
     LangAdd "ÇáÈíÚ ãä ÇáÓíÇÑÉ æÊÓæíÊå", "Van sales and settlement"
@@ -502,12 +505,12 @@ Private Sub D3_4()
     LangAdd "ŞÈÖ äŞÏíÉ (ÅíÑÇÏÇÊ ÃÎÑì", "Cash receipt (other revenue"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÊŞÇÑíÑ", "You do not have the permission for reports"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãæÇÒäÉ", "You do not have the permission for the budget"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ İÊÍ ÔÇÔÉ", "You do not have the permission to open the screen"
-    LangAdd "áÇ ÊæÌÏ ÊÍæíáÇÊ ÈÇáØÑíŞ", "No transfers in transit"
-    LangAdd "áÇ íõÍÕóøá ŞÈá ÇÓÊÍŞÇŞå", "is not collected before its due date"
 End Sub
 
 Private Sub D3_5()
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ İÊÍ ÔÇÔÉ", "You do not have the permission to open the screen"
+    LangAdd "áÇ ÊæÌÏ ÊÍæíáÇÊ ÈÇáØÑíŞ", "No transfers in transit"
+    LangAdd "áÇ íõÍÕóøá ŞÈá ÇÓÊÍŞÇŞå", "is not collected before its due date"
     LangAdd "ãÓíÑ ÇáÑæÇÊÈ æÇáÊÃãíäÇÊ", "Payroll and social insurance"
     LangAdd "ãä ÇáÚíäÇÊ İÍÕ ÇáÇãÊËÇá", "of the samples in the compliance checks"
     LangAdd "ãæÇÒäÉ ÇáÓäÉ: ÇáÅíÑÇÏÇÊ", "Budget of the year: revenue"
@@ -589,8 +592,4 @@ Private Sub D3_5()
     LangAdd "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ", "Who added, edited or deleted"
     LangAdd "åĞÇ ÇáÎíÇÑ ááãÈÑãÌ İŞØ", "This option is for the developer only"
     LangAdd "åá ÊÓãÍ ÈÅÊãÇã ÇáÚãáíÉ", "Do you allow the transaction to be completed"
-    LangAdd "æÇÑÏ ÂÎÑ (İæÇÆÏ Ãæ ŞÑÖ", "Other incoming (interest or a loan"
-    LangAdd "ÃÖİå ãä ÒÑ «ãäÊÌ ÌÏíÏ", "Add it with the button New product"
-    LangAdd "ÃİÖá 10 ãäÊÌÇÊ ãÈíÚğÇ", "Top 10 best-selling products"
-    LangAdd "ÃŞá ãä ÇáãÈáÛ ÇáãæÏóÚ", "less than the deposited amount"
 End Sub

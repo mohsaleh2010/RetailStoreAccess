@@ -250,6 +250,7 @@ End Function
 Public Function SettleRepDay(ByVal RepDayID As Long) As String
     ' The transfers of the van are complete, its count is posted and the custody box is closed since the day opened.
     Dim van As Long, box As Long, countID As Variant, closingID As Variant, since As String
+    Dim advanceTo As Variant, shortage As Currency
     If Not HasPermission("REP_DAYS") Then
         SettleRepDay = "ليست لديك صلاحية يوم المندوب."
         Exit Function
@@ -281,10 +282,18 @@ Public Function SettleRepDay(ByVal RepDayID As Long) As String
         SettleRepDay = "صفِّ صندوق العهدة قبل إغلاق اليوم (زر «تصفية الصندوق»)."
         Exit Function
     End If
+    ' the net goods shortage of the day is an advance on the rep when he has a program user (docs/66)
+    advanceTo = DbValue("SELECT r.EmployeeID FROM RepDays AS d INNER JOIN SalesReps AS r ON d.SalesRepID = r.SalesRepID " & _
+                        "WHERE d.RepDayID = " & RepDayID)
+    shortage = -RoundMoney(Nz(DbValue("SELECT CountDiffValue FROM RepDaySummaryQuery WHERE RepDayID = " & RepDayID), 0))
+    If shortage < 0 Or IsNull(advanceTo) Then shortage = 0
     CurrentDb.Execute "UPDATE RepDays SET Status = 'SETTLED', SettledAt = Now(), StockCountID = " & countID & _
-                      ", ClosingID = " & closingID & " WHERE RepDayID = " & RepDayID, dbFailOnError
+                      ", ClosingID = " & closingID & ", GoodsShortage = " & Str$(shortage) & ", AdvanceEmployeeID = " & _
+                      IIf(shortage > 0, CLng(Nz(advanceTo, 0)), "Null") & " WHERE RepDayID = " & RepDayID, dbFailOnError
     If ActingRepDayID() = RepDayID Then StopActingAsRep
-    LogAction "REP_DAY_SETTLE", "RepDays", CStr(RepDayID), "Count=" & countID & " Closing=" & closingID
+    LogAction "REP_DAY_SETTLE", "RepDays", CStr(RepDayID), "Count=" & countID & " Closing=" & closingID & _
+              " Shortage=" & Format$(shortage, "0.00")
+    If shortage > 0 Then SyncJournal
 End Function
 
 '==============================================================================
@@ -326,7 +335,7 @@ Private Function SummaryHead(ByVal Caption As String) As String
 End Function
 
 Public Function RepDaySummaryRows(ByVal RepDayID As Long) As String
-    Dim rs As DAO.Recordset, rows As String, vanValue As Variant
+    Dim rs As DAO.Recordset, rows As String, vanValue As Variant, advance As Currency
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM RepDaySummaryQuery WHERE RepDayID = " & RepDayID, dbOpenSnapshot)
     If rs.EOF Then
         rs.Close
@@ -348,7 +357,11 @@ Public Function RepDaySummaryRows(ByVal RepDayID As Long) As String
         rows = rows & SummaryItem("التصفية: المتوقع", rs!CashExpected) & SummaryItem("التصفية: الفعلي", rs!CashCounted) & _
                SummaryItem("التصفية: الفرق (عجز بالسالب)", rs!CashDifference) & _
                SummaryItem("المسلَّم للخزينة", rs!CashHandedOver)
+        advance = Nz(DbValue("SELECT Sum(Amount) FROM CashVouchers WHERE Category = 'ADVANCE' AND ClosingID = " & _
+                             rs!ClosingID), 0)
+        If advance <> 0 Then rows = rows & SummaryItem("عجز النقدية: سلفة على المندوب", advance)
     End If
+    If Nz(rs!GoodsShortage, 0) <> 0 Then rows = rows & SummaryItem("عجز البضاعة: سلفة على المندوب", rs!GoodsShortage)
     rs.Close
     RepDaySummaryRows = rows
 End Function
@@ -461,7 +474,7 @@ Public Function TestRepDays() As Boolean
     Dim ws As DAO.Workspace, inTrans As Boolean, pid As Long, refNo As String, msg As String, cust As Long
     Dim passed As Long, failed As Long, report As String, rep As Long, van As Long, box As Long, mainBox As Long
     Dim dayID As Long, trID As Long, invID As Long, countID As Long, lines As Long, netValue As Currency
-    Dim closingID As Long, expected As Currency
+    Dim closingID As Long, expected As Currency, advBefore As Currency
     Calendar = vbCalGreg
     EnsureTestUser
     g_SilentMode = True
@@ -539,10 +552,19 @@ Public Function TestRepDays() As Boolean
     CheckRd Len(msg) = 0 And WarehouseStock(pid, van) = 0, "تفريغ السيارة " & msg, passed, failed, report
     CheckRd Len(SettleRepDay(dayID)) > 0, "لا يُغلق اليوم قبل تصفية الصندوق", passed, failed, report
     expected = CashBoxBalance(box)
+    ' docs/66: the rep has a program user, so his shortages are advances on him
+    CurrentDb.Execute "UPDATE SalesReps SET EmployeeID = " & CurrentUserID() & " WHERE SalesRepID = " & rep, dbFailOnError
+    advBefore = Nz(DbValue("SELECT AdvanceBalance FROM qryAdvanceTotals WHERE EmployeeID = " & CurrentUserID()), 0)
     msg = PostCashClosing(box, expected - 5, "MAIN", mainBox, expected - 5, "TEST", closingID)
     CheckRd Len(msg) = 0 And expected = Nz(DbValue("SELECT PaidAmount FROM SalesInvoices WHERE SalesInvoiceID = " & invID), 0), _
             "تصفية صندوق العهدة بعجز 5 " & msg, passed, failed, report
+    CheckRd Nz(DbValue("SELECT COUNT(*) FROM CashVouchers WHERE Category = 'ADVANCE' AND ClosingID = " & closingID & _
+                       " AND AdvanceEmployeeID = " & CurrentUserID()), 0) = 1, "عجز صندوق العهدة سلفة على المندوب", _
+            passed, failed, report
     msg = SettleRepDay(dayID)
+    CheckRd Nz(DbValue("SELECT GoodsShortage FROM RepDays WHERE RepDayID = " & dayID), 0) = 6 And _
+            Nz(DbValue("SELECT AdvanceBalance FROM qryAdvanceTotals WHERE EmployeeID = " & CurrentUserID()), 0) = advBefore + 11, _
+            "عجز البضاعة والنقدية سلفة على المندوب (6 + 5)", passed, failed, report
     CheckRd Len(msg) = 0 And RepDayStatus(dayID) = "SETTLED" And ActingRepDayID() = 0 And CurrentWarehouseID() <> van, _
             "إغلاق اليوم يوقف العمل باسم المندوب " & msg, passed, failed, report
     CheckRd Nz(DbValue("SELECT LoadedValue FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0) = 36 And _

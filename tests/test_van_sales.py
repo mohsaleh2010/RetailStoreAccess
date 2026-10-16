@@ -115,6 +115,45 @@ class RepDayTests(unittest.TestCase):
                          (56, 51, -5, 51, "تمت تسويته"))
         self.assertEqual(s.cash_balance(box), 0, "the cash went to the treasury")
 
+    def balance(self, account):
+        return round(self.s.one("SELECT Coalesce(Sum(Debit) - Sum(Credit), 0) FROM JournalLines WHERE AccountCode = ?",
+                                account), 4)
+
+    def test_shortages_are_an_advance_on_a_rep_with_a_user(self):
+        """docs/66: the cash and the goods shortage of the day go to the rep's advances (1600), not to 5400 / 5200."""
+        s = self.s
+        s.c.execute("UPDATE SalesReps SET EmployeeID = 1 WHERE SalesRepID = ?", (self.rep,))
+        box = self.custody_box()
+        did = s.open_rep_day(self.rep)
+        s.send_transfer(s.stock_transfer(1, self.van, [(self.pid, 4)]))              # 4 x 6
+        s.act_as_rep(did)
+        s.sale([(self.pid, 1)], customer=self.cust)                                  # 23 in cash
+        self.van_count(-2)                                                           # two short: 12 at cost
+        s.send_transfer(s.stock_transfer(self.van, 1, [(self.pid, 1)]))
+        s.sync_journal()
+        shortage_before, stock_diff_before = self.balance(5400), self.balance(5200)
+        s.cash_closing(box, 20, "MAIN", s.box_of_type("MAIN"), 20)                  # 3 short
+        s.settle_rep_day(did)
+        s.sync_journal()
+        self.assertEqual(s.one("SELECT Category FROM CashVouchers WHERE ClosingID IS NOT NULL AND CashBoxID = ? AND "
+                               "VoucherType = 'OUT'", box), "ADVANCE")
+        self.assertEqual(s.one("SELECT GoodsShortage FROM RepDays WHERE RepDayID = ?", did), 12)
+        self.assertEqual(s.one("SELECT AdvanceBalance FROM qryAdvanceTotals WHERE EmployeeID = 1"), 15)
+        self.assertEqual(self.balance(1600), 15)
+        self.assertEqual(self.balance(5400), shortage_before)                       # not a box shortage
+        self.assertEqual(self.balance(5200), stock_diff_before - 12)                # the count loss is taken back
+        self.assertEqual(s.one("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit"), 0)
+
+    def test_a_rep_without_a_user_keeps_the_shortage_general(self):
+        s = self.s
+        box = self.custody_box()
+        did = s.open_rep_day(self.rep)
+        self.van_count(-1)
+        s.cash_closing(box, 0, "KEEP", None, 0)
+        s.settle_rep_day(did)
+        self.assertEqual(s.one("SELECT GoodsShortage FROM RepDays WHERE RepDayID = ?", did), 0)
+        self.assertIsNone(s.one("SELECT AdvanceEmployeeID FROM RepDays WHERE RepDayID = ?", did))
+
     def test_settle_needs_the_transfers_done_and_the_van_counted(self):
         s = self.s
         box = self.custody_box()

@@ -368,6 +368,7 @@ Private Sub D2_3()
     LangAdd "ÑÕíÏ ßá ãæÑÏ íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each supplier on the start-up day: positive"
     LangAdd "ÑŞã ÇáÊÓÌíá ÇáÖÑíÈí İí ãÕÑ 9 ÃÑŞÇã", "The Egyptian tax registration number has 9 digits"
     LangAdd "ÑŞã ÇáÊÓÌíá ÇáÖÑíÈí ááãÍá (9 ÃÑŞÇã", "Tax registration number of the store (9 digits"
+    LangAdd "ÚÌÒ ÈÖÇÚÉ ÇáÓíÇÑÉ ÓáİÉ Úáì ÇáãäÏæÈ", "Van goods shortage as an advance on the rep"
     LangAdd "İÇÊæÑÉ ÅĞä ÇáÇÓÊáÇã ÈÚãáÉ ÇáÈÑäÇãÌ", "The invoice of a receipt note is in the program currency"
     LangAdd "İÍÕ ÓáÇãÉ ÇáÈíÇäÇÊ: áÇ ÊæÌÏ ãÔßáÇÊ", "Data integrity check: no problems"
     LangAdd "ßá ÇáÃĞæäÇÊ ÇáãÑÍøáÉ ÕÏÑÊ İæÇÊíÑåÇ", "Every posted note is invoiced"
@@ -380,10 +381,10 @@ Private Sub D2_3()
     LangAdd "ãÈíÚÇÊå æãÓíÑ ÑÇÊÈå Úáì åĞÇ ÇáãÑßÒ", "His sales and payroll are on this center"
     LangAdd "äŞá ÇáÃÕá Åáì ãÑßÒ ÇáÊßáİÉ ÇáãÎÊÇÑ", "Transfer the asset to the chosen cost centre"
     LangAdd "äæÚ ÇáÍÑßÉ ÛíÑ ãÊÇÍ ááÅÏÎÇá ÇáíÏæí", "The move type is not available for manual entry"
-    LangAdd "åĞÇ ÇáÍÓÇÈ ãÚØøá. ÑÇÌÚ ãÏíÑ ÇáäÙÇã", "This account is disabled. Ask the system administrator"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "åĞÇ ÇáÍÓÇÈ ãÚØøá. ÑÇÌÚ ãÏíÑ ÇáäÙÇã", "This account is disabled. Ask the system administrator"
     LangAdd "ÃÏÎá ÊÇÑíÎ ÇáÈÏÇíÉ æÊÇÑíÎ ÇáäåÇíÉ", "Enter the start date and the end date"
     LangAdd "ÅŞÑÇÑ ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ (äãæĞÌ", "VAT return (form"
     LangAdd "Åáì ÊÇÑíÎ (ÇáãíÒÇäíÉ İí åĞÇ Çáíæã", "To date (the balance sheet on this day"
@@ -428,5 +429,4 @@ Private Sub D2_4()
     LangAdd "ÊÑÊíÈ ÇáÚãíá İí ÎØ ÓíÑ Ğáß Çáíæã", "The order of the customer on the route of that day"
     LangAdd "ÊÑÍíá ÇáãÓíÑ æÅäÔÇÁ ŞíÏ ÇáÚãæáÇÊ", "Post the run and create the commissions entry"
     LangAdd "Êã ÅáÛÇÁ ÇáÍİÙ: ÇáßãíÉ ÛíÑ ßÇİíÉ", "Saving was cancelled: the quantity is not enough"
-    LangAdd "Êã ÊİÚíá ÇáÈÑäÇãÌ Úáì åĞÇ ÇáÌåÇÒ", "The program was activated on this computer"
 End Sub

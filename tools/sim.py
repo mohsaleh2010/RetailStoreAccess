@@ -137,7 +137,15 @@ class Store:
                           ToCashBoxID=to_box if destination == "MAIN" and transfer > 0 else None,
                           TransferAmount=float(transfer), KeptAmount=float(counted - transfer))
         if diff < 0:
-            self.cash_voucher("OUT", box, -diff, "SHORTAGE", text="عجز تصفية " + no, closing=cid)
+            employee = self.one("SELECT r.EmployeeID FROM CashBoxes AS b INNER JOIN SalesReps AS r ON b.SalesRepID = "
+                                "r.SalesRepID WHERE b.BoxType = 'CUSTODY' AND r.EmployeeID IS NOT NULL AND b.CashBoxID = ?",
+                                box)                                             # ShortageEmployeeFor (docs/66)
+            if employee is None:
+                self.cash_voucher("OUT", box, -diff, "SHORTAGE", text="عجز تصفية " + no, closing=cid)
+            else:
+                vid = self.cash_voucher("OUT", box, -diff, "ADVANCE", text="عجز تصفية " + no + " سلفة على المندوب",
+                                        closing=cid)
+                self.c.execute("UPDATE CashVouchers SET AdvanceEmployeeID = ? WHERE CashVoucherID = ?", (employee, vid))
         elif diff > 0:
             self.cash_voucher("IN", box, diff, "OVERAGE", text="زيادة تصفية " + no, closing=cid)
         if transfer > 0:
@@ -779,9 +787,18 @@ class Store:
         closing = self.one("SELECT Max(ClosingID) FROM CashClosings WHERE CashBoxID = ? AND ClosingDate >= ?", box, opened)
         if count is None or closing is None:
             raise SimError("count the van and close the custody box first")
-        self.c.execute("UPDATE RepDays SET Status = 'SETTLED', SettledAt = ?, StockCountID = ?, ClosingID = ? "
-                       "WHERE RepDayID = ?", (self.now, count, closing, did))
+        employee = self.one("SELECT r.EmployeeID FROM RepDays AS d INNER JOIN SalesReps AS r ON d.SalesRepID = "
+                            "r.SalesRepID WHERE d.RepDayID = ?", did)
+        shortage = -dec(self.one("SELECT CountDiffValue FROM RepDaySummaryQuery WHERE RepDayID = ?", did) or 0
+                        ).quantize(D("0.01"))
+        if shortage < 0 or employee is None:
+            shortage = D(0)
+        self.c.execute("UPDATE RepDays SET Status = 'SETTLED', SettledAt = ?, StockCountID = ?, ClosingID = ?, "
+                       "GoodsShortage = ?, AdvanceEmployeeID = ? WHERE RepDayID = ?",
+                       (self.now, count, closing, float(shortage), employee if shortage > 0 else None, did))
         self.acting = None
+        if shortage > 0:
+            self.sync_journal()
 
     # ------------------------------------------------------------- routes, visits and rep limits (modRepRoutes, docs/64)
     def rep_for(self, customer):                                     # SalesRepFor

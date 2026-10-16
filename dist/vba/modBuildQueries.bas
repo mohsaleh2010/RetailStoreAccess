@@ -29,9 +29,9 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryStockNoteValue,qryInvoiced" & _
     "Notes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryRepDayStock,qryRepDaySales,qryRepDayReturns,qryRepDayCollections,RepDaySummaryQuery,RepVisitListQuery,RouteExecutionQuery,RepVanStockQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocume" & _
     "nt,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryAssetRevalTotals,qryAssetLastReval,qryAssetFirstCenter,qryJournalAsset,qryJournalAssetReval,qryJournalAssetT" & _
-    "ransfer,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEnt" & _
-    "ryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBal" & _
-    "anceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "ransfer,qryJournalRepShortage,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLi" & _
+    "nesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQue" & _
+    "ry,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -857,6 +857,7 @@ Private Sub CreateAllQueries()
     Q_qryJournalAsset
     Q_qryJournalAssetReval
     Q_qryJournalAssetTransfer
+    Q_qryJournalRepShortage
     Q_qryDepreciationLines
     Q_qryJournalDepreciation
     Q_qryPayrollTotals
@@ -2868,7 +2869,7 @@ Private Sub Q_RepDaySummaryQuery()
     s = s & "       Nz(s.InvCount, 0) AS InvoiceCount, Nz(s.SalesAmt, 0) AS SalesTotal, Nz(s.CashSalesAmt, 0) AS CashSales," & vbCrLf
     s = s & "       Nz(t.ReturnsAmt, 0) AS ReturnsTotal, Nz(t.RefundsAmt, 0) AS CashRefunds," & vbCrLf
     s = s & "       Nz(p.CollectedAmt, 0) AS Collections, c.ExpectedBalance AS CashExpected, c.CountedAmount AS CashCounted," & vbCrLf
-    s = s & "       c.Difference AS CashDifference, c.TransferAmount AS CashHandedOver" & vbCrLf
+    s = s & "       c.Difference AS CashDifference, c.TransferAmount AS CashHandedOver, d.ClosingID, d.GoodsShortage" & vbCrLf
     s = s & "FROM (((((((RepDays AS d INNER JOIN [@SalesReps] AS r ON d.SalesRepID = r.SalesRepID)" & vbCrLf
     s = s & "            INNER JOIN [@Warehouses] AS w ON d.WarehouseID = w.WarehouseID)" & vbCrLf
     s = s & "           INNER JOIN [@CashBoxes] AS b ON d.CashBoxID = b.CashBoxID)" & vbCrLf
@@ -3476,6 +3477,18 @@ Private Sub Q_qryJournalAssetTransfer()
     SaveQuery "qryJournalAssetTransfer", "√”ÿ— ﬁÌÊœ ‰ﬁ· «·√’Ê· «·À«» … »Ì‰ „—«ﬂ“ «· ﬂ·›…", s
 End Sub
 
+Private Sub Q_qryJournalRepShortage()
+    Dim s As String
+    s = "SELECT 'REP_SHORTAGE' AS SourceType, d.RepDayID AS SourceID, d.DayNumber AS SourceNumber, d.SettledAt AS SourceDate, r.RepName AS Party, 1 AS LineOrder, 1600 AS AccountCode, d.GoodsShortage AS Debit, CCur(0) AS Credit, '⁄Ã“ »÷«⁄… «·”Ì«—… ”·›… ⁄·Ï «·„‰œÊ»' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM RepDays AS d INNER JOIN [@SalesReps] AS r ON d.SalesRepID = r.SalesRepID" & vbCrLf
+    s = s & "WHERE d.Status = 'SETTLED' AND d.GoodsShortage <> 0 AND d.AdvanceEmployeeID Is Not Null" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'REP_SHORTAGE' AS SourceType, d.RepDayID AS SourceID, d.DayNumber AS SourceNumber, d.SettledAt AS SourceDate, r.RepName AS Party, 2 AS LineOrder, 5200 AS AccountCode, CCur(0) AS Debit, d.GoodsShortage AS Credit, '⁄Ã“ »÷«⁄… «·”Ì«—… ”·›… ⁄·Ï «·„‰œÊ»' AS LineText, 0 AS CostCenter" & vbCrLf
+    s = s & "FROM RepDays AS d INNER JOIN [@SalesReps] AS r ON d.SalesRepID = r.SalesRepID" & vbCrLf
+    s = s & "WHERE d.Status = 'SETTLED' AND d.GoodsShortage <> 0 AND d.AdvanceEmployeeID Is Not Null" & vbCrLf
+    SaveQuery "qryJournalRepShortage", "√”ÿ— ﬁÌÊœ ⁄Ã“ »÷«⁄… «·„‰œÊ» «·„Õ„Û¯· ⁄·ÌÂ ”·›…", s
+End Sub
+
 Private Sub Q_qryDepreciationLines()
     Dim s As String
     s = "SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName," & vbCrLf
@@ -3721,6 +3734,10 @@ Private Sub Q_qryAdvanceMoves()
     s = s & "SELECT l.EmployeeID, r.PayMonth, -l.AdvanceDeduction" & vbCrLf
     s = s & "FROM PayrollLines AS l INNER JOIN PayrollRuns AS r ON l.PayrollRunID = r.PayrollRunID" & vbCrLf
     s = s & "WHERE r.Status = 'POSTED' AND l.AdvanceDeduction <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT d.AdvanceEmployeeID, d.SettledAt, d.GoodsShortage" & vbCrLf
+    s = s & "FROM RepDays AS d" & vbCrLf
+    s = s & "WHERE d.Status = 'SETTLED' AND d.GoodsShortage <> 0 AND d.AdvanceEmployeeID Is Not Null" & vbCrLf
     SaveQuery "qryAdvanceMoves", "Õ—ﬂ«  ”·› «·„ÊŸ›Ì‰: «·’—› Ê«·”œ«œ «·‰ﬁœÌ Ê«·Œ’„ „‰ «·—Ê« »", s
 End Sub
 

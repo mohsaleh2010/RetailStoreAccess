@@ -379,6 +379,14 @@ Private Function InsertVoucher(ByVal db As DAO.Database, ByVal VoucherType As St
     rs.Close
 End Function
 
+Public Function ShortageEmployeeFor(ByVal BoxID As Long) As Variant
+    ' The program user of the rep who keeps a custody box (docs/66): its closing shortage is an advance on him.
+    ' Null = a box of the shop, or a rep with no user: the shortage stays a box shortage (5400).
+    ShortageEmployeeFor = DbValue("SELECT r.EmployeeID FROM CashBoxes AS b INNER JOIN SalesReps AS r ON b.SalesRepID = " & _
+                                  "r.SalesRepID WHERE b.BoxType = 'CUSTODY' AND r.EmployeeID Is Not Null AND b.CashBoxID = " & _
+                                  BoxID)
+End Function
+
 Public Function PostCashClosing(ByVal BoxID As Long, ByVal Counted As Currency, ByVal Destination As String, _
                                 ByVal ToBoxID As Variant, ByVal TransferAmount As Currency, ByVal Notes As String, _
                                 ByRef NewClosingID As Long) As String
@@ -388,6 +396,7 @@ Public Function PostCashClosing(ByVal BoxID As Long, ByVal Counted As Currency, 
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim periodStart As Variant, opening As Currency, cashIn As Currency, cashOut As Currency
     Dim expected As Currency, diff As Currency, closeDate As Date, closingNo As String
+    Dim advanceTo As Variant, voucherID As Long
 
     On Error GoTo EH
     NewClosingID = 0
@@ -463,7 +472,16 @@ Public Function PostCashClosing(ByVal BoxID As Long, ByVal Counted As Currency, 
     rs.Close
 
     If diff < 0 Then
-        InsertVoucher db, "OUT", BoxID, Null, "SHORTAGE", -diff, "", "⁄Ã“  ’›Ì… " & closingNo, Null, NewClosingID, closeDate
+        advanceTo = ShortageEmployeeFor(BoxID)
+        If IsNull(advanceTo) Then
+            InsertVoucher db, "OUT", BoxID, Null, "SHORTAGE", -diff, "", "⁄Ã“  ’›Ì… " & closingNo, Null, NewClosingID, closeDate
+        Else
+            ' a rep's custody box: the shortage is an advance on the rep (docs/66), deducted from his pay
+            voucherID = InsertVoucher(db, "OUT", BoxID, Null, "ADVANCE", -diff, "", "⁄Ã“  ’›Ì… " & closingNo & _
+                                      " ”·›… ⁄·Ï «·„‰œÊ»", Null, NewClosingID, closeDate)
+            db.Execute "UPDATE CashVouchers SET AdvanceEmployeeID = " & CLng(advanceTo) & " WHERE CashVoucherID = " & _
+                       voucherID, dbFailOnError
+        End If
     ElseIf diff > 0 Then
         InsertVoucher db, "IN", BoxID, Null, "OVERAGE", diff, "", "“Ì«œ…  ’›Ì… " & closingNo, Null, NewClosingID, closeDate
     End If

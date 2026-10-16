@@ -18,6 +18,10 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "وارد آخر (فوائد أو قرض", "Other incoming (interest or a loan"
+    LangAdd "أضفه من زر «منتج جديد", "Add it with the button New product"
+    LangAdd "أفضل 10 منتجات مبيعًا", "Top 10 best-selling products"
+    LangAdd "أقل من المبلغ المودَع", "less than the deposited amount"
     LangAdd "أو اختر المنتج بالاسم", "or choose the product by name"
     LangAdd "إجمالي تكلفة المبيعات", "Total cost of sales"
     LangAdd "إجمالي ضريبة المدخلات", "Total input VAT"
@@ -134,13 +138,13 @@ Private Sub D4_1()
     LangAdd "حذف الأصل وقيد شرائه", "Delete the asset and its purchase entry"
     LangAdd "حساب أساسي في النظام", "A system account"
     LangAdd "حساب الأصل (المجموعة", "Asset account (group"
+End Sub
+
+Private Sub D4_2()
     LangAdd "حساب البنك في الدليل", "Account of the bank in the chart"
     LangAdd "ربط السداد بالفواتير", "Match payments to invoices"
     LangAdd "رصيد أول المدة (قيمة", "Opening balance (value"
     LangAdd "رصيد أول المدة (كمية", "Opening balance (quantity"
-End Sub
-
-Private Sub D4_2()
     LangAdd "رصيد دائن غير مستخدم", "Unused credit balance"
     LangAdd "رقم الفاتورة الأصلية", "Original invoice number"
     LangAdd "رقم الهوية / الإقامة", "ID / iqama number"
@@ -257,13 +261,13 @@ Private Sub D4_2()
     LangAdd "التكلفة بدون ضريبة", "Cost without VAT"
     LangAdd "الصادرات (بسعر صفر", "Exports (zero rate"
     LangAdd "العمولات المرحَّلة", "Posted commissions"
+End Sub
+
+Private Sub D4_3()
     LangAdd "القيمة بعد التقييم", "Value after revaluation"
     LangAdd "الكافيه: سعر البيع", "Cafe: sale price"
     LangAdd "الكمية أكبر من صفر", "The quantity must be above zero"
     LangAdd "المبلغ قبل الضريبة", "Amount before VAT"
-End Sub
-
-Private Sub D4_3()
     LangAdd "المتبقي على الحساب", "Remaining on account"
     LangAdd "المرتجع من العملاء", "Returned by customers"
     LangAdd "المستخدم غير موجود", "The user does not exist"
@@ -380,13 +384,13 @@ Private Sub D4_3()
     LangAdd "تعذر تحديث القيود", "Could not refresh the entries"
     LangAdd "تعذر ترحيل الرصيد", "Could not post the stock"
     LangAdd "تعذر حفظ الفاتورة", "Could not save the invoice"
+End Sub
+
+Private Sub D4_4()
     LangAdd "تغيير كلمة المرور", "Change password"
     LangAdd "تم اعتماد الإقرار", "The return was approved"
     LangAdd "تمت الإضافة للطلب", "Added to the order"
     LangAdd "حذف قيد إهلاك شهر", "Delete the depreciation entry of the month"
-End Sub
-
-Private Sub D4_4()
     LangAdd "حذف مسودة الإقرار", "Delete the draft of the return"
     LangAdd "حذف مسودة التحويل", "Delete the draft transfer"
     LangAdd "حذف مسودة الطلبية", "Delete the draft order"
@@ -499,17 +503,18 @@ Private Sub D4_4()
     LangAdd "زيادة في الصندوق", "Overage in the box"
     LangAdd "زيارات المندوبين", "Rep visits"
     LangAdd "سعر الحجم الكبير", "Large size price"
+    LangAdd "سلفة على المندوب", "advance on the rep"
     LangAdd "صافي خسارة السنة", "Net loss of the year"
     LangAdd "طباعة كشف الحساب", "Print the statement"
     LangAdd "عاد المسير مسودة", "The run is a draft again"
+End Sub
+
+Private Sub D4_5()
     LangAdd "عمليات المستندات", "Document transactions"
     LangAdd "عمولات المندوبين", "Sales rep commissions"
     LangAdd "عن فاتورة الشراء", "for the purchase invoice"
     LangAdd "غير مسموح بالآجل", "Credit not allowed"
     LangAdd "لجهاز نقطة البيع", "of the POS device"
-End Sub
-
-Private Sub D4_5()
     LangAdd "لم يُقبل المستند", "The document was not accepted"
     LangAdd "لم يُلغَ المستند", "The document was not cancelled"
     LangAdd "مجمع إهلاك الأصل", "Accumulated depreciation of the asset"
@@ -625,14 +630,14 @@ Private Sub D4_5()
     LangAdd "مركز قيد عمولته", "Center of his commission entry"
     LangAdd "مستخدم البرنامج", "Program user"
     LangAdd "معفى من الضريبة", "Exempt from VAT"
+End Sub
+
+Private Sub D4_6()
     LangAdd "ملاحظات الزيارة", "Visit notes"
     LangAdd "ملصقات الباركود", "Barcode labels"
     LangAdd "ملف XML لفاتورة", "XML file of an invoice"
     LangAdd "مُسلَّمة جزئيًا", "Partly delivered"
     LangAdd "نسبة مجمل الربح", "Gross profit ratio"
-End Sub
-
-Private Sub D4_6()
     LangAdd "نقطة بيع المطعم", "Restaurant point of sale"
     LangAdd "هل تريد الترحيل", "Do you want to post"
     LangAdd "يبقى في الصندوق", "Stays in the box"
@@ -748,14 +753,14 @@ Private Sub D4_6()
     LangAdd "ضريبة المدخلات", "Input VAT"
     LangAdd "طابعة الملصقات", "Label printer"
     LangAdd "طباعة الباركود", "Print barcodes"
+End Sub
+
+Private Sub D4_7()
     LangAdd "طباعة المقارنة", "Print the comparison"
     LangAdd "طريقة الاستلام", "Receipt method"
     LangAdd "طلبيات العملاء", "Customer orders"
     LangAdd "عجز في الصندوق", "Shortage in the box"
     LangAdd "عرض الملصق (مم", "Label width (mm"
-End Sub
-
-Private Sub D4_7()
     LangAdd "عرض في اليومية", "Show in the journal"
     LangAdd "عميل عليه رصيد", "Customer with a balance"
     LangAdd "فاتورة مشتريات", "Purchase invoice"
@@ -824,11 +829,4 @@ Private Sub D4_7()
     LangAdd "الشخص المسؤول", "Contact person"
     LangAdd "الصرف المخزني", "Stock issue"
     LangAdd "الصنف والمخزن", "Product and warehouse"
-    LangAdd "العملية (فارغ", "Transaction (empty"
-    LangAdd "الفرع الرئيسي", "Main branch"
-    LangAdd "القائم بالجرد", "Counted by"
-    LangAdd "المبلغ المسدد", "Amount paid"
-    LangAdd "المردود نقدًا", "Refunded in cash"
-    LangAdd "المسترد نقدًا", "Refunded in cash"
-    LangAdd "المفتاح الخاص", "Private key"
 End Sub

@@ -18,6 +18,10 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "æÇÑÏ ÂÎÑ (İæÇÆÏ Ãæ ŞÑÖ", "Other incoming (interest or a loan"
+    LangAdd "ÃÖİå ãä ÒÑ «ãäÊÌ ÌÏíÏ", "Add it with the button New product"
+    LangAdd "ÃİÖá 10 ãäÊÌÇÊ ãÈíÚğÇ", "Top 10 best-selling products"
+    LangAdd "ÃŞá ãä ÇáãÈáÛ ÇáãæÏóÚ", "less than the deposited amount"
     LangAdd "Ãæ ÇÎÊÑ ÇáãäÊÌ ÈÇáÇÓã", "or choose the product by name"
     LangAdd "ÅÌãÇáí ÊßáİÉ ÇáãÈíÚÇÊ", "Total cost of sales"
     LangAdd "ÅÌãÇáí ÖÑíÈÉ ÇáãÏÎáÇÊ", "Total input VAT"
@@ -134,13 +138,13 @@ Private Sub D4_1()
     LangAdd "ÍĞİ ÇáÃÕá æŞíÏ ÔÑÇÆå", "Delete the asset and its purchase entry"
     LangAdd "ÍÓÇÈ ÃÓÇÓí İí ÇáäÙÇã", "A system account"
     LangAdd "ÍÓÇÈ ÇáÃÕá (ÇáãÌãæÚÉ", "Asset account (group"
+End Sub
+
+Private Sub D4_2()
     LangAdd "ÍÓÇÈ ÇáÈäß İí ÇáÏáíá", "Account of the bank in the chart"
     LangAdd "ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "Match payments to invoices"
     LangAdd "ÑÕíÏ Ãæá ÇáãÏÉ (ŞíãÉ", "Opening balance (value"
     LangAdd "ÑÕíÏ Ãæá ÇáãÏÉ (ßãíÉ", "Opening balance (quantity"
-End Sub
-
-Private Sub D4_2()
     LangAdd "ÑÕíÏ ÏÇÆä ÛíÑ ãÓÊÎÏã", "Unused credit balance"
     LangAdd "ÑŞã ÇáİÇÊæÑÉ ÇáÃÕáíÉ", "Original invoice number"
     LangAdd "ÑŞã ÇáåæíÉ / ÇáÅŞÇãÉ", "ID / iqama number"
@@ -257,13 +261,13 @@ Private Sub D4_2()
     LangAdd "ÇáÊßáİÉ ÈÏæä ÖÑíÈÉ", "Cost without VAT"
     LangAdd "ÇáÕÇÏÑÇÊ (ÈÓÚÑ ÕİÑ", "Exports (zero rate"
     LangAdd "ÇáÚãæáÇÊ ÇáãÑÍóøáÉ", "Posted commissions"
+End Sub
+
+Private Sub D4_3()
     LangAdd "ÇáŞíãÉ ÈÚÏ ÇáÊŞííã", "Value after revaluation"
     LangAdd "ÇáßÇİíå: ÓÚÑ ÇáÈíÚ", "Cafe: sale price"
     LangAdd "ÇáßãíÉ ÃßÈÑ ãä ÕİÑ", "The quantity must be above zero"
     LangAdd "ÇáãÈáÛ ŞÈá ÇáÖÑíÈÉ", "Amount before VAT"
-End Sub
-
-Private Sub D4_3()
     LangAdd "ÇáãÊÈŞí Úáì ÇáÍÓÇÈ", "Remaining on account"
     LangAdd "ÇáãÑÊÌÚ ãä ÇáÚãáÇÁ", "Returned by customers"
     LangAdd "ÇáãÓÊÎÏã ÛíÑ ãæÌæÏ", "The user does not exist"
@@ -380,13 +384,13 @@ Private Sub D4_3()
     LangAdd "ÊÚĞÑ ÊÍÏíË ÇáŞíæÏ", "Could not refresh the entries"
     LangAdd "ÊÚĞÑ ÊÑÍíá ÇáÑÕíÏ", "Could not post the stock"
     LangAdd "ÊÚĞÑ ÍİÙ ÇáİÇÊæÑÉ", "Could not save the invoice"
+End Sub
+
+Private Sub D4_4()
     LangAdd "ÊÛííÑ ßáãÉ ÇáãÑæÑ", "Change password"
     LangAdd "Êã ÇÚÊãÇÏ ÇáÅŞÑÇÑ", "The return was approved"
     LangAdd "ÊãÊ ÇáÅÖÇİÉ ááØáÈ", "Added to the order"
     LangAdd "ÍĞİ ŞíÏ ÅåáÇß ÔåÑ", "Delete the depreciation entry of the month"
-End Sub
-
-Private Sub D4_4()
     LangAdd "ÍĞİ ãÓæÏÉ ÇáÅŞÑÇÑ", "Delete the draft of the return"
     LangAdd "ÍĞİ ãÓæÏÉ ÇáÊÍæíá", "Delete the draft transfer"
     LangAdd "ÍĞİ ãÓæÏÉ ÇáØáÈíÉ", "Delete the draft order"
@@ -499,17 +503,18 @@ Private Sub D4_4()
     LangAdd "ÒíÇÏÉ İí ÇáÕäÏæŞ", "Overage in the box"
     LangAdd "ÒíÇÑÇÊ ÇáãäÏæÈíä", "Rep visits"
     LangAdd "ÓÚÑ ÇáÍÌã ÇáßÈíÑ", "Large size price"
+    LangAdd "ÓáİÉ Úáì ÇáãäÏæÈ", "advance on the rep"
     LangAdd "ÕÇİí ÎÓÇÑÉ ÇáÓäÉ", "Net loss of the year"
     LangAdd "ØÈÇÚÉ ßÔİ ÇáÍÓÇÈ", "Print the statement"
     LangAdd "ÚÇÏ ÇáãÓíÑ ãÓæÏÉ", "The run is a draft again"
+End Sub
+
+Private Sub D4_5()
     LangAdd "ÚãáíÇÊ ÇáãÓÊäÏÇÊ", "Document transactions"
     LangAdd "ÚãæáÇÊ ÇáãäÏæÈíä", "Sales rep commissions"
     LangAdd "Úä İÇÊæÑÉ ÇáÔÑÇÁ", "for the purchase invoice"
     LangAdd "ÛíÑ ãÓãæÍ ÈÇáÂÌá", "Credit not allowed"
     LangAdd "áÌåÇÒ äŞØÉ ÇáÈíÚ", "of the POS device"
-End Sub
-
-Private Sub D4_5()
     LangAdd "áã íõŞÈá ÇáãÓÊäÏ", "The document was not accepted"
     LangAdd "áã íõáÛó ÇáãÓÊäÏ", "The document was not cancelled"
     LangAdd "ãÌãÚ ÅåáÇß ÇáÃÕá", "Accumulated depreciation of the asset"
@@ -625,14 +630,14 @@ Private Sub D4_5()
     LangAdd "ãÑßÒ ŞíÏ ÚãæáÊå", "Center of his commission entry"
     LangAdd "ãÓÊÎÏã ÇáÈÑäÇãÌ", "Program user"
     LangAdd "ãÚİì ãä ÇáÖÑíÈÉ", "Exempt from VAT"
+End Sub
+
+Private Sub D4_6()
     LangAdd "ãáÇÍÙÇÊ ÇáÒíÇÑÉ", "Visit notes"
     LangAdd "ãáÕŞÇÊ ÇáÈÇÑßæÏ", "Barcode labels"
     LangAdd "ãáİ XML áİÇÊæÑÉ", "XML file of an invoice"
     LangAdd "ãõÓáóøãÉ ÌÒÆíğÇ", "Partly delivered"
     LangAdd "äÓÈÉ ãÌãá ÇáÑÈÍ", "Gross profit ratio"
-End Sub
-
-Private Sub D4_6()
     LangAdd "äŞØÉ ÈíÚ ÇáãØÚã", "Restaurant point of sale"
     LangAdd "åá ÊÑíÏ ÇáÊÑÍíá", "Do you want to post"
     LangAdd "íÈŞì İí ÇáÕäÏæŞ", "Stays in the box"
@@ -748,14 +753,14 @@ Private Sub D4_6()
     LangAdd "ÖÑíÈÉ ÇáãÏÎáÇÊ", "Input VAT"
     LangAdd "ØÇÈÚÉ ÇáãáÕŞÇÊ", "Label printer"
     LangAdd "ØÈÇÚÉ ÇáÈÇÑßæÏ", "Print barcodes"
+End Sub
+
+Private Sub D4_7()
     LangAdd "ØÈÇÚÉ ÇáãŞÇÑäÉ", "Print the comparison"
     LangAdd "ØÑíŞÉ ÇáÇÓÊáÇã", "Receipt method"
     LangAdd "ØáÈíÇÊ ÇáÚãáÇÁ", "Customer orders"
     LangAdd "ÚÌÒ İí ÇáÕäÏæŞ", "Shortage in the box"
     LangAdd "ÚÑÖ ÇáãáÕŞ (ãã", "Label width (mm"
-End Sub
-
-Private Sub D4_7()
     LangAdd "ÚÑÖ İí ÇáíæãíÉ", "Show in the journal"
     LangAdd "Úãíá Úáíå ÑÕíÏ", "Customer with a balance"
     LangAdd "İÇÊæÑÉ ãÔÊÑíÇÊ", "Purchase invoice"
@@ -824,11 +829,4 @@ Private Sub D4_7()
     LangAdd "ÇáÔÎÕ ÇáãÓÄæá", "Contact person"
     LangAdd "ÇáÕÑİ ÇáãÎÒäí", "Stock issue"
     LangAdd "ÇáÕäİ æÇáãÎÒä", "Product and warehouse"
-    LangAdd "ÇáÚãáíÉ (İÇÑÛ", "Transaction (empty"
-    LangAdd "ÇáİÑÚ ÇáÑÆíÓí", "Main branch"
-    LangAdd "ÇáŞÇÆã ÈÇáÌÑÏ", "Counted by"
-    LangAdd "ÇáãÈáÛ ÇáãÓÏÏ", "Amount paid"
-    LangAdd "ÇáãÑÏæÏ äŞÏğÇ", "Refunded in cash"
-    LangAdd "ÇáãÓÊÑÏ äŞÏğÇ", "Refunded in cash"
-    LangAdd "ÇáãİÊÇÍ ÇáÎÇÕ", "Private key"
 End Sub

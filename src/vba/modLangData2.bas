@@ -368,6 +368,7 @@ Private Sub D2_3()
     LangAdd "رصيد كل مورد يوم بدء التشغيل: موجب", "The balance of each supplier on the start-up day: positive"
     LangAdd "رقم التسجيل الضريبي في مصر 9 أرقام", "The Egyptian tax registration number has 9 digits"
     LangAdd "رقم التسجيل الضريبي للمحل (9 أرقام", "Tax registration number of the store (9 digits"
+    LangAdd "عجز بضاعة السيارة سلفة على المندوب", "Van goods shortage as an advance on the rep"
     LangAdd "فاتورة إذن الاستلام بعملة البرنامج", "The invoice of a receipt note is in the program currency"
     LangAdd "فحص سلامة البيانات: لا توجد مشكلات", "Data integrity check: no problems"
     LangAdd "كل الأذونات المرحّلة صدرت فواتيرها", "Every posted note is invoiced"
@@ -380,10 +381,10 @@ Private Sub D2_3()
     LangAdd "مبيعاته ومسير راتبه على هذا المركز", "His sales and payroll are on this center"
     LangAdd "نقل الأصل إلى مركز التكلفة المختار", "Transfer the asset to the chosen cost centre"
     LangAdd "نوع الحركة غير متاح للإدخال اليدوي", "The move type is not available for manual entry"
-    LangAdd "هذا الحساب معطّل. راجع مدير النظام", "This account is disabled. Ask the system administrator"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "هذا الحساب معطّل. راجع مدير النظام", "This account is disabled. Ask the system administrator"
     LangAdd "أدخل تاريخ البداية وتاريخ النهاية", "Enter the start date and the end date"
     LangAdd "إقرار ضريبة القيمة المضافة (نموذج", "VAT return (form"
     LangAdd "إلى تاريخ (الميزانية في هذا اليوم", "To date (the balance sheet on this day"
@@ -428,5 +429,4 @@ Private Sub D2_4()
     LangAdd "ترتيب العميل في خط سير ذلك اليوم", "The order of the customer on the route of that day"
     LangAdd "ترحيل المسير وإنشاء قيد العمولات", "Post the run and create the commissions entry"
     LangAdd "تم إلغاء الحفظ: الكمية غير كافية", "Saving was cancelled: the quantity is not enough"
-    LangAdd "تم تفعيل البرنامج على هذا الجهاز", "The program was activated on this computer"
 End Sub

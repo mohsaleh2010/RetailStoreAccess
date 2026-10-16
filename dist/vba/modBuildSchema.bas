@@ -33,8 +33,8 @@ Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,Ro
 Private Const EXPECTED_FIELD_COUNTS As String = "Settings=70;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;Customers=25;Products=25;SalesInvoices=47;SalesInvoiceDetails=14;SalesReturns=40;SalesReturnDetails=14;PurchaseInvoices=24;PurchaseInvoiceDetails=11;" & _
     "PurchaseReturns=23;PurchaseReturnDetails=11;CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;" & _
     "CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;TransactionTypes=6;InventoryTransactions=14;" & _
-    "StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=14;StockNoteLines=8;SalesOrders=13;RepDays=15;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=34;Roles=3;Permissions=45;RolePermissions=89;Employees=1;Screens=77;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=37;TransactionTypes=14;StockParties=1;LabelSettings=1"
+    "StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=14;StockNoteLines=8;SalesOrders=13;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=34;Roles=3;Permissions=45;RolePermissions=89;Employees=1;Screens=77;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=38;TransactionTypes=14;StockParties=1;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -3486,6 +3486,10 @@ Private Sub CreateTable_RepDays()
              "", "", "Ã—œ «·”Ì«—… ›Ì «· ”ÊÌ…", ""
     AddField tdf, "ClosingID", "LONG", 0, False, "", _
              "", "", " ’›Ì… ’‰œÊﬁ «·⁄Âœ… ›Ì «· ”ÊÌ…", ""
+    AddField tdf, "GoodsShortage", "MONEY", 0, True, "0", _
+             ">=0", "«·„»·€ ·« Ì„ﬂ‰ √‰ ÌﬂÊ‰ ”«·»«", "⁄Ã“ »÷«⁄… «·”Ì«—… «·„Õ„Û¯· ⁄·Ï «·„‰œÊ» ”·›…", "’«›Ì ›—ﬁ Ã—œ «·”Ì«—… ›Ì «·ÌÊ„ ≈‰ ﬂ«‰ ⁄Ã“« Ê··„‰œÊ» „” Œœ„ (docs/66)"
+    AddField tdf, "AdvanceEmployeeID", "LONG", 0, False, "", _
+             "", "", "«·„ÊŸ› «·„Õ„Û¯· ⁄·ÌÂ «·⁄Ã“", "„” Œœ„ «·„‰œÊ» (SalesReps.EmployeeID)"
     AddField tdf, "EmployeeID", "LONG", 0, True, "", _
              "", "", "› ÕÂ", ""
     AddField tdf, "Notes", "TEXT", 255, False, "", _
@@ -4311,7 +4315,8 @@ Private Sub Seed_JournalSourceTypes()
     SeedRow "[SourceType] = 'RECEIPT_NOTE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('RECEIPT_NOTE', '≈–‰ «” ·«„ „‰ „Ê—œ', 35)"
     SeedRow "[SourceType] = 'ASSET_REVAL'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('ASSET_REVAL', '≈⁄«œ…  ﬁÌÌ„ √’· À«» ', 36)"
     SeedRow "[SourceType] = 'ASSET_TRANSFER'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('ASSET_TRANSFER', '‰ﬁ· √’· À«»  »Ì‰ „—«ﬂ“ «· ﬂ·›…', 37)"
-    EndSeed "JournalSourceTypes", 37
+    SeedRow "[SourceType] = 'REP_SHORTAGE'", "INSERT INTO [JournalSourceTypes] ([SourceType], [TypeName], [SortOrder]) VALUES ('REP_SHORTAGE', '⁄Ã“ »÷«⁄… «·„‰œÊ» ”·›… ⁄·ÌÂ', 38)"
+    EndSeed "JournalSourceTypes", 38
 End Sub
 
 Private Sub Seed_TransactionTypes()
@@ -4567,6 +4572,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Goods receipt note from a supplier' WHERE [SourceType] = 'RECEIPT_NOTE' AND [TypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Fixed asset revaluation' WHERE [SourceType] = 'ASSET_REVAL' AND [TypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Fixed asset transfer between cost centres' WHERE [SourceType] = 'ASSET_TRANSFER' AND [TypeNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [JournalSourceTypes] SET [TypeNameEn] = 'Rep goods shortage charged as an advance' WHERE [SourceType] = 'REP_SHORTAGE' AND [TypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Purchase' WHERE [TypeCode] = 'PURCHASE' AND [TypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Sale' WHERE [TypeCode] = 'SALE' AND [TypeNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [TransactionTypes] SET [TypeNameEn] = 'Purchase return' WHERE [TypeCode] = 'PURCHASE_RETURN' AND [TypeNameEn] Is Null", dbFailOnError
