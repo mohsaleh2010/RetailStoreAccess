@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 157
+Private Const EXPECTED_RELATION_COUNT As Long = 160
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -397,6 +397,9 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_UserScreens_ScreenName", "Screens", "ScreenName", "UserScreens", "ScreenName", 256&)
     c.Add Array("FK_Activations_EmployeeID", "Employees", "EmployeeID", "Activations", "EmployeeID", 0&)
     c.Add Array("FK_CurrencyRates_CurrencyCode", "Currencies", "CurrencyCode", "CurrencyRates", "CurrencyCode", 256&)
+    c.Add Array("FK_CashBoxes_SalesRepID", "SalesReps", "SalesRepID", "CashBoxes", "SalesRepID", 0&)
+    c.Add Array("FK_CashBoxUsers_CashBoxID", "CashBoxes", "CashBoxID", "CashBoxUsers", "CashBoxID", 0&)
+    c.Add Array("FK_CashBoxUsers_EmployeeID", "Employees", "EmployeeID", "CashBoxUsers", "EmployeeID", 0&)
     c.Add Array("FK_Suppliers_CurrencyCode", "Currencies", "CurrencyCode", "Suppliers", "CurrencyCode", 256&)
     c.Add Array("FK_Customers_SalesRepID", "SalesReps", "SalesRepID", "Customers", "SalesRepID", 0&)
     c.Add Array("FK_Products_CategoryID", "Categories", "CategoryID", "Products", "CategoryID", 0&)
@@ -550,6 +553,7 @@ Private Function RetiredRelations() As Variant
     RetiredRelations = Array("FK_AuditLog_EmployeeID", _
                              "FK_BankReconciliations_EmployeeID", _
                              "FK_Budgets_EmployeeID", _
+                             "FK_CashVouchers_ReceivedByID", _
                              "FK_CommissionRuns_EmployeeID", _
                              "FK_CustomerAllocations_EmployeeID", _
                              "FK_DepreciationRuns_EmployeeID", _

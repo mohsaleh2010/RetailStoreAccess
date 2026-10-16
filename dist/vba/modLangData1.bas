@@ -20,6 +20,7 @@ Private Sub D1_1()
     LangAdd "ÇáÍÓÇÈÇÊ ÇáÃÓÇÓíÉ (ÇáãÚáóøãÉ) ÊÓÊÎÏãåÇ ÇáŞíæÏ ÇáÂáíÉ: áÇ ÊõÍĞİ æáÇ íÊÛíÑ äæÚåÇ. ÇáŞíæÏ ÇáíÏæíÉ ãä ÒÑ «ŞíÏ íÏæí", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "íõÚÑÖ ÇáÊŞÑíÑ ááãÚÇíäÉ æãäåÇ ÇáØÈÇÚÉ. «ÍİÙ PDF» æ«ÊÕÏíÑ Excel» íÍİÙÇä Çáãáİ İí ãÌáÏ Reports ÈÌÇäÈ ãáİ ÇáÈÑäÇãÌ", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
     LangAdd "ÑÕíÏ ßá ÍÓÇÈ æÚãíá æãæÑÏ æÕäÏæŞ æÈäß æÕäİ íæã ÈÏÁ ÇáÊÔÛíá¡ æãŞÇÈáåÇ ÍÓÇÈ ÅÌãÇáí ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ", "The balance of every account, customer, supplier, cash box, bank and item on the start-up date, against the total opening balances account"
+    LangAdd "ÕäÏæŞ ÈáÇ ÃãäÇÁ íÕÑİ ãäå ßá ãä áå ÕáÇÍíÉ ÇáÎÒíäÉ. æÕáÇÍíÉ «ÇáÕÑİ ãä ßá ÇáÕäÇÏíŞ» ÊÊÌÇæÒ ÇáÃãäÇÁ", "Everyone with the treasury permission pays from a box without custodians. The permission to pay from every box goes past the custodians"
     LangAdd "Êã ÇáäÓÎ áßä ÊÚĞÑ İÊÍ ÇáäÓÎÉ ááÊÍŞŞ ãäåÇ. ÃÚÏ ÇáãÍÇæáÉ ÈÚÏ ÅÛáÇŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì", "Copied, but the copy could not be opened to check it. Try again after closing the program on the other computers"
     LangAdd "ØÇÈŞ ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ÇáßÔİ¡ æÓÌøá ãÇ İí ÇáßÔİ æáã íõÓÌóøá (ÚãæáÇÊ¡ İæÇÆÏ...) ßÍÑßÉ ÈäßíÉ", "Match the transactions shown on the statement, and record what is on the statement but not in the books (fees, interest...) as a bank transaction"
     LangAdd "áÇ íæÌÏ ãæÙİæä İí ãÓíÑ ÇáÑæÇÊÈ: ÍÏøÏ «İí ãÓíÑ ÇáÑæÇÊÈ» æÇáÑÇÊÈ ÇáÃÓÇÓí İí ÔÇÔÉ ÇáãÓÊÎÏãíä", "No employees on payroll: set On payroll and the basic salary in the Users screen"
@@ -43,6 +44,7 @@ Private Sub D1_1()
     LangAdd "ÑÕíÏ ßá ÍÓÇÈ ÚÇã íæã ÈÏÁ ÇáÊÔÛíá: ÑÃÓ ÇáãÇá¡ æÇáŞÑæÖ¡ æÇáãÓÊÍŞÇÊ¡ æÇáÃÕæá ÇáÃÎÑì", "The balance of each general account on the start-up day: capital, loans, accruals and other assets"
     LangAdd "áÇ ÊæÌÏ ÖÑíÈÉ ãÓÊÍŞÉ ááÓÏÇÏ İí åĞÇ ÇáÅŞÑÇÑ (ÇáÑÕíÏ ÇáÏÇÆä íõÑÍóøá ááÅŞÑÇÑ ÇáÊÇáí", "There is no VAT due for payment in this return (the credit balance is carried to the next return"
     LangAdd "åĞÇ ÇáÑÕíÏ ãÑÍøá. áÊÚÏíáå ÃáÛö ÊÑÍíáå ÈÒÑ ÇáÍĞİ İí ÓØÑå¡ Ëã ÚÏøáå æÑÍøáå ãä ÌÏíÏ", "This balance is posted. To change it, unpost it with the delete button of its line, then edit and post it again"
+    LangAdd "ÇáÊÍæíá íÏÎá ÇáÕäÏæŞ ÇáãÓÊáã ÚäÏ ÊÃßíÏ ÇÓÊáÇãå¡ æÍÊì Ğáß İí ÍÓÇÈ «äŞÏíÉ ÈÇáØÑíŞ", "A transfer enters the receiving box when its receipt is confirmed, until then it is in the account: Cash in transit"
     LangAdd "áÇ íãßä ÇáÍİÙ: ÊæÌÏ ŞíãÉ ãßÑÑÉ İí ÍŞá íÌÈ Ãä íßæä İÑíÏğÇ (ãËá ÇáßæÏ Ãæ ÇáÈÇÑßæÏ", "Cannot save: a value is repeated in a field that must be unique (such as the code or the barcode"
     LangAdd "ãÓíÑ ßá ÔåÑ: ÇáÑæÇÊÈ æÇáÈÏáÇÊ æÇáÅÖÇİí æÇáÎÕæãÇÊ æÇáÊÃãíäÇÊ¡ Ëã ÇáÊÑÍíá æÇáÕÑİ", "A run each month: salaries, allowances, overtime, deductions and social insurance, then posting and payment"
     LangAdd "åĞÇ ÍÓÇÈ ÃÓÇÓí ÊÓÊÎÏãå ÇáŞíæÏ ÇáÂáíÉ: áÇ íÊÛíÑ äæÚå¡ æáÇ íÊÍæá Èíä ÑÆíÓí æİÑÚí", "This is a system account used by the automatic entries: its type does not change, and it does not switch between main and sub"
@@ -99,6 +101,7 @@ Private Sub D1_1()
     LangAdd "ÃÑÕÏÉ ÇáãäÊÌÇÊ æÍÑßÇÊåÇ¡ æÇáÑÕíÏ ÇáÇİÊÊÇÍí æÇáÅÖÇİÉ æÇáÎÕã ÇáíÏæí", "Product balances and moves, opening balance and manual additions and deductions"
     LangAdd "ÅŞÑÇÑ ÛíÑ ãÍİæÙ: ÇáÃÑŞÇã ãä ÇáãÓÊäÏÇÊ ÇáÂä. ÇÍİÙå ãÓæÏÉ Ãæ ÇÚÊãÏå", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
     LangAdd "ÇáÌåÇÒ ÛíÑ ãÓÌøá. ÇßÊÈ ÑãÒ ÇáÊÍŞŞ (OTP) ãä ÈæÇÈÉ İÇÊæÑÉ Ëã ÇáÎØæÉ", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
+    LangAdd "ÊÍæíáÇÊ Èíä ÇáÕäÇÏíŞ ÊäÊÙÑ ÊÃßíÏ ÇáÇÓÊáÇã ãä Ããíä ÇáÕäÏæŞ ÇáãÓÊáã", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
     LangAdd "Êã ÍİÙ äÓÈ ÇáÊÃãíäÇÊ. ÊõØÈóøŞ Úáì ÇáãÓæÏÇÊ ÚäÏ ÊÚÏíáåÇ Ãæ ÊÑÍíáåÇ", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
     LangAdd "ÓõÌøá ÇáÌåÇÒ İí ÈíÆÉ ÃÎÑì. ÓÌøáå İí ÇáÈíÆÉ ÇáÍÇáíÉ ãä ÅÚÏÇÏ ÇáÑÈØ", "The device was registered in another environment. Register it in the current one from the connection setup"
     LangAdd "íõäÔÃ ÇáãÕÑæİ İí íæã ÇáÇÓÊÍŞÇŞ ãä ßá İÊÑÉ¡ ÈÏÁğÇ ãä ÊÇÑíÎ ÇáÈÏÇíÉ", "The expense is created on the due day of each period, starting from the start date"
@@ -131,12 +134,12 @@ Private Sub D1_1()
     LangAdd "ÃÕäÇİ ãÚİÇÉ Ãæ ÈäÓÈÉ ÕİÑíÉ: ÊÍÊÇÌ ÓÈÈ ÇáÅÚİÇÁ¡ æáã íõÏÚã ÈÚÏ", "Exempt or zero-rated items: they need an exemption reason, not supported yet"
     LangAdd "ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÑÍóøáÉ ãä ÇáİÊÑÇÊ ÇáÓÇÈŞÉ (ÑÕíÏ ÏÇÆä", "VAT carried from previous periods (credit balance"
     LangAdd "ŞíÏ İí İÊÑÉ ãŞİáÉ: ááÚÑÖ İŞØ. íãßä Úãá ŞíÏ ÚßÓí ÈÊÇÑíÎ ãİÊæÍ", "An entry in a closed period: view only. A reversing entry can be made on an open date"
-    LangAdd "ááÅíÏÇÚ æÇáÓÍÈ æÇáÊÍæíá æÊÓæíÉ ãÏì ÇÎÊÑ äæÚ ÇáÍÑßÉ ÇáÎÇÕ ÈåÇ", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
-    LangAdd "ãØÇÈŞÉ ßÔİ ÇáÈäß ãÚ ÇáÏİÇÊÑ: Úáöøã ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ÇáßÔİ", "Match the bank statement with the books: mark the transactions shown on the statement"
-    LangAdd "íæÌÏ ãÓíÑ ãÑÍóøá ÈÚÏå: ÎÕæãÇÊ ÇáÓáİ İíå ÊÚÊãÏ Úáì åĞÇ ÇáãÓíÑ", "There is a posted run after it: its advance deductions depend on this run"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "ááÅíÏÇÚ æÇáÓÍÈ æÇáÊÍæíá æÊÓæíÉ ãÏì ÇÎÊÑ äæÚ ÇáÍÑßÉ ÇáÎÇÕ ÈåÇ", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
+    LangAdd "ãØÇÈŞÉ ßÔİ ÇáÈäß ãÚ ÇáÏİÇÊÑ: Úáöøã ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ÇáßÔİ", "Match the bank statement with the books: mark the transactions shown on the statement"
+    LangAdd "íæÌÏ ãÓíÑ ãÑÍóøá ÈÚÏå: ÎÕæãÇÊ ÇáÓáİ İíå ÊÚÊãÏ Úáì åĞÇ ÇáãÓíÑ", "There is a posted run after it: its advance deductions depend on this run"
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì Ëã ÇÍİÙ ÇáÅÚÏÇÏÇÊ ãÑÉ ÃÎÑì", "Close the program on the other computers, then save the settings again"
     LangAdd "ÅáÛÇÁ ÇÚÊãÇÏ ÇáÅŞÑÇÑ¿ íõÍĞİ ŞíÏ ÇáÊÓæíÉ æíÚæÏ ÇáÅŞÑÇÑ ãÓæÏÉ", "Cancel the approval of the return? The settlement entry is deleted and the return becomes a draft"
     LangAdd "ÅíÕÇá 150 Ãáİ Ìäíå Ãæ ÃßËÑ: ÇáÑŞã ÇáŞæãí Ãæ ÇáÖÑíÈí ááãÔÊÑí", "Receipt of 150,000 pounds or more: national ID or tax number of the buyer"
@@ -163,6 +166,7 @@ Private Sub D1_2()
     LangAdd "ÇÎÊÑ ÇáÈäß¡ æÇßÊÈ ÊÇÑíÎ ßÔİ ÇáÈäß æÑÕíÏå¡ Ëã «ÈÏÁ ÇáÊÓæíÉ", "Choose the bank, type the date and balance of the bank statement, then Start reconciliation"
     LangAdd "ÇáÑÕíÏ ÇáÇİÊÊÇÍí íõÓÌóøá ãÑÉ æÇÍÏÉ ŞÈá Ãí ÍÑßÉ Úáì ÇáãäÊÌ", "The opening balance is recorded once, before any move on the product"
     LangAdd "ÇáãäÊÌ ãæÌæÏ áßäå áíÓ Öãä åĞÇ ÇáÌÑÏ (ÊÕäíİ ÂÎÑ Ãæ ÛíÑ äÔØ", "The product exists but is not part of this count (another category or inactive"
+    LangAdd "ÊÍæíá ÊÕİíÉ ÇáßÇÔíÑ áÇ íõáÛì: íÓÊáãå Ããíä ÇáÕäÏæŞ ÇáãÓÊáã", "A cashier closing transfer is not cancelled: the custodian of the receiving box receives it"
     LangAdd "ÚãáíÉ ãØÇÈŞÉ ÊÛíøÑ ãÈáÛåÇ İí ÇáÏİÇÊÑ ÈÚÏ ÇáãØÇÈŞÉ: ÑÇÌÚåÇ", "A matched transaction whose amount changed in the books after matching: review it"
     LangAdd "ŞíÏ ãÍİæÙ: ÚÏøá Ëã ÇÍİÙ¡ İíÊÍÏË ŞíÏå İí ÇáíæãíÉ ÈäİÓ ÑŞãå", "Saved entry: edit and save, and its journal entry is updated with the same number"
     LangAdd "íõÍĞİ ÇáÔíß ÊÍÊ ÇáÊÍÕíá İŞØ: ÃáÛö ÊÍÕíáå Ãæ ÇÑÊÏÇÏå ÃæáğÇ", "Only a cheque under collection is deleted: cancel its collection or bounce first"
@@ -252,14 +256,15 @@ Private Sub D1_2()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÍĞİ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to delete in the payment matching screen"
     LangAdd "áÇ íãßä ÍĞİ åĞÇ ÇáÓÌá áÃäå ãÓÊÎÏã İí ÚãáíÇÊ ÓÇÈŞÉ", "This record cannot be deleted because it is used in earlier transactions"
     LangAdd "ãÈíÚÇÊ åĞÇ ÇáãÓÊÎÏã áÚãíá ÈáÇ ãäÏæÈ ÊõäÓÈ ááãäÏæÈ", "The sales of this user to a customer without a sales rep go to the sales rep"
+    LangAdd "ãä íÕÑİ ãä ßá ÕäÏæŞ æíÕİøíå æíÓÊáã ÇáÊÍæíáÇÊ Åáíå", "Who pays from each box, closes it and receives the transfers to it"
+End Sub
+
+Private Sub D1_3()
     LangAdd "íõÚÊãÏ ÇáÅŞÑÇÑ ÈÚÏ ÇäÊåÇÁ İÊÑÊå: ÇÎÊÑ ÊÇÑíÎğÇ ÈÚÏ", "The return is approved after its period ends: choose a date after"
     LangAdd "ÇáÕÛíÑº ÓÚÑ ÇáæÓØ Ãæ ÇáßÈíÑ íÌÚá ááãÔÑæÈ ÃÍÌÇãğÇ", "small, a medium or large price gives the drink sizes"
     LangAdd "ÇáåÏİ ÇáÔåÑí áÕÇİí ãÈíÚÇÊ ßá ãäÏæÈ (ÈÏæä ÇáÖÑíÈÉ", "The monthly target for the net sales of each sales rep (without VAT"
     LangAdd "ÛíÑ ãÊÇÍ İí ãáİ ACCDE. ÛíøÑ ßáãÉ ÇáãÑæÑ ãä äÓÎÊß", "Not available in an ACCDE file. Change the password from your copy"
     LangAdd "áÊÕÍíÍ ÇáßãíÉ ÇáÂä ÇÓÊÎÏã ÇáÌÑÏ Ãæ ÇáÅÖÇİÉ/ÇáÎÕã", "To correct the quantity now use the stock count or the addition/deduction"
-End Sub
-
-Private Sub D1_3()
     LangAdd "áåĞÇ ÇáÍÓÇÈ ÍÓÇÈÇÊ ÊÇÈÚÉ. ÇÍĞİåÇ Ãæ ÇäŞáåÇ ÃæáğÇ", "This account has sub-accounts. Delete them or move them first"
     LangAdd "ãÏíÑ ÇáäÙÇã íİÊÍ ßá ÇáÔÇÔÇÊ Èßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ", "The system administrator always opens every screen with every permission"
     LangAdd "ãÓÊäÏÇÊ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ (ÇáãŞÈæáÉ æÇáãÑİæÖÉ", "E-invoicing documents (accepted and rejected"
@@ -291,12 +296,4 @@ Private Sub D1_3()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to add in the bank transactions screen"
     LangAdd "áåĞÇ ÇáÍÓÇÈ ÍÓÇÈÇÊ ÊÇÈÚÉ¡ İíÈŞì ÍÓÇÈğÇ ÑÆíÓíğÇ", "This account has sub-accounts, so it stays a main account"
     LangAdd "ãİÊÇÍ ÇáÌåÇÒ æÔåÇÏÊå æÈÑäÇãÌ ÇáÊæŞíÚ (ÇáÓÚæÏíÉ", "Key and certificate of the device and the signing program (Saudi Arabia"
-    LangAdd "äŞÑ ãÒÏæÌ Úáì ÍÓÇÈ íİÊÍ ßÔİ ÍÓÇÈå ááİÊÑÉ äİÓåÇ", "Double-click an account to open its statement for the same period"
-    LangAdd "ÇÍİÙ ÊÇÑíÎ ÈÏÁ ÇáÊÔÛíá ÃæáğÇ¡ Ëã ÃÏÎá ÇáÃÑÕÏÉ", "Save the start-up date first, then enter the balances"
-    LangAdd "ÇÎÊÑ ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ßÔİ ÇáÈäß Ëã «ãØÇÈŞÉ", "Choose the transactions shown on the bank statement, then Match"
-    LangAdd "ÇÎÊÑ ÇáİÇÊæÑÉ ÇáÃÕáíÉ Ëã ÍÏÏ ÇáßãíÇÊ ÇáãÑÊÌÚÉ", "Choose the original invoice, then set the returned quantities"
-    LangAdd "ÇáÈÇŞí ãä ÇáİÇÊæÑÉ ÈÚÏ ãÇ ÑõÈØ ÈåÇ æãÑÊÌÚÇÊåÇ", "What remains of the invoice after what was linked to it and its returns"
-    LangAdd "ÇáÊŞÇÑíÑ ÇáãÍÇÓÈíÉ ÊÍÊÇÌ ÕáÇÍíÉ «ŞíæÏ ÇáíæãíÉ", "The accounting reports need the permission Journal entries"
-    LangAdd "ÇáãÈíÚÇÊ ÇáãÍáíÉ ÇáÎÇÖÚÉ ááÖÑíÈÉ ÈÇáÓÚÑ ÇáÚÇã", "Local sales taxed at the general rate"
-    LangAdd "ÇáãÑÊÌÚÇÊ Úáì åĞå ÇáİÇÊæÑÉ (äŞÑ ãÒÏæÌ ááØÈÇÚÉ", "Returns on this invoice (double-click to print"
 End Sub

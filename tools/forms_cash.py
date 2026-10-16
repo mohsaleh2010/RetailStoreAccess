@@ -53,7 +53,9 @@ def layout_treasury() -> FormModel:
     button(m, "btnClose", "رجوع", width - cm(0.4) - cm(2.4), cm(1.8), "secondary",
            call="DoCmd.Close acForm, Me.Name")
 
-    m.add(Control("label", "lblBoxesCap", cm(0.4), cm(3.0), cm(9.0), cm(0.55),
+    button(m, "btnTransfers", "التحويلات بالطريق", cm(5.9), cm(2.95), "secondary", w=cm(3.5), h=cm(0.6),
+           call='OpenScreen "frmCashTransfers", 0')
+    m.add(Control("label", "lblBoxesCap", cm(0.4), cm(3.0), cm(5.3), cm(0.55),
                   {"Caption": "الخزينة والصناديق (الرصيد الآن)", "FontSize": 10, "FontBold": True,
                    "ForeColor": Sym("CLR_MUTED")}))
     m.add(Control("list", "lstBoxes", cm(0.4), cm(3.6), cm(9.0), height - cm(4.1),
@@ -194,5 +196,31 @@ def layout_cash_closing() -> FormModel:
     return m
 
 
+# ------------------------------------------------------------------ transfers in transit
+def layout_cash_transfers() -> FormModel:
+    """The transfers waiting for the receipt of a box that needs it (CashBoxes.ConfirmReceipt)."""
+    width, height = cm(22.0), cm(12.6)
+    m = FormModel("frmCashTransfers", "التحويلات بالطريق", width, height, popup=True, allow_add=False)
+    title_band(m, "التحويلات بالطريق",
+               "تحويلات بين الصناديق تنتظر تأكيد الاستلام من أمين الصندوق المستلم", "treasury")
+    m.add(Control("list", "lstTransfers", cm(0.4), cm(2.3), width - cm(0.8), cm(7.4),
+                  {"RowSourceType": "Table/Query", "RowSource": "", "ColumnCount": 7,
+                   "ColumnWidths": "0;2.6;3.2;3.8;3.8;2.6;3.6", "ColumnHeads": True}))
+    m.add(Control("label", "lblHint", cm(0.4), cm(9.85), width - cm(0.8), cm(0.9),
+                  {"Caption": " ", "FontSize": 9, "ForeColor": Sym("CLR_MUTED")}))
+    y = cm(11.2)
+    button(m, "btnReceive", "تأكيد الاستلام", cm(0.4), y, "primary", w=cm(4.0), h=cm(0.9),
+           call="TransfersReceive Me")
+    button(m, "btnReturn", "إلغاء التحويل", cm(4.6), y, "danger", w=cm(3.6), h=cm(0.9),
+           call="TransfersCancel Me")
+    button(m, "btnPrint", "طباعة السند", cm(8.4), y, "secondary", w=cm(3.2), h=cm(0.9),
+           call="TransfersPrint Me")
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), y, "secondary", w=cm(2.6), h=cm(0.9),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = ["Private Sub Form_Load()", "    TransfersLoad Me", "End Sub"] + m.code
+    return m
+
+
 def cash_forms() -> List[FormModel]:
-    return [layout_treasury(), layout_cash_voucher(), layout_cash_closing()]
+    return [layout_treasury(), layout_cash_voucher(), layout_cash_closing(), layout_cash_transfers()]

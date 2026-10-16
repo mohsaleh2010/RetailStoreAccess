@@ -25,10 +25,10 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines," & _
-    "frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmJournal," & _
-    "frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup," & _
-    "frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice," & _
+    "frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher," & _
+    "frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames," & _
+    "frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -592,6 +592,7 @@ Private Sub BuildAllForms()
     BuildForm_frmUnits
     BuildForm_frmExpenseTypes
     BuildForm_frmCashBoxes
+    BuildForm_frmCashBoxUsers
     BuildForm_frmBanks
     BuildForm_frmAccounts
     BuildForm_frmSettings
@@ -631,6 +632,7 @@ Private Sub BuildAllForms()
     BuildForm_frmTreasury
     BuildForm_frmCashVoucher
     BuildForm_frmCashClosing
+    BuildForm_frmCashTransfers
     BuildForm_frmJournal
     BuildForm_frmJournalEntry
     BuildForm_frmManualLines
@@ -3153,7 +3155,7 @@ Private Sub BuildForm_frmCashBoxes()
     Dim c As Access.Control, s As String
     On Error GoTo EH
     StartForm "frmCashBoxes", "«·’‰«œÌﬁ", "SELECT * FROM CashBoxes", 15309, 8222, True, True, True, _
-              "KIND=LIST|TABLE=CashBoxes|PK=CashBoxID|LIST=SELECT t.CashBoxID, t.BoxName AS [«·’‰œÊﬁ], IIf(t.BoxType = 'MAIN', 'Œ“Ì‰…', 'ﬂ«‘Ì—') AS [«·‰Ê⁄] FROM [@CashBoxes] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.BoxType DESC, t.BoxName|SEARCH=t.BoxName,t.BoxNameEn,t.Notes|ACTIVE=t.IsActive|UNIQUE=BoxName"
+              "KIND=LIST|TABLE=CashBoxes|PK=CashBoxID|LIST=SELECT t.CashBoxID, t.BoxName AS [«·’‰œÊﬁ], IIf(t.BoxType = 'MAIN', 'Œ“Ì‰…', IIf(t.BoxType = 'CUSTODY', '⁄Âœ…', 'ﬂ«‘Ì—')) AS [«·‰Ê⁄] FROM [@CashBoxes] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.BoxType DESC, t.BoxName|SEARCH=t.BoxName,t.BoxNameEn,t.Notes|ACTIVE=t.IsActive|UNIQUE=BoxName"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "«·’‰«œÌﬁ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
@@ -3167,6 +3169,8 @@ Private Sub BuildForm_frmCashBoxes()
     Set c = AddButton("btnDelete", "Õ–›", 4649, 1021, 1361, 482, "danger")
     c.OnClick = EP
     Set c = AddButton("btnTreasury", "«·Œ“Ì‰…", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnBoxUsers", "√„‰«¡ «·’‰«œÌﬁ", 7937, 1021, 1701, 482, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "≈€·«ﬁ", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
@@ -3184,22 +3188,30 @@ Private Sub BuildForm_frmCashBoxes()
     Set c = AddLabel("lblBoxName", "«”„ «·’‰œÊﬁ *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "BoxName", 0)
     Set c = AddText("BoxNameEn", "BoxNameEn", 7201, 2268, 7881, 425)
     Set c = AddLabel("lblBoxNameEn", "«·«”„ »«·≈‰Ã·Ì“Ì…", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "BoxNameEn", 0)
-    Set c = AddCombo("BoxType", "BoxType", 7201, 2835, 2948, 425, "MAIN;Œ“Ì‰… —∆Ì”Ì…;CASHIER;’‰œÊﬁ ﬂ«‘Ì—", 2, "0;2835")
+    Set c = AddCombo("BoxType", "BoxType", 7201, 2835, 2948, 425, "MAIN;Œ“Ì‰… —∆Ì”Ì…;CASHIER;’‰œÊﬁ ﬂ«‘Ì—;CUSTODY;⁄Âœ… „‰œÊ»", 2, "0;2835")
     Set c = AddLabel("lblBoxType", "«·‰Ê⁄", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "BoxType", 0)
     Set c = AddCheck("IsActive", "IsActive", 12134, 2920)
     Set c = AddLabel("lblIsActive", "‰‘ÿ", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 3402, 2948, 425)
+    Set c = AddCombo("SalesRepID", "SalesRepID", 7201, 3402, 2948, 425, "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName", 2, "0;3402")
+    SetCtlProp c, "ControlTipText", "·’‰œÊﬁ ⁄Âœ… «·„‰œÊ»: „” Œœ„ «·„‰œÊ» √„Ì‰ ⁄·ÌÂ"
+    SetCtlProp c, "StatusBarText", "·’‰œÊﬁ ⁄Âœ… «·„‰œÊ»: „” Œœ„ «·„‰œÊ» √„Ì‰ ⁄·ÌÂ"
+    Set c = AddLabel("lblSalesRepID", "«·„‰œÊ» ’«Õ» «·⁄Âœ…", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
+    Set c = AddCheck("ConfirmReceipt", "ConfirmReceipt", 12134, 3487)
+    SetCtlProp c, "ControlTipText", "«· ÕÊÌ· ≈·ÌÂ Ì»ﬁÏ »«·ÿ—Ìﬁ Õ Ï Ì” ·„Â √„Ì‰Â"
+    SetCtlProp c, "StatusBarText", "«· ÕÊÌ· ≈·ÌÂ Ì»ﬁÏ »«·ÿ—Ìﬁ Õ Ï Ì” ·„Â √„Ì‰Â"
+    Set c = AddLabel("lblConfirmReceipt", "«· ÕÊÌ· ≈·ÌÂ ÌÕ «Ã  √ﬂÌœ «·«” ·«„", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "ConfirmReceipt", 0)
+    Set c = AddText("OpeningBalance", "OpeningBalance", 7201, 3969, 2948, 425)
     SetCtlProp c, "Format", "#,##0.00"
     SetCtlProp c, "ControlTipText", "«·‰ﬁœÌ… «·„ÊÃÊœ… ›Ì «·’‰œÊﬁ ⁄‰œ »œ¡ «” Œœ«„ «·»—‰«„Ã"
     SetCtlProp c, "StatusBarText", "«·‰ﬁœÌ… «·„ÊÃÊœ… ›Ì «·’‰œÊﬁ ⁄‰œ »œ¡ «” Œœ«„ «·»—‰«„Ã"
-    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
-    Set c = AddText("OpeningDate", "OpeningDate", 12134, 3402, 2948, 425)
+    Set c = AddLabel("lblOpeningBalance", "«·—’Ìœ «·«›  «ÕÌ", 5443, 3969, 1701, 425, 10, False, CLR_MUTED, "OpeningBalance", 0)
+    Set c = AddText("OpeningDate", "OpeningDate", 12134, 3969, 2948, 425)
     SetCtlProp c, "Format", "yyyy/mm/dd"
-    Set c = AddLabel("lblOpeningDate", " «—ÌŒ «·—’Ìœ «·«›  «ÕÌ", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "OpeningDate", 0)
-    Set c = AddLabel("lblBoxNote", "«·—’Ìœ ·« Ìıﬂ » ÌœÊÌ«: ÌıÕ”» „‰ «·„»Ì⁄«  Ê«·”‰œ«  Ê«·„’—Ê›« ", 5443, 3969, 9639, 425, 10, True, CLR_ACCENT, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 4536, 7881, 425)
-    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 5216, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblOpeningDate", " «—ÌŒ «·—’Ìœ «·«›  «ÕÌ", 10376, 3969, 1701, 425, 10, False, CLR_MUTED, "OpeningDate", 0)
+    Set c = AddLabel("lblBoxNote", "«·—’Ìœ ·« Ìıﬂ » ÌœÊÌ«: ÌıÕ”» „‰ «·„»Ì⁄«  Ê«·”‰œ«  Ê«·„’—Ê›« ", 5443, 4536, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 5103, 7881, 425)
+    Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 5783, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -3244,6 +3256,9 @@ Private Sub BuildForm_frmCashBoxes()
     s = s & "Private Sub btnTreasury_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmTreasury""" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnBoxUsers_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmCashBoxUsers""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -3260,6 +3275,98 @@ Private Sub BuildForm_frmCashBoxes()
     Exit Sub
 EH:
     AbortForm "frmCashBoxes", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmCashBoxUsers()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmCashBoxUsers", "√„‰«¡ «·’‰«œÌﬁ", "SELECT * FROM CashBoxUsers", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=CashBoxUsers|PK=CashBoxUserID|LIST=SELECT t.CashBoxUserID, b.BoxName AS [«·’‰œÊﬁ], e.EmployeeName AS [√„Ì‰ «·’‰œÊﬁ] FROM (CashBoxUsers AS t INNER JOIN [@CashBoxes] AS b ON t.CashBoxID = b.CashBoxID) INNER JOIN Employees AS e ON t.EmployeeID = e.EmployeeID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY b.BoxName, e.EmployeeName|SEARCH=b.BoxName,e.EmployeeName"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "√„‰«¡ «·’‰«œÌﬁ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "„‰ Ì’—› „‰ ﬂ· ’‰œÊﬁ ÊÌ’›¯ÌÂ ÊÌ” ·„ «· ÕÊÌ·«  ≈·ÌÂ", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "ÃœÌœ", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "Õ›Ÿ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", " —«Ã⁄", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "Õ–›", 4649, 1021, 1361, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnBoxes", "«·’‰«œÌﬁ", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "»ÕÀ (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddList("lstItems", 227, 2551, 4990, 5387, 3, "0;2608;2608", True)
+    c.AfterUpdate = EP
+    Set c = AddCombo("CashBoxID", "CashBoxID", 7201, 1701, 2948, 425, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3402")
+    Set c = AddLabel("lblCashBoxID", "«·’‰œÊﬁ *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "CashBoxID", 0)
+    Set c = AddCombo("EmployeeID", "EmployeeID", 12134, 1701, 2948, 425, "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName", 2, "0;3402")
+    Set c = AddLabel("lblEmployeeID", "«·„” Œœ„ *", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "EmployeeID", 0)
+    Set c = AddLabel("lblBoxUsersNote", "’‰œÊﬁ »·« √„‰«¡ Ì’—› „‰Â ﬂ· „‰ ·Â ’·«ÕÌ… «·Œ“Ì‰…. Ê’·«ÕÌ… ´«·’—› „‰ ﬂ· «·’‰«œÌﬁª   Ã«Ê“ «·√„‰«¡", 5443, 2268, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 2948, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnBoxes_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmCashBoxes""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmCashBoxUsers", s
+    Exit Sub
+EH:
+    AbortForm "frmCashBoxUsers", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmBanks()
@@ -6861,7 +6968,9 @@ Private Sub BuildForm_frmTreasury()
     c.OnClick = EP
     Set c = AddButton("btnClose", "—ÃÊ⁄", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
-    Set c = AddLabel("lblBoxesCap", "«·Œ“Ì‰… Ê«·’‰«œÌﬁ («·—’Ìœ «·¬‰)", 227, 1701, 5103, 312, 10, True, CLR_MUTED, "", 0)
+    Set c = AddButton("btnTransfers", "«· ÕÊÌ·«  »«·ÿ—Ìﬁ", 3345, 1673, 1984, 340, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblBoxesCap", "«·Œ“Ì‰… Ê«·’‰«œÌﬁ («·—’Ìœ «·¬‰)", 227, 1701, 3005, 312, 10, True, CLR_MUTED, "", 0)
     Set c = AddList("lstBoxes", 227, 2041, 5103, 6690, 4, "0;2381;1304;1304", True)
     c.FontSize = 11
     c.AfterUpdate = EP
@@ -6931,6 +7040,9 @@ Private Sub BuildForm_frmTreasury()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTransfers_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmCashTransfers"", 0" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnPrevDay_Click()" & vbCrLf
     s = s & "    TreasuryDayStep Me, -1" & vbCrLf
@@ -7120,6 +7232,48 @@ Private Sub BuildForm_frmCashClosing()
     Exit Sub
 EH:
     AbortForm "frmCashClosing", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmCashTransfers()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmCashTransfers", "«· ÕÊÌ·«  »«·ÿ—Ìﬁ", "", 12474, 7144, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12474, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE825), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "«· ÕÊÌ·«  »«·ÿ—Ìﬁ", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", " ÕÊÌ·«  »Ì‰ «·’‰«œÌﬁ  ‰ Ÿ—  √ﬂÌœ «·«” ·«„ „‰ √„Ì‰ «·’‰œÊﬁ «·„” ·„", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddList("lstTransfers", 227, 1304, 12020, 4196, 7, "0;1474;1814;2155;2155;1474;2041", True)
+    Set c = AddLabel("lblHint", " ", 227, 5585, 12020, 510, 9, False, CLR_MUTED, "", 0)
+    Set c = AddButton("btnReceive", " √ﬂÌœ «·«” ·«„", 227, 6350, 2268, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnReturn", "≈·€«¡ «· ÕÊÌ·", 2608, 6350, 2041, 510, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnPrint", "ÿ»«⁄… «·”‰œ", 4763, 6350, 1814, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "≈€·«ﬁ", 10773, 6350, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    TransfersLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReceive_Click()" & vbCrLf
+    s = s & "    TransfersReceive Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReturn_Click()" & vbCrLf
+    s = s & "    TransfersCancel Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    TransfersPrint Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmCashTransfers", s
+    Exit Sub
+EH:
+    AbortForm "frmCashTransfers", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmJournal()

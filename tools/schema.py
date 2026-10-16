@@ -432,6 +432,7 @@ TABLES: List[Table] = [
             ("EXPENSES", "المصروفات", "المصروفات", 60),
             ("CASH_BOX", "الخزينة: سندات القبض والصرف والتحويل والصناديق", "الخزينة", 65),
             ("CASH_CLOSING", "تصفية يومية الكاشير", "الخزينة", 66),
+            ("CASH_ALL_BOXES", "الصرف والتحويل من كل الصناديق (لا من صناديقه فقط)", "الخزينة", 69),
             ("JOURNAL", "قيود اليومية ودليل الحسابات وميزان المراجعة", "الحسابات", 75),
             ("MANUAL_ENTRY", "القيود اليدوية: إضافة وتعديل وحذف", "الحسابات", 76),
             ("PERIOD_CLOSE", "إقفال الفترات والسنة المالية وإعادة فتحها", "الحسابات", 77),
@@ -702,17 +703,34 @@ TABLES: List[Table] = [
             text("BoxName", 50, "اسم الصندوق", required=True),
             text("BoxNameEn", 50, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
             text("BoxType", 10, "النوع", required=True, default='"CASHIER"',
-                 rule='In ("MAIN","CASHIER")', rule_text="MAIN = خزينة رئيسية، CASHIER = صندوق كاشير"),
+                 rule='In ("MAIN","CASHIER","CUSTODY")',
+                 rule_text="MAIN = خزينة رئيسية، CASHIER = صندوق كاشير، CUSTODY = عهدة مندوب"),
             money("OpeningBalance", "الرصيد الافتتاحي"),
             date_("OpeningDate", "تاريخ الرصيد الافتتاحي"),
             is_active(),
             text("Notes", 255, "ملاحظات"),
             created_at(),
+            long_("SalesRepID", "المندوب صاحب العهدة", fk="SalesReps.SalesRepID", note="لصندوق عهدة المندوب"),
+            bool_("ConfirmReceipt", "التحويل إليه يحتاج تأكيد الاستلام"),
         ],
         pk=["CashBoxID"],
         indexes=[ux("BoxName")],
         seed_columns=["CashBoxID", "BoxName", "BoxType"],
         seed_rows=[(1, "الخزينة الرئيسية", "MAIN"), (2, "صندوق الكاشير", "CASHIER")],
+    ),
+
+    Table(
+        "CashBoxUsers", "أمناء الصناديق",
+        "المستخدمون المسؤولون عن كل صندوق: يصرفون منه ويحوّلون ويصفّونه ويستلمون التحويلات إليه. "
+        "صندوق بلا أمناء يصرف منه كل من له صلاحية الخزينة.",
+        [
+            auto("CashBoxUserID", "رقم داخلي"),
+            long_("CashBoxID", "الصندوق", required=True, fk="CashBoxes.CashBoxID"),
+            long_("EmployeeID", "المستخدم", required=True, fk="Employees.EmployeeID"),
+            created_at(),
+        ],
+        pk=["CashBoxUserID"],
+        indexes=[ux("CashBoxID", "EmployeeID")],
     ),
 
     Table(
@@ -1634,6 +1652,9 @@ TABLES: List[Table] = [
             long_("EmployeeID", "الموظف", required=True, fk="Employees.EmployeeID"),
             created_at(),
             long_("SalesRepID", "المندوب", fk="SalesReps.SalesRepID", note="صرف عمولة المندوب"),
+            bool_("InTransit", "بانتظار الاستلام (يدخل الصندوق المستلم عند تأكيد استلامه)"),
+            datetime_("ReceivedAt", "تاريخ الاستلام"),
+            long_("ReceivedByID", "استلمه", fk="Employees.EmployeeID"),
         ],
         pk=["CashVoucherID"],
         indexes=[ux("VoucherNumber"), ix("VoucherDate"), ix("CashBoxID")],
@@ -1732,6 +1753,7 @@ TABLES: List[Table] = [
             ("PAYROLL", "قيد مسير الرواتب", 25), ("PAYROLL_PAYMENT", "صرف الرواتب", 26),
             ("COMMISSION", "قيد عمولات المندوبين", 27),
             ("ACCOUNT_OPENING", "رصيد افتتاحي لحساب", 28),
+            ("CASH_RECEIVE", "استلام تحويل نقدية", 29),
         ],
         seed_missing=True,
     ),
@@ -2219,6 +2241,8 @@ SCREEN_LIST = [
     ("frmCashVoucher", "سندات النقدية والتحويل", "الخزينة", "CASH_BOX", True, False, False),
     ("frmCashClosing", "تصفية يومية الكاشير", "الخزينة", "CASH_CLOSING", True, False, False),
     ("frmCashBoxes", "الصناديق", "الخزينة", "CASH_BOX", True, True, True),
+    ("frmCashBoxUsers", "أمناء الصناديق", "الخزينة", "CASH_ALL_BOXES", True, True, True),
+    ("frmCashTransfers", "استلام التحويلات بين الصناديق", "الخزينة", "CASH_CLOSING", False, True, True),
     ("frmAccounting", "المحاسبة والمالية", "الحسابات", None, False, False, False),
     ("frmJournal", "قيود اليومية", "الحسابات", "JOURNAL", False, False, False),
     ("frmAccounts", "دليل الحسابات", "الحسابات", "JOURNAL", True, True, True),
@@ -2274,6 +2298,7 @@ ACCOUNT_TREE = [
     (110001, "الخزينة الرئيسية", A, 1100, True, True),
     (110002, "صندوق الكاشير", A, 1100, True, True),
     (1190, "نقدية غير موزعة على صندوق", A, 11, True, True),
+    (1195, "نقدية بالطريق بين الصناديق", A, 11, True, True),
     (1200, "مدى والمحافظ تحت التسوية (البنك والشبكة)", A, 11, True, True),
     (1210, "الحسابات البنكية", A, 11, False, True),
     (1250, "شيكات تحت التحصيل", A, 11, True, True),
@@ -2353,7 +2378,7 @@ ACCOUNT_TREE = [
 
 # Field rules changed after the first release: BuildSchema sets them on an existing back-end too
 # (generate.rule_upgrade_sub). Only looser rules go here: the existing rows already satisfy them.
-RULE_UPGRADES = [("Settings", "CountryCode"), ("Settings", "VATNumber"), ("Customers", "VATNumber"),
+RULE_UPGRADES = [("CashBoxes", "BoxType"), ("Settings", "CountryCode"), ("Settings", "VATNumber"), ("Customers", "VATNumber"),
                  ("Suppliers", "VATNumber"), ("SalesInvoices", "ZatcaStatus"), ("SalesReturns", "ZatcaStatus")]
 
 

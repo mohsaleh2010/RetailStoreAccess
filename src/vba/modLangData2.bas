@@ -15,12 +15,21 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "نقر مزدوج على حساب يفتح كشف حسابه للفترة نفسها", "Double-click an account to open its statement for the same period"
+    LangAdd "احفظ تاريخ بدء التشغيل أولًا، ثم أدخل الأرصدة", "Save the start-up date first, then enter the balances"
+    LangAdd "اختر العمليات الظاهرة في كشف البنك ثم «مطابقة", "Choose the transactions shown on the bank statement, then Match"
+    LangAdd "اختر الفاتورة الأصلية ثم حدد الكميات المرتجعة", "Choose the original invoice, then set the returned quantities"
+    LangAdd "الباقي من الفاتورة بعد ما رُبط بها ومرتجعاتها", "What remains of the invoice after what was linked to it and its returns"
+    LangAdd "التقارير المحاسبية تحتاج صلاحية «قيود اليومية", "The accounting reports need the permission Journal entries"
+    LangAdd "المبيعات المحلية الخاضعة للضريبة بالسعر العام", "Local sales taxed at the general rate"
+    LangAdd "المرتجعات على هذه الفاتورة (نقر مزدوج للطباعة", "Returns on this invoice (double-click to print"
     LangAdd "الواردات من السلع (المسددة ضريبتها في الجمارك", "Imported goods (VAT paid at customs"
     LangAdd "برنامج التوقيع (فلاشة التوقيع) في إعداد الربط", "Signing program (USB token) in the connection setup"
     LangAdd "بعد الحفظ عيّن كلمة المرور من زر «كلمة المرور", "After saving, set the password with the button Password"
     LangAdd "رصيد الحساب في البنك عند بدء استخدام البرنامج", "The account balance in the bank when the program is first used"
     LangAdd "لا تملك صلاحية الفترات المالية (إقفال الفترات", "You do not have the permission for the fiscal periods (period closing"
     LangAdd "لا تملك هذه الصلاحية في شاشة عمولات المندوبين", "You do not have this permission in the sales rep commissions screen"
+    LangAdd "لصندوق عهدة المندوب: مستخدم المندوب أمين عليه", "For a sales rep custody box: the user of the sales rep keeps it"
     LangAdd "للعمل في الدولة الأخرى ابدأ ملف بيانات جديدًا", "To work in the other country start a new data file"
     LangAdd "أضف صنفًا واحدًا على الأقل إلى قائمة الطباعة", "Add at least one item to the print list"
     LangAdd "الفاتورة الإلكترونية غير مفعّلة في الإعدادات", "E-invoicing is not enabled in the settings"
@@ -31,6 +40,7 @@ Private Sub D2_1()
     LangAdd "لا يتبع الحساب حسابًا من الحسابات التابعة له", "An account cannot belong to one of its own sub-accounts"
     LangAdd "لتصفير صنف غير موجود اكتب 0 في كميته الفعلية", "To set a missing item to zero type 0 as its actual quantity"
     LangAdd "يومية الصندوق التفصيلية (صفحة لكل صندوق ويوم", "Detailed cash box day book (a page per box and day"
+    LangAdd "إلغاء التحويل وإعادة المبلغ للصندوق المرسِل", "Cancel the transfer and return the amount to the sending box"
     LangAdd "اتركه فارغًا للطباعة على الطابعة الافتراضية", "Leave it empty to print on the default printer"
     LangAdd "اختر المشروب: الحجم والإضافات تظهر تلقائيًا", "Choose the drink: the size and extras appear automatically"
     LangAdd "السعر والخصم لا يمكن أن يكونا سالبين (السطر", "The price and the discount cannot be negative (line"
@@ -48,6 +58,7 @@ Private Sub D2_1()
     LangAdd "اختر حسابًا فرعيًا (حساب تُسجَّل عليه قيود", "Choose a posting account (an account that takes entries"
     LangAdd "اسم المستخدم 3 أحرف على الأقل وبدون مسافات", "The user name has at least 3 characters and no spaces"
     LangAdd "البرنامج (الفاتورة الإلكترونية): تم الدخول", "Program (e-invoice): logged in"
+    LangAdd "التحويل إليه يبقى بالطريق حتى يستلمه أمينه", "A transfer to it stays in transit until its custodian receives it"
     LangAdd "الفاتورة الإلكترونية غير مفعّلة (الإعدادات", "E-invoicing is not enabled (settings"
     LangAdd "بياناتك الحالية لم تتغير، ونسختها الوقائية", "Your current data did not change, and its safety copy"
     LangAdd "تاريخ الفاتورة لا يمكن أن يكون في المستقبل", "The invoice date cannot be in the future"
@@ -62,6 +73,7 @@ Private Sub D2_1()
     LangAdd "يوجد حقل مطلوب فارغ. أكمل البيانات ثم احفظ", "A required field is empty. Complete the data, then save"
     LangAdd "يُسجَّل إهلاك الشهر في آخر يوم منه أو بعده", "The depreciation of a month is recorded on its last day or later"
     LangAdd "إجمالي فاتورة البيع لا يساوي مجموع أسطرها", "The sales invoice total does not equal the sum of its lines"
+    LangAdd "إلغاء التحويل يعيد المبلغ للصندوق المرسِل", "cancelling a transfer returns the amount to the sending box"
     LangAdd "اختر الحساب الرئيسي الذي يتبعه هذا الحساب", "Choose the main account this account belongs to"
     LangAdd "اكتب المبالغ، أو انسخها من فعلي سنة سابقة", "Type the amounts, or copy them from the actuals of a previous year"
     LangAdd "اكتب المبلغ المستلم أو اختر مبلغًا جاهزًا", "Type the amount received or choose a ready amount"
@@ -123,6 +135,9 @@ Private Sub D2_1()
     LangAdd "مصر: كود الصنف المسجّل في بوابة المصلحة", "Egypt: product code registered on the Tax Authority portal"
     LangAdd "يجب أن يفعّله مدير النظام قبل الاستخدام", "The system administrator must activate it before use"
     LangAdd "أحرف على الأقل، ولا تساوي اسم المستخدم", "characters at least, and not equal to the user name"
+End Sub
+
+Private Sub D2_2()
     LangAdd "أدخل النقدية الموجودة فعلًا في الصندوق", "Enter the cash actually in the box"
     LangAdd "أو اترك التاريخ فارغًا لفتح كل الفترات", "or leave the date empty to open all periods"
     LangAdd "إعداد الربط يحتاج صلاحية إعدادات المحل", "The connection setup needs the store settings permission"
@@ -135,9 +150,6 @@ Private Sub D2_1()
     LangAdd "الكمية المرتجعة أكبر من الكمية المباعة", "The returned quantity is more than the quantity sold"
     LangAdd "الكمية المرتجعة أكبر من المتاح للإرجاع", "The returned quantity is more than what can be returned"
     LangAdd "المبلغ أكبر من عمولات المندوب المستحقة", "The amount is more than the commissions payable to the sales rep"
-End Sub
-
-Private Sub D2_2()
     LangAdd "بيانات المحل الضريبية وإعدادات التشغيل", "Tax data of the store and operating settings"
     LangAdd "ترتيب الزر في شاشة اللمس (الأصغر أولًا", "Order of the button on the touch screen (smallest first"
     LangAdd "ديون العملاء ÷ المبيعات الآجلة اليومية", "Customer receivables / daily credit sales"
@@ -158,6 +170,7 @@ Private Sub D2_2()
     LangAdd "المقارنة داخل سنة واحدة (موازنة السنة", "Comparison within one year (the budget of the year"
     LangAdd "تاريخ السداد قبل تاريخ اعتماد الإقرار", "The payment date is before the approval date of the return"
     LangAdd "ترحيل الرصيد الافتتاحي للأصناف بتاريخ", "Post the opening stock of the items dated"
+    LangAdd "تم استلام التحويل ودخل المبلغ الصندوق", "The transfer was received and the amount entered the box"
     LangAdd "تُحذف المسودة فقط: ألغِ الترحيل أولًا", "Only the draft is deleted: unpost it first"
     LangAdd "حركة الخزينة اليومية (أول اليوم وآخره", "Daily treasury moves (start and end of the day"
     LangAdd "رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ", "A new number that is not repeated, it does not change after saving"
@@ -245,6 +258,9 @@ Private Sub D2_2()
     LangAdd "نوع الحركة غير متاح للإدخال اليدوي", "The move type is not available for manual entry"
     LangAdd "هذا الحساب معطّل. راجع مدير النظام", "This account is disabled. Ask the system administrator"
     LangAdd "أدخل تاريخ البداية وتاريخ النهاية", "Enter the start date and the end date"
+End Sub
+
+Private Sub D2_3()
     LangAdd "إقرار ضريبة القيمة المضافة (نموذج", "VAT return (form"
     LangAdd "إلى تاريخ (الميزانية في هذا اليوم", "To date (the balance sheet on this day"
     LangAdd "اختر آخر يوم في الفترة التي تُقفل", "Choose the last day of the period to close"
@@ -253,14 +269,12 @@ Private Sub D2_2()
     LangAdd "الإقرار غير موجود أو معتمد بالفعل", "The return does not exist or is already approved"
     LangAdd "البرنامج غير مفعّل على هذا الجهاز", "The program is not activated on this computer"
     LangAdd "البنك الافتراضي للتحويلات البنكية", "Default bank for bank transfers"
+    LangAdd "التحويل إليه يحتاج تأكيد الاستلام", "Transfers to it need a confirmed receipt"
     LangAdd "الكمية والتكلفة لا تكونان سالبتين", "The quantity and the cost cannot be negative"
     LangAdd "المفتاح المشترك (إن أعطته المصلحة", "Pre-shared key (if given by the Tax Authority"
     LangAdd "امسح الباركود (يضيف 1) أو 3*الكود", "Scan the barcode (adds 1) or 3*code"
     LangAdd "بيانات ناقصة للفاتورة الإلكترونية", "Missing data for e-invoicing"
     LangAdd "بيع آجل لعميل غير مسموح له بالآجل", "A credit sale to a customer not allowed to buy on credit"
-End Sub
-
-Private Sub D2_3()
     LangAdd "حذف التسوية الجارية وكل مطابقاتها", "Delete the open reconciliation and all its matches"
     LangAdd "حذف الحركة البنكية المحددة وقيدها", "Delete the selected bank transaction and its entry"
     LangAdd "حسب صافي الكمية خلال فترة التقرير", "By net quantity during the report period"
@@ -302,6 +316,7 @@ Private Sub D2_3()
     LangAdd "ملء كل أشهر الموازنة من فعلي سنة", "Fill every month of the budget from the actuals of a year"
     LangAdd "موجود قبل البرنامج (رصيد افتتاحي", "Owned before the program (opening balance"
     LangAdd "نهاية الفترة لا تكون قبل بدايتها", "The end of the period cannot be before its start"
+    LangAdd "هذا التحويل ليس بانتظار الاستلام", "This transfer is not waiting for a receipt"
     LangAdd "يُولَّد تلقائيًا إذا تُرك فارغًا", "Generated automatically if left empty"
     LangAdd "اختر الشهر ثم «إنشاء مسير الشهر", "Choose the month, then Create the run of the month"
     LangAdd "الإقرار مسدد: ألغِ السداد أولًا", "The return is paid: cancel the payment first"
@@ -366,6 +381,9 @@ Private Sub D2_3()
     LangAdd "للبيع الآجل اختر عميلًا مسجلًا", "For a credit sale choose a registered customer"
     LangAdd "للعملاء المنشآت (فاتورة ضريبية", "For business customers (tax invoice"
     LangAdd "لم تُصدر الهيئة شهادة الامتثال", "ZATCA did not issue the compliance certificate"
+End Sub
+
+Private Sub D2_4()
     LangAdd "ليست لديك صلاحية سندات الخزينة", "You do not have the permission for treasury vouchers"
     LangAdd "مجلد Images بجانب ملف البيانات", "Images folder next to the data file"
     LangAdd "مجموع أرصدة المستوى الأول (صفر", "Total of the first-level balances (zero"
@@ -381,9 +399,6 @@ Private Sub D2_3()
     LangAdd "اختر كلمة مرور جديدة للمتابعة", "Choose a new password to continue"
     LangAdd "اسم العميل على الكوب (اختياري", "Customer name on the cup (optional"
     LangAdd "اكتب الحد الأعلى للأجر الخاضع", "Type the maximum insurable wage"
-End Sub
-
-Private Sub D2_4()
     LangAdd "اكتب تاريخ البيع أو الاستبعاد", "Type the date of the sale or disposal"
     LangAdd "الإيجار والكهرباء والاشتراكات", "Rent, electricity and subscriptions"
     LangAdd "البرنامج مفعّل على هذا الجهاز", "The program is activated on this computer"
@@ -410,6 +425,7 @@ Private Sub D2_4()
     LangAdd "لا توجد أرصدة قبل هذا التاريخ", "There are no balances before this date"
     LangAdd "لا توجد أسطر بكمية لم تُرحَّل", "There is no line with a quantity waiting to be posted"
     LangAdd "لا توجد منتجات منخفضة المخزون", "There are no low-stock products"
+    LangAdd "لا يمكنك الصرف أو التحويل منه", "you cannot pay or transfer from it"
     LangAdd "لا يمكنك تغيير صلاحياتك بنفسك", "You cannot change your own permissions"
     LangAdd "لا يوجد عملاء مسندون لمندوبين", "No customers are assigned to sales reps"
     LangAdd "موجود في الموازنة لنفس المركز", "already in the budget for the same center"
@@ -461,27 +477,4 @@ Private Sub D2_4()
     LangAdd "يتطلب صلاحية الأرقام المالية", "Needs the permission Financial figures"
     LangAdd "أرسل الفاتورة الأصلية أولًا", "Send the original invoice first"
     LangAdd "إجمالي الخصوم وحقوق الملكية", "Total liabilities and equity"
-    LangAdd "إقفال الفترة والسنة المالية", "Period and fiscal year closing"
-    LangAdd "إلغاء صرف الرواتب وحذف قيده", "Cancel the salary payment and delete its entry"
-    LangAdd "اجتازت العينات فحص الامتثال", "The samples passed the compliance checks"
-    LangAdd "اختر آخر شهر يُسجَّل إهلاكه", "Choose the last month to record depreciation for"
-    LangAdd "اختر الفاتورة الأصلية أولًا", "Choose the original invoice first"
-    LangAdd "الأرصدة الافتتاحية للحسابات", "Opening balances of the accounts"
-    LangAdd "الإحصائيات والرسوم البيانية", "Statistics and charts"
-    LangAdd "الباقي غير المربوط من السند", "The unlinked remainder of the voucher"
-    LangAdd "الخدمات المستوردة من الخارج", "Services imported from abroad"
-    LangAdd "الفاتورة الأصلية غير موجودة", "The original invoice does not exist"
-    LangAdd "المصروفات (إجمالي حسب النوع", "Expenses (total by type"
-    LangAdd "بالكامل (لا تبقى فترة مقفلة", "fully (no period stays closed"
-    LangAdd "بنكنا (الصادر: المسحوب عليه", "Our bank (issued: drawn on"
-    LangAdd "تسجيل الإهلاك حتى هذا الشهر", "Record depreciation up to this month"
-    LangAdd "تعذّر إنشاء المفتاح ببرنامج", "Could not create the key with"
-    LangAdd "تعذّر ضبط عملة ملف البيانات", "Could not set the currency of the data file"
-    LangAdd "تم الحفظ لكن تعذّرت الطباعة", "Saved, but printing failed"
-    LangAdd "تم ضبط وضع المستخدم النهائي", "End-user mode is set"
-    LangAdd "تُعاد فتح آخر سنة مقفلة فقط", "Only the last closed year can be reopened"
-    LangAdd "خصم الفاتورة أكبر من قيمتها", "The invoice discount is more than its value"
-    LangAdd "رد غير متوقع من الهيئة (رمز", "Unexpected reply from ZATCA (code"
-    LangAdd "صادر آخر (رسوم بنكية وغيرها", "Other outgoing (bank fees and others"
-    LangAdd "صافي الضريبة المستحقة (سالب", "Net VAT due (negative"
 End Sub

@@ -98,6 +98,8 @@ Public Function BankTxProblem(ByVal TxType As String, ByVal TxDate As Variant, B
                     p = "«Œ — «·’‰œÊﬁ."
                 ElseIf Not BoxIsActive(CashBoxID) Then
                     p = "«·’‰œÊﬁ €Ì— ‰‘ÿ."
+                ElseIf TxType = "DEPOSIT" And Not CanUseBox(CashBoxID) Then
+                    p = BoxUseProblem(CashBoxID)
                 ElseIf TxType = "DEPOSIT" And CashBoxBalance(CLng(CashBoxID), DateValue(TxDate) + 1) < Amount Then
                     p = "—’Ìœ «·’‰œÊﬁ ›Ì " & GDate(TxDate) & " √ﬁ· „‰ «·„»·€ «·„ÊœÛ⁄."
                 End If

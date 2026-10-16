@@ -265,6 +265,8 @@ Public Function PayPayroll(ByVal RunID As Long, ByVal PaidDate As Variant, ByVal
     ElseIf PaidFrom = "CASHBOX" Then
         If IsNull(CashBoxID) Then
             PayPayroll = "اختر الصندوق."
+        ElseIf Not CanUseBox(CashBoxID) Then
+            PayPayroll = BoxUseProblem(CashBoxID)
         ElseIf CashBoxBalance(CLng(CashBoxID), DateValue(PaidDate) + 1) < net Then
             PayPayroll = "رصيد الصندوق في " & GDate(PaidDate) & " أقل من صافي الرواتب (" & Format$(net, "#,##0.00") & ")."
         End If

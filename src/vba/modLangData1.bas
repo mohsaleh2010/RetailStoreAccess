@@ -20,6 +20,7 @@ Private Sub D1_1()
     LangAdd "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "يُعرض التقرير للمعاينة ومنها الطباعة. «حفظ PDF» و«تصدير Excel» يحفظان الملف في مجلد Reports بجانب ملف البرنامج", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
     LangAdd "رصيد كل حساب وعميل ومورد وصندوق وبنك وصنف يوم بدء التشغيل، ومقابلها حساب إجمالي الأرصدة الافتتاحية", "The balance of every account, customer, supplier, cash box, bank and item on the start-up date, against the total opening balances account"
+    LangAdd "صندوق بلا أمناء يصرف منه كل من له صلاحية الخزينة. وصلاحية «الصرف من كل الصناديق» تتجاوز الأمناء", "Everyone with the treasury permission pays from a box without custodians. The permission to pay from every box goes past the custodians"
     LangAdd "تم النسخ لكن تعذر فتح النسخة للتحقق منها. أعد المحاولة بعد إغلاق البرنامج على الأجهزة الأخرى", "Copied, but the copy could not be opened to check it. Try again after closing the program on the other computers"
     LangAdd "طابق العمليات الظاهرة في الكشف، وسجّل ما في الكشف ولم يُسجَّل (عمولات، فوائد...) كحركة بنكية", "Match the transactions shown on the statement, and record what is on the statement but not in the books (fees, interest...) as a bank transaction"
     LangAdd "لا يوجد موظفون في مسير الرواتب: حدّد «في مسير الرواتب» والراتب الأساسي في شاشة المستخدمين", "No employees on payroll: set On payroll and the basic salary in the Users screen"
@@ -43,6 +44,7 @@ Private Sub D1_1()
     LangAdd "رصيد كل حساب عام يوم بدء التشغيل: رأس المال، والقروض، والمستحقات، والأصول الأخرى", "The balance of each general account on the start-up day: capital, loans, accruals and other assets"
     LangAdd "لا توجد ضريبة مستحقة للسداد في هذا الإقرار (الرصيد الدائن يُرحَّل للإقرار التالي", "There is no VAT due for payment in this return (the credit balance is carried to the next return"
     LangAdd "هذا الرصيد مرحّل. لتعديله ألغِ ترحيله بزر الحذف في سطره، ثم عدّله ورحّله من جديد", "This balance is posted. To change it, unpost it with the delete button of its line, then edit and post it again"
+    LangAdd "التحويل يدخل الصندوق المستلم عند تأكيد استلامه، وحتى ذلك في حساب «نقدية بالطريق", "A transfer enters the receiving box when its receipt is confirmed, until then it is in the account: Cash in transit"
     LangAdd "لا يمكن الحفظ: توجد قيمة مكررة في حقل يجب أن يكون فريدًا (مثل الكود أو الباركود", "Cannot save: a value is repeated in a field that must be unique (such as the code or the barcode"
     LangAdd "مسير كل شهر: الرواتب والبدلات والإضافي والخصومات والتأمينات، ثم الترحيل والصرف", "A run each month: salaries, allowances, overtime, deductions and social insurance, then posting and payment"
     LangAdd "هذا حساب أساسي تستخدمه القيود الآلية: لا يتغير نوعه، ولا يتحول بين رئيسي وفرعي", "This is a system account used by the automatic entries: its type does not change, and it does not switch between main and sub"
@@ -99,6 +101,7 @@ Private Sub D1_1()
     LangAdd "أرصدة المنتجات وحركاتها، والرصيد الافتتاحي والإضافة والخصم اليدوي", "Product balances and moves, opening balance and manual additions and deductions"
     LangAdd "إقرار غير محفوظ: الأرقام من المستندات الآن. احفظه مسودة أو اعتمده", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
     LangAdd "الجهاز غير مسجّل. اكتب رمز التحقق (OTP) من بوابة فاتورة ثم الخطوة", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
+    LangAdd "تحويلات بين الصناديق تنتظر تأكيد الاستلام من أمين الصندوق المستلم", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
     LangAdd "تم حفظ نسب التأمينات. تُطبَّق على المسودات عند تعديلها أو ترحيلها", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
     LangAdd "سُجّل الجهاز في بيئة أخرى. سجّله في البيئة الحالية من إعداد الربط", "The device was registered in another environment. Register it in the current one from the connection setup"
     LangAdd "يُنشأ المصروف في يوم الاستحقاق من كل فترة، بدءًا من تاريخ البداية", "The expense is created on the due day of each period, starting from the start date"
@@ -131,12 +134,12 @@ Private Sub D1_1()
     LangAdd "أصناف معفاة أو بنسبة صفرية: تحتاج سبب الإعفاء، ولم يُدعم بعد", "Exempt or zero-rated items: they need an exemption reason, not supported yet"
     LangAdd "ضريبة القيمة المضافة المرحَّلة من الفترات السابقة (رصيد دائن", "VAT carried from previous periods (credit balance"
     LangAdd "قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح", "An entry in a closed period: view only. A reversing entry can be made on an open date"
-    LangAdd "للإيداع والسحب والتحويل وتسوية مدى اختر نوع الحركة الخاص بها", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
-    LangAdd "مطابقة كشف البنك مع الدفاتر: علِّم العمليات الظاهرة في الكشف", "Match the bank statement with the books: mark the transactions shown on the statement"
-    LangAdd "يوجد مسير مرحَّل بعده: خصومات السلف فيه تعتمد على هذا المسير", "There is a posted run after it: its advance deductions depend on this run"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "للإيداع والسحب والتحويل وتسوية مدى اختر نوع الحركة الخاص بها", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
+    LangAdd "مطابقة كشف البنك مع الدفاتر: علِّم العمليات الظاهرة في الكشف", "Match the bank statement with the books: mark the transactions shown on the statement"
+    LangAdd "يوجد مسير مرحَّل بعده: خصومات السلف فيه تعتمد على هذا المسير", "There is a posted run after it: its advance deductions depend on this run"
     LangAdd "أغلق البرنامج على الأجهزة الأخرى ثم احفظ الإعدادات مرة أخرى", "Close the program on the other computers, then save the settings again"
     LangAdd "إلغاء اعتماد الإقرار؟ يُحذف قيد التسوية ويعود الإقرار مسودة", "Cancel the approval of the return? The settlement entry is deleted and the return becomes a draft"
     LangAdd "إيصال 150 ألف جنيه أو أكثر: الرقم القومي أو الضريبي للمشتري", "Receipt of 150,000 pounds or more: national ID or tax number of the buyer"
@@ -163,6 +166,7 @@ Private Sub D1_2()
     LangAdd "اختر البنك، واكتب تاريخ كشف البنك ورصيده، ثم «بدء التسوية", "Choose the bank, type the date and balance of the bank statement, then Start reconciliation"
     LangAdd "الرصيد الافتتاحي يُسجَّل مرة واحدة قبل أي حركة على المنتج", "The opening balance is recorded once, before any move on the product"
     LangAdd "المنتج موجود لكنه ليس ضمن هذا الجرد (تصنيف آخر أو غير نشط", "The product exists but is not part of this count (another category or inactive"
+    LangAdd "تحويل تصفية الكاشير لا يُلغى: يستلمه أمين الصندوق المستلم", "A cashier closing transfer is not cancelled: the custodian of the receiving box receives it"
     LangAdd "عملية مطابقة تغيّر مبلغها في الدفاتر بعد المطابقة: راجعها", "A matched transaction whose amount changed in the books after matching: review it"
     LangAdd "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه", "Saved entry: edit and save, and its journal entry is updated with the same number"
     LangAdd "يُحذف الشيك تحت التحصيل فقط: ألغِ تحصيله أو ارتداده أولًا", "Only a cheque under collection is deleted: cancel its collection or bounce first"
@@ -252,14 +256,15 @@ Private Sub D1_2()
     LangAdd "لا تملك صلاحية الحذف في شاشة ربط السداد بالفواتير", "You do not have the permission to delete in the payment matching screen"
     LangAdd "لا يمكن حذف هذا السجل لأنه مستخدم في عمليات سابقة", "This record cannot be deleted because it is used in earlier transactions"
     LangAdd "مبيعات هذا المستخدم لعميل بلا مندوب تُنسب للمندوب", "The sales of this user to a customer without a sales rep go to the sales rep"
+    LangAdd "من يصرف من كل صندوق ويصفّيه ويستلم التحويلات إليه", "Who pays from each box, closes it and receives the transfers to it"
+End Sub
+
+Private Sub D1_3()
     LangAdd "يُعتمد الإقرار بعد انتهاء فترته: اختر تاريخًا بعد", "The return is approved after its period ends: choose a date after"
     LangAdd "الصغير؛ سعر الوسط أو الكبير يجعل للمشروب أحجامًا", "small, a medium or large price gives the drink sizes"
     LangAdd "الهدف الشهري لصافي مبيعات كل مندوب (بدون الضريبة", "The monthly target for the net sales of each sales rep (without VAT"
     LangAdd "غير متاح في ملف ACCDE. غيّر كلمة المرور من نسختك", "Not available in an ACCDE file. Change the password from your copy"
     LangAdd "لتصحيح الكمية الآن استخدم الجرد أو الإضافة/الخصم", "To correct the quantity now use the stock count or the addition/deduction"
-End Sub
-
-Private Sub D1_3()
     LangAdd "لهذا الحساب حسابات تابعة. احذفها أو انقلها أولًا", "This account has sub-accounts. Delete them or move them first"
     LangAdd "مدير النظام يفتح كل الشاشات بكل الصلاحيات دائمًا", "The system administrator always opens every screen with every permission"
     LangAdd "مستندات الفاتورة الإلكترونية (المقبولة والمرفوضة", "E-invoicing documents (accepted and rejected"
@@ -291,12 +296,4 @@ Private Sub D1_3()
     LangAdd "لا تملك صلاحية الإضافة في شاشة الحركات البنكية", "You do not have the permission to add in the bank transactions screen"
     LangAdd "لهذا الحساب حسابات تابعة، فيبقى حسابًا رئيسيًا", "This account has sub-accounts, so it stays a main account"
     LangAdd "مفتاح الجهاز وشهادته وبرنامج التوقيع (السعودية", "Key and certificate of the device and the signing program (Saudi Arabia"
-    LangAdd "نقر مزدوج على حساب يفتح كشف حسابه للفترة نفسها", "Double-click an account to open its statement for the same period"
-    LangAdd "احفظ تاريخ بدء التشغيل أولًا، ثم أدخل الأرصدة", "Save the start-up date first, then enter the balances"
-    LangAdd "اختر العمليات الظاهرة في كشف البنك ثم «مطابقة", "Choose the transactions shown on the bank statement, then Match"
-    LangAdd "اختر الفاتورة الأصلية ثم حدد الكميات المرتجعة", "Choose the original invoice, then set the returned quantities"
-    LangAdd "الباقي من الفاتورة بعد ما رُبط بها ومرتجعاتها", "What remains of the invoice after what was linked to it and its returns"
-    LangAdd "التقارير المحاسبية تحتاج صلاحية «قيود اليومية", "The accounting reports need the permission Journal entries"
-    LangAdd "المبيعات المحلية الخاضعة للضريبة بالسعر العام", "Local sales taxed at the general rate"
-    LangAdd "المرتجعات على هذه الفاتورة (نقر مزدوج للطباعة", "Returns on this invoice (double-click to print"
 End Sub

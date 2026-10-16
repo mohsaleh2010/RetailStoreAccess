@@ -99,6 +99,8 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmCashClosing": ScreenPermission = "CASH_CLOSING"
         Case "frmCashVoucher": ScreenPermission = "CASH_BOX"
         Case "frmCashBoxes": ScreenPermission = "CASH_BOX"
+        Case "frmCashBoxUsers": ScreenPermission = "CASH_ALL_BOXES"
+        Case "frmCashTransfers": ScreenPermission = "CASH_CLOSING"
         Case "frmJournal": ScreenPermission = "JOURNAL"
         Case "frmJournalEntry": ScreenPermission = "JOURNAL"
         Case "frmAccounts": ScreenPermission = "JOURNAL"

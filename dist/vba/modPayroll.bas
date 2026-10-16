@@ -265,6 +265,8 @@ Public Function PayPayroll(ByVal RunID As Long, ByVal PaidDate As Variant, ByVal
     ElseIf PaidFrom = "CASHBOX" Then
         If IsNull(CashBoxID) Then
             PayPayroll = "«Œ — «·’‰œÊﬁ."
+        ElseIf Not CanUseBox(CashBoxID) Then
+            PayPayroll = BoxUseProblem(CashBoxID)
         ElseIf CashBoxBalance(CLng(CashBoxID), DateValue(PaidDate) + 1) < net Then
             PayPayroll = "—’Ìœ «·’‰œÊﬁ ›Ì " & GDate(PaidDate) & " √ﬁ· „‰ ’«›Ì «·—Ê« » (" & Format$(net, "#,##0.00") & ")."
         End If

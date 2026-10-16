@@ -17,6 +17,29 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "إقفال الفترة والسنة المالية", "Period and fiscal year closing"
+    LangAdd "إلغاء صرف الرواتب وحذف قيده", "Cancel the salary payment and delete its entry"
+    LangAdd "اجتازت العينات فحص الامتثال", "The samples passed the compliance checks"
+    LangAdd "اختر آخر شهر يُسجَّل إهلاكه", "Choose the last month to record depreciation for"
+    LangAdd "اختر الفاتورة الأصلية أولًا", "Choose the original invoice first"
+    LangAdd "الأرصدة الافتتاحية للحسابات", "Opening balances of the accounts"
+    LangAdd "الإحصائيات والرسوم البيانية", "Statistics and charts"
+    LangAdd "الباقي غير المربوط من السند", "The unlinked remainder of the voucher"
+    LangAdd "الخدمات المستوردة من الخارج", "Services imported from abroad"
+    LangAdd "الفاتورة الأصلية غير موجودة", "The original invoice does not exist"
+    LangAdd "المصروفات (إجمالي حسب النوع", "Expenses (total by type"
+    LangAdd "بالكامل (لا تبقى فترة مقفلة", "fully (no period stays closed"
+    LangAdd "بنكنا (الصادر: المسحوب عليه", "Our bank (issued: drawn on"
+    LangAdd "تسجيل الإهلاك حتى هذا الشهر", "Record depreciation up to this month"
+    LangAdd "تعذّر إنشاء المفتاح ببرنامج", "Could not create the key with"
+    LangAdd "تعذّر ضبط عملة ملف البيانات", "Could not set the currency of the data file"
+    LangAdd "تم الحفظ لكن تعذّرت الطباعة", "Saved, but printing failed"
+    LangAdd "تم ضبط وضع المستخدم النهائي", "End-user mode is set"
+    LangAdd "تُعاد فتح آخر سنة مقفلة فقط", "Only the last closed year can be reopened"
+    LangAdd "خصم الفاتورة أكبر من قيمتها", "The invoice discount is more than its value"
+    LangAdd "رد غير متوقع من الهيئة (رمز", "Unexpected reply from ZATCA (code"
+    LangAdd "صادر آخر (رسوم بنكية وغيرها", "Other outgoing (bank fees and others"
+    LangAdd "صافي الضريبة المستحقة (سالب", "Net VAT due (negative"
     LangAdd "صافي المبيعات (بدون الضريبة", "Net sales (without VAT"
     LangAdd "في شاشة أرصدة بداية التشغيل", "in the start-up opening balances screen"
     LangAdd "لا تكلفة مبيعات أو لا مخزون", "No cost of sales or no stock"
@@ -114,6 +137,9 @@ Private Sub D3_1()
     LangAdd "لا توجد فاتورة شراء سابقة", "There is no previous purchase invoice"
     LangAdd "لا يمكنك تغيير دورك بنفسك", "You cannot change your own role"
     LangAdd "مسار برنامج OpenSSL (فارغ", "OpenSSL program path (empty"
+End Sub
+
+Private Sub D3_2()
     LangAdd "مصر: EA للحبة، KGM للكيلو", "Egypt: EA for a piece, KGM for a kilo"
     LangAdd "مصروف (يُسجل في المصروفات", "Expense (recorded in the expenses"
     LangAdd "ملخص ضريبة القيمة المضافة", "VAT summary"
@@ -137,9 +163,6 @@ Private Sub D3_1()
     LangAdd "المبلغ المسدد بين 0.01 و", "The amount paid is between 0.01 and"
     LangAdd "المتبقي في الصندوق (عهدة", "Left in the box (float"
     LangAdd "الملغاة أو التي لا تُرسل", "Cancelled or not sent"
-End Sub
-
-Private Sub D3_2()
     LangAdd "المملكة العربية السعودية", "Kingdom of Saudi Arabia"
     LangAdd "بيانات الموردين وأرصدتهم", "Supplier data and balances"
     LangAdd "تاريخ الاعتماد بعد اليوم", "The approval date is after today"
@@ -156,6 +179,7 @@ Private Sub D3_2()
     LangAdd "طباعة مباشرة بدون معاينة", "Print directly without preview"
     LangAdd "عملاء المندوبين وأرصدتهم", "Sales rep customers and balances"
     LangAdd "لا توجد عمليات في الفترة", "There are no transactions in the period"
+    LangAdd "ليست لديك صلاحية الخزينة", "You do not have the treasury permission"
     LangAdd "مبيعات سلع وخدمات الجدول", "Sales of schedule goods and services"
     LangAdd "مرتجع شراء (استرداد نقدي", "Purchase return (cash refund"
     LangAdd "مرتجع مبيعات (إشعار دائن", "Sales return (credit note"
@@ -175,6 +199,7 @@ Private Sub D3_2()
     LangAdd "إضافة فترة بعد آخر فترة", "Add a period after the last one"
     LangAdd "إعدادات ملصقات الباركود", "Barcode label settings"
     LangAdd "إقفال فترة (شهر أو أكثر", "Close a period (a month or more"
+    LangAdd "اختر التحويل من القائمة", "Choose the transfer from the list"
     LangAdd "اختر الموظف صاحب السلفة", "Choose the employee who takes the advance"
     LangAdd "اختر تقريرًا من القائمة", "Choose a report from the list"
     LangAdd "اختر مستندًا من القائمة", "Choose a document from the list"
@@ -235,6 +260,10 @@ Private Sub D3_2()
     LangAdd "موازنة السنة: الإيرادات", "Budget of the year: revenue"
     LangAdd "نظام تشغيل الجهاز (فارغ", "Operating system of the device (empty"
     LangAdd "وسيصبح للعميل رصيد دائن", "and the customer will have a credit balance"
+End Sub
+
+Private Sub D3_3()
+    LangAdd "يمكنك تصفية صناديقك فقط", "You can close your own boxes only"
     LangAdd "يومية الصندوق التفصيلية", "Detailed cash box day book"
     LangAdd "أدخل تاريخ بدء التشغيل", "Enter the start-up date"
     LangAdd "أصل جديد: القسط الشهري", "New asset: monthly installment"
@@ -260,9 +289,6 @@ Private Sub D3_2()
     LangAdd "البنك (التحصيل / الصرف", "Bank (collection / payment"
     LangAdd "الحسابات: مجموع الدائن", "Accounts: total credit"
     LangAdd "الحسابات: مجموع المدين", "Accounts: total debit"
-End Sub
-
-Private Sub D3_3()
     LangAdd "السنة / الفترة المالية", "Fiscal year / period"
     LangAdd "الصنف موجود في سطر آخر", "The item is already on another line"
     LangAdd "العملات وأسعار التحويل", "Currencies and exchange rates"
@@ -304,7 +330,6 @@ Private Sub D3_3()
     LangAdd "هذا الخيار للمبرمج فقط", "This option is for the developer only"
     LangAdd "هل تسمح بإتمام العملية", "Do you allow the transaction to be completed"
     LangAdd "وارد آخر (فوائد أو قرض", "Other incoming (interest or a loan"
-    LangAdd "يمكنك تصفية صندوقك فقط", "You can close your own box only"
     LangAdd "أضفه من زر «منتج جديد", "Add it with the button New product"
     LangAdd "أفضل 10 منتجات مبيعًا", "Top 10 best-selling products"
     LangAdd "أقل من المبلغ المودَع", "less than the deposited amount"
@@ -358,6 +383,9 @@ Private Sub D3_3()
     LangAdd "مبلغ مستحق على العميل", "an amount due from the customer"
     LangAdd "مراكز التكلفة والفروع", "Cost centers and branches"
     LangAdd "مركز من يُنشئ المصروف", "Center of the user who creates the expense"
+End Sub
+
+Private Sub D3_4()
     LangAdd "مسير عمولات المندوبين", "Sales rep commission run"
     LangAdd "مصر: EGS أو GS1 (فارغ", "Egypt: EGS or GS1 (empty"
     LangAdd "ملف التوقيع فارغ (رمز", "The signature file is empty (code"
@@ -383,9 +411,6 @@ Private Sub D3_3()
     LangAdd "الرقم الضريبي للعميل", "Customer tax number"
     LangAdd "الشهر التالي للتسجيل", "Next month to record"
     LangAdd "الصندوق (إيداع / سحب", "Box (deposit / withdrawal"
-End Sub
-
-Private Sub D3_4()
     LangAdd "الفاتورة الإلكترونية", "E-invoicing"
     LangAdd "المبلغ (بدون الضريبة", "Amount (without VAT"
     LangAdd "المبيعات حسب التصنيف", "Sales by category"
@@ -455,6 +480,7 @@ Private Sub D3_4()
     LangAdd "المخزون حسب التصنيف", "Stock by category"
     LangAdd "المدفوع للمورد الآن", "Paid to the supplier now"
     LangAdd "المسير مصروف بالفعل", "The run is already paid"
+    LangAdd "المندوب صاحب العهدة", "Sales rep holding the custody"
     LangAdd "بدء / تحديث التسوية", "Start / refresh the reconciliation"
     LangAdd "تاريخها + هذه المدة", "its date + this period"
     LangAdd "تحويل إلى صندوق آخر", "Transfer to another box"
@@ -480,6 +506,9 @@ Private Sub D3_4()
     LangAdd "فاتورة ضريبية مبسطة", "Simplified tax invoice"
     LangAdd "قيد عكسي جديد للقيد", "New reversing entry for the entry"
     LangAdd "كلمة المرور الجديدة", "New password"
+End Sub
+
+Private Sub D3_5()
     LangAdd "كلمة المرور الحالية", "Current password"
     LangAdd "كود النشاط (4 أرقام", "Activity code (4 digits"
     LangAdd "لا مبيعات هذا الشهر", "No sales this month"
@@ -506,9 +535,6 @@ Private Sub D3_4()
     LangAdd "الصادرات (بسعر صفر", "Exports (zero rate"
     LangAdd "العمولات المرحَّلة", "Posted commissions"
     LangAdd "الكافيه: سعر البيع", "Cafe: sale price"
-End Sub
-
-Private Sub D3_5()
     LangAdd "المبلغ قبل الضريبة", "Amount before VAT"
     LangAdd "المتبقي على الحساب", "Remaining on account"
     LangAdd "المستخدم غير موجود", "The user does not exist"
@@ -564,6 +590,7 @@ Private Sub D3_5()
     LangAdd "منخفضة المخزون فقط", "Low stock only"
     LangAdd "نسخة احتياطية الآن", "Back up now"
     LangAdd "وحدات بيع المنتجات", "Product sale units"
+    LangAdd "يستلم التحويل أمين", "The transfer is received by the custodian of"
     LangAdd "يومًا عن استحقاقها", "days after its due date"
     LangAdd "أسطر القيد اليدوي", "Manual entry lines"
     LangAdd "أسطر مسير الرواتب", "Payroll lines"
@@ -580,6 +607,7 @@ Private Sub D3_5()
     LangAdd "الاسم بالإنجليزية", "English name"
     LangAdd "البريد الإلكتروني", "E-mail"
     LangAdd "التاريخ بعد اليوم", "The date is after today"
+    LangAdd "التحويلات بالطريق", "Transfers in transit"
     LangAdd "التقرير غير موجود", "The report does not exist"
     LangAdd "الحد الأعلى للأجر", "Maximum wage"
     LangAdd "الحركة غير موجودة", "The move does not exist"
@@ -601,6 +629,9 @@ Private Sub D3_5()
     LangAdd "المستند غير موجود", "The document does not exist"
     LangAdd "المسير غير مرحَّل", "The run is not posted"
     LangAdd "المشتريات المعفاة", "Exempt purchases"
+End Sub
+
+Private Sub D3_6()
     LangAdd "المصروفات (تفصيلي", "Expenses (detailed"
     LangAdd "المطاعم (شاشة لمس", "Restaurants (touch screen"
     LangAdd "المقارنة: المجموع", "Comparison: total"
@@ -629,9 +660,6 @@ Private Sub D3_5()
     LangAdd "صادر آخر من البنك", "Other outgoing from the bank"
     LangAdd "صافي ضريبة الفترة", "Net VAT of the period"
     LangAdd "غير مسجل بالضريبة", "Not registered for VAT"
-End Sub
-
-Private Sub D3_6()
     LangAdd "فاتورة المورد رقم", "Supplier invoice number"
     LangAdd "قسط السلفة الشهري", "Monthly advance installment"
     LangAdd "لا توجد شهادة بعد", "No certificate yet"
@@ -676,42 +704,4 @@ Private Sub D3_6()
     LangAdd "العمولة المتوقعة", "Expected commission"
     LangAdd "العميل غير موجود", "The customer does not exist"
     LangAdd "الفترة مقفلة حتى", "The period is closed up to"
-    LangAdd "المبيعات الشهرية", "Monthly sales"
-    LangAdd "المبيعات المعفاة", "Exempt sales"
-    LangAdd "المبيعات اليومية", "Daily sales"
-    LangAdd "المخزون يكفي نحو", "The stock is enough for about"
-    LangAdd "المركز الافتراضي", "Default center"
-    LangAdd "المسير غير مصروف", "The run is not paid"
-    LangAdd "المسير ليس مسودة", "The run is not a draft"
-    LangAdd "المقارنة: الحساب", "Comparison: account"
-    LangAdd "المنتج غير موجود", "The product does not exist"
-    LangAdd "المورد الافتراضي", "Default supplier"
-    LangAdd "الواردة والصادرة", "Received and issued"
-    LangAdd "تحويل بين البنوك", "Transfer between banks"
-    LangAdd "تسويات هذا البنك", "Reconciliations of this bank"
-    LangAdd "تصنيفات المنتجات", "Product categories"
-    LangAdd "تعذر إقفال السنة", "The year could not be closed"
-    LangAdd "تعذر إنشاء الجرد", "The count could not be created"
-    LangAdd "تعذر ترحيل الجرد", "Could not post the count"
-    LangAdd "تعذر حفظ التصفية", "Could not save the closing"
-    LangAdd "تعذر حفظ المرتجع", "Could not save the return"
-    LangAdd "تعذر فتح التقرير", "Could not open the report"
-    LangAdd "تعذر قراءة الملف", "Could not read the file"
-    LangAdd "تفعيل هذا الجهاز", "Activate this computer"
-    LangAdd "تم حفظ القالب في", "The template was saved in"
-    LangAdd "تم حفظ سند الصرف", "The payment voucher was saved"
-    LangAdd "تم حفظ سند القبض", "The receipt voucher was saved"
-    LangAdd "تم فك قفل الحساب", "The account was unlocked"
-    LangAdd "تمت إضافة الفترة", "Added the period"
-    LangAdd "توجد موازنة لسنة", "A budget for the year"
-    LangAdd "توزيع على الأشهر", "Spread over the months"
-    LangAdd "حذف مسودة المسير", "Delete the draft of the run"
-    LangAdd "حركة بنكية جديدة", "New bank transaction"
-    LangAdd "خصم على الفاتورة", "Invoice discount"
-    LangAdd "راجع مدير النظام", "Ask the system administrator"
-    LangAdd "رصيد المنتج سالب", "The product balance is negative"
-    LangAdd "رصيد دائن مرحَّل", "Carried credit balance"
-    LangAdd "رقم أو اسم السجل", "Number or name of the record"
-    LangAdd "رقم فاتورة البيع", "Sales invoice number"
-    LangAdd "زيادة في الصندوق", "Overage in the box"
 End Sub

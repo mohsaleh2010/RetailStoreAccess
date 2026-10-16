@@ -12,6 +12,7 @@ ACCOUNT_NAMES_EN = {
     110001: "Main treasury",
     110002: "Cashier box",
     1190: "Cash not allocated to a box",
+    1195: "Cash in transit between boxes",
     1200: "Mada and wallets under settlement (bank and network)",
     1210: "Bank accounts",
     1250: "Cheques under collection",
@@ -103,6 +104,7 @@ SOURCE_TYPES_EN = {
     "ASSET_DISPOSAL": "Fixed asset sale or disposal", "DEPRECIATION": "Monthly depreciation entry",
     "PAYROLL": "Payroll entry", "PAYROLL_PAYMENT": "Salary payment", "COMMISSION": "Sales rep commissions entry",
     "ACCOUNT_OPENING": "Account opening balance",
+    "CASH_RECEIVE": "Cash transfer received",
 }
 
 TRANSACTION_TYPES_EN = {
@@ -121,6 +123,7 @@ PERMISSION_NAMES_EN = {
     "SUPPLIERS": "Manage suppliers", "SUPPLIER_PAYMENTS": "Payment vouchers", "PRODUCTS": "Manage products and prices",
     "INVENTORY_ADJUST": "Manual stock addition and deduction", "STOCK_COUNT": "Stock count", "EXPENSES": "Expenses",
     "CASH_BOX": "Treasury: receipt, payment and transfer vouchers and boxes", "CASH_CLOSING": "Daily cashier closing",
+    "CASH_ALL_BOXES": "Pay and transfer from every box, not only own boxes",
     "JOURNAL": "Journal entries, chart of accounts and trial balance",
     "MANUAL_ENTRY": "Manual entries: add, edit and delete",
     "PERIOD_CLOSE": "Close and reopen periods and the fiscal year",
@@ -147,7 +150,8 @@ SCREEN_TITLES_EN = {
     "frmInventory": "Stock and manual moves", "frmStockCount": "Stock count", "frmBarcodeLabels": "Barcode labels",
     "frmLabelSettings": "Label settings", "frmExpenses": "Expenses", "frmExpenseTypes": "Expense types",
     "frmRecurring": "Recurring expenses", "frmTreasury": "Treasury", "frmCashVoucher": "Cash and transfer vouchers",
-    "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmAccounting": "Accounting and finance",
+    "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmCashBoxUsers": "Box custodians",
+    "frmCashTransfers": "Receipt of transfers between boxes", "frmAccounting": "Accounting and finance",
     "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
     "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
     "frmPeriodClosing": "Period and fiscal year closing", "frmFiscalPeriods": "Fiscal periods", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",

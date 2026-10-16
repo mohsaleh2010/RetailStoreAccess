@@ -239,6 +239,7 @@ Public Sub OpenJournalSource(ByVal EntryID As Variant)
         Case "SUPPLIER_PAYMENT": PrintVoucher "PAYMENT", id
         Case "EXPENSE":          OpenScreen "frmExpenses", 0, id
         Case "CASH_VOUCHER":     PrintCashVoucher id
+        Case "CASH_RECEIVE":     PrintCashVoucher id
         Case "STOCK_MOVE":       OpenScreen "frmInventory"
         Case "STOCK_COUNT":      PrintStockCount id
         Case "BOX_OPENING":      OpenScreen "frmCashBoxes", 0, id

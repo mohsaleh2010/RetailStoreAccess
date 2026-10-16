@@ -152,6 +152,8 @@ def _expense():
 def _cash_voucher():
     k = ("'CASH_VOUCHER'", "v.CashVoucherID", "v.VoucherNumber", "v.VoucherDate",
          "IIf(v.PartyName Is Null, v.Description, v.PartyName)")
+    r = ("'CASH_RECEIVE'", "v.CashVoucherID", "v.VoucherNumber", "v.ReceivedAt", "v.Description")
+    received = "v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Not Null"
     out_src = "CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID"
     out_account = ("IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', "
                    "5400, IIf(v.Category = 'COMMISSION', 2330, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID "
@@ -166,10 +168,13 @@ def _cash_voucher():
         jline(*k, 1, out_account, f"v.Amount - {nz('x.Tax')}", ZERO, "v.Description", out_src, "v.VoucherType = 'OUT'"),
         jline(*k, 2, "110000 + v.CashBoxID", ZERO, "v.Amount", "v.PartyName", out_src, "v.VoucherType = 'OUT'"),
         jline(*k, 3, 1500, "x.Tax", ZERO, "'ضريبة المدخلات'", out_src, "v.VoucherType = 'OUT' AND x.Tax <> 0"),
-        jline(*k, 1, "110000 + v.ToCashBoxID", "v.Amount", ZERO, "v.Description", "CashVouchers AS v",
-              "v.VoucherType = 'TRANSFER'"),
+        # a transfer to a box that confirms its receipts goes through 1195 (cash in transit) until received
+        jline(*k, 1, "IIf(v.InTransit, 1195, 110000 + v.ToCashBoxID)", "v.Amount", ZERO, "v.Description",
+              "CashVouchers AS v", "v.VoucherType = 'TRANSFER'"),
         jline(*k, 2, "110000 + v.CashBoxID", ZERO, "v.Amount", "v.Description", "CashVouchers AS v",
-              "v.VoucherType = 'TRANSFER'")]), cc("v"))
+              "v.VoucherType = 'TRANSFER'"),
+        jline(*r, 1, "110000 + v.ToCashBoxID", "v.Amount", ZERO, "v.Description", "CashVouchers AS v", received),
+        jline(*r, 2, 1195, ZERO, "v.Amount", "'نقدية بالطريق'", "CashVouchers AS v", received)]), cc("v"))
 
 
 def _stock():
@@ -1462,10 +1467,10 @@ SELECT v.CashBoxID, v.VoucherDate, 'TRANSFER_OUT', 'تحويل إلى صندوق
 FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.ToCashBoxID = b.CashBoxID
 WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
-SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق آخر', v.VoucherNumber,
-       b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
+SELECT v.ToCashBoxID, IIf(v.InTransit, v.ReceivedAt, v.VoucherDate), 'TRANSFER_IN', 'تحويل من صندوق آخر',
+       v.VoucherNumber, b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
 FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID
-WHERE v.VoucherType = 'TRANSFER'
+WHERE v.VoucherType = 'TRANSFER' AND (v.InTransit = False OR v.ReceivedAt Is Not Null)
 UNION ALL
 SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description,
        CCur(0), t.Amount, t.EmployeeID
@@ -1504,7 +1509,8 @@ GROUP BY CashBoxID"""),
 
     Query("CashBoxBalanceQuery", "أرصدة الخزينة والصناديق الآن", f"""
 SELECT b.CashBoxID, b.BoxName, b.BoxType,
-       IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', 'صندوق كاشير') AS BoxTypeName, b.IsActive,
+       IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', IIf(b.BoxType = 'CUSTODY', 'عهدة مندوب', 'صندوق كاشير')) AS BoxTypeName,
+       b.IsActive,
        {nz("t.BoxIn")} AS TotalIn, {nz("t.BoxOut")} AS TotalOut,
        {nz("t.BoxIn")} - {nz("t.BoxOut")} AS Balance, t.LastMoveDate
 FROM [@CashBoxes] AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID

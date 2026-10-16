@@ -98,6 +98,8 @@ Public Function BankTxProblem(ByVal TxType As String, ByVal TxDate As Variant, B
                     p = "اختر الصندوق."
                 ElseIf Not BoxIsActive(CashBoxID) Then
                     p = "الصندوق غير نشط."
+                ElseIf TxType = "DEPOSIT" And Not CanUseBox(CashBoxID) Then
+                    p = BoxUseProblem(CashBoxID)
                 ElseIf TxType = "DEPOSIT" And CashBoxBalance(CLng(CashBoxID), DateValue(TxDate) + 1) < Amount Then
                     p = "رصيد الصندوق في " & GDate(TxDate) & " أقل من المبلغ المودَع."
                 End If

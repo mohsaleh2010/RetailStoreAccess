@@ -15,7 +15,12 @@ Attribute VB_Name = "modCash"
 '                      the EXPENSE category also records the expense
 '   PostCashClosing    cashier closing: count, shortage / overage, then the cash goes
 '                      to the main safe, to the owner, or stays in the box
-' Screens: frmTreasury, frmCashVoucher, frmCashClosing (built by modBuildForms).
+'   CanUseBox          who pays, transfers and closes from a box (docs/56): its custodians
+'                      (CashBoxUsers, Employees.CashBoxID, the sales rep of a custody box),
+'                      everyone with CASH_BOX when it has none, every box with CASH_ALL_BOXES
+'   ReceiveCashTransfer / CancelCashTransfer   a transfer to a box with ConfirmReceipt stays
+'                      in transit (account 1195) until a custodian of that box receives it
+' Screens: frmTreasury, frmCashVoucher, frmCashClosing, frmCashTransfers (built by modBuildForms).
 ' Posting functions return "" on success or an Arabic error message.
 '==============================================================================
 Option Compare Database
@@ -100,6 +105,141 @@ Private Function Money(ByVal Value As Currency) As String
 End Function
 
 '==============================================================================
+' Box custodians (docs/56)
+'==============================================================================
+Public Function IsBoxCustodian(ByVal BoxID As Variant) As Boolean
+    ' The box of the user (Employees.CashBoxID), a box he keeps (CashBoxUsers) or the custody box of his sales rep.
+    Dim uid As Long, box As Long
+    If IsNull(BoxID) Then Exit Function
+    uid = CurrentUserID()
+    box = CLng(BoxID)
+    IsBoxCustodian = Nz(DbValue("SELECT COUNT(*) FROM Employees WHERE EmployeeID = " & uid & _
+                                " AND CashBoxID = " & box), 0) > 0
+    If Not IsBoxCustodian Then
+        IsBoxCustodian = Nz(DbValue("SELECT COUNT(*) FROM CashBoxUsers WHERE CashBoxID = " & box & _
+                                    " AND EmployeeID = " & uid), 0) > 0
+    End If
+    If Not IsBoxCustodian Then
+        IsBoxCustodian = Nz(DbValue("SELECT COUNT(*) FROM CashBoxes AS b INNER JOIN SalesReps AS s ON " & _
+                                    "b.SalesRepID = s.SalesRepID WHERE b.CashBoxID = " & box & _
+                                    " AND s.EmployeeID = " & uid), 0) > 0
+    End If
+End Function
+
+Public Function BoxHasCustodians(ByVal BoxID As Long) As Boolean
+    BoxHasCustodians = Nz(DbValue("SELECT COUNT(*) FROM CashBoxUsers WHERE CashBoxID = " & BoxID), 0) > 0
+    If Not BoxHasCustodians Then
+        BoxHasCustodians = Nz(DbValue("SELECT COUNT(*) FROM Employees WHERE IsActive = True AND CashBoxID = " & _
+                                      BoxID), 0) > 0
+    End If
+    If Not BoxHasCustodians Then
+        BoxHasCustodians = Nz(DbValue("SELECT COUNT(*) FROM CashBoxes AS b INNER JOIN SalesReps AS s ON " & _
+                                      "b.SalesRepID = s.SalesRepID WHERE b.CashBoxID = " & BoxID & _
+                                      " AND s.EmployeeID Is Not Null"), 0) > 0
+    End If
+End Function
+
+Public Function CanUseBox(ByVal BoxID As Variant) As Boolean
+    ' Paying, transferring or closing from a box: every box with CASH_ALL_BOXES; otherwise the boxes
+    ' the user keeps and the boxes nobody keeps.
+    If IsNull(BoxID) Then Exit Function
+    If HasPermission("CASH_ALL_BOXES") Then
+        CanUseBox = True
+        Exit Function
+    End If
+    CanUseBox = IsBoxCustodian(BoxID)
+    If Not CanUseBox Then CanUseBox = Not BoxHasCustodians(CLng(BoxID))
+End Function
+
+Public Function BoxUseProblem(ByVal BoxID As Variant) As String
+    If Not CanUseBox(BoxID) Then BoxUseProblem = "·”  „‰ √„‰«¡ " & BoxName(BoxID) & ": ·« Ì„ﬂ‰ﬂ «·’—› √Ê «· ÕÊÌ· „‰Â."
+End Function
+
+Public Function ClosingAllowed(ByVal BoxID As Variant) As Boolean
+    ' A cashier closes his own box; who manages the treasury closes the boxes he may use.
+    If IsNull(BoxID) Then Exit Function
+    If CLng(BoxID) = CurrentCashBoxID() Or IsBoxCustodian(BoxID) Then
+        ClosingAllowed = True
+    ElseIf HasPermission("CASH_BOX") Then
+        ClosingAllowed = CanUseBox(BoxID)
+    End If
+End Function
+
+Private Function ClosingBoxes() As String
+    ' The active boxes the user may close, as a list for IN (...).
+    Dim rs As DAO.Recordset, ids As String
+    Set rs = CurrentDb.OpenRecordset("SELECT CashBoxID FROM CashBoxes WHERE IsActive = True", dbOpenSnapshot)
+    Do While Not rs.EOF
+        If ClosingAllowed(rs!CashBoxID) Then ids = ids & "," & rs!CashBoxID
+        rs.MoveNext
+    Loop
+    rs.Close
+    ClosingBoxes = IIf(Len(ids) = 0, "0", Mid$(ids, 2))
+End Function
+
+Public Function BoxConfirmsReceipt(ByVal BoxID As Variant) As Boolean
+    If IsNull(BoxID) Then Exit Function
+    BoxConfirmsReceipt = Nz(DbValue("SELECT ConfirmReceipt FROM CashBoxes WHERE CashBoxID = " & CLng(BoxID)), False)
+End Function
+
+'==============================================================================
+' Transfers in transit (docs/56)
+'==============================================================================
+Private Function PendingTransferBox(ByVal CashVoucherID As Long, ByVal FieldName As String) As Variant
+    ' The sending (CashBoxID) or receiving (ToCashBoxID) box of a transfer still in transit; Null otherwise.
+    PendingTransferBox = DbValue("SELECT " & FieldName & " FROM CashVouchers WHERE CashVoucherID = " & CashVoucherID & _
+                                 " AND VoucherType = 'TRANSFER' AND InTransit = True AND ReceivedAt Is Null")
+End Function
+
+Public Function ReceiveCashTransfer(ByVal CashVoucherID As Long) As String
+    ' A custodian of the receiving box confirms the cash arrived: it enters the box now.
+    Dim toBox As Variant, before As Collection, msg As String
+    toBox = PendingTransferBox(CashVoucherID, "ToCashBoxID")
+    If IsNull(toBox) Then
+        msg = "Â–« «· ÕÊÌ· ·Ì” »«‰ Ÿ«— «·«” ·«„."
+    ElseIf Not HasPermission("CASH_CLOSING") And Not HasPermission("CASH_BOX") Then
+        msg = "·Ì”  ·œÌﬂ ’·«ÕÌ… «·Œ“Ì‰…."
+    ElseIf Not CanUseBox(toBox) Then
+        msg = "Ì” ·„ «· ÕÊÌ· √„Ì‰ " & BoxName(toBox) & "."
+    Else
+        msg = ClosedPeriodProblem(Date)
+    End If
+    If Len(msg) > 0 Then
+        ReceiveCashTransfer = msg
+        Exit Function
+    End If
+    Set before = AuditSnapshot("CashVouchers", "CashVoucherID", CashVoucherID)
+    CurrentDb.Execute "UPDATE CashVouchers SET ReceivedAt = " & SqlDate(Now) & ", ReceivedByID = " & CurrentUserID() & _
+                      " WHERE CashVoucherID = " & CashVoucherID & " AND ReceivedAt Is Null", dbFailOnError
+    AuditEdited "CASH_TRANSFER_RECEIVE", "CashVouchers", "CashVoucherID", CashVoucherID, before
+End Function
+
+Public Function CancelCashTransfer(ByVal CashVoucherID As Long) As String
+    ' Before its receipt the sender can take a transfer back: the voucher is deleted and the cash
+    ' returns to the sending box. A closing transfer stays (the closing counts on it).
+    Dim fromBox As Variant, before As Collection, msg As String
+    fromBox = PendingTransferBox(CashVoucherID, "CashBoxID")
+    If IsNull(fromBox) Then
+        msg = "Â–« «· ÕÊÌ· ·Ì” »«‰ Ÿ«— «·«” ·«„."
+    ElseIf Not HasPermission("CASH_BOX") Then
+        msg = "·Ì”  ·œÌﬂ ’·«ÕÌ… ”‰œ«  «·Œ“Ì‰…."
+    ElseIf Not CanUseBox(fromBox) Then
+        msg = BoxUseProblem(fromBox)
+    ElseIf Not IsNull(DbValue("SELECT ClosingID FROM CashVouchers WHERE CashVoucherID = " & CashVoucherID)) Then
+        msg = " ÕÊÌ·  ’›Ì… «·ﬂ«‘Ì— ·« Ìı·€Ï: Ì” ·„Â √„Ì‰ «·’‰œÊﬁ «·„” ·„."
+    Else
+        msg = ClosedPeriodProblem(DbValue("SELECT VoucherDate FROM CashVouchers WHERE CashVoucherID = " & CashVoucherID))
+    End If
+    If Len(msg) > 0 Then
+        CancelCashTransfer = msg
+        Exit Function
+    End If
+    Set before = AuditSnapshot("CashVouchers", "CashVoucherID", CashVoucherID)
+    CurrentDb.Execute "DELETE FROM CashVouchers WHERE CashVoucherID = " & CashVoucherID, dbFailOnError
+    AuditDeleted "CASH_TRANSFER_DELETE", "CashVouchers", CashVoucherID, before
+End Function
+
+'==============================================================================
 ' Posting
 '==============================================================================
 Public Function PostCashVoucher(ByVal VoucherType As String, ByVal BoxID As Long, ByVal ToBoxID As Variant, _
@@ -115,6 +255,7 @@ Public Function PostCashVoucher(ByVal VoucherType As String, ByVal BoxID As Long
         Exit Function
     End If
     msg = VoucherProblem(VoucherType, BoxID, ToBoxID, Category, Amount, ExpenseTypeID)
+    If Len(msg) = 0 And VoucherType <> "IN" Then msg = BoxUseProblem(BoxID)
     If Len(msg) = 0 And VoucherType <> "IN" Then
         balance = CashBoxBalance(BoxID)
         If Amount > balance Then msg = "—’Ìœ " & BoxName(BoxID) & " (" & Money(balance) & ") ·« Ìﬂ›Ì ·’—› " & Money(Amount) & "."
@@ -211,6 +352,7 @@ Private Function InsertVoucher(ByVal db As DAO.Database, ByVal VoucherType As St
     If VoucherType = "TRANSFER" Then
         rs!ToCashBoxID = CLng(ToBoxID)
         rs!Category = "TRANSFER"
+        rs!InTransit = BoxConfirmsReceipt(ToBoxID)         ' enters the box when its custodian receives it
     Else
         rs!Category = Category
     End If
@@ -247,8 +389,8 @@ Public Function PostCashClosing(ByVal BoxID As Long, ByVal Counted As Currency, 
         PostCashClosing = "«Œ — «·’‰œÊﬁ."
         Exit Function
     End If
-    If BoxID <> CurrentCashBoxID() And Not HasPermission("CASH_BOX") Then
-        PostCashClosing = "Ì„ﬂ‰ﬂ  ’›Ì… ’‰œÊﬁﬂ ›ﬁÿ."
+    If Not ClosingAllowed(BoxID) Then
+        PostCashClosing = "Ì„ﬂ‰ﬂ  ’›Ì… ’‰«œÌﬁﬂ ›ﬁÿ."
         Exit Function
     End If
     If Counted < 0 Then
@@ -441,6 +583,61 @@ Public Sub PrintCashDay(ByVal frm As Access.Form)
 End Sub
 
 '==============================================================================
+' frmCashTransfers: the transfers in transit
+'==============================================================================
+Public Sub TransfersLoad(ByVal frm As Access.Form)
+    frm!lstTransfers.RowSource = Tr("SELECT v.CashVoucherID, v.VoucherNumber AS [—ﬁ„ «·”‰œ], " & _
+        "Format(v.VoucherDate, 'yyyy/mm/dd hh:nn') AS [«· «—ÌŒ], f.BoxName AS [„‰ ’‰œÊﬁ], t.BoxName AS [≈·Ï ’‰œÊﬁ], " & _
+        "Format(v.Amount, '#,##0.00') AS [«·„»·€ «·„ÕÊÛ¯·], v.Description AS [»Ì«‰ «· ÕÊÌ·] " & _
+        "FROM (CashVouchers AS v INNER JOIN [@CashBoxes] AS f ON v.CashBoxID = f.CashBoxID) " & _
+        "INNER JOIN [@CashBoxes] AS t ON v.ToCashBoxID = t.CashBoxID " & _
+        "WHERE v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Null ORDER BY v.VoucherDate")
+    frm!lstTransfers.Requery
+    frm!lblHint.Caption = Tr("«· ÕÊÌ· ÌœŒ· «·’‰œÊﬁ «·„” ·„ ⁄‰œ  √ﬂÌœ «” ·«„Â° ÊÕ Ï –·ﬂ ›Ì Õ”«» ´‰ﬁœÌ… »«·ÿ—Ìﬁª. " & _
+                             "≈·€«¡ «· ÕÊÌ· Ì⁄Ìœ «·„»·€ ··’‰œÊﬁ «·„—”ˆ·.")
+End Sub
+
+Private Function SelectedTransfer(ByVal frm As Access.Form) As Long
+    If IsNull(frm!lstTransfers.Value) Then
+        ShowWarning "«Œ — «· ÕÊÌ· „‰ «·ﬁ«∆„…."
+    Else
+        SelectedTransfer = CLng(frm!lstTransfers.Value)
+    End If
+End Function
+
+Public Sub TransfersReceive(ByVal frm As Access.Form)
+    Dim id As Long, msg As String
+    id = SelectedTransfer(frm)
+    If id = 0 Then Exit Sub
+    msg = ReceiveCashTransfer(id)
+    If Len(msg) > 0 Then
+        ShowWarning msg
+    Else
+        ShowInfo " „ «” ·«„ «· ÕÊÌ· ÊœŒ· «·„»·€ «·’‰œÊﬁ."
+        TransfersLoad frm
+    End If
+End Sub
+
+Public Sub TransfersCancel(ByVal frm As Access.Form)
+    Dim id As Long, msg As String
+    id = SelectedTransfer(frm)
+    If id = 0 Then Exit Sub
+    If Not AskYesNo("≈·€«¡ «· ÕÊÌ· Ê≈⁄«œ… «·„»·€ ··’‰œÊﬁ «·„—”ˆ·ø") Then Exit Sub
+    msg = CancelCashTransfer(id)
+    If Len(msg) > 0 Then
+        ShowWarning msg
+    Else
+        TransfersLoad frm
+    End If
+End Sub
+
+Public Sub TransfersPrint(ByVal frm As Access.Form)
+    Dim id As Long
+    id = SelectedTransfer(frm)
+    If id > 0 Then PrintCashVoucher id
+End Sub
+
+'==============================================================================
 ' frmCashVoucher: OpenArgs = "IN|box" / "OUT|box" / "TRANSFER|box"
 '==============================================================================
 Public Sub VoucherLoad(ByVal frm As Access.Form)
@@ -594,7 +791,7 @@ Public Sub ClosingLoad(ByVal frm As Access.Form)
     Dim sql As String
     Calendar = vbCalGreg
     sql = BOX_ROWS
-    If Not HasPermission("CASH_BOX") Then sql = sql & " AND q.CashBoxID = " & CurrentCashBoxID()
+    If Not HasPermission("CASH_ALL_BOXES") Then sql = sql & " AND q.CashBoxID IN (" & ClosingBoxes() & ")"
     frm!cboBox.RowSource = Tr(sql & " ORDER BY q.BoxType, q.BoxName")
     frm!cboToBox.RowSource = Tr(BOX_ROWS & " AND q.BoxType = 'MAIN' ORDER BY q.BoxName")
     frm!cboDestination.RowSource = Tr(DESTINATIONS)
@@ -602,7 +799,7 @@ Public Sub ClosingLoad(ByVal frm As Access.Form)
     If Not IsNull(frm.OpenArgs) Then
         If IsNumeric(frm.OpenArgs) Then frm!cboBox.Value = CLng(frm.OpenArgs)
     End If
-    If IsNull(frm!cboBox.Value) Or Not HasPermission("CASH_BOX") Then frm!cboBox.Value = CurrentCashBoxID()
+    If Not ClosingAllowed(frm!cboBox.Value) Then frm!cboBox.Value = CurrentCashBoxID()
     frm!cboToBox.Value = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive = True")
     ClosingBoxChanged frm
     ClosingDestinationChanged frm
@@ -738,6 +935,7 @@ End Sub
 Public Function TestCash() As Boolean
     Dim ws As DAO.Workspace, box As Long, mainBox As Long, before As Currency, msg As String, id As Long
     Dim passed As Long, failed As Long, report As String, expBefore As Long, inTrans As Boolean
+    Dim mainBefore As Currency
     Calendar = vbCalGreg
     EnsureTestUser
     g_SilentMode = True
@@ -785,6 +983,25 @@ Public Function TestCash() As Boolean
               CashBoxBalance(box), "ÌÊ„Ì… «·’‰œÊﬁ: —’Ìœ ¬Œ— «·ÌÊ„ = —’Ìœ «·’‰œÊﬁ", passed, failed, report
     CheckCash Nz(DbValue("SELECT Max(ClosingCount) FROM CashDayBookQuery"), 0) >= 1, _
               "ÌÊ„Ì… «·’‰œÊﬁ:  ’›Ì… «·ÌÊ„  ŸÂ—", passed, failed, report
+
+    ' custodians and transfers in transit (docs/56)
+    CurrentDb.Execute "INSERT INTO CashBoxUsers (CashBoxID, EmployeeID) VALUES (" & box & ", " & CurrentUserID() & ")", _
+                      dbFailOnError
+    CheckCash IsBoxCustodian(box) And BoxHasCustodians(box) And CanUseBox(box) And ClosingAllowed(box), _
+              "√„Ì‰ «·’‰œÊﬁ Ì’—› „‰Â ÊÌ’›¯ÌÂ", passed, failed, report
+    CurrentDb.Execute "UPDATE CashBoxes SET ConfirmReceipt = True WHERE CashBoxID = " & mainBox, dbFailOnError
+    mainBefore = CashBoxBalance(mainBox)
+    before = CashBoxBalance(box)
+    msg = PostCashVoucher("TRANSFER", box, mainBox, "TRANSFER", 50, "", "TEST-CASH", Null, id)
+    CheckCash Len(msg) = 0 And CashBoxBalance(box) = before - 50 And CashBoxBalance(mainBox) = mainBefore, _
+              " ÕÊÌ· ·’‰œÊﬁ Ìƒﬂœ «·«” ·«„: ÌŒ—Ã „‰ «·„—”ˆ· Ê·« ÌœŒ· «·„” ·„ " & msg, passed, failed, report
+    CheckCash Len(ReceiveCashTransfer(id)) = 0 And CashBoxBalance(mainBox) = mainBefore + 50, _
+              " √ﬂÌœ «·«” ·«„ ÌœŒ· «·„»·€ «·’‰œÊﬁ", passed, failed, report
+    CheckCash Len(ReceiveCashTransfer(id)) > 0, "·« Ìı” ·„ «· ÕÊÌ· „— Ì‰", passed, failed, report
+    msg = PostCashVoucher("TRANSFER", box, mainBox, "TRANSFER", 30, "", "TEST-CASH", Null, id)
+    CheckCash Len(msg) = 0 And Len(CancelCashTransfer(id)) = 0 And CashBoxBalance(box) = before - 50 And _
+              Nz(DbValue("SELECT COUNT(*) FROM CashVouchers WHERE CashVoucherID = " & id), 0) = 0, _
+              "≈·€«¡ «· ÕÊÌ· ﬁ»· «” ·«„Â Ì⁄Ìœ «·„»·€ " & msg, passed, failed, report
     ws.Rollback
     inTrans = False
     GoTo Done

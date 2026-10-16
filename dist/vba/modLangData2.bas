@@ -15,12 +15,21 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "äŞÑ ãÒÏæÌ Úáì ÍÓÇÈ íİÊÍ ßÔİ ÍÓÇÈå ááİÊÑÉ äİÓåÇ", "Double-click an account to open its statement for the same period"
+    LangAdd "ÇÍİÙ ÊÇÑíÎ ÈÏÁ ÇáÊÔÛíá ÃæáğÇ¡ Ëã ÃÏÎá ÇáÃÑÕÏÉ", "Save the start-up date first, then enter the balances"
+    LangAdd "ÇÎÊÑ ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ßÔİ ÇáÈäß Ëã «ãØÇÈŞÉ", "Choose the transactions shown on the bank statement, then Match"
+    LangAdd "ÇÎÊÑ ÇáİÇÊæÑÉ ÇáÃÕáíÉ Ëã ÍÏÏ ÇáßãíÇÊ ÇáãÑÊÌÚÉ", "Choose the original invoice, then set the returned quantities"
+    LangAdd "ÇáÈÇŞí ãä ÇáİÇÊæÑÉ ÈÚÏ ãÇ ÑõÈØ ÈåÇ æãÑÊÌÚÇÊåÇ", "What remains of the invoice after what was linked to it and its returns"
+    LangAdd "ÇáÊŞÇÑíÑ ÇáãÍÇÓÈíÉ ÊÍÊÇÌ ÕáÇÍíÉ «ŞíæÏ ÇáíæãíÉ", "The accounting reports need the permission Journal entries"
+    LangAdd "ÇáãÈíÚÇÊ ÇáãÍáíÉ ÇáÎÇÖÚÉ ááÖÑíÈÉ ÈÇáÓÚÑ ÇáÚÇã", "Local sales taxed at the general rate"
+    LangAdd "ÇáãÑÊÌÚÇÊ Úáì åĞå ÇáİÇÊæÑÉ (äŞÑ ãÒÏæÌ ááØÈÇÚÉ", "Returns on this invoice (double-click to print"
     LangAdd "ÇáæÇÑÏÇÊ ãä ÇáÓáÚ (ÇáãÓÏÏÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imported goods (VAT paid at customs"
     LangAdd "ÈÑäÇãÌ ÇáÊæŞíÚ (İáÇÔÉ ÇáÊæŞíÚ) İí ÅÚÏÇÏ ÇáÑÈØ", "Signing program (USB token) in the connection setup"
     LangAdd "ÈÚÏ ÇáÍİÙ Úíøä ßáãÉ ÇáãÑæÑ ãä ÒÑ «ßáãÉ ÇáãÑæÑ", "After saving, set the password with the button Password"
     LangAdd "ÑÕíÏ ÇáÍÓÇÈ İí ÇáÈäß ÚäÏ ÈÏÁ ÇÓÊÎÏÇã ÇáÈÑäÇãÌ", "The account balance in the bank when the program is first used"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáİÊÑÇÊ ÇáãÇáíÉ (ÅŞİÇá ÇáİÊÑÇÊ", "You do not have the permission for the fiscal periods (period closing"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÚãæáÇÊ ÇáãäÏæÈíä", "You do not have this permission in the sales rep commissions screen"
+    LangAdd "áÕäÏæŞ ÚåÏÉ ÇáãäÏæÈ: ãÓÊÎÏã ÇáãäÏæÈ Ããíä Úáíå", "For a sales rep custody box: the user of the sales rep keeps it"
     LangAdd "ááÚãá İí ÇáÏæáÉ ÇáÃÎÑì ÇÈÏÃ ãáİ ÈíÇäÇÊ ÌÏíÏğÇ", "To work in the other country start a new data file"
     LangAdd "ÃÖİ ÕäİğÇ æÇÍÏğÇ Úáì ÇáÃŞá Åáì ŞÇÆãÉ ÇáØÈÇÚÉ", "Add at least one item to the print list"
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ İí ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled in the settings"
@@ -31,6 +40,7 @@ Private Sub D2_1()
     LangAdd "áÇ íÊÈÚ ÇáÍÓÇÈ ÍÓÇÈğÇ ãä ÇáÍÓÇÈÇÊ ÇáÊÇÈÚÉ áå", "An account cannot belong to one of its own sub-accounts"
     LangAdd "áÊÕİíÑ Õäİ ÛíÑ ãæÌæÏ ÇßÊÈ 0 İí ßãíÊå ÇáİÚáíÉ", "To set a missing item to zero type 0 as its actual quantity"
     LangAdd "íæãíÉ ÇáÕäÏæŞ ÇáÊİÕíáíÉ (ÕİÍÉ áßá ÕäÏæŞ æíæã", "Detailed cash box day book (a page per box and day"
+    LangAdd "ÅáÛÇÁ ÇáÊÍæíá æÅÚÇÏÉ ÇáãÈáÛ ááÕäÏæŞ ÇáãÑÓöá", "Cancel the transfer and return the amount to the sending box"
     LangAdd "ÇÊÑßå İÇÑÛğÇ ááØÈÇÚÉ Úáì ÇáØÇÈÚÉ ÇáÇİÊÑÇÖíÉ", "Leave it empty to print on the default printer"
     LangAdd "ÇÎÊÑ ÇáãÔÑæÈ: ÇáÍÌã æÇáÅÖÇİÇÊ ÊÙåÑ ÊáŞÇÆíğÇ", "Choose the drink: the size and extras appear automatically"
     LangAdd "ÇáÓÚÑ æÇáÎÕã áÇ íãßä Ãä íßæäÇ ÓÇáÈíä (ÇáÓØÑ", "The price and the discount cannot be negative (line"
@@ -48,6 +58,7 @@ Private Sub D2_1()
     LangAdd "ÇÎÊÑ ÍÓÇÈğÇ İÑÚíğÇ (ÍÓÇÈ ÊõÓÌóøá Úáíå ŞíæÏ", "Choose a posting account (an account that takes entries"
     LangAdd "ÇÓã ÇáãÓÊÎÏã 3 ÃÍÑİ Úáì ÇáÃŞá æÈÏæä ãÓÇİÇÊ", "The user name has at least 3 characters and no spaces"
     LangAdd "ÇáÈÑäÇãÌ (ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ): Êã ÇáÏÎæá", "Program (e-invoice): logged in"
+    LangAdd "ÇáÊÍæíá Åáíå íÈŞì ÈÇáØÑíŞ ÍÊì íÓÊáãå Ããíäå", "A transfer to it stays in transit until its custodian receives it"
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ (ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled (settings"
     LangAdd "ÈíÇäÇÊß ÇáÍÇáíÉ áã ÊÊÛíÑ¡ æäÓÎÊåÇ ÇáæŞÇÆíÉ", "Your current data did not change, and its safety copy"
     LangAdd "ÊÇÑíÎ ÇáİÇÊæÑÉ áÇ íãßä Ãä íßæä İí ÇáãÓÊŞÈá", "The invoice date cannot be in the future"
@@ -62,6 +73,7 @@ Private Sub D2_1()
     LangAdd "íæÌÏ ÍŞá ãØáæÈ İÇÑÛ. Ãßãá ÇáÈíÇäÇÊ Ëã ÇÍİÙ", "A required field is empty. Complete the data, then save"
     LangAdd "íõÓÌóøá ÅåáÇß ÇáÔåÑ İí ÂÎÑ íæã ãäå Ãæ ÈÚÏå", "The depreciation of a month is recorded on its last day or later"
     LangAdd "ÅÌãÇáí İÇÊæÑÉ ÇáÈíÚ áÇ íÓÇæí ãÌãæÚ ÃÓØÑåÇ", "The sales invoice total does not equal the sum of its lines"
+    LangAdd "ÅáÛÇÁ ÇáÊÍæíá íÚíÏ ÇáãÈáÛ ááÕäÏæŞ ÇáãÑÓöá", "cancelling a transfer returns the amount to the sending box"
     LangAdd "ÇÎÊÑ ÇáÍÓÇÈ ÇáÑÆíÓí ÇáĞí íÊÈÚå åĞÇ ÇáÍÓÇÈ", "Choose the main account this account belongs to"
     LangAdd "ÇßÊÈ ÇáãÈÇáÛ¡ Ãæ ÇäÓÎåÇ ãä İÚáí ÓäÉ ÓÇÈŞÉ", "Type the amounts, or copy them from the actuals of a previous year"
     LangAdd "ÇßÊÈ ÇáãÈáÛ ÇáãÓÊáã Ãæ ÇÎÊÑ ãÈáÛğÇ ÌÇåÒğÇ", "Type the amount received or choose a ready amount"
@@ -123,6 +135,9 @@ Private Sub D2_1()
     LangAdd "ãÕÑ: ßæÏ ÇáÕäİ ÇáãÓÌøá İí ÈæÇÈÉ ÇáãÕáÍÉ", "Egypt: product code registered on the Tax Authority portal"
     LangAdd "íÌÈ Ãä íİÚøáå ãÏíÑ ÇáäÙÇã ŞÈá ÇáÇÓÊÎÏÇã", "The system administrator must activate it before use"
     LangAdd "ÃÍÑİ Úáì ÇáÃŞá¡ æáÇ ÊÓÇæí ÇÓã ÇáãÓÊÎÏã", "characters at least, and not equal to the user name"
+End Sub
+
+Private Sub D2_2()
     LangAdd "ÃÏÎá ÇáäŞÏíÉ ÇáãæÌæÏÉ İÚáğÇ İí ÇáÕäÏæŞ", "Enter the cash actually in the box"
     LangAdd "Ãæ ÇÊÑß ÇáÊÇÑíÎ İÇÑÛğÇ áİÊÍ ßá ÇáİÊÑÇÊ", "or leave the date empty to open all periods"
     LangAdd "ÅÚÏÇÏ ÇáÑÈØ íÍÊÇÌ ÕáÇÍíÉ ÅÚÏÇÏÇÊ ÇáãÍá", "The connection setup needs the store settings permission"
@@ -135,9 +150,6 @@ Private Sub D2_1()
     LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ÃßÈÑ ãä ÇáßãíÉ ÇáãÈÇÚÉ", "The returned quantity is more than the quantity sold"
     LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ÃßÈÑ ãä ÇáãÊÇÍ ááÅÑÌÇÚ", "The returned quantity is more than what can be returned"
     LangAdd "ÇáãÈáÛ ÃßÈÑ ãä ÚãæáÇÊ ÇáãäÏæÈ ÇáãÓÊÍŞÉ", "The amount is more than the commissions payable to the sales rep"
-End Sub
-
-Private Sub D2_2()
     LangAdd "ÈíÇäÇÊ ÇáãÍá ÇáÖÑíÈíÉ æÅÚÏÇÏÇÊ ÇáÊÔÛíá", "Tax data of the store and operating settings"
     LangAdd "ÊÑÊíÈ ÇáÒÑ İí ÔÇÔÉ ÇááãÓ (ÇáÃÕÛÑ ÃæáğÇ", "Order of the button on the touch screen (smallest first"
     LangAdd "Ïíæä ÇáÚãáÇÁ ÷ ÇáãÈíÚÇÊ ÇáÂÌáÉ ÇáíæãíÉ", "Customer receivables / daily credit sales"
@@ -158,6 +170,7 @@ Private Sub D2_2()
     LangAdd "ÇáãŞÇÑäÉ ÏÇÎá ÓäÉ æÇÍÏÉ (ãæÇÒäÉ ÇáÓäÉ", "Comparison within one year (the budget of the year"
     LangAdd "ÊÇÑíÎ ÇáÓÏÇÏ ŞÈá ÊÇÑíÎ ÇÚÊãÇÏ ÇáÅŞÑÇÑ", "The payment date is before the approval date of the return"
     LangAdd "ÊÑÍíá ÇáÑÕíÏ ÇáÇİÊÊÇÍí ááÃÕäÇİ ÈÊÇÑíÎ", "Post the opening stock of the items dated"
+    LangAdd "Êã ÇÓÊáÇã ÇáÊÍæíá æÏÎá ÇáãÈáÛ ÇáÕäÏæŞ", "The transfer was received and the amount entered the box"
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ: ÃáÛö ÇáÊÑÍíá ÃæáğÇ", "Only the draft is deleted: unpost it first"
     LangAdd "ÍÑßÉ ÇáÎÒíäÉ ÇáíæãíÉ (Ãæá Çáíæã æÂÎÑå", "Daily treasury moves (start and end of the day"
     LangAdd "ÑŞã ÌÏíÏ áÇ íÊßÑÑº áÇ íÊÛíÑ ÈÚÏ ÇáÍİÙ", "A new number that is not repeated, it does not change after saving"
@@ -245,6 +258,9 @@ Private Sub D2_2()
     LangAdd "äæÚ ÇáÍÑßÉ ÛíÑ ãÊÇÍ ááÅÏÎÇá ÇáíÏæí", "The move type is not available for manual entry"
     LangAdd "åĞÇ ÇáÍÓÇÈ ãÚØøá. ÑÇÌÚ ãÏíÑ ÇáäÙÇã", "This account is disabled. Ask the system administrator"
     LangAdd "ÃÏÎá ÊÇÑíÎ ÇáÈÏÇíÉ æÊÇÑíÎ ÇáäåÇíÉ", "Enter the start date and the end date"
+End Sub
+
+Private Sub D2_3()
     LangAdd "ÅŞÑÇÑ ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ (äãæĞÌ", "VAT return (form"
     LangAdd "Åáì ÊÇÑíÎ (ÇáãíÒÇäíÉ İí åĞÇ Çáíæã", "To date (the balance sheet on this day"
     LangAdd "ÇÎÊÑ ÂÎÑ íæã İí ÇáİÊÑÉ ÇáÊí ÊõŞİá", "Choose the last day of the period to close"
@@ -253,14 +269,12 @@ Private Sub D2_2()
     LangAdd "ÇáÅŞÑÇÑ ÛíÑ ãæÌæÏ Ãæ ãÚÊãÏ ÈÇáİÚá", "The return does not exist or is already approved"
     LangAdd "ÇáÈÑäÇãÌ ÛíÑ ãİÚøá Úáì åĞÇ ÇáÌåÇÒ", "The program is not activated on this computer"
     LangAdd "ÇáÈäß ÇáÇİÊÑÇÖí ááÊÍæíáÇÊ ÇáÈäßíÉ", "Default bank for bank transfers"
+    LangAdd "ÇáÊÍæíá Åáíå íÍÊÇÌ ÊÃßíÏ ÇáÇÓÊáÇã", "Transfers to it need a confirmed receipt"
     LangAdd "ÇáßãíÉ æÇáÊßáİÉ áÇ ÊßæäÇä ÓÇáÈÊíä", "The quantity and the cost cannot be negative"
     LangAdd "ÇáãİÊÇÍ ÇáãÔÊÑß (Åä ÃÚØÊå ÇáãÕáÍÉ", "Pre-shared key (if given by the Tax Authority"
     LangAdd "ÇãÓÍ ÇáÈÇÑßæÏ (íÖíİ 1) Ãæ 3*ÇáßæÏ", "Scan the barcode (adds 1) or 3*code"
     LangAdd "ÈíÇäÇÊ äÇŞÕÉ ááİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Missing data for e-invoicing"
     LangAdd "ÈíÚ ÂÌá áÚãíá ÛíÑ ãÓãæÍ áå ÈÇáÂÌá", "A credit sale to a customer not allowed to buy on credit"
-End Sub
-
-Private Sub D2_3()
     LangAdd "ÍĞİ ÇáÊÓæíÉ ÇáÌÇÑíÉ æßá ãØÇÈŞÇÊåÇ", "Delete the open reconciliation and all its matches"
     LangAdd "ÍĞİ ÇáÍÑßÉ ÇáÈäßíÉ ÇáãÍÏÏÉ æŞíÏåÇ", "Delete the selected bank transaction and its entry"
     LangAdd "ÍÓÈ ÕÇİí ÇáßãíÉ ÎáÇá İÊÑÉ ÇáÊŞÑíÑ", "By net quantity during the report period"
@@ -302,6 +316,7 @@ Private Sub D2_3()
     LangAdd "ãáÁ ßá ÃÔåÑ ÇáãæÇÒäÉ ãä İÚáí ÓäÉ", "Fill every month of the budget from the actuals of a year"
     LangAdd "ãæÌæÏ ŞÈá ÇáÈÑäÇãÌ (ÑÕíÏ ÇİÊÊÇÍí", "Owned before the program (opening balance"
     LangAdd "äåÇíÉ ÇáİÊÑÉ áÇ Êßæä ŞÈá ÈÏÇíÊåÇ", "The end of the period cannot be before its start"
+    LangAdd "åĞÇ ÇáÊÍæíá áíÓ ÈÇäÊÙÇÑ ÇáÇÓÊáÇã", "This transfer is not waiting for a receipt"
     LangAdd "íõæáóøÏ ÊáŞÇÆíğÇ ÅĞÇ ÊõÑß İÇÑÛğÇ", "Generated automatically if left empty"
     LangAdd "ÇÎÊÑ ÇáÔåÑ Ëã «ÅäÔÇÁ ãÓíÑ ÇáÔåÑ", "Choose the month, then Create the run of the month"
     LangAdd "ÇáÅŞÑÇÑ ãÓÏÏ: ÃáÛö ÇáÓÏÇÏ ÃæáğÇ", "The return is paid: cancel the payment first"
@@ -366,6 +381,9 @@ Private Sub D2_3()
     LangAdd "ááÈíÚ ÇáÂÌá ÇÎÊÑ ÚãíáğÇ ãÓÌáğÇ", "For a credit sale choose a registered customer"
     LangAdd "ááÚãáÇÁ ÇáãäÔÂÊ (İÇÊæÑÉ ÖÑíÈíÉ", "For business customers (tax invoice"
     LangAdd "áã ÊõÕÏÑ ÇáåíÆÉ ÔåÇÏÉ ÇáÇãÊËÇá", "ZATCA did not issue the compliance certificate"
+End Sub
+
+Private Sub D2_4()
     LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ ÓäÏÇÊ ÇáÎÒíäÉ", "You do not have the permission for treasury vouchers"
     LangAdd "ãÌáÏ Images ÈÌÇäÈ ãáİ ÇáÈíÇäÇÊ", "Images folder next to the data file"
     LangAdd "ãÌãæÚ ÃÑÕÏÉ ÇáãÓÊæì ÇáÃæá (ÕİÑ", "Total of the first-level balances (zero"
@@ -381,9 +399,6 @@ Private Sub D2_3()
     LangAdd "ÇÎÊÑ ßáãÉ ãÑæÑ ÌÏíÏÉ ááãÊÇÈÚÉ", "Choose a new password to continue"
     LangAdd "ÇÓã ÇáÚãíá Úáì ÇáßæÈ (ÇÎÊíÇÑí", "Customer name on the cup (optional"
     LangAdd "ÇßÊÈ ÇáÍÏ ÇáÃÚáì ááÃÌÑ ÇáÎÇÖÚ", "Type the maximum insurable wage"
-End Sub
-
-Private Sub D2_4()
     LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáÈíÚ Ãæ ÇáÇÓÊÈÚÇÏ", "Type the date of the sale or disposal"
     LangAdd "ÇáÅíÌÇÑ æÇáßåÑÈÇÁ æÇáÇÔÊÑÇßÇÊ", "Rent, electricity and subscriptions"
     LangAdd "ÇáÈÑäÇãÌ ãİÚøá Úáì åĞÇ ÇáÌåÇÒ", "The program is activated on this computer"
@@ -410,6 +425,7 @@ Private Sub D2_4()
     LangAdd "áÇ ÊæÌÏ ÃÑÕÏÉ ŞÈá åĞÇ ÇáÊÇÑíÎ", "There are no balances before this date"
     LangAdd "áÇ ÊæÌÏ ÃÓØÑ ÈßãíÉ áã ÊõÑÍóøá", "There is no line with a quantity waiting to be posted"
     LangAdd "áÇ ÊæÌÏ ãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "There are no low-stock products"
+    LangAdd "áÇ íãßäß ÇáÕÑİ Ãæ ÇáÊÍæíá ãäå", "you cannot pay or transfer from it"
     LangAdd "áÇ íãßäß ÊÛííÑ ÕáÇÍíÇÊß ÈäİÓß", "You cannot change your own permissions"
     LangAdd "áÇ íæÌÏ ÚãáÇÁ ãÓäÏæä áãäÏæÈíä", "No customers are assigned to sales reps"
     LangAdd "ãæÌæÏ İí ÇáãæÇÒäÉ áäİÓ ÇáãÑßÒ", "already in the budget for the same center"
@@ -461,27 +477,4 @@ Private Sub D2_4()
     LangAdd "íÊØáÈ ÕáÇÍíÉ ÇáÃÑŞÇã ÇáãÇáíÉ", "Needs the permission Financial figures"
     LangAdd "ÃÑÓá ÇáİÇÊæÑÉ ÇáÃÕáíÉ ÃæáğÇ", "Send the original invoice first"
     LangAdd "ÅÌãÇáí ÇáÎÕæã æÍŞæŞ ÇáãáßíÉ", "Total liabilities and equity"
-    LangAdd "ÅŞİÇá ÇáİÊÑÉ æÇáÓäÉ ÇáãÇáíÉ", "Period and fiscal year closing"
-    LangAdd "ÅáÛÇÁ ÕÑİ ÇáÑæÇÊÈ æÍĞİ ŞíÏå", "Cancel the salary payment and delete its entry"
-    LangAdd "ÇÌÊÇÒÊ ÇáÚíäÇÊ İÍÕ ÇáÇãÊËÇá", "The samples passed the compliance checks"
-    LangAdd "ÇÎÊÑ ÂÎÑ ÔåÑ íõÓÌóøá ÅåáÇßå", "Choose the last month to record depreciation for"
-    LangAdd "ÇÎÊÑ ÇáİÇÊæÑÉ ÇáÃÕáíÉ ÃæáğÇ", "Choose the original invoice first"
-    LangAdd "ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ ááÍÓÇÈÇÊ", "Opening balances of the accounts"
-    LangAdd "ÇáÅÍÕÇÆíÇÊ æÇáÑÓæã ÇáÈíÇäíÉ", "Statistics and charts"
-    LangAdd "ÇáÈÇŞí ÛíÑ ÇáãÑÈæØ ãä ÇáÓäÏ", "The unlinked remainder of the voucher"
-    LangAdd "ÇáÎÏãÇÊ ÇáãÓÊæÑÏÉ ãä ÇáÎÇÑÌ", "Services imported from abroad"
-    LangAdd "ÇáİÇÊæÑÉ ÇáÃÕáíÉ ÛíÑ ãæÌæÏÉ", "The original invoice does not exist"
-    LangAdd "ÇáãÕÑæİÇÊ (ÅÌãÇáí ÍÓÈ ÇáäæÚ", "Expenses (total by type"
-    LangAdd "ÈÇáßÇãá (áÇ ÊÈŞì İÊÑÉ ãŞİáÉ", "fully (no period stays closed"
-    LangAdd "ÈäßäÇ (ÇáÕÇÏÑ: ÇáãÓÍæÈ Úáíå", "Our bank (issued: drawn on"
-    LangAdd "ÊÓÌíá ÇáÅåáÇß ÍÊì åĞÇ ÇáÔåÑ", "Record depreciation up to this month"
-    LangAdd "ÊÚĞøÑ ÅäÔÇÁ ÇáãİÊÇÍ ÈÈÑäÇãÌ", "Could not create the key with"
-    LangAdd "ÊÚĞøÑ ÖÈØ ÚãáÉ ãáİ ÇáÈíÇäÇÊ", "Could not set the currency of the data file"
-    LangAdd "Êã ÇáÍİÙ áßä ÊÚĞøÑÊ ÇáØÈÇÚÉ", "Saved, but printing failed"
-    LangAdd "Êã ÖÈØ æÖÚ ÇáãÓÊÎÏã ÇáäåÇÆí", "End-user mode is set"
-    LangAdd "ÊõÚÇÏ İÊÍ ÂÎÑ ÓäÉ ãŞİáÉ İŞØ", "Only the last closed year can be reopened"
-    LangAdd "ÎÕã ÇáİÇÊæÑÉ ÃßÈÑ ãä ŞíãÊåÇ", "The invoice discount is more than its value"
-    LangAdd "ÑÏ ÛíÑ ãÊæŞÚ ãä ÇáåíÆÉ (ÑãÒ", "Unexpected reply from ZATCA (code"
-    LangAdd "ÕÇÏÑ ÂÎÑ (ÑÓæã ÈäßíÉ æÛíÑåÇ", "Other outgoing (bank fees and others"
-    LangAdd "ÕÇİí ÇáÖÑíÈÉ ÇáãÓÊÍŞÉ (ÓÇáÈ", "Net VAT due (negative"
 End Sub

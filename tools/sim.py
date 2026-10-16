@@ -100,11 +100,17 @@ class Store:
                                   ExpenseDate=self.now[:10] + " 00:00:00", ExpenseTypeID=expense_type,
                                   Amount=float(amount), Tax=0, TotalAmount=float(amount), PaymentMethodID=1,
                                   Description="سند صرف نقدية " + no, EmployeeID=self.user)
+        in_transit = vtype == "TRANSFER" and bool(self.one("SELECT ConfirmReceipt FROM CashBoxes WHERE CashBoxID = ?",
+                                                             to_box))
         return self.insert("CashVouchers", VoucherNumber=no, VoucherDate=self.now, VoucherType=vtype,
                            CashBoxID=box, ToCashBoxID=to_box if vtype == "TRANSFER" else None,
                            Category="TRANSFER" if vtype == "TRANSFER" else category, Amount=float(amount),
                            PartyName=party, Description=text, ExpenseID=expense, ClosingID=closing,
-                           EmployeeID=self.user)
+                           EmployeeID=self.user, InTransit=int(in_transit))
+
+    def receive_transfer(self, voucher):                                # ReceiveCashTransfer
+        self.c.execute("UPDATE CashVouchers SET ReceivedAt = ?, ReceivedByID = ? WHERE CashVoucherID = ? "
+                       "AND InTransit = 1 AND ReceivedAt Is Null", (self.now, self.user, voucher))
 
     def cash_closing(self, box, counted, destination, to_box, transfer):   # PostCashClosing
         counted, transfer = dec(counted), dec(transfer)

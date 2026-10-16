@@ -523,7 +523,7 @@ SELECT SupplierID, Nz(SupplierNameEn, LocArabicName) AS SupplierName, SupplierNa
 CashBoxes للواجهة الإنجليزية (خطوة 1)
 
 ```sql
-SELECT t.CashBoxID, t.BoxName AS LocArabicName, t.BoxNameEn, t.BoxType, t.OpeningBalance, t.OpeningDate, t.IsActive, t.Notes, t.CreatedAt FROM CashBoxes AS t
+SELECT t.CashBoxID, t.BoxName AS LocArabicName, t.BoxNameEn, t.BoxType, t.OpeningBalance, t.OpeningDate, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID, t.ConfirmReceipt FROM CashBoxes AS t
 ```
 
 ## qryLocCashBoxes
@@ -531,7 +531,7 @@ SELECT t.CashBoxID, t.BoxName AS LocArabicName, t.BoxNameEn, t.BoxType, t.Openin
 CashBoxes بالأسماء الإنجليزية (الواجهة الإنجليزية)
 
 ```sql
-SELECT CashBoxID, Nz(BoxNameEn, LocArabicName) AS BoxName, BoxNameEn, BoxType, OpeningBalance, OpeningDate, IsActive, Notes, CreatedAt FROM qryLocCashBoxes1
+SELECT CashBoxID, Nz(BoxNameEn, LocArabicName) AS BoxName, BoxNameEn, BoxType, OpeningBalance, OpeningDate, IsActive, Notes, CreatedAt, SalesRepID, ConfirmReceipt FROM qryLocCashBoxes1
 ```
 
 ## qryLocBanks1
@@ -2050,10 +2050,10 @@ SELECT v.CashBoxID, v.VoucherDate, 'TRANSFER_OUT', 'تحويل إلى صندوق
 FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.ToCashBoxID = b.CashBoxID
 WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
-SELECT v.ToCashBoxID, v.VoucherDate, 'TRANSFER_IN', 'تحويل من صندوق آخر', v.VoucherNumber,
-       b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
+SELECT v.ToCashBoxID, IIf(v.InTransit, v.ReceivedAt, v.VoucherDate), 'TRANSFER_IN', 'تحويل من صندوق آخر',
+       v.VoucherNumber, b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
 FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID
-WHERE v.VoucherType = 'TRANSFER'
+WHERE v.VoucherType = 'TRANSFER' AND (v.InTransit = False OR v.ReceivedAt Is Not Null)
 UNION ALL
 SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description,
        CCur(0), t.Amount, t.EmployeeID
@@ -2102,7 +2102,8 @@ GROUP BY CashBoxID
 
 ```sql
 SELECT b.CashBoxID, b.BoxName, b.BoxType,
-       IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', 'صندوق كاشير') AS BoxTypeName, b.IsActive,
+       IIf(b.BoxType = 'MAIN', 'خزينة رئيسية', IIf(b.BoxType = 'CUSTODY', 'عهدة مندوب', 'صندوق كاشير')) AS BoxTypeName,
+       b.IsActive,
        CCur(Nz(t.BoxIn, 0)) AS TotalIn, CCur(Nz(t.BoxOut, 0)) AS TotalOut,
        CCur(Nz(t.BoxIn, 0)) - CCur(Nz(t.BoxOut, 0)) AS Balance, t.LastMoveDate
 FROM [@CashBoxes] AS b LEFT JOIN qryCashBoxTotals AS t ON b.CashBoxID = t.CashBoxID
@@ -2493,13 +2494,21 @@ SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumbe
 FROM CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID
 WHERE v.VoucherType = 'OUT' AND x.Tax <> 0
 UNION ALL
-SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, 110000 + v.ToCashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
+SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 1 AS LineOrder, IIf(v.InTransit, 1195, 110000 + v.ToCashBoxID) AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
 SELECT 'CASH_VOUCHER' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.VoucherDate AS SourceDate, IIf(v.PartyName Is Null, v.Description, v.PartyName) AS Party, 2 AS LineOrder, 110000 + v.CashBoxID AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v
 WHERE v.VoucherType = 'TRANSFER'
+UNION ALL
+SELECT 'CASH_RECEIVE' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.ReceivedAt AS SourceDate, v.Description AS Party, 1 AS LineOrder, 110000 + v.ToCashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
+FROM CashVouchers AS v
+WHERE v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Not Null
+UNION ALL
+SELECT 'CASH_RECEIVE' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.ReceivedAt AS SourceDate, v.Description AS Party, 2 AS LineOrder, 1195 AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, 'نقدية بالطريق' AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
+FROM CashVouchers AS v
+WHERE v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Not Null
 ```
 
 ## qryJournalStock

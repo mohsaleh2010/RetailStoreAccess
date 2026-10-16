@@ -133,7 +133,7 @@ CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Cur
                  "WHERE IsActive = True ORDER BY SortOrder, CurrencyCode")
 REP_ROWS = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName"
 CASHBOX_ROWS = "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName"
-BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير"
+BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير;CUSTODY;عهدة مندوب"
 COMMISSION_BASES = "SALES;صافي المبيعات (بدون الضريبة);COLLECTION;التحصيل"
 EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
 FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
@@ -415,17 +415,33 @@ DATA_SCREENS: List[DataScreen] = [
         fields=[Fld("ExpenseTypeName", span=2), Fld("ExpenseTypeNameEn", span=2), Fld("IsActive")]),
     DataScreen(
         "frmCashBoxes", "CashBoxes", "الصناديق", "الخزينة الرئيسية وصناديق الكاشير", "treasury",
-        list_select="t.BoxName AS [الصندوق], IIf(t.BoxType = 'MAIN', 'خزينة', 'كاشير') AS [النوع]",
+        list_select="t.BoxName AS [الصندوق], IIf(t.BoxType = 'MAIN', 'خزينة', IIf(t.BoxType = 'CUSTODY', 'عهدة', "
+                    "'كاشير')) AS [النوع]",
         list_from="[@CashBoxes] AS t", list_order="t.BoxType DESC, t.BoxName",
         list_headers=[("الصندوق", 5.6), ("النوع", 2.8)],
         search=["t.BoxName", "t.BoxNameEn", "t.Notes"], active="t.IsActive", unique=["BoxName"],
-        extra_buttons=[("btnTreasury", "الخزينة", 'OpenScreen "frmTreasury"')],
+        extra_buttons=[("btnTreasury", "الخزينة", 'OpenScreen "frmTreasury"'),
+                       ("btnBoxUsers", "أمناء الصناديق", 'OpenScreen "frmCashBoxUsers"')],
         fields=[Fld("BoxName", span=2), Fld("BoxNameEn", span=2), Fld("BoxType", rows=BOX_TYPES, widths="0;5"),
                 Fld("IsActive"),
+                Fld("SalesRepID", rows=REP_ROWS, widths="0;6", hint="لصندوق عهدة المندوب: مستخدم المندوب أمين عليه"),
+                Fld("ConfirmReceipt", hint="التحويل إليه يبقى بالطريق حتى يستلمه أمينه"),
                 Fld("OpeningBalance", hint="النقدية الموجودة في الصندوق عند بدء استخدام البرنامج"),
                 Fld("OpeningDate"),
                 Info("lblBoxNote", "الرصيد لا يُكتب يدويًا: يُحسب من المبيعات والسندات والمصروفات"),
                 Fld("Notes", span=2)]),
+    DataScreen(
+        "frmCashBoxUsers", "CashBoxUsers", "أمناء الصناديق", "من يصرف من كل صندوق ويصفّيه ويستلم التحويلات إليه",
+        "treasury",
+        list_select="b.BoxName AS [الصندوق], e.EmployeeName AS [أمين الصندوق]",
+        list_from="(CashBoxUsers AS t INNER JOIN [@CashBoxes] AS b ON t.CashBoxID = b.CashBoxID) "
+                  "INNER JOIN Employees AS e ON t.EmployeeID = e.EmployeeID",
+        list_order="b.BoxName, e.EmployeeName", list_headers=[("الصندوق", 4.6), ("أمين الصندوق", 4.6)],
+        search=["b.BoxName", "e.EmployeeName"],
+        extra_buttons=[("btnBoxes", "الصناديق", 'OpenScreen "frmCashBoxes"')],
+        fields=[Fld("CashBoxID", rows=CASHBOX_ROWS, widths="0;6"), Fld("EmployeeID", rows=EMPLOYEE_ROWS, widths="0;6"),
+                Info("lblBoxUsersNote", "صندوق بلا أمناء يصرف منه كل من له صلاحية الخزينة. "
+                                        "وصلاحية «الصرف من كل الصناديق» تتجاوز الأمناء")]),
     DataScreen(
         "frmBanks", "Banks", "البنوك", "الحسابات البنكية للمحل وأرصدتها", "treasury",
         list_select="t.BankName AS [البنك], t.AccountNo AS [رقم الحساب]",
@@ -564,7 +580,8 @@ SCREEN_PERMISSIONS = {
     "frmTouchPOS": "SALES_POS", "frmTouchPay": "SALES_POS", "frmCafePOS": "SALES_POS",
     "frmCafeItem": "SALES_POS",
     "frmTreasury": "CASH_CLOSING", "frmCashClosing": "CASH_CLOSING",
-    "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX",
+    "frmCashVoucher": "CASH_BOX", "frmCashBoxes": "CASH_BOX", "frmCashBoxUsers": "CASH_ALL_BOXES",
+    "frmCashTransfers": "CASH_CLOSING",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
     "frmPeriodClosing": "PERIOD_CLOSE", "frmFiscalPeriods": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN", "frmOpeningBalances": "OPENING_BALANCES",
