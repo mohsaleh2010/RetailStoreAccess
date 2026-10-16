@@ -92,6 +92,7 @@
 | + | تحسينات الأصول الثابتة: الإهلاك بالقسط المتناقص، وإعادة التقييم (الفائض وخسارة الانخفاض)، وضريبة المخرجات على بيع الأصل في القيد والإقرار، ونقل الأصل بين الفروع ومراكز التكلفة | ✅ تمت الموافقة | [docs/65-Fixed-Assets-Improvements.md](docs/65-Fixed-Assets-Improvements.md) |
 | + | عجز المندوب سلفة عليه: عجز صندوق العهدة عند التصفية، وصافي عجز بضاعة السيارة عند إغلاق اليوم، على سلف مستخدم المندوب فيُخصم من راتبه | ✅ تمت الموافقة | [docs/66-Rep-Shortage-Advance.md](docs/66-Rep-Shortage-Advance.md) |
 | + | **5أ:** سكربت قاعدة البيانات على SQL Server (`dist/sql/RetailStore_Schema.sql`) من نفس تعريف الجداول: الجداول والأنواع والشروط والفهارس والعلاقات والبيانات الأولية، للإنشاء والترقية | ✅ تمت الموافقة | [docs/67-SQL-Server-Script.md](docs/67-SQL-Server-Script.md) |
+| + | **5ب:** شاشة «SQL Server»: الاتصال بالخادم، وتجهيز القاعدة بالسكربت، ونقل البيانات بأرقامها ومطابقتها (السجلات والمبالغ والنصوص)، وتشغيل البرنامج على الخادم والرجوع إلى ملف Access، وفحص الخادم عند فتح البرنامج | ✅ بانتظار الموافقة | [docs/68-SQL-Server-Transfer.md](docs/68-SQL-Server-Transfer.md) |
 
 ## هيكل المستودع
 
@@ -205,6 +206,7 @@
 | 60 | استبدال `modAssets` و`modJournal` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestAssets`, `TestJournal` |
 | 61 | استبدال `modCash` و`modVanSales` و`modJournal` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries` | `TestRepDays`, `TestCash`, `TestPayroll` |
 | 62 | لا شيء في Access: الملف الجديد `dist\sql\RetailStore_Schema.sql` يُشغَّل على SQL Server (`docs/67` القسم 3) | — | تشغيل السكربت مرتين بلا أخطاء |
+| 63 | `modSqlServer` (دائمة، جديدة)، واستبدال `modSecurityScreens` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`)، ومجلد `dist\sql` بجانب ملف البرنامج | `BuildSchema`, `BuildForms` | `TestSqlServer`، ثم التجربة على الخادم (`docs/68` القسم 4) |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

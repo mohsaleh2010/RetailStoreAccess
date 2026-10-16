@@ -20,6 +20,7 @@ Option Explicit
 ' Login / logout
 '==============================================================================
 Public Sub LoginLoad(ByVal frm As Access.Form)
+    Dim msg As String
     Calendar = vbCalGreg
     If Not g_SilentMode Then                 ' (tests open every screen while logged in)
         On Error Resume Next
@@ -27,6 +28,13 @@ Public Sub LoginLoad(ByVal frm As Access.Form)
         If Not IsDeveloperMode() Then HideAccessUI
         TempVars.Remove "UserID"
         On Error GoTo 0
+        msg = CheckServerAtStartup()                   ' modSqlServer: the data on a server that does not answer
+        If Len(msg) > 0 Then
+            frm!lblMessage.Caption = Tr(msg)
+            frm!lblMessage.ForeColor = CLR_DANGER
+            ShowWarning msg
+            Exit Sub
+        End If
     End If
     frm!lblStoreName.Caption = Tr(Nz(SettingValue("StoreName"), APP_TITLE))
     frm!txtUsername.Value = GetSetting("RetailStore", "Login", "LastUser", "")

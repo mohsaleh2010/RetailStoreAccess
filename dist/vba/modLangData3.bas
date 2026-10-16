@@ -16,6 +16,36 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "ÈíÇäÇÊ äÇŞÕÉ ááİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Missing data for e-invoicing"
+    LangAdd "ÈíÚ ÂÌá áÚãíá ÛíÑ ãÓãæÍ áå ÈÇáÂÌá", "A credit sale to a customer not allowed to buy on credit"
+    LangAdd "ÌÏÇæá ÇáÈÑäÇãÌ ÇáäÇŞÕÉ İí ÇáŞÇÚÏÉ", "Program tables missing in the database"
+    LangAdd "ÍĞİ ÇáÊÓæíÉ ÇáÌÇÑíÉ æßá ãØÇÈŞÇÊåÇ", "Delete the open reconciliation and all its matches"
+    LangAdd "ÍĞİ ÇáÍÑßÉ ÇáÈäßíÉ ÇáãÍÏÏÉ æŞíÏåÇ", "Delete the selected bank transaction and its entry"
+    LangAdd "ÍÓÈ ÕÇİí ÇáßãíÉ ÎáÇá İÊÑÉ ÇáÊŞÑíÑ", "By net quantity during the report period"
+    LangAdd "ÎÕã ÇáÛíÇÈ ÃßÈÑ ãä ÇáÃÓÇÓí æÇáÓßä", "The absence deduction is more than the basic and housing"
+    LangAdd "ÑÍøáå Ãæ ÃáÛå ŞÈá ÈÏÁ ÌÑÏ ÌÏíÏ áå", "Post or cancel it before starting a new count for it"
+    LangAdd "ÑŞãäÇ (PUR-) Ãæ ÑŞã İÇÊæÑÉ ÇáãæÑÏ", "Our number (PUR-) or the supplier invoice number"
+    LangAdd "ÓØÑ áÇ íäÊãí Åáì ÇáİÇÊæÑÉ ÇáÃÕáíÉ", "A line that does not belong to the original invoice"
+    LangAdd "ØáÈ ÓİÑí: íõÛáóøİ æíõÓáóøã ááÚãíá", "Takeaway order: packed and handed to the customer"
+    LangAdd "ßá ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ ÊÕÈÍ ÈÊÇÑíÎ", "Every opening balance will be dated"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚííä ßáãÇÊ ÇáãÑæÑ", "You do not have the permission to set passwords"
+    LangAdd "áÇ ÊæÌÏ ÈÖÇÚÉ İí ÓíÇÑÇÊ ÇáãäÏæÈíä", "There are no goods in the rep vans"
+    LangAdd "áÇ íÊæŞİ ÇáÈíÚ ÇáÂÌá ÈÓÈÈ ÇáÊÃÎíÑ", "Credit sales are not stopped for delays"
+    LangAdd "ãÌãæÚ ÃÑÕÏÉ ÚãáÇÆå İí ÇáÈíÚ ÇáÂÌá", "The total balance of his customers in credit sales"
+    LangAdd "ãÑßÒ ÇáãÓÊÎÏã Ãæ ÇáãÑßÒ ÇáÇİÊÑÇÖí", "The center of the user or the default center"
+    LangAdd "åĞÇ ÇáÔíß ãÓÌá ãä ŞÈá áäİÓ ÇáÚãíá", "This cheque is already recorded for the same customer"
+    LangAdd "æÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ áåĞå ÇáÏæáÉ", "and the e-invoicing of this country"
+    LangAdd "Ãßãá İÍæÕ ÇáÇãÊËÇá ÃæáğÇ (ÇáÎØæÉ", "Complete the compliance checks first (step"
+    LangAdd "ÇÎÊÑ ßáãÉ ãÑæÑ ãÎÊáİÉ Úä ÇáÍÇáíÉ", "Choose a password different from the current one"
+    LangAdd "ÇßÊÈ ÈíÇäÇÊ ÇáÏÎæá æÇÍİÙåÇ ÃæáğÇ", "Enter the credentials and save them first"
+    LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáÔÑÇÁ æÈÏÇíÉ ÇáÅåáÇß", "Type the purchase date and the start of depreciation"
+    LangAdd "ÇáÎÒíäÉ ÇáÑÆíÓíÉ æÕäÇÏíŞ ÇáßÇÔíÑ", "Main treasury and cashier boxes"
+    LangAdd "ÇáÑÕíÏ ÇáãÊÈŞí Úáì ÇáÚãíá ÍÇáíğÇ", "Balance currently due from the customer"
+    LangAdd "ÇáãÈíÚÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÃÓÇÓíÉ", "Sales at the standard rate"
+    LangAdd "ÇáãÔÊÑíÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÕİÑíÉ", "Zero-rated purchases"
+    LangAdd "ÊÑÊíÈ ÇáÚãíá İí ÎØ ÓíÑ Ğáß Çáíæã", "The order of the customer on the route of that day"
+    LangAdd "ÊÑÍíá ÇáãÓíÑ æÅäÔÇÁ ŞíÏ ÇáÚãæáÇÊ", "Post the run and create the commissions entry"
+    LangAdd "Êã ÅáÛÇÁ ÇáÍİÙ: ÇáßãíÉ ÛíÑ ßÇİíÉ", "Saving was cancelled: the quantity is not enough"
     LangAdd "Êã ÊİÚíá ÇáÈÑäÇãÌ Úáì åĞÇ ÇáÌåÇÒ", "The program was activated on this computer"
     LangAdd "Êã äÓÎ ÑŞã ÇáÌåÇÒ. ÃÑÓáå ááãÈÑãÌ", "The computer number was copied. Send it to the developer"
     LangAdd "ÊõäÓÈ áå İæÇÊíÑ ÇáÚãíá æÊÍÕíáÇÊå", "The invoices and collections of the customer are credited to him"
@@ -37,8 +67,10 @@ Private Sub D3_1()
     LangAdd "åĞÇ ÇáÊÍæíá áíÓ ÈÇäÊÙÇÑ ÇáÇÓÊáÇã", "This transfer is not waiting for a receipt"
     LangAdd "íõæáóøÏ ÊáŞÇÆíğÇ ÅĞÇ ÊõÑß İÇÑÛğÇ", "Generated automatically if left empty"
     LangAdd "ÇÎÊÑ ÇáÔåÑ Ëã «ÅäÔÇÁ ãÓíÑ ÇáÔåÑ", "Choose the month, then Create the run of the month"
+    LangAdd "ÇßÊÈ ÇÓã ÇáÎÇÏã æŞÇÚÏÉ ÇáÈíÇäÇÊ", "Enter the server and the database names"
     LangAdd "ÇáÅĞä áíÓ áÚãíá ÇáØáÈíÉ æãÎÒäåÇ", "The note is not for the customer and warehouse of the order"
     LangAdd "ÇáÅŞÑÇÑ ãÓÏÏ: ÃáÛö ÇáÓÏÇÏ ÃæáğÇ", "The return is paid: cancel the payment first"
+    LangAdd "ÇáÈÑäÇãÌ íÚãá Úáì ÇáÎÇÏã ÈÇáİÚá", "The program already works on the server"
     LangAdd "ÇáÍÓÇÈÇÊ ÇáÈäßíÉ ááãÍá æÃÑÕÏÊåÇ", "The bank accounts of the store and their balances"
     LangAdd "ÇáÑŞã ÇáÊÓáÓáí áÌåÇÒ äŞØÉ ÇáÈíÚ", "Serial number of the POS device"
     LangAdd "ÇáÚãáÇÁ æÇáãæÑÏæä ÍÓÈ ÇáÇÓÊÍŞÇŞ", "Customers and suppliers by due date"
@@ -104,6 +136,9 @@ Private Sub D3_1()
     LangAdd "áÇ ÊæÌÏ İÇÊæÑÉ ÔÑÇÁ ÈåĞÇ ÇáÑŞã", "There is no purchase invoice with this number"
     LangAdd "áÇ íæÌÏ ÓÏÇÏ ãÓÌá áåĞÇ ÇáÅŞÑÇÑ", "No payment is recorded for this return"
     LangAdd "ááÈíÚ ÇáÂÌá ÇÎÊÑ ÚãíáğÇ ãÓÌáğÇ", "For a credit sale choose a registered customer"
+End Sub
+
+Private Sub D3_2()
     LangAdd "ááÚãáÇÁ ÇáãäÔÂÊ (İÇÊæÑÉ ÖÑíÈíÉ", "For business customers (tax invoice"
     LangAdd "áã ÊõÕÏÑ ÇáåíÆÉ ÔåÇÏÉ ÇáÇãÊËÇá", "ZATCA did not issue the compliance certificate"
     LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ ÓäÏÇÊ ÇáÎÒíäÉ", "You do not have the permission for treasury vouchers"
@@ -127,6 +162,7 @@ Private Sub D3_1()
     LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáÈíÚ Ãæ ÇáÇÓÊÈÚÇÏ", "Type the date of the sale or disposal"
     LangAdd "ÇáÅíÌÇÑ æÇáßåÑÈÇÁ æÇáÇÔÊÑÇßÇÊ", "Rent, electricity and subscriptions"
     LangAdd "ÇáÈÑäÇãÌ ãİÚøá Úáì åĞÇ ÇáÌåÇÒ", "The program is activated on this computer"
+    LangAdd "ÇáÈÑäÇãÌ íÚãá ÇáÂä Úáì ÇáÎÇÏã", "The program now works on the server"
     LangAdd "ÇáÊÍæíáÇÊ Èíä ÇáãÎÇÒä ÈÇáØÑíŞ", "Transfers between warehouses in transit"
     LangAdd "ÇáÊßáİÉ áÇ íãßä Ãä Êßæä ÓÇáÈÉ", "The cost cannot be negative"
     LangAdd "ÇáÑãÒ ÇáÈÑíÏí ááÚãíá (5 ÃÑŞÇã", "Customer postal code (5 digits"
@@ -136,10 +172,8 @@ Private Sub D3_1()
     LangAdd "ÇäŞÑ ãÑÊíä Úáì ÇáäÊíÌÉ áİÊÍåÇ", "Double-click a result to open it"
     LangAdd "ÈÏæä ãÓÇİÇÊ¡ 3 ÃÍÑİ Úáì ÇáÃŞá", "No spaces, at least 3 characters"
     LangAdd "ÈÚÏ ÇáãÕÑæİÇÊ æİÑæŞÇÊ ÇáãÎÒæä", "after expenses and stock differences"
-End Sub
-
-Private Sub D3_2()
     LangAdd "ÈíÚ ÇáÃÕá ÇáãÚÑæÖ Ãæ ÇÓÊÈÚÇÏå", "Sell or dispose of the asset shown"
+    LangAdd "ÊÌåíÒ ŞÇÚÏÉ ÇáÎÇÏã ãä ÇáÓßÑÈÊ", "Set up the server database from the script"
     LangAdd "ÊõÚÇÏ İÊÍ ÂÎÑ ÊÓæíÉ ááÈäß İŞØ", "Only the last reconciliation of the bank can be reopened"
     LangAdd "ÊõŞİá ÇáÓäÉ ÈÚÏ ÇäÊåÇÆåÇ (ÈÚÏ", "A year is closed after it ends (after"
     LangAdd "ÑÛã Ğáß¿ (ÈÕáÇÍíÉ ãÏíÑ ÇáäÙÇã", "anyway? (with the permission of the system administrator"
@@ -225,6 +259,9 @@ Private Sub D3_2()
     LangAdd "æÖÚ ÇáãØæøÑ áãÏíÑ ÇáäÙÇã İŞØ", "Developer mode is for the system administrator only"
     LangAdd "íÊØáÈ ÕáÇÍíÉ ÇáÃÑŞÇã ÇáãÇáíÉ", "Needs the permission Financial figures"
     LangAdd "ÃÑÓá ÇáİÇÊæÑÉ ÇáÃÕáíÉ ÃæáğÇ", "Send the original invoice first"
+End Sub
+
+Private Sub D3_3()
     LangAdd "ÅÌãÇáí ÇáÎÕæã æÍŞæŞ ÇáãáßíÉ", "Total liabilities and equity"
     LangAdd "ÅŞİÇá ÇáİÊÑÉ æÇáÓäÉ ÇáãÇáíÉ", "Period and fiscal year closing"
     LangAdd "ÅáÛÇÁ ÕÑİ ÇáÑæÇÊÈ æÍĞİ ŞíÏå", "Cancel the salary payment and delete its entry"
@@ -259,14 +296,12 @@ Private Sub D3_2()
     LangAdd "áÇ ÊßáİÉ ãÈíÚÇÊ Ãæ áÇ ãÎÒæä", "No cost of sales or no stock"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ãÓíÑ ÇáÑæÇÊÈ", "You do not have the permission for payroll"
     LangAdd "áÇ ÊæÌÏ ÃÔåÑ áã ÊõÓÌóøá ÍÊì", "There are no unrecorded months up to"
-End Sub
-
-Private Sub D3_3()
     LangAdd "áÇ ÊæÌÏ ŞíæÏ ááİÊÑÉ ÇáãÍÏÏÉ", "There are no entries for the period set"
     LangAdd "ááÃÕá ÅÚÇÏÉ ÊŞííã Ãæ äŞá İí", "The asset has a revaluation or a transfer on"
     LangAdd "ãËÇá: PCE ááÍÈÉ¡ KGM ááßíáæ", "Example: PCE for a piece, KGM for a kilo"
     LangAdd "ãÕÑæİ ãä ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ", "An expense from the recurring expenses"
     LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ÛíÑ ãæÌæÏ", "The private key file was not found"
+    LangAdd "ãáİ ÈíÇäÇÊ Access ÛíÑ ãæÌæÏ", "The Access data file does not exist"
     LangAdd "íÈÏÃ ÊÌåíÒ ÇáØáÈíÉ ÇáãÚÊãÏÉ", "Preparing starts from an approved order"
     LangAdd "íõŞíóøÏ ÕÇİí ÇáÑÈÍ (ÇáÎÓÇÑÉ", "The net profit (loss"
     LangAdd "ÃÏÎá ÈÏÇíÉ ÇáİÊÑÉ æäåÇíÊåÇ", "Enter the start and the end of the period"
@@ -280,6 +315,7 @@ Private Sub D3_3()
     LangAdd "ÇÎÊÑ ÇáÕäÏæŞ ÇáĞí ÏõİÚ ãäå", "Choose the box it was paid from"
     LangAdd "ÇÎÊÑ ÇáÕäÏæŞ ÇáãÍæóøá Åáíå", "Choose the box transferred to"
     LangAdd "ÇÎÊÑ ŞíãÉ ÕÍíÍÉ ãä ÇáŞÇÆãÉ", "Choose a valid value from the list"
+    LangAdd "ÇáÈÑäÇãÌ íÚãá ÇáÂä Úáì ãáİ", "The program now works on the file"
     LangAdd "ÇáÈÑíÏ ÇáÅáßÊÑæäí ÛíÑ ÕÍíÍ", "The e-mail is not valid"
     LangAdd "ÇáÑŞã ÇáÓÑí áİáÇÔÉ ÇáÊæŞíÚ", "PIN of the signing token"
     LangAdd "ÇáÓØÑ ÇáËÇäí ÃÓİá ÇáÈÇÑßæÏ", "Second line below the barcode"
@@ -346,6 +382,9 @@ Private Sub D3_3()
     LangAdd "ÊÌÇæÒ ÍÏ ÇáÇÆÊãÇä: ÇáÑÕíÏ", "Credit limit exceeded: balance"
     LangAdd "ÊÓÌíá ÏİÚÉ áãæÑÏ ãä ÍÓÇÈå", "Record a payment to a supplier on his account"
     LangAdd "ÊÓæíÉ¡ ÕÇİí ŞíãÉ ÇáİÑæŞÇÊ", "Adjustment, net value of the differences"
+End Sub
+
+Private Sub D3_4()
     LangAdd "Êã ÇÚÊãÇÏ ÇáÊÓæíÉ ÇáÈäßíÉ", "The bank reconciliation was approved"
     LangAdd "Êã ÍİÙ ÇáÃÓãÇÁ ÇáÅäÌáíÒíÉ", "English names saved"
     LangAdd "ÊäÈíå: ÇáßãíÉ ÇáãÊæİÑÉ ãä", "Warning: the available quantity of"
@@ -382,9 +421,6 @@ Private Sub D3_3()
     LangAdd "ÅáÛÇÁ ÊÑÍíá ÅĞä ÇáÇÓÊáÇã", "Unposting the receipt note"
     LangAdd "ÅáÛÇÁ ÊÑÍíá ÓäÏ ÇáÇÓÊáÇã", "Unposting the receipt voucher"
     LangAdd "ÇÎÊÑ ÇáÈäß ÇáĞí ÏõİÚ ãäå", "Choose the bank it was paid from"
-End Sub
-
-Private Sub D3_4()
     LangAdd "ÇÎÊÑ ÇáÈäß ÇáãÍæóøá Åáíå", "Choose the bank transferred to"
     LangAdd "ÇÎÊÑ ÌÑÏğÇ ãİÊæÍğÇ ÃæáğÇ", "Choose an open count first"
     LangAdd "ÇÎÊÑ ÓØÑ ÍÓÇÈ ãä ÇáŞÇÆãÉ", "Choose an account line from the list"
@@ -469,6 +505,9 @@ Private Sub D3_4()
     LangAdd "ÇáãØÇÈŞÉ İí åĞå ÇáÊÓæíÉ", "Matched in this reconciliation"
     LangAdd "ÇáãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "Low-stock products"
     LangAdd "ÇáãíÒÇäíÉ ÇáÇİÊÊÇÍíÉ áÜ", "Opening balance sheet of"
+End Sub
+
+Private Sub D3_5()
     LangAdd "ÈÂÎÑ ÓÚÑ (ÚãáÉ ÇáÈÑäÇãÌ", "At the last rate (program currency"
     LangAdd "ÈÇáÏİÇÊÑ (ÚãáÉ ÇáÈÑäÇãÌ", "In the books (program currency"
     LangAdd "ÈíÇäÇÊ ÇáÚãáÇÁ æÃÑÕÏÊåã", "Customer data and balances"
@@ -505,9 +544,6 @@ Private Sub D3_4()
     LangAdd "ŞÈÖ äŞÏíÉ (ÅíÑÇÏÇÊ ÃÎÑì", "Cash receipt (other revenue"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÊŞÇÑíÑ", "You do not have the permission for reports"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãæÇÒäÉ", "You do not have the permission for the budget"
-End Sub
-
-Private Sub D3_5()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ İÊÍ ÔÇÔÉ", "You do not have the permission to open the screen"
     LangAdd "áÇ ÊæÌÏ ÊÍæíáÇÊ ÈÇáØÑíŞ", "No transfers in transit"
     LangAdd "áÇ íõÍÕóøá ŞÈá ÇÓÊÍŞÇŞå", "is not collected before its due date"
@@ -544,52 +580,4 @@ Private Sub D3_5()
     LangAdd "ÇáÅĞä áã íÚÏ ãõÑÍóøáğÇ", "The note is no longer posted"
     LangAdd "ÇáÈÇÑßæÏ Ãæ ßæÏ ÇáãäÊÌ", "Barcode or product code"
     LangAdd "ÇáÈÇŞí İí ÇáÓíÇÑÉ ÇáÂä", "Left in the van now"
-    LangAdd "ÇáÈäß (ÇáÊÍÕíá / ÇáÕÑİ", "Bank (collection / payment"
-    LangAdd "ÇáÍÓÇÈÇÊ: ãÌãæÚ ÇáÏÇÆä", "Accounts: total credit"
-    LangAdd "ÇáÍÓÇÈÇÊ: ãÌãæÚ ÇáãÏíä", "Accounts: total debit"
-    LangAdd "ÇáÓäÉ / ÇáİÊÑÉ ÇáãÇáíÉ", "Fiscal year / period"
-    LangAdd "ÇáÚãáÇÊ æÃÓÚÇÑ ÇáÊÍæíá", "Currencies and exchange rates"
-    LangAdd "ÇáãÓÇİÉ Èíä ÇáÕİæİ (ãã", "Space between rows (mm"
-    LangAdd "ÇáäŞÏíÉ ÇáİÚáíÉ ÈÇáÚÏø", "Actual cash counted"
-    LangAdd "ÈÖÇÚÉ ãÓÊáãÉ áã ÊõİæÊÑ", "Goods received not invoiced"
-    LangAdd "ÈáÇ ÊæŞíÚ¡ ááÊÌÑÈÉ İŞØ", "unsigned, for testing only"
-    LangAdd "Èíä ßÔİ ÇáÈäß æÇáÏİÇÊÑ", "between the bank statement and the books"
-    LangAdd "ÊÇÑíÎ ÇáÍÑßÉ ÈÚÏ Çáíæã", "The date of the move is after today"
-    LangAdd "ÊÇÑíÎ ÇáÑÕíÏ ÇáÇİÊÊÇÍí", "Opening balance date"
-    LangAdd "ÊÇÑíÎ ÇáÓÏÇÏ ÈÚÏ Çáíæã", "The payment date is after today"
-    LangAdd "ÊÇÑíÎ ÇáÔÑÇÁ ÈÚÏ Çáíæã", "The purchase date is after today"
-    LangAdd "ÊÈÏÃ ÇáİÊÑÉ ÇáÌÏíÏÉ İí", "The new period starts on"
-    LangAdd "ÊÓæíÉ / ãÓÍæÈÇÊ ÇáãÇáß", "Settlement / owner drawings"
-    LangAdd "ÊÚĞÑ ÅäÔÇÁ ÅĞä ÇáÊÓáíã", "Could not create the delivery note"
-    LangAdd "ÊÚĞÑ ÅäÔÇÁ ŞíÏ ÇáÊÓæíÉ", "The settlement entry could not be created"
-    LangAdd "ÊÚĞÑ ÍİÙ İÇÊæÑÉ ÇáÔÑÇÁ", "Could not save the purchase invoice"
-    LangAdd "ÊÛííÑ ÏæáÉ ÇáÊÔÛíá Åáì", "Change the operating country to"
-    LangAdd "ÊŞííã ÇáãÎÒæä áßá ãÎÒä", "Stock valuation by warehouse"
-    LangAdd "Êã ÅäÔÇÁ Çáãáİ ÇáãæŞøÚ", "The signed file was created"
-    LangAdd "Êã ÊÑÍíá ãÓíÑ ÇáÚãæáÇÊ", "The commission run was posted"
-    LangAdd "Êã ÍİÙ ãÑÊÌÚ ÇáãÔÊÑíÇÊ", "The purchase return was saved"
-    LangAdd "ÊãÊ ÅÚÇÏÉ ÅäÔÇÁ ÇáÃÓØÑ", "The lines were rebuilt"
-    LangAdd "ÍĞİ ÇáÔíß ÇáãÍÏÏ æŞíÏå", "Delete the selected cheque and its entry"
-    LangAdd "ÍÓÇÈ İÑÚí (íŞÈá ÇáŞíæÏ", "Sub-account (takes entries"
-    LangAdd "ÑÕíÏ ÕäÏæŞ ÇáÚåÏÉ ÇáÂä", "Custody box balance now"
-    LangAdd "ÑŞã ÇáÅŞÑÇÑ áÏì ÇáåíÆÉ", "Return number at the Authority"
-    LangAdd "ÕÇİí ÑÈÍ ÇáÔåÑ (ÊŞÑíÈí", "Net profit of the month (approximate"
-    LangAdd "ÕäÏæŞ ãä íõäÔÆ ÇáãÕÑæİ", "Box of the user who creates the expense"
-    LangAdd "ÖÑíÈÉ ÇáÚãæáÉ / ÇáÑÓæã", "VAT on the fee / charges"
-    LangAdd "ÖÑíÈÉ ãÏÎáÇÊ ÇáãÔÊÑíÇÊ", "Input VAT on purchases"
-    LangAdd "ÖÑíÈÉ ãÏÎáÇÊ ÇáãÕÑæİÇÊ", "Input VAT on expenses"
-    LangAdd "ÛíÑ ãæÌæÏÉ Ãæ ÛíÑ äÔØÉ", "does not exist or is not active"
-    LangAdd "İÇÊæÑÉ / ãÑÊÌÚ ãÔÊÑíÇÊ", "Purchase invoice / return"
-    LangAdd "ŞÇÆãÉ ÇáÏÎá æÇáãíÒÇäíÉ", "Income statement and balance sheet"
-    LangAdd "ŞíæÏ ÇáÊÓæíÉ æÇáÇİÊÊÇÍ", "Adjusting and opening entries"
-    LangAdd "ßÔİ ÍÓÇÈ æÏİÊÑ ÇáÃÓÊÇĞ", "Account statement and general ledger"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÔíßÇÊ", "You do not have the permission for cheques"
-    LangAdd "ãÊÃÎÑÉ ÃßËÑ ãä 20 ÓÇÚÉ", "Late more than 20 hours"
-    LangAdd "ãÍÇæáÇÊ ÇáÏÎæá ÇáİÇÔáÉ", "Failed login attempts"
-    LangAdd "ãÍÌæÒÉ áØáÈíÇÊ ÇáÚãáÇÁ", "reserved for customer orders"
-    LangAdd "ãáÇÍÙÇÊ ÇáÊÍæíá ÇáÌÏíÏ", "Notes of the new transfer"
-    LangAdd "ãáİ ÇáÈíÇäÇÊ ÛíÑ ãæÌæÏ", "The data file does not exist"
-    LangAdd "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ", "Who added, edited or deleted"
-    LangAdd "åĞÇ ÇáÎíÇÑ ááãÈÑãÌ İŞØ", "This option is for the developer only"
-    LangAdd "åá ÊÓãÍ ÈÅÊãÇã ÇáÚãáíÉ", "Do you allow the transaction to be completed"
 End Sub

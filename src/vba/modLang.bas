@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3176
+Private Const ENTRY_COUNT As Long = 3232
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -200,6 +200,7 @@ Private Sub LoadDictionary()
     LangData3
     LangData4
     LangData5
+    LangData6
     m_loaded = True
 End Sub
 
@@ -226,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("AS [التاريخ], Format(r.BookValueBefore, '#,##0.00') AS [القيمة الدفترية قبلها], Format(r.NewValue, '#,##0.00') AS ") = "AS [Date], Format(r.BookValueBefore, '#,##0.00') AS [Book value before], Format(r.NewValue, '#,##0.00') AS ", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إظهار غير النشط") = "Show inactive", "Tr sample 2", passed, failed, report
-    CheckLang Tr("البند") = "Item", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المبيعات الخاضعة للضريبة (بعد المرتجعات)") = "Taxable sales (after returns)", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذر ضبط تقرير الملصقات: ") = "Could not set up the labels report: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("سبتمبر") = "September", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا يمكن الترحيل إلى نفس الصندوق.") = "Cannot transfer to the same box.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("AS [مبلغ الشيك], StatusName AS [الحالة], Format(StatusDate, 'yyyy/mm/dd') AS [في], Nz(BankName, DrawerBank) AS [البنك] ") = "AS [Cheque amount], StatusName AS [Status], Format(StatusDate, 'yyyy/mm/dd') AS [in], Nz(BankName, DrawerBank) AS [Bank] ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("إعادة تقييم الأصل إلى ") = "Revalue the asset to ", "Tr sample 2", passed, failed, report
+    CheckLang Tr("البنوك") = "Banks", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المبيعات اليومية") = "Daily sales", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعذرت النسخة الوقائية قبل الاستعادة، فلم تتم الاستعادة: ") = "The safety copy before restoring failed, so nothing was restored: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("سجل التدقيق يحتاج صلاحية «سجل التدقيق».") = "The audit trail needs the permission Audit trail.", "Tr sample 6", passed, failed, report
+    CheckLang Tr("لا يمكن تغيير دولة التشغيل بعد تسجيل عمليات في البرنامج.") = "The operating country cannot change after operations are recorded.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة") = "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة", "العربية: من اليمين ولا ترجمة", _

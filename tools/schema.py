@@ -467,6 +467,7 @@ TABLES: List[Table] = [
             ("SETTINGS", "إعدادات المحل", "النظام", 80),
             ("USERS", "المستخدمون والصلاحيات", "النظام", 81),
             ("BACKUP", "النسخ الاحتياطي", "النظام", 82),
+            ("SQL_SERVER", "قاعدة SQL Server: الاتصال ونقل البيانات وتشغيل البرنامج على الخادم", "النظام", 84),
             ("AUDIT_LOG", "سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد", "النظام", 83),
             ("EINVOICE", "الفاتورة الإلكترونية: المتابعة وإعادة الإرسال", "المبيعات", 16),
         ],
@@ -2594,7 +2595,7 @@ TABLES: List[Table] = [
 def _role_permissions():
     perms = [r[0] for r in table("Permissions").seed_rows]
     cashier = ["SALES_POS", "SALES_VIEW", "CUSTOMERS", "CUSTOMER_PAYMENTS", "CASH_CLOSING"]
-    manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK", "PERIOD_CLOSE", "AUDIT_LOG"}
+    manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK", "PERIOD_CLOSE", "AUDIT_LOG", "SQL_SERVER"}
     rows = [(1, p) for p in perms]
     rows += [(2, p) for p in perms if p not in manager_excluded]
     rows += [(3, p) for p in cashier]
@@ -2679,6 +2680,7 @@ SCREEN_LIST = [
     ("frmUserScreens", "صلاحيات الشاشات للمستخدمين", "النظام", "USERS", False, True, False),
     ("frmAuditLog", "سجل التدقيق", "النظام", "AUDIT_LOG", False, False, False),
     ("frmBackup", "النسخ الاحتياطي", "النظام", "BACKUP", False, False, False),
+    ("frmSqlServer", "قاعدة البيانات على SQL Server", "النظام", "SQL_SERVER", False, False, False),
     ("frmEnglishNames", "الأسماء الإنجليزية", "النظام", "SETTINGS", False, True, False),
     ("frmEInvoices", "الفاتورة الإلكترونية", "المبيعات", "EINVOICE", False, True, False),
     ("frmZatcaSetup", "إعداد ربط منصة فاتورة", "النظام", "SETTINGS", False, True, False),

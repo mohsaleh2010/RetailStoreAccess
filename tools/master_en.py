@@ -158,6 +158,7 @@ PERMISSION_NAMES_EN = {
     "SALES_REPS": "Sales reps: data, targets, commissions and reports", "REPORTS": "Operating reports",
     "REPORTS_PROFIT": "Profit and VAT reports", "DASHBOARD_FINANCIAL": "Financial figures on the dashboard",
     "SETTINGS": "Store settings", "USERS": "Users and permissions", "BACKUP": "Backup",
+    "SQL_SERVER": "SQL Server database: connection, data transfer and running on the server",
     "AUDIT_LOG": "Audit trail: who added, edited or deleted, with the values before and after",
     "EINVOICE": "E-invoicing: follow-up and resending",
 }
@@ -186,7 +187,7 @@ SCREEN_TITLES_EN = {
     "frmRepTargets": "Sales rep targets", "frmCommissions": "Sales rep commissions", "frmCurrencyRates": "Exchange rates",
     "frmAllocation": "Match payments to invoices", "frmReportCenter": "Reports", "frmSearch": "Search",
     "frmSettings": "Store settings", "frmUsers": "Users", "frmRoles": "Roles and permissions",
-    "frmUserScreens": "Screen permissions of users", "frmAuditLog": "Audit trail", "frmBackup": "Backup",
+    "frmUserScreens": "Screen permissions of users", "frmAuditLog": "Audit trail", "frmBackup": "Backup", "frmSqlServer": "SQL Server database",
     "frmEnglishNames": "English names", "frmEInvoices": "E-invoicing", "frmZatcaSetup": "Fatoora connection setup",
     "frmEtaSetup": "E-receipt connection setup",
 }

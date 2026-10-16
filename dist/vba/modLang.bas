@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3176
+Private Const ENTRY_COUNT As Long = 3232
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -200,6 +200,7 @@ Private Sub LoadDictionary()
     LangData3
     LangData4
     LangData5
+    LangData6
     m_loaded = True
 End Sub
 
@@ -226,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("AS [ÇáÊÇÑíÎ], Format(r.BookValueBefore, '#,##0.00') AS [ÇáŞíãÉ ÇáÏİÊÑíÉ ŞÈáåÇ], Format(r.NewValue, '#,##0.00') AS ") = "AS [Date], Format(r.BookValueBefore, '#,##0.00') AS [Book value before], Format(r.NewValue, '#,##0.00') AS ", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÙåÇÑ ÛíÑ ÇáäÔØ") = "Show inactive", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈäÏ") = "Item", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÈíÚÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ (ÈÚÏ ÇáãÑÊÌÚÇÊ)") = "Taxable sales (after returns)", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞÑ ÖÈØ ÊŞÑíÑ ÇáãáÕŞÇÊ: ") = "Could not set up the labels report: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÈÊãÈÑ") = "September", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ íãßä ÇáÊÑÍíá Åáì äİÓ ÇáÕäÏæŞ.") = "Cannot transfer to the same box.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("AS [ãÈáÛ ÇáÔíß], StatusName AS [ÇáÍÇáÉ], Format(StatusDate, 'yyyy/mm/dd') AS [İí], Nz(BankName, DrawerBank) AS [ÇáÈäß] ") = "AS [Cheque amount], StatusName AS [Status], Format(StatusDate, 'yyyy/mm/dd') AS [in], Nz(BankName, DrawerBank) AS [Bank] ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÚÇÏÉ ÊŞííã ÇáÃÕá Åáì ") = "Revalue the asset to ", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈäæß") = "Banks", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÈíÚÇÊ ÇáíæãíÉ") = "Daily sales", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞÑÊ ÇáäÓÎÉ ÇáæŞÇÆíÉ ŞÈá ÇáÇÓÊÚÇÏÉ¡ İáã ÊÊã ÇáÇÓÊÚÇÏÉ: ") = "The safety copy before restoring failed, so nothing was restored: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÓÌá ÇáÊÏŞíŞ íÍÊÇÌ ÕáÇÍíÉ «ÓÌá ÇáÊÏŞíŞ».") = "The audit trail needs the permission Audit trail.", "Tr sample 6", passed, failed, report
+    CheckLang Tr("áÇ íãßä ÊÛííÑ ÏæáÉ ÇáÊÔÛíá ÈÚÏ ÊÓÌíá ÚãáíÇÊ İí ÇáÈÑäÇãÌ.") = "The operating country cannot change after operations are recorded.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ") = "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _

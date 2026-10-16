@@ -250,7 +250,8 @@ def layout_backup() -> FormModel:
     bx = cm(0.4)
     for name, caption, style, w, call in [
             ("btnRestore", "استعادة النسخة المحددة", "danger", 5.4, "BackupRestoreSelected Me"),
-            ("btnDevMode", "وضع المطوّر", "secondary", 3.6, "DeveloperModeFromApp")]:
+            ("btnDevMode", "وضع المطوّر", "secondary", 3.6, "DeveloperModeFromApp"),
+            ("btnSqlServer", "SQL Server", "secondary", 3.0, 'OpenScreen "frmSqlServer", 0')]:
         button(m, name, caption, bx, cm(13.2), style, w=cm(w), h=cm(1.0), call=call)
         bx += cm(w) + cm(0.2)
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(13.2), "secondary", w=cm(2.6), h=cm(1.0),

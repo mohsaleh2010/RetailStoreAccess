@@ -222,7 +222,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 45 سجل
+- بيانات أساسية: 46 سجل
 
 ## RolePermissions
 
@@ -234,7 +234,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 89 سجل
+- بيانات أساسية: 90 سجل
 
 ## Employees
 
@@ -296,7 +296,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 77 سجل
+- بيانات أساسية: 78 سجل
 
 ## UserScreens
 

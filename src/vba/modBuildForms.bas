@@ -29,7 +29,7 @@ Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppli
     "frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword,frmRolePermLines,frmRoles," & _
     "frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques," & _
     "frmAssets,frmDepreciation,frmAssetChanges,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder,frmRepDay," & _
-    "frmRepVisits"
+    "frmRepVisits,frmSqlServer"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -685,6 +685,7 @@ Private Sub BuildAllForms()
     BuildForm_frmSalesOrder
     BuildForm_frmRepDay
     BuildForm_frmRepVisits
+    BuildForm_frmSqlServer
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -6547,6 +6548,8 @@ Private Sub BuildForm_frmBackup()
     c.OnClick = EP
     Set c = AddButton("btnDevMode", "وضع المطوّر", 3402, 7484, 2041, 567, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnSqlServer", "SQL Server", 5556, 7484, 1701, 567, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 9639, 7484, 1474, 567, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -6568,6 +6571,9 @@ Private Sub BuildForm_frmBackup()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnDevMode_Click()" & vbCrLf
     s = s & "    DeveloperModeFromApp" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSqlServer_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmSqlServer"", 0" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -11694,4 +11700,89 @@ Private Sub BuildForm_frmRepVisits()
     Exit Sub
 EH:
     AbortForm "frmRepVisits", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmSqlServer()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmSqlServer", "قاعدة البيانات على SQL Server", "", 12474, 9185, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12474, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8B7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "قاعدة البيانات على SQL Server", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "الاتصال بالخادم، وتجهيز القاعدة، ونقل البيانات ومطابقتها، وتشغيل البرنامج على الخادم", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtServer", "", 227, 1361, 3175, 454)
+    Set c = AddLabel("lblServer", "الخادم (مثل .\SQLEXPRESS)", 227, 1049, 3175, 284, 9, False, CLR_MUTED, "txtServer", 0)
+    Set c = AddText("txtDatabase", "", 3515, 1361, 2041, 454)
+    Set c = AddLabel("lblDatabase", "قاعدة البيانات", 3515, 1049, 2041, 284, 9, False, CLR_MUTED, "txtDatabase", 0)
+    Set c = AddCombo("cboAuth", "", 5670, 1361, 1928, 454, "WINDOWS;حساب Windows;SQL;مستخدم SQL Server", 2, "0;1814")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblAuth", "الدخول", 5670, 1049, 1928, 284, 9, False, CLR_MUTED, "cboAuth", 0)
+    Set c = AddText("txtUser", "", 7711, 1361, 2041, 454)
+    Set c = AddLabel("lblUser", "المستخدم", 7711, 1049, 2041, 284, 9, False, CLR_MUTED, "txtUser", 0)
+    Set c = AddText("txtPassword", "", 9866, 1361, 2381, 454)
+    SetCtlProp c, "InputMask", "Password"
+    Set c = AddLabel("lblPassword", "كلمة المرور", 9866, 1049, 2381, 284, 9, False, CLR_MUTED, "txtPassword", 0)
+    Set c = AddCombo("cboDriver", "", 227, 2211, 3515, 454, "", 1, "3402")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblDriver", "برنامج التشغيل (ODBC)", 227, 1899, 3515, 284, 9, False, CLR_MUTED, "cboDriver", 0)
+    Set c = AddText("txtScript", "", 3856, 2211, 6237, 454)
+    Set c = AddLabel("lblScript", "ملف سكربت القاعدة", 3856, 1899, 6237, 284, 9, False, CLR_MUTED, "txtScript", 0)
+    Set c = AddButton("btnBrowse", "استعراض", 10206, 2211, 2041, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblState", " ", 227, 2807, 12020, 369, 10, True, CLR_MUTED, "", 0)
+    Set c = AddButton("btnTest", "اختبار الاتصال", 227, 3260, 1644, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSchema", "تجهيز القاعدة", 1984, 3260, 1871, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnTransfer", "نقل البيانات", 3968, 3260, 1701, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnCompare", "مطابقة البيانات", 5782, 3260, 1814, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnLink", "التشغيل على الخادم", 7709, 3260, 1928, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnAccess", "الرجوع إلى Access", 9750, 3260, 2041, 510, "danger")
+    c.OnClick = EP
+    Set c = AddLabel("lblResult", " ", 227, 3912, 12020, 340, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddList("lstResult", 227, 4309, 12020, 4082, 6, "2948;1474;1474;2041;2041;1361", True)
+    c.RowSourceType = "Value List"
+    Set c = AddButton("btnClose", "إغلاق", 10773, 8533, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    SqlServerLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboAuth_AfterUpdate()" & vbCrLf
+    s = s & "    SqlServerAuthChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnBrowse_Click()" & vbCrLf
+    s = s & "    SqlServerBrowseScript Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTest_Click()" & vbCrLf
+    s = s & "    SqlServerTest Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSchema_Click()" & vbCrLf
+    s = s & "    SqlServerSchema Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTransfer_Click()" & vbCrLf
+    s = s & "    SqlServerTransfer Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCompare_Click()" & vbCrLf
+    s = s & "    SqlServerCompare Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnLink_Click()" & vbCrLf
+    s = s & "    SqlServerLink Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAccess_Click()" & vbCrLf
+    s = s & "    SqlServerBackToAccess Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmSqlServer", s
+    Exit Sub
+EH:
+    AbortForm "frmSqlServer", Err.Number, Err.Description
 End Sub

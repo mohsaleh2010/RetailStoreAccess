@@ -12,7 +12,7 @@
   Then run this file in that database:
       sqlcmd -S .\SQLEXPRESS -d RetailStore -E -f 65001 -i RetailStore_Schema.sql
 
-  90 tables, 1158 fields, 135 indexes, 210 relationships, 435 seed rows
+  90 tables, 1158 fields, 135 indexes, 210 relationships, 438 seed rows
 ==============================================================================*/
 SET NOCOUNT ON;
 SET ANSI_NULLS ON;
@@ -5405,7 +5405,7 @@ BEGIN
     INSERT INTO [dbo].[Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (2, N'MANAGER', N'مدير', N'المبيعات والمشتريات والمخزون والتقارير');
     INSERT INTO [dbo].[Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (3, N'CASHIER', N'كاشير', N'المبيعات والعملاء فقط');
 END;
--- Permissions: 45 rows (the missing ones)
+-- Permissions: 46 rows (the missing ones)
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'SALES_POS')
     BEGIN
@@ -5794,6 +5794,14 @@ BEGIN
             INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'BACKUP');
         END
     END
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'SQL_SERVER')
+    BEGIN
+        INSERT INTO [dbo].[Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES (N'SQL_SERVER', N'قاعدة SQL Server: الاتصال ونقل البيانات وتشغيل البرنامج على الخادم', N'النظام', 84);
+        IF EXISTS (SELECT 1 FROM [dbo].[RolePermissions])
+        BEGIN
+            INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SQL_SERVER');
+        END
+    END
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'AUDIT_LOG')
     BEGIN
         INSERT INTO [dbo].[Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES (N'AUDIT_LOG', N'سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد', N'النظام', 83);
@@ -5812,7 +5820,7 @@ BEGIN
         END
     END
 END;
--- RolePermissions: 89 rows (an empty table)
+-- RolePermissions: 90 rows (an empty table)
 IF NOT EXISTS (SELECT 1 FROM [dbo].[RolePermissions])
 BEGIN
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SALES_POS');
@@ -5858,6 +5866,7 @@ BEGIN
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SETTINGS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'USERS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'BACKUP');
+    INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SQL_SERVER');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'AUDIT_LOG');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'EINVOICE');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'SALES_POS');
@@ -5912,7 +5921,7 @@ BEGIN
     INSERT INTO [dbo].[Employees] ([EmployeeID], [EmployeeName], [JobTitle], [Username], [RoleID], [MaxDiscountPercent], [MustChangePassword], [IsActive]) VALUES (1, N'مدير النظام', N'مدير النظام', N'admin', 1, 1, 1, 1);
 END;
 SET IDENTITY_INSERT [dbo].[Employees] OFF;
--- Screens: 77 rows (the missing ones)
+-- Screens: 78 rows (the missing ones)
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmPOS')
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmPOS', N'نقطة البيع (المحلات)', N'المبيعات', 10, N'SALES_POS', 1, 0, 0);
@@ -6060,14 +6069,16 @@ BEGIN
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAuditLog', N'سجل التدقيق', N'النظام', 720, N'AUDIT_LOG', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmBackup')
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBackup', N'النسخ الاحتياطي', N'النظام', 730, N'BACKUP', 0, 0, 0);
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmSqlServer')
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSqlServer', N'قاعدة البيانات على SQL Server', N'النظام', 740, N'SQL_SERVER', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEnglishNames')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEnglishNames', N'الأسماء الإنجليزية', N'النظام', 740, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEnglishNames', N'الأسماء الإنجليزية', N'النظام', 750, N'SETTINGS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEInvoices')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEInvoices', N'الفاتورة الإلكترونية', N'المبيعات', 750, N'EINVOICE', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEInvoices', N'الفاتورة الإلكترونية', N'المبيعات', 760, N'EINVOICE', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmZatcaSetup')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmZatcaSetup', N'إعداد ربط منصة فاتورة', N'النظام', 760, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmZatcaSetup', N'إعداد ربط منصة فاتورة', N'النظام', 770, N'SETTINGS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEtaSetup')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEtaSetup', N'إعداد ربط منظومة الإيصال الإلكتروني', N'النظام', 770, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEtaSetup', N'إعداد ربط منظومة الإيصال الإلكتروني', N'النظام', 780, N'SETTINGS', 0, 1, 0);
 END;
 -- Categories: 1 rows (an empty table)
 SET IDENTITY_INSERT [dbo].[Categories] ON;
@@ -6674,6 +6685,7 @@ UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Financial figures on the d
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Store settings' WHERE [PermissionKey] = N'SETTINGS' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Users and permissions' WHERE [PermissionKey] = N'USERS' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Backup' WHERE [PermissionKey] = N'BACKUP' AND [PermissionNameEn] IS NULL;
+UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'SQL Server database: connection, data transfer and running on the server' WHERE [PermissionKey] = N'SQL_SERVER' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Audit trail: who added, edited or deleted, with the values before and after' WHERE [PermissionKey] = N'AUDIT_LOG' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'E-invoicing: follow-up and resending' WHERE [PermissionKey] = N'EINVOICE' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [ModuleNameEn] = N'Sales' WHERE [ModuleName] = N'المبيعات' AND [ModuleNameEn] IS NULL;
@@ -6759,6 +6771,7 @@ UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Roles and permissions' WHERE [Scr
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Screen permissions of users' WHERE [ScreenName] = N'frmUserScreens' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Audit trail' WHERE [ScreenName] = N'frmAuditLog' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Backup' WHERE [ScreenName] = N'frmBackup' AND [ScreenTitleEn] IS NULL;
+UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'SQL Server database' WHERE [ScreenName] = N'frmSqlServer' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'English names' WHERE [ScreenName] = N'frmEnglishNames' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'E-invoicing' WHERE [ScreenName] = N'frmEInvoices' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Fatoora connection setup' WHERE [ScreenName] = N'frmZatcaSetup' AND [ScreenTitleEn] IS NULL;
@@ -7268,5 +7281,5 @@ IF OBJECT_ID(N'dbo.FK_VatReturns_EmployeeID', N'F') IS NOT NULL
 IF OBJECT_ID(N'dbo.FK_Warehouses_KeeperID', N'F') IS NOT NULL
     ALTER TABLE [dbo].[Warehouses] DROP CONSTRAINT [FK_Warehouses_KeeperID];
 GO
-PRINT N'RetailStore schema: done (90 tables, 1158 fields, 135 indexes, 210 relationships, 435 seed rows).';
+PRINT N'RetailStore schema: done (90 tables, 1158 fields, 135 indexes, 210 relationships, 438 seed rows).';
 GO
