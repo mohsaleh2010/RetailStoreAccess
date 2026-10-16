@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3111
+Private Const ENTRY_COUNT As Long = 3172
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,12 +227,12 @@ Public Function TestLang() As Boolean
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
     CheckLang Tr("AS [ÇáãÑßÒ], Format(BudgetAmount, '#,##0') AS [ÇáãæÇÒäÉ], Format(ActualAmount, '#,##0') AS [ÇáİÚáí], ") = "AS [Center], Format(BudgetAmount, '#,##0') AS [Budget], Format(ActualAmount, '#,##0') AS [Actual], ", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÚÇÏÉ ÇáÅäÔÇÁ") = "Rebuild", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈíÆÉ ÇáÊÌÑíÈíÉ") = "Test environment", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÈíÚÇÊ ÇáãÚİÇÉ") = "Exempt sales", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞÑ ÖÈØ ÊŞÑíÑ ÇáãáÕŞÇÊ: ") = "Could not set up the labels report: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÅÚÇÏÉ ÅäÔÇÁ ÃÓØÑ ÇáãÓíÑ ãä ÈíÇäÇÊ ÇáãæÙİíä¿ ÊÖíÚ ÇáÊÚÏíáÇÊ ÇáãßÊæÈÉ İíå.") = "Rebuild the run lines from the employee data? The changes typed in it are lost.", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈäß") = "Bank", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÈíÚÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ (ÈÚÏ ÇáãÑÊÌÚÇÊ)") = "Taxable sales (after returns)", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞÑ ÑÓã ÇáÅÍÕÇÆíÇÊ: ") = "Could not draw the statistics: ", "Tr sample 5", passed, failed, report
     CheckLang Tr("ÓÈÈ ÇáÅÑÌÇÚ ãØáæÈ.") = "The return reason is required.", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ íãßä ÅáÛÇÁ ÌÑÏ ãõÑÍøá Ãæ ãáÛì.") = "A posted or cancelled count cannot be cancelled.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("áÇ íãßä ÇáÊÑÍíá Åáì äİÓ ÇáÕäÏæŞ.") = "Cannot transfer to the same box.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ") = "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _

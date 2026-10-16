@@ -3763,43 +3763,45 @@ Private Sub BuildReport_rptFixedAssets()
     SetCtl c, "BackStyle", 1
     SetCtl c, "BackColor", CLR_SECONDARY
     Set c = RLabel(3, "lblCol1", "الرقم", 0, 1292, 1134, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol2", "الأصل", 1134, 1292, 2948, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol3", "المجموعة", 4082, 1292, 2041, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol4", "الشراء", 6123, 1292, 1247, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol5", "العمر (شهر)", 7370, 1292, 1021, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol6", "التكلفة", 8391, 1292, 1474, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol7", "القسط الشهري", 9865, 1292, 1361, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol8", "مجمع الإهلاك", 11226, 1292, 1474, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol9", "القيمة الدفترية", 12700, 1292, 1474, 284, 8, True, 2)
-    Set c = RLabel(3, "lblCol10", "الحالة", 14174, 1292, 1362, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "الأصل", 1134, 1292, 2268, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "المجموعة", 3402, 1292, 1814, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "الطريقة", 5216, 1292, 907, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "الشراء", 6123, 1292, 1247, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "العمر (شهر)", 7370, 1292, 1021, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "التكلفة", 8391, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol8", "القسط الشهري", 9865, 1292, 1361, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol9", "مجمع الإهلاك", 11226, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol10", "القيمة الدفترية", 12700, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol11", "الحالة", 14174, 1292, 1362, 284, 8, True, 2)
     Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
     Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
-    Set c = RText(2, "txtTotal6", "=Sum([Cost])", 8391, 85, 1474, 284, 8, True, 2)
+    Set c = RText(2, "txtTotal7", "=Sum([Cost])", 8391, 85, 1474, 284, 8, True, 2)
     SetCtl c, "Format", "#,##0.00"
-    Set c = RText(2, "txtTotal7", "=Sum([MonthlyDep])", 9865, 85, 1361, 284, 8, True, 2)
+    Set c = RText(2, "txtTotal8", "=Sum([MonthlyDep])", 9865, 85, 1361, 284, 8, True, 2)
     SetCtl c, "Format", "#,##0.00"
-    Set c = RText(2, "txtTotal8", "=Sum([AccumDep])", 11226, 85, 1474, 284, 8, True, 2)
+    Set c = RText(2, "txtTotal9", "=Sum([AccumDep])", 11226, 85, 1474, 284, 8, True, 2)
     SetCtl c, "Format", "#,##0.00"
-    Set c = RText(2, "txtTotal9", "=Sum([BookValue])", 12700, 85, 1474, 284, 8, True, 2)
+    Set c = RText(2, "txtTotal10", "=Sum([BookValue])", 12700, 85, 1474, 284, 8, True, 2)
     SetCtl c, "Format", "#,##0.00"
     Set c = RLine(2, "lnTotals", 28, 15536)
     Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 8391, 284, 8, True, 0)
     Set c = RText(0, "txtCol1", "AssetCode", 0, 17, 1134, 284, 8, False, 0)
-    Set c = RText(0, "txtCol2", "AssetName", 1134, 17, 2948, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "AssetName", 1134, 17, 2268, 284, 8, False, 0)
     SetCtl c, "CanGrow", True
-    Set c = RText(0, "txtCol3", "AssetGroup", 4082, 17, 2041, 284, 8, False, 0)
-    Set c = RText(0, "txtCol4", "=GDate([PurchaseDate])", 6123, 17, 1247, 284, 8, False, 0)
-    Set c = RText(0, "txtCol5", "UsefulLifeMonths", 7370, 17, 1021, 284, 8, False, 2)
+    Set c = RText(0, "txtCol3", "AssetGroup", 3402, 17, 1814, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "MethodName", 5216, 17, 907, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "=GDate([PurchaseDate])", 6123, 17, 1247, 284, 8, False, 0)
+    Set c = RText(0, "txtCol6", "UsefulLifeMonths", 7370, 17, 1021, 284, 8, False, 2)
     SetCtl c, "Format", "#,##0"
-    Set c = RText(0, "txtCol6", "Cost", 8391, 17, 1474, 284, 8, False, 2)
+    Set c = RText(0, "txtCol7", "Cost", 8391, 17, 1474, 284, 8, False, 2)
     SetCtl c, "Format", "#,##0.00"
-    Set c = RText(0, "txtCol7", "MonthlyDep", 9865, 17, 1361, 284, 8, False, 2)
+    Set c = RText(0, "txtCol8", "MonthlyDep", 9865, 17, 1361, 284, 8, False, 2)
     SetCtl c, "Format", "#,##0.00"
-    Set c = RText(0, "txtCol8", "AccumDep", 11226, 17, 1474, 284, 8, False, 2)
+    Set c = RText(0, "txtCol9", "AccumDep", 11226, 17, 1474, 284, 8, False, 2)
     SetCtl c, "Format", "#,##0.00"
-    Set c = RText(0, "txtCol9", "BookValue", 12700, 17, 1474, 284, 8, False, 2)
+    Set c = RText(0, "txtCol10", "BookValue", 12700, 17, 1474, 284, 8, False, 2)
     SetCtl c, "Format", "#,##0.00"
-    Set c = RText(0, "txtCol10", "StatusName", 14174, 17, 1362, 284, 8, False, 0)
+    Set c = RText(0, "txtCol11", "StatusName", 14174, 17, 1362, 284, 8, False, 0)
     m_rpt.OnNoData = EP
     SetSecProp 0, "AlternateBackColor", 15921906
     s = ""

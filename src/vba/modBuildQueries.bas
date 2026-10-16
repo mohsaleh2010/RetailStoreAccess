@@ -28,10 +28,10 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     "y,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint" & _
     ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryStockNoteValue,qryInvoiced" & _
     "Notes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryRepDayStock,qryRepDaySales,qryRepDayReturns,qryRepDayCollections,RepDaySummaryQuery,RepVisitListQuery,RouteExecutionQuery,RepVanStockQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocume" & _
-    "nt,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalP" & _
-    "ayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,Genera" & _
-    "lLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBa" & _
-    "lancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "nt,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryAssetRevalTotals,qryAssetLastReval,qryAssetFirstCenter,qryJournalAsset,qryJournalAssetReval,qryJournalAssetT" & _
+    "ransfer,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEnt" & _
+    "ryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBal" & _
+    "anceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -851,7 +851,12 @@ Private Sub CreateAllQueries()
     Q_qryJournalYearClose
     Q_qryJournalVatReturn
     Q_qryJournalCheque
+    Q_qryAssetRevalTotals
+    Q_qryAssetLastReval
+    Q_qryAssetFirstCenter
     Q_qryJournalAsset
+    Q_qryJournalAssetReval
+    Q_qryJournalAssetTransfer
     Q_qryDepreciationLines
     Q_qryJournalDepreciation
     Q_qryPayrollTotals
@@ -2030,6 +2035,14 @@ Private Sub Q_qryVatReturnLines()
     s = s & "SELECT 'P', 'S', e.ExpenseDate, e.Amount, CCur(0), e.Tax" & vbCrLf
     s = s & "FROM Expenses AS e" & vbCrLf
     s = s & "WHERE e.Tax <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'P', 'S', a.PurchaseDate, a.Cost, CCur(0), a.InputVAT" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.InputVAT <> 0 AND a.SourceType <> 'OPENING'" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'S', 'S', a.DisposalDate, a.DisposalProceeds, CCur(0), a.DisposalVAT" & vbCrLf
+    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND a.DisposalVAT <> 0" & vbCrLf
     SaveQuery "qryVatReturnLines", "أسطر الإقرار الضريبي: المبيعات والمشتريات والمصروفات بفئتها الضريبية", s
 End Sub
 
@@ -2510,7 +2523,7 @@ Private Sub Q_qryCashMovements()
     s = s & "WHERE a.SourceType = 'CASHBOX'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT a.DisposalCashBoxID, a.DisposalDate, 'ASSET_SALE', 'بيع أصل ثابت', a.AssetCode, a.AssetName, a.Notes," & vbCrLf
-    s = s & "       a.DisposalProceeds, CCur(0), a.EmployeeID" & vbCrLf
+    s = s & "       a.DisposalProceeds + a.DisposalVAT, CCur(0), a.EmployeeID" & vbCrLf
     s = s & "FROM FixedAssets AS a" & vbCrLf
     s = s & "WHERE a.Status = 'DISPOSED' AND a.DisposalTo = 'CASHBOX' AND a.DisposalProceeds <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
@@ -3351,50 +3364,122 @@ Private Sub Q_qryJournalCheque()
     SaveQuery "qryJournalCheque", "أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد", s
 End Sub
 
+Private Sub Q_qryAssetRevalTotals()
+    Dim s As String
+    s = "SELECT AssetID, Sum(ValueChange) AS SumReval, Sum(SurplusPart) AS SumSurplus, Sum(LossPart) AS SumLoss, Count(*) AS RevalCount" & vbCrLf
+    s = s & "FROM AssetRevaluations" & vbCrLf
+    s = s & "GROUP BY AssetID" & vbCrLf
+    SaveQuery "qryAssetRevalTotals", "مجموع إعادة تقييم كل أصل: الفرق، والفائض، وخسائر الانخفاض", s
+End Sub
+
+Private Sub Q_qryAssetLastReval()
+    Dim s As String
+    s = "SELECT r.AssetID, r.RevalDate, r.NewValue, r.MonthsLeft" & vbCrLf
+    s = s & "FROM AssetRevaluations AS r" & vbCrLf
+    s = s & "WHERE r.RevaluationID IN (SELECT Max(x.RevaluationID) FROM AssetRevaluations AS x GROUP BY x.AssetID)" & vbCrLf
+    SaveQuery "qryAssetLastReval", "آخر إعادة تقييم لكل أصل: القيمة الجديدة والعمر الباقي", s
+End Sub
+
+Private Sub Q_qryAssetFirstCenter()
+    Dim s As String
+    s = "SELECT t.AssetID, t.FromCenterID" & vbCrLf
+    s = s & "FROM AssetTransfers AS t" & vbCrLf
+    s = s & "WHERE t.TransferID IN (SELECT Min(x.TransferID) FROM AssetTransfers AS x GROUP BY x.AssetID)" & vbCrLf
+    SaveQuery "qryAssetFirstCenter", "مركز تكلفة الأصل وقت شرائه: مصدر أول نقل له", s
+End Sub
+
 Private Sub Q_qryJournalAsset()
     Dim s As String
-    s = "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, a.Cost AS Debit, CCur(0) AS Credit, a.AssetName AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, a.Cost AS Debit, CCur(0) AS Credit, a.AssetName AS LineText, IIf(pc.AssetID Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), IIf(pc.FromCenterID Is Null, 0, pc.FromCenterID)) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID" & vbCrLf
     s = s & "WHERE a.Cost <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 1500 AS AccountCode, a.InputVAT AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 1500 AS AccountCode, a.InputVAT AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, IIf(pc.AssetID Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), IIf(pc.FromCenterID Is Null, 0, pc.FromCenterID)) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID" & vbCrLf
     s = s & "WHERE a.InputVAT <> 0 AND a.SourceType <> 'OPENING'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900))) AS AccountCode, CCur(0) AS Debit, IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) AS Credit, a.Notes AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900))) AS AccountCode, CCur(0) AS Debit, IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) AS Credit, a.Notes AS LineText, IIf(pc.AssetID Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), IIf(pc.FromCenterID Is Null, 0, pc.FromCenterID)) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID" & vbCrLf
     s = s & "WHERE IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, a.OpeningAccumDep AS Credit, 'إهلاك سابق' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, a.OpeningAccumDep AS Credit, 'إهلاك سابق' AS LineText, IIf(pc.AssetID Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), IIf(pc.FromCenterID Is Null, 0, pc.FromCenterID)) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID" & vbCrLf
     s = s & "WHERE a.SourceType = 'OPENING' AND a.OpeningAccumDep <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, 1790 AS AccountCode, a.DisposalAccumDep AS Debit, CCur(0) AS Credit, 'مجمع إهلاك الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID" & vbCrLf
     s = s & "WHERE a.Status = 'DISPOSED' AND a.DisposalAccumDep <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID) AS AccountCode, a.DisposalProceeds AS Debit, CCur(0) AS Credit, 'ثمن بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID) AS AccountCode, a.DisposalProceeds + a.DisposalVAT AS Debit, CCur(0) AS Credit, 'ثمن بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID" & vbCrLf
     s = s & "WHERE a.Status = 'DISPOSED' AND a.DisposalProceeds <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, a.Cost AS Credit, a.AssetName AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, (a.Cost + CCur(Nz(rv.SumReval, 0))) AS Credit, a.AssetName AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID" & vbCrLf
     s = s & "WHERE a.Status = 'DISPOSED'" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 4500 AS AccountCode, CCur(0) AS Debit, (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Credit, 'ربح بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
-    s = s & "WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) > 0" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 4500 AS AccountCode, CCur(0) AS Debit, (a.DisposalProceeds + a.DisposalAccumDep - (a.Cost + CCur(Nz(rv.SumReval, 0)))) AS Credit, 'ربح بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - (a.Cost + CCur(Nz(rv.SumReval, 0)))) > 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
-    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 5 AS LineOrder, 5650 AS AccountCode, -(a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Debit, CCur(0) AS Credit, 'خسارة بيع / استبعاد الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
-    s = s & "FROM FixedAssets AS a" & vbCrLf
-    s = s & "WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) < 0" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 5 AS LineOrder, 5650 AS AccountCode, -(a.DisposalProceeds + a.DisposalAccumDep - (a.Cost + CCur(Nz(rv.SumReval, 0)))) AS Debit, CCur(0) AS Credit, 'خسارة بيع / استبعاد الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - (a.Cost + CCur(Nz(rv.SumReval, 0)))) < 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 6 AS LineOrder, 2200 AS AccountCode, CCur(0) AS Debit, a.DisposalVAT AS Credit, 'ضريبة المخرجات على بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND a.DisposalVAT <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 7 AS LineOrder, 3500 AS AccountCode, CCur(Nz(rv.SumSurplus, 0)) AS Debit, CCur(0) AS Credit, 'فائض إعادة تقييم الأصل المستبعد' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND CCur(Nz(rv.SumSurplus, 0)) > 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 8 AS LineOrder, 3300 AS AccountCode, CCur(0) AS Debit, CCur(Nz(rv.SumSurplus, 0)) AS Credit, 'فائض إعادة تقييم الأصل المستبعد' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID" & vbCrLf
+    s = s & "WHERE a.Status = 'DISPOSED' AND CCur(Nz(rv.SumSurplus, 0)) > 0" & vbCrLf
     SaveQuery "qryJournalAsset", "أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها", s
+End Sub
+
+Private Sub Q_qryJournalAssetReval()
+    Dim s As String
+    s = "SELECT 'ASSET_REVAL' AS SourceType, r.RevaluationID AS SourceID, r.RevalNumber AS SourceNumber, r.RevalDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, IIf(r.ValueChange > 0, r.ValueChange, 0) AS Debit, IIf(r.ValueChange < 0, -r.ValueChange, 0) AS Credit, a.AssetName AS LineText, IIf(r.RevalCenter Is Null, 0, r.RevalCenter) AS CostCenter" & vbCrLf
+    s = s & "FROM AssetRevaluations AS r INNER JOIN FixedAssets AS a ON r.AssetID = a.AssetID" & vbCrLf
+    s = s & "WHERE r.ValueChange <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_REVAL' AS SourceType, r.RevaluationID AS SourceID, r.RevalNumber AS SourceNumber, r.RevalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 3500 AS AccountCode, IIf(r.SurplusPart < 0, -r.SurplusPart, 0) AS Debit, IIf(r.SurplusPart > 0, r.SurplusPart, 0) AS Credit, 'فائض إعادة تقييم الأصول' AS LineText, IIf(r.RevalCenter Is Null, 0, r.RevalCenter) AS CostCenter" & vbCrLf
+    s = s & "FROM AssetRevaluations AS r INNER JOIN FixedAssets AS a ON r.AssetID = a.AssetID" & vbCrLf
+    s = s & "WHERE r.SurplusPart <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_REVAL' AS SourceType, r.RevaluationID AS SourceID, r.RevalNumber AS SourceNumber, r.RevalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, 5660 AS AccountCode, IIf(r.LossPart > 0, r.LossPart, 0) AS Debit, IIf(r.LossPart < 0, -r.LossPart, 0) AS Credit, 'انخفاض قيمة أصل ثابت' AS LineText, IIf(r.RevalCenter Is Null, 0, r.RevalCenter) AS CostCenter" & vbCrLf
+    s = s & "FROM AssetRevaluations AS r INNER JOIN FixedAssets AS a ON r.AssetID = a.AssetID" & vbCrLf
+    s = s & "WHERE r.LossPart <> 0" & vbCrLf
+    SaveQuery "qryJournalAssetReval", "أسطر قيود إعادة تقييم الأصول الثابتة", s
+End Sub
+
+Private Sub Q_qryJournalAssetTransfer()
+    Dim s As String
+    s = "SELECT 'ASSET_TRANSFER' AS SourceType, t.TransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, t.AssetValue AS Debit, CCur(0) AS Credit, a.AssetName AS LineText, IIf(t.ToCenterID Is Null, 0, t.ToCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID" & vbCrLf
+    s = s & "WHERE t.AssetValue <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_TRANSFER' AS SourceType, t.TransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, t.AssetValue AS Credit, a.AssetName AS LineText, IIf(t.FromCenterID Is Null, 0, t.FromCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID" & vbCrLf
+    s = s & "WHERE t.AssetValue <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_TRANSFER' AS SourceType, t.TransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, 1790 AS AccountCode, t.AccumDep AS Debit, CCur(0) AS Credit, 'مجمع إهلاك الأصل' AS LineText, IIf(t.FromCenterID Is Null, 0, t.FromCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID" & vbCrLf
+    s = s & "WHERE t.AccumDep <> 0" & vbCrLf
+    s = s & "UNION ALL" & vbCrLf
+    s = s & "SELECT 'ASSET_TRANSFER' AS SourceType, t.TransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, t.AccumDep AS Credit, 'مجمع إهلاك الأصل' AS LineText, IIf(t.ToCenterID Is Null, 0, t.ToCenterID) AS CostCenter" & vbCrLf
+    s = s & "FROM AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID" & vbCrLf
+    s = s & "WHERE t.AccumDep <> 0" & vbCrLf
+    SaveQuery "qryJournalAssetTransfer", "أسطر قيود نقل الأصول الثابتة بين مراكز التكلفة", s
 End Sub
 
 Private Sub Q_qryDepreciationLines()
     Dim s As String
     s = "SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName," & vbCrLf
-    s = s & "       IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS LineCenter" & vbCrLf
+    s = s & "       IIf(d.DepCenter Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), d.DepCenter) AS LineCenter" & vbCrLf
     s = s & "FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.RunID)" & vbCrLf
     s = s & "     INNER JOIN FixedAssets AS a ON d.AssetID = a.AssetID" & vbCrLf
     SaveQuery "qryDepreciationLines", "أسطر قيود الإهلاك الشهرية مع اسم الأصل", s
@@ -3602,11 +3687,16 @@ Private Sub Q_FixedAssetsQuery()
     Dim s As String
     s = "SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS AssetGroup, a.PurchaseDate, a.Cost," & vbCrLf
     s = s & "       a.SalvageValue, a.UsefulLifeMonths, a.DepStartDate, a.Status, IIf(a.Status = 'ACTIVE', 'قائم', 'مستبعد') AS StatusName," & vbCrLf
-    s = s & "       a.OpeningAccumDep + CCur(Nz(t.SumDep, 0)) AS AccumDep, a.Cost - a.OpeningAccumDep - CCur(Nz(t.SumDep, 0)) AS BookValue," & vbCrLf
-    s = s & "       Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2) AS MonthlyDep, CCur(Nz(t.DepCount, 0)) AS DepMonths," & vbCrLf
-    s = s & "       a.DisposalDate, a.DisposalProceeds" & vbCrLf
-    s = s & "FROM (FixedAssets AS a INNER JOIN [@Accounts] AS c ON a.AssetAccount = c.AccountCode)" & vbCrLf
-    s = s & "     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID" & vbCrLf
+    s = s & "       a.DepMethod, IIf(a.DepMethod = 'DB', 'متناقص', 'ثابت') AS MethodName, CCur(Nz(rv.SumReval, 0)) AS RevalTotal," & vbCrLf
+    s = s & "       a.OpeningAccumDep + CCur(Nz(t.SumDep, 0)) AS AccumDep, a.Cost + CCur(Nz(rv.SumReval, 0)) - a.OpeningAccumDep - CCur(Nz(t.SumDep, 0)) AS BookValue," & vbCrLf
+    s = s & "       IIf(a.DepMethod = 'DB', Round((a.Cost + CCur(Nz(rv.SumReval, 0)) - a.OpeningAccumDep - CCur(Nz(t.SumDep, 0))) * IIf(a.DepRate > 0, a.DepRate, 24 / a.UsefulLifeMonths) / 12, 2)," & vbCrLf
+    s = s & "           IIf(lr.AssetID Is Null, Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2)," & vbCrLf
+    s = s & "               Round((lr.NewValue - a.SalvageValue) / lr.MonthsLeft, 2))) AS MonthlyDep," & vbCrLf
+    s = s & "       CCur(Nz(t.DepCount, 0)) AS DepMonths, a.DisposalDate, a.DisposalProceeds" & vbCrLf
+    s = s & "FROM (((FixedAssets AS a INNER JOIN [@Accounts] AS c ON a.AssetAccount = c.AccountCode)" & vbCrLf
+    s = s & "     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID)" & vbCrLf
+    s = s & "     LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID)" & vbCrLf
+    s = s & "     LEFT JOIN qryAssetLastReval AS lr ON a.AssetID = lr.AssetID" & vbCrLf
     SaveQuery "FixedAssetsQuery", "سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري", s
 End Sub
 

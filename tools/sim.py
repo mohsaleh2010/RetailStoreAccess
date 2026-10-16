@@ -282,31 +282,98 @@ class Store:
         return result, {p: v for p, v in pool.items() if v != 0}
 
     # ------------------------------------------------------------- depreciation (modAssets.RecordDepreciation)
+    def asset_value(self, aid):                                    # modAssets.AssetValue
+        return dec(self.one("SELECT Cost FROM FixedAssets WHERE AssetID = ?", aid)) + dec(
+            self.one("SELECT Coalesce(Sum(ValueChange), 0) FROM AssetRevaluations WHERE AssetID = ?", aid))
+
+    def asset_depreciated(self, aid):                              # modAssets.AssetDepreciated
+        return dec(self.one("SELECT OpeningAccumDep FROM FixedAssets WHERE AssetID = ?", aid)) + dec(
+            self.one("SELECT Coalesce(Sum(Amount), 0) FROM AssetDepreciations WHERE AssetID = ?", aid))
+
+    def depreciation_for(self, aid, month_end):
+        """modAssets.DepreciationFor: SL (cost - salvage) / months, DB book value x yearly rate / 12 (0 = 24 / life)
+        and all that is left in the last month of its life; after a revaluation from its new value over the
+        months left, starting in its month."""
+        end = month_end[:10]
+        (cost, salvage, months, start, bought, status, disposed, method, rate) = self.c.execute(
+            "SELECT Cost, SalvageValue, UsefulLifeMonths, DepStartDate, PurchaseDate, Status, DisposalDate, DepMethod, "
+            "DepRate FROM FixedAssets WHERE AssetID = ?", (aid,)).fetchone()
+        if start[:10] > end or bought[:10] > end or (status != "ACTIVE" and (disposed or "")[:10] <= end):
+            return D(0)
+        remaining = self.asset_value(aid) - dec(salvage) - self.asset_depreciated(aid)
+        last = self.c.execute("SELECT RevalDate, NewValue, MonthsLeft FROM AssetRevaluations WHERE AssetID = ? AND "
+                              "substr(RevalDate, 1, 10) <= ? ORDER BY RevalDate DESC, RevaluationID DESC LIMIT 1",
+                              (aid, end)).fetchone()
+        first, n, base = (start, months, dec(cost)) if last is None else (last[0], last[2], dec(last[1]))
+        if (method or "SL") == "DB":
+            year_rate = dec(rate or 0)
+            if year_rate <= 0:
+                year_rate = D(24) / months
+            monthly = ((remaining + dec(salvage)) * year_rate / 12).quantize(D("0.01"))
+            y, m = int(first[:4]), int(first[5:7]) + n - 1
+            y, m = y + (m - 1) // 12, (m - 1) % 12 + 1
+            if end[:7] >= f"{y:04d}-{m:02d}":                      # the last month of its life
+                monthly = remaining
+        else:
+            monthly = ((base - dec(salvage)) / n).quantize(D("0.01"))
+        if monthly > remaining:
+            monthly = remaining
+        if remaining - monthly < 1:                                # the rounding cents in the last month
+            monthly = remaining
+        return monthly if monthly > 0 else D(0)
+
     def depreciate(self, month_end):
-        """Same amounts as RecordDepreciation for the month ending on month_end ('yyyy-mm-dd'): straight line,
-        round((cost - salvage) / months, 2), never past the salvage value, from the month of DepStartDate,
-        not in the month of the disposal. Returns (run id, total)."""
+        """Same amounts as RecordDepreciation for the month ending on month_end ('yyyy-mm-dd'), a line per asset on
+        its cost centre that month. Returns (run id, total)."""
         end = month_end[:10]
         run = self.insert("DepreciationRuns", RunNumber=self.next_number("DEPRECIATION"), RunMonth=end + " 00:00:00",
                           TotalAmount=0, EmployeeID=self.user)
         total, n = D(0), 0
-        for aid, cost, salvage, months, start, bought, status, disposed, opening in self.c.execute(
-                "SELECT AssetID, Cost, SalvageValue, UsefulLifeMonths, DepStartDate, PurchaseDate, Status, "
-                "DisposalDate, OpeningAccumDep FROM FixedAssets ORDER BY AssetID").fetchall():
-            if start[:10] > end or bought[:10] > end or (status != "ACTIVE" and (disposed or "")[:10] <= end):
-                continue
-            monthly = ((dec(cost) - dec(salvage)) / months).quantize(D("0.01"))
-            done = dec(opening) + dec(self.one("SELECT Coalesce(Sum(Amount), 0) FROM AssetDepreciations "
-                                               "WHERE AssetID = ?", aid))
-            remaining = dec(cost) - dec(salvage) - done
-            amount = remaining if remaining - monthly < 1 else monthly      # the rounding cents in the last month
+        for aid, center in self.c.execute("SELECT AssetID, CostCenterID FROM FixedAssets ORDER BY AssetID").fetchall():
+            amount = self.depreciation_for(aid, end)
             if amount > 0:
                 n += 1
-                self.insert("AssetDepreciations", RunID=run, LineNo=n, AssetID=aid, Amount=float(amount))
+                self.insert("AssetDepreciations", RunID=run, LineNo=n, AssetID=aid, Amount=float(amount),
+                            DepCenter=center or 0)
                 total += amount
         self.c.execute("UPDATE DepreciationRuns SET TotalAmount = ? WHERE RunID = ?", (float(total), run))
         self.sync_journal()
         return run, total
+
+    def revalue(self, aid, when, new_value, months_left):
+        """modAssets.RevalueAsset: a rise first takes back the impairment losses of the asset, the rest is surplus;
+        a fall first uses the surplus of the asset, the rest is a loss. Returns the revaluation id."""
+        new_value = dec(new_value)
+        before = self.asset_value(aid) - self.asset_depreciated(aid)
+        amount = new_value - before
+        if amount > 0:
+            part = max(D(0), min(amount, dec(self.one(
+                "SELECT Coalesce(Sum(LossPart), 0) FROM AssetRevaluations WHERE AssetID = ?", aid))))
+            surplus, loss = amount - part, -part
+        else:
+            part = max(D(0), min(-amount, dec(self.one(
+                "SELECT Coalesce(Sum(SurplusPart), 0) FROM AssetRevaluations WHERE AssetID = ?", aid))))
+            surplus, loss = -part, -amount - part
+        rid = self.insert("AssetRevaluations", RevalNumber=self.next_number("ASSET_REVAL"), AssetID=aid,
+                          RevalDate=when[:10] + " 00:00:00", BookValueBefore=float(before), NewValue=float(new_value),
+                          ValueChange=float(amount), SurplusPart=float(surplus), LossPart=float(loss), MonthsLeft=months_left,
+                          RevalCenter=self.one("SELECT CostCenterID FROM FixedAssets WHERE AssetID = ?", aid) or 0,
+                          EmployeeID=self.user)
+        self.sync_journal()
+        return rid
+
+    def transfer_asset(self, aid, when, to_center):
+        """modAssets.TransferAsset: the value and the accumulated depreciation move to the new cost centre."""
+        from_center = self.one("SELECT CostCenterID FROM FixedAssets WHERE AssetID = ?", aid)
+        self.c.execute("UPDATE AssetDepreciations SET DepCenter = ? WHERE AssetID = ? AND DepCenter IS NULL",
+                       (from_center or 0, aid))
+        tid = self.insert("AssetTransfers", TransferNumber=self.next_number("ASSET_TRANSFER"), AssetID=aid,
+                          TransferDate=when[:10] + " 00:00:00", FromCenterID=from_center, ToCenterID=to_center,
+                          AssetValue=float(self.asset_value(aid)), AccumDep=float(self.asset_depreciated(aid)),
+                          EmployeeID=self.user)
+        self.c.execute("UPDATE FixedAssets SET CostCenterID = ? WHERE AssetID = ?", (to_center, aid))
+        self.sync_journal()
+        return tid
 
     # ------------------------------------------------------------- payroll (modPayroll)
     def payroll_line(self, basic, housing, other, overtime=0, additions=0, absence=0, advance=0, penalties=0,

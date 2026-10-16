@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **88** | عدد الحقول: **1127**
+عدد الجداول: **90** | عدد الحقول: **1156**
 
 ## الفهرس
 
@@ -42,58 +42,60 @@
 34. [`FixedAssets`](#fixedassets) – الأصول الثابتة
 35. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
 36. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
-37. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
-38. [`SalesReps`](#salesreps) – المندوبين
-39. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
-40. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
-41. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
-42. [`Budgets`](#budgets) – الموازنات التقديرية
-43. [`BudgetLines`](#budgetlines) – أسطر الموازنة
-44. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
-45. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
-46. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-47. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-48. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-49. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-50. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-51. [`Expenses`](#expenses) – المصروفات
-52. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
-53. [`CashVouchers`](#cashvouchers) – سندات النقدية
-54. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-55. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-56. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-57. [`JournalEntries`](#journalentries) – قيود اليومية
-58. [`JournalLines`](#journallines) – أسطر القيود
-59. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-60. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
-61. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-62. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-63. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-64. [`ManualEntries`](#manualentries) – القيود اليدوية
-65. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-66. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
-67. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
-68. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-69. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-70. [`StockTransfers`](#stocktransfers) – التحويل بين المخازن
-71. [`StockTransferLines`](#stocktransferlines) – أسطر التحويل بين المخازن
-72. [`StockParties`](#stockparties) – جهات الصرف والاستلام المخزني
-73. [`StockDocuments`](#stockdocuments) – سندات الصرف والاستلام المخزني
-74. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
-75. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
-76. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
-77. [`SalesOrders`](#salesorders) – طلبيات العملاء
-78. [`RepDays`](#repdays) – أيام المندوبين
-79. [`RouteStops`](#routestops) – خط سير المندوبين
-80. [`RepVisits`](#repvisits) – زيارات المندوبين
-81. [`RepPrices`](#repprices) – أسعار المندوبين
-82. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
-83. [`StockCounts`](#stockcounts) – جلسات الجرد
-84. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-85. [`AuditLog`](#auditlog) – سجل العمليات
-86. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-87. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-88. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+37. [`AssetRevaluations`](#assetrevaluations) – إعادة تقييم الأصول الثابتة
+38. [`AssetTransfers`](#assettransfers) – نقل الأصول الثابتة بين مراكز التكلفة
+39. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
+40. [`SalesReps`](#salesreps) – المندوبين
+41. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
+42. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
+43. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
+44. [`Budgets`](#budgets) – الموازنات التقديرية
+45. [`BudgetLines`](#budgetlines) – أسطر الموازنة
+46. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+47. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+48. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+49. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+50. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+51. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+52. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+53. [`Expenses`](#expenses) – المصروفات
+54. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
+55. [`CashVouchers`](#cashvouchers) – سندات النقدية
+56. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+57. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+58. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+59. [`JournalEntries`](#journalentries) – قيود اليومية
+60. [`JournalLines`](#journallines) – أسطر القيود
+61. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+62. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
+63. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+64. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+65. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+66. [`ManualEntries`](#manualentries) – القيود اليدوية
+67. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+68. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
+69. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
+70. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+71. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+72. [`StockTransfers`](#stocktransfers) – التحويل بين المخازن
+73. [`StockTransferLines`](#stocktransferlines) – أسطر التحويل بين المخازن
+74. [`StockParties`](#stockparties) – جهات الصرف والاستلام المخزني
+75. [`StockDocuments`](#stockdocuments) – سندات الصرف والاستلام المخزني
+76. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
+77. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
+78. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
+79. [`SalesOrders`](#salesorders) – طلبيات العملاء
+80. [`RepDays`](#repdays) – أيام المندوبين
+81. [`RouteStops`](#routestops) – خط سير المندوبين
+82. [`RepVisits`](#repvisits) – زيارات المندوبين
+83. [`RepPrices`](#repprices) – أسعار المندوبين
+84. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
+85. [`StockCounts`](#stockcounts) – جلسات الجرد
+86. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+87. [`AuditLog`](#auditlog) – سجل العمليات
+88. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+89. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+90. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -188,7 +190,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 32 سجل
+- بيانات أساسية: 34 سجل
 
 ## Roles
 
@@ -294,7 +296,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 76 سجل
+- بيانات أساسية: 77 سجل
 
 ## UserScreens
 
@@ -983,7 +985,7 @@
 
 ## FixedAssets
 
-**الأصول الثابتة** – سجل الأصول: التكلفة وحساب الأصل، والعمر الإنتاجي بالأشهر، والقيمة المتبقية، ومصدر الشراء. يُهلك بالقسط الثابت شهريًا، ويُستبعد عند بيعه أو تلفه.
+**الأصول الثابتة** – سجل الأصول: التكلفة وحساب الأصل، والعمر الإنتاجي بالأشهر، والقيمة المتبقية، ومصدر الشراء. يُهلك شهريًا بالقسط الثابت أو المتناقص، ويُعاد تقييمه، ويُنقل بين مراكز التكلفة، ويُستبعد عند بيعه أو تلفه.
 
 | # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
 |---|---|---|---|---|---|---|---|---|
@@ -998,21 +1000,24 @@
 | 9 | SalvageValue | Currency |  | ✔ | `0` | `>=0` |  | القيمة المتبقية في آخر العمر |
 | 10 | UsefulLifeMonths | Number (Integer) |  | ✔ |  | `>0` |  | العمر الإنتاجي (شهر) |
 | 11 | DepStartDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | بداية الإهلاك (يُهلك من شهر هذا التاريخ) |
-| 12 | SourceType | Short Text | 10 | ✔ | `"BANK"` | `In ("OPENING","BANK","CASHBOX","ACCOUNT")` |  | مصدر الشراء |
-| 13 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك |
-| 14 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | الصندوق |
-| 15 | CounterAccount | Number (Long) |  |  |  |  | `Accounts.AccountCode` | الحساب الدائن (حساب آخر) |
-| 16 | OpeningAccumDep | Currency |  | ✔ | `0` | `>=0` |  | إهلاك سابق (للأصول الموجودة قبل البرنامج) |
-| 17 | Status | Short Text | 10 | ✔ | `"ACTIVE"` | `In ("ACTIVE","DISPOSED")` |  | الحالة |
-| 18 | DisposalDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ البيع / الاستبعاد |
-| 19 | DisposalProceeds | Currency |  | ✔ | `0` | `>=0` |  | ثمن البيع |
-| 20 | DisposalTo | Short Text | 10 |  |  | `Is Null Or In ("NONE","BANK","CASHBOX")` |  | استلام الثمن |
-| 21 | DisposalBankID | Number (Long) |  |  |  |  | `Banks.BankID` | بنك استلام الثمن |
-| 22 | DisposalCashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق استلام الثمن |
-| 23 | DisposalAccumDep | Currency |  | ✔ | `0` | `>=0` |  | مجمع الإهلاك يوم الاستبعاد |
-| 24 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 25 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
-| 26 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 12 | DepMethod | Short Text | 2 | ✔ | `"SL"` | `In ("SL","DB")` |  | طريقة الإهلاك |
+| 13 | DepRate | Currency (نسبة) |  | ✔ | `0` | `>=0 And <=1` |  | نسبة القسط المتناقص السنوية (0 = ضعف نسبة القسط الثابت) |
+| 14 | SourceType | Short Text | 10 | ✔ | `"BANK"` | `In ("OPENING","BANK","CASHBOX","ACCOUNT")` |  | مصدر الشراء |
+| 15 | BankID | Number (Long) |  |  |  |  | `Banks.BankID` | البنك |
+| 16 | CashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | الصندوق |
+| 17 | CounterAccount | Number (Long) |  |  |  |  | `Accounts.AccountCode` | الحساب الدائن (حساب آخر) |
+| 18 | OpeningAccumDep | Currency |  | ✔ | `0` | `>=0` |  | إهلاك سابق (للأصول الموجودة قبل البرنامج) |
+| 19 | Status | Short Text | 10 | ✔ | `"ACTIVE"` | `In ("ACTIVE","DISPOSED")` |  | الحالة |
+| 20 | DisposalDate | Date/Time (تاريخ) |  |  |  |  |  | تاريخ البيع / الاستبعاد |
+| 21 | DisposalProceeds | Currency |  | ✔ | `0` | `>=0` |  | ثمن البيع |
+| 22 | DisposalTo | Short Text | 10 |  |  | `Is Null Or In ("NONE","BANK","CASHBOX")` |  | استلام الثمن |
+| 23 | DisposalBankID | Number (Long) |  |  |  |  | `Banks.BankID` | بنك استلام الثمن |
+| 24 | DisposalCashBoxID | Number (Long) |  |  |  |  | `CashBoxes.CashBoxID` | صندوق استلام الثمن |
+| 25 | DisposalAccumDep | Currency |  | ✔ | `0` | `>=0` |  | مجمع الإهلاك يوم الاستبعاد |
+| 26 | DisposalVAT | Currency |  | ✔ | `0` | `>=0` |  | ضريبة المخرجات على ثمن البيع |
+| 27 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 28 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 29 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `AssetID`
 - فهرس فريد: `AssetCode`
@@ -1047,9 +1052,57 @@
 | 3 | LineNo | Number (Integer) |  | ✔ |  |  |  | رقم السطر في القيد |
 | 4 | AssetID | Number (Long) |  | ✔ |  |  | `FixedAssets.AssetID` | الأصل |
 | 5 | Amount | Currency |  | ✔ | `0` | `>0` |  | الإهلاك |
+| 6 | DepCenter | Number (Long) |  |  |  |  |  | مركز التكلفة وقت الإهلاك – 0 = بلا مركز؛ فارغ (قيود قديمة) = مركز الأصل الحالي. يبقى الإهلاك على مركزه بعد نقل الأصل |
 
 - المفتاح الأساسي: `DepreciationID`
 - فهرس فريد: `RunID, AssetID`
+- فهرس عادي: `AssetID`
+
+## AssetRevaluations
+
+**إعادة تقييم الأصول الثابتة** – القيمة الجديدة للأصل في تاريخ، وعمره الباقي. الزيادة تلغي خسائر انخفاض سابقة للأصل (5660) ثم تذهب لفائض إعادة التقييم (3500)، والنقص يخصم من فائض الأصل ثم يكون خسارة (5660). الإهلاك بعدها من القيمة الجديدة.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **RevaluationID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | RevalNumber | Short Text | 20 | ✔ |  |  |  | رقم إعادة التقييم |
+| 3 | AssetID | Number (Long) |  | ✔ |  |  | `FixedAssets.AssetID` | الأصل |
+| 4 | RevalDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ إعادة التقييم |
+| 5 | BookValueBefore | Currency |  | ✔ | `0` | `>=0` |  | القيمة الدفترية قبلها |
+| 6 | NewValue | Currency |  | ✔ | `0` | `>=0` |  | القيمة الجديدة |
+| 7 | ValueChange | Currency |  | ✔ | `0` |  |  | الفرق (+ زيادة / - نقص) |
+| 8 | SurplusPart | Currency |  | ✔ | `0` |  |  | التغير في فائض إعادة التقييم 3500 |
+| 9 | LossPart | Currency |  | ✔ | `0` |  |  | خسارة الانخفاض 5660 (سالب = إلغاء خسارة سابقة) |
+| 10 | MonthsLeft | Number (Integer) |  | ✔ |  | `>0` |  | العمر الباقي (شهر، من شهر إعادة التقييم) |
+| 11 | RevalCenter | Number (Long) |  |  |  |  |  | مركز التكلفة وقتها – 0 = بلا مركز |
+| 12 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 13 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 14 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `RevaluationID`
+- فهرس فريد: `RevalNumber`
+- فهرس عادي: `AssetID`
+
+## AssetTransfers
+
+**نقل الأصول الثابتة بين مراكز التكلفة** – نقل الأصل من فرع أو مركز تكلفة إلى آخر: قيمته ومجمع إهلاكه ينتقلان بقيد، وإهلاكه بعد النقل على المركز الجديد.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **TransferID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | TransferNumber | Short Text | 20 | ✔ |  |  |  | رقم النقل |
+| 3 | AssetID | Number (Long) |  | ✔ |  |  | `FixedAssets.AssetID` | الأصل |
+| 4 | TransferDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ النقل |
+| 5 | FromCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | من مركز التكلفة |
+| 6 | ToCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | إلى مركز التكلفة |
+| 7 | AssetValue | Currency |  | ✔ | `0` | `>=0` |  | قيمة الأصل (التكلفة وإعادة التقييم) |
+| 8 | AccumDep | Currency |  | ✔ | `0` | `>=0` |  | مجمع الإهلاك يوم النقل |
+| 9 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 10 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | الموظف |
+| 11 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `TransferID`
+- فهرس فريد: `TransferNumber`
 - فهرس عادي: `AssetID`
 
 ## CostCenters
@@ -1489,7 +1542,7 @@
 - المفتاح الأساسي: `AccountCode`
 - فهرس عادي: `ParentCode`
 - فهرس عادي: `TreeKey`
-- بيانات أساسية: 87 سجل
+- بيانات أساسية: 89 سجل
 
 ## JournalSourceTypes
 
@@ -1503,7 +1556,7 @@
 | 4 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `SourceType`
-- بيانات أساسية: 35 سجل
+- بيانات أساسية: 37 سجل
 
 ## JournalEntries
 

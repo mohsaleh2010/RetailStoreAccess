@@ -56,6 +56,7 @@ Private Sub D1_1()
     LangAdd "ááÕäİ ÍÑßÇÊ İí åĞÇ ÇáãÎÒä: ÇáÑÕíÏ ÇáÇİÊÊÇÍí íßæä ŞÈá Ãí ÍÑßÉ. ÕÍøÍ ÇáßãíÉ ÈÇáÌÑÏ", "The product has moves in this warehouse: the opening balance comes before any move. Correct the quantity with a stock count"
     LangAdd "åĞÇ ÇáÑÕíÏ ãÑÍøá. áÊÚÏíáå ÃáÛö ÊÑÍíáå ÈÒÑ ÇáÍĞİ İí ÓØÑå¡ Ëã ÚÏøáå æÑÍøáå ãä ÌÏíÏ", "This balance is posted. To change it, unpost it with the delete button of its line, then edit and post it again"
     LangAdd "ÇáÊÍæíá íÏÎá ÇáÕäÏæŞ ÇáãÓÊáã ÚäÏ ÊÃßíÏ ÇÓÊáÇãå¡ æÍÊì Ğáß İí ÍÓÇÈ «äŞÏíÉ ÈÇáØÑíŞ", "A transfer enters the receiving box when its receipt is confirmed, until then it is in the account: Cash in transit"
+    LangAdd "ÓÌá ÇáÃÕæá æŞíÏ ÔÑÇÆåÇ¡ æÇáÅåáÇß ÈÇáŞÓØ ÇáËÇÈÊ Ãæ ÇáãÊäÇŞÕ¡ æÇáÈíÚ Ãæ ÇáÇÓÊÈÚÇÏ", "The asset register and purchase entries, straight line or declining balance depreciation, sale or disposal"
     LangAdd "áÇ íãßä ÇáÍİÙ: ÊæÌÏ ŞíãÉ ãßÑÑÉ İí ÍŞá íÌÈ Ãä íßæä İÑíÏğÇ (ãËá ÇáßæÏ Ãæ ÇáÈÇÑßæÏ", "Cannot save: a value is repeated in a field that must be unique (such as the code or the barcode"
     LangAdd "áíÓ ááãäÏæÈ ÕäÏæŞ ÚåÏÉ äÔØ. ÃäÔÆå İí «ÇáÕäÇÏíŞ» ÈäæÚ «ÚåÏÉ ãäÏæÈ» æÇÎÊÑ ÇáãäÏæÈ", "The rep has no active custody box. Create it in Cash boxes with the type Rep custody and choose the rep"
     LangAdd "áíÓ ááãäÏæÈ ãÎÒä ÓíÇÑÉ äÔØ. ÃäÔÆå İí «ÇáãÎÇÒä» ÈäæÚ «ÓíÇÑÉ ãäÏæÈ» æÇÎÊÑ ÇáãäÏæÈ", "The rep has no active van warehouse. Create it in Warehouses with the type Rep van and choose the rep"
@@ -108,7 +109,6 @@ Private Sub D1_1()
     LangAdd "ÇáÑÕíÏ ÇáÇİÊÊÇÍí íõÓÌóøá ãÑÉ æÇÍÏÉ ŞÈá Ãí ÍÑßÉ Úáì ÇáãäÊÌ İí ÇáãÎÒä", "The opening balance is recorded once, before any move of the product in the warehouse"
     LangAdd "ÊÓÌíá ÇáÔíß íÓÏÏ ÑÕíÏ ÇáÚãíá Ãæ ÇáãæÑÏ¡ Ëã íõÍÕóøá İí ÇáÈäß Ãæ íÑÊÏ", "Recording the cheque pays the balance of the customer or supplier, then it is collected in the bank or bounces"
     LangAdd "ÍÓÇÈ ÇáÃÕá ÍÓÇÈ İÑÚí ãä ÇáÃÕæá ÛíÑ ÇáãÊÏÇæáÉ (12)¡ ÛíÑ ãÌãÚ ÇáÅåáÇß", "The asset account is a sub-account of the non-current assets (12), not the accumulated depreciation"
-    LangAdd "ÓÌá ÇáÃÕæá æŞíÏ ÔÑÇÆåÇ¡ æÇáÅåáÇß ÈÇáŞÓØ ÇáËÇÈÊ¡ æÇáÈíÚ Ãæ ÇáÇÓÊÈÚÇÏ", "Asset register and purchase entry, straight-line depreciation, and sale or disposal"
     LangAdd "áã ÊõÚíóøä ßáãÉ ãÑæÑ áåĞÇ ÇáãÓÊÎÏã ÈÚÏ. ÇØáÈ ãä ãÏíÑ ÇáäÙÇã ÊÚííäåÇ", "No password is set for this user yet. Ask the system administrator to set one"
     LangAdd "íÌÈ Ãä íßæä ÇáÈÑäÇãÌ ãÛáŞğÇ Úáì ßá ÇáÃÌåÒÉ ÇáÃÎÑì. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "The program must be closed on all other computers. Do you want to continue"
     LangAdd "ÇÈÏÃ ÌÑÏğÇ¡ ÃÏÎá ÇáßãíÉ ÇáİÚáíÉ Ãæ ÇãÓÍ ÇáÈÇÑßæÏ¡ Ëã ÑÍøá ÇáİÑæŞÇÊ", "Start a count, enter the actual quantity or scan the barcode, then post the differences"
@@ -127,16 +127,18 @@ Private Sub D1_1()
     LangAdd "ÕÏÑÊ ãä ÇáØáÈíÉ ÃĞæäÇÊ ÊÓáíã. ÇÍĞİ ÇáãÓæÏÇÊ ãäåÇ¡ Ãæ ÃáÛö ÇáØáÈíÉ", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
     LangAdd "íõäÔÃ ÇáãÕÑæİ İí íæã ÇáÇÓÊÍŞÇŞ ãä ßá İÊÑÉ¡ ÈÏÁğÇ ãä ÊÇÑíÎ ÇáÈÏÇíÉ", "The expense is created on the due day of each period, starting from the start date"
     LangAdd "ÇáÇÓÊíÑÇÏÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÃÓÇÓíÉ æÇáãÏİæÚÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imports subject to the standard rate with VAT paid at customs"
+    LangAdd "Úáì ÇáÃÕá ÅÚÇÏÉ ÊŞííã Ãæ äŞá: áÇ ÊÊÛíÑ ÈíÇäÇÊå ÇáãÇáíÉ æáÇ íõÍĞİ", "The asset has a revaluation or a transfer: its financial data cannot change and it cannot be deleted"
+    LangAdd "ŞíãÉ ÌÏíÏÉ ááÃÕá æÚãÑå ÇáÈÇŞí¡ Ãæ äŞáå Åáì İÑÚ Ãæ ãÑßÒ ÊßáİÉ ÂÎÑ", "A new value of the asset and its remaining life, or its transfer to another branch or cost centre"
     LangAdd "áÇ íæÌÏ ÍÓÇÈ ãÈÑãÌ ÈÚÏ. ÔÛøá BuildSchema: íØáÈ ßáãÉ ãÑæÑå æíäÔÆå", "There is no developer account yet. Run BuildSchema: it asks for its password and creates it"
     LangAdd "áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ İíåÇ ÔíÁ ÅáÇ ÈÚÏ ÅÚÇÏÉ İÊÍ ÇáİÊÑÉ", "Nothing is added, edited or deleted in it until the period is reopened"
     LangAdd "ááÚæÏÉ áæÖÚ ÇáÊØæíÑ: ÇİÊÍ Çáãáİ ãÚ ÇáÖÛØ Úáì ãİÊÇÍ SHIFT Ëã ÔÛøá", "To go back to developer mode: open the file while holding the SHIFT key, then run"
     LangAdd "ãÑßÒ ÇáãæÙİ ãä ÔÇÔÉ ÑæÇÊÈ ÇáãæÙİíäº ÇáãÓÊäÏÇÊ ÇáŞÏíãÉ «ÛíÑ ãæÒÚÉ", "The center of the employee from the Employee salaries screen, old documents are Not allocated"
     LangAdd "ãŞÇÓ ÇáãáÕŞ æÇáæÑŞ æÇáåæÇãÔ¡ æÍÌã ÇáÈÇÑßæÏ¡ æÇáäÕæÕ ÃÚáÇå æÃÓİáå", "Label and paper size, margins, barcode size, and the texts above and below it"
-    LangAdd "åá ÊÑíÏ ÊÚØíáå ÈÏáğÇ ãä Ğáß¿ (íÎÊİí ãä ÇáŞæÇÆã æíÈŞì İí ÇáÊŞÇÑíÑ", "Do you want to deactivate it instead? (It disappears from the lists and stays in the reports"
-    LangAdd "ÅäÔÇÁ ÇáİÇÊæÑÉ ãä åĞÇ ÇáÅĞä ÈÃÓÚÇÑå¿ áÇ íÊÍÑß ÇáãÎÒæä ãÑÉ ËÇäíÉ", "Make the invoice from this note at its prices? The stock does not move a second time"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "åá ÊÑíÏ ÊÚØíáå ÈÏáğÇ ãä Ğáß¿ (íÎÊİí ãä ÇáŞæÇÆã æíÈŞì İí ÇáÊŞÇÑíÑ", "Do you want to deactivate it instead? (It disappears from the lists and stays in the reports"
+    LangAdd "ÅäÔÇÁ ÇáİÇÊæÑÉ ãä åĞÇ ÇáÅĞä ÈÃÓÚÇÑå¿ áÇ íÊÍÑß ÇáãÎÒæä ãÑÉ ËÇäíÉ", "Make the invoice from this note at its prices? The stock does not move a second time"
     LangAdd "ÈÚÏ ÇáÅŞİÇá áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ãŞİá", "After closing, no document dated in a closed period is added, edited or deleted"
     LangAdd "ÊæÌÏ İÇÊæÑÉ ãÔÊÑíÇÊ ÛíÑ ãßÊãáÉ ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáåÇ", "There is an unfinished purchase invoice from a previous session. Do you want to continue it"
     LangAdd "åĞÇ ÇáãÕÑæİ ãÓÌá ãä ÓäÏ ÕÑİ äŞÏíÉ İí ÇáÎÒíäÉ æáÇ íõÚÏóøá ãä åäÇ", "This expense is recorded from a cash payment voucher in the treasury and is not edited from here"
@@ -164,6 +166,7 @@ Private Sub D1_2()
     LangAdd "ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÑÍóøáÉ ãä ÇáİÊÑÇÊ ÇáÓÇÈŞÉ (ÑÕíÏ ÏÇÆä", "VAT carried from previous periods (credit balance"
     LangAdd "ŞíÏ İí İÊÑÉ ãŞİáÉ: ááÚÑÖ İŞØ. íãßä Úãá ŞíÏ ÚßÓí ÈÊÇÑíÎ ãİÊæÍ", "An entry in a closed period: view only. A reversing entry can be made on an open date"
     LangAdd "ááÅíÏÇÚ æÇáÓÍÈ æÇáÊÍæíá æÊÓæíÉ ãÏì ÇÎÊÑ äæÚ ÇáÍÑßÉ ÇáÎÇÕ ÈåÇ", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
+    LangAdd "ááÊÕÍíÍ ÇÍĞİåÇ ãä ÔÇÔÉ ÅÚÇÏÉ ÇáÊŞííã æÇáäŞá ÈÏÁğÇ ãä ÇáÃÎíÑÉ", "To correct, delete them in the revaluation and transfer screen, the last one first"
     LangAdd "ãØÇÈŞÉ ßÔİ ÇáÈäß ãÚ ÇáÏİÇÊÑ: Úáöøã ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ÇáßÔİ", "Match the bank statement with the books: mark the transactions shown on the statement"
     LangAdd "íæÌÏ ãÓíÑ ãÑÍóøá ÈÚÏå: ÎÕæãÇÊ ÇáÓáİ İíå ÊÚÊãÏ Úáì åĞÇ ÇáãÓíÑ", "There is a posted run after it: its advance deductions depend on this run"
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáÃÎÑì Ëã ÇÍİÙ ÇáÅÚÏÇÏÇÊ ãÑÉ ÃÎÑì", "Close the program on the other computers, then save the settings again"
@@ -211,6 +214,7 @@ Private Sub D1_2()
     LangAdd "Úáì ÇáÃÕá ŞíæÏ ÅåáÇß: áÇ ÊÊÛíÑ ÈíÇäÇÊå ÇáãÇáíÉ æáÇ íõÍĞİ", "The asset has depreciation entries: its financial data do not change and it is not deleted"
     LangAdd "áÇ íÊÛíÑ ÑŞã ÍÓÇÈ ãÍİæÙ. ÃäÔÆ ÍÓÇÈğÇ ÌÏíÏğÇ æÚØøá ÇáŞÏíã", "A saved account number does not change. Create a new account and deactivate the old one"
     LangAdd "áßá ÚãáÉ ÓÚÑ æÇÍÏ İí Çáíæãº ÚãáÉ ÇáÈÑäÇãÌ áÇ ÊÍÊÇÌ ÓÚÑğÇ", "Each currency has one rate a day, the program currency needs no rate"
+    LangAdd "ááÃÕá äŞá İí íæã ÅÚÇÏÉ ÇáÊŞííã Ãæ ÈÚÏå: ÇÍĞİ ÇáäŞá ÃæáğÇ", "The asset has a transfer on or after the revaluation day: delete the transfer first"
     LangAdd "áã ÊõÚíóøä ßáãÉ ãÑæÑ ÈÚÏ¡ æáÇ íÓÊØíÚ åĞÇ ÇáãÓÊÎÏã ÇáÏÎæá", "No password is set yet, and this user cannot log in"
     LangAdd "ÇáÚãáÇÁ æÇáãæÑÏæä æÇáÕäÇÏíŞ æÇáÈäæß æÇáãÎÒæä İí ÃŞÓÇãåÇ", "Customers, suppliers, cash boxes, banks and stock have their own parts"
     LangAdd "Çáãáİ íÍÊÇÌ ÚãæÏíä Úáì ÇáÃŞá: ÇáßæÏ æÇáßãíÉ¡ Ëã ÇáÊßáİÉ", "The file needs at least two columns: the code and the quantity, then the cost"
@@ -253,13 +257,13 @@ Private Sub D1_2()
     LangAdd "Õİöø ÕäÏæŞ ÇáÚåÏÉ ŞÈá ÅÛáÇŞ Çáíæã (ÒÑ «ÊÕİíÉ ÇáÕäÏæŞ", "Close the custody box before closing the day (button Close the box"
     LangAdd "ŞÈÖ äŞÏíÉ İí ÕäÏæŞ¡ Ãæ ÕÑİ ãäå¡ Ãæ ÊÍæíá Èíä ÕäÏæŞíä", "Cash received in a box, paid from it, or transferred between two boxes"
     LangAdd "ãäÇÓÈ áØÇÈÚÇÊ 203 äŞØÉ/ÈæÕÉ¡ æßÈøÑå ÅĞÇ ÕÚÈÊ ÇáŞÑÇÁÉ", "Suitable for 203 dpi printers, make it larger if it is hard to read"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ãäÏæÈæ ÇáãÈíÚÇÊ: ÚãáÇÄåã æäÓÈÉ ÚãæáÊåã æãÑßÒ ÊßáİÊåã", "Sales reps: their customers, commission rate and cost center"
     LangAdd "äŞÏíÉ ãÈíÚÇÊ ÇáãÓÊÎÏã æÓäÏÇÊå ÊÏÎá åĞÇ ÇáÕäÏæŞº İÇÑÛ", "The cash of the sales and vouchers of the user goes into this box, empty"
     LangAdd "ÃÑÕÏÉ ÇáÎÒíäÉ ÇáÑÆíÓíÉ æÕäÇÏíŞ ÇáßÇÔíÑ æÍÑßÉ ßá íæã", "Balances of the main treasury and cashier boxes and the moves of each day"
     LangAdd "ÇáÎØæÉ 1 ÊãÊ: ÔåÇÏÉ ÇáÇãÊËÇá. ÇáÊÇáí: İÍæÕ ÇáÇãÊËÇá", "Step 1 done: compliance certificate. Next: compliance checks"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÈÚÏ (ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "e-invoicing platform yet (see the e-invoicing screen"
     LangAdd "ÇáİÊÑÉ ãŞİáÉ. ÃÚÏ İÊÍåÇ ÃæáğÇ ãä ÔÇÔÉ ÅŞİÇá ÇáİÊÑÇÊ", "The period is closed. Reopen it first in the period closing screen"
     LangAdd "ÇáİÑæÚ æÇáÃŞÓÇã: ÊõæÒóøÚ ÚáíåÇ ÇáÅíÑÇÏÇÊ æÇáãÕÑæİÇÊ", "Branches and departments: revenue and expenses are allocated to them"
@@ -269,16 +273,11 @@ Private Sub D1_3()
     LangAdd "ÊæÌÏ ÔåÇÏÉ ãÍİæÙÉ. åá ÊÑíÏ ÇÓÊÈÏÇáåÇ ÈÔåÇÏÉ ÊÌÑíÈíÉ", "A certificate is saved. Replace it with a test certificate"
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÃáÛö ÊÑÍíá ÇáÊÍæíá ÈÇáØÑíŞ ÃæáğÇ", "Only a draft is deleted. Unpost the transfer in transit first"
     LangAdd "ÌåÇÒ äŞØÉ ÇáÈíÚ ÇáãÓÌøá İí ÈæÇÈÉ ãÕáÍÉ ÇáÖÑÇÆÈ (ãÕÑ", "The POS device registered on the Egyptian Tax Authority portal (Egypt"
+    LangAdd "áÃÕá İí ÇáŞíÏ ÅÚÇÏÉ ÊŞííã Ãæ äŞá ÈÚÏå: ÇÍĞİåÇ ÃæáğÇ", "An asset of the entry has a later revaluation or transfer: delete it first"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to add in the payment matching screen"
     LangAdd "áÇ íæÌÏ ÓäÏ. ÇÎÊÑ ÇáäæÚ æÇáãÎÒä æÇáÌåÉ Ëã «ÓäÏ ÌÏíÏ", "No voucher. Choose the type, the warehouse and the party, then New voucher"
     LangAdd "ááÓíÇÑÉ ÊÍæíá ãÓæÏÉ áã íõÑÓóá. ÃÑÓáå Ãæ ÇÍĞİå ÃæáğÇ", "The van has a draft transfer not sent. Send it or delete it first"
     LangAdd "áã ÊõÚãá äÓÎÉ ÇÍÊíÇØíÉ Çáíæã. åá ÊÑíÏ Úãá äÓÎÉ ÇáÂä", "No backup was made today. Do you want to make a backup now"
     LangAdd "ãäÕÉ İÇÊæÑÉ ÊÑÏ ÚäÏ ÇáÅÑÓÇá¡ İáÇ ÍÇÌÉ áÊÍÏíË ÇáÍÇáÉ", "Fatoora answers when a document is sent, there is no status to refresh"
     LangAdd "åá ÊÑíÏ ÅáÛÇÁ ÇáİÇÊæÑÉ ÇáÍÇáíÉ æÇáÈÏÁ ÈİÇÊæÑÉ ÌÏíÏÉ", "Do you want to cancel the current invoice and start a new one"
-    LangAdd "ÇÎÊÑ İÇÊæÑÉ ÇáÔÑÇÁ Ëã ÍÏÏ ÇáßãíÇÊ ÇáÊí ÊÚæÏ ááãæÑÏ", "Choose the purchase invoice, then set the quantities going back to the supplier"
-    LangAdd "ÇáÈíÚ ÇáÂÌá íÍÊÇÌ ÚãíáğÇ ãÓÌáğÇ. ÇÎÊÑ ÇáÚãíá ÃæáğÇ", "A credit sale needs a registered customer. Choose the customer first"
-    LangAdd "ÇáÊÍæíáÇÊ ÇáÈäßíÉ İí ÇáİæÇÊíÑ æÇáÓäÏÇÊ ÊõŞíóøÏ İíå", "Bank transfers in invoices and vouchers are recorded in it"
-    LangAdd "ÇáãÈÇáÛ áÇ Êßæä ÓÇáÈÉ: ÇßÊÈ ÇáãÈáÛ İí ÇáÌÇäÈ ÇáÂÎÑ", "Amounts are never negative: type the amount on the other side"
-    LangAdd "ÊÃßÏ Ãä ÇáãÈÑãÌ ÃÕÏÑå áÑŞã ÇáÌåÇÒ ÇáÙÇåÑ İí ÇáÔÇÔÉ", "Make sure the developer issued it for the computer number shown on the screen"
-    LangAdd "ÊãÊ ÇáÇÓÊÚÇÏÉ. ÓíõÛáŞ ÇáÈÑäÇãÌ ÇáÂä¡ ÇİÊÍå ãä ÌÏíÏ", "Restored. The program will close now, open it again"
 End Sub

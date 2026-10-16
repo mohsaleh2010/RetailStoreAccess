@@ -28,7 +28,8 @@ Private Const EP As String = "[Event Procedure]"
 Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRouteStops,frmRepPrices,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmStockParties,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS," & _
     "frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword,frmRolePermLines,frmRoles," & _
     "frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques," & _
-    "frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder,frmRepDay,frmRepVisits"
+    "frmAssets,frmDepreciation,frmAssetChanges,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder,frmRepDay," & _
+    "frmRepVisits"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -659,6 +660,7 @@ Private Sub BuildAllForms()
     BuildForm_frmCheques
     BuildForm_frmAssets
     BuildForm_frmDepreciation
+    BuildForm_frmAssetChanges
     BuildForm_frmPayrollLines
     BuildForm_frmPayroll
     BuildForm_frmBudgetLines
@@ -9459,7 +9461,7 @@ Private Sub BuildForm_frmAssets()
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
     Set c = AddLabel("lblTitle", "الأصول الثابتة", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
-    Set c = AddLabel("lblSubtitle", "سجل الأصول وقيد شرائها، والإهلاك بالقسط الثابت، والبيع أو الاستبعاد", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblSubtitle", "سجل الأصول وقيد شرائها، والإهلاك بالقسط الثابت أو المتناقص، والبيع أو الاستبعاد", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
     Set c = AddText("txtAssetName", "", 227, 1304, 3629, 454)
     Set c = AddLabel("lblAssetName", "اسم الأصل", 227, 992, 3629, 284, 9, False, CLR_MUTED, "txtAssetName", 0)
     Set c = AddCombo("cboAssetAccount", "", 3969, 1304, 3062, 454, "SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND IsActive = True AND AccountType = 'ASSET' AND Level2Code = 12 AND AccountCode <> 1790 ORDER BY TreeKey", 2, "0;2948")
@@ -9504,8 +9506,16 @@ Private Sub BuildForm_frmAssets()
     Set c = AddText("txtOpeningAccum", "", 12701, 2126, 2381, 454)
     SetCtlProp c, "Format", "#,##0.00"
     Set c = AddLabel("lblOpeningAccum", "إهلاك سابق", 12701, 1814, 2381, 284, 9, False, CLR_MUTED, "txtOpeningAccum", 0)
-    Set c = AddText("txtNotes", "", 227, 2948, 4196, 454)
-    Set c = AddLabel("lblNotes", "ملاحظات", 227, 2636, 4196, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddText("txtNotes", "", 227, 2948, 1928, 454)
+    Set c = AddLabel("lblNotes", "ملاحظات", 227, 2636, 1928, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddCombo("cboDepMethod", "", 2268, 2948, 1474, 454, "SL;القسط الثابت;DB;القسط المتناقص", 2, "0;1361")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblDepMethod", "طريقة الإهلاك", 2268, 2636, 1474, 284, 9, False, CLR_MUTED, "cboDepMethod", 0)
+    Set c = AddText("txtDepRate", "", 3856, 2948, 567, 454)
+    SetCtlProp c, "Format", "0%"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblDepRate", "النسبة السنوية", 3856, 2636, 567, 284, 9, False, CLR_MUTED, "txtDepRate", 0)
     Set c = AddCombo("cboCenter", "", 4536, 2948, 1928, 454, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
     Set c = AddLabel("lblCenter", "مركز التكلفة", 4536, 2636, 1928, 284, 9, False, CLR_MUTED, "cboCenter", 0)
@@ -9527,21 +9537,26 @@ Private Sub BuildForm_frmAssets()
     Set c = AddText("txtDisposalDate", "", 227, 9497, 1588, 454)
     SetCtlProp c, "Format", "yyyy/mm/dd"
     Set c = AddLabel("lblDisposalDate", "التاريخ", 227, 9185, 1588, 284, 9, False, CLR_MUTED, "txtDisposalDate", 0)
-    Set c = AddCombo("cboDisposalTo", "", 1928, 9497, 3175, 454, "BANK;بيع - الثمن في البنك;CASHBOX;بيع - الثمن في صندوق;NONE;استبعاد بدون ثمن (تلف أو فقد)", 2, "0;3062")
+    Set c = AddCombo("cboDisposalTo", "", 1928, 9497, 2608, 454, "BANK;بيع - الثمن في البنك;CASHBOX;بيع - الثمن في صندوق;NONE;استبعاد بدون ثمن (تلف أو فقد)", 2, "0;3062")
     SetCtlProp c, "LimitToList", True
-    Set c = AddLabel("lblDisposalTo", "الطريقة", 1928, 9185, 3175, 284, 9, False, CLR_MUTED, "cboDisposalTo", 0)
-    Set c = AddText("txtProceeds", "", 5216, 9497, 1474, 454)
+    SetCtlProp c, "ListWidth", "5.6cm"
+    Set c = AddLabel("lblDisposalTo", "الطريقة", 1928, 9185, 2608, 284, 9, False, CLR_MUTED, "cboDisposalTo", 0)
+    Set c = AddText("txtProceeds", "", 4649, 9497, 1361, 454)
     SetCtlProp c, "Format", "#,##0.00"
-    Set c = AddLabel("lblProceeds", "ثمن البيع", 5216, 9185, 1474, 284, 9, False, CLR_MUTED, "txtProceeds", 0)
-    Set c = AddCombo("cboDisposalBank", "", 6804, 9497, 1928, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
+    Set c = AddLabel("lblProceeds", "الثمن قبل الضريبة", 4649, 9185, 1361, 284, 9, False, CLR_MUTED, "txtProceeds", 0)
+    Set c = AddCheck("chkDisposalVAT", "", 6124, 9582)
+    Set c = AddLabel("lblDisposalVAT", "خاضع للضريبة", 6493, 9497, 992, 454, 10, False, CLR_TEXT, "chkDisposalVAT", 0)
+    Set c = AddCombo("cboDisposalBank", "", 7598, 9497, 1588, 454, "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
-    Set c = AddLabel("lblDisposalBank", "البنك", 6804, 9185, 1928, 284, 9, False, CLR_MUTED, "cboDisposalBank", 0)
-    Set c = AddCombo("cboDisposalBox", "", 8845, 9497, 1814, 454, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3969")
+    Set c = AddLabel("lblDisposalBank", "البنك", 7598, 9185, 1588, 284, 9, False, CLR_MUTED, "cboDisposalBank", 0)
+    Set c = AddCombo("cboDisposalBox", "", 9299, 9497, 1474, 454, "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName", 2, "0;3969")
     SetCtlProp c, "LimitToList", True
-    Set c = AddLabel("lblDisposalBox", "الصندوق", 8845, 9185, 1814, 284, 9, False, CLR_MUTED, "cboDisposalBox", 0)
-    Set c = AddButton("btnDispose", "بيع / استبعاد", 10773, 9497, 1701, 454, "danger")
+    Set c = AddLabel("lblDisposalBox", "الصندوق", 9299, 9185, 1474, 284, 9, False, CLR_MUTED, "cboDisposalBox", 0)
+    Set c = AddButton("btnDispose", "بيع / استبعاد", 10886, 9497, 1588, 454, "danger")
     c.OnClick = EP
     Set c = AddButton("btnUndoDispose", "إلغاء الاستبعاد", 12587, 9497, 1814, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnChanges", "إعادة التقييم والنقل", 10887, 10206, 2608, 510, "secondary")
     c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13608, 10206, 1474, 510, "secondary")
     c.OnClick = EP
@@ -9553,6 +9568,9 @@ Private Sub BuildForm_frmAssets()
     s = s & "Private Sub cboSource_AfterUpdate()" & vbCrLf
     s = s & "    AssetSourceChanged Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboDepMethod_AfterUpdate()" & vbCrLf
+    s = s & "    AssetMethodChanged Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub lstAssets_AfterUpdate()" & vbCrLf
     s = s & "    AssetPick Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -9563,6 +9581,9 @@ Private Sub BuildForm_frmAssets()
     s = s & "    AssetRefresh Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub txtLife_AfterUpdate()" & vbCrLf
+    s = s & "    AssetRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtDepRate_AfterUpdate()" & vbCrLf
     s = s & "    AssetRefresh Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSave_Click()" & vbCrLf
@@ -9585,6 +9606,9 @@ Private Sub BuildForm_frmAssets()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnUndoDispose_Click()" & vbCrLf
     s = s & "    AssetUndoDisposal Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnChanges_Click()" & vbCrLf
+    s = s & "    AssetOpenChanges Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -9642,6 +9666,81 @@ Private Sub BuildForm_frmDepreciation()
     Exit Sub
 EH:
     AbortForm "frmDepreciation", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmAssetChanges()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmAssetChanges", "إعادة تقييم الأصول ونقلها", "", 12474, 9412, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12474, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8F1), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "إعادة التقييم والنقل", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "قيمة جديدة للأصل وعمره الباقي، أو نقله إلى فرع أو مركز تكلفة آخر", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddText("txtAssetID", "", 12304, 907, 113, 227)
+    SetCtlProp c, "Visible", False
+    Set c = AddLabel("lblAsset", " ", 227, 1247, 12020, 454, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblRevalCap", "إعادة التقييم", 227, 1814, 6804, 312, 10, True, CLR_TEXT, "", 0)
+    Set c = AddText("txtRevalDate", "", 227, 2495, 1588, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblRevalDate", "التاريخ", 227, 2183, 1588, 284, 9, False, CLR_MUTED, "txtRevalDate", 0)
+    Set c = AddText("txtNewValue", "", 1928, 2495, 1701, 454)
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddLabel("lblNewValue", "القيمة الجديدة", 1928, 2183, 1701, 284, 9, False, CLR_MUTED, "txtNewValue", 0)
+    Set c = AddText("txtMonthsLeft", "", 3742, 2495, 1361, 454)
+    SetCtlProp c, "Format", "0"
+    Set c = AddLabel("lblMonthsLeft", "العمر الباقي (شهر)", 3742, 2183, 1361, 284, 9, False, CLR_MUTED, "txtMonthsLeft", 0)
+    Set c = AddText("txtRevalNotes", "", 5216, 2495, 3175, 454)
+    Set c = AddLabel("lblRevalNotes", "ملاحظات", 5216, 2183, 3175, 284, 9, False, CLR_MUTED, "txtRevalNotes", 0)
+    Set c = AddButton("btnRevalue", "إعادة التقييم", 8505, 2495, 1701, 454, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndoReval", "حذف آخر تقييم", 10319, 2495, 1928, 454, "danger")
+    c.OnClick = EP
+    Set c = AddList("lstRevals", 227, 3062, 12020, 1928, 9, "0;1134;1247;1588;1588;1361;1361;1361;1134", True)
+    Set c = AddLabel("lblTransferCap", "النقل إلى فرع أو مركز تكلفة آخر", 227, 5160, 6804, 312, 10, True, CLR_TEXT, "", 0)
+    Set c = AddText("txtTransferDate", "", 227, 5840, 1588, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblTransferDate", "التاريخ", 227, 5528, 1588, 284, 9, False, CLR_MUTED, "txtTransferDate", 0)
+    Set c = AddCombo("cboToCenter", "", 1928, 5840, 2268, 454, "SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True ORDER BY c.CenterCode", 2, "0;3969")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblToCenter", "إلى مركز التكلفة", 1928, 5528, 2268, 284, 9, False, CLR_MUTED, "cboToCenter", 0)
+    Set c = AddText("txtTransferNotes", "", 4309, 5840, 4082, 454)
+    Set c = AddLabel("lblTransferNotes", "ملاحظات", 4309, 5528, 4082, 284, 9, False, CLR_MUTED, "txtTransferNotes", 0)
+    Set c = AddButton("btnTransfer", "نقل الأصل", 8505, 5840, 1701, 454, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndoTransfer", "حذف آخر نقل", 10319, 5840, 1928, 454, "danger")
+    c.OnClick = EP
+    Set c = AddList("lstTransfers", 227, 6407, 12020, 2041, 7, "0;1134;1247;2268;2268;1814;1814", True)
+    Set c = AddButton("btnClose", "إغلاق", 10773, 8675, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    AssetChangesLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtRevalDate_AfterUpdate()" & vbCrLf
+    s = s & "    AssetChangesRefresh Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRevalue_Click()" & vbCrLf
+    s = s & "    AssetChangesRevalue Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndoReval_Click()" & vbCrLf
+    s = s & "    AssetChangesUndoReval Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTransfer_Click()" & vbCrLf
+    s = s & "    AssetChangesTransfer Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndoTransfer_Click()" & vbCrLf
+    s = s & "    AssetChangesUndoTransfer Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmAssetChanges", s
+    Exit Sub
+EH:
+    AbortForm "frmAssetChanges", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmPayrollLines()

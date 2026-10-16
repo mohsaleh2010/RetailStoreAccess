@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 206
+Private Const EXPECTED_RELATION_COUNT As Long = 210
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -484,6 +484,10 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_FixedAssets_EmployeeID", "Employees", "EmployeeID", "FixedAssets", "EmployeeID", 0&)
     c.Add Array("FK_AssetDepreciations_RunID", "DepreciationRuns", "RunID", "AssetDepreciations", "RunID", 4096&)
     c.Add Array("FK_AssetDepreciations_AssetID", "FixedAssets", "AssetID", "AssetDepreciations", "AssetID", 0&)
+    c.Add Array("FK_AssetRevaluations_AssetID", "FixedAssets", "AssetID", "AssetRevaluations", "AssetID", 0&)
+    c.Add Array("FK_AssetTransfers_AssetID", "FixedAssets", "AssetID", "AssetTransfers", "AssetID", 0&)
+    c.Add Array("FK_AssetTransfers_FromCenterID", "CostCenters", "CostCenterID", "AssetTransfers", "FromCenterID", 0&)
+    c.Add Array("FK_AssetTransfers_ToCenterID", "CostCenters", "CostCenterID", "AssetTransfers", "ToCenterID", 0&)
     c.Add Array("FK_SalesReps_EmployeeID", "Employees", "EmployeeID", "SalesReps", "EmployeeID", 0&)
     c.Add Array("FK_SalesReps_CostCenterID", "CostCenters", "CostCenterID", "SalesReps", "CostCenterID", 0&)
     c.Add Array("FK_SalesRepTargets_SalesRepID", "SalesReps", "SalesRepID", "SalesRepTargets", "SalesRepID", 4096&)
@@ -596,7 +600,9 @@ Private Function RelationSpecs() As Collection
 End Function
 
 Private Function RetiredRelations() As Variant
-    RetiredRelations = Array("FK_AuditLog_EmployeeID", _
+    RetiredRelations = Array("FK_AssetRevaluations_EmployeeID", _
+                             "FK_AssetTransfers_EmployeeID", _
+                             "FK_AuditLog_EmployeeID", _
                              "FK_BankReconciliations_EmployeeID", _
                              "FK_Budgets_EmployeeID", _
                              "FK_CashVouchers_ReceivedByID", _

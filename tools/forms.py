@@ -688,7 +688,7 @@ SCREEN_PERMISSIONS = {
     "frmOpeningBoxes": "OPENING_BALANCES", "frmOpeningBanks": "OPENING_BALANCES", "frmOpeningStock": "OPENING_BALANCES",
     "frmAging": "REPORTS", "frmAllocation": "CUSTOMER_PAYMENTS",
     "frmBanks": "BANKS", "frmBankTx": "BANKS", "frmBankRecon": "BANKS", "frmCheques": "CHEQUES",
-    "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS",
+    "frmAssets": "FIXED_ASSETS", "frmDepreciation": "FIXED_ASSETS", "frmAssetChanges": "FIXED_ASSETS",
     "frmPayroll": "PAYROLL", "frmEmployeePay": "PAYROLL", "frmCostCenters": "JOURNAL", "frmBudget": "BUDGET",
     "frmRecurring": "EXPENSES", "frmAccounting": "", "frmAuditLog": "AUDIT_LOG",
     "frmCurrencies": "CURRENCIES", "frmCurrencyRates": "CURRENCIES",

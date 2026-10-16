@@ -1,4 +1,5 @@
-"""Fixed assets (frmAssets) and the monthly depreciation (frmDepreciation). The logic is in modAssets.
+"""Fixed assets (frmAssets), the monthly depreciation (frmDepreciation) and the revaluations and transfers of
+an asset (frmAssetChanges, docs/65). The logic is in modAssets.
 Layout conventions are the same as forms.py."""
 
 from typing import List
@@ -6,10 +7,12 @@ from typing import List
 from forms import BANK_ROWS, CASHBOX_ROWS, CENTER_ROWS, Control, FormModel, Sym, button, cm, labelled, title_band
 from forms_bank import COUNTER_ROWS
 from forms_cash import table_combo, value_list_combo
+from forms_purchases import check_with_label
 
 ASSET_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND "
                   "IsActive = True AND AccountType = 'ASSET' AND Level2Code = 12 AND AccountCode <> 1790 ORDER BY TreeKey")
 SOURCES = "BANK;من البنك;CASHBOX;من صندوق;ACCOUNT;على حساب آخر (مستحقات أو قرض...);OPENING;موجود قبل البرنامج (رصيد افتتاحي)"
+METHODS = "SL;القسط الثابت;DB;القسط المتناقص"
 DISPOSAL_TO = "BANK;بيع - الثمن في البنك;CASHBOX;بيع - الثمن في صندوق;NONE;استبعاد بدون ثمن (تلف أو فقد)"
 ASSET_LIST = ("SELECT AssetID, AssetCode AS [الرقم], AssetName AS [الأصل], AssetGroup AS [المجموعة], "
               "Format(PurchaseDate, 'yyyy/mm/dd') AS [الشراء], Format(q.Cost, '#,##0.00') AS [تكلفة الأصل], "
@@ -29,7 +32,8 @@ def _text(m, name, caption, x, y, w, fmt=None, events=()):
 def layout_assets() -> FormModel:
     width, height = cm(27.0), cm(19.4)
     m = FormModel("frmAssets", "الأصول الثابتة", width, height, popup=True, allow_add=False)
-    title_band(m, "الأصول الثابتة", "سجل الأصول وقيد شرائها، والإهلاك بالقسط الثابت، والبيع أو الاستبعاد", "journal")
+    title_band(m, "الأصول الثابتة", "سجل الأصول وقيد شرائها، والإهلاك بالقسط الثابت أو المتناقص، والبيع أو الاستبعاد",
+               "journal")
     y = cm(2.3)
     _text(m, "txtAssetName", "اسم الأصل", cm(0.4), y, cm(6.4))
     c = table_combo(m, "cboAssetAccount", cm(7.0), y, cm(5.4), rows=ASSET_ACCOUNTS, events=())
@@ -55,7 +59,11 @@ def layout_assets() -> FormModel:
     labelled(m, "cboCounter", "الحساب الدائن", c)
     _text(m, "txtOpeningAccum", "إهلاك سابق", cm(22.4), y, cm(4.2), "#,##0.00")
     y = cm(5.2)
-    _text(m, "txtNotes", "ملاحظات", cm(0.4), y, cm(7.4))
+    _text(m, "txtNotes", "ملاحظات", cm(0.4), y, cm(3.4))
+    c = value_list_combo(m, "cboDepMethod", cm(4.0), y, cm(2.6))
+    c.props.update({"RowSource": METHODS, "ColumnWidths": "0;2.4"})
+    labelled(m, "cboDepMethod", "طريقة الإهلاك", c)
+    _text(m, "txtDepRate", "النسبة السنوية", cm(6.8), y, cm(1.0), "0%", ["AfterUpdate"])
     c = table_combo(m, "cboCenter", cm(8.0), y, cm(3.4), rows=CENTER_ROWS, events=())
     labelled(m, "cboCenter", "مركز التكلفة", c)
     x = cm(11.6)
@@ -78,24 +86,28 @@ def layout_assets() -> FormModel:
                    "ForeColor": Sym("CLR_TEXT")}))
     y = cm(16.75)
     _text(m, "txtDisposalDate", "التاريخ", cm(0.4), y, cm(2.8), "yyyy/mm/dd")
-    c = value_list_combo(m, "cboDisposalTo", cm(3.4), y, cm(5.6), events=())
-    c.props.update({"RowSource": DISPOSAL_TO, "ColumnWidths": "0;5.4"})
+    c = value_list_combo(m, "cboDisposalTo", cm(3.4), y, cm(4.6), events=())
+    c.props.update({"RowSource": DISPOSAL_TO, "ColumnWidths": "0;5.4", "ListWidth": "5.6cm"})
     labelled(m, "cboDisposalTo", "الطريقة", c)
-    _text(m, "txtProceeds", "ثمن البيع", cm(9.2), y, cm(2.6), "#,##0.00")
-    c = table_combo(m, "cboDisposalBank", cm(12.0), y, cm(3.4), rows=BANK_ROWS, events=())
+    _text(m, "txtProceeds", "الثمن قبل الضريبة", cm(8.2), y, cm(2.4), "#,##0.00")
+    check_with_label(m, "chkDisposalVAT", "خاضع للضريبة", cm(10.8), y, cm(2.4), [])
+    c = table_combo(m, "cboDisposalBank", cm(13.4), y, cm(2.8), rows=BANK_ROWS, events=())
     labelled(m, "cboDisposalBank", "البنك", c)
-    c = table_combo(m, "cboDisposalBox", cm(15.6), y, cm(3.2), rows=CASHBOX_ROWS, events=())
+    c = table_combo(m, "cboDisposalBox", cm(16.4), y, cm(2.6), rows=CASHBOX_ROWS, events=())
     labelled(m, "cboDisposalBox", "الصندوق", c)
-    button(m, "btnDispose", "بيع / استبعاد", cm(19.0), y, "danger", w=cm(3.0), h=cm(0.8), call="AssetDispose Me")
+    button(m, "btnDispose", "بيع / استبعاد", cm(19.2), y, "danger", w=cm(2.8), h=cm(0.8), call="AssetDispose Me")
     button(m, "btnUndoDispose", "إلغاء الاستبعاد", cm(22.2), y, "secondary", w=cm(3.2), h=cm(0.8),
            call="AssetUndoDisposal Me")
+    button(m, "btnChanges", "إعادة التقييم والنقل", width - cm(0.4) - cm(2.6) - cm(0.2) - cm(4.6), cm(18.0), "secondary",
+           w=cm(4.6), h=cm(0.9), call="AssetOpenChanges Me")
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(18.0), "secondary", w=cm(2.6), h=cm(0.9),
            call="DoCmd.Close acForm, Me.Name")
     m.form_events = ["Load"]
     m.code = (["Private Sub Form_Load()", "    AssetsLoad Me", "End Sub",
                "Private Sub cboSource_AfterUpdate()", "    AssetSourceChanged Me", "End Sub",
+               "Private Sub cboDepMethod_AfterUpdate()", "    AssetMethodChanged Me", "End Sub",
                "Private Sub lstAssets_AfterUpdate()", "    AssetPick Me", "End Sub"]
-              + [line for ctl in ("txtCost", "txtSalvage", "txtLife")
+              + [line for ctl in ("txtCost", "txtSalvage", "txtLife", "txtDepRate")
                  for line in (f"Private Sub {ctl}_AfterUpdate()", "    AssetRefresh Me", "End Sub")]
               + m.code)
     return m
@@ -128,5 +140,47 @@ def layout_depreciation() -> FormModel:
     return m
 
 
+def layout_asset_changes() -> FormModel:
+    """The revaluations and the transfers between cost centres of one asset (OpenArgs = AssetID)."""
+    width, height = cm(22.0), cm(16.6)
+    m = FormModel("frmAssetChanges", "إعادة تقييم الأصول ونقلها", width, height, popup=True, allow_add=False)
+    title_band(m, "إعادة التقييم والنقل", "قيمة جديدة للأصل وعمره الباقي، أو نقله إلى فرع أو مركز تكلفة آخر", "journal")
+    m.add(Control("text", "txtAssetID", width - cm(0.3), cm(1.6), cm(0.2), cm(0.4), {"Visible": False}))
+    m.add(Control("label", "lblAsset", cm(0.4), cm(2.2), width - cm(0.8), cm(0.8),
+                  {"Caption": " ", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("label", "lblRevalCap", cm(0.4), cm(3.2), cm(12.0), cm(0.55),
+                  {"Caption": "إعادة التقييم", "FontSize": 10, "FontBold": True, "ForeColor": Sym("CLR_TEXT")}))
+    y = cm(4.4)
+    _text(m, "txtRevalDate", "التاريخ", cm(0.4), y, cm(2.8), "yyyy/mm/dd", ["AfterUpdate"])
+    _text(m, "txtNewValue", "القيمة الجديدة", cm(3.4), y, cm(3.0), "#,##0.00")
+    _text(m, "txtMonthsLeft", "العمر الباقي (شهر)", cm(6.6), y, cm(2.4), "0")
+    _text(m, "txtRevalNotes", "ملاحظات", cm(9.2), y, cm(5.6))
+    button(m, "btnRevalue", "إعادة التقييم", cm(15.0), y, "primary", w=cm(3.0), h=cm(0.8), call="AssetChangesRevalue Me")
+    button(m, "btnUndoReval", "حذف آخر تقييم", cm(18.2), y, "danger", w=cm(3.4), h=cm(0.8), call="AssetChangesUndoReval Me")
+    m.add(Control("list", "lstRevals", cm(0.4), cm(5.4), width - cm(0.8), cm(3.4),
+                  {"RowSourceType": "Table/Query", "RowSource": "", "ColumnCount": 9,
+                   "ColumnWidths": "0;2;2.2;2.8;2.8;2.4;2.4;2.4;2", "ColumnHeads": True}))
+    m.add(Control("label", "lblTransferCap", cm(0.4), cm(9.1), cm(12.0), cm(0.55),
+                  {"Caption": "النقل إلى فرع أو مركز تكلفة آخر", "FontSize": 10, "FontBold": True,
+                   "ForeColor": Sym("CLR_TEXT")}))
+    y = cm(10.3)
+    _text(m, "txtTransferDate", "التاريخ", cm(0.4), y, cm(2.8), "yyyy/mm/dd")
+    c = table_combo(m, "cboToCenter", cm(3.4), y, cm(4.0), rows=CENTER_ROWS, events=())
+    labelled(m, "cboToCenter", "إلى مركز التكلفة", c)
+    _text(m, "txtTransferNotes", "ملاحظات", cm(7.6), y, cm(7.2))
+    button(m, "btnTransfer", "نقل الأصل", cm(15.0), y, "primary", w=cm(3.0), h=cm(0.8), call="AssetChangesTransfer Me")
+    button(m, "btnUndoTransfer", "حذف آخر نقل", cm(18.2), y, "danger", w=cm(3.4), h=cm(0.8),
+           call="AssetChangesUndoTransfer Me")
+    m.add(Control("list", "lstTransfers", cm(0.4), cm(11.3), width - cm(0.8), cm(3.6),
+                  {"RowSourceType": "Table/Query", "RowSource": "", "ColumnCount": 7,
+                   "ColumnWidths": "0;2;2.2;4;4;3.2;3.2", "ColumnHeads": True}))
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(15.3), "secondary", w=cm(2.6), h=cm(0.9),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load"]
+    m.code = (["Private Sub Form_Load()", "    AssetChangesLoad Me", "End Sub",
+               "Private Sub txtRevalDate_AfterUpdate()", "    AssetChangesRefresh Me", "End Sub"] + m.code)
+    return m
+
+
 def asset_forms() -> List[FormModel]:
-    return [layout_assets(), layout_depreciation()]
+    return [layout_assets(), layout_depreciation(), layout_asset_changes()]

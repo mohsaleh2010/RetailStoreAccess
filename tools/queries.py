@@ -79,7 +79,8 @@ JOURNAL_SOURCE_QUERIES = ["qryJournalSale", "qryJournalSalesReturn", "qryJournal
                           "qryJournalOpening", "qryJournalManual", "qryJournalYearClose", "qryJournalVatReturn",
                           "qryJournalBankTx", "qryJournalCheque", "qryJournalAsset", "qryJournalDepreciation",
                           "qryJournalPayroll", "qryJournalCommission", "qryJournalStockTransfer",
-                          "qryJournalStockDocument", "qryJournalStockNote"]
+                          "qryJournalStockDocument", "qryJournalStockNote", "qryJournalAssetReval",
+                          "qryJournalAssetTransfer"]
 
 
 def _sale():
@@ -318,28 +319,64 @@ def _cheque():
 
 def _asset():
     # buying: the asset account (and the input VAT) against the bank, a cash box, another account, or for an
-    # asset owned before the program, the opening balances (3900) with its depreciation until then (1790).
-    # selling / scrapping: the accumulated depreciation and the price against the cost; gain 4500, loss 5650
-    src = "FixedAssets AS a"
+    # asset owned before the program, the opening balances (3900) with its depreciation until then (1790);
+    # on the cost centre the asset had when bought (the "from" of its first transfer, docs/65).
+    # selling / scrapping: the accumulated depreciation and the price (with its output VAT, 2200) against the
+    # value (cost + revaluations); gain 4500, loss 5650; the revaluation surplus left goes to retained earnings
+    src = "FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID"
+    dsrc = "FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID"
     k = ("'ASSET'", "a.AssetID", "a.AssetCode", "a.PurchaseDate", "a.AssetName")
     kd = ("'ASSET_DISPOSAL'", "a.AssetID", "a.AssetCode", "a.DisposalDate", "a.AssetName")
     credit = ("IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, "
               "IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900)))")
     paid = "IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT)"
-    gain = "(a.DisposalProceeds + a.DisposalAccumDep - a.Cost)"
+    value = f"(a.Cost + {nz('rv.SumReval')})"
+    surplus = nz("rv.SumSurplus")
+    gain = f"(a.DisposalProceeds + a.DisposalAccumDep - {value})"
     disposed = "a.Status = 'DISPOSED'"
-    return with_center(jquery([
+    bought = with_center(jquery([
         jline(*k, 1, "a.AssetAccount", "a.Cost", ZERO, "a.AssetName", src, "a.Cost <> 0"),
         jline(*k, 2, 1500, "a.InputVAT", ZERO, "'ضريبة المدخلات'", src, "a.InputVAT <> 0 AND a.SourceType <> 'OPENING'"),
         jline(*k, 3, credit, ZERO, paid, "a.Notes", src, f"{paid} <> 0"),
         jline(*k, 4, 1790, ZERO, "a.OpeningAccumDep", "'إهلاك سابق'", src,
-              "a.SourceType = 'OPENING' AND a.OpeningAccumDep <> 0"),
-        jline(*kd, 1, 1790, "a.DisposalAccumDep", ZERO, "'مجمع إهلاك الأصل'", src, f"{disposed} AND a.DisposalAccumDep <> 0"),
+              "a.SourceType = 'OPENING' AND a.OpeningAccumDep <> 0")]),
+        f"IIf(pc.AssetID Is Null, {cc('a')}, {cc('pc', 'FromCenterID')})")
+    sold = with_center(jquery([
+        jline(*kd, 1, 1790, "a.DisposalAccumDep", ZERO, "'مجمع إهلاك الأصل'", dsrc, f"{disposed} AND a.DisposalAccumDep <> 0"),
         jline(*kd, 2, "IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID)",
-              "a.DisposalProceeds", ZERO, "'ثمن بيع الأصل'", src, f"{disposed} AND a.DisposalProceeds <> 0"),
-        jline(*kd, 3, "a.AssetAccount", ZERO, "a.Cost", "a.AssetName", src, disposed),
-        jline(*kd, 4, 4500, ZERO, gain, "'ربح بيع الأصل'", src, f"{disposed} AND {gain} > 0"),
-        jline(*kd, 5, 5650, f"-{gain}", ZERO, "'خسارة بيع / استبعاد الأصل'", src, f"{disposed} AND {gain} < 0")]), cc("a"))
+              "a.DisposalProceeds + a.DisposalVAT", ZERO, "'ثمن بيع الأصل'", dsrc, f"{disposed} AND a.DisposalProceeds <> 0"),
+        jline(*kd, 3, "a.AssetAccount", ZERO, value, "a.AssetName", dsrc, disposed),
+        jline(*kd, 4, 4500, ZERO, gain, "'ربح بيع الأصل'", dsrc, f"{disposed} AND {gain} > 0"),
+        jline(*kd, 5, 5650, f"-{gain}", ZERO, "'خسارة بيع / استبعاد الأصل'", dsrc, f"{disposed} AND {gain} < 0"),
+        jline(*kd, 6, 2200, ZERO, "a.DisposalVAT", "'ضريبة المخرجات على بيع الأصل'", dsrc,
+              f"{disposed} AND a.DisposalVAT <> 0"),
+        jline(*kd, 7, 3500, surplus, ZERO, "'فائض إعادة تقييم الأصل المستبعد'", dsrc, f"{disposed} AND {surplus} > 0"),
+        jline(*kd, 8, 3300, ZERO, surplus, "'فائض إعادة تقييم الأصل المستبعد'", dsrc, f"{disposed} AND {surplus} > 0")]),
+        cc("a"))
+    return bought + "\nUNION ALL\n" + sold
+
+
+def _asset_reval():
+    # the difference to the asset account; the surplus part to 3500, the loss part to 5660 (docs/65)
+    src = "AssetRevaluations AS r INNER JOIN FixedAssets AS a ON r.AssetID = a.AssetID"
+    k = ("'ASSET_REVAL'", "r.RevaluationID", "r.RevalNumber", "r.RevalDate", "a.AssetName")
+    return with_center(jquery([
+        jline(*k, 1, "a.AssetAccount", *_signed("r.ValueChange"), "a.AssetName", src, "r.ValueChange <> 0"),
+        jline(*k, 2, 3500, *reversed(_signed("r.SurplusPart")), "'فائض إعادة تقييم الأصول'", src, "r.SurplusPart <> 0"),
+        jline(*k, 3, 5660, *_signed("r.LossPart"), "'انخفاض قيمة أصل ثابت'", src, "r.LossPart <> 0")]),
+        "IIf(r.RevalCenter Is Null, 0, r.RevalCenter)")
+
+
+def _asset_transfer():
+    # the value and the accumulated depreciation leave the old cost centre for the new one (docs/65)
+    src = "AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID"
+    k = ("'ASSET_TRANSFER'", "t.TransferID", "t.TransferNumber", "t.TransferDate", "a.AssetName")
+    to_, from_ = cc("t", "ToCenterID"), cc("t", "FromCenterID")
+    return jquery([
+        jline(*k, 1, "a.AssetAccount", "t.AssetValue", ZERO, "a.AssetName", src, "t.AssetValue <> 0", center=to_),
+        jline(*k, 2, "a.AssetAccount", ZERO, "t.AssetValue", "a.AssetName", src, "t.AssetValue <> 0", center=from_),
+        jline(*k, 3, 1790, "t.AccumDep", ZERO, "'مجمع إهلاك الأصل'", src, "t.AccumDep <> 0", center=from_),
+        jline(*k, 4, 1790, ZERO, "t.AccumDep", "'مجمع إهلاك الأصل'", src, "t.AccumDep <> 0", center=to_)])
 
 
 def _depreciation():
@@ -519,7 +556,15 @@ FROM {pret}
 UNION ALL
 SELECT 'P', 'S', e.ExpenseDate, e.Amount, {ZERO}, e.Tax
 FROM Expenses AS e
-WHERE e.Tax <> 0"""
+WHERE e.Tax <> 0
+UNION ALL
+SELECT 'P', 'S', a.PurchaseDate, a.Cost, {ZERO}, a.InputVAT
+FROM FixedAssets AS a
+WHERE a.InputVAT <> 0 AND a.SourceType <> 'OPENING'
+UNION ALL
+SELECT 'S', 'S', a.DisposalDate, a.DisposalProceeds, {ZERO}, a.DisposalVAT
+FROM FixedAssets AS a
+WHERE a.Status = 'DISPOSED' AND a.DisposalVAT <> 0"""
 
 
 def _vat_totals():
@@ -1668,7 +1713,7 @@ FROM FixedAssets AS a
 WHERE a.SourceType = 'CASHBOX'
 UNION ALL
 SELECT a.DisposalCashBoxID, a.DisposalDate, 'ASSET_SALE', 'بيع أصل ثابت', a.AssetCode, a.AssetName, a.Notes,
-       a.DisposalProceeds, CCur(0), a.EmployeeID
+       a.DisposalProceeds + a.DisposalVAT, CCur(0), a.EmployeeID
 FROM FixedAssets AS a
 WHERE a.Status = 'DISPOSED' AND a.DisposalTo = 'CASHBOX' AND a.DisposalProceeds <> 0
 UNION ALL
@@ -1997,10 +2042,24 @@ FROM FiscalYearClosings AS h INNER JOIN FiscalYearClosingLines AS l ON h.YearClo
     Query("qryJournalYearClose", "أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة", _year_close()),
     Query("qryJournalVatReturn", "أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده", _vat_return()),
     Query("qryJournalCheque", "أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد", _cheque()),
+    Query("qryAssetRevalTotals", "مجموع إعادة تقييم كل أصل: الفرق، والفائض، وخسائر الانخفاض", """
+SELECT AssetID, Sum(ValueChange) AS SumReval, Sum(SurplusPart) AS SumSurplus, Sum(LossPart) AS SumLoss, Count(*) AS RevalCount
+FROM AssetRevaluations
+GROUP BY AssetID"""),
+    Query("qryAssetLastReval", "آخر إعادة تقييم لكل أصل: القيمة الجديدة والعمر الباقي", """
+SELECT r.AssetID, r.RevalDate, r.NewValue, r.MonthsLeft
+FROM AssetRevaluations AS r
+WHERE r.RevaluationID IN (SELECT Max(x.RevaluationID) FROM AssetRevaluations AS x GROUP BY x.AssetID)"""),
+    Query("qryAssetFirstCenter", "مركز تكلفة الأصل وقت شرائه: مصدر أول نقل له", """
+SELECT t.AssetID, t.FromCenterID
+FROM AssetTransfers AS t
+WHERE t.TransferID IN (SELECT Min(x.TransferID) FROM AssetTransfers AS x GROUP BY x.AssetID)"""),
     Query("qryJournalAsset", "أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها", _asset()),
+    Query("qryJournalAssetReval", "أسطر قيود إعادة تقييم الأصول الثابتة", _asset_reval()),
+    Query("qryJournalAssetTransfer", "أسطر قيود نقل الأصول الثابتة بين مراكز التكلفة", _asset_transfer()),
     Query("qryDepreciationLines", "أسطر قيود الإهلاك الشهرية مع اسم الأصل", """
 SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName,
-       IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS LineCenter
+       IIf(d.DepCenter Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), d.DepCenter) AS LineCenter
 FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.RunID)
      INNER JOIN FixedAssets AS a ON d.AssetID = a.AssetID"""),
     Query("qryJournalDepreciation", "أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل", _depreciation()),
@@ -2061,11 +2120,16 @@ GROUP BY AssetID"""),
     Query("FixedAssetsQuery", "سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري", f"""
 SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS AssetGroup, a.PurchaseDate, a.Cost,
        a.SalvageValue, a.UsefulLifeMonths, a.DepStartDate, a.Status, IIf(a.Status = 'ACTIVE', 'قائم', 'مستبعد') AS StatusName,
-       a.OpeningAccumDep + {nz("t.SumDep")} AS AccumDep, a.Cost - a.OpeningAccumDep - {nz("t.SumDep")} AS BookValue,
-       Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2) AS MonthlyDep, {nz("t.DepCount")} AS DepMonths,
-       a.DisposalDate, a.DisposalProceeds
-FROM (FixedAssets AS a INNER JOIN [@Accounts] AS c ON a.AssetAccount = c.AccountCode)
-     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID"""),
+       a.DepMethod, IIf(a.DepMethod = 'DB', 'متناقص', 'ثابت') AS MethodName, {nz("rv.SumReval")} AS RevalTotal,
+       a.OpeningAccumDep + {nz("t.SumDep")} AS AccumDep, a.Cost + {nz("rv.SumReval")} - a.OpeningAccumDep - {nz("t.SumDep")} AS BookValue,
+       IIf(a.DepMethod = 'DB', Round((a.Cost + {nz("rv.SumReval")} - a.OpeningAccumDep - {nz("t.SumDep")}) * IIf(a.DepRate > 0, a.DepRate, 24 / a.UsefulLifeMonths) / 12, 2),
+           IIf(lr.AssetID Is Null, Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2),
+               Round((lr.NewValue - a.SalvageValue) / lr.MonthsLeft, 2))) AS MonthlyDep,
+       {nz("t.DepCount")} AS DepMonths, a.DisposalDate, a.DisposalProceeds
+FROM (((FixedAssets AS a INNER JOIN [@Accounts] AS c ON a.AssetAccount = c.AccountCode)
+     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID)
+     LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID)
+     LEFT JOIN qryAssetLastReval AS lr ON a.AssetID = lr.AssetID"""),
 
     Query("AuditTrailQuery", "سجل التدقيق: كل عملية بمن قام بها ووقتها، وحقولها بالقيمة قبل وبعد", """
 SELECT a.LogID, a.LogDate, a.EmployeeID, IIf(e.EmployeeName Is Null, '-', e.EmployeeName) AS UserName, a.ActionType,

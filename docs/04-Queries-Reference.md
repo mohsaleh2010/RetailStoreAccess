@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/queries.py` – لا تعدّله يدويًا.
 
-عدد الاستعلامات: **242**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
+عدد الاستعلامات: **247**. الاستعلامات التي تبدأ بـ `qry` مساعدة تستخدمها الاستعلامات الأخرى؛ البقية تُستخدم مباشرة في التقارير والنماذج. ⭐ = مطلوب بالاسم في البرومبت.
 
 | # | الاستعلام | الوصف | المعاملات |
 |---|---|---|---|
@@ -190,64 +190,69 @@
 | 182 | [`qryJournalYearClose`](#qryjournalyearclose) | أسطر قيود إقفال السنوات: الإيرادات والمصروفات إلى الأرباح المحتجزة |  |
 | 183 | [`qryJournalVatReturn`](#qryjournalvatreturn) | أسطر قيود الإقرار الضريبي المعتمد (التسوية) وسداده |  |
 | 184 | [`qryJournalCheque`](#qryjournalcheque) | أسطر قيود الشيكات: الاستلام أو الإصدار، ثم التحصيل أو الارتداد |  |
-| 185 | [`qryJournalAsset`](#qryjournalasset) | أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها |  |
-| 186 | [`qryDepreciationLines`](#qrydepreciationlines) | أسطر قيود الإهلاك الشهرية مع اسم الأصل |  |
-| 187 | [`qryJournalDepreciation`](#qryjournaldepreciation) | أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل |  |
-| 188 | [`qryPayrollTotals`](#qrypayrolltotals) | مجاميع كل مسير رواتب لقيده |  |
-| 189 | [`qryPayrollCenterTotals`](#qrypayrollcentertotals) | مجاميع كل مسير رواتب لكل مركز تكلفة لقيده |  |
-| 190 | [`qryJournalPayroll`](#qryjournalpayroll) | أسطر قيود مسيرات الرواتب المرحَّلة وصرفها |  |
-| 191 | [`qryCommissionCenterTotals`](#qrycommissioncentertotals) | عمولات كل مسير لكل مركز تكلفة لقيده |  |
-| 192 | [`qryJournalCommission`](#qryjournalcommission) | أسطر قيود مسيرات العمولات المرحَّلة |  |
-| 193 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
-| 194 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
-| 195 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
-| 196 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
-| 197 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
-| 198 | [`qryAssetDepTotals`](#qryassetdeptotals) | مجموع إهلاك كل أصل في القيود الشهرية |  |
-| 199 | [`FixedAssetsQuery`](#fixedassetsquery) | سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري |  |
-| 200 | [`AuditTrailQuery`](#audittrailquery) | سجل التدقيق: كل عملية بمن قام بها ووقتها، وحقولها بالقيمة قبل وبعد |  |
-| 201 | [`qryAdvanceMoves`](#qryadvancemoves) | حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب |  |
-| 202 | [`qryAdvanceTotals`](#qryadvancetotals) | رصيد سلف كل موظف |  |
-| 203 | [`AdvanceBalanceQuery`](#advancebalancequery) | أرصدة سلف الموظفين |  |
-| 204 | [`PayrollSheetQuery`](#payrollsheetquery) | مسير الرواتب المختار بأسطر الموظفين | `PayrollRunID` |
-| 205 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
-| 206 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
-| 207 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
-| 208 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
-| 209 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
-| 210 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
-| 211 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
-| 212 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 213 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
-| 214 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
-| 215 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
-| 216 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
-| 217 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
-| 218 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 219 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 220 | [`qryCenterMoves`](#qrycentermoves) | صافي حركة كل حساب إيرادات أو مصروفات لكل مركز تكلفة في الفترة | `PeriodStart`, `PeriodEnd` |
-| 221 | [`qryCenterNames`](#qrycenternames) | مراكز التكلفة ومعها «غير موزع» |  |
-| 222 | [`qryCenterSums`](#qrycentersums) | الإيرادات وتكلفة المبيعات والمصروفات لكل مركز تكلفة |  |
-| 223 | [`CostCenterProfitQuery`](#costcenterprofitquery) | قائمة الدخل لكل مركز تكلفة: الإيرادات، تكلفة المبيعات، مجمل الربح، المصروفات، صافي الربح | `PeriodStart`, `PeriodEnd` |
-| 224 | [`CostCenterAccountsQuery`](#costcenteraccountsquery) | إيرادات ومصروفات كل مركز تكلفة بالحسابات | `PeriodStart`, `PeriodEnd` |
-| 225 | [`qryBudgetMonths`](#qrybudgetmonths) | أشهر الموازنة: سطر لكل شهر من كل سطر موازنة |  |
-| 226 | [`qryBudgetPlanned`](#qrybudgetplanned) | مبلغ الموازنة لكل سطر في أشهر الفترة | `PeriodStart`, `PeriodEnd` |
-| 227 | [`qryBudgetActual`](#qrybudgetactual) | الفعلي لكل سطر موازنة في الفترة من القيود | `PeriodStart`, `PeriodEnd` |
-| 228 | [`BudgetVsActualQuery`](#budgetvsactualquery) | الموازنة مقابل الفعلي في الفترة: الانحراف ونسبته، وهل هو ملائم | `PeriodStart`, `PeriodEnd` |
-| 229 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 230 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 231 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
-| 232 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
-| 233 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
-| 234 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
-| 235 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
-| 236 | [`OpeningBalancesReportQuery`](#openingbalancesreportquery) | أرصدة أول المدة في بداية يوم PeriodStart: الحسابات، والعملاء، والموردون، والمخزون بالكمية والقيمة (docs/54) | `PeriodStart` |
-| 237 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
-| 238 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
-| 239 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
-| 240 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
-| 241 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
-| 242 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
+| 185 | [`qryAssetRevalTotals`](#qryassetrevaltotals) | مجموع إعادة تقييم كل أصل: الفرق، والفائض، وخسائر الانخفاض |  |
+| 186 | [`qryAssetLastReval`](#qryassetlastreval) | آخر إعادة تقييم لكل أصل: القيمة الجديدة والعمر الباقي |  |
+| 187 | [`qryAssetFirstCenter`](#qryassetfirstcenter) | مركز تكلفة الأصل وقت شرائه: مصدر أول نقل له |  |
+| 188 | [`qryJournalAsset`](#qryjournalasset) | أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها |  |
+| 189 | [`qryJournalAssetReval`](#qryjournalassetreval) | أسطر قيود إعادة تقييم الأصول الثابتة |  |
+| 190 | [`qryJournalAssetTransfer`](#qryjournalassettransfer) | أسطر قيود نقل الأصول الثابتة بين مراكز التكلفة |  |
+| 191 | [`qryDepreciationLines`](#qrydepreciationlines) | أسطر قيود الإهلاك الشهرية مع اسم الأصل |  |
+| 192 | [`qryJournalDepreciation`](#qryjournaldepreciation) | أسطر قيود الإهلاك الشهرية: مصروف الإهلاك ومجمع الإهلاك لكل أصل |  |
+| 193 | [`qryPayrollTotals`](#qrypayrolltotals) | مجاميع كل مسير رواتب لقيده |  |
+| 194 | [`qryPayrollCenterTotals`](#qrypayrollcentertotals) | مجاميع كل مسير رواتب لكل مركز تكلفة لقيده |  |
+| 195 | [`qryJournalPayroll`](#qryjournalpayroll) | أسطر قيود مسيرات الرواتب المرحَّلة وصرفها |  |
+| 196 | [`qryCommissionCenterTotals`](#qrycommissioncentertotals) | عمولات كل مسير لكل مركز تكلفة لقيده |  |
+| 197 | [`qryJournalCommission`](#qryjournalcommission) | أسطر قيود مسيرات العمولات المرحَّلة |  |
+| 198 | [`qryJournalBankTx`](#qryjournalbanktx) | أسطر قيود الحركات البنكية: الإيداع والسحب وتسوية مدى والتحويل والحركات الأخرى |  |
+| 199 | [`qryBankItemSums`](#qrybankitemsums) | صافي كل عملية على حساب كل بنك في القيود |  |
+| 200 | [`qryBankItems`](#qrybankitems) | عمليات البنوك: المبلغ، وهل طابقت كشف البنك ومبلغها يوم المطابقة |  |
+| 201 | [`qryBankTotals`](#qrybanktotals) | رصيد كل بنك في الدفاتر |  |
+| 202 | [`BankBalanceQuery`](#bankbalancequery) | أرصدة البنوك في الدفاتر |  |
+| 203 | [`qryAssetDepTotals`](#qryassetdeptotals) | مجموع إهلاك كل أصل في القيود الشهرية |  |
+| 204 | [`FixedAssetsQuery`](#fixedassetsquery) | سجل الأصول الثابتة: التكلفة ومجمع الإهلاك والقيمة الدفترية والقسط الشهري |  |
+| 205 | [`AuditTrailQuery`](#audittrailquery) | سجل التدقيق: كل عملية بمن قام بها ووقتها، وحقولها بالقيمة قبل وبعد |  |
+| 206 | [`qryAdvanceMoves`](#qryadvancemoves) | حركات سلف الموظفين: الصرف والسداد النقدي والخصم من الرواتب |  |
+| 207 | [`qryAdvanceTotals`](#qryadvancetotals) | رصيد سلف كل موظف |  |
+| 208 | [`AdvanceBalanceQuery`](#advancebalancequery) | أرصدة سلف الموظفين |  |
+| 209 | [`PayrollSheetQuery`](#payrollsheetquery) | مسير الرواتب المختار بأسطر الموظفين | `PayrollRunID` |
+| 210 | [`ChequesQuery`](#chequesquery) | الشيكات الواردة والصادرة مع العميل أو المورد وحالتها |  |
+| 211 | [`JournalLinesQuery`](#journallinesquery) | قيود اليومية خلال فترة بأسطرها | `PeriodStart`, `PeriodEnd` |
+| 212 | [`qryJournalEntryPrint`](#qryjournalentryprint) | بيانات طباعة قيد |  |
+| 213 | [`qryTrialBefore`](#qrytrialbefore) | مجموع الحسابات قبل الفترة | `PeriodStart` |
+| 214 | [`qryTrialPeriod`](#qrytrialperiod) | حركة الحسابات خلال الفترة | `PeriodStart`, `PeriodEnd` |
+| 215 | [`TrialBalanceQuery`](#trialbalancequery) | ميزان المراجعة: رصيد أول المدة وحركة الفترة والرصيد الختامي (المدين موجب) | `PeriodStart`, `PeriodEnd` |
+| 216 | [`qryStatementBefore`](#qrystatementbefore) | رصيد الحساب المختار (مع حساباته التابعة) قبل بداية الفترة | `PeriodStart`, `AccountCode` |
+| 217 | [`AccountStatementQuery`](#accountstatementquery) | كشف حساب لفترة: رصيد أول المدة ثم كل سطر قيد (الحساب الرئيسي يشمل حساباته التابعة) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 218 | [`GeneralLedgerQuery`](#generalledgerquery) | دفتر الأستاذ لفترة: لكل حساب فرعي رصيد أول المدة ثم أسطر قيوده (0 = كل الحسابات) | `PeriodStart`, `PeriodEnd`, `AccountCode` |
+| 219 | [`qryTreeRollup`](#qrytreerollup) | أرصدة ميزان المراجعة مجمّعة على كل مستوى من شجرة الحسابات | `PeriodStart`, `PeriodEnd` |
+| 220 | [`TrialBalanceTreeQuery`](#trialbalancetreequery) | ميزان المراجعة بالمستويات: كل حساب رئيسي بمجموع حساباته التابعة | `PeriodStart`, `PeriodEnd` |
+| 221 | [`qryIncomeMoves`](#qryincomemoves) | حركة الحسابات في الفترة بدون قيود إقفال السنة | `PeriodStart`, `PeriodEnd` |
+| 222 | [`qryCompareMoves`](#qrycomparemoves) | حركة الحسابات في فترة المقارنة بدون قيود إقفال السنة | `CompareStart`, `CompareEnd` |
+| 223 | [`qryIncomeAccounts`](#qryincomeaccounts) | حسابات قائمة الدخل: صافي حركة كل حساب إيرادات أو مصروفات في الفترة وفترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 224 | [`IncomeStatementQuery`](#incomestatementquery) | قائمة الدخل: الإيرادات والتكاليف والمصروفات ومجمل وصافي الربح، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 225 | [`qryCenterMoves`](#qrycentermoves) | صافي حركة كل حساب إيرادات أو مصروفات لكل مركز تكلفة في الفترة | `PeriodStart`, `PeriodEnd` |
+| 226 | [`qryCenterNames`](#qrycenternames) | مراكز التكلفة ومعها «غير موزع» |  |
+| 227 | [`qryCenterSums`](#qrycentersums) | الإيرادات وتكلفة المبيعات والمصروفات لكل مركز تكلفة |  |
+| 228 | [`CostCenterProfitQuery`](#costcenterprofitquery) | قائمة الدخل لكل مركز تكلفة: الإيرادات، تكلفة المبيعات، مجمل الربح، المصروفات، صافي الربح | `PeriodStart`, `PeriodEnd` |
+| 229 | [`CostCenterAccountsQuery`](#costcenteraccountsquery) | إيرادات ومصروفات كل مركز تكلفة بالحسابات | `PeriodStart`, `PeriodEnd` |
+| 230 | [`qryBudgetMonths`](#qrybudgetmonths) | أشهر الموازنة: سطر لكل شهر من كل سطر موازنة |  |
+| 231 | [`qryBudgetPlanned`](#qrybudgetplanned) | مبلغ الموازنة لكل سطر في أشهر الفترة | `PeriodStart`, `PeriodEnd` |
+| 232 | [`qryBudgetActual`](#qrybudgetactual) | الفعلي لكل سطر موازنة في الفترة من القيود | `PeriodStart`, `PeriodEnd` |
+| 233 | [`BudgetVsActualQuery`](#budgetvsactualquery) | الموازنة مقابل الفعلي في الفترة: الانحراف ونسبته، وهل هو ملائم | `PeriodStart`, `PeriodEnd` |
+| 234 | [`qryBalanceAt`](#qrybalanceat) | رصيد كل حساب في نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 235 | [`qryBalanceCompare`](#qrybalancecompare) | رصيد كل حساب في نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 236 | [`qryBalanceAccounts`](#qrybalanceaccounts) | حسابات الميزانية: رصيد كل حساب أصول أو خصوم أو حقوق ملكية (بطبيعته موجب) | `PeriodEnd`, `CompareEnd` |
+| 237 | [`qryProfitAt`](#qryprofitat) | صافي ربح الفترات غير المقفلة حتى نهاية الفترة (مدين موجب) | `PeriodEnd` |
+| 238 | [`qryProfitCompare`](#qryprofitcompare) | صافي ربح الفترات غير المقفلة حتى نهاية فترة المقارنة (مدين موجب) | `CompareEnd` |
+| 239 | [`qryBalanceItems`](#qrybalanceitems) | بنود الميزانية بمجموعاتها، ومعها صافي الربح غير المقفل في الأرباح المحتجزة (32) | `PeriodEnd`, `CompareEnd` |
+| 240 | [`BalanceSheetQuery`](#balancesheetquery) | الميزانية العمومية في نهاية الفترة: الأصول = الخصوم + حقوق الملكية، مع فترة المقارنة | `PeriodStart`, `PeriodEnd`, `CompareStart`, `CompareEnd` |
+| 241 | [`OpeningBalancesReportQuery`](#openingbalancesreportquery) | أرصدة أول المدة في بداية يوم PeriodStart: الحسابات، والعملاء، والموردون، والمخزون بالكمية والقيمة (docs/54) | `PeriodStart` |
+| 242 | [`AccountTreeQuery`](#accounttreequery) | شجرة الحسابات: كل حساب بمستواه ونوعه وهل يقبل القيود |  |
+| 243 | [`qrySalesInvoiceLineTotals`](#qrysalesinvoicelinetotals) | مجموع أسطر كل فاتورة بيع |  |
+| 244 | [`qryPurchaseInvoiceLineTotals`](#qrypurchaseinvoicelinetotals) | مجموع أسطر كل فاتورة شراء |  |
+| 245 | [`qrySalesReturnedQty`](#qrysalesreturnedqty) | الكمية المرتجعة من كل سطر فاتورة بيع |  |
+| 246 | [`qryPurchaseReturnedQty`](#qrypurchasereturnedqty) | الكمية المرتجعة للمورد من كل سطر فاتورة شراء |  |
+| 247 | [`IntegrityCheckQuery`](#integritycheckquery) | فحص سلامة البيانات: أي سطر هنا مشكلة يجب مراجعتها (النتيجة الفارغة = سليم) |  |
 
 ## بيانات الاختبار والنتائج المتوقعة
 
@@ -1733,6 +1738,14 @@ UNION ALL
 SELECT 'P', 'S', e.ExpenseDate, e.Amount, CCur(0), e.Tax
 FROM Expenses AS e
 WHERE e.Tax <> 0
+UNION ALL
+SELECT 'P', 'S', a.PurchaseDate, a.Cost, CCur(0), a.InputVAT
+FROM FixedAssets AS a
+WHERE a.InputVAT <> 0 AND a.SourceType <> 'OPENING'
+UNION ALL
+SELECT 'S', 'S', a.DisposalDate, a.DisposalProceeds, CCur(0), a.DisposalVAT
+FROM FixedAssets AS a
+WHERE a.Status = 'DISPOSED' AND a.DisposalVAT <> 0
 ```
 
 ## qryVatReturnTotals
@@ -2281,7 +2294,7 @@ FROM FixedAssets AS a
 WHERE a.SourceType = 'CASHBOX'
 UNION ALL
 SELECT a.DisposalCashBoxID, a.DisposalDate, 'ASSET_SALE', 'بيع أصل ثابت', a.AssetCode, a.AssetName, a.Notes,
-       a.DisposalProceeds, CCur(0), a.EmployeeID
+       a.DisposalProceeds + a.DisposalVAT, CCur(0), a.EmployeeID
 FROM FixedAssets AS a
 WHERE a.Status = 'DISPOSED' AND a.DisposalTo = 'CASHBOX' AND a.DisposalProceeds <> 0
 UNION ALL
@@ -3249,46 +3262,128 @@ FROM Cheques AS q
 WHERE q.Direction = 'OUT' AND q.Status = 'BOUNCED'
 ```
 
+## qryAssetRevalTotals
+
+مجموع إعادة تقييم كل أصل: الفرق، والفائض، وخسائر الانخفاض
+
+```sql
+SELECT AssetID, Sum(ValueChange) AS SumReval, Sum(SurplusPart) AS SumSurplus, Sum(LossPart) AS SumLoss, Count(*) AS RevalCount
+FROM AssetRevaluations
+GROUP BY AssetID
+```
+
+## qryAssetLastReval
+
+آخر إعادة تقييم لكل أصل: القيمة الجديدة والعمر الباقي
+
+```sql
+SELECT r.AssetID, r.RevalDate, r.NewValue, r.MonthsLeft
+FROM AssetRevaluations AS r
+WHERE r.RevaluationID IN (SELECT Max(x.RevaluationID) FROM AssetRevaluations AS x GROUP BY x.AssetID)
+```
+
+## qryAssetFirstCenter
+
+مركز تكلفة الأصل وقت شرائه: مصدر أول نقل له
+
+```sql
+SELECT t.AssetID, t.FromCenterID
+FROM AssetTransfers AS t
+WHERE t.TransferID IN (SELECT Min(x.TransferID) FROM AssetTransfers AS x GROUP BY x.AssetID)
+```
+
 ## qryJournalAsset
 
 أسطر قيود اقتناء الأصول الثابتة وبيعها أو استبعادها
 
 ```sql
-SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, a.Cost AS Debit, CCur(0) AS Credit, a.AssetName AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
+SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, a.Cost AS Debit, CCur(0) AS Credit, a.AssetName AS LineText, IIf(pc.AssetID Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), IIf(pc.FromCenterID Is Null, 0, pc.FromCenterID)) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID
 WHERE a.Cost <> 0
 UNION ALL
-SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 1500 AS AccountCode, a.InputVAT AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
+SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 1500 AS AccountCode, a.InputVAT AS Debit, CCur(0) AS Credit, 'ضريبة المدخلات' AS LineText, IIf(pc.AssetID Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), IIf(pc.FromCenterID Is Null, 0, pc.FromCenterID)) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID
 WHERE a.InputVAT <> 0 AND a.SourceType <> 'OPENING'
 UNION ALL
-SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900))) AS AccountCode, CCur(0) AS Debit, IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) AS Credit, a.Notes AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
+SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, IIf(a.SourceType = 'BANK', 120000 + a.BankID, IIf(a.SourceType = 'CASHBOX', 110000 + a.CashBoxID, IIf(a.SourceType = 'ACCOUNT', a.CounterAccount, 3900))) AS AccountCode, CCur(0) AS Debit, IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) AS Credit, a.Notes AS LineText, IIf(pc.AssetID Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), IIf(pc.FromCenterID Is Null, 0, pc.FromCenterID)) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID
 WHERE IIf(a.SourceType = 'OPENING', a.Cost - a.OpeningAccumDep, a.Cost + a.InputVAT) <> 0
 UNION ALL
-SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, a.OpeningAccumDep AS Credit, 'إهلاك سابق' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
+SELECT 'ASSET' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.PurchaseDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, a.OpeningAccumDep AS Credit, 'إهلاك سابق' AS LineText, IIf(pc.AssetID Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), IIf(pc.FromCenterID Is Null, 0, pc.FromCenterID)) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetFirstCenter AS pc ON a.AssetID = pc.AssetID
 WHERE a.SourceType = 'OPENING' AND a.OpeningAccumDep <> 0
 UNION ALL
 SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, 1790 AS AccountCode, a.DisposalAccumDep AS Debit, CCur(0) AS Credit, 'مجمع إهلاك الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
+FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID
 WHERE a.Status = 'DISPOSED' AND a.DisposalAccumDep <> 0
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID) AS AccountCode, a.DisposalProceeds AS Debit, CCur(0) AS Credit, 'ثمن بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, IIf(a.DisposalTo = 'BANK', 120000 + a.DisposalBankID, 110000 + a.DisposalCashBoxID) AS AccountCode, a.DisposalProceeds + a.DisposalVAT AS Debit, CCur(0) AS Credit, 'ثمن بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID
 WHERE a.Status = 'DISPOSED' AND a.DisposalProceeds <> 0
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, a.Cost AS Credit, a.AssetName AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, (a.Cost + CCur(Nz(rv.SumReval, 0))) AS Credit, a.AssetName AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID
 WHERE a.Status = 'DISPOSED'
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 4500 AS AccountCode, CCur(0) AS Debit, (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Credit, 'ربح بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
-WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) > 0
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 4500 AS AccountCode, CCur(0) AS Debit, (a.DisposalProceeds + a.DisposalAccumDep - (a.Cost + CCur(Nz(rv.SumReval, 0)))) AS Credit, 'ربح بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID
+WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - (a.Cost + CCur(Nz(rv.SumReval, 0)))) > 0
 UNION ALL
-SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 5 AS LineOrder, 5650 AS AccountCode, -(a.DisposalProceeds + a.DisposalAccumDep - a.Cost) AS Debit, CCur(0) AS Credit, 'خسارة بيع / استبعاد الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
-FROM FixedAssets AS a
-WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cost) < 0
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 5 AS LineOrder, 5650 AS AccountCode, -(a.DisposalProceeds + a.DisposalAccumDep - (a.Cost + CCur(Nz(rv.SumReval, 0)))) AS Debit, CCur(0) AS Credit, 'خسارة بيع / استبعاد الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID
+WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - (a.Cost + CCur(Nz(rv.SumReval, 0)))) < 0
+UNION ALL
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 6 AS LineOrder, 2200 AS AccountCode, CCur(0) AS Debit, a.DisposalVAT AS Credit, 'ضريبة المخرجات على بيع الأصل' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID
+WHERE a.Status = 'DISPOSED' AND a.DisposalVAT <> 0
+UNION ALL
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 7 AS LineOrder, 3500 AS AccountCode, CCur(Nz(rv.SumSurplus, 0)) AS Debit, CCur(0) AS Credit, 'فائض إعادة تقييم الأصل المستبعد' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID
+WHERE a.Status = 'DISPOSED' AND CCur(Nz(rv.SumSurplus, 0)) > 0
+UNION ALL
+SELECT 'ASSET_DISPOSAL' AS SourceType, a.AssetID AS SourceID, a.AssetCode AS SourceNumber, a.DisposalDate AS SourceDate, a.AssetName AS Party, 8 AS LineOrder, 3300 AS AccountCode, CCur(0) AS Debit, CCur(Nz(rv.SumSurplus, 0)) AS Credit, 'فائض إعادة تقييم الأصل المستبعد' AS LineText, IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS CostCenter
+FROM FixedAssets AS a LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID
+WHERE a.Status = 'DISPOSED' AND CCur(Nz(rv.SumSurplus, 0)) > 0
+```
+
+## qryJournalAssetReval
+
+أسطر قيود إعادة تقييم الأصول الثابتة
+
+```sql
+SELECT 'ASSET_REVAL' AS SourceType, r.RevaluationID AS SourceID, r.RevalNumber AS SourceNumber, r.RevalDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, IIf(r.ValueChange > 0, r.ValueChange, 0) AS Debit, IIf(r.ValueChange < 0, -r.ValueChange, 0) AS Credit, a.AssetName AS LineText, IIf(r.RevalCenter Is Null, 0, r.RevalCenter) AS CostCenter
+FROM AssetRevaluations AS r INNER JOIN FixedAssets AS a ON r.AssetID = a.AssetID
+WHERE r.ValueChange <> 0
+UNION ALL
+SELECT 'ASSET_REVAL' AS SourceType, r.RevaluationID AS SourceID, r.RevalNumber AS SourceNumber, r.RevalDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, 3500 AS AccountCode, IIf(r.SurplusPart < 0, -r.SurplusPart, 0) AS Debit, IIf(r.SurplusPart > 0, r.SurplusPart, 0) AS Credit, 'فائض إعادة تقييم الأصول' AS LineText, IIf(r.RevalCenter Is Null, 0, r.RevalCenter) AS CostCenter
+FROM AssetRevaluations AS r INNER JOIN FixedAssets AS a ON r.AssetID = a.AssetID
+WHERE r.SurplusPart <> 0
+UNION ALL
+SELECT 'ASSET_REVAL' AS SourceType, r.RevaluationID AS SourceID, r.RevalNumber AS SourceNumber, r.RevalDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, 5660 AS AccountCode, IIf(r.LossPart > 0, r.LossPart, 0) AS Debit, IIf(r.LossPart < 0, -r.LossPart, 0) AS Credit, 'انخفاض قيمة أصل ثابت' AS LineText, IIf(r.RevalCenter Is Null, 0, r.RevalCenter) AS CostCenter
+FROM AssetRevaluations AS r INNER JOIN FixedAssets AS a ON r.AssetID = a.AssetID
+WHERE r.LossPart <> 0
+```
+
+## qryJournalAssetTransfer
+
+أسطر قيود نقل الأصول الثابتة بين مراكز التكلفة
+
+```sql
+SELECT 'ASSET_TRANSFER' AS SourceType, t.TransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, a.AssetName AS Party, 1 AS LineOrder, a.AssetAccount AS AccountCode, t.AssetValue AS Debit, CCur(0) AS Credit, a.AssetName AS LineText, IIf(t.ToCenterID Is Null, 0, t.ToCenterID) AS CostCenter
+FROM AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID
+WHERE t.AssetValue <> 0
+UNION ALL
+SELECT 'ASSET_TRANSFER' AS SourceType, t.TransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, a.AssetName AS Party, 2 AS LineOrder, a.AssetAccount AS AccountCode, CCur(0) AS Debit, t.AssetValue AS Credit, a.AssetName AS LineText, IIf(t.FromCenterID Is Null, 0, t.FromCenterID) AS CostCenter
+FROM AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID
+WHERE t.AssetValue <> 0
+UNION ALL
+SELECT 'ASSET_TRANSFER' AS SourceType, t.TransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, a.AssetName AS Party, 3 AS LineOrder, 1790 AS AccountCode, t.AccumDep AS Debit, CCur(0) AS Credit, 'مجمع إهلاك الأصل' AS LineText, IIf(t.FromCenterID Is Null, 0, t.FromCenterID) AS CostCenter
+FROM AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID
+WHERE t.AccumDep <> 0
+UNION ALL
+SELECT 'ASSET_TRANSFER' AS SourceType, t.TransferID AS SourceID, t.TransferNumber AS SourceNumber, t.TransferDate AS SourceDate, a.AssetName AS Party, 4 AS LineOrder, 1790 AS AccountCode, CCur(0) AS Debit, t.AccumDep AS Credit, 'مجمع إهلاك الأصل' AS LineText, IIf(t.ToCenterID Is Null, 0, t.ToCenterID) AS CostCenter
+FROM AssetTransfers AS t INNER JOIN FixedAssets AS a ON t.AssetID = a.AssetID
+WHERE t.AccumDep <> 0
 ```
 
 ## qryDepreciationLines
@@ -3297,7 +3392,7 @@ WHERE a.Status = 'DISPOSED' AND (a.DisposalProceeds + a.DisposalAccumDep - a.Cos
 
 ```sql
 SELECT r.RunID, r.RunNumber, r.RunMonth, d.LineNo, d.AssetID, d.Amount, a.AssetName,
-       IIf(a.CostCenterID Is Null, 0, a.CostCenterID) AS LineCenter
+       IIf(d.DepCenter Is Null, IIf(a.CostCenterID Is Null, 0, a.CostCenterID), d.DepCenter) AS LineCenter
 FROM (DepreciationRuns AS r INNER JOIN AssetDepreciations AS d ON r.RunID = d.RunID)
      INNER JOIN FixedAssets AS a ON d.AssetID = a.AssetID
 ```
@@ -3531,11 +3626,16 @@ GROUP BY AssetID
 ```sql
 SELECT a.AssetID, a.AssetCode, a.AssetName, a.AssetAccount, c.AccountName AS AssetGroup, a.PurchaseDate, a.Cost,
        a.SalvageValue, a.UsefulLifeMonths, a.DepStartDate, a.Status, IIf(a.Status = 'ACTIVE', 'قائم', 'مستبعد') AS StatusName,
-       a.OpeningAccumDep + CCur(Nz(t.SumDep, 0)) AS AccumDep, a.Cost - a.OpeningAccumDep - CCur(Nz(t.SumDep, 0)) AS BookValue,
-       Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2) AS MonthlyDep, CCur(Nz(t.DepCount, 0)) AS DepMonths,
-       a.DisposalDate, a.DisposalProceeds
-FROM (FixedAssets AS a INNER JOIN [@Accounts] AS c ON a.AssetAccount = c.AccountCode)
-     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID
+       a.DepMethod, IIf(a.DepMethod = 'DB', 'متناقص', 'ثابت') AS MethodName, CCur(Nz(rv.SumReval, 0)) AS RevalTotal,
+       a.OpeningAccumDep + CCur(Nz(t.SumDep, 0)) AS AccumDep, a.Cost + CCur(Nz(rv.SumReval, 0)) - a.OpeningAccumDep - CCur(Nz(t.SumDep, 0)) AS BookValue,
+       IIf(a.DepMethod = 'DB', Round((a.Cost + CCur(Nz(rv.SumReval, 0)) - a.OpeningAccumDep - CCur(Nz(t.SumDep, 0))) * IIf(a.DepRate > 0, a.DepRate, 24 / a.UsefulLifeMonths) / 12, 2),
+           IIf(lr.AssetID Is Null, Round((a.Cost - a.SalvageValue) / a.UsefulLifeMonths, 2),
+               Round((lr.NewValue - a.SalvageValue) / lr.MonthsLeft, 2))) AS MonthlyDep,
+       CCur(Nz(t.DepCount, 0)) AS DepMonths, a.DisposalDate, a.DisposalProceeds
+FROM (((FixedAssets AS a INNER JOIN [@Accounts] AS c ON a.AssetAccount = c.AccountCode)
+     LEFT JOIN qryAssetDepTotals AS t ON a.AssetID = t.AssetID)
+     LEFT JOIN qryAssetRevalTotals AS rv ON a.AssetID = rv.AssetID)
+     LEFT JOIN qryAssetLastReval AS lr ON a.AssetID = lr.AssetID
 ```
 
 ## AuditTrailQuery

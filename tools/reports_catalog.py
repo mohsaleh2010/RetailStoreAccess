@@ -289,7 +289,8 @@ LIST_SPECS: List[ListSpec] = [
         Col("الحقل", "FieldCaption", 3.0), Col("قبل", "OldValue", 3.6, grow=True), Col("بعد", "NewValue", 3.6, grow=True)],
         [("LogID", True), ("LineNo", False)], landscape=True, no_data="لا توجد عمليات في الفترة."),
     ListSpec("FIXED_ASSETS", [
-        Col("الرقم", "AssetCode", 2.0), Col("الأصل", "AssetName", 5.2, grow=True), Col("المجموعة", "AssetGroup", 3.6),
+        Col("الرقم", "AssetCode", 2.0), Col("الأصل", "AssetName", 4.0, grow=True), Col("المجموعة", "AssetGroup", 3.2),
+        Col("الطريقة", "MethodName", 1.6),
         Col("الشراء", "=GDate([PurchaseDate])", 2.2), Col("العمر (شهر)", "UsefulLifeMonths", 1.8, INT),
         Col("التكلفة", "Cost", 2.6, MONEY, True), Col("القسط الشهري", "MonthlyDep", 2.4, MONEY, True),
         Col("مجمع الإهلاك", "AccumDep", 2.6, MONEY, True), Col("القيمة الدفترية", "BookValue", 2.6, MONEY, True),

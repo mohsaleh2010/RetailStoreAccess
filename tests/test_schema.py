@@ -165,7 +165,9 @@ class SchemaStructureTests(unittest.TestCase):
                             # a payroll draft line whose deductions exceed the pay (posting refuses it)
                             "NetPay",
                             # a commission line: returns may exceed the sales of the month, adjustments go both ways
-                            "NetSales", "Collections", "BaseAmount", "Adjustment"}
+                            "NetSales", "Collections", "BaseAmount", "Adjustment",
+                            # a fixed asset revaluation goes up or down (docs/65)
+                            "ValueChange", "SurplusPart", "LossPart"}
         for t in TABLES:
             for f in t.fields:
                 if f.kind == "MONEY" and f.name not in allowed_negative:

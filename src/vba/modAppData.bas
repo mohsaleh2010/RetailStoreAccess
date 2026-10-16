@@ -134,6 +134,7 @@ Public Function ScreenPermission(ByVal FormName As String) As String
         Case "frmCheques": ScreenPermission = "CHEQUES"
         Case "frmAssets": ScreenPermission = "FIXED_ASSETS"
         Case "frmDepreciation": ScreenPermission = "FIXED_ASSETS"
+        Case "frmAssetChanges": ScreenPermission = "FIXED_ASSETS"
         Case "frmPayroll": ScreenPermission = "PAYROLL"
         Case "frmEmployeePay": ScreenPermission = "PAYROLL"
         Case "frmCostCenters": ScreenPermission = "JOURNAL"

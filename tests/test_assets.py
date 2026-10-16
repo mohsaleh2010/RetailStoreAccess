@@ -131,6 +131,103 @@ class AssetTests(unittest.TestCase):
         self.assertEqual(total, 0)
         self.balanced()
 
+    # ---------------------------------------------------------------- docs/65
+    def amounts(self, aid):
+        return [D(str(r[0])) for r in self.c.execute("SELECT Amount FROM AssetDepreciations WHERE AssetID = ? "
+                                                      "ORDER BY DepreciationID", (aid,))]
+
+    def first_day(self, months_ago):
+        return month_end(months_ago)[:8] + "01"
+
+    def center_balance(self, account, center):
+        return round(self.s.one("SELECT Coalesce(Sum(Debit) - Sum(Credit), 0) FROM JournalLines WHERE AccountCode = ? "
+                                "AND CostCenterID = ?", account, center), 4)
+
+    def test_declining_balance(self):
+        a1 = self.asset(1200, 0, 4, DepMethod="DB", DepRate=0)          # 24 / 4 = 600 % a year: half the book value a month
+        a2 = self.asset(1200, 100, 4, DepMethod="DB", DepRate=0)
+        a3 = self.asset(1000, 0, 24, DepMethod="DB", DepRate=0.6)
+        for k in (5, 4, 3, 2, 1):
+            self.s.depreciate(month_end(k))
+        self.assertEqual(self.amounts(a1), [600, 300, 150, 150])         # all that is left in the last month
+        self.assertEqual(self.amounts(a2), [600, 300, 150, 50])          # never below the salvage value
+        self.assertEqual(self.amounts(a3)[:2], [D("50"), D("47.5")])     # 1000 x 60 % / 12, then on 950
+        row = self.c.execute("SELECT MethodName, MonthlyDep FROM FixedAssetsQuery WHERE AssetID = ?", (a3,)).fetchone()
+        book = 1000 - float(sum(self.amounts(a3)))
+        self.assertEqual(row[0], "متناقص")
+        self.assertAlmostEqual(row[1], round(book * 0.6 / 12, 2), places=2)
+        self.balanced()
+
+    def test_revaluation_surplus_loss_and_depreciation(self):
+        aid = self.asset(1000, 0, 10)
+        self.s.depreciate(month_end(5))                                  # 100, book value 900
+        self.s.revalue(aid, self.first_day(4), 1080, 8)                  # +180 surplus
+        self.assertEqual(self.balance(3500), -180)
+        self.assertEqual(self.balance(1720), 1180)
+        self.s.depreciate(month_end(4))
+        self.assertEqual(self.amounts(aid)[-1], 135)                     # 1080 / 8
+        self.s.revalue(aid, self.first_day(3), 700, 6)                   # 945 -> 700: -180 surplus, 65 loss
+        self.assertEqual(self.balance(3500), 0)
+        self.assertEqual(self.balance(5660), 65)
+        self.s.depreciate(month_end(3))
+        self.assertEqual(self.amounts(aid)[-1], D("116.67"))             # 700 / 6
+        self.s.revalue(aid, self.first_day(2), 650, 5)                   # 583.33 -> 650: the 65 loss back, then surplus
+        self.assertEqual(self.balance(5660), 0)
+        self.assertAlmostEqual(self.balance(3500), -1.67, places=2)
+        row = self.c.execute("SELECT BookValue, MonthlyDep, RevalTotal FROM FixedAssetsQuery WHERE AssetID = ?",
+                             (aid,)).fetchone()
+        self.assertAlmostEqual(row[0], 650, places=2)
+        self.assertEqual(row[1], 130)
+        self.assertAlmostEqual(row[2], 1080 - 900 + 700 - 945 + 650 - 583.33, places=2)
+        retained = self.balance(3300)
+        accum = float(self.s.asset_depreciated(aid))
+        self.c.execute("UPDATE FixedAssets SET Status = 'DISPOSED', DisposalDate = ?, DisposalProceeds = 600, "
+                       "DisposalTo = 'CASHBOX', DisposalCashBoxID = ?, DisposalAccumDep = ? WHERE AssetID = ?",
+                       (self.first_day(1) + " 00:00:00", self.box, accum, aid))
+        self.s.sync_journal()
+        self.assertEqual(self.balance(1720), 0)
+        self.assertEqual(self.balance(1790), 0)
+        self.assertEqual(self.balance(3500), 0)                          # the surplus left to retained earnings
+        self.assertAlmostEqual(self.balance(3300), retained - 1.67, places=2)
+        self.assertAlmostEqual(self.balance(5650), 50, places=2)         # 650 - 600
+        self.balanced()
+
+    def test_transfer_between_cost_centres(self):
+        c1 = self.s.insert("CostCenters", CenterCode="T1", CenterName="TEST فرع 1", IsDefault=0, IsActive=1)
+        c2 = self.s.insert("CostCenters", CenterCode="T2", CenterName="TEST فرع 2", IsDefault=0, IsActive=1)
+        aid = self.asset(1000, 0, 10, CostCenterID=c1)
+        self.s.depreciate(month_end(5))
+        self.s.transfer_asset(aid, self.first_day(4), c2)
+        self.s.depreciate(month_end(4))
+        self.assertEqual(self.center_balance(1720, c1), 0)
+        self.assertEqual(self.center_balance(1720, c2), 1000)
+        self.assertEqual(self.center_balance(1790, c1), 0)
+        self.assertEqual(self.center_balance(1790, c2), -200)
+        self.assertEqual(self.center_balance(5600, c1), 100)             # the month before stays on the old branch
+        self.assertEqual(self.center_balance(5600, c2), 100)
+        self.assertEqual(self.s.one("SELECT COUNT(*) FROM JournalLines AS l INNER JOIN JournalEntries AS e ON "
+                                    "l.EntryID = e.EntryID WHERE e.SourceType = 'ASSET' AND l.CostCenterID = ?", c1), 2)
+        self.balanced()
+
+    def test_sale_with_output_vat_in_the_vat_return(self):
+        aid = self.asset(1000, 0, 10, vat=150)
+        box = self.s.one("SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = ?", self.box)
+        vat_out = self.balance(2200)
+        when = self.first_day(1) + " 00:00:00"
+        self.c.execute("UPDATE FixedAssets SET Status = 'DISPOSED', DisposalDate = ?, DisposalProceeds = 800, "
+                       "DisposalVAT = 120, DisposalTo = 'CASHBOX', DisposalCashBoxID = ?, DisposalAccumDep = 0 "
+                       "WHERE AssetID = ?", (when, self.box, aid))
+        self.s.sync_journal()
+        self.assertEqual(self.balance(2200), vat_out - 120)
+        self.assertEqual(self.balance(5650), 200)                        # the VAT is not part of the gain or loss
+        self.assertAlmostEqual(self.s.one("SELECT Balance FROM CashBoxBalanceQuery WHERE CashBoxID = ?", self.box),
+                               box + 920, places=4)
+        rows = self.c.execute("SELECT Side, Category, Amount, VAT FROM qryVatReturnLines WHERE Amount IN (800, 1000) "
+                              "ORDER BY Side").fetchall()
+        self.assertIn(("S", "S", 800, 120), rows)
+        self.assertIn(("P", "S", 1000, 150), rows)
+        self.balanced()
+
     def test_demo_asset(self):
         step = [p for p in DD.PLAN if p["op"] == "asset"][0]
         self.assertEqual(step["account"], 1720)
@@ -166,11 +263,13 @@ class AssetCodeTests(unittest.TestCase):
         tree = {r[0]: r for r in ACCOUNT_TREE}
         for code in (1790, 5600, 4500, 5650):
             self.assertTrue(tree[code][5], code)
-        for form, prefixes in [("frmAssets", ("Asset", "PrintAssets")), ("frmDepreciation", ("Depreciation",))]:
+        for form, prefixes, skip in [("frmAssets", ("Asset", "PrintAssets"), ("AssetChanges",)),
+                                     ("frmDepreciation", ("Depreciation",), ()),
+                                     ("frmAssetChanges", ("AssetChanges",), ())]:
             self.assertEqual(F.SCREEN_PERMISSIONS[form], "FIXED_ASSETS")
             names = {c.name for c in MODELS[form].controls}
             for pname in re.findall(r"^Public Sub (\w+)\(ByVal frm As Access\.Form", self.text, re.M):
-                if pname.startswith(prefixes):
+                if pname.startswith(prefixes) and not (skip and pname.startswith(skip)):
                     for ctl in set(re.findall(r"frm!(\w+)", proc(self.text, pname))):
                         self.assertIn(ctl, names, f"{form} {pname}: {ctl}")
         self.assertIn("FIXED_ASSETS", {r.key for r in F.REPORTS})

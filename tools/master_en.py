@@ -61,6 +61,7 @@ ACCOUNT_NAMES_EN = {
     32: "Retained earnings and results",
     3300: "Retained earnings",
     3400: "Net profit (loss) of the year",
+    3500: "Fixed asset revaluation surplus",
     4: "Revenue",
     41: "Operating revenue",
     4100: "Sales",
@@ -90,6 +91,7 @@ ACCOUNT_NAMES_EN = {
     53: "Other expenses",
     5400: "Cash shortages",
     5650: "Loss on sale and disposal of fixed assets",
+    5660: "Impairment loss on fixed assets",
     5700: "Bad debts",
     5800: "Zakat",
     5900: "Miscellaneous expenses",
@@ -114,6 +116,7 @@ SOURCE_TYPES_EN = {
     "STOCK_TRANSFER": "Transfer between warehouses", "STOCK_RECEIVE": "Stock transfer received",
     "STOCK_ISSUE": "Stock issue to a party", "STOCK_RECEIPT": "Stock receipt from a party",
     "DELIVERY_NOTE": "Delivery note to a customer", "RECEIPT_NOTE": "Goods receipt note from a supplier",
+    "ASSET_REVAL": "Fixed asset revaluation", "ASSET_TRANSFER": "Fixed asset transfer between cost centres",
 }
 
 TRANSACTION_TYPES_EN = {
@@ -171,7 +174,7 @@ SCREEN_TITLES_EN = {
     "frmCashClosing": "Daily cashier closing", "frmCashBoxes": "Boxes", "frmCashBoxUsers": "Box custodians",
     "frmCashTransfers": "Receipt of transfers between boxes", "frmWarehouses": "Warehouses",
     "frmStockTransfer": "Transfers between warehouses", "frmStockParties": "Stock issue and receipt parties",
-    "frmStockDocument": "Stock issue and receipt vouchers", "frmStockNote": "Delivery and goods receipt notes", "frmSalesOrder": "Customer orders", "frmRepDay": "Rep day and van sales", "frmRepVisits": "Rep visits and the day plan", "frmRouteStops": "Rep routes", "frmRepPrices": "Rep price lists", "frmAccounting": "Accounting and finance",
+    "frmStockDocument": "Stock issue and receipt vouchers", "frmStockNote": "Delivery and goods receipt notes", "frmSalesOrder": "Customer orders", "frmRepDay": "Rep day and van sales", "frmRepVisits": "Rep visits and the day plan", "frmRouteStops": "Rep routes", "frmRepPrices": "Rep price lists", "frmAssetChanges": "Fixed asset revaluation and transfer", "frmAccounting": "Accounting and finance",
     "frmJournal": "Journal entries", "frmAccounts": "Chart of accounts", "frmManualEntry": "Manual entries",
     "frmLedger": "Account statement and general ledger", "frmFinancials": "Financial statements",
     "frmPeriodClosing": "Period and fiscal year closing", "frmFiscalPeriods": "Fiscal periods", "frmVatReturn": "VAT return", "frmOpeningBalances": "Start-up opening balances",

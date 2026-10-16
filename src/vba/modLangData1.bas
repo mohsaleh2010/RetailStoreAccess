@@ -56,6 +56,7 @@ Private Sub D1_1()
     LangAdd "للصنف حركات في هذا المخزن: الرصيد الافتتاحي يكون قبل أي حركة. صحّح الكمية بالجرد", "The product has moves in this warehouse: the opening balance comes before any move. Correct the quantity with a stock count"
     LangAdd "هذا الرصيد مرحّل. لتعديله ألغِ ترحيله بزر الحذف في سطره، ثم عدّله ورحّله من جديد", "This balance is posted. To change it, unpost it with the delete button of its line, then edit and post it again"
     LangAdd "التحويل يدخل الصندوق المستلم عند تأكيد استلامه، وحتى ذلك في حساب «نقدية بالطريق", "A transfer enters the receiving box when its receipt is confirmed, until then it is in the account: Cash in transit"
+    LangAdd "سجل الأصول وقيد شرائها، والإهلاك بالقسط الثابت أو المتناقص، والبيع أو الاستبعاد", "The asset register and purchase entries, straight line or declining balance depreciation, sale or disposal"
     LangAdd "لا يمكن الحفظ: توجد قيمة مكررة في حقل يجب أن يكون فريدًا (مثل الكود أو الباركود", "Cannot save: a value is repeated in a field that must be unique (such as the code or the barcode"
     LangAdd "ليس للمندوب صندوق عهدة نشط. أنشئه في «الصناديق» بنوع «عهدة مندوب» واختر المندوب", "The rep has no active custody box. Create it in Cash boxes with the type Rep custody and choose the rep"
     LangAdd "ليس للمندوب مخزن سيارة نشط. أنشئه في «المخازن» بنوع «سيارة مندوب» واختر المندوب", "The rep has no active van warehouse. Create it in Warehouses with the type Rep van and choose the rep"
@@ -108,7 +109,6 @@ Private Sub D1_1()
     LangAdd "الرصيد الافتتاحي يُسجَّل مرة واحدة قبل أي حركة على المنتج في المخزن", "The opening balance is recorded once, before any move of the product in the warehouse"
     LangAdd "تسجيل الشيك يسدد رصيد العميل أو المورد، ثم يُحصَّل في البنك أو يرتد", "Recording the cheque pays the balance of the customer or supplier, then it is collected in the bank or bounces"
     LangAdd "حساب الأصل حساب فرعي من الأصول غير المتداولة (12)، غير مجمع الإهلاك", "The asset account is a sub-account of the non-current assets (12), not the accumulated depreciation"
-    LangAdd "سجل الأصول وقيد شرائها، والإهلاك بالقسط الثابت، والبيع أو الاستبعاد", "Asset register and purchase entry, straight-line depreciation, and sale or disposal"
     LangAdd "لم تُعيَّن كلمة مرور لهذا المستخدم بعد. اطلب من مدير النظام تعيينها", "No password is set for this user yet. Ask the system administrator to set one"
     LangAdd "يجب أن يكون البرنامج مغلقًا على كل الأجهزة الأخرى. هل تريد المتابعة", "The program must be closed on all other computers. Do you want to continue"
     LangAdd "ابدأ جردًا، أدخل الكمية الفعلية أو امسح الباركود، ثم رحّل الفروقات", "Start a count, enter the actual quantity or scan the barcode, then post the differences"
@@ -127,16 +127,18 @@ Private Sub D1_1()
     LangAdd "صدرت من الطلبية أذونات تسليم. احذف المسودات منها، أو ألغِ الطلبية", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
     LangAdd "يُنشأ المصروف في يوم الاستحقاق من كل فترة، بدءًا من تاريخ البداية", "The expense is created on the due day of each period, starting from the start date"
     LangAdd "الاستيرادات الخاضعة للنسبة الأساسية والمدفوعة ضريبتها في الجمارك", "Imports subject to the standard rate with VAT paid at customs"
+    LangAdd "على الأصل إعادة تقييم أو نقل: لا تتغير بياناته المالية ولا يُحذف", "The asset has a revaluation or a transfer: its financial data cannot change and it cannot be deleted"
+    LangAdd "قيمة جديدة للأصل وعمره الباقي، أو نقله إلى فرع أو مركز تكلفة آخر", "A new value of the asset and its remaining life, or its transfer to another branch or cost centre"
     LangAdd "لا يوجد حساب مبرمج بعد. شغّل BuildSchema: يطلب كلمة مروره وينشئه", "There is no developer account yet. Run BuildSchema: it asks for its password and creates it"
     LangAdd "لا يُضاف ولا يُعدَّل ولا يُحذف فيها شيء إلا بعد إعادة فتح الفترة", "Nothing is added, edited or deleted in it until the period is reopened"
     LangAdd "للعودة لوضع التطوير: افتح الملف مع الضغط على مفتاح SHIFT ثم شغّل", "To go back to developer mode: open the file while holding the SHIFT key, then run"
     LangAdd "مركز الموظف من شاشة رواتب الموظفين؛ المستندات القديمة «غير موزعة", "The center of the employee from the Employee salaries screen, old documents are Not allocated"
     LangAdd "مقاس الملصق والورق والهوامش، وحجم الباركود، والنصوص أعلاه وأسفله", "Label and paper size, margins, barcode size, and the texts above and below it"
-    LangAdd "هل تريد تعطيله بدلًا من ذلك؟ (يختفي من القوائم ويبقى في التقارير", "Do you want to deactivate it instead? (It disappears from the lists and stays in the reports"
-    LangAdd "إنشاء الفاتورة من هذا الإذن بأسعاره؟ لا يتحرك المخزون مرة ثانية", "Make the invoice from this note at its prices? The stock does not move a second time"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "هل تريد تعطيله بدلًا من ذلك؟ (يختفي من القوائم ويبقى في التقارير", "Do you want to deactivate it instead? (It disappears from the lists and stays in the reports"
+    LangAdd "إنشاء الفاتورة من هذا الإذن بأسعاره؟ لا يتحرك المخزون مرة ثانية", "Make the invoice from this note at its prices? The stock does not move a second time"
     LangAdd "بعد الإقفال لا يُضاف ولا يُعدَّل ولا يُحذف أي مستند بتاريخ مقفل", "After closing, no document dated in a closed period is added, edited or deleted"
     LangAdd "توجد فاتورة مشتريات غير مكتملة من جلسة سابقة. هل تريد استكمالها", "There is an unfinished purchase invoice from a previous session. Do you want to continue it"
     LangAdd "هذا المصروف مسجل من سند صرف نقدية في الخزينة ولا يُعدَّل من هنا", "This expense is recorded from a cash payment voucher in the treasury and is not edited from here"
@@ -164,6 +166,7 @@ Private Sub D1_2()
     LangAdd "ضريبة القيمة المضافة المرحَّلة من الفترات السابقة (رصيد دائن", "VAT carried from previous periods (credit balance"
     LangAdd "قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح", "An entry in a closed period: view only. A reversing entry can be made on an open date"
     LangAdd "للإيداع والسحب والتحويل وتسوية مدى اختر نوع الحركة الخاص بها", "For deposit, withdrawal, transfer and Mada settlement choose their own move type"
+    LangAdd "للتصحيح احذفها من شاشة إعادة التقييم والنقل بدءًا من الأخيرة", "To correct, delete them in the revaluation and transfer screen, the last one first"
     LangAdd "مطابقة كشف البنك مع الدفاتر: علِّم العمليات الظاهرة في الكشف", "Match the bank statement with the books: mark the transactions shown on the statement"
     LangAdd "يوجد مسير مرحَّل بعده: خصومات السلف فيه تعتمد على هذا المسير", "There is a posted run after it: its advance deductions depend on this run"
     LangAdd "أغلق البرنامج على الأجهزة الأخرى ثم احفظ الإعدادات مرة أخرى", "Close the program on the other computers, then save the settings again"
@@ -211,6 +214,7 @@ Private Sub D1_2()
     LangAdd "على الأصل قيود إهلاك: لا تتغير بياناته المالية ولا يُحذف", "The asset has depreciation entries: its financial data do not change and it is not deleted"
     LangAdd "لا يتغير رقم حساب محفوظ. أنشئ حسابًا جديدًا وعطّل القديم", "A saved account number does not change. Create a new account and deactivate the old one"
     LangAdd "لكل عملة سعر واحد في اليوم؛ عملة البرنامج لا تحتاج سعرًا", "Each currency has one rate a day, the program currency needs no rate"
+    LangAdd "للأصل نقل في يوم إعادة التقييم أو بعده: احذف النقل أولًا", "The asset has a transfer on or after the revaluation day: delete the transfer first"
     LangAdd "لم تُعيَّن كلمة مرور بعد، ولا يستطيع هذا المستخدم الدخول", "No password is set yet, and this user cannot log in"
     LangAdd "العملاء والموردون والصناديق والبنوك والمخزون في أقسامها", "Customers, suppliers, cash boxes, banks and stock have their own parts"
     LangAdd "الملف يحتاج عمودين على الأقل: الكود والكمية، ثم التكلفة", "The file needs at least two columns: the code and the quantity, then the cost"
@@ -253,13 +257,13 @@ Private Sub D1_2()
     LangAdd "صفِّ صندوق العهدة قبل إغلاق اليوم (زر «تصفية الصندوق", "Close the custody box before closing the day (button Close the box"
     LangAdd "قبض نقدية في صندوق، أو صرف منه، أو تحويل بين صندوقين", "Cash received in a box, paid from it, or transferred between two boxes"
     LangAdd "مناسب لطابعات 203 نقطة/بوصة، وكبّره إذا صعبت القراءة", "Suitable for 203 dpi printers, make it larger if it is hard to read"
+End Sub
+
+Private Sub D1_3()
     LangAdd "مندوبو المبيعات: عملاؤهم ونسبة عمولتهم ومركز تكلفتهم", "Sales reps: their customers, commission rate and cost center"
     LangAdd "نقدية مبيعات المستخدم وسنداته تدخل هذا الصندوق؛ فارغ", "The cash of the sales and vouchers of the user goes into this box, empty"
     LangAdd "أرصدة الخزينة الرئيسية وصناديق الكاشير وحركة كل يوم", "Balances of the main treasury and cashier boxes and the moves of each day"
     LangAdd "الخطوة 1 تمت: شهادة الامتثال. التالي: فحوص الامتثال", "Step 1 done: compliance certificate. Next: compliance checks"
-End Sub
-
-Private Sub D1_3()
     LangAdd "الفاتورة الإلكترونية بعد (شاشة الفاتورة الإلكترونية", "e-invoicing platform yet (see the e-invoicing screen"
     LangAdd "الفترة مقفلة. أعد فتحها أولًا من شاشة إقفال الفترات", "The period is closed. Reopen it first in the period closing screen"
     LangAdd "الفروع والأقسام: تُوزَّع عليها الإيرادات والمصروفات", "Branches and departments: revenue and expenses are allocated to them"
@@ -269,16 +273,11 @@ Private Sub D1_3()
     LangAdd "توجد شهادة محفوظة. هل تريد استبدالها بشهادة تجريبية", "A certificate is saved. Replace it with a test certificate"
     LangAdd "تُحذف المسودة فقط. ألغِ ترحيل التحويل بالطريق أولًا", "Only a draft is deleted. Unpost the transfer in transit first"
     LangAdd "جهاز نقطة البيع المسجّل في بوابة مصلحة الضرائب (مصر", "The POS device registered on the Egyptian Tax Authority portal (Egypt"
+    LangAdd "لأصل في القيد إعادة تقييم أو نقل بعده: احذفها أولًا", "An asset of the entry has a later revaluation or transfer: delete it first"
     LangAdd "لا تملك صلاحية الإضافة في شاشة ربط السداد بالفواتير", "You do not have the permission to add in the payment matching screen"
     LangAdd "لا يوجد سند. اختر النوع والمخزن والجهة ثم «سند جديد", "No voucher. Choose the type, the warehouse and the party, then New voucher"
     LangAdd "للسيارة تحويل مسودة لم يُرسَل. أرسله أو احذفه أولًا", "The van has a draft transfer not sent. Send it or delete it first"
     LangAdd "لم تُعمل نسخة احتياطية اليوم. هل تريد عمل نسخة الآن", "No backup was made today. Do you want to make a backup now"
     LangAdd "منصة فاتورة ترد عند الإرسال، فلا حاجة لتحديث الحالة", "Fatoora answers when a document is sent, there is no status to refresh"
     LangAdd "هل تريد إلغاء الفاتورة الحالية والبدء بفاتورة جديدة", "Do you want to cancel the current invoice and start a new one"
-    LangAdd "اختر فاتورة الشراء ثم حدد الكميات التي تعود للمورد", "Choose the purchase invoice, then set the quantities going back to the supplier"
-    LangAdd "البيع الآجل يحتاج عميلًا مسجلًا. اختر العميل أولًا", "A credit sale needs a registered customer. Choose the customer first"
-    LangAdd "التحويلات البنكية في الفواتير والسندات تُقيَّد فيه", "Bank transfers in invoices and vouchers are recorded in it"
-    LangAdd "المبالغ لا تكون سالبة: اكتب المبلغ في الجانب الآخر", "Amounts are never negative: type the amount on the other side"
-    LangAdd "تأكد أن المبرمج أصدره لرقم الجهاز الظاهر في الشاشة", "Make sure the developer issued it for the computer number shown on the screen"
-    LangAdd "تمت الاستعادة. سيُغلق البرنامج الآن، افتحه من جديد", "Restored. The program will close now, open it again"
 End Sub

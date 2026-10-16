@@ -53,6 +53,8 @@ UNENFORCED = {
     ("SupplierAllocations", "EmployeeID"),
     ("BankReconciliations", "EmployeeID"),
     ("DepreciationRuns", "EmployeeID"),
+    ("AssetRevaluations", "EmployeeID"),
+    ("AssetTransfers", "EmployeeID"),
     ("Budgets", "EmployeeID"),
     ("PeriodClosings", "EmployeeID"),
     ("FiscalYearClosings", "EmployeeID"),
