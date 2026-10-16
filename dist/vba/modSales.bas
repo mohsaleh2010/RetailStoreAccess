@@ -288,7 +288,9 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
             Exit Function
         End If
         If rs!UnitPrice <> rs!SellingPrice Then                ' a size price of the product is not a change
-            If rs!UnitPrice <> Nz(rs!SizePriceM, -1) And rs!UnitPrice <> Nz(rs!SizePriceL, -1) Then priceChanged = True
+            If rs!UnitPrice <> Nz(rs!SizePriceM, -1) And rs!UnitPrice <> Nz(rs!SizePriceL, -1) Then
+                If Not IsSessionRepPrice(rs!ProductID, rs!UnitPrice) Then priceChanged = True   ' modRepRoutes
+            End If
         End If
         If Nz(rs!VATCategory, "S") = "S" Then rate = vatRate Else rate = 0
         CalcAddLine rs!Quantity, rs!UnitPrice, Nz(rs!LineDiscount, 0), rate
@@ -330,6 +332,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     End If
     msg = Settle(CalcTotal("TOTAL"), tend, isCredit, paid, remaining, change)
     If Len(msg) = 0 Then msg = CheckCustomer(CustomerID, isCredit, remaining)
+    If Len(msg) = 0 Then msg = RepCreditProblem(SalesRepFor(CustomerID), remaining)          ' modRepRoutes
     If Len(msg) = 0 And StockNoteID > 0 Then msg = NoteInvoiceProblem(StockNoteID, "DELIVERY", CustomerID, _
                                                                       productIDs, costs, n, noteWh)   ' modStockNotes
     If Len(msg) = 0 And StockNoteID = 0 Then msg = CheckStock(productIDs, n)
@@ -811,6 +814,7 @@ Private Function CheckDiscountAllowed(ByVal InvoiceDiscount As Currency) As Stri
     pct = (lineDisc + InvoiceDiscount) / (CalcTotal("GROSS") + lineDisc)
     If pct <= 0 Then Exit Function
     maxPct = Nz(DbValue("SELECT MaxDiscountPercent FROM Employees WHERE EmployeeID = " & CurrentUserID()), 0)
+    maxPct = RepDiscountLimit(maxPct)                           ' the rep who sells has his own limit (modRepRoutes)
     If pct > maxPct And Not HasPermission("DISCOUNT_OVERRIDE") Then
         CheckDiscountAllowed = "«·Œ’„ (" & Format$(pct, "0.0%") & ") √ﬂ»— „‰ «·Õœ «·„”„ÊÕ ·ﬂ (" & _
                                Format$(maxPct, "0.0%") & ")."

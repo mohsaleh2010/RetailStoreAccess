@@ -86,7 +86,7 @@ def layout_sales_order(line_heads) -> FormModel:
 def order_forms() -> List[FormModel]:
     lines, heads = layout_sales_order_lines()
     # the subform first: the parent form embeds it by name
-    return [lines, layout_sales_order(heads), layout_rep_day()]
+    return [lines, layout_sales_order(heads), layout_rep_day(), layout_rep_visits()]
 
 
 # ---------------------------------------------------------------- the rep day and van sales (docs/63)
@@ -142,4 +142,62 @@ def layout_rep_day() -> FormModel:
                "Private Sub Form_Activate()", "    RepDayShow Me", "End Sub",          # back from a sale or a count
                "Private Sub Form_Unload(Cancel As Integer)", "    StopActingAsRep", "End Sub",
                "Private Sub cboDay_AfterUpdate()", "    RepDayShow Me", "End Sub"] + m.code)
+    return m
+
+
+# ---------------------------------------------------------------- routes and visits of the reps (docs/64)
+def layout_rep_visits() -> FormModel:
+    width, height = cm(24.0), cm(16.4)
+    m = FormModel("frmRepVisits", "زيارات المندوبين", width, height, popup=False, allow_add=False)
+    title_band(m, "زيارات المندوبين وخطة اليوم",
+               "خطة اليوم من خط السير، ثم تسجيل كل زيارة ونتيجتها: طلبية أو بيع أو تحصيل أو لا شيء",
+               "customers")
+    y = cm(2.3)
+    c = m.add(Control("combo", "cboRep", cm(0.4), y, cm(5.0), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4.8", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboRep", "المندوب", c)
+    c = m.add(Control("text", "txtDate", cm(5.6), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}, events=["AfterUpdate"]))
+    labelled(m, "txtDate", "اليوم", c)
+    button(m, "btnPlan", "خطة اليوم من خط السير", cm(8.8), y - cm(0.03), "primary", w=cm(4.6), call="RepVisitsPlan Me")
+    button(m, "btnRoute", "خط السير", cm(13.6), y - cm(0.03), "secondary", w=cm(2.8),
+           call='OpenScreen "frmRouteStops", 0')
+    button(m, "btnPrices", "أسعار المندوب", cm(16.6), y - cm(0.03), "secondary", w=cm(3.2),
+           call='OpenScreen "frmRepPrices", 0')
+    y = cm(3.8)
+    c = m.add(Control("combo", "cboCustomer", cm(0.4), y, cm(8.2), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;8", "LimitToList": True}))
+    labelled(m, "cboCustomer", "عميل خارج خط السير", c)
+    button(m, "btnAddVisit", "إضافة زيارة", cm(8.8), y - cm(0.03), "secondary", w=cm(3.2), call="RepVisitsAdd Me")
+    m.add(Control("label", "lblInfo", cm(0.4), cm(4.9), width - cm(0.8), cm(0.7),
+                  {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    m.add(Control("list", "lstVisits", cm(0.4), cm(5.7), width - cm(0.8), cm(6.4),
+                  {"ColumnCount": 7, "ColumnWidths": "0;1.2;7;2.6;2.6;2.4;6.4", "ColumnHeads": True},
+                  events=["AfterUpdate"]))
+    y = cm(12.8)
+    c = m.add(Control("combo", "cboResult", cm(0.4), y, cm(4.0), cm(0.8),
+                      {"RowSourceType": "Value List", "RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;3.8",
+                       "LimitToList": True}))
+    labelled(m, "cboResult", "نتيجة الزيارة", c)
+    c = m.add(Control("text", "txtVisitNotes", cm(4.6), y, cm(8.0), cm(0.8), {}))
+    labelled(m, "txtVisitNotes", "ملاحظات الزيارة", c)
+    button(m, "btnRecord", "تسجيل الزيارة", cm(12.8), y - cm(0.03), "primary", w=cm(3.4), call="RepVisitsRecord Me")
+    button(m, "btnDeleteVisit", "حذف الزيارة", cm(16.4), y - cm(0.03), "danger", w=cm(3.0), call="RepVisitsDelete Me")
+    bx = cm(0.4)
+    for name, caption, w, call in [
+            ("btnExecution", "تقرير تنفيذ خط السير", 4.6, 'OpenScreen "frmReportCenter", 0, "ROUTE_EXECUTION"'),
+            ("btnVisitsReport", "تقرير الزيارات", 3.4, 'OpenScreen "frmReportCenter", 0, "REP_VISITS"'),
+            ("btnVanStock", "رصيد السيارات", 3.4, 'OpenScreen "frmReportCenter", 0, "REP_VAN_STOCK"')]:
+        button(m, name, caption, bx, cm(14.4), "secondary", w=cm(w), h=cm(1.1), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(14.4), "secondary", w=cm(2.6), h=cm(1.1),
+           call="DoCmd.Close acForm, Me.Name")
+    fit_window(m, bottom_y=cm(12.2), stretch_w=("lblInfo", "lstVisits"), stretch_h=("lstVisits",),
+               extra={"btnClose": (1000, 0, 1000, 0)})
+    m.form_events = ["Load", "Activate"]
+    m.code = (["Private Sub Form_Load()", "    RepVisitsLoad Me", "End Sub",
+               "Private Sub Form_Activate()", "    RepVisitsShow Me", "End Sub",     # back from the route screen
+               "Private Sub cboRep_AfterUpdate()", "    RepVisitsShow Me", "End Sub",
+               "Private Sub txtDate_AfterUpdate()", "    RepVisitsShow Me", "End Sub",
+               "Private Sub lstVisits_AfterUpdate()", "    RepVisitPicked Me", "End Sub"] + m.code)
     return m

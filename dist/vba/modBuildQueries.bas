@@ -27,11 +27,11 @@ Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaym
     "erInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuer" & _
     "y,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint" & _
     ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryStockNoteValue,qryInvoiced" & _
-    "Notes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryRepDayStock,qryRepDaySales,qryRepDayReturns,qryRepDayCollections,RepDaySummaryQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurch" & _
-    "ase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,q" & _
-    "ryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryInc" & _
-    "omeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineT" & _
-    "otals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "Notes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryRepDayStock,qryRepDaySales,qryRepDayReturns,qryRepDayCollections,RepDaySummaryQuery,RepVisitListQuery,RouteExecutionQuery,RepVanStockQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocume" & _
+    "nt,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryJournalAsset,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalP" & _
+    "ayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,Genera" & _
+    "lLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBa" & _
+    "lancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -827,6 +827,9 @@ Private Sub CreateAllQueries()
     Q_qryRepDayReturns
     Q_qryRepDayCollections
     Q_RepDaySummaryQuery
+    Q_RepVisitListQuery
+    Q_RouteExecutionQuery
+    Q_RepVanStockQuery
     Q_qryJournalStockTransfer
     Q_qryJournalStockNote
     Q_TransfersInTransitQuery
@@ -1114,13 +1117,13 @@ End Sub
 
 Private Sub Q_qryLocSalesReps1()
     Dim s As String
-    s = "SELECT t.SalesRepID, t.RepCode, t.RepName AS LocArabicName, t.RepNameEn, t.Mobile, t.EmployeeID, t.Region, t.CostCenterID, t.CommissionRate, t.CommissionBase, t.IsActive, t.Notes, t.CreatedAt FROM SalesReps AS t" & vbCrLf
+    s = "SELECT t.SalesRepID, t.RepCode, t.RepName AS LocArabicName, t.RepNameEn, t.Mobile, t.EmployeeID, t.Region, t.CostCenterID, t.CommissionRate, t.CommissionBase, t.CreditLimit, t.MaxDiscountPercent, t.IsActive, t.Notes, t.CreatedAt FROM SalesReps AS t" & vbCrLf
     SaveQuery "qryLocSalesReps1", "SalesReps ··Ê«ÃÂ… «·≈‰Ã·Ì“Ì… (ŒÿÊ… 1)", s
 End Sub
 
 Private Sub Q_qryLocSalesReps()
     Dim s As String
-    s = "SELECT SalesRepID, RepCode, Nz(RepNameEn, LocArabicName) AS RepName, RepNameEn, Mobile, EmployeeID, Region, CostCenterID, CommissionRate, CommissionBase, IsActive, Notes, CreatedAt FROM qryLocSalesReps1" & vbCrLf
+    s = "SELECT SalesRepID, RepCode, Nz(RepNameEn, LocArabicName) AS RepName, RepNameEn, Mobile, EmployeeID, Region, CostCenterID, CommissionRate, CommissionBase, CreditLimit, MaxDiscountPercent, IsActive, Notes, CreatedAt FROM qryLocSalesReps1" & vbCrLf
     SaveQuery "qryLocSalesReps", "SalesReps »«·√”„«¡ «·≈‰Ã·Ì“Ì… («·Ê«ÃÂ… «·≈‰Ã·Ì“Ì…)", s
 End Sub
 
@@ -2863,6 +2866,46 @@ Private Sub Q_RepDaySummaryQuery()
     s = s & "      LEFT JOIN CashClosings AS c ON d.ClosingID = c.ClosingID" & vbCrLf
     s = s & "ORDER BY d.DayDate, d.DayNumber" & vbCrLf
     SaveQuery "RepDaySummaryQuery", " ”ÊÌ… ÌÊ„ «·„‰œÊ»: «·»÷«⁄… («·„Õ„Û¯· Ê«·„»«⁄ Ê«·„— Ã⁄ Ê«·„›—Û¯€ Ê›—ﬁ «·Ã—œ) Ê«·‰ﬁœÌ… («·„»Ì⁄«  Ê«· Õ’Ì· Ê«·„ Êﬁ⁄ Ê«·›⁄·Ì Ê«·›—ﬁ)", s
+End Sub
+
+Private Sub Q_RepVisitListQuery()
+    Dim s As String
+    s = "SELECT v.RepVisitID, v.VisitDate, v.SalesRepID, r.RepName, v.CustomerID, c.CustomerName, v.StopOrder, v.IsPlanned," & vbCrLf
+    s = s & "       IIf(v.IsPlanned, '„‰ Œÿ «·”Ì—', 'Œ«—Ã «·Œÿ') AS PlanName, v.Result," & vbCrLf
+    s = s & "       IIf(v.Result = 'PENDING', '·„   „', IIf(v.Result = 'ORDER', 'ÿ·»Ì…', IIf(v.Result = 'SALE', '»Ì⁄'," & vbCrLf
+    s = s & "       IIf(v.Result = 'PAYMENT', ' Õ’Ì·', IIf(v.Result = 'NO_SALE', '»·« ‰ ÌÃ…', '«·„Õ· „€·ﬁ'))))) AS ResultName," & vbCrLf
+    s = s & "       v.VisitedAt, v.Notes" & vbCrLf
+    s = s & "FROM (RepVisits AS v INNER JOIN [@SalesReps] AS r ON v.SalesRepID = r.SalesRepID)" & vbCrLf
+    s = s & "     INNER JOIN [@Customers] AS c ON v.CustomerID = c.CustomerID" & vbCrLf
+    SaveQuery "RepVisitListQuery", "“Ì«—«  «·„‰œÊ»Ì‰: «·„Œÿÿ… „‰ Œÿ «·”Ì— ÊŒ«—ÃÂ Ê‰ ÌÃ… ﬂ· “Ì«—… (docs/64)", s
+End Sub
+
+Private Sub Q_RouteExecutionQuery()
+    Dim s As String
+    s = "SELECT v.VisitDate, v.SalesRepID, r.RepName, Count(*) AS VisitCount," & vbCrLf
+    s = s & "       Sum(IIf(v.IsPlanned, 1, 0)) AS PlannedCount," & vbCrLf
+    s = s & "       Sum(IIf(v.Result <> 'PENDING', 1, 0)) AS DoneCount," & vbCrLf
+    s = s & "       Sum(IIf(v.Result = 'PENDING', 1, 0)) AS MissedCount," & vbCrLf
+    s = s & "       Sum(IIf(v.Result = 'ORDER', 1, 0)) AS OrderCount," & vbCrLf
+    s = s & "       Sum(IIf(v.Result = 'SALE', 1, 0)) AS SaleCount," & vbCrLf
+    s = s & "       Sum(IIf(v.Result = 'PAYMENT', 1, 0)) AS PaymentCount," & vbCrLf
+    s = s & "       Sum(IIf(v.Result = 'NO_SALE', 1, 0)) AS NoSaleCount," & vbCrLf
+    s = s & "       Sum(IIf(v.Result = 'CLOSED', 1, 0)) AS ClosedCount," & vbCrLf
+    s = s & "       Sum(IIf(v.Result <> 'PENDING', 1.0, 0)) / Count(*) AS DoneRate" & vbCrLf
+    s = s & "FROM RepVisits AS v INNER JOIN [@SalesReps] AS r ON v.SalesRepID = r.SalesRepID" & vbCrLf
+    s = s & "GROUP BY v.VisitDate, v.SalesRepID, r.RepName" & vbCrLf
+    SaveQuery "RouteExecutionQuery", " ‰›Ì– Œÿ «·”Ì— ·ﬂ· „‰œÊ» ÊÌÊ„: «·„Œÿÿ Ê«·„‰›– Ê«·›«∆  Ê‰ «∆Ã «·“Ì«—«  (docs/64)", s
+End Sub
+
+Private Sub Q_RepVanStockQuery()
+    Dim s As String
+    s = "SELECT q.WarehouseID, w.SalesRepID, r.RepName, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName," & vbCrLf
+    s = s & "       q.StockQty, p.AverageCost, q.StockQty * p.AverageCost AS StockCostValue" & vbCrLf
+    s = s & "FROM ((qryWarehouseStock AS q INNER JOIN [@Warehouses] AS w ON q.WarehouseID = w.WarehouseID)" & vbCrLf
+    s = s & "      INNER JOIN [@SalesReps] AS r ON w.SalesRepID = r.SalesRepID)" & vbCrLf
+    s = s & "     INNER JOIN Products AS p ON q.ProductID = p.ProductID" & vbCrLf
+    s = s & "WHERE w.WarehouseType = 'VAN' AND q.StockQty <> 0" & vbCrLf
+    SaveQuery "RepVanStockQuery", "—’Ìœ ”Ì«—… ﬂ· „‰œÊ»: «·ﬂ„Ì… Ê«·ﬁÌ„… »„ Ê”ÿ «· ﬂ·›… (docs/64)", s
 End Sub
 
 Private Sub Q_qryJournalStockTransfer()

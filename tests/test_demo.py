@@ -106,7 +106,7 @@ class ReplayTests(unittest.TestCase):
                     continue                          # needs a budget, entered by the user (not demo data)
                 if rep.key == "SUPPLIER_FX":
                     continue                          # needs a document in a foreign currency (not demo data)
-                if rep.key.startswith("REP_"):
+                if rep.key.startswith("REP_") or rep.key == "ROUTE_EXECUTION":
                     continue                          # needs sales reps, entered by the user (not demo data)
                 if rep.key == "OPENING_BALANCES":
                     continue                          # before the period start: tests/test_fiscal.py runs it later

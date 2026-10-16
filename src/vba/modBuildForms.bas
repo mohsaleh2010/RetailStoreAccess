@@ -25,10 +25,10 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmStockParties,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn," & _
-    "frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword,frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens," & _
-    "frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmPayrollLines," & _
-    "frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder,frmRepDay"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRouteStops,frmRepPrices,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmStockParties,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines,frmPOS," & _
+    "frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword,frmRolePermLines,frmRoles," & _
+    "frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques," & _
+    "frmAssets,frmDepreciation,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder,frmRepDay,frmRepVisits"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -584,6 +584,8 @@ Private Sub BuildAllForms()
     BuildForm_frmCurrencyRates
     BuildForm_frmSalesReps
     BuildForm_frmRepTargets
+    BuildForm_frmRouteStops
+    BuildForm_frmRepPrices
     BuildForm_frmRecurring
     BuildForm_frmUsers
     BuildForm_frmCostCenters
@@ -680,6 +682,7 @@ Private Sub BuildAllForms()
     BuildForm_frmSalesOrderLines
     BuildForm_frmSalesOrder
     BuildForm_frmRepDay
+    BuildForm_frmRepVisits
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -2143,10 +2146,20 @@ Private Sub BuildForm_frmSalesReps()
     Set c = AddLabel("lblCostCenterID", "مركز التكلفة", 5443, 4536, 1701, 425, 10, False, CLR_MUTED, "CostCenterID", 0)
     Set c = AddCheck("IsActive", "IsActive", 12134, 4621)
     Set c = AddLabel("lblIsActive", "نشط", 10376, 4536, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblRepInfo", " ", 5443, 5103, 9639, 425, 10, True, CLR_ACCENT, "", 0)
-    Set c = AddText("Notes", "Notes", 7201, 5670, 7881, 425)
-    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 5670, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
-    Set c = AddLabel("lblStatus", " ", 5443, 6350, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddText("CreditLimit", "CreditLimit", 7201, 5103, 2948, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    SetCtlProp c, "ControlTipText", "مجموع أرصدة عملائه في البيع الآجل؛ 0 = بلا حد"
+    SetCtlProp c, "StatusBarText", "مجموع أرصدة عملائه في البيع الآجل؛ 0 = بلا حد"
+    Set c = AddLabel("lblCreditLimit", "حد ائتمان عملاء المندوب", 5443, 5103, 1701, 425, 10, False, CLR_MUTED, "CreditLimit", 0)
+    Set c = AddText("MaxDiscountPercent", "MaxDiscountPercent", 12134, 5103, 2948, 425)
+    SetCtlProp c, "Format", "0.00%"
+    SetCtlProp c, "ControlTipText", "حين يبيع هو أو يُباع باسمه؛ 0 = حد المستخدم"
+    SetCtlProp c, "StatusBarText", "حين يبيع هو أو يُباع باسمه؛ 0 = حد المستخدم"
+    Set c = AddLabel("lblMaxDiscountPercent", "أقصى خصم للمندوب", 10376, 5103, 1701, 425, 10, False, CLR_MUTED, "MaxDiscountPercent", 0)
+    Set c = AddLabel("lblRepInfo", " ", 5443, 5670, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("Notes", "Notes", 7201, 6237, 7881, 425)
+    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 6917, 9639, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP
@@ -2308,6 +2321,202 @@ Private Sub BuildForm_frmRepTargets()
     Exit Sub
 EH:
     AbortForm "frmRepTargets", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmRouteStops()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmRouteStops", "خط سير المندوبين", "SELECT * FROM RouteStops", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=RouteStops|PK=RouteStopID|LIST=SELECT t.RouteStopID, s.RepName AS [المندوب], IIf(t.VisitWeekday = 1, 'الأحد', IIf(t.VisitWeekday = 2, 'الاثنين', IIf(t.VisitWeekday = 3, 'الثلاثاء', IIf(t.VisitWeekday = 4, 'الأربعاء', IIf(t.VisitWeekday = 5, 'الخميس', IIf(t.VisitWeekday = 6, 'الجمعة', 'السبت')))))) AS [يوم الزيارة], t.StopOrder AS [الترتيب], c.CustomerName AS [العميل] FROM (RouteStops AS t INNER JOIN [@SalesReps] AS s ON t.SalesRepID = s.SalesRepID) INNER JOIN [@Customers] AS c ON t.CustomerID = c.CustomerID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY s.RepName, t.VisitWeekday, t.StopOrder, c.CustomerName|SEARCH=s.RepName,s.RepNameEn,c.CustomerName,c.CustomerNameEn|ACTIVE=t.IsActive"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "خط سير المندوبين", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "أيام زيارة كل عميل لكل مندوب: منها تُنشأ خطة زيارات اليوم", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", "تراجع", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddCheck("chkShowInactive", "", 227, 2579)
+    SetCtlProp c, "DefaultValue", "False"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 5, "0;1701;1021;680;2041", True)
+    c.AfterUpdate = EP
+    Set c = AddCombo("SalesRepID", "SalesRepID", 7201, 1701, 2948, 425, "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName", 2, "0;3402")
+    Set c = AddLabel("lblSalesRepID", "المندوب *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
+    Set c = AddCombo("CustomerID", "CustomerID", 12134, 1701, 2948, 425, "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c ORDER BY c.CustomerName", 2, "0;3402")
+    Set c = AddLabel("lblCustomerID", "العميل *", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "CustomerID", 0)
+    Set c = AddCombo("VisitWeekday", "VisitWeekday", 7201, 2268, 2948, 425, "1;الأحد;2;الاثنين;3;الثلاثاء;4;الأربعاء;5;الخميس;6;الجمعة;7;السبت", 2, "0;1701")
+    Set c = AddLabel("lblVisitWeekday", "يوم الزيارة", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "VisitWeekday", 0)
+    Set c = AddText("StopOrder", "StopOrder", 12134, 2268, 2948, 425)
+    SetCtlProp c, "ControlTipText", "ترتيب العميل في خط سير ذلك اليوم"
+    SetCtlProp c, "StatusBarText", "ترتيب العميل في خط سير ذلك اليوم"
+    Set c = AddLabel("lblStopOrder", "الترتيب في خط السير", 10376, 2268, 1701, 425, 10, False, CLR_MUTED, "StopOrder", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 2920)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddText("Notes", "Notes", 7201, 3402, 7881, 425)
+    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblRouteNote", "يزور المندوب العميل في هذا اليوم من كل أسبوع؛ لعدة أيام أضف سطرًا لكل يوم", 5443, 3969, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 4649, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub chkShowInactive_AfterUpdate()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmRouteStops", s
+    Exit Sub
+EH:
+    AbortForm "frmRouteStops", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmRepPrices()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmRepPrices", "أسعار المندوبين", "SELECT * FROM RepPrices", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=RepPrices|PK=RepPriceID|LIST=SELECT t.RepPriceID, s.RepName AS [المندوب], p.ProductName AS [الصنف], t.UnitPrice AS [سعر المندوب] FROM (RepPrices AS t INNER JOIN [@SalesReps] AS s ON t.SalesRepID = s.SalesRepID) INNER JOIN Products AS p ON t.ProductID = p.ProductID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY s.RepName, p.ProductName|SEARCH=s.RepName,s.RepNameEn,p.ProductName,p.ProductCode"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "أسعار المندوبين", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "قائمة أسعار المندوب: سعر خاص للصنف حين يبيع المندوب أو يُباع باسمه", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", "تراجع", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddList("lstItems", 227, 2551, 4990, 5387, 4, "0;1814;2268;1021", True)
+    c.AfterUpdate = EP
+    Set c = AddCombo("SalesRepID", "SalesRepID", 7201, 1701, 2948, 425, "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName", 2, "0;3402")
+    Set c = AddLabel("lblSalesRepID", "المندوب *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
+    Set c = AddCombo("ProductID", "ProductID", 12134, 1701, 2948, 425, "SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Item FROM Products ORDER BY ProductName", 2, "0;3969")
+    Set c = AddLabel("lblProductID", "الصنف *", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "ProductID", 0)
+    Set c = AddText("UnitPrice", "UnitPrice", 7201, 2268, 2948, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    SetCtlProp c, "ControlTipText", "شامل الضريبة كسعر البيع في نقطة البيع"
+    SetCtlProp c, "StatusBarText", "شامل الضريبة كسعر البيع في نقطة البيع"
+    Set c = AddLabel("lblUnitPrice", "سعر البيع للمندوب", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "UnitPrice", 0)
+    Set c = AddLabel("lblRepPriceNote", "يحل محل سعر البيع في الفاتورة والطلبية؛ تغييره في الفاتورة يحتاج صلاحية تعديل السعر", 10376, 2268, 4706, 425, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 2948, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmRepPrices", s
+    Exit Sub
+EH:
+    AbortForm "frmRepPrices", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmRecurring()
@@ -10005,11 +10214,19 @@ Private Sub BuildForm_frmAccounting()
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmRepDay"
     c.OnClick = EP
-    Set c = AddRect("boxNavAudit", 3912, 7514, 3402, 1106, RGB(69, 90, 100))
-    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 3912, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblTileAudit", "سجل التدقيق", 3912, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
-    Set c = AddLabel("lblHintAudit", "من أضاف أو عدّل أو حذف", 3912, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
-    Set c = AddButton("btnTileAudit", "سجل التدقيق", 3912, 7514, 3402, 1106, "secondary")
+    Set c = AddRect("boxNavRepVisits", 3912, 7514, 3402, 1106, RGB(2, 119, 189))
+    Set c = AddIcon("icoTileRepVisits", ChrW(&HE716), 3912, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileRepVisits", "زيارات المندوبين", 3912, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintRepVisits", "خط السير وخطة اليوم والأسعار", 3912, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileRepVisits", "زيارات المندوبين", 3912, 7514, 3402, 1106, "secondary")
+    SetCtlProp c, "Transparent", True
+    SetCtlProp c, "Tag", "frmRepVisits"
+    c.OnClick = EP
+    Set c = AddRect("boxNavAudit", 340, 7514, 3402, 1106, RGB(69, 90, 100))
+    Set c = AddIcon("icoTileAudit", ChrW(&HE8D7), 340, 7571, 3402, 454, 18, False, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblTileAudit", "سجل التدقيق", 340, 8013, 3402, 312, 12, True, CLR_SURFACE, "", 2)
+    Set c = AddLabel("lblHintAudit", "من أضاف أو عدّل أو حذف", 340, 8319, 3402, 255, 8, False, CLR_SURFACE, "", 2)
+    Set c = AddButton("btnTileAudit", "سجل التدقيق", 340, 7514, 3402, 1106, "secondary")
     SetCtlProp c, "Transparent", True
     SetCtlProp c, "Tag", "frmAuditLog"
     c.OnClick = EP
@@ -10086,6 +10303,9 @@ Private Sub BuildForm_frmAccounting()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnTileRepDays_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmRepDay""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnTileRepVisits_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmRepVisits""" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnTileAudit_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmAuditLog"", 0" & vbCrLf
@@ -11265,4 +11485,114 @@ Private Sub BuildForm_frmRepDay()
     Exit Sub
 EH:
     AbortForm "frmRepDay", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmRepVisits()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmRepVisits", "زيارات المندوبين", "", 13608, 9299, False, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 13608, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE716), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "زيارات المندوبين وخطة اليوم", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "خطة اليوم من خط السير، ثم تسجيل كل زيارة ونتيجتها: طلبية أو بيع أو تحصيل أو لا شيء", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboRep", "", 227, 1304, 2835, 454, "", 2, "0;2722")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblRep", "المندوب", 227, 992, 2835, 284, 9, False, CLR_MUTED, "cboRep", 0)
+    Set c = AddText("txtDate", "", 3175, 1304, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblDate", "اليوم", 3175, 992, 1701, 284, 9, False, CLR_MUTED, "txtDate", 0)
+    Set c = AddButton("btnPlan", "خطة اليوم من خط السير", 4990, 1287, 2608, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnRoute", "خط السير", 7711, 1287, 1588, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrices", "أسعار المندوب", 9412, 1287, 1814, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddCombo("cboCustomer", "", 227, 2155, 4649, 454, "", 2, "0;4536")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblCustomer", "عميل خارج خط السير", 227, 1843, 4649, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
+    Set c = AddButton("btnAddVisit", "إضافة زيارة", 4990, 2138, 1814, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblInfo", " ", 227, 2778, 13154, 397, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddList("lstVisits", 227, 3232, 13154, 3629, 7, "0;680;3969;1474;1474;1361;3629", True)
+    c.AfterUpdate = EP
+    Set c = AddCombo("cboResult", "", 227, 7258, 2268, 454, "", 2, "0;2155")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblResult", "نتيجة الزيارة", 227, 6946, 2268, 284, 9, False, CLR_MUTED, "cboResult", 0)
+    Set c = AddText("txtVisitNotes", "", 2608, 7258, 4536, 454)
+    Set c = AddLabel("lblVisitNotes", "ملاحظات الزيارة", 2608, 6946, 4536, 284, 9, False, CLR_MUTED, "txtVisitNotes", 0)
+    Set c = AddButton("btnRecord", "تسجيل الزيارة", 7258, 7241, 1928, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnDeleteVisit", "حذف الزيارة", 9299, 7241, 1701, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnExecution", "تقرير تنفيذ خط السير", 227, 8165, 2608, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnVisitsReport", "تقرير الزيارات", 2948, 8165, 1928, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnVanStock", "رصيد السيارات", 4989, 8165, 1928, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 11907, 8165, 1474, 624, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnActivate = EP
+    m_frm.OnResize = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    RepVisitsLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Activate()" & vbCrLf
+    s = s & "    RepVisitsShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboRep_AfterUpdate()" & vbCrLf
+    s = s & "    RepVisitsShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtDate_AfterUpdate()" & vbCrLf
+    s = s & "    RepVisitsShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstVisits_AfterUpdate()" & vbCrLf
+    s = s & "    RepVisitPicked Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPlan_Click()" & vbCrLf
+    s = s & "    RepVisitsPlan Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRoute_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmRouteStops"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrices_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmRepPrices"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnAddVisit_Click()" & vbCrLf
+    s = s & "    RepVisitsAdd Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRecord_Click()" & vbCrLf
+    s = s & "    RepVisitsRecord Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDeleteVisit_Click()" & vbCrLf
+    s = s & "    RepVisitsDelete Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnExecution_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmReportCenter"", 0, ""ROUTE_EXECUTION""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnVisitsReport_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmReportCenter"", 0, ""REP_VISITS""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnVanStock_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmReportCenter"", 0, ""REP_VAN_STOCK""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Resize()" & vbCrLf
+    s = s & "    Dim spec As String" & vbCrLf
+    s = s & "    spec = ""boxTitle,0,0,13608,850,0,1000,0,0;lblInfo,227,2778,13154,397,0,1000,0,0;lstVisits,227,3232,13154,3629,0,1000,0,1000;cboResult,227,7258,2268,454,0,0,1000,0;lblResult,227,6946,2268,284,0,0,1000,0;txtVisitNotes,2608,7258,4536,454,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";lblVisitNotes,2608,6946,4536,284,0,0,1000,0;btnRecord,7258,7241,1928,482,0,0,1000,0;btnDeleteVisit,9299,7241,1701,482,0,0,1000,0;btnExecution,227,8165,2608,624,0,0,1000,0;btnVisitsReport,2948,8165,1928,624,0,0,1000,0;btnVanStock,4989,8165,1928,624,0,0,1000,0""" & vbCrLf
+    s = s & "    spec = spec & "";btnClose,11907,8165,1474,624,1000,0,1000,0""" & vbCrLf
+    s = s & "    FitControls Me, 13608, 9299, -2154, " & IIf(MirrorLayout(), "True", "False") & ", spec" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmRepVisits", s
+    Exit Sub
+EH:
+    AbortForm "frmRepVisits", Err.Number, Err.Description
 End Sub

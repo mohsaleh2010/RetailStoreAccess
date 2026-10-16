@@ -88,6 +88,7 @@
 | + | إذن التسليم للعملاء وإذن الاستلام من الموردين مربوطان بالفواتير (المخزون يتحرك مرة واحدة، والحسابان 1430 و2150) | ✅ تمت الموافقة | [docs/61-Delivery-Receipt-Notes.md](docs/61-Delivery-Receipt-Notes.md) |
 | + | طلبيات العملاء: الاعتماد يحجز الكمية في المخزن، والتجهيز، والتسليم بأذونات من الطلبية كليًا أو جزئيًا ثم الفوترة، والإلغاء، وتقريرا الطلبيات المفتوحة والمحجوز | ✅ تمت الموافقة | [docs/62-Sales-Orders.md](docs/62-Sales-Orders.md) |
 | + | يوم المندوب والبيع من السيارة: تحميل السيارة، والبيع والمرتجع والتحصيل باسم المندوب من مخزن السيارة وصندوق العهدة، وجرد السيارة وتصفية الصندوق، وإغلاق اليوم وتقريره | ✅ تمت الموافقة | [docs/63-Van-Sales.md](docs/63-Van-Sales.md) |
+| + | خط السير والزيارات وخطة اليوم ونتيجة كل زيارة، وحدود المندوب (حد ائتمان عملائه، وأقصى خصم، وقائمة أسعاره)، وتقارير تنفيذ خط السير والزيارات ورصيد السيارات | ✅ بانتظار الموافقة | [docs/64-Rep-Routes-Limits.md](docs/64-Rep-Routes-Limits.md) |
 
 ## هيكل المستودع
 
@@ -197,6 +198,7 @@
 | 56 | `modStockNotes` (دائمة، جديدة)، واستبدال `modSales` و`modPurchases` و`modJournal` و`modVat` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestStockNotes`, `TestSales`, `TestPurchases`, `TestJournal` |
 | 57 | `modSalesOrders` (دائمة، جديدة)، واستبدال `modSales` و`modStockNotes` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestSalesOrders`, `TestStockNotes`, `TestSales` |
 | 58 | `modVanSales` (دائمة، جديدة)، واستبدال `modWarehouses` و`modCash` و`modSalesReps` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestRepDays`, `TestWarehouses`, `TestCash`, `TestSalesReps` |
+| 59 | `modRepRoutes` (دائمة، جديدة)، واستبدال `modSales` و`modPOS` و`modSalesOrders` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries`, `BuildForms`, `BuildReports` | `TestRepRoutes`, `TestSales`, `TestSalesOrders`, `TestRepDays` |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **85** | عدد الحقول: **1101**
+عدد الجداول: **88** | عدد الحقول: **1127**
 
 ## الفهرس
 
@@ -84,13 +84,16 @@
 76. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
 77. [`SalesOrders`](#salesorders) – طلبيات العملاء
 78. [`RepDays`](#repdays) – أيام المندوبين
-79. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
-80. [`StockCounts`](#stockcounts) – جلسات الجرد
-81. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-82. [`AuditLog`](#auditlog) – سجل العمليات
-83. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-84. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-85. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+79. [`RouteStops`](#routestops) – خط سير المندوبين
+80. [`RepVisits`](#repvisits) – زيارات المندوبين
+81. [`RepPrices`](#repprices) – أسعار المندوبين
+82. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
+83. [`StockCounts`](#stockcounts) – جلسات الجرد
+84. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+85. [`AuditLog`](#auditlog) – سجل العمليات
+86. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+87. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+88. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -217,7 +220,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 44 سجل
+- بيانات أساسية: 45 سجل
 
 ## RolePermissions
 
@@ -229,7 +232,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 87 سجل
+- بيانات أساسية: 89 سجل
 
 ## Employees
 
@@ -291,7 +294,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 73 سجل
+- بيانات أساسية: 76 سجل
 
 ## UserScreens
 
@@ -1084,9 +1087,11 @@
 | 8 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز قيد عمولته |
 | 9 | CommissionRate | Currency (نسبة) |  | ✔ | `0` | `>=0 And <1` |  | نسبة العمولة |
 | 10 | CommissionBase | Short Text | 10 | ✔ | `"SALES"` | `In ("SALES","COLLECTION")` |  | أساس العمولة |
-| 11 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
-| 12 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 11 | CreditLimit | Currency |  | ✔ | `0` | `>=0` |  | حد ائتمان عملاء المندوب – مجموع أرصدة عملائه؛ 0 = بلا حد (docs/64) |
+| 12 | MaxDiscountPercent | Currency (نسبة) |  | ✔ | `0` | `>=0 And <=1` |  | أقصى خصم للمندوب |
+| 13 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 14 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 15 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `SalesRepID`
 - فهرس فريد: `RepCode`
@@ -1974,6 +1979,61 @@
 - فهرس فريد: `DayNumber`
 - فهرس عادي: `DayDate`
 - فهرس عادي: `Status`
+
+## RouteStops
+
+**خط سير المندوبين** – أيام زيارة كل عميل لكل مندوب (docs/64): منها تُنشأ خطة زيارات اليوم.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **RouteStopID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | SalesRepID | Number (Long) |  | ✔ |  |  | `SalesReps.SalesRepID` | المندوب |
+| 3 | CustomerID | Number (Long) |  | ✔ |  |  | `Customers.CustomerID` | العميل |
+| 4 | VisitWeekday | Number (Byte) |  | ✔ | `1` | `Between 1 And 7` |  | يوم الزيارة |
+| 5 | StopOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب في خط السير |
+| 6 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 7 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `RouteStopID`
+- فهرس فريد: `SalesRepID, CustomerID, VisitWeekday`
+
+## RepVisits
+
+**زيارات المندوبين** – زيارة مندوب لعميل في يوم (docs/64): من خطة اليوم (خط السير) أو خارجها، ونتيجتها: طلبية، أو بيع، أو تحصيل، أو لا شيء، أو المحل مغلق.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **RepVisitID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | VisitDate | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | تاريخ الزيارة |
+| 3 | SalesRepID | Number (Long) |  | ✔ |  |  | `SalesReps.SalesRepID` | المندوب |
+| 4 | CustomerID | Number (Long) |  | ✔ |  |  | `Customers.CustomerID` | العميل |
+| 5 | IsPlanned | Yes/No |  |  | `False` |  |  | من خط السير |
+| 6 | StopOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
+| 7 | Result | Short Text | 10 | ✔ | `"PENDING"` | `In ("PENDING","ORDER","SALE","PAYMENT","NO_SALE","CLOSED")` |  | النتيجة |
+| 8 | VisitedAt | Date/Time |  |  |  |  |  | وقت تسجيل الزيارة |
+| 9 | EmployeeID | Number (Long) |  |  |  |  | `Employees.EmployeeID` | سجّلها |
+| 10 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 11 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `RepVisitID`
+- فهرس فريد: `VisitDate, SalesRepID, CustomerID`
+- فهرس عادي: `SalesRepID`
+
+## RepPrices
+
+**أسعار المندوبين** – قائمة أسعار المندوب (docs/64): سعر بيع خاص لصنف عندما يبيع المندوب (أو يبيع المكتب باسمه).
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **RepPriceID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | SalesRepID | Number (Long) |  | ✔ |  |  | `SalesReps.SalesRepID` | المندوب |
+| 3 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 4 | UnitPrice | Currency |  | ✔ | `0` | `>=0` |  | سعر البيع للمندوب |
+| 5 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `RepPriceID`
+- فهرس فريد: `SalesRepID, ProductID`
 
 ## SalesOrderLines
 

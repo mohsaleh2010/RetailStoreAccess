@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 200
+Private Const EXPECTED_RELATION_COUNT As Long = 206
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -578,6 +578,12 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_RepDays_StoreID", "Warehouses", "WarehouseID", "RepDays", "StoreID", 0&)
     c.Add Array("FK_RepDays_StockCountID", "StockCounts", "StockCountID", "RepDays", "StockCountID", 0&)
     c.Add Array("FK_RepDays_ClosingID", "CashClosings", "ClosingID", "RepDays", "ClosingID", 0&)
+    c.Add Array("FK_RouteStops_SalesRepID", "SalesReps", "SalesRepID", "RouteStops", "SalesRepID", 4096&)
+    c.Add Array("FK_RouteStops_CustomerID", "Customers", "CustomerID", "RouteStops", "CustomerID", 0&)
+    c.Add Array("FK_RepVisits_SalesRepID", "SalesReps", "SalesRepID", "RepVisits", "SalesRepID", 0&)
+    c.Add Array("FK_RepVisits_CustomerID", "Customers", "CustomerID", "RepVisits", "CustomerID", 0&)
+    c.Add Array("FK_RepPrices_SalesRepID", "SalesReps", "SalesRepID", "RepPrices", "SalesRepID", 4096&)
+    c.Add Array("FK_RepPrices_ProductID", "Products", "ProductID", "RepPrices", "ProductID", 0&)
     c.Add Array("FK_SalesOrderLines_SalesOrderID", "SalesOrders", "SalesOrderID", "SalesOrderLines", "SalesOrderID", 4096&)
     c.Add Array("FK_SalesOrderLines_ProductID", "Products", "ProductID", "SalesOrderLines", "ProductID", 0&)
     c.Add Array("FK_StockCounts_CategoryID", "Categories", "CategoryID", "StockCounts", "CategoryID", 0&)
@@ -600,6 +606,7 @@ Private Function RetiredRelations() As Variant
                              "FK_FiscalYearClosings_EmployeeID", _
                              "FK_PeriodClosings_EmployeeID", _
                              "FK_RepDays_EmployeeID", _
+                             "FK_RepVisits_EmployeeID", _
                              "FK_SalesOrders_EmployeeID", _
                              "FK_StockCounts_PostedByID", _
                              "FK_StockDocuments_EmployeeID", _

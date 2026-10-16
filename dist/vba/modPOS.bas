@@ -218,7 +218,7 @@ Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty 
         rs!ProductCode = p!ProductCode
         rs!ProductName = p!ProductName
         rs!Quantity = Qty
-        rs!UnitPrice = p!SellingPrice
+        rs!UnitPrice = SessionPrice(ProductID, p!SellingPrice)          ' the rep's price list (modRepRoutes)
         rs!LineDiscount = 0
     Else
         rs.Edit
@@ -247,9 +247,10 @@ Public Sub LineChanged(ByVal sf As Access.Form, ByVal FieldName As String)
     If Nz(sf!LineDiscount.Value, 0) < 0 Then sf!LineDiscount.Value = 0
     If FieldName = "UnitPrice" Then
         price = DLookup("SellingPrice", "Products", "ProductID = " & sf!ProductID.Value)
-        If sf!UnitPrice.Value <> price And Not HasPermission("PRICE_OVERRIDE") Then
+        If Nz(sf!UnitPrice.Value, 0) <> price And Not IsSessionRepPrice(sf!ProductID.Value, Nz(sf!UnitPrice.Value, 0)) _
+           And Not HasPermission("PRICE_OVERRIDE") Then
             ShowWarning "·«  „·ﬂ ’·«ÕÌ…  ⁄œÌ· ”⁄— «·»Ì⁄."
-            sf!UnitPrice.Value = price
+            sf!UnitPrice.Value = SessionPrice(sf!ProductID.Value, price)
         End If
     End If
     If sf.Dirty Then sf.Dirty = False

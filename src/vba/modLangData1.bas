@@ -41,8 +41,10 @@ Private Sub D1_1()
     LangAdd "معاملات برنامج التوقيع: {IN} ملف المستند، {OUT} ملف التوقيع، {PIN} الرقم السري (فارغ", "Arguments of the signing program: {IN} document file, {OUT} signature file, {PIN} PIN (empty"
     LangAdd "حدد الشاشات والإجراءات ثم اضغط «حفظ». الصلاحيات الخاصة (تقارير الأرباح، تعديل السعر", "Select the screens and actions, then click Save. The special permissions (profit reports, price change"
     LangAdd "فاتورة المشتريات الحالية لم تُحفظ (ستبقى محفوظة مؤقتًا لهذا الجهاز). هل تريد الخروج", "The current purchase invoice is not saved (it will stay held for this computer). Do you want to exit"
+    LangAdd "يحل محل سعر البيع في الفاتورة والطلبية؛ تغييره في الفاتورة يحتاج صلاحية تعديل السعر", "Replaces the selling price in the invoice and the order. Changing it in the invoice needs the price change permission"
     LangAdd "الأرصدة المدينة (الأصول) أكبر من الدائنة بهذا المبلغ: أكمل رأس المال أو الالتزامات", "The debit balances (assets) exceed the credit balances by this amount: complete the capital or the liabilities"
     LangAdd "العملة والضريبة والرقم الضريبي والفاتورة الإلكترونية. تتغير قبل تسجيل أي عملية فقط", "Currency, tax, tax number and e-invoicing. It changes only before any operation is recorded"
+    LangAdd "خطة اليوم من خط السير، ثم تسجيل كل زيارة ونتيجتها: طلبية أو بيع أو تحصيل أو لا شيء", "The day plan from the route, then each visit and its result: order, sale, collection or nothing"
     LangAdd "البرنامج غير مفعّل على هذا الجهاز: أرسل رقم الجهاز للمبرمج واكتب الكود الذي يرسله", "The program is not activated on this computer: send the computer number to the developer and type the code he sends"
     LangAdd "الموجب مستحق للهيئة، والسالب رصيد مسترد. راجع الأرقام مع محاسبك قبل تقديم الإقرار", "A positive amount is due to the Authority, a negative one is a refundable balance. Review the figures with your accountant before filing the return"
     LangAdd "عمليات في فترة مقفلة تغيرت ولم يتغير قيدها (أعد فتح الفترة إن كان التغيير مقصودًا", "Transactions in a closed period that changed while their entry did not (reopen the period if the change is intended"
@@ -83,6 +85,7 @@ Private Sub D1_1()
     LangAdd "يناير,فبراير,مارس,أبريل,مايو,يونيو,يوليو,أغسطس,سبتمبر,أكتوبر,نوفمبر,ديسمبر", "January,February,March,April,May,June,July,August,September,October,November,December"
     LangAdd "اسم إنجليزي لكل عميل ومورد ومنتج وصندوق وحساب: يظهر في الواجهة الإنجليزية", "An English name for each customer, supplier, product, box and account: shown in the English interface"
     LangAdd "سيُعاد إظهار أدوات Access ويُسمح بمفتاح Shift عند الفتح. هل تريد المتابعة", "The Access tools will be shown again and the Shift key allowed on opening. Do you want to continue"
+    LangAdd "يزور المندوب العميل في هذا اليوم من كل أسبوع؛ لعدة أيام أضف سطرًا لكل يوم", "The rep visits the customer on this day of every week. For several days add a line for each day"
     LangAdd "الإقرار معتمد: لا تتغير قيمه. ألغِ الاعتماد أولًا إن كان التغيير مقصودًا", "The return is approved: its values do not change. Cancel the approval first if the change is intended"
     LangAdd "هذا التقرير يعرض التكلفة والأرباح ويحتاج صلاحية «تقارير الأرباح والضريبة", "This report shows costs and profits and needs the permission Profit and VAT reports"
     LangAdd "إعادة إنشاء أسطر المسير من بيانات الموظفين؟ تضيع التعديلات المكتوبة فيه", "Rebuild the run lines from the employee data? The changes typed in it are lost"
@@ -93,6 +96,7 @@ Private Sub D1_1()
     LangAdd "إلغاء تفعيل الجهاز المحدد؟ لن يعمل عليه البرنامج حتى يُفعَّل بكود جديد", "Deactivate the selected computer? The program will not run on it until it is activated with a new code"
     LangAdd "اكتب التاريخ والبيان، ثم سطرًا لكل حساب: المبلغ في المدين أو في الدائن", "Type the date and the description, then a line for each account: the amount in debit or in credit"
     LangAdd "البيانات داخل هذا الملف نفسه (غير مقسمة)، فلا يمكن استعادتها وهو مفتوح", "The data is inside this same file (not split), so it cannot be restored while it is open"
+    LangAdd "اختر نتيجة الزيارة: لا فاتورة ولا طلبية ولا تحصيل للعميل في هذا اليوم", "Choose the result of the visit: the customer has no invoice, order or payment on this day"
     LangAdd "الفترة الأولى تبدأ في 1 يناير (والسنوات قبلها ميلادية) أو قبل أول قيد", "The first period starts on 1 January (the years before it are calendar years) or before the first entry"
     LangAdd "حساب إجمالي الأرصدة الافتتاحية هو مقابل كل الأرصدة، ولا يُدخل له رصيد", "The total opening balances account is the other side of every balance and takes no balance of its own"
     LangAdd "لا تنتهي فترتان في سنة ميلادية واحدة: إقفال الفترة يُعرف بسنة نهايتها", "No two periods end in the same calendar year: a closing is known by the year of its end"
@@ -112,6 +116,7 @@ Private Sub D1_1()
     LangAdd "بعدها لا يُضاف ولا يُعدَّل ولا يُحذف أي مستند بتاريخ حتى هذا اليوم", "After that, no document dated up to this day is added, edited or deleted"
     LangAdd "سيُنشأ مفتاح جديد ويُعاد تسجيل الجهاز من البداية. هل تريد المتابعة", "A new key will be created and the device registered again from the start. Continue"
     LangAdd "شهادة الجهاز (CSID): تُملأ من الخطوة 3، أو تُلصق كما تصدرها الهيئة", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
+    LangAdd "قائمة أسعار المندوب: سعر خاص للصنف حين يبيع المندوب أو يُباع باسمه", "Rep price list: a special price of a product when the rep sells or a sale is made in his name"
     LangAdd "يُلغى ترحيل التحويل بالطريق فقط. التحويل المستلم يُعاد بتحويل جديد", "Only a transfer in transit is unposted. A received transfer is sent back with a new transfer"
     LangAdd "أرصدة المنتجات وحركاتها، والرصيد الافتتاحي والإضافة والخصم اليدوي", "Product balances and moves, opening balance and manual additions and deductions"
     LangAdd "إقرار غير محفوظ: الأرقام من المستندات الآن. احفظه مسودة أو اعتمده", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
@@ -129,18 +134,19 @@ Private Sub D1_1()
     LangAdd "مقاس الملصق والورق والهوامش، وحجم الباركود، والنصوص أعلاه وأسفله", "Label and paper size, margins, barcode size, and the texts above and below it"
     LangAdd "هل تريد تعطيله بدلًا من ذلك؟ (يختفي من القوائم ويبقى في التقارير", "Do you want to deactivate it instead? (It disappears from the lists and stays in the reports"
     LangAdd "إنشاء الفاتورة من هذا الإذن بأسعاره؟ لا يتحرك المخزون مرة ثانية", "Make the invoice from this note at its prices? The stock does not move a second time"
+End Sub
+
+Private Sub D1_2()
     LangAdd "بعد الإقفال لا يُضاف ولا يُعدَّل ولا يُحذف أي مستند بتاريخ مقفل", "After closing, no document dated in a closed period is added, edited or deleted"
     LangAdd "توجد فاتورة مشتريات غير مكتملة من جلسة سابقة. هل تريد استكمالها", "There is an unfinished purchase invoice from a previous session. Do you want to continue it"
     LangAdd "هذا المصروف مسجل من سند صرف نقدية في الخزينة ولا يُعدَّل من هنا", "This expense is recorded from a cash payment voucher in the treasury and is not edited from here"
     LangAdd "إقفال السنة المالية (الإيرادات والمصروفات إلى الأرباح المحتجزة", "Fiscal year closing (revenue and expenses to retained earnings"
     LangAdd "الأصل الموجود قبل البرنامج بلا ضريبة مدخلات (سُجِّلت وقت شرائه", "An asset owned before the program has no input VAT (it was recorded when bought"
-End Sub
-
-Private Sub D1_2()
     LangAdd "الكافيه: أصناف هذه الفئة تظهر كإضافات للمشروب (حليب، شوت إضافي", "Cafe: the items of this category appear as extras of the drink (milk, extra shot"
     LangAdd "المشتريات الخاضعة للنسبة الأساسية (مع المصروفات بفاتورة ضريبية", "Purchases at the standard rate (with expenses with a tax invoice"
     LangAdd "صدرت فاتورة هذا الإذن، فلا يُلغى ترحيله. اعمل مرتجعًا للفاتورة", "This note is invoiced and cannot be unposted. Make a return of the invoice"
     LangAdd "قيد إهلاك كل شهر بالترتيب: مصروف الإهلاك ومجمع الإهلاك لكل أصل", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
+    LangAdd "لا زيارات في هذا اليوم. «خطة اليوم من خط السير» تضيف عملاء يوم", "No visits on this day. Day plan from the route adds the customers of"
     LangAdd "لا يوجد إذن. اختر النوع والمخزن والعميل أو المورد ثم «إذن جديد", "No note. Choose the type, the warehouse and the customer or supplier, then New note"
     LangAdd "لم يُدخل الرقم الضريبي، ولن تكون الفواتير فواتير ضريبية نظامية", "The VAT number is not entered, and the invoices will not be valid tax invoices"
     LangAdd "معامل كل عملة في تاريخ؛ المستند يأخذ آخر سعر في تاريخه أو قبله", "The rate of each currency on a date, a document takes the last rate on or before its date"
@@ -182,6 +188,7 @@ Private Sub D1_2()
     LangAdd "من أضاف أو عدّل أو حذف، ومتى، ومن أي جهاز، والقيم قبل وبعد", "Who added, edited or deleted, when, from which computer, and the values before and after"
     LangAdd "أحد الأصناف في الفاتورة لم يعد موجودًا. احذفه من الفاتورة", "An item of the invoice no longer exists. Remove it from the invoice"
     LangAdd "أضف أصناف الفاتورة أو احفظ فاتورة أولًا، ثم اطبع الباركود", "Add the invoice items or save an invoice first, then print the barcodes"
+    LangAdd "أيام زيارة كل عميل لكل مندوب: منها تُنشأ خطة زيارات اليوم", "The visit days of each customer for each rep: the plan of the day is made from them"
     LangAdd "إلغاء ترحيل رصيد هذا الصنف؟ تُحذف حركته ويعود رصيده صفرًا", "Unpost the opening stock of this item? Its move is deleted and its quantity goes back to zero"
     LangAdd "اجرد السيارة ورحّل الجرد قبل إغلاق اليوم (زر «جرد السيارة", "Count the van and post the count before closing the day (button Van count"
     LangAdd "اختر البنك، واكتب تاريخ كشف البنك ورصيده، ثم «بدء التسوية", "Choose the bank, type the date and balance of the bank statement, then Start reconciliation"
@@ -250,6 +257,9 @@ Private Sub D1_2()
     LangAdd "نقدية مبيعات المستخدم وسنداته تدخل هذا الصندوق؛ فارغ", "The cash of the sales and vouchers of the user goes into this box, empty"
     LangAdd "أرصدة الخزينة الرئيسية وصناديق الكاشير وحركة كل يوم", "Balances of the main treasury and cashier boxes and the moves of each day"
     LangAdd "الخطوة 1 تمت: شهادة الامتثال. التالي: فحوص الامتثال", "Step 1 done: compliance certificate. Next: compliance checks"
+End Sub
+
+Private Sub D1_3()
     LangAdd "الفاتورة الإلكترونية بعد (شاشة الفاتورة الإلكترونية", "e-invoicing platform yet (see the e-invoicing screen"
     LangAdd "الفترة مقفلة. أعد فتحها أولًا من شاشة إقفال الفترات", "The period is closed. Reopen it first in the period closing screen"
     LangAdd "الفروع والأقسام: تُوزَّع عليها الإيرادات والمصروفات", "Branches and departments: revenue and expenses are allocated to them"
@@ -257,9 +267,6 @@ Private Sub D1_2()
     LangAdd "المدير المسؤول عن الخزينة: اختر له الخزينة الرئيسية", "The manager in charge of the treasury: choose the main treasury for him"
     LangAdd "تاريخ المصروف في المستقبل. هل تريد الحفظ على أي حال", "The expense date is in the future. Do you want to save anyway"
     LangAdd "توجد شهادة محفوظة. هل تريد استبدالها بشهادة تجريبية", "A certificate is saved. Replace it with a test certificate"
-End Sub
-
-Private Sub D1_3()
     LangAdd "تُحذف المسودة فقط. ألغِ ترحيل التحويل بالطريق أولًا", "Only a draft is deleted. Unpost the transfer in transit first"
     LangAdd "جهاز نقطة البيع المسجّل في بوابة مصلحة الضرائب (مصر", "The POS device registered on the Egyptian Tax Authority portal (Egypt"
     LangAdd "لا تملك صلاحية الإضافة في شاشة ربط السداد بالفواتير", "You do not have the permission to add in the payment matching screen"
@@ -274,13 +281,4 @@ Private Sub D1_3()
     LangAdd "المبالغ لا تكون سالبة: اكتب المبلغ في الجانب الآخر", "Amounts are never negative: type the amount on the other side"
     LangAdd "تأكد أن المبرمج أصدره لرقم الجهاز الظاهر في الشاشة", "Make sure the developer issued it for the computer number shown on the screen"
     LangAdd "تمت الاستعادة. سيُغلق البرنامج الآن، افتحه من جديد", "Restored. The program will close now, open it again"
-    LangAdd "توجد تعديلات غير محفوظة. هل تريد حفظها قبل الإغلاق", "There are unsaved changes. Do you want to save them before closing"
-    LangAdd "تُحذف المسودة فقط. ألغِ الطلبية المعتمدة بدل حذفها", "Only a draft is deleted. Cancel an approved order instead"
-    LangAdd "تُعدَّل أسطر المسودة فقط. أعد الطلبية لمسودة أولًا", "Only the lines of a draft are changed. Return the order to draft first"
-    LangAdd "رصيد العملاء يُدخل في قسم «العملاء»: رصيد لكل عميل", "The customers balance is entered in the Customers part: one balance per customer"
-    LangAdd "رفضت المصلحة بيانات الدخول (بيانات جهاز نقطة البيع", "The Tax Authority refused the credentials (POS device data"
-    LangAdd "صلاحيات شاشات خاصة بهذا المستخدم (بدل صلاحيات دوره", "Custom screen permissions for this user (instead of the permissions of his role"
-    LangAdd "ضريبة المبيعات ناقص الضريبة القابلة للخصم عن الشهر", "Output VAT less deductible input VAT of the month"
-    LangAdd "في السعودية يُصحَّح المستند بإشعار دائن، ولا يُلغى", "In Saudi Arabia a document is corrected by a credit note, not cancelled"
-    LangAdd "لا توجد طلبية. اختر العميل والمخزن ثم «طلبية جديدة", "No order. Choose the customer and the warehouse, then New order"
 End Sub

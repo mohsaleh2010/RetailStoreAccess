@@ -167,6 +167,26 @@ LIST_SPECS: List[ListSpec] = [
         Col("فرق جرد السيارة", "CountDiffValue", 2.1, MONEY, True), Col("النقدية الفعلية", "CashCounted", 2.1, MONEY, True),
         Col("فرق النقدية", "CashDifference", 1.9, MONEY, True), Col("الحالة", "StatusName", 2.0)],
         [("DayDate", False), ("DayNumber", False)], landscape=True, no_data="لا توجد أيام مندوبين في هذه الفترة."),
+    ListSpec("ROUTE_EXECUTION", [
+        Col("التاريخ", "=GDate([VisitDate])", 2.2), Col("المندوب", "RepName", 3.6, grow=True),
+        Col("الزيارات", "VisitCount", 1.6, INT, True), Col("المخططة", "PlannedCount", 1.6, INT, True),
+        Col("المنفذة", "DoneCount", 1.6, INT, True), Col("لم تتم", "MissedCount", 1.6, INT, True),
+        Col("طلبية", "OrderCount", 1.4, INT, True), Col("بيع", "SaleCount", 1.4, INT, True),
+        Col("تحصيل", "PaymentCount", 1.4, INT, True), Col("بلا نتيجة", "NoSaleCount", 1.6, INT, True),
+        Col("مغلق", "ClosedCount", 1.4, INT, True), Col("نسبة التنفيذ", "DoneRate", 1.9, PCT)],
+        [("VisitDate", False), ("RepName", False)], landscape=True, no_data="لا توجد زيارات في هذه الفترة."),
+    ListSpec("REP_VISITS", [
+        Col("التاريخ", "=GDate([VisitDate])", 2.2), Col("المندوب", "RepName", 3.2),
+        Col("الترتيب", "StopOrder", 1.3, INT), Col("العميل", "CustomerName", 4.4, grow=True),
+        Col("الخطة", "PlanName", 2.2), Col("النتيجة", "ResultName", 2.2),
+        Col("وقت التسجيل", "=GDate([VisitedAt],True)", 3.2), Col("ملاحظات", "Notes", 4.6, grow=True)],
+        [("VisitDate", False), ("RepName", False), ("StopOrder", False)], landscape=True,
+        no_data="لا توجد زيارات في هذه الفترة."),
+    ListSpec("REP_VAN_STOCK", [
+        Col("المندوب", "RepName", 3.2), Col("السيارة", "WarehouseName", 2.8), Col("الكود", "ProductCode", 2.2),
+        Col("الصنف", "ProductName", 5.0, grow=True), Col("الكمية", "StockQty", 1.9, QTY, True),
+        Col("التكلفة", "AverageCost", 2.0, MONEY), Col("القيمة", "StockCostValue", 2.4, MONEY, True)],
+        [("RepName", False), ("ProductName", False)], landscape=True, no_data="لا توجد بضاعة في سيارات المندوبين."),
     ListSpec("STOCK_COUNT_DIFF", [
         Col("رقم الجرد", "CountNumber", 2.4), Col("التاريخ", "=GDate([CountDate])", 2.2),
         Col("المخزن", "WarehouseName", 3.0), Col("الكود", "ProductCode", 2.3),

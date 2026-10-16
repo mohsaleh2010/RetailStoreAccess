@@ -144,6 +144,16 @@ WAREHOUSE_ROWS = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w
                   "ORDER BY w.WarehouseID")
 REPORT_WAREHOUSE_ROWS = "SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w ORDER BY w.WarehouseID"
 COMMISSION_BASES = "SALES;صافي المبيعات (بدون الضريبة);COLLECTION;التحصيل"
+WEEKDAY_NAMES = ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"]   # VBA Weekday 1..7
+WEEKDAY_ROWS = ";".join(f"{i + 1};{d}" for i, d in enumerate(WEEKDAY_NAMES))
+
+
+def weekday_name_sql(column: str) -> str:
+    """The Arabic name of a weekday number 1..7 (VBA Weekday, Sunday = 1) in SQL, without Choose()."""
+    sql = f"'{WEEKDAY_NAMES[6]}'"
+    for i in range(5, -1, -1):
+        sql = f"IIf({column} = {i + 1}, '{WEEKDAY_NAMES[i]}', {sql})"
+    return sql
 EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
 FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
 ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
@@ -308,6 +318,8 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("CommissionBase", rows=COMMISSION_BASES, widths="0;4.5"),
             Fld("CostCenterID", rows=CENTER_ROWS, widths="0;6", hint="مركز قيد عمولته"),
             Fld("IsActive"),
+            Fld("CreditLimit", hint="مجموع أرصدة عملائه في البيع الآجل؛ 0 = بلا حد"),
+            Fld("MaxDiscountPercent", hint="حين يبيع هو أو يُباع باسمه؛ 0 = حد المستخدم"),
             Info("lblRepInfo"),
             Fld("Notes", span=2),
         ]),
@@ -322,6 +334,33 @@ DATA_SCREENS: List[DataScreen] = [
         fields=[Fld("SalesRepID", rows=REP_ROWS, widths="0;6"), Fld("TargetYear"), Fld("TargetMonth"),
                 Fld("TargetAmount"),
                 Info("lblTargetNote", "لكل مندوب هدف واحد في الشهر؛ تقرير «أداء المندوبين» يقارن الفعلي بالهدف")]),
+    DataScreen(
+        "frmRouteStops", "RouteStops", "خط سير المندوبين",
+        "أيام زيارة كل عميل لكل مندوب: منها تُنشأ خطة زيارات اليوم", "customers",
+        list_select=("s.RepName AS [المندوب], " + weekday_name_sql("t.VisitWeekday") + " AS [يوم الزيارة], "
+                     "t.StopOrder AS [الترتيب], c.CustomerName AS [العميل]"),
+        list_from=("(RouteStops AS t INNER JOIN [@SalesReps] AS s ON t.SalesRepID = s.SalesRepID) "
+                   "INNER JOIN [@Customers] AS c ON t.CustomerID = c.CustomerID"),
+        list_order="s.RepName, t.VisitWeekday, t.StopOrder, c.CustomerName",
+        list_headers=[("المندوب", 3.0), ("اليوم", 1.8), ("الترتيب", 1.2), ("العميل", 3.6)],
+        search=["s.RepName", "s.RepNameEn", "c.CustomerName", "c.CustomerNameEn"], active="t.IsActive",
+        fields=[Fld("SalesRepID", rows=REP_ROWS, widths="0;6"), Fld("CustomerID", rows=CUSTOMER_ROWS, widths="0;6"),
+                Fld("VisitWeekday", rows=WEEKDAY_ROWS, widths="0;3"),
+                Fld("StopOrder", hint="ترتيب العميل في خط سير ذلك اليوم"),
+                Fld("IsActive"), Fld("Notes", span=2),
+                Info("lblRouteNote", "يزور المندوب العميل في هذا اليوم من كل أسبوع؛ لعدة أيام أضف سطرًا لكل يوم")]),
+    DataScreen(
+        "frmRepPrices", "RepPrices", "أسعار المندوبين",
+        "قائمة أسعار المندوب: سعر خاص للصنف حين يبيع المندوب أو يُباع باسمه", "customers",
+        list_select="s.RepName AS [المندوب], p.ProductName AS [الصنف], t.UnitPrice AS [سعر المندوب]",
+        list_from=("(RepPrices AS t INNER JOIN [@SalesReps] AS s ON t.SalesRepID = s.SalesRepID) "
+                   "INNER JOIN Products AS p ON t.ProductID = p.ProductID"),
+        list_order="s.RepName, p.ProductName",
+        list_headers=[("المندوب", 3.2), ("الصنف", 4.0), ("السعر", 1.8)],
+        search=["s.RepName", "s.RepNameEn", "p.ProductName", "p.ProductCode"],
+        fields=[Fld("SalesRepID", rows=REP_ROWS, widths="0;6"), Fld("ProductID", rows=PRODUCT_ROWS, widths="0;7"),
+                Fld("UnitPrice", hint="شامل الضريبة كسعر البيع في نقطة البيع"),
+                Info("lblRepPriceNote", "يحل محل سعر البيع في الفاتورة والطلبية؛ تغييره في الفاتورة يحتاج صلاحية تعديل السعر")]),
     DataScreen(
         "frmRecurring", "RecurringExpenses", "المصروفات المتكررة",
         "الإيجار والكهرباء والاشتراكات: يُنشأ المصروف تلقائيًا في تاريخ استحقاقه", "expenses",
@@ -641,6 +680,7 @@ SCREEN_PERMISSIONS = {
     "frmCashTransfers": "CASH_CLOSING", "frmWarehouses": "PRODUCTS",
     "frmStockTransfer": "STOCK_TRANSFER", "frmStockParties": "STOCK_DOCS", "frmStockDocument": "STOCK_DOCS",
     "frmStockNote": "STOCK_NOTES", "frmSalesOrder": "SALES_ORDERS", "frmRepDay": "REP_DAYS",
+    "frmRepVisits": "REP_ROUTES", "frmRouteStops": "REP_ROUTES", "frmRepPrices": "REP_ROUTES",
     "frmJournal": "JOURNAL", "frmJournalEntry": "JOURNAL", "frmAccounts": "JOURNAL",
     "frmManualEntry": "MANUAL_ENTRY", "frmLedger": "JOURNAL", "frmFinancials": "REPORTS_PROFIT",
     "frmPeriodClosing": "PERIOD_CLOSE", "frmFiscalPeriods": "PERIOD_CLOSE", "frmVatReturn": "VAT_RETURN", "frmOpeningBalances": "OPENING_BALANCES",
@@ -745,6 +785,10 @@ REPORTS: List[ReportEntry] = [
                 "rptReservedStock", "w"),
     ReportEntry("REP_DAYS", "تسوية أيام المندوبين: البضاعة والنقدية", "RepDaySummaryQuery", "rptRepDays", "D",
                 "DayDate"),
+    ReportEntry("ROUTE_EXECUTION", "تنفيذ خط السير: الزيارات المخططة والمنفذة ونتائجها", "RouteExecutionQuery",
+                "rptRouteExecution", "D", "VisitDate"),
+    ReportEntry("REP_VISITS", "زيارات المندوبين بالتفصيل", "RepVisitListQuery", "rptRepVisits", "Dc", "VisitDate"),
+    ReportEntry("REP_VAN_STOCK", "رصيد سيارات المندوبين", "RepVanStockQuery", "rptRepVanStock", "w"),
     ReportEntry("STOCK_COUNT_DIFF", "فروقات الجرد المرحّلة لكل مخزن", "StockCountDiffQuery", "rptStockCountDiff",
                 "Dw", "CountDate"),
     ReportEntry("LOW_STOCK", "المنتجات منخفضة المخزون", "LowStockQuery", "rptLowStock"),

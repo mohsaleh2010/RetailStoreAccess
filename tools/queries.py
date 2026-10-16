@@ -1922,6 +1922,37 @@ FROM (((((((RepDays AS d INNER JOIN [@SalesReps] AS r ON d.SalesRepID = r.SalesR
        LEFT JOIN qryRepDayCollections AS p ON d.RepDayID = p.RepDayID)
       LEFT JOIN CashClosings AS c ON d.ClosingID = c.ClosingID
 ORDER BY d.DayDate, d.DayNumber"""),
+    Query("RepVisitListQuery", "زيارات المندوبين: المخططة من خط السير وخارجه ونتيجة كل زيارة (docs/64)", """
+SELECT v.RepVisitID, v.VisitDate, v.SalesRepID, r.RepName, v.CustomerID, c.CustomerName, v.StopOrder, v.IsPlanned,
+       IIf(v.IsPlanned, 'من خط السير', 'خارج الخط') AS PlanName, v.Result,
+       IIf(v.Result = 'PENDING', 'لم تتم', IIf(v.Result = 'ORDER', 'طلبية', IIf(v.Result = 'SALE', 'بيع',
+       IIf(v.Result = 'PAYMENT', 'تحصيل', IIf(v.Result = 'NO_SALE', 'بلا نتيجة', 'المحل مغلق'))))) AS ResultName,
+       v.VisitedAt, v.Notes
+FROM (RepVisits AS v INNER JOIN [@SalesReps] AS r ON v.SalesRepID = r.SalesRepID)
+     INNER JOIN [@Customers] AS c ON v.CustomerID = c.CustomerID"""),
+
+    Query("RouteExecutionQuery", "تنفيذ خط السير لكل مندوب ويوم: المخطط والمنفذ والفائت ونتائج الزيارات (docs/64)", """
+SELECT v.VisitDate, v.SalesRepID, r.RepName, Count(*) AS VisitCount,
+       Sum(IIf(v.IsPlanned, 1, 0)) AS PlannedCount,
+       Sum(IIf(v.Result <> 'PENDING', 1, 0)) AS DoneCount,
+       Sum(IIf(v.Result = 'PENDING', 1, 0)) AS MissedCount,
+       Sum(IIf(v.Result = 'ORDER', 1, 0)) AS OrderCount,
+       Sum(IIf(v.Result = 'SALE', 1, 0)) AS SaleCount,
+       Sum(IIf(v.Result = 'PAYMENT', 1, 0)) AS PaymentCount,
+       Sum(IIf(v.Result = 'NO_SALE', 1, 0)) AS NoSaleCount,
+       Sum(IIf(v.Result = 'CLOSED', 1, 0)) AS ClosedCount,
+       Sum(IIf(v.Result <> 'PENDING', 1.0, 0)) / Count(*) AS DoneRate
+FROM RepVisits AS v INNER JOIN [@SalesReps] AS r ON v.SalesRepID = r.SalesRepID
+GROUP BY v.VisitDate, v.SalesRepID, r.RepName"""),
+
+    Query("RepVanStockQuery", "رصيد سيارة كل مندوب: الكمية والقيمة بمتوسط التكلفة (docs/64)", """
+SELECT q.WarehouseID, w.SalesRepID, r.RepName, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName,
+       q.StockQty, p.AverageCost, q.StockQty * p.AverageCost AS StockCostValue
+FROM ((qryWarehouseStock AS q INNER JOIN [@Warehouses] AS w ON q.WarehouseID = w.WarehouseID)
+      INNER JOIN [@SalesReps] AS r ON w.SalesRepID = r.SalesRepID)
+     INNER JOIN Products AS p ON q.ProductID = p.ProductID
+WHERE w.WarehouseType = 'VAN' AND q.StockQty <> 0"""),
+
     Query("qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", _stock_transfer()),
     Query("qryJournalStockNote", "أسطر قيود أذونات التسليم والاستلام (1430 و2150)", _stock_note()),
     Query("TransfersInTransitQuery", "التحويلات بين المخازن المرسلة ولم تُستلم بعد، بقيمتها وعدد أيامها بالطريق", """

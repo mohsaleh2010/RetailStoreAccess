@@ -11,6 +11,7 @@ The rules that refuse a document in VBA (not enough stock, credit limit, ...)
 raise SimError here, so a plan that Access would refuse cannot pass in Python.
 """
 
+import datetime as dt
 from decimal import Decimal as D
 from typing import Dict, List, Optional, Tuple
 
@@ -715,6 +716,71 @@ class Store:
                        "WHERE RepDayID = ?", (self.now, count, closing, did))
         self.acting = None
 
+    # ------------------------------------------------------------- routes, visits and rep limits (modRepRoutes, docs/64)
+    def rep_for(self, customer):                                     # SalesRepFor
+        if self.acting:
+            return self.acting[2]
+        rep = self.one("SELECT c.SalesRepID FROM Customers AS c INNER JOIN SalesReps AS s ON c.SalesRepID = s.SalesRepID "
+                       "WHERE s.IsActive = 1 AND c.CustomerID = ?", customer)
+        return rep or self.one("SELECT Min(SalesRepID) FROM SalesReps WHERE IsActive = 1 AND EmployeeID = ?", self.user)
+
+    def session_rep(self):                                           # SessionRepID
+        if self.acting:
+            return self.acting[2]
+        return self.one("SELECT Min(SalesRepID) FROM SalesReps WHERE IsActive = 1 AND EmployeeID = ?", self.user) or 0
+
+    def rep_price(self, rep, pid):                                   # RepProductPrice
+        return self.one("SELECT UnitPrice FROM RepPrices WHERE SalesRepID = ? AND ProductID = ?", rep, pid) if rep else None
+
+    def rep_credit_problem(self, rep, remaining):                    # RepCreditProblem
+        if not rep or remaining <= 0:
+            return False
+        limit = dec(self.one("SELECT CreditLimit FROM SalesReps WHERE SalesRepID = ?", rep) or 0)
+        bal = dec(self.one("SELECT Sum(CurrentBalance) FROM Customers WHERE CurrentBalance > 0 AND SalesRepID = ?", rep) or 0)
+        return limit > 0 and bal + remaining > limit
+
+    @staticmethod
+    def weekday(d):                                                  # VBA Weekday(d, vbSunday): Sunday = 1
+        return dt.date.fromisoformat(str(d)[:10]).isoweekday() % 7 + 1
+
+    def create_visit_plan(self, rep, d):                             # CreateVisitPlan
+        d = str(d)[:10] + " 00:00:00"
+        if not self.one("SELECT Count(*) FROM RouteStops WHERE IsActive = 1 AND SalesRepID = ? AND VisitWeekday = ?",
+                        rep, self.weekday(d)):
+            raise SimError("no customers on the route of this weekday")
+        cur = self.c.execute(
+            "INSERT INTO RepVisits (VisitDate, SalesRepID, CustomerID, IsPlanned, StopOrder, Result, EmployeeID) "
+            "SELECT ?, s.SalesRepID, s.CustomerID, 1, s.StopOrder, 'PENDING', ? FROM RouteStops AS s INNER JOIN Customers "
+            "AS c ON s.CustomerID = c.CustomerID WHERE s.IsActive = 1 AND c.IsActive = 1 AND s.SalesRepID = ? AND "
+            "s.VisitWeekday = ? AND s.CustomerID NOT IN (SELECT v.CustomerID FROM RepVisits AS v WHERE v.VisitDate = ? "
+            "AND v.SalesRepID = ?)", (d, self.user, rep, self.weekday(d), d, rep))
+        return cur.rowcount
+
+    def add_visit(self, rep, customer, d):                           # AddRepVisit
+        d = str(d)[:10] + " 00:00:00"
+        if self.one("SELECT Count(*) FROM RepVisits WHERE VisitDate = ? AND SalesRepID = ? AND CustomerID = ?",
+                    d, rep, customer):
+            raise SimError("the customer is in the visits of the day")
+        order = (self.one("SELECT Max(StopOrder) FROM RepVisits WHERE VisitDate = ? AND SalesRepID = ?", d, rep) or 0) + 1
+        return self.insert("RepVisits", VisitDate=d, SalesRepID=rep, CustomerID=customer, IsPlanned=0, StopOrder=order,
+                           Result="PENDING", EmployeeID=self.user)
+
+    def suggested_result(self, vid):                                 # SuggestedVisitResult
+        cust, d = self.c.execute("SELECT CustomerID, VisitDate FROM RepVisits WHERE RepVisitID = ?", (vid,)).fetchone()
+        nxt = (dt.date.fromisoformat(str(d)[:10]) + dt.timedelta(days=1)).isoformat()
+        for table, col, result in (("SalesInvoices", "InvoiceDate", "SALE"), ("SalesOrders", "OrderDate", "ORDER"),
+                                   ("CustomerPayments", "PaymentDate", "PAYMENT")):
+            if self.one(f"SELECT Count(*) FROM {table} WHERE CustomerID = ? AND {col} >= ? AND {col} < ?", cust, d, nxt):
+                return result
+        return ""
+
+    def record_visit(self, vid, result=None, notes=None):            # RecordRepVisit
+        result = result or self.suggested_result(vid)
+        if result not in ("ORDER", "SALE", "PAYMENT", "NO_SALE", "CLOSED"):
+            raise SimError("choose the result of the visit")
+        self.c.execute("UPDATE RepVisits SET Result = ?, VisitedAt = ?, EmployeeID = ?, Notes = Coalesce(?, Notes) "
+                       "WHERE RepVisitID = ?", (result, self.now, self.user, notes, vid))
+
     def _note_order(self, nid):
         return self.one("SELECT SalesOrderID FROM StockNotes WHERE StockNoteID = ?", nid)
 
@@ -800,6 +866,8 @@ class Store:
                                              "WHERE ProductID = ?", (pid,)).fetchone()
             if noted:                                                    # the price and cost of the note line
                 price, avg = noted[i]
+            elif self.rep_price(self.session_rep(), pid) is not None:    # the rep's price list (AddLine)
+                price = self.rep_price(self.session_rep(), pid)
             prods.append((pid, dec(q), dec(price), dec(avg), cat or "S"))
         out = P.calc([P.LineIn(q, price, D(0), VAT if cat == "S" else D(0)) for _, q, price, _, cat in prods],
                      dec(invoice_discount), True)
@@ -812,6 +880,9 @@ class Store:
             raise SimError(f"customer {customer} may not buy on credit")
         if (credit or remaining > 0) and dec(limit) > 0 and dec(bal) + remaining > dec(limit):
             raise SimError(f"credit limit of customer {customer}")
+        rep = self.rep_for(customer)
+        if self.rep_credit_problem(rep, remaining):
+            raise SimError(f"credit limit of rep {rep}")
         needs: Dict[int, D] = {}
         for pid, q, *_ in prods:
             needs[pid] = needs.get(pid, D(0)) + q
@@ -824,7 +895,7 @@ class Store:
                           TaxableAmount=float(out.taxable), Tax=float(out.tax), TotalAmount=float(out.total),
                           PaidAmount=float(paid_amt), RemainingAmount=float(remaining),
                           AmountTendered=float(tendered), ChangeDue=float(change),
-                          CashBoxID=self.box_for(1, paid_amt),
+                          CashBoxID=self.box_for(1, paid_amt), SalesRepID=rep,
                           WarehouseID=self.one("SELECT WarehouseID FROM StockNotes WHERE StockNoteID = ?", note)
                           if note else self.warehouse())
         for i, ((pid, q, _, avg, cat), ln) in enumerate(zip(prods, out.lines)):

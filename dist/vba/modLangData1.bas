@@ -41,8 +41,10 @@ Private Sub D1_1()
     LangAdd "ãÚÇãáÇÊ ÈÑäÇãÌ ÇáÊæŞíÚ: {IN} ãáİ ÇáãÓÊäÏ¡ {OUT} ãáİ ÇáÊæŞíÚ¡ {PIN} ÇáÑŞã ÇáÓÑí (İÇÑÛ", "Arguments of the signing program: {IN} document file, {OUT} signature file, {PIN} PIN (empty"
     LangAdd "ÍÏÏ ÇáÔÇÔÇÊ æÇáÅÌÑÇÁÇÊ Ëã ÇÖÛØ «ÍİÙ». ÇáÕáÇÍíÇÊ ÇáÎÇÕÉ (ÊŞÇÑíÑ ÇáÃÑÈÇÍ¡ ÊÚÏíá ÇáÓÚÑ", "Select the screens and actions, then click Save. The special permissions (profit reports, price change"
     LangAdd "İÇÊæÑÉ ÇáãÔÊÑíÇÊ ÇáÍÇáíÉ áã ÊõÍİÙ (ÓÊÈŞì ãÍİæÙÉ ãÄŞÊğÇ áåĞÇ ÇáÌåÇÒ). åá ÊÑíÏ ÇáÎÑæÌ", "The current purchase invoice is not saved (it will stay held for this computer). Do you want to exit"
+    LangAdd "íÍá ãÍá ÓÚÑ ÇáÈíÚ İí ÇáİÇÊæÑÉ æÇáØáÈíÉº ÊÛííÑå İí ÇáİÇÊæÑÉ íÍÊÇÌ ÕáÇÍíÉ ÊÚÏíá ÇáÓÚÑ", "Replaces the selling price in the invoice and the order. Changing it in the invoice needs the price change permission"
     LangAdd "ÇáÃÑÕÏÉ ÇáãÏíäÉ (ÇáÃÕæá) ÃßÈÑ ãä ÇáÏÇÆäÉ ÈåĞÇ ÇáãÈáÛ: Ãßãá ÑÃÓ ÇáãÇá Ãæ ÇáÇáÊÒÇãÇÊ", "The debit balances (assets) exceed the credit balances by this amount: complete the capital or the liabilities"
     LangAdd "ÇáÚãáÉ æÇáÖÑíÈÉ æÇáÑŞã ÇáÖÑíÈí æÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ÊÊÛíÑ ŞÈá ÊÓÌíá Ãí ÚãáíÉ İŞØ", "Currency, tax, tax number and e-invoicing. It changes only before any operation is recorded"
+    LangAdd "ÎØÉ Çáíæã ãä ÎØ ÇáÓíÑ¡ Ëã ÊÓÌíá ßá ÒíÇÑÉ æäÊíÌÊåÇ: ØáÈíÉ Ãæ ÈíÚ Ãæ ÊÍÕíá Ãæ áÇ ÔíÁ", "The day plan from the route, then each visit and its result: order, sale, collection or nothing"
     LangAdd "ÇáÈÑäÇãÌ ÛíÑ ãİÚøá Úáì åĞÇ ÇáÌåÇÒ: ÃÑÓá ÑŞã ÇáÌåÇÒ ááãÈÑãÌ æÇßÊÈ ÇáßæÏ ÇáĞí íÑÓáå", "The program is not activated on this computer: send the computer number to the developer and type the code he sends"
     LangAdd "ÇáãæÌÈ ãÓÊÍŞ ááåíÆÉ¡ æÇáÓÇáÈ ÑÕíÏ ãÓÊÑÏ. ÑÇÌÚ ÇáÃÑŞÇã ãÚ ãÍÇÓÈß ŞÈá ÊŞÏíã ÇáÅŞÑÇÑ", "A positive amount is due to the Authority, a negative one is a refundable balance. Review the figures with your accountant before filing the return"
     LangAdd "ÚãáíÇÊ İí İÊÑÉ ãŞİáÉ ÊÛíÑÊ æáã íÊÛíÑ ŞíÏåÇ (ÃÚÏ İÊÍ ÇáİÊÑÉ Åä ßÇä ÇáÊÛííÑ ãŞÕæÏğÇ", "Transactions in a closed period that changed while their entry did not (reopen the period if the change is intended"
@@ -83,6 +85,7 @@ Private Sub D1_1()
     LangAdd "íäÇíÑ,İÈÑÇíÑ,ãÇÑÓ,ÃÈÑíá,ãÇíæ,íæäíæ,íæáíæ,ÃÛÓØÓ,ÓÈÊãÈÑ,ÃßÊæÈÑ,äæİãÈÑ,ÏíÓãÈÑ", "January,February,March,April,May,June,July,August,September,October,November,December"
     LangAdd "ÇÓã ÅäÌáíÒí áßá Úãíá æãæÑÏ æãäÊÌ æÕäÏæŞ æÍÓÇÈ: íÙåÑ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "An English name for each customer, supplier, product, box and account: shown in the English interface"
     LangAdd "ÓíõÚÇÏ ÅÙåÇÑ ÃÏæÇÊ Access æíõÓãÍ ÈãİÊÇÍ Shift ÚäÏ ÇáİÊÍ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "The Access tools will be shown again and the Shift key allowed on opening. Do you want to continue"
+    LangAdd "íÒæÑ ÇáãäÏæÈ ÇáÚãíá İí åĞÇ Çáíæã ãä ßá ÃÓÈæÚº áÚÏÉ ÃíÇã ÃÖİ ÓØÑğÇ áßá íæã", "The rep visits the customer on this day of every week. For several days add a line for each day"
     LangAdd "ÇáÅŞÑÇÑ ãÚÊãÏ: áÇ ÊÊÛíÑ Şíãå. ÃáÛö ÇáÇÚÊãÇÏ ÃæáğÇ Åä ßÇä ÇáÊÛííÑ ãŞÕæÏğÇ", "The return is approved: its values do not change. Cancel the approval first if the change is intended"
     LangAdd "åĞÇ ÇáÊŞÑíÑ íÚÑÖ ÇáÊßáİÉ æÇáÃÑÈÇÍ æíÍÊÇÌ ÕáÇÍíÉ «ÊŞÇÑíÑ ÇáÃÑÈÇÍ æÇáÖÑíÈÉ", "This report shows costs and profits and needs the permission Profit and VAT reports"
     LangAdd "ÅÚÇÏÉ ÅäÔÇÁ ÃÓØÑ ÇáãÓíÑ ãä ÈíÇäÇÊ ÇáãæÙİíä¿ ÊÖíÚ ÇáÊÚÏíáÇÊ ÇáãßÊæÈÉ İíå", "Rebuild the run lines from the employee data? The changes typed in it are lost"
@@ -93,6 +96,7 @@ Private Sub D1_1()
     LangAdd "ÅáÛÇÁ ÊİÚíá ÇáÌåÇÒ ÇáãÍÏÏ¿ áä íÚãá Úáíå ÇáÈÑäÇãÌ ÍÊì íõİÚóøá ÈßæÏ ÌÏíÏ", "Deactivate the selected computer? The program will not run on it until it is activated with a new code"
     LangAdd "ÇßÊÈ ÇáÊÇÑíÎ æÇáÈíÇä¡ Ëã ÓØÑğÇ áßá ÍÓÇÈ: ÇáãÈáÛ İí ÇáãÏíä Ãæ İí ÇáÏÇÆä", "Type the date and the description, then a line for each account: the amount in debit or in credit"
     LangAdd "ÇáÈíÇäÇÊ ÏÇÎá åĞÇ Çáãáİ äİÓå (ÛíÑ ãŞÓãÉ)¡ İáÇ íãßä ÇÓÊÚÇÏÊåÇ æåæ ãİÊæÍ", "The data is inside this same file (not split), so it cannot be restored while it is open"
+    LangAdd "ÇÎÊÑ äÊíÌÉ ÇáÒíÇÑÉ: áÇ İÇÊæÑÉ æáÇ ØáÈíÉ æáÇ ÊÍÕíá ááÚãíá İí åĞÇ Çáíæã", "Choose the result of the visit: the customer has no invoice, order or payment on this day"
     LangAdd "ÇáİÊÑÉ ÇáÃæáì ÊÈÏÃ İí 1 íäÇíÑ (æÇáÓäæÇÊ ŞÈáåÇ ãíáÇÏíÉ) Ãæ ŞÈá Ãæá ŞíÏ", "The first period starts on 1 January (the years before it are calendar years) or before the first entry"
     LangAdd "ÍÓÇÈ ÅÌãÇáí ÇáÃÑÕÏÉ ÇáÇİÊÊÇÍíÉ åæ ãŞÇÈá ßá ÇáÃÑÕÏÉ¡ æáÇ íõÏÎá áå ÑÕíÏ", "The total opening balances account is the other side of every balance and takes no balance of its own"
     LangAdd "áÇ ÊäÊåí İÊÑÊÇä İí ÓäÉ ãíáÇÏíÉ æÇÍÏÉ: ÅŞİÇá ÇáİÊÑÉ íõÚÑİ ÈÓäÉ äåÇíÊåÇ", "No two periods end in the same calendar year: a closing is known by the year of its end"
@@ -112,6 +116,7 @@ Private Sub D1_1()
     LangAdd "ÈÚÏåÇ áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ÍÊì åĞÇ Çáíæã", "After that, no document dated up to this day is added, edited or deleted"
     LangAdd "ÓíõäÔÃ ãİÊÇÍ ÌÏíÏ æíõÚÇÏ ÊÓÌíá ÇáÌåÇÒ ãä ÇáÈÏÇíÉ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "A new key will be created and the device registered again from the start. Continue"
     LangAdd "ÔåÇÏÉ ÇáÌåÇÒ (CSID): ÊõãáÃ ãä ÇáÎØæÉ 3¡ Ãæ ÊõáÕŞ ßãÇ ÊÕÏÑåÇ ÇáåíÆÉ", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
+    LangAdd "ŞÇÆãÉ ÃÓÚÇÑ ÇáãäÏæÈ: ÓÚÑ ÎÇÕ ááÕäİ Ííä íÈíÚ ÇáãäÏæÈ Ãæ íõÈÇÚ ÈÇÓãå", "Rep price list: a special price of a product when the rep sells or a sale is made in his name"
     LangAdd "íõáÛì ÊÑÍíá ÇáÊÍæíá ÈÇáØÑíŞ İŞØ. ÇáÊÍæíá ÇáãÓÊáã íõÚÇÏ ÈÊÍæíá ÌÏíÏ", "Only a transfer in transit is unposted. A received transfer is sent back with a new transfer"
     LangAdd "ÃÑÕÏÉ ÇáãäÊÌÇÊ æÍÑßÇÊåÇ¡ æÇáÑÕíÏ ÇáÇİÊÊÇÍí æÇáÅÖÇİÉ æÇáÎÕã ÇáíÏæí", "Product balances and moves, opening balance and manual additions and deductions"
     LangAdd "ÅŞÑÇÑ ÛíÑ ãÍİæÙ: ÇáÃÑŞÇã ãä ÇáãÓÊäÏÇÊ ÇáÂä. ÇÍİÙå ãÓæÏÉ Ãæ ÇÚÊãÏå", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
@@ -129,18 +134,19 @@ Private Sub D1_1()
     LangAdd "ãŞÇÓ ÇáãáÕŞ æÇáæÑŞ æÇáåæÇãÔ¡ æÍÌã ÇáÈÇÑßæÏ¡ æÇáäÕæÕ ÃÚáÇå æÃÓİáå", "Label and paper size, margins, barcode size, and the texts above and below it"
     LangAdd "åá ÊÑíÏ ÊÚØíáå ÈÏáğÇ ãä Ğáß¿ (íÎÊİí ãä ÇáŞæÇÆã æíÈŞì İí ÇáÊŞÇÑíÑ", "Do you want to deactivate it instead? (It disappears from the lists and stays in the reports"
     LangAdd "ÅäÔÇÁ ÇáİÇÊæÑÉ ãä åĞÇ ÇáÅĞä ÈÃÓÚÇÑå¿ áÇ íÊÍÑß ÇáãÎÒæä ãÑÉ ËÇäíÉ", "Make the invoice from this note at its prices? The stock does not move a second time"
+End Sub
+
+Private Sub D1_2()
     LangAdd "ÈÚÏ ÇáÅŞİÇá áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ãŞİá", "After closing, no document dated in a closed period is added, edited or deleted"
     LangAdd "ÊæÌÏ İÇÊæÑÉ ãÔÊÑíÇÊ ÛíÑ ãßÊãáÉ ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáåÇ", "There is an unfinished purchase invoice from a previous session. Do you want to continue it"
     LangAdd "åĞÇ ÇáãÕÑæİ ãÓÌá ãä ÓäÏ ÕÑİ äŞÏíÉ İí ÇáÎÒíäÉ æáÇ íõÚÏóøá ãä åäÇ", "This expense is recorded from a cash payment voucher in the treasury and is not edited from here"
     LangAdd "ÅŞİÇá ÇáÓäÉ ÇáãÇáíÉ (ÇáÅíÑÇÏÇÊ æÇáãÕÑæİÇÊ Åáì ÇáÃÑÈÇÍ ÇáãÍÊÌÒÉ", "Fiscal year closing (revenue and expenses to retained earnings"
     LangAdd "ÇáÃÕá ÇáãæÌæÏ ŞÈá ÇáÈÑäÇãÌ ÈáÇ ÖÑíÈÉ ãÏÎáÇÊ (ÓõÌöøáÊ æŞÊ ÔÑÇÆå", "An asset owned before the program has no input VAT (it was recorded when bought"
-End Sub
-
-Private Sub D1_2()
     LangAdd "ÇáßÇİíå: ÃÕäÇİ åĞå ÇáİÆÉ ÊÙåÑ ßÅÖÇİÇÊ ááãÔÑæÈ (ÍáíÈ¡ ÔæÊ ÅÖÇİí", "Cafe: the items of this category appear as extras of the drink (milk, extra shot"
     LangAdd "ÇáãÔÊÑíÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÃÓÇÓíÉ (ãÚ ÇáãÕÑæİÇÊ ÈİÇÊæÑÉ ÖÑíÈíÉ", "Purchases at the standard rate (with expenses with a tax invoice"
     LangAdd "ÕÏÑÊ İÇÊæÑÉ åĞÇ ÇáÅĞä¡ İáÇ íõáÛì ÊÑÍíáå. ÇÚãá ãÑÊÌÚğÇ ááİÇÊæÑÉ", "This note is invoiced and cannot be unposted. Make a return of the invoice"
     LangAdd "ŞíÏ ÅåáÇß ßá ÔåÑ ÈÇáÊÑÊíÈ: ãÕÑæİ ÇáÅåáÇß æãÌãÚ ÇáÅåáÇß áßá ÃÕá", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
+    LangAdd "áÇ ÒíÇÑÇÊ İí åĞÇ Çáíæã. «ÎØÉ Çáíæã ãä ÎØ ÇáÓíÑ» ÊÖíİ ÚãáÇÁ íæã", "No visits on this day. Day plan from the route adds the customers of"
     LangAdd "áÇ íæÌÏ ÅĞä. ÇÎÊÑ ÇáäæÚ æÇáãÎÒä æÇáÚãíá Ãæ ÇáãæÑÏ Ëã «ÅĞä ÌÏíÏ", "No note. Choose the type, the warehouse and the customer or supplier, then New note"
     LangAdd "áã íõÏÎá ÇáÑŞã ÇáÖÑíÈí¡ æáä Êßæä ÇáİæÇÊíÑ İæÇÊíÑ ÖÑíÈíÉ äÙÇãíÉ", "The VAT number is not entered, and the invoices will not be valid tax invoices"
     LangAdd "ãÚÇãá ßá ÚãáÉ İí ÊÇÑíÎº ÇáãÓÊäÏ íÃÎĞ ÂÎÑ ÓÚÑ İí ÊÇÑíÎå Ãæ ŞÈáå", "The rate of each currency on a date, a document takes the last rate on or before its date"
@@ -182,6 +188,7 @@ Private Sub D1_2()
     LangAdd "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ¡ æãÊì¡ æãä Ãí ÌåÇÒ¡ æÇáŞíã ŞÈá æÈÚÏ", "Who added, edited or deleted, when, from which computer, and the values before and after"
     LangAdd "ÃÍÏ ÇáÃÕäÇİ İí ÇáİÇÊæÑÉ áã íÚÏ ãæÌæÏğÇ. ÇÍĞİå ãä ÇáİÇÊæÑÉ", "An item of the invoice no longer exists. Remove it from the invoice"
     LangAdd "ÃÖİ ÃÕäÇİ ÇáİÇÊæÑÉ Ãæ ÇÍİÙ İÇÊæÑÉ ÃæáğÇ¡ Ëã ÇØÈÚ ÇáÈÇÑßæÏ", "Add the invoice items or save an invoice first, then print the barcodes"
+    LangAdd "ÃíÇã ÒíÇÑÉ ßá Úãíá áßá ãäÏæÈ: ãäåÇ ÊõäÔÃ ÎØÉ ÒíÇÑÇÊ Çáíæã", "The visit days of each customer for each rep: the plan of the day is made from them"
     LangAdd "ÅáÛÇÁ ÊÑÍíá ÑÕíÏ åĞÇ ÇáÕäİ¿ ÊõÍĞİ ÍÑßÊå æíÚæÏ ÑÕíÏå ÕİÑğÇ", "Unpost the opening stock of this item? Its move is deleted and its quantity goes back to zero"
     LangAdd "ÇÌÑÏ ÇáÓíÇÑÉ æÑÍøá ÇáÌÑÏ ŞÈá ÅÛáÇŞ Çáíæã (ÒÑ «ÌÑÏ ÇáÓíÇÑÉ", "Count the van and post the count before closing the day (button Van count"
     LangAdd "ÇÎÊÑ ÇáÈäß¡ æÇßÊÈ ÊÇÑíÎ ßÔİ ÇáÈäß æÑÕíÏå¡ Ëã «ÈÏÁ ÇáÊÓæíÉ", "Choose the bank, type the date and balance of the bank statement, then Start reconciliation"
@@ -250,6 +257,9 @@ Private Sub D1_2()
     LangAdd "äŞÏíÉ ãÈíÚÇÊ ÇáãÓÊÎÏã æÓäÏÇÊå ÊÏÎá åĞÇ ÇáÕäÏæŞº İÇÑÛ", "The cash of the sales and vouchers of the user goes into this box, empty"
     LangAdd "ÃÑÕÏÉ ÇáÎÒíäÉ ÇáÑÆíÓíÉ æÕäÇÏíŞ ÇáßÇÔíÑ æÍÑßÉ ßá íæã", "Balances of the main treasury and cashier boxes and the moves of each day"
     LangAdd "ÇáÎØæÉ 1 ÊãÊ: ÔåÇÏÉ ÇáÇãÊËÇá. ÇáÊÇáí: İÍæÕ ÇáÇãÊËÇá", "Step 1 done: compliance certificate. Next: compliance checks"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÈÚÏ (ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "e-invoicing platform yet (see the e-invoicing screen"
     LangAdd "ÇáİÊÑÉ ãŞİáÉ. ÃÚÏ İÊÍåÇ ÃæáğÇ ãä ÔÇÔÉ ÅŞİÇá ÇáİÊÑÇÊ", "The period is closed. Reopen it first in the period closing screen"
     LangAdd "ÇáİÑæÚ æÇáÃŞÓÇã: ÊõæÒóøÚ ÚáíåÇ ÇáÅíÑÇÏÇÊ æÇáãÕÑæİÇÊ", "Branches and departments: revenue and expenses are allocated to them"
@@ -257,9 +267,6 @@ Private Sub D1_2()
     LangAdd "ÇáãÏíÑ ÇáãÓÄæá Úä ÇáÎÒíäÉ: ÇÎÊÑ áå ÇáÎÒíäÉ ÇáÑÆíÓíÉ", "The manager in charge of the treasury: choose the main treasury for him"
     LangAdd "ÊÇÑíÎ ÇáãÕÑæİ İí ÇáãÓÊŞÈá. åá ÊÑíÏ ÇáÍİÙ Úáì Ãí ÍÇá", "The expense date is in the future. Do you want to save anyway"
     LangAdd "ÊæÌÏ ÔåÇÏÉ ãÍİæÙÉ. åá ÊÑíÏ ÇÓÊÈÏÇáåÇ ÈÔåÇÏÉ ÊÌÑíÈíÉ", "A certificate is saved. Replace it with a test certificate"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÃáÛö ÊÑÍíá ÇáÊÍæíá ÈÇáØÑíŞ ÃæáğÇ", "Only a draft is deleted. Unpost the transfer in transit first"
     LangAdd "ÌåÇÒ äŞØÉ ÇáÈíÚ ÇáãÓÌøá İí ÈæÇÈÉ ãÕáÍÉ ÇáÖÑÇÆÈ (ãÕÑ", "The POS device registered on the Egyptian Tax Authority portal (Egypt"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to add in the payment matching screen"
@@ -274,13 +281,4 @@ Private Sub D1_3()
     LangAdd "ÇáãÈÇáÛ áÇ Êßæä ÓÇáÈÉ: ÇßÊÈ ÇáãÈáÛ İí ÇáÌÇäÈ ÇáÂÎÑ", "Amounts are never negative: type the amount on the other side"
     LangAdd "ÊÃßÏ Ãä ÇáãÈÑãÌ ÃÕÏÑå áÑŞã ÇáÌåÇÒ ÇáÙÇåÑ İí ÇáÔÇÔÉ", "Make sure the developer issued it for the computer number shown on the screen"
     LangAdd "ÊãÊ ÇáÇÓÊÚÇÏÉ. ÓíõÛáŞ ÇáÈÑäÇãÌ ÇáÂä¡ ÇİÊÍå ãä ÌÏíÏ", "Restored. The program will close now, open it again"
-    LangAdd "ÊæÌÏ ÊÚÏíáÇÊ ÛíÑ ãÍİæÙÉ. åá ÊÑíÏ ÍİÙåÇ ŞÈá ÇáÅÛáÇŞ", "There are unsaved changes. Do you want to save them before closing"
-    LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÃáÛö ÇáØáÈíÉ ÇáãÚÊãÏÉ ÈÏá ÍĞİåÇ", "Only a draft is deleted. Cancel an approved order instead"
-    LangAdd "ÊõÚÏóøá ÃÓØÑ ÇáãÓæÏÉ İŞØ. ÃÚÏ ÇáØáÈíÉ áãÓæÏÉ ÃæáğÇ", "Only the lines of a draft are changed. Return the order to draft first"
-    LangAdd "ÑÕíÏ ÇáÚãáÇÁ íõÏÎá İí ŞÓã «ÇáÚãáÇÁ»: ÑÕíÏ áßá Úãíá", "The customers balance is entered in the Customers part: one balance per customer"
-    LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÇáÏÎæá (ÈíÇäÇÊ ÌåÇÒ äŞØÉ ÇáÈíÚ", "The Tax Authority refused the credentials (POS device data"
-    LangAdd "ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ ÈåĞÇ ÇáãÓÊÎÏã (ÈÏá ÕáÇÍíÇÊ ÏæÑå", "Custom screen permissions for this user (instead of the permissions of his role"
-    LangAdd "ÖÑíÈÉ ÇáãÈíÚÇÊ äÇŞÕ ÇáÖÑíÈÉ ÇáŞÇÈáÉ ááÎÕã Úä ÇáÔåÑ", "Output VAT less deductible input VAT of the month"
-    LangAdd "İí ÇáÓÚæÏíÉ íõÕÍóøÍ ÇáãÓÊäÏ ÈÅÔÚÇÑ ÏÇÆä¡ æáÇ íõáÛì", "In Saudi Arabia a document is corrected by a credit note, not cancelled"
-    LangAdd "áÇ ÊæÌÏ ØáÈíÉ. ÇÎÊÑ ÇáÚãíá æÇáãÎÒä Ëã «ØáÈíÉ ÌÏíÏÉ", "No order. Choose the customer and the warehouse, then New order"
 End Sub

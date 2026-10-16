@@ -507,6 +507,17 @@ Public Sub StockNoteOpenOrder(ByVal frm As Access.Form)
     If orderID > 0 Then OpenScreen "frmSalesOrder", 0, orderID
 End Sub
 
+Public Function OrderDefaultPrice(ByVal SalesOrderID As Long, ByVal ProductID As Long) As Currency
+    ' The price list of the order's rep (modRepRoutes), else the selling price.
+    Dim v As Variant
+    v = RepProductPrice(Nz(DbValue("SELECT SalesRepID FROM SalesOrders WHERE SalesOrderID = " & SalesOrderID), 0), ProductID)
+    If IsNull(v) Then
+        OrderDefaultPrice = NoteDefaultPrice("DELIVERY", ProductID)
+    Else
+        OrderDefaultPrice = CCur(v)
+    End If
+End Function
+
 Public Sub SalesOrderLineBeforeUpdate(ByVal frm As Access.Form, ByRef Cancel As Integer)
     Dim id As Long, msg As String
     id = Nz(frm.Parent!cboOrder.Value, 0)
@@ -521,7 +532,7 @@ Public Sub SalesOrderLineBeforeUpdate(ByVal frm As Access.Form, ByRef Cancel As 
         Exit Sub
     End If
     If frm.NewRecord Then frm!SalesOrderID.Value = id
-    If Nz(frm!UnitPrice.Value, 0) = 0 Then frm!UnitPrice.Value = NoteDefaultPrice("DELIVERY", CLng(frm!ProductID.Value))
+    If Nz(frm!UnitPrice.Value, 0) = 0 Then frm!UnitPrice.Value = OrderDefaultPrice(id, CLng(frm!ProductID.Value))
     AuditFormBefore frm, "SalesOrderLines", "SalesOrderLineID"
 End Sub
 
