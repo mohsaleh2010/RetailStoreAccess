@@ -33,6 +33,7 @@ Private Sub D1_1()
     LangAdd "ÊÍãíá ÇáÓíÇÑÉ¡ æÇáÈíÚ æÇáãÑÊÌÚ æÇáÊÍÕíá ÈÇÓã ÇáãäÏæÈ¡ Ëã ÌÑÏ ÇáÓíÇÑÉ æÊÕİíÉ ÕäÏæŞ ÇáÚåÏÉ", "Load the van, sell, take returns and collect in the rep name, then count the van and close the custody box"
     LangAdd "ãÓæÏÉ ÈÇáÃÕäÇİ¡ Ëã «ÊÑÍíá»: ÊõÎÕã ãä ÇáãÑÓöá æÊõÖÇİ ááãÓÊáã¡ Ãæ ÊÈŞì ÈÇáØÑíŞ ÍÊì íÓÊáãåÇ", "A draft with the products, then Post: they leave the sender and enter the receiver, or stay in transit until received"
     LangAdd "ÇÓÊÚáÇãÇÊ ŞÇÚÏÉ ÇáÎÇÏã ãä äÓÎÉ ÃÎÑì ãä ÇáÈÑäÇãÌ: ÔÛøá «ÊÌåíÒ ÇáŞÇÚÏÉ» ÈÓßÑÈÊ åĞå ÇáäÓÎÉ", "The queries of the server database are from another version of the program: run Set up the database with the script of this version"
+    LangAdd "ÇÚÊãÇÏ» íÌÚá ÇáßãíÉ ÊÍÊ ÇáØáÈ¡ Ëã «ÅĞä ÇáÇÓÊáÇã» ãä ÇáÃãÑ¡ Ëã İÇÊæÑÉ ÇáãÔÊÑíÇÊ ãä ÇáÅĞä", "Approve puts the quantity on order, then the receipt note from the order, then the purchase invoice from the note"
     LangAdd "ÇáãÓÊÎÏã íÊÈÚ ÕáÇÍíÇÊ ÏæÑå ßãÇ İí ÇáŞÇÆãÉ. İÚøá «ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ» áÊÍÏíÏ ÔÇÔÇÊå æÍÏå", "The user follows the permissions of his role as in the list. Turn on Custom screen permissions to set his own screens"
     LangAdd "æááÈÏÁ ãä ãáİ Access ãä ÌÏíÏ: «ÇáÑÌæÚ Åáì Access» ãÚ ÌÚá ãáİ Access åæ ÇáÈíÇäÇÊ ÇáİÚáíÉ", "To start again from the Access file: Back to Access, making the Access file the real data"
     LangAdd "ÊõÍĞİ ßá ÇáÈíÇäÇÊ ÇáãæÌæÏÉ İí ŞÇÚÏÉ ÇáÎÇÏã ÃæáğÇ. áÇ íÚãá ÃÍÏ Úáì ÇáÈÑäÇãÌ ÃËäÇÁ ÇáäŞá", "All the data in the server database is deleted first. Nobody works on the program during the transfer"
@@ -93,6 +94,7 @@ Private Sub D1_1()
     LangAdd "ÇáÅåáÇß ÇáÓÇÈŞ ááÃÕæá ÇáãæÌæÏÉ ŞÈá ÇáÈÑäÇãÌ İŞØ (ãÕÏÑ ÇáÔÑÇÁ: ÑÕíÏ ÇİÊÊÇÍí", "Previous depreciation, only for assets owned before the program (purchase source: opening balance"
     LangAdd "ÊÑÍíá ÇáÌÑÏ íÍæøá ÇáİÑæŞÇÊ Åáì ÍÑßÇÊ ÊÓæíÉ İí ÇáãÎÒæä æáÇ íãßä ÇáÊÑÇÌÚ Úäå", "Posting the count turns the differences into stock adjustment moves and cannot be undone"
     LangAdd "ÎÇäÇÊ äãæĞÌ ÇáÅŞÑÇÑ ÇáÖÑíÈí ãä ÇáãÓÊäÏÇÊ¡ Ëã ÇáÇÚÊãÇÏ æŞíÏ ÇáÊÓæíÉ æÇáÓÏÇÏ", "The boxes of the tax return form from the documents, then the approval, the settlement entry and the payment"
+    LangAdd "áÇ íæÌÏ ÃãÑ ÔÑÇÁ. ÇÎÊÑ ÇáãæÑÏ æÇáãÎÒä Ëã «ÃãÑ ÌÏíÏ»¡ Ãæ «ÃæÇãÑ ãä ÇáÇŞÊÑÇÍ", "No purchase order. Choose the supplier and warehouse then New order, or Orders from suggestion"
     LangAdd "ãÌãá ÇáÑÈÍ ± İÑæŞÇÊ ÇáãÎÒæä - ÇáãÕÑæİÇÊ. ÇáÑÕíÏ ÇáÇİÊÊÇÍí áÇ íÏÎá İí ÇáÑÈÍ", "Gross profit +/- stock differences - expenses. The opening balance is not part of the profit"
     LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä (íõÍÖóøÑ ÚäÏ ÇáØáÈ)¡ İáÇ ÊõÓÌóøá áå ÍÑßÇÊ ãÎÒæä", "This item does not track stock (prepared on order), so no stock moves are recorded for it"
     LangAdd "íäÇíÑ,İÈÑÇíÑ,ãÇÑÓ,ÃÈÑíá,ãÇíæ,íæäíæ,íæáíæ,ÃÛÓØÓ,ÓÈÊãÈÑ,ÃßÊæÈÑ,äæİãÈÑ,ÏíÓãÈÑ", "January,February,March,April,May,June,July,August,September,October,November,December"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "ÇÈÏÃ ÌÑÏğÇ¡ ÃÏÎá ÇáßãíÉ ÇáİÚáíÉ Ãæ ÇãÓÍ ÇáÈÇÑßæÏ¡ Ëã ÑÍøá ÇáİÑæŞÇÊ", "Start a count, enter the actual quantity or scan the barcode, then post the differences"
     LangAdd "ÇáÔÇÔÇÊ ÇáÊí íİÊÍåÇ ßá ãÓÊÎÏã¡ æÇáÅÖÇİÉ æÇáÊÚÏíá æÇáÍĞİ İí ßá ÔÇÔÉ", "The screens each user opens, and add, edit and delete in each screen"
     LangAdd "ÈÚÏåÇ áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ÍÊì åĞÇ Çáíæã", "After that, no document dated up to this day is added, edited or deleted"
-    LangAdd "ÓíõäÔÃ ãİÊÇÍ ÌÏíÏ æíõÚÇÏ ÊÓÌíá ÇáÌåÇÒ ãä ÇáÈÏÇíÉ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "A new key will be created and the device registered again from the start. Continue"
-    LangAdd "ÔåÇÏÉ ÇáÌåÇÒ (CSID): ÊõãáÃ ãä ÇáÎØæÉ 3¡ Ãæ ÊõáÕŞ ßãÇ ÊÕÏÑåÇ ÇáåíÆÉ", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "ÓíõäÔÃ ãİÊÇÍ ÌÏíÏ æíõÚÇÏ ÊÓÌíá ÇáÌåÇÒ ãä ÇáÈÏÇíÉ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "A new key will be created and the device registered again from the start. Continue"
+    LangAdd "ÔåÇÏÉ ÇáÌåÇÒ (CSID): ÊõãáÃ ãä ÇáÎØæÉ 3¡ Ãæ ÊõáÕŞ ßãÇ ÊÕÏÑåÇ ÇáåíÆÉ", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
     LangAdd "ŞÇÆãÉ ÃÓÚÇÑ ÇáãäÏæÈ: ÓÚÑ ÎÇÕ ááÕäİ Ííä íÈíÚ ÇáãäÏæÈ Ãæ íõÈÇÚ ÈÇÓãå", "Rep price list: a special price of a product when the rep sells or a sale is made in his name"
     LangAdd "ŞÇÚÏÉ ÌÏíÏÉ ÊõäÔÃ ÌÏÇæáåÇ¡ æŞÇÚÏÉ ãæÌæÏÉ ÊõÑŞøì æáÇ ÊõÍĞİ ÈíÇäÇÊåÇ", "A new database gets its tables, an existing one is upgraded and keeps its data"
     LangAdd "íõáÛì ÊÑÍíá ÇáÊÍæíá ÈÇáØÑíŞ İŞØ. ÇáÊÍæíá ÇáãÓÊáã íõÚÇÏ ÈÊÍæíá ÌÏíÏ", "Only a transfer in transit is unposted. A received transfer is sent back with a new transfer"
@@ -166,6 +168,7 @@ Private Sub D1_2()
     LangAdd "ÇáßÇİíå: ÃÕäÇİ åĞå ÇáİÆÉ ÊÙåÑ ßÅÖÇİÇÊ ááãÔÑæÈ (ÍáíÈ¡ ÔæÊ ÅÖÇİí", "Cafe: the items of this category appear as extras of the drink (milk, extra shot"
     LangAdd "ÇáãÔÊÑíÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÃÓÇÓíÉ (ãÚ ÇáãÕÑæİÇÊ ÈİÇÊæÑÉ ÖÑíÈíÉ", "Purchases at the standard rate (with expenses with a tax invoice"
     LangAdd "ÕÏÑÊ İÇÊæÑÉ åĞÇ ÇáÅĞä¡ İáÇ íõáÛì ÊÑÍíáå. ÇÚãá ãÑÊÌÚğÇ ááİÇÊæÑÉ", "This note is invoiced and cannot be unposted. Make a return of the invoice"
+    LangAdd "ÕÏÑÊ ãä ÇáÃãÑ ÃĞæäÇÊ ÇÓÊáÇã. ÇÍĞİ ÇáãÓæÏÇÊ ãäåÇ¡ Ãæ ÃáÛö ÇáÃãÑ", "Receipt notes were made from the order. Delete their drafts, or cancel the order"
     LangAdd "ŞíÏ ÅåáÇß ßá ÔåÑ ÈÇáÊÑÊíÈ: ãÕÑæİ ÇáÅåáÇß æãÌãÚ ÇáÅåáÇß áßá ÃÕá", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
     LangAdd "áÇ ÒíÇÑÇÊ İí åĞÇ Çáíæã. «ÎØÉ Çáíæã ãä ÎØ ÇáÓíÑ» ÊÖíİ ÚãáÇÁ íæã", "No visits on this day. Day plan from the route adds the customers of"
     LangAdd "áÇ íæÌÏ ÅĞä. ÇÎÊÑ ÇáäæÚ æÇáãÎÒä æÇáÚãíá Ãæ ÇáãæÑÏ Ëã «ÅĞä ÌÏíÏ", "No note. Choose the type, the warehouse and the customer or supplier, then New note"
@@ -216,6 +219,7 @@ Private Sub D1_2()
     LangAdd "ãä ÃÖÇİ Ãæ ÚÏøá Ãæ ÍĞİ¡ æãÊì¡ æãä Ãí ÌåÇÒ¡ æÇáŞíã ŞÈá æÈÚÏ", "Who added, edited or deleted, when, from which computer, and the values before and after"
     LangAdd "ÃÍÏ ÇáÃÕäÇİ İí ÇáİÇÊæÑÉ áã íÚÏ ãæÌæÏğÇ. ÇÍĞİå ãä ÇáİÇÊæÑÉ", "An item of the invoice no longer exists. Remove it from the invoice"
     LangAdd "ÃÖİ ÃÕäÇİ ÇáİÇÊæÑÉ Ãæ ÇÍİÙ İÇÊæÑÉ ÃæáğÇ¡ Ëã ÇØÈÚ ÇáÈÇÑßæÏ", "Add the invoice items or save an invoice first, then print the barcodes"
+    LangAdd "ÃãÑ ÇáÔÑÇÁ áåĞÇ ÇáÅĞä áíÓ ãİÊæÍğÇ ááÇÓÊáÇã (ãÓÊáã Ãæ ãáÛì", "The purchase order of this note is not open for receiving (received or cancelled"
     LangAdd "ÃíÇã ÒíÇÑÉ ßá Úãíá áßá ãäÏæÈ: ãäåÇ ÊõäÔÃ ÎØÉ ÒíÇÑÇÊ Çáíæã", "The visit days of each customer for each rep: the plan of the day is made from them"
     LangAdd "ÅáÛÇÁ ÊÑÍíá ÑÕíÏ åĞÇ ÇáÕäİ¿ ÊõÍĞİ ÍÑßÊå æíÚæÏ ÑÕíÏå ÕİÑğÇ", "Unpost the opening stock of this item? Its move is deleted and its quantity goes back to zero"
     LangAdd "ÇÌÑÏ ÇáÓíÇÑÉ æÑÍøá ÇáÌÑÏ ŞÈá ÅÛáÇŞ Çáíæã (ÒÑ «ÌÑÏ ÇáÓíÇÑÉ", "Count the van and post the count before closing the day (button Van count"
@@ -227,8 +231,10 @@ Private Sub D1_2()
     LangAdd "İí ÔÇÔÉ ÇáÈíÚ İÇÊæÑÉ áã ÊõÍİÙ ÈÚÏ. ÇÍİÙåÇ Ãæ ÇãÓÍåÇ ÃæáğÇ", "The sales screen has an unsaved invoice. Save or clear it first"
     LangAdd "İí åĞÇ Çáíæã ÍÑßÉ (ÊÍãíá Ãæ ÈíÚ Ãæ ÊÍÕíá). Óæöøå ÈÏá ÍĞİå", "This day has activity (loading, sales or collections). Settle it instead of deleting it"
     LangAdd "ŞíÏ ãÍİæÙ: ÚÏøá Ëã ÇÍİÙ¡ İíÊÍÏË ŞíÏå İí ÇáíæãíÉ ÈäİÓ ÑŞãå", "Saved entry: edit and save, and its journal entry is updated with the same number"
+    LangAdd "áÇ ÊæÌÏ ÃÕäÇİ æÕáÊ áÍÏ ÅÚÇÏÉ ÇáØáÈ (Ãæ åí İí ãÓæÏÇÊ ÃæÇãÑ", "No products are at their reorder level (or they are in draft orders"
     LangAdd "íõÍĞİ ÇáÔíß ÊÍÊ ÇáÊÍÕíá İŞØ: ÃáÛö ÊÍÕíáå Ãæ ÇÑÊÏÇÏå ÃæáğÇ", "Only a cheque under collection is deleted: cancel its collection or bounce first"
     LangAdd "ÅÑÌÇÚ ÇáÔíß Åáì «ÊÍÊ ÇáÊÍÕíá» æÍĞİ ŞíÏ ÊÍÕíáå Ãæ ÇÑÊÏÇÏå", "Return the cheque to Under collection and delete the entry of its collection or bounce"
+    LangAdd "ÅäÔÇÁ ãÓæÏÇÊ ÃæÇãÑ ÔÑÇÁ ãä ÇŞÊÑÇÍ ÇáÔÑÇÁ (ãÓæÏÉ áßá ãæÑÏ", "Create draft purchase orders from the purchase suggestion (one draft per supplier"
     LangAdd "ÇßÊÈ ÓÈÈ ÇáÍÑßÉ İí ÇáãáÇÍÙÇÊ (ãËÇá: ÊÇáİ¡ åÏíÉ ãä ÇáãæÑÏ", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
     LangAdd "ÇáÅÚÏÇÏ ãßÊãá. İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "The setup is complete. Enable sending in the e-invoicing screen"
     LangAdd "ÇáÅáÛÇÁ ááİÇÊæÑÉ ÇáÅáßÊÑæäíÉ İŞØ. ÇáÅíÕÇá íõÕÍóøÍ ÈãÑÊÌÚ", "Only an e-invoice can be cancelled. A receipt is corrected by a return"
@@ -251,24 +257,17 @@ Private Sub D1_2()
     LangAdd "ÊæÌÏ İÇÊæÑÉ ÛíÑ ãßÊãáÉ ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáåÇ", "There is an unfinished invoice from a previous session. Do you want to continue it"
     LangAdd "áÇ ÊæÌÏ ÈíÇäÇÊ áÚÑÖåÇ İí åĞÇ ÇáÊŞÑíÑ ááÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "There is no data to show in this report for the choices made"
     LangAdd "áÇ íãßä ÇáÍĞİ Ãæ ÇáÊÚÏíá áæÌæÏ ÚãáíÇÊ ãÑÊÈØÉ ÈåĞÇ ÇáÓÌá", "Cannot delete or edit because there are transactions linked to this record"
+End Sub
+
+Private Sub D1_3()
     LangAdd "áÇ íãßä ÊÛííÑ ÏæáÉ ÇáÊÔÛíá ÈÚÏ ÊÓÌíá ÚãáíÇÊ İí ÇáÈÑäÇãÌ", "The operating country cannot change after operations are recorded"
     LangAdd "áíÓÊ İí ÇáİÊÑÇÊ ÇáãÇáíÉ. ÃÖİåÇ İí ÔÇÔÉ «ÇáİÊÑÇÊ ÇáãÇáíÉ", "is not in the fiscal periods. Add it in the Fiscal periods screen"
     LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÓáóøã æáÇ íõÓÊáã ÈÅĞä", "This item does not track stock, so it has no delivery or receipt note"
     LangAdd "íõãÓÍ İí äŞØÉ ÇáÈíÚ æÇáãÔÊÑíÇÊ İíõÖÇİ ÇáÓØÑ ÈåĞå ÇáæÍÏÉ", "Scanned in the POS and purchases, it adds the line in this unit"
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ æÇäÓÎ ãáİ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ ãßÇäå íÏæíğÇ", "Close the program and copy the backup file in its place by hand"
     LangAdd "ÅÌãÇáí ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÓÊÍŞÉ Úä ÇáİÊÑÉ ÇáÍÇáíÉ", "Total VAT due for the current period"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÇÎÊÑ ÔÇÔÉ æÇÍÏÉ Úáì ÇáÃŞá¡ Ãæ ÃáÛö «ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ", "Choose at least one screen, or clear Custom screen permissions"
     LangAdd "ÇáÑŞã ÇáÖÑíÈí İí ÇáÓÚæÏíÉ 15 ÑŞãğÇ æíÈÏÃ æíäÊåí ÈÇáÑŞã", "The Saudi tax number has 15 digits and starts and ends with the digit"
     LangAdd "ÇáÖÑíÈÉ æÇáŞíãÉ ÇáãÊÈŞíÉ æÇáÅåáÇß ÇáÓÇÈŞ áÇ Êßæä ÓÇáÈÉ", "VAT, residual value and previous depreciation are never negative"
     LangAdd "ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ ááİÇÊæÑÉ ÇáÅáßÊÑæäíÉ (Client ID æ", "Credentials of the program for the e-invoice (Client ID and"
-    LangAdd "ÊÃßÏ ãä ÊÔÛíá ÇáÎÇÏã æÇáÔÈßÉ¡ Ëã ÇİÊÍ ÇáÈÑäÇãÌ ãä ÌÏíÏ", "Make sure the server and the network are running, then open the program again"
-    LangAdd "ÊÚĞÑÊ ÇáäÓÎÉ ÇáæŞÇÆíÉ ŞÈá ÇáÇÓÊÚÇÏÉ¡ İáã ÊÊã ÇáÇÓÊÚÇÏÉ", "The safety copy before restoring failed, so nothing was restored"
-    LangAdd "Êã ÍİÙ ÕáÇÍíÇÊ ÇáÔÇÔÇÊ. ÊÓÑí ãä ÇáÏÎæá ÇáÊÇáí ááãÓÊÎÏã", "The screen permissions were saved. They apply from the next login of the user"
-    LangAdd "ÍÓÇÈ ÇáäæÚ: ÇáŞÓã 5640¡ ÇáÕÇáÉ 1420¡ ÇáåÇáß 5250¡ ÃÎÑì", "account of the type: department 5640, hall 1420, waste 5250, other"
-    LangAdd "ÓØÑğÇ: ßãíÉ ÛíÑ ÕÍíÍÉ¡ Ãæ Õäİ áå ÍÑßÇÊ¡ Ãæ ÑÕíÏå ãÑÍøá", "lines: a wrong quantity, an item with moves, or a balance already posted"
-    LangAdd "ØáÈíÉ åĞÇ ÇáÅĞä áíÓÊ ãİÊæÍÉ ááÊÓáíã (ãõÓáóøãÉ Ãæ ãáÛÇÉ", "The order of this note is not open for delivery (delivered or cancelled"
-    LangAdd "ááØáÈíÉ ÅĞä ÊÓáíã áã íõÑÍóøá. ÇİÊÍå ãä «ÃĞæäÇÊ ÇáØáÈíÉ", "The order has a delivery note not posted yet. Open it from Order notes"
 End Sub

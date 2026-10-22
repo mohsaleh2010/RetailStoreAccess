@@ -1939,6 +1939,48 @@ FROM ((((qrySalesOrderLineStatus AS s INNER JOIN SalesOrders AS o ON s.SalesOrde
      LEFT JOIN [@SalesReps] AS r ON o.SalesRepID = r.SalesRepID
 WHERE o.Status In ('APPROVED', 'PREPARING', 'PARTIAL') AND s.RemainingQty > 0
 ORDER BY o.OrderDate, o.OrderNumber"""),
+    Query("qryPurchaseOrderLineNotes", "ما استُلم وما فُوتر من كل سطر أمر شراء: أسطر أذونات الاستلام المرحّلة المرتبطة به (docs/74)", """
+SELECT nl.PurchaseOrderLineID, Sum(nl.Quantity) AS NoteQty,
+       Sum(IIf(n.Status = 'INVOICED', nl.Quantity, 0)) AS InvQty
+FROM StockNoteLines AS nl INNER JOIN StockNotes AS n ON nl.StockNoteID = n.StockNoteID
+WHERE n.Status <> 'DRAFT' AND nl.PurchaseOrderLineID Is Not Null
+GROUP BY nl.PurchaseOrderLineID"""),
+    Query("qryPurchaseOrderLineStatus", "كل سطر أمر شراء: المطلوب والمستلم والمفوتر والباقي، ومخزن الأمر ومورده وحالته", """
+SELECT l.PurchaseOrderLineID, l.PurchaseOrderID, l.ProductID, o.WarehouseID, o.SupplierID, o.Status AS OrderStatus,
+       l.Quantity, l.UnitCost, Nz(d.NoteQty, 0) AS ReceivedQty, Nz(d.InvQty, 0) AS InvoicedQty,
+       IIf(l.Quantity > Nz(d.NoteQty, 0), l.Quantity - Nz(d.NoteQty, 0), 0) AS RemainingQty
+FROM (PurchaseOrderLines AS l INNER JOIN PurchaseOrders AS o ON l.PurchaseOrderID = o.PurchaseOrderID)
+     LEFT JOIN qryPurchaseOrderLineNotes AS d ON l.PurchaseOrderLineID = d.PurchaseOrderLineID"""),
+    Query("qryOnOrderStock", "الكمية تحت الطلب لكل صنف: باقي أوامر الشراء المعتمدة التي لم تُستلم", """
+SELECT ProductID, Sum(RemainingQty) AS OpenQty
+FROM qryPurchaseOrderLineStatus
+WHERE OrderStatus In ('APPROVED', 'PARTIAL') AND RemainingQty > 0
+GROUP BY ProductID"""),
+    Query("PurchaseSuggestQuery", "اقتراح الشراء: الأصناف التي وصل رصيدها مع ما تحت الطلب إلى حد إعادة الطلب، والكمية المقترحة (docs/74)", """
+SELECT p.ProductID, p.ProductCode, p.ProductName, p.SupplierID, s.SupplierName, p.CurrentQuantity,
+       Nz(o.OpenQty, 0) AS OnOrderQty, p.MinimumQuantity, p.ReorderQuantity,
+       IIf(p.ReorderQuantity > 0, p.ReorderQuantity,
+           2 * p.MinimumQuantity - p.CurrentQuantity - Nz(o.OpenQty, 0)) AS SuggestQty,
+       p.PurchasePrice,
+       IIf(p.ReorderQuantity > 0, p.ReorderQuantity,
+           2 * p.MinimumQuantity - p.CurrentQuantity - Nz(o.OpenQty, 0)) * p.PurchasePrice AS SuggestValue
+FROM (Products AS p LEFT JOIN qryOnOrderStock AS o ON p.ProductID = o.ProductID)
+     LEFT JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID
+WHERE p.IsActive <> 0 AND p.TrackStock <> 0 AND p.MinimumQuantity > 0
+  AND p.CurrentQuantity + Nz(o.OpenQty, 0) <= p.MinimumQuantity
+ORDER BY s.SupplierName, p.ProductName"""),
+    Query("PendingPurchaseOrdersQuery", "أسطر أوامر الشراء المفتوحة التي لم تُستلم كلها: الباقي وقيمته والتأخير عن الموعد", """
+SELECT o.PurchaseOrderID, o.OrderNumber, o.OrderDate, o.ExpectedDate, o.SupplierID, s.SupplierName,
+       o.WarehouseID, w.WarehouseName, p.ProductCode, p.ProductName, l.Quantity, l.ReceivedQty, l.RemainingQty,
+       l.RemainingQty * l.UnitCost AS RemainingValue,
+       IIf(o.Status = 'PARTIAL', 'مستلم جزئيًا', 'معتمد') AS StatusName,
+       IIf(o.ExpectedDate Is Null, 0, IIf(Date() > o.ExpectedDate, DateDiff('d', o.ExpectedDate, Date()), 0)) AS DaysLate
+FROM (((qryPurchaseOrderLineStatus AS l INNER JOIN PurchaseOrders AS o ON l.PurchaseOrderID = o.PurchaseOrderID)
+       INNER JOIN [@Suppliers] AS s ON o.SupplierID = s.SupplierID)
+      INNER JOIN [@Warehouses] AS w ON o.WarehouseID = w.WarehouseID)
+     INNER JOIN Products AS p ON l.ProductID = p.ProductID
+WHERE o.Status In ('APPROVED', 'PARTIAL') AND l.RemainingQty > 0
+ORDER BY o.OrderDate, o.OrderNumber"""),
     Query("qryRepDayStock", "حركة مخزن سيارة المندوب في يومه بالتكلفة: المحمَّل والمفرَّغ والمباع والمرتجع وفرق الجرد (docs/63)", """
 SELECT d.RepDayID,
        Sum(IIf(t.ReferenceType = 'TRANSFER' AND t.Quantity > 0, t.Quantity * t.UnitCost, 0)) AS LoadedVal,

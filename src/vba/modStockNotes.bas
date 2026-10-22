@@ -17,7 +17,8 @@ Attribute VB_Name = "modStockNotes"
 '                      (qryInvoicedNotes in qryJournalSale / qryJournalPurchase)
 ' A delivery note made from a customer order (docs/62) carries SalesOrderID and, on each line, SalesOrderLineID:
 ' posting it checks the order (OrderNoteProblem) and frees its reservation; the order follows its notes
-' (SyncSalesOrder, modSalesOrders).
+' (SyncSalesOrder, modSalesOrders). A receipt note made from a purchase order (docs/74) carries PurchaseOrderID and
+' PurchaseOrderLineID the same way (PurchaseOrderNoteProblem, SyncPurchaseOrder, modPurchaseOrders).
 ' Screen: frmStockNote (built by modBuildForms).
 '==============================================================================
 Option Compare Database
@@ -174,6 +175,7 @@ Public Function PostStockNote(ByVal StockNoteID As Long) As String
         If Len(msg) = 0 And n = 0 Then msg = "أضف الأصناف وكمياتها أولًا."
     End If
     If Len(msg) = 0 And orderID > 0 Then msg = OrderNoteProblem(StockNoteID)          ' modSalesOrders
+    If Len(msg) = 0 Then msg = PurchaseOrderNoteProblem(StockNoteID)                  ' modPurchaseOrders
     If Len(msg) = 0 And kind = "DELIVERY" Then msg = CheckStockAvailable(ids, qtys, n, "إذن التسليم", wh, orderID)
     If Len(msg) > 0 Then
         PostStockNote = msg
@@ -209,6 +211,7 @@ Public Function PostStockNote(ByVal StockNoteID As Long) As String
     rs.Close
     db.Execute "UPDATE StockNotes SET NoteDate = Now(), Status = 'POSTED' WHERE StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
     If orderID > 0 Then SyncSalesOrder db, orderID                      ' partly or fully delivered
+    If NotePurchaseOrderID(StockNoteID) > 0 Then SyncPurchaseOrder db, NotePurchaseOrderID(StockNoteID)   ' received
     ws.CommitTrans
     inTrans = False
     LogAction "STOCK_NOTE_POST", "StockNotes", noteNo, kind & " Warehouse=" & wh
@@ -283,6 +286,7 @@ Public Function UnpostStockNote(ByVal StockNoteID As Long) As String
                dbFailOnError + dbSeeChanges
     db.Execute "UPDATE StockNotes SET Status = 'DRAFT' WHERE StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
     If NoteOrderID(StockNoteID) > 0 Then SyncSalesOrder db, NoteOrderID(StockNoteID)   ' reserved again
+    If NotePurchaseOrderID(StockNoteID) > 0 Then SyncPurchaseOrder db, NotePurchaseOrderID(StockNoteID)   ' on order again
     ws.CommitTrans
     inTrans = False
     AuditEdited "STOCK_NOTE_UNPOST", "StockNotes", "StockNoteID", StockNoteID, before
@@ -348,6 +352,7 @@ Public Sub MarkNoteInvoiced(ByVal db As DAO.Database, ByVal StockNoteID As Long,
                " WHERE Status = 'POSTED' AND StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
     If db.RecordsAffected <> 1 Then Err.Raise vbObjectError + 610, "MarkNoteInvoiced", "الإذن لم يعد مُرحَّلًا"
     If NoteOrderID(StockNoteID) > 0 Then SyncSalesOrder db, NoteOrderID(StockNoteID)   ' the order may be invoiced now
+    If NotePurchaseOrderID(StockNoteID) > 0 Then SyncPurchaseOrder db, NotePurchaseOrderID(StockNoteID)
 End Sub
 
 Public Function InvoiceStockNote(ByVal StockNoteID As Long, ByVal PaymentType As String, ByVal SupplierInvoiceNo As String, _
@@ -469,6 +474,10 @@ Public Sub StockNoteShow(ByVal frm As Access.Form)
         If NoteOrderID(id) > 0 Then
             info = info & "الطلبية " & DbValue("SELECT OrderNumber FROM SalesOrders WHERE SalesOrderID = " & NoteOrderID(id)) & "    "
         End If
+        If NotePurchaseOrderID(id) > 0 Then
+            info = info & "أمر الشراء " & DbValue("SELECT OrderNumber FROM PurchaseOrders WHERE PurchaseOrderID = " & _
+                                                 NotePurchaseOrderID(id)) & "    "
+        End If
         If st = "DRAFT" Then
             info = info & "مسودة: أضف الأصناف ثم «ترحيل»"
         ElseIf st = "POSTED" Then
@@ -494,7 +503,7 @@ Public Sub StockNoteShow(ByVal frm As Access.Form)
     frm!btnDelete.Enabled = (st = "DRAFT")
     frm!btnUnpost.Enabled = (st = "POSTED")
     frm!btnInvoice.Enabled = (st = "POSTED")
-    frm!btnOrder.Enabled = (NoteOrderID(id) > 0)
+    frm!btnOrder.Enabled = (NoteOrderID(id) > 0 Or NotePurchaseOrderID(id) > 0)
     frm!txtSupplierRef.Enabled = (st = "POSTED" And kind = "RECEIPT")
     frm!chkVat.Enabled = (st = "POSTED" And kind = "RECEIPT")
 End Sub

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **93** | عدد الحقول: **1192**
+عدد الجداول: **95** | عدد الحقول: **1212**
 
 ## الفهرس
 
@@ -88,17 +88,19 @@
 80. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
 81. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
 82. [`SalesOrders`](#salesorders) – طلبيات العملاء
-83. [`RepDays`](#repdays) – أيام المندوبين
-84. [`RouteStops`](#routestops) – خط سير المندوبين
-85. [`RepVisits`](#repvisits) – زيارات المندوبين
-86. [`RepPrices`](#repprices) – أسعار المندوبين
-87. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
-88. [`StockCounts`](#stockcounts) – جلسات الجرد
-89. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-90. [`AuditLog`](#auditlog) – سجل العمليات
-91. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-92. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-93. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+83. [`PurchaseOrders`](#purchaseorders) – أوامر الشراء
+84. [`PurchaseOrderLines`](#purchaseorderlines) – أسطر أوامر الشراء
+85. [`RepDays`](#repdays) – أيام المندوبين
+86. [`RouteStops`](#routestops) – خط سير المندوبين
+87. [`RepVisits`](#repvisits) – زيارات المندوبين
+88. [`RepPrices`](#repprices) – أسعار المندوبين
+89. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
+90. [`StockCounts`](#stockcounts) – جلسات الجرد
+91. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+92. [`AuditLog`](#auditlog) – سجل العمليات
+93. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+94. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+95. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -194,7 +196,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 34 سجل
+- بيانات أساسية: 35 سجل
 
 ## Roles
 
@@ -226,7 +228,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 46 سجل
+- بيانات أساسية: 47 سجل
 
 ## RolePermissions
 
@@ -238,7 +240,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 90 سجل
+- بيانات أساسية: 92 سجل
 
 ## Employees
 
@@ -300,7 +302,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 81 سجل
+- بيانات أساسية: 82 سجل
 
 ## UserScreens
 
@@ -596,6 +598,7 @@
 | 23 | SizePriceL | Currency |  |  |  | `>=0` |  | سعر الحجم الكبير |
 | 24 | EtaItemType | Short Text | 3 |  |  |  |  | مصر: نوع كود الصنف – EGS (كود داخلي مسجّل) أو GS1؛ فارغ = EGS (docs/48) |
 | 25 | EtaItemCode | Short Text | 100 |  |  |  |  | مصر: كود الصنف لدى المصلحة – مثل EG-123456789-1001، مسجّل في بوابة المصلحة |
+| 26 | ReorderQuantity | Currency (كمية) |  | ✔ | `0` | `>=0` |  | كمية إعادة الطلب – docs/74: ما يُقترح شراؤه حين يصل الرصيد لحد إعادة الطلب؛ 0 = ما يرفع الرصيد لضعف الحد |
 
 - المفتاح الأساسي: `ProductID`
 - فهرس فريد: `ProductCode`
@@ -2021,12 +2024,13 @@
 | 6 | CustomerID | Number (Long) |  |  |  |  | `Customers.CustomerID` | العميل (إذن التسليم) |
 | 7 | SupplierID | Number (Long) |  |  |  |  | `Suppliers.SupplierID` | المورد (إذن الاستلام) |
 | 8 | SalesOrderID | Number (Long) |  |  |  |  | `SalesOrders.SalesOrderID` | طلبية العميل (إذن تسليم منها) – docs/62: إذن التسليم المنشأ من طلبية |
-| 9 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","POSTED","INVOICED")` |  | الحالة |
-| 10 | SalesInvoiceID | Number (Long) |  |  |  |  | `SalesInvoices.SalesInvoiceID` | فاتورة البيع الصادرة منه |
-| 11 | PurchaseInvoiceID | Number (Long) |  |  |  |  | `PurchaseInvoices.PurchaseInvoiceID` | فاتورة الشراء الصادرة منه |
-| 12 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أنشأه |
-| 13 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 14 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 9 | PurchaseOrderID | Number (Long) |  |  |  |  | `PurchaseOrders.PurchaseOrderID` | أمر الشراء (إذن استلام منه) – docs/74: إذن الاستلام المنشأ من أمر شراء |
+| 10 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","POSTED","INVOICED")` |  | الحالة |
+| 11 | SalesInvoiceID | Number (Long) |  |  |  |  | `SalesInvoices.SalesInvoiceID` | فاتورة البيع الصادرة منه |
+| 12 | PurchaseInvoiceID | Number (Long) |  |  |  |  | `PurchaseInvoices.PurchaseInvoiceID` | فاتورة الشراء الصادرة منه |
+| 13 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | أنشأه |
+| 14 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 15 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `StockNoteID`
 - فهرس فريد: `NoteNumber`
@@ -2045,7 +2049,8 @@
 | 5 | UnitPrice | Currency |  | ✔ | `0` | `>=0` |  | السعر في الفاتورة (البيع، أو الشراء بدون الضريبة) |
 | 6 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة |
 | 7 | SalesOrderLineID | Number (Long) |  |  |  |  | `SalesOrderLines.SalesOrderLineID` | سطر الطلبية الذي يسلّمه |
-| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 8 | PurchaseOrderLineID | Number (Long) |  |  |  |  | `PurchaseOrderLines.PurchaseOrderLineID` | سطر أمر الشراء الذي يستلمه |
+| 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `StockNoteLineID`
 - فهرس عادي: `StockNoteID`
@@ -2074,6 +2079,45 @@
 - فهرس فريد: `OrderNumber`
 - فهرس عادي: `OrderDate`
 - فهرس عادي: `Status`
+
+## PurchaseOrders
+
+**أوامر الشراء** – أمر شراء لمورد (docs/74): مسودة (يدويًا أو من اقتراح الشراء)، ثم «اعتماد» فتُحسب كمياته «تحت الطلب»، ثم الاستلام بأذونات الاستلام منه (كليًا أو جزئيًا) ثم فوترتها، أو الإلغاء.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **PurchaseOrderID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | OrderNumber | Short Text | 20 | ✔ |  |  |  | رقم أمر الشراء |
+| 3 | OrderDate | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الأمر |
+| 4 | SupplierID | Number (Long) |  | ✔ |  |  | `Suppliers.SupplierID` | المورد |
+| 5 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن الذي يستلم |
+| 6 | ExpectedDate | Date/Time (تاريخ) |  |  |  |  |  | موعد الاستلام المتوقع |
+| 7 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","APPROVED","PARTIAL","RECEIVED","INVOICED","CANCELLED","CLOSED")` |  | الحالة |
+| 8 | ApprovedAt | Date/Time |  |  |  |  |  | وقت الاعتماد |
+| 9 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | سجّله |
+| 10 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 11 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `PurchaseOrderID`
+- فهرس فريد: `OrderNumber`
+- فهرس عادي: `OrderDate`
+- فهرس عادي: `Status`
+
+## PurchaseOrderLines
+
+**أسطر أوامر الشراء** – الأصناف وكمياتها وسعر الشراء (بدون الضريبة كفاتورة المشتريات). المستلم = أسطر أذونات الاستلام المرحّلة المرتبطة بالسطر، وتحت الطلب = الكمية ناقص المستلم ما دام الأمر مفتوحًا.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **PurchaseOrderLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر |
+| 2 | PurchaseOrderID | Number (Long) |  | ✔ |  |  | `PurchaseOrders.PurchaseOrderID` | أمر الشراء |
+| 3 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 4 | Quantity | Currency (كمية) |  | ✔ |  | `>0` |  | الكمية |
+| 5 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | سعر الشراء بدون الضريبة |
+| 6 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `PurchaseOrderLineID`
+- فهرس عادي: `PurchaseOrderID`
 
 ## RepDays
 

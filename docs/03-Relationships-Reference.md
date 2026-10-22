@@ -2,9 +2,9 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` و`tools/relations.py` – لا تعدّله يدويًا.
 
-عدد العلاقات: **220** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **26**، التحديث المتتالي: **12**.
+عدد العلاقات: **226** – جميعها مع **Enforce Referential Integrity**. الحذف المتتالي: **27**، التحديث المتتالي: **12**.
 
-حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، والمستخدمون يُعطَّلون ولا يُحذفون: `AssetRevaluations.EmployeeID`، `AssetTransfers.EmployeeID`، `AuditLog.EmployeeID`، `BankReconciliations.EmployeeID`، `Budgets.EmployeeID`، `CashVouchers.ReceivedByID`، `CommissionRuns.EmployeeID`، `CustomerAllocations.EmployeeID`، `DepreciationRuns.EmployeeID`، `FiscalYearClosings.EmployeeID`، `PeriodClosings.EmployeeID`، `RepDays.AdvanceEmployeeID`، `RepDays.EmployeeID`، `RepVisits.EmployeeID`، `SalesOrders.EmployeeID`، `StockCounts.PostedByID`، `StockDocuments.EmployeeID`، `StockNotes.EmployeeID`، `StockTransfers.EmployeeID`، `StockTransfers.ReceivedByID`، `SupplierAllocations.EmployeeID`، `VatReturns.EmployeeID`، `Warehouses.KeeperID`.
+حقول «سجّلها الموظف» التالية تشير إلى `Employees` بلا علاقة مفروضة: Access يسمح بـ32 فهرسًا لكل جدول، وكل علاقة تُحسب فهرسًا على طرفيها. البرنامج يكتب فيها المستخدم الحالي، والمستخدمون يُعطَّلون ولا يُحذفون: `AssetRevaluations.EmployeeID`، `AssetTransfers.EmployeeID`، `AuditLog.EmployeeID`، `BankReconciliations.EmployeeID`، `Budgets.EmployeeID`، `CashVouchers.ReceivedByID`، `CommissionRuns.EmployeeID`، `CustomerAllocations.EmployeeID`، `DepreciationRuns.EmployeeID`، `FiscalYearClosings.EmployeeID`، `PeriodClosings.EmployeeID`، `PurchaseOrders.EmployeeID`، `RepDays.AdvanceEmployeeID`، `RepDays.EmployeeID`، `RepVisits.EmployeeID`، `SalesOrders.EmployeeID`، `StockCounts.PostedByID`، `StockDocuments.EmployeeID`، `StockNotes.EmployeeID`، `StockTransfers.EmployeeID`، `StockTransfers.ReceivedByID`، `SupplierAllocations.EmployeeID`، `VatReturns.EmployeeID`، `Warehouses.KeeperID`.
 
 ## مخطط الكيانات والعلاقات
 
@@ -202,14 +202,20 @@ erDiagram
     Customers |o--o{ StockNotes : "CustomerID"
     Suppliers |o--o{ StockNotes : "SupplierID"
     SalesOrders |o--o{ StockNotes : "SalesOrderID"
+    PurchaseOrders |o--o{ StockNotes : "PurchaseOrderID"
     SalesInvoices |o--o{ StockNotes : "SalesInvoiceID"
     PurchaseInvoices |o--o{ StockNotes : "PurchaseInvoiceID"
     StockNotes ||--o{ StockNoteLines : "StockNoteID"
     Products ||--o{ StockNoteLines : "ProductID"
     SalesOrderLines |o--o{ StockNoteLines : "SalesOrderLineID"
+    PurchaseOrderLines |o--o{ StockNoteLines : "PurchaseOrderLineID"
     Customers ||--o{ SalesOrders : "CustomerID"
     Warehouses ||--o{ SalesOrders : "WarehouseID"
     SalesReps |o--o{ SalesOrders : "SalesRepID"
+    Suppliers ||--o{ PurchaseOrders : "SupplierID"
+    Warehouses ||--o{ PurchaseOrders : "WarehouseID"
+    PurchaseOrders ||--o{ PurchaseOrderLines : "PurchaseOrderID"
+    Products ||--o{ PurchaseOrderLines : "ProductID"
     SalesReps ||--o{ RepDays : "SalesRepID"
     Warehouses ||--o{ RepDays : "WarehouseID"
     CashBoxes ||--o{ RepDays : "CashBoxID"
@@ -430,31 +436,37 @@ erDiagram
 | 190 | `FK_StockNotes_CustomerID` | Customers (العملاء) | `CustomerID` | StockNotes (أذونات التسليم والاستلام) | `CustomerID` |  | فرض التكامل |
 | 191 | `FK_StockNotes_SupplierID` | Suppliers (الموردون) | `SupplierID` | StockNotes (أذونات التسليم والاستلام) | `SupplierID` |  | فرض التكامل |
 | 192 | `FK_StockNotes_SalesOrderID` | SalesOrders (طلبيات العملاء) | `SalesOrderID` | StockNotes (أذونات التسليم والاستلام) | `SalesOrderID` |  | فرض التكامل |
-| 193 | `FK_StockNotes_SalesInvoiceID` | SalesInvoices (فواتير المبيعات) | `SalesInvoiceID` | StockNotes (أذونات التسليم والاستلام) | `SalesInvoiceID` |  | فرض التكامل |
-| 194 | `FK_StockNotes_PurchaseInvoiceID` | PurchaseInvoices (فواتير المشتريات) | `PurchaseInvoiceID` | StockNotes (أذونات التسليم والاستلام) | `PurchaseInvoiceID` |  | فرض التكامل |
-| 195 | `FK_StockNoteLines_StockNoteID` | StockNotes (أذونات التسليم والاستلام) | `StockNoteID` | StockNoteLines (أسطر أذونات التسليم والاستلام) | `StockNoteID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 196 | `FK_StockNoteLines_ProductID` | Products (المنتجات) | `ProductID` | StockNoteLines (أسطر أذونات التسليم والاستلام) | `ProductID` | ✔ | فرض التكامل |
-| 197 | `FK_StockNoteLines_SalesOrderLineID` | SalesOrderLines (أسطر طلبيات العملاء) | `SalesOrderLineID` | StockNoteLines (أسطر أذونات التسليم والاستلام) | `SalesOrderLineID` |  | فرض التكامل |
-| 198 | `FK_SalesOrders_CustomerID` | Customers (العملاء) | `CustomerID` | SalesOrders (طلبيات العملاء) | `CustomerID` | ✔ | فرض التكامل |
-| 199 | `FK_SalesOrders_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | SalesOrders (طلبيات العملاء) | `WarehouseID` | ✔ | فرض التكامل |
-| 200 | `FK_SalesOrders_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | SalesOrders (طلبيات العملاء) | `SalesRepID` |  | فرض التكامل |
-| 201 | `FK_RepDays_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RepDays (أيام المندوبين) | `SalesRepID` | ✔ | فرض التكامل |
-| 202 | `FK_RepDays_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | RepDays (أيام المندوبين) | `WarehouseID` | ✔ | فرض التكامل |
-| 203 | `FK_RepDays_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | RepDays (أيام المندوبين) | `CashBoxID` | ✔ | فرض التكامل |
-| 204 | `FK_RepDays_StoreID` | Warehouses (المخازن) | `WarehouseID` | RepDays (أيام المندوبين) | `StoreID` | ✔ | فرض التكامل |
-| 205 | `FK_RepDays_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | RepDays (أيام المندوبين) | `StockCountID` |  | فرض التكامل |
-| 206 | `FK_RepDays_ClosingID` | CashClosings (تصفية يومية الكاشير) | `ClosingID` | RepDays (أيام المندوبين) | `ClosingID` |  | فرض التكامل |
-| 207 | `FK_RouteStops_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RouteStops (خط سير المندوبين) | `SalesRepID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 208 | `FK_RouteStops_CustomerID` | Customers (العملاء) | `CustomerID` | RouteStops (خط سير المندوبين) | `CustomerID` | ✔ | فرض التكامل |
-| 209 | `FK_RepVisits_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RepVisits (زيارات المندوبين) | `SalesRepID` | ✔ | فرض التكامل |
-| 210 | `FK_RepVisits_CustomerID` | Customers (العملاء) | `CustomerID` | RepVisits (زيارات المندوبين) | `CustomerID` | ✔ | فرض التكامل |
-| 211 | `FK_RepPrices_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RepPrices (أسعار المندوبين) | `SalesRepID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 212 | `FK_RepPrices_ProductID` | Products (المنتجات) | `ProductID` | RepPrices (أسعار المندوبين) | `ProductID` | ✔ | فرض التكامل |
-| 213 | `FK_SalesOrderLines_SalesOrderID` | SalesOrders (طلبيات العملاء) | `SalesOrderID` | SalesOrderLines (أسطر طلبيات العملاء) | `SalesOrderID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 214 | `FK_SalesOrderLines_ProductID` | Products (المنتجات) | `ProductID` | SalesOrderLines (أسطر طلبيات العملاء) | `ProductID` | ✔ | فرض التكامل |
-| 215 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
-| 216 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
-| 217 | `FK_StockCounts_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | StockCounts (جلسات الجرد) | `WarehouseID` | ✔ | فرض التكامل |
-| 218 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
-| 219 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
-| 220 | `FK_AuditChanges_LogID` | AuditLog (سجل العمليات) | `LogID` | AuditChanges (تفاصيل سجل التدقيق) | `LogID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 193 | `FK_StockNotes_PurchaseOrderID` | PurchaseOrders (أوامر الشراء) | `PurchaseOrderID` | StockNotes (أذونات التسليم والاستلام) | `PurchaseOrderID` |  | فرض التكامل |
+| 194 | `FK_StockNotes_SalesInvoiceID` | SalesInvoices (فواتير المبيعات) | `SalesInvoiceID` | StockNotes (أذونات التسليم والاستلام) | `SalesInvoiceID` |  | فرض التكامل |
+| 195 | `FK_StockNotes_PurchaseInvoiceID` | PurchaseInvoices (فواتير المشتريات) | `PurchaseInvoiceID` | StockNotes (أذونات التسليم والاستلام) | `PurchaseInvoiceID` |  | فرض التكامل |
+| 196 | `FK_StockNoteLines_StockNoteID` | StockNotes (أذونات التسليم والاستلام) | `StockNoteID` | StockNoteLines (أسطر أذونات التسليم والاستلام) | `StockNoteID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 197 | `FK_StockNoteLines_ProductID` | Products (المنتجات) | `ProductID` | StockNoteLines (أسطر أذونات التسليم والاستلام) | `ProductID` | ✔ | فرض التكامل |
+| 198 | `FK_StockNoteLines_SalesOrderLineID` | SalesOrderLines (أسطر طلبيات العملاء) | `SalesOrderLineID` | StockNoteLines (أسطر أذونات التسليم والاستلام) | `SalesOrderLineID` |  | فرض التكامل |
+| 199 | `FK_StockNoteLines_PurchaseOrderLineID` | PurchaseOrderLines (أسطر أوامر الشراء) | `PurchaseOrderLineID` | StockNoteLines (أسطر أذونات التسليم والاستلام) | `PurchaseOrderLineID` |  | فرض التكامل |
+| 200 | `FK_SalesOrders_CustomerID` | Customers (العملاء) | `CustomerID` | SalesOrders (طلبيات العملاء) | `CustomerID` | ✔ | فرض التكامل |
+| 201 | `FK_SalesOrders_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | SalesOrders (طلبيات العملاء) | `WarehouseID` | ✔ | فرض التكامل |
+| 202 | `FK_SalesOrders_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | SalesOrders (طلبيات العملاء) | `SalesRepID` |  | فرض التكامل |
+| 203 | `FK_PurchaseOrders_SupplierID` | Suppliers (الموردون) | `SupplierID` | PurchaseOrders (أوامر الشراء) | `SupplierID` | ✔ | فرض التكامل |
+| 204 | `FK_PurchaseOrders_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | PurchaseOrders (أوامر الشراء) | `WarehouseID` | ✔ | فرض التكامل |
+| 205 | `FK_PurchaseOrderLines_PurchaseOrderID` | PurchaseOrders (أوامر الشراء) | `PurchaseOrderID` | PurchaseOrderLines (أسطر أوامر الشراء) | `PurchaseOrderID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 206 | `FK_PurchaseOrderLines_ProductID` | Products (المنتجات) | `ProductID` | PurchaseOrderLines (أسطر أوامر الشراء) | `ProductID` | ✔ | فرض التكامل |
+| 207 | `FK_RepDays_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RepDays (أيام المندوبين) | `SalesRepID` | ✔ | فرض التكامل |
+| 208 | `FK_RepDays_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | RepDays (أيام المندوبين) | `WarehouseID` | ✔ | فرض التكامل |
+| 209 | `FK_RepDays_CashBoxID` | CashBoxes (الخزينة والصناديق) | `CashBoxID` | RepDays (أيام المندوبين) | `CashBoxID` | ✔ | فرض التكامل |
+| 210 | `FK_RepDays_StoreID` | Warehouses (المخازن) | `WarehouseID` | RepDays (أيام المندوبين) | `StoreID` | ✔ | فرض التكامل |
+| 211 | `FK_RepDays_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | RepDays (أيام المندوبين) | `StockCountID` |  | فرض التكامل |
+| 212 | `FK_RepDays_ClosingID` | CashClosings (تصفية يومية الكاشير) | `ClosingID` | RepDays (أيام المندوبين) | `ClosingID` |  | فرض التكامل |
+| 213 | `FK_RouteStops_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RouteStops (خط سير المندوبين) | `SalesRepID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 214 | `FK_RouteStops_CustomerID` | Customers (العملاء) | `CustomerID` | RouteStops (خط سير المندوبين) | `CustomerID` | ✔ | فرض التكامل |
+| 215 | `FK_RepVisits_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RepVisits (زيارات المندوبين) | `SalesRepID` | ✔ | فرض التكامل |
+| 216 | `FK_RepVisits_CustomerID` | Customers (العملاء) | `CustomerID` | RepVisits (زيارات المندوبين) | `CustomerID` | ✔ | فرض التكامل |
+| 217 | `FK_RepPrices_SalesRepID` | SalesReps (المندوبين) | `SalesRepID` | RepPrices (أسعار المندوبين) | `SalesRepID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 218 | `FK_RepPrices_ProductID` | Products (المنتجات) | `ProductID` | RepPrices (أسعار المندوبين) | `ProductID` | ✔ | فرض التكامل |
+| 219 | `FK_SalesOrderLines_SalesOrderID` | SalesOrders (طلبيات العملاء) | `SalesOrderID` | SalesOrderLines (أسطر طلبيات العملاء) | `SalesOrderID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 220 | `FK_SalesOrderLines_ProductID` | Products (المنتجات) | `ProductID` | SalesOrderLines (أسطر طلبيات العملاء) | `ProductID` | ✔ | فرض التكامل |
+| 221 | `FK_StockCounts_CategoryID` | Categories (التصنيفات) | `CategoryID` | StockCounts (جلسات الجرد) | `CategoryID` |  | فرض التكامل |
+| 222 | `FK_StockCounts_EmployeeID` | Employees (الموظفون والمستخدمون) | `EmployeeID` | StockCounts (جلسات الجرد) | `EmployeeID` | ✔ | فرض التكامل |
+| 223 | `FK_StockCounts_WarehouseID` | Warehouses (المخازن) | `WarehouseID` | StockCounts (جلسات الجرد) | `WarehouseID` | ✔ | فرض التكامل |
+| 224 | `FK_StockCountDetails_StockCountID` | StockCounts (جلسات الجرد) | `StockCountID` | StockCountDetails (تفاصيل الجرد) | `StockCountID` | ✔ | فرض التكامل + حذف متتالٍ |
+| 225 | `FK_StockCountDetails_ProductID` | Products (المنتجات) | `ProductID` | StockCountDetails (تفاصيل الجرد) | `ProductID` | ✔ | فرض التكامل |
+| 226 | `FK_AuditChanges_LogID` | AuditLog (سجل العمليات) | `LogID` | AuditChanges (تفاصيل سجل التدقيق) | `LogID` | ✔ | فرض التكامل + حذف متتالٍ |

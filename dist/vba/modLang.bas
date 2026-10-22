@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3319
+Private Const ENTRY_COUNT As Long = 3383
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("BANK;ãä ÇáÈäß;CASHBOX;ãä ÕäÏæŞ") = "BANK;From the bank;CASHBOX;From a box", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÚÇÏÉ İÊÍ ÇáÓäÉ") = "Reopen the year", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈíÇäÇÊ ÏÇÎá åĞÇ Çáãáİ äİÓå (ÛíÑ ãŞÓãÉ)¡ İáÇ íãßä ÇÓÊÚÇÏÊåÇ æåæ ãİÊæÍ.") = "The data is inside this same file (not split), so it cannot be restored while it is open.", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÌáÏ ÇáÇİÊÑÇÖí áÜ SQL Server") = "The default folder of SQL Server", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞøÑ ÊÍÏíË ÇáÍÇáÉ: ") = "Could not refresh the status: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÚÑ ÇáÈíÚ ááãäÏæÈ") = "Selling price for the rep", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ íãßä ÍĞİ åĞÇ ÇáÓÌá áÃäå ãÓÊÎÏã İí ÚãáíÇÊ ÓÇÈŞÉ.") = "This record cannot be deleted because it is used in earlier transactions.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("C;ÇáÚãáÇÁ;S;ÇáãæÑÏæä") = "C;Customers;S;Suppliers", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÚÇÏÉ ÇáİÊÍ Åáì åĞÇ Çáíæã") = "Reopen up to this day", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈäß") = "Bank", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ") = "The remainder of each credit invoice by its delay after the due date", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞøÑ ÊÔÛíá OpenSSL: ") = "Could not run OpenSSL: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÓÚÑ ÇáÍÌã ÇáæÓØ") = "Medium size price", "Tr sample 6", passed, failed, report
+    CheckLang Tr("áÇ íæÌÏ ÊÍæíá. ÇÎÊÑ ÇáãÎÒäíä Ëã «ÊÍæíá ÌÏíÏ».") = "No transfer. Choose the two warehouses, then New transfer.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ") = "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _

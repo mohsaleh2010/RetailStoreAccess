@@ -501,10 +501,12 @@ Public Sub SalesOrderOpenNote(ByVal frm As Access.Form)
 End Sub
 
 Public Sub StockNoteOpenOrder(ByVal frm As Access.Form)
-    ' frmStockNote: the order of the note.
+    ' frmStockNote: the customer order or the purchase order (modPurchaseOrders) of the note.
     Dim orderID As Long
     orderID = NoteOrderID(Nz(frm!cboNote.Value, 0))
     If orderID > 0 Then OpenScreen "frmSalesOrder", 0, orderID
+    orderID = NotePurchaseOrderID(Nz(frm!cboNote.Value, 0))
+    If orderID > 0 Then OpenScreen "frmPurchaseOrder", 0, orderID
 End Sub
 
 Public Function OrderDefaultPrice(ByVal SalesOrderID As Long, ByVal ProductID As Long) As Currency

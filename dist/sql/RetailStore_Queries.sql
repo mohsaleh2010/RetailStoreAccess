@@ -1620,6 +1620,54 @@ FROM (((([dbo].[qrySalesOrderLineStatus] AS s INNER JOIN [dbo].[SalesOrders] AS 
      LEFT JOIN [dbo].[SalesReps] AS r ON o.SalesRepID = r.SalesRepID
 WHERE o.Status In (N'APPROVED', N'PREPARING', N'PARTIAL') AND s.RemainingQty > 0;
 GO
+CREATE OR ALTER VIEW [dbo].[qryPurchaseOrderLineNotes] AS
+-- ما استُلم وما فُوتر من كل سطر أمر شراء: أسطر أذونات الاستلام المرحّلة المرتبطة به (docs/74)
+SELECT nl.PurchaseOrderLineID, Sum(nl.Quantity) AS NoteQty,
+       Sum(IIF(n.Status = N'INVOICED', nl.Quantity, 0)) AS InvQty
+FROM [dbo].[StockNoteLines] AS nl INNER JOIN [dbo].[StockNotes] AS n ON nl.StockNoteID = n.StockNoteID
+WHERE n.Status <> N'DRAFT' AND nl.PurchaseOrderLineID Is Not Null
+GROUP BY nl.PurchaseOrderLineID;
+GO
+CREATE OR ALTER VIEW [dbo].[qryPurchaseOrderLineStatus] AS
+-- كل سطر أمر شراء: المطلوب والمستلم والمفوتر والباقي، ومخزن الأمر ومورده وحالته
+SELECT l.PurchaseOrderLineID, l.PurchaseOrderID, l.ProductID, o.WarehouseID, o.SupplierID, o.Status AS OrderStatus,
+       l.Quantity, l.UnitCost, COALESCE(d.NoteQty, 0) AS ReceivedQty, COALESCE(d.InvQty, 0) AS InvoicedQty,
+       IIF(l.Quantity > COALESCE(d.NoteQty, 0), l.Quantity - COALESCE(d.NoteQty, 0), 0) AS RemainingQty
+FROM ([dbo].[PurchaseOrderLines] AS l INNER JOIN [dbo].[PurchaseOrders] AS o ON l.PurchaseOrderID = o.PurchaseOrderID)
+     LEFT JOIN [dbo].[qryPurchaseOrderLineNotes] AS d ON l.PurchaseOrderLineID = d.PurchaseOrderLineID;
+GO
+CREATE OR ALTER VIEW [dbo].[qryOnOrderStock] AS
+-- الكمية تحت الطلب لكل صنف: باقي أوامر الشراء المعتمدة التي لم تُستلم
+SELECT ProductID, Sum(RemainingQty) AS OpenQty
+FROM [dbo].[qryPurchaseOrderLineStatus]
+WHERE OrderStatus In (N'APPROVED', N'PARTIAL') AND RemainingQty > 0
+GROUP BY ProductID;
+GO
+CREATE OR ALTER VIEW [dbo].[PurchaseSuggestQuery] AS
+-- اقتراح الشراء: الأصناف التي وصل رصيدها مع ما تحت الطلب إلى حد إعادة الطلب، والكمية المقترحة (docs/74)
+SELECT p.ProductID, p.ProductCode, p.ProductName, p.SupplierID, s.SupplierName, p.CurrentQuantity,
+       COALESCE(o.OpenQty, 0) AS OnOrderQty, p.MinimumQuantity, p.ReorderQuantity,
+       IIF(p.ReorderQuantity > 0, p.ReorderQuantity, 2 * p.MinimumQuantity - p.CurrentQuantity - COALESCE(o.OpenQty, 0)) AS SuggestQty,
+       p.PurchasePrice,
+       IIF(p.ReorderQuantity > 0, p.ReorderQuantity, 2 * p.MinimumQuantity - p.CurrentQuantity - COALESCE(o.OpenQty, 0)) * p.PurchasePrice AS SuggestValue
+FROM ([dbo].[Products] AS p LEFT JOIN [dbo].[qryOnOrderStock] AS o ON p.ProductID = o.ProductID)
+     LEFT JOIN [dbo].[Suppliers] AS s ON p.SupplierID = s.SupplierID
+WHERE p.IsActive <> 0 AND p.TrackStock <> 0 AND p.MinimumQuantity > 0
+  AND p.CurrentQuantity + COALESCE(o.OpenQty, 0) <= p.MinimumQuantity;
+GO
+CREATE OR ALTER VIEW [dbo].[PendingPurchaseOrdersQuery] AS
+-- أسطر أوامر الشراء المفتوحة التي لم تُستلم كلها: الباقي وقيمته والتأخير عن الموعد
+SELECT o.PurchaseOrderID, o.OrderNumber, o.OrderDate, o.ExpectedDate, o.SupplierID, s.SupplierName,
+       o.WarehouseID, w.WarehouseName, p.ProductCode, p.ProductName, l.Quantity, l.ReceivedQty, l.RemainingQty,
+       l.RemainingQty * l.UnitCost AS RemainingValue,
+       IIF(o.Status = N'PARTIAL', N'مستلم جزئيًا', N'معتمد') AS StatusName,
+       IIF(o.ExpectedDate Is Null, 0, IIF(DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0) > o.ExpectedDate, DATEDIFF(day, o.ExpectedDate, DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0)), 0)) AS DaysLate
+FROM ((([dbo].[qryPurchaseOrderLineStatus] AS l INNER JOIN [dbo].[PurchaseOrders] AS o ON l.PurchaseOrderID = o.PurchaseOrderID)
+       INNER JOIN [dbo].[Suppliers] AS s ON o.SupplierID = s.SupplierID)
+      INNER JOIN [dbo].[Warehouses] AS w ON o.WarehouseID = w.WarehouseID)
+     INNER JOIN [dbo].[Products] AS p ON l.ProductID = p.ProductID
+WHERE o.Status In (N'APPROVED', N'PARTIAL') AND l.RemainingQty > 0;
+GO
 CREATE OR ALTER VIEW [dbo].[qryRepDayStock] AS
 -- حركة مخزن سيارة المندوب في يومه بالتكلفة: المحمَّل والمفرَّغ والمباع والمرتجع وفرق الجرد (docs/63)
 SELECT d.RepDayID,
@@ -4543,6 +4591,54 @@ FROM (((([en].[qrySalesOrderLineStatus] AS s INNER JOIN [dbo].[SalesOrders] AS o
      LEFT JOIN [en].[qryLocSalesReps] AS r ON o.SalesRepID = r.SalesRepID
 WHERE o.Status In (N'APPROVED', N'PREPARING', N'PARTIAL') AND s.RemainingQty > 0;
 GO
+CREATE OR ALTER VIEW [en].[qryPurchaseOrderLineNotes] AS
+-- ما استُلم وما فُوتر من كل سطر أمر شراء: أسطر أذونات الاستلام المرحّلة المرتبطة به (docs/74)
+SELECT nl.PurchaseOrderLineID, Sum(nl.Quantity) AS NoteQty,
+       Sum(IIF(n.Status = N'INVOICED', nl.Quantity, 0)) AS InvQty
+FROM [dbo].[StockNoteLines] AS nl INNER JOIN [dbo].[StockNotes] AS n ON nl.StockNoteID = n.StockNoteID
+WHERE n.Status <> N'DRAFT' AND nl.PurchaseOrderLineID Is Not Null
+GROUP BY nl.PurchaseOrderLineID;
+GO
+CREATE OR ALTER VIEW [en].[qryPurchaseOrderLineStatus] AS
+-- كل سطر أمر شراء: المطلوب والمستلم والمفوتر والباقي، ومخزن الأمر ومورده وحالته
+SELECT l.PurchaseOrderLineID, l.PurchaseOrderID, l.ProductID, o.WarehouseID, o.SupplierID, o.Status AS OrderStatus,
+       l.Quantity, l.UnitCost, COALESCE(d.NoteQty, 0) AS ReceivedQty, COALESCE(d.InvQty, 0) AS InvoicedQty,
+       IIF(l.Quantity > COALESCE(d.NoteQty, 0), l.Quantity - COALESCE(d.NoteQty, 0), 0) AS RemainingQty
+FROM ([dbo].[PurchaseOrderLines] AS l INNER JOIN [dbo].[PurchaseOrders] AS o ON l.PurchaseOrderID = o.PurchaseOrderID)
+     LEFT JOIN [en].[qryPurchaseOrderLineNotes] AS d ON l.PurchaseOrderLineID = d.PurchaseOrderLineID;
+GO
+CREATE OR ALTER VIEW [en].[qryOnOrderStock] AS
+-- الكمية تحت الطلب لكل صنف: باقي أوامر الشراء المعتمدة التي لم تُستلم
+SELECT ProductID, Sum(RemainingQty) AS OpenQty
+FROM [en].[qryPurchaseOrderLineStatus]
+WHERE OrderStatus In (N'APPROVED', N'PARTIAL') AND RemainingQty > 0
+GROUP BY ProductID;
+GO
+CREATE OR ALTER VIEW [en].[PurchaseSuggestQuery] AS
+-- اقتراح الشراء: الأصناف التي وصل رصيدها مع ما تحت الطلب إلى حد إعادة الطلب، والكمية المقترحة (docs/74)
+SELECT p.ProductID, p.ProductCode, p.ProductName, p.SupplierID, s.SupplierName, p.CurrentQuantity,
+       COALESCE(o.OpenQty, 0) AS OnOrderQty, p.MinimumQuantity, p.ReorderQuantity,
+       IIF(p.ReorderQuantity > 0, p.ReorderQuantity, 2 * p.MinimumQuantity - p.CurrentQuantity - COALESCE(o.OpenQty, 0)) AS SuggestQty,
+       p.PurchasePrice,
+       IIF(p.ReorderQuantity > 0, p.ReorderQuantity, 2 * p.MinimumQuantity - p.CurrentQuantity - COALESCE(o.OpenQty, 0)) * p.PurchasePrice AS SuggestValue
+FROM ([dbo].[Products] AS p LEFT JOIN [en].[qryOnOrderStock] AS o ON p.ProductID = o.ProductID)
+     LEFT JOIN [en].[qryLocSuppliers] AS s ON p.SupplierID = s.SupplierID
+WHERE p.IsActive <> 0 AND p.TrackStock <> 0 AND p.MinimumQuantity > 0
+  AND p.CurrentQuantity + COALESCE(o.OpenQty, 0) <= p.MinimumQuantity;
+GO
+CREATE OR ALTER VIEW [en].[PendingPurchaseOrdersQuery] AS
+-- أسطر أوامر الشراء المفتوحة التي لم تُستلم كلها: الباقي وقيمته والتأخير عن الموعد
+SELECT o.PurchaseOrderID, o.OrderNumber, o.OrderDate, o.ExpectedDate, o.SupplierID, s.SupplierName,
+       o.WarehouseID, w.WarehouseName, p.ProductCode, p.ProductName, l.Quantity, l.ReceivedQty, l.RemainingQty,
+       l.RemainingQty * l.UnitCost AS RemainingValue,
+       IIF(o.Status = N'PARTIAL', N'Partly received', N'Approved') AS StatusName,
+       IIF(o.ExpectedDate Is Null, 0, IIF(DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0) > o.ExpectedDate, DATEDIFF(day, o.ExpectedDate, DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0)), 0)) AS DaysLate
+FROM ((([en].[qryPurchaseOrderLineStatus] AS l INNER JOIN [dbo].[PurchaseOrders] AS o ON l.PurchaseOrderID = o.PurchaseOrderID)
+       INNER JOIN [en].[qryLocSuppliers] AS s ON o.SupplierID = s.SupplierID)
+      INNER JOIN [en].[qryLocWarehouses] AS w ON o.WarehouseID = w.WarehouseID)
+     INNER JOIN [dbo].[Products] AS p ON l.ProductID = p.ProductID
+WHERE o.Status In (N'APPROVED', N'PARTIAL') AND l.RemainingQty > 0;
+GO
 CREATE OR ALTER VIEW [en].[qryRepDayStock] AS
 -- حركة مخزن سيارة المندوب في يومه بالتكلفة: المحمَّل والمفرَّغ والمباع والمرتجع وفرق الجرد (docs/63)
 SELECT d.RepDayID,
@@ -5908,5 +6004,5 @@ WHERE q.QtyReturned > o.Quantity;
 GO
 CREATE OR ALTER VIEW [dbo].[QueriesVersion] AS
 -- the version of these views: the front-end links to them only when it is its own
-SELECT N'03ae36e2a4c1' AS Version;
+SELECT N'0252e2fff168' AS Version;
 GO

@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 220
+Private Const EXPECTED_RELATION_COUNT As Long = 226
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -578,14 +578,20 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_StockNotes_CustomerID", "Customers", "CustomerID", "StockNotes", "CustomerID", 0&)
     c.Add Array("FK_StockNotes_SupplierID", "Suppliers", "SupplierID", "StockNotes", "SupplierID", 0&)
     c.Add Array("FK_StockNotes_SalesOrderID", "SalesOrders", "SalesOrderID", "StockNotes", "SalesOrderID", 0&)
+    c.Add Array("FK_StockNotes_PurchaseOrderID", "PurchaseOrders", "PurchaseOrderID", "StockNotes", "PurchaseOrderID", 0&)
     c.Add Array("FK_StockNotes_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "StockNotes", "SalesInvoiceID", 0&)
     c.Add Array("FK_StockNotes_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "StockNotes", "PurchaseInvoiceID", 0&)
     c.Add Array("FK_StockNoteLines_StockNoteID", "StockNotes", "StockNoteID", "StockNoteLines", "StockNoteID", 4096&)
     c.Add Array("FK_StockNoteLines_ProductID", "Products", "ProductID", "StockNoteLines", "ProductID", 0&)
     c.Add Array("FK_StockNoteLines_SalesOrderLineID", "SalesOrderLines", "SalesOrderLineID", "StockNoteLines", "SalesOrderLineID", 0&)
+    c.Add Array("FK_StockNoteLines_PurchaseOrderLineID", "PurchaseOrderLines", "PurchaseOrderLineID", "StockNoteLines", "PurchaseOrderLineID", 0&)
     c.Add Array("FK_SalesOrders_CustomerID", "Customers", "CustomerID", "SalesOrders", "CustomerID", 0&)
     c.Add Array("FK_SalesOrders_WarehouseID", "Warehouses", "WarehouseID", "SalesOrders", "WarehouseID", 0&)
     c.Add Array("FK_SalesOrders_SalesRepID", "SalesReps", "SalesRepID", "SalesOrders", "SalesRepID", 0&)
+    c.Add Array("FK_PurchaseOrders_SupplierID", "Suppliers", "SupplierID", "PurchaseOrders", "SupplierID", 0&)
+    c.Add Array("FK_PurchaseOrders_WarehouseID", "Warehouses", "WarehouseID", "PurchaseOrders", "WarehouseID", 0&)
+    c.Add Array("FK_PurchaseOrderLines_PurchaseOrderID", "PurchaseOrders", "PurchaseOrderID", "PurchaseOrderLines", "PurchaseOrderID", 4096&)
+    c.Add Array("FK_PurchaseOrderLines_ProductID", "Products", "ProductID", "PurchaseOrderLines", "ProductID", 0&)
     c.Add Array("FK_RepDays_SalesRepID", "SalesReps", "SalesRepID", "RepDays", "SalesRepID", 0&)
     c.Add Array("FK_RepDays_WarehouseID", "Warehouses", "WarehouseID", "RepDays", "WarehouseID", 0&)
     c.Add Array("FK_RepDays_CashBoxID", "CashBoxes", "CashBoxID", "RepDays", "CashBoxID", 0&)
@@ -621,6 +627,7 @@ Private Function RetiredRelations() As Variant
                              "FK_DepreciationRuns_EmployeeID", _
                              "FK_FiscalYearClosings_EmployeeID", _
                              "FK_PeriodClosings_EmployeeID", _
+                             "FK_PurchaseOrders_EmployeeID", _
                              "FK_RepDays_AdvanceEmployeeID", _
                              "FK_RepDays_EmployeeID", _
                              "FK_RepVisits_EmployeeID", _

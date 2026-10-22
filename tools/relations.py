@@ -68,6 +68,7 @@ UNENFORCED = {
     ("StockDocuments", "EmployeeID"),
     ("StockNotes", "EmployeeID"),
     ("SalesOrders", "EmployeeID"),
+    ("PurchaseOrders", "EmployeeID"),
     ("RepDays", "EmployeeID"),
     ("RepVisits", "EmployeeID"),
 }

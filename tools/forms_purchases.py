@@ -343,8 +343,7 @@ def layout_inventory() -> FormModel:
     for name, caption, style, w, call in [
             ("btnStockCount", "الجرد", "secondary", 2.6, 'OpenScreen "frmStockCount", 7'),
             ("btnPurchase", "فاتورة مشتريات", "secondary", 3.6, 'OpenScreen "frmPurchaseInvoice", 7'),
-            ("btnLowReport", "تقرير النواقص", "secondary", 3.4,
-             'OpenReportOrQuery "rptLowStock", "LowStockQuery", ""'),
+            ("btnPurchaseOrders", "أوامر الشراء", "secondary", 3.4, 'OpenScreen "frmPurchaseOrder"'),
             ("btnStockReport", "تقرير المخزون", "secondary", 3.4,
              'OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", ""'),
             ("btnLabels", "طباعة باركود", "secondary", 3.4,
@@ -696,7 +695,7 @@ def layout_stock_note(line_heads) -> FormModel:
             ("btnPost", "ترحيل", "primary", 3.6, 'StockNoteAction Me, "POST"'),
             ("btnUnpost", "إلغاء الترحيل", "danger", 3.4, 'StockNoteAction Me, "UNPOST"'),
             ("btnDelete", "حذف المسودة", "danger", 3.2, 'StockNoteAction Me, "DELETE"'),
-            ("btnOrder", "الطلبية", "secondary", 2.6, "StockNoteOpenOrder Me")]:
+            ("btnOrder", "أصل الإذن", "secondary", 2.6, "StockNoteOpenOrder Me")]:
         button(m, name, caption, bx, cm(16.1), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(16.1), "secondary", w=cm(2.6), h=cm(1.1),

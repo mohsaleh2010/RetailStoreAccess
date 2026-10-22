@@ -187,6 +187,23 @@ LIST_SPECS: List[ListSpec] = [
         Col("الصنف", "ProductName", 5.0, grow=True), Col("الكمية", "StockQty", 1.9, QTY, True),
         Col("التكلفة", "AverageCost", 2.0, MONEY), Col("القيمة", "StockCostValue", 2.4, MONEY, True)],
         [("RepName", False), ("ProductName", False)], landscape=True, no_data="لا توجد بضاعة في سيارات المندوبين."),
+    ListSpec("PURCHASE_SUGGEST", [
+        Col("المورد", "SupplierName", 3.2), Col("الكود", "ProductCode", 2.2),
+        Col("الصنف", "ProductName", 5.0, grow=True), Col("الرصيد", "CurrentQuantity", 1.8, QTY),
+        Col("تحت الطلب", "OnOrderQty", 1.8, QTY), Col("حد الطلب", "MinimumQuantity", 1.8, QTY),
+        Col("المقترح", "SuggestQty", 1.8, QTY), Col("آخر سعر شراء", "PurchasePrice", 2.1, MONEY),
+        Col("القيمة التقريبية", "SuggestValue", 2.4, MONEY, True)],
+        [("SupplierName", False), ("ProductName", False)], landscape=True,
+        no_data="لا توجد أصناف وصلت لحد إعادة الطلب."),
+    ListSpec("PENDING_PURCHASE_ORDERS", [
+        Col("رقم الأمر", "OrderNumber", 2.3), Col("التاريخ", "=GDate([OrderDate])", 2.0),
+        Col("موعد الاستلام", "=GDate([ExpectedDate])", 2.1), Col("المورد", "SupplierName", 3.4, grow=True),
+        Col("المخزن", "WarehouseName", 2.2), Col("الصنف", "ProductName", 3.8, grow=True),
+        Col("المطلوب", "Quantity", 1.6, QTY), Col("المستلم", "ReceivedQty", 1.6, QTY),
+        Col("الباقي", "RemainingQty", 1.6, QTY, True), Col("قيمة الباقي", "RemainingValue", 2.3, MONEY, True),
+        Col("الحالة", "StatusName", 2.0), Col("أيام التأخير", "DaysLate", 1.4, INT)],
+        [("OrderDate", False), ("OrderNumber", False), ("ProductName", False)], landscape=True,
+        no_data="لا توجد أوامر شراء مفتوحة باقٍ منها شيء."),
     ListSpec("PRICE_LISTS", [
         Col("القائمة", "ListName", 3.0), Col("الكود", "ProductCode", 2.2),
         Col("الصنف", "ProductName", 5.0, grow=True), Col("الوحدة", "PriceUnit", 1.9),

@@ -98,6 +98,7 @@
 | + | **5د:** الاستعلامات والتقارير على الخادم: كل استعلام محفوظ (248، منها مصادر القيود وميزان المراجعة والقوائم المالية) عرض (View) على SQL Server بالاسم نفسه، عربي وإنجليزي، وفترة التقرير تُرسل إلى الخادم لكل جهاز؛ وتحقّق على SQL Server 2022 حقيقي: كل عرض يعطي صفوف Access نفسها | ✅ تمت الموافقة | [docs/71-SQL-Server-Views.md](docs/71-SQL-Server-Views.md) |
 | + | **الوحدات المتعددة للصنف** (`docs/69` رقم 1): كرتونة / علبة لها عدد وباركود وسعر؛ البيع والشراء ومرتجعاتهما بأي وحدة (مسح باركود الوحدة أو عمود الوحدة في السطر)، والمخزون والتكلفة بالوحدة الصغرى، والوحدة على المطبوعات والفاتورة الإلكترونية | ✅ تمت الموافقة | [docs/72-Product-Units.md](docs/72-Product-Units.md) |
 | + | **قوائم الأسعار** (`docs/69` رقم 2): تجزئة / جملة / موزع تُسند للعميل؛ سعر لكل صنف ووحدة بتاريخ سريان (العرض المؤقت يغلب السعر الدائم)، وخصم للأصناف غير المسعّرة؛ في نقطة البيع (وإعادة التسعير عند تغيير العميل) والطلبيات وأذونات التسليم، وتقرير القوائم | ✅ تمت الموافقة | [docs/73-Price-Lists.md](docs/73-Price-Lists.md) |
+| + | **أوامر الشراء واقتراح الشراء** (`docs/69` رقم 4): اقتراح الشراء من حد إعادة الطلب (وكمية إعادة الطلب)، ومسودة أمر لكل مورد منه، والاعتماد (تحت الطلب)، والاستلام بأذونات من الأمر كليًا أو جزئيًا ثم الفاتورة، وحالة الأمر تتبع أذوناته، وتقريرا الاقتراح والأوامر المفتوحة | ✅ بانتظار الموافقة | [docs/74-Purchase-Orders.md](docs/74-Purchase-Orders.md) |
 
 ## هيكل المستودع
 
@@ -215,6 +216,7 @@
 | 64 | كل الوحدات تقريبًا (`dbSeeChanges`): **`BuildFrontEnd.vbs`**، ومجلد `dist\sql` الجديد بجانب ملف البرنامج | `BuildSchema`؛ وعلى الخادم «تجهيز القاعدة» | `TestSqlServer`، ثم `RunAllTests` على قاعدة تجربة على الخادم (`docs/70` القسم 6) |
 | 66 | `modProductUnits` (جديدة)، واستبدال `modSales` و`modPurchases` و`modPOS` و`modPurchaseScreens` و`modForms` و`modZatcaXml` و`modEtaInvoice` و`modEtaReceipt` و`modTestAll` والوحدات المولَّدة (أو **`BuildFrontEnd.vbs`**) | `BuildSchema`, `BuildRelationships`؛ وعلى الخادم «تجهيز القاعدة» | `TestProductUnits`، ثم البيع والشراء بالكرتونة (`docs/72` القسم 6) |
 | 67 | `modPriceLists` (جديدة)، واستبدال `modProductUnits` و`modSales` و`modPOS` و`modSalesOrders` و`modStockNotes` و`modForms` و`modTestAll` والوحدات المولَّدة (أو **`BuildFrontEnd.vbs`**) | `BuildSchema`, `BuildRelationships`؛ وعلى الخادم «تجهيز القاعدة» | `TestPriceLists`، ثم عميل جملة في نقطة البيع (`docs/73` القسم 7) |
+| 68 | `modPurchaseOrders` (جديدة)، واستبدال `modStockNotes` و`modSalesOrders` و`modTestAll` والوحدات المولَّدة (أو **`BuildFrontEnd.vbs`**) | `BuildSchema`, `BuildRelationships`؛ وعلى الخادم «تجهيز القاعدة» | `TestPurchaseOrders`، ثم «المخزون» ← «أوامر الشراء» (`docs/74` القسم 5) |
 | 65 | `modServerQueries` و`modServerQueryData` (جديدتان)، واستبدال `modSqlServer` و`modQueryParams` و`modDashboard` و`modIndicators` و`modSecurityScreens` و`modBuildQueries` و`modTestAll` و`modLang` و`modLangData*` (أو **`BuildFrontEnd.vbs`**)، ومجلد `dist\sql` (فيه `RetailStore_Queries.sql`) | على الخادم: «تجهيز القاعدة» ثم «التشغيل على الخادم» | `TestServerQueries`، ثم التقارير على قاعدة تجربة على الخادم (`docs/71` القسم 4) |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.

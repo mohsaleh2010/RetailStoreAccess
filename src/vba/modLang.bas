@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3319
+Private Const ENTRY_COUNT As Long = 3383
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("BANK;من البنك;CASHBOX;من صندوق") = "BANK;From the bank;CASHBOX;From a box", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إعادة فتح السنة") = "Reopen the year", "Tr sample 2", passed, failed, report
-    CheckLang Tr("البيانات داخل هذا الملف نفسه (غير مقسمة)، فلا يمكن استعادتها وهو مفتوح.") = "The data is inside this same file (not split), so it cannot be restored while it is open.", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المجلد الافتراضي لـ SQL Server") = "The default folder of SQL Server", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذّر تحديث الحالة: ") = "Could not refresh the status: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("سعر البيع للمندوب") = "Selling price for the rep", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا يمكن حذف هذا السجل لأنه مستخدم في عمليات سابقة.") = "This record cannot be deleted because it is used in earlier transactions.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("C;العملاء;S;الموردون") = "C;Customers;S;Suppliers", "Tr sample 1", passed, failed, report
+    CheckLang Tr("إعادة الفتح إلى هذا اليوم") = "Reopen up to this day", "Tr sample 2", passed, failed, report
+    CheckLang Tr("البنك") = "Bank", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المتبقي من كل فاتورة آجلة حسب تأخيرها عن تاريخ الاستحقاق") = "The remainder of each credit invoice by its delay after the due date", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعذّر تشغيل OpenSSL: ") = "Could not run OpenSSL: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("سعر الحجم الوسط") = "Medium size price", "Tr sample 6", passed, failed, report
+    CheckLang Tr("لا يوجد تحويل. اختر المخزنين ثم «تحويل جديد».") = "No transfer. Choose the two warehouses, then New transfer.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة") = "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة", "العربية: من اليمين ولا ترجمة", _

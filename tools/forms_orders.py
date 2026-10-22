@@ -83,10 +83,91 @@ def layout_sales_order(line_heads) -> FormModel:
     return m
 
 
+PURCHASE_ORDER_TITLES = ["الصنف", "الكمية المطلوبة", "سعر الشراء", "المستلم", "قيمة السطر"]
+
+
+def layout_purchase_order_lines() -> Tuple[FormModel, list]:
+    row_h = cm(0.75)
+    m = FormModel("frmPurchaseOrderLines", "أسطر أمر الشراء", cm(20.6), row_h, popup=False,
+                  record_source="SELECT * FROM PurchaseOrderLines WHERE PurchaseOrderID = 0", allow_add=True)
+    m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0, "AllowDeletions": False}
+    heads = grid_row(m, [
+        ("ProductID", "ProductID", 7.8, {"_kind": "combo", "RowSource": TRANSFER_PRODUCTS, "ColumnCount": 2,
+                                         "ColumnWidths": "0;7.6", "BoundColumn": 1, "LimitToList": True}, []),
+        ("Quantity", "Quantity", 2.4, {"Format": "#,##0.###"}, []),
+        ("UnitCost", "UnitCost", 2.8, {"Format": "#,##0.00##"}, []),
+        ("txtReceived", "=PurchaseOrderLineReceived([PurchaseOrderLineID])", 2.4, {**LOCKED, "Format": "#,##0.###"}, []),
+        ("txtValue", "=Nz([Quantity],0)*Nz([UnitCost],0)", 3.2, {**LOCKED, "Format": "#,##0.00"}, []),
+        ("btnRemove", "", 0.8, {"_kind": "button", "Caption": Sym(f"ChrW(&H{0xE74D:X})"),
+                               "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
+    ], row_h)
+    m.form_events = ["BeforeUpdate", "AfterUpdate"]
+    m.code = ["Private Sub Form_BeforeUpdate(Cancel As Integer)", "    PurchaseOrderLineBeforeUpdate Me, Cancel", "End Sub",
+              "Private Sub Form_AfterUpdate()", "    PurchaseOrderLineAfterUpdate Me", "End Sub",
+              "Private Sub btnRemove_Click()", "    PurchaseOrderRemoveLine Me", "End Sub"]
+    return m, heads
+
+
+def layout_purchase_order(line_heads) -> FormModel:
+    width, height = cm(21.4), cm(18.0)
+    m = FormModel("frmPurchaseOrder", "أوامر الشراء", width, height, popup=True, allow_add=False)
+    title_band(m, "أوامر الشراء",
+               "«اعتماد» يجعل الكمية تحت الطلب، ثم «إذن الاستلام» من الأمر، ثم فاتورة المشتريات من الإذن",
+               "purchases")
+    c = m.add(Control("combo", "cboOrder", cm(0.4), cm(2.3), cm(16.6), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 6, "ColumnWidths": "0;2.4;2.2;5.6;2.8;3.2", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboOrder", "أمر الشراء (الأحدث أولًا)", c)
+    y = cm(3.8)
+    c = m.add(Control("combo", "cboSupplier", cm(0.4), y, cm(5.0), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4.8", "LimitToList": True}))
+    labelled(m, "cboSupplier", "المورد", c)
+    c = m.add(Control("combo", "cboWarehouse", cm(5.6), y, cm(3.4), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;3.2", "LimitToList": True}))
+    labelled(m, "cboWarehouse", "المخزن", c)
+    c = m.add(Control("text", "txtExpected", cm(9.2), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtExpected", "موعد الاستلام", c)
+    c = m.add(Control("text", "txtNotes", cm(12.4), y, cm(4.8), cm(0.8), {}))
+    labelled(m, "txtNotes", "ملاحظات", c)
+    button(m, "btnNew", "أمر جديد", cm(17.4), y - cm(0.03), "primary", w=cm(3.6), call="PurchaseOrderNew Me")
+    m.add(Control("label", "lblInfo", cm(0.4), cm(4.9), width - cm(0.8), cm(0.7),
+                  {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    header_labels(m, cm(0.4), cm(5.75), PURCHASE_ORDER_TITLES, line_heads)
+    m.add(Control("subform", "subLines", cm(0.4), cm(6.35), cm(20.6), cm(7.0),
+                  {"SourceObject": "frmPurchaseOrderLines"}))
+    bx = cm(0.4)                                        # the way of the order
+    for name, caption, style, w, call in [
+            ("btnApprove", "اعتماد", "primary", 2.6, 'PurchaseOrderAction Me, "APPROVE"'),
+            ("btnReceive", "إذن الاستلام", "primary", 3.2, 'PurchaseOrderAction Me, "RECEIVE"'),
+            ("btnNotes", "أذونات الأمر", "secondary", 3.0, "PurchaseOrderOpenNote Me"),
+            ("btnSuggest", "أوامر من الاقتراح", "secondary", 3.8, "PurchaseOrderSuggest Me"),
+            ("btnSuggestReport", "اقتراح الشراء", "secondary", 3.2,
+             'OpenScreen "frmReportCenter", 0, "PURCHASE_SUGGEST"'),
+            ("btnPending", "المفتوحة", "secondary", 2.6, 'OpenScreen "frmReportCenter", 0, "PENDING_PURCHASE_ORDERS"')]:
+        button(m, name, caption, bx, cm(14.1), style, w=cm(w), call=call)
+        bx += cm(w) + cm(0.2)
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnUnapprove", "إعادة لمسودة", "secondary", 3.2, 'PurchaseOrderAction Me, "UNAPPROVE"'),
+            ("btnCancel", "إلغاء الأمر", "danger", 3.2, 'PurchaseOrderAction Me, "CANCEL"'),
+            ("btnDelete", "حذف المسودة", "danger", 3.2, 'PurchaseOrderAction Me, "DELETE"')]:
+        button(m, name, caption, bx, cm(16.1), style, w=cm(w), h=cm(1.1), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(16.1), "secondary", w=cm(2.6), h=cm(1.1),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load", "Activate"]
+    m.code = (["Private Sub Form_Load()", "    PurchaseOrderLoad Me", "End Sub",
+               "Private Sub Form_Activate()", "    PurchaseOrderShow Me", "End Sub",    # back from its receipt note
+               "Private Sub cboOrder_AfterUpdate()", "    PurchaseOrderShow Me", "End Sub"] + m.code)
+    return m
+
+
 def order_forms() -> List[FormModel]:
     lines, heads = layout_sales_order_lines()
+    po_lines, po_heads = layout_purchase_order_lines()
     # the subform first: the parent form embeds it by name
-    return [lines, layout_sales_order(heads), layout_rep_day(), layout_rep_visits()]
+    return [lines, layout_sales_order(heads), po_lines, layout_purchase_order(po_heads), layout_rep_day(),
+            layout_rep_visits()]
 
 
 # ---------------------------------------------------------------- the rep day and van sales (docs/63)
