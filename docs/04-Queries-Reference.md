@@ -676,14 +676,14 @@ FROM SalesReturns AS r
 
 ```sql
 SELECT 'SALE' AS DocType, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber,
-       h.InvoiceDate AS DocDate, h.CustomerID, d.ProductID, d.Quantity AS SignedQty,
-       d.Quantity AS SoldQty, CCur(0) AS ReturnedQty, d.NetAmount AS LineNet,
+       h.InvoiceDate AS DocDate, h.CustomerID, d.ProductID, d.Quantity * d.UnitFactor AS SignedQty,
+       d.Quantity * d.UnitFactor AS SoldQty, CCur(0) AS ReturnedQty, d.NetAmount AS LineNet,
        d.Tax AS LineVAT, d.LineTotal AS LineGross, d.Quantity * d.UnitCost AS LineCost
 FROM SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d
      ON h.SalesInvoiceID = d.SalesInvoiceID
 UNION ALL
 SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, r.CustomerID, d.ProductID,
-       -d.Quantity, CCur(0), d.Quantity, -d.NetAmount, -d.Tax, -d.LineTotal,
+       -d.Quantity * d.UnitFactor, CCur(0), d.Quantity * d.UnitFactor, -d.NetAmount, -d.Tax, -d.LineTotal,
        IIf(d.ReturnToStock, -d.Quantity * d.UnitCost, 0)
 FROM SalesReturns AS r INNER JOIN SalesReturnDetails AS d
      ON r.SalesReturnID = d.SalesReturnID
@@ -2127,29 +2127,33 @@ SELECT 'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumbe
        c.BuildingNo AS CustomerBuilding, c.PostalCode AS CustomerPostal, e.EmployeeName,
        h.SubTotal AS DocSubTotal, h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax,
        h.TotalAmount, h.PaidAmount, h.RemainingAmount, h.AmountTendered, h.ChangeDue,
-       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, d.Quantity, d.UnitPrice,
+       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, v.UnitName AS LineUnit,
+       d.Quantity, d.UnitPrice,
        d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal,
        h.OrderType, h.TableNo, h.OrderName, d.LineNote
-FROM ((((SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID)
+FROM (((((SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID)
        INNER JOIN Products AS p ON d.ProductID = p.ProductID)
       INNER JOIN Units AS u ON p.UnitID = u.UnitID)
      INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID)
-    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID
+    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID)
+    LEFT JOIN Units AS v ON d.UnitID = v.UnitID
 UNION ALL
 SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, o.InvoiceNumber, r.InvoiceSubType,
        r.RefundType, r.CustomerID, c.CustomerName, c.VATNumber, c.City, c.District, c.StreetName,
        c.BuildingNo, c.PostalCode, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax,
        r.TotalAmount, r.RefundedAmount, r.TotalAmount - r.RefundedAmount, CCur(0), CCur(0),
-       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, rd.Quantity, rd.UnitPrice,
+       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, v.UnitName,
+       rd.Quantity, rd.UnitPrice,
        rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal, o.OrderType, o.TableNo, o.OrderName,
        od.LineNote
-FROM ((((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)
+FROM (((((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)
         INNER JOIN SalesInvoices AS o ON r.SalesInvoiceID = o.SalesInvoiceID)
         INNER JOIN SalesInvoiceDetails AS od ON rd.SalesDetailID = od.SalesDetailID)
        INNER JOIN Products AS p ON rd.ProductID = p.ProductID)
       INNER JOIN Units AS u ON p.UnitID = u.UnitID)
      INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID)
-    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID
+    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID)
+    LEFT JOIN Units AS v ON rd.UnitID = v.UnitID
 ```
 
 ## qryPurchaseDocPrint
@@ -2162,30 +2166,33 @@ SELECT 'PURCHASE' AS DocKind, h.PurchaseInvoiceID AS DocID, h.InvoiceNumber AS D
        '' AS Reason, h.SupplierID, s.SupplierName, s.VATNumber AS SupplierVAT,
        s.Mobile AS SupplierMobile, e.EmployeeName, h.SubTotal AS DocSubTotal,
        h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax, h.TotalAmount,
-       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName, u.UnitName,
+       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName,
+       u.UnitName, v.UnitName AS LineUnit,
        d.Quantity, d.UnitCost, d.Discount AS LineDiscount, d.NetAmount, d.VATRate,
        d.Tax AS LineTax, d.LineTotal
-FROM ((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d
+FROM (((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d
          ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)
        INNER JOIN Products AS p ON d.ProductID = p.ProductID)
       INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID)
-    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID
+    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID)
+    LEFT JOIN [@Units] AS v ON d.UnitID = v.UnitID
 UNION ALL
 SELECT 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, o.SupplierInvoiceNo,
        o.InvoiceNumber, r.RefundType, r.Reason, r.SupplierID, s.SupplierName, s.VATNumber,
        s.Mobile, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax, r.TotalAmount,
        r.RefundedAmount, r.TotalAmount - r.RefundedAmount, od.LineNumber, p.ProductCode,
-       p.ProductName, u.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount,
+       p.ProductName, u.UnitName, v.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount,
        rd.VATRate, rd.Tax, rd.LineTotal
-FROM ((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd
+FROM (((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd
            ON r.PurchaseReturnID = rd.PurchaseReturnID)
          INNER JOIN PurchaseInvoiceDetails AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)
         INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)
        INNER JOIN Products AS p ON rd.ProductID = p.ProductID)
       INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID)
-    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID
+    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID)
+    LEFT JOIN [@Units] AS v ON rd.UnitID = v.UnitID
 ```
 
 ## qryVoucherPrint

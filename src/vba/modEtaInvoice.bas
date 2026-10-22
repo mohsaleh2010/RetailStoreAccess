@@ -264,9 +264,10 @@ Public Function EtaInvoiceDocumentJson(ByVal DocKind As String, ByVal DocID As L
                             Txt(c!StreetName), Txt(c!BuildingNo), Txt(c!PostalCode))
     c.Close
     Set rs = db.OpenRecordset("SELECT d.Quantity, d.UnitPrice, d.Discount, d.NetAmount, d.VATRate, d.Tax, d.LineTotal, " & _
-                              "p.ProductCode, p.ProductName, p.EtaItemType, p.EtaItemCode, u.EtaUnitCode FROM (" & LinesOf(DocKind) & _
+                              "p.ProductCode, p.ProductName, p.EtaItemType, p.EtaItemCode, " & _
+                              "IIf(v.UnitID Is Null, u.EtaUnitCode, v.EtaUnitCode) AS EtaUnitCode FROM ((" & LinesOf(DocKind) & _
                               " AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) INNER JOIN Units AS u ON " & _
-                              "p.UnitID = u.UnitID WHERE d." & DocKeyOf(DocKind) & " = " & DocID & " ORDER BY d." & _
+                              "p.UnitID = u.UnitID) LEFT JOIN Units AS v ON d.UnitID = v.UnitID WHERE d." & DocKeyOf(DocKind) & " = " & DocID & " ORDER BY d." & _
                               IIf(isReturn, "ReturnDetailID", "SalesDetailID"), dbOpenSnapshot)
     Do Until rs.EOF
         If Len(lines) > 0 Then lines = lines & ","

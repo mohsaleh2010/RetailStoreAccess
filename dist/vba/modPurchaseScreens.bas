@@ -81,19 +81,18 @@ Public Sub PurBarcodeKeyDown(ByVal frm As Access.Form, ByRef KeyCode As Integer)
 End Sub
 
 Public Function PurScanCode(ByVal frm As Access.Form, ByVal Code As String) As Boolean
-    ' Same input rules as the point of sale: barcode or product code, "12*code" adds 12.
-    Dim qty As Currency, id As Variant
+    ' Same input rules as the point of sale: barcode or product code, "12*code" adds 12; the barcode of a unit
+    ' (a carton, modProductUnits) adds a line in that unit.
+    Dim qty As Currency, pid As Long, unit As Variant
     qty = Nz(frm!txtQty.Value, 1)
     SplitQtyPrefix Code, qty
-    id = DLookup("ProductID", "Products", "IsActive <> 0 AND (Barcode = " & SqlText(Code) & _
-                 " OR ProductCode = " & SqlText(Code) & ")")
-    If IsNull(id) Then
+    If Not FindProductCode(Code, pid, unit) Then
         Beep
         SetPurStatus frm, "·„ Ì „ «·⁄ÀÊ— ⁄·Ï „‰ Ã »«·»«—ﬂÊœ √Ê «·ﬂÊœ: " & Code & _
                      "  (√÷›Â „‰ “— ´„‰ Ã ÃœÌœª)", CLR_DANGER
         Exit Function
     End If
-    PurAddLine frm, CLng(id), qty
+    PurAddLine frm, pid, qty, unit
     frm!txtQty.Value = 1
     PurScanCode = True
 End Function
@@ -106,23 +105,36 @@ Public Sub PurProductPicked(ByVal frm As Access.Form)
     SafeFocus frm!txtBarcode
 End Sub
 
-Public Sub PurAddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty As Currency)
-    ' New line at the last purchase price; the same product again adds to its line.
-    Dim rs As DAO.Recordset, p As DAO.Recordset
+Public Sub PurAddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty As Currency, _
+                      Optional ByVal UnitID As Variant)
+    ' New line at the last purchase price; the same product (in the same unit) again adds to its line.
+    ' UnitID: a bigger unit of the product (modProductUnits); Null = its smallest unit.
+    Dim rs As DAO.Recordset, p As DAO.Recordset, factor As Currency
     If Qty <= 0 Then Qty = 1
+    If IsMissing(UnitID) Then UnitID = Null
+    UnitID = LineUnitID(ProductID, UnitID)
+    factor = UnitFactorOf(ProductID, UnitID)
+    If factor <= 0 Then
+        UnitID = Null
+        factor = 1
+    End If
     Set p = CurrentDb.OpenRecordset("SELECT ProductCode, ProductName, PurchasePrice, SellingPrice " & _
                                     "FROM Products WHERE ProductID = " & ProductID, dbOpenSnapshot)
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPurchaseLines WHERE ProductID = " & ProductID & _
-                                     " AND LineDiscount = 0", dbOpenDynaset, dbSeeChanges)
+                                     " AND LineDiscount = 0 AND " & _
+                                     IIf(IsNull(UnitID), "UnitID Is Null", "UnitID = " & Nz(UnitID, 0)), _
+                                     dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         rs.AddNew
         rs!ProductID = ProductID
         rs!ProductCode = p!ProductCode
         rs!ProductName = p!ProductName
         rs!Quantity = Qty
-        rs!UnitCost = p!PurchasePrice
+        rs!UnitCost = UnitPurchasePrice(ProductID, UnitID)
         rs!LineDiscount = 0
-        rs!SellingPrice = p!SellingPrice
+        rs!SellingPrice = UnitSalePrice(ProductID, UnitID)
+        rs!UnitID = UnitID
+        rs!UnitFactor = factor
     Else
         rs.Edit
         rs!Quantity = rs!Quantity + Qty
@@ -135,7 +147,21 @@ Public Sub PurAddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Q
 End Sub
 
 Public Sub PurLineChanged(ByVal sf As Access.Form, ByVal FieldName As String)
-    ' AfterUpdate of Quantity / UnitCost / LineDiscount / NewSellingPrice in frmPurchaseLines.
+    ' AfterUpdate of Quantity / UnitCost / LineDiscount / NewSellingPrice / UnitID in frmPurchaseLines.
+    Dim factor As Currency
+    If FieldName = "UnitID" Then                        ' another unit of the product: its factor and prices
+        factor = UnitFactorOf(sf!ProductID.Value, sf!UnitID.Value)
+        If factor <= 0 Then
+            ShowWarning "Â–Â «·ÊÕœ… ·Ì”  „‰ ÊÕœ«  «·’‰›. ⁄—¯›Â« „‰ ´ÊÕœ«  «·’‰›ª ›Ì ‘«‘… «·„‰ Ã« ."
+            sf!UnitID.Value = Null
+            factor = 1
+        End If
+        sf!UnitID.Value = LineUnitID(sf!ProductID.Value, sf!UnitID.Value)
+        sf!UnitFactor.Value = factor
+        sf!UnitCost.Value = UnitPurchasePrice(sf!ProductID.Value, sf!UnitID.Value)
+        sf!SellingPrice.Value = UnitSalePrice(sf!ProductID.Value, sf!UnitID.Value)
+        sf!NewSellingPrice.Value = Null
+    End If
     If Nz(sf!Quantity.Value, 0) <= 0 Then
         ShowWarning "«·ﬂ„Ì… ÌÃ» √‰  ﬂÊ‰ √ﬂ»— „‰ ’›—."
         sf!Quantity.Value = 1
@@ -359,13 +385,15 @@ End Sub
 Public Sub LoadPurchaseForReturn(ByVal frm As Access.Form, ByVal PurchaseInvoiceID As Long)
     Dim rs As DAO.Recordset
     CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError + dbSeeChanges
-    CurrentDb.Execute "INSERT INTO tmpPurchaseReturnLines (PurchaseDetailID, ProductID, ProductName, BoughtQty, " & _
+    CurrentDb.Execute Tr("INSERT INTO tmpPurchaseReturnLines (PurchaseDetailID, ProductID, ProductName, BoughtQty, " & _
         "ReturnedQty, AvailableQty, InStock, ReturnQty, ReturnAmount) " & _
-        "SELECT d.PurchaseDetailID, d.ProductID, p.ProductName, d.Quantity, CCur(Nz(r.QtyReturned, 0)), " & _
-        "d.Quantity - CCur(Nz(r.QtyReturned, 0)), p.CurrentQuantity, 0, 0 " & _
-        "FROM (PurchaseInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) " & _
-        "LEFT JOIN qryPurchaseReturnedQty AS r ON d.PurchaseDetailID = r.PurchaseDetailID " & _
-        "WHERE d.PurchaseInvoiceID = " & PurchaseInvoiceID, dbFailOnError + dbSeeChanges
+        "SELECT d.PurchaseDetailID, d.ProductID, p.ProductName & IIf(d.UnitID Is Null, '', ' - ' & u.UnitName), " & _
+        "d.Quantity, CCur(Nz(r.QtyReturned, 0)), d.Quantity - CCur(Nz(r.QtyReturned, 0)), " & _
+        "p.CurrentQuantity / d.UnitFactor, 0, 0 " & _
+        "FROM ((PurchaseInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) " & _
+        "LEFT JOIN qryPurchaseReturnedQty AS r ON d.PurchaseDetailID = r.PurchaseDetailID) " & _
+        "LEFT JOIN [@Units] AS u ON d.UnitID = u.UnitID " & _
+        "WHERE d.PurchaseInvoiceID = " & PurchaseInvoiceID), dbFailOnError + dbSeeChanges
     Set rs = CurrentDb.OpenRecordset(Tr("SELECT h.*, s.SupplierName FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] " & _
                                      "AS s ON h.SupplierID = s.SupplierID WHERE h.PurchaseInvoiceID = " & _
                                      PurchaseInvoiceID), dbOpenSnapshot)

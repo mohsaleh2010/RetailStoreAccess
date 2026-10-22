@@ -464,7 +464,7 @@ Private Sub BuildReport_rptSalesReceipt()
     HideSection 2
     HideSection 3
     HideSection 4
-    Set c = RText(0, "txtProduct", "=[ProductName] & IIf(Len(Nz([LineNote],""""))>0,"" - "" & [LineNote],"""")", 0, 0, 4196, 255, 9, False, 0)
+    Set c = RText(0, "txtProduct", "=[ProductName] & IIf(IsNull([LineUnit]),"""","" ("" & [LineUnit] & "")"") & IIf(Len(Nz([LineNote],""""))>0,"" - "" & [LineNote],"""")", 0, 0, 4196, 255, 9, False, 0)
     SetCtl c, "CanGrow", True
     Set c = RText(0, "txtQtyPrice", "=[Quantity] & "" × "" & Format([LineTotal]/[Quantity],""#,##0.00"")", 113, 266, 2835, 238, 8, False, 0)
     Set c = RText(0, "txtLineTotal", "LineTotal", 2948, 266, 1247, 238, 9, True, 1)
@@ -540,7 +540,7 @@ Private Sub BuildReport_rptSalesInvoiceA4()
     HideSection 3
     HideSection 4
     Set c = RText(0, "txtCol1", "LineNumber", 0, 28, 454, 284, 8, False, 2)
-    Set c = RText(0, "txtCol2", "=[ProductName] & IIf(Len(Nz([LineNote],""""))>0,"" - "" & [LineNote],"""")", 454, 28, 3515, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=[ProductName] & IIf(IsNull([LineUnit]),"""","" ("" & [LineUnit] & "")"") & IIf(Len(Nz([LineNote],""""))>0,"" - "" & [LineNote],"""")", 454, 28, 3515, 284, 8, False, 0)
     SetCtl c, "CanGrow", True
     Set c = RText(0, "txtCol3", "Quantity", 3969, 28, 907, 284, 8, False, 2)
     SetCtl c, "Format", "#,##0.###"
@@ -643,7 +643,7 @@ Private Sub BuildReport_rptPurchaseDocument()
     Set c = RText(0, "txtCol2", "ProductCode", 454, 23, 1247, 284, 8, False, 0)
     Set c = RText(0, "txtCol3", "ProductName", 1701, 23, 2835, 284, 8, False, 0)
     SetCtl c, "CanGrow", True
-    Set c = RText(0, "txtCol4", "UnitName", 4536, 23, 794, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "=Nz([LineUnit],[UnitName])", 4536, 23, 794, 284, 8, False, 0)
     Set c = RText(0, "txtCol5", "Quantity", 5330, 23, 850, 284, 8, False, 2)
     SetCtl c, "Format", "#,##0.###"
     Set c = RText(0, "txtCol6", "UnitCost", 6180, 23, 1134, 284, 8, False, 2)

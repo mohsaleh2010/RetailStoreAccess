@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3259
+Private Const ENTRY_COUNT As Long = 3283
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("ATTENTION;ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ);SENT;ÃõÑÓáÊ;NOT_SENT;ŞÈá ÇáÊİÚíá;ALL;Çáßá") = "ATTENTION;Need follow-up (waiting, rejected, warning);SENT;Sent;NOT_SENT;Before enabling;ALL;All", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÚÇÏÉ ØÈÇÚÉ") = "Reprint", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈíÆÉ ÇáÊÌÑíÈíÉ") = "Test environment", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÈíÚÇÊ ÍÓÈ İÊÑÉ") = "Sales by period", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞÑÊ ÇáÇÓÊÚÇÏÉ: ") = "Restore failed: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÌøá ÇáÌåÇÒ İí ÈæÇÈÉ ÇáãÕáÍÉ Ëã ÇäÓÎ ÈíÇäÇÊå åäÇ. ÇáÑŞã ÇáÖÑíÈí æÇáÚäæÇä ãä ÇáÅÚÏÇÏÇÊ¡ æßæÏ ÇáãÕáÍÉ áßá Õäİ ãä ÔÇÔÉ ÇáãäÊÌÇÊ¡ æÑãÒ ÇáæÍÏÉ ãä æÍÏÇÊ ÇáŞíÇÓ.") = "Register the device on the Tax Authority portal, then copy its data here. The tax number and the address come from the settings, the code of each product from the products screen, the unit code from the units.", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ íãßä ÍĞİ åĞÇ ÇáÓÌá áÃäå ãÓÊÎÏã İí ÚãáíÇÊ ÓÇÈŞÉ.") = "This record cannot be deleted because it is used in earlier transactions.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("ActionName(a.ActionType) AS [ÇáÚãáíÉ], a.ObjectName AS [ÇáÌÏæá], a.RecordID AS [ÇáÑŞã], ") = "ActionName(a.ActionType) AS [Transaction], a.ObjectName AS [Table], a.RecordID AS [Number], ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÚÇÏÉ İÊÍ ÇáÊÓæíÉ ÇáãÚÊãÏÉ¿") = "Reopen the approved reconciliation?", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈíÇä") = "Description", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÊÈŞí İí ÇáÕäÏæŞ (ÚåÏÉ)") = "Left in the box (float)", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞøÑ ÇáÅÑÓÇá: ") = "Could not send: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÓØÑ áÇ íäÊãí Åáì İÇÊæÑÉ ÇáÔÑÇÁ ÇáÃÕáíÉ.") = "A line that does not belong to the original purchase invoice.", "Tr sample 6", passed, failed, report
+    CheckLang Tr("áÇ íãßäß ÊÛííÑ ÏæÑß ÈäİÓß.") = "You cannot change your own role.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ") = "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _

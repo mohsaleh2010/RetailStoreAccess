@@ -4,7 +4,7 @@ Layout conventions are the same as forms.py (twips, x from the start edge)."""
 from typing import List, Tuple
 
 from forms import (Control, FormModel, Sym, ICONS, button, cm, currency_pair, fit_window, labelled, title_band,
-                   CUSTOMER_ROWS)
+                   CUSTOMER_ROWS, UNIT_ROWS)
 
 PAYMENT_TYPES = "CASH;نقدي;CREDIT;آجل"
 REFUND_TYPES = "CASH;رد نقدي;CREDIT;خصم من رصيد العميل"
@@ -50,7 +50,7 @@ LOCKED = {"Locked": True, "TabStop": False}
 
 
 # ------------------------------------------------------------------ cart lines
-POS_COLUMNS_TITLES = ["#", "الصنف", "الكمية", "السعر", "خصم السطر", "الإجمالي", "المتوفر", ""]
+POS_COLUMNS_TITLES = ["#", "الصنف", "الوحدة", "الكمية", "السعر", "خصم السطر", "الإجمالي", "المتوفر", ""]
 
 
 def layout_pos_lines() -> Tuple[FormModel, list]:
@@ -60,7 +60,9 @@ def layout_pos_lines() -> Tuple[FormModel, list]:
     m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0}
     heads = grid_row(m, [
         ("LineNo", "LineNo", 1.0, dict(LOCKED), []),
-        ("ProductName", "ProductName", 7.5, dict(LOCKED), []),
+        ("ProductName", "ProductName", 5.5, dict(LOCKED), []),
+        ("UnitID", "UnitID", 1.95, {"_kind": "combo", "RowSource": UNIT_ROWS, "ColumnCount": 2, "ColumnWidths": "0;1.95"},
+         ["AfterUpdate"]),
         ("Quantity", "Quantity", 2.2, {"Format": "#,##0.###"}, ["AfterUpdate"]),
         ("UnitPrice", "UnitPrice", 2.6, {"Format": "#,##0.00"}, ["AfterUpdate"]),
         ("LineDiscount", "LineDiscount", 2.2, {"Format": "#,##0.00"}, ["AfterUpdate"]),
@@ -70,7 +72,7 @@ def layout_pos_lines() -> Tuple[FormModel, list]:
                                "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
     ], row_h)
     m.code = []
-    for f in ("Quantity", "UnitPrice", "LineDiscount"):
+    for f in ("Quantity", "UnitPrice", "LineDiscount", "UnitID"):
         m.code += [f"Private Sub {f}_AfterUpdate()", f'    LineChanged Me, "{f}"', "End Sub"]
     m.code += ["Private Sub btnRemove_Click()", "    RemoveCurrentLine Me", "End Sub"]
     return m, heads

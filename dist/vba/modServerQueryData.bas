@@ -7,7 +7,7 @@ Option Compare Database
 Option Explicit
 
 ' the version of dist\sql\RetailStore_Queries.sql this front-end needs (view dbo.QueriesVersion)
-Public Const SERVER_QUERIES_VERSION As String = "f6d46ddb7361"
+Public Const SERVER_QUERIES_VERSION As String = "c5c7cf0c13e4"
 
 Public Function ServerQueryList() As String
     ' Name|ORDER BY of the query over its view ("~" = it stays an Access query), separated by ";"

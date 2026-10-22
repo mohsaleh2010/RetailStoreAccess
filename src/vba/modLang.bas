@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3259
+Private Const ENTRY_COUNT As Long = 3283
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("ATTENTION;تحتاج متابعة (بانتظار الإرسال، مرفوضة، تحذير);SENT;أُرسلت;NOT_SENT;قبل التفعيل;ALL;الكل") = "ATTENTION;Need follow-up (waiting, rejected, warning);SENT;Sent;NOT_SENT;Before enabling;ALL;All", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إعادة طباعة") = "Reprint", "Tr sample 2", passed, failed, report
-    CheckLang Tr("البيئة التجريبية") = "Test environment", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المبيعات حسب فترة") = "Sales by period", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذرت الاستعادة: ") = "Restore failed: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("سجّل الجهاز في بوابة المصلحة ثم انسخ بياناته هنا. الرقم الضريبي والعنوان من الإعدادات، وكود المصلحة لكل صنف من شاشة المنتجات، ورمز الوحدة من وحدات القياس.") = "Register the device on the Tax Authority portal, then copy its data here. The tax number and the address come from the settings, the code of each product from the products screen, the unit code from the units.", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا يمكن حذف هذا السجل لأنه مستخدم في عمليات سابقة.") = "This record cannot be deleted because it is used in earlier transactions.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("ActionName(a.ActionType) AS [العملية], a.ObjectName AS [الجدول], a.RecordID AS [الرقم], ") = "ActionName(a.ActionType) AS [Transaction], a.ObjectName AS [Table], a.RecordID AS [Number], ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("إعادة فتح التسوية المعتمدة؟") = "Reopen the approved reconciliation?", "Tr sample 2", passed, failed, report
+    CheckLang Tr("البيان") = "Description", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المتبقي في الصندوق (عهدة)") = "Left in the box (float)", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعذّر الإرسال: ") = "Could not send: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("سطر لا ينتمي إلى فاتورة الشراء الأصلية.") = "A line that does not belong to the original purchase invoice.", "Tr sample 6", passed, failed, report
+    CheckLang Tr("لا يمكنك تغيير دورك بنفسك.") = "You cannot change your own role.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة") = "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة", "العربية: من اليمين ولا ترجمة", _

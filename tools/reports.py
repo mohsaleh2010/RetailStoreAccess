@@ -100,7 +100,9 @@ def setting(name, prefix=""):
 
 
 # the product name with the line note (café size and options)
-PRODUCT_WITH_NOTE = '=[ProductName] & IIf(Len(Nz([LineNote],""))>0," - " & [LineNote],"")'
+# the unit of the line when it is not the smallest one (a carton, docs/72), then the café note
+PRODUCT_WITH_NOTE = ('=[ProductName] & IIf(IsNull([LineUnit]),""," (" & [LineUnit] & ")") & '
+                     'IIf(Len(Nz([LineNote],""))>0," - " & [LineNote],"")')
 
 
 def receipt() -> ReportModel:

@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 210
+Private Const EXPECTED_RELATION_COUNT As Long = 216
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -408,6 +408,8 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_Products_CategoryID", "Categories", "CategoryID", "Products", "CategoryID", 0&)
     c.Add Array("FK_Products_UnitID", "Units", "UnitID", "Products", "UnitID", 0&)
     c.Add Array("FK_Products_SupplierID", "Suppliers", "SupplierID", "Products", "SupplierID", 0&)
+    c.Add Array("FK_ProductUnits_ProductID", "Products", "ProductID", "ProductUnits", "ProductID", 0&)
+    c.Add Array("FK_ProductUnits_UnitID", "Units", "UnitID", "ProductUnits", "UnitID", 0&)
     c.Add Array("FK_SalesInvoices_CustomerID", "Customers", "CustomerID", "SalesInvoices", "CustomerID", 0&)
     c.Add Array("FK_SalesInvoices_EmployeeID", "Employees", "EmployeeID", "SalesInvoices", "EmployeeID", 0&)
     c.Add Array("FK_SalesInvoices_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "SalesInvoices", "PaymentMethodID", 0&)
@@ -418,6 +420,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_SalesInvoices_WarehouseID", "Warehouses", "WarehouseID", "SalesInvoices", "WarehouseID", 0&)
     c.Add Array("FK_SalesInvoiceDetails_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "SalesInvoiceDetails", "SalesInvoiceID", 4096&)
     c.Add Array("FK_SalesInvoiceDetails_ProductID", "Products", "ProductID", "SalesInvoiceDetails", "ProductID", 0&)
+    c.Add Array("FK_SalesInvoiceDetails_UnitID", "Units", "UnitID", "SalesInvoiceDetails", "UnitID", 0&)
     c.Add Array("FK_SalesReturns_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "SalesReturns", "SalesInvoiceID", 0&)
     c.Add Array("FK_SalesReturns_CustomerID", "Customers", "CustomerID", "SalesReturns", "CustomerID", 0&)
     c.Add Array("FK_SalesReturns_EmployeeID", "Employees", "EmployeeID", "SalesReturns", "EmployeeID", 0&)
@@ -430,6 +433,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_SalesReturnDetails_SalesReturnID", "SalesReturns", "SalesReturnID", "SalesReturnDetails", "SalesReturnID", 4096&)
     c.Add Array("FK_SalesReturnDetails_SalesDetailID", "SalesInvoiceDetails", "SalesDetailID", "SalesReturnDetails", "SalesDetailID", 0&)
     c.Add Array("FK_SalesReturnDetails_ProductID", "Products", "ProductID", "SalesReturnDetails", "ProductID", 0&)
+    c.Add Array("FK_SalesReturnDetails_UnitID", "Units", "UnitID", "SalesReturnDetails", "UnitID", 0&)
     c.Add Array("FK_PurchaseInvoices_SupplierID", "Suppliers", "SupplierID", "PurchaseInvoices", "SupplierID", 0&)
     c.Add Array("FK_PurchaseInvoices_EmployeeID", "Employees", "EmployeeID", "PurchaseInvoices", "EmployeeID", 0&)
     c.Add Array("FK_PurchaseInvoices_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "PurchaseInvoices", "PaymentMethodID", 0&)
@@ -439,6 +443,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_PurchaseInvoices_WarehouseID", "Warehouses", "WarehouseID", "PurchaseInvoices", "WarehouseID", 0&)
     c.Add Array("FK_PurchaseInvoiceDetails_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "PurchaseInvoiceDetails", "PurchaseInvoiceID", 4096&)
     c.Add Array("FK_PurchaseInvoiceDetails_ProductID", "Products", "ProductID", "PurchaseInvoiceDetails", "ProductID", 0&)
+    c.Add Array("FK_PurchaseInvoiceDetails_UnitID", "Units", "UnitID", "PurchaseInvoiceDetails", "UnitID", 0&)
     c.Add Array("FK_PurchaseReturns_PurchaseInvoiceID", "PurchaseInvoices", "PurchaseInvoiceID", "PurchaseReturns", "PurchaseInvoiceID", 0&)
     c.Add Array("FK_PurchaseReturns_SupplierID", "Suppliers", "SupplierID", "PurchaseReturns", "SupplierID", 0&)
     c.Add Array("FK_PurchaseReturns_EmployeeID", "Employees", "EmployeeID", "PurchaseReturns", "EmployeeID", 0&)
@@ -450,6 +455,7 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_PurchaseReturnDetails_PurchaseReturnID", "PurchaseReturns", "PurchaseReturnID", "PurchaseReturnDetails", "PurchaseReturnID", 4096&)
     c.Add Array("FK_PurchaseReturnDetails_PurchaseDetailID", "PurchaseInvoiceDetails", "PurchaseDetailID", "PurchaseReturnDetails", "PurchaseDetailID", 0&)
     c.Add Array("FK_PurchaseReturnDetails_ProductID", "Products", "ProductID", "PurchaseReturnDetails", "ProductID", 0&)
+    c.Add Array("FK_PurchaseReturnDetails_UnitID", "Units", "UnitID", "PurchaseReturnDetails", "UnitID", 0&)
     c.Add Array("FK_CustomerPayments_CustomerID", "Customers", "CustomerID", "CustomerPayments", "CustomerID", 0&)
     c.Add Array("FK_CustomerPayments_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "CustomerPayments", "PaymentMethodID", 0&)
     c.Add Array("FK_CustomerPayments_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "CustomerPayments", "SalesInvoiceID", 0&)

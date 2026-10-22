@@ -164,14 +164,14 @@ class StockNoteCodeTests(unittest.TestCase):
     def test_invoice_engines_skip_the_stock_of_a_note(self):
         sale = proc(read("modSales"), "PostSaleFromCart")
         self.assertIn("Optional ByVal StockNoteID As Long = 0", sale)
-        self.assertIn("If Len(msg) = 0 And StockNoteID = 0 Then msg = CheckStock(productIDs, n)", sale)
+        self.assertIn("If Len(msg) = 0 And StockNoteID = 0 Then msg = CheckStock(productIDs, factors, n)", sale)
         self.assertIn('MarkNoteInvoiced db, StockNoteID, "SalesInvoiceID", invoiceID', sale)
         self.assertLess(sale.index("If StockNoteID = 0 Then\n        For i = 0 To n - 1\n            ApplyStockMovement"),
                         sale.index("ws.CommitTrans"))
         purchase = proc(read("modPurchases"), "PostPurchaseFromCart")
         self.assertIn("Optional ByVal StockNoteID As Long = 0", purchase)
         self.assertIn('MarkNoteInvoiced db, StockNoteID, "PurchaseInvoiceID", invoiceID', purchase)
-        self.assertIn("If StockNoteID = 0 Then\n            unitCost = PurchaseUnitCost", purchase)
+        self.assertRegex(purchase, r"If StockNoteID = 0 Then[^\n]*\n\s+unitCost = PurchaseUnitCost")
         self.assertLess(purchase.index("MarkNoteInvoiced"), purchase.index("ws.CommitTrans"))
 
     def test_post_unpost_delete_invoice(self):

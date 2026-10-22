@@ -261,7 +261,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     Dim productIDs() As Long, costs() As Currency, vatCats() As String
     Dim isCredit As Boolean, tend As Currency, paid As Currency, remaining As Currency, change As Currency
     Dim invoiceID As Long, invNo As String, invDate As Date, subType As String, priceChanged As Boolean
-    Dim lineNotes() As String, noteWh As Long
+    Dim lineNotes() As String, noteWh As Long, factors() As Currency, unitIDs() As Variant, pieceCosts() As Currency
 
     On Error GoTo EH
     NewInvoiceID = 0
@@ -271,7 +271,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
 
     ' ---- 1. cart -> calculation engine
     Set rs = db.OpenRecordset( _
-        "SELECT t.ProductID, t.Quantity, t.UnitPrice, t.LineDiscount, t.LineNote, p.ProductName, " & _
+        "SELECT t.ProductID, t.Quantity, t.UnitPrice, t.LineDiscount, t.LineNote, t.UnitID, p.ProductName, " & _
         "p.VATCategory, p.AverageCost, p.SellingPrice, p.SizePriceM, p.SizePriceL, p.IsActive " & _
         "FROM tmpPOSLines AS t LEFT JOIN Products AS p ON t.ProductID = p.ProductID " & _
         "ORDER BY t.LineNo", dbOpenSnapshot)
@@ -287,7 +287,25 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
             rs.Close
             Exit Function
         End If
-        If rs!UnitPrice <> rs!SellingPrice Then                ' a size price of the product is not a change
+        ReDim Preserve factors(0 To n)
+        ReDim Preserve unitIDs(0 To n)
+        ReDim Preserve pieceCosts(0 To n)
+        ' the unit of the line (docs/72): its factor now, not the one the cart was filled with
+        unitIDs(n) = LineUnitID(rs!ProductID, rs!UnitID)
+        factors(n) = UnitFactorOf(rs!ProductID, rs!UnitID)
+        If factors(n) <= 0 Then
+            PostSaleFromCart = "«·ÊÕœ… «·„Œ «—… ·‹ ´" & rs!ProductName & "ª ·„  ⁄œ „‰ ÊÕœ« Â. «Œ — «·ÊÕœ… „‰ ÃœÌœ."
+            rs.Close
+            Exit Function
+        End If
+        If StockNoteID > 0 And factors(n) <> 1 Then
+            PostSaleFromCart = "›« Ê—… ≈–‰ «· ”·Ì„ »«·ÊÕœ… «·’€—Ï ··√’‰«›."
+            rs.Close
+            Exit Function
+        End If
+        If factors(n) <> 1 Then
+            If Not IsListedUnitPrice(rs!ProductID, rs!UnitID, rs!UnitPrice) Then priceChanged = True   ' modProductUnits
+        ElseIf rs!UnitPrice <> rs!SellingPrice Then            ' a size price of the product is not a change
             If rs!UnitPrice <> Nz(rs!SizePriceM, -1) And rs!UnitPrice <> Nz(rs!SizePriceL, -1) Then
                 If Not IsSessionRepPrice(rs!ProductID, rs!UnitPrice) Then priceChanged = True   ' modRepRoutes
             End If
@@ -300,7 +318,8 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
         ReDim Preserve lineNotes(0 To n)
         lineNotes(n) = Nz(rs!LineNote, "")
         productIDs(n) = rs!ProductID
-        costs(n) = Nz(rs!AverageCost, 0)
+        pieceCosts(n) = Nz(rs!AverageCost, 0)
+        costs(n) = pieceCosts(n) * factors(n)                    ' the cost of one unit of the line
         vatCats(n) = Nz(rs!VATCategory, "S")
         n = n + 1
         rs.MoveNext
@@ -335,7 +354,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     If Len(msg) = 0 Then msg = RepCreditProblem(SalesRepFor(CustomerID), remaining)          ' modRepRoutes
     If Len(msg) = 0 And StockNoteID > 0 Then msg = NoteInvoiceProblem(StockNoteID, "DELIVERY", CustomerID, _
                                                                       productIDs, costs, n, noteWh)   ' modStockNotes
-    If Len(msg) = 0 And StockNoteID = 0 Then msg = CheckStock(productIDs, n)
+    If Len(msg) = 0 And StockNoteID = 0 Then msg = CheckStock(productIDs, factors, n)
     If Len(msg) > 0 Then
         PostSaleFromCart = msg
         Exit Function
@@ -404,13 +423,16 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
         rs!LineTotal = CalcLine(i, "TOTAL")
         rs!UnitCost = costs(i)
         If Len(lineNotes(i)) > 0 Then rs!LineNote = Left$(lineNotes(i), 100)
+        rs!UnitID = unitIDs(i)
+        rs!UnitFactor = factors(i)
         rs.Update
     Next
     rs.Close
 
     If StockNoteID = 0 Then
         For i = 0 To n - 1
-            ApplyStockMovement db, productIDs(i), -CalcLine(i, "QTY"), TT_SALE, costs(i), "SALE", invoiceID, invNo
+            ApplyStockMovement db, productIDs(i), -CalcLine(i, "QTY") * factors(i), TT_SALE, pieceCosts(i), "SALE", _
+                               invoiceID, invNo
         Next
     Else
         MarkNoteInvoiced db, StockNoteID, "SalesInvoiceID", invoiceID                  ' modStockNotes
@@ -439,7 +461,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     Dim costs() As Currency, rates() As Currency, cats() As String, discs() As Currency
     Dim sumNet As Currency, sumTax As Currency, sumTotal As Currency, sumDisc As Currency
     Dim refunded As Currency, customerID As Long, retID As Long, retNo As String, retDate As Date
-    Dim subType As String
+    Dim subType As String, factors() As Currency, unitIDs() As Variant
 
     On Error GoTo EH
     NewReturnID = 0
@@ -463,7 +485,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
 
     Set rs = db.OpenRecordset( _
         "SELECT r.SalesDetailID, r.ReturnQty, r.ReturnToStock, d.ProductID, d.Quantity, d.LineTotal, " & _
-        "d.Tax, d.UnitPrice, d.UnitCost, d.VATRate, d.VATCategory, d.SalesInvoiceID " & _
+        "d.Tax, d.UnitPrice, d.UnitCost, d.VATRate, d.VATCategory, d.SalesInvoiceID, d.UnitID, d.UnitFactor " & _
         "FROM tmpReturnLines AS r INNER JOIN SalesInvoiceDetails AS d ON r.SalesDetailID = d.SalesDetailID " & _
         "WHERE r.ReturnQty > 0", dbOpenSnapshot)
     Do Until rs.EOF
@@ -478,6 +500,10 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
         ReDim Preserve taxes(0 To n): ReDim Preserve totals(0 To n)
         ReDim Preserve costs(0 To n): ReDim Preserve rates(0 To n)
         ReDim Preserve cats(0 To n): ReDim Preserve discs(0 To n)
+        ReDim Preserve factors(0 To n): ReDim Preserve unitIDs(0 To n)
+        factors(n) = Nz(rs!UnitFactor, 1)                    ' the unit of the invoice line (docs/72)
+        If factors(n) <= 0 Then factors(n) = 1
+        unitIDs(n) = rs!UnitID
         detailIDs(n) = rs!SalesDetailID
         productIDs(n) = rs!ProductID
         qtys(n) = rs!ReturnQty
@@ -561,13 +587,15 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
         rs!LineTotal = totals(i)
         rs!UnitCost = costs(i)
         rs!ReturnToStock = toStock(i)
+        rs!UnitID = unitIDs(i)
+        rs!UnitFactor = factors(i)
         rs.Update
     Next
     rs.Close
 
     For i = 0 To n - 1
         If toStock(i) Then
-            ApplyStockMovement db, productIDs(i), qtys(i), TT_SALES_RETURN, costs(i), "SALES_RETURN", _
+            ApplyStockMovement db, productIDs(i), qtys(i) * factors(i), TT_SALES_RETURN, costs(i) / factors(i), "SALES_RETURN", _
                                retID, retNo, "", True, _
                                Nz(DbValue("SELECT WarehouseID FROM SalesReturns WHERE SalesReturnID = " & retID), 0)
         End If
@@ -749,11 +777,12 @@ Private Function CheckCustomer(ByVal CustomerID As Long, ByVal IsCredit As Boole
     rs.Close
 End Function
 
-Private Function CheckStock(ByRef ProductIDs() As Long, ByVal n As Long) As String
+Private Function CheckStock(ByRef ProductIDs() As Long, ByRef Factors() As Currency, ByVal n As Long) As String
+    ' the pieces each line takes out (docs/72)
     Dim qtys() As Currency, i As Long
     ReDim qtys(0 To n - 1)
     For i = 0 To n - 1
-        qtys(i) = CalcLine(i, "QTY")
+        qtys(i) = CalcLine(i, "QTY") * Factors(i)
     Next
     CheckStock = CheckStockAvailable(ProductIDs, qtys, n, "«·»Ì⁄")
 End Function

@@ -76,7 +76,7 @@ def purchase_document() -> ReportModel:
         by + cm(1.3), W - cm(0.4), cm(0.5), 9)
     columns(m, cm(5.15), [
         ("#", "LineNumber", 0.8, None, {}), ("الكود", "ProductCode", 2.2, None, {}),
-        ("الصنف", "ProductName", 5.0, None, {}), ("الوحدة", "UnitName", 1.4, None, {}),
+        ("الصنف", "ProductName", 5.0, None, {}), ("الوحدة", "=Nz([LineUnit],[UnitName])", 1.4, None, {}),
         ("الكمية", "Quantity", 1.5, QTY, {}), ("تكلفة الوحدة", "UnitCost", 2.0, "#,##0.00##", {}),
         ("الخصم", "LineDiscount", 1.5, MONEY, {}), ("الضريبة", "LineTax", 1.6, MONEY, {}),
         ("الإجمالي", "LineTotal", 3.0, MONEY, {})])

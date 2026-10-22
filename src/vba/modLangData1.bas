@@ -21,6 +21,7 @@ Private Sub D1_1()
     LangAdd "رصيد الصنف في المخزن يُحسب من حركاته فيه. المستخدم يبيع ويشتري من مخزنه في شاشة المستخدمين، وبدونه من المخزن الرئيسي", "The balance of a product in a warehouse comes from its moves there. A user sells and buys from the warehouse set in the users screen, else from the main warehouse"
     LangAdd "الحسابات الأساسية (المعلَّمة) تستخدمها القيود الآلية: لا تُحذف ولا يتغير نوعها. القيود اليدوية من زر «قيد يدوي", "The system accounts (marked) are used by the automatic entries: they are not deleted and their type does not change. Manual entries from the button Manual entry"
     LangAdd "يُعرض التقرير للمعاينة ومنها الطباعة. «حفظ PDF» و«تصدير Excel» يحفظان الملف في مجلد Reports بجانب ملف البرنامج", "The report is shown in preview and printed from it. Save PDF and Export Excel save the file in the Reports folder next to the program file"
+    LangAdd "كرتونة أو علبة لها عدد من الوحدة الصغرى للصنف، وباركود وسعر: تُباع وتُشترى بها، والمخزون بالوحدة الصغرى", "A carton or box holding a count of the smallest unit, with its barcode and price: sold and bought in it, stock in the smallest unit"
     LangAdd "أول جهاز: تُطابَق البيانات أولًا، ثم يصير الخادم هو البيانات الفعلية. الأجهزة التالية تُربط مباشرة", "First PC: the data is compared first, then the server holds the real data. The next PCs are linked directly"
     LangAdd "رصيد كل حساب وعميل ومورد وصندوق وبنك وصنف يوم بدء التشغيل، ومقابلها حساب إجمالي الأرصدة الافتتاحية", "The balance of every account, customer, supplier, cash box, bank and item on the start-up date, against the total opening balances account"
     LangAdd "تسليم أصناف لعميل أو استلامها من مورد قبل الفاتورة: «ترحيل» يحرك المخزون، ثم «إنشاء الفاتورة» منه", "Deliver goods to a customer or receive them from a supplier before the invoice: Post moves the stock, then Make the invoice from it"
@@ -66,6 +67,7 @@ Private Sub D1_1()
     LangAdd "لا يمكن الحفظ: توجد قيمة مكررة في حقل يجب أن يكون فريدًا (مثل الكود أو الباركود", "Cannot save: a value is repeated in a field that must be unique (such as the code or the barcode"
     LangAdd "ليس للمندوب صندوق عهدة نشط. أنشئه في «الصناديق» بنوع «عهدة مندوب» واختر المندوب", "The rep has no active custody box. Create it in Cash boxes with the type Rep custody and choose the rep"
     LangAdd "ليس للمندوب مخزن سيارة نشط. أنشئه في «المخازن» بنوع «سيارة مندوب» واختر المندوب", "The rep has no active van warehouse. Create it in Warehouses with the type Rep van and choose the rep"
+    LangAdd "هذه هي الوحدة الصغرى للصنف نفسه (من شاشة المنتجات): اختر وحدة أكبر مثل الكرتونة", "This is the smallest unit of the product itself (products screen): choose a bigger unit such as a carton"
     LangAdd "مسير كل شهر: الرواتب والبدلات والإضافي والخصومات والتأمينات، ثم الترحيل والصرف", "A run each month: salaries, allowances, overtime, deductions and social insurance, then posting and payment"
     LangAdd "هذا حساب أساسي تستخدمه القيود الآلية: لا يتغير نوعه، ولا يتحول بين رئيسي وفرعي", "This is a system account used by the automatic entries: its type does not change, and it does not switch between main and sub"
     LangAdd "إعادة إنشاء أسطر المسير من مبيعات وتحصيلات الشهر؟ تضيع التعديلات المكتوبة فيه", "Rebuild the run lines from the sales and collections of the month? The changes typed in it are lost"
@@ -98,8 +100,10 @@ Private Sub D1_1()
     LangAdd "الإقرار معتمد: لا تتغير قيمه. ألغِ الاعتماد أولًا إن كان التغيير مقصودًا", "The return is approved: its values do not change. Cancel the approval first if the change is intended"
     LangAdd "نعم: يُسمح بنقل البيانات إلى الخادم من جديد، وكل الأجهزة يجب أن ترجع إلى", "Yes: a new transfer to the server is allowed, and every PC must go back to"
     LangAdd "هذا التقرير يعرض التكلفة والأرباح ويحتاج صلاحية «تقارير الأرباح والضريبة", "This report shows costs and profits and needs the permission Profit and VAT reports"
+    LangAdd "هذه الوحدة ليست من وحدات الصنف. عرّفها من «وحدات الصنف» في شاشة المنتجات", "This unit is not one of the product units. Define it from Product units on the products screen"
     LangAdd "إعادة إنشاء أسطر المسير من بيانات الموظفين؟ تضيع التعديلات المكتوبة فيه", "Rebuild the run lines from the employee data? The changes typed in it are lost"
     LangAdd "الإيجار والكهرباء والاشتراكات: يُنشأ المصروف تلقائيًا في تاريخ استحقاقه", "Rent, electricity and subscriptions: the expense is created automatically on its due date"
+    LangAdd "الرصيد والتكلفة بالوحدة الصغرى؛ الفاتورة تحفظ كمية الوحدة وسعرها وعددها", "Stock and cost stay in the smallest unit, an invoice keeps the quantity, price and count of the unit"
     LangAdd "المبيعات للمواطنين (الخدمات الصحية الخاصة والتعليم الأهلي والمسكن الأول", "Sales to citizens (private health care, private education and first home"
     LangAdd "لكل مندوب هدف واحد في الشهر؛ تقرير «أداء المندوبين» يقارن الفعلي بالهدف", "Each sales rep has one target a month, the report Sales rep performance compares the actual with the target"
     LangAdd "ألغِ العلامة للوجبات والمشروبات التي تُحضَّر عند الطلب: تُباع بلا رصيد", "Clear the mark for meals and drinks prepared on order: they are sold without stock"
@@ -130,13 +134,13 @@ Private Sub D1_1()
     LangAdd "قاعدة جديدة تُنشأ جداولها، وقاعدة موجودة تُرقّى ولا تُحذف بياناتها", "A new database gets its tables, an existing one is upgraded and keeps its data"
     LangAdd "يُلغى ترحيل التحويل بالطريق فقط. التحويل المستلم يُعاد بتحويل جديد", "Only a transfer in transit is unposted. A received transfer is sent back with a new transfer"
     LangAdd "أرصدة المنتجات وحركاتها، والرصيد الافتتاحي والإضافة والخصم اليدوي", "Product balances and moves, opening balance and manual additions and deductions"
+End Sub
+
+Private Sub D1_2()
     LangAdd "إقرار غير محفوظ: الأرقام من المستندات الآن. احفظه مسودة أو اعتمده", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
     LangAdd "الجهاز غير مسجّل. اكتب رمز التحقق (OTP) من بوابة فاتورة ثم الخطوة", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
     LangAdd "تحويلات بين الصناديق تنتظر تأكيد الاستلام من أمين الصندوق المستلم", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
     LangAdd "تم حفظ نسب التأمينات. تُطبَّق على المسودات عند تعديلها أو ترحيلها", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
-End Sub
-
-Private Sub D1_2()
     LangAdd "سُجّل الجهاز في بيئة أخرى. سجّله في البيئة الحالية من إعداد الربط", "The device was registered in another environment. Register it in the current one from the connection setup"
     LangAdd "صدرت من الطلبية أذونات تسليم. احذف المسودات منها، أو ألغِ الطلبية", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
     LangAdd "يُنشأ المصروف في يوم الاستحقاق من كل فترة، بدءًا من تاريخ البداية", "The expense is created on the due day of each period, starting from the start date"
@@ -213,6 +217,7 @@ Private Sub D1_2()
     LangAdd "اختر البنك، واكتب تاريخ كشف البنك ورصيده، ثم «بدء التسوية", "Choose the bank, type the date and balance of the bank statement, then Start reconciliation"
     LangAdd "المنتج موجود لكنه ليس ضمن هذا الجرد (تصنيف آخر أو غير نشط", "The product exists but is not part of this count (another category or inactive"
     LangAdd "تحويل تصفية الكاشير لا يُلغى: يستلمه أمين الصندوق المستلم", "A cashier closing transfer is not cancelled: the custodian of the receiving box receives it"
+    LangAdd "عدد الوحدات الصغرى في الوحدة يجب أن يكون أكبر من صفر وغير", "The count of smallest units must be more than zero and not"
     LangAdd "عملية مطابقة تغيّر مبلغها في الدفاتر بعد المطابقة: راجعها", "A matched transaction whose amount changed in the books after matching: review it"
     LangAdd "في شاشة البيع فاتورة لم تُحفظ بعد. احفظها أو امسحها أولًا", "The sales screen has an unsaved invoice. Save or clear it first"
     LangAdd "في هذا اليوم حركة (تحميل أو بيع أو تحصيل). سوِّه بدل حذفه", "This day has activity (loading, sales or collections). Settle it instead of deleting it"
@@ -228,6 +233,7 @@ Private Sub D1_2()
     LangAdd "رصيد المخزون يُدخل في قسم «المخزون»: كمية وتكلفة لكل صنف", "The stock balance is entered in the Stock part: quantity and cost of each item"
     LangAdd "رفضت الهيئة بيانات الدخول (شهادة الجهاز أو الكلمة السرية", "ZATCA refused the credentials (device certificate or secret"
     LangAdd "على الأصل قيود إهلاك: لا تتغير بياناته المالية ولا يُحذف", "The asset has depreciation entries: its financial data do not change and it is not deleted"
+    LangAdd "كم حبة (الوحدة الصغرى للصنف) في هذه الوحدة؛ مثال: كرتونة", "How many pieces (the smallest unit) are in this unit, example: carton"
     LangAdd "لا يتغير رقم حساب محفوظ. أنشئ حسابًا جديدًا وعطّل القديم", "A saved account number does not change. Create a new account and deactivate the old one"
     LangAdd "لكل عملة سعر واحد في اليوم؛ عملة البرنامج لا تحتاج سعرًا", "Each currency has one rate a day, the program currency needs no rate"
     LangAdd "للأصل نقل في يوم إعادة التقييم أو بعده: احذف النقل أولًا", "The asset has a transfer on or after the revaluation day: delete the transfer first"
@@ -243,6 +249,7 @@ Private Sub D1_2()
     LangAdd "لا يمكن تغيير دولة التشغيل بعد تسجيل عمليات في البرنامج", "The operating country cannot change after operations are recorded"
     LangAdd "ليست في الفترات المالية. أضفها في شاشة «الفترات المالية", "is not in the fiscal periods. Add it in the Fiscal periods screen"
     LangAdd "هذا الصنف لا يتابع المخزون، فلا يُسلَّم ولا يُستلم بإذن", "This item does not track stock, so it has no delivery or receipt note"
+    LangAdd "يُمسح في نقطة البيع والمشتريات فيُضاف السطر بهذه الوحدة", "Scanned in the POS and purchases, it adds the line in this unit"
     LangAdd "أغلق البرنامج وانسخ ملف النسخة الاحتياطية مكانه يدويًا", "Close the program and copy the backup file in its place by hand"
     LangAdd "إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية", "Total VAT due for the current period"
     LangAdd "اختر شاشة واحدة على الأقل، أو ألغِ «صلاحيات شاشات خاصة", "Choose at least one screen, or clear Custom screen permissions"
@@ -250,6 +257,9 @@ Private Sub D1_2()
     LangAdd "الضريبة والقيمة المتبقية والإهلاك السابق لا تكون سالبة", "VAT, residual value and previous depreciation are never negative"
     LangAdd "بيانات دخول البرنامج للفاتورة الإلكترونية (Client ID و", "Credentials of the program for the e-invoice (Client ID and"
     LangAdd "تأكد من تشغيل الخادم والشبكة، ثم افتح البرنامج من جديد", "Make sure the server and the network are running, then open the program again"
+End Sub
+
+Private Sub D1_3()
     LangAdd "تعذرت النسخة الوقائية قبل الاستعادة، فلم تتم الاستعادة", "The safety copy before restoring failed, so nothing was restored"
     LangAdd "تم حفظ صلاحيات الشاشات. تسري من الدخول التالي للمستخدم", "The screen permissions were saved. They apply from the next login of the user"
     LangAdd "حساب النوع: القسم 5640، الصالة 1420، الهالك 5250، أخرى", "account of the type: department 5640, hall 1420, waste 5250, other"
@@ -257,21 +267,10 @@ Private Sub D1_2()
     LangAdd "طلبية هذا الإذن ليست مفتوحة للتسليم (مُسلَّمة أو ملغاة", "The order of this note is not open for delivery (delivered or cancelled"
     LangAdd "للطلبية إذن تسليم لم يُرحَّل. افتحه من «أذونات الطلبية", "The order has a delivery note not posted yet. Open it from Order notes"
     LangAdd "هذا الصنف لا يتابع المخزون، فلا يُحجز ولا يُسلَّم بإذن", "This product does not track stock, so it is not reserved or delivered with a note"
-End Sub
-
-Private Sub D1_3()
     LangAdd "يعمل البرنامج على الأجهزة المفعّلة فقط بكود من المبرمج", "The program runs only on computers activated with a code from the developer"
     LangAdd "اختر سطر قيد من القائمة (سطر رصيد أول المدة ليس قيدًا", "Choose an entry line from the list (the opening balance line is not an entry"
     LangAdd "الحساب مقفل مؤقتًا بسبب محاولات دخول خاطئة حتى الساعة", "The account is locked for a while after wrong login attempts, until"
     LangAdd "المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل", "The main warehouse, branches, sales rep vans and work in progress"
     LangAdd "امسح الباركود أو اختر الصنف بالاسم، وحدد عدد الملصقات", "Scan the barcode or choose the item by name, and set the number of labels"
     LangAdd "حركة الشيك مطابقة في تسوية بنكية: ألغِ مطابقتها أولًا", "The cheque move is matched in a bank reconciliation: unmatch it first"
-    LangAdd "قيد لكل عملية مربوط بأصلها: افتح القيد أو أصل العملية", "One entry for each transaction, linked to its source: open the entry or the source transaction"
-    LangAdd "مبيعات المستخدم ومشترياته وحركاته من هذا المخزن؛ فارغ", "The sales, purchases and moves of the user use this warehouse, empty"
-    LangAdd "الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا", "The main account it belongs to (the account type follows it automatically"
-    LangAdd "المبلغ المرحَّل يجب أن يكون بين صفر والنقدية الفعلية", "The transferred amount must be between zero and the actual cash"
-    LangAdd "النقدية الموجودة في الصندوق عند بدء استخدام البرنامج", "The cash in the box when the program is first used"
-    LangAdd "تم حفظ صلاحيات الدور. تسري عند الفتح التالي لكل شاشة", "The permissions of the role were saved. They apply the next time each screen opens"
-    LangAdd "توجد تسوية جارية لهذا البنك: اعتمدها أو احذفها أولًا", "There is an open reconciliation for this bank: approve it or delete it first"
-    LangAdd "جرد السيارة مفتوح. أدخل الكميات الفعلية ورحّله أولًا", "The van count is open. Enter the counted quantities and post it first"
 End Sub

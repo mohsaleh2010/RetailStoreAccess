@@ -4,7 +4,7 @@ Layout conventions are the same as forms.py (twips, x from the start edge)."""
 
 from typing import List, Tuple
 
-from forms import Control, FormModel, Sym, button, cm, currency_pair, fit_window, labelled, shrink_area, title_band, CATEGORY_ROWS
+from forms import Control, FormModel, Sym, button, cm, currency_pair, fit_window, labelled, shrink_area, title_band, CATEGORY_ROWS, UNIT_ROWS
 from forms_sales import LOCKED, PAYMENT_ROWS, PAYMENT_TYPES, grid_row, header_labels
 
 PURCHASE_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, PurchasePrice "
@@ -33,7 +33,7 @@ def check_with_label(m: FormModel, name: str, caption: str, x: int, y: int, w: i
 
 
 # ------------------------------------------------------------------ purchase invoice
-PURCHASE_TITLES = ["#", "الصنف", "الكمية", "تكلفة الوحدة", "الخصم", "الإجمالي", "سعر البيع",
+PURCHASE_TITLES = ["#", "الصنف", "الوحدة", "الكمية", "تكلفة الوحدة", "الخصم", "الإجمالي", "سعر البيع",
                    "سعر بيع جديد", ""]
 
 
@@ -44,7 +44,9 @@ def layout_purchase_lines() -> Tuple[FormModel, list]:
     m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0}
     heads = grid_row(m, [
         ("LineNo", "LineNo", 0.9, dict(LOCKED), []),
-        ("ProductName", "ProductName", 5.6, dict(LOCKED), []),
+        ("ProductName", "ProductName", 3.75, dict(LOCKED), []),
+        ("UnitID", "UnitID", 1.8, {"_kind": "combo", "RowSource": UNIT_ROWS, "ColumnCount": 2, "ColumnWidths": "0;1.8"},
+         ["AfterUpdate"]),
         ("Quantity", "Quantity", 1.9, {"Format": "#,##0.###"}, ["AfterUpdate"]),
         ("UnitCost", "UnitCost", 2.3, {"Format": "#,##0.00##"}, ["AfterUpdate"]),
         ("LineDiscount", "LineDiscount", 1.9, {"Format": "#,##0.00"}, ["AfterUpdate"]),
@@ -55,7 +57,7 @@ def layout_purchase_lines() -> Tuple[FormModel, list]:
                                "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
     ], row_h)
     m.code = []
-    for f in ("Quantity", "UnitCost", "LineDiscount", "NewSellingPrice"):
+    for f in ("Quantity", "UnitCost", "LineDiscount", "NewSellingPrice", "UnitID"):
         m.code += [f"Private Sub {f}_AfterUpdate()", f'    PurLineChanged Me, "{f}"', "End Sub"]
     m.code += ["Private Sub btnRemove_Click()", "    PurRemoveLine Me", "End Sub"]
     return m, heads

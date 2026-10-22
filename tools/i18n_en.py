@@ -3265,4 +3265,33 @@ EN = {
     'تعذر ربط الاستعلام': 'Could not link the query',
     'قاعدة الخادم ليس فيها استعلامات البرنامج: شغّل «تجهيز القاعدة» أولًا (ملف':
         'The server database lacks the queries of the program: run Set up the database first (file',
+    # docs/72: multiple units per product
+    'آخر سعر شراء للحبة × العدد': 'the last piece cost x the count',
+    'احفظ الصنف أولًا': 'Save the product first',
+    'اختر الصنف والوحدة': 'Choose the product and the unit',
+    'الرصيد والتكلفة بالوحدة الصغرى؛ الفاتورة تحفظ كمية الوحدة وسعرها وعددها':
+        'Stock and cost stay in the smallest unit, an invoice keeps the quantity, price and count of the unit',
+    'الوحدة المختارة لـ': 'The unit chosen for',
+    'باركود الوحدة': 'Unit barcode',
+    'سعر الحبة × العدد': 'the piece price x the count',
+    'سعر بيع الوحدة': 'Unit selling price',
+    'سعر شراء الوحدة': 'Unit purchase price',
+    'شامل الضريبة كسعر الصنف': 'VAT included like the product price',
+    'عدد الوحدات الصغرى في الوحدة يجب أن يكون أكبر من صفر وغير': 'The count of smallest units must be more than zero and not',
+    'عدد الوحدات الصغرى فيها': 'Smallest units in it',
+    'فاتورة إذن الاستلام بالوحدة الصغرى للأصناف': 'The invoice of a receipt note is in the smallest unit of the products',
+    'فاتورة إذن التسليم بالوحدة الصغرى للأصناف': 'The invoice of a delivery note is in the smallest unit of the products',
+    'كرتونة أو علبة لها عدد من الوحدة الصغرى للصنف، وباركود وسعر: تُباع وتُشترى بها، والمخزون بالوحدة الصغرى':
+        'A carton or box holding a count of the smallest unit, with its barcode and price: sold and bought in it, stock in the smallest unit',
+    'كم حبة (الوحدة الصغرى للصنف) في هذه الوحدة؛ مثال: كرتونة': 'How many pieces (the smallest unit) are in this unit, example: carton',
+    'لم تعد من وحداته. اختر الوحدة من جديد': 'is no longer one of its units. Choose the unit again',
+    'مستخدم باركودًا أو كودًا لصنف': 'is used as the barcode or code of a product',
+    'مستخدم لوحدة من وحدات الأصناف': 'is used by a product unit',
+    'هذه الوحدة ليست من وحدات الصنف. عرّفها من «وحدات الصنف» في شاشة المنتجات':
+        'This unit is not one of the product units. Define it from Product units on the products screen',
+    'هذه هي الوحدة الصغرى للصنف نفسه (من شاشة المنتجات): اختر وحدة أكبر مثل الكرتونة':
+        'This is the smallest unit of the product itself (products screen): choose a bigger unit such as a carton',
+    'وحدات الأصناف': 'Product units',
+    'وحدات الصنف': 'Product units',
+    'يُمسح في نقطة البيع والمشتريات فيُضاف السطر بهذه الوحدة': 'Scanned in the POS and purchases, it adds the line in this unit',
 }

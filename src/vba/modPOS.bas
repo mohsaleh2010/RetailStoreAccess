@@ -30,6 +30,9 @@ Public Sub EnsureLocalTables()
     If Not LocalFieldExists("tmpPOSLines", "LineNote") Then         ' café: size and options of the line
         CurrentDb.Execute "ALTER TABLE tmpPOSLines ADD COLUMN LineNote TEXT(100)", dbFailOnError
     End If
+    If Not LocalFieldExists("tmpPOSLines", "UnitID") Then           ' the unit of the line (docs/72)
+        CurrentDb.Execute "ALTER TABLE tmpPOSLines ADD COLUMN UnitID LONG, UnitFactor CURRENCY", dbFailOnError
+    End If
     If Not LocalTableExists("tmpReturnLines") Then
         CurrentDb.Execute "CREATE TABLE tmpReturnLines (SalesDetailID LONG CONSTRAINT pkReturnLines " & _
             "PRIMARY KEY, ProductID LONG, ProductName TEXT(150), SoldQty CURRENCY, ReturnedQty CURRENCY, " & _
@@ -78,6 +81,9 @@ Public Sub EnsureLocalTables()
         CurrentDb.Execute "CREATE TABLE tmpPurchaseLines (LineNo COUNTER CONSTRAINT pkPurchaseLines PRIMARY KEY, " & _
             "ProductID LONG, ProductCode TEXT(30), ProductName TEXT(150), Quantity CURRENCY, UnitCost CURRENCY, " & _
             "LineDiscount CURRENCY, LineTotal CURRENCY, SellingPrice CURRENCY, NewSellingPrice CURRENCY)", dbFailOnError
+    End If
+    If Not LocalFieldExists("tmpPurchaseLines", "UnitID") Then      ' the unit of the line (docs/72)
+        CurrentDb.Execute "ALTER TABLE tmpPurchaseLines ADD COLUMN UnitID LONG, UnitFactor CURRENCY", dbFailOnError
     End If
     If Not LocalTableExists("tmpPurchaseReturnLines") Then
         CurrentDb.Execute "CREATE TABLE tmpPurchaseReturnLines (PurchaseDetailID LONG CONSTRAINT pkPurchaseReturnLines " & _
@@ -176,23 +182,22 @@ Public Sub BarcodeKeyDown(ByVal frm As Access.Form, ByRef KeyCode As Integer)
 End Sub
 
 Public Function ScanCode(ByVal frm As Access.Form, ByVal Code As String) As Boolean
-    ' "3*6281234567890" adds 3 units. Matches the barcode or the product code.
-    Dim qty As Currency, id As Variant, p As Long
+    ' "3*6281234567890" adds 3 units. Matches the barcode or the product code, or the barcode of a unit of a
+    ' product (a carton, modProductUnits): the line is then in that unit.
+    Dim qty As Currency, pid As Long, unit As Variant, p As Long
     qty = Nz(frm!txtQty.Value, 1)
     p = InStr(Code, "*")
     If p > 1 Then
         If IsNumeric(Left$(Code, p - 1)) Then qty = CCur(Left$(Code, p - 1))
         Code = Mid$(Code, p + 1)
     End If
-    id = DLookup("ProductID", "Products", "IsActive <> 0 AND (Barcode = " & SqlText(Code) & _
-                 " OR ProductCode = " & SqlText(Code) & ")")
-    If IsNull(id) Then
+    If Not FindProductCode(Code, pid, unit) Then
         Beep
         SetPOSStatus frm, "لم يتم العثور على منتج بالباركود أو الكود: " & Code, CLR_DANGER
         Exit Function
     End If
     If qty <= 0 Then qty = 1
-    AddLine frm, CLng(id), qty
+    AddLine frm, pid, qty, unit
     frm!txtQty.Value = 1
     ScanCode = True
 End Function
@@ -205,21 +210,34 @@ Public Sub ProductPicked(ByVal frm As Access.Form)
     SafeFocus frm!txtBarcode
 End Sub
 
-Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty As Currency)
-    Dim rs As DAO.Recordset, p As DAO.Recordset, total As Currency, available As Currency
+Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty As Currency, _
+                   Optional ByVal UnitID As Variant)
+    ' UnitID: a bigger unit of the product (modProductUnits); Null = its smallest unit.
+    Dim rs As DAO.Recordset, p As DAO.Recordset, total As Currency, available As Currency, factor As Currency
     available = AvailableQty(ProductID)                     ' in the warehouse of the user (modWarehouses)
+    If IsMissing(UnitID) Then UnitID = Null
+    UnitID = LineUnitID(ProductID, UnitID)
+    factor = UnitFactorOf(ProductID, UnitID)
+    If factor <= 0 Then
+        UnitID = Null
+        factor = 1
+    End If
     Set p = CurrentDb.OpenRecordset("SELECT ProductCode, ProductName, SellingPrice, CurrentQuantity " & _
                                     "FROM Products WHERE ProductID = " & ProductID, dbOpenSnapshot)
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPOSLines WHERE ProductID = " & ProductID & _
-                                     " AND LineDiscount = 0 AND LineNote Is Null", dbOpenDynaset, dbSeeChanges)
+                                     " AND LineDiscount = 0 AND LineNote Is Null AND " & _
+                                     IIf(IsNull(UnitID), "UnitID Is Null", "UnitID = " & Nz(UnitID, 0)), _
+                                     dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         rs.AddNew
         rs!ProductID = ProductID
         rs!ProductCode = p!ProductCode
         rs!ProductName = p!ProductName
         rs!Quantity = Qty
-        rs!UnitPrice = SessionPrice(ProductID, p!SellingPrice)          ' the rep's price list (modRepRoutes)
+        rs!UnitPrice = UnitSalePrice(ProductID, UnitID)         ' the rep's price list, the unit's price (modProductUnits)
         rs!LineDiscount = 0
+        rs!UnitID = UnitID
+        rs!UnitFactor = factor
     Else
         rs.Edit
         rs!Quantity = rs!Quantity + Qty
@@ -229,23 +247,39 @@ Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty 
     rs.Update
     rs.Close
     RecalcPOS frm
-    If total > available And ProductTracksStock(ProductID) Then
+    If total * factor > available And ProductTracksStock(ProductID) Then
         SetPOSStatus frm, "تنبيه: الكمية المتوفرة من «" & p!ProductName & "» هي " & available, CLR_WARNING
     Else
-        SetPOSStatus frm, "تمت إضافة: " & p!ProductName & "  (" & total & ")", CLR_SUCCESS
+        SetPOSStatus frm, "تمت إضافة: " & p!ProductName & "  (" & total & " " & UnitNameOf(ProductID, UnitID) & ")", CLR_SUCCESS
     End If
     p.Close
 End Sub
 
 Public Sub LineChanged(ByVal sf As Access.Form, ByVal FieldName As String)
-    ' AfterUpdate of Quantity / UnitPrice / LineDiscount in frmPOSLines.
-    Dim price As Variant
+    ' AfterUpdate of Quantity / UnitPrice / LineDiscount / UnitID in frmPOSLines.
+    Dim price As Variant, factor As Currency
     If Nz(sf!Quantity.Value, 0) <= 0 Then
         ShowWarning "الكمية يجب أن تكون أكبر من صفر."
         sf!Quantity.Value = 1
     End If
     If Nz(sf!LineDiscount.Value, 0) < 0 Then sf!LineDiscount.Value = 0
-    If FieldName = "UnitPrice" Then
+    If FieldName = "UnitID" Then                        ' another unit of the product: its factor and price
+        factor = UnitFactorOf(sf!ProductID.Value, sf!UnitID.Value)
+        If factor <= 0 Then
+            ShowWarning "هذه الوحدة ليست من وحدات الصنف. عرّفها من «وحدات الصنف» في شاشة المنتجات."
+            sf!UnitID.Value = Null
+            factor = 1
+        End If
+        sf!UnitID.Value = LineUnitID(sf!ProductID.Value, sf!UnitID.Value)
+        sf!UnitFactor.Value = factor
+        sf!UnitPrice.Value = UnitSalePrice(sf!ProductID.Value, sf!UnitID.Value)
+    ElseIf FieldName = "UnitPrice" And Nz(sf!UnitFactor.Value, 1) <> 1 Then
+        If Not IsListedUnitPrice(sf!ProductID.Value, sf!UnitID.Value, Nz(sf!UnitPrice.Value, 0)) And _
+           Not HasPermission("PRICE_OVERRIDE") Then
+            ShowWarning "لا تملك صلاحية تعديل سعر البيع."
+            sf!UnitPrice.Value = UnitSalePrice(sf!ProductID.Value, sf!UnitID.Value)
+        End If
+    ElseIf FieldName = "UnitPrice" Then
         price = DLookup("SellingPrice", "Products", "ProductID = " & sf!ProductID.Value)
         If Nz(sf!UnitPrice.Value, 0) <> price And Not IsSessionRepPrice(sf!ProductID.Value, Nz(sf!UnitPrice.Value, 0)) _
            And Not HasPermission("PRICE_OVERRIDE") Then
@@ -461,13 +495,14 @@ End Sub
 Public Sub LoadInvoiceForReturn(ByVal frm As Access.Form, ByVal SalesInvoiceID As Long)
     Dim rs As DAO.Recordset
     CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError + dbSeeChanges
-    CurrentDb.Execute "INSERT INTO tmpReturnLines (SalesDetailID, ProductID, ProductName, SoldQty, ReturnedQty, " & _
+    CurrentDb.Execute Tr("INSERT INTO tmpReturnLines (SalesDetailID, ProductID, ProductName, SoldQty, ReturnedQty, " & _
         "AvailableQty, ReturnQty, ReturnToStock, ReturnAmount) " & _
-        "SELECT d.SalesDetailID, d.ProductID, p.ProductName, d.Quantity, CCur(Nz(r.QtyReturned, 0)), " & _
-        "d.Quantity - CCur(Nz(r.QtyReturned, 0)), 0, True, 0 " & _
-        "FROM (SalesInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) " & _
-        "LEFT JOIN qrySalesReturnedQty AS r ON d.SalesDetailID = r.SalesDetailID " & _
-        "WHERE d.SalesInvoiceID = " & SalesInvoiceID, dbFailOnError + dbSeeChanges
+        "SELECT d.SalesDetailID, d.ProductID, p.ProductName & IIf(d.UnitID Is Null, '', ' - ' & u.UnitName), " & _
+        "d.Quantity, CCur(Nz(r.QtyReturned, 0)), d.Quantity - CCur(Nz(r.QtyReturned, 0)), 0, True, 0 " & _
+        "FROM ((SalesInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) " & _
+        "LEFT JOIN qrySalesReturnedQty AS r ON d.SalesDetailID = r.SalesDetailID) " & _
+        "LEFT JOIN [@Units] AS u ON d.UnitID = u.UnitID " & _
+        "WHERE d.SalesInvoiceID = " & SalesInvoiceID), dbFailOnError + dbSeeChanges
     Set rs = CurrentDb.OpenRecordset(Tr("SELECT h.*, c.CustomerName FROM SalesInvoices AS h INNER JOIN [@Customers] " & _
                                      "AS c ON h.CustomerID = c.CustomerID WHERE h.SalesInvoiceID = " & _
                                      SalesInvoiceID), dbOpenSnapshot)

@@ -1154,14 +1154,14 @@ End Sub
 Private Sub Q_qrySalesLineItems()
     Dim s As String
     s = "SELECT 'SALE' AS DocType, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber," & vbCrLf
-    s = s & "       h.InvoiceDate AS DocDate, h.CustomerID, d.ProductID, d.Quantity AS SignedQty," & vbCrLf
-    s = s & "       d.Quantity AS SoldQty, CCur(0) AS ReturnedQty, d.NetAmount AS LineNet," & vbCrLf
+    s = s & "       h.InvoiceDate AS DocDate, h.CustomerID, d.ProductID, d.Quantity * d.UnitFactor AS SignedQty," & vbCrLf
+    s = s & "       d.Quantity * d.UnitFactor AS SoldQty, CCur(0) AS ReturnedQty, d.NetAmount AS LineNet," & vbCrLf
     s = s & "       d.Tax AS LineVAT, d.LineTotal AS LineGross, d.Quantity * d.UnitCost AS LineCost" & vbCrLf
     s = s & "FROM SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d" & vbCrLf
     s = s & "     ON h.SalesInvoiceID = d.SalesInvoiceID" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, r.CustomerID, d.ProductID," & vbCrLf
-    s = s & "       -d.Quantity, CCur(0), d.Quantity, -d.NetAmount, -d.Tax, -d.LineTotal," & vbCrLf
+    s = s & "       -d.Quantity * d.UnitFactor, CCur(0), d.Quantity * d.UnitFactor, -d.NetAmount, -d.Tax, -d.LineTotal," & vbCrLf
     s = s & "       IIf(d.ReturnToStock, -d.Quantity * d.UnitCost, 0)" & vbCrLf
     s = s & "FROM SalesReturns AS r INNER JOIN SalesReturnDetails AS d" & vbCrLf
     s = s & "     ON r.SalesReturnID = d.SalesReturnID" & vbCrLf
@@ -2365,29 +2365,33 @@ Private Sub Q_qrySalesDocPrint()
     s = s & "       c.BuildingNo AS CustomerBuilding, c.PostalCode AS CustomerPostal, e.EmployeeName," & vbCrLf
     s = s & "       h.SubTotal AS DocSubTotal, h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax," & vbCrLf
     s = s & "       h.TotalAmount, h.PaidAmount, h.RemainingAmount, h.AmountTendered, h.ChangeDue," & vbCrLf
-    s = s & "       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, d.Quantity, d.UnitPrice," & vbCrLf
+    s = s & "       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, v.UnitName AS LineUnit," & vbCrLf
+    s = s & "       d.Quantity, d.UnitPrice," & vbCrLf
     s = s & "       d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal," & vbCrLf
     s = s & "       h.OrderType, h.TableNo, h.OrderName, d.LineNote" & vbCrLf
-    s = s & "FROM ((((SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID)" & vbCrLf
+    s = s & "FROM (((((SalesInvoices AS h INNER JOIN SalesInvoiceDetails AS d ON h.SalesInvoiceID = d.SalesInvoiceID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
     s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
     s = s & "     INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID)" & vbCrLf
-    s = s & "    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID" & vbCrLf
+    s = s & "    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID)" & vbCrLf
+    s = s & "    LEFT JOIN Units AS v ON d.UnitID = v.UnitID" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, o.InvoiceNumber, r.InvoiceSubType," & vbCrLf
     s = s & "       r.RefundType, r.CustomerID, c.CustomerName, c.VATNumber, c.City, c.District, c.StreetName," & vbCrLf
     s = s & "       c.BuildingNo, c.PostalCode, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax," & vbCrLf
     s = s & "       r.TotalAmount, r.RefundedAmount, r.TotalAmount - r.RefundedAmount, CCur(0), CCur(0)," & vbCrLf
-    s = s & "       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, rd.Quantity, rd.UnitPrice," & vbCrLf
+    s = s & "       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, v.UnitName," & vbCrLf
+    s = s & "       rd.Quantity, rd.UnitPrice," & vbCrLf
     s = s & "       rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal, o.OrderType, o.TableNo, o.OrderName," & vbCrLf
     s = s & "       od.LineNote" & vbCrLf
-    s = s & "FROM ((((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)" & vbCrLf
+    s = s & "FROM (((((((SalesReturns AS r INNER JOIN SalesReturnDetails AS rd ON r.SalesReturnID = rd.SalesReturnID)" & vbCrLf
     s = s & "        INNER JOIN SalesInvoices AS o ON r.SalesInvoiceID = o.SalesInvoiceID)" & vbCrLf
     s = s & "        INNER JOIN SalesInvoiceDetails AS od ON rd.SalesDetailID = od.SalesDetailID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)" & vbCrLf
     s = s & "      INNER JOIN Units AS u ON p.UnitID = u.UnitID)" & vbCrLf
     s = s & "     INNER JOIN Customers AS c ON r.CustomerID = c.CustomerID)" & vbCrLf
-    s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID" & vbCrLf
+    s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID)" & vbCrLf
+    s = s & "    LEFT JOIN Units AS v ON rd.UnitID = v.UnitID" & vbCrLf
     SaveQuery "qrySalesDocPrint", "»Ì«‰«  ÿ»«⁄… ›Ê« Ì— «·»Ì⁄ Ê«·≈‘⁄«—«  «·œ«∆‰… (”ÿ— ·ﬂ· ’‰›)", s
 End Sub
 
@@ -2398,30 +2402,33 @@ Private Sub Q_qryPurchaseDocPrint()
     s = s & "       '' AS Reason, h.SupplierID, s.SupplierName, s.VATNumber AS SupplierVAT," & vbCrLf
     s = s & "       s.Mobile AS SupplierMobile, e.EmployeeName, h.SubTotal AS DocSubTotal," & vbCrLf
     s = s & "       h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax, h.TotalAmount," & vbCrLf
-    s = s & "       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName, u.UnitName," & vbCrLf
+    s = s & "       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName," & vbCrLf
+    s = s & "       u.UnitName, v.UnitName AS LineUnit," & vbCrLf
     s = s & "       d.Quantity, d.UnitCost, d.Discount AS LineDiscount, d.NetAmount, d.VATRate," & vbCrLf
     s = s & "       d.Tax AS LineTax, d.LineTotal" & vbCrLf
-    s = s & "FROM ((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d" & vbCrLf
+    s = s & "FROM (((((PurchaseInvoices AS h INNER JOIN PurchaseInvoiceDetails AS d" & vbCrLf
     s = s & "         ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON d.ProductID = p.ProductID)" & vbCrLf
     s = s & "      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)" & vbCrLf
     s = s & "     INNER JOIN [@Suppliers] AS s ON h.SupplierID = s.SupplierID)" & vbCrLf
-    s = s & "    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID" & vbCrLf
+    s = s & "    INNER JOIN Employees AS e ON h.EmployeeID = e.EmployeeID)" & vbCrLf
+    s = s & "    LEFT JOIN [@Units] AS v ON d.UnitID = v.UnitID" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, o.SupplierInvoiceNo," & vbCrLf
     s = s & "       o.InvoiceNumber, r.RefundType, r.Reason, r.SupplierID, s.SupplierName, s.VATNumber," & vbCrLf
     s = s & "       s.Mobile, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax, r.TotalAmount," & vbCrLf
     s = s & "       r.RefundedAmount, r.TotalAmount - r.RefundedAmount, od.LineNumber, p.ProductCode," & vbCrLf
-    s = s & "       p.ProductName, u.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount," & vbCrLf
+    s = s & "       p.ProductName, u.UnitName, v.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount," & vbCrLf
     s = s & "       rd.VATRate, rd.Tax, rd.LineTotal" & vbCrLf
-    s = s & "FROM ((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd" & vbCrLf
+    s = s & "FROM (((((((PurchaseReturns AS r INNER JOIN PurchaseReturnDetails AS rd" & vbCrLf
     s = s & "           ON r.PurchaseReturnID = rd.PurchaseReturnID)" & vbCrLf
     s = s & "         INNER JOIN PurchaseInvoiceDetails AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)" & vbCrLf
     s = s & "        INNER JOIN PurchaseInvoices AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)" & vbCrLf
     s = s & "       INNER JOIN Products AS p ON rd.ProductID = p.ProductID)" & vbCrLf
     s = s & "      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)" & vbCrLf
     s = s & "     INNER JOIN [@Suppliers] AS s ON r.SupplierID = s.SupplierID)" & vbCrLf
-    s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID" & vbCrLf
+    s = s & "    INNER JOIN Employees AS e ON r.EmployeeID = e.EmployeeID)" & vbCrLf
+    s = s & "    LEFT JOIN [@Units] AS v ON rd.UnitID = v.UnitID" & vbCrLf
     SaveQuery "qryPurchaseDocPrint", "»Ì«‰«  ÿ»«⁄… ›Ê« Ì— «·‘—«¡ Ê„— Ã⁄« Â« (”ÿ— ·ﬂ· ’‰›)", s
 End Sub
 

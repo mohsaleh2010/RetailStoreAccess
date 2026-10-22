@@ -96,6 +96,7 @@
 | + | دراسة الوحدات المتبقية لنظام ERP (الوحدات المتعددة، وقوائم الأسعار، وعروض وأوامر الشراء، والصلاحية، وتكاليف الاستيراد، ونهاية الخدمة...)، وقرار الخطة 6: Blazor (Razor) للويب وMAUI Blazor Hybrid لـ Windows وAndroid وiOS؛ اختيار صاحب المشروع: 1 ثم 2 ثم 4 ثم 3 | 📋 خطة | [docs/69-Remaining-Modules.md](docs/69-Remaining-Modules.md) · [docs/51 الخطة 6](docs/51-Plan-Opening-Warehouses-Treasury-Reps-SQL-Web.md) |
 | + | **5ج:** البرنامج كاملًا على SQL Server: `dbSeeChanges` في كل الكود، ورقم السجل بعد الحفظ، ومقارنة نعم/لا بـ `<> 0`، والنسخ الاحتياطي والاستعادة على الخادم، وعلامة «البيانات الفعلية على الخادم» (لا نقل فوقها، وتحذير ملف Access القديم)، و`READ_COMMITTED_SNAPSHOT` | ✅ تمت الموافقة | [docs/70-SQL-Server-Code.md](docs/70-SQL-Server-Code.md) |
 | + | **5د:** الاستعلامات والتقارير على الخادم: كل استعلام محفوظ (248، منها مصادر القيود وميزان المراجعة والقوائم المالية) عرض (View) على SQL Server بالاسم نفسه، عربي وإنجليزي، وفترة التقرير تُرسل إلى الخادم لكل جهاز؛ وتحقّق على SQL Server 2022 حقيقي: كل عرض يعطي صفوف Access نفسها | ✅ تمت الموافقة | [docs/71-SQL-Server-Views.md](docs/71-SQL-Server-Views.md) |
+| + | **الوحدات المتعددة للصنف** (`docs/69` رقم 1): كرتونة / علبة لها عدد وباركود وسعر؛ البيع والشراء ومرتجعاتهما بأي وحدة (مسح باركود الوحدة أو عمود الوحدة في السطر)، والمخزون والتكلفة بالوحدة الصغرى، والوحدة على المطبوعات والفاتورة الإلكترونية | ✅ بانتظار الموافقة | [docs/72-Product-Units.md](docs/72-Product-Units.md) |
 
 ## هيكل المستودع
 
@@ -211,6 +212,7 @@
 | 62 | لا شيء في Access: الملف الجديد `dist\sql\RetailStore_Schema.sql` يُشغَّل على SQL Server (`docs/67` القسم 3) | — | تشغيل السكربت مرتين بلا أخطاء |
 | 63 | `modSqlServer` (دائمة، جديدة)، واستبدال `modSecurityScreens` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`)، ومجلد `dist\sql` بجانب ملف البرنامج | `BuildSchema`, `BuildForms` | `TestSqlServer`، ثم التجربة على الخادم (`docs/68` القسم 4) |
 | 64 | كل الوحدات تقريبًا (`dbSeeChanges`): **`BuildFrontEnd.vbs`**، ومجلد `dist\sql` الجديد بجانب ملف البرنامج | `BuildSchema`؛ وعلى الخادم «تجهيز القاعدة» | `TestSqlServer`، ثم `RunAllTests` على قاعدة تجربة على الخادم (`docs/70` القسم 6) |
+| 66 | `modProductUnits` (جديدة)، واستبدال `modSales` و`modPurchases` و`modPOS` و`modPurchaseScreens` و`modForms` و`modZatcaXml` و`modEtaInvoice` و`modEtaReceipt` و`modTestAll` والوحدات المولَّدة (أو **`BuildFrontEnd.vbs`**) | `BuildSchema`, `BuildRelationships`؛ وعلى الخادم «تجهيز القاعدة» | `TestProductUnits`، ثم البيع والشراء بالكرتونة (`docs/72` القسم 6) |
 | 65 | `modServerQueries` و`modServerQueryData` (جديدتان)، واستبدال `modSqlServer` و`modQueryParams` و`modDashboard` و`modIndicators` و`modSecurityScreens` و`modBuildQueries` و`modTestAll` و`modLang` و`modLangData*` (أو **`BuildFrontEnd.vbs`**)، ومجلد `dist\sql` (فيه `RetailStore_Queries.sql`) | على الخادم: «تجهيز القاعدة» ثم «التشغيل على الخادم» | `TestServerQueries`، ثم التقارير على قاعدة تجربة على الخادم (`docs/71` القسم 4) |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.

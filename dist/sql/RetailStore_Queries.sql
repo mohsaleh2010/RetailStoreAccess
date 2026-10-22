@@ -220,14 +220,14 @@ GO
 CREATE OR ALTER VIEW [dbo].[qrySalesLineItems] AS
 -- أسطر البيع والمرتجعات مع التكلفة (أساس تحليل المنتجات والأرباح)
 SELECT N'SALE' AS DocType, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber,
-       h.InvoiceDate AS DocDate, h.CustomerID, d.ProductID, d.Quantity AS SignedQty,
-       d.Quantity AS SoldQty, CAST(0 AS MONEY) AS ReturnedQty, d.NetAmount AS LineNet,
+       h.InvoiceDate AS DocDate, h.CustomerID, d.ProductID, d.Quantity * d.UnitFactor AS SignedQty,
+       d.Quantity * d.UnitFactor AS SoldQty, CAST(0 AS MONEY) AS ReturnedQty, d.NetAmount AS LineNet,
        d.Tax AS LineVAT, d.LineTotal AS LineGross, d.Quantity * d.UnitCost AS LineCost
 FROM [dbo].[SalesInvoices] AS h INNER JOIN [dbo].[SalesInvoiceDetails] AS d
      ON h.SalesInvoiceID = d.SalesInvoiceID
 UNION ALL
 SELECT N'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, r.CustomerID, d.ProductID,
-       -d.Quantity, CAST(0 AS MONEY), d.Quantity, -d.NetAmount, -d.Tax, -d.LineTotal,
+       -d.Quantity * d.UnitFactor, CAST(0 AS MONEY), d.Quantity * d.UnitFactor, -d.NetAmount, -d.Tax, -d.LineTotal,
        IIF(d.ReturnToStock <> 0, -d.Quantity * d.UnitCost, 0)
 FROM [dbo].[SalesReturns] AS r INNER JOIN [dbo].[SalesReturnDetails] AS d
      ON r.SalesReturnID = d.SalesReturnID;
@@ -1227,29 +1227,33 @@ SELECT N'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumb
        c.BuildingNo AS CustomerBuilding, c.PostalCode AS CustomerPostal, e.EmployeeName,
        h.SubTotal AS DocSubTotal, h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax,
        h.TotalAmount, h.PaidAmount, h.RemainingAmount, h.AmountTendered, h.ChangeDue,
-       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, d.Quantity, d.UnitPrice,
+       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, v.UnitName AS LineUnit,
+       d.Quantity, d.UnitPrice,
        d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal,
        h.OrderType, h.TableNo, h.OrderName, d.LineNote
-FROM (((([dbo].[SalesInvoices] AS h INNER JOIN [dbo].[SalesInvoiceDetails] AS d ON h.SalesInvoiceID = d.SalesInvoiceID)
+FROM ((((([dbo].[SalesInvoices] AS h INNER JOIN [dbo].[SalesInvoiceDetails] AS d ON h.SalesInvoiceID = d.SalesInvoiceID)
        INNER JOIN [dbo].[Products] AS p ON d.ProductID = p.ProductID)
       INNER JOIN [dbo].[Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [dbo].[Customers] AS c ON h.CustomerID = c.CustomerID)
-    INNER JOIN [dbo].[Employees] AS e ON h.EmployeeID = e.EmployeeID
+    INNER JOIN [dbo].[Employees] AS e ON h.EmployeeID = e.EmployeeID)
+    LEFT JOIN [dbo].[Units] AS v ON d.UnitID = v.UnitID
 UNION ALL
 SELECT N'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, o.InvoiceNumber, r.InvoiceSubType,
        r.RefundType, r.CustomerID, c.CustomerName, c.VATNumber, c.City, c.District, c.StreetName,
        c.BuildingNo, c.PostalCode, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax,
        r.TotalAmount, r.RefundedAmount, r.TotalAmount - r.RefundedAmount, CAST(0 AS MONEY), CAST(0 AS MONEY),
-       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, rd.Quantity, rd.UnitPrice,
+       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, v.UnitName,
+       rd.Quantity, rd.UnitPrice,
        rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal, o.OrderType, o.TableNo, o.OrderName,
        od.LineNote
-FROM (((((([dbo].[SalesReturns] AS r INNER JOIN [dbo].[SalesReturnDetails] AS rd ON r.SalesReturnID = rd.SalesReturnID)
+FROM ((((((([dbo].[SalesReturns] AS r INNER JOIN [dbo].[SalesReturnDetails] AS rd ON r.SalesReturnID = rd.SalesReturnID)
         INNER JOIN [dbo].[SalesInvoices] AS o ON r.SalesInvoiceID = o.SalesInvoiceID)
         INNER JOIN [dbo].[SalesInvoiceDetails] AS od ON rd.SalesDetailID = od.SalesDetailID)
        INNER JOIN [dbo].[Products] AS p ON rd.ProductID = p.ProductID)
       INNER JOIN [dbo].[Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [dbo].[Customers] AS c ON r.CustomerID = c.CustomerID)
-    INNER JOIN [dbo].[Employees] AS e ON r.EmployeeID = e.EmployeeID;
+    INNER JOIN [dbo].[Employees] AS e ON r.EmployeeID = e.EmployeeID)
+    LEFT JOIN [dbo].[Units] AS v ON rd.UnitID = v.UnitID;
 GO
 CREATE OR ALTER VIEW [dbo].[qryPurchaseDocPrint] AS
 -- بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف)
@@ -1258,30 +1262,33 @@ SELECT N'PURCHASE' AS DocKind, h.PurchaseInvoiceID AS DocID, h.InvoiceNumber AS 
        N'' AS Reason, h.SupplierID, s.SupplierName, s.VATNumber AS SupplierVAT,
        s.Mobile AS SupplierMobile, e.EmployeeName, h.SubTotal AS DocSubTotal,
        h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax, h.TotalAmount,
-       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName, u.UnitName,
+       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName,
+       u.UnitName, v.UnitName AS LineUnit,
        d.Quantity, d.UnitCost, d.Discount AS LineDiscount, d.NetAmount, d.VATRate,
        d.Tax AS LineTax, d.LineTotal
-FROM (((([dbo].[PurchaseInvoices] AS h INNER JOIN [dbo].[PurchaseInvoiceDetails] AS d
+FROM ((((([dbo].[PurchaseInvoices] AS h INNER JOIN [dbo].[PurchaseInvoiceDetails] AS d
          ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)
        INNER JOIN [dbo].[Products] AS p ON d.ProductID = p.ProductID)
       INNER JOIN [dbo].[Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [dbo].[Suppliers] AS s ON h.SupplierID = s.SupplierID)
-    INNER JOIN [dbo].[Employees] AS e ON h.EmployeeID = e.EmployeeID
+    INNER JOIN [dbo].[Employees] AS e ON h.EmployeeID = e.EmployeeID)
+    LEFT JOIN [dbo].[Units] AS v ON d.UnitID = v.UnitID
 UNION ALL
 SELECT N'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, o.SupplierInvoiceNo,
        o.InvoiceNumber, r.RefundType, r.Reason, r.SupplierID, s.SupplierName, s.VATNumber,
        s.Mobile, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax, r.TotalAmount,
        r.RefundedAmount, r.TotalAmount - r.RefundedAmount, od.LineNumber, p.ProductCode,
-       p.ProductName, u.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount,
+       p.ProductName, u.UnitName, v.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount,
        rd.VATRate, rd.Tax, rd.LineTotal
-FROM (((((([dbo].[PurchaseReturns] AS r INNER JOIN [dbo].[PurchaseReturnDetails] AS rd
+FROM ((((((([dbo].[PurchaseReturns] AS r INNER JOIN [dbo].[PurchaseReturnDetails] AS rd
            ON r.PurchaseReturnID = rd.PurchaseReturnID)
          INNER JOIN [dbo].[PurchaseInvoiceDetails] AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)
         INNER JOIN [dbo].[PurchaseInvoices] AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)
        INNER JOIN [dbo].[Products] AS p ON rd.ProductID = p.ProductID)
       INNER JOIN [dbo].[Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [dbo].[Suppliers] AS s ON r.SupplierID = s.SupplierID)
-    INNER JOIN [dbo].[Employees] AS e ON r.EmployeeID = e.EmployeeID;
+    INNER JOIN [dbo].[Employees] AS e ON r.EmployeeID = e.EmployeeID)
+    LEFT JOIN [dbo].[Units] AS v ON rd.UnitID = v.UnitID;
 GO
 CREATE OR ALTER VIEW [dbo].[qryVoucherPrint] AS
 -- بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين)
@@ -3114,14 +3121,14 @@ GO
 CREATE OR ALTER VIEW [en].[qrySalesLineItems] AS
 -- أسطر البيع والمرتجعات مع التكلفة (أساس تحليل المنتجات والأرباح)
 SELECT N'SALE' AS DocType, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumber,
-       h.InvoiceDate AS DocDate, h.CustomerID, d.ProductID, d.Quantity AS SignedQty,
-       d.Quantity AS SoldQty, CAST(0 AS MONEY) AS ReturnedQty, d.NetAmount AS LineNet,
+       h.InvoiceDate AS DocDate, h.CustomerID, d.ProductID, d.Quantity * d.UnitFactor AS SignedQty,
+       d.Quantity * d.UnitFactor AS SoldQty, CAST(0 AS MONEY) AS ReturnedQty, d.NetAmount AS LineNet,
        d.Tax AS LineVAT, d.LineTotal AS LineGross, d.Quantity * d.UnitCost AS LineCost
 FROM [dbo].[SalesInvoices] AS h INNER JOIN [dbo].[SalesInvoiceDetails] AS d
      ON h.SalesInvoiceID = d.SalesInvoiceID
 UNION ALL
 SELECT N'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, r.CustomerID, d.ProductID,
-       -d.Quantity, CAST(0 AS MONEY), d.Quantity, -d.NetAmount, -d.Tax, -d.LineTotal,
+       -d.Quantity * d.UnitFactor, CAST(0 AS MONEY), d.Quantity * d.UnitFactor, -d.NetAmount, -d.Tax, -d.LineTotal,
        IIF(d.ReturnToStock <> 0, -d.Quantity * d.UnitCost, 0)
 FROM [dbo].[SalesReturns] AS r INNER JOIN [dbo].[SalesReturnDetails] AS d
      ON r.SalesReturnID = d.SalesReturnID;
@@ -4121,29 +4128,33 @@ SELECT N'SALE' AS DocKind, h.SalesInvoiceID AS DocID, h.InvoiceNumber AS DocNumb
        c.BuildingNo AS CustomerBuilding, c.PostalCode AS CustomerPostal, e.EmployeeName,
        h.SubTotal AS DocSubTotal, h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax,
        h.TotalAmount, h.PaidAmount, h.RemainingAmount, h.AmountTendered, h.ChangeDue,
-       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, d.Quantity, d.UnitPrice,
+       d.LineNumber, p.ProductName, p.ProductCode, u.UnitName, v.UnitName AS LineUnit,
+       d.Quantity, d.UnitPrice,
        d.Discount AS LineDiscount, d.NetAmount, d.VATRate, d.Tax AS LineTax, d.LineTotal,
        h.OrderType, h.TableNo, h.OrderName, d.LineNote
-FROM (((([dbo].[SalesInvoices] AS h INNER JOIN [dbo].[SalesInvoiceDetails] AS d ON h.SalesInvoiceID = d.SalesInvoiceID)
+FROM ((((([dbo].[SalesInvoices] AS h INNER JOIN [dbo].[SalesInvoiceDetails] AS d ON h.SalesInvoiceID = d.SalesInvoiceID)
        INNER JOIN [dbo].[Products] AS p ON d.ProductID = p.ProductID)
       INNER JOIN [dbo].[Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [dbo].[Customers] AS c ON h.CustomerID = c.CustomerID)
-    INNER JOIN [dbo].[Employees] AS e ON h.EmployeeID = e.EmployeeID
+    INNER JOIN [dbo].[Employees] AS e ON h.EmployeeID = e.EmployeeID)
+    LEFT JOIN [dbo].[Units] AS v ON d.UnitID = v.UnitID
 UNION ALL
 SELECT N'RETURN', r.SalesReturnID, r.ReturnNumber, r.ReturnDate, o.InvoiceNumber, r.InvoiceSubType,
        r.RefundType, r.CustomerID, c.CustomerName, c.VATNumber, c.City, c.District, c.StreetName,
        c.BuildingNo, c.PostalCode, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax,
        r.TotalAmount, r.RefundedAmount, r.TotalAmount - r.RefundedAmount, CAST(0 AS MONEY), CAST(0 AS MONEY),
-       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, rd.Quantity, rd.UnitPrice,
+       rd.ReturnDetailID, p.ProductName, p.ProductCode, u.UnitName, v.UnitName,
+       rd.Quantity, rd.UnitPrice,
        rd.Discount, rd.NetAmount, rd.VATRate, rd.Tax, rd.LineTotal, o.OrderType, o.TableNo, o.OrderName,
        od.LineNote
-FROM (((((([dbo].[SalesReturns] AS r INNER JOIN [dbo].[SalesReturnDetails] AS rd ON r.SalesReturnID = rd.SalesReturnID)
+FROM ((((((([dbo].[SalesReturns] AS r INNER JOIN [dbo].[SalesReturnDetails] AS rd ON r.SalesReturnID = rd.SalesReturnID)
         INNER JOIN [dbo].[SalesInvoices] AS o ON r.SalesInvoiceID = o.SalesInvoiceID)
         INNER JOIN [dbo].[SalesInvoiceDetails] AS od ON rd.SalesDetailID = od.SalesDetailID)
        INNER JOIN [dbo].[Products] AS p ON rd.ProductID = p.ProductID)
       INNER JOIN [dbo].[Units] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [dbo].[Customers] AS c ON r.CustomerID = c.CustomerID)
-    INNER JOIN [dbo].[Employees] AS e ON r.EmployeeID = e.EmployeeID;
+    INNER JOIN [dbo].[Employees] AS e ON r.EmployeeID = e.EmployeeID)
+    LEFT JOIN [dbo].[Units] AS v ON rd.UnitID = v.UnitID;
 GO
 CREATE OR ALTER VIEW [en].[qryPurchaseDocPrint] AS
 -- بيانات طباعة فواتير الشراء ومرتجعاتها (سطر لكل صنف)
@@ -4152,30 +4163,33 @@ SELECT N'PURCHASE' AS DocKind, h.PurchaseInvoiceID AS DocID, h.InvoiceNumber AS 
        N'' AS Reason, h.SupplierID, s.SupplierName, s.VATNumber AS SupplierVAT,
        s.Mobile AS SupplierMobile, e.EmployeeName, h.SubTotal AS DocSubTotal,
        h.Discount AS DocDiscount, h.TaxableAmount, h.Tax AS DocTax, h.TotalAmount,
-       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName, u.UnitName,
+       h.PaidAmount, h.RemainingAmount, d.LineNumber, p.ProductCode, p.ProductName,
+       u.UnitName, v.UnitName AS LineUnit,
        d.Quantity, d.UnitCost, d.Discount AS LineDiscount, d.NetAmount, d.VATRate,
        d.Tax AS LineTax, d.LineTotal
-FROM (((([dbo].[PurchaseInvoices] AS h INNER JOIN [dbo].[PurchaseInvoiceDetails] AS d
+FROM ((((([dbo].[PurchaseInvoices] AS h INNER JOIN [dbo].[PurchaseInvoiceDetails] AS d
          ON h.PurchaseInvoiceID = d.PurchaseInvoiceID)
        INNER JOIN [dbo].[Products] AS p ON d.ProductID = p.ProductID)
       INNER JOIN [en].[qryLocUnits] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [en].[qryLocSuppliers] AS s ON h.SupplierID = s.SupplierID)
-    INNER JOIN [dbo].[Employees] AS e ON h.EmployeeID = e.EmployeeID
+    INNER JOIN [dbo].[Employees] AS e ON h.EmployeeID = e.EmployeeID)
+    LEFT JOIN [en].[qryLocUnits] AS v ON d.UnitID = v.UnitID
 UNION ALL
 SELECT N'RETURN', r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, o.SupplierInvoiceNo,
        o.InvoiceNumber, r.RefundType, r.Reason, r.SupplierID, s.SupplierName, s.VATNumber,
        s.Mobile, e.EmployeeName, r.SubTotal, r.Discount, r.TaxableAmount, r.Tax, r.TotalAmount,
        r.RefundedAmount, r.TotalAmount - r.RefundedAmount, od.LineNumber, p.ProductCode,
-       p.ProductName, u.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount,
+       p.ProductName, u.UnitName, v.UnitName, rd.Quantity, rd.UnitCost, rd.Discount, rd.NetAmount,
        rd.VATRate, rd.Tax, rd.LineTotal
-FROM (((((([dbo].[PurchaseReturns] AS r INNER JOIN [dbo].[PurchaseReturnDetails] AS rd
+FROM ((((((([dbo].[PurchaseReturns] AS r INNER JOIN [dbo].[PurchaseReturnDetails] AS rd
            ON r.PurchaseReturnID = rd.PurchaseReturnID)
          INNER JOIN [dbo].[PurchaseInvoiceDetails] AS od ON rd.PurchaseDetailID = od.PurchaseDetailID)
         INNER JOIN [dbo].[PurchaseInvoices] AS o ON r.PurchaseInvoiceID = o.PurchaseInvoiceID)
        INNER JOIN [dbo].[Products] AS p ON rd.ProductID = p.ProductID)
       INNER JOIN [en].[qryLocUnits] AS u ON p.UnitID = u.UnitID)
      INNER JOIN [en].[qryLocSuppliers] AS s ON r.SupplierID = s.SupplierID)
-    INNER JOIN [dbo].[Employees] AS e ON r.EmployeeID = e.EmployeeID;
+    INNER JOIN [dbo].[Employees] AS e ON r.EmployeeID = e.EmployeeID)
+    LEFT JOIN [en].[qryLocUnits] AS v ON rd.UnitID = v.UnitID;
 GO
 CREATE OR ALTER VIEW [en].[qryVoucherPrint] AS
 -- بيانات طباعة سندات القبض (من العملاء) وسندات الصرف (للموردين)
@@ -5850,5 +5864,5 @@ WHERE q.QtyReturned > o.Quantity;
 GO
 CREATE OR ALTER VIEW [dbo].[QueriesVersion] AS
 -- the version of these views: the front-end links to them only when it is its own
-SELECT N'f6d46ddb7361' AS Version;
+SELECT N'c5c7cf0c13e4' AS Version;
 GO

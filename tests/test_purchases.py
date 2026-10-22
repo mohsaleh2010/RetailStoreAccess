@@ -168,12 +168,12 @@ class PostingCodeTests(unittest.TestCase):
 
     def test_stock_movement_types_and_average(self):
         body = proc(self.text, "PostPurchaseFromCart")
-        self.assertRegex(body, r'ApplyStockMovement db, productIDs\(i\), CalcLine\(i, "QTY"\), TT_PURCHASE, '
-                               r'unitCost, "PURCHASE",[\s\S]*?, True')
+        self.assertRegex(body, r'ApplyStockMovement db, productIDs\(i\), CalcLine\(i, "QTY"\) \* factors\(i\), '
+                               r'TT_PURCHASE, unitCost, "PURCHASE",[\s\S]*?, True')     # pieces (docs/72)
         self.assertIn("CalcRun(ToBase(InvoiceDiscount, FxRate), False)", body)   # prices exclude VAT; in SAR
         body = proc(self.text, "PostPurchaseReturn")
-        self.assertRegex(body, r"ApplyStockMovement db, productIDs\(i\), -qtys\(i\), TT_PURCHASE_RETURN")
-        self.assertIn('CheckStockAvailable(productIDs, qtys, n, "الإرجاع للمورد", warehouse)', body)
+        self.assertRegex(body, r"ApplyStockMovement db, productIDs\(i\), -pieces\(i\), TT_PURCHASE_RETURN")
+        self.assertIn('CheckStockAvailable(productIDs, pieces, n, "الإرجاع للمورد", warehouse)', body)
         body = proc(self.text, "PostStockCount")
         self.assertIn("TT_ADJUSTMENT", body)
         self.assertNotRegex(body, r"TT_ADJUSTMENT[^\n]*True")            # a count never changes the average

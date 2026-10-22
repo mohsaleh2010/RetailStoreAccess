@@ -640,8 +640,10 @@ Public Function ZatcaDocumentXml(ByVal DocKind As String, ByVal DocID As Long, B
         buyer = ZxParty("Customer", "", "", "", "", "", "", "", "", "", "")
     End If
     Set rs = db.OpenRecordset("SELECT d.Quantity, d.UnitPrice, d.Discount, d.NetAmount, d.VATCategory, d.VATRate, d.Tax, " & _
-                              "d.LineTotal, p.ProductName, u.ZatcaUnitCode FROM (" & LinesTable(DocKind) & " AS d INNER JOIN " & _
-                              "Products AS p ON d.ProductID = p.ProductID) INNER JOIN Units AS u ON p.UnitID = u.UnitID " & _
+                              "d.LineTotal, p.ProductName, IIf(v.UnitID Is Null, u.ZatcaUnitCode, v.ZatcaUnitCode) AS ZatcaUnitCode " & _
+                              "FROM ((" & LinesTable(DocKind) & " AS d INNER JOIN " & _
+                              "Products AS p ON d.ProductID = p.ProductID) INNER JOIN Units AS u ON p.UnitID = u.UnitID) " & _
+                              "LEFT JOIN Units AS v ON d.UnitID = v.UnitID " & _
                               "WHERE d." & DocKeyOf(DocKind) & " = " & DocID & " ORDER BY d." & _
                               IIf(isReturn, "ReturnDetailID", "SalesDetailID"), dbOpenSnapshot)
     Do Until rs.EOF

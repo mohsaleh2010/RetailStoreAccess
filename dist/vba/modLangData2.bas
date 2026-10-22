@@ -15,6 +15,14 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "ŞíÏ áßá ÚãáíÉ ãÑÈæØ ÈÃÕáåÇ: ÇİÊÍ ÇáŞíÏ Ãæ ÃÕá ÇáÚãáíÉ", "One entry for each transaction, linked to its source: open the entry or the source transaction"
+    LangAdd "ãÈíÚÇÊ ÇáãÓÊÎÏã æãÔÊÑíÇÊå æÍÑßÇÊå ãä åĞÇ ÇáãÎÒäº İÇÑÛ", "The sales, purchases and moves of the user use this warehouse, empty"
+    LangAdd "ÇáÍÓÇÈ ÇáÑÆíÓí ÇáĞí íÊÈÚå (äæÚ ÇáÍÓÇÈ íÊÈÚå ÊáŞÇÆíğÇ", "The main account it belongs to (the account type follows it automatically"
+    LangAdd "ÇáãÈáÛ ÇáãÑÍóøá íÌÈ Ãä íßæä Èíä ÕİÑ æÇáäŞÏíÉ ÇáİÚáíÉ", "The transferred amount must be between zero and the actual cash"
+    LangAdd "ÇáäŞÏíÉ ÇáãæÌæÏÉ İí ÇáÕäÏæŞ ÚäÏ ÈÏÁ ÇÓÊÎÏÇã ÇáÈÑäÇãÌ", "The cash in the box when the program is first used"
+    LangAdd "Êã ÍİÙ ÕáÇÍíÇÊ ÇáÏæÑ. ÊÓÑí ÚäÏ ÇáİÊÍ ÇáÊÇáí áßá ÔÇÔÉ", "The permissions of the role were saved. They apply the next time each screen opens"
+    LangAdd "ÊæÌÏ ÊÓæíÉ ÌÇÑíÉ áåĞÇ ÇáÈäß: ÇÚÊãÏåÇ Ãæ ÇÍĞİåÇ ÃæáğÇ", "There is an open reconciliation for this bank: approve it or delete it first"
+    LangAdd "ÌÑÏ ÇáÓíÇÑÉ ãİÊæÍ. ÃÏÎá ÇáßãíÇÊ ÇáİÚáíÉ æÑÍøáå ÃæáğÇ", "The van count is open. Enter the counted quantities and post it first"
     LangAdd "ÑÈØ ßá ÇáãÈÇáÛ ÛíÑ ÇáãÑÈæØÉ ÈÃŞÏã ÇáİæÇÊíÑ ÇÓÊÍŞÇŞğÇ", "Link all unlinked amounts to the oldest due invoices"
     LangAdd "ÑÕíÏ ÇáãæÑÏíä íõÏÎá İí ŞÓã «ÇáãæÑÏæä»: ÑÕíÏ áßá ãæÑÏ", "The suppliers balance is entered in the Suppliers part: one balance per supplier"
     LangAdd "Õİöø ÕäÏæŞ ÇáÚåÏÉ ŞÈá ÅÛáÇŞ Çáíæã (ÒÑ «ÊÕİíÉ ÇáÕäÏæŞ", "Close the custody box before closing the day (button Close the box"
@@ -127,6 +135,9 @@ Private Sub D2_1()
     LangAdd "ÇáæÇÑÏÇÊ ãä ÇáÓáÚ (ÇáãÓÏÏÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imported goods (VAT paid at customs"
     LangAdd "ÈÑäÇãÌ ÇáÊæŞíÚ (İáÇÔÉ ÇáÊæŞíÚ) İí ÅÚÏÇÏ ÇáÑÈØ", "Signing program (USB token) in the connection setup"
     LangAdd "ÈÚÏ ÇáÍİÙ Úíøä ßáãÉ ÇáãÑæÑ ãä ÒÑ «ßáãÉ ÇáãÑæÑ", "After saving, set the password with the button Password"
+End Sub
+
+Private Sub D2_2()
     LangAdd "ÑÕíÏ ÇáÍÓÇÈ İí ÇáÈäß ÚäÏ ÈÏÁ ÇÓÊÎÏÇã ÇáÈÑäÇãÌ", "The account balance in the bank when the program is first used"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáİÊÑÇÊ ÇáãÇáíÉ (ÅŞİÇá ÇáİÊÑÇÊ", "You do not have the permission for the fiscal periods (period closing"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÚãæáÇÊ ÇáãäÏæÈíä", "You do not have this permission in the sales rep commissions screen"
@@ -135,9 +146,6 @@ Private Sub D2_1()
     LangAdd "ááÚãá İí ÇáÏæáÉ ÇáÃÎÑì ÇÈÏÃ ãáİ ÈíÇäÇÊ ÌÏíÏğÇ", "To work in the other country start a new data file"
     LangAdd "ÃÖİ ÕäİğÇ æÇÍÏğÇ Úáì ÇáÃŞá Åáì ŞÇÆãÉ ÇáØÈÇÚÉ", "Add at least one item to the print list"
     LangAdd "ÇÍĞİ ŞíæÏ ÇáÅåáÇß ãä ÔåÑ ÅÚÇÏÉ ÇáÊŞííã ÃæáğÇ", "delete the depreciation entries from the month of the revaluation first"
-End Sub
-
-Private Sub D2_2()
     LangAdd "ÇáÈíÇäÇÊ ÇáİÚáíÉ ááÈÑäÇãÌ Úáì SQL Server ãäĞ", "The real data of the program is on SQL Server since"
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ İí ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled in the settings"
     LangAdd "ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ", "Need follow-up (waiting, rejected, warning"
@@ -180,6 +188,7 @@ Private Sub D2_2()
     LangAdd "ÍĞİ ÂÎÑ äŞá ááÃÕá æÅÑÌÇÚå Åáì ãÑßÒå ÇáÓÇÈŞ", "Delete the last transfer of the asset and return it to its previous centre"
     LangAdd "ÚãáÇÁ ÎØ ÇáÓíÑ ãæÌæÏæä İí ÒíÇÑÇÊ åĞÇ Çáíæã", "The route customers are already in the visits of this day"
     LangAdd "İÇÊæÑÉ Ãæ ãÑÊÌÚ İí ÇáİÊÑÉ áã ÊŞÈáåÇ ãäÙæãÉ", "invoices or returns of the period not accepted by the"
+    LangAdd "İÇÊæÑÉ ÅĞä ÇáÇÓÊáÇã ÈÇáæÍÏÉ ÇáÕÛÑì ááÃÕäÇİ", "The invoice of a receipt note is in the smallest unit of the products"
     LangAdd "İí ÇáÃÑÈÇÍ ÇáãÍÊÌÒÉ¡ æÊõŞİá ÇáÓäÉ ßáåÇ ÍÊì", "to retained earnings, and the whole year is closed through"
     LangAdd "ßáãÉ ãÑæÑ ãÄŞÊÉ: ÓíõØáÈ ÊÛííÑåÇ ÚäÏ ÇáÏÎæá", "Temporary password: the user is asked to change it at login"
     LangAdd "áÇ ÊæÌÏ ÔåÇÏÉ ÇáÌåÇÒ (CSID) İí ÅÚÏÇÏ ÇáÑÈØ", "There is no device certificate (CSID) in the connection setup"
@@ -208,6 +217,7 @@ Private Sub D2_2()
     LangAdd "ÓØÑ İí ÇáÅĞä áÇ íØÇÈŞ Õäİ ÓØÑå İí ÇáØáÈíÉ", "A note line does not match the product of its order line"
     LangAdd "ÔÌÑÉ ÇáÍÓÇÈÇÊ: ÇáÍÓÇÈÇÊ ÇáÑÆíÓíÉ æÇáİÑÚíÉ", "Account tree: main and sub-accounts"
     LangAdd "ØáÈíÇÊ ÇáÚãáÇÁ ÇáãİÊæÍÉ: ÇáÈÇŞí ÈáÇ ÊÓáíã", "Open customer orders: what is left to deliver"
+    LangAdd "İÇÊæÑÉ ÅĞä ÇáÊÓáíã ÈÇáæÍÏÉ ÇáÕÛÑì ááÃÕäÇİ", "The invoice of a delivery note is in the smallest unit of the products"
     LangAdd "İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Enable sending in the e-invoicing screen"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ãÓíÑ ÇáÑæÇÊÈ", "You do not have this permission in the payroll screen"
     LangAdd "áÇ ÊæÌÏ ãÈÇáÛ ÛíÑ ãÑÈæØÉ Ãæ İæÇÊíÑ ãİÊæÍÉ", "There are no unlinked amounts or open invoices"
@@ -248,6 +258,9 @@ Private Sub D2_2()
     LangAdd "ÃĞæäÇÊ ÇáÊÓáíã æÇáÇÓÊáÇã ÇáÊí áã ÊõİæÊÑ", "Delivery and goods receipt notes not invoiced"
     LangAdd "ÃÑÕÏÉ Ãæá ÇáãÏÉ (İí ÈÏÇíÉ ÊÇÑíÎ ÇáÈÏÇíÉ", "Opening balances (at the start of the start date"
     LangAdd "ÅÚÇÏÉ ÇáØáÈíÉ áãÓæÏÉ¿ íõáÛì ÍÌÒ ßãíÇÊåÇ", "Return the order to draft? Its quantities are no longer reserved"
+End Sub
+
+Private Sub D2_3()
     LangAdd "ÇÎÊÑ Ãíä ÇÓÊõáã Ëãä ÇáÈíÚ (Èäß Ãæ ÕäÏæŞ", "Choose where the sale price was received (bank or box"
     LangAdd "ÇáÃÕäÇİ ÇáãÍÌæÒÉ ááØáÈíÇÊ æÇáãÊÇÍ ááÈíÚ", "Stock reserved for orders and free to sell"
     LangAdd "ÇáãÈíÚÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ (ÈÚÏ ÇáãÑÊÌÚÇÊ", "Taxable sales (after returns"
@@ -258,9 +271,6 @@ Private Sub D2_2()
     LangAdd "ÊÑÍíá ÇáÓäÏ¿ íÊÍÑß ÇáãÎÒæä æíõäÔÃ ÇáŞíÏ", "Post the voucher? The stock moves and the entry is created"
     LangAdd "ÍÏÏ ÇáßãíÉ ÇáãÑÊÌÚÉ áÕäİ æÇÍÏ Úáì ÇáÃŞá", "Set the returned quantity of at least one item"
     LangAdd "ÑÇÌÚ ÇáÊÇÑíÎ æÇáÃÓØÑ Ëã ÇÖÛØ «ÍİÙ ÇáŞíÏ", "Check the date and the lines, then click Save entry"
-End Sub
-
-Private Sub D2_3()
     LangAdd "ÑÕíÏ ßá ÍÓÇÈ Èäßí íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each bank account on the start-up day: positive"
     LangAdd "ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "The new sale price cannot be negative"
     LangAdd "ÕäİğÇ áÃä áåÇ ÍÑßÇÊ Ãæ áÇ ÊÊÇÈÚ ÇáãÎÒæä", "items, because they have moves or do not track stock"
@@ -329,6 +339,7 @@ Private Sub D2_3()
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÇáãæÇÒäÉ", "You do not have this permission in the budget screen"
     LangAdd "áÇ ÊæÌÏ ÍÑßÉ äŞÏíÉ ááÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "There is no cash move for the choices made"
     LangAdd "áÇ íæÌÏ íæã. ÇÎÊÑ ÇáãäÏæÈ Ëã «İÊÍ íæã", "No day. Choose the rep, then Open day"
+    LangAdd "áã ÊÚÏ ãä æÍÏÇÊå. ÇÎÊÑ ÇáæÍÏÉ ãä ÌÏíÏ", "is no longer one of its units. Choose the unit again"
     LangAdd "ãŞİáÉ ÈŞíÏ ÅŞİÇá. ÃÚÏ İÊÍ ÇáÓäÉ ÃæáğÇ", "closed with a closing entry. Reopen the year first"
     LangAdd "ãä ÈÏÇíÉ ÇáÕäÏæŞ (áÇ ÊæÌÏ ÊÕİíÉ ÓÇÈŞÉ", "since the box started (no previous closing"
     LangAdd "åĞÇ ÓÌá ÃÓÇÓí İí ÇáäÙÇã æáÇ íãßä ÍĞİå", "This is a system record and cannot be deleted"
@@ -370,6 +381,9 @@ Private Sub D2_3()
     LangAdd "æíãßäß ÇáÊÕİíÉ ÍÓÈ ÇáÇÎÊíÇÑ (ÇÎÊíÇÑí", "and you can filter by the choice (optional"
     LangAdd "ÃÏÎá ÈÏÇíÉ ÇáİÊÑÉ ÇáÖÑíÈíÉ æäåÇíÊåÇ", "Enter the start and end of the tax period"
     LangAdd "ÅÚÏÇÏ ÑÈØ ãäÙæãÉ ÇáÅíÕÇá ÇáÅáßÊÑæäí", "E-receipt connection setup"
+End Sub
+
+Private Sub D2_4()
     LangAdd "ÇÚÊãÏ ÇáÅŞÑÇÑ ÃæáğÇ¡ Ëã ÓÌøá ÇáÓÏÇÏ", "Approve the return first, then record the payment"
     LangAdd "ÇáÃÕæá ÇáãÊÏÇæáÉ ÷ ÇáÎÕæã ÇáãÊÏÇæáÉ", "Current assets / current liabilities"
     LangAdd "ÇáÈÑäÇãÌ íÚãá Úáì ãáİ Access ÈÇáİÚá", "The program already works on the Access file"
@@ -381,9 +395,6 @@ Private Sub D2_3()
     LangAdd "ÊÛíÑÊ ÇáÃÑÕÏÉ: ÇÖÛØ «ÊÍÏíË ÇáÅÌãÇáí", "The balances changed: press Refresh total"
     LangAdd "ÊÛííÑ ÇÓã ÇáãÍá íÊã Úä ØÑíŞ ÇáãÈÑãÌ", "The store name is changed by the developer"
     LangAdd "ÊãÊ ÇáäÓÎÉ Úáì ÇáÎÇÏã áßä İÍÕåÇ İÔá", "The server made the backup but its check failed"
-End Sub
-
-Private Sub D2_4()
     LangAdd "ÌÏæá: ÇäŞá ÇáÈíÇäÇÊ Ëã ØÇÈŞåÇ ÃæáğÇ", "tables: transfer the data then compare it first"
     LangAdd "ÍÓÇÈ ÑÆíÓí: íÔãá ßá ÍÓÇÈÇÊå ÇáÊÇÈÚÉ", "Main account: includes all its sub-accounts"
     LangAdd "ÑÈØ ÇáÈÑäÇãÌ Úáì åĞÇ ÇáÌåÇÒ ÈÇáÎÇÏã", "Link the program on this PC to the server"
@@ -401,19 +412,4 @@ Private Sub D2_4()
     LangAdd "ÇáÃÕá ãÓÊÈÚÏ: ÃáÛö ÇáÇÓÊÈÚÇÏ ÃæáğÇ", "The asset is disposed: cancel the disposal first"
     LangAdd "ÇáÕäİ ãæÌæÏ İí ÓØÑ ÂÎÑ áäİÓ ÇáãÎÒä", "The product is in another line of the same warehouse"
     LangAdd "ÇáÚãæáÉ æÖÑíÈÊåÇ áÇ ÊßæäÇä ÓÇáÈÊíä", "The fee and its VAT are never negative"
-    LangAdd "ÇáİÇÊæÑÉ áíÓÊ áäİÓ äæÚ ÇáÅĞä æØÑİå", "The invoice is not of the same type and party as the note"
-    LangAdd "ÇáãÕÑæİ ÈÚãáÉ ÃÎÑì: ÇßÊÈ ãÈáÛå ÈåÇ", "An expense in another currency: type its amount in it"
-    LangAdd "ÇáãŞÈæáÉ (ÕÇİí ÇáİæÇÊíÑ æÇáãÑÊÌÚÇÊ", "Accepted (invoices net of returns"
-    LangAdd "ÊÃßÏ ãä İáÇÔÉ ÇáÊæŞíÚ æÑŞãåÇ ÇáÓÑí", "Check the signing token and its PIN"
-    LangAdd "ÊÓÌíá ÇÑÊÏÇÏ ÇáÔíß¿ íÚæÏ ãÈáÛå Úáì", "Record the bounce of the cheque? Its amount goes back to"
-    LangAdd "ÊÓæíÇÊ æÊÕÍíÍÇÊ ãä ÇáİÊÑÇÊ ÇáÓÇÈŞÉ", "Adjustments and corrections of earlier periods"
-    LangAdd "ÊÚĞÑ ÅÑÓÇá İÊÑÉ ÇáÊŞÑíÑ Åáì ÇáÎÇÏã", "Could not send the report period to the server"
-    LangAdd "ÑÕíÏ ßá Úãíá íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each customer on the start-up day: positive"
-    LangAdd "ÑÕíÏ ßá ãæÑÏ íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each supplier on the start-up day: positive"
-    LangAdd "ÑŞã ÇáÊÓÌíá ÇáÖÑíÈí İí ãÕÑ 9 ÃÑŞÇã", "The Egyptian tax registration number has 9 digits"
-    LangAdd "ÑŞã ÇáÊÓÌíá ÇáÖÑíÈí ááãÍá (9 ÃÑŞÇã", "Tax registration number of the store (9 digits"
-    LangAdd "ÚÌÒ ÈÖÇÚÉ ÇáÓíÇÑÉ ÓáİÉ Úáì ÇáãäÏæÈ", "Van goods shortage as an advance on the rep"
-    LangAdd "İÇÊæÑÉ ÅĞä ÇáÇÓÊáÇã ÈÚãáÉ ÇáÈÑäÇãÌ", "The invoice of a receipt note is in the program currency"
-    LangAdd "İÍÕ ÓáÇãÉ ÇáÈíÇäÇÊ: áÇ ÊæÌÏ ãÔßáÇÊ", "Data integrity check: no problems"
-    LangAdd "ßá ÇáÃĞæäÇÊ ÇáãÑÍøáÉ ÕÏÑÊ İæÇÊíÑåÇ", "Every posted note is invoiced"
 End Sub

@@ -168,6 +168,14 @@ def ix(*fields):
     return Index("IX_" + "_".join(fields), list(fields))
 
 
+def line_unit():
+    """The unit of a sales / purchase line (docs/72): Quantity, prices and UnitCost are in it; the stock moves
+    Quantity x UnitFactor of the product's smallest unit."""
+    return [long_("UnitID", "وحدة السطر", fk="Units.UnitID", note="فارغ = الوحدة الصغرى للصنف (Products.UnitID)"),
+            qty("UnitFactor", "عدد الوحدات الصغرى في وحدة السطر", default="1", rule=">0",
+                rule_text="عدد الوحدات الصغرى يجب أن يكون أكبر من صفر")]
+
+
 def doc_totals():
     """Header totals shared by every sales/purchase document."""
     return [
@@ -889,6 +897,26 @@ TABLES: List[Table] = [
         indexes=[ux("ProductCode"), ux("Barcode", ignore_nulls=True), ix("ProductName")],
     ),
 
+    Table(
+        "ProductUnits", "وحدات الأصناف",
+        "الوحدات الأكبر للصنف (docs/72): كرتونة أو علبة = عدد من وحدته الصغرى (Products.UnitID)، ولها باركودها وسعرها. "
+        "المخزون والتكلفة بالوحدة الصغرى دائمًا؛ سطر البيع أو الشراء بأي وحدة يحفظ كميتها وسعرها ومعاملها.",
+        [
+            auto("ProductUnitID", "رقم داخلي"),
+            long_("ProductID", "الصنف", required=True, fk="Products.ProductID"),
+            long_("UnitID", "الوحدة", required=True, fk="Units.UnitID"),
+            qty("UnitFactor", "عدد الوحدات الصغرى فيها", default=None, rule=">0 And <>1",
+                rule_text="عدد الوحدات الصغرى يجب أن يكون أكبر من صفر وغير 1"),
+            text("Barcode", 50, "باركود الوحدة"),
+            money("SellingPrice", "سعر بيع الوحدة", note="0 = سعر بيع الصنف × العدد"),
+            money("PurchasePrice", "سعر شراء الوحدة", note="بدون ضريبة؛ 0 = آخر سعر شراء للصنف × العدد"),
+            is_active(),
+            created_at(),
+        ],
+        pk=["ProductUnitID"],
+        indexes=[ux("ProductID", "UnitID"), ux("Barcode", ignore_nulls=True)],
+    ),
+
     # ----------------------------------------------------------------- Sales
     Table(
         "SalesInvoices", "فواتير المبيعات",
@@ -952,7 +980,7 @@ TABLES: List[Table] = [
             money("LineTotal", "الإجمالي شامل الضريبة", note="NetAmount + Tax"),
             money("UnitCost", "تكلفة الوحدة", note="AverageCost لحظة البيع"),
             text("LineNote", 100, "ملاحظة السطر", note="الحجم والخيارات (الكافيه)"),
-        ],
+        ] + line_unit(),
         pk=["SalesDetailID"],
         indexes=[ux("SalesInvoiceID", "LineNumber")],
     ),
@@ -1014,7 +1042,7 @@ TABLES: List[Table] = [
             money("LineTotal", "الإجمالي شامل الضريبة"),
             money("UnitCost", "تكلفة الوحدة", note="نفس تكلفة سطر البيع الأصلي"),
             bool_("ReturnToStock", "يعاد للمخزون", "True"),
-        ],
+        ] + line_unit(),
         pk=["ReturnDetailID"],
     ),
 
@@ -1066,7 +1094,7 @@ TABLES: List[Table] = [
             rate("VATRate", "نسبة الضريبة", default="0.15"),
             money("Tax", "ضريبة المدخلات"),
             money("LineTotal", "الإجمالي شامل الضريبة"),
-        ],
+        ] + line_unit(),
         pk=["PurchaseDetailID"],
         indexes=[ux("PurchaseInvoiceID", "LineNumber")],
     ),
@@ -1121,7 +1149,7 @@ TABLES: List[Table] = [
             rate("VATRate", "نسبة الضريبة", default="0.15"),
             money("Tax", "الضريبة"),
             money("LineTotal", "الإجمالي شامل الضريبة"),
-        ],
+        ] + line_unit(),
         pk=["PurchaseReturnDetailID"],
     ),
 
@@ -2625,6 +2653,7 @@ SCREEN_LIST = [
     ("frmProducts", "المنتجات والأسعار", "المخزون", "PRODUCTS", True, True, True),
     ("frmCategories", "التصنيفات", "المخزون", "PRODUCTS", True, True, True),
     ("frmUnits", "الوحدات", "المخزون", "PRODUCTS", True, True, True),
+    ("frmProductUnits", "وحدات الأصناف", "المخزون", "PRODUCTS", True, True, True),
     ("frmInventory", "المخزون والحركات اليدوية", "المخزون", "PRODUCTS", True, False, False),
     ("frmStockCount", "الجرد", "المخزون", "STOCK_COUNT", True, False, False),
     ("frmBarcodeLabels", "ملصقات الباركود", "المخزون", "PRODUCTS", False, False, False),

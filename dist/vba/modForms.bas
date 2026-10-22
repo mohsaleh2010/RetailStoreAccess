@@ -125,6 +125,8 @@ Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
             If Not ValidateAccount(frm) Then Exit Function         ' modAccounts
         Case "RecurringExpenses"
             If Not ValidateRecurring(frm) Then Exit Function       ' modRecurring
+        Case "ProductUnits"
+            If Not ValidateProductUnit(frm) Then Exit Function     ' modProductUnits
     End Select
     If Not CheckUnique(frm) Then Exit Function
     If Not AssignSequence(frm) Then Exit Function      ' last: a refused save wastes no number
@@ -424,6 +426,11 @@ Private Function ValidateProduct(ByVal frm As Access.Form) As Boolean
     If frm.NewRecord Then frm!CurrentQuantity.Value = 0
     If Nz(frm!CurrentQuantity.Value, 0) = 0 And Nz(frm!AverageCost.Value, 0) = 0 Then
         frm!AverageCost.Value = Nz(frm!PurchasePrice.Value, 0)   ' no stock yet
+    End If
+    If Len(ProductBarcodeProblem(frm!Barcode.Value, frm!ProductID.Value)) > 0 Then     ' modProductUnits
+        ShowWarning ProductBarcodeProblem(frm!Barcode.Value, frm!ProductID.Value)
+        SafeFocus frm!Barcode
+        Exit Function
     End If
     cost = Nz(frm!AverageCost.Value, 0)
     If Nz(frm!SellingPrice.Value, 0) < cost And cost > 0 Then

@@ -169,7 +169,7 @@ SCREEN_TITLES_EN = {
     "frmSalesReturn": "Sales returns", "frmCustomers": "Customers", "frmCustomerPayment": "Customer receipt vouchers",
     "frmPurchaseInvoice": "Purchase invoices", "frmPurchaseView": "View purchase invoices",
     "frmPurchaseReturn": "Purchase returns", "frmSuppliers": "Suppliers", "frmSupplierPayment": "Supplier payment vouchers",
-    "frmProducts": "Products and prices", "frmCategories": "Categories", "frmUnits": "Units",
+    "frmProducts": "Products and prices", "frmCategories": "Categories", "frmUnits": "Units", "frmProductUnits": "Product units",
     "frmInventory": "Stock and manual moves", "frmStockCount": "Stock count", "frmBarcodeLabels": "Barcode labels",
     "frmLabelSettings": "Label settings", "frmExpenses": "Expenses", "frmExpenseTypes": "Expense types",
     "frmRecurring": "Recurring expenses", "frmTreasury": "Treasury", "frmCashVoucher": "Cash and transfer vouchers",

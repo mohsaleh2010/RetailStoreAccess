@@ -40,7 +40,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     Dim productIDs() As Long, newPrices() As Variant, isCredit As Boolean, reclaim As Boolean
     Dim tend As Currency, paid As Currency, remaining As Currency, change As Currency
     Dim invoiceID As Long, invNo As String, docDate As Date, unitCost As Currency, priceChanges As String
-    Dim noteCosts() As Currency, noteWh As Long
+    Dim noteCosts() As Currency, noteWh As Long, factors() As Currency, unitIDs() As Variant
 
     On Error GoTo EH
     NewInvoiceID = 0
@@ -70,8 +70,8 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
 
     ' ---- 1. cart -> calculation engine (purchase prices are typed WITHOUT VAT)
     Set rs = db.OpenRecordset( _
-        "SELECT t.ProductID, t.Quantity, t.UnitCost, t.LineDiscount, t.NewSellingPrice, p.ProductName, " & _
-        "p.VATCategory, p.SellingPrice, p.IsActive " & _
+        "SELECT t.ProductID, t.Quantity, t.UnitCost, t.LineDiscount, t.NewSellingPrice, t.UnitID, p.ProductName, " & _
+        "p.VATCategory, IIf(t.SellingPrice Is Null, p.SellingPrice, t.SellingPrice) AS ShownPrice, p.IsActive " & _
         "FROM tmpPurchaseLines AS t LEFT JOIN Products AS p ON t.ProductID = p.ProductID " & _
         "ORDER BY t.LineNo", dbOpenSnapshot)
     CalcReset
@@ -83,8 +83,19 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
         ElseIf Not IsNull(rs!NewSellingPrice) Then
             If rs!NewSellingPrice < 0 Then
                 msg = "ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ áÇ íãßä Ãä íßæä ÓÇáÈðÇ («" & rs!ProductName & "»)."
-            ElseIf rs!NewSellingPrice <> rs!SellingPrice Then
-                priceChanges = priceChanges & " " & rs!ProductID & ":" & rs!SellingPrice & "->" & rs!NewSellingPrice
+            ElseIf rs!NewSellingPrice <> rs!ShownPrice Then
+                priceChanges = priceChanges & " " & rs!ProductID & ":" & rs!ShownPrice & "->" & rs!NewSellingPrice
+            End If
+        End If
+        If Len(msg) = 0 And Not IsNull(rs!ProductName) Then          ' the unit of the line (docs/72)
+            ReDim Preserve factors(0 To n)
+            ReDim Preserve unitIDs(0 To n)
+            factors(n) = UnitFactorOf(rs!ProductID, rs!UnitID)
+            unitIDs(n) = LineUnitID(rs!ProductID, rs!UnitID)
+            If factors(n) <= 0 Then
+                msg = "ÇáæÍÏÉ ÇáãÎÊÇÑÉ áÜ «" & rs!ProductName & "» áã ÊÚÏ ãä æÍÏÇÊå. ÇÎÊÑ ÇáæÍÏÉ ãä ÌÏíÏ."
+            ElseIf StockNoteID > 0 And factors(n) <> 1 Then
+                msg = "ÝÇÊæÑÉ ÅÐä ÇáÇÓÊáÇã ÈÇáæÍÏÉ ÇáÕÛÑì ááÃÕäÇÝ."
             End If
         End If
         If Len(msg) > 0 Then
@@ -188,17 +199,26 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
         rs!VATRate = CalcLine(i, "RATE")
         rs!Tax = CalcLine(i, "TAX")
         rs!LineTotal = CalcLine(i, "TOTAL")
+        rs!UnitID = unitIDs(i)
+        rs!UnitFactor = factors(i)
         rs.Update
     Next
     rs.Close
 
     For i = 0 To n - 1
-        If StockNoteID = 0 Then
-            unitCost = PurchaseUnitCost(CalcLine(i, "NET"), CalcLine(i, "TOTAL"), CalcLine(i, "QTY"), reclaim)
-            ApplyStockMovement db, productIDs(i), CalcLine(i, "QTY"), TT_PURCHASE, unitCost, "PURCHASE", _
+        If StockNoteID = 0 Then                     ' pieces in, at the cost of one piece (docs/72)
+            unitCost = PurchaseUnitCost(CalcLine(i, "NET"), CalcLine(i, "TOTAL"), CalcLine(i, "QTY") * factors(i), reclaim)
+            ApplyStockMovement db, productIDs(i), CalcLine(i, "QTY") * factors(i), TT_PURCHASE, unitCost, "PURCHASE", _
                                invoiceID, invNo, "", True, WarehouseID
         End If
-        UpdateProductPrices db, productIDs(i), CalcLine(i, "UNIT"), newPrices(i), SupplierID
+        If factors(i) = 1 Then
+            UpdateProductPrices db, productIDs(i), CalcLine(i, "UNIT"), newPrices(i), SupplierID
+        Else                                        ' a bigger unit: its own last price and shelf price
+            UpdateProductPrices db, productIDs(i), RoundMoney(CDec(CalcLine(i, "UNIT")) / CDec(factors(i)), 4), Null, SupplierID
+            db.Execute "UPDATE ProductUnits SET PurchasePrice = " & Str$(CalcLine(i, "UNIT")) & _
+                       IIf(IsNull(newPrices(i)), "", ", SellingPrice = " & Str$(Nz(newPrices(i), 0))) & _
+                       " WHERE ProductID = " & productIDs(i) & " AND UnitID = " & unitIDs(i), dbFailOnError + dbSeeChanges
+        End If
     Next
     If StockNoteID > 0 Then MarkNoteInvoiced db, StockNoteID, "PurchaseInvoiceID", invoiceID   ' modStockNotes
     If remaining <> 0 Then AdjustBalance db, "Suppliers", "SupplierID", SupplierID, remaining
@@ -243,6 +263,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
     Dim discs() As Currency, costs() As Currency
     Dim sumNet As Currency, sumTax As Currency, sumTotal As Currency, sumDisc As Currency
     Dim refunded As Currency, retID As Long, retNo As String, warehouse As Long
+    Dim factors() As Currency, unitIDs() As Variant, pieces() As Currency
 
     On Error GoTo EH
     NewReturnID = 0
@@ -266,7 +287,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
 
     Set rs = db.OpenRecordset( _
         "SELECT r.PurchaseDetailID, r.ReturnQty, d.ProductID, d.Quantity, d.UnitCost, d.NetAmount, d.Tax, " & _
-        "d.LineTotal, d.VATRate, d.PurchaseInvoiceID " & _
+        "d.LineTotal, d.VATRate, d.PurchaseInvoiceID, d.UnitID, d.UnitFactor " & _
         "FROM tmpPurchaseReturnLines AS r INNER JOIN PurchaseInvoiceDetails AS d " & _
         "ON r.PurchaseDetailID = d.PurchaseDetailID WHERE r.ReturnQty > 0", dbOpenSnapshot)
     Do Until rs.EOF
@@ -280,13 +301,18 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
         ReDim Preserve nets(0 To n): ReDim Preserve taxes(0 To n)
         ReDim Preserve totals(0 To n): ReDim Preserve rates(0 To n)
         ReDim Preserve discs(0 To n): ReDim Preserve costs(0 To n)
+        ReDim Preserve factors(0 To n): ReDim Preserve unitIDs(0 To n): ReDim Preserve pieces(0 To n)
+        factors(n) = Nz(rs!UnitFactor, 1)                    ' the unit of the invoice line (docs/72)
+        If factors(n) <= 0 Then factors(n) = 1
+        unitIDs(n) = rs!UnitID
+        pieces(n) = rs!ReturnQty * factors(n)
         detailIDs(n) = rs!PurchaseDetailID
         productIDs(n) = rs!ProductID
         qtys(n) = rs!ReturnQty
         units(n) = rs!UnitCost
         rates(n) = rs!VATRate
-        ' the goods leave at the cost they came in with
-        costs(n) = PurchaseUnitCost(rs!NetAmount, rs!LineTotal, rs!Quantity, reclaim)
+        ' the goods leave at the cost they came in with (of one piece)
+        costs(n) = PurchaseUnitCost(rs!NetAmount, rs!LineTotal, rs!Quantity * factors(n), reclaim)
         msg = ReturnAmounts(rs!Quantity, rs!LineTotal, rs!Tax, _
                             PrevPurchaseReturned(db, rs!PurchaseDetailID, "Quantity"), _
                             PrevPurchaseReturned(db, rs!PurchaseDetailID, "LineTotal"), _
@@ -313,7 +339,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
     End If
     warehouse = Nz(DbValue("SELECT WarehouseID FROM PurchaseInvoices WHERE PurchaseInvoiceID = " & PurchaseInvoiceID), _
                    MAIN_WAREHOUSE_ID)                      ' the goods leave the warehouse they entered
-    msg = CheckStockAvailable(productIDs, qtys, n, "ÇáÅÑÌÇÚ ááãæÑÏ", warehouse)
+    msg = CheckStockAvailable(productIDs, pieces, n, "ÇáÅÑÌÇÚ ááãæÑÏ", warehouse)
     If Len(msg) > 0 Then
         PostPurchaseReturn = msg
         Exit Function
@@ -366,12 +392,14 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
         rs!VATRate = rates(i)
         rs!Tax = taxes(i)
         rs!LineTotal = totals(i)
+        rs!UnitID = unitIDs(i)
+        rs!UnitFactor = factors(i)
         rs.Update
     Next
     rs.Close
 
     For i = 0 To n - 1
-        ApplyStockMovement db, productIDs(i), -qtys(i), TT_PURCHASE_RETURN, costs(i), "PURCHASE_RETURN", _
+        ApplyStockMovement db, productIDs(i), -pieces(i), TT_PURCHASE_RETURN, costs(i), "PURCHASE_RETURN", _
                            retID, retNo, "", True, warehouse
     Next
     If refunded - sumTotal <> 0 Then AdjustBalance db, "Suppliers", "SupplierID", supplierID, refunded - sumTotal

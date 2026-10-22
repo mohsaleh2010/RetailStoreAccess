@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **90** | عدد الحقول: **1159**
+عدد الجداول: **91** | عدد الحقول: **1176**
 
 ## الفهرس
 
@@ -26,76 +26,77 @@
 18. [`Suppliers`](#suppliers) – الموردون
 19. [`Customers`](#customers) – العملاء
 20. [`Products`](#products) – المنتجات
-21. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
-22. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
-23. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
-24. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
-25. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
-26. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
-27. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
-28. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
-29. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
-30. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
-31. [`Banks`](#banks) – البنوك
-32. [`BankTransactions`](#banktransactions) – الحركات البنكية
-33. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
-34. [`FixedAssets`](#fixedassets) – الأصول الثابتة
-35. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
-36. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
-37. [`AssetRevaluations`](#assetrevaluations) – إعادة تقييم الأصول الثابتة
-38. [`AssetTransfers`](#assettransfers) – نقل الأصول الثابتة بين مراكز التكلفة
-39. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
-40. [`SalesReps`](#salesreps) – المندوبين
-41. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
-42. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
-43. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
-44. [`Budgets`](#budgets) – الموازنات التقديرية
-45. [`BudgetLines`](#budgetlines) – أسطر الموازنة
-46. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
-47. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
-48. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-49. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-50. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-51. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-52. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-53. [`Expenses`](#expenses) – المصروفات
-54. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
-55. [`CashVouchers`](#cashvouchers) – سندات النقدية
-56. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-57. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-58. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-59. [`JournalEntries`](#journalentries) – قيود اليومية
-60. [`JournalLines`](#journallines) – أسطر القيود
-61. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-62. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
-63. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-64. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-65. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-66. [`ManualEntries`](#manualentries) – القيود اليدوية
-67. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-68. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
-69. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
-70. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-71. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-72. [`StockTransfers`](#stocktransfers) – التحويل بين المخازن
-73. [`StockTransferLines`](#stocktransferlines) – أسطر التحويل بين المخازن
-74. [`StockParties`](#stockparties) – جهات الصرف والاستلام المخزني
-75. [`StockDocuments`](#stockdocuments) – سندات الصرف والاستلام المخزني
-76. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
-77. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
-78. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
-79. [`SalesOrders`](#salesorders) – طلبيات العملاء
-80. [`RepDays`](#repdays) – أيام المندوبين
-81. [`RouteStops`](#routestops) – خط سير المندوبين
-82. [`RepVisits`](#repvisits) – زيارات المندوبين
-83. [`RepPrices`](#repprices) – أسعار المندوبين
-84. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
-85. [`StockCounts`](#stockcounts) – جلسات الجرد
-86. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-87. [`AuditLog`](#auditlog) – سجل العمليات
-88. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-89. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-90. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+21. [`ProductUnits`](#productunits) – وحدات الأصناف
+22. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
+23. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
+24. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
+25. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
+26. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
+27. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
+28. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
+29. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
+30. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
+31. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
+32. [`Banks`](#banks) – البنوك
+33. [`BankTransactions`](#banktransactions) – الحركات البنكية
+34. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
+35. [`FixedAssets`](#fixedassets) – الأصول الثابتة
+36. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
+37. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
+38. [`AssetRevaluations`](#assetrevaluations) – إعادة تقييم الأصول الثابتة
+39. [`AssetTransfers`](#assettransfers) – نقل الأصول الثابتة بين مراكز التكلفة
+40. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
+41. [`SalesReps`](#salesreps) – المندوبين
+42. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
+43. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
+44. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
+45. [`Budgets`](#budgets) – الموازنات التقديرية
+46. [`BudgetLines`](#budgetlines) – أسطر الموازنة
+47. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+48. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+49. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+50. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+51. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+52. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+53. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+54. [`Expenses`](#expenses) – المصروفات
+55. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
+56. [`CashVouchers`](#cashvouchers) – سندات النقدية
+57. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+58. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+59. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+60. [`JournalEntries`](#journalentries) – قيود اليومية
+61. [`JournalLines`](#journallines) – أسطر القيود
+62. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+63. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
+64. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+65. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+66. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+67. [`ManualEntries`](#manualentries) – القيود اليدوية
+68. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+69. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
+70. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
+71. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+72. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+73. [`StockTransfers`](#stocktransfers) – التحويل بين المخازن
+74. [`StockTransferLines`](#stocktransferlines) – أسطر التحويل بين المخازن
+75. [`StockParties`](#stockparties) – جهات الصرف والاستلام المخزني
+76. [`StockDocuments`](#stockdocuments) – سندات الصرف والاستلام المخزني
+77. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
+78. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
+79. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
+80. [`SalesOrders`](#salesorders) – طلبيات العملاء
+81. [`RepDays`](#repdays) – أيام المندوبين
+82. [`RouteStops`](#routestops) – خط سير المندوبين
+83. [`RepVisits`](#repvisits) – زيارات المندوبين
+84. [`RepPrices`](#repprices) – أسعار المندوبين
+85. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
+86. [`StockCounts`](#stockcounts) – جلسات الجرد
+87. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+88. [`AuditLog`](#auditlog) – سجل العمليات
+89. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+90. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+91. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -297,7 +298,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 78 سجل
+- بيانات أساسية: 79 سجل
 
 ## UserScreens
 
@@ -581,6 +582,26 @@
 - فهرس فريد (يتجاهل الفارغ): `Barcode`
 - فهرس عادي: `ProductName`
 
+## ProductUnits
+
+**وحدات الأصناف** – الوحدات الأكبر للصنف (docs/72): كرتونة أو علبة = عدد من وحدته الصغرى (Products.UnitID)، ولها باركودها وسعرها. المخزون والتكلفة بالوحدة الصغرى دائمًا؛ سطر البيع أو الشراء بأي وحدة يحفظ كميتها وسعرها ومعاملها.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **ProductUnitID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 3 | UnitID | Number (Long) |  | ✔ |  |  | `Units.UnitID` | الوحدة |
+| 4 | UnitFactor | Currency (كمية) |  | ✔ |  | `>0 And <>1` |  | عدد الوحدات الصغرى فيها |
+| 5 | Barcode | Short Text | 50 |  |  |  |  | باركود الوحدة |
+| 6 | SellingPrice | Currency |  | ✔ | `0` | `>=0` |  | سعر بيع الوحدة – 0 = سعر بيع الصنف × العدد |
+| 7 | PurchasePrice | Currency |  | ✔ | `0` | `>=0` |  | سعر شراء الوحدة – بدون ضريبة؛ 0 = آخر سعر شراء للصنف × العدد |
+| 8 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `ProductUnitID`
+- فهرس فريد: `ProductID, UnitID`
+- فهرس فريد (يتجاهل الفارغ): `Barcode`
+
 ## SalesInvoices
 
 **فواتير المبيعات** – رأس فاتورة البيع. لا تُحذف ولا تُعدَّل بعد الحفظ؛ التصحيح بمرتجع.
@@ -662,6 +683,8 @@
 | 12 | LineTotal | Currency |  | ✔ | `0` | `>=0` |  | الإجمالي شامل الضريبة – NetAmount + Tax |
 | 13 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة – AverageCost لحظة البيع |
 | 14 | LineNote | Short Text | 100 |  |  |  |  | ملاحظة السطر – الحجم والخيارات (الكافيه) |
+| 15 | UnitID | Number (Long) |  |  |  |  | `Units.UnitID` | وحدة السطر – فارغ = الوحدة الصغرى للصنف (Products.UnitID) |
+| 16 | UnitFactor | Currency (كمية) |  | ✔ | `1` | `>0` |  | عدد الوحدات الصغرى في وحدة السطر |
 
 - المفتاح الأساسي: `SalesDetailID`
 - فهرس فريد: `SalesInvoiceID, LineNumber`
@@ -739,6 +762,8 @@
 | 12 | LineTotal | Currency |  | ✔ | `0` | `>=0` |  | الإجمالي شامل الضريبة |
 | 13 | UnitCost | Currency |  | ✔ | `0` | `>=0` |  | تكلفة الوحدة – نفس تكلفة سطر البيع الأصلي |
 | 14 | ReturnToStock | Yes/No |  |  | `True` |  |  | يعاد للمخزون |
+| 15 | UnitID | Number (Long) |  |  |  |  | `Units.UnitID` | وحدة السطر – فارغ = الوحدة الصغرى للصنف (Products.UnitID) |
+| 16 | UnitFactor | Currency (كمية) |  | ✔ | `1` | `>0` |  | عدد الوحدات الصغرى في وحدة السطر |
 
 - المفتاح الأساسي: `ReturnDetailID`
 
@@ -796,6 +821,8 @@
 | 9 | VATRate | Currency (نسبة) |  | ✔ | `0.15` | `>=0 And <1` |  | نسبة الضريبة |
 | 10 | Tax | Currency |  | ✔ | `0` | `>=0` |  | ضريبة المدخلات |
 | 11 | LineTotal | Currency |  | ✔ | `0` | `>=0` |  | الإجمالي شامل الضريبة |
+| 12 | UnitID | Number (Long) |  |  |  |  | `Units.UnitID` | وحدة السطر – فارغ = الوحدة الصغرى للصنف (Products.UnitID) |
+| 13 | UnitFactor | Currency (كمية) |  | ✔ | `1` | `>0` |  | عدد الوحدات الصغرى في وحدة السطر |
 
 - المفتاح الأساسي: `PurchaseDetailID`
 - فهرس فريد: `PurchaseInvoiceID, LineNumber`
@@ -852,6 +879,8 @@
 | 9 | VATRate | Currency (نسبة) |  | ✔ | `0.15` | `>=0 And <1` |  | نسبة الضريبة |
 | 10 | Tax | Currency |  | ✔ | `0` | `>=0` |  | الضريبة |
 | 11 | LineTotal | Currency |  | ✔ | `0` | `>=0` |  | الإجمالي شامل الضريبة |
+| 12 | UnitID | Number (Long) |  |  |  |  | `Units.UnitID` | وحدة السطر – فارغ = الوحدة الصغرى للصنف (Products.UnitID) |
+| 13 | UnitFactor | Currency (كمية) |  | ✔ | `1` | `>0` |  | عدد الوحدات الصغرى في وحدة السطر |
 
 - المفتاح الأساسي: `PurchaseReturnDetailID`
 

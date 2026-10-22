@@ -170,7 +170,8 @@ class RepRoutesCodeTests(unittest.TestCase):
         self.assertIn("RepCreditProblem(SalesRepFor(CustomerID), remaining)", proc(sales, "PostSaleFromCart"))
         self.assertIn("IsSessionRepPrice(rs!ProductID, rs!UnitPrice)", proc(sales, "PostSaleFromCart"))
         pos = read("modPOS")
-        self.assertIn("SessionPrice(ProductID, p!SellingPrice)", proc(pos, "AddLine"))
+        self.assertIn("UnitSalePrice(ProductID, UnitID)", proc(pos, "AddLine"))      # docs/72: the unit's price
+        self.assertIn("piece = SessionPrice(ProductID,", proc(read("modProductUnits"), "UnitSalePrice"))
         self.assertIn("IsSessionRepPrice(", proc(pos, "LineChanged"))
         self.assertIn("OrderDefaultPrice(id,", proc(read("modSalesOrders"), "SalesOrderLineBeforeUpdate"))
         session = proc(VBA, "SessionRepID")

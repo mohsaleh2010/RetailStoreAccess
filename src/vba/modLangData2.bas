@@ -15,6 +15,14 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "قيد لكل عملية مربوط بأصلها: افتح القيد أو أصل العملية", "One entry for each transaction, linked to its source: open the entry or the source transaction"
+    LangAdd "مبيعات المستخدم ومشترياته وحركاته من هذا المخزن؛ فارغ", "The sales, purchases and moves of the user use this warehouse, empty"
+    LangAdd "الحساب الرئيسي الذي يتبعه (نوع الحساب يتبعه تلقائيًا", "The main account it belongs to (the account type follows it automatically"
+    LangAdd "المبلغ المرحَّل يجب أن يكون بين صفر والنقدية الفعلية", "The transferred amount must be between zero and the actual cash"
+    LangAdd "النقدية الموجودة في الصندوق عند بدء استخدام البرنامج", "The cash in the box when the program is first used"
+    LangAdd "تم حفظ صلاحيات الدور. تسري عند الفتح التالي لكل شاشة", "The permissions of the role were saved. They apply the next time each screen opens"
+    LangAdd "توجد تسوية جارية لهذا البنك: اعتمدها أو احذفها أولًا", "There is an open reconciliation for this bank: approve it or delete it first"
+    LangAdd "جرد السيارة مفتوح. أدخل الكميات الفعلية ورحّله أولًا", "The van count is open. Enter the counted quantities and post it first"
     LangAdd "ربط كل المبالغ غير المربوطة بأقدم الفواتير استحقاقًا", "Link all unlinked amounts to the oldest due invoices"
     LangAdd "رصيد الموردين يُدخل في قسم «الموردون»: رصيد لكل مورد", "The suppliers balance is entered in the Suppliers part: one balance per supplier"
     LangAdd "صفِّ صندوق العهدة قبل إغلاق اليوم (زر «تصفية الصندوق", "Close the custody box before closing the day (button Close the box"
@@ -127,6 +135,9 @@ Private Sub D2_1()
     LangAdd "الواردات من السلع (المسددة ضريبتها في الجمارك", "Imported goods (VAT paid at customs"
     LangAdd "برنامج التوقيع (فلاشة التوقيع) في إعداد الربط", "Signing program (USB token) in the connection setup"
     LangAdd "بعد الحفظ عيّن كلمة المرور من زر «كلمة المرور", "After saving, set the password with the button Password"
+End Sub
+
+Private Sub D2_2()
     LangAdd "رصيد الحساب في البنك عند بدء استخدام البرنامج", "The account balance in the bank when the program is first used"
     LangAdd "لا تملك صلاحية الفترات المالية (إقفال الفترات", "You do not have the permission for the fiscal periods (period closing"
     LangAdd "لا تملك هذه الصلاحية في شاشة عمولات المندوبين", "You do not have this permission in the sales rep commissions screen"
@@ -135,9 +146,6 @@ Private Sub D2_1()
     LangAdd "للعمل في الدولة الأخرى ابدأ ملف بيانات جديدًا", "To work in the other country start a new data file"
     LangAdd "أضف صنفًا واحدًا على الأقل إلى قائمة الطباعة", "Add at least one item to the print list"
     LangAdd "احذف قيود الإهلاك من شهر إعادة التقييم أولًا", "delete the depreciation entries from the month of the revaluation first"
-End Sub
-
-Private Sub D2_2()
     LangAdd "البيانات الفعلية للبرنامج على SQL Server منذ", "The real data of the program is on SQL Server since"
     LangAdd "الفاتورة الإلكترونية غير مفعّلة في الإعدادات", "E-invoicing is not enabled in the settings"
     LangAdd "تحتاج متابعة (بانتظار الإرسال، مرفوضة، تحذير", "Need follow-up (waiting, rejected, warning"
@@ -180,6 +188,7 @@ Private Sub D2_2()
     LangAdd "حذف آخر نقل للأصل وإرجاعه إلى مركزه السابق", "Delete the last transfer of the asset and return it to its previous centre"
     LangAdd "عملاء خط السير موجودون في زيارات هذا اليوم", "The route customers are already in the visits of this day"
     LangAdd "فاتورة أو مرتجع في الفترة لم تقبلها منظومة", "invoices or returns of the period not accepted by the"
+    LangAdd "فاتورة إذن الاستلام بالوحدة الصغرى للأصناف", "The invoice of a receipt note is in the smallest unit of the products"
     LangAdd "في الأرباح المحتجزة، وتُقفل السنة كلها حتى", "to retained earnings, and the whole year is closed through"
     LangAdd "كلمة مرور مؤقتة: سيُطلب تغييرها عند الدخول", "Temporary password: the user is asked to change it at login"
     LangAdd "لا توجد شهادة الجهاز (CSID) في إعداد الربط", "There is no device certificate (CSID) in the connection setup"
@@ -208,6 +217,7 @@ Private Sub D2_2()
     LangAdd "سطر في الإذن لا يطابق صنف سطره في الطلبية", "A note line does not match the product of its order line"
     LangAdd "شجرة الحسابات: الحسابات الرئيسية والفرعية", "Account tree: main and sub-accounts"
     LangAdd "طلبيات العملاء المفتوحة: الباقي بلا تسليم", "Open customer orders: what is left to deliver"
+    LangAdd "فاتورة إذن التسليم بالوحدة الصغرى للأصناف", "The invoice of a delivery note is in the smallest unit of the products"
     LangAdd "فعّل الإرسال من شاشة الفاتورة الإلكترونية", "Enable sending in the e-invoicing screen"
     LangAdd "لا تملك هذه الصلاحية في شاشة مسير الرواتب", "You do not have this permission in the payroll screen"
     LangAdd "لا توجد مبالغ غير مربوطة أو فواتير مفتوحة", "There are no unlinked amounts or open invoices"
@@ -248,6 +258,9 @@ Private Sub D2_2()
     LangAdd "أذونات التسليم والاستلام التي لم تُفوتر", "Delivery and goods receipt notes not invoiced"
     LangAdd "أرصدة أول المدة (في بداية تاريخ البداية", "Opening balances (at the start of the start date"
     LangAdd "إعادة الطلبية لمسودة؟ يُلغى حجز كمياتها", "Return the order to draft? Its quantities are no longer reserved"
+End Sub
+
+Private Sub D2_3()
     LangAdd "اختر أين استُلم ثمن البيع (بنك أو صندوق", "Choose where the sale price was received (bank or box"
     LangAdd "الأصناف المحجوزة للطلبيات والمتاح للبيع", "Stock reserved for orders and free to sell"
     LangAdd "المبيعات الخاضعة للضريبة (بعد المرتجعات", "Taxable sales (after returns"
@@ -258,9 +271,6 @@ Private Sub D2_2()
     LangAdd "ترحيل السند؟ يتحرك المخزون ويُنشأ القيد", "Post the voucher? The stock moves and the entry is created"
     LangAdd "حدد الكمية المرتجعة لصنف واحد على الأقل", "Set the returned quantity of at least one item"
     LangAdd "راجع التاريخ والأسطر ثم اضغط «حفظ القيد", "Check the date and the lines, then click Save entry"
-End Sub
-
-Private Sub D2_3()
     LangAdd "رصيد كل حساب بنكي يوم بدء التشغيل: موجب", "The balance of each bank account on the start-up day: positive"
     LangAdd "سعر البيع الجديد لا يمكن أن يكون سالبًا", "The new sale price cannot be negative"
     LangAdd "صنفًا لأن لها حركات أو لا تتابع المخزون", "items, because they have moves or do not track stock"
@@ -329,6 +339,7 @@ Private Sub D2_3()
     LangAdd "لا تملك هذه الصلاحية في شاشة الموازنة", "You do not have this permission in the budget screen"
     LangAdd "لا توجد حركة نقدية للاختيارات المحددة", "There is no cash move for the choices made"
     LangAdd "لا يوجد يوم. اختر المندوب ثم «فتح يوم", "No day. Choose the rep, then Open day"
+    LangAdd "لم تعد من وحداته. اختر الوحدة من جديد", "is no longer one of its units. Choose the unit again"
     LangAdd "مقفلة بقيد إقفال. أعد فتح السنة أولًا", "closed with a closing entry. Reopen the year first"
     LangAdd "من بداية الصندوق (لا توجد تصفية سابقة", "since the box started (no previous closing"
     LangAdd "هذا سجل أساسي في النظام ولا يمكن حذفه", "This is a system record and cannot be deleted"
@@ -370,6 +381,9 @@ Private Sub D2_3()
     LangAdd "ويمكنك التصفية حسب الاختيار (اختياري", "and you can filter by the choice (optional"
     LangAdd "أدخل بداية الفترة الضريبية ونهايتها", "Enter the start and end of the tax period"
     LangAdd "إعداد ربط منظومة الإيصال الإلكتروني", "E-receipt connection setup"
+End Sub
+
+Private Sub D2_4()
     LangAdd "اعتمد الإقرار أولًا، ثم سجّل السداد", "Approve the return first, then record the payment"
     LangAdd "الأصول المتداولة ÷ الخصوم المتداولة", "Current assets / current liabilities"
     LangAdd "البرنامج يعمل على ملف Access بالفعل", "The program already works on the Access file"
@@ -381,9 +395,6 @@ Private Sub D2_3()
     LangAdd "تغيرت الأرصدة: اضغط «تحديث الإجمالي", "The balances changed: press Refresh total"
     LangAdd "تغيير اسم المحل يتم عن طريق المبرمج", "The store name is changed by the developer"
     LangAdd "تمت النسخة على الخادم لكن فحصها فشل", "The server made the backup but its check failed"
-End Sub
-
-Private Sub D2_4()
     LangAdd "جدول: انقل البيانات ثم طابقها أولًا", "tables: transfer the data then compare it first"
     LangAdd "حساب رئيسي: يشمل كل حساباته التابعة", "Main account: includes all its sub-accounts"
     LangAdd "ربط البرنامج على هذا الجهاز بالخادم", "Link the program on this PC to the server"
@@ -401,19 +412,4 @@ Private Sub D2_4()
     LangAdd "الأصل مستبعد: ألغِ الاستبعاد أولًا", "The asset is disposed: cancel the disposal first"
     LangAdd "الصنف موجود في سطر آخر لنفس المخزن", "The product is in another line of the same warehouse"
     LangAdd "العمولة وضريبتها لا تكونان سالبتين", "The fee and its VAT are never negative"
-    LangAdd "الفاتورة ليست لنفس نوع الإذن وطرفه", "The invoice is not of the same type and party as the note"
-    LangAdd "المصروف بعملة أخرى: اكتب مبلغه بها", "An expense in another currency: type its amount in it"
-    LangAdd "المقبولة (صافي الفواتير والمرتجعات", "Accepted (invoices net of returns"
-    LangAdd "تأكد من فلاشة التوقيع ورقمها السري", "Check the signing token and its PIN"
-    LangAdd "تسجيل ارتداد الشيك؟ يعود مبلغه على", "Record the bounce of the cheque? Its amount goes back to"
-    LangAdd "تسويات وتصحيحات من الفترات السابقة", "Adjustments and corrections of earlier periods"
-    LangAdd "تعذر إرسال فترة التقرير إلى الخادم", "Could not send the report period to the server"
-    LangAdd "رصيد كل عميل يوم بدء التشغيل: موجب", "The balance of each customer on the start-up day: positive"
-    LangAdd "رصيد كل مورد يوم بدء التشغيل: موجب", "The balance of each supplier on the start-up day: positive"
-    LangAdd "رقم التسجيل الضريبي في مصر 9 أرقام", "The Egyptian tax registration number has 9 digits"
-    LangAdd "رقم التسجيل الضريبي للمحل (9 أرقام", "Tax registration number of the store (9 digits"
-    LangAdd "عجز بضاعة السيارة سلفة على المندوب", "Van goods shortage as an advance on the rep"
-    LangAdd "فاتورة إذن الاستلام بعملة البرنامج", "The invoice of a receipt note is in the program currency"
-    LangAdd "فحص سلامة البيانات: لا توجد مشكلات", "Data integrity check: no problems"
-    LangAdd "كل الأذونات المرحّلة صدرت فواتيرها", "Every posted note is invoiced"
 End Sub
