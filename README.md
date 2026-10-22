@@ -94,7 +94,7 @@
 | + | **5أ:** سكربت قاعدة البيانات على SQL Server (`dist/sql/RetailStore_Schema.sql`) من نفس تعريف الجداول: الجداول والأنواع والشروط والفهارس والعلاقات والبيانات الأولية، للإنشاء والترقية | ✅ تمت الموافقة | [docs/67-SQL-Server-Script.md](docs/67-SQL-Server-Script.md) |
 | + | **5ب:** شاشة «SQL Server»: الاتصال بالخادم، وتجهيز القاعدة بالسكربت، ونقل البيانات بأرقامها ومطابقتها (السجلات والمبالغ والنصوص)، وتشغيل البرنامج على الخادم والرجوع إلى ملف Access، وفحص الخادم عند فتح البرنامج | ✅ تمت الموافقة | [docs/68-SQL-Server-Transfer.md](docs/68-SQL-Server-Transfer.md) |
 | + | دراسة الوحدات المتبقية لنظام ERP (الوحدات المتعددة، وقوائم الأسعار، وعروض وأوامر الشراء، والصلاحية، وتكاليف الاستيراد، ونهاية الخدمة...)، وقرار الخطة 6: Blazor (Razor) للويب وMAUI Blazor Hybrid لـ Windows وAndroid وiOS؛ اختيار صاحب المشروع: 1 ثم 2 ثم 4 ثم 3 | 📋 خطة | [docs/69-Remaining-Modules.md](docs/69-Remaining-Modules.md) · [docs/51 الخطة 6](docs/51-Plan-Opening-Warehouses-Treasury-Reps-SQL-Web.md) |
-| + | **5ج:** البرنامج كاملًا على SQL Server: `dbSeeChanges` في كل الكود، ورقم السجل بعد الحفظ، ومقارنة نعم/لا بـ `<> 0`، والنسخ الاحتياطي والاستعادة على الخادم، وعلامة «البيانات الفعلية على الخادم» (لا نقل فوقها، وتحذير ملف Access القديم)، و`READ_COMMITTED_SNAPSHOT` | ✅ بانتظار الموافقة | [docs/70-SQL-Server-Code.md](docs/70-SQL-Server-Code.md) |
+| + | **5ج:** البرنامج كاملًا على SQL Server: `dbSeeChanges` في كل الكود، ورقم السجل بعد الحفظ، ومقارنة نعم/لا بـ `<> 0`، والنسخ الاحتياطي والاستعادة على الخادم، وعلامة «البيانات الفعلية على الخادم» (لا نقل فوقها، وتحذير ملف Access القديم)، و`READ_COMMITTED_SNAPSHOT` | ✅ تمت الموافقة | [docs/70-SQL-Server-Code.md](docs/70-SQL-Server-Code.md) |
 
 ## هيكل المستودع
 
