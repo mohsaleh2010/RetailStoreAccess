@@ -13,6 +13,7 @@ from generate_common import vba_str  # noqa: E402
 import gen_relations  # noqa: E402
 import gen_queries  # noqa: E402
 import gen_sql  # noqa: E402
+import gen_sql_views  # noqa: E402
 import gen_forms  # noqa: E402
 import gen_qr  # noqa: E402
 import gen_lang  # noqa: E402
@@ -27,7 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
                   "modZatca", "modSales", "modPOS", "modPurchases",
                   "modPurchaseScreens", "modReports", "modDashboard",
-                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modSalesReps", "modEnglishNames", "modCountry", "modHttp", "modEInvoice", "modZatcaXml", "modZatcaApi", "modEtaReceipt", "modEtaInvoice", "modOpening", "modFiscal", "modWarehouses", "modStockDocs", "modStockNotes", "modSalesOrders", "modVanSales", "modRepRoutes", "modSqlServer", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
+                  "modSecurity", "modSecurityScreens", "modBackup", "modLabels", "modCharts", "modTouchPOS", "modCash", "modJournal", "modAccounts", "modManualEntry", "modLedger", "modFinancials", "modClosing", "modVat", "modAging", "modBank", "modCheque", "modAssets", "modPayroll", "modCostCenters", "modBudget", "modRecurring", "modAudit", "modIndicators", "modCurrency", "modSalesReps", "modEnglishNames", "modCountry", "modHttp", "modEInvoice", "modZatcaXml", "modZatcaApi", "modEtaReceipt", "modEtaInvoice", "modOpening", "modFiscal", "modWarehouses", "modStockDocs", "modStockNotes", "modSalesOrders", "modVanSales", "modRepRoutes", "modSqlServer", "modServerQueries", "modActivation", "modTestAll"]   # hand-written (not generated) VBA modules
 
 KIND_LABEL = {
     "AUTO": "AutoNumber", "LONG": "Number (Long)", "INT": "Number (Integer)",
@@ -904,6 +905,8 @@ def main():
 
     # plan 5A (docs/67): the same back-end as a SQL Server script; UTF-8 with BOM + CRLF for SSMS / sqlcmd
     write("dist/sql/RetailStore_Schema.sql", gen_sql.build_sql(), encoding="utf-8-sig", newline="\r\n")
+    # plan 5D (docs/71): the saved queries as server views, and what the front-end knows of them
+    write("dist/sql/RetailStore_Queries.sql", gen_sql_views.build_views_sql(), encoding="utf-8-sig", newline="\r\n")
 
     qry = gen_queries.build_queries_vba()
     write("src/vba/modBuildQueries.bas", qry)
@@ -919,7 +922,8 @@ def main():
                        ("modTestSecurity", gen_test_security.build_test_security_vba()),
                        ("modDemoData", gen_demo.build_demo_vba()),
                        ("modLang", gen_lang.build_lang_vba()),
-                       ("modZatcaData", gen_zatca.build_zatca_data_vba())):
+                       ("modZatcaData", gen_zatca.build_zatca_data_vba()),
+                       ("modServerQueryData", gen_sql_views.build_data_vba())):
         write(f"src/vba/{name}.bas", text)
         write(f"dist/vba/{name}.bas", text, encoding="cp1256", newline="\r\n")
     for n, text in enumerate(gen_lang.data_modules(), 1):      # the dictionary of modLang

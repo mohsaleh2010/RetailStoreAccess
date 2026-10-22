@@ -16,6 +16,11 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "لا تملك صلاحية أرصدة بداية التشغيل", "You do not have the permission for the start-up opening balances"
+    LangAdd "لا تملك صلاحية المندوبين وعمولاتهم", "You do not have the permission for sales reps and their commissions"
+    LangAdd "لا تملك صلاحية حذف الحركات البنكية", "You do not have the permission to delete bank transactions"
+    LangAdd "لا توجد أرصدة موردين بعملات أجنبية", "There are no supplier balances in foreign currencies"
+    LangAdd "لا توجد أيام مندوبين في هذه الفترة", "No rep days in this period"
     LangAdd "لا تُسجَّل دفعات على العميل النقدي", "No payments are recorded on the cash customer"
     LangAdd "مبيعاته ومسير راتبه على هذا المركز", "His sales and payroll are on this center"
     LangAdd "نقل الأصل إلى مركز التكلفة المختار", "Transfer the asset to the chosen cost centre"
@@ -131,14 +136,14 @@ Private Sub D3_1()
     LangAdd "اختر الخزينة التي تستلم المبلغ", "Choose the treasury that receives the amount"
     LangAdd "اختر دفع الفاتورة: نقدي أو آجل", "Choose the invoice payment: cash or credit"
     LangAdd "البرنامج (الفاتورة الإلكترونية", "Program (e-invoice"
+End Sub
+
+Private Sub D3_2()
     LangAdd "التحويل غير موجود أو تم ترحيله", "The transfer does not exist or is already posted"
     LangAdd "الحساب المقابل (الحركات الأخرى", "Contra account (other moves"
     LangAdd "الخزينة والصناديق (الرصيد الآن", "Treasury and boxes (balance now"
     LangAdd "السند والفاتورة لطرفين مختلفين", "The voucher and the invoice belong to different parties"
     LangAdd "الشاشة التي يفتحها زر المبيعات", "The screen opened by the Sales button"
-End Sub
-
-Private Sub D3_2()
     LangAdd "العميل مدين للمحل (عليه)، سالب", "the customer owes the shop (debit), negative"
     LangAdd "الكمية يجب أن تكون أكبر من صفر", "The quantity must be greater than zero"
     LangAdd "المبلغ أكبر من رصيد سلف الموظف", "The amount is more than the advance balance of the employee"
@@ -254,14 +259,14 @@ Private Sub D3_2()
     LangAdd "حركة يدوية على المنتج المحدد", "A manual move on the selected product"
     LangAdd "خصم السلفة أكبر من رصيد سلفه", "The advance deduction is more than his advance balance"
     LangAdd "خصم على الفاتورة (بدون ضريبة", "Invoice discount (without VAT"
+End Sub
+
+Private Sub D3_3()
     LangAdd "خط السير وخطة اليوم والأسعار", "Route, day plan and prices"
     LangAdd "دليل الحسابات (شجرة الحسابات", "Chart of accounts (account tree"
     LangAdd "رد غير متوقع من المصلحة (رمز", "Unexpected reply from the Tax Authority (code"
     LangAdd "صافي الضريبة المستحقة للسداد", "Net VAT due for payment"
     LangAdd "ضريبة المخرجات على بيع الأصل", "Output VAT on the asset sale"
-End Sub
-
-Private Sub D3_3()
     LangAdd "ضريبة المدخلات أقل من المبلغ", "Input VAT is less than the amount"
     LangAdd "على حساب آخر (مستحقات أو قرض", "On another account (accruals or a loan"
     LangAdd "عملة البرنامج لا تحتاج سعرًا", "The program currency needs no rate"
@@ -377,14 +382,14 @@ Private Sub D3_3()
     LangAdd "هامش الربح الإجمالي (الشهر", "Gross profit margin (month"
     LangAdd "هل تريد مسح قائمة الملصقات", "Do you want to clear the label list"
     LangAdd "وسيصبح المورد مدينًا للمحل", "and the supplier will owe the store"
+End Sub
+
+Private Sub D3_4()
     LangAdd "يوجد جرد مفتوح لهذا المخزن", "This warehouse has an open stock count"
     LangAdd "أصل جديد: قسط الشهر الأول", "New asset: depreciation of the first month"
     LangAdd "إعادة الفتح إلى هذا اليوم", "Reopen up to this day"
     LangAdd "إعادة تقييم الأصول ونقلها", "Fixed asset revaluation and transfer"
     LangAdd "إلغاء بيع / استبعاد الأصل", "Cancel the sale / disposal of the asset"
-End Sub
-
-Private Sub D3_4()
     LangAdd "إلغاء تفعيل الجهاز المحدد", "Deactivate the selected computer"
     LangAdd "اكتب القيمة الجديدة للأصل", "Enter the new value of the asset"
     LangAdd "اكتب المبلغ بعملة المصروف", "Type the amount in the currency of the expense"
@@ -500,14 +505,14 @@ Private Sub D3_4()
     LangAdd "أرصدة الخزينة والصناديق", "Treasury and cash box balances"
     LangAdd "أصلح هذا أولًا، ثم أقفل", "Fix this first, then close"
     LangAdd "أكبر من الحد المسموح لك", "more than the limit allowed to you"
+End Sub
+
+Private Sub D3_5()
     LangAdd "إجمالي الإيرادات الأخرى", "Total other revenue"
     LangAdd "إجمالي المصروفات الأخرى", "Total other expenses"
     LangAdd "إضافة فترة بعد آخر فترة", "Add a period after the last one"
     LangAdd "إعدادات ملصقات الباركود", "Barcode label settings"
     LangAdd "إقفال فترة (شهر أو أكثر", "Close a period (a month or more"
-End Sub
-
-Private Sub D3_5()
     LangAdd "اختر التحويل من القائمة", "Choose the transfer from the list"
     LangAdd "اختر الزيارة من القائمة", "Choose the visit from the list"
     LangAdd "اختر الموظف صاحب السلفة", "Choose the employee who takes the advance"
@@ -566,11 +571,4 @@ Private Sub D3_5()
     LangAdd "في شاشة الفترات المالية", "in the fiscal periods screen"
     LangAdd "في فترة مقفلة، لم يُنشأ", "in a closed period, not created"
     LangAdd "قبض نقدية (إيرادات أخرى", "Cash receipt (other revenue"
-    LangAdd "لا تملك صلاحية التقارير", "You do not have the permission for reports"
-    LangAdd "لا تملك صلاحية الموازنة", "You do not have the permission for the budget"
-    LangAdd "لا تملك صلاحية فتح شاشة", "You do not have the permission to open the screen"
-    LangAdd "لا توجد تحويلات بالطريق", "No transfers in transit"
-    LangAdd "لا يُحصَّل قبل استحقاقه", "is not collected before its due date"
-    LangAdd "مسير الرواتب والتأمينات", "Payroll and social insurance"
-    LangAdd "من العينات فحص الامتثال", "of the samples in the compliance checks"
 End Sub

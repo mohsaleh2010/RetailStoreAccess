@@ -114,7 +114,7 @@ class FinancialCodeTests(unittest.TestCase):
         body = proc(read("modQueryParams"), "SetComparePeriod")
         for part in ("If Day(FromDate) = 1 Then", 'cFrom = DateAdd("m", -k, FromDate)',
                      'If cTo >= FromDate Then cTo = DateAdd("d", -1, FromDate)', 'cTo = DateAdd("d", -1, FromDate)',
-                     'TempVars.Add "CompareEnd", DateAdd("d", 1, cTo)'):
+                     'SetQueryParams "CompareStart", cFrom, "CompareEnd", DateAdd("d", 1, cTo)'):
             self.assertIn(part, body)
 
     def test_screen_and_reports(self):

@@ -4162,8 +4162,8 @@ SELECT b.BudgetLineID, b.AccountCode, a.AccountName, a.TreeKey, a.AccountType,
        CCur(Nz(p.SumPlan, 0)) AS BudgetAmount, CCur(Nz(x.SumActual, 0)) AS ActualAmount,
        CCur(Nz(x.SumActual, 0)) - CCur(Nz(p.SumPlan, 0)) AS Variance,
        IIf(CCur(Nz(p.SumPlan, 0)) = 0, Null, (CCur(Nz(x.SumActual, 0)) - CCur(Nz(p.SumPlan, 0))) / CCur(Nz(p.SumPlan, 0))) AS VariancePct,
-       IIf(CCur(Nz(x.SumActual, 0)) = CCur(Nz(p.SumPlan, 0)), 'مطابق', IIf((a.AccountType = 'REVENUE') = (CCur(Nz(x.SumActual, 0)) > CCur(Nz(p.SumPlan, 0))),
-           'ملائم', 'غير ملائم')) AS VarianceNote
+       IIf(CCur(Nz(x.SumActual, 0)) = CCur(Nz(p.SumPlan, 0)), 'مطابق', IIf(IIf(a.AccountType = 'REVENUE', 1, 0) =
+           IIf(CCur(Nz(x.SumActual, 0)) > CCur(Nz(p.SumPlan, 0)), 1, 0), 'ملائم', 'غير ملائم')) AS VarianceNote
 FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)
        INNER JOIN [@Accounts] AS a ON b.AccountCode = a.AccountCode)
       LEFT JOIN [@CostCenters] AS c ON b.CostCenterID = c.CostCenterID)

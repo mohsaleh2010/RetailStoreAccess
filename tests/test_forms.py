@@ -332,7 +332,7 @@ class ProjectStaticTests(unittest.TestCase):
                 for call in re.findall(r"(?<![\w.!])([A-Z]\w+)\(", code):
                     if call in known or call in vba_and_access:
                         continue
-                    if re.search(rf"\b(?:Dim|Private|Public|Const|ByVal|ByRef)\s+{call}\b", text):
+                    if re.search(rf"\b(?:Dim|Private|Public|Const|ByVal|ByRef|ParamArray)\s+{call}\b", text):
                         continue   # array/variable indexing
                     if re.search(rf"\b{call}\s+As\b", text):
                         continue

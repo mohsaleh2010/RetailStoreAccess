@@ -18,6 +18,13 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÊŞÇÑíÑ", "You do not have the permission for reports"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãæÇÒäÉ", "You do not have the permission for the budget"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ İÊÍ ÔÇÔÉ", "You do not have the permission to open the screen"
+    LangAdd "áÇ ÊæÌÏ ÊÍæíáÇÊ ÈÇáØÑíŞ", "No transfers in transit"
+    LangAdd "áÇ íõÍÕóøá ŞÈá ÇÓÊÍŞÇŞå", "is not collected before its due date"
+    LangAdd "ãÓíÑ ÇáÑæÇÊÈ æÇáÊÃãíäÇÊ", "Payroll and social insurance"
+    LangAdd "ãä ÇáÚíäÇÊ İÍÕ ÇáÇãÊËÇá", "of the samples in the compliance checks"
     LangAdd "ãæÇÒäÉ ÇáÓäÉ: ÇáÅíÑÇÏÇÊ", "Budget of the year: revenue"
     LangAdd "äÊíÌÉ ÇáÒíÇÑÉ ÛíÑ ÕÍíÍÉ", "The visit result is not valid"
     LangAdd "äÙÇã ÊÔÛíá ÇáÌåÇÒ (İÇÑÛ", "Operating system of the device (empty"
@@ -131,6 +138,9 @@ Private Sub D4_1()
     LangAdd "ÈÏÇíÉ ÇáİÊÑÉ ÇáÖÑíÈíÉ", "Start of the tax period"
     LangAdd "ÈÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ", "With VAT"
     LangAdd "ÊÇÑíÎ ÇáÕÑİ ÈÚÏ Çáíæã", "The payment date is after today"
+End Sub
+
+Private Sub D4_2()
     LangAdd "ÊÇÑíÎ ÇáßÔİ ÈÚÏ Çáíæã", "The statement date is after today"
     LangAdd "ÊÍÏíË ÇáßãíÇÊ ÇáãÓÌáÉ", "Refresh the recorded quantities"
     LangAdd "ÊÍÕíáÇÊ ãÏì áã ÊõÓæóø", "Mada collections not settled"
@@ -138,9 +148,6 @@ Private Sub D4_1()
     LangAdd "ÊßáİÉ ÇáÈÖÇÚÉ ÇáãÈÇÚÉ", "Cost of goods sold"
     LangAdd "Êã ÊÓÌíá ÇÑÊÏÇÏ ÇáÔíß", "The bounce of the cheque was recorded"
     LangAdd "Êã ÊÓÌíá ÓÏÇÏ ÇáÖÑíÈÉ", "The VAT payment was recorded"
-End Sub
-
-Private Sub D4_2()
     LangAdd "ÊãÊ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ", "Backup done"
     LangAdd "ÊæŞİ ÇáÓßÑÈÊ İí ÇáÌÒÁ", "The script stopped at part"
     LangAdd "ÌáÓÉ ÇáÌÑÏ ÛíÑ ãæÌæÏÉ", "The count session does not exist"
@@ -212,6 +219,7 @@ Private Sub D4_2()
     LangAdd "ÈíÚ - ÇáËãä İí ÇáÈäß", "Sale - price in the bank"
     LangAdd "ÈíÚ - ÇáËãä İí ÕäÏæŞ", "Sale - price in a box"
     LangAdd "ÊÕİíÇÊ íæãíÉ ÇáßÇÔíÑ", "Daily cashier closings"
+    LangAdd "ÊÚĞÑ ÅÑÌÇÚ ÇáÇÓÊÚáÇã", "Could not return the query"
     LangAdd "ÊÚĞøÑÊ ŞÑÇÁÉ ÇáÔåÇÏÉ", "Could not read the certificate"
     LangAdd "ÊŞÑíÑ ÊäİíĞ ÎØ ÇáÓíÑ", "Route execution report"
     LangAdd "Êã ÊÓÌíá ÕÑİ ÇáÑæÇÊÈ", "The salary payment was recorded"
@@ -253,6 +261,9 @@ Private Sub D4_2()
     LangAdd "ãÑßÒ ÇáÊßáİÉ ÛíÑ äÔØ", "The cost centre is inactive"
     LangAdd "ãÓíÑ ÇáÚãæáÇÊ ÇáÔåÑí", "Monthly commission run"
     LangAdd "åá ÊÑíÏ ÊÓÌíá ÇáÎÑæÌ", "Do you want to log out"
+End Sub
+
+Private Sub D4_3()
     LangAdd "ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", "Start-up opening balances"
     LangAdd "ÃŞá ÇáãäÊÌÇÊ ãÈíÚğÇ", "Least-selling products"
     LangAdd "ÃŞá ãä ÕÇİí ÇáÑæÇÊÈ", "less than the net salaries"
@@ -261,9 +272,6 @@ Private Sub D4_2()
     LangAdd "ÅŞİÇá ÍÊì åĞÇ Çáíæã", "Close up to this day"
     LangAdd "ÅíÕÇá¡ æÊÛíøÑÊ ÍÇáÉ", "receipts, status changed for"
     LangAdd "ÇÎÊÑ ÇáÍÓÇÈ ÇáãŞÇÈá", "Choose the contra account"
-End Sub
-
-Private Sub D4_3()
     LangAdd "ÇÎÊÑ ÇáÕäÏæŞ æÇáíæã", "Choose the box and the day"
     LangAdd "ÇÎÊÑ ÇáİÆÉ Ëã ÇáÕäİ", "Choose the category, then the item"
     LangAdd "ÇÎÊÑ ÇáãÎÒä ÇáãÑÓöá", "Choose the sending warehouse"
@@ -374,7 +382,11 @@ Private Sub D4_3()
     LangAdd "ÊÚĞÑ ÊÑÍíá ÇáÊÍæíá", "Could not post the transfer"
     LangAdd "ÊÚĞÑ ÍİÙ ÓäÏ ÇáÕÑİ", "Could not save the payment voucher"
     LangAdd "ÊÚĞÑ ÍİÙ ÓäÏ ÇáŞÈÖ", "Could not save the receipt voucher"
+    LangAdd "ÊÚĞÑ ÑÈØ ÇáÇÓÊÚáÇã", "Could not link the query"
     LangAdd "ÊÚĞøÑ ÈäÇÁ ÇáÅíÕÇá", "Could not build the receipt"
+End Sub
+
+Private Sub D4_4()
     LangAdd "ÊÚĞøÑ ÊÍÏíË ÇáÍÇáÉ", "Could not refresh the status"
     LangAdd "Êã ÇáÇÊÕÇá ÈÇáÎÇÏã", "Connected to the server"
     LangAdd "Êã ÊÓÌíá ÕÑİ ÇáÔíß", "The payment of the cheque was recorded"
@@ -384,9 +396,6 @@ Private Sub D4_3()
     LangAdd "ÍĞİ ÂÎÑ İÊÑÉ ãÇáíÉ", "Delete the last fiscal period"
     LangAdd "ÍÕÉ ÇáãäÔÃÉ (ÓÚæÏí", "Employer share (Saudi"
     LangAdd "ÍÕÉ ÇáãæÙİ ÇáÓÚæÏí", "Saudi employee share"
-End Sub
-
-Private Sub D4_4()
     LangAdd "ÎÕã ãä ÑÕíÏ ÇáÚãíá", "Deduct from the customer balance"
     LangAdd "ÎÕã ãä ÑÕíÏ ÇáãæÑÏ", "Deduct from the supplier balance"
     LangAdd "ÑÈØ ÊáŞÇÆí ÈÇáÃŞÏã", "Auto-link to the oldest"
@@ -498,6 +507,9 @@ Private Sub D4_4()
     LangAdd "ŞÓØ ÇáÓáİÉ ÇáÔåÑí", "Monthly advance installment"
     LangAdd "ßá ÇáÌÏÇæá ãØÇÈŞÉ", "All the tables match"
     LangAdd "áÇ ÊæÌÏ ÔåÇÏÉ ÈÚÏ", "No certificate yet"
+End Sub
+
+Private Sub D4_5()
     LangAdd "áÇ íæÌÏ äŞá ááÃÕá", "The asset has no transfer"
     LangAdd "ááãäÏæÈ íæã ãİÊæÍ", "The rep has an open day"
     LangAdd "áã ÊõÍÏÏ ÇáİÇÊæÑÉ", "The invoice was not set"
@@ -507,9 +519,6 @@ Private Sub D4_4()
     LangAdd "ãÓÊäÏ ãİÊæÍ. ÇÎÊÑ", "An open document. Choose"
     LangAdd "ãáİ ÓßÑÈÊ ÇáŞÇÚÏÉ", "Database script file"
     LangAdd "äÓÈÉ ÇáÖÑíÈÉ áíÓÊ", "The VAT rate is not"
-End Sub
-
-Private Sub D4_5()
     LangAdd "äÔÇØ ÇáãäÔÃÉ (ãËá", "Business activity (such as"
     LangAdd "æ - áÊÚÏíá ÇáßãíÉ", "and - to change the quantity"
     LangAdd "íÓãÍ ÈÇáÈíÚ ÇáÂÌá", "Allows credit sales"
@@ -532,6 +541,7 @@ Private Sub D4_5()
     LangAdd "ÇÎÊÑ ŞíÏğÇ ÃæáğÇ", "Choose an entry first"
     LangAdd "ÇÎÊÑ ãÕÏÑ ÇáÔÑÇÁ", "Choose the purchase source"
     LangAdd "ÇÎÊÑ äæÚ ÇáãÕÑæİ", "Choose the expense type"
+    LangAdd "ÇÓÊÚáÇãÇÊ ÇáÎÇÏã", "Server queries"
     LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáÕÑİ", "Type the payment date"
     LangAdd "ÇßÊÈ ÊÇÑíÎ ÇáŞíÏ", "Type the date of the entry"
     LangAdd "ÇáÃÌåÒÉ ÇáãİÚøáÉ", "Activated computers"
@@ -620,6 +630,9 @@ Private Sub D4_5()
     LangAdd "ãä ÕáÇÍíÇÊ ÇáÏæÑ", "From the role permissions"
     LangAdd "ãõÓáóøãÉ æãİæÊÑÉ", "Delivered and invoiced"
     LangAdd "äÙÇã ÅÏÇÑÉ ÇáãÍá", "Store management system"
+End Sub
+
+Private Sub D4_6()
     LangAdd "äŞØÉ ÈíÚ ÇáßÇİíå", "Cafe point of sale"
     LangAdd "äæÚ ÇáÅĞä ÇáÌÏíÏ", "New note type"
     LangAdd "äæÚ ÇáÓäÏ ÇáÌÏíÏ", "New voucher type"
@@ -630,9 +643,6 @@ Private Sub D4_5()
     LangAdd "ÃÑÕÏÉ Ãæá ÇáãÏÉ", "Opening balances"
     LangAdd "ÃÓÚÇÑ ÇáãäÏæÈíä", "Rep price lists"
     LangAdd "ÃßÈÑ ãä ÇáãÊÈŞí", "more than the remaining"
-End Sub
-
-Private Sub D4_6()
     LangAdd "ÃäæÇÚ ÇáãÕÑæİÇÊ", "Expense types"
     LangAdd "ÃåÏÇİ ÇáãäÏæÈíä", "Sales rep targets"
     LangAdd "Ãæá ÕäÏæŞ ßÇÔíÑ", "First cashier box"
@@ -743,6 +753,9 @@ Private Sub D4_6()
     LangAdd "ÃĞæäÇÊ ÇáØáÈíÉ", "Order notes"
     LangAdd "ÃÑÕÏÉ ÇáãæÑÏíä", "Supplier balances"
     LangAdd "ÃŞá ãä ÇáÊßáİÉ", "below cost"
+End Sub
+
+Private Sub D4_7()
     LangAdd "ÃãäÇÁ ÇáÕäÇÏíŞ", "Box custodians"
     LangAdd "ÅÚÏÇÏÇÊ ÇáãáÕŞ", "Label settings"
     LangAdd "ÅáÛÇÁ ÇáÇÚÊãÇÏ", "Cancel approval"
@@ -753,9 +766,6 @@ Private Sub D4_6()
     LangAdd "ÇÎÊÈÇÑ ÇáÇÊÕÇá", "Test the connection"
     LangAdd "ÇÎÊÑ ÈäÏ ÇáÕÑİ", "Choose the payment item"
     LangAdd "ÇÎÊÑ ÈäÏ ÇáŞÈÖ", "Choose the receipt item"
-End Sub
-
-Private Sub D4_7()
     LangAdd "ÇÓÊáÇã ãä ãæÑÏ", "Receipt from a supplier"
     LangAdd "ÇÚÊãÇÏ ÇáÅŞÑÇÑ", "Approve the return"
     LangAdd "ÇÚÊãÇÏ ÇáÊÓæíÉ", "Approve the reconciliation"
@@ -777,19 +787,4 @@ Private Sub D4_7()
     LangAdd "ÇáÑÈÍ ÇáÊÔÛíáí", "Operating profit"
     LangAdd "ÇáÑÌæÚ Åáì ãáİ", "Back to the file"
     LangAdd "ÇáÑÕíÏ ÇáÎÊÇãí", "Closing balance"
-    LangAdd "ÇáÑÕíÏ ÇáãÓÊÍŞ", "Balance due"
-    LangAdd "ÇáÑÕíÏ ÈÇáÚãáÉ", "Balance in currency"
-    LangAdd "ÇáÑŞã ÇáÊÓáÓáí", "Serial number"
-    LangAdd "ÇáÔíß ãÓÊÍŞ İí", "The cheque is due on"
-    LangAdd "ÇáİÆÉ ÇáÖÑíÈíÉ", "VAT category"
-    LangAdd "ÇáİÊÑÉ ÇáÍÇáíÉ", "Current period"
-    LangAdd "ÇáİÊÑÉ: ÇáÍÓÇÈ", "Period: account"
-    LangAdd "ÇáİÑŞ ãÚ ÇáßÔİ", "Difference with the statement"
-    LangAdd "ÇáŞÓØ ÇáãÊäÇŞÕ", "Declining balance"
-    LangAdd "ÇáŞíãÉ ÇáÌÏíÏÉ", "New value"
-    LangAdd "ÇáŞíãÉ æÇáÍÇáÉ", "Value and status"
-    LangAdd "ÇáŞíæÏ ÇáíÏæíÉ", "Manual entries"
-    LangAdd "ÇáßãíÉ ÇáÍÇáíÉ", "Current quantity"
-    LangAdd "ÇáßãíÉ ÇáİÚáíÉ", "Actual quantity"
-    LangAdd "ÇáßãíÉ ÇáãÈÇÚÉ", "Quantity sold"
 End Sub

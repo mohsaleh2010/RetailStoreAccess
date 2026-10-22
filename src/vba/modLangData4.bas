@@ -18,6 +18,13 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "لا تملك صلاحية التقارير", "You do not have the permission for reports"
+    LangAdd "لا تملك صلاحية الموازنة", "You do not have the permission for the budget"
+    LangAdd "لا تملك صلاحية فتح شاشة", "You do not have the permission to open the screen"
+    LangAdd "لا توجد تحويلات بالطريق", "No transfers in transit"
+    LangAdd "لا يُحصَّل قبل استحقاقه", "is not collected before its due date"
+    LangAdd "مسير الرواتب والتأمينات", "Payroll and social insurance"
+    LangAdd "من العينات فحص الامتثال", "of the samples in the compliance checks"
     LangAdd "موازنة السنة: الإيرادات", "Budget of the year: revenue"
     LangAdd "نتيجة الزيارة غير صحيحة", "The visit result is not valid"
     LangAdd "نظام تشغيل الجهاز (فارغ", "Operating system of the device (empty"
@@ -131,6 +138,9 @@ Private Sub D4_1()
     LangAdd "بداية الفترة الضريبية", "Start of the tax period"
     LangAdd "بضريبة القيمة المضافة", "With VAT"
     LangAdd "تاريخ الصرف بعد اليوم", "The payment date is after today"
+End Sub
+
+Private Sub D4_2()
     LangAdd "تاريخ الكشف بعد اليوم", "The statement date is after today"
     LangAdd "تحديث الكميات المسجلة", "Refresh the recorded quantities"
     LangAdd "تحصيلات مدى لم تُسوَّ", "Mada collections not settled"
@@ -138,9 +148,6 @@ Private Sub D4_1()
     LangAdd "تكلفة البضاعة المباعة", "Cost of goods sold"
     LangAdd "تم تسجيل ارتداد الشيك", "The bounce of the cheque was recorded"
     LangAdd "تم تسجيل سداد الضريبة", "The VAT payment was recorded"
-End Sub
-
-Private Sub D4_2()
     LangAdd "تمت النسخة الاحتياطية", "Backup done"
     LangAdd "توقف السكربت في الجزء", "The script stopped at part"
     LangAdd "جلسة الجرد غير موجودة", "The count session does not exist"
@@ -212,6 +219,7 @@ Private Sub D4_2()
     LangAdd "بيع - الثمن في البنك", "Sale - price in the bank"
     LangAdd "بيع - الثمن في صندوق", "Sale - price in a box"
     LangAdd "تصفيات يومية الكاشير", "Daily cashier closings"
+    LangAdd "تعذر إرجاع الاستعلام", "Could not return the query"
     LangAdd "تعذّرت قراءة الشهادة", "Could not read the certificate"
     LangAdd "تقرير تنفيذ خط السير", "Route execution report"
     LangAdd "تم تسجيل صرف الرواتب", "The salary payment was recorded"
@@ -253,6 +261,9 @@ Private Sub D4_2()
     LangAdd "مركز التكلفة غير نشط", "The cost centre is inactive"
     LangAdd "مسير العمولات الشهري", "Monthly commission run"
     LangAdd "هل تريد تسجيل الخروج", "Do you want to log out"
+End Sub
+
+Private Sub D4_3()
     LangAdd "أرصدة بداية التشغيل", "Start-up opening balances"
     LangAdd "أقل المنتجات مبيعًا", "Least-selling products"
     LangAdd "أقل من صافي الرواتب", "less than the net salaries"
@@ -261,9 +272,6 @@ Private Sub D4_2()
     LangAdd "إقفال حتى هذا اليوم", "Close up to this day"
     LangAdd "إيصال، وتغيّرت حالة", "receipts, status changed for"
     LangAdd "اختر الحساب المقابل", "Choose the contra account"
-End Sub
-
-Private Sub D4_3()
     LangAdd "اختر الصندوق واليوم", "Choose the box and the day"
     LangAdd "اختر الفئة ثم الصنف", "Choose the category, then the item"
     LangAdd "اختر المخزن المرسِل", "Choose the sending warehouse"
@@ -374,7 +382,11 @@ Private Sub D4_3()
     LangAdd "تعذر ترحيل التحويل", "Could not post the transfer"
     LangAdd "تعذر حفظ سند الصرف", "Could not save the payment voucher"
     LangAdd "تعذر حفظ سند القبض", "Could not save the receipt voucher"
+    LangAdd "تعذر ربط الاستعلام", "Could not link the query"
     LangAdd "تعذّر بناء الإيصال", "Could not build the receipt"
+End Sub
+
+Private Sub D4_4()
     LangAdd "تعذّر تحديث الحالة", "Could not refresh the status"
     LangAdd "تم الاتصال بالخادم", "Connected to the server"
     LangAdd "تم تسجيل صرف الشيك", "The payment of the cheque was recorded"
@@ -384,9 +396,6 @@ Private Sub D4_3()
     LangAdd "حذف آخر فترة مالية", "Delete the last fiscal period"
     LangAdd "حصة المنشأة (سعودي", "Employer share (Saudi"
     LangAdd "حصة الموظف السعودي", "Saudi employee share"
-End Sub
-
-Private Sub D4_4()
     LangAdd "خصم من رصيد العميل", "Deduct from the customer balance"
     LangAdd "خصم من رصيد المورد", "Deduct from the supplier balance"
     LangAdd "ربط تلقائي بالأقدم", "Auto-link to the oldest"
@@ -498,6 +507,9 @@ Private Sub D4_4()
     LangAdd "قسط السلفة الشهري", "Monthly advance installment"
     LangAdd "كل الجداول مطابقة", "All the tables match"
     LangAdd "لا توجد شهادة بعد", "No certificate yet"
+End Sub
+
+Private Sub D4_5()
     LangAdd "لا يوجد نقل للأصل", "The asset has no transfer"
     LangAdd "للمندوب يوم مفتوح", "The rep has an open day"
     LangAdd "لم تُحدد الفاتورة", "The invoice was not set"
@@ -507,9 +519,6 @@ Private Sub D4_4()
     LangAdd "مستند مفتوح. اختر", "An open document. Choose"
     LangAdd "ملف سكربت القاعدة", "Database script file"
     LangAdd "نسبة الضريبة ليست", "The VAT rate is not"
-End Sub
-
-Private Sub D4_5()
     LangAdd "نشاط المنشأة (مثل", "Business activity (such as"
     LangAdd "و - لتعديل الكمية", "and - to change the quantity"
     LangAdd "يسمح بالبيع الآجل", "Allows credit sales"
@@ -532,6 +541,7 @@ Private Sub D4_5()
     LangAdd "اختر قيدًا أولًا", "Choose an entry first"
     LangAdd "اختر مصدر الشراء", "Choose the purchase source"
     LangAdd "اختر نوع المصروف", "Choose the expense type"
+    LangAdd "استعلامات الخادم", "Server queries"
     LangAdd "اكتب تاريخ الصرف", "Type the payment date"
     LangAdd "اكتب تاريخ القيد", "Type the date of the entry"
     LangAdd "الأجهزة المفعّلة", "Activated computers"
@@ -620,6 +630,9 @@ Private Sub D4_5()
     LangAdd "من صلاحيات الدور", "From the role permissions"
     LangAdd "مُسلَّمة ومفوترة", "Delivered and invoiced"
     LangAdd "نظام إدارة المحل", "Store management system"
+End Sub
+
+Private Sub D4_6()
     LangAdd "نقطة بيع الكافيه", "Cafe point of sale"
     LangAdd "نوع الإذن الجديد", "New note type"
     LangAdd "نوع السند الجديد", "New voucher type"
@@ -630,9 +643,6 @@ Private Sub D4_5()
     LangAdd "أرصدة أول المدة", "Opening balances"
     LangAdd "أسعار المندوبين", "Rep price lists"
     LangAdd "أكبر من المتبقي", "more than the remaining"
-End Sub
-
-Private Sub D4_6()
     LangAdd "أنواع المصروفات", "Expense types"
     LangAdd "أهداف المندوبين", "Sales rep targets"
     LangAdd "أول صندوق كاشير", "First cashier box"
@@ -743,6 +753,9 @@ Private Sub D4_6()
     LangAdd "أذونات الطلبية", "Order notes"
     LangAdd "أرصدة الموردين", "Supplier balances"
     LangAdd "أقل من التكلفة", "below cost"
+End Sub
+
+Private Sub D4_7()
     LangAdd "أمناء الصناديق", "Box custodians"
     LangAdd "إعدادات الملصق", "Label settings"
     LangAdd "إلغاء الاعتماد", "Cancel approval"
@@ -753,9 +766,6 @@ Private Sub D4_6()
     LangAdd "اختبار الاتصال", "Test the connection"
     LangAdd "اختر بند الصرف", "Choose the payment item"
     LangAdd "اختر بند القبض", "Choose the receipt item"
-End Sub
-
-Private Sub D4_7()
     LangAdd "استلام من مورد", "Receipt from a supplier"
     LangAdd "اعتماد الإقرار", "Approve the return"
     LangAdd "اعتماد التسوية", "Approve the reconciliation"
@@ -777,19 +787,4 @@ Private Sub D4_7()
     LangAdd "الربح التشغيلي", "Operating profit"
     LangAdd "الرجوع إلى ملف", "Back to the file"
     LangAdd "الرصيد الختامي", "Closing balance"
-    LangAdd "الرصيد المستحق", "Balance due"
-    LangAdd "الرصيد بالعملة", "Balance in currency"
-    LangAdd "الرقم التسلسلي", "Serial number"
-    LangAdd "الشيك مستحق في", "The cheque is due on"
-    LangAdd "الفئة الضريبية", "VAT category"
-    LangAdd "الفترة الحالية", "Current period"
-    LangAdd "الفترة: الحساب", "Period: account"
-    LangAdd "الفرق مع الكشف", "Difference with the statement"
-    LangAdd "القسط المتناقص", "Declining balance"
-    LangAdd "القيمة الجديدة", "New value"
-    LangAdd "القيمة والحالة", "Value and status"
-    LangAdd "القيود اليدوية", "Manual entries"
-    LangAdd "الكمية الحالية", "Current quantity"
-    LangAdd "الكمية الفعلية", "Actual quantity"
-    LangAdd "الكمية المباعة", "Quantity sold"
 End Sub

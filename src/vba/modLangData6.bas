@@ -13,6 +13,31 @@ Public Sub LangData6()
 End Sub
 
 Private Sub D6_1()
+    LangAdd "من بنك", "From a bank"
+    LangAdd "موازنة", "Budget"
+    LangAdd "موردًا", "suppliers"
+    LangAdd "مُرحّل", "Posted"
+    LangAdd "نوفمبر", "November"
+    LangAdd "أبريل", "April"
+    LangAdd "أربعة", "four"
+    LangAdd "أعدّه", "Prepared by"
+    LangAdd "أغسطس", "August"
+    LangAdd "ألفان", "two thousand"
+    LangAdd "أولها", "the first on"
+    LangAdd "أُرسل", "Sent"
+    LangAdd "أُضيف", "Added"
+    LangAdd "إضافة", "Add"
+    LangAdd "إغلاق", "Close"
+    LangAdd "إلغاء", "Cancel"
+    LangAdd "إيداع", "Deposit"
+    LangAdd "اثنان", "two"
+    LangAdd "الأحد", "Sunday"
+    LangAdd "الأصل", "Asset"
+    LangAdd "الاسم", "Name"
+    LangAdd "البحث", "Search"
+    LangAdd "البند", "Item"
+    LangAdd "البنك", "Bank"
+    LangAdd "البيع", "Sale"
     LangAdd "الجرد", "Stock count"
     LangAdd "الجهة", "Party"
     LangAdd "الحجم", "Size"
@@ -108,6 +133,9 @@ Private Sub D6_1()
     LangAdd "ملائم", "Suitable"
     LangAdd "ملغاة", "Cancelled"
     LangAdd "مليون", "million"
+End Sub
+
+Private Sub D6_2()
     LangAdd "منخفض", "Low"
     LangAdd "منصرف", "Out"
     LangAdd "مُرسل", "Submitted"
@@ -133,9 +161,6 @@ Private Sub D6_1()
     LangAdd "بثمن", "for a price"
     LangAdd "بدون", "None"
     LangAdd "تسعة", "nine"
-End Sub
-
-Private Sub D6_2()
     LangAdd "ثابت", "Straight line"
     LangAdd "جديد", "New"
     LangAdd "جنيه", "EGP"

@@ -15,6 +15,9 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "ÑÈØ ßá ÇáãÈÇáÛ ÛíÑ ÇáãÑÈæØÉ ÈÃŞÏã ÇáİæÇÊíÑ ÇÓÊÍŞÇŞğÇ", "Link all unlinked amounts to the oldest due invoices"
+    LangAdd "ÑÕíÏ ÇáãæÑÏíä íõÏÎá İí ŞÓã «ÇáãæÑÏæä»: ÑÕíÏ áßá ãæÑÏ", "The suppliers balance is entered in the Suppliers part: one balance per supplier"
+    LangAdd "Õİöø ÕäÏæŞ ÇáÚåÏÉ ŞÈá ÅÛáÇŞ Çáíæã (ÒÑ «ÊÕİíÉ ÇáÕäÏæŞ", "Close the custody box before closing the day (button Close the box"
     LangAdd "ŞÈÖ äŞÏíÉ İí ÕäÏæŞ¡ Ãæ ÕÑİ ãäå¡ Ãæ ÊÍæíá Èíä ÕäÏæŞíä", "Cash received in a box, paid from it, or transferred between two boxes"
     LangAdd "ãäÇÓÈ áØÇÈÚÇÊ 203 äŞØÉ/ÈæÕÉ¡ æßÈøÑå ÅĞÇ ÕÚÈÊ ÇáŞÑÇÁÉ", "Suitable for 203 dpi printers, make it larger if it is hard to read"
     LangAdd "ãäÏæÈæ ÇáãÈíÚÇÊ: ÚãáÇÄåã æäÓÈÉ ÚãæáÊåã æãÑßÒ ÊßáİÊåã", "Sales reps: their customers, commission rate and cost center"
@@ -132,12 +135,12 @@ Private Sub D2_1()
     LangAdd "ááÚãá İí ÇáÏæáÉ ÇáÃÎÑì ÇÈÏÃ ãáİ ÈíÇäÇÊ ÌÏíÏğÇ", "To work in the other country start a new data file"
     LangAdd "ÃÖİ ÕäİğÇ æÇÍÏğÇ Úáì ÇáÃŞá Åáì ŞÇÆãÉ ÇáØÈÇÚÉ", "Add at least one item to the print list"
     LangAdd "ÇÍĞİ ŞíæÏ ÇáÅåáÇß ãä ÔåÑ ÅÚÇÏÉ ÇáÊŞííã ÃæáğÇ", "delete the depreciation entries from the month of the revaluation first"
-    LangAdd "ÇáÈíÇäÇÊ ÇáİÚáíÉ ááÈÑäÇãÌ Úáì SQL Server ãäĞ", "The real data of the program is on SQL Server since"
-    LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ İí ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled in the settings"
-    LangAdd "ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ", "Need follow-up (waiting, rejected, warning"
 End Sub
 
 Private Sub D2_2()
+    LangAdd "ÇáÈíÇäÇÊ ÇáİÚáíÉ ááÈÑäÇãÌ Úáì SQL Server ãäĞ", "The real data of the program is on SQL Server since"
+    LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ İí ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled in the settings"
+    LangAdd "ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ", "Need follow-up (waiting, rejected, warning"
     LangAdd "ÊÕÏÑ ÇáİÇÊæÑÉ ãä ÅĞä ãõÑÍóøá áã ÊÕÏÑ İÇÊæÑÊå", "The invoice is made from a posted note not yet invoiced"
     LangAdd "ÊÚæÏ ááãÓæÏÉ ÇáØáÈíÉ ÇáãÚÊãÏÉ Ãæ ŞíÏ ÇáÊÌåíÒ", "Only an approved order or one being prepared goes back to draft"
     LangAdd "ÚãáíÇÊ ÇáÏİÇÊÑ ÛíÑ ÇáãØÇÈŞÉ (ÍÊì ÊÇÑíÎ ÇáßÔİ", "Book transactions not matched (up to the statement date"
@@ -255,12 +258,12 @@ Private Sub D2_2()
     LangAdd "ÊÑÍíá ÇáÓäÏ¿ íÊÍÑß ÇáãÎÒæä æíõäÔÃ ÇáŞíÏ", "Post the voucher? The stock moves and the entry is created"
     LangAdd "ÍÏÏ ÇáßãíÉ ÇáãÑÊÌÚÉ áÕäİ æÇÍÏ Úáì ÇáÃŞá", "Set the returned quantity of at least one item"
     LangAdd "ÑÇÌÚ ÇáÊÇÑíÎ æÇáÃÓØÑ Ëã ÇÖÛØ «ÍİÙ ÇáŞíÏ", "Check the date and the lines, then click Save entry"
-    LangAdd "ÑÕíÏ ßá ÍÓÇÈ Èäßí íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each bank account on the start-up day: positive"
-    LangAdd "ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "The new sale price cannot be negative"
-    LangAdd "ÕäİğÇ áÃä áåÇ ÍÑßÇÊ Ãæ áÇ ÊÊÇÈÚ ÇáãÎÒæä", "items, because they have moves or do not track stock"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "ÑÕíÏ ßá ÍÓÇÈ Èäßí íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each bank account on the start-up day: positive"
+    LangAdd "ÓÚÑ ÇáÈíÚ ÇáÌÏíÏ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "The new sale price cannot be negative"
+    LangAdd "ÕäİğÇ áÃä áåÇ ÍÑßÇÊ Ãæ áÇ ÊÊÇÈÚ ÇáãÎÒæä", "items, because they have moves or do not track stock"
     LangAdd "ÚÏøá ÇáÅÖÇİí æÇáÎÕæãÇÊ Ëã «ÊÑÍíá ÇáãÓíÑ", "Edit the overtime and deductions, then Post the run"
     LangAdd "ßáãÉ ÇáÈÍË (ÇÓã¡ ßæÏ¡ ÈÇÑßæÏ¡ ÑŞã¡ ÌæÇá", "Search text (name, code, barcode, number, mobile"
     LangAdd "áÇ ÊæÌÏ İÑæŞÇÊ ÌÑÏ ãÑÍøáÉ İí åĞå ÇáİÊÑÉ", "No posted stock count differences in this period"
@@ -378,12 +381,12 @@ Private Sub D2_3()
     LangAdd "ÊÛíÑÊ ÇáÃÑÕÏÉ: ÇÖÛØ «ÊÍÏíË ÇáÅÌãÇáí", "The balances changed: press Refresh total"
     LangAdd "ÊÛííÑ ÇÓã ÇáãÍá íÊã Úä ØÑíŞ ÇáãÈÑãÌ", "The store name is changed by the developer"
     LangAdd "ÊãÊ ÇáäÓÎÉ Úáì ÇáÎÇÏã áßä İÍÕåÇ İÔá", "The server made the backup but its check failed"
-    LangAdd "ÌÏæá: ÇäŞá ÇáÈíÇäÇÊ Ëã ØÇÈŞåÇ ÃæáğÇ", "tables: transfer the data then compare it first"
-    LangAdd "ÍÓÇÈ ÑÆíÓí: íÔãá ßá ÍÓÇÈÇÊå ÇáÊÇÈÚÉ", "Main account: includes all its sub-accounts"
-    LangAdd "ÑÈØ ÇáÈÑäÇãÌ Úáì åĞÇ ÇáÌåÇÒ ÈÇáÎÇÏã", "Link the program on this PC to the server"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "ÌÏæá: ÇäŞá ÇáÈíÇäÇÊ Ëã ØÇÈŞåÇ ÃæáğÇ", "tables: transfer the data then compare it first"
+    LangAdd "ÍÓÇÈ ÑÆíÓí: íÔãá ßá ÍÓÇÈÇÊå ÇáÊÇÈÚÉ", "Main account: includes all its sub-accounts"
+    LangAdd "ÑÈØ ÇáÈÑäÇãÌ Úáì åĞÇ ÇáÌåÇÒ ÈÇáÎÇÏã", "Link the program on this PC to the server"
     LangAdd "ÑÕíÏ ÇáÕäÏæŞ íõÏÎá İí ŞÓã «ÇáÕäÇÏíŞ", "The balance of a cash box is entered in the Cash boxes part"
     LangAdd "ÑÕíÏ ÇáÚãíá ÇáãÓÌá áÇ íØÇÈŞ ÇáÍÑßÇÊ", "The recorded customer balance does not match the moves"
     LangAdd "ÑÕíÏ ÇáãæÑÏ ÇáãÓÌá áÇ íØÇÈŞ ÇáÍÑßÇÊ", "The recorded supplier balance does not match the moves"
@@ -404,6 +407,7 @@ Private Sub D2_4()
     LangAdd "ÊÃßÏ ãä İáÇÔÉ ÇáÊæŞíÚ æÑŞãåÇ ÇáÓÑí", "Check the signing token and its PIN"
     LangAdd "ÊÓÌíá ÇÑÊÏÇÏ ÇáÔíß¿ íÚæÏ ãÈáÛå Úáì", "Record the bounce of the cheque? Its amount goes back to"
     LangAdd "ÊÓæíÇÊ æÊÕÍíÍÇÊ ãä ÇáİÊÑÇÊ ÇáÓÇÈŞÉ", "Adjustments and corrections of earlier periods"
+    LangAdd "ÊÚĞÑ ÅÑÓÇá İÊÑÉ ÇáÊŞÑíÑ Åáì ÇáÎÇÏã", "Could not send the report period to the server"
     LangAdd "ÑÕíÏ ßá Úãíá íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each customer on the start-up day: positive"
     LangAdd "ÑÕíÏ ßá ãæÑÏ íæã ÈÏÁ ÇáÊÔÛíá: ãæÌÈ", "The balance of each supplier on the start-up day: positive"
     LangAdd "ÑŞã ÇáÊÓÌíá ÇáÖÑíÈí İí ãÕÑ 9 ÃÑŞÇã", "The Egyptian tax registration number has 9 digits"
@@ -412,9 +416,4 @@ Private Sub D2_4()
     LangAdd "İÇÊæÑÉ ÅĞä ÇáÇÓÊáÇã ÈÚãáÉ ÇáÈÑäÇãÌ", "The invoice of a receipt note is in the program currency"
     LangAdd "İÍÕ ÓáÇãÉ ÇáÈíÇäÇÊ: áÇ ÊæÌÏ ãÔßáÇÊ", "Data integrity check: no problems"
     LangAdd "ßá ÇáÃĞæäÇÊ ÇáãÑÍøáÉ ÕÏÑÊ İæÇÊíÑåÇ", "Every posted note is invoiced"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", "You do not have the permission for the start-up opening balances"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãäÏæÈíä æÚãæáÇÊåã", "You do not have the permission for sales reps and their commissions"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÍĞİ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to delete bank transactions"
-    LangAdd "áÇ ÊæÌÏ ÃÑÕÏÉ ãæÑÏíä ÈÚãáÇÊ ÃÌäÈíÉ", "There are no supplier balances in foreign currencies"
-    LangAdd "áÇ ÊæÌÏ ÃíÇã ãäÏæÈíä İí åĞå ÇáİÊÑÉ", "No rep days in this period"
 End Sub

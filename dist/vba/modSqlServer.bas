@@ -13,6 +13,8 @@ Attribute VB_Name = "modSqlServer"
 '   CompareAllData     each table: the number of rows and the total of each amount field, Access vs server
 '   LinkToServer       the program's tables linked to the server (after a clean comparison);
 '   LinkToAccess       linked back to the .accdb file
+'   (plan 5D, docs/71: the saved queries follow, modServerQueries; "Prepare the database" also runs
+'   RetailStore_Queries.sql, the views of the saved queries)
 '   CheckServerAtStartup  the login screen says so when the server does not answer
 ' The pure parts (SqlLiteral, ServerConnect, SplitSqlBatches, InsertBatchSql) have a Python mirror in
 ' tools/sql_transfer_reference.py and run in LibreOffice in the tests.
@@ -359,6 +361,11 @@ Public Function DefaultScriptPath() As String
     DefaultScriptPath = p
 End Function
 
+Public Function QueriesScriptPath(ByVal SchemaScriptPath As String) As String
+    ' The views of the saved queries (docs/71): RetailStore_Queries.sql in the folder of the database script.
+    QueriesScriptPath = Left$(SchemaScriptPath, InStrRev(SchemaScriptPath, "\")) & "RetailStore_Queries.sql"
+End Function
+
 Public Function RunSchemaScript(ByVal Connect As String, ByVal ScriptPath As String, ByRef Done As Long) As String
     ' The database script (docs/67), batch by batch: a new database is created, an existing one upgraded.
     Dim batches As Variant, i As Long, msg As String
@@ -534,7 +541,7 @@ End Function
 '------------------------------------------------------------------------------
 ' Linking the program to the server, and back
 '------------------------------------------------------------------------------
-Private Sub RelinkTable(ByVal db As DAO.Database, ByVal TableName As String, ByVal Connect As String, _
+Public Sub RelinkTable(ByVal db As DAO.Database, ByVal TableName As String, ByVal Connect As String, _
                         ByVal Source As String, ByVal SavePassword As Boolean)
     Dim tdf As DAO.TableDef
     On Error Resume Next
@@ -565,6 +572,7 @@ Public Function LinkToServer(ByVal Connect As String) As String
     If Len(msg) = 0 Then
         If ServerTablesMissing(Connect) > 0 Then msg = "ŞÇÚÏÉ ÇáÎÇÏã áíÓ İíåÇ ßá ÇáÌÏÇæá: ÔÛøá «ÊÌåíÒ ÇáŞÇÚÏÉ» ÃæáğÇ."
     End If
+    If Len(msg) = 0 Then msg = ServerQueriesProblem(Connect)       ' the views of the saved queries (docs/71)
     If Len(msg) = 0 Then
         live = Not IsNull(ServerLiveSince(Connect))
         If Not live Then
@@ -591,6 +599,7 @@ Public Function LinkToServer(ByVal Connect As String) As String
     Next
     db.TableDefs.Refresh
     LogAction "SQL_LINK", "SqlServer", SqlSetting("SqlDatabase"), SqlSetting("SqlServer")
+    LinkToServer = UseServerQueries(Connect)                    ' the saved queries on the server views
 End Function
 
 Public Function LinkToAccess(Optional ByVal BackEndPath As String = "", Optional ByVal ReleaseServer As Boolean = False) As String
@@ -608,6 +617,11 @@ Public Function LinkToAccess(Optional ByVal BackEndPath As String = "", Optional
             LinkToAccess = msg
             Exit Function
         End If
+    End If
+    msg = UseAccessQueries()                                    ' the saved queries in Access again
+    If Len(msg) > 0 Then
+        LinkToAccess = msg
+        Exit Function
     End If
     Set db = CurrentDb
     names = Split(SchemaTableList(), ",")
@@ -729,7 +743,7 @@ Public Sub SqlServerBrowseScript(ByVal frm As Access.Form)
 End Sub
 
 Public Sub SqlServerSchema(ByVal frm As Access.Form)
-    Dim msg As String, n As Long
+    Dim msg As String, n As Long, views As Long
     msg = ScreenProblem(frm)
     If Len(msg) > 0 Then
         ShowWarning msg
@@ -737,6 +751,10 @@ Public Sub SqlServerSchema(ByVal frm As Access.Form)
     End If
     If Not AskYesNo("ÊÌåíÒ ŞÇÚÏÉ ÇáÎÇÏã ãä ÇáÓßÑÈÊ¿" & vbCrLf & "ŞÇÚÏÉ ÌÏíÏÉ ÊõäÔÃ ÌÏÇæáåÇ¡ æŞÇÚÏÉ ãæÌæÏÉ ÊõÑŞøì æáÇ ÊõÍĞİ ÈíÇäÇÊåÇ.") Then Exit Sub
     msg = RunSchemaScript(ScreenConnect(frm), Nz(frm!txtScript.Value, ""), n)
+    If Len(msg) = 0 Then                                        ' then the views of the saved queries (docs/71)
+        msg = RunSchemaScript(ScreenConnect(frm), QueriesScriptPath(Nz(frm!txtScript.Value, "")), views)
+        n = n + views
+    End If
     If Len(msg) > 0 Then
         ShowWarning msg
     Else
@@ -869,6 +887,8 @@ Public Function TestSqlServer() As Boolean
     CheckSql InStr(RestoreDatabaseSql("RetailStore", "x.bak"), "SET SINGLE_USER WITH ROLLBACK IMMEDIATE") > 0 And _
              InStrRev(RestoreDatabaseSql("RetailStore", "x.bak"), "END CATCH;" & vbLf & "ALTER DATABASE [RetailStore] SET MULTI_USER;") > 0, _
              "ÃãÑ ÇáÇÓÊÚÇÏÉ íÚíÏ ÇáŞÇÚÏÉ áßá ÇáãÓÊÎÏãíä", passed, failed, Report
+    CheckSql QueriesScriptPath("D:\Shop\sql\RetailStore_Schema.sql") = "D:\Shop\sql\RetailStore_Queries.sql", _
+             "ÓßÑÈÊ ÇÓÊÚáÇãÇÊ ÇáÎÇÏã ÈÌÇäÈ ÓßÑÈÊ ÇáŞÇÚÏÉ", passed, failed, Report
     If IsLinkedToServer() Then                                  ' on the server: the real data is marked
         CheckSql Not IsNull(ServerLiveSince(LinkConnect())), "ÇáÎÇÏã ãÚáóøã ÈÃäå ÇáÈíÇäÇÊ ÇáİÚáíÉ", passed, failed, Report
         CheckSql Len(StaleAccessWarning()) = 0, "áÇ ÊÍĞíÑ ãáİ Access ÇáŞÏíã Úáì ÇáÎÇÏã", passed, failed, Report

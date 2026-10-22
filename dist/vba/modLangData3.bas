@@ -16,6 +16,11 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÃÑÕÏÉ ÈÏÇíÉ ÇáÊÔÛíá", "You do not have the permission for the start-up opening balances"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãäÏæÈíä æÚãæáÇÊåã", "You do not have the permission for sales reps and their commissions"
+    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÍĞİ ÇáÍÑßÇÊ ÇáÈäßíÉ", "You do not have the permission to delete bank transactions"
+    LangAdd "áÇ ÊæÌÏ ÃÑÕÏÉ ãæÑÏíä ÈÚãáÇÊ ÃÌäÈíÉ", "There are no supplier balances in foreign currencies"
+    LangAdd "áÇ ÊæÌÏ ÃíÇã ãäÏæÈíä İí åĞå ÇáİÊÑÉ", "No rep days in this period"
     LangAdd "áÇ ÊõÓÌóøá ÏİÚÇÊ Úáì ÇáÚãíá ÇáäŞÏí", "No payments are recorded on the cash customer"
     LangAdd "ãÈíÚÇÊå æãÓíÑ ÑÇÊÈå Úáì åĞÇ ÇáãÑßÒ", "His sales and payroll are on this center"
     LangAdd "äŞá ÇáÃÕá Åáì ãÑßÒ ÇáÊßáİÉ ÇáãÎÊÇÑ", "Transfer the asset to the chosen cost centre"
@@ -131,14 +136,14 @@ Private Sub D3_1()
     LangAdd "ÇÎÊÑ ÇáÎÒíäÉ ÇáÊí ÊÓÊáã ÇáãÈáÛ", "Choose the treasury that receives the amount"
     LangAdd "ÇÎÊÑ ÏİÚ ÇáİÇÊæÑÉ: äŞÏí Ãæ ÂÌá", "Choose the invoice payment: cash or credit"
     LangAdd "ÇáÈÑäÇãÌ (ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Program (e-invoice"
+End Sub
+
+Private Sub D3_2()
     LangAdd "ÇáÊÍæíá ÛíÑ ãæÌæÏ Ãæ Êã ÊÑÍíáå", "The transfer does not exist or is already posted"
     LangAdd "ÇáÍÓÇÈ ÇáãŞÇÈá (ÇáÍÑßÇÊ ÇáÃÎÑì", "Contra account (other moves"
     LangAdd "ÇáÎÒíäÉ æÇáÕäÇÏíŞ (ÇáÑÕíÏ ÇáÂä", "Treasury and boxes (balance now"
     LangAdd "ÇáÓäÏ æÇáİÇÊæÑÉ áØÑİíä ãÎÊáİíä", "The voucher and the invoice belong to different parties"
     LangAdd "ÇáÔÇÔÉ ÇáÊí íİÊÍåÇ ÒÑ ÇáãÈíÚÇÊ", "The screen opened by the Sales button"
-End Sub
-
-Private Sub D3_2()
     LangAdd "ÇáÚãíá ãÏíä ááãÍá (Úáíå)¡ ÓÇáÈ", "the customer owes the shop (debit), negative"
     LangAdd "ÇáßãíÉ íÌÈ Ãä Êßæä ÃßÈÑ ãä ÕİÑ", "The quantity must be greater than zero"
     LangAdd "ÇáãÈáÛ ÃßÈÑ ãä ÑÕíÏ Óáİ ÇáãæÙİ", "The amount is more than the advance balance of the employee"
@@ -254,14 +259,14 @@ Private Sub D3_2()
     LangAdd "ÍÑßÉ íÏæíÉ Úáì ÇáãäÊÌ ÇáãÍÏÏ", "A manual move on the selected product"
     LangAdd "ÎÕã ÇáÓáİÉ ÃßÈÑ ãä ÑÕíÏ Óáİå", "The advance deduction is more than his advance balance"
     LangAdd "ÎÕã Úáì ÇáİÇÊæÑÉ (ÈÏæä ÖÑíÈÉ", "Invoice discount (without VAT"
+End Sub
+
+Private Sub D3_3()
     LangAdd "ÎØ ÇáÓíÑ æÎØÉ Çáíæã æÇáÃÓÚÇÑ", "Route, day plan and prices"
     LangAdd "Ïáíá ÇáÍÓÇÈÇÊ (ÔÌÑÉ ÇáÍÓÇÈÇÊ", "Chart of accounts (account tree"
     LangAdd "ÑÏ ÛíÑ ãÊæŞÚ ãä ÇáãÕáÍÉ (ÑãÒ", "Unexpected reply from the Tax Authority (code"
     LangAdd "ÕÇİí ÇáÖÑíÈÉ ÇáãÓÊÍŞÉ ááÓÏÇÏ", "Net VAT due for payment"
     LangAdd "ÖÑíÈÉ ÇáãÎÑÌÇÊ Úáì ÈíÚ ÇáÃÕá", "Output VAT on the asset sale"
-End Sub
-
-Private Sub D3_3()
     LangAdd "ÖÑíÈÉ ÇáãÏÎáÇÊ ÃŞá ãä ÇáãÈáÛ", "Input VAT is less than the amount"
     LangAdd "Úáì ÍÓÇÈ ÂÎÑ (ãÓÊÍŞÇÊ Ãæ ŞÑÖ", "On another account (accruals or a loan"
     LangAdd "ÚãáÉ ÇáÈÑäÇãÌ áÇ ÊÍÊÇÌ ÓÚÑğÇ", "The program currency needs no rate"
@@ -377,14 +382,14 @@ Private Sub D3_3()
     LangAdd "åÇãÔ ÇáÑÈÍ ÇáÅÌãÇáí (ÇáÔåÑ", "Gross profit margin (month"
     LangAdd "åá ÊÑíÏ ãÓÍ ŞÇÆãÉ ÇáãáÕŞÇÊ", "Do you want to clear the label list"
     LangAdd "æÓíÕÈÍ ÇáãæÑÏ ãÏíäğÇ ááãÍá", "and the supplier will owe the store"
+End Sub
+
+Private Sub D3_4()
     LangAdd "íæÌÏ ÌÑÏ ãİÊæÍ áåĞÇ ÇáãÎÒä", "This warehouse has an open stock count"
     LangAdd "ÃÕá ÌÏíÏ: ŞÓØ ÇáÔåÑ ÇáÃæá", "New asset: depreciation of the first month"
     LangAdd "ÅÚÇÏÉ ÇáİÊÍ Åáì åĞÇ Çáíæã", "Reopen up to this day"
     LangAdd "ÅÚÇÏÉ ÊŞííã ÇáÃÕæá æäŞáåÇ", "Fixed asset revaluation and transfer"
     LangAdd "ÅáÛÇÁ ÈíÚ / ÇÓÊÈÚÇÏ ÇáÃÕá", "Cancel the sale / disposal of the asset"
-End Sub
-
-Private Sub D3_4()
     LangAdd "ÅáÛÇÁ ÊİÚíá ÇáÌåÇÒ ÇáãÍÏÏ", "Deactivate the selected computer"
     LangAdd "ÇßÊÈ ÇáŞíãÉ ÇáÌÏíÏÉ ááÃÕá", "Enter the new value of the asset"
     LangAdd "ÇßÊÈ ÇáãÈáÛ ÈÚãáÉ ÇáãÕÑæİ", "Type the amount in the currency of the expense"
@@ -500,14 +505,14 @@ Private Sub D3_4()
     LangAdd "ÃÑÕÏÉ ÇáÎÒíäÉ æÇáÕäÇÏíŞ", "Treasury and cash box balances"
     LangAdd "ÃÕáÍ åĞÇ ÃæáğÇ¡ Ëã ÃŞİá", "Fix this first, then close"
     LangAdd "ÃßÈÑ ãä ÇáÍÏ ÇáãÓãæÍ áß", "more than the limit allowed to you"
+End Sub
+
+Private Sub D3_5()
     LangAdd "ÅÌãÇáí ÇáÅíÑÇÏÇÊ ÇáÃÎÑì", "Total other revenue"
     LangAdd "ÅÌãÇáí ÇáãÕÑæİÇÊ ÇáÃÎÑì", "Total other expenses"
     LangAdd "ÅÖÇİÉ İÊÑÉ ÈÚÏ ÂÎÑ İÊÑÉ", "Add a period after the last one"
     LangAdd "ÅÚÏÇÏÇÊ ãáÕŞÇÊ ÇáÈÇÑßæÏ", "Barcode label settings"
     LangAdd "ÅŞİÇá İÊÑÉ (ÔåÑ Ãæ ÃßËÑ", "Close a period (a month or more"
-End Sub
-
-Private Sub D3_5()
     LangAdd "ÇÎÊÑ ÇáÊÍæíá ãä ÇáŞÇÆãÉ", "Choose the transfer from the list"
     LangAdd "ÇÎÊÑ ÇáÒíÇÑÉ ãä ÇáŞÇÆãÉ", "Choose the visit from the list"
     LangAdd "ÇÎÊÑ ÇáãæÙİ ÕÇÍÈ ÇáÓáİÉ", "Choose the employee who takes the advance"
@@ -566,11 +571,4 @@ Private Sub D3_5()
     LangAdd "İí ÔÇÔÉ ÇáİÊÑÇÊ ÇáãÇáíÉ", "in the fiscal periods screen"
     LangAdd "İí İÊÑÉ ãŞİáÉ¡ áã íõäÔÃ", "in a closed period, not created"
     LangAdd "ŞÈÖ äŞÏíÉ (ÅíÑÇÏÇÊ ÃÎÑì", "Cash receipt (other revenue"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÊŞÇÑíÑ", "You do not have the permission for reports"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáãæÇÒäÉ", "You do not have the permission for the budget"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ İÊÍ ÔÇÔÉ", "You do not have the permission to open the screen"
-    LangAdd "áÇ ÊæÌÏ ÊÍæíáÇÊ ÈÇáØÑíŞ", "No transfers in transit"
-    LangAdd "áÇ íõÍÕóøá ŞÈá ÇÓÊÍŞÇŞå", "is not collected before its due date"
-    LangAdd "ãÓíÑ ÇáÑæÇÊÈ æÇáÊÃãíäÇÊ", "Payroll and social insurance"
-    LangAdd "ãä ÇáÚíäÇÊ İÍÕ ÇáÇãÊËÇá", "of the samples in the compliance checks"
 End Sub

@@ -2410,8 +2410,8 @@ SELECT b.BudgetLineID, b.AccountCode, a.AccountName, a.TreeKey, a.AccountType,
        {nz("p.SumPlan")} AS BudgetAmount, {nz("x.SumActual")} AS ActualAmount,
        {nz("x.SumActual")} - {nz("p.SumPlan")} AS Variance,
        IIf({nz("p.SumPlan")} = 0, Null, ({nz("x.SumActual")} - {nz("p.SumPlan")}) / {nz("p.SumPlan")}) AS VariancePct,
-       IIf({nz("x.SumActual")} = {nz("p.SumPlan")}, 'مطابق', IIf((a.AccountType = 'REVENUE') = ({nz("x.SumActual")} > {nz("p.SumPlan")}),
-           'ملائم', 'غير ملائم')) AS VarianceNote
+       IIf({nz("x.SumActual")} = {nz("p.SumPlan")}, 'مطابق', IIf(IIf(a.AccountType = 'REVENUE', 1, 0) =
+           IIf({nz("x.SumActual")} > {nz("p.SumPlan")}, 1, 0), 'ملائم', 'غير ملائم')) AS VarianceNote
 FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)
        INNER JOIN [@Accounts] AS a ON b.AccountCode = a.AccountCode)
       LEFT JOIN [@CostCenters] AS c ON b.CostCenterID = c.CostCenterID)

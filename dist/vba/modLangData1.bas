@@ -31,6 +31,7 @@ Private Sub D1_1()
     LangAdd "áÇ íæÌÏ ãæÙİæä İí ãÓíÑ ÇáÑæÇÊÈ: ÍÏøÏ «İí ãÓíÑ ÇáÑæÇÊÈ» æÇáÑÇÊÈ ÇáÃÓÇÓí İí ÔÇÔÉ ÇáãÓÊÎÏãíä", "No employees on payroll: set On payroll and the basic salary in the Users screen"
     LangAdd "ÊÍãíá ÇáÓíÇÑÉ¡ æÇáÈíÚ æÇáãÑÊÌÚ æÇáÊÍÕíá ÈÇÓã ÇáãäÏæÈ¡ Ëã ÌÑÏ ÇáÓíÇÑÉ æÊÕİíÉ ÕäÏæŞ ÇáÚåÏÉ", "Load the van, sell, take returns and collect in the rep name, then count the van and close the custody box"
     LangAdd "ãÓæÏÉ ÈÇáÃÕäÇİ¡ Ëã «ÊÑÍíá»: ÊõÎÕã ãä ÇáãÑÓöá æÊõÖÇİ ááãÓÊáã¡ Ãæ ÊÈŞì ÈÇáØÑíŞ ÍÊì íÓÊáãåÇ", "A draft with the products, then Post: they leave the sender and enter the receiver, or stay in transit until received"
+    LangAdd "ÇÓÊÚáÇãÇÊ ŞÇÚÏÉ ÇáÎÇÏã ãä äÓÎÉ ÃÎÑì ãä ÇáÈÑäÇãÌ: ÔÛøá «ÊÌåíÒ ÇáŞÇÚÏÉ» ÈÓßÑÈÊ åĞå ÇáäÓÎÉ", "The queries of the server database are from another version of the program: run Set up the database with the script of this version"
     LangAdd "ÇáãÓÊÎÏã íÊÈÚ ÕáÇÍíÇÊ ÏæÑå ßãÇ İí ÇáŞÇÆãÉ. İÚøá «ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ» áÊÍÏíÏ ÔÇÔÇÊå æÍÏå", "The user follows the permissions of his role as in the list. Turn on Custom screen permissions to set his own screens"
     LangAdd "æááÈÏÁ ãä ãáİ Access ãä ÌÏíÏ: «ÇáÑÌæÚ Åáì Access» ãÚ ÌÚá ãáİ Access åæ ÇáÈíÇäÇÊ ÇáİÚáíÉ", "To start again from the Access file: Back to Access, making the Access file the real data"
     LangAdd "ÊõÍĞİ ßá ÇáÈíÇäÇÊ ÇáãæÌæÏÉ İí ŞÇÚÏÉ ÇáÎÇÏã ÃæáğÇ. áÇ íÚãá ÃÍÏ Úáì ÇáÈÑäÇãÌ ÃËäÇÁ ÇáäŞá", "All the data in the server database is deleted first. Nobody works on the program during the transfer"
@@ -92,6 +93,7 @@ Private Sub D1_1()
     LangAdd "íäÇíÑ,İÈÑÇíÑ,ãÇÑÓ,ÃÈÑíá,ãÇíæ,íæäíæ,íæáíæ,ÃÛÓØÓ,ÓÈÊãÈÑ,ÃßÊæÈÑ,äæİãÈÑ,ÏíÓãÈÑ", "January,February,March,April,May,June,July,August,September,October,November,December"
     LangAdd "ÇÓã ÅäÌáíÒí áßá Úãíá æãæÑÏ æãäÊÌ æÕäÏæŞ æÍÓÇÈ: íÙåÑ İí ÇáæÇÌåÉ ÇáÅäÌáíÒíÉ", "An English name for each customer, supplier, product, box and account: shown in the English interface"
     LangAdd "ÓíõÚÇÏ ÅÙåÇÑ ÃÏæÇÊ Access æíõÓãÍ ÈãİÊÇÍ Shift ÚäÏ ÇáİÊÍ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "The Access tools will be shown again and the Shift key allowed on opening. Do you want to continue"
+    LangAdd "ŞÇÚÏÉ ÇáÎÇÏã áíÓ İíåÇ ÇÓÊÚáÇãÇÊ ÇáÈÑäÇãÌ: ÔÛøá «ÊÌåíÒ ÇáŞÇÚÏÉ» ÃæáğÇ (ãáİ", "The server database lacks the queries of the program: run Set up the database first (file"
     LangAdd "íÒæÑ ÇáãäÏæÈ ÇáÚãíá İí åĞÇ Çáíæã ãä ßá ÃÓÈæÚº áÚÏÉ ÃíÇã ÃÖİ ÓØÑğÇ áßá íæã", "The rep visits the customer on this day of every week. For several days add a line for each day"
     LangAdd "ÇáÅŞÑÇÑ ãÚÊãÏ: áÇ ÊÊÛíÑ Şíãå. ÃáÛö ÇáÇÚÊãÇÏ ÃæáğÇ Åä ßÇä ÇáÊÛííÑ ãŞÕæÏğÇ", "The return is approved: its values do not change. Cancel the approval first if the change is intended"
     LangAdd "äÚã: íõÓãÍ ÈäŞá ÇáÈíÇäÇÊ Åáì ÇáÎÇÏã ãä ÌÏíÏ¡ æßá ÇáÃÌåÒÉ íÌÈ Ãä ÊÑÌÚ Åáì", "Yes: a new transfer to the server is allowed, and every PC must go back to"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "ÇáÌåÇÒ ÛíÑ ãÓÌøá. ÇßÊÈ ÑãÒ ÇáÊÍŞŞ (OTP) ãä ÈæÇÈÉ İÇÊæÑÉ Ëã ÇáÎØæÉ", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
     LangAdd "ÊÍæíáÇÊ Èíä ÇáÕäÇÏíŞ ÊäÊÙÑ ÊÃßíÏ ÇáÇÓÊáÇã ãä Ããíä ÇáÕäÏæŞ ÇáãÓÊáã", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
     LangAdd "Êã ÍİÙ äÓÈ ÇáÊÃãíäÇÊ. ÊõØÈóøŞ Úáì ÇáãÓæÏÇÊ ÚäÏ ÊÚÏíáåÇ Ãæ ÊÑÍíáåÇ", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
-    LangAdd "ÓõÌøá ÇáÌåÇÒ İí ÈíÆÉ ÃÎÑì. ÓÌøáå İí ÇáÈíÆÉ ÇáÍÇáíÉ ãä ÅÚÏÇÏ ÇáÑÈØ", "The device was registered in another environment. Register it in the current one from the connection setup"
-    LangAdd "ÕÏÑÊ ãä ÇáØáÈíÉ ÃĞæäÇÊ ÊÓáíã. ÇÍĞİ ÇáãÓæÏÇÊ ãäåÇ¡ Ãæ ÃáÛö ÇáØáÈíÉ", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "ÓõÌøá ÇáÌåÇÒ İí ÈíÆÉ ÃÎÑì. ÓÌøáå İí ÇáÈíÆÉ ÇáÍÇáíÉ ãä ÅÚÏÇÏ ÇáÑÈØ", "The device was registered in another environment. Register it in the current one from the connection setup"
+    LangAdd "ÕÏÑÊ ãä ÇáØáÈíÉ ÃĞæäÇÊ ÊÓáíã. ÇÍĞİ ÇáãÓæÏÇÊ ãäåÇ¡ Ãæ ÃáÛö ÇáØáÈíÉ", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
     LangAdd "íõäÔÃ ÇáãÕÑæİ İí íæã ÇáÇÓÊÍŞÇŞ ãä ßá İÊÑÉ¡ ÈÏÁğÇ ãä ÊÇÑíÎ ÇáÈÏÇíÉ", "The expense is created on the due day of each period, starting from the start date"
     LangAdd "ÇáÇÓÊíÑÇÏÇÊ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÃÓÇÓíÉ æÇáãÏİæÚÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imports subject to the standard rate with VAT paid at customs"
     LangAdd "Úáì ÇáÃÕá ÅÚÇÏÉ ÊŞííã Ãæ äŞá: áÇ ÊÊÛíÑ ÈíÇäÇÊå ÇáãÇáíÉ æáÇ íõÍĞİ", "The asset has a revaluation or a transfer: its financial data cannot change and it cannot be deleted"
@@ -255,11 +257,11 @@ Private Sub D1_2()
     LangAdd "ØáÈíÉ åĞÇ ÇáÅĞä áíÓÊ ãİÊæÍÉ ááÊÓáíã (ãõÓáóøãÉ Ãæ ãáÛÇÉ", "The order of this note is not open for delivery (delivered or cancelled"
     LangAdd "ááØáÈíÉ ÅĞä ÊÓáíã áã íõÑÍóøá. ÇİÊÍå ãä «ÃĞæäÇÊ ÇáØáÈíÉ", "The order has a delivery note not posted yet. Open it from Order notes"
     LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÍÌÒ æáÇ íõÓáóøã ÈÅĞä", "This product does not track stock, so it is not reserved or delivered with a note"
-    LangAdd "íÚãá ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáãİÚøáÉ İŞØ ÈßæÏ ãä ÇáãÈÑãÌ", "The program runs only on computers activated with a code from the developer"
-    LangAdd "ÇÎÊÑ ÓØÑ ŞíÏ ãä ÇáŞÇÆãÉ (ÓØÑ ÑÕíÏ Ãæá ÇáãÏÉ áíÓ ŞíÏğÇ", "Choose an entry line from the list (the opening balance line is not an entry"
 End Sub
 
 Private Sub D1_3()
+    LangAdd "íÚãá ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáãİÚøáÉ İŞØ ÈßæÏ ãä ÇáãÈÑãÌ", "The program runs only on computers activated with a code from the developer"
+    LangAdd "ÇÎÊÑ ÓØÑ ŞíÏ ãä ÇáŞÇÆãÉ (ÓØÑ ÑÕíÏ Ãæá ÇáãÏÉ áíÓ ŞíÏğÇ", "Choose an entry line from the list (the opening balance line is not an entry"
     LangAdd "ÇáÍÓÇÈ ãŞİá ãÄŞÊğÇ ÈÓÈÈ ãÍÇæáÇÊ ÏÎæá ÎÇØÆÉ ÍÊì ÇáÓÇÚÉ", "The account is locked for a while after wrong login attempts, until"
     LangAdd "ÇáãÎÒä ÇáÑÆíÓí æÇáİÑæÚ æÓíÇÑÇÊ ÇáãäÏæÈíä æÊÍÊ ÇáÊÔÛíá", "The main warehouse, branches, sales rep vans and work in progress"
     LangAdd "ÇãÓÍ ÇáÈÇÑßæÏ Ãæ ÇÎÊÑ ÇáÕäİ ÈÇáÇÓã¡ æÍÏÏ ÚÏÏ ÇáãáÕŞÇÊ", "Scan the barcode or choose the item by name, and set the number of labels"
@@ -272,7 +274,4 @@ Private Sub D1_3()
     LangAdd "Êã ÍİÙ ÕáÇÍíÇÊ ÇáÏæÑ. ÊÓÑí ÚäÏ ÇáİÊÍ ÇáÊÇáí áßá ÔÇÔÉ", "The permissions of the role were saved. They apply the next time each screen opens"
     LangAdd "ÊæÌÏ ÊÓæíÉ ÌÇÑíÉ áåĞÇ ÇáÈäß: ÇÚÊãÏåÇ Ãæ ÇÍĞİåÇ ÃæáğÇ", "There is an open reconciliation for this bank: approve it or delete it first"
     LangAdd "ÌÑÏ ÇáÓíÇÑÉ ãİÊæÍ. ÃÏÎá ÇáßãíÇÊ ÇáİÚáíÉ æÑÍøáå ÃæáğÇ", "The van count is open. Enter the counted quantities and post it first"
-    LangAdd "ÑÈØ ßá ÇáãÈÇáÛ ÛíÑ ÇáãÑÈæØÉ ÈÃŞÏã ÇáİæÇÊíÑ ÇÓÊÍŞÇŞğÇ", "Link all unlinked amounts to the oldest due invoices"
-    LangAdd "ÑÕíÏ ÇáãæÑÏíä íõÏÎá İí ŞÓã «ÇáãæÑÏæä»: ÑÕíÏ áßá ãæÑÏ", "The suppliers balance is entered in the Suppliers part: one balance per supplier"
-    LangAdd "Õİöø ÕäÏæŞ ÇáÚåÏÉ ŞÈá ÅÛáÇŞ Çáíæã (ÒÑ «ÊÕİíÉ ÇáÕäÏæŞ", "Close the custody box before closing the day (button Close the box"
 End Sub

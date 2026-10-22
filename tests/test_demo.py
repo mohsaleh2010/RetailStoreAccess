@@ -176,7 +176,7 @@ def signatures():
         for kind, name, params in SIG.findall(text):
             ps = [p.strip() for p in params.split(",") if p.strip()]
             req = sum(1 for p in ps if not p.startswith("Optional") and not p.startswith("ParamArray"))
-            sig = (req, len(ps))
+            sig = (req, 999 if any(p.startswith("ParamArray") for p in ps) else len(ps))
             line = re.search(rf"^(Public |Private )?(?:Sub|Function) {name}\(", text, re.M)
             if line and line.group(1) == "Private ":
                 private.setdefault(module, {})[name.lower()] = sig

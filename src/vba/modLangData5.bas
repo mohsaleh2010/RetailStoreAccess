@@ -21,6 +21,21 @@ Public Sub LangData5()
 End Sub
 
 Private Sub D5_1()
+    LangAdd "الرصيد المستحق", "Balance due"
+    LangAdd "الرصيد بالعملة", "Balance in currency"
+    LangAdd "الرقم التسلسلي", "Serial number"
+    LangAdd "الشيك مستحق في", "The cheque is due on"
+    LangAdd "الفئة الضريبية", "VAT category"
+    LangAdd "الفترة الحالية", "Current period"
+    LangAdd "الفترة: الحساب", "Period: account"
+    LangAdd "الفرق مع الكشف", "Difference with the statement"
+    LangAdd "القسط المتناقص", "Declining balance"
+    LangAdd "القيمة الجديدة", "New value"
+    LangAdd "القيمة والحالة", "Value and status"
+    LangAdd "القيود اليدوية", "Manual entries"
+    LangAdd "الكمية الحالية", "Current quantity"
+    LangAdd "الكمية الفعلية", "Actual quantity"
+    LangAdd "الكمية المباعة", "Quantity sold"
     LangAdd "الكمية المسجلة", "Recorded quantity"
     LangAdd "المبلغ المدفوع", "Amount paid"
     LangAdd "المبلغ المربوط", "Linked amount"
@@ -126,6 +141,9 @@ Private Sub D5_1()
     LangAdd "إجمالي الأصول", "Total assets"
     LangAdd "إجمالي الخارج", "Total out"
     LangAdd "إجمالي الخصوم", "Total liabilities"
+End Sub
+
+Private Sub D5_2()
     LangAdd "إجمالي الدائن", "Total credit"
     LangAdd "إجمالي الداخل", "Total in"
     LangAdd "إجمالي المدين", "Total debit"
@@ -141,9 +159,6 @@ Private Sub D5_1()
     LangAdd "اختر المستخدم", "Choose the user"
     LangAdd "استلام من جهة", "Receipt from a party"
     LangAdd "اقتراح للفارغ", "Suggest for empty"
-End Sub
-
-Private Sub D5_2()
     LangAdd "الباقي للعميل", "Change for the customer"
     LangAdd "البحث المتقدم", "Advanced search"
     LangAdd "البنك غير نشط", "The bank is not active"
@@ -249,6 +264,9 @@ Private Sub D5_2()
     LangAdd "معامل التحويل", "Exchange rate"
     LangAdd "مقفلة حتى يوم", "Closed up to the day"
     LangAdd "ملء من الفعلي", "Fill from actuals"
+End Sub
+
+Private Sub D5_3()
     LangAdd "نتيجة الزيارة", "Visit result"
     LangAdd "نسخة احتياطية", "Backup"
     LangAdd "نقدية بالطريق", "Cash in transit"
@@ -264,9 +282,6 @@ Private Sub D5_2()
     LangAdd "أساس العمولة", "Commission base"
     LangAdd "أسطر التحويل", "Transfer lines"
     LangAdd "أسطر المرتجع", "Return lines"
-End Sub
-
-Private Sub D5_3()
     LangAdd "أعمار الديون", "Aging"
     LangAdd "أكبر من الحد", "more than the limit"
     LangAdd "أمين الصندوق", "Cashier"
@@ -372,6 +387,9 @@ Private Sub D5_3()
     LangAdd "قيمة المخزون", "Stock value"
     LangAdd "قيمة المرتجع", "Return value"
     LangAdd "قيمة المنصرف", "Value out"
+End Sub
+
+Private Sub D5_4()
     LangAdd "قيود اليومية", "Journal entries"
     LangAdd "لا توجد قيود", "There are no entries"
     LangAdd "لا يكفي لصرف", "is not enough to pay"
@@ -387,9 +405,6 @@ Private Sub D5_3()
     LangAdd "مدينة العميل", "Customer city"
     LangAdd "مربوط ومرتجع", "Linked and returned"
     LangAdd "مرتجع سابقًا", "Returned before"
-End Sub
-
-Private Sub D5_4()
     LangAdd "مرتجع مبيعات", "Sales return"
     LangAdd "مركز التكلفة", "Cost center"
     LangAdd "مسودة عمولات", "Commission draft"
@@ -495,6 +510,9 @@ Private Sub D5_4()
     LangAdd "سعر المندوب", "Rep price"
     LangAdd "سوِّه أولًا", "Settle it first"
     LangAdd "سيارة مندوب", "Sales rep van"
+End Sub
+
+Private Sub D5_5()
     LangAdd "شارع العميل", "Customer street"
     LangAdd "شهرًا مسجلة", "months recorded"
     LangAdd "صافي المباع", "Net sold"
@@ -510,9 +528,6 @@ Private Sub D5_4()
     LangAdd "طلبية جديدة", "New order"
     LangAdd "عرض التقرير", "Show the report"
     LangAdd "فاتورة شراء", "Purchase invoice"
-End Sub
-
-Private Sub D5_5()
     LangAdd "فرق النقدية", "Cash difference"
     LangAdd "قائمة الدخل", "Income statement"
     LangAdd "قبل التفعيل", "Before enabling"
@@ -618,6 +633,9 @@ Private Sub D5_5()
     LangAdd "رقم الجوال", "Mobile number"
     LangAdd "رقم الحساب", "Account number"
     LangAdd "رقم المبنى", "Building number"
+End Sub
+
+Private Sub D5_6()
     LangAdd "رمز التحقق", "Verification code"
     LangAdd "رمز العملة", "Currency code"
     LangAdd "رمز المركز", "Center code"
@@ -633,9 +651,6 @@ Private Sub D5_5()
     LangAdd "على الحساب", "On account"
     LangAdd "على العميل", "The customer"
     LangAdd "عهدة مندوب", "Sales rep custody"
-End Sub
-
-Private Sub D5_6()
     LangAdd "غير متوازن", "Not balanced"
     LangAdd "فئة إضافات", "Extras category"
     LangAdd "فاتورة بيع", "Sales invoice"
@@ -741,6 +756,9 @@ Private Sub D5_6()
     LangAdd "رقم اليوم", "Day number"
     LangAdd "ساخن جدًا", "Extra hot"
     LangAdd "سحب نقدية", "Cash withdrawal"
+End Sub
+
+Private Sub D5_7()
     LangAdd "سعر البيع", "Sale price"
     LangAdd "سلفة موظف", "Employee advance"
     LangAdd "سنة جديدة", "New year"
@@ -756,9 +774,6 @@ Private Sub D5_6()
     LangAdd "عمولة مدى", "Mada fee"
     LangAdd "غير مربوط", "Unlinked"
     LangAdd "غير مستحق", "Not due"
-End Sub
-
-Private Sub D5_7()
     LangAdd "غير مقفلة", "Not closed"
     LangAdd "غير ملائم", "Unsuitable"
     LangAdd "فتح القيد", "Open the entry"
@@ -864,6 +879,9 @@ Private Sub D5_7()
     LangAdd "غير مسدد", "Unpaid"
     LangAdd "غير موزع", "Not allocated"
     LangAdd "فعلي سنة", "Actuals of year"
+End Sub
+
+Private Sub D5_8()
     LangAdd "فك القفل", "Unlock"
     LangAdd "قيد جديد", "New entry"
     LangAdd "قيد عكسي", "Reversing entry"
@@ -879,9 +897,6 @@ Private Sub D5_7()
     LangAdd "من البنك", "From the bank"
     LangAdd "من تاريخ", "From date"
     LangAdd "من صندوق", "From a box"
-End Sub
-
-Private Sub D5_8()
     LangAdd "مُسلَّمة", "Delivered"
     LangAdd "نوع جديد", "New type"
     LangAdd "والمتوفر", "and available"
@@ -973,6 +988,7 @@ Private Sub D5_8()
     LangAdd "النتيجة", "Result of visit"
     LangAdd "النقدية", "Cash"
     LangAdd "الوحدات", "Units"
+    LangAdd "بالخادم", "to the server"
     LangAdd "بالطريق", "In transit"
     LangAdd "بدون حد", "No limit"
     LangAdd "برتقالي", "Orange"
@@ -986,6 +1002,9 @@ Private Sub D5_8()
     LangAdd "سند صرف", "Payment voucher"
     LangAdd "سند قبض", "Receipt voucher"
     LangAdd "صرف آخر", "Other payment"
+End Sub
+
+Private Sub D5_9()
     LangAdd "صرف شيك", "Cheque payment"
     LangAdd "طُبع في", "Printed on"
     LangAdd "غير نشط", "is not active"
@@ -1002,9 +1021,6 @@ Private Sub D5_8()
     LangAdd "مليونان", "two million"
     LangAdd "من مخزن", "From warehouse"
     LangAdd "من مركز", "From centre"
-End Sub
-
-Private Sub D5_9()
     LangAdd "مُبلَّغ", "Reported"
     LangAdd "مُرحَّل", "Posted"
     LangAdd "مُستلَم", "Received"
@@ -1109,33 +1125,8 @@ Private Sub D5_9()
     LangAdd "مفوترة", "Invoiced"
     LangAdd "مكافآت", "Bonuses"
     LangAdd "ملايين", "million"
-    LangAdd "ممنوحة", "Granted"
-    LangAdd "من بنك", "From a bank"
-    LangAdd "موازنة", "Budget"
-    LangAdd "موردًا", "suppliers"
-    LangAdd "مُرحّل", "Posted"
-    LangAdd "نوفمبر", "November"
-    LangAdd "أبريل", "April"
-    LangAdd "أربعة", "four"
-    LangAdd "أعدّه", "Prepared by"
-    LangAdd "أغسطس", "August"
-    LangAdd "ألفان", "two thousand"
-    LangAdd "أولها", "the first on"
-    LangAdd "أُرسل", "Sent"
-    LangAdd "أُضيف", "Added"
-    LangAdd "إضافة", "Add"
-    LangAdd "إغلاق", "Close"
 End Sub
 
 Private Sub D5_10()
-    LangAdd "إلغاء", "Cancel"
-    LangAdd "إيداع", "Deposit"
-    LangAdd "اثنان", "two"
-    LangAdd "الأحد", "Sunday"
-    LangAdd "الأصل", "Asset"
-    LangAdd "الاسم", "Name"
-    LangAdd "البحث", "Search"
-    LangAdd "البند", "Item"
-    LangAdd "البنك", "Bank"
-    LangAdd "البيع", "Sale"
+    LangAdd "ممنوحة", "Granted"
 End Sub

@@ -53,6 +53,9 @@ Public Function BuildQueries() As Boolean
     CreateAllQueries
 
     m_db.QueryDefs.Refresh
+    On Error Resume Next                         ' a front-end on SQL Server: the queries back on the server views
+    Application.Run "ServerQueriesAfterBuild"    ' (modServerQueries, docs/71); not installed yet = nothing to do
+    On Error GoTo 0
     Application.RefreshDatabaseWindow
     Debug.Print "--- ÃœÌœ…: " & m_created & " | „Õœ¯À…: " & m_updated & " | ›‘· : " & m_failed
 
@@ -4123,8 +4126,8 @@ Private Sub Q_BudgetVsActualQuery()
     s = s & "       CCur(Nz(p.SumPlan, 0)) AS BudgetAmount, CCur(Nz(x.SumActual, 0)) AS ActualAmount," & vbCrLf
     s = s & "       CCur(Nz(x.SumActual, 0)) - CCur(Nz(p.SumPlan, 0)) AS Variance," & vbCrLf
     s = s & "       IIf(CCur(Nz(p.SumPlan, 0)) = 0, Null, (CCur(Nz(x.SumActual, 0)) - CCur(Nz(p.SumPlan, 0))) / CCur(Nz(p.SumPlan, 0))) AS VariancePct," & vbCrLf
-    s = s & "       IIf(CCur(Nz(x.SumActual, 0)) = CCur(Nz(p.SumPlan, 0)), '„ÿ«»ﬁ', IIf((a.AccountType = 'REVENUE') = (CCur(Nz(x.SumActual, 0)) > CCur(Nz(p.SumPlan, 0)))," & vbCrLf
-    s = s & "           '„·«∆„', '€Ì— „·«∆„')) AS VarianceNote" & vbCrLf
+    s = s & "       IIf(CCur(Nz(x.SumActual, 0)) = CCur(Nz(p.SumPlan, 0)), '„ÿ«»ﬁ', IIf(IIf(a.AccountType = 'REVENUE', 1, 0) =" & vbCrLf
+    s = s & "           IIf(CCur(Nz(x.SumActual, 0)) > CCur(Nz(p.SumPlan, 0)), 1, 0), '„·«∆„', '€Ì— „·«∆„')) AS VarianceNote" & vbCrLf
     s = s & "FROM ((((Budgets AS h INNER JOIN BudgetLines AS b ON h.BudgetID = b.BudgetID)" & vbCrLf
     s = s & "       INNER JOIN [@Accounts] AS a ON b.AccountCode = a.AccountCode)" & vbCrLf
     s = s & "      LEFT JOIN [@CostCenters] AS c ON b.CostCenterID = c.CostCenterID)" & vbCrLf

@@ -31,6 +31,7 @@ Private Sub D1_1()
     LangAdd "لا يوجد موظفون في مسير الرواتب: حدّد «في مسير الرواتب» والراتب الأساسي في شاشة المستخدمين", "No employees on payroll: set On payroll and the basic salary in the Users screen"
     LangAdd "تحميل السيارة، والبيع والمرتجع والتحصيل باسم المندوب، ثم جرد السيارة وتصفية صندوق العهدة", "Load the van, sell, take returns and collect in the rep name, then count the van and close the custody box"
     LangAdd "مسودة بالأصناف، ثم «ترحيل»: تُخصم من المرسِل وتُضاف للمستلم، أو تبقى بالطريق حتى يستلمها", "A draft with the products, then Post: they leave the sender and enter the receiver, or stay in transit until received"
+    LangAdd "استعلامات قاعدة الخادم من نسخة أخرى من البرنامج: شغّل «تجهيز القاعدة» بسكربت هذه النسخة", "The queries of the server database are from another version of the program: run Set up the database with the script of this version"
     LangAdd "المستخدم يتبع صلاحيات دوره كما في القائمة. فعّل «صلاحيات شاشات خاصة» لتحديد شاشاته وحده", "The user follows the permissions of his role as in the list. Turn on Custom screen permissions to set his own screens"
     LangAdd "وللبدء من ملف Access من جديد: «الرجوع إلى Access» مع جعل ملف Access هو البيانات الفعلية", "To start again from the Access file: Back to Access, making the Access file the real data"
     LangAdd "تُحذف كل البيانات الموجودة في قاعدة الخادم أولًا. لا يعمل أحد على البرنامج أثناء النقل", "All the data in the server database is deleted first. Nobody works on the program during the transfer"
@@ -92,6 +93,7 @@ Private Sub D1_1()
     LangAdd "يناير,فبراير,مارس,أبريل,مايو,يونيو,يوليو,أغسطس,سبتمبر,أكتوبر,نوفمبر,ديسمبر", "January,February,March,April,May,June,July,August,September,October,November,December"
     LangAdd "اسم إنجليزي لكل عميل ومورد ومنتج وصندوق وحساب: يظهر في الواجهة الإنجليزية", "An English name for each customer, supplier, product, box and account: shown in the English interface"
     LangAdd "سيُعاد إظهار أدوات Access ويُسمح بمفتاح Shift عند الفتح. هل تريد المتابعة", "The Access tools will be shown again and the Shift key allowed on opening. Do you want to continue"
+    LangAdd "قاعدة الخادم ليس فيها استعلامات البرنامج: شغّل «تجهيز القاعدة» أولًا (ملف", "The server database lacks the queries of the program: run Set up the database first (file"
     LangAdd "يزور المندوب العميل في هذا اليوم من كل أسبوع؛ لعدة أيام أضف سطرًا لكل يوم", "The rep visits the customer on this day of every week. For several days add a line for each day"
     LangAdd "الإقرار معتمد: لا تتغير قيمه. ألغِ الاعتماد أولًا إن كان التغيير مقصودًا", "The return is approved: its values do not change. Cancel the approval first if the change is intended"
     LangAdd "نعم: يُسمح بنقل البيانات إلى الخادم من جديد، وكل الأجهزة يجب أن ترجع إلى", "Yes: a new transfer to the server is allowed, and every PC must go back to"
@@ -132,11 +134,11 @@ Private Sub D1_1()
     LangAdd "الجهاز غير مسجّل. اكتب رمز التحقق (OTP) من بوابة فاتورة ثم الخطوة", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
     LangAdd "تحويلات بين الصناديق تنتظر تأكيد الاستلام من أمين الصندوق المستلم", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
     LangAdd "تم حفظ نسب التأمينات. تُطبَّق على المسودات عند تعديلها أو ترحيلها", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
-    LangAdd "سُجّل الجهاز في بيئة أخرى. سجّله في البيئة الحالية من إعداد الربط", "The device was registered in another environment. Register it in the current one from the connection setup"
-    LangAdd "صدرت من الطلبية أذونات تسليم. احذف المسودات منها، أو ألغِ الطلبية", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "سُجّل الجهاز في بيئة أخرى. سجّله في البيئة الحالية من إعداد الربط", "The device was registered in another environment. Register it in the current one from the connection setup"
+    LangAdd "صدرت من الطلبية أذونات تسليم. احذف المسودات منها، أو ألغِ الطلبية", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
     LangAdd "يُنشأ المصروف في يوم الاستحقاق من كل فترة، بدءًا من تاريخ البداية", "The expense is created on the due day of each period, starting from the start date"
     LangAdd "الاستيرادات الخاضعة للنسبة الأساسية والمدفوعة ضريبتها في الجمارك", "Imports subject to the standard rate with VAT paid at customs"
     LangAdd "على الأصل إعادة تقييم أو نقل: لا تتغير بياناته المالية ولا يُحذف", "The asset has a revaluation or a transfer: its financial data cannot change and it cannot be deleted"
@@ -255,11 +257,11 @@ Private Sub D1_2()
     LangAdd "طلبية هذا الإذن ليست مفتوحة للتسليم (مُسلَّمة أو ملغاة", "The order of this note is not open for delivery (delivered or cancelled"
     LangAdd "للطلبية إذن تسليم لم يُرحَّل. افتحه من «أذونات الطلبية", "The order has a delivery note not posted yet. Open it from Order notes"
     LangAdd "هذا الصنف لا يتابع المخزون، فلا يُحجز ولا يُسلَّم بإذن", "This product does not track stock, so it is not reserved or delivered with a note"
-    LangAdd "يعمل البرنامج على الأجهزة المفعّلة فقط بكود من المبرمج", "The program runs only on computers activated with a code from the developer"
-    LangAdd "اختر سطر قيد من القائمة (سطر رصيد أول المدة ليس قيدًا", "Choose an entry line from the list (the opening balance line is not an entry"
 End Sub
 
 Private Sub D1_3()
+    LangAdd "يعمل البرنامج على الأجهزة المفعّلة فقط بكود من المبرمج", "The program runs only on computers activated with a code from the developer"
+    LangAdd "اختر سطر قيد من القائمة (سطر رصيد أول المدة ليس قيدًا", "Choose an entry line from the list (the opening balance line is not an entry"
     LangAdd "الحساب مقفل مؤقتًا بسبب محاولات دخول خاطئة حتى الساعة", "The account is locked for a while after wrong login attempts, until"
     LangAdd "المخزن الرئيسي والفروع وسيارات المندوبين وتحت التشغيل", "The main warehouse, branches, sales rep vans and work in progress"
     LangAdd "امسح الباركود أو اختر الصنف بالاسم، وحدد عدد الملصقات", "Scan the barcode or choose the item by name, and set the number of labels"
@@ -272,7 +274,4 @@ Private Sub D1_3()
     LangAdd "تم حفظ صلاحيات الدور. تسري عند الفتح التالي لكل شاشة", "The permissions of the role were saved. They apply the next time each screen opens"
     LangAdd "توجد تسوية جارية لهذا البنك: اعتمدها أو احذفها أولًا", "There is an open reconciliation for this bank: approve it or delete it first"
     LangAdd "جرد السيارة مفتوح. أدخل الكميات الفعلية ورحّله أولًا", "The van count is open. Enter the counted quantities and post it first"
-    LangAdd "ربط كل المبالغ غير المربوطة بأقدم الفواتير استحقاقًا", "Link all unlinked amounts to the oldest due invoices"
-    LangAdd "رصيد الموردين يُدخل في قسم «الموردون»: رصيد لكل مورد", "The suppliers balance is entered in the Suppliers part: one balance per supplier"
-    LangAdd "صفِّ صندوق العهدة قبل إغلاق اليوم (زر «تصفية الصندوق", "Close the custody box before closing the day (button Close the box"
 End Sub

@@ -123,6 +123,9 @@ Public Function BuildQueries() As Boolean
     CreateAllQueries
 
     m_db.QueryDefs.Refresh
+    On Error Resume Next                         ' a front-end on SQL Server: the queries back on the server views
+    Application.Run "ServerQueriesAfterBuild"    ' (modServerQueries, docs/71); not installed yet = nothing to do
+    On Error GoTo 0
     Application.RefreshDatabaseWindow
     Debug.Print "--- جديدة: " & m_created & " | محدّثة: " & m_updated & " | فشلت: " & m_failed
 

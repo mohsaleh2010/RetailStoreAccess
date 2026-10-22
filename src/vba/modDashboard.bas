@@ -145,9 +145,8 @@ End Function
 ' Helpers
 '------------------------------------------------------------------------------
 Public Sub SetDashboardParams(ByVal Today As Date)
-    TempVars.Add "DashDay", DateValue(Today)
-    TempVars.Add "DashMonth", DateSerial(Year(Today), Month(Today), 1)
-    TempVars.Add "DashEnd", DateValue(Today) + 1
+    SetQueryParams "DashDay", DateValue(Today), "DashMonth", DateSerial(Year(Today), Month(Today), 1), _
+                   "DashEnd", DateValue(Today) + 1
 End Sub
 
 Private Function MonthNetProfit() As Currency
@@ -158,11 +157,9 @@ Private Function MonthNetProfit() As Currency
     SetPeriod DateSerial(Year(Date), Month(Date), 1), Date
     MonthNetProfit = Nz(DbValue("SELECT NetProfit FROM ProfitQuery"), 0)
     If IsNull(savedStart) Then
-        TempVars.Remove "PeriodStart"
-        TempVars.Remove "PeriodEnd"
+        RemoveQueryParams Array("PeriodStart", "PeriodEnd")
     Else
-        TempVars.Add "PeriodStart", savedStart
-        TempVars.Add "PeriodEnd", savedEnd
+        SetQueryParams "PeriodStart", savedStart, "PeriodEnd", savedEnd
     End If
 End Function
 
@@ -224,11 +221,9 @@ Public Function TestDashboard() As Boolean
     Exit Function
 Restore:
     If IsNull(savedStart) Then
-        TempVars.Remove "PeriodStart"
-        TempVars.Remove "PeriodEnd"
+        RemoveQueryParams Array("PeriodStart", "PeriodEnd")
     Else
-        TempVars.Add "PeriodStart", savedStart
-        TempVars.Add "PeriodEnd", savedEnd
+        SetQueryParams "PeriodStart", savedStart, "PeriodEnd", savedEnd
     End If
     Return
 EH:

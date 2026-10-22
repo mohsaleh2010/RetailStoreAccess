@@ -37,6 +37,8 @@ Public Sub LoginLoad(ByVal frm As Access.Form)
         End If
         msg = StaleAccessWarning()                     ' the real data is on the server, this PC on the old file
         If Len(msg) > 0 Then ShowWarning msg
+        msg = ServerQueriesWarning()                   ' modServerQueries: the server views of another version
+        If Len(msg) > 0 Then ShowWarning msg
     End If
     frm!lblStoreName.Caption = Tr(Nz(SettingValue("StoreName"), APP_TITLE))
     frm!txtUsername.Value = GetSetting("RetailStore", "Login", "LastUser", "")

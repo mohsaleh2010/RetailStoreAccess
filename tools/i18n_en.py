@@ -3255,4 +3255,14 @@ EN = {
     'مقفلة': 'Closed',
     'نهاية الفترة لا تكون قبل بدايتها': 'The end of the period cannot be before its start',
     'واحدة. تُحذف آخر فترة فقط، وهي غير مقفلة': 'year. Only the last period can be deleted, while it is not closed',
+    # plan 5D (docs/71): the saved queries as server views
+    'استعلامات الخادم': 'Server queries',
+    'استعلامات قاعدة الخادم من نسخة أخرى من البرنامج: شغّل «تجهيز القاعدة» بسكربت هذه النسخة':
+        'The queries of the server database are from another version of the program: run Set up the database with the script of this version',
+    'بالخادم': 'to the server',
+    'تعذر إرجاع الاستعلام': 'Could not return the query',
+    'تعذر إرسال فترة التقرير إلى الخادم': 'Could not send the report period to the server',
+    'تعذر ربط الاستعلام': 'Could not link the query',
+    'قاعدة الخادم ليس فيها استعلامات البرنامج: شغّل «تجهيز القاعدة» أولًا (ملف':
+        'The server database lacks the queries of the program: run Set up the database first (file',
 }

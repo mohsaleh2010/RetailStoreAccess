@@ -15,6 +15,9 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "ربط كل المبالغ غير المربوطة بأقدم الفواتير استحقاقًا", "Link all unlinked amounts to the oldest due invoices"
+    LangAdd "رصيد الموردين يُدخل في قسم «الموردون»: رصيد لكل مورد", "The suppliers balance is entered in the Suppliers part: one balance per supplier"
+    LangAdd "صفِّ صندوق العهدة قبل إغلاق اليوم (زر «تصفية الصندوق", "Close the custody box before closing the day (button Close the box"
     LangAdd "قبض نقدية في صندوق، أو صرف منه، أو تحويل بين صندوقين", "Cash received in a box, paid from it, or transferred between two boxes"
     LangAdd "مناسب لطابعات 203 نقطة/بوصة، وكبّره إذا صعبت القراءة", "Suitable for 203 dpi printers, make it larger if it is hard to read"
     LangAdd "مندوبو المبيعات: عملاؤهم ونسبة عمولتهم ومركز تكلفتهم", "Sales reps: their customers, commission rate and cost center"
@@ -132,12 +135,12 @@ Private Sub D2_1()
     LangAdd "للعمل في الدولة الأخرى ابدأ ملف بيانات جديدًا", "To work in the other country start a new data file"
     LangAdd "أضف صنفًا واحدًا على الأقل إلى قائمة الطباعة", "Add at least one item to the print list"
     LangAdd "احذف قيود الإهلاك من شهر إعادة التقييم أولًا", "delete the depreciation entries from the month of the revaluation first"
-    LangAdd "البيانات الفعلية للبرنامج على SQL Server منذ", "The real data of the program is on SQL Server since"
-    LangAdd "الفاتورة الإلكترونية غير مفعّلة في الإعدادات", "E-invoicing is not enabled in the settings"
-    LangAdd "تحتاج متابعة (بانتظار الإرسال، مرفوضة، تحذير", "Need follow-up (waiting, rejected, warning"
 End Sub
 
 Private Sub D2_2()
+    LangAdd "البيانات الفعلية للبرنامج على SQL Server منذ", "The real data of the program is on SQL Server since"
+    LangAdd "الفاتورة الإلكترونية غير مفعّلة في الإعدادات", "E-invoicing is not enabled in the settings"
+    LangAdd "تحتاج متابعة (بانتظار الإرسال، مرفوضة، تحذير", "Need follow-up (waiting, rejected, warning"
     LangAdd "تصدر الفاتورة من إذن مُرحَّل لم تصدر فاتورته", "The invoice is made from a posted note not yet invoiced"
     LangAdd "تعود للمسودة الطلبية المعتمدة أو قيد التجهيز", "Only an approved order or one being prepared goes back to draft"
     LangAdd "عمليات الدفاتر غير المطابقة (حتى تاريخ الكشف", "Book transactions not matched (up to the statement date"
@@ -255,12 +258,12 @@ Private Sub D2_2()
     LangAdd "ترحيل السند؟ يتحرك المخزون ويُنشأ القيد", "Post the voucher? The stock moves and the entry is created"
     LangAdd "حدد الكمية المرتجعة لصنف واحد على الأقل", "Set the returned quantity of at least one item"
     LangAdd "راجع التاريخ والأسطر ثم اضغط «حفظ القيد", "Check the date and the lines, then click Save entry"
-    LangAdd "رصيد كل حساب بنكي يوم بدء التشغيل: موجب", "The balance of each bank account on the start-up day: positive"
-    LangAdd "سعر البيع الجديد لا يمكن أن يكون سالبًا", "The new sale price cannot be negative"
-    LangAdd "صنفًا لأن لها حركات أو لا تتابع المخزون", "items, because they have moves or do not track stock"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "رصيد كل حساب بنكي يوم بدء التشغيل: موجب", "The balance of each bank account on the start-up day: positive"
+    LangAdd "سعر البيع الجديد لا يمكن أن يكون سالبًا", "The new sale price cannot be negative"
+    LangAdd "صنفًا لأن لها حركات أو لا تتابع المخزون", "items, because they have moves or do not track stock"
     LangAdd "عدّل الإضافي والخصومات ثم «ترحيل المسير", "Edit the overtime and deductions, then Post the run"
     LangAdd "كلمة البحث (اسم، كود، باركود، رقم، جوال", "Search text (name, code, barcode, number, mobile"
     LangAdd "لا توجد فروقات جرد مرحّلة في هذه الفترة", "No posted stock count differences in this period"
@@ -378,12 +381,12 @@ Private Sub D2_3()
     LangAdd "تغيرت الأرصدة: اضغط «تحديث الإجمالي", "The balances changed: press Refresh total"
     LangAdd "تغيير اسم المحل يتم عن طريق المبرمج", "The store name is changed by the developer"
     LangAdd "تمت النسخة على الخادم لكن فحصها فشل", "The server made the backup but its check failed"
-    LangAdd "جدول: انقل البيانات ثم طابقها أولًا", "tables: transfer the data then compare it first"
-    LangAdd "حساب رئيسي: يشمل كل حساباته التابعة", "Main account: includes all its sub-accounts"
-    LangAdd "ربط البرنامج على هذا الجهاز بالخادم", "Link the program on this PC to the server"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "جدول: انقل البيانات ثم طابقها أولًا", "tables: transfer the data then compare it first"
+    LangAdd "حساب رئيسي: يشمل كل حساباته التابعة", "Main account: includes all its sub-accounts"
+    LangAdd "ربط البرنامج على هذا الجهاز بالخادم", "Link the program on this PC to the server"
     LangAdd "رصيد الصندوق يُدخل في قسم «الصناديق", "The balance of a cash box is entered in the Cash boxes part"
     LangAdd "رصيد العميل المسجل لا يطابق الحركات", "The recorded customer balance does not match the moves"
     LangAdd "رصيد المورد المسجل لا يطابق الحركات", "The recorded supplier balance does not match the moves"
@@ -404,6 +407,7 @@ Private Sub D2_4()
     LangAdd "تأكد من فلاشة التوقيع ورقمها السري", "Check the signing token and its PIN"
     LangAdd "تسجيل ارتداد الشيك؟ يعود مبلغه على", "Record the bounce of the cheque? Its amount goes back to"
     LangAdd "تسويات وتصحيحات من الفترات السابقة", "Adjustments and corrections of earlier periods"
+    LangAdd "تعذر إرسال فترة التقرير إلى الخادم", "Could not send the report period to the server"
     LangAdd "رصيد كل عميل يوم بدء التشغيل: موجب", "The balance of each customer on the start-up day: positive"
     LangAdd "رصيد كل مورد يوم بدء التشغيل: موجب", "The balance of each supplier on the start-up day: positive"
     LangAdd "رقم التسجيل الضريبي في مصر 9 أرقام", "The Egyptian tax registration number has 9 digits"
@@ -412,9 +416,4 @@ Private Sub D2_4()
     LangAdd "فاتورة إذن الاستلام بعملة البرنامج", "The invoice of a receipt note is in the program currency"
     LangAdd "فحص سلامة البيانات: لا توجد مشكلات", "Data integrity check: no problems"
     LangAdd "كل الأذونات المرحّلة صدرت فواتيرها", "Every posted note is invoiced"
-    LangAdd "لا تملك صلاحية أرصدة بداية التشغيل", "You do not have the permission for the start-up opening balances"
-    LangAdd "لا تملك صلاحية المندوبين وعمولاتهم", "You do not have the permission for sales reps and their commissions"
-    LangAdd "لا تملك صلاحية حذف الحركات البنكية", "You do not have the permission to delete bank transactions"
-    LangAdd "لا توجد أرصدة موردين بعملات أجنبية", "There are no supplier balances in foreign currencies"
-    LangAdd "لا توجد أيام مندوبين في هذه الفترة", "No rep days in this period"
 End Sub

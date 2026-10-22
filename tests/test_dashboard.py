@@ -121,7 +121,7 @@ class DashboardCodeTests(unittest.TestCase):
     def test_report_period_is_restored(self):
         body = self.text.split("Private Function MonthNetProfit(")[1].split("\nEnd Function")[0]
         self.assertIn('savedStart = TempVars("PeriodStart")', body)
-        self.assertIn('TempVars.Add "PeriodStart", savedStart', body)
+        self.assertIn('SetQueryParams "PeriodStart", savedStart, "PeriodEnd", savedEnd', body)   # docs/71: also on the server
 
     def test_dashboard_refreshes(self):
         main = next(m for m in F.all_forms() if m.name == "frmMain")

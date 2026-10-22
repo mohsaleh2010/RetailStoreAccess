@@ -13,6 +13,31 @@ Public Sub LangData6()
 End Sub
 
 Private Sub D6_1()
+    LangAdd "„‰ »‰ﬂ", "From a bank"
+    LangAdd "„Ê«“‰…", "Budget"
+    LangAdd "„Ê—œ«", "suppliers"
+    LangAdd "„ı—Õ¯·", "Posted"
+    LangAdd "‰Ê›„»—", "November"
+    LangAdd "√»—Ì·", "April"
+    LangAdd "√—»⁄…", "four"
+    LangAdd "√⁄œ¯Â", "Prepared by"
+    LangAdd "√€”ÿ”", "August"
+    LangAdd "√·›«‰", "two thousand"
+    LangAdd "√Ê·Â«", "the first on"
+    LangAdd "√ı—”·", "Sent"
+    LangAdd "√ı÷Ì›", "Added"
+    LangAdd "≈÷«›…", "Add"
+    LangAdd "≈€·«ﬁ", "Close"
+    LangAdd "≈·€«¡", "Cancel"
+    LangAdd "≈Ìœ«⁄", "Deposit"
+    LangAdd "«À‰«‰", "two"
+    LangAdd "«·√Õœ", "Sunday"
+    LangAdd "«·√’·", "Asset"
+    LangAdd "«·«”„", "Name"
+    LangAdd "«·»ÕÀ", "Search"
+    LangAdd "«·»‰œ", "Item"
+    LangAdd "«·»‰ﬂ", "Bank"
+    LangAdd "«·»Ì⁄", "Sale"
     LangAdd "«·Ã—œ", "Stock count"
     LangAdd "«·ÃÂ…", "Party"
     LangAdd "«·ÕÃ„", "Size"
@@ -108,6 +133,9 @@ Private Sub D6_1()
     LangAdd "„·«∆„", "Suitable"
     LangAdd "„·€«…", "Cancelled"
     LangAdd "„·ÌÊ‰", "million"
+End Sub
+
+Private Sub D6_2()
     LangAdd "„‰Œ›÷", "Low"
     LangAdd "„‰’—›", "Out"
     LangAdd "„ı—”·", "Submitted"
@@ -133,9 +161,6 @@ Private Sub D6_1()
     LangAdd "»À„‰", "for a price"
     LangAdd "»œÊ‰", "None"
     LangAdd " ”⁄…", "nine"
-End Sub
-
-Private Sub D6_2()
     LangAdd "À«» ", "Straight line"
     LangAdd "ÃœÌœ", "New"
     LangAdd "Ã‰ÌÂ", "EGP"

@@ -53,11 +53,9 @@ End Function
 '------------------------------------------------------------------------------
 Public Sub SetIndicatorParams(ByVal AsOf As Date)
     AsOf = DateValue(AsOf)
-    TempVars.Add "IndEnd", AsOf + 1
-    TempVars.Add "IndMonth", DateSerial(Year(AsOf), Month(AsOf), 1)
-    TempVars.Add "IndPrevMonth", DateSerial(Year(AsOf), Month(AsOf) - 1, 1)
-    TempVars.Add "IndYear", AsOf - 364
-    TempVars.Add "Ind90", AsOf - (COLLECTION_DAYS_SPAN - 1)
+    SetQueryParams "IndEnd", AsOf + 1, "IndMonth", DateSerial(Year(AsOf), Month(AsOf), 1), _
+                   "IndPrevMonth", DateSerial(Year(AsOf), Month(AsOf) - 1, 1), "IndYear", AsOf - 364, _
+                   "Ind90", AsOf - (COLLECTION_DAYS_SPAN - 1)
 End Sub
 
 Public Function FinancialIndicators(ByVal AsOf As Date, Optional ByVal Force As Boolean = False) As Variant
