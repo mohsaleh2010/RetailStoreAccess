@@ -188,7 +188,9 @@ Phases 1–12, accounting, VAT return, aging, banks, cheques, fixed assets, payr
 budget, recurring expenses, the audit trail, the financial indicators of the dashboard, multiple
 currencies, sales reps with commissions, customer orders with reservation, the rep day with van sales, routes, visits and rep limits (plan 4A-4C), fixed asset declining balance, revaluation, sale VAT and transfer (`docs/65`), rep shortages as advances (`docs/66`), the SQL Server schema script and the data transfer (plan 5A-5B, `docs/67`-`68`), the English interface and e-invoicing for Saudi Arabia (ZATCA phase 2)
 and Egypt (e-receipt, B2B e-invoice, form 10 return; plan `docs/43`, phases A-F) are done
-(see `README.md` for approval status). Next steps are decided by the owner.
+(see `README.md` for approval status). Next: 5C-5D, then the modules the owner picks from `docs/69-Remaining-Modules.md`,
+then plan 6, decided: one C# system, Blazor (Razor) on .NET 10 for the web and .NET MAUI Blazor Hybrid sharing the same
+Razor components for Windows (POS), Android (rep app) and iOS (`docs/51`, plan 6).
 
 ## Standard procedures
 **Run the tests:** `python3 tools/generate.py`, then `python3 -m unittest discover -s tests`; report the
