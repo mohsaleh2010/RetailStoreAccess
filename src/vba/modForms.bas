@@ -127,6 +127,8 @@ Public Function FormBeforeUpdate(ByVal frm As Access.Form) As Boolean
             If Not ValidateRecurring(frm) Then Exit Function       ' modRecurring
         Case "ProductUnits"
             If Not ValidateProductUnit(frm) Then Exit Function     ' modProductUnits
+        Case "PriceListItems"
+            If Not ValidatePriceListItem(frm) Then Exit Function   ' modPriceLists
     End Select
     If Not CheckUnique(frm) Then Exit Function
     If Not AssignSequence(frm) Then Exit Function      ' last: a refused save wastes no number

@@ -508,14 +508,17 @@ Public Sub StockNoteOpenOrder(ByVal frm As Access.Form)
 End Sub
 
 Public Function OrderDefaultPrice(ByVal SalesOrderID As Long, ByVal ProductID As Long) As Currency
-    ' The price list of the order's rep (modRepRoutes), else the selling price.
-    Dim v As Variant
+    ' The price list of the order's customer (modPriceLists), else the price list of the order's rep
+    ' (modRepRoutes) or the selling price, less the discount of the customer's list.
+    Dim v As Variant, usual As Currency
     v = RepProductPrice(Nz(DbValue("SELECT SalesRepID FROM SalesOrders WHERE SalesOrderID = " & SalesOrderID), 0), ProductID)
     If IsNull(v) Then
-        OrderDefaultPrice = NoteDefaultPrice("DELIVERY", ProductID)
+        usual = NoteDefaultPrice("DELIVERY", ProductID)
     Else
-        OrderDefaultPrice = CCur(v)
+        usual = CCur(v)
     End If
+    OrderDefaultPrice = CustomerPrice(Nz(DbValue("SELECT CustomerID FROM SalesOrders WHERE SalesOrderID = " & _
+                                                 SalesOrderID), 0), ProductID, Null, usual)
 End Function
 
 Public Sub SalesOrderLineBeforeUpdate(ByVal frm As Access.Form, ByRef Cancel As Integer)

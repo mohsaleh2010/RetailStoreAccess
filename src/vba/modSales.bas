@@ -303,7 +303,9 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
             rs.Close
             Exit Function
         End If
-        If factors(n) <> 1 Then
+        If IsCustomerListPrice(CustomerID, rs!ProductID, rs!UnitID, rs!UnitPrice) Then
+            ' the price of the customer's price list (modPriceLists): not a price change
+        ElseIf factors(n) <> 1 Then
             If Not IsListedUnitPrice(rs!ProductID, rs!UnitID, rs!UnitPrice) Then priceChanged = True   ' modProductUnits
         ElseIf rs!UnitPrice <> rs!SellingPrice Then            ' a size price of the product is not a change
             If rs!UnitPrice <> Nz(rs!SizePriceM, -1) And rs!UnitPrice <> Nz(rs!SizePriceL, -1) Then

@@ -142,11 +142,11 @@ SELECT ExpenseTypeID, COALESCE(ExpenseTypeNameEn, LocArabicName) AS ExpenseTypeN
 GO
 CREATE OR ALTER VIEW [dbo].[qryLocCustomers1] AS
 -- Customers للواجهة الإنجليزية (خطوة 1)
-SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.NationalID, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID FROM [dbo].[Customers] AS t;
+SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.NationalID, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID, t.PriceListID FROM [dbo].[Customers] AS t;
 GO
 CREATE OR ALTER VIEW [dbo].[qryLocCustomers] AS
 -- Customers بالأسماء الإنجليزية (الواجهة الإنجليزية)
-SELECT CustomerID, COALESCE(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, NationalID, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID FROM [dbo].[qryLocCustomers1];
+SELECT CustomerID, COALESCE(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, NationalID, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID, PriceListID FROM [dbo].[qryLocCustomers1];
 GO
 CREATE OR ALTER VIEW [dbo].[qryLocSuppliers1] AS
 -- Suppliers للواجهة الإنجليزية (خطوة 1)
@@ -203,6 +203,14 @@ GO
 CREATE OR ALTER VIEW [dbo].[qryLocSalesReps] AS
 -- SalesReps بالأسماء الإنجليزية (الواجهة الإنجليزية)
 SELECT SalesRepID, RepCode, COALESCE(RepNameEn, LocArabicName) AS RepName, RepNameEn, Mobile, EmployeeID, Region, CostCenterID, CommissionRate, CommissionBase, CreditLimit, MaxDiscountPercent, IsActive, Notes, CreatedAt FROM [dbo].[qryLocSalesReps1];
+GO
+CREATE OR ALTER VIEW [dbo].[qryLocPriceLists1] AS
+-- PriceLists للواجهة الإنجليزية (خطوة 1)
+SELECT t.PriceListID, t.ListName AS LocArabicName, t.ListNameEn, t.DiscountPercent, t.IsActive, t.Notes, t.CreatedAt FROM [dbo].[PriceLists] AS t;
+GO
+CREATE OR ALTER VIEW [dbo].[qryLocPriceLists] AS
+-- PriceLists بالأسماء الإنجليزية (الواجهة الإنجليزية)
+SELECT PriceListID, COALESCE(ListNameEn, LocArabicName) AS ListName, ListNameEn, DiscountPercent, IsActive, Notes, CreatedAt FROM [dbo].[qryLocPriceLists1];
 GO
 CREATE OR ALTER VIEW [dbo].[qrySalesDocuments] AS
 -- مستندات البيع: الفواتير (+) والمرتجعات (−) بقيم موقّعة
@@ -1690,6 +1698,20 @@ SELECT v.VisitDate, v.SalesRepID, r.RepName, Count(*) AS VisitCount,
 FROM [dbo].[RepVisits] AS v INNER JOIN [dbo].[SalesReps] AS r ON v.SalesRepID = r.SalesRepID
 GROUP BY v.VisitDate, v.SalesRepID, r.RepName;
 GO
+CREATE OR ALTER VIEW [dbo].[PriceListQuery] AS
+-- أسعار قوائم الأسعار: سعر كل صنف في كل قائمة لكل وحدة، وسعر البيع المعتاد، والسريان (docs/73)
+SELECT i.PriceListItemID, l.PriceListID, l.ListName, p.ProductCode, p.ProductName,
+       IIF(i.UnitID Is Null, u.UnitName, v.UnitName) AS PriceUnit, i.UnitPrice,
+       IIF(i.UnitID Is Null, p.SellingPrice, IIF(CAST(COALESCE(pu.SellingPrice, 0) AS MONEY) > 0, pu.SellingPrice, p.SellingPrice * CAST(COALESCE(pu.UnitFactor, 1) AS MONEY))) AS UsualPrice,
+       i.ValidFrom, i.ValidTo,
+       IIF(i.ValidTo < DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0), N'انتهى سريانه', IIF(i.ValidFrom > DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0), N'لم يبدأ بعد', N'ساري')) AS StatusName
+FROM (((([dbo].[PriceListItems] AS i INNER JOIN [dbo].[PriceLists] AS l ON i.PriceListID = l.PriceListID)
+      INNER JOIN [dbo].[Products] AS p ON i.ProductID = p.ProductID)
+      INNER JOIN [dbo].[Units] AS u ON p.UnitID = u.UnitID)
+      LEFT JOIN [dbo].[Units] AS v ON i.UnitID = v.UnitID)
+     LEFT JOIN [dbo].[ProductUnits] AS pu ON (i.ProductID = pu.ProductID AND i.UnitID = pu.UnitID)
+WHERE l.IsActive <> 0;
+GO
 CREATE OR ALTER VIEW [dbo].[RepVanStockQuery] AS
 -- رصيد سيارة كل مندوب: الكمية والقيمة بمتوسط التكلفة (docs/64)
 SELECT q.WarehouseID, w.SalesRepID, r.RepName, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName,
@@ -3043,11 +3065,11 @@ SELECT ExpenseTypeID, COALESCE(ExpenseTypeNameEn, LocArabicName) AS ExpenseTypeN
 GO
 CREATE OR ALTER VIEW [en].[qryLocCustomers1] AS
 -- Customers للواجهة الإنجليزية (خطوة 1)
-SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.NationalID, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID FROM [dbo].[Customers] AS t;
+SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.NationalID, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID, t.PriceListID FROM [dbo].[Customers] AS t;
 GO
 CREATE OR ALTER VIEW [en].[qryLocCustomers] AS
 -- Customers بالأسماء الإنجليزية (الواجهة الإنجليزية)
-SELECT CustomerID, COALESCE(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, NationalID, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID FROM [en].[qryLocCustomers1];
+SELECT CustomerID, COALESCE(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, NationalID, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID, PriceListID FROM [en].[qryLocCustomers1];
 GO
 CREATE OR ALTER VIEW [en].[qryLocSuppliers1] AS
 -- Suppliers للواجهة الإنجليزية (خطوة 1)
@@ -3104,6 +3126,14 @@ GO
 CREATE OR ALTER VIEW [en].[qryLocSalesReps] AS
 -- SalesReps بالأسماء الإنجليزية (الواجهة الإنجليزية)
 SELECT SalesRepID, RepCode, COALESCE(RepNameEn, LocArabicName) AS RepName, RepNameEn, Mobile, EmployeeID, Region, CostCenterID, CommissionRate, CommissionBase, CreditLimit, MaxDiscountPercent, IsActive, Notes, CreatedAt FROM [en].[qryLocSalesReps1];
+GO
+CREATE OR ALTER VIEW [en].[qryLocPriceLists1] AS
+-- PriceLists للواجهة الإنجليزية (خطوة 1)
+SELECT t.PriceListID, t.ListName AS LocArabicName, t.ListNameEn, t.DiscountPercent, t.IsActive, t.Notes, t.CreatedAt FROM [dbo].[PriceLists] AS t;
+GO
+CREATE OR ALTER VIEW [en].[qryLocPriceLists] AS
+-- PriceLists بالأسماء الإنجليزية (الواجهة الإنجليزية)
+SELECT PriceListID, COALESCE(ListNameEn, LocArabicName) AS ListName, ListNameEn, DiscountPercent, IsActive, Notes, CreatedAt FROM [en].[qryLocPriceLists1];
 GO
 CREATE OR ALTER VIEW [en].[qrySalesDocuments] AS
 -- مستندات البيع: الفواتير (+) والمرتجعات (−) بقيم موقّعة
@@ -4591,6 +4621,20 @@ SELECT v.VisitDate, v.SalesRepID, r.RepName, Count(*) AS VisitCount,
 FROM [dbo].[RepVisits] AS v INNER JOIN [en].[qryLocSalesReps] AS r ON v.SalesRepID = r.SalesRepID
 GROUP BY v.VisitDate, v.SalesRepID, r.RepName;
 GO
+CREATE OR ALTER VIEW [en].[PriceListQuery] AS
+-- أسعار قوائم الأسعار: سعر كل صنف في كل قائمة لكل وحدة، وسعر البيع المعتاد، والسريان (docs/73)
+SELECT i.PriceListItemID, l.PriceListID, l.ListName, p.ProductCode, p.ProductName,
+       IIF(i.UnitID Is Null, u.UnitName, v.UnitName) AS PriceUnit, i.UnitPrice,
+       IIF(i.UnitID Is Null, p.SellingPrice, IIF(CAST(COALESCE(pu.SellingPrice, 0) AS MONEY) > 0, pu.SellingPrice, p.SellingPrice * CAST(COALESCE(pu.UnitFactor, 1) AS MONEY))) AS UsualPrice,
+       i.ValidFrom, i.ValidTo,
+       IIF(i.ValidTo < DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0), N'Expired', IIF(i.ValidFrom > DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0), N'Not started', N'Valid')) AS StatusName
+FROM (((([dbo].[PriceListItems] AS i INNER JOIN [en].[qryLocPriceLists] AS l ON i.PriceListID = l.PriceListID)
+      INNER JOIN [dbo].[Products] AS p ON i.ProductID = p.ProductID)
+      INNER JOIN [en].[qryLocUnits] AS u ON p.UnitID = u.UnitID)
+      LEFT JOIN [en].[qryLocUnits] AS v ON i.UnitID = v.UnitID)
+     LEFT JOIN [dbo].[ProductUnits] AS pu ON (i.ProductID = pu.ProductID AND i.UnitID = pu.UnitID)
+WHERE l.IsActive <> 0;
+GO
 CREATE OR ALTER VIEW [en].[RepVanStockQuery] AS
 -- رصيد سيارة كل مندوب: الكمية والقيمة بمتوسط التكلفة (docs/64)
 SELECT q.WarehouseID, w.SalesRepID, r.RepName, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName,
@@ -5864,5 +5908,5 @@ WHERE q.QtyReturned > o.Quantity;
 GO
 CREATE OR ALTER VIEW [dbo].[QueriesVersion] AS
 -- the version of these views: the front-end links to them only when it is its own
-SELECT N'c5c7cf0c13e4' AS Version;
+SELECT N'03ae36e2a4c1' AS Version;
 GO

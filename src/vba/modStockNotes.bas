@@ -559,7 +559,12 @@ Public Sub StockNoteLineBeforeUpdate(ByVal frm As Access.Form, ByRef Cancel As I
         Exit Sub
     End If
     If frm.NewRecord Then frm!StockNoteID.Value = id
-    If Nz(frm!UnitPrice.Value, 0) = 0 Then frm!UnitPrice.Value = NoteDefaultPrice(NoteKind(id), CLng(frm!ProductID.Value))
+    If Nz(frm!UnitPrice.Value, 0) = 0 Then
+        frm!UnitPrice.Value = NoteDefaultPrice(NoteKind(id), CLng(frm!ProductID.Value))
+        If NoteKind(id) = "DELIVERY" Then           ' the customer's price list (modPriceLists)
+            frm!UnitPrice.Value = CustomerPrice(NoteParty(id), CLng(frm!ProductID.Value), Null, frm!UnitPrice.Value)
+        End If
+    End If
     AuditFormBefore frm, "StockNoteLines", "StockNoteLineID"
 End Sub
 

@@ -11,7 +11,8 @@ Attribute VB_Name = "modProductUnits"
 ' so the amounts, the VAT and the e-invoice lines are those of the document, and the cost of a sale line
 ' (UnitCost = AverageCost x UnitFactor) keeps Quantity x UnitCost right in every report.
 '   UnitFactorOf        1 for the smallest unit, the factor of a unit of the product, 0 = not one of its units
-'   UnitSalePrice       the price of a new sale line in a unit (the unit's own price, else the piece price x factor)
+'   UnitSalePrice       the price of a new sale line in a unit (the unit's own price, else the piece price x factor;
+'                       a customer's price list first, modPriceLists)
 '   UnitPurchasePrice   the same for a purchase line (without VAT)
 '   FindProductCode     a scanned code: the product's barcode / code (smallest unit) or a unit barcode
 '   ValidateProductUnit the screen frmProductUnits (modForms.FormBeforeUpdate)
@@ -58,21 +59,23 @@ Private Function OwnUnitPrice(ByVal ProductID As Long, ByVal UnitID As Variant, 
                               ProductID & " AND UnitID = " & CLng(UnitID)), 0)
 End Function
 
-Public Function UnitSalePrice(ByVal ProductID As Long, ByVal UnitID As Variant) As Currency
+Public Function UnitSalePrice(ByVal ProductID As Long, ByVal UnitID As Variant, Optional ByVal CustomerID As Long = 0) _
+                              As Currency
     ' A new sale line: the piece price (the rep's price list, modRepRoutes) or, for a bigger unit, its own price,
-    ' else the piece price x its factor.
-    Dim piece As Currency, own As Currency
+    ' else the piece price x its factor; for a customer with a price list, the price of his list (modPriceLists).
+    Dim piece As Currency, own As Currency, usual As Currency
     piece = SessionPrice(ProductID, Nz(DbValue("SELECT SellingPrice FROM Products WHERE ProductID = " & ProductID), 0))
     If IsBaseUnit(ProductID, UnitID) Then
-        UnitSalePrice = piece
-        Exit Function
-    End If
-    own = OwnUnitPrice(ProductID, UnitID, "SellingPrice")
-    If own > 0 Then
-        UnitSalePrice = own
+        usual = piece
     Else
-        UnitSalePrice = RoundMoney(CDec(piece) * CDec(UnitFactorOf(ProductID, UnitID)))
+        own = OwnUnitPrice(ProductID, UnitID, "SellingPrice")
+        If own > 0 Then
+            usual = own
+        Else
+            usual = RoundMoney(CDec(piece) * CDec(UnitFactorOf(ProductID, UnitID)))
+        End If
     End If
+    UnitSalePrice = CustomerPrice(CustomerID, ProductID, UnitID, usual)
 End Function
 
 Public Function IsListedUnitPrice(ByVal ProductID As Long, ByVal UnitID As Variant, ByVal Price As Currency) As Boolean

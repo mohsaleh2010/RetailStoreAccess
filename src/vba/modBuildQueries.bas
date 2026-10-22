@@ -21,17 +21,17 @@ Private Const MSG_RTL As Long = &H180000           ' vbMsgBoxRight + vbMsgBoxRtl
 Private Const PERIOD_START_DAYS_AGO As Long = 30
 Private Const TEST_SLOW_MOVING_DAYS As Long = 90
 Private Const QUERY_NAMES As String = "qryLocAccounts1,qryLocAccounts,qryLocPaymentMethods1,qryLocPaymentMethods,qryLocJournalSourceTypes1,qryLocJournalSourceTypes,qryLocTransactionTypes1,qryLocTransactionTypes,qryLocRoles1,qryLocRoles,qryLocPermissions1,qryLocPermissions,qryLocScreens1,qryLocScreens,qryLocCategories1,qryLocCategories,qryLocUnits1,qryLocUnits,qryLocExpenseTypes1,qryLocExpenseTypes,qryLocCustomers1,qryLocCustomers,qryLo" & _
-    "cSuppliers1,qryLocSuppliers,qryLocCashBoxes1,qryLocCashBoxes,qryLocWarehouses1,qryLocWarehouses,qryLocStockParties1,qryLocStockParties,qryLocBanks1,qryLocBanks,qryLocCostCenters1,qryLocCostCenters,qryLocSalesReps1,qryLocSalesReps,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,SalesByPeriodQuery,SalesByProductQuery" & _
-    ",BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryWarehouseStock,StockByWarehouseQuery,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,qryStockMoveParty,ItemCardQuery,StockValueByWarehouseQuery,StockCountDiffQuery,SlowMovingProductsQuery,StockByCategoryQuery,StockCountQuery,qryCustomerOpening,qry" & _
-    "SupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSums,qryCustomerPaymentFree,qryCustom" & _
-    "erInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases,qryVatInputExpenses,VatSummaryQuer" & _
-    "y,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,EInvoiceReportQuery,qrySalesDocPrint" & _
-    ",qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransferValue,qryStockNoteValue,qryInvoiced" & _
-    "Notes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryRepDayStock,qryRepDaySales,qryRepDayReturns,qryRepDayCollections,RepDaySummaryQuery,RepVisitListQuery,RouteExecutionQuery,RepVanStockQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAccounts,qryStockDocumentValue,qryJournalStockDocume" & _
-    "nt,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryAssetRevalTotals,qryAssetLastReval,qryAssetFirstCenter,qryJournalAsset,qryJournalAssetReval,qryJournalAssetT" & _
-    "ransfer,qryJournalRepShortage,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBalanceQuery,PayrollSheetQuery,ChequesQuery,JournalLi" & _
-    "nesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths,qryBudgetPlanned,qryBudgetActual,BudgetVsActualQue" & _
-    "ry,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
+    "cSuppliers1,qryLocSuppliers,qryLocCashBoxes1,qryLocCashBoxes,qryLocWarehouses1,qryLocWarehouses,qryLocStockParties1,qryLocStockParties,qryLocBanks1,qryLocBanks,qryLocCostCenters1,qryLocCostCenters,qryLocSalesReps1,qryLocSalesReps,qryLocPriceLists1,qryLocPriceLists,qrySalesDocuments,qrySalesLineItems,qrySalesLinesInPeriod,DailySalesQuery,qrySalesMonthlyDocs,qrySalesMonthlyCost,MonthlySalesQuery,Sal" & _
+    "esByPeriodQuery,SalesByProductQuery,BestSellingProductsQuery,SalesByCategoryQuery,LeastSellingProductsQuery,qryPurchaseDocuments,PurchasesQuery,qryProductLedger,qryWarehouseStock,StockByWarehouseQuery,qryProductLastSale,StockBalanceQuery,LowStockQuery,ProductMovementQuery,qryStockMoveParty,ItemCardQuery,StockValueByWarehouseQuery,StockCountDiffQuery,SlowMovingProductsQuery,StockByCategoryQuery,Sto" & _
+    "ckCountQuery,qryCustomerOpening,qrySupplierOpening,qryOpeningAccountLines,qryOpeningTotals,qryCustomerLedger,qryCustomerLedgerTotals,CustomerBalanceQuery,CustomersWithDebtQuery,CustomerStatementQuery,qrySupplierLedger,qrySupplierLedgerTotals,SupplierBalanceQuery,qrySupplierFxMoves,qryLatestRateDates,qryLatestRates,qrySupplierFxTotals,SupplierFxBalanceQuery,SupplierStatementQuery,qryCustomerAllocSu" & _
+    "ms,qryCustomerPaymentFree,qryCustomerInvoiceAlloc,qryCustomerInvoiceReturns,qryCustomerInvoiceFree,qrySupplierAllocSums,qrySupplierPaymentFree,qrySupplierInvoiceAlloc,qrySupplierInvoiceReturns,qrySupplierInvoiceFree,qryAgingDebits,qryAgingCredits,qryAgingAllocations,ExpensesQuery,ExpensesByTypeQuery,qryProfitSales,qryProfitAdjustments,qryProfitExpenses,ProfitQuery,qryVatOutput,qryVatInputPurchases" & _
+    ",qryVatInputExpenses,VatSummaryQuery,qryVatReturnLines,qryVatReturnTotals,qryVatReturnHead,VatReturnQuery,VatReturnQueryEG,DashboardQuery,qryRepDocs,qryRepPeriodTotals,qryRepTargetTotals,qryRepCommissionPaid,qryRepCommissionPosted,RepPerformanceQuery,RepCustomersQuery,RepCommissionBalanceQuery,CommissionSheetQuery,qryIndicatorLines,FinancialIndicatorsQuery,qryDashboardTopProducts,qryEInvoiceDocs,E" & _
+    "InvoiceReportQuery,qrySalesDocPrint,qryPurchaseDocPrint,qryVoucherPrint,qryCashMovements,qryCashBoxTotals,CashBoxBalanceQuery,CashStatementQuery,qryCashDays,qryCashDayOpening,CashDailyQuery,qryCashBoxMoves,qryCashBoxDays,qryCashBoxDayOpening,qryCashBoxDayClosings,CashDayBookQuery,CashClosingsQuery,qryCashClosingPrint,qryCashVoucherPrint,qrySaleCost,qryReturnCost,qryStockCountValue,qryStockTransfer" & _
+    "Value,qryStockNoteValue,qryInvoicedNotes,NotesNotInvoicedQuery,qryOrderLineNotes,qrySalesOrderLineStatus,qryReservedStock,ReservedStockQuery,PendingOrdersQuery,qryRepDayStock,qryRepDaySales,qryRepDayReturns,qryRepDayCollections,RepDaySummaryQuery,RepVisitListQuery,RouteExecutionQuery,PriceListQuery,RepVanStockQuery,qryJournalStockTransfer,qryJournalStockNote,TransfersInTransitQuery,qryStockPartyAc" & _
+    "counts,qryStockDocumentValue,qryJournalStockDocument,qryJournalSale,qryJournalSalesReturn,qryJournalPurchase,qryJournalPurchaseReturn,qryJournalPayments,qryJournalExpense,qryJournalCashVoucher,qryJournalStock,qryJournalOpening,qryManualEntryLines,qryJournalManual,qryYearCloseLines,qryJournalYearClose,qryJournalVatReturn,qryJournalCheque,qryAssetRevalTotals,qryAssetLastReval,qryAssetFirstCenter,qry" & _
+    "JournalAsset,qryJournalAssetReval,qryJournalAssetTransfer,qryJournalRepShortage,qryDepreciationLines,qryJournalDepreciation,qryPayrollTotals,qryPayrollCenterTotals,qryJournalPayroll,qryCommissionCenterTotals,qryJournalCommission,qryJournalBankTx,qryBankItemSums,qryBankItems,qryBankTotals,BankBalanceQuery,qryAssetDepTotals,FixedAssetsQuery,AuditTrailQuery,qryAdvanceMoves,qryAdvanceTotals,AdvanceBal" & _
+    "anceQuery,PayrollSheetQuery,ChequesQuery,JournalLinesQuery,qryJournalEntryPrint,qryTrialBefore,qryTrialPeriod,TrialBalanceQuery,qryStatementBefore,AccountStatementQuery,GeneralLedgerQuery,qryTreeRollup,TrialBalanceTreeQuery,qryIncomeMoves,qryCompareMoves,qryIncomeAccounts,IncomeStatementQuery,qryCenterMoves,qryCenterNames,qryCenterSums,CostCenterProfitQuery,CostCenterAccountsQuery,qryBudgetMonths," & _
+    "qryBudgetPlanned,qryBudgetActual,BudgetVsActualQuery,qryBalanceAt,qryBalanceCompare,qryBalanceAccounts,qryProfitAt,qryProfitCompare,qryBalanceItems,BalanceSheetQuery,OpeningBalancesReportQuery,AccountTreeQuery,qrySalesInvoiceLineTotals,qryPurchaseInvoiceLineTotals,qrySalesReturnedQty,qryPurchaseReturnedQty,IntegrityCheckQuery"
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -706,6 +706,8 @@ Private Sub CreateAllQueries()
     Q_qryLocCostCenters
     Q_qryLocSalesReps1
     Q_qryLocSalesReps
+    Q_qryLocPriceLists1
+    Q_qryLocPriceLists
     Q_qrySalesDocuments
     Q_qrySalesLineItems
     Q_qrySalesLinesInPeriod
@@ -832,6 +834,7 @@ Private Sub CreateAllQueries()
     Q_RepDaySummaryQuery
     Q_RepVisitListQuery
     Q_RouteExecutionQuery
+    Q_PriceListQuery
     Q_RepVanStockQuery
     Q_qryJournalStockTransfer
     Q_qryJournalStockNote
@@ -1042,13 +1045,13 @@ End Sub
 
 Private Sub Q_qryLocCustomers1()
     Dim s As String
-    s = "SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.NationalID, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID FROM Customers AS t" & vbCrLf
+    s = "SELECT t.CustomerID, t.CustomerName AS LocArabicName, t.CustomerNameEn, t.Mobile, t.Phone, t.Email, t.VATNumber, t.CRNumber, t.BuildingNo, t.StreetName, t.District, t.City, t.PostalCode, t.Address, t.NationalID, t.OpeningBalance, t.CurrentBalance, t.AllowCredit, t.CreditLimit, t.PaymentTermsDays, t.IsSystem, t.IsActive, t.Notes, t.CreatedAt, t.SalesRepID, t.PriceListID FROM Customers AS t" & vbCrLf
     SaveQuery "qryLocCustomers1", "Customers للواجهة الإنجليزية (خطوة 1)", s
 End Sub
 
 Private Sub Q_qryLocCustomers()
     Dim s As String
-    s = "SELECT CustomerID, Nz(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, NationalID, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID FROM qryLocCustomers1" & vbCrLf
+    s = "SELECT CustomerID, Nz(CustomerNameEn, LocArabicName) AS CustomerName, CustomerNameEn, Mobile, Phone, Email, VATNumber, CRNumber, BuildingNo, StreetName, District, City, PostalCode, Address, NationalID, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, PaymentTermsDays, IsSystem, IsActive, Notes, CreatedAt, SalesRepID, PriceListID FROM qryLocCustomers1" & vbCrLf
     SaveQuery "qryLocCustomers", "Customers بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
 End Sub
 
@@ -1134,6 +1137,18 @@ Private Sub Q_qryLocSalesReps()
     Dim s As String
     s = "SELECT SalesRepID, RepCode, Nz(RepNameEn, LocArabicName) AS RepName, RepNameEn, Mobile, EmployeeID, Region, CostCenterID, CommissionRate, CommissionBase, CreditLimit, MaxDiscountPercent, IsActive, Notes, CreatedAt FROM qryLocSalesReps1" & vbCrLf
     SaveQuery "qryLocSalesReps", "SalesReps بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
+End Sub
+
+Private Sub Q_qryLocPriceLists1()
+    Dim s As String
+    s = "SELECT t.PriceListID, t.ListName AS LocArabicName, t.ListNameEn, t.DiscountPercent, t.IsActive, t.Notes, t.CreatedAt FROM PriceLists AS t" & vbCrLf
+    SaveQuery "qryLocPriceLists1", "PriceLists للواجهة الإنجليزية (خطوة 1)", s
+End Sub
+
+Private Sub Q_qryLocPriceLists()
+    Dim s As String
+    s = "SELECT PriceListID, Nz(ListNameEn, LocArabicName) AS ListName, ListNameEn, DiscountPercent, IsActive, Notes, CreatedAt FROM qryLocPriceLists1" & vbCrLf
+    SaveQuery "qryLocPriceLists", "PriceLists بالأسماء الإنجليزية (الواجهة الإنجليزية)", s
 End Sub
 
 Private Sub Q_qrySalesDocuments()
@@ -2919,6 +2934,23 @@ Private Sub Q_RouteExecutionQuery()
     s = s & "FROM RepVisits AS v INNER JOIN [@SalesReps] AS r ON v.SalesRepID = r.SalesRepID" & vbCrLf
     s = s & "GROUP BY v.VisitDate, v.SalesRepID, r.RepName" & vbCrLf
     SaveQuery "RouteExecutionQuery", "تنفيذ خط السير لكل مندوب ويوم: المخطط والمنفذ والفائت ونتائج الزيارات (docs/64)", s
+End Sub
+
+Private Sub Q_PriceListQuery()
+    Dim s As String
+    s = "SELECT i.PriceListItemID, l.PriceListID, l.ListName, p.ProductCode, p.ProductName," & vbCrLf
+    s = s & "       IIf(i.UnitID Is Null, u.UnitName, v.UnitName) AS PriceUnit, i.UnitPrice," & vbCrLf
+    s = s & "       IIf(i.UnitID Is Null, p.SellingPrice," & vbCrLf
+    s = s & "           IIf(CCur(Nz(pu.SellingPrice, 0)) > 0, pu.SellingPrice, p.SellingPrice * CCur(Nz(pu.UnitFactor, 1)))) AS UsualPrice," & vbCrLf
+    s = s & "       i.ValidFrom, i.ValidTo," & vbCrLf
+    s = s & "       IIf(i.ValidTo < Date(), 'انتهى سريانه', IIf(i.ValidFrom > Date(), 'لم يبدأ بعد', 'ساري')) AS StatusName" & vbCrLf
+    s = s & "FROM ((((PriceListItems AS i INNER JOIN [@PriceLists] AS l ON i.PriceListID = l.PriceListID)" & vbCrLf
+    s = s & "      INNER JOIN Products AS p ON i.ProductID = p.ProductID)" & vbCrLf
+    s = s & "      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)" & vbCrLf
+    s = s & "      LEFT JOIN [@Units] AS v ON i.UnitID = v.UnitID)" & vbCrLf
+    s = s & "     LEFT JOIN ProductUnits AS pu ON (i.ProductID = pu.ProductID AND i.UnitID = pu.UnitID)" & vbCrLf
+    s = s & "WHERE l.IsActive <> 0" & vbCrLf
+    SaveQuery "PriceListQuery", "أسعار قوائم الأسعار: سعر كل صنف في كل قائمة لكل وحدة، وسعر البيع المعتاد، والسريان (docs/73)", s
 End Sub
 
 Private Sub Q_RepVanStockQuery()

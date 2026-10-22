@@ -33,6 +33,9 @@ Public Sub EnsureLocalTables()
     If Not LocalFieldExists("tmpPOSLines", "UnitID") Then           ' the unit of the line (docs/72)
         CurrentDb.Execute "ALTER TABLE tmpPOSLines ADD COLUMN UnitID LONG, UnitFactor CURRENCY", dbFailOnError
     End If
+    If Not LocalFieldExists("tmpPOSLines", "ListPrice") Then        ' the price the program gave the line (docs/73)
+        CurrentDb.Execute "ALTER TABLE tmpPOSLines ADD COLUMN ListPrice CURRENCY", dbFailOnError
+    End If
     If Not LocalTableExists("tmpReturnLines") Then
         CurrentDb.Execute "CREATE TABLE tmpReturnLines (SalesDetailID LONG CONSTRAINT pkReturnLines " & _
             "PRIMARY KEY, ProductID LONG, ProductName TEXT(150), SoldQty CURRENCY, ReturnedQty CURRENCY, " & _
@@ -234,7 +237,9 @@ Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty 
         rs!ProductCode = p!ProductCode
         rs!ProductName = p!ProductName
         rs!Quantity = Qty
-        rs!UnitPrice = UnitSalePrice(ProductID, UnitID)         ' the rep's price list, the unit's price (modProductUnits)
+        ' the customer's price list, the rep's, the unit's price (modPriceLists, modProductUnits)
+        rs!UnitPrice = UnitSalePrice(ProductID, UnitID, CartCustomerID(frm))
+        rs!ListPrice = rs!UnitPrice
         rs!LineDiscount = 0
         rs!UnitID = UnitID
         rs!UnitFactor = factor
@@ -255,9 +260,40 @@ Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty 
     p.Close
 End Sub
 
+Public Function CartCustomerID(ByVal frm As Access.Form) As Long
+    ' The customer of the sale on the screen (0 = none), whose price list prices the cart (modPriceLists).
+    If HasControl(frm, "cboCustomer") Then CartCustomerID = Nz(frm!cboCustomer.Value, 0)
+End Function
+
+Public Sub RepriceCart(ByVal frm As Access.Form)
+    ' The customer changed: the lines still at the price the program gave them take his price (his price list,
+    ' docs/73); a price the cashier typed stays.
+    Dim rs As DAO.Recordset, price As Currency, cust As Long, n As Long
+    cust = CartCustomerID(frm)
+    Set rs = CurrentDb.OpenRecordset("SELECT ProductID, UnitID, UnitPrice, ListPrice FROM tmpPOSLines " & _
+                                     "WHERE UnitPrice = ListPrice", dbOpenDynaset, dbSeeChanges)
+    Do Until rs.EOF
+        price = UnitSalePrice(rs!ProductID, rs!UnitID, cust)
+        If price <> rs!UnitPrice Then
+            rs.Edit
+            rs!UnitPrice = price
+            rs!ListPrice = price
+            rs.Update
+            n = n + 1
+        End If
+        rs.MoveNext
+    Loop
+    rs.Close
+    If n > 0 Then
+        RecalcPOS frm
+        SetPOSStatus frm, " €Ì¯— ”⁄— " & n & " ”ÿ— Õ”» ﬁ«∆„… √”⁄«— «·⁄„Ì·", CLR_SUCCESS
+    End If
+End Sub
+
 Public Sub LineChanged(ByVal sf As Access.Form, ByVal FieldName As String)
     ' AfterUpdate of Quantity / UnitPrice / LineDiscount / UnitID in frmPOSLines.
-    Dim price As Variant, factor As Currency
+    Dim price As Variant, factor As Currency, cust As Long
+    cust = CartCustomerID(sf.Parent)
     If Nz(sf!Quantity.Value, 0) <= 0 Then
         ShowWarning "«·ﬂ„Ì… ÌÃ» √‰  ﬂÊ‰ √ﬂ»— „‰ ’›—."
         sf!Quantity.Value = 1
@@ -272,19 +308,23 @@ Public Sub LineChanged(ByVal sf As Access.Form, ByVal FieldName As String)
         End If
         sf!UnitID.Value = LineUnitID(sf!ProductID.Value, sf!UnitID.Value)
         sf!UnitFactor.Value = factor
-        sf!UnitPrice.Value = UnitSalePrice(sf!ProductID.Value, sf!UnitID.Value)
+        sf!UnitPrice.Value = UnitSalePrice(sf!ProductID.Value, sf!UnitID.Value, cust)
+        sf!ListPrice.Value = sf!UnitPrice.Value
+    ElseIf FieldName = "UnitPrice" And IsCustomerListPrice(cust, sf!ProductID.Value, sf!UnitID.Value, _
+                                                           Nz(sf!UnitPrice.Value, 0)) Then
+        ' the price of the customer's price list (modPriceLists): not a price change
     ElseIf FieldName = "UnitPrice" And Nz(sf!UnitFactor.Value, 1) <> 1 Then
         If Not IsListedUnitPrice(sf!ProductID.Value, sf!UnitID.Value, Nz(sf!UnitPrice.Value, 0)) And _
            Not HasPermission("PRICE_OVERRIDE") Then
             ShowWarning "·«  „·ﬂ ’·«ÕÌ…  ⁄œÌ· ”⁄— «·»Ì⁄."
-            sf!UnitPrice.Value = UnitSalePrice(sf!ProductID.Value, sf!UnitID.Value)
+            sf!UnitPrice.Value = UnitSalePrice(sf!ProductID.Value, sf!UnitID.Value, cust)
         End If
     ElseIf FieldName = "UnitPrice" Then
         price = DLookup("SellingPrice", "Products", "ProductID = " & sf!ProductID.Value)
         If Nz(sf!UnitPrice.Value, 0) <> price And Not IsSessionRepPrice(sf!ProductID.Value, Nz(sf!UnitPrice.Value, 0)) _
            And Not HasPermission("PRICE_OVERRIDE") Then
             ShowWarning "·«  „·ﬂ ’·«ÕÌ…  ⁄œÌ· ”⁄— «·»Ì⁄."
-            sf!UnitPrice.Value = SessionPrice(sf!ProductID.Value, price)
+            sf!UnitPrice.Value = UnitSalePrice(sf!ProductID.Value, Null, cust)
         End If
     End If
     If sf.Dirty Then sf.Dirty = False
@@ -378,6 +418,7 @@ Public Sub CustomerChanged(ByVal frm As Access.Form)
         If Not rs!AllowCredit Then frm!cboPaymentType.Value = "CASH"
     End If
     rs.Close
+    RepriceCart frm                                     ' his price list (modPriceLists)
 End Sub
 
 Public Sub PaymentTypeChanged(ByVal frm As Access.Form)

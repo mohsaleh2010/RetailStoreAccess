@@ -25,11 +25,11 @@ Option Explicit
 
 Private Const MIRROR_LAYOUT As Boolean = False
 Private Const EP As String = "[Event Procedure]"
-Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRouteStops,frmRepPrices,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmProductUnits,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmStockParties,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch,frmReportCenter,frmPOSLines," & _
-    "frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword,frmRolePermLines,frmRoles," & _
-    "frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx,frmBankRecon,frmCheques," & _
-    "frmAssets,frmDepreciation,frmAssetChanges,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines,frmSalesOrder,frmRepDay," & _
-    "frmRepVisits,frmSqlServer"
+Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppliers,frmExpenses,frmCurrencies,frmCurrencyRates,frmSalesReps,frmRepTargets,frmRouteStops,frmRepPrices,frmRecurring,frmUsers,frmCostCenters,frmEmployeePay,frmCategories,frmUnits,frmProductUnits,frmPriceLists,frmPriceListItems,frmExpenseTypes,frmCashBoxes,frmCashBoxUsers,frmWarehouses,frmStockParties,frmBanks,frmAccounts,frmSettings,frmLabelSettings,frmSearch," & _
+    "frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword," & _
+    "frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx," & _
+    "frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmAssetChanges,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines," & _
+    "frmSalesOrder,frmRepDay,frmRepVisits,frmSqlServer"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -594,6 +594,8 @@ Private Sub BuildAllForms()
     BuildForm_frmCategories
     BuildForm_frmUnits
     BuildForm_frmProductUnits
+    BuildForm_frmPriceLists
+    BuildForm_frmPriceListItems
     BuildForm_frmExpenseTypes
     BuildForm_frmCashBoxes
     BuildForm_frmCashBoxUsers
@@ -1196,6 +1198,8 @@ Private Sub BuildForm_frmProducts()
     c.OnClick = EP
     Set c = AddButton("btnProductUnits", "وحدات الصنف", 7937, 1021, 1701, 482, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnPriceLists", "قوائم الأسعار", 9751, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
     c.OnClick = EP
     Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
@@ -1333,6 +1337,9 @@ Private Sub BuildForm_frmProducts()
     s = s & "Private Sub btnProductUnits_Click()" & vbCrLf
     s = s & "    OpenProductUnits Me" & vbCrLf
     s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPriceLists_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmPriceLists""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
     s = s & "End Sub" & vbCrLf
@@ -1455,9 +1462,13 @@ Private Sub BuildForm_frmCustomers()
     SetCtlProp c, "ControlTipText", "تُنسب له فواتير العميل وتحصيلاته"
     SetCtlProp c, "StatusBarText", "تُنسب له فواتير العميل وتحصيلاته"
     Set c = AddLabel("lblSalesRepID", "المندوب", 5443, 7938, 1701, 425, 10, False, CLR_MUTED, "SalesRepID", 0)
-    Set c = AddCheck("IsActive", "IsActive", 12134, 8023)
-    Set c = AddLabel("lblIsActive", "نشط", 10376, 7938, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
-    Set c = AddLabel("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق على العميل", 5443, 8505, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddCombo("PriceListID", "PriceListID", 12134, 7938, 2948, 425, "SELECT l.PriceListID, l.ListName FROM [@PriceLists] AS l WHERE l.IsActive <> 0 ORDER BY l.ListName", 2, "0;3402")
+    SetCtlProp c, "ControlTipText", "جملة / موزع؛ فارغ = سعر البيع المعتاد"
+    SetCtlProp c, "StatusBarText", "جملة / موزع؛ فارغ = سعر البيع المعتاد"
+    Set c = AddLabel("lblPriceListID", "قائمة الأسعار", 10376, 7938, 1701, 425, 10, False, CLR_MUTED, "PriceListID", 0)
+    Set c = AddCheck("IsActive", "IsActive", 7201, 8590)
+    Set c = AddLabel("lblIsActive", "نشط", 5443, 8505, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddLabel("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق على العميل", 10376, 8505, 4706, 425, 9, False, CLR_MUTED, "", 0)
     Set c = AddText("Notes", "Notes", 7201, 9072, 7881, 907)
     SetCtlProp c, "EnterKeyBehavior", True
     SetCtlProp c, "ScrollBars", 2
@@ -3412,6 +3423,220 @@ Private Sub BuildForm_frmProductUnits()
     Exit Sub
 EH:
     AbortForm "frmProductUnits", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmPriceLists()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmPriceLists", "قوائم الأسعار", "SELECT * FROM PriceLists", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=PriceLists|PK=PriceListID|LIST=SELECT t.PriceListID, t.ListName AS [القائمة], t.DiscountPercent AS [خصم القائمة] FROM [@PriceLists] AS t WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY t.ListName|SEARCH=t.ListName,t.ListNameEn,t.Notes|ACTIVE=t.IsActive|UNIQUE=ListName"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8FD), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "قوائم الأسعار", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "تجزئة / جملة / موزع: تُسند القائمة للعميل فيُباع له بأسعارها في نقطة البيع والطلبيات", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", "تراجع", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnListItems", "أسعار القائمة", 6123, 1021, 1701, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddCheck("chkShowInactive", "", 227, 2579)
+    SetCtlProp c, "DefaultValue", "False"
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblShowInactive", "إظهار غير النشط", 567, 2551, 2835, 340, 9, False, CLR_MUTED, "", 0)
+    Set c = AddList("lstItems", 227, 3005, 4990, 4933, 3, "0;3062;1701", True)
+    c.AfterUpdate = EP
+    Set c = AddText("ListName", "ListName", 7201, 1701, 7881, 425)
+    Set c = AddLabel("lblListName", "اسم القائمة *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "ListName", 0)
+    Set c = AddText("ListNameEn", "ListNameEn", 7201, 2268, 7881, 425)
+    Set c = AddLabel("lblListNameEn", "الاسم بالإنجليزية", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ListNameEn", 0)
+    Set c = AddText("DiscountPercent", "DiscountPercent", 7201, 2835, 2948, 425)
+    SetCtlProp c, "Format", "0.00%"
+    SetCtlProp c, "ControlTipText", "للأصناف التي ليس لها سعر في القائمة: سعر البيع ناقص هذه النسبة (0 = بلا خصم)"
+    SetCtlProp c, "StatusBarText", "للأصناف التي ليس لها سعر في القائمة: سعر البيع ناقص هذه النسبة (0 = بلا خصم)"
+    Set c = AddLabel("lblDiscountPercent", "خصم الأصناف غير المسعّرة فيها", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "DiscountPercent", 0)
+    Set c = AddCheck("IsActive", "IsActive", 12134, 2920)
+    Set c = AddLabel("lblIsActive", "نشط", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "IsActive", 0)
+    Set c = AddText("Notes", "Notes", 7201, 3402, 7881, 425)
+    Set c = AddLabel("lblNotes", "ملاحظات", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "Notes", 0)
+    Set c = AddLabel("lblListNote", "تُسند القائمة للعميل من شاشة العملاء؛ أسعار الأصناف من زر «أسعار القائمة»", 5443, 3969, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 4649, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnListItems_Click()" & vbCrLf
+    s = s & "    OpenPriceListItems Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub chkShowInactive_AfterUpdate()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmPriceLists", s
+    Exit Sub
+EH:
+    AbortForm "frmPriceLists", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmPriceListItems()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmPriceListItems", "أسعار قوائم الأسعار", "SELECT * FROM PriceListItems", 15309, 8222, True, True, True, _
+              "KIND=LIST|TABLE=PriceListItems|PK=PriceListItemID|LIST=SELECT t.PriceListItemID, l.ListName AS [القائمة], p.ProductName AS [الصنف], u.UnitName AS [وحدة السعر], t.UnitPrice AS [سعر القائمة] FROM ((PriceListItems AS t INNER JOIN [@PriceLists] AS l ON t.PriceListID = l.PriceListID) INNER JOIN Products AS p ON t.ProductID = p.ProductID) LEFT JOIN [@Units] AS u ON t.UnitID = u.UnitID WHERE ({ACTIVE}) AND ({SEARCH}) ORDER BY l.ListName, p.ProductName, t.ValidFrom|SEARCH=l.ListName,p.ProductName,p.ProductCode,p.Barcode,p.ProductNameEn"
+    Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8FD), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "أسعار قوائم الأسعار", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "سعر الصنف في القائمة لكل وحدة، بتاريخ سريان؛ بين الأسعار السارية يُؤخذ الذي بدأ آخرًا", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddButton("btnNew", "جديد", 227, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnSave", "حفظ", 1701, 1021, 1361, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnUndo", "تراجع", 3175, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف", 4649, 1021, 1361, 482, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 13721, 1021, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblSearch", "بحث (F3)", 227, 1701, 3118, 284, 9, False, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblCount", " ", 3402, 1701, 1815, 284, 9, False, CLR_MUTED, "", 3)
+    Set c = AddText("txtSearch", "", 227, 1985, 4990, 454)
+    c.OnChange = EP
+    Set c = AddList("lstItems", 227, 2551, 4990, 5387, 5, "0;1247;1928;794;794", True)
+    c.AfterUpdate = EP
+    Set c = AddCombo("PriceListID", "PriceListID", 7201, 1701, 7881, 425, "SELECT l.PriceListID, l.ListName FROM [@PriceLists] AS l WHERE l.IsActive <> 0 ORDER BY l.ListName", 2, "0;3402")
+    Set c = AddLabel("lblPriceListID", "قائمة الأسعار *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "PriceListID", 0)
+    Set c = AddCombo("ProductID", "ProductID", 7201, 2268, 7881, 425, "SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Item FROM Products ORDER BY ProductName", 2, "0;3969")
+    Set c = AddLabel("lblProductID", "الصنف *", 5443, 2268, 1701, 425, 10, False, CLR_MUTED, "ProductID", 0)
+    Set c = AddCombo("UnitID", "UnitID", 7201, 2835, 2948, 425, "SELECT u.UnitID, u.UnitName FROM [@Units] AS u ORDER BY u.UnitName", 2, "0;2268")
+    SetCtlProp c, "ControlTipText", "فارغ = الوحدة الصغرى؛ أو كرتونة من وحدات الصنف"
+    SetCtlProp c, "StatusBarText", "فارغ = الوحدة الصغرى؛ أو كرتونة من وحدات الصنف"
+    Set c = AddLabel("lblUnitID", "الوحدة", 5443, 2835, 1701, 425, 10, False, CLR_MUTED, "UnitID", 0)
+    Set c = AddText("UnitPrice", "UnitPrice", 12134, 2835, 2948, 425)
+    SetCtlProp c, "Format", "#,##0.00"
+    SetCtlProp c, "ControlTipText", "شامل الضريبة كسعر الصنف"
+    SetCtlProp c, "StatusBarText", "شامل الضريبة كسعر الصنف"
+    Set c = AddLabel("lblUnitPrice", "السعر في القائمة", 10376, 2835, 1701, 425, 10, False, CLR_MUTED, "UnitPrice", 0)
+    Set c = AddText("ValidFrom", "ValidFrom", 7201, 3402, 2948, 425)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    SetCtlProp c, "ControlTipText", "فارغ = من البداية"
+    SetCtlProp c, "StatusBarText", "فارغ = من البداية"
+    Set c = AddLabel("lblValidFrom", "ساري من", 5443, 3402, 1701, 425, 10, False, CLR_MUTED, "ValidFrom", 0)
+    Set c = AddText("ValidTo", "ValidTo", 12134, 3402, 2948, 425)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    SetCtlProp c, "ControlTipText", "فارغ = بلا نهاية"
+    SetCtlProp c, "StatusBarText", "فارغ = بلا نهاية"
+    Set c = AddLabel("lblValidTo", "ساري حتى", 10376, 3402, 1701, 425, 10, False, CLR_MUTED, "ValidTo", 0)
+    Set c = AddLabel("lblItemsNote", "سعر الحبة في القائمة يجعل سعر الكرتونة = سعرها × العدد، ما لم يكن للكرتونة سعر فيها", 5443, 3969, 9639, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddLabel("lblStatus", " ", 5443, 4649, 9639, 340, 10, True, CLR_MUTED, "", 0)
+    m_frm.OnLoad = EP
+    m_frm.OnCurrent = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    m_frm.OnError = EP
+    m_frm.OnKeyDown = EP
+    m_frm.OnUnload = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    FormLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Current()" & vbCrLf
+    s = s & "    FormCurrent Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormBeforeUpdate(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    FormAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Error(DataErr As Integer, Response As Integer)" & vbCrLf
+    s = s & "    Response = FormError(Me, DataErr)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)" & vbCrLf
+    s = s & "    FormKeyDown Me, KeyCode, Shift" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Unload(Cancel As Integer)" & vbCrLf
+    s = s & "    Cancel = Not FormUnload(Me)" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""NEW""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""SAVE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUndo_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""UNDO""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    FormAction Me, ""CLOSE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub txtSearch_Change()" & vbCrLf
+    s = s & "    RefreshList Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub lstItems_AfterUpdate()" & vbCrLf
+    s = s & "    ListPick Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmPriceListItems", s
+    Exit Sub
+EH:
+    AbortForm "frmPriceListItems", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmExpenseTypes()

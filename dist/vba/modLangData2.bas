@@ -15,6 +15,13 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÍÌÒ æáÇ íõÓáóøã ÈÅĞä", "This product does not track stock, so it is not reserved or delivered with a note"
+    LangAdd "íÚãá ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáãİÚøáÉ İŞØ ÈßæÏ ãä ÇáãÈÑãÌ", "The program runs only on computers activated with a code from the developer"
+    LangAdd "ÇÎÊÑ ÓØÑ ŞíÏ ãä ÇáŞÇÆãÉ (ÓØÑ ÑÕíÏ Ãæá ÇáãÏÉ áíÓ ŞíÏğÇ", "Choose an entry line from the list (the opening balance line is not an entry"
+    LangAdd "ÇáÍÓÇÈ ãŞİá ãÄŞÊğÇ ÈÓÈÈ ãÍÇæáÇÊ ÏÎæá ÎÇØÆÉ ÍÊì ÇáÓÇÚÉ", "The account is locked for a while after wrong login attempts, until"
+    LangAdd "ÇáãÎÒä ÇáÑÆíÓí æÇáİÑæÚ æÓíÇÑÇÊ ÇáãäÏæÈíä æÊÍÊ ÇáÊÔÛíá", "The main warehouse, branches, sales rep vans and work in progress"
+    LangAdd "ÇãÓÍ ÇáÈÇÑßæÏ Ãæ ÇÎÊÑ ÇáÕäİ ÈÇáÇÓã¡ æÍÏÏ ÚÏÏ ÇáãáÕŞÇÊ", "Scan the barcode or choose the item by name, and set the number of labels"
+    LangAdd "ÍÑßÉ ÇáÔíß ãØÇÈŞÉ İí ÊÓæíÉ ÈäßíÉ: ÃáÛö ãØÇÈŞÊåÇ ÃæáğÇ", "The cheque move is matched in a bank reconciliation: unmatch it first"
     LangAdd "ŞíÏ áßá ÚãáíÉ ãÑÈæØ ÈÃÕáåÇ: ÇİÊÍ ÇáŞíÏ Ãæ ÃÕá ÇáÚãáíÉ", "One entry for each transaction, linked to its source: open the entry or the source transaction"
     LangAdd "ãÈíÚÇÊ ÇáãÓÊÎÏã æãÔÊÑíÇÊå æÍÑßÇÊå ãä åĞÇ ÇáãÎÒäº İÇÑÛ", "The sales, purchases and moves of the user use this warehouse, empty"
     LangAdd "ÇáÍÓÇÈ ÇáÑÆíÓí ÇáĞí íÊÈÚå (äæÚ ÇáÍÓÇÈ íÊÈÚå ÊáŞÇÆíğÇ", "The main account it belongs to (the account type follows it automatically"
@@ -128,6 +135,9 @@ Private Sub D2_1()
     LangAdd "ÇÎÊÑ ÇáÚãáíÇÊ ÇáÙÇåÑÉ İí ßÔİ ÇáÈäß Ëã «ãØÇÈŞÉ", "Choose the transactions shown on the bank statement, then Match"
     LangAdd "ÇÎÊÑ ÇáİÇÊæÑÉ ÇáÃÕáíÉ Ëã ÍÏÏ ÇáßãíÇÊ ÇáãÑÊÌÚÉ", "Choose the original invoice, then set the returned quantities"
     LangAdd "ÇÎÊÑ äæÚ ÇáÅĞä: ÊÓáíã áÚãíá Ãæ ÇÓÊáÇã ãä ãæÑÏ", "Choose the note type: delivery to a customer or receipt from a supplier"
+End Sub
+
+Private Sub D2_2()
     LangAdd "ÇáÈÇŞí ãä ÇáİÇÊæÑÉ ÈÚÏ ãÇ ÑõÈØ ÈåÇ æãÑÊÌÚÇÊåÇ", "What remains of the invoice after what was linked to it and its returns"
     LangAdd "ÇáÊŞÇÑíÑ ÇáãÍÇÓÈíÉ ÊÍÊÇÌ ÕáÇÍíÉ «ŞíæÏ ÇáíæãíÉ", "The accounting reports need the permission Journal entries"
     LangAdd "ÇáãÈíÚÇÊ ÇáãÍáíÉ ÇáÎÇÖÚÉ ááÖÑíÈÉ ÈÇáÓÚÑ ÇáÚÇã", "Local sales taxed at the general rate"
@@ -135,9 +145,6 @@ Private Sub D2_1()
     LangAdd "ÇáæÇÑÏÇÊ ãä ÇáÓáÚ (ÇáãÓÏÏÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imported goods (VAT paid at customs"
     LangAdd "ÈÑäÇãÌ ÇáÊæŞíÚ (İáÇÔÉ ÇáÊæŞíÚ) İí ÅÚÏÇÏ ÇáÑÈØ", "Signing program (USB token) in the connection setup"
     LangAdd "ÈÚÏ ÇáÍİÙ Úíøä ßáãÉ ÇáãÑæÑ ãä ÒÑ «ßáãÉ ÇáãÑæÑ", "After saving, set the password with the button Password"
-End Sub
-
-Private Sub D2_2()
     LangAdd "ÑÕíÏ ÇáÍÓÇÈ İí ÇáÈäß ÚäÏ ÈÏÁ ÇÓÊÎÏÇã ÇáÈÑäÇãÌ", "The account balance in the bank when the program is first used"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáİÊÑÇÊ ÇáãÇáíÉ (ÅŞİÇá ÇáİÊÑÇÊ", "You do not have the permission for the fiscal periods (period closing"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÚãæáÇÊ ÇáãäÏæÈíä", "You do not have this permission in the sales rep commissions screen"
@@ -186,6 +193,7 @@ Private Sub D2_2()
     LangAdd "ÈíÇäÇÊß ÇáÍÇáíÉ áã ÊÊÛíÑ¡ æäÓÎÊåÇ ÇáæŞÇÆíÉ", "Your current data did not change, and its safety copy"
     LangAdd "ÊÇÑíÎ ÇáİÇÊæÑÉ áÇ íãßä Ãä íßæä İí ÇáãÓÊŞÈá", "The invoice date cannot be in the future"
     LangAdd "ÍĞİ ÂÎÑ äŞá ááÃÕá æÅÑÌÇÚå Åáì ãÑßÒå ÇáÓÇÈŞ", "Delete the last transfer of the asset and return it to its previous centre"
+    LangAdd "ÓÚÑåÇ × ÇáÚÏÏ¡ ãÇ áã íßä ááßÑÊæäÉ ÓÚÑ İíåÇ", "its price x the count, unless the carton has its own price in the list"
     LangAdd "ÚãáÇÁ ÎØ ÇáÓíÑ ãæÌæÏæä İí ÒíÇÑÇÊ åĞÇ Çáíæã", "The route customers are already in the visits of this day"
     LangAdd "İÇÊæÑÉ Ãæ ãÑÊÌÚ İí ÇáİÊÑÉ áã ÊŞÈáåÇ ãäÙæãÉ", "invoices or returns of the period not accepted by the"
     LangAdd "İÇÊæÑÉ ÅĞä ÇáÇÓÊáÇã ÈÇáæÍÏÉ ÇáÕÛÑì ááÃÕäÇİ", "The invoice of a receipt note is in the smallest unit of the products"
@@ -245,10 +253,14 @@ Private Sub D2_2()
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÌåÇÒ äŞØÉ ÇáÈíÚ (ÑãÒ", "The Tax Authority refused the POS device data (code"
     LangAdd "ÓØÑ ÇáãÑÊÌÚ ãä İÇÊæÑÉ ÛíÑ İÇÊæÑÉ ÇáãÑÊÌÚ", "A return line from an invoice other than the invoice of the return"
     LangAdd "Úáì åĞÇ ÇáÍÓÇÈ ŞíæÏ¡ İíÈŞì ÍÓÇÈğÇ İÑÚíğÇ", "This account has entries, so it stays a sub-account"
+    LangAdd "ŞæÇÆã ÇáÃÓÚÇÑ: ÃÓÚÇÑ ÇáÃÕäÇİ İí ßá ŞÇÆãÉ", "Price lists: the product prices in each list"
     LangAdd "ßáãÊÇ ÇáãÑæÑ ÛíÑ ãÊØÇÈŞÊíä. áã íÊÛíÑ ÔíÁ", "The two passwords do not match. Nothing changed"
     LangAdd "áÇ íãßäß ÊÚØíá ÍÓÇÈß æÃäÊ ãÓÌá ÇáÏÎæá Èå", "You cannot deactivate your own account while logged in with it"
     LangAdd "áã íõäÔÆ ÈÑäÇãÌ ÇáÊæŞíÚ ãáİ ÇáÊæŞíÚ (ÑãÒ", "The signing program did not create the signature file (code"
     LangAdd "ãÈáÛ ãÓÊÍŞ ááãæÑÏ (ÈÚãáÉ ÇáÈÑäÇãÌ ÏÇÆãğÇ", "an amount due to the supplier (always in the program currency"
+End Sub
+
+Private Sub D2_3()
     LangAdd "äŞá ßá ÇáÈíÇäÇÊ ãä ãáİ Access Åáì ÇáÎÇÏã", "Transfer all the data from the Access file to the server"
     LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáíÓ áå ÑÕíÏ", "This item does not track stock, so it has no balance"
     LangAdd "åĞå ÇáÔÇÔÉ ÓÊßæä ãÊÇÍÉ ÈÚÏ ÊäİíĞ ÇáãÑÍáÉ", "This screen will be available after phase"
@@ -258,14 +270,12 @@ Private Sub D2_2()
     LangAdd "ÃĞæäÇÊ ÇáÊÓáíã æÇáÇÓÊáÇã ÇáÊí áã ÊõİæÊÑ", "Delivery and goods receipt notes not invoiced"
     LangAdd "ÃÑÕÏÉ Ãæá ÇáãÏÉ (İí ÈÏÇíÉ ÊÇÑíÎ ÇáÈÏÇíÉ", "Opening balances (at the start of the start date"
     LangAdd "ÅÚÇÏÉ ÇáØáÈíÉ áãÓæÏÉ¿ íõáÛì ÍÌÒ ßãíÇÊåÇ", "Return the order to draft? Its quantities are no longer reserved"
-End Sub
-
-Private Sub D2_3()
     LangAdd "ÇÎÊÑ Ãíä ÇÓÊõáã Ëãä ÇáÈíÚ (Èäß Ãæ ÕäÏæŞ", "Choose where the sale price was received (bank or box"
     LangAdd "ÇáÃÕäÇİ ÇáãÍÌæÒÉ ááØáÈíÇÊ æÇáãÊÇÍ ááÈíÚ", "Stock reserved for orders and free to sell"
     LangAdd "ÇáãÈíÚÇÊ ÇáÎÇÖÚÉ ááÖÑíÈÉ (ÈÚÏ ÇáãÑÊÌÚÇÊ", "Taxable sales (after returns"
     LangAdd "ÇáãÈíÚÇÊ ÇáãÍáíÉ ÇáÎÇÖÚÉ ááäÓÈÉ ÇáÕİÑíÉ", "Domestic zero-rated sales"
     LangAdd "ÇáãíÒÇäíÉ ÇáÚãæãíÉ (ŞÇÆãÉ ÇáãÑßÒ ÇáãÇáí", "Balance sheet (statement of financial position"
+    LangAdd "ÇáæÍÏÉ ÇáÕÛÑìº Ãæ ßÑÊæäÉ ãä æÍÏÇÊ ÇáÕäİ", "the smallest unit, or a carton of the product units"
     LangAdd "ÊÇÑíÎ ÈÏÁ ÇáÊÔÛíá áÇ íßæä ÈÚÏ Ãæá ãÓÊäÏ", "The start-up date cannot be after the first document"
     LangAdd "ÊÑÍíá ÇáÅĞä¿ íÊÍÑß ÇáãÎÒæä æíõäÔÃ ÇáŞíÏ", "Post the note? The stock moves and the entry is made"
     LangAdd "ÊÑÍíá ÇáÓäÏ¿ íÊÍÑß ÇáãÎÒæä æíõäÔÃ ÇáŞíÏ", "Post the voucher? The stock moves and the entry is created"
@@ -305,6 +315,7 @@ Private Sub D2_3()
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ (ÑãÒ", "The Tax Authority refused the credentials of the program (code"
     LangAdd "ÓØÑ İí ÇáÅĞä áÇ íØÇÈŞ ÓØÑğÇ İí ÇáØáÈíÉ", "A note line does not match a line of the order"
     LangAdd "ÓØÑ áÇ íäÊãí Åáì İÇÊæÑÉ ÇáÔÑÇÁ ÇáÃÕáíÉ", "A line that does not belong to the original purchase invoice"
+    LangAdd "ÓÚÑ ÇáÍÈÉ İí ÇáŞÇÆãÉ íÌÚá ÓÚÑ ÇáßÑÊæäÉ", "A piece price in the list makes the carton price"
     LangAdd "ÓÚæÏí (ÇáÊÃãíäÇÊ ÈÍÕÊí ÇáãæÙİ æÇáãäÔÃÉ", "Saudi (social insurance with the employee and employer shares"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÓÌíá ãÑÊÌÚÇÊ ÇáãÔÊÑíÇÊ", "You do not have the permission to record purchase returns"
     LangAdd "æåĞÇ ÇáÌåÇÒ íÚãá Úáì ãáİ Access ÇáŞÏíã", "and this PC works on the old Access file"
@@ -337,6 +348,7 @@ Private Sub D2_3()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇÚÊãÇÏ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to approve the bank reconciliation"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÓÌíá İæÇÊíÑ ÇáãÔÊÑíÇÊ", "You do not have the permission to record purchase invoices"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÇáãæÇÒäÉ", "You do not have this permission in the budget screen"
+    LangAdd "áÇ ÊæÌÏ ÃÓÚÇÑ İí ŞæÇÆã ÇáÃÓÚÇÑ ÇáäÔØÉ", "No prices in the active price lists"
     LangAdd "áÇ ÊæÌÏ ÍÑßÉ äŞÏíÉ ááÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "There is no cash move for the choices made"
     LangAdd "áÇ íæÌÏ íæã. ÇÎÊÑ ÇáãäÏæÈ Ëã «İÊÍ íæã", "No day. Choose the rep, then Open day"
     LangAdd "áã ÊÚÏ ãä æÍÏÇÊå. ÇÎÊÑ ÇáæÍÏÉ ãä ÌÏíÏ", "is no longer one of its units. Choose the unit again"
@@ -369,6 +381,9 @@ Private Sub D2_3()
     LangAdd "ÕÇİí ÑÈÍ (ÎÓÇÑÉ) ÇáİÊÑÇÊ ÛíÑ ÇáãŞİáÉ", "Net profit (loss) of the periods not closed"
     LangAdd "ÖÑíÈÉ ãÓÊÑÏÉ (ÊõÑÍóøá ááÅŞÑÇÑ ÇáÊÇáí", "Refundable VAT (carried to the next return"
     LangAdd "ØáÈÇÊ ÇáãÓÊäÏ ÇáãÎÊÇÑ æÑÏæÏ ÇáãäÙæãÉ", "Requests of the selected document and the replies of the platform"
+End Sub
+
+Private Sub D2_4()
     LangAdd "ßáãÉ ÇáãÑæÑ ÛíÑ ÕÍíÍÉ. Êã Şİá ÇáÍÓÇÈ", "The password is wrong. The account was locked"
     LangAdd "ßáãÉ ÇáãÑæÑ áÇ ÊÈÏÃ æáÇ ÊäÊåí ÈãÓÇİÉ", "The password does not start or end with a space"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to edit the bank reconciliation"
@@ -381,9 +396,6 @@ Private Sub D2_3()
     LangAdd "æíãßäß ÇáÊÕİíÉ ÍÓÈ ÇáÇÎÊíÇÑ (ÇÎÊíÇÑí", "and you can filter by the choice (optional"
     LangAdd "ÃÏÎá ÈÏÇíÉ ÇáİÊÑÉ ÇáÖÑíÈíÉ æäåÇíÊåÇ", "Enter the start and end of the tax period"
     LangAdd "ÅÚÏÇÏ ÑÈØ ãäÙæãÉ ÇáÅíÕÇá ÇáÅáßÊÑæäí", "E-receipt connection setup"
-End Sub
-
-Private Sub D2_4()
     LangAdd "ÇÚÊãÏ ÇáÅŞÑÇÑ ÃæáğÇ¡ Ëã ÓÌøá ÇáÓÏÇÏ", "Approve the return first, then record the payment"
     LangAdd "ÇáÃÕæá ÇáãÊÏÇæáÉ ÷ ÇáÎÕæã ÇáãÊÏÇæáÉ", "Current assets / current liabilities"
     LangAdd "ÇáÈÑäÇãÌ íÚãá Úáì ãáİ Access ÈÇáİÚá", "The program already works on the Access file"
@@ -396,20 +408,4 @@ Private Sub D2_4()
     LangAdd "ÊÛííÑ ÇÓã ÇáãÍá íÊã Úä ØÑíŞ ÇáãÈÑãÌ", "The store name is changed by the developer"
     LangAdd "ÊãÊ ÇáäÓÎÉ Úáì ÇáÎÇÏã áßä İÍÕåÇ İÔá", "The server made the backup but its check failed"
     LangAdd "ÌÏæá: ÇäŞá ÇáÈíÇäÇÊ Ëã ØÇÈŞåÇ ÃæáğÇ", "tables: transfer the data then compare it first"
-    LangAdd "ÍÓÇÈ ÑÆíÓí: íÔãá ßá ÍÓÇÈÇÊå ÇáÊÇÈÚÉ", "Main account: includes all its sub-accounts"
-    LangAdd "ÑÈØ ÇáÈÑäÇãÌ Úáì åĞÇ ÇáÌåÇÒ ÈÇáÎÇÏã", "Link the program on this PC to the server"
-    LangAdd "ÑÕíÏ ÇáÕäÏæŞ íõÏÎá İí ŞÓã «ÇáÕäÇÏíŞ", "The balance of a cash box is entered in the Cash boxes part"
-    LangAdd "ÑÕíÏ ÇáÚãíá ÇáãÓÌá áÇ íØÇÈŞ ÇáÍÑßÇÊ", "The recorded customer balance does not match the moves"
-    LangAdd "ÑÕíÏ ÇáãæÑÏ ÇáãÓÌá áÇ íØÇÈŞ ÇáÍÑßÇÊ", "The recorded supplier balance does not match the moves"
-    LangAdd "ÑŞã ÇáÊÓÌíá ÇáÖÑíÈí ááÚãíá (9 ÃÑŞÇã", "Tax registration number of the customer (9 digits"
-    LangAdd "ÖÑíÈÉ ãÓÊÑÏÉ ÊõÑÍóøá ááÅŞÑÇÑ ÇáÊÇáí", "Refundable VAT carried to the next return"
-    LangAdd "ßÇÑÊ ÇáÕäİ (ÇáßãíÉ æÇáŞíãÉ áßá ãÎÒä", "Item card (quantity and value by warehouse"
-    LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÚÏíá ÇáãÎÒæä íÏæíğÇ", "You do not have the permission to adjust the stock by hand"
-    LangAdd "áÇ ÊæÌÏ ØáÈíÇÊ ãİÊæÍÉ ÈÇŞò ãäåÇ ÔíÁ", "No open order has anything left to deliver"
-    LangAdd "ááãÈÑãÌ: ÊæáíÏ ßæÏ ÊİÚíá áÌåÇÒ Úãíá", "For the developer: generate an activation code for a customer computer"
-    LangAdd "ãÓÊÍŞÉ ÎáÇá 7 ÃíÇã Ãæ İÇÊ ÇÓÊÍŞÇŞåÇ", "Due within 7 days or overdue"
-    LangAdd "ÇßÊÈ ÇáÊÇÑíÎ æÇáãÚÇãá (ÃßÈÑ ãä ÕİÑ", "Type the date and the rate (greater than zero"
-    LangAdd "ÇáÃÕá ãÓÊÈÚÏ: ÃáÛö ÇáÇÓÊÈÚÇÏ ÃæáğÇ", "The asset is disposed: cancel the disposal first"
-    LangAdd "ÇáÕäİ ãæÌæÏ İí ÓØÑ ÂÎÑ áäİÓ ÇáãÎÒä", "The product is in another line of the same warehouse"
-    LangAdd "ÇáÚãæáÉ æÖÑíÈÊåÇ áÇ ÊßæäÇä ÓÇáÈÊíä", "The fee and its VAT are never negative"
 End Sub

@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 216
+Private Const EXPECTED_RELATION_COUNT As Long = 220
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -405,11 +405,15 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_Warehouses_SalesRepID", "SalesReps", "SalesRepID", "Warehouses", "SalesRepID", 0&)
     c.Add Array("FK_Suppliers_CurrencyCode", "Currencies", "CurrencyCode", "Suppliers", "CurrencyCode", 256&)
     c.Add Array("FK_Customers_SalesRepID", "SalesReps", "SalesRepID", "Customers", "SalesRepID", 0&)
+    c.Add Array("FK_Customers_PriceListID", "PriceLists", "PriceListID", "Customers", "PriceListID", 0&)
     c.Add Array("FK_Products_CategoryID", "Categories", "CategoryID", "Products", "CategoryID", 0&)
     c.Add Array("FK_Products_UnitID", "Units", "UnitID", "Products", "UnitID", 0&)
     c.Add Array("FK_Products_SupplierID", "Suppliers", "SupplierID", "Products", "SupplierID", 0&)
     c.Add Array("FK_ProductUnits_ProductID", "Products", "ProductID", "ProductUnits", "ProductID", 0&)
     c.Add Array("FK_ProductUnits_UnitID", "Units", "UnitID", "ProductUnits", "UnitID", 0&)
+    c.Add Array("FK_PriceListItems_PriceListID", "PriceLists", "PriceListID", "PriceListItems", "PriceListID", 4096&)
+    c.Add Array("FK_PriceListItems_ProductID", "Products", "ProductID", "PriceListItems", "ProductID", 0&)
+    c.Add Array("FK_PriceListItems_UnitID", "Units", "UnitID", "PriceListItems", "UnitID", 0&)
     c.Add Array("FK_SalesInvoices_CustomerID", "Customers", "CustomerID", "SalesInvoices", "CustomerID", 0&)
     c.Add Array("FK_SalesInvoices_EmployeeID", "Employees", "EmployeeID", "SalesInvoices", "EmployeeID", 0&)
     c.Add Array("FK_SalesInvoices_PaymentMethodID", "PaymentMethods", "PaymentMethodID", "SalesInvoices", "PaymentMethodID", 0&)

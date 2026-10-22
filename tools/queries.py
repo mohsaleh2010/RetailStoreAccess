@@ -2007,6 +2007,19 @@ SELECT v.VisitDate, v.SalesRepID, r.RepName, Count(*) AS VisitCount,
 FROM RepVisits AS v INNER JOIN [@SalesReps] AS r ON v.SalesRepID = r.SalesRepID
 GROUP BY v.VisitDate, v.SalesRepID, r.RepName"""),
 
+    Query("PriceListQuery", "أسعار قوائم الأسعار: سعر كل صنف في كل قائمة لكل وحدة، وسعر البيع المعتاد، والسريان (docs/73)", """
+SELECT i.PriceListItemID, l.PriceListID, l.ListName, p.ProductCode, p.ProductName,
+       IIf(i.UnitID Is Null, u.UnitName, v.UnitName) AS PriceUnit, i.UnitPrice,
+       IIf(i.UnitID Is Null, p.SellingPrice,
+           IIf(CCur(Nz(pu.SellingPrice, 0)) > 0, pu.SellingPrice, p.SellingPrice * CCur(Nz(pu.UnitFactor, 1)))) AS UsualPrice,
+       i.ValidFrom, i.ValidTo,
+       IIf(i.ValidTo < Date(), 'انتهى سريانه', IIf(i.ValidFrom > Date(), 'لم يبدأ بعد', 'ساري')) AS StatusName
+FROM ((((PriceListItems AS i INNER JOIN [@PriceLists] AS l ON i.PriceListID = l.PriceListID)
+      INNER JOIN Products AS p ON i.ProductID = p.ProductID)
+      INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
+      LEFT JOIN [@Units] AS v ON i.UnitID = v.UnitID)
+     LEFT JOIN ProductUnits AS pu ON (i.ProductID = pu.ProductID AND i.UnitID = pu.UnitID)
+WHERE l.IsActive <> 0"""),
     Query("RepVanStockQuery", "رصيد سيارة كل مندوب: الكمية والقيمة بمتوسط التكلفة (docs/64)", """
 SELECT q.WarehouseID, w.SalesRepID, r.RepName, w.WarehouseName, p.ProductID, p.ProductCode, p.ProductName,
        q.StockQty, p.AverageCost, q.StockQty * p.AverageCost AS StockCostValue

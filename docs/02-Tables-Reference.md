@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **91** | عدد الحقول: **1176**
+عدد الجداول: **93** | عدد الحقول: **1192**
 
 ## الفهرس
 
@@ -24,79 +24,81 @@
 16. [`CashBoxUsers`](#cashboxusers) – أمناء الصناديق
 17. [`Warehouses`](#warehouses) – المخازن
 18. [`Suppliers`](#suppliers) – الموردون
-19. [`Customers`](#customers) – العملاء
-20. [`Products`](#products) – المنتجات
-21. [`ProductUnits`](#productunits) – وحدات الأصناف
-22. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
-23. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
-24. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
-25. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
-26. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
-27. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
-28. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
-29. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
-30. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
-31. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
-32. [`Banks`](#banks) – البنوك
-33. [`BankTransactions`](#banktransactions) – الحركات البنكية
-34. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
-35. [`FixedAssets`](#fixedassets) – الأصول الثابتة
-36. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
-37. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
-38. [`AssetRevaluations`](#assetrevaluations) – إعادة تقييم الأصول الثابتة
-39. [`AssetTransfers`](#assettransfers) – نقل الأصول الثابتة بين مراكز التكلفة
-40. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
-41. [`SalesReps`](#salesreps) – المندوبين
-42. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
-43. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
-44. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
-45. [`Budgets`](#budgets) – الموازنات التقديرية
-46. [`BudgetLines`](#budgetlines) – أسطر الموازنة
-47. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
-48. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
-49. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
-50. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
-51. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
-52. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
-53. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
-54. [`Expenses`](#expenses) – المصروفات
-55. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
-56. [`CashVouchers`](#cashvouchers) – سندات النقدية
-57. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
-58. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
-59. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
-60. [`JournalEntries`](#journalentries) – قيود اليومية
-61. [`JournalLines`](#journallines) – أسطر القيود
-62. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
-63. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
-64. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
-65. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
-66. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
-67. [`ManualEntries`](#manualentries) – القيود اليدوية
-68. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
-69. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
-70. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
-71. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
-72. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
-73. [`StockTransfers`](#stocktransfers) – التحويل بين المخازن
-74. [`StockTransferLines`](#stocktransferlines) – أسطر التحويل بين المخازن
-75. [`StockParties`](#stockparties) – جهات الصرف والاستلام المخزني
-76. [`StockDocuments`](#stockdocuments) – سندات الصرف والاستلام المخزني
-77. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
-78. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
-79. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
-80. [`SalesOrders`](#salesorders) – طلبيات العملاء
-81. [`RepDays`](#repdays) – أيام المندوبين
-82. [`RouteStops`](#routestops) – خط سير المندوبين
-83. [`RepVisits`](#repvisits) – زيارات المندوبين
-84. [`RepPrices`](#repprices) – أسعار المندوبين
-85. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
-86. [`StockCounts`](#stockcounts) – جلسات الجرد
-87. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-88. [`AuditLog`](#auditlog) – سجل العمليات
-89. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-90. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-91. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+19. [`PriceLists`](#pricelists) – قوائم الأسعار
+20. [`Customers`](#customers) – العملاء
+21. [`Products`](#products) – المنتجات
+22. [`ProductUnits`](#productunits) – وحدات الأصناف
+23. [`PriceListItems`](#pricelistitems) – أسعار قوائم الأسعار
+24. [`SalesInvoices`](#salesinvoices) – فواتير المبيعات
+25. [`SalesInvoiceDetails`](#salesinvoicedetails) – تفاصيل فواتير المبيعات
+26. [`SalesReturns`](#salesreturns) – مرتجعات المبيعات
+27. [`SalesReturnDetails`](#salesreturndetails) – تفاصيل مرتجعات المبيعات
+28. [`PurchaseInvoices`](#purchaseinvoices) – فواتير المشتريات
+29. [`PurchaseInvoiceDetails`](#purchaseinvoicedetails) – تفاصيل فواتير المشتريات
+30. [`PurchaseReturns`](#purchasereturns) – مرتجعات المشتريات
+31. [`PurchaseReturnDetails`](#purchasereturndetails) – تفاصيل مرتجعات المشتريات
+32. [`CustomerPayments`](#customerpayments) – دفعات العملاء (سندات القبض)
+33. [`SupplierPayments`](#supplierpayments) – دفعات الموردين (سندات الصرف)
+34. [`Banks`](#banks) – البنوك
+35. [`BankTransactions`](#banktransactions) – الحركات البنكية
+36. [`Cheques`](#cheques) – الشيكات الواردة والصادرة
+37. [`FixedAssets`](#fixedassets) – الأصول الثابتة
+38. [`DepreciationRuns`](#depreciationruns) – قيود الإهلاك الشهرية
+39. [`AssetDepreciations`](#assetdepreciations) – إهلاك كل أصل في كل شهر
+40. [`AssetRevaluations`](#assetrevaluations) – إعادة تقييم الأصول الثابتة
+41. [`AssetTransfers`](#assettransfers) – نقل الأصول الثابتة بين مراكز التكلفة
+42. [`CostCenters`](#costcenters) – مراكز التكلفة والفروع
+43. [`SalesReps`](#salesreps) – المندوبين
+44. [`SalesRepTargets`](#salesreptargets) – أهداف المندوبين
+45. [`CommissionRuns`](#commissionruns) – مسيرات العمولات
+46. [`CommissionLines`](#commissionlines) – أسطر مسير العمولات
+47. [`Budgets`](#budgets) – الموازنات التقديرية
+48. [`BudgetLines`](#budgetlines) – أسطر الموازنة
+49. [`PayrollRuns`](#payrollruns) – مسيرات الرواتب
+50. [`PayrollLines`](#payrolllines) – أسطر مسير الرواتب
+51. [`BankReconciliations`](#bankreconciliations) – التسويات البنكية
+52. [`BankClearings`](#bankclearings) – حركات الدفاتر المطابقة لكشف البنك
+53. [`CustomerAllocations`](#customerallocations) – ربط سندات القبض بالفواتير
+54. [`SupplierAllocations`](#supplierallocations) – ربط سندات الصرف بفواتير الشراء
+55. [`ExpenseTypes`](#expensetypes) – أنواع المصروفات
+56. [`Expenses`](#expenses) – المصروفات
+57. [`RecurringExpenses`](#recurringexpenses) – المصروفات المتكررة
+58. [`CashVouchers`](#cashvouchers) – سندات النقدية
+59. [`CashClosings`](#cashclosings) – تصفية يومية الكاشير
+60. [`Accounts`](#accounts) – دليل الحسابات (شجرة الحسابات)
+61. [`JournalSourceTypes`](#journalsourcetypes) – أنواع مصادر القيود
+62. [`JournalEntries`](#journalentries) – قيود اليومية
+63. [`JournalLines`](#journallines) – أسطر القيود
+64. [`PeriodClosings`](#periodclosings) – سجل إقفال الفترات
+65. [`FiscalPeriods`](#fiscalperiods) – الفترات المالية
+66. [`FiscalYearClosings`](#fiscalyearclosings) – إقفال السنوات المالية
+67. [`FiscalYearClosingLines`](#fiscalyearclosinglines) – أسطر قيود إقفال السنوات
+68. [`VatReturns`](#vatreturns) – إقرارات ضريبة القيمة المضافة
+69. [`ManualEntries`](#manualentries) – القيود اليدوية
+70. [`ManualEntryLines`](#manualentrylines) – أسطر القيود اليدوية
+71. [`OpeningBalances`](#openingbalances) – الأرصدة الافتتاحية للحسابات
+72. [`OpeningStock`](#openingstock) – الرصيد الافتتاحي للمخزون
+73. [`TransactionTypes`](#transactiontypes) – أنواع حركات المخزون
+74. [`InventoryTransactions`](#inventorytransactions) – حركة المخزون
+75. [`StockTransfers`](#stocktransfers) – التحويل بين المخازن
+76. [`StockTransferLines`](#stocktransferlines) – أسطر التحويل بين المخازن
+77. [`StockParties`](#stockparties) – جهات الصرف والاستلام المخزني
+78. [`StockDocuments`](#stockdocuments) – سندات الصرف والاستلام المخزني
+79. [`StockDocumentLines`](#stockdocumentlines) – أسطر سندات الصرف والاستلام المخزني
+80. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
+81. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
+82. [`SalesOrders`](#salesorders) – طلبيات العملاء
+83. [`RepDays`](#repdays) – أيام المندوبين
+84. [`RouteStops`](#routestops) – خط سير المندوبين
+85. [`RepVisits`](#repvisits) – زيارات المندوبين
+86. [`RepPrices`](#repprices) – أسعار المندوبين
+87. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
+88. [`StockCounts`](#stockcounts) – جلسات الجرد
+89. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+90. [`AuditLog`](#auditlog) – سجل العمليات
+91. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+92. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+93. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -298,7 +300,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 79 سجل
+- بيانات أساسية: 81 سجل
 
 ## UserScreens
 
@@ -508,6 +510,23 @@
 - فهرس عادي: `SupplierName`
 - فهرس عادي: `Mobile`
 
+## PriceLists
+
+**قوائم الأسعار** – قوائم أسعار البيع (docs/73): تجزئة / جملة / موزع. تُسند للعميل (Customers.PriceListID)؛ أسعار أصنافها في PriceListItems، والصنف الذي ليس فيها يُباع بسعره المعتاد ناقص نسبة خصم القائمة.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **PriceListID** 🔑 | AutoNumber |  |  |  |  |  | رقم القائمة |
+| 2 | ListName | Short Text | 100 | ✔ |  |  |  | اسم القائمة |
+| 3 | ListNameEn | Short Text | 100 |  |  |  |  | الاسم بالإنجليزية – يظهر في الواجهة الإنجليزية |
+| 4 | DiscountPercent | Currency (نسبة) |  | ✔ | `0` | `>=0 And <1` |  | خصم الأصناف غير المسعّرة فيها |
+| 5 | IsActive | Yes/No |  |  | `True` |  |  | نشط |
+| 6 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 7 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `PriceListID`
+- فهرس فريد: `ListName`
+
 ## Customers
 
 **العملاء** – بيانات العملاء. السجل رقم 1 هو "عميل نقدي" الافتراضي ولا يُحذف.
@@ -539,6 +558,7 @@
 | 23 | Notes | Long Text |  |  |  |  |  | ملاحظات |
 | 24 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 | 25 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – المندوب المسؤول عن العميل: تُنسب له فواتيره وتحصيلاته |
+| 26 | PriceListID | Number (Long) |  |  |  |  | `PriceLists.PriceListID` | قائمة الأسعار – فارغ = سعر البيع المعتاد (docs/73)؛ القائمة هي فئة العميل: تجزئة / جملة / موزع |
 
 - المفتاح الأساسي: `CustomerID`
 - فهرس عادي: `CustomerName`
@@ -601,6 +621,25 @@
 - المفتاح الأساسي: `ProductUnitID`
 - فهرس فريد: `ProductID, UnitID`
 - فهرس فريد (يتجاهل الفارغ): `Barcode`
+
+## PriceListItems
+
+**أسعار قوائم الأسعار** – سعر الصنف في قائمة أسعار (docs/73) لوحدة منه (فارغ = الوحدة الصغرى)، شامل الضريبة كسعر الصنف، ساريًا من تاريخ إلى تاريخ (فارغ = بلا حد). بين الأسعار السارية في يوم يُؤخذ الذي بدأ آخرًا.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **PriceListItemID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | PriceListID | Number (Long) |  | ✔ |  |  | `PriceLists.PriceListID` | قائمة الأسعار |
+| 3 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 4 | UnitID | Number (Long) |  |  |  |  | `Units.UnitID` | الوحدة – فارغ = الوحدة الصغرى للصنف |
+| 5 | UnitPrice | Currency |  | ✔ | `0` | `>0` |  | السعر في القائمة |
+| 6 | ValidFrom | Date/Time (تاريخ) |  |  |  |  |  | ساري من |
+| 7 | ValidTo | Date/Time (تاريخ) |  |  |  |  |  | ساري حتى |
+| 8 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `PriceListItemID`
+- فهرس عادي: `PriceListID, ProductID`
+- فهرس عادي: `ProductID`
 
 ## SalesInvoices
 

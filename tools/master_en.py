@@ -170,6 +170,7 @@ SCREEN_TITLES_EN = {
     "frmPurchaseInvoice": "Purchase invoices", "frmPurchaseView": "View purchase invoices",
     "frmPurchaseReturn": "Purchase returns", "frmSuppliers": "Suppliers", "frmSupplierPayment": "Supplier payment vouchers",
     "frmProducts": "Products and prices", "frmCategories": "Categories", "frmUnits": "Units", "frmProductUnits": "Product units",
+    "frmPriceLists": "Price lists", "frmPriceListItems": "Price list prices",
     "frmInventory": "Stock and manual moves", "frmStockCount": "Stock count", "frmBarcodeLabels": "Barcode labels",
     "frmLabelSettings": "Label settings", "frmExpenses": "Expenses", "frmExpenseTypes": "Expense types",
     "frmRecurring": "Recurring expenses", "frmTreasury": "Treasury", "frmCashVoucher": "Cash and transfer vouchers",
@@ -232,6 +233,7 @@ ENGLISH_NAMES = {
     "Banks": ("BankNameEn", "BankName", "BankID", {}),
     "CostCenters": ("CenterNameEn", "CenterName", "CostCenterID", {}),
     "SalesReps": ("RepNameEn", "RepName", "SalesRepID", {}),
+    "PriceLists": ("ListNameEn", "ListName", "PriceListID", {}),
 }
 
 # More English names of a table of ENGLISH_NAMES, by the Arabic value (the group of a permission or screen in the

@@ -820,6 +820,23 @@ TABLES: List[Table] = [
     ),
 
     Table(
+        "PriceLists", "قوائم الأسعار",
+        "قوائم أسعار البيع (docs/73): تجزئة / جملة / موزع. تُسند للعميل (Customers.PriceListID)؛ أسعار أصنافها في "
+        "PriceListItems، والصنف الذي ليس فيها يُباع بسعره المعتاد ناقص نسبة خصم القائمة.",
+        [
+            auto("PriceListID", "رقم القائمة"),
+            text("ListName", 100, "اسم القائمة", required=True),
+            text("ListNameEn", 100, "الاسم بالإنجليزية", note="يظهر في الواجهة الإنجليزية"),
+            rate("DiscountPercent", "خصم الأصناف غير المسعّرة فيها", default="0"),
+            is_active(),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["PriceListID"],
+        indexes=[ux("ListName")],
+    ),
+
+    Table(
         "Customers", "العملاء",
         "بيانات العملاء. السجل رقم 1 هو \"عميل نقدي\" الافتراضي ولا يُحذف.",
         [
@@ -852,6 +869,8 @@ TABLES: List[Table] = [
             memo("Notes", "ملاحظات"),
             created_at(),
             long_("SalesRepID", "المندوب", fk="SalesReps.SalesRepID", note="المندوب المسؤول عن العميل: تُنسب له فواتيره وتحصيلاته"),
+            long_("PriceListID", "قائمة الأسعار", fk="PriceLists.PriceListID",
+                  note="فارغ = سعر البيع المعتاد (docs/73)؛ القائمة هي فئة العميل: تجزئة / جملة / موزع"),
         ],
         pk=["CustomerID"],
         indexes=[ix("CustomerName"), ix("Mobile")],
@@ -915,6 +934,24 @@ TABLES: List[Table] = [
         ],
         pk=["ProductUnitID"],
         indexes=[ux("ProductID", "UnitID"), ux("Barcode", ignore_nulls=True)],
+    ),
+
+    Table(
+        "PriceListItems", "أسعار قوائم الأسعار",
+        "سعر الصنف في قائمة أسعار (docs/73) لوحدة منه (فارغ = الوحدة الصغرى)، شامل الضريبة كسعر الصنف، "
+        "ساريًا من تاريخ إلى تاريخ (فارغ = بلا حد). بين الأسعار السارية في يوم يُؤخذ الذي بدأ آخرًا.",
+        [
+            auto("PriceListItemID", "رقم داخلي"),
+            long_("PriceListID", "قائمة الأسعار", required=True, fk="PriceLists.PriceListID", cascade=True),
+            long_("ProductID", "الصنف", required=True, fk="Products.ProductID"),
+            long_("UnitID", "الوحدة", fk="Units.UnitID", note="فارغ = الوحدة الصغرى للصنف"),
+            money("UnitPrice", "السعر في القائمة", rule=">0", rule_text="السعر يجب أن يكون أكبر من صفر"),
+            date_("ValidFrom", "ساري من", required=False, default=None),
+            date_("ValidTo", "ساري حتى", required=False, default=None),
+            created_at(),
+        ],
+        pk=["PriceListItemID"],
+        indexes=[ix("PriceListID", "ProductID"), ix("ProductID")],
     ),
 
     # ----------------------------------------------------------------- Sales
@@ -2654,6 +2691,8 @@ SCREEN_LIST = [
     ("frmCategories", "التصنيفات", "المخزون", "PRODUCTS", True, True, True),
     ("frmUnits", "الوحدات", "المخزون", "PRODUCTS", True, True, True),
     ("frmProductUnits", "وحدات الأصناف", "المخزون", "PRODUCTS", True, True, True),
+    ("frmPriceLists", "قوائم الأسعار", "المبيعات", "PRODUCTS", True, True, True),
+    ("frmPriceListItems", "أسعار قوائم الأسعار", "المبيعات", "PRODUCTS", True, True, True),
     ("frmInventory", "المخزون والحركات اليدوية", "المخزون", "PRODUCTS", True, False, False),
     ("frmStockCount", "الجرد", "المخزون", "STOCK_COUNT", True, False, False),
     ("frmBarcodeLabels", "ملصقات الباركود", "المخزون", "PRODUCTS", False, False, False),

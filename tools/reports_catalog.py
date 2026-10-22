@@ -187,6 +187,14 @@ LIST_SPECS: List[ListSpec] = [
         Col("الصنف", "ProductName", 5.0, grow=True), Col("الكمية", "StockQty", 1.9, QTY, True),
         Col("التكلفة", "AverageCost", 2.0, MONEY), Col("القيمة", "StockCostValue", 2.4, MONEY, True)],
         [("RepName", False), ("ProductName", False)], landscape=True, no_data="لا توجد بضاعة في سيارات المندوبين."),
+    ListSpec("PRICE_LISTS", [
+        Col("القائمة", "ListName", 3.0), Col("الكود", "ProductCode", 2.2),
+        Col("الصنف", "ProductName", 5.0, grow=True), Col("الوحدة", "PriceUnit", 1.9),
+        Col("سعر القائمة", "UnitPrice", 2.1, MONEY), Col("السعر المعتاد", "UsualPrice", 2.1, MONEY),
+        Col("ساري من", "=GDate([ValidFrom])", 2.1), Col("ساري حتى", "=GDate([ValidTo])", 2.1),
+        Col("الحالة", "StatusName", 2.2)],
+        [("ListName", False), ("ProductName", False), ("ValidFrom", False)], landscape=True,
+        no_data="لا توجد أسعار في قوائم الأسعار النشطة."),
     ListSpec("STOCK_COUNT_DIFF", [
         Col("رقم الجرد", "CountNumber", 2.4), Col("التاريخ", "=GDate([CountDate])", 2.2),
         Col("المخزن", "WarehouseName", 3.0), Col("الكود", "ProductCode", 2.3),

@@ -131,6 +131,8 @@ CENTER_ROWS = ("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHE
                "ORDER BY c.CenterCode")
 CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies "
                  "WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode")
+PRICE_LIST_ROWS = ("SELECT l.PriceListID, l.ListName FROM [@PriceLists] AS l WHERE l.IsActive <> 0 "
+                   "ORDER BY l.ListName")
 REP_ROWS = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive <> 0 ORDER BY s.RepName"
 CASHBOX_ROWS = "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير;CUSTODY;عهدة مندوب"
@@ -203,7 +205,8 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("Notes", span=2),
         ],
         extra_buttons=[("btnItemCard", "كارت الصنف", 'OpenScreen "frmReportCenter", 0, "ITEM_CARD|" & Nz(Me!ProductID, 0)'),
-                       ("btnProductUnits", "وحدات الصنف", 'OpenProductUnits Me')]),
+                       ("btnProductUnits", "وحدات الصنف", 'OpenProductUnits Me'),
+                       ("btnPriceLists", "قوائم الأسعار", 'OpenScreen "frmPriceLists"')]),
     DataScreen(
         "frmCustomers", "Customers", "العملاء", "بيانات العملاء وأرصدتهم", "customers",
         list_select="t.CustomerName AS [العميل], t.Mobile AS [رقم الجوال], t.CurrentBalance AS [الرصيد]",
@@ -225,6 +228,7 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("AllowCredit"), Fld("CreditLimit", hint="0 = بدون حد"),
             Fld("PaymentTermsDays", hint="استحقاق الفاتورة الآجلة = تاريخها + هذه المدة"),
             Fld("SalesRepID", rows=REP_ROWS, widths="0;6", hint="تُنسب له فواتير العميل وتحصيلاته"),
+            Fld("PriceListID", rows=PRICE_LIST_ROWS, widths="0;6", hint="جملة / موزع؛ فارغ = سعر البيع المعتاد"),
             Fld("IsActive"), Info("lblBalanceNote", "الرصيد الموجب = مبلغ مستحق على العميل"),
             Fld("Notes", span=2),
         ]),
@@ -479,6 +483,34 @@ DATA_SCREENS: List[DataScreen] = [
                 Fld("IsActive"),
                 Info("lblUnitsNote", "الرصيد والتكلفة بالوحدة الصغرى؛ الفاتورة تحفظ كمية الوحدة وسعرها وعددها")]),
     DataScreen(
+        "frmPriceLists", "PriceLists", "قوائم الأسعار",
+        "تجزئة / جملة / موزع: تُسند القائمة للعميل فيُباع له بأسعارها في نقطة البيع والطلبيات", "category",
+        list_select="t.ListName AS [القائمة], t.DiscountPercent AS [خصم القائمة]", list_from="[@PriceLists] AS t",
+        list_order="t.ListName", list_headers=[("القائمة", 5.4), ("الخصم", 3.0)],
+        search=["t.ListName", "t.ListNameEn", "t.Notes"], active="t.IsActive", unique=["ListName"],
+        extra_buttons=[("btnListItems", "أسعار القائمة", 'OpenPriceListItems Me')],
+        fields=[Fld("ListName", span=2), Fld("ListNameEn", span=2),
+                Fld("DiscountPercent", hint="للأصناف التي ليس لها سعر في القائمة: سعر البيع ناقص هذه النسبة (0 = بلا خصم)"),
+                Fld("IsActive"), Fld("Notes", span=2),
+                Info("lblListNote", "تُسند القائمة للعميل من شاشة العملاء؛ أسعار الأصناف من زر «أسعار القائمة»")]),
+    DataScreen(
+        "frmPriceListItems", "PriceListItems", "أسعار قوائم الأسعار",
+        "سعر الصنف في القائمة لكل وحدة، بتاريخ سريان؛ بين الأسعار السارية يُؤخذ الذي بدأ آخرًا", "category",
+        list_select="l.ListName AS [القائمة], p.ProductName AS [الصنف], u.UnitName AS [وحدة السعر], "
+                    "t.UnitPrice AS [سعر القائمة]",
+        list_from=("((PriceListItems AS t INNER JOIN [@PriceLists] AS l ON t.PriceListID = l.PriceListID) "
+                   "INNER JOIN Products AS p ON t.ProductID = p.ProductID) "
+                   "LEFT JOIN [@Units] AS u ON t.UnitID = u.UnitID"),
+        list_order="l.ListName, p.ProductName, t.ValidFrom",
+        list_headers=[("القائمة", 2.2), ("الصنف", 3.4), ("الوحدة", 1.4), ("السعر", 1.4)],
+        search=["l.ListName", "p.ProductName", "p.ProductCode", "p.Barcode", "p.ProductNameEn"],
+        fields=[Fld("PriceListID", rows=PRICE_LIST_ROWS, widths="0;6", span=2),
+                Fld("ProductID", rows=PRODUCT_ROWS, widths="0;7", span=2),
+                Fld("UnitID", rows=UNIT_ROWS, widths="0;4", hint="فارغ = الوحدة الصغرى؛ أو كرتونة من وحدات الصنف"),
+                Fld("UnitPrice", hint="شامل الضريبة كسعر الصنف"),
+                Fld("ValidFrom", hint="فارغ = من البداية"), Fld("ValidTo", hint="فارغ = بلا نهاية"),
+                Info("lblItemsNote", "سعر الحبة في القائمة يجعل سعر الكرتونة = سعرها × العدد، ما لم يكن للكرتونة سعر فيها")]),
+    DataScreen(
         "frmExpenseTypes", "ExpenseTypes", "أنواع المصروفات", "قائمة أنواع المصروفات", "expenses",
         list_select="t.ExpenseTypeName AS [النوع]", list_from="[@ExpenseTypes] AS t",
         list_order="t.ExpenseTypeName", list_headers=[("النوع", 8.4)],
@@ -686,7 +718,7 @@ SCREEN_PERMISSIONS = {
     "frmCustomerPayment": "CUSTOMER_PAYMENTS", "frmCustomers": "CUSTOMERS",
     "frmSuppliers": "SUPPLIERS", "frmSupplierPayment": "SUPPLIER_PAYMENTS",
     "frmPurchaseInvoice": "PURCHASES", "frmPurchaseView": "PURCHASES", "frmPurchaseReturn": "PURCHASE_RETURN",
-    "frmProducts": "PRODUCTS", "frmCategories": "PRODUCTS", "frmUnits": "PRODUCTS", "frmProductUnits": "PRODUCTS", "frmInventory": "PRODUCTS",
+    "frmProducts": "PRODUCTS", "frmCategories": "PRODUCTS", "frmUnits": "PRODUCTS", "frmProductUnits": "PRODUCTS", "frmPriceLists": "PRODUCTS", "frmPriceListItems": "PRODUCTS", "frmInventory": "PRODUCTS",
     "frmStockCount": "STOCK_COUNT", "frmExpenses": "EXPENSES", "frmExpenseTypes": "EXPENSES",
     "frmReportCenter": "REPORTS", "frmSettings": "SETTINGS", "frmUsers": "USERS", "frmRoles": "USERS",
     "frmUserScreens": "USERS", "frmActivation": "",
@@ -808,6 +840,7 @@ REPORTS: List[ReportEntry] = [
                 "rptRouteExecution", "D", "VisitDate"),
     ReportEntry("REP_VISITS", "زيارات المندوبين بالتفصيل", "RepVisitListQuery", "rptRepVisits", "Dc", "VisitDate"),
     ReportEntry("REP_VAN_STOCK", "رصيد سيارات المندوبين", "RepVanStockQuery", "rptRepVanStock", "w"),
+    ReportEntry("PRICE_LISTS", "قوائم الأسعار: أسعار الأصناف في كل قائمة", "PriceListQuery", "rptPriceLists"),
     ReportEntry("STOCK_COUNT_DIFF", "فروقات الجرد المرحّلة لكل مخزن", "StockCountDiffQuery", "rptStockCountDiff",
                 "Dw", "CountDate"),
     ReportEntry("LOW_STOCK", "المنتجات منخفضة المخزون", "LowStockQuery", "rptLowStock"),

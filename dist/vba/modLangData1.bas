@@ -38,10 +38,12 @@ Private Sub D1_1()
     LangAdd "ÊõÍĞİ ßá ÇáÈíÇäÇÊ ÇáãæÌæÏÉ İí ŞÇÚÏÉ ÇáÎÇÏã ÃæáğÇ. áÇ íÚãá ÃÍÏ Úáì ÇáÈÑäÇãÌ ÃËäÇÁ ÇáäŞá", "All the data in the server database is deleted first. Nobody works on the program during the transfer"
     LangAdd "ÚÏøá ÇáäÓÈÉ Ãæ ÇáÊÚÏíá Ëã «ÊÑÍíá ÇáãÓíÑ». ÇáÕÑİ ÈÓäÏ ÕÑİ äŞÏíÉ ãä ÈäÏ «ÕÑİ ÚãæáÉ ãäÏæÈ", "Edit the rate or the adjustment, then Post the run. The payment is a cash payment voucher with the item Sales rep commission payment"
     LangAdd "ßãíÉ ßá Õäİ æÊßáİÉ æÍÏÊå íæã ÈÏÁ ÇáÊÔÛíá¡ Ëã «ÊÑÍíá ÇáÑÕíÏ». «ßá ÇáÃÕäÇİ» íÖíİ ÇáÃÕäÇİ", "The quantity and unit cost of each item on the start-up date, then Post the stock. All items adds the items"
+    LangAdd "ÓÚÑ ÇáÕäİ İí ÇáŞÇÆãÉ áßá æÍÏÉ¡ ÈÊÇÑíÎ ÓÑíÇäº Èíä ÇáÃÓÚÇÑ ÇáÓÇÑíÉ íõÄÎĞ ÇáĞí ÈÏÃ ÂÎÑğÇ", "The price of a product in the list for each unit, with validity dates, among the valid prices the one that starts last is used"
     LangAdd "ÇáÃŞÓÇã æÕÇáÇÊ ÇáÅäÊÇÌ æÇáåÇáß: íõÕÑİ áåÇ ãä ÇáãÎÒæä Ãæ íõÓÊáã ãäåÇ¡ æáßá ÌåÉ ÍÓÇÈåÇ", "Departments, production halls and waste: stock is issued to them or received from them, each party has its account"
     LangAdd "ÇáÇÊÕÇá ÈÇáÎÇÏã¡ æÊÌåíÒ ÇáŞÇÚÏÉ¡ æäŞá ÇáÈíÇäÇÊ æãØÇÈŞÊåÇ¡ æÊÔÛíá ÇáÈÑäÇãÌ Úáì ÇáÎÇÏã", "The server connection, the database setup, the data transfer and comparison, and running the program on the server"
     LangAdd "ÇáÍÓÇÈ ÇáãŞÇÈá ÍÓÇÈ İÑÚí äÔØ¡ æáíÓ ÕäÏæŞğÇ æáÇ ÈäßğÇ æáÇ ãÏì æáÇ ÇáÚãáÇÁ Ãæ ÇáãæÑÏíä", "The contra account is an active sub-account, not a box, a bank, Mada, customers or suppliers"
     LangAdd "ÇáİÊÑÉ ÇáÌÏíÏÉ ÊÈÏÃ İí Çáíæã ÇáÊÇáí áäåÇíÉ ÂÎÑ İÊÑÉ¡ æáÇ ÊäÊåí İÊÑÊÇä İí ÓäÉ ãíáÇÏíÉ", "A new period starts the day after the end of the last one, and no two periods end in the same calendar"
+    LangAdd "ÊÌÒÆÉ / ÌãáÉ / ãæÒÚ: ÊõÓäÏ ÇáŞÇÆãÉ ááÚãíá İíõÈÇÚ áå ÈÃÓÚÇÑåÇ İí äŞØÉ ÇáÈíÚ æÇáØáÈíÇÊ", "Retail / wholesale / distributor: a list given to a customer prices his sales in the POS and orders"
     LangAdd "ÍÑßÉ Ãí ÍÓÇÈ ÈÑÕíÏ Ãæá ÇáãÏÉ æÇáÑÕíÏ ÈÚÏ ßá ŞíÏº ÇáÍÓÇÈ ÇáÑÆíÓí íÔãá ÍÓÇÈÇÊå ÇáÊÇÈÚÉ", "Moves of any account with the opening balance and the balance after each entry, a main account includes its sub-accounts"
     LangAdd "ßá ãÇ ÓõÌøá ÈÚÏ ÊÇÑíÎ åĞå ÇáäÓÎÉ ÓíõİŞÏ (ÊõÍİÙ äÓÎÉ æŞÇÆíÉ ãä ÇáÈíÇäÇÊ ÇáÍÇáíÉ ÃæáğÇ", "Everything recorded after the date of this backup will be lost (a safety copy of the current data is saved first"
     LangAdd "ãÚÇãáÇÊ ÈÑäÇãÌ ÇáÊæŞíÚ: {IN} ãáİ ÇáãÓÊäÏ¡ {OUT} ãáİ ÇáÊæŞíÚ¡ {PIN} ÇáÑŞã ÇáÓÑí (İÇÑÛ", "Arguments of the signing program: {IN} document file, {OUT} signature file, {PIN} PIN (empty"
@@ -68,6 +70,7 @@ Private Sub D1_1()
     LangAdd "áíÓ ááãäÏæÈ ÕäÏæŞ ÚåÏÉ äÔØ. ÃäÔÆå İí «ÇáÕäÇÏíŞ» ÈäæÚ «ÚåÏÉ ãäÏæÈ» æÇÎÊÑ ÇáãäÏæÈ", "The rep has no active custody box. Create it in Cash boxes with the type Rep custody and choose the rep"
     LangAdd "áíÓ ááãäÏæÈ ãÎÒä ÓíÇÑÉ äÔØ. ÃäÔÆå İí «ÇáãÎÇÒä» ÈäæÚ «ÓíÇÑÉ ãäÏæÈ» æÇÎÊÑ ÇáãäÏæÈ", "The rep has no active van warehouse. Create it in Warehouses with the type Rep van and choose the rep"
     LangAdd "åĞå åí ÇáæÍÏÉ ÇáÕÛÑì ááÕäİ äİÓå (ãä ÔÇÔÉ ÇáãäÊÌÇÊ): ÇÎÊÑ æÍÏÉ ÃßÈÑ ãËá ÇáßÑÊæäÉ", "This is the smallest unit of the product itself (products screen): choose a bigger unit such as a carton"
+    LangAdd "ááÕäİ ÈåĞå ÇáæÍÏÉ ÓÚÑ İí ÇáŞÇÆãÉ íÈÏÃ İí ÇáÊÇÑíÎ äİÓå. ÚÏøáå ÈÏá ÅÖÇİÉ ÓÚÑ ÂÎÑ", "The product in this unit already has a price in the list starting on the same date. Edit it instead of adding another"
     LangAdd "ãÓíÑ ßá ÔåÑ: ÇáÑæÇÊÈ æÇáÈÏáÇÊ æÇáÅÖÇİí æÇáÎÕæãÇÊ æÇáÊÃãíäÇÊ¡ Ëã ÇáÊÑÍíá æÇáÕÑİ", "A run each month: salaries, allowances, overtime, deductions and social insurance, then posting and payment"
     LangAdd "åĞÇ ÍÓÇÈ ÃÓÇÓí ÊÓÊÎÏãå ÇáŞíæÏ ÇáÂáíÉ: áÇ íÊÛíÑ äæÚå¡ æáÇ íÊÍæá Èíä ÑÆíÓí æİÑÚí", "This is a system account used by the automatic entries: its type does not change, and it does not switch between main and sub"
     LangAdd "ÅÚÇÏÉ ÅäÔÇÁ ÃÓØÑ ÇáãÓíÑ ãä ãÈíÚÇÊ æÊÍÕíáÇÊ ÇáÔåÑ¿ ÊÖíÚ ÇáÊÚÏíáÇÊ ÇáãßÊæÈÉ İíå", "Rebuild the run lines from the sales and collections of the month? The changes typed in it are lost"
@@ -98,6 +101,7 @@ Private Sub D1_1()
     LangAdd "ŞÇÚÏÉ ÇáÎÇÏã áíÓ İíåÇ ÇÓÊÚáÇãÇÊ ÇáÈÑäÇãÌ: ÔÛøá «ÊÌåíÒ ÇáŞÇÚÏÉ» ÃæáğÇ (ãáİ", "The server database lacks the queries of the program: run Set up the database first (file"
     LangAdd "íÒæÑ ÇáãäÏæÈ ÇáÚãíá İí åĞÇ Çáíæã ãä ßá ÃÓÈæÚº áÚÏÉ ÃíÇã ÃÖİ ÓØÑğÇ áßá íæã", "The rep visits the customer on this day of every week. For several days add a line for each day"
     LangAdd "ÇáÅŞÑÇÑ ãÚÊãÏ: áÇ ÊÊÛíÑ Şíãå. ÃáÛö ÇáÇÚÊãÇÏ ÃæáğÇ Åä ßÇä ÇáÊÛííÑ ãŞÕæÏğÇ", "The return is approved: its values do not change. Cancel the approval first if the change is intended"
+    LangAdd "ÊõÓäÏ ÇáŞÇÆãÉ ááÚãíá ãä ÔÇÔÉ ÇáÚãáÇÁº ÃÓÚÇÑ ÇáÃÕäÇİ ãä ÒÑ «ÃÓÚÇÑ ÇáŞÇÆãÉ", "Give the list to a customer on the customers screen, the product prices from the List prices button"
     LangAdd "äÚã: íõÓãÍ ÈäŞá ÇáÈíÇäÇÊ Åáì ÇáÎÇÏã ãä ÌÏíÏ¡ æßá ÇáÃÌåÒÉ íÌÈ Ãä ÊÑÌÚ Åáì", "Yes: a new transfer to the server is allowed, and every PC must go back to"
     LangAdd "åĞÇ ÇáÊŞÑíÑ íÚÑÖ ÇáÊßáİÉ æÇáÃÑÈÇÍ æíÍÊÇÌ ÕáÇÍíÉ «ÊŞÇÑíÑ ÇáÃÑÈÇÍ æÇáÖÑíÈÉ", "This report shows costs and profits and needs the permission Profit and VAT reports"
     LangAdd "åĞå ÇáæÍÏÉ áíÓÊ ãä æÍÏÇÊ ÇáÕäİ. ÚÑøİåÇ ãä «æÍÏÇÊ ÇáÕäİ» İí ÔÇÔÉ ÇáãäÊÌÇÊ", "This unit is not one of the product units. Define it from Product units on the products screen"
@@ -130,13 +134,13 @@ Private Sub D1_1()
     LangAdd "ÈÚÏåÇ áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ÍÊì åĞÇ Çáíæã", "After that, no document dated up to this day is added, edited or deleted"
     LangAdd "ÓíõäÔÃ ãİÊÇÍ ÌÏíÏ æíõÚÇÏ ÊÓÌíá ÇáÌåÇÒ ãä ÇáÈÏÇíÉ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "A new key will be created and the device registered again from the start. Continue"
     LangAdd "ÔåÇÏÉ ÇáÌåÇÒ (CSID): ÊõãáÃ ãä ÇáÎØæÉ 3¡ Ãæ ÊõáÕŞ ßãÇ ÊÕÏÑåÇ ÇáåíÆÉ", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
+End Sub
+
+Private Sub D1_2()
     LangAdd "ŞÇÆãÉ ÃÓÚÇÑ ÇáãäÏæÈ: ÓÚÑ ÎÇÕ ááÕäİ Ííä íÈíÚ ÇáãäÏæÈ Ãæ íõÈÇÚ ÈÇÓãå", "Rep price list: a special price of a product when the rep sells or a sale is made in his name"
     LangAdd "ŞÇÚÏÉ ÌÏíÏÉ ÊõäÔÃ ÌÏÇæáåÇ¡ æŞÇÚÏÉ ãæÌæÏÉ ÊõÑŞøì æáÇ ÊõÍĞİ ÈíÇäÇÊåÇ", "A new database gets its tables, an existing one is upgraded and keeps its data"
     LangAdd "íõáÛì ÊÑÍíá ÇáÊÍæíá ÈÇáØÑíŞ İŞØ. ÇáÊÍæíá ÇáãÓÊáã íõÚÇÏ ÈÊÍæíá ÌÏíÏ", "Only a transfer in transit is unposted. A received transfer is sent back with a new transfer"
     LangAdd "ÃÑÕÏÉ ÇáãäÊÌÇÊ æÍÑßÇÊåÇ¡ æÇáÑÕíÏ ÇáÇİÊÊÇÍí æÇáÅÖÇİÉ æÇáÎÕã ÇáíÏæí", "Product balances and moves, opening balance and manual additions and deductions"
-End Sub
-
-Private Sub D1_2()
     LangAdd "ÅŞÑÇÑ ÛíÑ ãÍİæÙ: ÇáÃÑŞÇã ãä ÇáãÓÊäÏÇÊ ÇáÂä. ÇÍİÙå ãÓæÏÉ Ãæ ÇÚÊãÏå", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
     LangAdd "ÇáÌåÇÒ ÛíÑ ãÓÌøá. ÇßÊÈ ÑãÒ ÇáÊÍŞŞ (OTP) ãä ÈæÇÈÉ İÇÊæÑÉ Ëã ÇáÎØæÉ", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
     LangAdd "ÊÍæíáÇÊ Èíä ÇáÕäÇÏíŞ ÊäÊÙÑ ÊÃßíÏ ÇáÇÓÊáÇã ãä Ããíä ÇáÕäÏæŞ ÇáãÓÊáã", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
@@ -165,6 +169,7 @@ Private Sub D1_2()
     LangAdd "ŞíÏ ÅåáÇß ßá ÔåÑ ÈÇáÊÑÊíÈ: ãÕÑæİ ÇáÅåáÇß æãÌãÚ ÇáÅåáÇß áßá ÃÕá", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
     LangAdd "áÇ ÒíÇÑÇÊ İí åĞÇ Çáíæã. «ÎØÉ Çáíæã ãä ÎØ ÇáÓíÑ» ÊÖíİ ÚãáÇÁ íæã", "No visits on this day. Day plan from the route adds the customers of"
     LangAdd "áÇ íæÌÏ ÅĞä. ÇÎÊÑ ÇáäæÚ æÇáãÎÒä æÇáÚãíá Ãæ ÇáãæÑÏ Ëã «ÅĞä ÌÏíÏ", "No note. Choose the type, the warehouse and the customer or supplier, then New note"
+    LangAdd "ááÃÕäÇİ ÇáÊí áíÓ áåÇ ÓÚÑ İí ÇáŞÇÆãÉ: ÓÚÑ ÇáÈíÚ äÇŞÕ åĞå ÇáäÓÈÉ", "For products without a price in the list: the selling price less this rate"
     LangAdd "áã íõÏÎá ÇáÑŞã ÇáÖÑíÈí¡ æáä Êßæä ÇáİæÇÊíÑ İæÇÊíÑ ÖÑíÈíÉ äÙÇãíÉ", "The VAT number is not entered, and the invoices will not be valid tax invoices"
     LangAdd "ãÚÇãá ßá ÚãáÉ İí ÊÇÑíÎº ÇáãÓÊäÏ íÃÎĞ ÂÎÑ ÓÚÑ İí ÊÇÑíÎå Ãæ ŞÈáå", "The rate of each currency on a date, a document takes the last rate on or before its date"
     LangAdd "ãäÕÉ İÇÊæÑÉ ááãäÔÂÊ İí ÇáÓÚæÏíÉ İŞØ (ÏæáÉ ÇáÊÔÛíá İí ÇáÅÚÏÇÏÇÊ", "The Fatoora platform is for businesses in Saudi Arabia only (operating country in the settings"
@@ -252,25 +257,18 @@ Private Sub D1_2()
     LangAdd "íõãÓÍ İí äŞØÉ ÇáÈíÚ æÇáãÔÊÑíÇÊ İíõÖÇİ ÇáÓØÑ ÈåĞå ÇáæÍÏÉ", "Scanned in the POS and purchases, it adds the line in this unit"
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ æÇäÓÎ ãáİ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ ãßÇäå íÏæíğÇ", "Close the program and copy the backup file in its place by hand"
     LangAdd "ÅÌãÇáí ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÓÊÍŞÉ Úä ÇáİÊÑÉ ÇáÍÇáíÉ", "Total VAT due for the current period"
+End Sub
+
+Private Sub D1_3()
     LangAdd "ÇÎÊÑ ÔÇÔÉ æÇÍÏÉ Úáì ÇáÃŞá¡ Ãæ ÃáÛö «ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ", "Choose at least one screen, or clear Custom screen permissions"
     LangAdd "ÇáÑŞã ÇáÖÑíÈí İí ÇáÓÚæÏíÉ 15 ÑŞãğÇ æíÈÏÃ æíäÊåí ÈÇáÑŞã", "The Saudi tax number has 15 digits and starts and ends with the digit"
     LangAdd "ÇáÖÑíÈÉ æÇáŞíãÉ ÇáãÊÈŞíÉ æÇáÅåáÇß ÇáÓÇÈŞ áÇ Êßæä ÓÇáÈÉ", "VAT, residual value and previous depreciation are never negative"
     LangAdd "ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ ááİÇÊæÑÉ ÇáÅáßÊÑæäíÉ (Client ID æ", "Credentials of the program for the e-invoice (Client ID and"
     LangAdd "ÊÃßÏ ãä ÊÔÛíá ÇáÎÇÏã æÇáÔÈßÉ¡ Ëã ÇİÊÍ ÇáÈÑäÇãÌ ãä ÌÏíÏ", "Make sure the server and the network are running, then open the program again"
-End Sub
-
-Private Sub D1_3()
     LangAdd "ÊÚĞÑÊ ÇáäÓÎÉ ÇáæŞÇÆíÉ ŞÈá ÇáÇÓÊÚÇÏÉ¡ İáã ÊÊã ÇáÇÓÊÚÇÏÉ", "The safety copy before restoring failed, so nothing was restored"
     LangAdd "Êã ÍİÙ ÕáÇÍíÇÊ ÇáÔÇÔÇÊ. ÊÓÑí ãä ÇáÏÎæá ÇáÊÇáí ááãÓÊÎÏã", "The screen permissions were saved. They apply from the next login of the user"
     LangAdd "ÍÓÇÈ ÇáäæÚ: ÇáŞÓã 5640¡ ÇáÕÇáÉ 1420¡ ÇáåÇáß 5250¡ ÃÎÑì", "account of the type: department 5640, hall 1420, waste 5250, other"
     LangAdd "ÓØÑğÇ: ßãíÉ ÛíÑ ÕÍíÍÉ¡ Ãæ Õäİ áå ÍÑßÇÊ¡ Ãæ ÑÕíÏå ãÑÍøá", "lines: a wrong quantity, an item with moves, or a balance already posted"
     LangAdd "ØáÈíÉ åĞÇ ÇáÅĞä áíÓÊ ãİÊæÍÉ ááÊÓáíã (ãõÓáóøãÉ Ãæ ãáÛÇÉ", "The order of this note is not open for delivery (delivered or cancelled"
     LangAdd "ááØáÈíÉ ÅĞä ÊÓáíã áã íõÑÍóøá. ÇİÊÍå ãä «ÃĞæäÇÊ ÇáØáÈíÉ", "The order has a delivery note not posted yet. Open it from Order notes"
-    LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÍÌÒ æáÇ íõÓáóøã ÈÅĞä", "This product does not track stock, so it is not reserved or delivered with a note"
-    LangAdd "íÚãá ÇáÈÑäÇãÌ Úáì ÇáÃÌåÒÉ ÇáãİÚøáÉ İŞØ ÈßæÏ ãä ÇáãÈÑãÌ", "The program runs only on computers activated with a code from the developer"
-    LangAdd "ÇÎÊÑ ÓØÑ ŞíÏ ãä ÇáŞÇÆãÉ (ÓØÑ ÑÕíÏ Ãæá ÇáãÏÉ áíÓ ŞíÏğÇ", "Choose an entry line from the list (the opening balance line is not an entry"
-    LangAdd "ÇáÍÓÇÈ ãŞİá ãÄŞÊğÇ ÈÓÈÈ ãÍÇæáÇÊ ÏÎæá ÎÇØÆÉ ÍÊì ÇáÓÇÚÉ", "The account is locked for a while after wrong login attempts, until"
-    LangAdd "ÇáãÎÒä ÇáÑÆíÓí æÇáİÑæÚ æÓíÇÑÇÊ ÇáãäÏæÈíä æÊÍÊ ÇáÊÔÛíá", "The main warehouse, branches, sales rep vans and work in progress"
-    LangAdd "ÇãÓÍ ÇáÈÇÑßæÏ Ãæ ÇÎÊÑ ÇáÕäİ ÈÇáÇÓã¡ æÍÏÏ ÚÏÏ ÇáãáÕŞÇÊ", "Scan the barcode or choose the item by name, and set the number of labels"
-    LangAdd "ÍÑßÉ ÇáÔíß ãØÇÈŞÉ İí ÊÓæíÉ ÈäßíÉ: ÃáÛö ãØÇÈŞÊåÇ ÃæáğÇ", "The cheque move is matched in a bank reconciliation: unmatch it first"
 End Sub
