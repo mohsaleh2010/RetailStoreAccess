@@ -92,8 +92,8 @@ End Function
 Public Function AssetAccountProblem(ByVal AccountCode As Variant) As String
     If IsNull(AccountCode) Then
         AssetAccountProblem = "«Œ — Õ”«» «·√’·."
-    ElseIf IsNull(DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & CLng(AccountCode) & " AND IsPosting = True " & _
-                          "AND IsActive = True AND AccountType = 'ASSET' AND Level2Code = 12 AND AccountCode <> 1790")) Then
+    ElseIf IsNull(DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & CLng(AccountCode) & " AND IsPosting <> 0 " & _
+                          "AND IsActive <> 0 AND AccountType = 'ASSET' AND Level2Code = 12 AND AccountCode <> 1790")) Then
         AssetAccountProblem = "Õ”«» «·√’· Õ”«» ›—⁄Ì „‰ «·√’Ê· €Ì— «·„ œ«Ê·… (12)° €Ì— „Ã„⁄ «·≈Â·«ﬂ."
     End If
 End Function
@@ -134,7 +134,7 @@ Public Function AssetProblem(ByVal AssetID As Long, ByVal AccountCode As Variant
             Case "BANK"
                 If IsNull(BankID) Then
                     p = "«Œ — «·»‰ﬂ «·–Ì œı›⁄ „‰Â."
-                ElseIf Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive = True AND BankID = " & CLng(BankID)), 0) = 0 Then
+                ElseIf Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive <> 0 AND BankID = " & CLng(BankID)), 0) = 0 Then
                     p = "«·»‰ﬂ €Ì— ‰‘ÿ."
                 End If
             Case "CASHBOX"
@@ -193,13 +193,13 @@ Public Function SaveAsset(ByRef AssetID As Long, ByVal AssetName As String, ByVa
     If Len(SaveAsset) > 0 Then Exit Function
     Dim auditBefore As Collection
     If AssetID = 0 Then
-        Set rs = CurrentDb.OpenRecordset("FixedAssets", dbOpenDynaset)
+        Set rs = CurrentDb.OpenRecordset("FixedAssets", dbOpenDynaset, dbSeeChanges)
         rs.AddNew
         rs!AssetCode = NextNumber("FIXED_ASSET")
         rs!Status = "ACTIVE"
     Else
         Set auditBefore = AuditSnapshot("FixedAssets", "AssetID", AssetID)       ' modAudit
-        Set rs = CurrentDb.OpenRecordset("SELECT * FROM FixedAssets WHERE AssetID = " & AssetID, dbOpenDynaset)
+        Set rs = CurrentDb.OpenRecordset("SELECT * FROM FixedAssets WHERE AssetID = " & AssetID, dbOpenDynaset, dbSeeChanges)
         rs.Edit
     End If
     rs!AssetName = Left$(Trim$(AssetName), 150)
@@ -234,7 +234,7 @@ Public Function DeleteAsset(ByVal AssetID As Long) As String
     If Len(DeleteAsset) > 0 Then Exit Function
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("FixedAssets", "AssetID", AssetID)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM FixedAssets WHERE AssetID = " & AssetID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM FixedAssets WHERE AssetID = " & AssetID, dbFailOnError + dbSeeChanges
     AuditDeleted "FIXED_ASSET_DELETE", "FixedAssets", AssetID, auditBefore
     DeleteAsset = SyncJournal()
 End Function
@@ -289,7 +289,7 @@ Public Function DisposeAsset(ByVal AssetID As Long, ByVal DisposalDate As Varian
         ", DisposalProceeds = " & Str$(Proceeds) & ", DisposalVAT = " & Str$(vat) & ", DisposalTo = " & SqlText(DisposalTo) & ", DisposalBankID = " & _
         IIf(DisposalTo = "BANK", CLng(Nz(BankID, 0)), "Null") & ", DisposalCashBoxID = " & _
         IIf(DisposalTo = "CASHBOX", CLng(Nz(CashBoxID, 0)), "Null") & ", DisposalAccumDep = " & Str$(AssetDepreciated(AssetID)) & _
-        " WHERE AssetID = " & AssetID, dbFailOnError
+        " WHERE AssetID = " & AssetID, dbFailOnError + dbSeeChanges
     LogAction "FIXED_ASSET_DISPOSE", "FixedAssets", CStr(AssetID), Format$(Proceeds, "0.00")
     DisposeAsset = SyncJournal()
 End Function
@@ -304,7 +304,7 @@ Public Function UndoDisposal(ByVal AssetID As Long) As String
     UndoDisposal = ClosedPeriodProblem(AssetField(AssetID, "DisposalDate"))
     If Len(UndoDisposal) > 0 Then Exit Function
     CurrentDb.Execute "UPDATE FixedAssets SET Status = 'ACTIVE', DisposalDate = Null, DisposalProceeds = 0, DisposalTo = Null, " & _
-                      "DisposalBankID = Null, DisposalCashBoxID = Null, DisposalAccumDep = 0, DisposalVAT = 0 WHERE AssetID = " & AssetID, dbFailOnError
+                      "DisposalBankID = Null, DisposalCashBoxID = Null, DisposalAccumDep = 0, DisposalVAT = 0 WHERE AssetID = " & AssetID, dbFailOnError + dbSeeChanges
     LogAction "FIXED_ASSET_UNDISPOSE", "FixedAssets", CStr(AssetID)
     UndoDisposal = SyncJournal()
 End Function
@@ -389,7 +389,7 @@ Public Function RecordDepreciation(ByVal RunMonth As Date, ByRef RunID As Long) 
     End If
     If Len(RecordDepreciation) > 0 Then Exit Function
     Set db = CurrentDb
-    Set rs = db.OpenRecordset("DepreciationRuns", dbOpenDynaset)
+    Set rs = db.OpenRecordset("DepreciationRuns", dbOpenDynaset, dbSeeChanges)
     rs.AddNew
     rs!RunNumber = NextNumber("DEPRECIATION")
     rs!RunMonth = RunMonth
@@ -400,7 +400,7 @@ Public Function RecordDepreciation(ByVal RunMonth As Date, ByRef RunID As Long) 
     RunID = rs!RunID
     rs.Close
     Set rs = db.OpenRecordset("SELECT AssetID, CostCenterID FROM FixedAssets ORDER BY AssetID", dbOpenSnapshot)
-    Set d = db.OpenRecordset("AssetDepreciations", dbOpenDynaset, dbAppendOnly)
+    Set d = db.OpenRecordset("AssetDepreciations", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     Do Until rs.EOF
         amount = DepreciationFor(rs!AssetID, RunMonth)
         If amount > 0 Then
@@ -418,7 +418,7 @@ Public Function RecordDepreciation(ByVal RunMonth As Date, ByRef RunID As Long) 
     Loop
     rs.Close
     d.Close
-    db.Execute "UPDATE DepreciationRuns SET TotalAmount = " & Str$(total) & " WHERE RunID = " & RunID, dbFailOnError
+    db.Execute "UPDATE DepreciationRuns SET TotalAmount = " & Str$(total) & " WHERE RunID = " & RunID, dbFailOnError + dbSeeChanges
     LogAction "DEPRECIATION", "DepreciationRuns", Format$(RunMonth, "yyyy-mm"), Format$(total, "0.00")
     RecordDepreciation = SyncJournal()
 End Function
@@ -468,7 +468,7 @@ Public Function DeleteLastRun() As String
     If Len(DeleteLastRun) > 0 Then Exit Function
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("DepreciationRuns", "RunID", last)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM DepreciationRuns WHERE RunID = " & last, dbFailOnError      ' lines cascade
+    CurrentDb.Execute "DELETE FROM DepreciationRuns WHERE RunID = " & last, dbFailOnError + dbSeeChanges      ' lines cascade
     AuditDeleted "DEPRECIATION_DELETE", "DepreciationRuns", last, auditBefore
     DeleteLastRun = SyncJournal()
 End Function
@@ -556,7 +556,7 @@ Public Function RevalueAsset(ByVal AssetID As Long, ByVal RevalDate As Variant, 
         surplus = -part
         loss = -amount - part
     End If
-    Set rs = CurrentDb.OpenRecordset("AssetRevaluations", dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("AssetRevaluations", dbOpenDynaset, dbSeeChanges)
     rs.AddNew
     rs!RevalNumber = NextNumber("ASSET_REVAL")
     rs!AssetID = AssetID
@@ -589,7 +589,7 @@ Public Function DeleteLastRevaluation(ByVal AssetID As Long) As String
     End If
     If Len(p) = 0 Then
         Set rs = CurrentDb.OpenRecordset("SELECT RevalDate FROM AssetRevaluations WHERE RevaluationID = " & id, _
-                                         dbOpenSnapshot)
+                                         dbOpenSnapshot, dbSeeChanges)
         later = DepreciatedFrom(AssetID, rs!RevalDate)
         If Not IsNull(later) Then
             p = "··√’· ≈Â·«ﬂ „”Ã· Õ Ï " & GDate(later) & ": «Õ–› ﬁÌÊœ «·≈Â·«ﬂ „‰ ‘Â— ≈⁄«œ… «· ﬁÌÌ„ √Ê·«."
@@ -606,7 +606,7 @@ Public Function DeleteLastRevaluation(ByVal AssetID As Long) As String
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("AssetRevaluations", "RevaluationID", id)      ' modAudit
-    CurrentDb.Execute "DELETE FROM AssetRevaluations WHERE RevaluationID = " & id, dbFailOnError
+    CurrentDb.Execute "DELETE FROM AssetRevaluations WHERE RevaluationID = " & id, dbFailOnError + dbSeeChanges
     AuditDeleted "ASSET_REVAL_DELETE", "AssetRevaluations", id, auditBefore
     DeleteLastRevaluation = SyncJournal()
 End Function
@@ -624,7 +624,7 @@ Public Function TransferAsset(ByVal AssetID As Long, ByVal TransferDate As Varia
         If Nz(fromCenter, 0) = Nz(ToCenter, 0) Then
             p = "«·√’· ⁄·Ï Â–« «·„—ﬂ“."
         ElseIf Not IsNull(ToCenter) Then
-            If Nz(DbValue("SELECT COUNT(*) FROM CostCenters WHERE IsActive = True AND CostCenterID = " & CLng(ToCenter)), 0) = 0 Then
+            If Nz(DbValue("SELECT COUNT(*) FROM CostCenters WHERE IsActive <> 0 AND CostCenterID = " & CLng(ToCenter)), 0) = 0 Then
                 p = "„—ﬂ“ «· ﬂ·›… €Ì— ‰‘ÿ."
             End If
         End If
@@ -635,8 +635,8 @@ Public Function TransferAsset(ByVal AssetID As Long, ByVal TransferDate As Varia
     End If
     ' the depreciation recorded before stays on the centre it was on
     CurrentDb.Execute "UPDATE AssetDepreciations SET DepCenter = " & CLng(Nz(fromCenter, 0)) & " WHERE AssetID = " & AssetID & _
-                      " AND DepCenter Is Null", dbFailOnError
-    Set rs = CurrentDb.OpenRecordset("AssetTransfers", dbOpenDynaset)
+                      " AND DepCenter Is Null", dbFailOnError + dbSeeChanges
+    Set rs = CurrentDb.OpenRecordset("AssetTransfers", dbOpenDynaset, dbSeeChanges)
     rs.AddNew
     rs!TransferNumber = NextNumber("ASSET_TRANSFER")
     rs!AssetID = AssetID
@@ -652,7 +652,7 @@ Public Function TransferAsset(ByVal AssetID As Long, ByVal TransferDate As Varia
     TransferID = rs!TransferID
     rs.Close
     CurrentDb.Execute "UPDATE FixedAssets SET CostCenterID = " & IIf(IsNull(ToCenter), "Null", CLng(Nz(ToCenter, 0))) & _
-                      " WHERE AssetID = " & AssetID, dbFailOnError
+                      " WHERE AssetID = " & AssetID, dbFailOnError + dbSeeChanges
     LogAction "ASSET_TRANSFER", "AssetTransfers", CStr(TransferID), CStr(Nz(ToCenter, 0))
     TransferAsset = SyncJournal()
 End Function
@@ -687,9 +687,9 @@ Public Function DeleteLastTransfer(ByVal AssetID As Long) As String
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("AssetTransfers", "TransferID", id)            ' modAudit
-    CurrentDb.Execute "DELETE FROM AssetTransfers WHERE TransferID = " & id, dbFailOnError
+    CurrentDb.Execute "DELETE FROM AssetTransfers WHERE TransferID = " & id, dbFailOnError + dbSeeChanges
     CurrentDb.Execute "UPDATE FixedAssets SET CostCenterID = " & IIf(IsNull(fromCenter), "Null", CLng(Nz(fromCenter, 0))) & _
-                      " WHERE AssetID = " & AssetID, dbFailOnError
+                      " WHERE AssetID = " & AssetID, dbFailOnError + dbSeeChanges
     AuditDeleted "ASSET_TRANSFER_DELETE", "AssetTransfers", id, auditBefore
     DeleteLastTransfer = SyncJournal()
 End Function
@@ -853,7 +853,7 @@ Public Sub AssetSave(ByVal frm As Access.Form)
     End If
     ' the cost centre of the asset (modCostCenters): its depreciation and its sale go there
     CurrentDb.Execute "UPDATE FixedAssets SET CostCenterID = " & IIf(IsNull(frm!cboCenter.Value), "Null", _
-                      Nz(frm!cboCenter.Value, 0)) & " WHERE AssetID = " & id, dbFailOnError
+                      Nz(frm!cboCenter.Value, 0)) & " WHERE AssetID = " & id, dbFailOnError + dbSeeChanges
     SyncJournal
     ShowInfo IIf(isNew, " „ Õ›Ÿ «·√’· ÊﬁÌœ ‘—«∆Â.", " „ Õ›Ÿ «· ⁄œÌ·.")
     AssetShow frm, id
@@ -1145,9 +1145,9 @@ Public Function TestAssets() As Boolean
                "«·‰ﬁ’ ÌŒ’„ «·›«∆÷ À„ Œ”«—… «‰Œ›«÷ " & msg, passed, failed, report
     CheckAsset DepreciationFor(id2, MonthEnd(DateAdd("m", 1, start))) = 83.33, _
                "«·≈Â·«ﬂ »⁄œÂ« „‰ «·ﬁÌ„… «·ÃœÌœ… Ê«·⁄„— «·»«ﬁÌ", passed, failed, report
-    centerA = DbValue("SELECT Min(CostCenterID) FROM CostCenters WHERE IsActive = True")
+    centerA = DbValue("SELECT Min(CostCenterID) FROM CostCenters WHERE IsActive <> 0")
     If Not IsNull(centerA) Then
-        CurrentDb.Execute "UPDATE FixedAssets SET CostCenterID = Null WHERE AssetID = " & id2, dbFailOnError
+        CurrentDb.Execute "UPDATE FixedAssets SET CostCenterID = Null WHERE AssetID = " & id2, dbFailOnError + dbSeeChanges
         msg = TransferAsset(id2, DateAdd("m", 1, start), centerA, "", trID)
         CheckAsset Len(msg) = 0 And trID > 0 And Nz(AssetField(id2, "CostCenterID"), 0) = centerA And _
                    Nz(DbValue("SELECT Sum(Debit) - Sum(Credit) FROM JournalLines WHERE AccountCode = 1720 AND CostCenterID = " & _
@@ -1161,7 +1161,7 @@ Public Function TestAssets() As Boolean
     CheckAsset Len(msg) = 0 And AssetBookValue(id2) = 1100 And AccountBalance(3500) = surplusBefore, _
                "Õ–› ≈⁄«œ Ì «· ﬁÌÌ„ „‰ «·√ŒÌ—… " & msg, passed, failed, report
     vatBefore = AccountBalance(2200)
-    msg = DisposeAsset(id2, Date, 1000, "CASHBOX", Null, DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True"), True)
+    msg = DisposeAsset(id2, Date, 1000, "CASHBOX", Null, DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive <> 0"), True)
     CheckAsset Len(msg) = 0 And AccountBalance(2200) = vatBefore - RoundMoney(1000 * Nz(SettingValue("VATRate"), 0)), _
                "»Ì⁄ «·√’· „⁄ ÷—Ì»… «·„Œ—Ã«  " & msg, passed, failed, report
     CheckAsset Nz(DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit"), 0) = 0, _

@@ -67,7 +67,7 @@ Public Function ChequeProblem(ByVal Direction As String, ByVal PartyID As Varian
     ElseIf Direction = "OUT" And IsNull(BankID) Then
         p = "«Œ — «·»‰ﬂ «·„”ÕÊ» ⁄·ÌÂ «·‘Ìﬂ."
     ElseIf Not IsNull(BankID) Then
-        If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive = True AND BankID = " & CLng(BankID)), 0) = 0 Then
+        If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive <> 0 AND BankID = " & CLng(BankID)), 0) = 0 Then
             p = "«·»‰ﬂ €Ì— ‰‘ÿ."
         End If
     End If
@@ -94,7 +94,7 @@ Public Function PostCheque(ByVal Direction As String, ByVal PartyID As Variant, 
     ws.BeginTrans
     inTrans = True
     ref = NextNumber("CHEQUE")
-    Set rs = db.OpenRecordset("Cheques", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("Cheques", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!ChequeRef = ref
     rs!Direction = Direction
@@ -144,7 +144,7 @@ Public Function DeleteCheque(ByVal ChequeID As Long) As String
     MoveBalance direction, PartyOf(ChequeID), amount
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("Cheques", "ChequeID", ChequeID)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM Cheques WHERE ChequeID = " & ChequeID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM Cheques WHERE ChequeID = " & ChequeID, dbFailOnError + dbSeeChanges
     AuditDeleted "CHEQUE_DELETE", "Cheques", ChequeID, auditBefore
     DeleteCheque = SyncJournal()
 End Function
@@ -183,7 +183,7 @@ Public Function SetChequeStatus(ByVal ChequeID As Long, ByVal NewStatus As Strin
         SetChequeStatus = "«Œ — «·»‰ﬂ."
     End If
     If Len(SetChequeStatus) = 0 And NewStatus = "COLLECTED" Then
-        If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive = True AND BankID = " & CLng(BankID)), 0) = 0 Then
+        If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive <> 0 AND BankID = " & CLng(BankID)), 0) = 0 Then
             SetChequeStatus = "«·»‰ﬂ €Ì— ‰‘ÿ."
         End If
     End If
@@ -192,7 +192,7 @@ Public Function SetChequeStatus(ByVal ChequeID As Long, ByVal NewStatus As Strin
     amount = ChequeField(ChequeID, "Amount")
     CurrentDb.Execute "UPDATE Cheques SET Status = " & SqlText(NewStatus) & ", StatusDate = " & SqlDate(DateValue(StatusDate)) & _
                       IIf(NewStatus = "COLLECTED", ", BankID = " & CLng(Nz(BankID, 0)), "") & _
-                      " WHERE ChequeID = " & ChequeID, dbFailOnError
+                      " WHERE ChequeID = " & ChequeID, dbFailOnError + dbSeeChanges
     If NewStatus = "BOUNCED" Then MoveBalance direction, PartyOf(ChequeID), amount     ' owed again
     LogAction "CHEQUE_" & NewStatus, "Cheques", CStr(ChequeID)
     SetChequeStatus = SyncJournal()
@@ -215,7 +215,7 @@ Public Function UndoChequeStatus(ByVal ChequeID As Long) As String
     UndoChequeStatus = ClosedPeriodProblem(ChequeField(ChequeID, "StatusDate"))
     If Len(UndoChequeStatus) > 0 Then Exit Function
     If status = "BOUNCED" Then MoveBalance ChequeField(ChequeID, "Direction"), PartyOf(ChequeID), -ChequeField(ChequeID, "Amount")
-    CurrentDb.Execute "UPDATE Cheques SET Status = 'PENDING', StatusDate = Null WHERE ChequeID = " & ChequeID, dbFailOnError
+    CurrentDb.Execute "UPDATE Cheques SET Status = 'PENDING', StatusDate = Null WHERE ChequeID = " & ChequeID, dbFailOnError + dbSeeChanges
     LogAction "CHEQUE_UNDO", "Cheques", CStr(ChequeID)
     UndoChequeStatus = SyncJournal()
 End Function
@@ -239,12 +239,12 @@ End Sub
 
 Public Sub ChequesDirectionChanged(ByVal frm As Access.Form)
     If frm!cboDirection.Value = "IN" Then
-        frm!cboParty.RowSource = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsActive = True AND " & _
+        frm!cboParty.RowSource = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsActive <> 0 AND " & _
                                  "c.CustomerID <> " & Nz(SettingValue("DefaultCustomerID"), 1) & " ORDER BY c.CustomerName")
         frm!lblParty.Caption = Tr("«·⁄„Ì·")
         frm!btnCollect.Caption = Tr(" Õ’Ì· ›Ì «·»‰ﬂ")
     Else
-        frm!cboParty.RowSource = Tr("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive = True ORDER BY s.SupplierName")
+        frm!cboParty.RowSource = Tr("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive <> 0 ORDER BY s.SupplierName")
         frm!lblParty.Caption = Tr("«·„Ê—œ")
         frm!btnCollect.Caption = Tr("’—›Â «·»‰ﬂ")
     End If
@@ -390,12 +390,12 @@ Public Function TestCheques() As Boolean
         GoTo Undo
     End If
     CurrentDb.Execute "INSERT INTO Customers (CustomerName, AllowCredit, CreditLimit, Notes) VALUES ('TEST ⁄„Ì· ‘Ìﬂ« ', True, 0, " & _
-                      "'TEST')", dbFailOnError
+                      "'TEST')", dbFailOnError + dbSeeChanges
     cust = DbValue("SELECT CustomerID FROM Customers WHERE CustomerName = 'TEST ⁄„Ì· ‘Ìﬂ« '")
-    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, Notes) VALUES ('TEST „Ê—œ ‘Ìﬂ« ', 'TEST')", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, Notes) VALUES ('TEST „Ê—œ ‘Ìﬂ« ', 'TEST')", dbFailOnError + dbSeeChanges
     supp = DbValue("SELECT SupplierID FROM Suppliers WHERE SupplierName = 'TEST „Ê—œ ‘Ìﬂ« '")
     CurrentDb.Execute "INSERT INTO Banks (BankName, OpeningBalance, OpeningDate, IsActive) VALUES ('TEST »‰ﬂ «·‘Ìﬂ« ', 0, " & _
-                      SqlDate(Date) & ", True)", dbFailOnError
+                      SqlDate(Date) & ", True)", dbFailOnError + dbSeeChanges
     bank = DbValue("SELECT BankID FROM Banks WHERE BankName = 'TEST »‰ﬂ «·‘Ìﬂ« '")
     before = AccountBalance(1250)
 

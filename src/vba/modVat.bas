@@ -148,12 +148,12 @@ Private Function WriteVatDraft(ByVal FromDate As Date, ByVal ToDate As Date, ByV
 
     Dim auditBefore As Collection
     If VatReturnID = 0 Then
-        Set rs = CurrentDb.OpenRecordset("VatReturns", dbOpenDynaset)
+        Set rs = CurrentDb.OpenRecordset("VatReturns", dbOpenDynaset, dbSeeChanges)
         rs.AddNew
         rs!Status = "DRAFT"
     Else
         Set auditBefore = AuditSnapshot("VatReturns", "VatReturnID", VatReturnID)    ' modAudit
-        Set rs = CurrentDb.OpenRecordset("SELECT * FROM VatReturns WHERE VatReturnID = " & VatReturnID, dbOpenDynaset)
+        Set rs = CurrentDb.OpenRecordset("SELECT * FROM VatReturns WHERE VatReturnID = " & VatReturnID, dbOpenDynaset, dbSeeChanges)
         rs.Edit
     End If
     rs!ReturnNumber = "VAT-" & Format$(ToDate, "yyyymmdd")
@@ -180,7 +180,7 @@ Public Function DeleteVatDraft(ByVal VatReturnID As Long) As String
     End If
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("VatReturns", "VatReturnID", VatReturnID)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM VatReturns WHERE VatReturnID = " & VatReturnID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM VatReturns WHERE VatReturnID = " & VatReturnID, dbFailOnError + dbSeeChanges
     AuditDeleted "VAT_DELETE", "VatReturns", VatReturnID, auditBefore
 End Function
 
@@ -224,12 +224,12 @@ Public Function FileVatReturn(ByVal VatReturnID As Long, ByVal FiledDate As Date
     End If
     CurrentDb.Execute "UPDATE VatReturns SET Status = 'FILED', FiledDate = " & SqlDate(FiledDate) & ", FilingRef = " & _
                       IIf(Len(Trim$(FilingRef)) > 0, SqlText(Left$(Trim$(FilingRef), 30)), "Null") & _
-                      ", EmployeeID = " & CurrentUserID() & " WHERE VatReturnID = " & VatReturnID, dbFailOnError
+                      ", EmployeeID = " & CurrentUserID() & " WHERE VatReturnID = " & VatReturnID, dbFailOnError + dbSeeChanges
     msg = SyncJournal()
     Set d = VatReturnFigures(VatReturnID)
     If IsNull(EntryOf("VAT_RETURN", VatReturnID)) And d("SalesStdVAT") - d("PurchStdVAT") + d("Corrections") <> 0 Then
         CurrentDb.Execute "UPDATE VatReturns SET Status = 'DRAFT', FiledDate = Null WHERE VatReturnID = " & VatReturnID, _
-                          dbFailOnError
+                          dbFailOnError + dbSeeChanges
         FileVatReturn = "تعذر إنشاء قيد التسوية:" & vbCrLf & msg
         Exit Function
     End If
@@ -262,7 +262,7 @@ Public Function UnfileVatReturn(ByVal VatReturnID As Long, ByVal Reason As Strin
     UnfileVatReturn = ClosedPeriodProblem(DbValue("SELECT FiledDate FROM VatReturns WHERE VatReturnID = " & VatReturnID))
     If Len(UnfileVatReturn) > 0 Then Exit Function
     CurrentDb.Execute "UPDATE VatReturns SET Status = 'DRAFT', FiledDate = Null, Notes = " & _
-                      SqlText(Left$(Trim$(Reason), 255)) & " WHERE VatReturnID = " & VatReturnID, dbFailOnError
+                      SqlText(Left$(Trim$(Reason), 255)) & " WHERE VatReturnID = " & VatReturnID, dbFailOnError + dbSeeChanges
     SyncJournal                                        ' removes the settlement entry
     LogAction "VAT_UNFILE", "VatReturns", CStr(VatReturnID), Reason
 End Function
@@ -271,7 +271,7 @@ Public Function VatPaymentAccountProblem(ByVal AccountCode As Long) As String
     ' The bank (or another cash account of the current assets that is not a cash box: the balance
     ' of a box comes from its vouchers, so a box pays the VAT through the bank only).
     Dim ok As Variant
-    ok = DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & AccountCode & " AND IsPosting = True AND " & _
+    ok = DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & AccountCode & " AND IsPosting <> 0 AND " & _
                  "AccountType = 'ASSET' AND Level2Code = 11 AND Nz(Level3Code, 0) <> 1100 AND AccountCode NOT IN " & _
                  "(1300, 1400, 1410, 1420, 1430, 1500, 1600) AND AccountCode NOT BETWEEN 140001 AND 149999")
     If IsNull(ok) Then VatPaymentAccountProblem = "اختر حساب البنك الذي سُدِّدت منه الضريبة."
@@ -306,7 +306,7 @@ Public Function PayVatReturn(ByVal VatReturnID As Long, ByVal PaidDate As Date, 
     End If
     If Len(PayVatReturn) > 0 Then Exit Function
     CurrentDb.Execute "UPDATE VatReturns SET PaidDate = " & SqlDate(PaidDate) & ", PaidAmount = " & _
-                      Str$(Amount) & ", PaidAccount = " & AccountCode & " WHERE VatReturnID = " & VatReturnID, dbFailOnError
+                      Str$(Amount) & ", PaidAccount = " & AccountCode & " WHERE VatReturnID = " & VatReturnID, dbFailOnError + dbSeeChanges
     SyncJournal
     LogAction "VAT_PAY", "VatReturns", CStr(VatReturnID), Format$(Amount, "0.00")
 End Function
@@ -323,7 +323,7 @@ Public Function CancelVatPayment(ByVal VatReturnID As Long) As String
     CancelVatPayment = ClosedPeriodProblem(paid)
     If Len(CancelVatPayment) > 0 Then Exit Function
     CurrentDb.Execute "UPDATE VatReturns SET PaidDate = Null, PaidAmount = 0, PaidAccount = Null WHERE VatReturnID = " & _
-                      VatReturnID, dbFailOnError
+                      VatReturnID, dbFailOnError + dbSeeChanges
     SyncJournal
     LogAction "VAT_UNPAY", "VatReturns", CStr(VatReturnID)
 End Function
@@ -441,7 +441,7 @@ End Function
 
 Public Sub VatReturnLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
-    frm!cboPayAccount.RowSource = Tr("SELECT a.AccountCode, a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND " & _
+    frm!cboPayAccount.RowSource = Tr("SELECT a.AccountCode, a.AccountName FROM [@Accounts] AS a WHERE IsPosting <> 0 AND " & _
         "AccountType = 'ASSET' AND Level2Code = 11 AND Nz(Level3Code, 0) <> 1100 AND AccountCode NOT IN " & _
         "(1300, 1400, 1410, 1420, 1430, 1500, 1600) AND AccountCode NOT BETWEEN 140001 AND 149999 ORDER BY TreeKey")
     If AppCountry() = "EG" Then                        ' the Egyptian return is monthly

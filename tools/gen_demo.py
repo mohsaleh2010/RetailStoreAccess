@@ -14,6 +14,7 @@ from decimal import Decimal as D
 
 import demo_data as DD
 from generate_common import vba_str
+from server_code import see_changes
 
 CHUNK = 6          # plan steps per generated procedure (keeps procedures small)
 
@@ -365,7 +366,7 @@ Private Function CategoryIDOf(ByVal CategoryName As String) As Long
 End Function
 
 Private Function BoxOfType(ByVal BoxType As String) As Long
-    BoxOfType = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True AND BoxType = " & SqlText(BoxType)), 0)
+    BoxOfType = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive <> 0 AND BoxType = " & SqlText(BoxType)), 0)
 End Function
 
 Private Function UserIDOf(ByVal Username As String) As Long
@@ -454,7 +455,7 @@ Public Function VerifyDemoData() As Boolean
     Expect DbValue("SELECT COUNT(*) FROM Categories WHERE Description = '" & DEMO_MARK & "'") = @@N_CATEGORIES@@, "@@N_CATEGORIES@@ تصنيفات"
     Expect DbValue("SELECT COUNT(*) FROM Customers WHERE Notes = '" & DEMO_MARK & "'") = @@N_CUSTOMERS@@, "@@N_CUSTOMERS@@ عملاء"
     Expect DbValue("SELECT COUNT(*) FROM Suppliers WHERE Notes = '" & DEMO_MARK & "'") = @@N_SUPPLIERS@@, "@@N_SUPPLIERS@@ موردين"
-    Expect DbValue("SELECT COUNT(*) FROM Employees WHERE Notes = '" & DEMO_MARK & "' AND MustChangePassword = True " & _
+    Expect DbValue("SELECT COUNT(*) FROM Employees WHERE Notes = '" & DEMO_MARK & "' AND MustChangePassword <> 0 " & _
                    "AND PasswordHash Is Not Null") = @@N_EMPLOYEES@@, "@@N_EMPLOYEES@@ موظفين بكلمة مرور مؤقتة"
     Expect DbValue("SELECT COUNT(*) FROM SalesInvoices") = @@SALES@@, "@@SALES@@ فواتير بيع"
     Expect DbValue("SELECT COUNT(*) FROM PurchaseInvoices") = @@PURCHASES@@, "@@PURCHASES@@ فواتير شراء"
@@ -626,4 +627,4 @@ def build_demo_vba() -> str:
     for k, v in values.items():
         text = text.replace(f"@@{k}@@", v)
     assert not re.search(r"@@[A-Z_]+@@", text), re.findall(r"@@[A-Z_]+@@", text)
-    return text
+    return see_changes(text)                                   # plan 5C: SQL Server tables

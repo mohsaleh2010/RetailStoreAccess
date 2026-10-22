@@ -45,9 +45,9 @@ Public Function SalesRepFor(ByVal CustomerID As Long) As Variant
         Exit Function
     End If
     v = DbValue("SELECT c.SalesRepID FROM Customers AS c INNER JOIN SalesReps AS s ON c.SalesRepID = s.SalesRepID " & _
-                "WHERE s.IsActive = True AND c.CustomerID = " & CustomerID)
+                "WHERE s.IsActive <> 0 AND c.CustomerID = " & CustomerID)
     If IsNull(v) Then
-        v = DbValue("SELECT Min(SalesRepID) FROM SalesReps WHERE IsActive = True AND EmployeeID = " & CurrentUserID())
+        v = DbValue("SELECT Min(SalesRepID) FROM SalesReps WHERE IsActive <> 0 AND EmployeeID = " & CurrentUserID())
     End If
     SalesRepFor = v
 End Function
@@ -95,7 +95,7 @@ End Sub
 Private Sub UpdateRunTotal(ByVal RunID As Long)
     CurrentDb.Execute "UPDATE CommissionRuns SET TotalAmount = " & _
         Str$(Nz(DbValue("SELECT Sum(Commission) FROM CommissionLines WHERE CommissionRunID = " & RunID), 0)) & _
-        " WHERE CommissionRunID = " & RunID, dbFailOnError
+        " WHERE CommissionRunID = " & RunID, dbFailOnError + dbSeeChanges
 End Sub
 
 Private Sub AddCommissionLines(ByVal RunID As Long, ByVal RunMonth As Date)
@@ -106,7 +106,7 @@ Private Sub AddCommissionLines(ByVal RunID As Long, ByVal RunMonth As Date)
     Set p = db.OpenRecordset("SELECT p.*, s.CostCenterID FROM RepPerformanceQuery AS p INNER JOIN SalesReps AS s " & _
                              "ON p.SalesRepID = s.SalesRepID WHERE p.NetSales <> 0 OR p.Collections <> 0 " & _
                              "ORDER BY p.RepName", dbOpenSnapshot)
-    Set l = db.OpenRecordset("CommissionLines", dbOpenDynaset, dbAppendOnly)
+    Set l = db.OpenRecordset("CommissionLines", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     Do Until p.EOF
         l.AddNew
         l!CommissionRunID = RunID
@@ -146,7 +146,7 @@ Public Function CreateCommissionRun(ByVal AnyDayOfMonth As Date, ByRef RunID As 
     End If
     CreateCommissionRun = ClosedPeriodProblem(m)
     If Len(CreateCommissionRun) > 0 Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("CommissionRuns", dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("CommissionRuns", dbOpenDynaset, dbSeeChanges)
     rs.AddNew
     rs!RunNumber = NextNumber("COMMISSION_RUN")
     rs!RunMonth = m
@@ -168,7 +168,7 @@ Public Function RebuildCommissionRun(ByVal RunID As Long) As String
         RebuildCommissionRun = "المسير ليس مسودة."
     End If
     If Len(RebuildCommissionRun) > 0 Then Exit Function
-    CurrentDb.Execute "DELETE FROM CommissionLines WHERE CommissionRunID = " & RunID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM CommissionLines WHERE CommissionRunID = " & RunID, dbFailOnError + dbSeeChanges
     AddCommissionLines RunID, CommissionRunField(RunID, "RunMonth")
 End Function
 
@@ -176,7 +176,7 @@ Public Sub RecalcCommissionRun(ByVal RunID As Long)
     ' The commission of every line of a draft (after the lines were edited).
     Dim rs As DAO.Recordset
     If Nz(CommissionRunField(RunID, "Status"), "") <> "DRAFT" Then Exit Sub
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM CommissionLines WHERE CommissionRunID = " & RunID, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM CommissionLines WHERE CommissionRunID = " & RunID, dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         rs.Edit
         SaveCommissionAmounts rs
@@ -207,7 +207,7 @@ Public Function PostCommissionRun(ByVal RunID As Long) As String
     End If
     If Len(PostCommissionRun) > 0 Then Exit Function
     CurrentDb.Execute "UPDATE CommissionRuns SET Status = 'POSTED', PostedAt = Now(), EmployeeID = " & CurrentUserID() & _
-                      " WHERE CommissionRunID = " & RunID, dbFailOnError
+                      " WHERE CommissionRunID = " & RunID, dbFailOnError + dbSeeChanges
     LogAction "COMMISSION_POST", "CommissionRuns", Format$(rm, "yyyy-mm")
     SyncJournal
 End Function
@@ -234,7 +234,7 @@ Public Function UnpostCommissionRun(ByVal RunID As Long) As String
     UnpostCommissionRun = p
     If Len(p) > 0 Then Exit Function
     CurrentDb.Execute "UPDATE CommissionRuns SET Status = 'DRAFT', PostedAt = Null WHERE CommissionRunID = " & RunID, _
-                      dbFailOnError
+                      dbFailOnError + dbSeeChanges
     LogAction "COMMISSION_UNPOST", "CommissionRuns", CStr(RunID)
     SyncJournal
 End Function
@@ -247,7 +247,7 @@ Public Function DeleteCommissionRun(ByVal RunID As Long) As String
     If Len(DeleteCommissionRun) > 0 Then Exit Function
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("CommissionRuns", "CommissionRunID", RunID)      ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM CommissionRuns WHERE CommissionRunID = " & RunID, dbFailOnError   ' lines cascade
+    CurrentDb.Execute "DELETE FROM CommissionRuns WHERE CommissionRunID = " & RunID, dbFailOnError + dbSeeChanges   ' lines cascade
     AuditDeleted "COMMISSION_DELETE", "CommissionRuns", RunID, auditBefore
 End Function
 
@@ -302,7 +302,7 @@ Public Sub CommissionsTotals(ByVal frm As Access.Form)
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT COUNT(*) AS LineCount, Sum(NetSales) AS SumSales, Sum(Collections) AS SumCollected, " & _
                                      "Sum(Commission) AS SumCommission FROM CommissionLines WHERE CommissionRunID = " & id, _
-                                     dbOpenSnapshot)
+                                     dbOpenSnapshot, dbSeeChanges)
     If Nz(rs!LineCount, 0) > 0 Then
         frm!lblTotals.Caption = Tr(rs!LineCount & " مندوب   صافي المبيعات " & Format$(Nz(rs!SumSales, 0), "#,##0.00") & _
             "   التحصيل " & Format$(Nz(rs!SumCollected, 0), "#,##0.00") & "   إجمالي العمولات " & _
@@ -414,7 +414,7 @@ Public Sub SalesRepCurrent(ByVal frm As Access.Form)
     End If
     SetPeriod DateSerial(Year(Date), Month(Date), 1), Date
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM RepPerformanceQuery WHERE SalesRepID = " & frm!SalesRepID.Value, _
-                                     dbOpenSnapshot)
+                                     dbOpenSnapshot, dbSeeChanges)
     If Not rs.EOF Then
         info = "هذا الشهر: صافي المبيعات " & Format$(Nz(rs!NetSales, 0), "#,##0.00") & "   التحصيل " & _
                Format$(Nz(rs!Collections, 0), "#,##0.00")
@@ -460,16 +460,16 @@ Public Function TestSalesReps() As Boolean
     End If
     CheckRep CalcCommission(1000, 0.025, 0) = 25 And CalcCommission(1000, 0.025, -40) = 0 And _
              CalcCommission(-500, 0.1, 0) = 0, "حساب العمولة ولا تقل عن صفر", passed, failed, report
-    CurrentDb.Execute "UPDATE SalesReps SET IsActive = False", dbFailOnError
+    CurrentDb.Execute "UPDATE SalesReps SET IsActive = False", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO SalesReps (RepCode, RepName, CommissionRate, CommissionBase, IsActive) VALUES " & _
-                      "('TST-REP', 'TEST مندوب', 0.1, 'COLLECTION', True)", dbFailOnError
+                      "('TST-REP', 'TEST مندوب', 0.1, 'COLLECTION', True)", dbFailOnError + dbSeeChanges
     rep = DbValue("SELECT SalesRepID FROM SalesReps WHERE RepCode = 'TST-REP'")
     CurrentDb.Execute "INSERT INTO Customers (CustomerName, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, IsActive, " & _
-                      "SalesRepID) VALUES ('TEST عميل المندوب', 0, 1000, True, 0, True, " & rep & ")", dbFailOnError
+                      "SalesRepID) VALUES ('TEST عميل المندوب', 0, 1000, True, 0, True, " & rep & ")", dbFailOnError + dbSeeChanges
     cust = DbValue("SELECT CustomerID FROM Customers WHERE CustomerName = 'TEST عميل المندوب'")
     CheckRep SalesRepFor(cust) = rep, "مندوب العميل", passed, failed, report
     CheckRep IsNull(SalesRepFor(1)), "عميل بلا مندوب ومستخدم بلا مندوب", passed, failed, report
-    CurrentDb.Execute "UPDATE SalesReps SET EmployeeID = " & CurrentUserID() & " WHERE SalesRepID = " & rep, dbFailOnError
+    CurrentDb.Execute "UPDATE SalesReps SET EmployeeID = " & CurrentUserID() & " WHERE SalesRepID = " & rep, dbFailOnError + dbSeeChanges
     CheckRep SalesRepFor(1) = rep, "مندوب المستخدم الحالي", passed, failed, report
 
     msg = PostCustomerPayment(cust, 800, CASH_METHOD_ID, "TEST", payID)
@@ -481,7 +481,7 @@ Public Function TestSalesReps() As Boolean
              "مسودة العمولات: 10% من التحصيل " & msg, passed, failed, report
     CheckRep Len(CreateCommissionRun(Date, voucher)) > 0, "مسير واحد للشهر", passed, failed, report
     CurrentDb.Execute "UPDATE CommissionLines SET Adjustment = 20 WHERE CommissionRunID = " & runID & " AND SalesRepID = " & rep, _
-                      dbFailOnError
+                      dbFailOnError + dbSeeChanges
     msg = PostCommissionRun(runID)
     CheckRep Len(msg) = 0 And Nz(CommissionRunField(runID, "TotalAmount"), 0) >= 100 And RepPayable(rep) = 100 And _
              Not IsNull(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = 'COMMISSION' AND SourceID = " & runID)), _
@@ -491,13 +491,13 @@ Public Function TestSalesReps() As Boolean
              Len(CommissionVoucherProblem("OUT", "COMMISSION", Null, 50)) > 0 And _
              Len(CommissionVoucherProblem("OUT", "COMMISSION", rep, 60)) = 0, "صرف العمولة لا يتجاوز المستحق", _
              passed, failed, report
-    box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True"), 0)
+    box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive <> 0"), 0)
     CurrentDb.Execute "INSERT INTO CashVouchers (VoucherNumber, VoucherDate, VoucherType, CashBoxID, Category, Amount, " & _
         "Description, EmployeeID, SalesRepID) VALUES ('TEST-COM', " & SqlDate(Date) & ", 'OUT', " & box & _
-        ", 'COMMISSION', 60, 'TEST', " & CurrentUserID() & ", " & rep & ")", dbFailOnError
+        ", 'COMMISSION', 60, 'TEST', " & CurrentUserID() & ", " & rep & ")", dbFailOnError + dbSeeChanges
     CheckRep RepPayable(rep) = 40, "سند الصرف ينقص المستحق", passed, failed, report
     CheckRep Len(UnpostCommissionRun(runID)) > 0, "لا يُلغى ترحيل عمولات صُرف منها", passed, failed, report
-    CurrentDb.Execute "DELETE FROM CashVouchers WHERE VoucherNumber = 'TEST-COM'", dbFailOnError
+    CurrentDb.Execute "DELETE FROM CashVouchers WHERE VoucherNumber = 'TEST-COM'", dbFailOnError + dbSeeChanges
     msg = UnpostCommissionRun(runID) & DeleteCommissionRun(runID)
     CheckRep Len(msg) = 0 And IsNull(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = 'COMMISSION' AND " & _
              "SourceID = " & runID)), "إلغاء الترحيل يحذف القيد ثم تُحذف المسودة " & msg, passed, failed, report

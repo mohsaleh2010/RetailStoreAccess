@@ -53,7 +53,7 @@ Public Function StartActingAsRep(ByVal RepDayID As Long) As String
         Exit Function
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT WarehouseID, CashBoxID, SalesRepID FROM RepDays WHERE RepDayID = " & RepDayID, _
-                                     dbOpenSnapshot)
+                                     dbOpenSnapshot, dbSeeChanges)
     m_ActWarehouse = rs!WarehouseID
     m_ActBox = rs!CashBoxID
     m_ActRep = rs!SalesRepID
@@ -80,12 +80,12 @@ Private Function DayField(ByVal RepDayID As Long, ByVal FieldName As String) As 
 End Function
 
 Public Function RepVanID(ByVal SalesRepID As Long) As Long
-    RepVanID = Nz(DbValue("SELECT Min(WarehouseID) FROM Warehouses WHERE WarehouseType = 'VAN' AND IsActive = True " & _
+    RepVanID = Nz(DbValue("SELECT Min(WarehouseID) FROM Warehouses WHERE WarehouseType = 'VAN' AND IsActive <> 0 " & _
                           "AND SalesRepID = " & SalesRepID), 0)
 End Function
 
 Public Function RepCustodyBoxID(ByVal SalesRepID As Long) As Long
-    RepCustodyBoxID = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'CUSTODY' AND IsActive = True " & _
+    RepCustodyBoxID = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'CUSTODY' AND IsActive <> 0 " & _
                                  "AND SalesRepID = " & SalesRepID), 0)
 End Function
 
@@ -121,7 +121,7 @@ Public Function OpenRepDay(ByVal SalesRepID As Variant, ByVal StoreID As Variant
         OpenRepDay = "للمندوب يوم مفتوح (" & openNo & "). سوِّه أولًا."
         Exit Function
     End If
-    Set rs = CurrentDb.OpenRecordset("RepDays", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("RepDays", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!DayNumber = NextNumber("REP_DAY")
     rs!DayDate = Date
@@ -161,7 +161,7 @@ Public Function DeleteRepDay(ByVal RepDayID As Long) As String
     If Len(DeleteRepDay) > 0 Then Exit Function
     If ActingRepDayID() = RepDayID Then StopActingAsRep
     Set auditBefore = AuditSnapshot("RepDays", "RepDayID", RepDayID)
-    CurrentDb.Execute "DELETE FROM RepDays WHERE RepDayID = " & RepDayID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM RepDays WHERE RepDayID = " & RepDayID, dbFailOnError + dbSeeChanges
     AuditDeleted "REP_DAY_DELETE", "RepDays", RepDayID, auditBefore
 End Function
 
@@ -204,7 +204,7 @@ Public Function UnloadRepDay(ByVal RepDayID As Long, ByRef NewTransferID As Long
     If Len(msg) = 0 Then
         Set rs = db.OpenRecordset("SELECT ProductID, StockQty FROM qryWarehouseStock WHERE StockQty > 0 AND WarehouseID = " & _
                                   van & " ORDER BY ProductID", dbOpenSnapshot)
-        Set ln = db.OpenRecordset("StockTransferLines", dbOpenDynaset, dbAppendOnly)
+        Set ln = db.OpenRecordset("StockTransferLines", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
         Do Until rs.EOF
             ln.AddNew
             ln!StockTransferID = NewTransferID
@@ -289,7 +289,7 @@ Public Function SettleRepDay(ByVal RepDayID As Long) As String
     If shortage < 0 Or IsNull(advanceTo) Then shortage = 0
     CurrentDb.Execute "UPDATE RepDays SET Status = 'SETTLED', SettledAt = Now(), StockCountID = " & countID & _
                       ", ClosingID = " & closingID & ", GoodsShortage = " & Str$(shortage) & ", AdvanceEmployeeID = " & _
-                      IIf(shortage > 0, CLng(Nz(advanceTo, 0)), "Null") & " WHERE RepDayID = " & RepDayID, dbFailOnError
+                      IIf(shortage > 0, CLng(Nz(advanceTo, 0)), "Null") & " WHERE RepDayID = " & RepDayID, dbFailOnError + dbSeeChanges
     If ActingRepDayID() = RepDayID Then StopActingAsRep
     LogAction "REP_DAY_SETTLE", "RepDays", CStr(RepDayID), "Count=" & countID & " Closing=" & closingID & _
               " Shortage=" & Format$(shortage, "0.00")
@@ -302,9 +302,9 @@ End Function
 Public Sub RepDayLoad(ByVal frm As Access.Form)
     Dim id As Variant
     Calendar = vbCalGreg
-    frm!cboRep.RowSource = Tr("SELECT r.SalesRepID, r.RepName FROM [@SalesReps] AS r WHERE r.IsActive = True AND " & _
+    frm!cboRep.RowSource = Tr("SELECT r.SalesRepID, r.RepName FROM [@SalesReps] AS r WHERE r.IsActive <> 0 AND " & _
                               "r.SalesRepID In (SELECT SalesRepID FROM Warehouses WHERE WarehouseType = 'VAN' AND " & _
-                              "IsActive = True) ORDER BY r.RepName")
+                              "IsActive <> 0) ORDER BY r.RepName")
     frm!cboStore.RowSource = WarehouseRows()
     frm!cboStore.Value = MAIN_WAREHOUSE_ID
     RepDayListRefresh frm
@@ -485,26 +485,26 @@ Public Function TestRepDays() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
-    CurrentDb.Execute "UPDATE Settings SET AllowNegativeStock = False", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE Settings SET AllowNegativeStock = False", dbFailOnError + dbSeeChanges
     g_AutoAnswer = False
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, UnitID, SellingPrice, PurchasePrice, " & _
                       "CurrentQuantity, AverageCost) VALUES ('TEST-RD-P', 'TEST صنف السيارة', " & _
                       Nz(DbValue("SELECT Min(CategoryID) FROM Categories"), 1) & ", " & _
-                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 8, 0, 0)", dbFailOnError
+                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 8, 0, 0)", dbFailOnError + dbSeeChanges
     pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-RD-P'")
     CurrentDb.Execute "INSERT INTO SalesReps (RepCode, RepName, CommissionRate, CommissionBase, IsActive) " & _
-                      "VALUES ('TEST-RD', 'TEST مندوب السيارة', 0, 'SALES', True)", dbFailOnError
+                      "VALUES ('TEST-RD', 'TEST مندوب السيارة', 0, 'SALES', True)", dbFailOnError + dbSeeChanges
     rep = DbValue("SELECT SalesRepID FROM SalesReps WHERE RepCode = 'TEST-RD'")
     CurrentDb.Execute "INSERT INTO Warehouses (WarehouseCode, WarehouseName, WarehouseType, SalesRepID, ConfirmReceipt, " & _
-                      "IsActive) VALUES ('TEST-VAN', 'TEST سيارة', 'VAN', " & rep & ", False, True)", dbFailOnError
+                      "IsActive) VALUES ('TEST-VAN', 'TEST سيارة', 'VAN', " & rep & ", False, True)", dbFailOnError + dbSeeChanges
     van = DbValue("SELECT WarehouseID FROM Warehouses WHERE WarehouseCode = 'TEST-VAN'")
-    cust = Nz(DbValue("SELECT Min(CustomerID) FROM Customers WHERE IsActive = True"), 0)
-    mainBox = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive = True"), 0)
+    cust = Nz(DbValue("SELECT Min(CustomerID) FROM Customers WHERE IsActive <> 0"), 0)
+    mainBox = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive <> 0"), 0)
     msg = OpenRepDay(rep, MAIN_WAREHOUSE_ID, dayID)
     CheckRd Len(msg) > 0 And dayID = 0, "لا يوم لمندوب بلا صندوق عهدة", passed, failed, report
     CurrentDb.Execute "INSERT INTO CashBoxes (BoxName, BoxType, OpeningBalance, IsActive, SalesRepID, ConfirmReceipt) " & _
-                      "VALUES ('TEST عهدة السيارة', 'CUSTODY', 0, True, " & rep & ", False)", dbFailOnError
+                      "VALUES ('TEST عهدة السيارة', 'CUSTODY', 0, True, " & rep & ", False)", dbFailOnError + dbSeeChanges
     box = DbValue("SELECT CashBoxID FROM CashBoxes WHERE BoxName = 'TEST عهدة السيارة'")
     CheckRd cust > 0 And mainBox > 0, "يوجد عميل وخزينة رئيسية", passed, failed, report
     msg = PostManualStock(pid, TT_STOCK_IN, 10, 6, "TEST", refNo, MAIN_WAREHOUSE_ID)
@@ -515,7 +515,7 @@ Public Function TestRepDays() As Boolean
     ' load 6 into the van
     msg = LoadRepDay(dayID, trID)
     CurrentDb.Execute "INSERT INTO StockTransferLines (StockTransferID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      trID & ", " & pid & ", 6, 0)", dbFailOnError
+                      trID & ", " & pid & ", 6, 0)", dbFailOnError + dbSeeChanges
     msg = msg & SendStockTransfer(trID)
     CheckRd Len(msg) = 0 And WarehouseStock(pid, van) = 6, "تحميل 6 في السيارة " & msg, passed, failed, report
 
@@ -524,9 +524,9 @@ Public Function TestRepDays() As Boolean
     CheckRd Len(msg) = 0 And CurrentWarehouseID() = van And CurrentCashBoxID() = box And SalesRepFor(cust) = rep, _
             "العمل باسم المندوب: مخزن السيارة وصندوقها والمندوب", passed, failed, report
     CurrentDb.Execute "INSERT INTO tmpPOSLines (ProductID, ProductCode, ProductName, Quantity, UnitPrice, LineDiscount, " & _
-                      "Available) VALUES (" & pid & ", 'TEST-RD-P', 'TEST صنف السيارة', 2, 20, 0, 6)", dbFailOnError
+                      "Available) VALUES (" & pid & ", 'TEST-RD-P', 'TEST صنف السيارة', 2, 20, 0, 6)", dbFailOnError + dbSeeChanges
     msg = PostSaleFromCart(cust, "CASH", CASH_METHOD_ID, 0, Null, "TEST", invID)
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CheckRd Len(msg) = 0 And WarehouseStock(pid, van) = 4 And _
             Nz(DbValue("SELECT CashBoxID FROM SalesInvoices WHERE SalesInvoiceID = " & invID), 0) = box And _
             Nz(DbValue("SELECT SalesRepID FROM SalesInvoices WHERE SalesInvoiceID = " & invID), 0) = rep, _
@@ -535,7 +535,7 @@ Public Function TestRepDays() As Boolean
     ' the van count finds 3: one short
     msg = CountRepDay(dayID, countID)
     CurrentDb.Execute "UPDATE StockCountDetails SET ActualQuantity = 3 WHERE StockCountID = " & countID & _
-                      " AND ProductID = " & pid, dbFailOnError
+                      " AND ProductID = " & pid, dbFailOnError + dbSeeChanges
     CheckRd Len(SettleRepDay(dayID)) > 0, "لا يُغلق اليوم وجرد السيارة مفتوح", passed, failed, report
     msg = msg & PostStockCount(countID, False, lines, netValue)
     CheckRd Len(msg) = 0 And WarehouseStock(pid, van) = 3 And netValue = -6, "جرد السيارة: عجز صنف واحد " & msg, _
@@ -553,7 +553,7 @@ Public Function TestRepDays() As Boolean
     CheckRd Len(SettleRepDay(dayID)) > 0, "لا يُغلق اليوم قبل تصفية الصندوق", passed, failed, report
     expected = CashBoxBalance(box)
     ' docs/66: the rep has a program user, so his shortages are advances on him
-    CurrentDb.Execute "UPDATE SalesReps SET EmployeeID = " & CurrentUserID() & " WHERE SalesRepID = " & rep, dbFailOnError
+    CurrentDb.Execute "UPDATE SalesReps SET EmployeeID = " & CurrentUserID() & " WHERE SalesRepID = " & rep, dbFailOnError + dbSeeChanges
     advBefore = Nz(DbValue("SELECT AdvanceBalance FROM qryAdvanceTotals WHERE EmployeeID = " & CurrentUserID()), 0)
     msg = PostCashClosing(box, expected - 5, "MAIN", mainBox, expected - 5, "TEST", closingID)
     CheckRd Len(msg) = 0 And expected = Nz(DbValue("SELECT PaidAmount FROM SalesInvoices WHERE SalesInvoiceID = " & invID), 0), _

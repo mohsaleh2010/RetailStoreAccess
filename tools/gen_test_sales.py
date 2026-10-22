@@ -9,6 +9,7 @@ import pricing as P
 import qr_reference as R
 import zatca_reference as Z
 from generate_common import vba_str
+from server_code import see_changes
 
 ARABIC_LOCAL = dt.datetime(2026, 10, 4, 12, 15)
 
@@ -129,7 +130,7 @@ Private Sub TestPosting()
     inTrans = True
 
     db.Execute "UPDATE Settings SET StoreName = 'TEST متجر', VATNumber = '300000000000003', " & _
-               "VATRate = 0.15, PricesIncludeVAT = True, AllowNegativeStock = False", dbFailOnError
+               "VATRate = 0.15, PricesIncludeVAT = True, AllowNegativeStock = 0", dbFailOnError
     db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
     db.Execute "INSERT INTO Products (ProductCode, ProductName, Barcode, PurchasePrice, AverageCost, " & _
                "SellingPrice, CurrentQuantity, MinimumQuantity) VALUES ('TEST-POS-1', 'TEST منتج', " & _
@@ -301,4 +302,4 @@ End Sub
 def build_test_sales_vba() -> str:
     text = TEMPLATE.replace("@@VECTORS@@", vector_lines())
     assert not re.search(r"@@[A-Z_]+@@", text)
-    return text
+    return see_changes(text)                                   # plan 5C: SQL Server tables

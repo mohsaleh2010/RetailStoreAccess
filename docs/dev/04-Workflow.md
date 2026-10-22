@@ -79,6 +79,9 @@
 | لا «ريال» ولا SAR ولا 15% ثابتة: `BaseCurrency()` و`CurrencyWord()` و`SettingValue("VATRate")` و`TaxNumberProblem`، ورمز QR السعودي بشرط `AppCountry() = "SA"` | البرنامج خطأ في مصر |
 | شرط حقل تغيّر على جدول موجود يوضع في `schema.RULE_UPGRADES` (الأوسع فقط) | `BuildSchema` يُبقي الشرط القديم في ملف البيانات الموجود |
 | `MSG_RTL` دالة في `modLang` (صفر في الإنجليزية)، وليست ثابتًا | رسائل معكوسة الاتجاه |
+| SQL Server: كل `Execute` وكل `OpenRecordset` قابل للتعديل بالخيار `dbSeeChanges` (`tools/server_code.see_changes`) | الخطأ 3622 على جدول فيه IDENTITY |
+| SQL Server: رقم السجل الجديد يُقرأ بعد `Update` (`rs.Bookmark = rs.LastModified`)، لا بين `AddNew` و`Update` | الرقم فارغ، وضاعت تفاصيل سجل التدقيق |
+| SQL Server: حقل نعم/لا في SQL يُقارن بـ `<> 0` أو `= 0`، لا بـ `True` أو `-1` (الخادم يخزّن 1) | قوائم فارغة واستعلامات لا تجد شيئًا |
 
 ## 4) تشخيص خطأ يأتي من Access
 1. **اطلب الدليل الكامل:**

@@ -344,6 +344,13 @@ SET XACT_ABORT ON;
 GO"""
 
 
+# Readers see the last committed rows instead of waiting for another user's posting transaction (the program
+# keeps a document and its stock moves and journal in one transaction). Set once: WITH ROLLBACK IMMEDIATE ends
+# the other connections, which Access opens again.
+DATABASE_OPTIONS = """IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
+    ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;"""
+
+
 def section(title: str) -> str:
     return f"\n/*------------------------------------------------------------------------------\n  {title}\n" \
            f"------------------------------------------------------------------------------*/"
@@ -385,6 +392,9 @@ def build_sql() -> str:
     parts.append(GO)
     parts.append(section("7. Relationships"))
     parts.extend(foreign_keys_sql())
+    parts.append(GO)
+    parts.append(section("8. Database options (plan 5C, docs/70)"))
+    parts.append(DATABASE_OPTIONS)
     parts.append(GO)
     parts.append("PRINT N'RetailStore schema: done (" + counts + ").';\nGO\n")
     return "\n".join(parts)

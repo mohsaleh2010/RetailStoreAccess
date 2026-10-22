@@ -159,7 +159,7 @@ class SalesRepCodeTests(unittest.TestCase):
         self.assertIn("rs!SalesRepID = SalesRepFor(CustomerID)", proc(read("modSales"), "PostCustomerPayment"))
         self.assertIn("SELECT SalesRepID FROM SalesInvoices", proc(read("modSales"), "PostSalesReturn"))
         rep_for = proc(self.text, "SalesRepFor")
-        self.assertIn("s.IsActive = True", rep_for)
+        self.assertIn("s.IsActive <> 0", rep_for)
         self.assertIn("EmployeeID = \" & CurrentUserID()", rep_for)
 
     def test_posting_rules(self):

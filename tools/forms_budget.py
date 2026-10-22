@@ -8,7 +8,7 @@ from forms_cash import table_combo
 from forms_sales import grid_row, header_labels
 
 BUDGET_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE AccountType IN "
-                   "('REVENUE', 'EXPENSE') AND IsActive = True ORDER BY TreeKey")
+                   "('REVENUE', 'EXPENSE') AND IsActive <> 0 ORDER BY TreeKey")
 BUDGET_ROWS = "SELECT BudgetID, BudgetYear & '  ' & BudgetName FROM Budgets ORDER BY BudgetYear DESC"
 MONTHS = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"]
 LINE_TITLES = ["الحساب", "المركز"] + MONTHS + ["السنة"]

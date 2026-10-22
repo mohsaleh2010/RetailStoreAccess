@@ -131,7 +131,7 @@ Public Sub POSLoad(ByVal frm As Access.Form)
     EnsureLocalTables
     If DCount("*", "tmpPOSLines") > 0 Then
         If Not AskYesNo(" ÊÃœ ›« Ê—… €Ì— „ﬂ „·… „‰ Ã·”… ”«»ﬁ…. Â·  —Ìœ «” ﬂ„«·Â«ø") Then
-            CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+            CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
         End If
     End If
     ResetSaleHeader frm
@@ -184,7 +184,7 @@ Public Function ScanCode(ByVal frm As Access.Form, ByVal Code As String) As Bool
         If IsNumeric(Left$(Code, p - 1)) Then qty = CCur(Left$(Code, p - 1))
         Code = Mid$(Code, p + 1)
     End If
-    id = DLookup("ProductID", "Products", "IsActive = True AND (Barcode = " & SqlText(Code) & _
+    id = DLookup("ProductID", "Products", "IsActive <> 0 AND (Barcode = " & SqlText(Code) & _
                  " OR ProductCode = " & SqlText(Code) & ")")
     If IsNull(id) Then
         Beep
@@ -211,7 +211,7 @@ Public Sub AddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Qty 
     Set p = CurrentDb.OpenRecordset("SELECT ProductCode, ProductName, SellingPrice, CurrentQuantity " & _
                                     "FROM Products WHERE ProductID = " & ProductID, dbOpenSnapshot)
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPOSLines WHERE ProductID = " & ProductID & _
-                                     " AND LineDiscount = 0 AND LineNote Is Null", dbOpenDynaset)
+                                     " AND LineDiscount = 0 AND LineNote Is Null", dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         rs.AddNew
         rs!ProductID = ProductID
@@ -259,7 +259,7 @@ End Sub
 
 Public Sub RemoveCurrentLine(ByVal sf As Access.Form)
     If sf.NewRecord Or IsNull(sf!LineNo.Value) Then Exit Sub
-    CurrentDb.Execute "DELETE FROM tmpPOSLines WHERE LineNo = " & sf!LineNo.Value, dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines WHERE LineNo = " & sf!LineNo.Value, dbFailOnError + dbSeeChanges
     RecalcPOS sf.Parent
     SetPOSStatus sf.Parent, " „ Õ–› «·”ÿ—", CLR_MUTED
 End Sub
@@ -283,7 +283,7 @@ Public Sub RecalcPOS(ByVal frm As Access.Form)
     rs.Close
     If n > 0 Then msg = CalcRun(Nz(frm!txtInvoiceDiscount.Value, 0), Nz(SettingValue("PricesIncludeVAT"), True))
     If n > 0 And Len(msg) = 0 Then
-        Set rs = CurrentDb.OpenRecordset("SELECT LineNo, LineTotal FROM tmpPOSLines ORDER BY LineNo", dbOpenDynaset)
+        Set rs = CurrentDb.OpenRecordset("SELECT LineNo, LineTotal FROM tmpPOSLines ORDER BY LineNo", dbOpenDynaset, dbSeeChanges)
         For i = 0 To n - 1
             rs.Edit
             rs!LineTotal = CalcLine(i, "TOTAL")
@@ -391,7 +391,7 @@ Public Function SavePOS(ByVal frm As Access.Form, ByVal PrintAfter As Boolean) A
     End If
     invNo = DLookup("InvoiceNumber", "SalesInvoices", "SalesInvoiceID = " & newID)
     change = DLookup("ChangeDue", "SalesInvoices", "SalesInvoiceID = " & newID)
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     ResetSaleHeader frm
     RecalcPOS frm
     SetPOSStatus frm, " „ Õ›Ÿ «·›« Ê—… " & invNo & IIf(change > 0, "  -  «·»«ﬁÌ ··⁄„Ì·: " & _
@@ -406,7 +406,7 @@ Public Sub NewSale(ByVal frm As Access.Form)
     If DCount("*", "tmpPOSLines") > 0 Then
         If Not AskYesNo("Â·  —Ìœ ≈·€«¡ «·›« Ê—… «·Õ«·Ì… Ê«·»œ¡ »›« Ê—… ÃœÌœ…ø") Then Exit Sub
     End If
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     ResetSaleHeader frm
     RecalcPOS frm
     SetPOSStatus frm, "›« Ê—… ÃœÌœ…", CLR_MUTED
@@ -442,7 +442,7 @@ End Sub
 Public Sub ReturnLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     EnsureLocalTables
-    CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError + dbSeeChanges
     frm!subReturnLines.Form.Requery
     frm!txtInvoiceID.Value = Null
     If Not IsNull(frm.OpenArgs) Then LoadInvoiceForReturn frm, CLng(frm.OpenArgs)
@@ -460,14 +460,14 @@ End Sub
 
 Public Sub LoadInvoiceForReturn(ByVal frm As Access.Form, ByVal SalesInvoiceID As Long)
     Dim rs As DAO.Recordset
-    CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO tmpReturnLines (SalesDetailID, ProductID, ProductName, SoldQty, ReturnedQty, " & _
         "AvailableQty, ReturnQty, ReturnToStock, ReturnAmount) " & _
         "SELECT d.SalesDetailID, d.ProductID, p.ProductName, d.Quantity, CCur(Nz(r.QtyReturned, 0)), " & _
         "d.Quantity - CCur(Nz(r.QtyReturned, 0)), 0, True, 0 " & _
         "FROM (SalesInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) " & _
         "LEFT JOIN qrySalesReturnedQty AS r ON d.SalesDetailID = r.SalesDetailID " & _
-        "WHERE d.SalesInvoiceID = " & SalesInvoiceID, dbFailOnError
+        "WHERE d.SalesInvoiceID = " & SalesInvoiceID, dbFailOnError + dbSeeChanges
     Set rs = CurrentDb.OpenRecordset(Tr("SELECT h.*, c.CustomerName FROM SalesInvoices AS h INNER JOIN [@Customers] " & _
                                      "AS c ON h.CustomerID = c.CustomerID WHERE h.SalesInvoiceID = " & _
                                      SalesInvoiceID), dbOpenSnapshot)
@@ -499,7 +499,7 @@ Public Sub ReturnLineChanged(ByVal sf As Access.Form)
 End Sub
 
 Public Sub ReturnAll(ByVal frm As Access.Form)
-    CurrentDb.Execute "UPDATE tmpReturnLines SET ReturnQty = AvailableQty", dbFailOnError
+    CurrentDb.Execute "UPDATE tmpReturnLines SET ReturnQty = AvailableQty", dbFailOnError + dbSeeChanges
     RecalcReturn frm
 End Sub
 
@@ -507,7 +507,7 @@ Public Sub RecalcReturn(ByVal frm As Access.Form)
     ' Shows the credit-note value of each line with the same rule used for posting.
     Dim rs As DAO.Recordset, d As DAO.Recordset, total As Currency, net As Currency, tax As Currency
     Dim lineTotal As Currency, msg As String
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpReturnLines", dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpReturnLines", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         lineTotal = 0
         If Nz(rs!ReturnQty, 0) > 0 Then

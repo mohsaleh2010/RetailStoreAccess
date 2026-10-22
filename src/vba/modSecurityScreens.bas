@@ -35,6 +35,8 @@ Public Sub LoginLoad(ByVal frm As Access.Form)
             ShowWarning msg
             Exit Sub
         End If
+        msg = StaleAccessWarning()                     ' the real data is on the server, this PC on the old file
+        If Len(msg) > 0 Then ShowWarning msg
     End If
     frm!lblStoreName.Caption = Tr(Nz(SettingValue("StoreName"), APP_TITLE))
     frm!txtUsername.Value = GetSetting("RetailStore", "Login", "LastUser", "")
@@ -243,7 +245,7 @@ Public Sub UnlockUser(ByVal frm As Access.Form)
         Exit Sub
     End If
     CurrentDb.Execute "UPDATE Employees SET FailedLoginCount = 0, LockedUntil = Null WHERE EmployeeID = " & _
-                      frm!EmployeeID.Value, dbFailOnError
+                      frm!EmployeeID.Value, dbFailOnError + dbSeeChanges
     LogAction "USER_UNLOCK", "Employees", CStr(frm!EmployeeID.Value)
     frm.Refresh
     UserCurrent frm
@@ -262,15 +264,15 @@ End Sub
 Public Sub RolePicked(ByVal frm As Access.Form)
     Dim roleID As Long, locked As Boolean
     roleID = Nz(frm!cboRole.Value, 0)
-    CurrentDb.Execute "DELETE FROM tmpRolePermissions", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpRolePermissions", dbFailOnError + dbSeeChanges
     CurrentDb.Execute Tr("INSERT INTO tmpRolePermissions (PermissionKey, PermissionName, ModuleName, SortOrder, Granted) " & _
         "SELECT p.PermissionKey, p.PermissionName, p.ModuleName, p.SortOrder, " & _
         "IIf(r.PermissionKey Is Null, False, True) FROM [@Permissions] AS p LEFT JOIN " & _
         "(SELECT PermissionKey FROM RolePermissions WHERE RoleID = " & roleID & ") AS r " & _
-        "ON p.PermissionKey = r.PermissionKey"), dbFailOnError      ' the names in the interface language
+        "ON p.PermissionKey = r.PermissionKey"), dbFailOnError + dbSeeChanges      ' the names in the interface language
     frm!subPermissions.Form.Requery
     frm!lblRoleInfo.Caption = Tr(Nz(DLookup("Description", "Roles", "RoleID = " & roleID), " ") & "   (" & _
-        DCount("*", "Employees", "RoleID = " & roleID & " AND IsActive = True AND IsDeveloper = False") & " مستخدم)")
+        DCount("*", "Employees", "RoleID = " & roleID & " AND IsActive <> 0 AND IsDeveloper = 0") & " مستخدم)")
     locked = (roleID = ADMIN_ROLE_ID)
     frm!subPermissions.Form.AllowEdits = Not locked
     SafeFocus frm!cboRole
@@ -281,7 +283,7 @@ Public Sub RolePicked(ByVal frm As Access.Form)
 End Sub
 
 Public Sub RoleSelectAll(ByVal frm As Access.Form, ByVal Granted As Boolean)
-    CurrentDb.Execute "UPDATE tmpRolePermissions SET Granted = " & IIf(Granted, "True", "False"), dbFailOnError
+    CurrentDb.Execute "UPDATE tmpRolePermissions SET Granted = " & IIf(Granted, "True", "False"), dbFailOnError + dbSeeChanges
     frm!subPermissions.Form.Requery
 End Sub
 
@@ -324,11 +326,11 @@ Public Function SaveRolePermissionSet(ByVal RoleID As Long, ByVal KeyList As Str
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    db.Execute "DELETE FROM RolePermissions WHERE RoleID = " & RoleID, dbFailOnError
+    db.Execute "DELETE FROM RolePermissions WHERE RoleID = " & RoleID, dbFailOnError + dbSeeChanges
     If Len(KeyList) > 0 Then
         For Each k In Split(KeyList, ",")
             db.Execute "INSERT INTO RolePermissions (RoleID, PermissionKey) VALUES (" & RoleID & ", " & _
-                       SqlText(Trim$(CStr(k))) & ")", dbFailOnError
+                       SqlText(Trim$(CStr(k))) & ")", dbFailOnError + dbSeeChanges
         Next
     End If
     ws.CommitTrans
@@ -347,7 +349,7 @@ End Function
 '==============================================================================
 Public Sub UserScreensLoad(ByVal frm As Access.Form)
     EnsureLocalTables
-    frm!cboUser.Value = Nz(DbValue("SELECT TOP 1 EmployeeID FROM Employees WHERE IsDeveloper = False AND RoleID <> " & _
+    frm!cboUser.Value = Nz(DbValue("SELECT TOP 1 EmployeeID FROM Employees WHERE IsDeveloper = 0 AND RoleID <> " & _
                                    ADMIN_ROLE_ID & " ORDER BY EmployeeName, EmployeeID"), frm!cboUser.ItemData(0))
     UserScreensPicked frm
 End Sub
@@ -376,7 +378,7 @@ Public Sub UserScreensAll(ByVal frm As Access.Form, ByVal Granted As Boolean)
     Dim g As String
     g = IIf(Granted, "True", "False")
     CurrentDb.Execute "UPDATE tmpUserScreens SET CanOpen = " & g & ", CanAdd = " & g & " AND HasAdd, CanEdit = " & g & _
-                      " AND HasEdit, CanDelete = " & g & " AND HasDelete", dbFailOnError
+                      " AND HasEdit, CanDelete = " & g & " AND HasDelete", dbFailOnError + dbSeeChanges
     frm!subScreens.Form.Requery
 End Sub
 
@@ -406,27 +408,27 @@ Public Sub FillUserScreens(ByVal EmployeeID As Long, ByVal FromRole As Boolean)
     Dim db As DAO.Database, roleID As Long
     Set db = CurrentDb
     roleID = Nz(DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & EmployeeID), 0)
-    db.Execute "DELETE FROM tmpUserScreens", dbFailOnError
+    db.Execute "DELETE FROM tmpUserScreens", dbFailOnError + dbSeeChanges
     db.Execute Tr("INSERT INTO tmpUserScreens (ScreenName, ScreenTitle, ModuleName, SortOrder, HasAdd, HasEdit, " & _
         "HasDelete, CanOpen, CanAdd, CanEdit, CanDelete) SELECT s.ScreenName, s.ScreenTitle, s.ModuleName, s.SortOrder, " & _
-        "s.HasAdd, s.HasEdit, s.HasDelete, False, False, False, False FROM [@Screens] AS s"), dbFailOnError
+        "s.HasAdd, s.HasEdit, s.HasDelete, False, False, False, False FROM [@Screens] AS s"), dbFailOnError + dbSeeChanges
     If Not FromRole Then
         db.Execute "UPDATE tmpUserScreens AS t INNER JOIN UserScreens AS u ON t.ScreenName = u.ScreenName " & _
             "SET t.CanOpen = u.CanOpen, t.CanAdd = u.CanAdd AND t.HasAdd, t.CanEdit = u.CanEdit AND t.HasEdit, " & _
-            "t.CanDelete = u.CanDelete AND t.HasDelete WHERE u.EmployeeID = " & EmployeeID, dbFailOnError
+            "t.CanDelete = u.CanDelete AND t.HasDelete WHERE u.EmployeeID = " & EmployeeID, dbFailOnError + dbSeeChanges
     Else
         If roleID = ADMIN_ROLE_ID Then
-            db.Execute "UPDATE tmpUserScreens SET CanOpen = True", dbFailOnError
+            db.Execute "UPDATE tmpUserScreens SET CanOpen = True", dbFailOnError + dbSeeChanges
         Else
             db.Execute "UPDATE tmpUserScreens AS t INNER JOIN Screens AS s ON t.ScreenName = s.ScreenName " & _
                 "SET t.CanOpen = True WHERE s.PermissionKey Is Null OR s.PermissionKey IN " & _
-                "(SELECT PermissionKey FROM RolePermissions WHERE RoleID = " & roleID & ")", dbFailOnError
+                "(SELECT PermissionKey FROM RolePermissions WHERE RoleID = " & roleID & ")", dbFailOnError + dbSeeChanges
         End If
         db.Execute "UPDATE tmpUserScreens SET CanAdd = CanOpen AND HasAdd, CanEdit = CanOpen AND HasEdit, " & _
-                   "CanDelete = CanOpen AND HasDelete", dbFailOnError
+                   "CanDelete = CanOpen AND HasDelete", dbFailOnError + dbSeeChanges
     End If
     db.Execute "UPDATE tmpUserScreens SET ActionsNote = IIf(HasAdd Or HasEdit Or HasDelete, Mid(IIf(HasAdd, " & _
-        "'، إضافة', '') & IIf(HasEdit, '، تعديل', '') & IIf(HasDelete, '، حذف', ''), 3), 'فتح وعرض فقط')", dbFailOnError
+        "'، إضافة', '') & IIf(HasEdit, '، تعديل', '') & IIf(HasDelete, '، حذف', ''), 3), 'فتح وعرض فقط')", dbFailOnError + dbSeeChanges
 End Sub
 
 Private Sub ShowUserScreensState(ByVal frm As Access.Form)
@@ -476,14 +478,14 @@ Public Function SaveUserScreensFor(ByVal EmployeeID As Long, ByVal Custom As Boo
         SaveUserScreensFor = "لا تملك صلاحية إدارة المستخدمين."
         Exit Function
     End If
-    roleID = DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & EmployeeID & " AND IsDeveloper = False")
+    roleID = DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & EmployeeID & " AND IsDeveloper = 0")
     If IsNull(roleID) Then
         SaveUserScreensFor = "اختر المستخدم."
     ElseIf roleID = ADMIN_ROLE_ID Then
         SaveUserScreensFor = "مدير النظام يفتح كل الشاشات بكل الصلاحيات دائمًا."
     ElseIf EmployeeID = CurrentUserID() Then
         SaveUserScreensFor = "لا يمكنك تغيير صلاحياتك بنفسك."
-    ElseIf Custom And Nz(DbValue("SELECT COUNT(*) FROM tmpUserScreens WHERE CanOpen = True"), 0) = 0 Then
+    ElseIf Custom And Nz(DbValue("SELECT COUNT(*) FROM tmpUserScreens WHERE CanOpen <> 0"), 0) = 0 Then
         SaveUserScreensFor = "اختر شاشة واحدة على الأقل، أو ألغِ «صلاحيات شاشات خاصة»."
     End If
     If Len(SaveUserScreensFor) > 0 Then Exit Function
@@ -491,14 +493,14 @@ Public Function SaveUserScreensFor(ByVal EmployeeID As Long, ByVal Custom As Boo
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    db.Execute "DELETE FROM UserScreens WHERE EmployeeID = " & EmployeeID, dbFailOnError
+    db.Execute "DELETE FROM UserScreens WHERE EmployeeID = " & EmployeeID, dbFailOnError + dbSeeChanges
     If Custom Then
         db.Execute "INSERT INTO UserScreens (EmployeeID, ScreenName, CanOpen, CanAdd, CanEdit, CanDelete) SELECT " & _
             EmployeeID & ", ScreenName, CanOpen, CanOpen AND CanAdd AND HasAdd, CanOpen AND CanEdit AND HasEdit, " & _
-            "CanOpen AND CanDelete AND HasDelete FROM tmpUserScreens", dbFailOnError
+            "CanOpen AND CanDelete AND HasDelete FROM tmpUserScreens", dbFailOnError + dbSeeChanges
     End If
     db.Execute "UPDATE Employees SET CustomScreens = " & IIf(Custom, "True", "False") & " WHERE EmployeeID = " & _
-               EmployeeID, dbFailOnError
+               EmployeeID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     LogAction "USER_SCREENS", "Employees", CStr(EmployeeID), IIf(Custom, "custom", "role")
@@ -513,18 +515,28 @@ End Function
 '==============================================================================
 Public Sub BackupLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
-    frm!lblDataFile.Caption = Tr("ملف البيانات: " & BackendFilePath())
+    If IsLinkedToServer() Then
+        frm!lblDataFile.Caption = Tr("قاعدة البيانات: ") & DataLocation()
+    Else
+        frm!lblDataFile.Caption = Tr("ملف البيانات: " & BackendFilePath())
+    End If
     BackupRefreshList frm
 End Sub
 
 Public Sub BackupRefreshList(ByVal frm As Access.Form)
     Dim folder As String, names As String, v As Variant, rows As String, i As Long, arr() As String
     Dim lastDate As Variant
-    folder = BackupFolderPath()
-    frm!lblFolder.Caption = Tr("المجلد: " & folder)
     lastDate = LastBackupDate()
     frm!lblLast.Caption = Tr("آخر نسخة: " & IIf(IsNull(lastDate), "لا توجد", GDate(lastDate, True)) & _
         "    يُحتفظ بآخر " & Nz(SettingValue("BackupKeepCount"), 30) & " نسخة")
+    If IsLinkedToServer() Then                   ' plan 5C: the server's backups (full paths on the server)
+        folder = ServerBackupFolder()
+        frm!lblFolder.Caption = Tr("مجلد النسخ على الخادم: " & IIf(Len(folder) > 0, folder, "المجلد الافتراضي للخادم"))
+        frm!lstBackups.RowSource = Tr("""الملف"";""التاريخ"";""الحجم""") & ServerBackupRows()
+        Exit Sub
+    End If
+    folder = BackupFolderPath()
+    frm!lblFolder.Caption = Tr("المجلد: " & folder)
     names = BackupList(folder, BaseNameOfFile(BackendFilePath()))
     rows = """الملف"";""التاريخ"";""الحجم"""
     If Len(names) > 0 Then
@@ -565,7 +577,11 @@ Public Sub BackupRestoreSelected(ByVal frm As Access.Form)
         ShowWarning "اختر النسخة من القائمة أولًا."
         Exit Sub
     End If
-    file = BackupFolderPath() & "\" & frm!lstBackups.Value
+    If IsLinkedToServer() Then
+        file = frm!lstBackups.Value                     ' the full path on the server
+    Else
+        file = BackupFolderPath() & "\" & frm!lstBackups.Value
+    End If
     If Not AskYesNo("ستُستبدل كل البيانات الحالية بالنسخة:" & vbCrLf & frm!lstBackups.Value & vbCrLf & vbCrLf & _
                     "كل ما سُجّل بعد تاريخ هذه النسخة سيُفقد (تُحفظ نسخة وقائية من البيانات الحالية أولًا)." & _
                     vbCrLf & "يجب أن يكون البرنامج مغلقًا على كل الأجهزة الأخرى. هل تريد المتابعة؟") Then Exit Sub
@@ -582,6 +598,14 @@ Public Sub BackupRestoreSelected(ByVal frm As Access.Form)
 End Sub
 
 Public Sub BackupOpenFolder()
+    If IsLinkedToServer() Then
+        If Len(ServerBackupFolder()) = 0 Or Len(Dir$(ServerBackupFolder(), vbDirectory)) = 0 Then
+            ShowInfo "النسخ على جهاز الخادم في: " & IIf(Len(ServerBackupFolder()) > 0, ServerBackupFolder(), "المجلد الافتراضي لـ SQL Server")
+            Exit Sub
+        End If
+        Application.FollowHyperlink ServerBackupFolder()
+        Exit Sub
+    End If
     Application.FollowHyperlink BackupFolderPath()
 End Sub
 
@@ -591,7 +615,7 @@ Public Sub BackupChooseFolder(ByVal frm As Access.Form)
         .Title = "اختر مجلد النسخ الاحتياطي (يفضل قرص آخر أو فلاشة أو مجلد متزامن مع السحابة)"
         If .Show Then
             CurrentDb.Execute "UPDATE Settings SET BackupFolder = " & SqlText(.SelectedItems(1)) & _
-                              " WHERE SettingID = 1", dbFailOnError
+                              " WHERE SettingID = 1", dbFailOnError + dbSeeChanges
             LogAction "BACKUP_FOLDER", "Settings", "1", .SelectedItems(1)
         End If
     End With

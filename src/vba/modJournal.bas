@@ -31,16 +31,16 @@ Public Sub EnsureAccounts()
     ' stock is 1400, docs/58), then the levels of the tree (modAccounts)
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 110000 + b.CashBoxID, b.BoxName, 'ASSET', 1100, True, True FROM CashBoxes AS b " & _
-        "WHERE 110000 + b.CashBoxID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
+        "WHERE 110000 + b.CashBoxID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 530000 + t.ExpenseTypeID, t.ExpenseTypeName, 'EXPENSE', 5300, True, True FROM ExpenseTypes AS t " & _
-        "WHERE 530000 + t.ExpenseTypeID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
+        "WHERE 530000 + t.ExpenseTypeID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 120000 + k.BankID, k.BankName, 'ASSET', 1210, True, True FROM Banks AS k " & _
-        "WHERE 120000 + k.BankID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
+        "WHERE 120000 + k.BankID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO Accounts (AccountCode, AccountName, AccountType, ParentCode, IsPosting, IsSystem) " & _
         "SELECT 140000 + w.WarehouseID, w.WarehouseName, 'ASSET', 11, True, True FROM Warehouses AS w " & _
-        "WHERE w.WarehouseID <> 1 AND 140000 + w.WarehouseID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError
+        "WHERE w.WarehouseID <> 1 AND 140000 + w.WarehouseID NOT IN (SELECT AccountCode FROM Accounts)", dbFailOnError + dbSeeChanges
     ' their English names (docs/40-English-Party-Names.md), for the accounts that have none yet
     FillAccountNamesEn "SELECT 110000 + CashBoxID AS SubCode, BoxNameEn AS SubNameEn FROM CashBoxes WHERE BoxNameEn Is Not Null"
     FillAccountNamesEn "SELECT 530000 + ExpenseTypeID AS SubCode, ExpenseTypeNameEn AS SubNameEn FROM ExpenseTypes " & _
@@ -57,7 +57,7 @@ Private Sub FillAccountNamesEn(ByVal Sql As String)
     Set rs = CurrentDb.OpenRecordset(Sql, dbOpenSnapshot)
     Do Until rs.EOF
         CurrentDb.Execute "UPDATE Accounts SET AccountNameEn = " & SqlText(rs!SubNameEn) & " WHERE AccountCode = " & _
-                          rs!SubCode & " AND AccountNameEn Is Null", dbFailOnError
+                          rs!SubCode & " AND AccountNameEn Is Null", dbFailOnError + dbSeeChanges
         rs.MoveNext
     Loop
     rs.Close
@@ -79,7 +79,7 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
     EnsureAccounts
     Set kinds = CreateObject("Scripting.Dictionary")
     Set rs = db.OpenRecordset(Tr("SELECT j.SourceType, j.TypeName FROM [@JournalSourceTypes] AS j"), _
-                              dbOpenSnapshot)                                ' the name in the interface language (modLang)
+                              dbOpenSnapshot, dbSeeChanges)                                ' the name in the interface language (modLang)
     Do Until rs.EOF
         kinds(CStr(rs!SourceType)) = CStr(rs!TypeName)
         rs.MoveNext
@@ -100,7 +100,7 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    Set e = db.OpenRecordset("JournalEntries", dbOpenDynaset)
+    Set e = db.OpenRecordset("JournalEntries", dbOpenDynaset, dbSeeChanges)
     sources = Split(SOURCE_QUERIES, ",")
     For i = 0 To UBound(sources)
         Set rs = db.OpenRecordset("SELECT SourceType, SourceID, Max(SourceNumber) AS DocNumber, " & _
@@ -130,7 +130,7 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
                 ElseIf InClosedPeriod(st, info(2), closed) Or InClosedPeriod(st, SourceDateOf(rs), closed) Then
                     locked = locked & "  " & kinds(st) & " " & Nz(rs!DocNumber, "") & vbCrLf
                 Else
-                    db.Execute "DELETE FROM JournalLines WHERE EntryID = " & info(0), dbFailOnError
+                    db.Execute "DELETE FROM JournalLines WHERE EntryID = " & info(0), dbFailOnError + dbSeeChanges
                     e.FindFirst "EntryID = " & info(0)
                     e.Edit
                     FillHeader e, rs, kinds
@@ -148,10 +148,10 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
             "SELECT e.EntryID, q.LineOrder, q.AccountCode, q.Debit, q.Credit, q.LineText, " & _
             "IIf(q.CostCenter = 0, Null, q.CostCenter) FROM " & sources(i) & _
             " AS q INNER JOIN JournalEntries AS e ON (q.SourceType = e.SourceType AND q.SourceID = e.SourceID) " & _
-            "WHERE e.LineCount < 0", dbFailOnError
+            "WHERE e.LineCount < 0", dbFailOnError + dbSeeChanges
     Next
     e.Close
-    db.Execute "UPDATE JournalEntries SET LineCount = -LineCount WHERE LineCount < 0", dbFailOnError
+    db.Execute "UPDATE JournalEntries SET LineCount = -LineCount WHERE LineCount < 0", dbFailOnError + dbSeeChanges
 
     ' operations that no longer exist (a deleted expense, ...)
     For Each k In existing.Keys
@@ -161,8 +161,8 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
             If InClosedPeriod(st, info(2), closed) Then
                 locked = locked & "  " & kinds(st) & " (" & GDate(info(2)) & ")" & vbCrLf
             Else
-                db.Execute "DELETE FROM JournalLines WHERE EntryID = " & info(0), dbFailOnError
-                db.Execute "DELETE FROM JournalEntries WHERE EntryID = " & info(0), dbFailOnError
+                db.Execute "DELETE FROM JournalLines WHERE EntryID = " & info(0), dbFailOnError + dbSeeChanges
+                db.Execute "DELETE FROM JournalEntries WHERE EntryID = " & info(0), dbFailOnError + dbSeeChanges
                 Removed = Removed + 1
             End If
         End If
@@ -170,7 +170,7 @@ Public Function SyncJournal(Optional ByRef Added As Long, Optional ByRef Updated
 
     ' numbers of the new entries, in date order
     Set rs = db.OpenRecordset("SELECT EntryNumber FROM JournalEntries WHERE EntryNumber Like '~*' " & _
-                              "ORDER BY EntryDate, EntryID", dbOpenDynaset)
+                              "ORDER BY EntryDate, EntryID", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         rs.Edit
         rs!EntryNumber = NextNumber("JOURNAL")
@@ -478,10 +478,10 @@ Public Function TestJournal() As Boolean
                  "TreeKey Is Null OR Level1Code Is Null"), 0) = 0, "شجرة الحسابات: لكل حساب مستواه ومكانه " & msg, _
                  passed, failed, report
     CheckJournal Nz(DbValue("SELECT COUNT(*) FROM Accounts AS a INNER JOIN Accounts AS p ON a.ParentCode = " & _
-                            "p.AccountCode WHERE p.IsPosting = True OR p.AccountType <> a.AccountType"), 0) = 0, _
+                            "p.AccountCode WHERE p.IsPosting <> 0 OR p.AccountType <> a.AccountType"), 0) = 0, _
                  "كل حساب يتبع حسابًا رئيسيًا من نوعه", passed, failed, report
     CheckJournal Nz(DbValue("SELECT COUNT(*) FROM JournalLines AS l INNER JOIN Accounts AS a ON l.AccountCode = " & _
-                            "a.AccountCode WHERE a.IsPosting = False"), 0) = 0, "لا قيود على الحسابات الرئيسية", _
+                            "a.AccountCode WHERE a.IsPosting = 0"), 0) = 0, "لا قيود على الحسابات الرئيسية", _
                  passed, failed, report
 
     ' the account statement (modLedger): customers and all the assets agree with the account balances
@@ -492,7 +492,7 @@ Public Function TestJournal() As Boolean
     CheckJournal opening + debit - credit = Nz(DbValue("SELECT Sum(l.Debit) - Sum(l.Credit) FROM JournalLines AS l " & _
                  "INNER JOIN Accounts AS a ON l.AccountCode = a.AccountCode WHERE a.AccountType = 'ASSET'"), 0), _
                  "كشف الحساب الرئيسي (الأصول) يشمل كل حساباته التابعة", passed, failed, report
-    CurrentDb.Execute "DELETE FROM tmpLedger", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpLedger", dbFailOnError + dbSeeChanges
 
     ' the financial statements (modFinancials) over all the entries until today
     Call PrepareFinancials("INCOME", DateSerial(2000, 1, 1), Date)
@@ -511,34 +511,34 @@ Public Function TestJournal() As Boolean
     inTrans = True
     CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, " & _
         "PaymentMethodID, Description, EmployeeID) VALUES ('TEST-JV', Date(), 1, 100, 15, 115, 3, 'TEST-JV', " & _
-        CurrentUserID() & ")", dbFailOnError
+        CurrentUserID() & ")", dbFailOnError + dbSeeChanges
     msg = SyncJournal(added, updated, removed)
     id = Nz(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = 'EXPENSE' AND SourceNumber = 'TEST-JV'"), 0)
     CheckJournal added = 1 And id > 0, "مصروف جديد = قيد جديد", passed, failed, report
     CheckJournal Nz(DbValue("SELECT Debit FROM JournalLines WHERE EntryID = " & id & " AND AccountCode = 1500"), 0) = 15 And _
                  Nz(DbValue("SELECT Credit FROM JournalLines WHERE EntryID = " & id & " AND AccountCode = 1200"), 0) = 115, _
                  "قيد المصروف: الضريبة مدينة والبنك دائن", passed, failed, report
-    CurrentDb.Execute "UPDATE Expenses SET Amount = 200, Tax = 0, TotalAmount = 200 WHERE ExpenseNumber = 'TEST-JV'", dbFailOnError
+    CurrentDb.Execute "UPDATE Expenses SET Amount = 200, Tax = 0, TotalAmount = 200 WHERE ExpenseNumber = 'TEST-JV'", dbFailOnError + dbSeeChanges
     msg = SyncJournal(added, updated, removed)
     CheckJournal updated = 1 And Nz(DbValue("SELECT TotalDebit FROM JournalEntries WHERE EntryID = " & id), 0) = 200, _
                  "تعديل المصروف يحدّث قيده بنفس الرقم", passed, failed, report
-    CurrentDb.Execute "DELETE FROM Expenses WHERE ExpenseNumber = 'TEST-JV'", dbFailOnError
+    CurrentDb.Execute "DELETE FROM Expenses WHERE ExpenseNumber = 'TEST-JV'", dbFailOnError + dbSeeChanges
     msg = SyncJournal(added, updated, removed)
     CheckJournal removed = 1 And Nz(DbValue("SELECT COUNT(*) FROM JournalEntries WHERE EntryID = " & id), 0) = 0, _
                  "حذف المصروف يحذف قيده", passed, failed, report
 
     ' a manual entry: refused when unbalanced or on a main account; saved, changed and deleted
     EnsureLocalTables
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (5500, 1000, 0)", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (2310, 0, 900)", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (5500, 1000, 0)", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (2310, 0, 900)", dbFailOnError + dbSeeChanges
     CheckJournal Len(PostManualEntry(0, Date, "TEST-MJ", "", Null, manualID)) > 0 And manualID = 0, _
                  "قيد يدوي غير متوازن يُرفض", passed, failed, report
-    CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 1000 WHERE AccountCode = 2310", dbFailOnError
-    CurrentDb.Execute "UPDATE tmpManualLines SET AccountCode = 52 WHERE AccountCode = 5500", dbFailOnError
+    CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 1000 WHERE AccountCode = 2310", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE tmpManualLines SET AccountCode = 52 WHERE AccountCode = 5500", dbFailOnError + dbSeeChanges
     CheckJournal Len(PostManualEntry(0, Date, "TEST-MJ", "", Null, manualID)) > 0 And manualID = 0, _
                  "قيد يدوي على حساب رئيسي يُرفض", passed, failed, report
-    CurrentDb.Execute "UPDATE tmpManualLines SET AccountCode = 5500 WHERE AccountCode = 52", dbFailOnError
+    CurrentDb.Execute "UPDATE tmpManualLines SET AccountCode = 5500 WHERE AccountCode = 52", dbFailOnError + dbSeeChanges
     msg = PostManualEntry(0, Date, "TEST-MJ", "TEST-REF", Null, manualID)
     CheckJournal Len(msg) = 0 And manualID > 0 And _
                  Nz(DbValue("SELECT COUNT(*) FROM ManualEntryLines WHERE ManualEntryID = " & manualID), 0) = 2, _
@@ -548,8 +548,8 @@ Public Function TestJournal() As Boolean
     CheckJournal added = 1 And Not IsNull(jv) And Nz(DbValue("SELECT TotalDebit FROM JournalEntries WHERE EntryID = " & _
                  Nz(jv, 0)), 0) = 1000, "القيد اليدوي يصبح قيد يومية مربوطًا به", passed, failed, report
     number = Nz(DbValue("SELECT EntryNumber FROM JournalEntries WHERE EntryID = " & Nz(jv, 0)), "")
-    CurrentDb.Execute "UPDATE tmpManualLines SET Debit = 1200 WHERE AccountCode = 5500", dbFailOnError
-    CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 1200 WHERE AccountCode = 2310", dbFailOnError
+    CurrentDb.Execute "UPDATE tmpManualLines SET Debit = 1200 WHERE AccountCode = 5500", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 1200 WHERE AccountCode = 2310", dbFailOnError + dbSeeChanges
     msg = PostManualEntry(manualID, Date, "TEST-MJ", "", Null, id)
     msg = msg & SyncJournal(added, updated, removed)
     CheckJournal Len(msg) = 0 And updated = 1 And id = manualID And _
@@ -567,8 +567,8 @@ Public Function TestJournal() As Boolean
         msg = ClosePeriod(Date - 2, "TEST")
         CheckJournal Len(msg) = 0 And ClosedThroughDate() = Date - 2, "إقفال الفترة حتى " & GDate(Date - 2) & " " & msg, _
                      passed, failed, report
-        CurrentDb.Execute "UPDATE tmpManualLines SET Debit = 100 WHERE AccountCode = 5500", dbFailOnError
-        CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 100 WHERE AccountCode = 2310", dbFailOnError
+        CurrentDb.Execute "UPDATE tmpManualLines SET Debit = 100 WHERE AccountCode = 5500", dbFailOnError + dbSeeChanges
+        CurrentDb.Execute "UPDATE tmpManualLines SET Credit = 100 WHERE AccountCode = 2310", dbFailOnError + dbSeeChanges
         CheckJournal Len(PostManualEntry(0, Date - 3, "TEST-MJ", "", Null, manualID)) > 0 And manualID = 0, _
                      "إقفال الفترة يمنع القيد اليدوي بتاريخ مقفل", passed, failed, report
         msg = PostManualEntry(0, Date, "TEST-MJ", "", Null, manualID)
@@ -576,7 +576,7 @@ Public Function TestJournal() As Boolean
         msg = ReopenPeriod(IIf(wasClosed > 0, wasClosed, Null), "TEST")
         CheckJournal Len(msg) = 0 And ClosedThroughDate() = wasClosed, "إعادة فتح الفترة " & msg, passed, failed, report
     End If
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
 
     ' the VAT return of last month (modVat): filed with a balanced settlement entry, paid, back to a draft
     vatFrom = DateSerial(Year(Date), Month(Date) - 1, 1)
@@ -624,7 +624,7 @@ Public Function TestJournal() As Boolean
     End If
     ' the English name of a new box reaches its account (docs/40-English-Party-Names.md)
     CurrentDb.Execute "INSERT INTO CashBoxes (BoxName, BoxNameEn, BoxType) VALUES ('TEST صندوق الأسماء', " & _
-                      "'TEST names box', 'CASHIER')", dbFailOnError
+                      "'TEST names box', 'CASHIER')", dbFailOnError + dbSeeChanges
     id = Nz(DbValue("SELECT CashBoxID FROM CashBoxes WHERE BoxName = 'TEST صندوق الأسماء'"), 0)
     EnsureAccounts
     CheckJournal Nz(DbValue("SELECT AccountNameEn FROM Accounts WHERE AccountCode = " & (110000 + id)), "") = _

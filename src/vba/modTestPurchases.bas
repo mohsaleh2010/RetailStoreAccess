@@ -78,31 +78,31 @@ Private Sub TestCycle()
     inTrans = True
 
     db.Execute "UPDATE Settings SET VATNumber = '300000000000003', VATRate = 0.15, PricesIncludeVAT = True, " & _
-               "AllowNegativeStock = False", dbFailOnError
-    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
-    db.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+               "AllowNegativeStock = 0", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     ' an open stocktake of the user blocks a new one: closed here, restored by the rollback
-    db.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE Status = 'OPEN'", dbFailOnError
+    db.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE Status = 'OPEN'", dbFailOnError + dbSeeChanges
 
     ' --- 1. new supplier and products
     db.Execute "INSERT INTO Suppliers (SupplierName, VATNumber) VALUES ('TEST مورد المشتريات', '300000000000003')", _
-               dbFailOnError
+               dbFailOnError + dbSeeChanges
     sid = DbValue("SELECT SupplierID FROM Suppliers WHERE SupplierName = 'TEST مورد المشتريات'")
-    db.Execute "INSERT INTO Categories (CategoryName) VALUES ('TEST تصنيف الجرد')", dbFailOnError
+    db.Execute "INSERT INTO Categories (CategoryName) VALUES ('TEST تصنيف الجرد')", dbFailOnError + dbSeeChanges
     cat = DbValue("SELECT CategoryID FROM Categories WHERE CategoryName = 'TEST تصنيف الجرد'")
     db.Execute "INSERT INTO Products (ProductCode, ProductName, Barcode, CategoryID, SellingPrice, MinimumQuantity) " & _
-               "VALUES ('TEST-PUR-A', 'TEST منتج أ', 'TESTPUR000A', " & cat & ", 115, 5)", dbFailOnError
+               "VALUES ('TEST-PUR-A', 'TEST منتج أ', 'TESTPUR000A', " & cat & ", 115, 5)", dbFailOnError + dbSeeChanges
     pa = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-PUR-A'")
     db.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, SellingPrice) " & _
-               "VALUES ('TEST-PUR-B', 'TEST منتج ب', " & cat & ", 23)", dbFailOnError
+               "VALUES ('TEST-PUR-B', 'TEST منتج ب', " & cat & ", 23)", dbFailOnError + dbSeeChanges
     pb = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-PUR-B'")
     Call Record(Stock(pa) = 0, "منتج جديد بدون رصيد")
 
     ' --- 2. purchase 1: 100 x 50 + VAT, credit, 1000 paid now
     PurCartAdd pa, 100, 50
     msg = PostPurchaseFromCart(sid, "TEST-S-1", Date, "CREDIT", 1, True, 0, 1000, "", inv1)
-    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     Call Record(Len(msg) = 0 And inv1 > 0, "حفظ فاتورة شراء آجلة " & msg)
     Call Record(PurInv(inv1, "TotalAmount") = 5750 And PurInv(inv1, "Tax") = 750 And _
                 PurInv(inv1, "RemainingAmount") = 4750, "الإجمالي 5750 والضريبة 750 والمتبقي 4750")
@@ -123,7 +123,7 @@ Private Sub TestCycle()
     Call Record(Len(PostPurchaseFromCart(sid, "", Date + 1, "CASH", 1, True, 0, Null, "", dummy)) > 0, _
                 "رفض تاريخ فاتورة في المستقبل")
     Call Record(Len(PostPurchaseFromCart(0, "", Date, "CASH", 1, True, 0, Null, "", dummy)) > 0, "رفض فاتورة بدون مورد")
-    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     Call Record(Len(PostPurchaseFromCart(sid, "", Date, "CASH", 1, True, 0, Null, "", dummy)) > 0, _
                 "رفض فاتورة بدون أصناف")
     Call Record(Stock(pa) = 100 And SupBalance(sid) = 4750, "الرفض لم يغير المخزون ولا الرصيد")
@@ -131,18 +131,18 @@ Private Sub TestCycle()
     ' --- 3. the spec scenario: sell 10 -> 90
     CurrentDb.Execute "INSERT INTO tmpPOSLines (ProductID, ProductCode, ProductName, Quantity, UnitPrice, " & _
         "LineDiscount, Available) SELECT ProductID, ProductCode, ProductName, 10, SellingPrice, 0, " & _
-        "CurrentQuantity FROM Products WHERE ProductID = " & pa, dbFailOnError
+        "CurrentQuantity FROM Products WHERE ProductID = " & pa, dbFailOnError + dbSeeChanges
     msg = PostSaleFromCart(1, "CASH", 1, 0, Null, "", saleID)
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     Call Record(Len(msg) = 0 And Stock(pa) = 90, "بيع 10: المخزون 90 " & msg)
     Call Record(Nz(DbValue("SELECT UnitCost FROM SalesInvoiceDetails WHERE SalesInvoiceID = " & saleID), 0) = 50, _
                 "تكلفة البيع = متوسط تكلفة الشراء")
 
     ' --- 4. purchase 2: 10 x 60, cash, new selling price
     PurCartAdd pa, 10, 60
-    db.Execute "UPDATE tmpPurchaseLines SET NewSellingPrice = 120", dbFailOnError
+    db.Execute "UPDATE tmpPurchaseLines SET NewSellingPrice = 120", dbFailOnError + dbSeeChanges
     msg = PostPurchaseFromCart(sid, "TEST-S-2", Date, "CASH", 1, True, 0, Null, "", inv2)
-    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     Call Record(Len(msg) = 0 And PurInv(inv2, "TotalAmount") = 690 And PurInv(inv2, "RemainingAmount") = 0, _
                 "شراء نقدي 690 مدفوع بالكامل " & msg)
     Call Record(Stock(pa) = 100 And AvgCost(pa) = 51, "المخزون 100 ومتوسط التكلفة المرجح 51")
@@ -152,7 +152,7 @@ Private Sub TestCycle()
 
     ' --- 5. purchase return: 10 units of purchase 1, deducted from the account
     db.Execute "INSERT INTO tmpPurchaseReturnLines (PurchaseDetailID, ProductID, ReturnQty) SELECT PurchaseDetailID, " & _
-               "ProductID, 10 FROM PurchaseInvoiceDetails WHERE PurchaseInvoiceID = " & inv1, dbFailOnError
+               "ProductID, 10 FROM PurchaseInvoiceDetails WHERE PurchaseInvoiceID = " & inv1, dbFailOnError + dbSeeChanges
     Call Record(Len(PostPurchaseReturn(inv1, "", "CREDIT", Null, dummy)) > 0, "رفض مرتجع بدون سبب")
     msg = PostPurchaseReturn(inv1, "TEST عيب مصنعي", "CREDIT", Null, retID)
     Call Record(Len(msg) = 0 And retID > 0, "حفظ مرتجع المشتريات " & msg)
@@ -161,10 +161,10 @@ Private Sub TestCycle()
                 "قيمة المرتجع 575 منها ضريبة 75")
     Call Record(Stock(pa) = 90 And AvgCost(pa) = 51.1111, "المرتجع أخرج 10 بتكلفة شرائها: المتوسط 51.1111")
     Call Record(SupBalance(sid) = 4175, "المرتجع خُصم من رصيد المورد: 4175")
-    db.Execute "UPDATE tmpPurchaseReturnLines SET ReturnQty = 95", dbFailOnError
+    db.Execute "UPDATE tmpPurchaseReturnLines SET ReturnQty = 95", dbFailOnError + dbSeeChanges
     Call Record(Len(PostPurchaseReturn(inv1, "TEST", "CREDIT", Null, dummy)) > 0 And Stock(pa) = 90, _
                 "رفض إرجاع أكثر من المتبقي من الفاتورة")
-    db.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError + dbSeeChanges
 
     ' --- 6. payment voucher
     Call Record(Len(PostSupplierPayment(sid, 0, 1, "", dummy)) > 0, "رفض سند صرف بمبلغ صفر")
@@ -193,9 +193,9 @@ Private Sub TestCycle()
                 " AND ProductID = " & pa) = 90, "الجرد يضم منتجي التصنيف بالكمية المسجلة")
     Call Record(Len(CreateStockCount(cat, "", dummy)) > 0, "منع فتح جردين في نفس الوقت")
     db.Execute "UPDATE StockCountDetails SET ActualQuantity = 88 WHERE StockCountID = " & countID & _
-               " AND ProductID = " & pa, dbFailOnError
+               " AND ProductID = " & pa, dbFailOnError + dbSeeChanges
     db.Execute "UPDATE StockCountDetails SET ActualQuantity = 18 WHERE StockCountID = " & countID & _
-               " AND ProductID = " & pb, dbFailOnError
+               " AND ProductID = " & pb, dbFailOnError + dbSeeChanges
     msg = PostStockCount(countID, False, adjusted, netValue)
     Call Record(Len(msg) = 0 And adjusted = 1 And netValue = -102.22, _
                 "ترحيل الجرد: تسوية واحدة بقيمة -102.22 " & msg)
@@ -219,9 +219,9 @@ Private Sub TestCycle()
 
     ws.Rollback
     inTrans = False
-    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
-    db.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     Call Record(DbValue("SELECT COUNT(*) FROM Suppliers WHERE SupplierName = 'TEST مورد المشتريات'") = 0, _
                 "التراجع عن كل بيانات الاختبار")
     Exit Sub
@@ -237,9 +237,9 @@ End Sub
 Private Sub TestPurchaseScreens()
     Dim frm As Access.Form, pid As Long
     On Error GoTo EH
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, Barcode, PurchasePrice, SellingPrice) VALUES " & _
-                      "('TEST-PUR-C', 'TEST منتج شاشة المشتريات', 'TESTPUR000C', 40, 55)", dbFailOnError
+                      "('TEST-PUR-C', 'TEST منتج شاشة المشتريات', 'TESTPUR000C', 40, 55)", dbFailOnError + dbSeeChanges
     pid = DLookup("ProductID", "Products", "ProductCode = 'TEST-PUR-C'")
     DoCmd.OpenForm "frmPurchaseInvoice", acNormal, , , , acHidden
     Set frm = Forms("frmPurchaseInvoice")
@@ -268,7 +268,7 @@ Private Sub TestPurchaseScreens()
     DoCmd.OpenForm "frmStockCount", acNormal, , , , acHidden
     Call Record(IsFormOpen("frmStockCount"), "فتح شاشة الجرد")
     DoCmd.Close acForm, "frmStockCount", acSaveNo
-    CurrentDb.Execute "DELETE FROM Products WHERE ProductID = " & pid, dbFailOnError
+    CurrentDb.Execute "DELETE FROM Products WHERE ProductID = " & pid, dbFailOnError + dbSeeChanges
     Exit Sub
 EH:
     Fail "شاشات المشتريات: خطأ " & Err.Number & ": " & Err.Description
@@ -276,8 +276,8 @@ EH:
     DoCmd.Close acForm, "frmPurchaseInvoice", acSaveNo
     DoCmd.Close acForm, "frmInventory", acSaveNo
     DoCmd.Close acForm, "frmStockCount", acSaveNo
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines"
-    CurrentDb.Execute "DELETE FROM Products WHERE ProductCode = 'TEST-PUR-C'"
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbSeeChanges
+    CurrentDb.Execute "DELETE FROM Products WHERE ProductCode = 'TEST-PUR-C'", dbSeeChanges
 End Sub
 
 '------------------------------------------------------------------------------
@@ -286,7 +286,7 @@ End Sub
 Private Sub PurCartAdd(ByVal ProductID As Long, ByVal Qty As Currency, ByVal Cost As Currency)
     CurrentDb.Execute "INSERT INTO tmpPurchaseLines (ProductID, ProductCode, ProductName, Quantity, UnitCost, " & _
         "LineDiscount, SellingPrice) SELECT ProductID, ProductCode, ProductName, " & Trim$(Str$(Qty)) & ", " & _
-        Trim$(Str$(Cost)) & ", 0, SellingPrice FROM Products WHERE ProductID = " & ProductID, dbFailOnError
+        Trim$(Str$(Cost)) & ", 0, SellingPrice FROM Products WHERE ProductID = " & ProductID, dbFailOnError + dbSeeChanges
 End Sub
 
 Private Function Stock(ByVal ProductID As Long) As Currency

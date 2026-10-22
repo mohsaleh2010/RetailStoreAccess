@@ -36,7 +36,7 @@ Public Function RebuildAccountTree() As String
     Loop
     rs.Close
     Set rs = db.OpenRecordset("SELECT AccountCode, AccountLevel, TreeKey, Level1Code, Level2Code, Level3Code, " & _
-                              "Level4Code, Level5Code FROM Accounts", dbOpenDynaset)
+                              "Level4Code, Level5Code FROM Accounts", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         ' chain(1) = the account, chain(n) = its level-1 account (a parent that does not exist ends it)
         code = rs!AccountCode

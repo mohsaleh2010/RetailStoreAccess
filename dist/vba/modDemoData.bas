@@ -114,55 +114,55 @@ End Function
 Private Sub DemoSettings()
     ' The demo store details are used only when the store is not set up yet.
     If Not IsNull(SettingValue("VATNumber")) Then Exit Sub
-    CurrentDb.Execute "UPDATE Settings SET StoreName = '„ Ã— «·‰Œ»… ·· Ã“∆…', StoreNameEn = 'Al Nukhba Retail Store', VATNumber = '310123456700003', CRNumber = '1010654321', BuildingNo = '2345', StreetName = 'ÿ—Ìﬁ «·„·ﬂ ›Âœ', District = '«·⁄·Ì«', City = '«·—Ì«÷', PostalCode = '12211', Phone = '0112345678' WHERE SettingID = 1", dbFailOnError
+    CurrentDb.Execute "UPDATE Settings SET StoreName = '„ Ã— «·‰Œ»… ·· Ã“∆…', StoreNameEn = 'Al Nukhba Retail Store', VATNumber = '310123456700003', CRNumber = '1010654321', BuildingNo = '2345', StreetName = 'ÿ—Ìﬁ «·„·ﬂ ›Âœ', District = '«·⁄·Ì«', City = '«·—Ì«÷', PostalCode = '12211', Phone = '0112345678' WHERE SettingID = 1", dbFailOnError + dbSeeChanges
 End Sub
 
 Private Sub DemoMasters()
-    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("„Ê«œ €–«∆Ì…") & ", 'DEMO')", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("„‘—Ê»« ") & ", 'DEMO')", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("„‰Ÿ›« ") & ", 'DEMO')", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("⁄‰«Ì… ‘Œ’Ì…") & ", 'DEMO')", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("√œÊ«  „‰“·Ì…") & ", 'DEMO')", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", " & SqlText("”«·„ «·⁄„—Ì") & ", '0551110001', '300112233400003', " & SqlText("«·—Ì«÷") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", " & SqlText("„«Ãœ «·Õ—»Ì") & ", '0551110002', '300223344500003', " & SqlText("Ãœ…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", " & SqlText(" —ﬂÌ «·€«„œÌ") & ", '0551110003', '300334455600003', " & SqlText("«·œ„«„") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…") & ", " & SqlText("Â‰œ «·”»Ì⁄Ì") & ", '0551110004', '300445566700003', " & SqlText("«·—Ì«÷") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« ") & ", " & SqlText("Ê·Ìœ «·‘„—Ì") & ", '0551110005', '300556677800003', " & SqlText("«·—Ì«÷") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000014', " & SqlText("√—“ »”„ Ì 5 ﬂÃ„") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 4, 38.00, 52.00, 10, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000021', " & SqlText("”ﬂ— √»Ì÷ 2 ﬂÃ„") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 4, 9.50, 13.50, 15, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000038', " & SqlText("“Ì  œÊ«— «·‘„” 1.5 · —") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 1, 14.00, 19.95, 12, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000045', " & SqlText("„⁄ﬂ—Ê‰… 450 Ã„") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 1, 2.60, 3.95, 30, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000052', " & SqlText(" „— ”ﬂ—Ì 1 ﬂÃ„") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 2, 22.00, 34.50, 8, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000069', " & SqlText("„Ì«Â „⁄œ‰Ì… 330 „· ◊ 40") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 3, 11.00, 16.50, 10, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000076', " & SqlText("⁄’Ì— »— ﬁ«· 1 · —") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 1, 4.20, 6.50, 20, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000083', " & SqlText("Õ·Ì» ÿ«“Ã 2 · —") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 1, 7.80, 11.00, 15, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000090', " & SqlText("ﬁÂÊ… ⁄—»Ì… 500 Ã„") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 4, 26.00, 39.00, 6, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000106', " & SqlText("‘«Ì √ﬂÌ«” ◊ 100") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 2, 9.00, 14.25, 10, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000113', " & SqlText("„‰Ÿ› √—÷Ì«  3 · —") & ", " & CategoryIDOf("„‰Ÿ›« ") & ", 1, 11.50, 17.25, 8, " & SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000120', " & SqlText("”«∆· €”Ì· ’ÕÊ‰ 1 · —") & ", " & CategoryIDOf("„‰Ÿ›« ") & ", 1, 5.30, 8.50, 12, " & SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000137', " & SqlText("„”ÕÊﬁ €”Ì· 3 ﬂÃ„") & ", " & CategoryIDOf("„‰Ÿ›« ") & ", 4, 24.00, 36.00, 6, " & SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000144', " & SqlText("„‰«œÌ· Ê—ﬁÌ… ◊ 5") & ", " & CategoryIDOf("„‰Ÿ›« ") & ", 4, 8.40, 12.95, 15, " & SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000151', " & SqlText("‘«„»Ê 400 „·") & ", " & CategoryIDOf("⁄‰«Ì… ‘Œ’Ì…") & ", 1, 12.00, 18.95, 8, " & SupplierIDOf("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000168', " & SqlText("„⁄ÃÊ‰ √”‰«‰ 100 „·") & ", " & CategoryIDOf("⁄‰«Ì… ‘Œ’Ì…") & ", 1, 6.10, 9.50, 12, " & SupplierIDOf("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000175', " & SqlText("’«»Ê‰ ÌœÌ‰ 500 „·") & ", " & CategoryIDOf("⁄‰«Ì… ‘Œ’Ì…") & ", 1, 5.20, 8.25, 10, " & SupplierIDOf("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000182', " & SqlText("√ﬂÌ«” ‰›«Ì«  ﬂ»Ì—… ◊ 30") & ", " & CategoryIDOf("√œÊ«  „‰“·Ì…") & ", 4, 7.00, 10.95, 10, " & SupplierIDOf("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000199', " & SqlText("Ê—ﬁ √·„‰ÌÊ„ 30 „") & ", " & CategoryIDOf("√œÊ«  „‰“·Ì…") & ", 1, 9.20, 14.50, 6, " & SupplierIDOf("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000205', " & SqlText("»ÿ«—Ì«  AA ◊ 4") & ", " & CategoryIDOf("√œÊ«  „‰“·Ì…") & ", 4, 8.00, 13.00, 5, " & SupplierIDOf("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« ") & ", 'DEMO', " & SqlDate(Date - 150) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("„ÿ⁄„ «·œÌ—…") & ", '0501000001', '300667788900003', " & SqlText("«·—Ì«÷") & ", True, 5000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("„ƒ””… «·÷Ì«›… ·· „ÊÌ‰") & ", '0501000002', '300778899000003', " & SqlText("«·—Ì«÷") & ", True, 10000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("„ﬁÂÏ «·—ﬂ‰") & ", '0501000003', '300889900100003', " & SqlText("«·—Ì«÷") & ", True, 3000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("√Õ„œ „Õ„œ «·⁄ Ì»Ì") & ", '0501000004', Null, " & SqlText("«·—Ì«÷") & ", True, 1000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("”«—… ⁄»œ«··Â «·ﬁÕÿ«‰Ì") & ", '0501000005', Null, " & SqlText("«·—Ì«÷") & ", True, 500, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("Œ«·œ ≈»—«ÂÌ„ «·‘Â—Ì") & ", '0501000006', Null, " & SqlText("«·—Ì«÷") & ", False, 0, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("‰Ê—… ”⁄œ «·œÊ”—Ì") & ", '0501000007', Null, " & SqlText("«·—Ì«÷") & ", False, 0, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("›Âœ ⁄»œ«·—Õ„‰ «·Õ—»Ì") & ", '0501000008', Null, " & SqlText("«·—Ì«÷") & ", True, 1500, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("„‰Ï ⁄·Ì «·“Â—«‰Ì") & ", '0501000009', Null, " & SqlText("«·—Ì«÷") & ", False, 0, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("⁄»œ«··Â ‰«’— «·„ÿÌ—Ì") & ", '0501000010', Null, " & SqlText("«·—Ì«÷") & ", True, 2000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError
-    CurrentDb.Execute "INSERT INTO Employees (EmployeeName, JobTitle, Username, RoleID, MaxDiscountPercent, Notes) VALUES (" & SqlText("„‘—› «·›—⁄ ( Ã—Ì»Ì)") & ", " & SqlText("„œÌ— ›—⁄") & ", 'manager', 2, 0.10, 'DEMO')", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("„Ê«œ €–«∆Ì…") & ", 'DEMO')", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("„‘—Ê»« ") & ", 'DEMO')", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("„‰Ÿ›« ") & ", 'DEMO')", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("⁄‰«Ì… ‘Œ’Ì…") & ", 'DEMO')", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Categories (CategoryName, Description) VALUES (" & SqlText("√œÊ«  „‰“·Ì…") & ", 'DEMO')", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", " & SqlText("”«·„ «·⁄„—Ì") & ", '0551110001', '300112233400003', " & SqlText("«·—Ì«÷") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", " & SqlText("„«Ãœ «·Õ—»Ì") & ", '0551110002', '300223344500003', " & SqlText("Ãœ…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", " & SqlText(" —ﬂÌ «·€«„œÌ") & ", '0551110003', '300334455600003', " & SqlText("«·œ„«„") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…") & ", " & SqlText("Â‰œ «·”»Ì⁄Ì") & ", '0551110004', '300445566700003', " & SqlText("«·—Ì«÷") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Suppliers (SupplierName, ContactPerson, Mobile, VATNumber, City, Notes, CreatedAt) VALUES (" & SqlText("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« ") & ", " & SqlText("Ê·Ìœ «·‘„—Ì") & ", '0551110005', '300556677800003', " & SqlText("«·—Ì«÷") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000014', " & SqlText("√—“ »”„ Ì 5 ﬂÃ„") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 4, 38.00, 52.00, 10, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000021', " & SqlText("”ﬂ— √»Ì÷ 2 ﬂÃ„") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 4, 9.50, 13.50, 15, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000038', " & SqlText("“Ì  œÊ«— «·‘„” 1.5 · —") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 1, 14.00, 19.95, 12, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000045', " & SqlText("„⁄ﬂ—Ê‰… 450 Ã„") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 1, 2.60, 3.95, 30, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000052', " & SqlText(" „— ”ﬂ—Ì 1 ﬂÃ„") & ", " & CategoryIDOf("„Ê«œ €–«∆Ì…") & ", 2, 22.00, 34.50, 8, " & SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000069', " & SqlText("„Ì«Â „⁄œ‰Ì… 330 „· ◊ 40") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 3, 11.00, 16.50, 10, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000076', " & SqlText("⁄’Ì— »— ﬁ«· 1 · —") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 1, 4.20, 6.50, 20, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000083', " & SqlText("Õ·Ì» ÿ«“Ã 2 · —") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 1, 7.80, 11.00, 15, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000090', " & SqlText("ﬁÂÊ… ⁄—»Ì… 500 Ã„") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 4, 26.00, 39.00, 6, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000106', " & SqlText("‘«Ì √ﬂÌ«” ◊ 100") & ", " & CategoryIDOf("„‘—Ê»« ") & ", 2, 9.00, 14.25, 10, " & SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000113', " & SqlText("„‰Ÿ› √—÷Ì«  3 · —") & ", " & CategoryIDOf("„‰Ÿ›« ") & ", 1, 11.50, 17.25, 8, " & SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000120', " & SqlText("”«∆· €”Ì· ’ÕÊ‰ 1 · —") & ", " & CategoryIDOf("„‰Ÿ›« ") & ", 1, 5.30, 8.50, 12, " & SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000137', " & SqlText("„”ÕÊﬁ €”Ì· 3 ﬂÃ„") & ", " & CategoryIDOf("„‰Ÿ›« ") & ", 4, 24.00, 36.00, 6, " & SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000144', " & SqlText("„‰«œÌ· Ê—ﬁÌ… ◊ 5") & ", " & CategoryIDOf("„‰Ÿ›« ") & ", 4, 8.40, 12.95, 15, " & SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000151', " & SqlText("‘«„»Ê 400 „·") & ", " & CategoryIDOf("⁄‰«Ì… ‘Œ’Ì…") & ", 1, 12.00, 18.95, 8, " & SupplierIDOf("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000168', " & SqlText("„⁄ÃÊ‰ √”‰«‰ 100 „·") & ", " & CategoryIDOf("⁄‰«Ì… ‘Œ’Ì…") & ", 1, 6.10, 9.50, 12, " & SupplierIDOf("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000175', " & SqlText("’«»Ê‰ ÌœÌ‰ 500 „·") & ", " & CategoryIDOf("⁄‰«Ì… ‘Œ’Ì…") & ", 1, 5.20, 8.25, 10, " & SupplierIDOf("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000182', " & SqlText("√ﬂÌ«” ‰›«Ì«  ﬂ»Ì—… ◊ 30") & ", " & CategoryIDOf("√œÊ«  „‰“·Ì…") & ", 4, 7.00, 10.95, 10, " & SupplierIDOf("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000199', " & SqlText("Ê—ﬁ √·„‰ÌÊ„ 30 „") & ", " & CategoryIDOf("√œÊ«  „‰“·Ì…") & ", 1, 9.20, 14.50, 6, " & SupplierIDOf("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« ") & ", 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Products (ProductCode, Barcode, ProductName, CategoryID, UnitID, PurchasePrice, SellingPrice, MinimumQuantity, SupplierID, Notes, CreatedAt) VALUES (" & SqlText(NextNumber("PRODUCT_CODE")) & ", '6281000000205', " & SqlText("»ÿ«—Ì«  AA ◊ 4") & ", " & CategoryIDOf("√œÊ«  „‰“·Ì…") & ", 4, 8.00, 13.00, 5, " & SupplierIDOf("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« ") & ", 'DEMO', " & SqlDate(Date - 150) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("„ÿ⁄„ «·œÌ—…") & ", '0501000001', '300667788900003', " & SqlText("«·—Ì«÷") & ", True, 5000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("„ƒ””… «·÷Ì«›… ·· „ÊÌ‰") & ", '0501000002', '300778899000003', " & SqlText("«·—Ì«÷") & ", True, 10000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("„ﬁÂÏ «·—ﬂ‰") & ", '0501000003', '300889900100003', " & SqlText("«·—Ì«÷") & ", True, 3000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("√Õ„œ „Õ„œ «·⁄ Ì»Ì") & ", '0501000004', Null, " & SqlText("«·—Ì«÷") & ", True, 1000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("”«—… ⁄»œ«··Â «·ﬁÕÿ«‰Ì") & ", '0501000005', Null, " & SqlText("«·—Ì«÷") & ", True, 500, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("Œ«·œ ≈»—«ÂÌ„ «·‘Â—Ì") & ", '0501000006', Null, " & SqlText("«·—Ì«÷") & ", False, 0, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("‰Ê—… ”⁄œ «·œÊ”—Ì") & ", '0501000007', Null, " & SqlText("«·—Ì«÷") & ", False, 0, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("›Âœ ⁄»œ«·—Õ„‰ «·Õ—»Ì") & ", '0501000008', Null, " & SqlText("«·—Ì«÷") & ", True, 1500, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("„‰Ï ⁄·Ì «·“Â—«‰Ì") & ", '0501000009', Null, " & SqlText("«·—Ì«÷") & ", False, 0, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName, Mobile, VATNumber, City, AllowCredit, CreditLimit, Notes, CreatedAt) VALUES (" & SqlText("⁄»œ«··Â ‰«’— «·„ÿÌ—Ì") & ", '0501000010', Null, " & SqlText("«·—Ì«÷") & ", True, 2000, 'DEMO', " & SqlDate(Date - 60) & ")", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO Employees (EmployeeName, JobTitle, Username, RoleID, MaxDiscountPercent, Notes) VALUES (" & SqlText("„‘—› «·›—⁄ ( Ã—Ì»Ì)") & ", " & SqlText("„œÌ— ›—⁄") & ", 'manager', 2, 0.10, 'DEMO')", dbFailOnError + dbSeeChanges
     Check SetUserPassword(UserIDOf("manager"), DEMO_PASSWORD, True), "ﬂ·„… „—Ê— manager"
-    CurrentDb.Execute "INSERT INTO Employees (EmployeeName, JobTitle, Username, RoleID, MaxDiscountPercent, Notes) VALUES (" & SqlText("ﬂ«‘Ì— «·’»«Õ ( Ã—Ì»Ì)") & ", " & SqlText("ﬂ«‘Ì—") & ", 'cashier1', 3, 0.02, 'DEMO')", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Employees (EmployeeName, JobTitle, Username, RoleID, MaxDiscountPercent, Notes) VALUES (" & SqlText("ﬂ«‘Ì— «·’»«Õ ( Ã—Ì»Ì)") & ", " & SqlText("ﬂ«‘Ì—") & ", 'cashier1', 3, 0.02, 'DEMO')", dbFailOnError + dbSeeChanges
     Check SetUserPassword(UserIDOf("cashier1"), DEMO_PASSWORD, True), "ﬂ·„… „—Ê— cashier1"
-    CurrentDb.Execute "INSERT INTO Employees (EmployeeName, JobTitle, Username, RoleID, MaxDiscountPercent, Notes) VALUES (" & SqlText("ﬂ«‘Ì— «·„”«¡ ( Ã—Ì»Ì)") & ", " & SqlText("ﬂ«‘Ì—") & ", 'cashier2', 3, 0.02, 'DEMO')", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Employees (EmployeeName, JobTitle, Username, RoleID, MaxDiscountPercent, Notes) VALUES (" & SqlText("ﬂ«‘Ì— «·„”«¡ ( Ã—Ì»Ì)") & ", " & SqlText("ﬂ«‘Ì—") & ", 'cashier2', 3, 0.02, 'DEMO')", dbFailOnError + dbSeeChanges
     Check SetUserPassword(UserIDOf("cashier2"), DEMO_PASSWORD, True), "ﬂ·„… „—Ê— cashier2"
 End Sub
 
@@ -176,54 +176,54 @@ Private Sub DemoSteps1()
     ' --- purchase (day -30)
     when = DemoWhen(30, 9)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     PurLine "6281000000014", 40, "38.00"
     PurLine "6281000000021", 40, "9.50"
     PurLine "6281000000038", 50, "14.00"
     PurLine "6281000000045", 120, "2.60"
     PurLine "6281000000052", 30, "22.00"
     Check PostPurchaseFromCart(SupplierIDOf("„ƒ””… «·Ê›—… ··„Ê«œ «·€–«∆Ì…"), "INV-7781", DateValue(when), "CREDIT", 1, True, 0.00, 1000, "", id), "›« Ê—… ‘—«¡ 1"
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     MoveDoc "PURCHASE", id, when
     m_purchases(1) = id
     ' --- purchase (day -29)
     when = DemoWhen(29, 10)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     PurLine "6281000000069", 40, "11.00"
     PurLine "6281000000076", 80, "4.20"
     PurLine "6281000000083", 25, "7.80"
     PurLine "6281000000090", 25, "26.00"
     PurLine "6281000000106", 40, "9.00"
     Check PostPurchaseFromCart(SupplierIDOf("‘—ﬂ… «·Ì‰«»Ì⁄ ··„‘—Ê»« "), "SP-20451", DateValue(when), "CASH", 1, True, 0.00, Null, "", id), "›« Ê—… ‘—«¡ 2"
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     MoveDoc "PURCHASE", id, when
     m_purchases(2) = id
     ' --- expense (day -28)
     when = DemoWhen(28, 9)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 1, 4500.00, 0.00, 4500.00, 1, " & SqlText("≈ÌÃ«— «·„Õ· ··‘Â—") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 1, 4500.00, 0.00, 4500.00, 1, " & SqlText("≈ÌÃ«— «·„Õ· ··‘Â—") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError + dbSeeChanges
     ' --- purchase (day -27)
     when = DemoWhen(27, 11)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     PurLine "6281000000113", 30, "11.50"
     PurLine "6281000000120", 40, "5.30"
     PurLine "6281000000137", 8, "24.00"
     PurLine "6281000000144", 60, "8.40"
     Check PostPurchaseFromCart(SupplierIDOf("„ƒ””… «·‰ﬁ«¡ ··„‰Ÿ›« "), "N-3390", DateValue(when), "CREDIT", 1, True, 0.00, 0, "", id), "›« Ê—… ‘—«¡ 3"
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     MoveDoc "PURCHASE", id, when
     m_purchases(3) = id
     ' --- purchase (day -25)
     when = DemoWhen(25, 12)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     PurLine "6281000000151", 30, "12.00"
     PurLine "6281000000168", 15, "6.10"
     PurLine "6281000000175", 40, "5.20"
     Check PostPurchaseFromCart(SupplierIDOf("‘—ﬂ… «·⁄‰«Ì… «·–Â»Ì…"), "GC-118", DateValue(when), "CREDIT", 1, True, 0.00, 500, "", id), "›« Ê—… ‘—«¡ 4"
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     MoveDoc "PURCHASE", id, when
     m_purchases(4) = id
 End Sub
@@ -233,48 +233,48 @@ Private Sub DemoSteps2()
     ' --- purchase (day -22)
     when = DemoWhen(22, 10)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     PurLine "6281000000182", 40, "7.00"
     PurLine "6281000000199", 25, "9.20"
     PurLine "6281000000205", 20, "8.00"
     Check PostPurchaseFromCart(SupplierIDOf("„ƒ””… «·»Ì  «·⁄’—Ì ··√œÊ« "), "BA-5521", DateValue(when), "CASH", 1, True, 20.00, Null, "", id), "›« Ê—… ‘—«¡ 5"
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     MoveDoc "PURCHASE", id, when
     m_purchases(5) = id
     ' --- sale (day -20)
     when = DemoWhen(20, 10)
     SetDemoUser "cashier1"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000045", 10
     CartLine "6281000000021", 2
     CartLine "6281000000038", 1
     Check PostSaleFromCart(1, "CASH", 1, 0.00, Null, "", id), "›« Ê—… »Ì⁄ 1"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(1) = id
     ' --- expense (day -20)
     when = DemoWhen(20, 12)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 2, 380.00, 57.00, 437.00, 1, " & SqlText("›« Ê—… «·ﬂÂ—»«¡") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 2, 380.00, 57.00, 437.00, 1, " & SqlText("›« Ê—… «·ﬂÂ—»«¡") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError + dbSeeChanges
     ' --- expense (day -19)
     when = DemoWhen(19, 12)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 3, 120.00, 18.00, 138.00, 1, " & SqlText("›« Ê—… «·„Ì«Â") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 3, 120.00, 18.00, 138.00, 1, " & SqlText("›« Ê—… «·„Ì«Â") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError + dbSeeChanges
     ' --- sale (day -18)
     when = DemoWhen(18, 11)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000014", 10
     CartLine "6281000000038", 6
     CartLine "6281000000069", 5
     Check PostSaleFromCart(CustomerIDOf("„ÿ⁄„ «·œÌ—…"), "CREDIT", 1, 0.00, 0, "", id), "›« Ê—… »Ì⁄ 2"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(2) = id
     ' --- expense (day -16)
     when = DemoWhen(16, 13)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 4, 299.00, 44.85, 343.85, 1, " & SqlText("«·≈‰ —‰  Ê«·Â« ›") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 4, 299.00, 44.85, 343.85, 1, " & SqlText("«·≈‰ —‰  Ê«·Â« ›") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError + dbSeeChanges
 End Sub
 
 Private Sub DemoSteps3()
@@ -282,12 +282,12 @@ Private Sub DemoSteps3()
     ' --- sale (day -15)
     when = DemoWhen(15, 17)
     SetDemoUser "cashier2"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000076", 6
     CartLine "6281000000168", 2
     CartLine "6281000000151", 1
     Check PostSaleFromCart(1, "CASH", 1, 0.00, Null, "", id), "›« Ê—… »Ì⁄ 3"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(3) = id
     ' --- supplier_payment (day -15)
@@ -304,25 +304,25 @@ Private Sub DemoSteps3()
     ' --- purchase_return (day -14)
     when = DemoWhen(14, 10)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpPurchaseReturnLines (PurchaseDetailID, ProductID, ReturnQty) SELECT PurchaseDetailID, ProductID, 3 FROM PurchaseInvoiceDetails WHERE PurchaseInvoiceID = " & m_purchases(3) & " AND LineNumber = 1", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpPurchaseReturnLines (PurchaseDetailID, ProductID, ReturnQty) SELECT PurchaseDetailID, ProductID, 3 FROM PurchaseInvoiceDetails WHERE PurchaseInvoiceID = " & m_purchases(3) & " AND LineNumber = 1", dbFailOnError + dbSeeChanges
     Check PostPurchaseReturn(m_purchases(3), "⁄Ì» „’‰⁄Ì ( Ã—Ì»Ì)", "CREDIT", Null, id), "„— Ã⁄ „‘ —Ì« "
-    CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError + dbSeeChanges
     MoveDoc "PURCHASE_RETURN", id, when
     ' --- sale (day -12)
     when = DemoWhen(12, 13)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000052", 2
     CartLine "6281000000090", 1
     Check PostSaleFromCart(CustomerIDOf("√Õ„œ „Õ„œ «·⁄ Ì»Ì"), "CREDIT", 1, 0.00, 50, "", id), "›« Ê—… »Ì⁄ 4"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(4) = id
     ' --- expense (day -11)
     when = DemoWhen(11, 9)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 5, 150.00, 0.00, 150.00, 1, " & SqlText("‰ﬁ· »÷«⁄…") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 5, 150.00, 0.00, 150.00, 1, " & SqlText("‰ﬁ· »÷«⁄…") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError + dbSeeChanges
 End Sub
 
 Private Sub DemoSteps4()
@@ -330,12 +330,12 @@ Private Sub DemoSteps4()
     ' --- sale (day -10)
     when = DemoWhen(10, 19)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000137", 2
     CartLine "6281000000113", 1
     CartLine "6281000000144", 3
     Check PostSaleFromCart(1, "CASH", 1, 5.00, Null, "", id), "›« Ê—… »Ì⁄ 5"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(5) = id
     ' --- supplier_payment (day -9)
@@ -346,13 +346,13 @@ Private Sub DemoSteps4()
     ' --- sale (day -8)
     when = DemoWhen(8, 12)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000014", 15
     CartLine "6281000000021", 25
     CartLine "6281000000045", 60
     CartLine "6281000000069", 20
     Check PostSaleFromCart(CustomerIDOf("„ƒ””… «·÷Ì«›… ·· „ÊÌ‰"), "CREDIT", 1, 0.00, 1000, "", id), "›« Ê—… »Ì⁄ 6"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(6) = id
     ' --- stock_out (day -7)
@@ -377,36 +377,36 @@ Private Sub DemoSteps5()
     ' --- expense (day -6)
     when = DemoWhen(6, 15)
     SetDemoUser ""
-    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 6, 260.00, 39.00, 299.00, 1, " & SqlText("’Ì«‰… À·«Ã… «·⁄—÷") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, PaymentMethodID, Description, EmployeeID, CreatedAt, CashBoxID) VALUES (" & SqlText(NextNumber("EXPENSE")) & ", " & SqlDate(DateValue(when)) & ", 6, 260.00, 39.00, 299.00, 1, " & SqlText("’Ì«‰… À·«Ã… «·⁄—÷") & ", " & CurrentUserID() & ", " & SqlDate(when) & ", " & CurrentCashBoxID() & ")", dbFailOnError + dbSeeChanges
     ' --- sale (day -5)
     when = DemoWhen(5, 18)
     SetDemoUser "cashier1"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000083", 4
     CartLine "6281000000106", 2
     CartLine "6281000000120", 3
     CartLine "6281000000175", 2
     Check PostSaleFromCart(1, "CASH", 1, 0.00, Null, "", id), "›« Ê—… »Ì⁄ 7"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(7) = id
     ' --- sales_return (day -4)
     when = DemoWhen(4, 10)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpReturnLines (SalesDetailID, ProductID, ReturnQty, ReturnToStock) SELECT SalesDetailID, ProductID, 2, True FROM SalesInvoiceDetails WHERE SalesInvoiceID = " & m_sales(6) & " AND LineNumber = 4", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpReturnLines (SalesDetailID, ProductID, ReturnQty, ReturnToStock) SELECT SalesDetailID, ProductID, 2, True FROM SalesInvoiceDetails WHERE SalesInvoiceID = " & m_sales(6) & " AND LineNumber = 4", dbFailOnError + dbSeeChanges
     Check PostSalesReturn(m_sales(6), " ·› ›Ì «· €·Ì› ( Ã—Ì»Ì)", "CREDIT", Null, id), "„— Ã⁄ „»Ì⁄« "
-    CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpReturnLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALES_RETURN", id, when
     ' --- sale (day -3)
     when = DemoWhen(3, 16)
     SetDemoUser ""
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000090", 2
     CartLine "6281000000052", 1
     CartLine "6281000000199", 1
     Check PostSaleFromCart(CustomerIDOf("›Âœ ⁄»œ«·—Õ„‰ «·Õ—»Ì"), "CREDIT", 1, 0.00, 0, "", id), "›« Ê—… »Ì⁄ 8"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(8) = id
     ' --- customer_payment (day -2)
@@ -427,18 +427,18 @@ Private Sub DemoSteps6()
     when = DemoWhen(2, 21)
     SetDemoUser ""
     Check CreateStockCount(CategoryIDOf("√œÊ«  „‰“·Ì…"), "Ã—œ  Ã—Ì»Ì", id), "≈‰‘«¡ «·Ã—œ"
-    CurrentDb.Execute "UPDATE StockCountDetails SET ActualQuantity = SystemQuantity + (-1) WHERE StockCountID = " & id & " AND ProductID = " & ProductIDOf("6281000000199"), dbFailOnError
+    CurrentDb.Execute "UPDATE StockCountDetails SET ActualQuantity = SystemQuantity + (-1) WHERE StockCountID = " & id & " AND ProductID = " & ProductIDOf("6281000000199"), dbFailOnError + dbSeeChanges
     Check PostStockCount(id, False, adjusted, netValue), " —ÕÌ· «·Ã—œ"
     MoveDoc "STOCK_COUNT", id, when
     ' --- sale (day -1)
     when = DemoWhen(1, 20)
     SetDemoUser "cashier2"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000076", 10
     CartLine "6281000000083", 6
     CartLine "6281000000182", 2
     Check PostSaleFromCart(1, "CASH", 1, 0.00, Null, "", id), "›« Ê—… »Ì⁄ 9"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(9) = id
     ' --- closing (day -1)
@@ -450,12 +450,12 @@ Private Sub DemoSteps6()
     ' --- sale (day -0)
     when = DemoWhen(0, 0)
     SetDemoUser "cashier1"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartLine "6281000000038", 2
     CartLine "6281000000168", 3
     CartLine "6281000000144", 2
     Check PostSaleFromCart(1, "CASH", 1, 0.00, Null, "", id), "›« Ê—… »Ì⁄ 10"
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     MoveDoc "SALE", id, when
     m_sales(10) = id
 End Sub
@@ -500,7 +500,7 @@ Private Function CategoryIDOf(ByVal CategoryName As String) As Long
 End Function
 
 Private Function BoxOfType(ByVal BoxType As String) As Long
-    BoxOfType = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True AND BoxType = " & SqlText(BoxType)), 0)
+    BoxOfType = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive <> 0 AND BoxType = " & SqlText(BoxType)), 0)
 End Function
 
 Private Function UserIDOf(ByVal Username As String) As Long
@@ -510,19 +510,19 @@ End Function
 Private Sub CartLine(ByVal Barcode As String, ByVal Qty As Long)
     CurrentDb.Execute "INSERT INTO tmpPOSLines (ProductID, ProductCode, ProductName, Quantity, UnitPrice, " & _
         "LineDiscount, Available) SELECT ProductID, ProductCode, ProductName, " & Qty & ", SellingPrice, 0, " & _
-        "CurrentQuantity FROM Products WHERE Barcode = " & SqlText(Barcode), dbFailOnError
+        "CurrentQuantity FROM Products WHERE Barcode = " & SqlText(Barcode), dbFailOnError + dbSeeChanges
 End Sub
 
 Private Sub PurLine(ByVal Barcode As String, ByVal Qty As Long, ByVal Cost As String)
     CurrentDb.Execute "INSERT INTO tmpPurchaseLines (ProductID, ProductCode, ProductName, Quantity, UnitCost, " & _
         "LineDiscount, SellingPrice) SELECT ProductID, ProductCode, ProductName, " & Qty & ", " & Cost & _
-        ", 0, SellingPrice FROM Products WHERE Barcode = " & SqlText(Barcode), dbFailOnError
+        ", 0, SellingPrice FROM Products WHERE Barcode = " & SqlText(Barcode), dbFailOnError + dbSeeChanges
 End Sub
 
 Private Sub ClearWorkTables()
     Dim t As Variant
     For Each t In Array("tmpPOSLines", "tmpReturnLines", "tmpPurchaseLines", "tmpPurchaseReturnLines")
-        CurrentDb.Execute "DELETE FROM " & t, dbFailOnError
+        CurrentDb.Execute "DELETE FROM " & t, dbFailOnError + dbSeeChanges
     Next
 End Sub
 
@@ -542,27 +542,27 @@ Private Sub MoveDoc(ByVal Kind As String, ByVal DocID As Long, ByVal When As Dat
     End Select
     If Kind = "STOCK_COUNT" Then
         CurrentDb.Execute "UPDATE StockCounts SET CountDate = " & SqlDate(When) & ", PostedAt = " & SqlDate(When) & _
-                          " WHERE StockCountID = " & DocID, dbFailOnError
+                          " WHERE StockCountID = " & DocID, dbFailOnError + dbSeeChanges
     Else
         CurrentDb.Execute "UPDATE " & tbl & " SET " & fld & " = " & SqlDate(When) & ", CreatedAt = " & SqlDate(When) & _
-                          " WHERE " & key & " = " & DocID, dbFailOnError
+                          " WHERE " & key & " = " & DocID, dbFailOnError + dbSeeChanges
     End If
     If Kind = "CASH_CLOSING" Then          ' the shortage / transfer vouchers of the closing
         CurrentDb.Execute "UPDATE CashVouchers SET VoucherDate = " & SqlDate(When) & ", CreatedAt = " & SqlDate(When) & _
-                          " WHERE ClosingID = " & DocID, dbFailOnError
+                          " WHERE ClosingID = " & DocID, dbFailOnError + dbSeeChanges
     End If
     Select Case Kind
         Case "SALE", "SALES_RETURN", "PURCHASE", "PURCHASE_RETURN", "STOCK_COUNT"
             CurrentDb.Execute "UPDATE InventoryTransactions SET TransactionDate = " & SqlDate(When) & ", CreatedAt = " & _
                               SqlDate(When) & " WHERE ReferenceType = " & SqlText(Kind) & " AND ReferenceID = " & DocID, _
-                              dbFailOnError
+                              dbFailOnError + dbSeeChanges
     End Select
     If Kind = "SALE" Or Kind = "SALES_RETURN" Then
         ' the ZATCA QR code carries the time stamp of the document
         vatNo = SettingValue("VATNumber")
         If Not IsNull(vatNo) Then
             Set rs = CurrentDb.OpenRecordset("SELECT QRCodeData, TotalAmount, Tax FROM " & tbl & " WHERE " & key & _
-                                             " = " & DocID, dbOpenDynaset)
+                                             " = " & DocID, dbOpenDynaset, dbSeeChanges)
             rs.Edit
             rs!QRCodeData = BuildZatcaQR(Nz(SettingValue("StoreName"), ""), CStr(vatNo), When, rs!TotalAmount, rs!Tax)
             rs.Update
@@ -574,7 +574,7 @@ End Sub
 Private Sub MoveManual(ByVal RefNumber As String, ByVal When As Date)
     CurrentDb.Execute "UPDATE InventoryTransactions SET TransactionDate = " & SqlDate(When) & ", CreatedAt = " & _
                       SqlDate(When) & " WHERE ReferenceType = 'MANUAL' AND ReferenceNumber = " & SqlText(RefNumber), _
-                      dbFailOnError
+                      dbFailOnError + dbSeeChanges
 End Sub
 
 '==============================================================================
@@ -589,7 +589,7 @@ Public Function VerifyDemoData() As Boolean
     Expect DbValue("SELECT COUNT(*) FROM Categories WHERE Description = '" & DEMO_MARK & "'") = 5, "5  ’‰Ì›« "
     Expect DbValue("SELECT COUNT(*) FROM Customers WHERE Notes = '" & DEMO_MARK & "'") = 10, "10 ⁄„·«¡"
     Expect DbValue("SELECT COUNT(*) FROM Suppliers WHERE Notes = '" & DEMO_MARK & "'") = 5, "5 „Ê—œÌ‰"
-    Expect DbValue("SELECT COUNT(*) FROM Employees WHERE Notes = '" & DEMO_MARK & "' AND MustChangePassword = True " & _
+    Expect DbValue("SELECT COUNT(*) FROM Employees WHERE Notes = '" & DEMO_MARK & "' AND MustChangePassword <> 0 " & _
                    "AND PasswordHash Is Not Null") = 3, "3 „ÊŸ›Ì‰ »ﬂ·„… „—Ê— „ƒﬁ …"
     Expect DbValue("SELECT COUNT(*) FROM SalesInvoices") = 10, "10 ›Ê« Ì— »Ì⁄"
     Expect DbValue("SELECT COUNT(*) FROM PurchaseInvoices") = 5, "5 ›Ê« Ì— ‘—«¡"
@@ -763,54 +763,54 @@ Public Function RemoveDemoData() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    db.Execute "DELETE FROM JournalLines", dbFailOnError
-    db.Execute "DELETE FROM JournalEntries", dbFailOnError
-    db.Execute "DELETE FROM AssetDepreciations", dbFailOnError
-    db.Execute "DELETE FROM DepreciationRuns", dbFailOnError
-    db.Execute "DELETE FROM FixedAssets", dbFailOnError
-    db.Execute "DELETE FROM CashVouchers", dbFailOnError
-    db.Execute "DELETE FROM CashClosings", dbFailOnError
-    db.Execute "DELETE FROM SalesReturnDetails", dbFailOnError
-    db.Execute "DELETE FROM SalesReturns", dbFailOnError
-    db.Execute "DELETE FROM CustomerPayments", dbFailOnError
-    db.Execute "DELETE FROM SalesInvoiceDetails", dbFailOnError
-    db.Execute "DELETE FROM SalesInvoices", dbFailOnError
-    db.Execute "DELETE FROM PurchaseReturnDetails", dbFailOnError
-    db.Execute "DELETE FROM PurchaseReturns", dbFailOnError
-    db.Execute "DELETE FROM SupplierPayments", dbFailOnError
-    db.Execute "DELETE FROM PurchaseInvoiceDetails", dbFailOnError
-    db.Execute "DELETE FROM PurchaseInvoices", dbFailOnError
-    db.Execute "DELETE FROM StockCountDetails", dbFailOnError
-    db.Execute "DELETE FROM StockCounts", dbFailOnError
-    db.Execute "DELETE FROM InventoryTransactions", dbFailOnError
-    db.Execute "DELETE FROM Expenses", dbFailOnError
-    db.Execute "DELETE FROM Products WHERE Notes = 'DEMO'", dbFailOnError
-    db.Execute "UPDATE Products SET CurrentQuantity = 0", dbFailOnError
-    db.Execute "DELETE FROM Customers WHERE Notes = 'DEMO'", dbFailOnError
-    db.Execute "UPDATE Customers SET CurrentBalance = OpeningBalance", dbFailOnError
-    db.Execute "DELETE FROM Suppliers WHERE Notes = 'DEMO' AND SupplierID NOT IN (SELECT SupplierID FROM Products WHERE SupplierID Is Not Null)", dbFailOnError
-    db.Execute "UPDATE Suppliers SET CurrentBalance = OpeningBalance", dbFailOnError
-    db.Execute "DELETE FROM Categories WHERE Description = 'DEMO' AND CategoryID NOT IN (SELECT CategoryID FROM Products)", dbFailOnError
-    db.Execute "DELETE FROM AuditLog WHERE EmployeeID IN (SELECT EmployeeID FROM Employees WHERE Notes = 'DEMO' AND Username IN ('manager', 'cashier1', 'cashier2'))", dbFailOnError
-    db.Execute "DELETE FROM Employees WHERE Notes = 'DEMO' AND Username IN ('manager', 'cashier1', 'cashier2')", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'SALES_INVOICE'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'SALES_RETURN'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PURCHASE_INVOICE'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PURCHASE_RETURN'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CUSTOMER_PAYMENT'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'SUPPLIER_PAYMENT'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'EXPENSE'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'STOCK_COUNT'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'STOCK_ADJUST'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'ZATCA_ICV'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_IN'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_OUT'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_TRANSFER'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_CLOSING'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'JOURNAL'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'FIXED_ASSET'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'DEPRECIATION'", dbFailOnError
-    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PRODUCT_CODE' AND (SELECT COUNT(*) FROM Products) = 0", dbFailOnError
+    db.Execute "DELETE FROM JournalLines", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM JournalEntries", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM AssetDepreciations", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM DepreciationRuns", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM FixedAssets", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM CashVouchers", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM CashClosings", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM SalesReturnDetails", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM SalesReturns", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM CustomerPayments", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM SalesInvoiceDetails", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM SalesInvoices", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM PurchaseReturnDetails", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM PurchaseReturns", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM SupplierPayments", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM PurchaseInvoiceDetails", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM PurchaseInvoices", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM StockCountDetails", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM StockCounts", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM InventoryTransactions", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM Expenses", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM Products WHERE Notes = 'DEMO'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Products SET CurrentQuantity = 0", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM Customers WHERE Notes = 'DEMO'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Customers SET CurrentBalance = OpeningBalance", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM Suppliers WHERE Notes = 'DEMO' AND SupplierID NOT IN (SELECT SupplierID FROM Products WHERE SupplierID Is Not Null)", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Suppliers SET CurrentBalance = OpeningBalance", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM Categories WHERE Description = 'DEMO' AND CategoryID NOT IN (SELECT CategoryID FROM Products)", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM AuditLog WHERE EmployeeID IN (SELECT EmployeeID FROM Employees WHERE Notes = 'DEMO' AND Username IN ('manager', 'cashier1', 'cashier2'))", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM Employees WHERE Notes = 'DEMO' AND Username IN ('manager', 'cashier1', 'cashier2')", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'SALES_INVOICE'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'SALES_RETURN'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PURCHASE_INVOICE'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PURCHASE_RETURN'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CUSTOMER_PAYMENT'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'SUPPLIER_PAYMENT'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'EXPENSE'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'STOCK_COUNT'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'STOCK_ADJUST'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'ZATCA_ICV'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_IN'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_OUT'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_TRANSFER'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'CASH_CLOSING'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'JOURNAL'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'FIXED_ASSET'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'DEPRECIATION'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Sequences SET NextValue = 1 WHERE SequenceName = 'PRODUCT_CODE' AND (SELECT COUNT(*) FROM Products) = 0", dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     LogAction "DEMO_REMOVED", "", "", file

@@ -21,7 +21,7 @@ Public Sub FormLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     If TagValue(frm, "TABLE") = "LabelSettings" Then LabelSettingsLoad frm      ' printer list (modLabels)
     If TagValue(frm, "TABLE") = "Employees" And Not IsDeveloper() Then
-        frm.RecordSource = "SELECT * FROM Employees WHERE IsDeveloper = False"  ' the programmer stays hidden
+        frm.RecordSource = "SELECT * FROM Employees WHERE IsDeveloper = 0"  ' the programmer stays hidden
     End If
     If TagValue(frm, "TABLE") = "Settings" Then SettingsScreenLoad frm
     If TagValue(frm, "TABLE") = "Accounts" Then RebuildAccountTree                    ' tree order (modAccounts)
@@ -268,7 +268,7 @@ Private Sub DeleteRecord(ByVal frm As Access.Form)
     Set before = AuditSnapshot(table, pk, id)             ' the record as it was (modAudit)
 
     On Error Resume Next
-    CurrentDb.Execute "DELETE FROM [" & table & "] WHERE [" & pk & "] = " & id, dbFailOnError
+    CurrentDb.Execute "DELETE FROM [" & table & "] WHERE [" & pk & "] = " & id, dbFailOnError + dbSeeChanges
     errNo = Err.Number
     On Error GoTo 0
 
@@ -321,7 +321,7 @@ Public Sub RefreshList(ByVal frm As Access.Form)
     End If
 
     If TagValue(frm, "TABLE") = "Employees" And Not IsDeveloper() Then
-        searchCond = "t.IsDeveloper = False AND (" & searchCond & ")"        ' the programmer stays hidden
+        searchCond = "t.IsDeveloper = 0 AND (" & searchCond & ")"        ' the programmer stays hidden
     End If
     sql = Tr(TagValue(frm, "LIST"))           ' translated before the typed text goes in (modLang)
     sql = Replace(sql, "{ACTIVE}", activeCond)

@@ -119,13 +119,13 @@ Public Function SaveOpeningDate(ByVal NewDate As Variant) As String
     old = OpeningDateValue()
     Set before = AuditSnapshot("Settings", "SettingID", 1)
     CurrentDb.Execute "UPDATE Settings SET OpeningDate = " & SqlDate(DateValue(NewDate)) & " WHERE SettingID = 1", _
-                      dbFailOnError
+                      dbFailOnError + dbSeeChanges
     cond = "OpeningDate Is Null"
     If IsDate(old) Then cond = cond & " OR OpeningDate = " & SqlDate(old)
-    CurrentDb.Execute "UPDATE CashBoxes SET OpeningDate = " & SqlDate(DateValue(NewDate)) & " WHERE " & cond, dbFailOnError
-    CurrentDb.Execute "UPDATE Banks SET OpeningDate = " & SqlDate(DateValue(NewDate)) & " WHERE " & cond, dbFailOnError
+    CurrentDb.Execute "UPDATE CashBoxes SET OpeningDate = " & SqlDate(DateValue(NewDate)) & " WHERE " & cond, dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE Banks SET OpeningDate = " & SqlDate(DateValue(NewDate)) & " WHERE " & cond, dbFailOnError + dbSeeChanges
     CurrentDb.Execute "UPDATE InventoryTransactions SET TransactionDate = " & SqlDate(DateValue(NewDate)) & _
-                      " WHERE TransactionID IN (SELECT TransactionID FROM OpeningStock)", dbFailOnError
+                      " WHERE TransactionID IN (SELECT TransactionID FROM OpeningStock)", dbFailOnError + dbSeeChanges
     AuditEdited "OPENING_DATE", "Settings", "SettingID", 1, before
     SaveOpeningDate = SyncJournal()
 End Function
@@ -323,7 +323,7 @@ Public Sub OpeningRemoveLine(ByVal frm As Access.Form)
     If Not AskYesNo("حذف رصيد هذا الحساب؟") Then Exit Sub
     If frm.Dirty Then frm.Undo
     Set before = AuditSnapshot("OpeningBalances", "OpeningLineID", id)
-    CurrentDb.Execute "DELETE FROM OpeningBalances WHERE OpeningLineID = " & CLng(id), dbFailOnError
+    CurrentDb.Execute "DELETE FROM OpeningBalances WHERE OpeningLineID = " & CLng(id), dbFailOnError + dbSeeChanges
     AuditDeleted "OPENING_DELETE", "OpeningBalances", id, before
     frm.Requery
     OpeningGridAfterUpdate frm
@@ -401,10 +401,10 @@ Public Function FillOpeningStock(Optional ByVal WarehouseID As Long = 1) As Long
     before = Nz(DbValue("SELECT COUNT(*) FROM OpeningStock"), 0)
     CurrentDb.Execute "INSERT INTO OpeningStock (ProductID, WarehouseID, Quantity, UnitCost) " & _
         "SELECT p.ProductID, " & WarehouseID & ", 0, IIf(p.AverageCost > 0, p.AverageCost, p.PurchasePrice) " & _
-        "FROM Products AS p WHERE p.TrackStock = True AND p.IsActive = True " & _
+        "FROM Products AS p WHERE p.TrackStock <> 0 AND p.IsActive <> 0 " & _
         "AND p.ProductID NOT IN (SELECT ProductID FROM OpeningStock WHERE WarehouseID = " & WarehouseID & ") " & _
         "AND p.ProductID NOT IN (SELECT ProductID FROM InventoryTransactions WHERE WarehouseID = " & WarehouseID & ")", _
-        dbFailOnError
+        dbFailOnError + dbSeeChanges
     FillOpeningStock = Nz(DbValue("SELECT COUNT(*) FROM OpeningStock"), 0) - before
 End Function
 
@@ -437,9 +437,9 @@ Public Function PostOpeningStock(ByRef Posted As Long, ByRef Skipped As Long) As
             tid = DbValue("SELECT Max(TransactionID) FROM InventoryTransactions WHERE ProductID = " & pid & _
                           " AND WarehouseID = " & wh)
             db.Execute "UPDATE InventoryTransactions SET TransactionDate = " & SqlDate(startDay) & _
-                       " WHERE TransactionID = " & tid, dbFailOnError
+                       " WHERE TransactionID = " & tid, dbFailOnError + dbSeeChanges
             db.Execute "UPDATE OpeningStock SET TransactionID = " & tid & " WHERE OpeningStockID = " & _
-                       rs!OpeningStockID, dbFailOnError
+                       rs!OpeningStockID, dbFailOnError + dbSeeChanges
             Posted = Posted + 1
         Else
             Skipped = Skipped + 1
@@ -480,17 +480,17 @@ Public Function UnpostOpeningStock(ByVal LineID As Long) As String
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    db.Execute "DELETE FROM InventoryTransactions WHERE TransactionID = " & tid, dbFailOnError
+    db.Execute "DELETE FROM InventoryTransactions WHERE TransactionID = " & tid, dbFailOnError + dbSeeChanges
     ' the quantity of the other warehouses stays; with nothing left the average cost starts again
     remainQty = Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & pid), 0) - qty
     If remainQty = 0 Then
         db.Execute "UPDATE Products SET CurrentQuantity = 0, AverageCost = 0, UpdatedAt = Now() WHERE ProductID = " & pid, _
-                   dbFailOnError
+                   dbFailOnError + dbSeeChanges
     Else
         db.Execute "UPDATE Products SET CurrentQuantity = " & Str$(remainQty) & ", UpdatedAt = Now() WHERE ProductID = " & pid, _
-                   dbFailOnError
+                   dbFailOnError + dbSeeChanges
     End If
-    db.Execute "UPDATE OpeningStock SET TransactionID = Null WHERE OpeningStockID = " & LineID, dbFailOnError
+    db.Execute "UPDATE OpeningStock SET TransactionID = Null WHERE OpeningStockID = " & LineID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     AuditDeleted "OPENING_STOCK_UNPOST", "InventoryTransactions", tid, before
@@ -556,11 +556,11 @@ Public Function ImportOpeningStockRow(ByVal Code As String, ByVal Qty As Variant
     End If
     If IsNull(lineID) Then
         CurrentDb.Execute "INSERT INTO OpeningStock (ProductID, WarehouseID, Quantity, UnitCost) VALUES (" & pid & ", " & _
-                          wh & ", " & Str$(CDbl(Qty)) & ", " & Str$(cost) & ")", dbFailOnError
+                          wh & ", " & Str$(CDbl(Qty)) & ", " & Str$(cost) & ")", dbFailOnError + dbSeeChanges
         ImportOpeningStockRow = "ADDED"
     Else
         CurrentDb.Execute "UPDATE OpeningStock SET Quantity = " & Str$(CDbl(Qty)) & ", UnitCost = " & Str$(cost) & _
-                          " WHERE OpeningStockID = " & lineID, dbFailOnError
+                          " WHERE OpeningStockID = " & lineID, dbFailOnError + dbSeeChanges
         ImportOpeningStockRow = "UPDATED"
     End If
 End Function
@@ -650,7 +650,7 @@ Public Function OpeningStockTemplateSql() As String
         "w.WarehouseCode AS [كود المخزن] " & _
         "FROM (Products AS p LEFT JOIN (SELECT * FROM OpeningStock WHERE WarehouseID = 1) AS o " & _
         "ON p.ProductID = o.ProductID), Warehouses AS w " & _
-        "WHERE w.WarehouseID = 1 AND p.TrackStock = True AND p.IsActive = True AND o.TransactionID Is Null " & _
+        "WHERE w.WarehouseID = 1 AND p.TrackStock <> 0 AND p.IsActive <> 0 AND o.TransactionID Is Null " & _
         "AND p.ProductID NOT IN (SELECT ProductID FROM InventoryTransactions WHERE WarehouseID = 1) " & _
         "ORDER BY p.ProductName"
 End Function
@@ -743,7 +743,7 @@ Public Sub OpeningStockRemoveLine(ByVal frm As Access.Form)
         If Len(msg) = 0 Then
             If Not AskYesNo("حذف هذا السطر؟") Then Exit Sub
             Set before = AuditSnapshot("OpeningStock", "OpeningStockID", id)
-            CurrentDb.Execute "DELETE FROM OpeningStock WHERE OpeningStockID = " & CLng(id), dbFailOnError
+            CurrentDb.Execute "DELETE FROM OpeningStock WHERE OpeningStockID = " & CLng(id), dbFailOnError + dbSeeChanges
             AuditDeleted "OPENING_STOCK_DELETE", "OpeningStock", id, before
         End If
     End If
@@ -785,7 +785,7 @@ Public Function TestOpeningBalances() As Boolean
                passed, failed, report
         totalBefore = OpeningBalanceTotal()
         CurrentDb.Execute "INSERT INTO OpeningBalances (AccountCode, Debit, Credit, LineText) VALUES (3200, 0, 1000, 'TEST')", _
-                          dbFailOnError
+                          dbFailOnError + dbSeeChanges
         msg = SyncJournal()
         entry = DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = 'ACCOUNT_OPENING' AND SourceID = " & _
                         "(SELECT Max(OpeningLineID) FROM OpeningBalances)")
@@ -825,7 +825,7 @@ Private Sub TestOpeningStockPart(ByVal startDay As Date, ByVal first As Variant,
                                  ByRef failed As Long, ByRef report As String)
     ' The opening stock of a product without moves: post, entry, unpost, import row.
     Dim pid As Variant, lineID As Variant, tid As Variant, posted As Long, skipped As Long, code As String
-    pid = DbValue("SELECT TOP 1 ProductID FROM Products WHERE TrackStock = True AND ProductID NOT IN " & _
+    pid = DbValue("SELECT TOP 1 ProductID FROM Products WHERE TrackStock <> 0 AND ProductID NOT IN " & _
                   "(SELECT ProductID FROM InventoryTransactions) AND ProductID NOT IN (SELECT ProductID FROM OpeningStock) " & _
                   "ORDER BY ProductID")
     If IsNull(pid) Then
@@ -839,7 +839,7 @@ Private Sub TestOpeningStockPart(ByVal startDay As Date, ByVal first As Variant,
     Record ImportOpeningStockRow(code, 10, 5) = "UPDATED", "استيراد: تعديل سطر الصنف", passed, failed, report
     lineID = DbValue("SELECT OpeningStockID FROM OpeningStock WHERE ProductID = " & pid)
     CurrentDb.Execute "UPDATE OpeningStock SET Quantity = 0 WHERE TransactionID Is Null AND OpeningStockID <> " & lineID, _
-                      dbFailOnError                                   ' only the test line is posted
+                      dbFailOnError + dbSeeChanges                                   ' only the test line is posted
     Record PostOpeningStock(posted, skipped) = "" And posted = 1, "ترحيل الرصيد الافتتاحي للمخزون", _
            passed, failed, report
     tid = DbValue("SELECT TransactionID FROM OpeningStock WHERE OpeningStockID = " & lineID)

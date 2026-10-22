@@ -7,6 +7,7 @@ import re
 import pricing as P
 import purchases_reference as R
 from generate_common import vba_str
+from server_code import see_changes
 
 
 def num(v) -> str:
@@ -97,7 +98,7 @@ Private Sub TestCycle()
     inTrans = True
 
     db.Execute "UPDATE Settings SET VATNumber = '300000000000003', VATRate = 0.15, PricesIncludeVAT = True, " & _
-               "AllowNegativeStock = False", dbFailOnError
+               "AllowNegativeStock = 0", dbFailOnError
     db.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
     db.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError
     db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
@@ -359,4 +360,4 @@ def build_test_purchases_vba() -> str:
     for key, value in placeholders().items():
         text = text.replace(f"@@{key}@@", value)
     assert not re.search(r"@@[A-Z0-9_]+@@", text), re.findall(r"@@[A-Z0-9_]+@@", text)
-    return text
+    return see_changes(text)                                   # plan 5C: SQL Server tables

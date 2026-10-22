@@ -35,7 +35,7 @@ Public Function ManualEntryProblem(ByVal EntryDate As Variant, ByVal Description
         Exit Function
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT LineNo, AccountCode, Debit, Credit FROM tmpManualLines ORDER BY LineNo", _
-                                     dbOpenSnapshot)
+                                     dbOpenSnapshot, dbSeeChanges)
     Do Until rs.EOF
         If IsNull(rs!AccountCode) And Nz(rs!Debit, 0) = 0 And Nz(rs!Credit, 0) = 0 Then
             ' an empty line is ignored
@@ -49,8 +49,8 @@ Public Function ManualEntryProblem(ByVal EntryDate As Variant, ByVal Description
             ManualEntryProblem = "اكتب المبلغ مدينًا أو دائنًا في كل سطر فيه حساب."
         Else
             acc = rs!AccountCode
-            If IsNull(DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & acc & " AND IsPosting = True " & _
-                              "AND IsActive = True")) Then
+            If IsNull(DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & acc & " AND IsPosting <> 0 " & _
+                              "AND IsActive <> 0")) Then
                 ManualEntryProblem = "الحساب " & acc & " حساب رئيسي أو معطّل: القيود على الحسابات الفرعية النشطة فقط."
             Else
                 n = n + 1
@@ -103,13 +103,13 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
     inTrans = True
     Dim auditBefore As Collection
     If ManualEntryID = 0 Then
-        Set h = db.OpenRecordset("ManualEntries", dbOpenDynaset)
+        Set h = db.OpenRecordset("ManualEntries", dbOpenDynaset, dbSeeChanges)
         h.AddNew
         h!EntryNumber = NextNumber("MANUAL_ENTRY")
         h!EmployeeID = CurrentUserID()
         If Not IsNull(ReversalOf) Then h!ReversalOfID = ReversalOf
     Else
-        Set h = db.OpenRecordset("SELECT * FROM ManualEntries WHERE ManualEntryID = " & ManualEntryID, dbOpenDynaset)
+        Set h = db.OpenRecordset("SELECT * FROM ManualEntries WHERE ManualEntryID = " & ManualEntryID, dbOpenDynaset, dbSeeChanges)
         If h.EOF Then
             h.Close
             ws.Rollback
@@ -119,7 +119,7 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
         Set auditBefore = AuditSnapshot("ManualEntries", "ManualEntryID", ManualEntryID)   ' modAudit
         h.Edit
         h!UpdatedAt = Now
-        db.Execute "DELETE FROM ManualEntryLines WHERE ManualEntryID = " & ManualEntryID, dbFailOnError
+        db.Execute "DELETE FROM ManualEntryLines WHERE ManualEntryID = " & ManualEntryID, dbFailOnError + dbSeeChanges
     End If
     h!EntryDate = DateValue(EntryDate)
     h!Description = Left$(Trim$(Description), 255)
@@ -134,7 +134,7 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
 
     Set rs = db.OpenRecordset("SELECT AccountCode, Debit, Credit, LineText, LineCenter FROM tmpManualLines " & _
                               "WHERE AccountCode Is Not Null ORDER BY LineNo", dbOpenSnapshot)
-    Set h = db.OpenRecordset("ManualEntryLines", dbOpenDynaset, dbAppendOnly)
+    Set h = db.OpenRecordset("ManualEntryLines", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     Do Until rs.EOF
         n = n + 1
         h.AddNew
@@ -162,15 +162,15 @@ Public Function PostManualEntry(ByVal ManualEntryID As Long, ByVal EntryDate As 
                           IIf(diff > 0, "Credit > 0 ORDER BY Credit DESC", "Debit > 0 ORDER BY Debit DESC"))
         If diff > 0 Then
             db.Execute "UPDATE ManualEntryLines SET Credit = Credit + " & Str$(diff) & " WHERE ManualLineID = " & fixLine, _
-                       dbFailOnError
+                       dbFailOnError + dbSeeChanges
         Else
             db.Execute "UPDATE ManualEntryLines SET Debit = Debit - " & Str$(diff) & " WHERE ManualLineID = " & fixLine, _
-                       dbFailOnError
+                       dbFailOnError + dbSeeChanges
             total = total - diff
         End If
     End If
     db.Execute "UPDATE ManualEntries SET TotalAmount = " & Str$(total) & ", ForeignAmount = " & Str$(foreignTotal) & _
-               " WHERE ManualEntryID = " & NewID, dbFailOnError
+               " WHERE ManualEntryID = " & NewID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     LogAction IIf(ManualEntryID = 0, "MANUAL_ENTRY_ADD", "MANUAL_ENTRY_EDIT"), "ManualEntries", CStr(NewID)
@@ -195,7 +195,7 @@ Public Function RemoveManualEntry(ByVal ManualEntryID As Long) As String
     If Len(RemoveManualEntry) > 0 Then Exit Function
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("ManualEntries", "ManualEntryID", ManualEntryID)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM ManualEntries WHERE ManualEntryID = " & ManualEntryID, dbFailOnError   ' lines cascade
+    CurrentDb.Execute "DELETE FROM ManualEntries WHERE ManualEntryID = " & ManualEntryID, dbFailOnError + dbSeeChanges   ' lines cascade
     AuditDeleted "MANUAL_ENTRY_DELETE", "ManualEntries", ManualEntryID, auditBefore
 End Function
 
@@ -218,7 +218,7 @@ Public Sub ManualEntryLoad(ByVal frm As Access.Form)
 End Sub
 
 Public Sub ManualNew(ByVal frm As Access.Form)
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
     frm!txtEntryID.Value = Null
     frm!txtReversalOf.Value = Null
     frm!txtNumber.Value = "جديد"
@@ -253,10 +253,10 @@ Public Sub ManualOpen(ByVal frm As Access.Form, ByVal ManualEntryID As Long)
     frm!txtRate.Value = Nz(rs!ExchangeRate, 1)
     frm!txtRate.Locked = IsBaseCurrency(frm!cboCurrency.Value)
     rs.Close
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit, LineText, LineCenter) SELECT AccountCode, " & _
                       LINE_AMOUNTS & ", LineText, CostCenterID FROM ManualEntryLines WHERE ManualEntryID = " & ManualEntryID & _
-                      " ORDER BY LineNumber", dbFailOnError
+                      " ORDER BY LineNumber", dbFailOnError + dbSeeChanges
     frm!subLines.Form.Requery
     ManualRecalc frm
     ManualButtons frm
@@ -302,7 +302,7 @@ Public Sub ManualRemoveLine(ByVal sf As Access.Form)
         sf.Undo
         Exit Sub
     End If
-    CurrentDb.Execute "DELETE FROM tmpManualLines WHERE LineNo = " & sf!LineNo.Value, dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines WHERE LineNo = " & sf!LineNo.Value, dbFailOnError + dbSeeChanges
     sf.Requery
     ManualRecalc sf.Parent
 End Sub
@@ -368,10 +368,10 @@ Public Sub ReverseManualEntry(ByVal frm As Access.Form)
     id = Nz(frm!txtEntryID.Value, 0)
     If id = 0 Then Exit Sub
     number = Nz(frm!txtNumber.Value, "")
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Credit, Debit, LineText, LineCenter) SELECT AccountCode, " & _
                       LINE_AMOUNTS & ", LineText, CostCenterID FROM ManualEntryLines WHERE ManualEntryID = " & id & _
-                      " ORDER BY LineNumber", dbFailOnError
+                      " ORDER BY LineNumber", dbFailOnError + dbSeeChanges
     frm!txtDescription.Value = Left$("عكس القيد " & number & ": " & Nz(frm!txtDescription.Value, ""), 255)
     frm!txtReversalOf.Value = id
     frm!txtEntryID.Value = Null

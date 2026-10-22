@@ -54,11 +54,11 @@ Public Function FillLedger(ByVal AccountCode As Long, ByVal FromDate As Date, By
     Dim db As DAO.Database, rs As DAO.Recordset, t As DAO.Recordset, balance As Currency, n As Long
     Set db = CurrentDb
     Opening = 0: Debit = 0: Credit = 0
-    db.Execute "DELETE FROM tmpLedger", dbFailOnError
+    db.Execute "DELETE FROM tmpLedger", dbFailOnError + dbSeeChanges
     SetPeriod FromDate, ToDate
     SetQueryParam "AccountCode", AccountCode
     Set rs = db.OpenRecordset("SELECT * FROM AccountStatementQuery ORDER BY SortKey, LineDate, EntryNo", dbOpenSnapshot)
-    Set t = db.OpenRecordset("tmpLedger", dbOpenDynaset, dbAppendOnly)
+    Set t = db.OpenRecordset("tmpLedger", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     Do Until rs.EOF
         balance = balance + Nz(rs!LineDebit, 0) - Nz(rs!LineCredit, 0)
         If rs!SortKey = 0 Then

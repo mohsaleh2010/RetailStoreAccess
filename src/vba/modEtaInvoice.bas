@@ -334,7 +334,7 @@ Public Function EtaInvoicePrepare(ByVal DocKind As String, ByVal DocID As Long) 
         json = EtaInvoiceDocumentJson(DocKind, DocID, "0.9")
     End If
     Set rs = CurrentDb.OpenRecordset("SELECT EInvoiceXml FROM " & DocTableOf(DocKind) & " WHERE " & DocKeyOf(DocKind) & _
-                                     " = " & DocID, dbOpenDynaset)
+                                     " = " & DocID, dbOpenDynaset, dbSeeChanges)
     rs.Edit
     rs!EInvoiceXml = json                                 ' a memo: the document as it is sent
     rs.Update
@@ -411,7 +411,7 @@ Public Function EtaInvoiceSend(ByVal DocKind As String, ByVal DocID As Long) As 
     If Len(docStatus) > 0 Then SetEInvoiceStatus DocKind, DocID, docStatus, reply
     If Len(uuid) > 0 Then
         Set rs = CurrentDb.OpenRecordset("SELECT EtaUUID, EtaLongId, EtaSubmissionId, QRCodeData FROM " & DocTableOf(DocKind) & _
-                                         " WHERE " & DocKeyOf(DocKind) & " = " & DocID, dbOpenDynaset)
+                                         " WHERE " & DocKeyOf(DocKind) & " = " & DocID, dbOpenDynaset, dbSeeChanges)
         rs.Edit
         rs!EtaUUID = uuid
         rs!EtaLongId = IIf(Len(longId) = 0, Null, longId)

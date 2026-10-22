@@ -12,7 +12,7 @@
   Then run this file in that database:
       sqlcmd -S .\SQLEXPRESS -d RetailStore -E -f 65001 -i RetailStore_Schema.sql
 
-  90 tables, 1158 fields, 135 indexes, 210 relationships, 438 seed rows
+  90 tables, 1159 fields, 135 indexes, 210 relationships, 438 seed rows
 ==============================================================================*/
 SET NOCOUNT ON;
 SET ANSI_NULLS ON;
@@ -95,6 +95,7 @@ IF OBJECT_ID(N'dbo.Settings', N'U') IS NULL
         [EtaSignerArgs] NVARCHAR(255) NULL,
         [EtaTokenPin] NVARCHAR(50) NULL,
         [EInvoiceEnvironment] NVARCHAR(12) NOT NULL CONSTRAINT [DF_Settings_EInvoiceEnvironment] DEFAULT (N'TEST'),
+        [ServerLiveSince] DATETIME NULL,
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_Settings] PRIMARY KEY ([SettingID])
     );
@@ -1776,6 +1777,8 @@ IF COL_LENGTH(N'dbo.Settings', N'EtaTokenPin') IS NULL
     ALTER TABLE [dbo].[Settings] ADD [EtaTokenPin] NVARCHAR(50) NULL;
 IF COL_LENGTH(N'dbo.Settings', N'EInvoiceEnvironment') IS NULL
     ALTER TABLE [dbo].[Settings] ADD [EInvoiceEnvironment] NVARCHAR(12) NOT NULL CONSTRAINT [DF_Settings_EInvoiceEnvironment] DEFAULT (N'TEST');
+IF COL_LENGTH(N'dbo.Settings', N'ServerLiveSince') IS NULL
+    ALTER TABLE [dbo].[Settings] ADD [ServerLiveSince] DATETIME NULL;
 IF COL_LENGTH(N'dbo.Settings', N'RowVer') IS NULL
     ALTER TABLE [dbo].[Settings] ADD [RowVer] ROWVERSION NOT NULL;
 IF COL_LENGTH(N'dbo.Sequences', N'SequenceName') IS NULL
@@ -7281,5 +7284,12 @@ IF OBJECT_ID(N'dbo.FK_VatReturns_EmployeeID', N'F') IS NOT NULL
 IF OBJECT_ID(N'dbo.FK_Warehouses_KeeperID', N'F') IS NOT NULL
     ALTER TABLE [dbo].[Warehouses] DROP CONSTRAINT [FK_Warehouses_KeeperID];
 GO
-PRINT N'RetailStore schema: done (90 tables, 1158 fields, 135 indexes, 210 relationships, 438 seed rows).';
+
+/*------------------------------------------------------------------------------
+  8. Database options (plan 5C, docs/70)
+------------------------------------------------------------------------------*/
+IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
+    ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
+GO
+PRINT N'RetailStore schema: done (90 tables, 1159 fields, 135 indexes, 210 relationships, 438 seed rows).';
 GO

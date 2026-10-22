@@ -221,7 +221,7 @@ Private Sub SaveSettings(ByVal Pairs As Variant)
     ' Array(field, value, field, value ...) of the settings, with the audit trail.
     Dim before As Collection, rs As DAO.Recordset, i As Long
     Set before = AuditSnapshot("Settings", "SettingID", 1)
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM Settings WHERE SettingID = 1", dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM Settings WHERE SettingID = 1", dbOpenDynaset, dbSeeChanges)
     rs.Edit
     For i = LBound(Pairs) To UBound(Pairs) - 1 Step 2
         If IsNull(Pairs(i + 1)) Then
@@ -388,7 +388,7 @@ Public Function ZatcaSendDocument(ByVal DocKind As String, ByVal DocID As Long) 
         n = Base64Decode(CStr(cleared), b)                   ' the document with ZATCA's stamp: it is the invoice now
         xml = Utf8Decode(b, 0, n)
         Set rs = CurrentDb.OpenRecordset("SELECT EInvoiceXml, QRCodeData FROM " & DocTableOf(DocKind) & " WHERE " & _
-                                         DocKeyOf(DocKind) & " = " & DocID, dbOpenDynaset)
+                                         DocKeyOf(DocKind) & " = " & DocID, dbOpenDynaset, dbSeeChanges)
         rs.Edit
         rs!EInvoiceXml = xml
         If Len(ClearedQR(xml)) > 0 Then rs!QRCodeData = ClearedQR(xml)
@@ -477,7 +477,7 @@ Public Function TestZatcaApi() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    CurrentDb.Execute "UPDATE Settings SET ZatcaOnboardStage = 'CHECKED' WHERE SettingID = 1", dbFailOnError
+    CurrentDb.Execute "UPDATE Settings SET ZatcaOnboardStage = 'CHECKED' WHERE SettingID = 1", dbFailOnError + dbSeeChanges
     Record Len(ZatcaReadyProblem()) > 0, "لا إرسال قبل الشهادة الفعلية", passed, failed, report
     xml = ZatcaSampleXml("383", "0100000", 3, ZATCA_INITIAL_PIH, "00000000-0000-0000-0000-000000000003", totals)
     Record InStr(xml, ">383</cbc:InvoiceTypeCode>") > 0 And InStr(xml, "<cac:BillingReference>") > 0 And _

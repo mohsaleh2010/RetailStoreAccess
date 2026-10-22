@@ -157,7 +157,7 @@ class ManualEntryCodeTests(unittest.TestCase):
 
     def test_rules(self):
         body = proc(self.text, "ManualEntryProblem")
-        for part in ("If n < 2 Then", "ElseIf debit <> credit Then", "AND IsPosting = True ", "AND IsActive = True",
+        for part in ("If n < 2 Then", "ElseIf debit <> credit Then", "AND IsPosting <> 0 ", "AND IsActive <> 0",
                      "Nz(rs!Debit, 0) > 0 And Nz(rs!Credit, 0) > 0"):
             self.assertIn(part, body)
         post = proc(self.text, "PostManualEntry")

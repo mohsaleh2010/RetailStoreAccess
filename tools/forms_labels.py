@@ -10,7 +10,7 @@ from forms_sales import LOCKED, grid_row, header_labels
 
 LABEL_TITLES = ["الصنف", "الباركود المطبوع", "السعر", "عدد الملصقات", ""]
 LABEL_PRODUCT_ROWS = ("SELECT ProductID, ProductName, SellingPrice FROM Products "
-                      "WHERE IsActive = True ORDER BY ProductName")
+                      "WHERE IsActive <> 0 ORDER BY ProductName")
 
 
 def layout_label_lines() -> Tuple[FormModel, list]:

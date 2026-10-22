@@ -142,13 +142,13 @@ class CustodyCodeTests(unittest.TestCase):
         self.assertLess(cancel.index('AuditSnapshot("CashVouchers"'), cancel.index("DELETE FROM CashVouchers"))
         self.assertIn('AuditDeleted "CASH_TRANSFER_DELETE"', cancel)
         pending = proc(CASH, "PendingTransferBox")
-        self.assertIn("InTransit = True AND ReceivedAt Is Null", pending)
+        self.assertIn("InTransit <> 0 AND ReceivedAt Is Null", pending)
         self.assertIn('Case "CASH_RECEIVE":', read("modJournal"))
 
     def test_movements_and_journal_queries(self):
         moves = Q.query("qryCashMovements").sql
         self.assertIn("IIf(v.InTransit, v.ReceivedAt, v.VoucherDate)", moves)
-        self.assertIn("(v.InTransit = False OR v.ReceivedAt Is Not Null)", moves)
+        self.assertIn("(v.InTransit = 0 OR v.ReceivedAt Is Not Null)", moves)
         journal = Q.query("qryJournalCashVoucher").sql
         self.assertIn("IIf(v.InTransit, 1195, 110000 + v.ToCashBoxID)", journal)
         self.assertIn("'CASH_RECEIVE' AS SourceType", journal)

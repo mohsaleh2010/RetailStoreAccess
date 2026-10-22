@@ -3,6 +3,7 @@
 import re
 
 import forms as F
+from server_code import see_changes
 from generate_common import vba_str
 
 EVENT_PROPERTY = {
@@ -537,7 +538,7 @@ Private Sub CheckFormOpens(ByVal FormName As String)
     Dim frm As Access.Form, ctl As Access.Control, rs As DAO.Recordset
     On Error GoTo EH
     ' frmCafeItem shows the drink chosen on frmCafePOS: give it one
-    If FormName = "frmCafeItem" Then TempVars.Add "CafeItemID", Nz(DMin("ProductID", "Products", "IsActive = True"), 0)
+    If FormName = "frmCafeItem" Then TempVars.Add "CafeItemID", Nz(DMin("ProductID", "Products", "IsActive <> 0"), 0)
     DoCmd.OpenForm FormName, acNormal, , , , acHidden
     If Not CurrentProject.AllForms(FormName).IsLoaded Then
         ' a dialog that closes itself when it has nothing to show (no product yet)
@@ -776,7 +777,7 @@ def build_forms_vba() -> str:
     }.items():
         text = text.replace(key, value)
     assert not re.search(r"@@[A-Z_]+@@", text)
-    return text
+    return see_changes(text)                                   # plan 5C: SQL Server tables
 
 
 APPDATA_TEMPLATE = r'''Attribute VB_Name = "modAppData"

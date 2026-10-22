@@ -20,7 +20,7 @@ Option Compare Database
 Option Explicit
 
 Public Const CURRENCY_ROWS As String = "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies " & _
-                                       "WHERE IsActive = True ORDER BY SortOrder, CurrencyCode"
+                                       "WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode"
 
 '------------------------------------------------------------------------------
 ' Currencies and rates
@@ -62,7 +62,7 @@ Public Function CurrencyProblem(ByVal Code As Variant, ByVal Rate As Variant) As
         CurrencyProblem = "اختر العملة."
     ElseIf Len(Trim$(Code)) = 0 Then
         CurrencyProblem = "اختر العملة."
-    ElseIf IsNull(DbValue("SELECT CurrencyCode FROM Currencies WHERE IsActive = True AND CurrencyCode = " & SqlText(Code))) Then
+    ElseIf IsNull(DbValue("SELECT CurrencyCode FROM Currencies WHERE IsActive <> 0 AND CurrencyCode = " & SqlText(Code))) Then
         CurrencyProblem = "العملة " & Code & " غير موجودة أو غير نشطة."
     ElseIf IsBaseCurrency(Code) Then
         If Nz(Rate, 1) <> 1 Then CurrencyProblem = "معامل عملة البرنامج " & BaseCurrency() & " يساوي 1."
@@ -101,9 +101,9 @@ Public Function SaveCurrencyRate(ByVal Code As String, ByVal RateDate As Variant
                  " AND RateDate = " & SqlDate(DateValue(RateDate)))
     If IsNull(id) Then
         CurrentDb.Execute "INSERT INTO CurrencyRates (CurrencyCode, RateDate, Rate) VALUES (" & SqlText(Code) & ", " & _
-                          SqlDate(DateValue(RateDate)) & ", " & Str$(Rate) & ")", dbFailOnError
+                          SqlDate(DateValue(RateDate)) & ", " & Str$(Rate) & ")", dbFailOnError + dbSeeChanges
     Else
-        CurrentDb.Execute "UPDATE CurrencyRates SET Rate = " & Str$(Rate) & " WHERE CurrencyRateID = " & id, dbFailOnError
+        CurrentDb.Execute "UPDATE CurrencyRates SET Rate = " & Str$(Rate) & " WHERE CurrencyRateID = " & id, dbFailOnError + dbSeeChanges
     End If
     LogAction "CURRENCY_RATE", "CurrencyRates", Code, GDate(RateDate) & " = " & Rate
 End Function
@@ -211,7 +211,7 @@ Public Sub StampJournalCurrencies()
             "] SET e.CurrencyCode = d.CurrencyCode, e.ExchangeRate = d.ExchangeRate, e.ForeignAmount = d.ForeignAmount " & _
             "WHERE e.SourceType = '" & parts(0) & "' AND d.CurrencyCode Is Not Null AND (e.CurrencyCode Is Null OR " & _
             "e.CurrencyCode <> d.CurrencyCode OR e.ExchangeRate <> d.ExchangeRate OR e.ForeignAmount <> d.ForeignAmount)", _
-            dbFailOnError
+            dbFailOnError + dbSeeChanges
     Next
 End Sub
 
@@ -243,7 +243,7 @@ Public Function TestCurrency() As Boolean
     msg = SaveCurrencyRate("USD", Date, 3.76)
     Check Len(msg) = 0 And RateOn("USD", Date) = 3.76 And RateOn("USD", Date - 1) <> 3.76, "سعر اليوم وأحدث سعر قبله " & msg, _
           passed, failed, report
-    supplier = Nz(DbValue("SELECT Min(SupplierID) FROM Suppliers WHERE IsActive = True"), 0)
+    supplier = Nz(DbValue("SELECT Min(SupplierID) FROM Suppliers WHERE IsActive <> 0"), 0)
     before = Nz(DbValue("SELECT CurrentBalance FROM Suppliers WHERE SupplierID = " & supplier), 0)
     msg = PostSupplierPayment(supplier, 100, 1, "TEST-FX", payID, "USD", 3.76)
     msg = msg & SyncJournal()
@@ -258,16 +258,16 @@ Public Function TestCurrency() As Boolean
           Nz(DbValue("SELECT ForeignAmount FROM JournalEntries WHERE EntryID = " & Nz(entry, 0)), 0) = 100, _
           "القيد بالريال ويحمل العملة والمعامل والمبلغ بالدولار", passed, failed, report
     EnsureLocalTables
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (5900, 33.33, 0)", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (5900, 33.33, 0)", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (2300, 0, 66.66)", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (5900, 33.33, 0)", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (5900, 33.33, 0)", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (2300, 0, 66.66)", dbFailOnError + dbSeeChanges
     msg = PostManualEntry(0, Date, "TEST-FX", "", Null, manualID, "USD", 3.7777)
     Check Len(msg) = 0 And Nz(DbValue("SELECT Sum(Debit) - Sum(Credit) FROM ManualEntryLines WHERE ManualEntryID = " & _
           manualID), 1) = 0 And Nz(DbValue("SELECT Sum(ForeignDebit) FROM ManualEntryLines WHERE ManualEntryID = " & _
           manualID), 0) = 66.66, "قيد يدوي بالدولار: متوازن بالريال بعد التقريب، ومبالغه بالدولار محفوظة " & msg, _
           passed, failed, report
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
 Undo:
     ws.Rollback
     inTrans = False

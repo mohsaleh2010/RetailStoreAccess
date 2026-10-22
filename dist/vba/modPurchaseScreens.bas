@@ -27,7 +27,7 @@ Public Sub PurchaseLoad(ByVal frm As Access.Form)
     EnsureLocalTables
     If DCount("*", "tmpPurchaseLines") > 0 Then
         If Not AskYesNo(" ÊÃœ ›« Ê—… „‘ —Ì«  €Ì— „ﬂ „·… „‰ Ã·”… ”«»ﬁ…. Â·  —Ìœ «” ﬂ„«·Â«ø") Then
-            CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+            CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
         End If
     End If
     ResetPurchaseHeader frm
@@ -85,7 +85,7 @@ Public Function PurScanCode(ByVal frm As Access.Form, ByVal Code As String) As B
     Dim qty As Currency, id As Variant
     qty = Nz(frm!txtQty.Value, 1)
     SplitQtyPrefix Code, qty
-    id = DLookup("ProductID", "Products", "IsActive = True AND (Barcode = " & SqlText(Code) & _
+    id = DLookup("ProductID", "Products", "IsActive <> 0 AND (Barcode = " & SqlText(Code) & _
                  " OR ProductCode = " & SqlText(Code) & ")")
     If IsNull(id) Then
         Beep
@@ -113,7 +113,7 @@ Public Sub PurAddLine(ByVal frm As Access.Form, ByVal ProductID As Long, ByVal Q
     Set p = CurrentDb.OpenRecordset("SELECT ProductCode, ProductName, PurchasePrice, SellingPrice " & _
                                     "FROM Products WHERE ProductID = " & ProductID, dbOpenSnapshot)
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPurchaseLines WHERE ProductID = " & ProductID & _
-                                     " AND LineDiscount = 0", dbOpenDynaset)
+                                     " AND LineDiscount = 0", dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         rs.AddNew
         rs!ProductID = ProductID
@@ -161,7 +161,7 @@ End Sub
 
 Public Sub PurRemoveLine(ByVal sf As Access.Form)
     If sf.NewRecord Or IsNull(sf!LineNo.Value) Then Exit Sub
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines WHERE LineNo = " & sf!LineNo.Value, dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines WHERE LineNo = " & sf!LineNo.Value, dbFailOnError + dbSeeChanges
     RecalcPurchase sf.Parent
     SetPurStatus sf.Parent, " „ Õ–› «·”ÿ—", CLR_MUTED
 End Sub
@@ -185,7 +185,7 @@ Public Sub RecalcPurchase(ByVal frm As Access.Form)
     rs.Close
     If n > 0 Then msg = CalcRun(Nz(frm!txtInvoiceDiscount.Value, 0), False)
     If n > 0 And Len(msg) = 0 Then
-        Set rs = CurrentDb.OpenRecordset("SELECT LineNo, LineTotal FROM tmpPurchaseLines ORDER BY LineNo", dbOpenDynaset)
+        Set rs = CurrentDb.OpenRecordset("SELECT LineNo, LineTotal FROM tmpPurchaseLines ORDER BY LineNo", dbOpenDynaset, dbSeeChanges)
         For i = 0 To n - 1
             rs.Edit
             rs!LineTotal = CalcLine(i, "TOTAL")
@@ -276,7 +276,7 @@ Public Function SavePurchase(ByVal frm As Access.Form) As Boolean
     End If
     invNo = DLookup("InvoiceNumber", "PurchaseInvoices", "PurchaseInvoiceID = " & newID)
     TempVars("LastPurchaseID") = newID
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     ResetPurchaseHeader frm
     RecalcPurchase frm
     SetPurStatus frm, " „ Õ›Ÿ ›« Ê—… «·‘—«¡ " & invNo & " Ê ÕœÌÀ «·„Œ“Ê‰ Ê„ Ê”ÿ «· ﬂ·›…", CLR_SUCCESS
@@ -288,7 +288,7 @@ Public Sub NewPurchase(ByVal frm As Access.Form)
     If DCount("*", "tmpPurchaseLines") > 0 Then
         If Not AskYesNo("Â·  —Ìœ ≈·€«¡ «·›« Ê—… «·Õ«·Ì… Ê«·»œ¡ »›« Ê—… ÃœÌœ…ø") Then Exit Sub
     End If
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     ResetPurchaseHeader frm
     RecalcPurchase frm
     SetPurStatus frm, "›« Ê—… ÃœÌœ…", CLR_MUTED
@@ -337,7 +337,7 @@ End Sub
 Public Sub PurReturnLoad(ByVal frm As Access.Form)
     Calendar = vbCalGreg
     EnsureLocalTables
-    CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError + dbSeeChanges
     frm!subReturnLines.Form.Requery
     frm!txtInvoiceID.Value = Null
     frm!cboRefundType.Value = "CREDIT"
@@ -358,14 +358,14 @@ End Sub
 
 Public Sub LoadPurchaseForReturn(ByVal frm As Access.Form, ByVal PurchaseInvoiceID As Long)
     Dim rs As DAO.Recordset
-    CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPurchaseReturnLines", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO tmpPurchaseReturnLines (PurchaseDetailID, ProductID, ProductName, BoughtQty, " & _
         "ReturnedQty, AvailableQty, InStock, ReturnQty, ReturnAmount) " & _
         "SELECT d.PurchaseDetailID, d.ProductID, p.ProductName, d.Quantity, CCur(Nz(r.QtyReturned, 0)), " & _
         "d.Quantity - CCur(Nz(r.QtyReturned, 0)), p.CurrentQuantity, 0, 0 " & _
         "FROM (PurchaseInvoiceDetails AS d INNER JOIN Products AS p ON d.ProductID = p.ProductID) " & _
         "LEFT JOIN qryPurchaseReturnedQty AS r ON d.PurchaseDetailID = r.PurchaseDetailID " & _
-        "WHERE d.PurchaseInvoiceID = " & PurchaseInvoiceID, dbFailOnError
+        "WHERE d.PurchaseInvoiceID = " & PurchaseInvoiceID, dbFailOnError + dbSeeChanges
     Set rs = CurrentDb.OpenRecordset(Tr("SELECT h.*, s.SupplierName FROM PurchaseInvoices AS h INNER JOIN [@Suppliers] " & _
                                      "AS s ON h.SupplierID = s.SupplierID WHERE h.PurchaseInvoiceID = " & _
                                      PurchaseInvoiceID), dbOpenSnapshot)
@@ -392,14 +392,14 @@ Public Sub PurReturnLineChanged(ByVal sf As Access.Form)
 End Sub
 
 Public Sub PurReturnAll(ByVal frm As Access.Form)
-    CurrentDb.Execute "UPDATE tmpPurchaseReturnLines SET ReturnQty = AvailableQty", dbFailOnError
+    CurrentDb.Execute "UPDATE tmpPurchaseReturnLines SET ReturnQty = AvailableQty", dbFailOnError + dbSeeChanges
     RecalcPurchaseReturn frm
 End Sub
 
 Public Sub RecalcPurchaseReturn(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset, d As DAO.Recordset, total As Currency, net As Currency, tax As Currency
     Dim lineTotal As Currency, msg As String
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPurchaseReturnLines", dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPurchaseReturnLines", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         lineTotal = 0
         If Nz(rs!ReturnQty, 0) > 0 Then
@@ -548,7 +548,7 @@ End Sub
 Public Sub InventoryRefresh(ByVal frm As Access.Form)
     Dim where As String, rs As DAO.Recordset, keep As Variant
     keep = frm!lstProducts.Value
-    where = "p.IsActive = True"
+    where = "p.IsActive <> 0"
     If Len(Trim$(Nz(frm!txtSearch.Value, ""))) > 0 Then
         where = where & " AND (p.ProductName Like " & LikePattern(Trim$(frm!txtSearch.Value)) & _
                 " OR p.ProductCode Like " & LikePattern(Trim$(frm!txtSearch.Value)) & _
@@ -774,7 +774,7 @@ Public Function CountScanCode(ByVal frm As Access.Form, ByVal Code As String) As
         Exit Function
     End If
     If frm!subCountLines.Form.Dirty Then frm!subCountLines.Form.Dirty = False
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM StockCountDetails WHERE StockCountDetailID = " & detailID, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM StockCountDetails WHERE StockCountDetailID = " & detailID, dbOpenDynaset, dbSeeChanges)
     rs.Edit
     rs!ActualQuantity = Nz(rs!ActualQuantity, 0) + qty
     diff = rs!ActualQuantity - rs!SystemQuantity
@@ -797,7 +797,7 @@ Public Sub CountRefreshSystem(ByVal frm As Access.Form)
     If frm!subCountLines.Form.Dirty Then frm!subCountLines.Form.Dirty = False
     Set rs = CurrentDb.OpenRecordset("SELECT d.SystemQuantity, d.ActualQuantity, d.Difference, d.UnitCost, " & _
         "d.DifferenceValue, p.CurrentQuantity, p.AverageCost FROM StockCountDetails AS d INNER JOIN Products AS p " & _
-        "ON d.ProductID = p.ProductID WHERE d.StockCountID = " & Nz(frm!cboCount.Value, 0), dbOpenDynaset)
+        "ON d.ProductID = p.ProductID WHERE d.StockCountID = " & Nz(frm!cboCount.Value, 0), dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         If IsNull(rs!ActualQuantity) Then diff = 0 Else diff = rs!ActualQuantity - rs!CurrentQuantity
         rs.Edit

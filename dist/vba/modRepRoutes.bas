@@ -31,7 +31,7 @@ Public Function SessionRepID() As Long
         SessionRepID = ActingSalesRepID()
         Exit Function
     End If
-    SessionRepID = Nz(DbValue("SELECT Min(SalesRepID) FROM SalesReps WHERE IsActive = True AND EmployeeID = " & _
+    SessionRepID = Nz(DbValue("SELECT Min(SalesRepID) FROM SalesReps WHERE IsActive <> 0 AND EmployeeID = " & _
                               CurrentUserID()), 0)
 End Function
 
@@ -143,7 +143,7 @@ Public Function CreateVisitPlan(ByVal SalesRepID As Variant, ByVal VisitDate As 
         Exit Function
     End If
     d = DateValue(VisitDate)
-    stops = Nz(DbValue("SELECT Count(*) FROM RouteStops WHERE IsActive = True AND SalesRepID = " & CLng(SalesRepID) & _
+    stops = Nz(DbValue("SELECT Count(*) FROM RouteStops WHERE IsActive <> 0 AND SalesRepID = " & CLng(SalesRepID) & _
                        " AND VisitWeekday = " & VisitWeekdayOf(d)), 0)
     If stops = 0 Then
         CreateVisitPlan = "·« ⁄„·«¡ ›Ì Œÿ ”Ì— «·„‰œÊ» ·ÌÊ„ " & RouteWeekdayName(VisitWeekdayOf(d)) & ". √÷›Â„ ›Ì ´Œÿ «·”Ì—ª."
@@ -153,10 +153,10 @@ Public Function CreateVisitPlan(ByVal SalesRepID As Variant, ByVal VisitDate As 
     db.Execute "INSERT INTO RepVisits (VisitDate, SalesRepID, CustomerID, IsPlanned, StopOrder, Result, EmployeeID) " & _
                "SELECT " & SqlDate(d) & ", s.SalesRepID, s.CustomerID, True, s.StopOrder, 'PENDING', " & CurrentUserID() & _
                " FROM RouteStops AS s INNER JOIN Customers AS c ON s.CustomerID = c.CustomerID " & _
-               "WHERE s.IsActive = True AND c.IsActive = True AND s.SalesRepID = " & CLng(SalesRepID) & _
+               "WHERE s.IsActive <> 0 AND c.IsActive <> 0 AND s.SalesRepID = " & CLng(SalesRepID) & _
                " AND s.VisitWeekday = " & VisitWeekdayOf(d) & " AND s.CustomerID NOT IN (SELECT v.CustomerID FROM " & _
                "RepVisits AS v WHERE v.VisitDate = " & SqlDate(d) & " AND v.SalesRepID = " & CLng(SalesRepID) & ")", _
-               dbFailOnError
+               dbFailOnError + dbSeeChanges
     Added = db.RecordsAffected
     If Added > 0 Then LogAction "REP_VISIT_PLAN", "RepVisits", "", "Rep=" & SalesRepID & " Date=" & Format$(d, "yyyy-mm-dd") & _
                                 " Added=" & Added
@@ -182,7 +182,7 @@ Public Function AddRepVisit(ByVal SalesRepID As Variant, ByVal CustomerID As Var
         AddRepVisit = "«·⁄„Ì· ›Ì “Ì«—«  Â–« «·ÌÊ„."
         Exit Function
     End If
-    Set rs = CurrentDb.OpenRecordset("RepVisits", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("RepVisits", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!VisitDate = d
     rs!SalesRepID = CLng(SalesRepID)
@@ -245,7 +245,7 @@ Public Function RecordRepVisit(ByVal VisitID As Long, ByVal Result As Variant, B
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("RepVisits", "RepVisitID", VisitID)
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM RepVisits WHERE RepVisitID = " & VisitID, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM RepVisits WHERE RepVisitID = " & VisitID, dbOpenDynaset, dbSeeChanges)
     rs.Edit
     rs!Result = res
     rs!VisitedAt = Now
@@ -266,7 +266,7 @@ Public Function DeleteRepVisit(ByVal VisitID As Long) As String
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("RepVisits", "RepVisitID", VisitID)
-    CurrentDb.Execute "DELETE FROM RepVisits WHERE RepVisitID = " & VisitID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM RepVisits WHERE RepVisitID = " & VisitID, dbFailOnError + dbSeeChanges
     AuditDeleted "REP_VISIT_DELETE", "RepVisits", VisitID, auditBefore
 End Function
 
@@ -281,9 +281,9 @@ End Function
 Public Sub RepVisitsLoad(ByVal frm As Access.Form)
     Dim rep As Long
     Calendar = vbCalGreg
-    frm!cboRep.RowSource = Tr("SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName")
-    frm!cboCustomer.RowSource = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsActive = True " & _
-                                   "AND c.IsSystem = False ORDER BY c.CustomerName")
+    frm!cboRep.RowSource = Tr("SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive <> 0 ORDER BY s.RepName")
+    frm!cboCustomer.RowSource = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsActive <> 0 " & _
+                                   "AND c.IsSystem = 0 ORDER BY c.CustomerName")
     frm!cboResult.RowSource = VisitResultRows()
     frm!txtDate.Value = Date
     rep = SessionRepID()
@@ -315,7 +315,7 @@ Public Sub RepVisitsShow(ByVal frm As Access.Form)
     frm!lstVisits.Requery
     total = Nz(DbValue("SELECT Count(*) FROM RepVisits" & where), 0)
     done = Nz(DbValue("SELECT Count(*) FROM RepVisits" & where & " AND Result <> 'PENDING'"), 0)
-    outside = Nz(DbValue("SELECT Count(*) FROM RepVisits" & where & " AND IsPlanned = False"), 0)
+    outside = Nz(DbValue("SELECT Count(*) FROM RepVisits" & where & " AND IsPlanned = 0"), 0)
     If total = 0 Then
         info = "·« “Ì«—«  ›Ì Â–« «·ÌÊ„. ´Œÿ… «·ÌÊ„ „‰ Œÿ «·”Ì—ª  ÷Ì› ⁄„·«¡ ÌÊ„ " & RouteWeekdayName(VisitWeekdayOf(CDate(d))) & "."
     Else
@@ -415,33 +415,33 @@ Public Function TestRepRoutes() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
-    CurrentDb.Execute "UPDATE SalesReps SET EmployeeID = Null WHERE EmployeeID = " & CurrentUserID(), dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE SalesReps SET EmployeeID = Null WHERE EmployeeID = " & CurrentUserID(), dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO SalesReps (RepCode, RepName, CommissionRate, CommissionBase, IsActive, EmployeeID, " & _
                       "CreditLimit, MaxDiscountPercent) VALUES ('TEST-RR', 'TEST „‰œÊ» Œÿ «·”Ì—', 0, 'SALES', True, " & _
-                      CurrentUserID() & ", 100, 0.05)", dbFailOnError
+                      CurrentUserID() & ", 100, 0.05)", dbFailOnError + dbSeeChanges
     rep = DbValue("SELECT SalesRepID FROM SalesReps WHERE RepCode = 'TEST-RR'")
     CurrentDb.Execute "INSERT INTO Customers (CustomerName, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, IsActive, " & _
-                      "IsSystem, SalesRepID) VALUES ('TEST ⁄„Ì· Œÿ «·”Ì— 1', 0, 0, True, 0, True, False, " & rep & ")", dbFailOnError
+                      "IsSystem, SalesRepID) VALUES ('TEST ⁄„Ì· Œÿ «·”Ì— 1', 0, 0, True, 0, True, False, " & rep & ")", dbFailOnError + dbSeeChanges
     c1 = DbValue("SELECT CustomerID FROM Customers WHERE CustomerName = 'TEST ⁄„Ì· Œÿ «·”Ì— 1'")
     CurrentDb.Execute "INSERT INTO Customers (CustomerName, OpeningBalance, CurrentBalance, AllowCredit, CreditLimit, IsActive, " & _
-                      "IsSystem, SalesRepID) VALUES ('TEST ⁄„Ì· Œÿ «·”Ì— 2', 0, 0, True, 0, True, False, " & rep & ")", dbFailOnError
+                      "IsSystem, SalesRepID) VALUES ('TEST ⁄„Ì· Œÿ «·”Ì— 2', 0, 0, True, 0, True, False, " & rep & ")", dbFailOnError + dbSeeChanges
     c2 = DbValue("SELECT CustomerID FROM Customers WHERE CustomerName = 'TEST ⁄„Ì· Œÿ «·”Ì— 2'")
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, UnitID, SellingPrice, PurchasePrice, " & _
                       "CurrentQuantity, AverageCost) VALUES ('TEST-RR-P', 'TEST ’‰› «·„‰œÊ»', " & _
                       Nz(DbValue("SELECT Min(CategoryID) FROM Categories"), 1) & ", " & _
-                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 8, 0, 0)", dbFailOnError
+                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 8, 0, 0)", dbFailOnError + dbSeeChanges
     pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-RR-P'")
     CurrentDb.Execute "INSERT INTO RepPrices (SalesRepID, ProductID, UnitPrice) VALUES (" & rep & ", " & pid & ", 18)", _
-                      dbFailOnError
+                      dbFailOnError + dbSeeChanges
 
     ' the route: customer 1 on today's weekday, customer 2 on another day
     msg = CreateVisitPlan(rep, today, added)
     CheckRr Len(msg) > 0 And added = 0, "·« Œÿ… »·« ⁄„·«¡ ›Ì Œÿ «·”Ì— ·Â–« «·ÌÊ„", passed, failed, report
     CurrentDb.Execute "INSERT INTO RouteStops (SalesRepID, CustomerID, VisitWeekday, StopOrder, IsActive) VALUES (" & _
-                      rep & ", " & c1 & ", " & VisitWeekdayOf(today) & ", 1, True)", dbFailOnError
+                      rep & ", " & c1 & ", " & VisitWeekdayOf(today) & ", 1, True)", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO RouteStops (SalesRepID, CustomerID, VisitWeekday, StopOrder, IsActive) VALUES (" & _
-                      rep & ", " & c2 & ", " & (VisitWeekdayOf(today) Mod 7) + 1 & ", 1, True)", dbFailOnError
+                      rep & ", " & c2 & ", " & (VisitWeekdayOf(today) Mod 7) + 1 & ", 1, True)", dbFailOnError + dbSeeChanges
     msg = CreateVisitPlan(rep, today, added)
     v1 = Nz(DbValue("SELECT RepVisitID FROM RepVisits WHERE SalesRepID = " & rep & " AND CustomerID = " & c1), 0)
     CheckRr Len(msg) = 0 And added = 1 And v1 > 0 And VisitField(v1, "IsPlanned") = True, _
@@ -456,7 +456,7 @@ Public Function TestRepRoutes() As Boolean
     ' the results: an order of customer 1 today, customer 2 closed
     CheckRr Len(RecordRepVisit(v1, Null, Null)) > 0, "·« ‰ ÌÃ… »·« „” ‰œ Ê·« «Œ Ì«—", passed, failed, report
     CurrentDb.Execute "INSERT INTO SalesOrders (OrderNumber, OrderDate, CustomerID, WarehouseID, Status, EmployeeID) " & _
-                      "VALUES ('TEST-SO-RR', Now(), " & c1 & ", 1, 'DRAFT', " & CurrentUserID() & ")", dbFailOnError
+                      "VALUES ('TEST-SO-RR', Now(), " & c1 & ", 1, 'DRAFT', " & CurrentUserID() & ")", dbFailOnError + dbSeeChanges
     msg = RecordRepVisit(v1, Null, "TEST")
     CheckRr Len(msg) = 0 And VisitField(v1, "Result") = "ORDER" And Not IsNull(VisitField(v1, "VisitedAt")), _
             "«·‰ ÌÃ… „‰ „” ‰œ«  «·ÌÊ„: ÿ·»Ì… " & msg, passed, failed, report
@@ -478,11 +478,11 @@ Public Function TestRepRoutes() As Boolean
             RepDiscountLimit(0.5) = 0.05, "”⁄— «·„‰œÊ» ÊÕœ Œ’„Â", passed, failed, report
     CheckRr Len(RepCreditProblem(rep, 50)) = 0 And Len(RepCreditProblem(rep, 150)) > 0, "Õœ «∆ „«‰ «·„‰œÊ»", _
             passed, failed, report
-    CurrentDb.Execute "UPDATE Customers SET CurrentBalance = 90 WHERE CustomerID = " & c1, dbFailOnError
+    CurrentDb.Execute "UPDATE Customers SET CurrentBalance = 90 WHERE CustomerID = " & c1, dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO tmpPOSLines (ProductID, ProductCode, ProductName, Quantity, UnitPrice, LineDiscount, " & _
-                      "Available) VALUES (" & pid & ", 'TEST-RR-P', 'TEST ’‰› «·„‰œÊ»', 1, 18, 0, 0)", dbFailOnError
+                      "Available) VALUES (" & pid & ", 'TEST-RR-P', 'TEST ’‰› «·„‰œÊ»', 1, 18, 0, 0)", dbFailOnError + dbSeeChanges
     msg = PostSaleFromCart(c2, "CREDIT", CASH_METHOD_ID, 0, Null, "TEST", invID)
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CheckRr invID = 0 And InStr(msg, Nz(DbValue(Tr("SELECT s.RepName FROM [@SalesReps] AS s WHERE s.SalesRepID = " & rep)), "#")) > 0, _
             "«·»Ì⁄ «·¬Ã· Ìı—›÷ ›Êﬁ Õœ «∆ „«‰ «·„‰œÊ»", passed, failed, report
     ws.Rollback

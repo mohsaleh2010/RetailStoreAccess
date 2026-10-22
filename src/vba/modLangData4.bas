@@ -18,6 +18,37 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "موازنة السنة: الإيرادات", "Budget of the year: revenue"
+    LangAdd "نتيجة الزيارة غير صحيحة", "The visit result is not valid"
+    LangAdd "نظام تشغيل الجهاز (فارغ", "Operating system of the device (empty"
+    LangAdd "هذا التحويل ليس بالطريق", "This transfer is not in transit"
+    LangAdd "وسيصبح للعميل رصيد دائن", "and the customer will have a credit balance"
+    LangAdd "يمكنك تصفية صناديقك فقط", "You can close your own boxes only"
+    LangAdd "يومية الصندوق التفصيلية", "Detailed cash box day book"
+    LangAdd "يُحذف اليوم المفتوح فقط", "Only an open day is deleted"
+    LangAdd "أدخل تاريخ بدء التشغيل", "Enter the start-up date"
+    LangAdd "أرصدة الأصناف لكل مخزن", "Product balances per warehouse"
+    LangAdd "أقل من إجمالي الفاتورة", "less than the invoice total"
+    LangAdd "أكبر من الرصيد المستحق", "more than the balance due"
+    LangAdd "أكبر من المستحق للمورد", "more than what is due to the supplier"
+    LangAdd "إعادة طباعة آخر فاتورة", "Reprint the last invoice"
+    LangAdd "إقفال كل المستندات حتى", "Close all documents up to"
+    LangAdd "اختر الجهاز من القائمة", "Choose the computer from the list"
+    LangAdd "اختر الحركة من القائمة", "Choose the move from the list"
+    LangAdd "اختر الحساب، ثم الفترة", "Choose the account, then the period"
+    LangAdd "اختر سطرًا من الموازنة", "Choose a budget line"
+    LangAdd "اختر فاتورة شراء أولًا", "Choose a purchase invoice first"
+    LangAdd "اختر فترة لا إقرار لها", "Choose a period without a return"
+    LangAdd "اختر ملف المفتاح الخاص", "Choose the private key file"
+    LangAdd "اختر منتجًا من القائمة", "Choose a product from the list"
+    LangAdd "استرداد نقدي من المورد", "Cash refund from the supplier"
+    LangAdd "استعادة النسخة المحددة", "Restore the selected backup"
+    LangAdd "اسم العملة بالإنجليزية", "Currency name in English"
+    LangAdd "اسم المحل من الإعدادات", "Store name from the settings"
+    LangAdd "اسم نوع المصروف الجديد", "Name of the new expense type"
+    LangAdd "الإذن لم يعد مُرحَّلًا", "The note is no longer posted"
+    LangAdd "الباركود أو كود المنتج", "Barcode or product code"
+    LangAdd "الباقي في السيارة الآن", "Left in the van now"
     LangAdd "البنك (التحصيل / الصرف", "Bank (collection / payment"
     LangAdd "الحسابات: مجموع الدائن", "Accounts: total credit"
     LangAdd "الحسابات: مجموع المدين", "Accounts: total debit"
@@ -107,6 +138,9 @@ Private Sub D4_1()
     LangAdd "تكلفة البضاعة المباعة", "Cost of goods sold"
     LangAdd "تم تسجيل ارتداد الشيك", "The bounce of the cheque was recorded"
     LangAdd "تم تسجيل سداد الضريبة", "The VAT payment was recorded"
+End Sub
+
+Private Sub D4_2()
     LangAdd "تمت النسخة الاحتياطية", "Backup done"
     LangAdd "توقف السكربت في الجزء", "The script stopped at part"
     LangAdd "جلسة الجرد غير موجودة", "The count session does not exist"
@@ -128,6 +162,7 @@ Private Sub D4_1()
     LangAdd "لا توجد تعديلات للحفظ", "There are no changes to save"
     LangAdd "لا مبيعات آجلة في آخر", "No credit sales in the last"
     LangAdd "مبلغ مستحق على العميل", "an amount due from the customer"
+    LangAdd "مجلد النسخ على الخادم", "Backup folder on the server"
     LangAdd "مراكز التكلفة والفروع", "Cost centers and branches"
     LangAdd "مركز من يُنشئ المصروف", "Center of the user who creates the expense"
     LangAdd "مسير عمولات المندوبين", "Sales rep commission run"
@@ -138,9 +173,6 @@ Private Sub D4_1()
     LangAdd "مندوب   صافي المبيعات", "sales reps   Net sales"
     LangAdd "نسبة السيولة (التداول", "Liquidity (current) ratio"
     LangAdd "نسبة العمولة بين 0% و", "The commission rate is between 0% and"
-End Sub
-
-Private Sub D4_2()
     LangAdd "يجب تغيير كلمة المرور", "The password must be changed"
     LangAdd "يوجد مسير عمولات لشهر", "A commission run for the month"
     LangAdd "يوم المندوب غير مفتوح", "The rep day is not open"
@@ -229,6 +261,9 @@ Private Sub D4_2()
     LangAdd "إقفال حتى هذا اليوم", "Close up to this day"
     LangAdd "إيصال، وتغيّرت حالة", "receipts, status changed for"
     LangAdd "اختر الحساب المقابل", "Choose the contra account"
+End Sub
+
+Private Sub D4_3()
     LangAdd "اختر الصندوق واليوم", "Choose the box and the day"
     LangAdd "اختر الفئة ثم الصنف", "Choose the category, then the item"
     LangAdd "اختر المخزن المرسِل", "Choose the sending warehouse"
@@ -250,6 +285,7 @@ Private Sub D4_2()
     LangAdd "الكافيهات (شاشة لمس", "Cafes (touch screen"
     LangAdd "المبيعات بدون ضريبة", "Sales without VAT"
     LangAdd "المبيعات حسب المنتج", "Sales by product"
+    LangAdd "المجلد الافتراضي لـ", "The default folder of"
     LangAdd "المخزون حسب التصنيف", "Stock by category"
     LangAdd "المدفوع للمورد الآن", "Paid to the supplier now"
     LangAdd "المسير مصروف بالفعل", "The run is already paid"
@@ -261,9 +297,6 @@ Private Sub D4_2()
     LangAdd "تسجيل مصروفات المحل", "Record the expenses of the store"
     LangAdd "تسليم للمالك (تسوية", "Hand over to the owner (settlement"
     LangAdd "تصفية يومية الكاشير", "Daily cashier closing"
-End Sub
-
-Private Sub D4_3()
     LangAdd "تعذر استلام التحويل", "Could not receive the transfer"
     LangAdd "تعذر تحديث المؤشرات", "Could not refresh the indicators"
     LangAdd "تعذر رسم الإحصائيات", "Could not draw the statistics"
@@ -351,6 +384,9 @@ Private Sub D4_3()
     LangAdd "حذف آخر فترة مالية", "Delete the last fiscal period"
     LangAdd "حصة المنشأة (سعودي", "Employer share (Saudi"
     LangAdd "حصة الموظف السعودي", "Saudi employee share"
+End Sub
+
+Private Sub D4_4()
     LangAdd "خصم من رصيد العميل", "Deduct from the customer balance"
     LangAdd "خصم من رصيد المورد", "Deduct from the supplier balance"
     LangAdd "ربط تلقائي بالأقدم", "Auto-link to the oldest"
@@ -384,9 +420,6 @@ Private Sub D4_3()
     LangAdd "وحدات بيع المنتجات", "Product sale units"
     LangAdd "يستلم التحويل أمين", "The transfer is received by the custodian of"
     LangAdd "يومًا عن استحقاقها", "days after its due date"
-End Sub
-
-Private Sub D4_4()
     LangAdd "أسطر القيد اليدوي", "Manual entry lines"
     LangAdd "أسطر طلبية العميل", "Customer order lines"
     LangAdd "أسطر مسير الرواتب", "Payroll lines"
@@ -474,6 +507,9 @@ Private Sub D4_4()
     LangAdd "مستند مفتوح. اختر", "An open document. Choose"
     LangAdd "ملف سكربت القاعدة", "Database script file"
     LangAdd "نسبة الضريبة ليست", "The VAT rate is not"
+End Sub
+
+Private Sub D4_5()
     LangAdd "نشاط المنشأة (مثل", "Business activity (such as"
     LangAdd "و - لتعديل الكمية", "and - to change the quantity"
     LangAdd "يسمح بالبيع الآجل", "Allows credit sales"
@@ -507,9 +543,6 @@ Private Sub D4_4()
     LangAdd "البيئة التجريبية", "Test environment"
     LangAdd "التصفية: المتوقع", "Closing: expected"
     LangAdd "الخزينة الرئيسية", "Main treasury"
-End Sub
-
-Private Sub D4_5()
     LangAdd "الخزينة المستلمة", "Receiving treasury"
     LangAdd "الرصيد الافتتاحي", "Opening balance"
     LangAdd "السعر بدون ضريبة", "Price without VAT"
@@ -597,6 +630,9 @@ Private Sub D4_5()
     LangAdd "أرصدة أول المدة", "Opening balances"
     LangAdd "أسعار المندوبين", "Rep price lists"
     LangAdd "أكبر من المتبقي", "more than the remaining"
+End Sub
+
+Private Sub D4_6()
     LangAdd "أنواع المصروفات", "Expense types"
     LangAdd "أهداف المندوبين", "Sales rep targets"
     LangAdd "أول صندوق كاشير", "First cashier box"
@@ -630,9 +666,6 @@ Private Sub D4_5()
     LangAdd "الشهادة الفعلية", "Production certificate"
     LangAdd "الشيك غير موجود", "The cheque does not exist"
     LangAdd "الصندوق غير نشط", "The box is not active"
-End Sub
-
-Private Sub D4_6()
     LangAdd "الضريبة بالعملة", "VAT in currency"
     LangAdd "العميل (اختياري", "Customer (optional"
     LangAdd "العميل / المورد", "Customer / supplier"
@@ -720,6 +753,9 @@ Private Sub D4_6()
     LangAdd "اختبار الاتصال", "Test the connection"
     LangAdd "اختر بند الصرف", "Choose the payment item"
     LangAdd "اختر بند القبض", "Choose the receipt item"
+End Sub
+
+Private Sub D4_7()
     LangAdd "استلام من مورد", "Receipt from a supplier"
     LangAdd "اعتماد الإقرار", "Approve the return"
     LangAdd "اعتماد التسوية", "Approve the reconciliation"
@@ -753,56 +789,7 @@ Private Sub D4_6()
     LangAdd "القيمة الجديدة", "New value"
     LangAdd "القيمة والحالة", "Value and status"
     LangAdd "القيود اليدوية", "Manual entries"
-End Sub
-
-Private Sub D4_7()
     LangAdd "الكمية الحالية", "Current quantity"
     LangAdd "الكمية الفعلية", "Actual quantity"
     LangAdd "الكمية المباعة", "Quantity sold"
-    LangAdd "الكمية المسجلة", "Recorded quantity"
-    LangAdd "المبلغ المدفوع", "Amount paid"
-    LangAdd "المبلغ المربوط", "Linked amount"
-    LangAdd "المبلغ المستلم", "Amount received"
-    LangAdd "المتاح للإرجاع", "Available to return"
-    LangAdd "المخزن الرئيسي", "Main warehouse"
-    LangAdd "المخزن المستلم", "Receiving warehouse"
-    LangAdd "المخزون الحالي", "Current stock"
-    LangAdd "المستحق للمورد", "Due to the supplier"
-    LangAdd "المستخدم (فارغ", "User (empty"
-    LangAdd "المسمى الوظيفي", "Job title"
-    LangAdd "المعمول بها في", "applied in"
-    LangAdd "المندوب (سيارة", "Sales rep (van"
-    LangAdd "النسبة السنوية", "Yearly rate"
-    LangAdd "النقدية بالعدّ", "Cash counted"
-    LangAdd "برنامج التشغيل", "Driver"
-    LangAdd "بمتوسط التكلفة", "at average cost"
-    LangAdd "تأكيد الاستلام", "Confirm the receipt"
-    LangAdd "تاريخ الاعتماد", "Approval date"
-    LangAdd "تاريخ الفاتورة", "Invoice date"
-    LangAdd "تحديث الإجمالي", "Refresh total"
-    LangAdd "تحصيل في البنك", "Collection in the bank"
-    LangAdd "تذييل الفاتورة", "Invoice footer"
-    LangAdd "تسجيل شيك جديد", "Record a new cheque"
-    LangAdd "تصفيات الكاشير", "Cashier closings"
-    LangAdd "تعذر حفظ السند", "Could not save the voucher"
-    LangAdd "تعذر حفظ الشيك", "Could not save the cheque"
-    LangAdd "تعذر حفظ القيد", "Could not save the entry"
-    LangAdd "تفاصيل العملية", "Transaction details"
-    LangAdd "تفعيل البرنامج", "Program activation"
-    LangAdd "تقرير الزيارات", "Visits report"
-    LangAdd "تكلفة المبيعات", "Cost of sales"
-    LangAdd "تم إقفال السنة", "The year was closed"
-    LangAdd "تم إلغاء الصرف", "The payment was cancelled"
-    LangAdd "تم الحفظ بنجاح", "Saved successfully"
-    LangAdd "تم ترحيل الجرد", "The count was posted"
-    LangAdd "تم تسجيل إهلاك", "Depreciation recorded for"
-    LangAdd "تم تسجيل الشيك", "The cheque was recorded"
-    LangAdd "تم تعطيل السجل", "The record was deactivated"
-    LangAdd "تم حفظ التصفية", "The closing was saved"
-    LangAdd "تم حفظ التعديل", "The change was saved"
-    LangAdd "تم حفظ المرتجع", "The return was saved"
-    LangAdd "جزاءات وخصومات", "Penalties and deductions"
-    LangAdd "حد إعادة الطلب", "Reorder level"
-    LangAdd "خسارة الانخفاض", "Impairment loss"
-    LangAdd "خيارات المشروب", "Drink options"
 End Sub

@@ -215,7 +215,7 @@ Public Function LoginUser(ByVal Username As String, ByVal Password As String, By
     EmployeeID = 0
     Calendar = vbCalGreg
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM Employees WHERE Username = " & SqlText(Trim$(Username)), _
-                                     dbOpenDynaset)
+                                     dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         LoginUser = "«”„ «·„” Œœ„ √Ê ﬂ·„… «·„—Ê— €Ì— ’ÕÌÕ…."
         rs.Close
@@ -273,7 +273,7 @@ Public Function SetUserPassword(ByVal EmployeeID As Long, ByVal NewPassword As S
                                 ByVal MustChangeNext As Boolean) As String
     ' Stores a new salt and hash, clears the lock. "" on success.
     Dim rs As DAO.Recordset, msg As String, salt As String
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM Employees WHERE EmployeeID = " & EmployeeID, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM Employees WHERE EmployeeID = " & EmployeeID, dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         SetUserPassword = "«·„” Œœ„ €Ì— „ÊÃÊœ."
         rs.Close
@@ -335,7 +335,7 @@ Public Sub ResetDeveloperPassword()
         MsgBox Tr("€Ì— „ «Õ ›Ì „·› ACCDE. €Ì¯— ﬂ·„… «·„—Ê— „‰ ‰”Œ ﬂ ACCDB."), vbExclamation + MSG_RTL, Tr(APP_TITLE)
         Exit Sub
     End If
-    id = DbValue("SELECT EmployeeID FROM Employees WHERE IsDeveloper = True")
+    id = DbValue("SELECT EmployeeID FROM Employees WHERE IsDeveloper <> 0")
     If IsNull(id) Then
         MsgBox Tr("·« ÌÊÃœ Õ”«» „»—„Ã »⁄œ. ‘€¯· BuildSchema: Ìÿ·» ﬂ·„… „—Ê—Â ÊÌ‰‘∆Â."), vbExclamation + MSG_RTL, Tr(APP_TITLE)
         Exit Sub
@@ -349,7 +349,7 @@ Public Sub ResetDeveloperPassword()
     End If
     msg = SetUserPassword(CLng(id), pwd, False)
     If Len(msg) = 0 Then
-        CurrentDb.Execute "UPDATE Employees SET IsActive = True WHERE EmployeeID = " & CLng(id), dbFailOnError
+        CurrentDb.Execute "UPDATE Employees SET IsActive = True WHERE EmployeeID = " & CLng(id), dbFailOnError + dbSeeChanges
         MsgBox Tr(" „  €ÌÌ— ﬂ·„… „—Ê— «·„»—„Ã. «œŒ· »«”„ developer Êﬂ·„… «·„—Ê— «·ÃœÌœ…."), vbInformation + MSG_RTL, Tr(APP_TITLE)
     Else
         MsgBox Tr(msg & vbCrLf & "·„ Ì €Ì— ‘Ì¡."), vbExclamation + MSG_RTL, Tr(APP_TITLE)
@@ -369,12 +369,12 @@ End Sub
 
 Public Function IsAdministrator() As Boolean
     IsAdministrator = (Nz(DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & CurrentUserID() & _
-                                  " AND IsActive = True"), 0) = ADMIN_ROLE_ID)
+                                  " AND IsActive <> 0"), 0) = ADMIN_ROLE_ID)
 End Function
 
 Public Function IsDeveloper() As Boolean
     IsDeveloper = Nz(DbValue("SELECT IsDeveloper FROM Employees WHERE EmployeeID = " & CurrentUserID() & _
-                             " AND IsActive = True"), False)
+                             " AND IsActive <> 0"), False)
 End Function
 
 '==============================================================================
@@ -384,7 +384,7 @@ Public Function UsesCustomScreens(Optional ByVal EmployeeID As Long = -1) As Boo
     ' A user whose screens are set one by one in frmUserScreens (never an administrator or the programmer).
     If EmployeeID = -1 Then EmployeeID = CurrentUserID()
     UsesCustomScreens = Nz(DbValue("SELECT CustomScreens FROM Employees WHERE EmployeeID = " & EmployeeID & _
-        " AND IsActive = True AND IsDeveloper = False AND RoleID <> " & ADMIN_ROLE_ID), False)
+        " AND IsActive <> 0 AND IsDeveloper = 0 AND RoleID <> " & ADMIN_ROLE_ID), False)
 End Function
 
 Private Function ScreenTitle(ByVal FormName As String) As Variant
@@ -474,7 +474,7 @@ Public Function ValidateEmployee(ByVal frm As Access.Form) As Boolean
         wasAdmin = (Nz(frm!RoleID.OldValue, 0) = ADMIN_ROLE_ID And Nz(frm!IsActive.OldValue, False))
         staysAdmin = (frm!RoleID.Value = ADMIN_ROLE_ID And frm!IsActive.Value)
         If wasAdmin And Not staysAdmin Then
-            If Nz(DCount("*", "Employees", "RoleID = " & ADMIN_ROLE_ID & " AND IsActive = True AND IsDeveloper = False " & _
+            If Nz(DCount("*", "Employees", "RoleID = " & ADMIN_ROLE_ID & " AND IsActive <> 0 AND IsDeveloper = 0 " & _
                          "AND EmployeeID <> " & id), 0) = 0 Then
                 ShowWarning "ÌÃ» √‰ Ì»ﬁÏ „œÌ— ‰Ÿ«„ ‰‘ÿ Ê«Õœ ⁄·Ï «·√ﬁ·."
                 Exit Function

@@ -152,23 +152,23 @@ Private Sub TestPosting()
     inTrans = True
 
     db.Execute "UPDATE Settings SET StoreName = 'TEST „ Ã—', VATNumber = '300000000000003', " & _
-               "VATRate = 0.15, PricesIncludeVAT = True, AllowNegativeStock = False", dbFailOnError
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+               "VATRate = 0.15, PricesIncludeVAT = True, AllowNegativeStock = 0", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     db.Execute "INSERT INTO Products (ProductCode, ProductName, Barcode, PurchasePrice, AverageCost, " & _
                "SellingPrice, CurrentQuantity, MinimumQuantity) VALUES ('TEST-POS-1', 'TEST „‰ Ã', " & _
-               "'TESTPOS0001', 60, 60, 115, 0, 5)", dbFailOnError
+               "'TESTPOS0001', 60, 60, 115, 0, 5)", dbFailOnError + dbSeeChanges
     pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-POS-1'")
     ApplyStockMovement db, pid, 100, TT_OPENING, 60, "MANUAL", 0, "TEST-OPEN"
     Call Record(Stock(pid) = 100, "—’Ìœ «›  «ÕÌ 100 ﬁÿ⁄…")
     db.Execute "INSERT INTO Customers (CustomerName, AllowCredit, CreditLimit) VALUES " & _
-               "('TEST ⁄„Ì· ¬Ã·', True, 1000)", dbFailOnError
+               "('TEST ⁄„Ì· ¬Ã·', True, 1000)", dbFailOnError + dbSeeChanges
     cid = DbValue("SELECT CustomerID FROM Customers WHERE CustomerName = 'TEST ⁄„Ì· ¬Ã·'")
 
     ' --- cash sale: 10 x 115 (incl. VAT)
     CartAdd pid, 10
     msg = PostSaleFromCart(1, "CASH", 1, 0, Null, "", cashInv)
     Call Record(Len(msg) = 0 And cashInv > 0, "Õ›Ÿ ›« Ê—… ‰ﬁœÌ… " & msg)
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     Call Record(Stock(pid) = 90, "»⁄œ »Ì⁄ 10 ﬁÿ⁄ √’»Õ «·„Œ“Ê‰ 90")
     Call Record(Inv(cashInv, "TotalAmount") = 1150 And Inv(cashInv, "Tax") = 150 And _
                 Inv(cashInv, "TaxableAmount") = 1000, "«·≈Ã„«·Ì 1150 = 1000 + ÷—Ì»… 150")
@@ -191,18 +191,18 @@ Private Sub TestPosting()
     Call Record(Len(msg) > 0 And Stock(pid) = 90, "—›÷ »Ì⁄ ‰ﬁœÌ »„»·€ „œ›Ê⁄ √ﬁ· „‰ «·≈Ã„«·Ì")
     msg = PostSaleFromCart(1, "CREDIT", 1, 0, 0, "", dummy)
     Call Record(Len(msg) > 0, "—›÷ «·»Ì⁄ «·¬Ã· ··⁄„Ì· «·‰ﬁœÌ")
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CartAdd pid, 500
     g_AutoAnswer = False
     msg = PostSaleFromCart(1, "CASH", 1, 0, Null, "", dummy)
     g_AutoAnswer = True
     Call Record(Len(msg) > 0 And Stock(pid) = 90, "„‰⁄ «·»Ì⁄ »√ﬂÀ— „‰ «·„ Ê›— »œÊ‰ „Ê«›ﬁ… «·„œÌ—")
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
 
     ' --- credit sale: 2 x 115 = 230, paid 50
     CartAdd pid, 2
     msg = PostSaleFromCart(cid, "CREDIT", 1, 0, 50, "", creditInv)
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     Call Record(Len(msg) = 0 And Inv(creditInv, "RemainingAmount") = 180, "»Ì⁄ ¬Ã·: «·„ »ﬁÌ 180 " & msg)
     Call Record(Balance(cid) = 180, "—’Ìœ «·⁄„Ì· «·¬Ã· 180")
     Call Record(Stock(pid) = 88, "«·„Œ“Ê‰ 88")
@@ -213,10 +213,10 @@ Private Sub TestPosting()
     Call Record(Len(PostCustomerPayment(1, 10, 1, "", dummy)) > 0, "—›÷ ”‰œ ﬁ»÷ ⁄·Ï «·⁄„Ì· «·‰ﬁœÌ")
 
     ' --- return 1 unit of the credit sale to stock, credited to the account
-    db.Execute "DELETE FROM tmpReturnLines", dbFailOnError
+    db.Execute "DELETE FROM tmpReturnLines", dbFailOnError + dbSeeChanges
     db.Execute "INSERT INTO tmpReturnLines (SalesDetailID, ProductID, ReturnQty, ReturnToStock) " & _
                "SELECT SalesDetailID, ProductID, 1, True FROM SalesInvoiceDetails WHERE SalesInvoiceID = " & _
-               creditInv, dbFailOnError
+               creditInv, dbFailOnError + dbSeeChanges
     Call Record(Len(PostSalesReturn(creditInv, "", "CREDIT", Null, dummy)) > 0, "—›÷ „— Ã⁄ »œÊ‰ ”»»")
     msg = PostSalesReturn(creditInv, "TEST ≈—Ã«⁄", "CREDIT", Null, retID)
     Call Record(Len(msg) = 0 And retID > 0, "Õ›Ÿ ≈‘⁄«— œ«∆‰ " & msg)
@@ -224,18 +224,18 @@ Private Sub TestPosting()
                 DbValue("SELECT InvoiceTypeCode FROM SalesReturns WHERE SalesReturnID = " & retID) = "381", _
                 "ﬁÌ„… «·„— Ã⁄ 115 Ê‰Ê⁄Â ≈‘⁄«— œ«∆‰ 381")
     Call Record(Stock(pid) = 89 And Balance(cid) = -35, "«·„— Ã⁄ √⁄«œ ﬁÿ⁄… ··„Œ“Ê‰ (89) ÊŒ’„ 115 „‰ «·—’Ìœ (-35)")
-    db.Execute "UPDATE tmpReturnLines SET ReturnQty = 5", dbFailOnError
+    db.Execute "UPDATE tmpReturnLines SET ReturnQty = 5", dbFailOnError + dbSeeChanges
     Call Record(Len(PostSalesReturn(creditInv, "TEST", "CREDIT", Null, dummy)) > 0, _
                 "—›÷ ≈—Ã«⁄ √ﬂÀ— „‰ «·ﬂ„Ì… «·„ »ﬁÌ…")
 
     Call Record(DbValue("SELECT COUNT(*) FROM IntegrityCheckQuery") = integrityBefore, "›Õ’ «·”·«„… ·« ÌÃœ √Ì „‘ﬂ·… ÃœÌœ…")
     Call Record(CurrentDb.OpenRecordset("SELECT COUNT(*) FROM qrySalesDocPrint WHERE DocKind = 'SALE' " & _
-                "AND DocID = " & cashInv)(0) = 1, "»Ì«‰«  ÿ»«⁄… «·›« Ê—…")
+                "AND DocID = " & cashInv, dbOpenDynaset, dbSeeChanges)(0) = 1, "»Ì«‰«  ÿ»«⁄… «·›« Ê—…")
 
     ws.Rollback
     inTrans = False
-    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError
-    db.Execute "DELETE FROM tmpReturnLines", dbFailOnError
+    db.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
+    db.Execute "DELETE FROM tmpReturnLines", dbFailOnError + dbSeeChanges
     Call Record(DbValue("SELECT COUNT(*) FROM Products WHERE ProductCode = 'TEST-POS-1'") = 0, "«· —«Ã⁄ ⁄‰ ﬂ· »Ì«‰«  «·«Œ »«—")
     Exit Sub
 EH:
@@ -250,9 +250,9 @@ End Sub
 Private Sub TestPOSScreen()
     Dim frm As Access.Form, pid As Long
     On Error GoTo EH
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, Barcode, SellingPrice) VALUES " & _
-                      "('TEST-POS-2', 'TEST „‰ Ã ‘«‘…', 'TESTPOS0002', 11.5)", dbFailOnError
+                      "('TEST-POS-2', 'TEST „‰ Ã ‘«‘…', 'TESTPOS0002', 11.5)", dbFailOnError + dbSeeChanges
     pid = DLookup("ProductID", "Products", "ProductCode = 'TEST-POS-2'")
     DoCmd.OpenForm "frmPOS", acNormal, , , , acHidden
     Set frm = Forms("frmPOS")
@@ -273,14 +273,14 @@ Private Sub TestPOSScreen()
     RemoveCurrentLine frm!subLines.Form
     Call Record(DCount("*", "tmpPOSLines") = 0 And frm!lblTotal.Caption = Format$(0, "#,##0.00"), "Õ–› «·”ÿ—")
     DoCmd.Close acForm, "frmPOS", acSaveNo
-    CurrentDb.Execute "DELETE FROM Products WHERE ProductID = " & pid, dbFailOnError
+    CurrentDb.Execute "DELETE FROM Products WHERE ProductID = " & pid, dbFailOnError + dbSeeChanges
     Exit Sub
 EH:
     Fail "‘«‘… «·»Ì⁄: Œÿ√ " & Err.Number & ": " & Err.Description
     On Error Resume Next
     DoCmd.Close acForm, "frmPOS", acSaveNo
-    CurrentDb.Execute "DELETE FROM tmpPOSLines"
-    CurrentDb.Execute "DELETE FROM Products WHERE ProductCode = 'TEST-POS-2'"
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbSeeChanges
+    CurrentDb.Execute "DELETE FROM Products WHERE ProductCode = 'TEST-POS-2'", dbSeeChanges
 End Sub
 
 '------------------------------------------------------------------------------
@@ -289,7 +289,7 @@ End Sub
 Private Sub CartAdd(ByVal ProductID As Long, ByVal Qty As Currency)
     CurrentDb.Execute "INSERT INTO tmpPOSLines (ProductID, ProductCode, ProductName, Quantity, UnitPrice, " & _
         "LineDiscount, Available) SELECT ProductID, ProductCode, ProductName, " & Trim$(Str$(Qty)) & _
-        ", SellingPrice, 0, CurrentQuantity FROM Products WHERE ProductID = " & ProductID, dbFailOnError
+        ", SellingPrice, 0, CurrentQuantity FROM Products WHERE ProductID = " & ProductID, dbFailOnError + dbSeeChanges
 End Sub
 
 Private Function Stock(ByVal ProductID As Long) As Currency

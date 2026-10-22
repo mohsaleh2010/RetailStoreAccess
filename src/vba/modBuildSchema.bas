@@ -30,7 +30,7 @@ Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,Ro
     "BankTransactions,Cheques,FixedAssets,DepreciationRuns,AssetDepreciations,AssetRevaluations,AssetTransfers,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings,Accounts,JournalSourceTypes," & _
     "JournalEntries,JournalLines,PeriodClosings,FiscalPeriods,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,OpeningBalances,OpeningStock,TransactionTypes,InventoryTransactions,StockTransfers,StockTransferLines,StockParties,StockDocuments,StockDocumentLines,StockNotes,StockNoteLines,SalesOrders,RepDays,RouteStops,RepVisits,RepPrices,SalesOrderLines,StockCounts," & _
     "StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=70;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;Customers=25;Products=25;SalesInvoices=47;SalesInvoiceDetails=14;SalesReturns=40;SalesReturnDetails=14;PurchaseInvoices=24;PurchaseInvoiceDetails=11;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=71;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;Customers=25;Products=25;SalesInvoices=47;SalesInvoiceDetails=14;SalesReturns=40;SalesReturnDetails=14;PurchaseInvoices=24;PurchaseInvoiceDetails=11;" & _
     "PurchaseReturns=23;PurchaseReturnDetails=11;CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;BankReconciliations=12;BankClearings=7;" & _
     "CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;TransactionTypes=6;InventoryTransactions=14;" & _
     "StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=14;StockNoteLines=8;SalesOrders=13;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
@@ -53,11 +53,25 @@ Private m_inTrans As Boolean
 '------------------------------------------------------------------------------
 ' Public entry points
 '------------------------------------------------------------------------------
+Private Function TablesOnServer() As Boolean
+    ' The tables of this front-end are linked to SQL Server (docs/70).
+    Dim db As DAO.Database
+    On Error Resume Next
+    Set db = CurrentDb
+    TablesOnServer = (Left$(db.TableDefs("Settings").Connect, 5) = "ODBC;")
+End Function
+
 Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolean
     On Error GoTo EH
     If Len(BackEndPath) = 0 Then BackEndPath = DefaultBackEndPath()
     If StrComp(BackEndPath, CurrentProject.FullName, vbTextCompare) = 0 Then
         MsgBox "مسار ملف البيانات يجب أن يختلف عن ملف الواجهة الحالي.", vbExclamation + MSG_RTL
+        Exit Function
+    End If
+    If TablesOnServer() Then                 ' plan 5C: never relink a server front-end to the old Access file
+        MsgBox "البرنامج يعمل على SQL Server: قاعدة الخادم تُحدَّث من شاشة «SQL Server» بزر «تجهيز القاعدة»." & vbCrLf & _
+               "BuildSchema لم يغيّر شيئًا.", vbInformation + MSG_RTL, "BuildSchema"
+        BuildSchema = True
         Exit Function
     End If
 
@@ -498,7 +512,7 @@ Private Sub EnsureDeveloperUser()
     ' Created only with the password typed now: there is never a programmer account without one.
     ' (PasswordHash / NewSalt of modSecurity through Application.Run: no compile-time dependency.)
     Dim pwd As String, salt As String
-    If DCountIn("Employees", "[IsDeveloper] = True") > 0 Then Exit Sub
+    If DCountIn("Employees", "[IsDeveloper] <> 0") > 0 Then Exit Sub
     If DCountIn("Employees", "[Username] = 'developer'") > 0 Then
         LogLine "تنبيه: يوجد مستخدم باسم developer وليس هو المبرمج؛ لم يُنشأ حساب المبرمج."
         Exit Sub
@@ -850,6 +864,8 @@ Private Sub CreateTable_Settings()
              "", "", "مصر: الرقم السري لفلاشة التوقيع", "فارغ إذا كان برنامج التوقيع يطلبه بنفسه"
     AddField tdf, "EInvoiceEnvironment", "TEXT", 12, True, """TEST""", _
              "In (""TEST"",""SIMULATION"",""PRODUCTION"")", "TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية", "بيئة الفاتورة الإلكترونية", "السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45)"
+    AddField tdf, "ServerLiveSince", "DATETIME", 0, False, "", _
+             "", "", "البيانات الفعلية على SQL Server منذ", "يُكتب على الخادم عند ربط البرنامج به (docs/70): لا يُنقل فوقه من ملف Access، والأجهزة الأخرى تُربط بلا مطابقة"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
     EndTable tdf, "إعدادات المحل: سجل واحد فقط يحتوي بيانات المحل الضريبية وإعدادات التشغيل.", "", ""
 End Sub

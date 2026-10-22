@@ -208,8 +208,8 @@ class DataTests(unittest.TestCase):
         self.assertIn("If Not ProductTracksStock(ProductID) Then Exit Sub", body("modSales", "Public Sub ApplyStockMovement("))
         self.assertIn("If Not ProductTracksStock(ProductIDs(i)) Then need = 0",
                       body("modSales", "Public Function CheckStockAvailable("))
-        self.assertIn("p.TrackStock = True", Q.query("LowStockQuery").sql)
-        self.assertIn('scope = "IsActive = True AND TrackStock = True"', read("modPurchases"))
+        self.assertIn("p.TrackStock <> 0", Q.query("LowStockQuery").sql)
+        self.assertIn('scope = "IsActive <> 0 AND TrackStock <> 0"', read("modPurchases"))
 
     def test_order_details_are_posted(self):
         sig = body("modSales", "Public Function PostSaleFromCart(")
@@ -234,9 +234,9 @@ class CafeTests(unittest.TestCase):
 
     def test_add_on_categories_stay_out_of_the_category_tiles(self):
         text = read("modTouchPOS")
-        self.assertIn("c.IsAddOn = False AND EXISTS", body("modTouchPOS", "Public Sub LoadCategories("))
-        self.assertIn("c.IsAddOn = False AND", body("modTouchPOS", "Public Sub TouchLoad("))
-        self.assertIn("WHERE c.IsAddOn = True", body("modTouchPOS", "Public Sub ItemLoad("))
+        self.assertIn("c.IsAddOn = 0 AND EXISTS", body("modTouchPOS", "Public Sub LoadCategories("))
+        self.assertIn("c.IsAddOn = 0 AND", body("modTouchPOS", "Public Sub TouchLoad("))
+        self.assertIn("WHERE c.IsAddOn <> 0", body("modTouchPOS", "Public Sub ItemLoad("))
         self.assertIn('"   + "', body("modTouchPOS", "Public Sub ItemConfirm("))
 
     def test_notes_reach_the_cart_and_the_receipt(self):

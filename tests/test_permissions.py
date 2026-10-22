@@ -109,13 +109,13 @@ class EnforcementTests(unittest.TestCase):
         sec = read("modSecurity")
         has = proc(read("modCommon"), "HasPermission")
         self.assertLess(has.index("IsDeveloper"), has.index("CustomScreens"), "the programmer first")
-        self.assertIn("u.CanOpen = True AND", has)
+        self.assertIn("u.CanOpen <> 0 AND", has)
         self.assertIn("roleID <> ADMIN_ROLE_ID And", has, "an administrator is never limited")
         opener = proc(sec, "CanOpenScreen")
         self.assertLess(opener.index("IsDeveloper()"), opener.index("UsesCustomScreens()"))
         self.assertIn('If FormName = "frmActivation" Then', opener)
         custom = proc(sec, "UsesCustomScreens")
-        self.assertIn("IsDeveloper = False AND RoleID <> ", custom)
+        self.assertIn("IsDeveloper = 0 AND RoleID <> ", custom)
         action = proc(sec, "CanScreenAction")
         self.assertIn('"SELECT CanOpen AND Can" & word', action)
         self.assertIn('"SELECT Has" & word', action)
@@ -147,17 +147,17 @@ class DeveloperTests(unittest.TestCase):
         text = read("modBuildSchema")
         self.assertIn("EnsureDeveloperUser", text)
         body = proc(text, "EnsureDeveloperUser")
-        self.assertIn("[IsDeveloper] = True", body)
+        self.assertIn("[IsDeveloper] <> 0", body)
         self.assertIn("'developer', 1, 1, False, True, True, '\" & salt & \"', '\" & _", body)
         self.assertIn('Application.Run("PasswordHash", pwd, salt)', body)
         self.assertIn("If Len(pwd) = 0 Then", body, "cancel: no account rather than one without a password")
 
     def test_hidden_from_users_screen(self):
         text = read("modForms")
-        self.assertIn('frm.RecordSource = "SELECT * FROM Employees WHERE IsDeveloper = False"', proc(text, "FormLoad"))
-        self.assertIn('"t.IsDeveloper = False AND ("', proc(text, "RefreshList"))
+        self.assertIn('frm.RecordSource = "SELECT * FROM Employees WHERE IsDeveloper = 0"', proc(text, "FormLoad"))
+        self.assertIn('"t.IsDeveloper = 0 AND ("', proc(text, "RefreshList"))
         import forms_security as FS
-        self.assertIn("e.IsDeveloper = False", FS.USER_ROWS)
+        self.assertIn("e.IsDeveloper = 0", FS.USER_ROWS)
 
     def test_never_without_a_password(self):
         body = proc(read("modSecurity"), "LoginUser")

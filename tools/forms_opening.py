@@ -14,7 +14,7 @@ MONEY = {"Format": "#,##0.00"}
 # the general accounts: posting accounts that have no opening balance of their own elsewhere
 # (customers 1300, suppliers 2100, stock 1400, the opening balances account 3900, cash boxes, banks)
 OPENING_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a "
-                    "WHERE IsPosting = True AND IsActive = True AND AccountCode NOT IN (1300, 2100, 1400, 3900) "
+                    "WHERE IsPosting <> 0 AND IsActive <> 0 AND AccountCode NOT IN (1300, 2100, 1400, 3900) "
                     "AND AccountCode NOT BETWEEN 110001 AND 119999 AND AccountCode NOT BETWEEN 120001 AND 129999 "
                     "AND AccountCode NOT BETWEEN 140001 AND 149999 "
                     "ORDER BY TreeKey")
@@ -23,7 +23,7 @@ OPENING_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName 
 PARTY_GRIDS = [
     ("CUSTOMERS", "frmOpeningCustomers", "Customers", "CustomerID",
      "SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c", "CurrentBalance",
-     "SELECT CustomerID, OpeningBalance, CurrentBalance, CreatedAt FROM Customers WHERE IsSystem = False "
+     "SELECT CustomerID, OpeningBalance, CurrentBalance, CreatedAt FROM Customers WHERE IsSystem = 0 "
      "ORDER BY CustomerID",
      '=IIf([OpeningBalance]>0,"عليه (مدين)",IIf([OpeningBalance]<0,"له (دائن)",""))'),
     ("SUPPLIERS", "frmOpeningSuppliers", "Suppliers", "SupplierID",
@@ -43,9 +43,9 @@ PARTS = [("ACCOUNTS", "الحسابات العامة"), ("CUSTOMERS", "العم�
          ("BOXES", "الصناديق"), ("BANKS", "البنوك"), ("STOCK", "المخزون")]
 # the stock part (docs/53): the products that track stock, by code and name
 STOCK_PRODUCTS = ("SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p "
-                  "WHERE p.TrackStock = True ORDER BY p.ProductName")
+                  "WHERE p.TrackStock <> 0 ORDER BY p.ProductName")
 # the warehouse of each line (docs/57): empty = the main warehouse
-STOCK_WAREHOUSES = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True "
+STOCK_WAREHOUSES = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive <> 0 "
                     "ORDER BY w.WarehouseID")
 # its buttons, shown with the stock part only: name, caption, call
 STOCK_BUTTONS = [("btnStockFill", "كل الأصناف", "OpeningStockFill Me"),

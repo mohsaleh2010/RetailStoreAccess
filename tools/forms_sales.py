@@ -8,12 +8,12 @@ from forms import (Control, FormModel, Sym, ICONS, button, cm, currency_pair, fi
 
 PAYMENT_TYPES = "CASH;نقدي;CREDIT;آجل"
 REFUND_TYPES = "CASH;رد نقدي;CREDIT;خصم من رصيد العميل"
-PAYMENT_ROWS = ("SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive = True "
+PAYMENT_ROWS = ("SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p WHERE p.IsActive <> 0 "
                 "ORDER BY p.SortOrder")
 POS_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, SellingPrice "
-                    "FROM Products WHERE IsActive = True ORDER BY ProductName")
-CREDIT_CUSTOMER_ROWS = ("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsSystem = False "
-                        "AND c.IsActive = True ORDER BY c.CustomerName")
+                    "FROM Products WHERE IsActive <> 0 ORDER BY ProductName")
+CREDIT_CUSTOMER_ROWS = ("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsSystem = 0 "
+                        "AND c.IsActive <> 0 ORDER BY c.CustomerName")
 
 
 def grid_row(m: FormModel, columns: List[Tuple[str, str, float, dict, list]], row_h: int):

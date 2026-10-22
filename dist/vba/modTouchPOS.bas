@@ -94,6 +94,8 @@ Public Function ImagesFolder() As String
     ImagesFolder = Trim$(Nz(SettingValue("ImagesFolder"), ""))
     If Len(ImagesFolder) > 0 Then Exit Function
     be = BackendFilePath()
+    If IsLinkedToServer() Then be = AccessBackEndPath()      ' on SQL Server: next to the Access data file it came from
+    If Len(be) = 0 Then be = CurrentProject.FullName
     If InStrRev(be, "\") > 0 Then ImagesFolder = Left$(be, InStrRev(be, "\")) & "Images"
 End Function
 
@@ -126,15 +128,15 @@ Public Sub TouchLoad(ByVal frm As Access.Form)
     EnsureLocalTables
     If DCount("*", "tmpPOSLines") > 0 And Not g_SilentMode Then
         If Not AskYesNo("ÌÊÃœ ÿ·» €Ì— „ﬂ „· „‰ Ã·”… ”«»ﬁ…. Â·  —Ìœ «” ﬂ„«·Âø") Then
-            CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+            CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
         End If
     End If
     ResetSaleHeader frm                                   ' modPOS: also resets the order (ResetTouchOrder)
     m_catPage = 0
     m_prodPage = 0
-    m_catID = Nz(DbValue(Tr("SELECT TOP 1 c.CategoryID FROM [@Categories] AS c WHERE c.IsActive = True AND " & _
-                         "c.IsAddOn = False AND " & _
-                         "EXISTS (SELECT 1 FROM Products AS p WHERE p.CategoryID = c.CategoryID AND p.IsActive = True) " & _
+    m_catID = Nz(DbValue(Tr("SELECT TOP 1 c.CategoryID FROM [@Categories] AS c WHERE c.IsActive <> 0 AND " & _
+                         "c.IsAddOn = 0 AND " & _
+                         "EXISTS (SELECT 1 FROM Products AS p WHERE p.CategoryID = c.CategoryID AND p.IsActive <> 0) " & _
                          "ORDER BY c.SortOrder, c.CategoryName")), 0)          ' the same order as the tiles
     LoadCategories frm
     LoadProducts frm
@@ -255,8 +257,8 @@ Public Sub LoadCategories(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset, n As Long, i As Long, k As String, sel As Boolean, tiles As Long
     tiles = TileCount(frm, "btnCat")
     Set rs = CurrentDb.OpenRecordset(Tr("SELECT c.CategoryID, c.CategoryName, c.ImagePath, c.TileColor " & _
-        "FROM [@Categories] AS c WHERE c.IsActive = True AND c.IsAddOn = False AND EXISTS (SELECT 1 FROM Products AS p " & _
-        "WHERE p.CategoryID = c.CategoryID AND p.IsActive = True) ORDER BY c.SortOrder, c.CategoryName"), dbOpenSnapshot)
+        "FROM [@Categories] AS c WHERE c.IsActive <> 0 AND c.IsAddOn = 0 AND EXISTS (SELECT 1 FROM Products AS p " & _
+        "WHERE p.CategoryID = c.CategoryID AND p.IsActive <> 0) ORDER BY c.SortOrder, c.CategoryName"), dbOpenSnapshot)
     If Not rs.EOF Then
         rs.MoveLast
         n = rs.RecordCount
@@ -300,7 +302,7 @@ Public Sub LoadProducts(ByVal frm As Access.Form)
     color = TileColorValue(DbValue("SELECT TileColor FROM Categories WHERE CategoryID = " & m_catID))
     frm!lblCategoryTitle.Caption = Tr(Nz(DbValue(Tr("SELECT c.CategoryName FROM [@Categories] AS c WHERE c.CategoryID = " & m_catID)), " "))
     Set rs = CurrentDb.OpenRecordset("SELECT ProductID, ProductName, SellingPrice, ImagePath FROM Products " & _
-        "WHERE IsActive = True AND CategoryID = " & m_catID & " ORDER BY ProductName", dbOpenSnapshot)
+        "WHERE IsActive <> 0 AND CategoryID = " & m_catID & " ORDER BY ProductName", dbOpenSnapshot)
     If Not rs.EOF Then
         rs.MoveLast
         n = rs.RecordCount
@@ -381,10 +383,10 @@ Public Sub TouchQtyStep(ByVal sf As Access.Form, ByVal Delta As Currency)
     If sf.NewRecord Or IsNull(sf!LineNo.Value) Then Exit Sub
     q = Nz(sf!Quantity.Value, 0) + Delta
     If q <= 0 Then
-        CurrentDb.Execute "DELETE FROM tmpPOSLines WHERE LineNo = " & sf!LineNo.Value, dbFailOnError
+        CurrentDb.Execute "DELETE FROM tmpPOSLines WHERE LineNo = " & sf!LineNo.Value, dbFailOnError + dbSeeChanges
     Else
         CurrentDb.Execute "UPDATE tmpPOSLines SET Quantity = " & Str$(q) & " WHERE LineNo = " & sf!LineNo.Value, _
-                          dbFailOnError
+                          dbFailOnError + dbSeeChanges
     End If
     RecalcPOS sf.Parent
 End Sub
@@ -591,7 +593,7 @@ Public Sub AddCartLine(ByVal ProductID As Long, ByVal Qty As Currency, ByVal Uni
     crit = "ProductID = " & ProductID & " AND UnitPrice = " & Str$(UnitPrice) & " AND LineDiscount = 0 AND " & _
            IIf(Len(LineNote) = 0, "LineNote Is Null", "LineNote = " & SqlText(LineNote)) & _
            " AND ProductName = " & SqlText(Left$(DisplayName, 150))
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPOSLines WHERE " & crit, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpPOSLines WHERE " & crit, dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         Set p = CurrentDb.OpenRecordset("SELECT ProductCode, CurrentQuantity FROM Products WHERE ProductID = " & _
                                         ProductID, dbOpenSnapshot)
@@ -648,8 +650,8 @@ Public Sub ItemLoad(ByVal frm As Access.Form)
     frm!txtAddOns.Value = ","
     frm!txtNoteFlags.Value = ","
     Set rs = CurrentDb.OpenRecordset("SELECT p.ProductID, p.ProductName, p.SellingPrice FROM Products AS p " & _
-        "INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID WHERE c.IsAddOn = True AND c.IsActive = True " & _
-        "AND p.IsActive = True ORDER BY c.SortOrder, p.ProductName", dbOpenSnapshot)
+        "INNER JOIN Categories AS c ON p.CategoryID = c.CategoryID WHERE c.IsAddOn <> 0 AND c.IsActive <> 0 " & _
+        "AND p.IsActive <> 0 ORDER BY c.SortOrder, p.ProductName", dbOpenSnapshot)
     For i = 1 To ADDON_TILES
         k = CStr(i)
         If rs.EOF Then
@@ -771,7 +773,7 @@ Public Function TestTouchPOS() As Boolean
                passed, failed, report
     CheckTouch Not IsNull(DbValue("SELECT POSMode FROM Settings WHERE SettingID = 1")), _
                "ÕﬁÊ· ‘«‘… «··„” „ÊÃÊœ… (BuildSchema)", passed, failed, report
-    pid = DMin("ProductID", "Products", "IsActive = True")
+    pid = DMin("ProductID", "Products", "IsActive <> 0")
     If IsNull(pid) Then
         Debug.Print "[i] ·«  ÊÃœ „‰ Ã« :  ŒÿÌ «Œ »«— «·‘«‘…"
     ElseIf DCount("*", "tmpPOSLines") > 0 Then
@@ -796,7 +798,7 @@ Public Function TestTouchPOS() As Boolean
         SetOrderType frm, "DINE_IN"
         CheckTouch frm!cboTable.Visible And Not frm!txtDeliveryPhone.Visible, "«·ÿ·» «·œ«Œ·Ì Ì⁄—÷ —ﬁ„ «·ÿ«Ê·…", _
                    passed, failed, report
-        CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+        CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
         DoCmd.Close acForm, "frmTouchPOS", acSaveNo
         ' cafÈ: the same drink with the same size and notes adds up; other notes make another line
         AddCartLine CLng(pid), 2, 10, "TEST (ﬂ»Ì—)", "ﬂ»Ì—"
@@ -804,7 +806,7 @@ Public Function TestTouchPOS() As Boolean
         AddCartLine CLng(pid), 1, 10, "TEST (ﬂ»Ì—° »œÊ‰ ”ﬂ—)", "ﬂ»Ì—° »œÊ‰ ”ﬂ—"
         CheckTouch DCount("*", "tmpPOSLines") = 2 And Nz(DMax("Quantity", "tmpPOSLines"), 0) = 3, _
                    "«·ﬂ«›ÌÂ: ‰›” «·ÕÃ„ Ê«·„·«ÕŸ«  ”ÿ— Ê«Õœ", passed, failed, report
-        CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
+        CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
         DoCmd.OpenForm "frmCafePOS", acNormal, , , , acHidden
         Set frm = Forms("frmCafePOS")
         CheckTouch frm!txtOrderType.Value = "TAKEAWAY" And frm!btnCat1.Visible, "‘«‘… «·ﬂ«›ÌÂ  › Õ »›∆« Â« (”›—Ì)", _

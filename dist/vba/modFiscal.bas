@@ -90,7 +90,7 @@ Public Function FiscalPeriodOf(ByVal When As Date, ByRef StartDay As Date, ByRef
     Dim rs As DAO.Recordset
     Set rs = CurrentDb.OpenRecordset("SELECT StartDate, EndDate FROM FiscalPeriods WHERE StartDate <= " & _
                                      SqlDate(DateValue(When)) & " AND EndDate >= " & SqlDate(DateValue(When)), _
-                                     dbOpenSnapshot)
+                                     dbOpenSnapshot, dbSeeChanges)
     If rs.EOF Then
         StartDay = DateSerial(Year(When), 1, 1)
         EndDay = DateSerial(Year(When), 12, 31)
@@ -170,7 +170,7 @@ Public Function AddFiscalPeriod(ByVal PeriodName As String, ByVal StartDay As Va
     If Len(AddFiscalPeriod) > 0 Then Exit Function
     CurrentDb.Execute "INSERT INTO FiscalPeriods (PeriodName, StartDate, EndDate, Notes) VALUES (" & _
                       SqlText(Trim$(PeriodName)) & ", " & SqlDate(DateValue(StartDay)) & ", " & _
-                      SqlDate(DateValue(EndDay)) & ", " & SqlText(Trim$(Notes)) & ")", dbFailOnError
+                      SqlDate(DateValue(EndDay)) & ", " & SqlText(Trim$(Notes)) & ")", dbFailOnError + dbSeeChanges
     LogAction "FISCAL_PERIOD_ADD", "FiscalPeriods", Trim$(PeriodName), GDate(StartDay) & " - " & GDate(EndDay)
 End Function
 
@@ -190,7 +190,7 @@ Public Function DeleteLastFiscalPeriod() As String
         Exit Function
     End If
     Set before = AuditSnapshot("FiscalPeriods", "FiscalPeriodID", id)
-    CurrentDb.Execute "DELETE FROM FiscalPeriods WHERE FiscalPeriodID = " & CLng(id), dbFailOnError
+    CurrentDb.Execute "DELETE FROM FiscalPeriods WHERE FiscalPeriodID = " & CLng(id), dbFailOnError + dbSeeChanges
     AuditDeleted "FISCAL_PERIOD_DELETE", "FiscalPeriods", id, before
 End Function
 
@@ -333,7 +333,7 @@ Public Function TestFiscalPeriods() As Boolean
         firstDay = DateSerial(Year(Date) + 5, 1, 1)                ' far after every entry and closing
         CurrentDb.Execute "INSERT INTO FiscalPeriods (PeriodName, StartDate, EndDate) VALUES ('TEST-0', " & _
                           SqlDate(DateSerial(Year(Date) - 30, 1, 1)) & ", " & SqlDate(DateAdd("d", -1, firstDay)) & ")", _
-                          dbFailOnError                              ' a first period, so the rules of the next apply
+                          dbFailOnError + dbSeeChanges                              ' a first period, so the rules of the next apply
     End If
     Record FiscalPeriodProblem("TEST-GAP", DateAdd("d", 1, firstDay), DateAdd("yyyy", 1, firstDay)) <> "", _
            "ÑÝÖ ÇáÝÌæÉ ÈÚÏ ÂÎÑ ÝÊÑÉ", passed, failed, report

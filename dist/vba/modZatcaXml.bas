@@ -826,7 +826,7 @@ Public Function ZatcaPrepareDocument(ByVal DocKind As String, ByVal DocID As Lon
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    db.Execute "UPDATE Settings SET LastInvoiceHash = LastInvoiceHash WHERE SettingID = 1", dbFailOnError    ' lock the chain
+    db.Execute "UPDATE Settings SET LastInvoiceHash = LastInvoiceHash WHERE SettingID = 1", dbFailOnError + dbSeeChanges    ' lock the chain
     pih = Nz(DbValue("SELECT LastInvoiceHash FROM Settings WHERE SettingID = 1"), ZATCA_INITIAL_PIH)
     msg = ZatcaBuildSigned(DocKind, DocID, pih, xml, hash, qr)
     If Len(msg) > 0 Then
@@ -835,7 +835,7 @@ Public Function ZatcaPrepareDocument(ByVal DocKind As String, ByVal DocID As Lon
         Exit Function
     End If
     Set rs = db.OpenRecordset("SELECT InvoiceHash, PreviousInvoiceHash, QRCodeData, EInvoiceXml FROM " & _
-                              DocTableOf(DocKind) & " WHERE " & DocKeyOf(DocKind) & " = " & DocID, dbOpenDynaset)
+                              DocTableOf(DocKind) & " WHERE " & DocKeyOf(DocKind) & " = " & DocID, dbOpenDynaset, dbSeeChanges)
     rs.Edit
     rs!InvoiceHash = hash
     rs!PreviousInvoiceHash = pih
@@ -843,7 +843,7 @@ Public Function ZatcaPrepareDocument(ByVal DocKind As String, ByVal DocID As Lon
     rs!EInvoiceXml = xml                                  ' a memo: longer than a SQL statement may be
     rs.Update
     rs.Close
-    db.Execute "UPDATE Settings SET LastInvoiceHash = '" & hash & "' WHERE SettingID = 1", dbFailOnError
+    db.Execute "UPDATE Settings SET LastInvoiceHash = '" & hash & "' WHERE SettingID = 1", dbFailOnError + dbSeeChanges
     ws.CommitTrans
     Exit Function
 EH:
@@ -881,7 +881,7 @@ Public Function ZatcaMakeTestCertificate(ByVal Folder As String) As String
     Loop
     Close #f
     CurrentDb.Execute "UPDATE Settings SET ZatcaKeyFile = " & SqlText(keyFile) & ", ZatcaCertificate = " & _
-                      SqlText(CertificateBody(body)) & " WHERE SettingID = 1", dbFailOnError
+                      SqlText(CertificateBody(body)) & " WHERE SettingID = 1", dbFailOnError + dbSeeChanges
 End Function
 
 '==============================================================================
@@ -926,7 +926,7 @@ Public Sub ZatcaSetupSave(ByVal frm As Access.Form)
     End If
     Set before = AuditSnapshot("Settings", "SettingID", 1)
     Set rs = CurrentDb.OpenRecordset("SELECT OpenSslPath, ZatcaKeyFile, ZatcaCertificate FROM Settings WHERE SettingID = 1", _
-                                     dbOpenDynaset)
+                                     dbOpenDynaset, dbSeeChanges)
     rs.Edit
     rs!OpenSslPath = IIf(Len(Trim$(Nz(frm!txtOpenSsl.Value, ""))) = 0, Null, Trim$(Nz(frm!txtOpenSsl.Value, "")))
     rs!ZatcaKeyFile = IIf(Len(Trim$(Nz(frm!txtKeyFile.Value, ""))) = 0, Null, Trim$(Nz(frm!txtKeyFile.Value, "")))

@@ -158,9 +158,9 @@ Public Function TestIndicators() As Boolean
     ws.BeginTrans
     inTrans = True
     EnsureLocalTables
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (1400, 1000, 0)", dbFailOnError
-    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (2100, 0, 1000)", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (1400, 1000, 0)", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "INSERT INTO tmpManualLines (AccountCode, Debit, Credit) VALUES (2100, 0, 1000)", dbFailOnError + dbSeeChanges
     msg = PostManualEntry(0, Date, "TEST-IND", "", Null, id)
     msg = msg & SyncJournal()
     Set after = CurrentDb.OpenRecordset("SELECT * FROM FinancialIndicatorsQuery", dbOpenSnapshot)
@@ -168,7 +168,7 @@ Public Function TestIndicators() As Boolean
           after!CurrentLiabilities = l0 + 1000, "ﬁÌœ „Œ“Ê‰ ⁄·Ï „Ê—œ Ì—›⁄ «·„Œ“Ê‰ Ê«·√’Ê· Ê«·Œ’Ê„ «·„ œ«Ê·… " & msg, _
           passed, failed, report
     after.Close
-    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpManualLines", dbFailOnError + dbSeeChanges
     ws.Rollback
     inTrans = False
     ForgetIndicators

@@ -109,10 +109,10 @@ Public Function SaveActivation(ByVal ForMachineID As String, ByVal Code As Strin
         Exit Function
     End If
     id = UCase$(Trim$(ForMachineID))
-    CurrentDb.Execute "DELETE FROM Activations WHERE MachineID = " & SqlText(id), dbFailOnError
+    CurrentDb.Execute "DELETE FROM Activations WHERE MachineID = " & SqlText(id), dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO Activations (MachineID, ActivationCode, ComputerName, ActivatedAt, EmployeeID) " & _
         "VALUES (" & SqlText(id) & ", " & SqlText(UCase$(Trim$(Code))) & ", " & SqlText(Left$(ComputerName, 64)) & _
-        ", Now(), " & CurrentUserID() & ")", dbFailOnError
+        ", Now(), " & CurrentUserID() & ")", dbFailOnError + dbSeeChanges
     LogAction "ACTIVATE", "Activations", id, ComputerName
 End Function
 
@@ -127,7 +127,7 @@ Public Function RemoveActivation(ByVal ActivationID As Long) As String
         RemoveActivation = "«Œ — «·ÃÂ«“ „‰ «·ﬁ«∆„…."
         Exit Function
     End If
-    CurrentDb.Execute "DELETE FROM Activations WHERE ActivationID = " & ActivationID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM Activations WHERE ActivationID = " & ActivationID, dbFailOnError + dbSeeChanges
     If id = MachineID() Then m_activated = False
     LogAction "DEACTIVATE", "Activations", CStr(id)
 End Function

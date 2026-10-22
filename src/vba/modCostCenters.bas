@@ -22,13 +22,13 @@ Public Function CostCenterFor(Optional ByVal EmployeeID As Long = 0) As Variant
     Dim v As Variant
     If EmployeeID = 0 Then EmployeeID = CurrentUserID()
     v = DbValue("SELECT e.CostCenterID FROM Employees AS e INNER JOIN CostCenters AS c ON e.CostCenterID = " & _
-                "c.CostCenterID WHERE c.IsActive = True AND e.EmployeeID = " & EmployeeID)
-    If IsNull(v) Then v = DbValue("SELECT Min(CostCenterID) FROM CostCenters WHERE IsDefault = True AND IsActive = True")
+                "c.CostCenterID WHERE c.IsActive <> 0 AND e.EmployeeID = " & EmployeeID)
+    If IsNull(v) Then v = DbValue("SELECT Min(CostCenterID) FROM CostCenters WHERE IsDefault <> 0 AND IsActive <> 0")
     CostCenterFor = v
 End Function
 
 Public Function CostCenterRows() As String
-    CostCenterRows = Tr("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True " & _
+    CostCenterRows = Tr("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive <> 0 " & _
                         "ORDER BY c.CenterCode")
 End Function
 
@@ -50,18 +50,18 @@ Public Function TestCostCenters() As Boolean
         Debug.Print "[--] الفترة مقفلة حتى اليوم"
         GoTo Undo
     End If
-    CurrentDb.Execute "UPDATE CostCenters SET IsDefault = False", dbFailOnError
+    CurrentDb.Execute "UPDATE CostCenters SET IsDefault = False", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO CostCenters (CenterCode, CenterName, IsDefault, IsActive) VALUES ('TST1', 'TEST مركز 1', " & _
-                      "True, True)", dbFailOnError
+                      "True, True)", dbFailOnError + dbSeeChanges
     center = DbValue("SELECT CostCenterID FROM CostCenters WHERE CenterCode = 'TST1'")
     CurrentDb.Execute "INSERT INTO CostCenters (CenterCode, CenterName, IsDefault, IsActive) VALUES ('TST2', 'TEST مركز 2', " & _
-                      "False, True)", dbFailOnError
+                      "False, True)", dbFailOnError + dbSeeChanges
     other = DbValue("SELECT CostCenterID FROM CostCenters WHERE CenterCode = 'TST2'")
-    CurrentDb.Execute "UPDATE Employees SET CostCenterID = Null WHERE EmployeeID = " & CurrentUserID(), dbFailOnError
+    CurrentDb.Execute "UPDATE Employees SET CostCenterID = Null WHERE EmployeeID = " & CurrentUserID(), dbFailOnError + dbSeeChanges
     Record CostCenterFor() = center, "بلا مركز للموظف: المركز الافتراضي", passed, failed, report
-    CurrentDb.Execute "UPDATE Employees SET CostCenterID = " & other & " WHERE EmployeeID = " & CurrentUserID(), dbFailOnError
+    CurrentDb.Execute "UPDATE Employees SET CostCenterID = " & other & " WHERE EmployeeID = " & CurrentUserID(), dbFailOnError + dbSeeChanges
     Record CostCenterFor() = other, "مركز الموظف قبل الافتراضي", passed, failed, report
-    box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True"), 0)
+    box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive <> 0"), 0)
     msg = PostCashVoucher("IN", box, Null, "OTHER", 50, "TEST", "TEST-CC", Null, voucher)
     msg = msg & SyncJournal()
     entry = DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = 'CASH_VOUCHER' AND SourceID = " & voucher)

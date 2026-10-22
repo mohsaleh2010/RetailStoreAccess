@@ -75,9 +75,9 @@ Private Sub AddLines(ByVal RunID As Long)
     Dim db As DAO.Database, e As DAO.Recordset, l As DAO.Recordset, advance As Currency, room As Currency
     Dim wage As Currency, ee As Currency, er As Currency
     Set db = CurrentDb
-    Set e = db.OpenRecordset("SELECT * FROM Employees WHERE OnPayroll = True AND IsActive = True AND BasicSalary > 0 " & _
+    Set e = db.OpenRecordset("SELECT * FROM Employees WHERE OnPayroll <> 0 AND IsActive <> 0 AND BasicSalary > 0 " & _
                              "ORDER BY EmployeeName", dbOpenSnapshot)
-    Set l = db.OpenRecordset("PayrollLines", dbOpenDynaset, dbAppendOnly)
+    Set l = db.OpenRecordset("PayrollLines", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     Do Until e.EOF
         l.AddNew
         l!PayrollRunID = RunID
@@ -121,13 +121,13 @@ Public Function CreatePayroll(ByVal AnyDayOfMonth As Date, ByRef RunID As Long) 
         CreatePayroll = "لا يُنشأ مسير لشهر لم يبدأ."
         Exit Function
     End If
-    If Nz(DbValue("SELECT COUNT(*) FROM Employees WHERE OnPayroll = True AND IsActive = True AND BasicSalary > 0"), 0) = 0 Then
+    If Nz(DbValue("SELECT COUNT(*) FROM Employees WHERE OnPayroll <> 0 AND IsActive <> 0 AND BasicSalary > 0"), 0) = 0 Then
         CreatePayroll = "لا يوجد موظفون في مسير الرواتب: حدّد «في مسير الرواتب» والراتب الأساسي في شاشة المستخدمين."
         Exit Function
     End If
     CreatePayroll = ClosedPeriodProblem(m)
     If Len(CreatePayroll) > 0 Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("PayrollRuns", dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("PayrollRuns", dbOpenDynaset, dbSeeChanges)
     rs.AddNew
     rs!RunNumber = NextNumber("PAYROLL")
     rs!PayMonth = m
@@ -147,7 +147,7 @@ Public Function RebuildPayroll(ByVal RunID As Long) As String
     RebuildPayroll = CanPayroll("EDIT")
     If Len(RebuildPayroll) = 0 And Nz(RunField(RunID, "Status"), "") <> "DRAFT" Then RebuildPayroll = "المسير ليس مسودة."
     If Len(RebuildPayroll) > 0 Then Exit Function
-    CurrentDb.Execute "DELETE FROM PayrollLines WHERE PayrollRunID = " & RunID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM PayrollLines WHERE PayrollRunID = " & RunID, dbFailOnError + dbSeeChanges
     AddLines RunID
 End Function
 
@@ -155,7 +155,7 @@ Public Function RecalcPayroll(ByVal RunID As Long) As String
     ' GOSI and net of every line of a draft (after the lines were edited).
     Dim rs As DAO.Recordset
     If Nz(RunField(RunID, "Status"), "") <> "DRAFT" Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM PayrollLines WHERE PayrollRunID = " & RunID, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM PayrollLines WHERE PayrollRunID = " & RunID, dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         rs.Edit
         SaveLineAmounts rs
@@ -169,7 +169,7 @@ Public Function PayrollProblem(ByVal RunID As Long) As String
     ' The checks of a draft before posting ("" = fine).
     Dim rs As DAO.Recordset, p As String
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM PayrollLines WHERE PayrollRunID = " & RunID & " ORDER BY EmployeeName", _
-                                     dbOpenSnapshot)
+                                     dbOpenSnapshot, dbSeeChanges)
     If rs.EOF Then p = "المسير بلا أسطر."
     Do Until rs.EOF Or Len(p) > 0
         If rs!Overtime < 0 Or rs!Additions < 0 Or rs!AbsenceDeduction < 0 Or rs!AdvanceDeduction < 0 Or rs!OtherDeduction < 0 Then
@@ -201,7 +201,7 @@ Public Function PostPayroll(ByVal RunID As Long) As String
     If Len(PostPayroll) = 0 Then PostPayroll = ClosedPeriodProblem(pm)
     If Len(PostPayroll) > 0 Then Exit Function
     CurrentDb.Execute "UPDATE PayrollRuns SET Status = 'POSTED', EmployeeID = " & CurrentUserID() & _
-                      " WHERE PayrollRunID = " & RunID, dbFailOnError
+                      " WHERE PayrollRunID = " & RunID, dbFailOnError + dbSeeChanges
     LogAction "PAYROLL_POST", "PayrollRuns", Format$(pm, "yyyy-mm")
     SyncJournal
 End Function
@@ -220,7 +220,7 @@ Public Function UnpostPayroll(ByVal RunID As Long) As String
         UnpostPayroll = ClosedPeriodProblem(RunField(RunID, "PayMonth"))
     End If
     If Len(UnpostPayroll) > 0 Then Exit Function
-    CurrentDb.Execute "UPDATE PayrollRuns SET Status = 'DRAFT' WHERE PayrollRunID = " & RunID, dbFailOnError
+    CurrentDb.Execute "UPDATE PayrollRuns SET Status = 'DRAFT' WHERE PayrollRunID = " & RunID, dbFailOnError + dbSeeChanges
     LogAction "PAYROLL_UNPOST", "PayrollRuns", CStr(RunID)
     SyncJournal
 End Function
@@ -233,7 +233,7 @@ Public Function DeletePayroll(ByVal RunID As Long) As String
     If Len(DeletePayroll) > 0 Then Exit Function
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("PayrollRuns", "PayrollRunID", RunID)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM PayrollRuns WHERE PayrollRunID = " & RunID, dbFailOnError       ' lines cascade
+    CurrentDb.Execute "DELETE FROM PayrollRuns WHERE PayrollRunID = " & RunID, dbFailOnError + dbSeeChanges       ' lines cascade
     AuditDeleted "PAYROLL_DELETE", "PayrollRuns", RunID, auditBefore
 End Function
 
@@ -259,7 +259,7 @@ Public Function PayPayroll(ByVal RunID As Long, ByVal PaidDate As Variant, ByVal
     ElseIf DateValue(PaidDate) < DateSerial(Year(pm), Month(pm), 1) Then
         PayPayroll = "تاريخ الصرف قبل شهر المسير."
     ElseIf PaidFrom = "BANK" Then
-        If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive = True AND BankID = " & CLng(Nz(BankID, 0))), 0) = 0 Then
+        If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive <> 0 AND BankID = " & CLng(Nz(BankID, 0))), 0) = 0 Then
             PayPayroll = "اختر البنك."
         End If
     ElseIf PaidFrom = "CASHBOX" Then
@@ -278,7 +278,7 @@ Public Function PayPayroll(ByVal RunID As Long, ByVal PaidDate As Variant, ByVal
     CurrentDb.Execute "UPDATE PayrollRuns SET PaidDate = " & SqlDate(DateValue(PaidDate)) & ", PaidFrom = " & SqlText(PaidFrom) & _
         ", BankID = " & IIf(PaidFrom = "BANK", CLng(Nz(BankID, 0)), "Null") & ", CashBoxID = " & _
         IIf(PaidFrom = "CASHBOX", CLng(Nz(CashBoxID, 0)), "Null") & ", PaidAmount = " & Str$(net) & _
-        " WHERE PayrollRunID = " & RunID, dbFailOnError
+        " WHERE PayrollRunID = " & RunID, dbFailOnError + dbSeeChanges
     LogAction "PAYROLL_PAY", "PayrollRuns", CStr(RunID), Format$(net, "0.00")
     SyncJournal
 End Function
@@ -297,7 +297,7 @@ Public Function UndoPayrollPayment(ByVal RunID As Long) As String
     UndoPayrollPayment = ClosedPeriodProblem(RunField(RunID, "PaidDate"))
     If Len(UndoPayrollPayment) > 0 Then Exit Function
     CurrentDb.Execute "UPDATE PayrollRuns SET PaidDate = Null, PaidFrom = Null, BankID = Null, CashBoxID = Null, " & _
-                      "PaidAmount = 0 WHERE PayrollRunID = " & RunID, dbFailOnError
+                      "PaidAmount = 0 WHERE PayrollRunID = " & RunID, dbFailOnError + dbSeeChanges
     LogAction "PAYROLL_UNPAY", "PayrollRuns", CStr(RunID)
     SyncJournal
 End Function
@@ -484,7 +484,7 @@ Public Sub SaveGosiRates(ByVal frm As Access.Form)
     End If
     CurrentDb.Execute "UPDATE Settings SET GosiEmployeeRate = " & Str$(frm!txtGosiEE.Value) & ", GosiEmployerRate = " & _
                       Str$(frm!txtGosiER.Value) & ", GosiNonSaudiRate = " & Str$(frm!txtGosiNonSaudi.Value) & _
-                      ", GosiMaxWage = " & Str$(frm!txtGosiMax.Value) & " WHERE SettingID = 1", dbFailOnError
+                      ", GosiMaxWage = " & Str$(frm!txtGosiMax.Value) & " WHERE SettingID = 1", dbFailOnError + dbSeeChanges
     LogAction "GOSI_RATES", "Settings"
     ShowInfo "تم حفظ نسب التأمينات. تُطبَّق على المسودات عند تعديلها أو ترحيلها."
 End Sub
@@ -548,25 +548,25 @@ Public Function TestPayroll() As Boolean
     net = CalcPayLine(50000, 0, 0, 0, 0, 0, 0, 0, False, wage, ee, er)
     CheckPay wage = Nz(SettingValue("GosiMaxWage"), 45000) And ee = 0, "غير السعودي والحد الأعلى للأجر", passed, failed, report
 
-    CurrentDb.Execute "UPDATE Employees SET OnPayroll = False", dbFailOnError
+    CurrentDb.Execute "UPDATE Employees SET OnPayroll = False", dbFailOnError + dbSeeChanges
     emp = CurrentUserID()
     CurrentDb.Execute "UPDATE Employees SET OnPayroll = True, BasicSalary = 4000, HousingAllowance = 1000, " & _
                       "TransportAllowance = 400, OtherAllowance = 0, IsSaudi = True, AdvanceInstallment = 500 " & _
-                      "WHERE EmployeeID = " & emp, dbFailOnError
-    box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True"), 0)
+                      "WHERE EmployeeID = " & emp, dbFailOnError + dbSeeChanges
+    box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive <> 0"), 0)
     adv = AdvanceBalance(emp)
     CurrentDb.Execute "INSERT INTO CashVouchers (VoucherNumber, VoucherDate, VoucherType, CashBoxID, Category, Amount, " & _
         "Description, EmployeeID, AdvanceEmployeeID) VALUES ('TEST-ADV', " & SqlDate(pm - 10) & ", 'OUT', " & box & _
-        ", 'ADVANCE', 1200, 'TEST', " & emp & ", " & emp & ")", dbFailOnError
+        ", 'ADVANCE', 1200, 'TEST', " & emp & ", " & emp & ")", dbFailOnError + dbSeeChanges
     CheckPay AdvanceBalance(emp) = adv + 1200, "سلفة الموظف من سند الصرف", passed, failed, report
     msg = CreatePayroll(pm, runID)
     CheckPay Len(msg) = 0 And runID > 0 And Nz(DbValue("SELECT COUNT(*) FROM PayrollLines WHERE PayrollRunID = " & runID), 0) = 1 And _
              Nz(DbValue("SELECT AdvanceDeduction FROM PayrollLines WHERE PayrollRunID = " & runID), 0) = 500, _
              "مسودة المسير بقسط السلفة " & msg, passed, failed, report
-    CurrentDb.Execute "UPDATE PayrollLines SET AdvanceDeduction = 999999 WHERE PayrollRunID = " & runID, dbFailOnError
+    CurrentDb.Execute "UPDATE PayrollLines SET AdvanceDeduction = 999999 WHERE PayrollRunID = " & runID, dbFailOnError + dbSeeChanges
     RecalcPayroll runID
     CheckPay Len(PostPayroll(runID)) > 0, "لا يُخصم أكثر من رصيد السلف", passed, failed, report
-    CurrentDb.Execute "UPDATE PayrollLines SET AdvanceDeduction = 500, Overtime = 100 WHERE PayrollRunID = " & runID, dbFailOnError
+    CurrentDb.Execute "UPDATE PayrollLines SET AdvanceDeduction = 500, Overtime = 100 WHERE PayrollRunID = " & runID, dbFailOnError + dbSeeChanges
     msg = PostPayroll(runID)
     net = Nz(DbValue("SELECT SumNet FROM qryPayrollTotals WHERE PayrollRunID = " & runID), 0)
     CheckPay Len(msg) = 0 And net = 4000 + 1000 + 400 + 100 - 500 - 487.5 And AdvanceBalance(emp) = adv + 700 And _
@@ -575,7 +575,7 @@ Public Function TestPayroll() As Boolean
     CheckPay Len(DeletePayroll(runID)) > 0, "لا يُحذف مسير مرحَّل", passed, failed, report
     CurrentDb.Execute "INSERT INTO CashVouchers (VoucherNumber, VoucherDate, VoucherType, CashBoxID, Category, Amount, " & _
         "Description, EmployeeID) VALUES ('TEST-CIN', " & SqlDate(pm) & ", 'IN', " & box & ", 'OTHER', " & Str$(net) & _
-        ", 'TEST', " & emp & ")", dbFailOnError
+        ", 'TEST', " & emp & ")", dbFailOnError + dbSeeChanges
     msg = PayPayroll(runID, Date, "CASHBOX", Null, box)
     CheckPay Len(msg) = 0 And Not IsNull(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = 'PAYROLL_PAYMENT' " & _
              "AND SourceID = " & runID)), "صرف الرواتب من الصندوق " & msg, passed, failed, report

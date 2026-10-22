@@ -36,7 +36,7 @@ Public Function BankFor(ByVal PaymentMethodID As Variant, ByVal Amount As Curren
     If Nz(PaymentMethodID, 0) <> BANK_TRANSFER_METHOD_ID Or Amount = 0 Then Exit Function
     bank = SettingValue("DefaultBankID")
     If IsNull(bank) Then Exit Function
-    If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive = True AND BankID = " & CLng(bank)), 0) > 0 Then BankFor = CLng(bank)
+    If Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive <> 0 AND BankID = " & CLng(bank)), 0) > 0 Then BankFor = CLng(bank)
 End Function
 
 Public Function BankBookBalance(ByVal BankID As Long, Optional ByVal AsOf As Variant) As Currency
@@ -58,7 +58,7 @@ End Function
 '------------------------------------------------------------------------------
 Private Function ActiveBank(ByVal BankID As Variant) As Boolean
     If IsNull(BankID) Then Exit Function
-    ActiveBank = Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive = True AND BankID = " & CLng(BankID)), 0) > 0
+    ActiveBank = Nz(DbValue("SELECT COUNT(*) FROM Banks WHERE IsActive <> 0 AND BankID = " & CLng(BankID)), 0) > 0
 End Function
 
 Public Function CounterAccountProblem(ByVal AccountCode As Variant) As String
@@ -69,8 +69,8 @@ Public Function CounterAccountProblem(ByVal AccountCode As Variant) As String
         CounterAccountProblem = "اختر الحساب المقابل."
         Exit Function
     End If
-    ok = DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & CLng(AccountCode) & " AND IsPosting = True " & _
-                 "AND IsActive = True AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, 2100)")
+    ok = DbValue("SELECT AccountCode FROM Accounts WHERE AccountCode = " & CLng(AccountCode) & " AND IsPosting <> 0 " & _
+                 "AND IsActive <> 0 AND Nz(Level3Code, 0) NOT IN (1100, 1210) AND AccountCode NOT IN (1190, 1200, 1300, 2100)")
     If IsNull(ok) Then
         CounterAccountProblem = "الحساب المقابل حساب فرعي نشط، وليس صندوقًا ولا بنكًا ولا مدى ولا العملاء أو الموردين." & vbCrLf & _
                                 "للإيداع والسحب والتحويل وتسوية مدى اختر نوع الحركة الخاص بها."
@@ -141,7 +141,7 @@ Public Function PostBankTx(ByVal TxType As String, ByVal TxDate As Variant, ByVa
     PostBankTx = BankTxProblem(TxType, TxDate, BankID, ToBankID, CashBoxID, CounterAccount, Amount, FeeAmount, FeeVAT)
     If Len(PostBankTx) > 0 Then Exit Function
     number = NextNumber("BANK_TX")
-    Set rs = CurrentDb.OpenRecordset("BankTransactions", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("BankTransactions", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!TxNumber = number
     rs!TxDate = DateValue(TxDate)
@@ -183,7 +183,7 @@ Public Function DeleteBankTx(ByVal BankTxID As Long) As String
     If Len(DeleteBankTx) > 0 Then Exit Function
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("BankTransactions", "BankTxID", BankTxID)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM BankTransactions WHERE BankTxID = " & BankTxID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM BankTransactions WHERE BankTxID = " & BankTxID, dbFailOnError + dbSeeChanges
     AuditDeleted "BANK_TX_DELETE", "BankTransactions", BankTxID, auditBefore
     DeleteBankTx = SyncJournal()
 End Function
@@ -255,7 +255,7 @@ Public Function OpenReconciliation(ByVal BankID As Long, ByVal StatementDate As 
             OpenReconciliation = "لا تملك صلاحية الإضافة في شاشة التسوية البنكية."
             Exit Function
         End If
-        Set rs = CurrentDb.OpenRecordset("BankReconciliations", dbOpenDynaset, dbAppendOnly)
+        Set rs = CurrentDb.OpenRecordset("BankReconciliations", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
         rs.AddNew
         rs!ReconNumber = NextNumber("BANK_RECON")
         rs!BankID = BankID
@@ -269,7 +269,7 @@ Public Function OpenReconciliation(ByVal BankID As Long, ByVal StatementDate As 
         rs.Close
     Else
         CurrentDb.Execute "UPDATE BankReconciliations SET StatementDate = " & SqlDate(DateValue(StatementDate)) & _
-                          ", StatementBalance = " & Str$(StatementBalance) & " WHERE ReconciliationID = " & ReconID, dbFailOnError
+                          ", StatementBalance = " & Str$(StatementBalance) & " WHERE ReconciliationID = " & ReconID, dbFailOnError + dbSeeChanges
     End If
 End Function
 
@@ -293,7 +293,7 @@ Public Function ClearBankItem(ByVal ReconID As Long, ByVal SourceType As String,
     End If
     CurrentDb.Execute "INSERT INTO BankClearings (ReconciliationID, BankID, SourceType, SourceID, ClearedAmount) VALUES (" & _
                       ReconID & ", " & bank & ", " & SqlText(SourceType) & ", " & SourceID & ", " & Str$(CCur(amount)) & ")", _
-                      dbFailOnError
+                      dbFailOnError + dbSeeChanges
 End Function
 
 Public Function UnclearBankItem(ByVal ReconID As Long, ByVal SourceType As String, ByVal SourceID As Long) As String
@@ -302,7 +302,7 @@ Public Function UnclearBankItem(ByVal ReconID As Long, ByVal SourceType As Strin
         Exit Function
     End If
     CurrentDb.Execute "DELETE FROM BankClearings WHERE ReconciliationID = " & ReconID & " AND SourceType = " & _
-                      SqlText(SourceType) & " AND SourceID = " & SourceID, dbFailOnError
+                      SqlText(SourceType) & " AND SourceID = " & SourceID, dbFailOnError + dbSeeChanges
 End Function
 
 Public Function FinishReconciliation(ByVal ReconID As Long) As String
@@ -323,7 +323,7 @@ Public Function FinishReconciliation(ByVal ReconID As Long) As String
     End If
     CurrentDb.Execute "UPDATE BankReconciliations SET Status = 'DONE', BookBalance = " & Str$(book) & ", Outstanding = " & _
                       Str$(outstanding) & ", Difference = 0, EmployeeID = " & CurrentUserID() & _
-                      " WHERE ReconciliationID = " & ReconID, dbFailOnError
+                      " WHERE ReconciliationID = " & ReconID, dbFailOnError + dbSeeChanges
     LogAction "BANK_RECON", "BankReconciliations", CStr(ReconID)
 End Function
 
@@ -348,7 +348,7 @@ Public Function ReopenReconciliation(ByVal ReconID As Long) As String
         ReopenReconciliation = "تُعاد فتح آخر تسوية للبنك فقط."
         Exit Function
     End If
-    CurrentDb.Execute "UPDATE BankReconciliations SET Status = 'OPEN' WHERE ReconciliationID = " & ReconID, dbFailOnError
+    CurrentDb.Execute "UPDATE BankReconciliations SET Status = 'OPEN' WHERE ReconciliationID = " & ReconID, dbFailOnError + dbSeeChanges
     LogAction "BANK_RECON_REOPEN", "BankReconciliations", CStr(ReconID)
 End Function
 
@@ -359,7 +359,7 @@ Public Function DeleteReconciliation(ByVal ReconID As Long) As String
     End If
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("BankReconciliations", "ReconciliationID", ReconID)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM BankReconciliations WHERE ReconciliationID = " & ReconID, dbFailOnError   ' clearings cascade
+    CurrentDb.Execute "DELETE FROM BankReconciliations WHERE ReconciliationID = " & ReconID, dbFailOnError + dbSeeChanges   ' clearings cascade
     AuditDeleted "BANK_RECON_DELETE", "BankReconciliations", ReconID, auditBefore
 End Function
 
@@ -663,20 +663,20 @@ Public Function TestBank() As Boolean
         GoTo Undo
     End If
     CurrentDb.Execute "INSERT INTO Banks (BankName, OpeningBalance, OpeningDate, IsActive) VALUES ('TEST بنك 1', 1000, " & _
-                      SqlDate(Date) & ", True)", dbFailOnError
+                      SqlDate(Date) & ", True)", dbFailOnError + dbSeeChanges
     bank = DbValue("SELECT BankID FROM Banks WHERE BankName = 'TEST بنك 1'")
     CurrentDb.Execute "INSERT INTO Banks (BankName, OpeningBalance, OpeningDate, IsActive) VALUES ('TEST بنك 2', 0, " & _
-                      SqlDate(Date) & ", True)", dbFailOnError
+                      SqlDate(Date) & ", True)", dbFailOnError + dbSeeChanges
     bank2 = DbValue("SELECT BankID FROM Banks WHERE BankName = 'TEST بنك 2'")
     msg = SyncJournal()
     CheckBank AccountBalance(BankAccount(bank)) = 1000 And BankBookBalance(bank) = 1000, _
               "حساب البنك في الدليل برصيده الافتتاحي " & msg, passed, failed, report
 
     box = CurrentCashBoxID()
-    If box = 0 Then box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True"), 0)
+    If box = 0 Then box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive <> 0"), 0)
     CurrentDb.Execute "INSERT INTO CashVouchers (VoucherNumber, VoucherDate, VoucherType, CashBoxID, Category, Amount, " & _
         "Description, EmployeeID) VALUES ('TEST-CIN', " & SqlDate(Date) & ", 'IN', " & box & ", 'OTHER', 500, 'TEST', " & _
-        CurrentUserID() & ")", dbFailOnError
+        CurrentUserID() & ")", dbFailOnError + dbSeeChanges
     msg = PostBankTx("DEPOSIT", Date, bank, Null, box, Null, 300, 0, 0, "", "TEST", id)
     CheckBank Len(msg) = 0 And id > 0 And BankBookBalance(bank) = 1300, "إيداع نقدية من الصندوق في البنك " & msg, _
               passed, failed, report

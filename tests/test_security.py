@@ -179,7 +179,7 @@ class SecurityCodeTests(unittest.TestCase):
         # Immediate window of the programmer's .accdb; never in the client's ACCDE.
         text = read("modSecurity")
         reset = proc(text, "ResetDeveloperPassword")
-        for part in ("If IsCompiledFile() Then", "WHERE IsDeveloper = True", "again <> pwd",
+        for part in ("If IsCompiledFile() Then", "WHERE IsDeveloper <> 0", "again <> pwd",
                      "SetUserPassword(CLng(id), pwd, False)"):
             self.assertIn(part, reset)
         self.assertIn('CurrentDb.Properties("MDE") = "T"', proc(text, "IsCompiledFile"))

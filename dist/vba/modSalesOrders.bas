@@ -89,7 +89,7 @@ Public Function CreateSalesOrder(ByVal CustomerID As Variant, ByVal WarehouseID 
         If Not IsDate(RequiredDate) Then CreateSalesOrder = "„Ê⁄œ «· ”·Ì„ ·Ì”  «—ÌŒ«."
     End If
     If Len(CreateSalesOrder) > 0 Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("SalesOrders", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("SalesOrders", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!OrderNumber = NextNumber("SALES_ORDER")
     rs!OrderDate = Now
@@ -145,7 +145,7 @@ Public Function ApproveSalesOrder(ByVal SalesOrderID As Long) As String
         Exit Function
     End If
     CurrentDb.Execute "UPDATE SalesOrders SET Status = 'APPROVED', ApprovedAt = Now() WHERE SalesOrderID = " & SalesOrderID, _
-                      dbFailOnError
+                      dbFailOnError + dbSeeChanges
     LogAction "SALES_ORDER_APPROVE", "SalesOrders", CStr(SalesOrderID)
 End Function
 
@@ -156,7 +156,7 @@ Public Function PrepareSalesOrder(ByVal SalesOrderID As Long) As String
         PrepareSalesOrder = "Ì»œ√  ÃÂÌ“ «·ÿ·»Ì… «·„⁄ „œ…."
     Else
         CurrentDb.Execute "UPDATE SalesOrders SET Status = 'PREPARING', PreparedAt = Now() WHERE SalesOrderID = " & _
-                          SalesOrderID, dbFailOnError
+                          SalesOrderID, dbFailOnError + dbSeeChanges
         LogAction "SALES_ORDER_PREPARE", "SalesOrders", CStr(SalesOrderID)
     End If
 End Function
@@ -175,7 +175,7 @@ Public Function UnapproveSalesOrder(ByVal SalesOrderID As Long) As String
     If Len(UnapproveSalesOrder) > 0 Then Exit Function
     Set before = AuditSnapshot("SalesOrders", "SalesOrderID", SalesOrderID)
     CurrentDb.Execute "UPDATE SalesOrders SET Status = 'DRAFT', ApprovedAt = Null, PreparedAt = Null " & _
-                      "WHERE SalesOrderID = " & SalesOrderID, dbFailOnError
+                      "WHERE SalesOrderID = " & SalesOrderID, dbFailOnError + dbSeeChanges
     AuditEdited "SALES_ORDER_UNAPPROVE", "SalesOrders", "SalesOrderID", SalesOrderID, before
 End Function
 
@@ -194,7 +194,7 @@ Public Function CancelSalesOrder(ByVal SalesOrderID As Long) As String
     newStatus = "CANCELLED"
     If OrderDelivered(SalesOrderID) > 0 Then newStatus = "CLOSED"
     Set before = AuditSnapshot("SalesOrders", "SalesOrderID", SalesOrderID)
-    CurrentDb.Execute "UPDATE SalesOrders SET Status = '" & newStatus & "' WHERE SalesOrderID = " & SalesOrderID, dbFailOnError
+    CurrentDb.Execute "UPDATE SalesOrders SET Status = '" & newStatus & "' WHERE SalesOrderID = " & SalesOrderID, dbFailOnError + dbSeeChanges
     AuditEdited "SALES_ORDER_CANCEL", "SalesOrders", "SalesOrderID", SalesOrderID, before
 End Function
 
@@ -210,8 +210,8 @@ Public Function DeleteSalesOrder(ByVal SalesOrderID As Long) As String
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("SalesOrders", "SalesOrderID", SalesOrderID)
-    CurrentDb.Execute "DELETE FROM SalesOrderLines WHERE SalesOrderID = " & SalesOrderID, dbFailOnError
-    CurrentDb.Execute "DELETE FROM SalesOrders WHERE SalesOrderID = " & SalesOrderID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM SalesOrderLines WHERE SalesOrderID = " & SalesOrderID, dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "DELETE FROM SalesOrders WHERE SalesOrderID = " & SalesOrderID, dbFailOnError + dbSeeChanges
     AuditDeleted "SALES_ORDER_DELETE", "SalesOrders", SalesOrderID, auditBefore
 End Function
 
@@ -254,11 +254,11 @@ Public Function CreateOrderDeliveryNote(ByVal SalesOrderID As Long, ByRef NewNot
     inTrans = True
     msg = CreateStockNote("DELIVERY", wh, cust, "«·ÿ·»Ì… " & orderNo, NewNoteID)   ' modStockNotes
     If Len(msg) = 0 Then
-        db.Execute "UPDATE StockNotes SET SalesOrderID = " & SalesOrderID & " WHERE StockNoteID = " & NewNoteID, dbFailOnError
+        db.Execute "UPDATE StockNotes SET SalesOrderID = " & SalesOrderID & " WHERE StockNoteID = " & NewNoteID, dbFailOnError + dbSeeChanges
         Set rs = db.OpenRecordset("SELECT SalesOrderLineID, ProductID, RemainingQty, UnitPrice FROM qrySalesOrderLineStatus " & _
                                   "WHERE SalesOrderID = " & SalesOrderID & " AND RemainingQty > 0 ORDER BY SalesOrderLineID", _
-                                  dbOpenSnapshot)
-        Set nl = db.OpenRecordset("StockNoteLines", dbOpenDynaset, dbAppendOnly)
+                                  dbOpenSnapshot, dbSeeChanges)
+        Set nl = db.OpenRecordset("StockNoteLines", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
         Do Until rs.EOF
             nl.AddNew
             nl!StockNoteID = NewNoteID
@@ -300,9 +300,9 @@ Public Function OrderNoteProblem(ByVal StockNoteID As Long) As String
         Exit Function
     End If
     Set o = CurrentDb.OpenRecordset("SELECT CustomerID, WarehouseID FROM SalesOrders WHERE SalesOrderID = " & orderID, _
-                                    dbOpenSnapshot)
+                                    dbOpenSnapshot, dbSeeChanges)
     Set note = CurrentDb.OpenRecordset("SELECT CustomerID, WarehouseID FROM StockNotes WHERE StockNoteID = " & StockNoteID, _
-                                       dbOpenSnapshot)
+                                       dbOpenSnapshot, dbSeeChanges)
     If Nz(note!CustomerID, 0) <> o!CustomerID Or note!WarehouseID <> o!WarehouseID Then
         OrderNoteProblem = "«·≈–‰ ·Ì” ·⁄„Ì· «·ÿ·»Ì… Ê„Œ“‰Â«."
     End If
@@ -362,7 +362,7 @@ Public Sub SyncSalesOrder(ByVal db As DAO.Database, ByVal SalesOrderID As Long)
         newStatus = "DELIVERED"
     End If
     If newStatus <> st Then
-        db.Execute "UPDATE SalesOrders SET Status = '" & newStatus & "' WHERE SalesOrderID = " & SalesOrderID, dbFailOnError
+        db.Execute "UPDATE SalesOrders SET Status = '" & newStatus & "' WHERE SalesOrderID = " & SalesOrderID, dbFailOnError + dbSeeChanges
     End If
 End Sub
 
@@ -555,7 +555,7 @@ Public Sub SalesOrderRemoveLine(ByVal frm As Access.Form)
     End If
     If frm.Dirty Then frm.Undo
     Set auditBefore = AuditSnapshot("SalesOrderLines", "SalesOrderLineID", id)
-    CurrentDb.Execute "DELETE FROM SalesOrderLines WHERE SalesOrderLineID = " & CLng(id), dbFailOnError
+    CurrentDb.Execute "DELETE FROM SalesOrderLines WHERE SalesOrderLineID = " & CLng(id), dbFailOnError + dbSeeChanges
     AuditDeleted "SALES_ORDER_LINE_DELETE", "SalesOrderLines", id, auditBefore
     frm.Requery
     SalesOrderShow frm.Parent
@@ -577,15 +577,15 @@ Public Function TestSalesOrders() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
-    CurrentDb.Execute "UPDATE Settings SET AllowNegativeStock = False", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE Settings SET AllowNegativeStock = False", dbFailOnError + dbSeeChanges
     g_AutoAnswer = False
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, UnitID, SellingPrice, PurchasePrice, " & _
                       "CurrentQuantity, AverageCost) VALUES ('TEST-SO-P', 'TEST ’‰› «·ÿ·»Ì« ', " & _
                       Nz(DbValue("SELECT Min(CategoryID) FROM Categories"), 1) & ", " & _
-                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 8, 0, 0)", dbFailOnError
+                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 8, 0, 0)", dbFailOnError + dbSeeChanges
     pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-SO-P'")
-    cust = Nz(DbValue("SELECT Min(CustomerID) FROM Customers WHERE IsActive = True"), 0)
+    cust = Nz(DbValue("SELECT Min(CustomerID) FROM Customers WHERE IsActive <> 0"), 0)
     CheckSo cust > 0, "ÌÊÃœ ⁄„Ì· ‰‘ÿ", passed, failed, report
     msg = PostManualStock(pid, TT_STOCK_IN, 10, 6, "TEST", refNo, MAIN_WAREHOUSE_ID)
     CheckSo Len(msg) = 0, "≈÷«›… 10 » ﬂ·›… 6 " & msg, passed, failed, report
@@ -593,7 +593,7 @@ Public Function TestSalesOrders() As Boolean
     ' an order of 6: approving it reserves 6, so only 4 are left for others
     msg = CreateSalesOrder(cust, MAIN_WAREHOUSE_ID, Null, "TEST", orderID)
     CurrentDb.Execute "INSERT INTO SalesOrderLines (SalesOrderID, ProductID, Quantity, UnitPrice) VALUES (" & _
-                      orderID & ", " & pid & ", 6, 20)", dbFailOnError
+                      orderID & ", " & pid & ", 6, 20)", dbFailOnError + dbSeeChanges
     msg = msg & ApproveSalesOrder(orderID)
     CheckSo Len(msg) = 0 And OrderStatus(orderID) = "APPROVED" And ReservedQty(pid, MAIN_WAREHOUSE_ID) = 6, _
             "«⁄ „«œ «·ÿ·»Ì… ÌÕÃ“ 6 " & msg, passed, failed, report
@@ -605,7 +605,7 @@ Public Function TestSalesOrders() As Boolean
     CheckSo Len(CheckStockAvailable(ids, qtys, 1, "TEST", MAIN_WAREHOUSE_ID)) = 0, "Ìı»«⁄ «·„ «Õ 4", passed, failed, report
     msg = CreateSalesOrder(cust, MAIN_WAREHOUSE_ID, Null, "TEST", order2)
     CurrentDb.Execute "INSERT INTO SalesOrderLines (SalesOrderID, ProductID, Quantity, UnitPrice) VALUES (" & _
-                      order2 & ", " & pid & ", 5, 20)", dbFailOnError
+                      order2 & ", " & pid & ", 5, 20)", dbFailOnError + dbSeeChanges
     CheckSo Len(ApproveSalesOrder(order2)) > 0 And OrderStatus(order2) = "DRAFT", "·«  ı⁄ „œ ÿ·»Ì… √ﬂ»— „‰ «·„ «Õ", _
             passed, failed, report
     CheckSo Len(DeleteSalesOrder(order2)) = 0 And OrderStatus(order2) = "", "Õ–› „”Êœ… «·ÿ·»Ì…", passed, failed, report
@@ -616,7 +616,7 @@ Public Function TestSalesOrders() As Boolean
     CheckSo Len(msg) = 0 And Nz(DbValue("SELECT Sum(Quantity) FROM StockNoteLines WHERE StockNoteID = " & noteID), 0) = 6, _
             "≈–‰ «· ”·Ì„ »«·»«ﬁÌ „‰ «·ÿ·»Ì… " & msg, passed, failed, report
     CheckSo Len(CancelSalesOrder(orderID)) > 0, "·«  ı·€Ï «·ÿ·»Ì… Ê·Â« ≈–‰ ·„ Ìı—ÕÛ¯·", passed, failed, report
-    CurrentDb.Execute "UPDATE StockNoteLines SET Quantity = 4 WHERE StockNoteID = " & noteID, dbFailOnError
+    CurrentDb.Execute "UPDATE StockNoteLines SET Quantity = 4 WHERE StockNoteID = " & noteID, dbFailOnError + dbSeeChanges
     msg = PostStockNote(noteID)
     CheckSo Len(msg) = 0 And OrderStatus(orderID) = "PARTIAL" And ReservedQty(pid, MAIN_WAREHOUSE_ID) = 2 And _
             WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 6, " ”·Ì„ 4: „ı”·Û¯„… Ã“∆Ì« Ê«·„ÕÃÊ“ 2 " & msg, passed, failed, report
@@ -625,9 +625,9 @@ Public Function TestSalesOrders() As Boolean
     CheckSo Len(UnapproveSalesOrder(orderID)) > 0, "·«  ⁄Êœ ·„”Êœ… »⁄œ «· ”·Ì„", passed, failed, report
 
     msg = CreateOrderDeliveryNote(orderID, noteID)
-    CurrentDb.Execute "UPDATE StockNoteLines SET Quantity = 3 WHERE StockNoteID = " & noteID, dbFailOnError
+    CurrentDb.Execute "UPDATE StockNoteLines SET Quantity = 3 WHERE StockNoteID = " & noteID, dbFailOnError + dbSeeChanges
     CheckSo Len(PostStockNote(noteID)) > 0, "·« Ìı”·Û¯„ √ﬂÀ— „‰ «·»«ﬁÌ ›Ì «·ÿ·»Ì… " & msg, passed, failed, report
-    CurrentDb.Execute "UPDATE StockNoteLines SET Quantity = 2 WHERE StockNoteID = " & noteID, dbFailOnError
+    CurrentDb.Execute "UPDATE StockNoteLines SET Quantity = 2 WHERE StockNoteID = " & noteID, dbFailOnError + dbSeeChanges
     msg = PostStockNote(noteID)
     CheckSo Len(msg) = 0 And OrderStatus(orderID) = "DELIVERED" And ReservedQty(pid, MAIN_WAREHOUSE_ID) = 0, _
             " ”·Ì„ «·»«ﬁÌ: „ı”·Û¯„… ﬂ·Â« Ê·« ÕÃ“ " & msg, passed, failed, report
@@ -642,9 +642,9 @@ Public Function TestSalesOrders() As Boolean
     ' cancelling frees the reservation; an order delivered in part is closed
     msg = CreateSalesOrder(cust, MAIN_WAREHOUSE_ID, Date + 3, "TEST", order2)
     CurrentDb.Execute "INSERT INTO SalesOrderLines (SalesOrderID, ProductID, Quantity, UnitPrice) VALUES (" & _
-                      order2 & ", " & pid & ", 3, 20)", dbFailOnError
+                      order2 & ", " & pid & ", 3, 20)", dbFailOnError + dbSeeChanges
     msg = msg & ApproveSalesOrder(order2) & CreateOrderDeliveryNote(order2, noteID)
-    CurrentDb.Execute "UPDATE StockNoteLines SET Quantity = 1 WHERE StockNoteID = " & noteID, dbFailOnError
+    CurrentDb.Execute "UPDATE StockNoteLines SET Quantity = 1 WHERE StockNoteID = " & noteID, dbFailOnError + dbSeeChanges
     msg = msg & PostStockNote(noteID)
     CheckSo Len(msg) = 0 And ReservedQty(pid, MAIN_WAREHOUSE_ID) = 2, "ÿ·»Ì… À«‰Ì… ”ı·ˆ¯„ „‰Â« 1 " & msg, passed, failed, report
     msg = CancelSalesOrder(order2)

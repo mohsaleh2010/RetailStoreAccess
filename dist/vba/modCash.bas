@@ -28,14 +28,14 @@ Option Explicit
 
 Public Const CASH_METHOD_ID As Long = 1          ' PaymentMethods: ‰ﬁœÌ
 
-Private Const BOX_ROWS As String = "SELECT q.CashBoxID, q.BoxName FROM [@CashBoxes] AS q WHERE q.IsActive = True"
+Private Const BOX_ROWS As String = "SELECT q.CashBoxID, q.BoxName FROM [@CashBoxes] AS q WHERE q.IsActive <> 0"
 Private Const VOUCHER_TYPES As String = "IN;”‰œ ﬁ»÷ ‰ﬁœÌ…;OUT;”‰œ ’—› ‰ﬁœÌ…;TRANSFER; ÕÊÌ· »Ì‰ «·’‰«œÌﬁ"
 Private Const IN_CATEGORIES As String = "OTHER;ﬁ»÷ ‰ﬁœÌ… (≈Ì—«œ«  √Œ—Ï);OWNER;≈Ìœ«⁄ „‰ «·„«·ﬂ;" & _
                                         "ADVANCE;”œ«œ ”·›… „ÊŸ›"
 Private Const OUT_CATEGORIES As String = "EXPENSE;„’—Ê› (Ìı”Ã· ›Ì «·„’—Ê›« );OWNER; ”ÊÌ… / „”ÕÊ»«  «·„«·ﬂ;" & _
                                          "ADVANCE;”·›… „ÊŸ›;COMMISSION;’—› ⁄„Ê·… „‰œÊ»;OTHER;’—› ¬Œ—"
-Private Const EMPLOYEE_ROWS As String = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
-Private Const REP_ROWS As String = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName"
+Private Const EMPLOYEE_ROWS As String = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive <> 0 ORDER BY EmployeeName"
+Private Const REP_ROWS As String = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive <> 0 ORDER BY s.RepName"
 Private Const DESTINATIONS As String = "MAIN; —ÕÌ· ≈·Ï «·Œ“Ì‰… «·—∆Ì”Ì…;OWNER; ”·Ì„ ··„«·ﬂ ( ”ÊÌ…);" & _
                                        "KEEP;Ì»ﬁÏ ›Ì «·’‰œÊﬁ"
 
@@ -49,12 +49,12 @@ Public Function CurrentCashBoxID() As Long
         Exit Function
     End If
     v = DbValue("SELECT e.CashBoxID FROM Employees AS e INNER JOIN CashBoxes AS b ON e.CashBoxID = b.CashBoxID " & _
-                "WHERE e.EmployeeID = " & CurrentUserID() & " AND b.IsActive = True")
+                "WHERE e.EmployeeID = " & CurrentUserID() & " AND b.IsActive <> 0")
     ' no box of his own: the main safe for who manages the treasury, the cashier box for the others
     If IsNull(v) And HasPermission("CASH_BOX") Then _
-        v = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive = True")
-    If IsNull(v) Then v = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'CASHIER' AND IsActive = True")
-    If IsNull(v) Then v = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive = True")
+        v = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive <> 0")
+    If IsNull(v) Then v = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'CASHIER' AND IsActive <> 0")
+    If IsNull(v) Then v = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE IsActive <> 0")
     CurrentCashBoxID = Nz(v, 0)
 End Function
 
@@ -101,7 +101,7 @@ End Function
 
 Public Function BoxIsActive(ByVal BoxID As Variant) As Boolean
     If IsNull(BoxID) Then Exit Function
-    BoxIsActive = Nz(DbValue("SELECT COUNT(*) FROM CashBoxes WHERE IsActive = True AND CashBoxID = " & CLng(BoxID)), 0) > 0
+    BoxIsActive = Nz(DbValue("SELECT COUNT(*) FROM CashBoxes WHERE IsActive <> 0 AND CashBoxID = " & CLng(BoxID)), 0) > 0
 End Function
 
 Private Function Money(ByVal Value As Currency) As String
@@ -133,7 +133,7 @@ End Function
 Public Function BoxHasCustodians(ByVal BoxID As Long) As Boolean
     BoxHasCustodians = Nz(DbValue("SELECT COUNT(*) FROM CashBoxUsers WHERE CashBoxID = " & BoxID), 0) > 0
     If Not BoxHasCustodians Then
-        BoxHasCustodians = Nz(DbValue("SELECT COUNT(*) FROM Employees WHERE IsActive = True AND CashBoxID = " & _
+        BoxHasCustodians = Nz(DbValue("SELECT COUNT(*) FROM Employees WHERE IsActive <> 0 AND CashBoxID = " & _
                                       BoxID), 0) > 0
     End If
     If Not BoxHasCustodians Then
@@ -178,7 +178,7 @@ End Function
 Private Function ClosingBoxes() As String
     ' The active boxes the user may close, as a list for IN (...).
     Dim rs As DAO.Recordset, ids As String
-    Set rs = CurrentDb.OpenRecordset("SELECT CashBoxID FROM CashBoxes WHERE IsActive = True", dbOpenSnapshot)
+    Set rs = CurrentDb.OpenRecordset("SELECT CashBoxID FROM CashBoxes WHERE IsActive <> 0", dbOpenSnapshot)
     Do While Not rs.EOF
         If ClosingAllowed(rs!CashBoxID) Then ids = ids & "," & rs!CashBoxID
         rs.MoveNext
@@ -198,7 +198,7 @@ End Function
 Private Function PendingTransferBox(ByVal CashVoucherID As Long, ByVal FieldName As String) As Variant
     ' The sending (CashBoxID) or receiving (ToCashBoxID) box of a transfer still in transit; Null otherwise.
     PendingTransferBox = DbValue("SELECT " & FieldName & " FROM CashVouchers WHERE CashVoucherID = " & CashVoucherID & _
-                                 " AND VoucherType = 'TRANSFER' AND InTransit = True AND ReceivedAt Is Null")
+                                 " AND VoucherType = 'TRANSFER' AND InTransit <> 0 AND ReceivedAt Is Null")
 End Function
 
 Public Function ReceiveCashTransfer(ByVal CashVoucherID As Long) As String
@@ -220,7 +220,7 @@ Public Function ReceiveCashTransfer(ByVal CashVoucherID As Long) As String
     End If
     Set before = AuditSnapshot("CashVouchers", "CashVoucherID", CashVoucherID)
     CurrentDb.Execute "UPDATE CashVouchers SET ReceivedAt = " & SqlDate(Now) & ", ReceivedByID = " & CurrentUserID() & _
-                      " WHERE CashVoucherID = " & CashVoucherID & " AND ReceivedAt Is Null", dbFailOnError
+                      " WHERE CashVoucherID = " & CashVoucherID & " AND ReceivedAt Is Null", dbFailOnError + dbSeeChanges
     AuditEdited "CASH_TRANSFER_RECEIVE", "CashVouchers", "CashVoucherID", CashVoucherID, before
 End Function
 
@@ -245,7 +245,7 @@ Public Function CancelCashTransfer(ByVal CashVoucherID As Long) As String
         Exit Function
     End If
     Set before = AuditSnapshot("CashVouchers", "CashVoucherID", CashVoucherID)
-    CurrentDb.Execute "DELETE FROM CashVouchers WHERE CashVoucherID = " & CashVoucherID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM CashVouchers WHERE CashVoucherID = " & CashVoucherID, dbFailOnError + dbSeeChanges
     AuditDeleted "CASH_TRANSFER_DELETE", "CashVouchers", CashVoucherID, before
 End Function
 
@@ -335,7 +335,7 @@ Private Function InsertVoucher(ByVal db As DAO.Database, ByVal VoucherType As St
 
     If VoucherType = "OUT" And Category = "EXPENSE" Then
         ' the voucher moves the cash; the expense (without a box) feeds the expense reports
-        Set rs = db.OpenRecordset("Expenses", dbOpenDynaset, dbAppendOnly)
+        Set rs = db.OpenRecordset("Expenses", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
         rs.AddNew
         rs!ExpenseNumber = NextNumber("EXPENSE")
         rs!ExpenseDate = DateValue(VoucherDate)
@@ -353,7 +353,7 @@ Private Function InsertVoucher(ByVal db As DAO.Database, ByVal VoucherType As St
         rs.Close
     End If
 
-    Set rs = db.OpenRecordset("CashVouchers", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("CashVouchers", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!VoucherNumber = vNo
     rs!VoucherDate = VoucherDate
@@ -448,7 +448,7 @@ Public Function PostCashClosing(ByVal BoxID As Long, ByVal Counted As Currency, 
     inTrans = True
     closingNo = NextNumber("CASH_CLOSING")
     closeDate = Now
-    Set rs = db.OpenRecordset("CashClosings", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("CashClosings", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!ClosingNumber = closingNo
     rs!ClosingDate = closeDate
@@ -480,7 +480,7 @@ Public Function PostCashClosing(ByVal BoxID As Long, ByVal Counted As Currency, 
             voucherID = InsertVoucher(db, "OUT", BoxID, Null, "ADVANCE", -diff, "", "⁄Ã“  ’›Ì… " & closingNo & _
                                       " ”·›… ⁄·Ï «·„‰œÊ»", Null, NewClosingID, closeDate)
             db.Execute "UPDATE CashVouchers SET AdvanceEmployeeID = " & CLng(advanceTo) & " WHERE CashVoucherID = " & _
-                       voucherID, dbFailOnError
+                       voucherID, dbFailOnError + dbSeeChanges
         End If
     ElseIf diff > 0 Then
         InsertVoucher db, "IN", BoxID, Null, "OVERAGE", diff, "", "“Ì«œ…  ’›Ì… " & closingNo, Null, NewClosingID, closeDate
@@ -512,7 +512,7 @@ Public Sub TreasuryLoad(ByVal frm As Access.Form)
     Dim sql As String
     Calendar = vbCalGreg
     sql = "SELECT CashBoxID, BoxName AS [«·’‰œÊﬁ], BoxTypeName AS [«·‰Ê⁄], Format(q.Balance, '#,##0.00') AS [—’Ìœ «·’‰œÊﬁ] " & _
-          "FROM CashBoxBalanceQuery AS q WHERE q.IsActive = True"
+          "FROM CashBoxBalanceQuery AS q WHERE q.IsActive <> 0"
     If Not HasPermission("CASH_BOX") Then sql = sql & " AND q.CashBoxID = " & CurrentCashBoxID()   ' a cashier sees his box
     frm!lstBoxes.RowSource = Tr(sql & " ORDER BY q.BoxType DESC, q.BoxName")
     frm!btnCashIn.Enabled = HasPermission("CASH_BOX")
@@ -619,7 +619,7 @@ Public Sub TransfersLoad(ByVal frm As Access.Form)
         "Format(v.Amount, '#,##0.00') AS [«·„»·€ «·„ÕÊÛ¯·], v.Description AS [»Ì«‰ «· ÕÊÌ·] " & _
         "FROM (CashVouchers AS v INNER JOIN [@CashBoxes] AS f ON v.CashBoxID = f.CashBoxID) " & _
         "INNER JOIN [@CashBoxes] AS t ON v.ToCashBoxID = t.CashBoxID " & _
-        "WHERE v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Null ORDER BY v.VoucherDate")
+        "WHERE v.VoucherType = 'TRANSFER' AND v.InTransit <> 0 AND v.ReceivedAt Is Null ORDER BY v.VoucherDate")
     frm!lstTransfers.Requery
     frm!lblHint.Caption = Tr("«· ÕÊÌ· ÌœŒ· «·’‰œÊﬁ «·„” ·„ ⁄‰œ  √ﬂÌœ «” ·«„Â° ÊÕ Ï –·ﬂ ›Ì Õ”«» ´‰ﬁœÌ… »«·ÿ—Ìﬁª. " & _
                              "≈·€«¡ «· ÕÊÌ· Ì⁄Ìœ «·„»·€ ··’‰œÊﬁ «·„—”ˆ·.")
@@ -781,10 +781,10 @@ Public Function SaveCashVoucher(ByVal frm As Access.Form, Optional ByVal PrintAf
     End If
     If Nz(frm!cboCategory.Value, "") = "ADVANCE" Then
         CurrentDb.Execute "UPDATE CashVouchers SET AdvanceEmployeeID = " & CLng(frm!cboEmployee.Value) & _
-                          " WHERE CashVoucherID = " & newID, dbFailOnError
+                          " WHERE CashVoucherID = " & newID, dbFailOnError + dbSeeChanges
     ElseIf Nz(frm!cboCategory.Value, "") = "COMMISSION" Then
         CurrentDb.Execute "UPDATE CashVouchers SET SalesRepID = " & CLng(frm!cboEmployee.Value) & _
-                          " WHERE CashVoucherID = " & newID, dbFailOnError                  ' modSalesReps
+                          " WHERE CashVoucherID = " & newID, dbFailOnError + dbSeeChanges                  ' modSalesReps
     End If
     ShowInfo " „ Õ›Ÿ " & DLookupList(VOUCHER_TYPES, kind) & " —ﬁ„ " & _
              DLookup("VoucherNumber", "CashVouchers", "CashVoucherID = " & newID)
@@ -804,7 +804,7 @@ Public Sub AddExpenseType(ByVal frm As Access.Form, ByVal ControlName As String)
     id = DbValue("SELECT ExpenseTypeID FROM ExpenseTypes WHERE ExpenseTypeName = " & SqlText(Left$(typeName, 50)))
     If IsNull(id) Then
         CurrentDb.Execute "INSERT INTO ExpenseTypes (ExpenseTypeName) VALUES (" & SqlText(Left$(typeName, 50)) & ")", _
-                          dbFailOnError
+                          dbFailOnError + dbSeeChanges
         id = DbValue("SELECT ExpenseTypeID FROM ExpenseTypes WHERE ExpenseTypeName = " & SqlText(Left$(typeName, 50)))
         LogAction "SAVE", "ExpenseTypes", CStr(id), typeName
     End If
@@ -828,7 +828,7 @@ Public Sub ClosingLoad(ByVal frm As Access.Form)
         If IsNumeric(frm.OpenArgs) Then frm!cboBox.Value = CLng(frm.OpenArgs)
     End If
     If Not ClosingAllowed(frm!cboBox.Value) Then frm!cboBox.Value = CurrentCashBoxID()
-    frm!cboToBox.Value = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive = True")
+    frm!cboToBox.Value = DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive <> 0")
     ClosingBoxChanged frm
     ClosingDestinationChanged frm
 End Sub
@@ -968,8 +968,8 @@ Public Function TestCash() As Boolean
     EnsureTestUser
     g_SilentMode = True
     Debug.Print "=== TestCash  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
-    mainBox = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive = True"), 0)
-    box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'CASHIER' AND IsActive = True"), 0)
+    mainBox = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'MAIN' AND IsActive <> 0"), 0)
+    box = Nz(DbValue("SELECT Min(CashBoxID) FROM CashBoxes WHERE BoxType = 'CASHIER' AND IsActive <> 0"), 0)
     CheckCash mainBox > 0 And box > 0, "Œ“Ì‰… —∆Ì”Ì… Ê’‰œÊﬁ ﬂ«‘Ì— ‰‘ÿ«‰", passed, failed, report
     CheckCash IsNull(CashBoxFor(2, 100)), "«·œ›⁄ »«·»ÿ«ﬁ… ·« ÌœŒ· «·’‰œÊﬁ", passed, failed, report
     CheckCash IsNull(CashBoxFor(CASH_METHOD_ID, 0)), "«·„»·€ «·¬Ã· ·« ÌœŒ· «·’‰œÊﬁ", passed, failed, report
@@ -1014,10 +1014,10 @@ Public Function TestCash() As Boolean
 
     ' custodians and transfers in transit (docs/56)
     CurrentDb.Execute "INSERT INTO CashBoxUsers (CashBoxID, EmployeeID) VALUES (" & box & ", " & CurrentUserID() & ")", _
-                      dbFailOnError
+                      dbFailOnError + dbSeeChanges
     CheckCash IsBoxCustodian(box) And BoxHasCustodians(box) And CanUseBox(box) And ClosingAllowed(box), _
               "√„Ì‰ «·’‰œÊﬁ Ì’—› „‰Â ÊÌ’›¯ÌÂ", passed, failed, report
-    CurrentDb.Execute "UPDATE CashBoxes SET ConfirmReceipt = True WHERE CashBoxID = " & mainBox, dbFailOnError
+    CurrentDb.Execute "UPDATE CashBoxes SET ConfirmReceipt = True WHERE CashBoxID = " & mainBox, dbFailOnError + dbSeeChanges
     mainBefore = CashBoxBalance(mainBox)
     before = CashBoxBalance(box)
     msg = PostCashVoucher("TRANSFER", box, mainBox, "TRANSFER", 50, "", "TEST-CASH", Null, id)

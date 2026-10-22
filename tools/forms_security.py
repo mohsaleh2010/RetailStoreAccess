@@ -115,7 +115,7 @@ def layout_roles(heads) -> FormModel:
 
 # ------------------------------------------------------------- screens of a user
 USER_ROWS = ("SELECT e.EmployeeID, e.EmployeeName & '  (' & e.Username & ')', r.RoleName FROM Employees AS e "
-             "INNER JOIN [@Roles] AS r ON e.RoleID = r.RoleID WHERE e.IsDeveloper = False ORDER BY e.EmployeeName")
+             "INNER JOIN [@Roles] AS r ON e.RoleID = r.RoleID WHERE e.IsDeveloper = 0 ORDER BY e.EmployeeName")
 USER_SCREEN_TITLES = ["فتح", "الشاشة", "القسم", "إضافة / حفظ", "تعديل", "حذف", "ما ينطبق عليها"]
 USER_SCREEN_CHECKS = ("CanOpen", "CanAdd", "CanEdit", "CanDelete")
 

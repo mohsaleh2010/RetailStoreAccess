@@ -253,7 +253,7 @@ Public Sub EnsureLabelTables()
     End If
     If Not LabelTableExists("tmpLabelNumbers") Then
         db.Execute "CREATE TABLE tmpLabelNumbers (N LONG CONSTRAINT pkLabelNumbers PRIMARY KEY)", dbFailOnError
-        Set rs = db.OpenRecordset("tmpLabelNumbers", dbOpenDynaset, dbAppendOnly)
+        Set rs = db.OpenRecordset("tmpLabelNumbers", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
         For i = 1 To MAX_COPIES
             rs.AddNew
             rs!N = i
@@ -278,7 +278,7 @@ Public Function AddLabelProduct(ByVal ProductID As Long, ByVal Copies As Long) A
         AddLabelProduct = "«·„‰ Ã €Ì— „ÊÃÊœ."
         Exit Function
     End If
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpLabelQueue WHERE ProductID = " & ProductID, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM tmpLabelQueue WHERE ProductID = " & ProductID, dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         rs.AddNew
         rs!ProductID = ProductID
@@ -315,7 +315,7 @@ Public Function AddPurchaseLabels(ByVal PurchaseInvoiceID As Long) As Long
     Dim rs As DAO.Recordset, n As Long
     Set rs = CurrentDb.OpenRecordset("SELECT ProductID, SUM(Quantity) AS Units FROM PurchaseInvoiceDetails " & _
                                      "WHERE PurchaseInvoiceID = " & PurchaseInvoiceID & " GROUP BY ProductID", _
-                                     dbOpenSnapshot)
+                                     dbOpenSnapshot, dbSeeChanges)
     Do Until rs.EOF
         If Len(AddLabelProduct(rs!ProductID, UnitsToCopies(rs!Units))) = 0 Then n = n + 1
         rs.MoveNext
@@ -339,7 +339,7 @@ End Function
 
 Public Sub ClearLabelQueue()
     EnsureLabelTables
-    CurrentDb.Execute "DELETE FROM tmpLabelQueue", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpLabelQueue", dbFailOnError + dbSeeChanges
 End Sub
 
 '------------------------------------------------------------------------------
@@ -557,7 +557,7 @@ End Sub
 
 Public Sub RemoveLabelLine(ByVal frm As Access.Form)
     If IsNull(frm!LineNo.Value) Then Exit Sub
-    CurrentDb.Execute "DELETE FROM tmpLabelQueue WHERE LineNo = " & frm!LineNo.Value, dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpLabelQueue WHERE LineNo = " & frm!LineNo.Value, dbFailOnError + dbSeeChanges
     frm.Requery
     UpdateLabelStatus frm.Parent
 End Sub

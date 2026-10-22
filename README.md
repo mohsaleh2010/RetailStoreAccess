@@ -93,7 +93,8 @@
 | + | عجز المندوب سلفة عليه: عجز صندوق العهدة عند التصفية، وصافي عجز بضاعة السيارة عند إغلاق اليوم، على سلف مستخدم المندوب فيُخصم من راتبه | ✅ تمت الموافقة | [docs/66-Rep-Shortage-Advance.md](docs/66-Rep-Shortage-Advance.md) |
 | + | **5أ:** سكربت قاعدة البيانات على SQL Server (`dist/sql/RetailStore_Schema.sql`) من نفس تعريف الجداول: الجداول والأنواع والشروط والفهارس والعلاقات والبيانات الأولية، للإنشاء والترقية | ✅ تمت الموافقة | [docs/67-SQL-Server-Script.md](docs/67-SQL-Server-Script.md) |
 | + | **5ب:** شاشة «SQL Server»: الاتصال بالخادم، وتجهيز القاعدة بالسكربت، ونقل البيانات بأرقامها ومطابقتها (السجلات والمبالغ والنصوص)، وتشغيل البرنامج على الخادم والرجوع إلى ملف Access، وفحص الخادم عند فتح البرنامج | ✅ تمت الموافقة | [docs/68-SQL-Server-Transfer.md](docs/68-SQL-Server-Transfer.md) |
-| + | دراسة الوحدات المتبقية لنظام ERP (الوحدات المتعددة، وقوائم الأسعار، وعروض وأوامر الشراء، والصلاحية، وتكاليف الاستيراد، ونهاية الخدمة...)، وقرار الخطة 6: Blazor (Razor) للويب وMAUI Blazor Hybrid لـ Windows وAndroid وiOS | 📋 خطة | [docs/69-Remaining-Modules.md](docs/69-Remaining-Modules.md) · [docs/51 الخطة 6](docs/51-Plan-Opening-Warehouses-Treasury-Reps-SQL-Web.md) |
+| + | دراسة الوحدات المتبقية لنظام ERP (الوحدات المتعددة، وقوائم الأسعار، وعروض وأوامر الشراء، والصلاحية، وتكاليف الاستيراد، ونهاية الخدمة...)، وقرار الخطة 6: Blazor (Razor) للويب وMAUI Blazor Hybrid لـ Windows وAndroid وiOS؛ اختيار صاحب المشروع: 1 ثم 2 ثم 4 ثم 3 | 📋 خطة | [docs/69-Remaining-Modules.md](docs/69-Remaining-Modules.md) · [docs/51 الخطة 6](docs/51-Plan-Opening-Warehouses-Treasury-Reps-SQL-Web.md) |
+| + | **5ج:** البرنامج كاملًا على SQL Server: `dbSeeChanges` في كل الكود، ورقم السجل بعد الحفظ، ومقارنة نعم/لا بـ `<> 0`، والنسخ الاحتياطي والاستعادة على الخادم، وعلامة «البيانات الفعلية على الخادم» (لا نقل فوقها، وتحذير ملف Access القديم)، و`READ_COMMITTED_SNAPSHOT` | ✅ بانتظار الموافقة | [docs/70-SQL-Server-Code.md](docs/70-SQL-Server-Code.md) |
 
 ## هيكل المستودع
 
@@ -208,6 +209,7 @@
 | 61 | استبدال `modCash` و`modVanSales` و`modJournal` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`) | `BuildSchema`, `BuildRelations`, `BuildQueries` | `TestRepDays`, `TestCash`, `TestPayroll` |
 | 62 | لا شيء في Access: الملف الجديد `dist\sql\RetailStore_Schema.sql` يُشغَّل على SQL Server (`docs/67` القسم 3) | — | تشغيل السكربت مرتين بلا أخطاء |
 | 63 | `modSqlServer` (دائمة، جديدة)، واستبدال `modSecurityScreens` و`modTestAll` والوحدات المولَّدة (أو `BuildFrontEnd.vbs`)، ومجلد `dist\sql` بجانب ملف البرنامج | `BuildSchema`, `BuildForms` | `TestSqlServer`، ثم التجربة على الخادم (`docs/68` القسم 4) |
+| 64 | كل الوحدات تقريبًا (`dbSeeChanges`): **`BuildFrontEnd.vbs`**، ومجلد `dist\sql` الجديد بجانب ملف البرنامج | `BuildSchema`؛ وعلى الخادم «تجهيز القاعدة» | `TestSqlServer`، ثم `RunAllTests` على قاعدة تجربة على الخادم (`docs/70` القسم 6) |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

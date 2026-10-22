@@ -9,8 +9,8 @@ from forms_bank import COUNTER_ROWS
 from forms_cash import table_combo, value_list_combo
 from forms_purchases import check_with_label
 
-ASSET_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting = True AND "
-                  "IsActive = True AND AccountType = 'ASSET' AND Level2Code = 12 AND AccountCode <> 1790 ORDER BY TreeKey")
+ASSET_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName FROM [@Accounts] AS a WHERE IsPosting <> 0 AND "
+                  "IsActive <> 0 AND AccountType = 'ASSET' AND Level2Code = 12 AND AccountCode <> 1790 ORDER BY TreeKey")
 SOURCES = "BANK;من البنك;CASHBOX;من صندوق;ACCOUNT;على حساب آخر (مستحقات أو قرض...);OPENING;موجود قبل البرنامج (رصيد افتتاحي)"
 METHODS = "SL;القسط الثابت;DB;القسط المتناقص"
 DISPOSAL_TO = "BANK;بيع - الثمن في البنك;CASHBOX;بيع - الثمن في صندوق;NONE;استبعاد بدون ثمن (تلف أو فقد)"

@@ -87,7 +87,7 @@ End Function
 Private Sub LogClosing(ByVal ActionType As String, ByVal Through As Variant, ByVal Previous As Date, _
                        ByVal FiscalYear As Variant, ByVal Notes As String)
     Dim rs As DAO.Recordset
-    Set rs = CurrentDb.OpenRecordset("PeriodClosings", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("PeriodClosings", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!ActionType = ActionType
     rs!ClosedThrough = Through
@@ -104,7 +104,7 @@ Private Sub SetClosedThrough(ByVal Through As Variant)
     Dim sqlValue As String
     sqlValue = "Null"                                  ' not IIf: VBA evaluates both sides, SqlDate(Null) fails
     If IsDate(Through) Then sqlValue = SqlDate(Through)
-    CurrentDb.Execute "UPDATE Settings SET ClosedThrough = " & sqlValue & " WHERE SettingID = 1", dbFailOnError
+    CurrentDb.Execute "UPDATE Settings SET ClosedThrough = " & sqlValue & " WHERE SettingID = 1", dbFailOnError + dbSeeChanges
 End Sub
 
 Public Function ClosePeriod(ByVal Through As Date, ByVal Notes As String) As String
@@ -206,7 +206,7 @@ Public Function CloseFiscalYear(ByVal FiscalYear As Long, ByVal Notes As String)
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    Set h = db.OpenRecordset("FiscalYearClosings", dbOpenDynaset)
+    Set h = db.OpenRecordset("FiscalYearClosings", dbOpenDynaset, dbSeeChanges)
     h.AddNew
     h!FiscalYear = FiscalYear
     h!ClosingNumber = "FY-" & FiscalYear
@@ -222,8 +222,8 @@ Public Function CloseFiscalYear(ByVal FiscalYear As Long, ByVal Notes As String)
         "INNER JOIN JournalEntries AS e ON l.EntryID = e.EntryID) INNER JOIN Accounts AS a ON l.AccountCode = " & _
         "a.AccountCode WHERE e.EntryDate < " & SqlDate(DateAdd("d", 1, yearEnd)) & " AND a.AccountType IN " & _
         "('REVENUE', 'EXPENSE') GROUP BY l.AccountCode HAVING Sum(l.Debit) <> Sum(l.Credit) ORDER BY l.AccountCode", _
-        dbOpenSnapshot)
-    Set l = db.OpenRecordset("FiscalYearClosingLines", dbOpenDynaset, dbAppendOnly)
+        dbOpenSnapshot, dbSeeChanges)
+    Set l = db.OpenRecordset("FiscalYearClosingLines", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     Do Until rs.EOF
         net = rs!Net
         n = n + 1
@@ -281,7 +281,7 @@ Public Function ReopenFiscalYear(ByVal FiscalYear As Long, ByVal Notes As String
     If Len(ReopenFiscalYear) > 0 Then Exit Function
     previous = ClosedThroughDate()
     opened = DateAdd("d", -1, FiscalYearStart(FiscalYear))   ' the last day of the year before
-    CurrentDb.Execute "DELETE FROM FiscalYearClosings WHERE FiscalYear = " & FiscalYear, dbFailOnError   ' lines cascade
+    CurrentDb.Execute "DELETE FROM FiscalYearClosings WHERE FiscalYear = " & FiscalYear, dbFailOnError + dbSeeChanges   ' lines cascade
     If previous > opened Then SetClosedThrough opened
     LogClosing "YEAR_OPEN", IIf(previous > opened, opened, previous), previous, FiscalYear, Notes
     ReopenFiscalYear = SyncJournal()                   ' removes the closing entry

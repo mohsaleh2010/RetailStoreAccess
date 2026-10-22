@@ -61,7 +61,7 @@ End Function
 '------------------------------------------------------------------------------
 Public Function DueRecurringCount(Optional ByVal AsOf As Variant) As Long
     If IsMissing(AsOf) Then AsOf = Date
-    DueRecurringCount = Nz(DbValue("SELECT COUNT(*) FROM RecurringExpenses WHERE IsActive = True AND " & _
+    DueRecurringCount = Nz(DbValue("SELECT COUNT(*) FROM RecurringExpenses WHERE IsActive <> 0 AND " & _
         "NextDueDate <= " & SqlDate(AsOf) & " AND (EndDate Is Null OR NextDueDate <= EndDate)"), 0)
 End Function
 
@@ -74,9 +74,9 @@ Public Function CreateDueExpenses(ByVal AsOf As Date, ByRef Created As Long, Opt
         CreateDueExpenses = "·Ì”  ·œÌﬂ ’·«ÕÌ… «·„’—Ê›« ."
         Exit Function
     End If
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM RecurringExpenses WHERE IsActive = True AND NextDueDate <= " & _
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM RecurringExpenses WHERE IsActive <> 0 AND NextDueDate <= " & _
         SqlDate(AsOf) & IIf(OnlyID > 0, " AND RecurringID = " & OnlyID, "") & " ORDER BY NextDueDate, RecurringID", _
-        dbOpenDynaset)
+        dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         msg = CreateDueOf(rs, AsOf, n)
         Created = Created + n
@@ -123,7 +123,7 @@ Private Sub AddRecurringExpense(ByVal r As DAO.Recordset, ByVal Due As Date)
         number = NextNumber("EXPENSE")
         tries = tries + 1
     Loop While Nz(DbValue("SELECT COUNT(*) FROM Expenses WHERE ExpenseNumber = " & SqlText(number)), 0) > 0 And tries < 1000
-    Set e = CurrentDb.OpenRecordset("Expenses", dbOpenDynaset, dbAppendOnly)
+    Set e = CurrentDb.OpenRecordset("Expenses", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     e.AddNew
     e!ExpenseNumber = number
     e!ExpenseDate = Due
@@ -282,7 +282,7 @@ Public Function TestRecurring() As Boolean
     CurrentDb.Execute "INSERT INTO RecurringExpenses (RecurringName, ExpenseTypeID, Amount, Tax, PaymentMethodID, Frequency, DueDay, " & _
         "StartDate, NextDueDate, IsActive) VALUES ('TEST ≈ÌÃ«—', " & _
         Nz(DbValue("SELECT Min(ExpenseTypeID) FROM ExpenseTypes"), 1) & ", 1000, 150, " & BANK_TRANSFER_METHOD_ID & _
-        ", 'MONTHLY', 1, " & SqlDate(start) & ", " & SqlDate(FirstDueDate(start, 1)) & ", True)", dbFailOnError
+        ", 'MONTHLY', 1, " & SqlDate(start) & ", " & SqlDate(FirstDueDate(start, 1)) & ", True)", dbFailOnError + dbSeeChanges
     id = DbValue("SELECT RecurringID FROM RecurringExpenses WHERE RecurringName = 'TEST ≈ÌÃ«—'")
     expected = 3
     Check DueRecurringCount() >= 1, "«·„’—Ê› «·„” Õﬁ ÌŸÂ— ›Ì «·⁄œœ", passed, failed, report
@@ -299,7 +299,7 @@ Public Function TestRecurring() As Boolean
           "e.ExpenseID WHERE j.SourceType = 'EXPENSE' AND e.RecurringID = " & id), 0) = expected And _
           Nz(DbValue("SELECT COUNT(*) FROM JournalEntries WHERE TotalDebit <> TotalCredit"), 0) = 0, _
           "·ﬂ· „’—Ê› ﬁÌœ „ Ê«“‰ " & msg, passed, failed, report
-    CurrentDb.Execute "UPDATE RecurringExpenses SET NextDueDate = " & SqlDate(start) & " WHERE RecurringID = " & id, dbFailOnError
+    CurrentDb.Execute "UPDATE RecurringExpenses SET NextDueDate = " & SqlDate(start) & " WHERE RecurringID = " & id, dbFailOnError + dbSeeChanges
     msg = CreateDueExpenses(Date, created, id)
     Check created = 0 And Nz(DbValue("SELECT COUNT(*) FROM Expenses WHERE RecurringID = " & id), 0) = expected, _
           "«· «—ÌŒ «·–Ì ·Â „’—Ê› ·« Ìı‰‘√ „—… √Œ—Ï", passed, failed, report

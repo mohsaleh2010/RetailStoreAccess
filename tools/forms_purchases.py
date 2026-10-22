@@ -8,11 +8,11 @@ from forms import Control, FormModel, Sym, button, cm, currency_pair, fit_window
 from forms_sales import LOCKED, PAYMENT_ROWS, PAYMENT_TYPES, grid_row, header_labels
 
 PURCHASE_PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' - ' & ProductCode AS Item, PurchasePrice "
-                         "FROM Products WHERE IsActive = True ORDER BY ProductName")
-ACTIVE_SUPPLIER_ROWS = ("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive = True "
+                         "FROM Products WHERE IsActive <> 0 ORDER BY ProductName")
+ACTIVE_SUPPLIER_ROWS = ("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive <> 0 "
                         "ORDER BY s.SupplierName")
 PURCHASE_REFUND_TYPES = "CREDIT;خصم من رصيد المورد;CASH;استرداد نقدي من المورد"
-MANUAL_TYPE_ROWS = ("SELECT t.TransactionTypeID, t.TypeName FROM [@TransactionTypes] AS t WHERE t.IsManual = True "
+MANUAL_TYPE_ROWS = ("SELECT t.TransactionTypeID, t.TypeName FROM [@TransactionTypes] AS t WHERE t.IsManual <> 0 "
                     "ORDER BY t.TransactionTypeID")
 COUNT_ROWS = ("SELECT c.StockCountID, c.CountNumber, c.CountDate, IIf(c.Status = 'OPEN', 'مفتوح', "
               "IIf(c.Status = 'POSTED', 'مُرحّل', 'ملغى')) AS StatusName, w.WarehouseName "
@@ -486,7 +486,7 @@ def layout_stock_count(line_heads) -> FormModel:
 
 # ------------------------------------------------------------------ transfers between warehouses (docs/58)
 TRANSFER_PRODUCTS = ("SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p "
-                     "WHERE p.TrackStock = True AND p.IsActive = True ORDER BY p.ProductName")
+                     "WHERE p.TrackStock <> 0 AND p.IsActive <> 0 ORDER BY p.ProductName")
 TRANSFER_TITLES = ["الصنف", "الكمية المحوَّلة", "تكلفة الوحدة", "قيمة السطر"]
 
 

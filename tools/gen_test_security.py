@@ -6,6 +6,7 @@ import re
 
 import security_reference as S
 from generate_common import vba_str
+from server_code import see_changes
 
 
 def vba_text_expr(text: str) -> str:
@@ -333,4 +334,4 @@ def build_test_security_vba() -> str:
     text = TEMPLATE.replace("@@VECTORS@@", vector_lines()).replace("@@MID@@", mid) \
         .replace("@@CODE@@", A.activation_code(mid, A.vba_secret()))
     assert not re.search(r"@@[A-Z_]+@@", text)
-    return text
+    return see_changes(text)                                   # plan 5C: SQL Server tables

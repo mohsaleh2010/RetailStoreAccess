@@ -8,6 +8,9 @@ Attribute VB_Name = "modBackup"
 '   RestoreBackup   puts a backup back in place (after a safety copy of the current data)
 '   OfferBackupOnExit  asks for a backup at logout/exit if none was made today
 ' Folder: Settings.BackupFolder, or "Backups" next to the front end.
+' On SQL Server (plan 5C, docs/70) the same procedures make BACKUP DATABASE files (.bak) written by the
+' server itself (Settings.BackupFolder as the server sees it, else its default backup folder), verify them with
+' RESTORE VERIFYONLY and restore them from master; the list comes from the server's backup history (msdb).
 ' Pure helpers (BackupFileName, OldBackups) have the same results as
 ' tools/security_reference.py.
 '==============================================================================
@@ -100,6 +103,10 @@ Public Function BackupNow(ByRef BackupFile As String, Optional ByVal Folder As S
         BackupNow = "·«  „·ﬂ ’·«ÕÌ… «·‰”Œ «·«Õ Ì«ÿÌ."
         Exit Function
     End If
+    If IsLinkedToServer() Then
+        BackupNow = ServerBackupNow(BackupFile, Folder, Suffix)
+        Exit Function
+    End If
     source = BackendFilePath()
     If Len(Dir$(source)) = 0 Then
         BackupNow = "„·› «·»Ì«‰«  €Ì— „ÊÃÊœ: " & source
@@ -130,6 +137,10 @@ End Function
 
 Public Function BackupIsReadable(ByVal FilePath As String) As Boolean
     Dim db As DAO.Database, tdf As DAO.TableDef
+    If LCase$(Right$(FilePath, 4)) = ".bak" Then
+        BackupIsReadable = (Len(ServerExec(LinkConnect(), VerifyBackupSql(FilePath))) = 0)
+        Exit Function
+    End If
     On Error GoTo EH
     Set db = DBEngine.OpenDatabase(FilePath, False, True)
     For Each tdf In db.TableDefs
@@ -141,10 +152,11 @@ EH:
     BackupIsReadable = False
 End Function
 
-Public Function BackupList(ByVal Folder As String, ByVal BaseName As String) As String
+Public Function BackupList(ByVal Folder As String, ByVal BaseName As String, _
+                           Optional ByVal Extension As String = ".accdb") As String
     ' "|"-separated names of the regular backups of BaseName in Folder.
     Dim f As String, out As String
-    f = Dir$(Folder & "\" & BaseName & "_????-??-??_??????.accdb")
+    f = Dir$(Folder & "\" & BaseName & "_????-??-??_??????" & Extension)
     Do While Len(f) > 0
         If Len(out) > 0 Then out = out & "|"
         out = out & f
@@ -190,6 +202,10 @@ Public Function RestoreBackup(ByVal BackupFile As String) As String
         RestoreBackup = "«·„·› «·„Œ «— ·Ì” ‰”Œ… ’«·Õ… „‰ »Ì«‰«  «·»—‰«„Ã."
         Exit Function
     End If
+    If IsLinkedToServer() Then
+        RestoreBackup = ServerRestore(BackupFile)
+        Exit Function
+    End If
     target = BackendFilePath()
     If StrComp(target, CurrentProject.FullName, vbTextCompare) = 0 Then
         RestoreBackup = "«·»Ì«‰«  œ«Œ· Â–« «·„·› ‰›”Â (€Ì— „ﬁ”„…)° ›·« Ì„ﬂ‰ «” ⁄«œ Â« ÊÂÊ „› ÊÕ." & vbCrLf & _
@@ -212,4 +228,95 @@ EH:
     RestoreBackup = " ⁄–—  «·«” ⁄«œ…: " & Err.Description & vbCrLf & _
                     " √ﬂœ √‰ «·»—‰«„Ã „€·ﬁ ⁄·Ï ﬂ· «·√ÃÂ“… «·√Œ—Ï À„ √⁄œ «·„Õ«Ê·…." & vbCrLf & _
                     "»Ì«‰« ﬂ «·Õ«·Ì… ·„   €Ì—° Ê‰”Œ Â« «·Êﬁ«∆Ì…: " & safety
+End Function
+
+'------------------------------------------------------------------------------
+' The database on SQL Server (plan 5C)
+'------------------------------------------------------------------------------
+Public Function DataLocation() As String
+    ' What the backup screen shows: the data file, or the server and database.
+    If IsLinkedToServer() Then
+        DataLocation = "SQL Server: " & SqlSetting("SqlServer") & " / " & ConnectDatabase(LinkConnect())
+    Else
+        DataLocation = BackendFilePath()
+    End If
+End Function
+
+Public Function ServerBackupFolder() As String
+    ' The folder the server writes to (as the server sees it): Settings.BackupFolder, else "" = its default folder.
+    ServerBackupFolder = Trim$(Nz(SettingValue("BackupFolder"), ""))
+    If Right$(ServerBackupFolder, 1) = "\" Then ServerBackupFolder = Left$(ServerBackupFolder, Len(ServerBackupFolder) - 1)
+End Function
+
+Public Function ServerBackupNow(ByRef BackupFile As String, Optional ByVal Folder As String = "", _
+                                Optional ByVal Suffix As String = "") As String
+    ' BACKUP DATABASE to <folder>\<database>_yyyy-mm-dd_hhnnss.bak, then RESTORE VERIFYONLY.
+    Dim cn As String, dbName As String, fileName As String, msg As String, deleted As String, v As Variant
+    Dim history As String
+    cn = LinkConnect()
+    dbName = ConnectDatabase(cn)
+    If Len(Folder) = 0 Then Folder = ServerBackupFolder()
+    fileName = BackupFileName(dbName & Suffix, Now)
+    fileName = Left$(fileName, Len(fileName) - 6) & ".bak"
+    BackupFile = IIf(Len(Folder) > 0, Folder & "\" & fileName, fileName)
+    msg = ServerExec(cn, BackupDatabaseSql(dbName, BackupFile))
+    If Len(msg) > 0 Then
+        ServerBackupNow = " ⁄–— ⁄„· «·‰”Œ… «·«Õ Ì«ÿÌ… ⁄·Ï «·Œ«œ„:" & vbCrLf & msg & vbCrLf & vbCrLf & _
+                          "«·„Ã·œ ÌÃ» √‰ ÌﬂÊ‰ ⁄·Ï ÃÂ«“ «·Œ«œ„ √Ê „Ã·œ« „‘ —ﬂ« Ìﬂ » ›ÌÂ SQL Server."
+        Exit Function
+    End If
+    If Len(Folder) = 0 Then                                    ' the server's default folder: its full path
+        history = ServerQueryRows(cn, ServerBackupHistorySql())
+        If Len(history) > 0 Then BackupFile = Split(Split(history, vbLf)(0), vbTab)(0)
+    End If
+    If Not BackupIsReadable(BackupFile) Then
+        ServerBackupNow = " „  «·‰”Œ… ⁄·Ï «·Œ«œ„ ·ﬂ‰ ›Õ’Â« ›‘· (RESTORE VERIFYONLY): " & BackupFile
+        Exit Function
+    End If
+    If Len(Suffix) = 0 And Len(Folder) > 0 Then                ' old copies, when this PC sees the folder too
+        On Error Resume Next
+        deleted = OldBackups(BackupList(Folder, dbName, ".bak"), Nz(SettingValue("BackupKeepCount"), 30))
+        If Len(deleted) > 0 Then
+            For Each v In Split(deleted, "|")
+                Kill Folder & "\" & v
+            Next
+        End If
+        On Error GoTo 0
+    End If
+    LogAction "BACKUP", "Backup", "", BackupFile
+End Function
+
+Public Function ServerBackupRows() As String
+    ' The backup list of the screen: "path;date;size" rows (newest first) from the server's history.
+    Dim history As String, r As Variant, parts As Variant, rows As String
+    history = ServerQueryRows(LinkConnect(), ServerBackupHistorySql())
+    If Len(history) = 0 Then Exit Function
+    For Each r In Split(history, vbLf)
+        parts = Split(r, vbTab)
+        rows = rows & ";""" & parts(0) & """;""" & parts(1) & """;""" & parts(2) & " MB"""
+    Next
+    ServerBackupRows = rows
+End Function
+
+Public Function ServerRestore(ByVal BackupFile As String) As String
+    ' The server database replaced by BackupFile (after a safety backup), from master. Every connection to the
+    ' database is closed by the server; the program closes afterwards.
+    Dim cn As String, dbName As String, safety As String, msg As String, i As Long
+    cn = LinkConnect()
+    dbName = ConnectDatabase(cn)
+    msg = ServerBackupNow(safety, , "_BeforeRestore")
+    If Len(msg) > 0 Then
+        ServerRestore = " ⁄–—  «·‰”Œ… «·Êﬁ«∆Ì… ﬁ»· «·«” ⁄«œ…° ›·„   „ «·«” ⁄«œ…: " & msg
+        Exit Function
+    End If
+    LogAction "RESTORE", "Backup", "", BackupFile
+    For i = Forms.Count - 1 To 0 Step -1
+        DoCmd.Close acForm, Forms(i).Name, acSaveNo
+    Next
+    msg = ServerExec(ConnectToDatabase(cn, "master"), RestoreDatabaseSql(dbName, BackupFile))
+    If Len(msg) > 0 Then
+        ServerRestore = " ⁄–—  «·«” ⁄«œ… ⁄·Ï «·Œ«œ„:" & vbCrLf & msg & vbCrLf & _
+                        "«·«” ⁄«œ…  Õ «Ã ’·«ÕÌ… dbcreator √Ê sysadmin ⁄·Ï «·Œ«œ„." & vbCrLf & _
+                        "»Ì«‰« ﬂ «·Õ«·Ì… ·„   €Ì—° Ê‰”Œ Â« «·Êﬁ«∆Ì…: " & safety
+    End If
 End Function

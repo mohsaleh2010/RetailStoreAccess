@@ -55,7 +55,7 @@ Public Function CreateBudget(ByVal BudgetYear As Long, ByVal BudgetName As Strin
         CreateBudget = "توجد موازنة لسنة " & BudgetYear & " بالفعل."
     End If
     If Len(CreateBudget) > 0 Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("Budgets", dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("Budgets", dbOpenDynaset, dbSeeChanges)
     rs.AddNew
     rs!BudgetYear = BudgetYear
     rs!BudgetName = Left$(IIf(Len(Trim$(BudgetName)) > 0, Trim$(BudgetName), "موازنة " & BudgetYear), 100)
@@ -72,7 +72,7 @@ Public Function DeleteBudget(ByVal BudgetID As Long) As String
     If Len(DeleteBudget) > 0 Then Exit Function
     Dim auditBefore As Collection
     Set auditBefore = AuditSnapshot("Budgets", "BudgetID", BudgetID)        ' the record as it was (modAudit)
-    CurrentDb.Execute "DELETE FROM Budgets WHERE BudgetID = " & BudgetID, dbFailOnError       ' lines cascade
+    CurrentDb.Execute "DELETE FROM Budgets WHERE BudgetID = " & BudgetID, dbFailOnError + dbSeeChanges       ' lines cascade
     AuditDeleted "BUDGET_DELETE", "Budgets", BudgetID, auditBefore
 End Function
 
@@ -81,13 +81,13 @@ Public Function AddAllAccounts(ByVal BudgetID As Long, ByRef Added As Long) As S
     Added = 0
     AddAllAccounts = CanBudget("ADD")
     If Len(AddAllAccounts) > 0 Then Exit Function
-    Added = Nz(DbValue("SELECT COUNT(*) FROM Accounts WHERE IsPosting = True AND IsActive = True AND AccountType IN " & _
+    Added = Nz(DbValue("SELECT COUNT(*) FROM Accounts WHERE IsPosting <> 0 AND IsActive <> 0 AND AccountType IN " & _
                        "('REVENUE', 'EXPENSE') AND AccountCode NOT IN (SELECT AccountCode FROM BudgetLines WHERE BudgetID = " & _
                        BudgetID & ")"), 0)
     CurrentDb.Execute "INSERT INTO BudgetLines (BudgetID, AccountCode, M1, M2, M3, M4, M5, M6, M7, M8, M9, M10, M11, M12) " & _
-        "SELECT " & BudgetID & ", AccountCode, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 FROM Accounts WHERE IsPosting = True AND " & _
-        "IsActive = True AND AccountType IN ('REVENUE', 'EXPENSE') AND AccountCode NOT IN (SELECT AccountCode FROM BudgetLines " & _
-        "WHERE BudgetID = " & BudgetID & ")", dbFailOnError
+        "SELECT " & BudgetID & ", AccountCode, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 FROM Accounts WHERE IsPosting <> 0 AND " & _
+        "IsActive <> 0 AND AccountType IN ('REVENUE', 'EXPENSE') AND AccountCode NOT IN (SELECT AccountCode FROM BudgetLines " & _
+        "WHERE BudgetID = " & BudgetID & ")", dbFailOnError + dbSeeChanges
 End Function
 
 Public Function ActualOfMonth(ByVal AccountCode As Long, ByVal CostCenterID As Variant, ByVal Y As Long, _
@@ -110,7 +110,7 @@ Public Function FillFromActual(ByVal BudgetID As Long, ByVal FromYear As Long, B
     Dim rs As DAO.Recordset, m As Long
     FillFromActual = CanBudget("EDIT")
     If Len(FillFromActual) > 0 Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM BudgetLines WHERE BudgetID = " & BudgetID, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM BudgetLines WHERE BudgetID = " & BudgetID, dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         rs.Edit
         For m = 1 To 12
@@ -131,7 +131,7 @@ Public Function SpreadAnnual(ByVal BudgetLineID As Long, ByVal Annual As Currenc
     If Len(SpreadAnnual) = 0 And Annual < 0 Then SpreadAnnual = "المبلغ لا يكون سالبًا."
     If Len(SpreadAnnual) > 0 Then Exit Function
     part = Round(Annual / 12, 2)
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM BudgetLines WHERE BudgetLineID = " & BudgetLineID, dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM BudgetLines WHERE BudgetLineID = " & BudgetLineID, dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         SpreadAnnual = "اختر سطرًا من الموازنة."
     Else
@@ -369,7 +369,7 @@ Public Function TestBudget() As Boolean
                 "لا يتكرر الحساب، ولا حسابات الميزانية", passed, failed, report
     ' compare with the actual: the budget of this year moved to the test year is the same months
     CurrentDb.Execute "UPDATE Budgets SET BudgetYear = " & Year(Date) & " WHERE BudgetID = " & id & _
-                      " AND " & Year(Date) & " NOT IN (SELECT BudgetYear FROM Budgets)", dbFailOnError
+                      " AND " & Year(Date) & " NOT IN (SELECT BudgetYear FROM Budgets)", dbFailOnError + dbSeeChanges
     If DbValue("SELECT BudgetYear FROM Budgets WHERE BudgetID = " & id) = Year(Date) Then
         SetPeriod DateSerial(Year(Date), 1, 1), DateSerial(Year(Date), 12, 31)
         actual = 0

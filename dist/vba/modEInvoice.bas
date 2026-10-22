@@ -134,7 +134,7 @@ Public Function SendEInvoice(ByVal DocKind As String, ByVal DocID As Long, ByRef
     On Error GoTo 0
     CurrentDb.Execute "UPDATE " & DocTableOf(DocKind) & " SET EInvoiceAttempts = Nz(EInvoiceAttempts, 0) + 1, " & _
                       "EInvoiceError = " & SqlText(Left$(IIf(result = "OK", "", Message), 255)) & _
-                      " WHERE " & DocKeyOf(DocKind) & " = " & DocID, dbFailOnError
+                      " WHERE " & DocKeyOf(DocKind) & " = " & DocID, dbFailOnError + dbSeeChanges
     SendEInvoice = result
 End Function
 
@@ -181,7 +181,7 @@ Public Sub SetEInvoiceStatus(ByVal DocKind As String, ByVal DocID As Long, ByVal
                              Optional ByVal Response As String = "")
     CurrentDb.Execute "UPDATE " & DocTableOf(DocKind) & " SET ZatcaStatus = '" & Status & "', ZatcaSubmittedAt = Now(), " & _
                       "ZatcaResponse = " & SqlText(Left$(Response, 60000)) & " WHERE " & DocKeyOf(DocKind) & " = " & _
-                      DocID, dbFailOnError
+                      DocID, dbFailOnError + dbSeeChanges
 End Sub
 
 Public Sub LogEInvoice(ByVal DocKind As String, ByVal DocID As Long, ByVal Action As String, ByVal Endpoint As String, _
@@ -189,7 +189,7 @@ Public Sub LogEInvoice(ByVal DocKind As String, ByVal DocID As Long, ByVal Actio
                        ByVal RequestBody As String, ByVal ResponseBody As String, ByVal DurationMs As Long)
     ' One request to the platform and its reply (EInvoiceLog). DocKind "" = a request of the device.
     Dim rs As DAO.Recordset
-    Set rs = CurrentDb.OpenRecordset("EInvoiceLog", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("EInvoiceLog", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!LoggedAt = Now
     rs!Country = AppCountry()
@@ -288,7 +288,7 @@ Public Sub EInvoiceSettingChanged(ByVal frm As Access.Form)
     Set before = AuditSnapshot("Settings", "SettingID", 1)
     CurrentDb.Execute "UPDATE Settings SET EInvoiceEnvironment = '" & Nz(frm!cboEnvironment.Value, "TEST") & _
                       "', EInvoiceEnabled = " & IIf(Nz(frm!chkEnabled.Value, False), "True", "False") & _
-                      " WHERE SettingID = 1", dbFailOnError
+                      " WHERE SettingID = 1", dbFailOnError + dbSeeChanges
     AuditEdited "EDIT", "Settings", "SettingID", 1, before
     EInvoicesShow frm
 End Sub
@@ -493,7 +493,7 @@ Public Function TestEInvoice() As Boolean
     inTrans = True
     id = Nz(DbValue("SELECT Max(SalesInvoiceID) FROM SalesInvoices"), 0)
     If id > 0 Then
-        CurrentDb.Execute "UPDATE Settings SET EInvoiceEnabled = False WHERE SettingID = 1", dbFailOnError
+        CurrentDb.Execute "UPDATE Settings SET EInvoiceEnabled = False WHERE SettingID = 1", dbFailOnError + dbSeeChanges
         Record SendEInvoice("SALE", id, msg) = "ERROR" And Len(msg) > 0, "·« ≈—”«· ﬁ»· «· ›⁄Ì·", passed, failed, report
         SetEInvoiceStatus "SALE", id, "REJECTED", "{""test"": 1}"
         Record DbValue("SELECT ZatcaStatus FROM SalesInvoices WHERE SalesInvoiceID = " & id) = "REJECTED", _
@@ -505,7 +505,7 @@ Public Function TestEInvoice() As Boolean
                Nz(DbValue("SELECT InvoiceNumber FROM SalesInvoices WHERE SalesInvoiceID = " & id), "-"), _
                "”Ã· «·≈—”«· »—ﬁ„ «·„” ‰œ", passed, failed, report
         CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'PENDING', InvoiceDate = DateAdd('h', -30, Now()) " & _
-                          "WHERE SalesInvoiceID = " & id, dbFailOnError
+                          "WHERE SalesInvoiceID = " & id, dbFailOnError + dbSeeChanges
         Record EInvoiceOverdueCount() >= 1, " ‰»ÌÂ «·„” ‰œ«  «·„ √Œ—…", passed, failed, report
     Else
         Debug.Print "[--] ·«  ÊÃœ ›Ê« Ì— »Ì⁄"
@@ -546,13 +546,13 @@ Public Function TestEInvoiceReports() As Boolean
     inTrans = True
     id = Nz(DbValue("SELECT Max(SalesInvoiceID) FROM SalesInvoices"), 0)
     If id > 0 Then
-        CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'REJECTED' WHERE SalesInvoiceID = " & id, dbFailOnError
+        CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'REJECTED' WHERE SalesInvoiceID = " & id, dbFailOnError + dbSeeChanges
         Record Nz(DbValue("SELECT GroupNo FROM EInvoiceReportQuery WHERE DocKind = 'SALE' AND DocID = " & id), 0) = 1, _
                "«·„—›Ê÷ ›Ì „Ã„Ê⁄… «·„—›Ê÷…", passed, failed, report
         n = EInvoiceOpenCount(DateValue(DbValue("SELECT InvoiceDate FROM SalesInvoices WHERE SalesInvoiceID = " & id)), _
                               DateValue(DbValue("SELECT InvoiceDate FROM SalesInvoices WHERE SalesInvoiceID = " & id)))
         Record n >= 1, " ‰»ÌÂ «·≈ﬁ—«— »«·„” ‰œ«  €Ì— «·„ﬁ»Ê·…", passed, failed, report
-        CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'VALID' WHERE SalesInvoiceID = " & id, dbFailOnError
+        CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'VALID' WHERE SalesInvoiceID = " & id, dbFailOnError + dbSeeChanges
         Record Nz(DbValue("SELECT GroupNo FROM EInvoiceReportQuery WHERE DocKind = 'SALE' AND DocID = " & id), 0) = 3 And _
                EInvoiceOpenCount(DateValue(DbValue("SELECT InvoiceDate FROM SalesInvoices WHERE SalesInvoiceID = " & id)), _
                                  DateValue(DbValue("SELECT InvoiceDate FROM SalesInvoices WHERE SalesInvoiceID = " & id))) = n - 1, _
@@ -562,10 +562,10 @@ Public Function TestEInvoiceReports() As Boolean
     End If
     Set d = VatPeriodTotals(DateAdd("m", -1, Date), Date)
     country = AppCountry()
-    CurrentDb.Execute "UPDATE Settings SET CountryCode = 'EG' WHERE SettingID = 1", dbFailOnError
+    CurrentDb.Execute "UPDATE Settings SET CountryCode = 'EG' WHERE SettingID = 1", dbFailOnError + dbSeeChanges
     Record VatBoxCount() = 14 And VatBoxCaption(14) <> "" And _
            UBound(Split(VatBoxRows(d), ";")) + 1 = 15 * 5, "≈ﬁ—«— „’—: 14 »‰œ«", passed, failed, report
-    CurrentDb.Execute "UPDATE Settings SET CountryCode = 'SA' WHERE SettingID = 1", dbFailOnError
+    CurrentDb.Execute "UPDATE Settings SET CountryCode = 'SA' WHERE SettingID = 1", dbFailOnError + dbSeeChanges
     Record VatBoxCount() = 16 And VatBoxCaption(16) <> "" And _
            UBound(Split(VatBoxRows(d), ";")) + 1 = 17 * 5, "≈ﬁ—«— «·”⁄ÊœÌ…: 16 Œ«‰…", passed, failed, report
     ws.Rollback

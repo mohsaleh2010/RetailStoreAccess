@@ -575,13 +575,13 @@ Public Function EtaPrepareDocument(ByVal DocKind As String, ByVal DocID As Long)
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    db.Execute "UPDATE Settings SET EtaLastUUID = EtaLastUUID WHERE SettingID = 1", dbFailOnError    ' lock the chain
+    db.Execute "UPDATE Settings SET EtaLastUUID = EtaLastUUID WHERE SettingID = 1", dbFailOnError + dbSeeChanges    ' lock the chain
     If Not rebuild Then prev = Nz(DbValue("SELECT EtaLastUUID FROM Settings WHERE SettingID = 1"), "")
     json = EtaDocumentJson(DocKind, DocID, prev, dt, total)
     uuid = EtaReceiptUuid(json)
     json = EtaWithUuid(json, uuid)
     Set rs = db.OpenRecordset("SELECT EtaUUID, EtaPreviousUUID, QRCodeData, EInvoiceXml FROM " & DocTableOf(DocKind) & _
-                              " WHERE " & DocKeyOf(DocKind) & " = " & DocID, dbOpenDynaset)
+                              " WHERE " & DocKeyOf(DocKind) & " = " & DocID, dbOpenDynaset, dbSeeChanges)
     rs.Edit
     rs!EtaUUID = uuid
     rs!EtaPreviousUUID = IIf(Len(prev) = 0, Null, prev)
@@ -591,9 +591,9 @@ Public Function EtaPrepareDocument(ByVal DocKind As String, ByVal DocID As Long)
     rs.Close
     If rebuild Then
         db.Execute "UPDATE Settings SET EtaLastUUID = '" & uuid & "' WHERE SettingID = 1 AND EtaLastUUID = '" & _
-                   oldUuid & "'", dbFailOnError
+                   oldUuid & "'", dbFailOnError + dbSeeChanges
     Else
-        db.Execute "UPDATE Settings SET EtaLastUUID = '" & uuid & "' WHERE SettingID = 1", dbFailOnError
+        db.Execute "UPDATE Settings SET EtaLastUUID = '" & uuid & "' WHERE SettingID = 1", dbFailOnError + dbSeeChanges
     End If
     ws.CommitTrans
     Exit Function
@@ -720,7 +720,7 @@ Public Function EtaSendDocument(ByVal DocKind As String, ByVal DocID As Long) As
     If Len(docStatus) > 0 Then SetEInvoiceStatus DocKind, DocID, docStatus, reply
     If Len(subId) > 0 Then
         CurrentDb.Execute "UPDATE " & DocTableOf(DocKind) & " SET EtaSubmissionId = " & SqlText(subId) & " WHERE " & _
-                          DocKeyOf(DocKind) & " = " & DocID, dbFailOnError
+                          DocKeyOf(DocKind) & " = " & DocID, dbFailOnError + dbSeeChanges
     End If
     EtaSendDocument = result & "|" & msg
 End Function
@@ -816,7 +816,7 @@ Public Sub EtaSetupSave(ByVal frm As Access.Form)
     ctl = SetupControls()
     fld = SetupFields()
     Set before = AuditSnapshot("Settings", "SettingID", 1)
-    Set rs = CurrentDb.OpenRecordset("SELECT * FROM Settings WHERE SettingID = 1", dbOpenDynaset)
+    Set rs = CurrentDb.OpenRecordset("SELECT * FROM Settings WHERE SettingID = 1", dbOpenDynaset, dbSeeChanges)
     rs.Edit
     For i = 0 To UBound(ctl)
         If Len(Trim$(Nz(frm(ctl(i)).Value, ""))) = 0 Then
@@ -899,7 +899,7 @@ Public Function TestEtaReceipt() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    CurrentDb.Execute "UPDATE Settings SET EtaClientId = Null WHERE SettingID = 1", dbFailOnError
+    CurrentDb.Execute "UPDATE Settings SET EtaClientId = Null WHERE SettingID = 1", dbFailOnError + dbSeeChanges
     Record Len(EtaReadyProblem()) > 0, "áÇ ÅÑÓÇá ÈÏæä ÈíÇäÇÊ ÇáÏÎæá", passed, failed, report
     ws.Rollback
     inTrans = False

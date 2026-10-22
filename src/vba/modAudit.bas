@@ -134,7 +134,7 @@ Private Sub WriteAudit(ByVal ActionType As String, ByVal TableName As String, By
                        ByVal Label As String, ByVal changes As Collection)
     Dim db As DAO.Database, rs As DAO.Recordset, logID As Long, item As Variant, n As Long
     Set db = CurrentDb
-    Set rs = db.OpenRecordset("AuditLog", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("AuditLog", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!LogDate = Now
     rs!EmployeeID = CurrentUserID()
@@ -143,10 +143,11 @@ Private Sub WriteAudit(ByVal ActionType As String, ByVal TableName As String, By
     If Len(RecordID) > 0 Then rs!RecordID = Left$(RecordID, 30)
     If Len(Label) > 0 Then rs!RecordLabel = Left$(Label, 100)
     rs!ComputerName = Left$(Environ$("COMPUTERNAME"), 50)
-    logID = rs!LogID
     rs.Update
+    rs.Bookmark = rs.LastModified                ' SQL Server gives the number only when the row is saved
+    logID = rs!LogID
     rs.Close
-    Set rs = db.OpenRecordset("AuditChanges", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("AuditChanges", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     For Each item In changes
         n = n + 1
         rs.AddNew
@@ -296,6 +297,7 @@ Private Function BackEndDatabase() As DAO.Database
     Set db = CurrentDb
     Set tdf = db.TableDefs("AuditLog")
     cnn = tdf.Connect
+    If Left$(cnn, 5) = "ODBC;" Then cnn = ";DATABASE=" & AccessBackEndPath()   ' SQL Server: the captions of the Access file
     If InStr(cnn, "DATABASE=") > 0 Then
         Set BackEndDatabase = DBEngine.OpenDatabase(Mid$(cnn, InStr(cnn, "DATABASE=") + 9), False, True)
     Else
@@ -458,11 +460,11 @@ Public Function TestAudit() As Boolean
     inTrans = True
     lastLog = Nz(DMax("LogID", "AuditLog"), 0)
     CurrentDb.Execute "INSERT INTO CostCenters (CenterCode, CenterName, IsDefault, IsActive) VALUES ('TAUD', " & _
-                      "'TEST مركز التدقيق', False, True)", dbFailOnError
+                      "'TEST مركز التدقيق', False, True)", dbFailOnError + dbSeeChanges
     id = DbValue("SELECT CostCenterID FROM CostCenters WHERE CenterCode = 'TAUD'")
     Set before = AuditSnapshot("CostCenters", "CostCenterID", id)
     Check before.Count >= 4, "لقطة السجل قبل التعديل (" & before.Count & " حقول)", passed, failed, report
-    CurrentDb.Execute "UPDATE CostCenters SET CenterName = 'TEST مركز معدَّل' WHERE CostCenterID = " & id, dbFailOnError
+    CurrentDb.Execute "UPDATE CostCenters SET CenterName = 'TEST مركز معدَّل' WHERE CostCenterID = " & id, dbFailOnError + dbSeeChanges
     AuditEdited "EDIT", "CostCenters", "CostCenterID", id, before
     logID = DbValue("SELECT Max(LogID) FROM AuditLog WHERE ActionType = 'EDIT' AND ObjectName = 'CostCenters' " & _
                     "AND RecordID = '" & id & "' AND LogID > " & lastLog)
@@ -472,7 +474,7 @@ Public Function TestAudit() As Boolean
           Nz(DbValue("SELECT EmployeeID FROM AuditLog WHERE LogID = " & Nz(logID, 0)), 0) = CurrentUserID(), _
           "التعديل: الحقل المتغير فقط، بقيمته قبل وبعد، ومن عدّله", passed, failed, report
     Set before = AuditSnapshot("CostCenters", "CostCenterID", id)
-    CurrentDb.Execute "DELETE FROM CostCenters WHERE CostCenterID = " & id, dbFailOnError
+    CurrentDb.Execute "DELETE FROM CostCenters WHERE CostCenterID = " & id, dbFailOnError + dbSeeChanges
     AuditDeleted "DELETE", "CostCenters", id, before
     logID = DbValue("SELECT Max(LogID) FROM AuditLog WHERE ActionType = 'DELETE' AND ObjectName = 'CostCenters' " & _
                     "AND LogID > " & lastLog)

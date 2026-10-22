@@ -196,8 +196,8 @@ Public Function ApplyCountryData(ByVal Country As String) As String
     cur = CountryCurrency(Country)
     prev = CountryCurrency(IIf(Country = "EG", "SA", "EG"))
     Set db = CurrentDb
-    db.Execute "UPDATE Currencies SET IsActive = True WHERE CurrencyCode = '" & cur & "'", dbFailOnError
-    db.Execute "UPDATE Suppliers SET CurrencyCode = '" & cur & "' WHERE CurrencyCode = '" & prev & "'", dbFailOnError
+    db.Execute "UPDATE Currencies SET IsActive = True WHERE CurrencyCode = '" & cur & "'", dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Suppliers SET CurrencyCode = '" & cur & "' WHERE CurrencyCode = '" & prev & "'", dbFailOnError + dbSeeChanges
     Set tdf = db.TableDefs("Settings")
     cnn = tdf.Connect
     If InStr(cnn, "DATABASE=") > 0 Then                    ' the data file of the linked tables

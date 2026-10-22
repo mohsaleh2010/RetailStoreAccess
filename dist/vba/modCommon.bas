@@ -118,7 +118,7 @@ Public Function HasPermission(ByVal PermissionKey As String) As Boolean
     Dim roleID As Variant, uid As Long, key As String
     ' DbValue reads through CurrentDb, so it also sees changes made inside an open transaction.
     uid = CurrentUserID()
-    roleID = DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & uid & " AND IsActive = True")
+    roleID = DbValue("SELECT RoleID FROM Employees WHERE EmployeeID = " & uid & " AND IsActive <> 0")
     If IsNull(roleID) Then Exit Function
     If Nz(DbValue("SELECT IsDeveloper FROM Employees WHERE EmployeeID = " & uid), False) Then
         HasPermission = True
@@ -128,7 +128,7 @@ Public Function HasPermission(ByVal PermissionKey As String) As Boolean
     If roleID <> ADMIN_ROLE_ID And Nz(DbValue("SELECT CustomScreens FROM Employees WHERE EmployeeID = " & uid), False) Then
         If Nz(DbValue("SELECT COUNT(*) FROM Screens WHERE PermissionKey = " & key), 0) > 0 Then
             HasPermission = Nz(DbValue("SELECT COUNT(*) FROM UserScreens AS u INNER JOIN Screens AS s ON " & _
-                "u.ScreenName = s.ScreenName WHERE u.EmployeeID = " & uid & " AND u.CanOpen = True AND " & _
+                "u.ScreenName = s.ScreenName WHERE u.EmployeeID = " & uid & " AND u.CanOpen <> 0 AND " & _
                 "s.PermissionKey = " & key), 0) > 0
             Exit Function
         End If
@@ -144,7 +144,7 @@ End Function
 Public Function NextNumber(ByVal SequenceName As String) As String
     Dim rs As DAO.Recordset, n As Long, prefix As String, pad As Integer
     Set rs = CurrentDb.OpenRecordset("SELECT * FROM [Sequences] WHERE [SequenceName] = " & _
-                                     SqlText(SequenceName), dbOpenDynaset)
+                                     SqlText(SequenceName), dbOpenDynaset, dbSeeChanges)
     If rs.EOF Then
         rs.Close
         Err.Raise vbObjectError + 700, "NextNumber", "Sequence not found: " & SequenceName
@@ -233,7 +233,7 @@ Public Sub LogAction(ByVal ActionType As String, Optional ByVal ObjectName As St
         "[RecordID], [Details], [ComputerName]) VALUES (" & CurrentUserID() & ", " & _
         SqlText(Left$(ActionType, 30)) & ", " & SqlText(Left$(ObjectName, 50)) & ", " & _
         SqlText(Left$(RecordID, 30)) & ", " & SqlText(Details) & ", " & _
-        SqlText(Left$(Environ$("COMPUTERNAME"), 50)) & ")", dbFailOnError
+        SqlText(Left$(Environ$("COMPUTERNAME"), 50)) & ")", dbFailOnError + dbSeeChanges
 End Sub
 
 '------------------------------------------------------------------------------

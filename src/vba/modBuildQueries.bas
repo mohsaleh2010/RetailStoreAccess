@@ -1269,7 +1269,7 @@ Private Sub Q_LeastSellingProductsQuery()
     s = s & "       CCur(Nz(s.NetQty, 0)) AS NetQtySold, CCur(Nz(s.NetSales, 0)) AS NetSalesAmount" & vbCrLf
     s = s & "FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
     s = s & "     LEFT JOIN SalesByProductQuery AS s ON p.ProductID = s.ProductID" & vbCrLf
-    s = s & "WHERE p.IsActive = True" & vbCrLf
+    s = s & "WHERE p.IsActive <> 0" & vbCrLf
     s = s & "ORDER BY CCur(Nz(s.NetQty, 0)), p.ProductName" & vbCrLf
     SaveQuery "LeastSellingProductsQuery", "أقل المنتجات مبيعًا خلال فترة (تشمل المنتجات التي لم تُبع)", s
 End Sub
@@ -1361,7 +1361,7 @@ Private Sub Q_LowStockQuery()
     s = s & "       s.SupplierName, s.Mobile AS SupplierMobile" & vbCrLf
     s = s & "FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
     s = s & "     LEFT JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID" & vbCrLf
-    s = s & "WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity" & vbCrLf
+    s = s & "WHERE p.IsActive <> 0 AND p.TrackStock <> 0 AND p.CurrentQuantity <= p.MinimumQuantity" & vbCrLf
     s = s & "ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName" & vbCrLf
     SaveQuery "LowStockQuery", "المنتجات منخفضة المخزون: CurrentQuantity <= MinimumQuantity", s
 End Sub
@@ -1497,7 +1497,7 @@ Private Sub Q_SlowMovingProductsQuery()
     s = s & "       DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) AS DaysWithoutSale" & vbCrLf
     s = s & "FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)" & vbCrLf
     s = s & "     LEFT JOIN qryProductLastSale AS ls ON p.ProductID = ls.ProductID" & vbCrLf
-    s = s & "WHERE p.IsActive = True AND p.CurrentQuantity > 0" & vbCrLf
+    s = s & "WHERE p.IsActive <> 0 AND p.CurrentQuantity > 0" & vbCrLf
     s = s & "  AND DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) >=" & vbCrLf
     s = s & "      (SELECT SlowMovingDays FROM Settings)" & vbCrLf
     s = s & "ORDER BY DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) DESC" & vbCrLf
@@ -1511,7 +1511,7 @@ Private Sub Q_StockByCategoryQuery()
     s = s & "       Sum(p.CurrentQuantity * p.AverageCost) AS StockCostValue," & vbCrLf
     s = s & "       Sum(p.CurrentQuantity * p.SellingPrice) AS StockSalesValue" & vbCrLf
     s = s & "FROM Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID" & vbCrLf
-    s = s & "WHERE p.IsActive = True" & vbCrLf
+    s = s & "WHERE p.IsActive <> 0" & vbCrLf
     s = s & "GROUP BY c.CategoryID, c.CategoryName" & vbCrLf
     s = s & "ORDER BY c.CategoryName" & vbCrLf
     SaveQuery "StockByCategoryQuery", "المخزون حسب التصنيف: عدد المنتجات والكمية والقيمة", s
@@ -2189,7 +2189,7 @@ Private Sub Q_DashboardQuery()
     s = s & "       (SELECT Count(*) FROM Customers AS c WHERE c.CurrentBalance > 0) AS DebtorCount," & vbCrLf
     s = s & "       (SELECT CCur(Nz(Sum(s.CurrentBalance), 0)) FROM Suppliers AS s WHERE s.CurrentBalance > 0) AS SupplierDue," & vbCrLf
     s = s & "       (SELECT CCur(Nz(Sum(p.CurrentQuantity * p.AverageCost), 0)) FROM Products AS p" & vbCrLf
-    s = s & "        WHERE p.IsActive = True AND p.CurrentQuantity > 0) AS StockValue," & vbCrLf
+    s = s & "        WHERE p.IsActive <> 0 AND p.CurrentQuantity > 0) AS StockValue," & vbCrLf
     s = s & "       (SELECT Count(*) FROM LowStockQuery) AS LowStockCount" & vbCrLf
     s = s & "FROM Settings AS st" & vbCrLf
     s = s & "WHERE st.SettingID = 1" & vbCrLf
@@ -2261,7 +2261,7 @@ Private Sub Q_RepPerformanceQuery()
     s = s & "           0) AS Commission" & vbCrLf
     s = s & "FROM ([@SalesReps] AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)" & vbCrLf
     s = s & "     LEFT JOIN qryRepTargetTotals AS g ON s.SalesRepID = g.SalesRepID" & vbCrLf
-    s = s & "WHERE s.IsActive = True OR CCur(Nz(t.SumSales, 0)) <> 0 OR CCur(Nz(t.SumCollected, 0)) <> 0" & vbCrLf
+    s = s & "WHERE s.IsActive <> 0 OR CCur(Nz(t.SumSales, 0)) <> 0 OR CCur(Nz(t.SumCollected, 0)) <> 0" & vbCrLf
     SaveQuery "RepPerformanceQuery", "أداء المندوبين في الفترة: المبيعات والتحصيل والهدف والإنجاز والعمولة المتوقعة", s
 End Sub
 
@@ -2501,7 +2501,7 @@ Private Sub Q_qryCashMovements()
     s = s & "SELECT v.ToCashBoxID, IIf(v.InTransit, v.ReceivedAt, v.VoucherDate), 'TRANSFER_IN', 'تحويل من صندوق آخر'," & vbCrLf
     s = s & "       v.VoucherNumber, b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID" & vbCrLf
     s = s & "FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID" & vbCrLf
-    s = s & "WHERE v.VoucherType = 'TRANSFER' AND (v.InTransit = False OR v.ReceivedAt Is Not Null)" & vbCrLf
+    s = s & "WHERE v.VoucherType = 'TRANSFER' AND (v.InTransit = 0 OR v.ReceivedAt Is Not Null)" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description," & vbCrLf
     s = s & "       CCur(0), t.Amount, t.EmployeeID" & vbCrLf
@@ -2934,11 +2934,11 @@ Private Sub Q_qryJournalStockTransfer()
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'STOCK_RECEIVE' AS SourceType, t.StockTransferID AS SourceID, t.TransferNumber AS SourceNumber, t.ReceivedAt AS SourceDate, 'استلام تحويل مخزني' AS Party, 1 AS LineOrder, IIf(t.ToWarehouseID = 1, 1400, 140000 + t.ToWarehouseID) AS AccountCode, v.TransferValue AS Debit, CCur(0) AS Credit, t.Notes AS LineText, 0 AS CostCenter" & vbCrLf
     s = s & "FROM StockTransfers AS t INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID" & vbCrLf
-    s = s & "WHERE t.Status = 'RECEIVED' AND t.InTransit = True AND v.TransferValue <> 0" & vbCrLf
+    s = s & "WHERE t.Status = 'RECEIVED' AND t.InTransit <> 0 AND v.TransferValue <> 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'STOCK_RECEIVE' AS SourceType, t.StockTransferID AS SourceID, t.TransferNumber AS SourceNumber, t.ReceivedAt AS SourceDate, 'استلام تحويل مخزني' AS Party, 2 AS LineOrder, 1410 AS AccountCode, CCur(0) AS Debit, v.TransferValue AS Credit, 'بضاعة بالطريق' AS LineText, 0 AS CostCenter" & vbCrLf
     s = s & "FROM StockTransfers AS t INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID" & vbCrLf
-    s = s & "WHERE t.Status = 'RECEIVED' AND t.InTransit = True AND v.TransferValue <> 0" & vbCrLf
+    s = s & "WHERE t.Status = 'RECEIVED' AND t.InTransit <> 0 AND v.TransferValue <> 0" & vbCrLf
     SaveQuery "qryJournalStockTransfer", "أسطر قيود التحويل بين المخازن واستلامها", s
 End Sub
 
@@ -3180,11 +3180,11 @@ Private Sub Q_qryJournalCashVoucher()
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'CASH_RECEIVE' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.ReceivedAt AS SourceDate, v.Description AS Party, 1 AS LineOrder, 110000 + v.ToCashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter" & vbCrLf
     s = s & "FROM CashVouchers AS v" & vbCrLf
-    s = s & "WHERE v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Not Null" & vbCrLf
+    s = s & "WHERE v.VoucherType = 'TRANSFER' AND v.InTransit <> 0 AND v.ReceivedAt Is Not Null" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'CASH_RECEIVE' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.ReceivedAt AS SourceDate, v.Description AS Party, 2 AS LineOrder, 1195 AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, 'نقدية بالطريق' AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter" & vbCrLf
     s = s & "FROM CashVouchers AS v" & vbCrLf
-    s = s & "WHERE v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Not Null" & vbCrLf
+    s = s & "WHERE v.VoucherType = 'TRANSFER' AND v.InTransit <> 0 AND v.ReceivedAt Is Not Null" & vbCrLf
     SaveQuery "qryJournalCashVoucher", "أسطر قيود سندات النقدية (قبض وصرف وتحويل)", s
 End Sub
 
@@ -4337,7 +4337,7 @@ Private Sub Q_IntegrityCheckQuery()
     s = s & "SELECT 'CREDIT_NOT_ALLOWED', 'بيع آجل لعميل غير مسموح له بالآجل', 'SalesInvoices'," & vbCrLf
     s = s & "       h.SalesInvoiceID, CCur(0), CCur(h.RemainingAmount)" & vbCrLf
     s = s & "FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID" & vbCrLf
-    s = s & "WHERE h.RemainingAmount > 0 AND c.AllowCredit = False" & vbCrLf
+    s = s & "WHERE h.RemainingAmount > 0 AND c.AllowCredit = 0" & vbCrLf
     s = s & "UNION ALL" & vbCrLf
     s = s & "SELECT 'RETURN_CUSTOMER', 'عميل المرتجع يختلف عن عميل الفاتورة الأصلية', 'SalesReturns'," & vbCrLf
     s = s & "       r.SalesReturnID, CCur(h.CustomerID), CCur(r.CustomerID)" & vbCrLf

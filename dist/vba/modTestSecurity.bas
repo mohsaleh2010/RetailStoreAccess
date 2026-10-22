@@ -86,7 +86,7 @@ Private Sub TestUsers()
     inTrans = True
 
     db.Execute "INSERT INTO Employees (EmployeeName, Username, RoleID, MaxDiscountPercent, IsActive) " & _
-               "VALUES ('TEST ﬂ«‘Ì—', 'test_cashier', 3, 0, True)", dbFailOnError
+               "VALUES ('TEST ﬂ«‘Ì—', 'test_cashier', 3, 0, True)", dbFailOnError + dbSeeChanges
     uid = DbValue("SELECT EmployeeID FROM Employees WHERE Username = 'test_cashier'")
 
     ' --- password rules
@@ -115,7 +115,7 @@ Private Sub TestUsers()
     Call Record(id = 0 And Not IsNull(DbValue("SELECT LockedUntil FROM Employees WHERE EmployeeID = " & uid)), _
                 "ﬁ›· «·Õ”«» »⁄œ " & MAX_FAILED_LOGINS & " „Õ«Ê·«  Œ«ÿ∆…")
     Call Record(Len(LoginUser("test_cashier", "Kashier#26", id)) > 0 And id = 0, "«·Õ”«» «·„ﬁ›· Ì—›÷ Õ Ï ﬂ·„… «·„—Ê— «·’ÕÌÕ…")
-    db.Execute "UPDATE Employees SET LockedUntil = DateAdd('n', -1, Now()) WHERE EmployeeID = " & uid, dbFailOnError
+    db.Execute "UPDATE Employees SET LockedUntil = DateAdd('n', -1, Now()) WHERE EmployeeID = " & uid, dbFailOnError + dbSeeChanges
     msg = LoginUser("test_cashier", "Kashier#26", id)
     Call Record(Len(msg) = 0 And id = uid And CurrentUserID() = uid, "«·œŒÊ· »⁄œ «‰ Â«¡ «·ﬁ›· " & msg)
     Call Record(DbValue("SELECT FailedLoginCount FROM Employees WHERE EmployeeID = " & uid) = 0 And _
@@ -124,7 +124,7 @@ Private Sub TestUsers()
     Call Record(Len(LoginUser("no_such_user", "x", id)) > 0, "«”„ „” Œœ„ €Ì— „ÊÃÊœ Ìı—›÷")
     Call Record(LoginUser("no_such_user", "x", id) = LoginUser("test_cashier", "bad-pass", id), _
                 "‰›” «·—”«·… ·«”„ Œ«ÿ∆ Ê·ﬂ·„… Œ«ÿ∆… (·« Ìﬂ‘› ÊÃÊœ «·„” Œœ„)")
-    db.Execute "UPDATE Employees SET FailedLoginCount = 0 WHERE EmployeeID = " & uid, dbFailOnError
+    db.Execute "UPDATE Employees SET FailedLoginCount = 0 WHERE EmployeeID = " & uid, dbFailOnError + dbSeeChanges
     msg = LoginUser("test_cashier", "Kashier#26", id)
 
     ' --- the cashier's permissions (logged in as the cashier now)
@@ -150,7 +150,7 @@ Private Sub TestUsers()
                 DbValue("SELECT COUNT(*) FROM RolePermissions WHERE RoleID = " & ADMIN_ROLE_ID) = _
                 DbValue("SELECT COUNT(*) FROM Permissions"), _
                 "’·«ÕÌ«  „œÌ— «·‰Ÿ«„ ·«  ıﬁÌÛ¯œ")
-    db.Execute "UPDATE Employees SET IsActive = False WHERE EmployeeID = " & uid, dbFailOnError
+    db.Execute "UPDATE Employees SET IsActive = False WHERE EmployeeID = " & uid, dbFailOnError + dbSeeChanges
     Call Record(Len(LoginUser("test_cashier", "NewPass#1", id)) > 0 And id = 0, "«·„” Œœ„ «·„⁄ÿ¯· ·« ÌœŒ·")
     Call Record(CurrentUserID() = adminID, "«·œŒÊ· «·›«‘· ·« Ì€Ì— «·„” Œœ„ «·Õ«·Ì")
 
@@ -181,7 +181,7 @@ Private Sub TestBackupFile()
     Call Record(InStr(file, "_" & Format$(Date, "yyyy-mm-dd") & "_") > 0, "«”„ «·‰”Œ… » «—ÌŒ «·ÌÊ„")
     If Len(file) > 0 And Len(Dir$(file)) > 0 Then Kill file
     ' a test copy is not a real backup: keep "last backup" (shown on exit) truthful
-    CurrentDb.Execute "DELETE FROM AuditLog WHERE ActionType = 'BACKUP' AND Details = " & SqlText(file), dbFailOnError
+    CurrentDb.Execute "DELETE FROM AuditLog WHERE ActionType = 'BACKUP' AND Details = " & SqlText(file), dbFailOnError + dbSeeChanges
     RmDir folder
     Exit Sub
 EH:
@@ -202,10 +202,10 @@ Private Sub TestScreens()
     ws.BeginTrans
     inTrans = True
     db.Execute "INSERT INTO Employees (EmployeeName, Username, RoleID, MaxDiscountPercent, IsActive) " & _
-               "VALUES ('TEST ‘«‘« ', 'test_screens', 3, 0, True)", dbFailOnError
+               "VALUES ('TEST ‘«‘« ', 'test_screens', 3, 0, True)", dbFailOnError + dbSeeChanges
     uid = DbValue("SELECT EmployeeID FROM Employees WHERE Username = 'test_screens'")
     db.Execute "INSERT INTO Employees (EmployeeName, Username, RoleID, MaxDiscountPercent, IsActive, IsDeveloper) " & _
-               "VALUES ('TEST „»—„Ã', 'test_dev', 3, 0, True, True)", dbFailOnError
+               "VALUES ('TEST „»—„Ã', 'test_dev', 3, 0, True, True)", dbFailOnError + dbSeeChanges
     dev = DbValue("SELECT EmployeeID FROM Employees WHERE Username = 'test_dev'")
 
     ' --- the grid starts from the role; then own screens: no customers, products without add / delete
@@ -214,9 +214,9 @@ Private Sub TestScreens()
                 Not DbValue("SELECT CanOpen FROM tmpUserScreens WHERE ScreenName = 'frmSettings'"), _
                 "‘«‘«  «·„” Œœ„  »œ√ „‰ ’·«ÕÌ«  œÊ—Â")
     db.Execute "UPDATE tmpUserScreens SET CanOpen = False, CanAdd = False, CanEdit = False, CanDelete = False " & _
-               "WHERE ScreenName = 'frmCustomers'", dbFailOnError
+               "WHERE ScreenName = 'frmCustomers'", dbFailOnError + dbSeeChanges
     db.Execute "UPDATE tmpUserScreens SET CanOpen = True, CanAdd = False, CanEdit = True, CanDelete = False " & _
-               "WHERE ScreenName = 'frmProducts'", dbFailOnError
+               "WHERE ScreenName = 'frmProducts'", dbFailOnError + dbSeeChanges
     msg = SaveUserScreensFor(uid, True)
     Call Record(Len(msg) = 0 And UsesCustomScreens(uid), "Õ›Ÿ ‘«‘«  Œ«’… ··„” Œœ„ " & msg)
     TempVars.Add "UserID", uid
@@ -241,9 +241,9 @@ Private Sub TestScreens()
     Call Record(IsDeveloper() And HasPermission("USERS") And HasPermission("REPORTS_PROFIT") And _
                 CanOpenScreen("frmBackup", True) And CanChangeStoreName(), "«·„»—„Ã Ì„·ﬂ ﬂ· «·’·«ÕÌ«  ÊÌ€Ì— «”„ «·„Õ·")
     TempVars.Add "UserID", adminID
-    db.Execute "UPDATE Settings SET AllowAdminCompanyName = False", dbFailOnError
+    db.Execute "UPDATE Settings SET AllowAdminCompanyName = False", dbFailOnError + dbSeeChanges
     Call Record(Not IsDeveloper() And Not CanChangeStoreName(), "„œÌ— «·‰Ÿ«„ ·« Ì€Ì— «”„ «·„Õ· »œÊ‰ ≈–‰ «·„»—„Ã")
-    db.Execute "UPDATE Settings SET AllowAdminCompanyName = True", dbFailOnError
+    db.Execute "UPDATE Settings SET AllowAdminCompanyName = True", dbFailOnError + dbSeeChanges
     Call Record(CanChangeStoreName(), "»≈–‰ «·„»—„Ã Ì€Ì— „œÌ— «·‰Ÿ«„ «”„ «·„Õ·")
 
     ' --- activation of a made-up computer

@@ -132,14 +132,14 @@ Public Function FillAging(ByVal Kind As String, ByVal AsOf As Date, Optional ByV
     Dim late As Long, cols As Variant, n As Long
     EnsureLocalTables
     Set db = CurrentDb
-    db.Execute "DELETE FROM tmpAging", dbFailOnError
+    db.Execute "DELETE FROM tmpAging", dbFailOnError + dbSeeChanges
     Set names = CreateObject("Scripting.Dictionary")
     If Kind = "C" Then
         Set rs = db.OpenRecordset(Tr("SELECT c.CustomerID AS ID, c.CustomerName AS PartyName FROM [@Customers] AS c"), _
-                                  dbOpenSnapshot)
+                                  dbOpenSnapshot, dbSeeChanges)
     Else
         Set rs = db.OpenRecordset(Tr("SELECT s.SupplierID AS ID, s.SupplierName AS PartyName FROM [@Suppliers] AS s"), _
-                                  dbOpenSnapshot)
+                                  dbOpenSnapshot, dbSeeChanges)
     End If
     Do Until rs.EOF
         names(CStr(rs!ID)) = rs!PartyName.Value
@@ -147,7 +147,7 @@ Public Function FillAging(ByVal Kind As String, ByVal AsOf As Date, Optional ByV
     Loop
     rs.Close
     cols = Array("NotDue", "Days30", "Days60", "Days90", "Over90")
-    Set t = db.OpenRecordset("tmpAging", dbOpenDynaset, dbAppendOnly)
+    Set t = db.OpenRecordset("tmpAging", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     For Each item In ComputeAging(Kind, AsOf, PartyID)
         t.AddNew
         t!PartyKind = Kind
@@ -242,10 +242,10 @@ Public Function AllocatePayment(ByVal Kind As String, ByVal PaymentID As Long, B
                        invoiceCol & " = " & InvoiceID)
     If IsNull(existing) Then
         CurrentDb.Execute "INSERT INTO " & allocTable & " (PaymentID, " & invoiceCol & ", Amount, EmployeeID) VALUES (" & _
-                          PaymentID & ", " & InvoiceID & ", " & Str$(Amount) & ", " & CurrentUserID() & ")", dbFailOnError
+                          PaymentID & ", " & InvoiceID & ", " & Str$(Amount) & ", " & CurrentUserID() & ")", dbFailOnError + dbSeeChanges
     Else
         CurrentDb.Execute "UPDATE " & allocTable & " SET Amount = Amount + " & Str$(Amount) & " WHERE AllocationID = " & _
-                          existing, dbFailOnError
+                          existing, dbFailOnError + dbSeeChanges
     End If
     LogAction "ALLOCATE", allocTable, PaymentID & ">" & InvoiceID, Format$(Amount, "0.00")
 End Function
@@ -258,7 +258,7 @@ Public Function RemoveAllocation(ByVal Kind As String, ByVal AllocationID As Lon
         RemoveAllocation = "لا تملك صلاحية الحذف في شاشة ربط السداد بالفواتير."
         Exit Function
     End If
-    CurrentDb.Execute "DELETE FROM " & allocTable & " WHERE AllocationID = " & AllocationID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM " & allocTable & " WHERE AllocationID = " & AllocationID, dbFailOnError + dbSeeChanges
     LogAction "UNALLOCATE", allocTable, CStr(AllocationID)
 End Function
 
@@ -393,7 +393,7 @@ End Sub
 
 Public Sub AllocationKindChanged(ByVal frm As Access.Form)
     If frm!cboKind.Value = "C" Then
-        frm!cboParty.RowSource = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.AllowCredit = True Or " & _
+        frm!cboParty.RowSource = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.AllowCredit <> 0 Or " & _
                                  "c.CurrentBalance <> 0 ORDER BY c.CustomerName")
     Else
         frm!cboParty.RowSource = Tr("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s ORDER BY s.SupplierName")

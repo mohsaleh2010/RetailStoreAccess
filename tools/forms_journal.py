@@ -100,13 +100,13 @@ def layout_journal_entry() -> FormModel:
 
 # ------------------------------------------------------------- manual entries
 POSTING_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a "
-                    "WHERE IsPosting = True AND IsActive = True ORDER BY TreeKey")
+                    "WHERE IsPosting <> 0 AND IsActive <> 0 ORDER BY TreeKey")
 MANUAL_FIND_ROWS = ("SELECT ManualEntryID, EntryNumber, EntryDate, Description FROM ManualEntries "
                     "ORDER BY EntryDate DESC, ManualEntryID DESC")
 MANUAL_TITLES = ["#", "الحساب", "مدين", "دائن", "بيان السطر", "مركز التكلفة", ""]
 
 
-CENTER_ROWS = ("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True "
+CENTER_ROWS = ("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive <> 0 "
                "ORDER BY c.CenterCode")
 
 

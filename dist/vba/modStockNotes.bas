@@ -47,10 +47,10 @@ End Function
 Public Function NotePartyRows(ByVal NoteType As String) As String
     ' the active customers of a delivery note, the active suppliers of a receipt note
     If NoteType = "RECEIPT" Then
-        NotePartyRows = Tr("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive = True " & _
+        NotePartyRows = Tr("SELECT s.SupplierID, s.SupplierName FROM [@Suppliers] AS s WHERE s.IsActive <> 0 " & _
                            "ORDER BY s.SupplierName")
     Else
-        NotePartyRows = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsActive = True " & _
+        NotePartyRows = Tr("SELECT c.CustomerID, c.CustomerName FROM [@Customers] AS c WHERE c.IsActive <> 0 " & _
                            "ORDER BY c.CustomerName")
     End If
 End Function
@@ -59,10 +59,10 @@ Public Function NotePartyIsActive(ByVal NoteType As String, ByVal PartyID As Var
     If IsNull(PartyID) Then Exit Function
     If Not IsNumeric(PartyID) Then Exit Function
     If NoteType = "RECEIPT" Then
-        NotePartyIsActive = Nz(DbValue("SELECT COUNT(*) FROM Suppliers WHERE IsActive = True AND SupplierID = " & _
+        NotePartyIsActive = Nz(DbValue("SELECT COUNT(*) FROM Suppliers WHERE IsActive <> 0 AND SupplierID = " & _
                                        CLng(PartyID)), 0) > 0
     Else
-        NotePartyIsActive = Nz(DbValue("SELECT COUNT(*) FROM Customers WHERE IsActive = True AND CustomerID = " & _
+        NotePartyIsActive = Nz(DbValue("SELECT COUNT(*) FROM Customers WHERE IsActive <> 0 AND CustomerID = " & _
                                        CLng(PartyID)), 0) > 0
     End If
 End Function
@@ -101,7 +101,7 @@ Public Function CreateStockNote(ByVal NoteType As String, ByVal WarehouseID As V
         CreateStockNote = IIf(NoteType = "RECEIPT", "«Œ — «·„Ê—œ.", "«Œ — «·⁄„Ì·.")
     End If
     If Len(CreateStockNote) > 0 Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("StockNotes", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("StockNotes", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!NoteNumber = NextNumber(IIf(NoteType = "DELIVERY", "DELIVERY_NOTE", "RECEIPT_NOTE"))
     rs!NoteType = NoteType
@@ -187,7 +187,7 @@ Public Function PostStockNote(ByVal StockNoteID As Long) As String
     ws.BeginTrans
     inTrans = True
     Set rs = db.OpenRecordset("SELECT StockNoteLineID, ProductID, Quantity, UnitPrice, UnitCost FROM StockNoteLines " & _
-                              "WHERE StockNoteID = " & StockNoteID & " ORDER BY StockNoteLineID", dbOpenDynaset)
+                              "WHERE StockNoteID = " & StockNoteID & " ORDER BY StockNoteLineID", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         If kind = "DELIVERY" Then
             cost = Nz(DbValue("SELECT AverageCost FROM Products WHERE ProductID = " & rs!ProductID), 0)
@@ -207,7 +207,7 @@ Public Function PostStockNote(ByVal StockNoteID As Long) As String
         rs.MoveNext
     Loop
     rs.Close
-    db.Execute "UPDATE StockNotes SET NoteDate = Now(), Status = 'POSTED' WHERE StockNoteID = " & StockNoteID, dbFailOnError
+    db.Execute "UPDATE StockNotes SET NoteDate = Now(), Status = 'POSTED' WHERE StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
     If orderID > 0 Then SyncSalesOrder db, orderID                      ' partly or fully delivered
     ws.CommitTrans
     inTrans = False
@@ -267,7 +267,7 @@ Public Function UnpostStockNote(ByVal StockNoteID As Long) As String
                               "'STOCK_NOTE' AND ReferenceID = " & StockNoteID, dbOpenSnapshot)
     Do Until rs.EOF
         Set cur = db.OpenRecordset("SELECT ProductID, CurrentQuantity, AverageCost, UpdatedAt FROM Products " & _
-                                   "WHERE ProductID = " & rs!ProductID, dbOpenDynaset)
+                                   "WHERE ProductID = " & rs!ProductID, dbOpenDynaset, dbSeeChanges)
         cur.Edit
         newAvg = cur!AverageCost
         If kind = "RECEIPT" Then newAvg = WeightedAverage(cur!CurrentQuantity, cur!AverageCost, -rs!Quantity, rs!UnitCost)
@@ -280,8 +280,8 @@ Public Function UnpostStockNote(ByVal StockNoteID As Long) As String
     Loop
     rs.Close
     db.Execute "DELETE FROM InventoryTransactions WHERE ReferenceType = 'STOCK_NOTE' AND ReferenceID = " & StockNoteID, _
-               dbFailOnError
-    db.Execute "UPDATE StockNotes SET Status = 'DRAFT' WHERE StockNoteID = " & StockNoteID, dbFailOnError
+               dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE StockNotes SET Status = 'DRAFT' WHERE StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
     If NoteOrderID(StockNoteID) > 0 Then SyncSalesOrder db, NoteOrderID(StockNoteID)   ' reserved again
     ws.CommitTrans
     inTrans = False
@@ -304,8 +304,8 @@ Public Function DeleteStockNote(ByVal StockNoteID As Long) As String
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("StockNotes", "StockNoteID", StockNoteID)
-    CurrentDb.Execute "DELETE FROM StockNoteLines WHERE StockNoteID = " & StockNoteID, dbFailOnError
-    CurrentDb.Execute "DELETE FROM StockNotes WHERE StockNoteID = " & StockNoteID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM StockNoteLines WHERE StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "DELETE FROM StockNotes WHERE StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
     AuditDeleted "STOCK_NOTE_DELETE", "StockNotes", StockNoteID, auditBefore
 End Function
 
@@ -345,7 +345,7 @@ Public Sub MarkNoteInvoiced(ByVal db As DAO.Database, ByVal StockNoteID As Long,
                             ByVal InvoiceID As Long)
     ' Inside the transaction of the invoice: a note gets one invoice only.
     db.Execute "UPDATE StockNotes SET Status = 'INVOICED', " & FieldName & " = " & InvoiceID & _
-               " WHERE Status = 'POSTED' AND StockNoteID = " & StockNoteID, dbFailOnError
+               " WHERE Status = 'POSTED' AND StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
     If db.RecordsAffected <> 1 Then Err.Raise vbObjectError + 610, "MarkNoteInvoiced", "«·≈–‰ ·„ Ì⁄œ „ı—ÕÛ¯·«"
     If NoteOrderID(StockNoteID) > 0 Then SyncSalesOrder db, NoteOrderID(StockNoteID)   ' the order may be invoiced now
 End Sub
@@ -384,7 +384,7 @@ Public Function InvoiceStockNote(ByVal StockNoteID As Long, ByVal PaymentType As
     Set rs = db.OpenRecordset("SELECT l.ProductID, l.Quantity, l.UnitPrice, p.ProductCode, p.ProductName, p.SellingPrice, " & _
                               "p.CurrentQuantity FROM StockNoteLines AS l INNER JOIN Products AS p ON l.ProductID = p.ProductID " & _
                               "WHERE l.StockNoteID = " & StockNoteID & " ORDER BY l.StockNoteLineID", dbOpenSnapshot)
-    Set cart = db.OpenRecordset(cartTable, dbOpenDynaset, dbAppendOnly)
+    Set cart = db.OpenRecordset(cartTable, dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     Do Until rs.EOF                                                 ' one cart line per note line, in order
         cart.AddNew
         cart!ProductID = rs!ProductID
@@ -411,7 +411,7 @@ Public Function InvoiceStockNote(ByVal StockNoteID As Long, ByVal PaymentType As
         msg = PostPurchaseFromCart(party, SupplierInvoiceNo, Date, PaymentType, method, ChargeVat, 0, Null, _
                                    "≈–‰ «·«” ·«„ " & noteNo, NewInvoiceID, StockNoteID:=StockNoteID)
     End If
-    db.Execute "DELETE FROM " & cartTable, dbFailOnError            ' the cart never keeps the lines of a note
+    db.Execute "DELETE FROM " & cartTable, dbFailOnError + dbSeeChanges            ' the cart never keeps the lines of a note
     InvoiceStockNote = msg
     If Len(msg) = 0 Then LogAction "STOCK_NOTE_INVOICE", "StockNotes", noteNo, "Invoice=" & NewInvoiceID
 End Function
@@ -582,7 +582,7 @@ Public Sub StockNoteRemoveLine(ByVal frm As Access.Form)
     End If
     If frm.Dirty Then frm.Undo
     Set auditBefore = AuditSnapshot("StockNoteLines", "StockNoteLineID", id)
-    CurrentDb.Execute "DELETE FROM StockNoteLines WHERE StockNoteLineID = " & CLng(id), dbFailOnError
+    CurrentDb.Execute "DELETE FROM StockNoteLines WHERE StockNoteLineID = " & CLng(id), dbFailOnError + dbSeeChanges
     AuditDeleted "STOCK_NOTE_LINE_DELETE", "StockNoteLines", id, auditBefore
     frm.Requery
     StockNoteShow frm.Parent
@@ -603,15 +603,15 @@ Public Function TestStockNotes() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError
-    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpPOSLines", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "DELETE FROM tmpPurchaseLines", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, UnitID, SellingPrice, PurchasePrice, " & _
                       "CurrentQuantity, AverageCost) VALUES ('TEST-SN-P', 'TEST ’‰› «·√–Ê‰« ', " & _
                       Nz(DbValue("SELECT Min(CategoryID) FROM Categories"), 1) & ", " & _
-                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 8, 0, 0)", dbFailOnError
+                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 8, 0, 0)", dbFailOnError + dbSeeChanges
     pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-SN-P'")
-    cust = Nz(DbValue("SELECT Min(CustomerID) FROM Customers WHERE IsActive = True"), 0)
-    sup = Nz(DbValue("SELECT Min(SupplierID) FROM Suppliers WHERE IsActive = True"), 0)
+    cust = Nz(DbValue("SELECT Min(CustomerID) FROM Customers WHERE IsActive <> 0"), 0)
+    sup = Nz(DbValue("SELECT Min(SupplierID) FROM Suppliers WHERE IsActive <> 0"), 0)
     CheckSn cust > 0 And sup > 0, "ÌÊÃœ ⁄„Ì· Ê„Ê—œ ‰‘ÿ«‰", passed, failed, report
     msg = PostManualStock(pid, TT_STOCK_IN, 10, 6, "TEST", refNo, MAIN_WAREHOUSE_ID)
     CheckSn Len(msg) = 0, "≈÷«›… 10 » ﬂ·›… 6 " & msg, passed, failed, report
@@ -619,7 +619,7 @@ Public Function TestStockNotes() As Boolean
     ' a receipt note at the purchase price, then its purchase invoice: no second stock move
     msg = CreateStockNote("RECEIPT", MAIN_WAREHOUSE_ID, sup, "TEST", noteID)
     CurrentDb.Execute "INSERT INTO StockNoteLines (StockNoteID, ProductID, Quantity, UnitPrice) VALUES (" & _
-                      noteID & ", " & pid & ", 10, 10)", dbFailOnError
+                      noteID & ", " & pid & ", 10, 10)", dbFailOnError + dbSeeChanges
     msg = msg & PostStockNote(noteID)
     CheckSn Len(msg) = 0 And NoteStatus(noteID) = "POSTED" And WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 20 And _
             Nz(DbValue("SELECT AverageCost FROM Products WHERE ProductID = " & pid), 0) = 8, _
@@ -640,7 +640,7 @@ Public Function TestStockNotes() As Boolean
     ' a delivery note at the average cost, then its sales invoice
     msg = CreateStockNote("DELIVERY", MAIN_WAREHOUSE_ID, cust, "TEST", noteID)
     CurrentDb.Execute "INSERT INTO StockNoteLines (StockNoteID, ProductID, Quantity, UnitPrice) VALUES (" & _
-                      noteID & ", " & pid & ", 5, 20)", dbFailOnError
+                      noteID & ", " & pid & ", 5, 20)", dbFailOnError + dbSeeChanges
     msg = msg & PostStockNote(noteID)
     CheckSn Len(msg) = 0 And WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 15 And _
             Nz(DbValue("SELECT NoteValue FROM qryStockNoteValue WHERE StockNoteID = " & noteID), 0) = 40, _

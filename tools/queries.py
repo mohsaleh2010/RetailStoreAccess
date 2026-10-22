@@ -169,7 +169,7 @@ def _cash_voucher():
     k = ("'CASH_VOUCHER'", "v.CashVoucherID", "v.VoucherNumber", "v.VoucherDate",
          "IIf(v.PartyName Is Null, v.Description, v.PartyName)")
     r = ("'CASH_RECEIVE'", "v.CashVoucherID", "v.VoucherNumber", "v.ReceivedAt", "v.Description")
-    received = "v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Not Null"
+    received = "v.VoucherType = 'TRANSFER' AND v.InTransit <> 0 AND v.ReceivedAt Is Not Null"
     out_src = "CashVouchers AS v LEFT JOIN Expenses AS x ON v.ExpenseID = x.ExpenseID"
     out_account = ("IIf(v.Category = 'OWNER', 3100, IIf(v.Category = 'ADVANCE', 1600, IIf(v.Category = 'SHORTAGE', "
                    "5400, IIf(v.Category = 'COMMISSION', 2330, IIf(v.Category = 'EXPENSE' AND x.ExpenseTypeID "
@@ -218,7 +218,7 @@ def _stock_transfer():
     k = ("'STOCK_TRANSFER'", "t.StockTransferID", "t.TransferNumber", "t.TransferDate", "'تحويل بين المخازن'")
     r = ("'STOCK_RECEIVE'", "t.StockTransferID", "t.TransferNumber", "t.ReceivedAt", "'استلام تحويل مخزني'")
     sent = "t.Status <> 'DRAFT' AND v.TransferValue <> 0"
-    received = "t.Status = 'RECEIVED' AND t.InTransit = True AND v.TransferValue <> 0"
+    received = "t.Status = 'RECEIVED' AND t.InTransit <> 0 AND v.TransferValue <> 0"
     return jquery([
         jline(*k, 1, f"IIf(t.InTransit, 1410, {stock_account('t.ToWarehouseID')})", "v.TransferValue", ZERO,
               "t.Notes", src, sent),
@@ -826,7 +826,7 @@ SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuant
        {nz("s.NetQty")} AS NetQtySold, {nz("s.NetSales")} AS NetSalesAmount
 FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN SalesByProductQuery AS s ON p.ProductID = s.ProductID
-WHERE p.IsActive = True
+WHERE p.IsActive <> 0
 ORDER BY {nz("s.NetQty")}, p.ProductName""", P),
 
     # ============================================================ PURCHASES
@@ -896,7 +896,7 @@ SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName,
        s.SupplierName, s.Mobile AS SupplierMobile
 FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID
-WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity
+WHERE p.IsActive <> 0 AND p.TrackStock <> 0 AND p.CurrentQuantity <= p.MinimumQuantity
 ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName"""),
 
     Query("ProductMovementQuery", "حركة منتج خلال فترة مع رصيد أول المدة (الرصيد التراكمي في التقرير)", f"""
@@ -1015,7 +1015,7 @@ SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuant
        DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) AS DaysWithoutSale
 FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN qryProductLastSale AS ls ON p.ProductID = ls.ProductID
-WHERE p.IsActive = True AND p.CurrentQuantity > 0
+WHERE p.IsActive <> 0 AND p.CurrentQuantity > 0
   AND DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) >=
       (SELECT SlowMovingDays FROM Settings)
 ORDER BY DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) DESC"""),
@@ -1026,7 +1026,7 @@ SELECT c.CategoryID, c.CategoryName, Count(*) AS ProductCount,
        Sum(p.CurrentQuantity * p.AverageCost) AS StockCostValue,
        Sum(p.CurrentQuantity * p.SellingPrice) AS StockSalesValue
 FROM Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID
-WHERE p.IsActive = True
+WHERE p.IsActive <> 0
 GROUP BY c.CategoryID, c.CategoryName
 ORDER BY c.CategoryName"""),
 
@@ -1440,7 +1440,7 @@ SELECT (SELECT {nz("Sum(d.GrossAmount)")} FROM qrySalesDocuments AS d
        (SELECT Count(*) FROM Customers AS c WHERE c.CurrentBalance > 0) AS DebtorCount,
        (SELECT {nz("Sum(s.CurrentBalance)")} FROM Suppliers AS s WHERE s.CurrentBalance > 0) AS SupplierDue,
        (SELECT {nz("Sum(p.CurrentQuantity * p.AverageCost)")} FROM Products AS p
-        WHERE p.IsActive = True AND p.CurrentQuantity > 0) AS StockValue,
+        WHERE p.IsActive <> 0 AND p.CurrentQuantity > 0) AS StockValue,
        (SELECT Count(*) FROM LowStockQuery) AS LowStockCount
 FROM Settings AS st
 WHERE st.SettingID = 1""", ["DashDay", "DashMonth", "DashEnd"]),
@@ -1492,7 +1492,7 @@ SELECT s.SalesRepID, s.RepCode, s.RepName, s.Region, s.IsActive, s.CommissionRat
            0) AS Commission
 FROM ([@SalesReps] AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)
      LEFT JOIN qryRepTargetTotals AS g ON s.SalesRepID = g.SalesRepID
-WHERE s.IsActive = True OR {nz("t.SumSales")} <> 0 OR {nz("t.SumCollected")} <> 0""", P),
+WHERE s.IsActive <> 0 OR {nz("t.SumSales")} <> 0 OR {nz("t.SumCollected")} <> 0""", P),
     Query("RepCustomersQuery", "عملاء كل مندوب وأرصدتهم", f"""
 SELECT s.SalesRepID, s.RepName, c.CustomerID, c.CustomerName, c.Mobile, b.Balance
 FROM ([@Customers] AS c INNER JOIN [@SalesReps] AS s ON c.SalesRepID = s.SalesRepID)
@@ -1700,7 +1700,7 @@ UNION ALL
 SELECT v.ToCashBoxID, IIf(v.InTransit, v.ReceivedAt, v.VoucherDate), 'TRANSFER_IN', 'تحويل من صندوق آخر',
        v.VoucherNumber, b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
 FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID
-WHERE v.VoucherType = 'TRANSFER' AND (v.InTransit = False OR v.ReceivedAt Is Not Null)
+WHERE v.VoucherType = 'TRANSFER' AND (v.InTransit = 0 OR v.ReceivedAt Is Not Null)
 UNION ALL
 SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description,
        CCur(0), t.Amount, t.EmployeeID
@@ -2556,7 +2556,7 @@ UNION ALL
 SELECT 'CREDIT_NOT_ALLOWED', 'بيع آجل لعميل غير مسموح له بالآجل', 'SalesInvoices',
        h.SalesInvoiceID, CCur(0), CCur(h.RemainingAmount)
 FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
-WHERE h.RemainingAmount > 0 AND c.AllowCredit = False
+WHERE h.RemainingAmount > 0 AND c.AllowCredit = 0
 UNION ALL
 SELECT 'RETURN_CUSTOMER', 'عميل المرتجع يختلف عن عميل الفاتورة الأصلية', 'SalesReturns',
        r.SalesReturnID, CCur(h.CustomerID), CCur(r.CustomerID)

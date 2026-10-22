@@ -126,21 +126,21 @@ PRODUCT_ROWS = ("SELECT ProductID, ProductName & ' (' & ProductCode & ')' AS Ite
 EXPENSE_TYPE_ROWS = ("SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x "
                      "ORDER BY x.ExpenseTypeName")
 PAYMENT_ROWS = "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS p ORDER BY p.SortOrder"
-BANK_ROWS = "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive = True ORDER BY k.BankName"
-CENTER_ROWS = ("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive = True "
+BANK_ROWS = "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive <> 0 ORDER BY k.BankName"
+CENTER_ROWS = ("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive <> 0 "
                "ORDER BY c.CenterCode")
 CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies "
-                 "WHERE IsActive = True ORDER BY SortOrder, CurrencyCode")
-REP_ROWS = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive = True ORDER BY s.RepName"
+                 "WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode")
+REP_ROWS = "SELECT s.SalesRepID, s.RepName FROM [@SalesReps] AS s WHERE s.IsActive <> 0 ORDER BY s.RepName"
 CASHBOX_ROWS = "SELECT b.CashBoxID, b.BoxName FROM [@CashBoxes] AS b ORDER BY b.BoxType DESC, b.BoxName"
 BOX_TYPES = "MAIN;خزينة رئيسية;CASHIER;صندوق كاشير;CUSTODY;عهدة مندوب"
 WAREHOUSE_TYPES = "MAIN;مخزن رئيسي;BRANCH;مخزن فرع;VAN;سيارة مندوب;WIP;تحت التشغيل"
 STOCK_PARTY_TYPES = "DEPARTMENT;قسم;PRODUCTION;صالة إنتاج;WASTE;هالك;OTHER;أخرى"
 # the account of a stock party: an expense account or work in progress (docs/59)
 STOCK_PARTY_ACCOUNTS = ("SELECT a.AccountCode, a.AccountCode & '  ' & a.AccountName AS Account FROM [@Accounts] AS a "
-                        "WHERE a.IsPosting = True AND a.IsActive = True AND (a.AccountType = 'EXPENSE' OR "
+                        "WHERE a.IsPosting <> 0 AND a.IsActive <> 0 AND (a.AccountType = 'EXPENSE' OR "
                         "a.AccountCode = 1420) ORDER BY a.TreeKey")
-WAREHOUSE_ROWS = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True "
+WAREHOUSE_ROWS = ("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive <> 0 "
                   "ORDER BY w.WarehouseID")
 REPORT_WAREHOUSE_ROWS = "SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w ORDER BY w.WarehouseID"
 COMMISSION_BASES = "SALES;صافي المبيعات (بدون الضريبة);COLLECTION;التحصيل"
@@ -154,12 +154,12 @@ def weekday_name_sql(column: str) -> str:
     for i in range(5, -1, -1):
         sql = f"IIf({column} = {i + 1}, '{WEEKDAY_NAMES[i]}', {sql})"
     return sql
-EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName"
+EMPLOYEE_ROWS = "SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive <> 0 ORDER BY EmployeeName"
 FREQUENCIES = "MONTHLY;شهري;QUARTERLY;كل 3 أشهر;YEARLY;سنوي"
 ACCOUNT_TYPES = "ASSET;أصول;LIABILITY;خصوم;EQUITY;حقوق ملكية;REVENUE;إيرادات;EXPENSE;مصروفات"
 # main (summary) accounts only: a sub-account always hangs under a main account
 ACCOUNT_ROWS = ("SELECT a.AccountCode, Space((a.AccountLevel - 1) * 3) & a.AccountName AS Account FROM [@Accounts] AS a "
-                "WHERE a.IsPosting = False ORDER BY a.TreeKey")
+                "WHERE a.IsPosting = 0 ORDER BY a.TreeKey")
 ROLE_ROWS = "SELECT r.RoleID, r.RoleName FROM [@Roles] AS r ORDER BY r.RoleID"
 VAT_CATEGORY_LIST = "S;خاضع للضريبة 15%;Z;نسبة صفرية;E;معفى من الضريبة"
 

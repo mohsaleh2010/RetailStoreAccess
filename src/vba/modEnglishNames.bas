@@ -174,7 +174,7 @@ Public Sub EnglishNamesShow(ByVal frm As Access.Form)
     Dim spec As Variant, p() As String, sql As String, chosen As String, n As Long
     If frm!subNames.Form.Dirty Then frm!subNames.Form.Dirty = False
     chosen = Nz(frm!cboTable.Value, "ALL")
-    CurrentDb.Execute "DELETE FROM tmpEnglishNames", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpEnglishNames", dbFailOnError + dbSeeChanges
     For Each spec In Split(NAME_TABLES, ";")
         p = Split(spec, ",")
         If chosen = "ALL" Or chosen = p(0) Then
@@ -182,7 +182,7 @@ Public Sub EnglishNamesShow(ByVal frm As Access.Form)
                   "MaxLen) SELECT '" & p(0) & "', '" & p(5) & "', t." & p(1) & ", t." & p(2) & ", t." & p(3) & ", t." & _
                   p(3) & ", " & p(4) & " FROM " & p(0) & " AS t"
             If Nz(frm!chkMissing.Value, False) Then sql = sql & " WHERE t." & p(3) & " Is Null"
-            CurrentDb.Execute Tr(sql & " ORDER BY t." & p(2)), dbFailOnError     ' the caption in the interface language
+            CurrentDb.Execute Tr(sql & " ORDER BY t." & p(2)), dbFailOnError + dbSeeChanges     ' the caption in the interface language
         End If
     Next
     frm!subNames.Form.Requery
@@ -195,7 +195,7 @@ Public Sub EnglishNamesSuggest(ByVal frm As Access.Form)
     Dim rs As DAO.Recordset, s As String, n As Long
     If frm!subNames.Form.Dirty Then frm!subNames.Form.Dirty = False
     Set rs = CurrentDb.OpenRecordset("SELECT ArabicName, EnglishName, MaxLen FROM tmpEnglishNames " & _
-                                     "WHERE EnglishName Is Null", dbOpenDynaset)
+                                     "WHERE EnglishName Is Null", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         s = Trim$(Left$(Transliterate(Nz(rs!ArabicName, "")), rs!MaxLen))
         If Len(s) > 0 Then
@@ -242,14 +242,14 @@ Public Function SaveEnglishNameRows(ByRef Saved As Long) As String
         rs.MoveNext
     Loop
     rs.Close
-    Set rs = db.OpenRecordset("SELECT * FROM tmpEnglishNames ORDER BY LineNo", dbOpenDynaset)
+    Set rs = db.OpenRecordset("SELECT * FROM tmpEnglishNames ORDER BY LineNo", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         newName = Trim$(Nz(rs!EnglishName, ""))
         If StrComp(newName, Nz(rs!OldEnglish, ""), vbBinaryCompare) <> 0 Then
             p = TableSpec(rs!TableName)
             Set before = AuditSnapshot(p(0), p(1), rs!KeyValue)
             db.Execute "UPDATE [" & p(0) & "] SET [" & p(3) & "] = " & SqlText(newName) & " WHERE [" & p(1) & "] = " & _
-                       rs!KeyValue, dbFailOnError
+                       rs!KeyValue, dbFailOnError + dbSeeChanges
             AuditEdited "EDIT", p(0), p(1), rs!KeyValue, before
             rs.Edit
             If Len(newName) > 0 Then
@@ -296,23 +296,23 @@ Public Function TestEnglishNames() As Boolean
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
-    CurrentDb.Execute "INSERT INTO Customers (CustomerName) VALUES ('TEST عميل الأسماء')", dbFailOnError
+    CurrentDb.Execute "INSERT INTO Customers (CustomerName) VALUES ('TEST عميل الأسماء')", dbFailOnError + dbSeeChanges
     id = DbValue("SELECT CustomerID FROM Customers WHERE CustomerName = 'TEST عميل الأسماء'")
-    CurrentDb.Execute "DELETE FROM tmpEnglishNames", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpEnglishNames", dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO tmpEnglishNames (TableName, TableTitle, KeyValue, ArabicName, EnglishName, MaxLen) " & _
-                      "VALUES ('Customers', 'TEST', " & id & ", 'TEST عميل الأسماء', 'TEST names customer', 150)", dbFailOnError
+                      "VALUES ('Customers', 'TEST', " & id & ", 'TEST عميل الأسماء', 'TEST names customer', 150)", dbFailOnError + dbSeeChanges
     msg = SaveEnglishNameRows(n)
     Record Len(msg) = 0 And n = 1 And Nz(DbValue("SELECT CustomerNameEn FROM Customers WHERE CustomerID = " & id), "") = _
            "TEST names customer", "حفظ الاسم الإنجليزي " & msg, passed, failed, report
     msg = SaveEnglishNameRows(n)
     Record Len(msg) = 0 And n = 0, "الحفظ الثاني لا يغيّر شيئًا", passed, failed, report
-    CurrentDb.Execute "UPDATE tmpEnglishNames SET EnglishName = '" & String$(151, "a") & "'", dbFailOnError
+    CurrentDb.Execute "UPDATE tmpEnglishNames SET EnglishName = '" & String$(151, "a") & "'", dbFailOnError + dbSeeChanges
     msg = SaveEnglishNameRows(n)
     Record Len(msg) > 0 And n = 0 And Nz(DbValue("SELECT CustomerNameEn FROM Customers WHERE CustomerID = " & id), "") = _
            "TEST names customer", "الاسم الأطول من الحقل لا يُحفظ", passed, failed, report
     ws.Rollback
     inTrans = False
-    CurrentDb.Execute "DELETE FROM tmpEnglishNames", dbFailOnError
+    CurrentDb.Execute "DELETE FROM tmpEnglishNames", dbFailOnError + dbSeeChanges
     GoTo Done
 EH:
     Record False, "خطأ: " & Err.Description, passed, failed, report

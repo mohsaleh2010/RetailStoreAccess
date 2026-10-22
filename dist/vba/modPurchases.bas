@@ -146,7 +146,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     ws.BeginTrans
     inTrans = True
     invNo = NextNumber("PURCHASE_INVOICE")
-    Set rs = db.OpenRecordset("PurchaseInvoices", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("PurchaseInvoices", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!InvoiceNumber = invNo
     If Len(Trim$(SupplierInvoiceNo)) > 0 Then rs!SupplierInvoiceNo = Left$(Trim$(SupplierInvoiceNo), 30)
@@ -175,7 +175,7 @@ Public Function PostPurchaseFromCart(ByVal SupplierID As Long, ByVal SupplierInv
     invoiceID = rs!PurchaseInvoiceID
     rs.Close
 
-    Set rs = db.OpenRecordset("PurchaseInvoiceDetails", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("PurchaseInvoiceDetails", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     For i = 0 To n - 1
         rs.AddNew
         rs!PurchaseInvoiceID = invoiceID
@@ -220,7 +220,7 @@ Private Sub UpdateProductPrices(ByVal db As DAO.Database, ByVal ProductID As Lon
     ' Last purchase price (excl. VAT), the default supplier when empty, and the new shelf price if typed.
     Dim rs As DAO.Recordset
     Set rs = db.OpenRecordset("SELECT ProductID, PurchasePrice, SellingPrice, SupplierID, UpdatedAt FROM Products " & _
-                              "WHERE ProductID = " & ProductID, dbOpenDynaset)
+                              "WHERE ProductID = " & ProductID, dbOpenDynaset, dbSeeChanges)
     rs.Edit
     rs!PurchasePrice = LastCost
     If IsNull(rs!SupplierID) Then rs!SupplierID = SupplierID
@@ -324,7 +324,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
     ws.BeginTrans
     inTrans = True
     retNo = NextNumber("PURCHASE_RETURN")
-    Set rs = db.OpenRecordset("PurchaseReturns", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("PurchaseReturns", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!ReturnNumber = retNo
     rs!ReturnDate = Now
@@ -353,7 +353,7 @@ Public Function PostPurchaseReturn(ByVal PurchaseInvoiceID As Long, ByVal Reason
     retID = rs!PurchaseReturnID
     rs.Close
 
-    Set rs = db.OpenRecordset("PurchaseReturnDetails", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("PurchaseReturnDetails", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     For i = 0 To n - 1
         rs.AddNew
         rs!PurchaseReturnID = retID
@@ -442,7 +442,7 @@ Public Function PostSupplierPayment(ByVal SupplierID As Long, ByVal Amount As Cu
     ws.BeginTrans
     inTrans = True
     payNo = NextNumber("SUPPLIER_PAYMENT")
-    Set rs = db.OpenRecordset("SupplierPayments", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("SupplierPayments", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!PaymentNumber = payNo
     rs!SupplierID = SupplierID
@@ -585,7 +585,7 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
         CreateStockCount = "ÌÊÃœ Ã—œ „› ÊÕ ·Â–« «·„Œ“‰ (" & openNo & "). —Õ¯·Â √Ê √·€Â ﬁ»· »œ¡ Ã—œ ÃœÌœ ·Â."
         Exit Function
     End If
-    scope = "IsActive = True AND TrackStock = True"
+    scope = "IsActive <> 0 AND TrackStock <> 0"
     If Not IsNull(CategoryID) Then scope = scope & " AND CategoryID = " & CLng(CategoryID)
     If Nz(DbValue("SELECT COUNT(*) FROM Products WHERE " & scope), 0) = 0 Then
         CreateStockCount = "·«  ÊÃœ „‰ Ã«  ‰‘ÿ… ··Ã—œ ›Ì Â–« «·«Œ Ì«—."
@@ -596,7 +596,7 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
     ws.BeginTrans
     inTrans = True
     countNo = NextNumber("STOCK_COUNT")
-    Set rs = db.OpenRecordset("StockCounts", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("StockCounts", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!CountNumber = countNo
     rs!CountDate = Now
@@ -617,7 +617,7 @@ Public Function CreateStockCount(ByVal CategoryID As Variant, ByVal Notes As Str
     End If
     db.Execute "INSERT INTO StockCountDetails (StockCountID, ProductID, SystemQuantity, ActualQuantity, " & _
                "Difference, UnitCost, DifferenceValue) SELECT " & NewCountID & ", ProductID, " & sysQty & ", " & _
-               "Null, 0, AverageCost, 0 FROM Products WHERE " & scope, dbFailOnError
+               "Null, 0, AverageCost, 0 FROM Products WHERE " & scope, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     LogAction "STOCK_COUNT_OPEN", "StockCounts", countNo
@@ -658,7 +658,7 @@ Public Function PostStockCount(ByVal StockCountID As Long, ByVal UncountedAsZero
     ws.BeginTrans
     inTrans = True
     Set rs = db.OpenRecordset("SELECT * FROM StockCountDetails WHERE StockCountID = " & StockCountID & _
-                              " ORDER BY StockCountDetailID", dbOpenDynaset)
+                              " ORDER BY StockCountDetailID", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         Set p = db.OpenRecordset("SELECT AverageCost FROM Products WHERE ProductID = " & rs!ProductID, dbOpenSnapshot)
         cost = p!AverageCost
@@ -687,7 +687,7 @@ Public Function PostStockCount(ByVal StockCountID As Long, ByVal UncountedAsZero
     Loop
     rs.Close
     db.Execute "UPDATE StockCounts SET Status = 'POSTED', PostedAt = Now(), PostedByID = " & CurrentUserID() & _
-               " WHERE StockCountID = " & StockCountID, dbFailOnError
+               " WHERE StockCountID = " & StockCountID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     LogAction "STOCK_COUNT_POST", "StockCounts", countNo, "Lines=" & AdjustedLines & " Value=" & NetValue
@@ -709,7 +709,7 @@ Public Function CancelStockCount(ByVal StockCountID As Long) As String
         CancelStockCount = "·« Ì„ﬂ‰ ≈·€«¡ Ã—œ „ı—Õ¯· √Ê „·€Ï."
         Exit Function
     End If
-    CurrentDb.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE StockCountID = " & StockCountID, dbFailOnError
+    CurrentDb.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE StockCountID = " & StockCountID, dbFailOnError + dbSeeChanges
     LogAction "STOCK_COUNT_CANCEL", "StockCounts", CStr(StockCountID)
 End Function
 
@@ -720,7 +720,7 @@ Private Function CheckSupplier(ByVal SupplierID As Long) As String
     Dim rs As DAO.Recordset
     Set rs = CurrentDb.OpenRecordset(Tr("SELECT s.SupplierName, s.IsActive FROM [@Suppliers] AS s WHERE s.SupplierID = " & _
                                         SupplierID), _
-                                     dbOpenSnapshot)
+                                     dbOpenSnapshot, dbSeeChanges)
     If rs.EOF Then
         CheckSupplier = "«Œ — «·„Ê—œ."
     ElseIf Not rs!IsActive Then

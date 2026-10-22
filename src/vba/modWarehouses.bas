@@ -35,15 +35,15 @@ Public Function CurrentWarehouseID() As Long
         Exit Function
     End If
     v = DbValue("SELECT e.WarehouseID FROM Employees AS e INNER JOIN Warehouses AS w ON e.WarehouseID = w.WarehouseID " & _
-                "WHERE e.EmployeeID = " & CurrentUserID() & " AND w.IsActive = True")
-    If IsNull(v) Then v = DbValue("SELECT Min(WarehouseID) FROM Warehouses WHERE IsActive = True AND WarehouseType = 'MAIN'")
-    If IsNull(v) Then v = DbValue("SELECT Min(WarehouseID) FROM Warehouses WHERE IsActive = True")
+                "WHERE e.EmployeeID = " & CurrentUserID() & " AND w.IsActive <> 0")
+    If IsNull(v) Then v = DbValue("SELECT Min(WarehouseID) FROM Warehouses WHERE IsActive <> 0 AND WarehouseType = 'MAIN'")
+    If IsNull(v) Then v = DbValue("SELECT Min(WarehouseID) FROM Warehouses WHERE IsActive <> 0")
     CurrentWarehouseID = Nz(v, MAIN_WAREHOUSE_ID)
 End Function
 
 Public Function WarehouseIsActive(ByVal WarehouseID As Variant) As Boolean
     If IsNull(WarehouseID) Then Exit Function
-    WarehouseIsActive = Nz(DbValue("SELECT COUNT(*) FROM Warehouses WHERE IsActive = True AND WarehouseID = " & _
+    WarehouseIsActive = Nz(DbValue("SELECT COUNT(*) FROM Warehouses WHERE IsActive <> 0 AND WarehouseID = " & _
                                    CLng(WarehouseID)), 0) > 0
 End Function
 
@@ -79,7 +79,7 @@ End Function
 
 Public Function WarehouseRows() As String
     ' The active warehouses for a combo box (through Tr: an English front-end shows the English names).
-    WarehouseRows = Tr("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive = True " & _
+    WarehouseRows = Tr("SELECT w.WarehouseID, w.WarehouseName FROM [@Warehouses] AS w WHERE w.IsActive <> 0 " & _
                        "ORDER BY w.WarehouseID")
 End Function
 
@@ -104,7 +104,7 @@ Public Function CanReceiveIn(ByVal WarehouseID As Long) As Boolean
         CanReceiveIn = True
     Else
         CanReceiveIn = Nz(DbValue("SELECT COUNT(*) FROM Employees WHERE EmployeeID = " & uid & _
-                                  " AND (RoleID = " & ADMIN_ROLE_ID & " OR IsDeveloper = True)"), 0) > 0
+                                  " AND (RoleID = " & ADMIN_ROLE_ID & " OR IsDeveloper <> 0)"), 0) > 0
     End If
 End Function
 
@@ -126,7 +126,7 @@ Public Function CreateStockTransfer(ByVal FromWarehouseID As Variant, ByVal ToWa
         CreateStockTransfer = "المخزن المستلم غير المرسِل."
     End If
     If Len(CreateStockTransfer) > 0 Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("StockTransfers", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("StockTransfers", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!TransferNumber = NextNumber("STOCK_TRANSFER")
     rs!TransferDate = Now
@@ -200,7 +200,7 @@ Public Function SendStockTransfer(ByVal StockTransferID As Long) As String
     ws.BeginTrans
     inTrans = True
     Set rs = db.OpenRecordset("SELECT StockTransferLineID, ProductID, Quantity, UnitCost FROM StockTransferLines " & _
-                              "WHERE StockTransferID = " & StockTransferID & " ORDER BY StockTransferLineID", dbOpenDynaset)
+                              "WHERE StockTransferID = " & StockTransferID & " ORDER BY StockTransferLineID", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         cost = Nz(DbValue("SELECT AverageCost FROM Products WHERE ProductID = " & rs!ProductID), 0)
         rs.Edit
@@ -216,12 +216,12 @@ Public Function SendStockTransfer(ByVal StockTransferID As Long) As String
     Loop
     rs.Close
     If transit Then
-        db.Execute "UPDATE StockTransfers SET TransferDate = Now(), Status = 'SENT', InTransit = True " & _
-                   "WHERE StockTransferID = " & StockTransferID, dbFailOnError
+        db.Execute "UPDATE StockTransfers SET TransferDate = Now(), Status = 'SENT', InTransit <> 0 " & _
+                   "WHERE StockTransferID = " & StockTransferID, dbFailOnError + dbSeeChanges
     Else
-        db.Execute "UPDATE StockTransfers SET TransferDate = Now(), Status = 'RECEIVED', InTransit = False, " & _
+        db.Execute "UPDATE StockTransfers SET TransferDate = Now(), Status = 'RECEIVED', InTransit = 0, " & _
                    "ReceivedAt = Now(), ReceivedByID = " & CurrentUserID() & " WHERE StockTransferID = " & _
-                   StockTransferID, dbFailOnError
+                   StockTransferID, dbFailOnError + dbSeeChanges
     End If
     ws.CommitTrans
     inTrans = False
@@ -264,7 +264,7 @@ Public Function ReceiveStockTransfer(ByVal StockTransferID As Long) As String
     Loop
     rs.Close
     db.Execute "UPDATE StockTransfers SET Status = 'RECEIVED', ReceivedAt = Now(), ReceivedByID = " & CurrentUserID() & _
-               " WHERE StockTransferID = " & StockTransferID, dbFailOnError
+               " WHERE StockTransferID = " & StockTransferID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     AuditEdited "STOCK_TRANSFER_RECEIVE", "StockTransfers", "StockTransferID", StockTransferID, before
@@ -300,14 +300,14 @@ Public Function UnpostStockTransfer(ByVal StockTransferID As Long) As String
                               StockTransferID, dbOpenSnapshot)
     Do Until rs.EOF
         db.Execute "UPDATE Products SET CurrentQuantity = CurrentQuantity + " & Str$(rs!Quantity) & _
-                   ", UpdatedAt = Now() WHERE ProductID = " & rs!ProductID, dbFailOnError
+                   ", UpdatedAt = Now() WHERE ProductID = " & rs!ProductID, dbFailOnError + dbSeeChanges
         rs.MoveNext
     Loop
     rs.Close
     db.Execute "DELETE FROM InventoryTransactions WHERE ReferenceType = 'TRANSFER' AND ReferenceID = " & StockTransferID, _
-               dbFailOnError
+               dbFailOnError + dbSeeChanges
     db.Execute "UPDATE StockTransfers SET Status = 'DRAFT', InTransit = False WHERE StockTransferID = " & StockTransferID, _
-               dbFailOnError
+               dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     AuditEdited "STOCK_TRANSFER_UNPOST", "StockTransfers", "StockTransferID", StockTransferID, before
@@ -329,8 +329,8 @@ Public Function DeleteStockTransfer(ByVal StockTransferID As Long) As String
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("StockTransfers", "StockTransferID", StockTransferID)
-    CurrentDb.Execute "DELETE FROM StockTransferLines WHERE StockTransferID = " & StockTransferID, dbFailOnError
-    CurrentDb.Execute "DELETE FROM StockTransfers WHERE StockTransferID = " & StockTransferID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM StockTransferLines WHERE StockTransferID = " & StockTransferID, dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "DELETE FROM StockTransfers WHERE StockTransferID = " & StockTransferID, dbFailOnError + dbSeeChanges
     AuditDeleted "STOCK_TRANSFER_DELETE", "StockTransfers", StockTransferID, auditBefore
 End Function
 
@@ -468,7 +468,7 @@ Public Sub TransferRemoveLine(ByVal frm As Access.Form)
     End If
     If frm.Dirty Then frm.Undo
     Set auditBefore = AuditSnapshot("StockTransferLines", "StockTransferLineID", id)
-    CurrentDb.Execute "DELETE FROM StockTransferLines WHERE StockTransferLineID = " & CLng(id), dbFailOnError
+    CurrentDb.Execute "DELETE FROM StockTransferLines WHERE StockTransferLineID = " & CLng(id), dbFailOnError + dbSeeChanges
     AuditDeleted "STOCK_TRANSFER_LINE_DELETE", "StockTransferLines", id, auditBefore
     frm.Requery
     TransferShow frm.Parent
@@ -491,12 +491,12 @@ Public Function TestWarehouses() As Boolean
     ws.BeginTrans
     inTrans = True
     CurrentDb.Execute "INSERT INTO Warehouses (WarehouseCode, WarehouseName, WarehouseType) VALUES " & _
-                      "('TEST-WH', 'TEST مخزن فرع', 'BRANCH')", dbFailOnError
+                      "('TEST-WH', 'TEST مخزن فرع', 'BRANCH')", dbFailOnError + dbSeeChanges
     wh2 = DbValue("SELECT Max(WarehouseID) FROM Warehouses")
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, UnitID, SellingPrice, " & _
                       "CurrentQuantity, AverageCost) VALUES ('TEST-WH-P', 'TEST صنف المخازن', " & _
                       Nz(DbValue("SELECT Min(CategoryID) FROM Categories"), 1) & ", " & _
-                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 0, 0)", dbFailOnError
+                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 0, 0)", dbFailOnError + dbSeeChanges
     pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-WH-P'")
 
     msg = PostManualStock(pid, TT_STOCK_IN, 10, 5, "TEST", refNo, MAIN_WAREHOUSE_ID)
@@ -513,22 +513,22 @@ Public Function TestWarehouses() As Boolean
                        " AND WarehouseID = " & wh2), 0) = 4, "تقرير أرصدة المخازن", passed, failed, report
 
     ' the user's warehouse
-    CurrentDb.Execute "UPDATE Employees SET WarehouseID = " & wh2 & " WHERE EmployeeID = " & CurrentUserID(), dbFailOnError
+    CurrentDb.Execute "UPDATE Employees SET WarehouseID = " & wh2 & " WHERE EmployeeID = " & CurrentUserID(), dbFailOnError + dbSeeChanges
     CheckWh CurrentWarehouseID() = wh2, "مخزن المستخدم", passed, failed, report
     msg = PostManualStock(pid, TT_STOCK_OUT, 1, Null, "TEST تالف", refNo)
     CheckWh Len(msg) = 0 And WarehouseStock(pid, wh2) = 3 And WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 10, _
             "الخصم من مخزن المستخدم " & msg, passed, failed, report
-    CurrentDb.Execute "UPDATE Employees SET WarehouseID = Null WHERE EmployeeID = " & CurrentUserID(), dbFailOnError
+    CurrentDb.Execute "UPDATE Employees SET WarehouseID = Null WHERE EmployeeID = " & CurrentUserID(), dbFailOnError + dbSeeChanges
 
     ' a stock count of one warehouse compares with that warehouse only
-    CurrentDb.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE Status = 'OPEN'", dbFailOnError
+    CurrentDb.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE Status = 'OPEN'", dbFailOnError + dbSeeChanges
     msg = CreateStockCount(Null, "TEST", countID, wh2)
     CheckWh Len(msg) = 0 And Nz(DbValue("SELECT SystemQuantity FROM StockCountDetails WHERE StockCountID = " & _
             countID & " AND ProductID = " & pid), -1) = 3, "الجرد يقرأ رصيد مخزنه " & msg, passed, failed, report
     CurrentDb.Execute "UPDATE StockCountDetails SET ActualQuantity = 2 WHERE StockCountID = " & countID & _
-                      " AND ProductID = " & pid, dbFailOnError
+                      " AND ProductID = " & pid, dbFailOnError + dbSeeChanges
     CurrentDb.Execute "UPDATE StockCountDetails SET ActualQuantity = SystemQuantity WHERE StockCountID = " & countID & _
-                      " AND ProductID <> " & pid, dbFailOnError
+                      " AND ProductID <> " & pid, dbFailOnError + dbSeeChanges
     msg = PostStockCount(countID, False, lines, netValue)
     CheckWh Len(msg) = 0 And WarehouseStock(pid, wh2) = 2 And WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 10, _
             "تسوية الجرد في مخزنه فقط " & msg, passed, failed, report
@@ -536,16 +536,16 @@ Public Function TestWarehouses() As Boolean
     ' transfers (docs/58): at once, then through transit
     msg = CreateStockTransfer(MAIN_WAREHOUSE_ID, wh2, "TEST", tid)
     CurrentDb.Execute "INSERT INTO StockTransferLines (StockTransferID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      tid & ", " & pid & ", 3, 0)", dbFailOnError
+                      tid & ", " & pid & ", 3, 0)", dbFailOnError + dbSeeChanges
     msg = msg & SendStockTransfer(tid)
     CheckWh Len(msg) = 0 And WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 7 And WarehouseStock(pid, wh2) = 5 And _
             Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & pid), 0) = 12, _
             "التحويل يخصم من المرسِل ويضيف للمستلم " & msg, passed, failed, report
     CheckWh TransferStatus(tid) = "RECEIVED", "مخزن بلا تأكيد يستلم فورًا", passed, failed, report
-    CurrentDb.Execute "UPDATE Warehouses SET ConfirmReceipt = True WHERE WarehouseID = " & wh2, dbFailOnError
+    CurrentDb.Execute "UPDATE Warehouses SET ConfirmReceipt = True WHERE WarehouseID = " & wh2, dbFailOnError + dbSeeChanges
     msg = CreateStockTransfer(MAIN_WAREHOUSE_ID, wh2, "TEST", tid)
     CurrentDb.Execute "INSERT INTO StockTransferLines (StockTransferID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      tid & ", " & pid & ", 2, 0)", dbFailOnError
+                      tid & ", " & pid & ", 2, 0)", dbFailOnError + dbSeeChanges
     msg = msg & SendStockTransfer(tid)
     CheckWh Len(msg) = 0 And TransferStatus(tid) = "SENT" And WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 5 And _
             WarehouseStock(pid, wh2) = 5, "التحويل بالطريق لا يدخل المستلم " & msg, passed, failed, report
@@ -560,8 +560,8 @@ Public Function TestWarehouses() As Boolean
             "التحويل المستلم لا يُلغى ولا يُحذف", passed, failed, report
     msg = CreateStockTransfer(MAIN_WAREHOUSE_ID, wh2, "TEST", tid)
     CurrentDb.Execute "INSERT INTO StockTransferLines (StockTransferID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      tid & ", " & pid & ", 999, 0)", dbFailOnError
-    CurrentDb.Execute "UPDATE Settings SET AllowNegativeStock = False", dbFailOnError
+                      tid & ", " & pid & ", 999, 0)", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE Settings SET AllowNegativeStock = False", dbFailOnError + dbSeeChanges
     g_AutoAnswer = False
     CheckWh Len(SendStockTransfer(tid)) > 0 And TransferStatus(tid) = "DRAFT", "لا يُحوَّل أكثر من رصيد المرسِل", _
             passed, failed, report
@@ -597,13 +597,13 @@ Public Function TestStockReports() As Boolean
     ws.BeginTrans
     inTrans = True
     CurrentDb.Execute "INSERT INTO Warehouses (WarehouseCode, WarehouseName, WarehouseType) VALUES " & _
-                      "('TEST-WH', 'TEST مخزن فرع', 'BRANCH')", dbFailOnError
+                      "('TEST-WH', 'TEST مخزن فرع', 'BRANCH')", dbFailOnError + dbSeeChanges
     wh2 = DbValue("SELECT Max(WarehouseID) FROM Warehouses")
     branchName = Nz(DbValue(Tr("SELECT w.WarehouseName FROM [@Warehouses] AS w WHERE w.WarehouseID = " & wh2)), "")
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, UnitID, SellingPrice, " & _
                       "CurrentQuantity, AverageCost) VALUES ('TEST-CARD-P', 'TEST كارت الصنف', " & _
                       Nz(DbValue("SELECT Min(CategoryID) FROM Categories"), 1) & ", " & _
-                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 0, 0)", dbFailOnError
+                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 0, 0)", dbFailOnError + dbSeeChanges
     pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-CARD-P'")
     msg = PostManualStock(pid, TT_STOCK_IN, 10, 5, "TEST", refNo, MAIN_WAREHOUSE_ID) & _
           PostManualStock(pid, TT_STOCK_IN, 4, 5, "TEST", refNo, wh2)
@@ -631,7 +631,7 @@ Public Function TestStockReports() As Boolean
     ' a transfer shows the other warehouse as its party
     msg = CreateStockTransfer(MAIN_WAREHOUSE_ID, wh2, "TEST", tid)
     CurrentDb.Execute "INSERT INTO StockTransferLines (StockTransferID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      tid & ", " & pid & ", 3, 0)", dbFailOnError
+                      tid & ", " & pid & ", 3, 0)", dbFailOnError + dbSeeChanges
     msg = msg & SendStockTransfer(tid)
     SetPeriod Date, Date
     CheckWh Len(msg) = 0 And Nz(DbValue("SELECT PartyName FROM ItemCardQuery WHERE NetQty = -3"), "") = branchName, _
@@ -641,16 +641,16 @@ Public Function TestStockReports() As Boolean
             "تقييم المخزون لكل مخزن", passed, failed, report
 
     ' a transfer waiting for its receiver
-    CurrentDb.Execute "UPDATE Warehouses SET ConfirmReceipt = True WHERE WarehouseID = " & wh2, dbFailOnError
+    CurrentDb.Execute "UPDATE Warehouses SET ConfirmReceipt = True WHERE WarehouseID = " & wh2, dbFailOnError + dbSeeChanges
     msg = CreateStockTransfer(MAIN_WAREHOUSE_ID, wh2, "TEST", tid)
     CurrentDb.Execute "INSERT INTO StockTransferLines (StockTransferID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      tid & ", " & pid & ", 1, 0)", dbFailOnError
+                      tid & ", " & pid & ", 1, 0)", dbFailOnError + dbSeeChanges
     msg = msg & SendStockTransfer(tid)
     CheckWh Len(msg) = 0 And Nz(DbValue("SELECT TransferValue FROM TransfersInTransitQuery WHERE StockTransferID = " & _
             tid), 0) = 5, "التحويلات بالطريق " & msg, passed, failed, report
 
     ' one open count per warehouse
-    CurrentDb.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE Status = 'OPEN'", dbFailOnError
+    CurrentDb.Execute "UPDATE StockCounts SET Status = 'CANCELLED' WHERE Status = 'OPEN'", dbFailOnError + dbSeeChanges
     msg = CreateStockCount(Null, "TEST", countID, MAIN_WAREHOUSE_ID)
     CheckWh Len(msg) = 0, "جرد المخزن الرئيسي " & msg, passed, failed, report
     msg = CreateStockCount(Null, "TEST", countID, wh2)

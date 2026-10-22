@@ -221,6 +221,106 @@ Failed:
     m_lastError = OdbcError()
 End Function
 
+Public Function ServerQueryRows(ByVal Connect As String, ByVal Sql As String) As String
+    ' Every row a query returns on the server: rows separated by vbLf, values by vbTab ("" when none or it fails).
+    Dim qd As DAO.QueryDef, rs As DAO.Recordset, f As DAO.Field, row As String, out As String
+    m_lastError = ""
+    On Error GoTo Failed
+    Set qd = CurrentDb.CreateQueryDef("")
+    qd.Connect = Connect
+    qd.ODBCTimeout = 60
+    qd.ReturnsRecords = True
+    qd.Sql = Sql
+    Set rs = qd.OpenRecordset(dbOpenSnapshot)
+    Do Until rs.EOF
+        row = ""
+        For Each f In rs.Fields
+            row = row & IIf(Len(row) > 0, vbTab, "") & Nz(f.Value, "")
+        Next
+        out = out & IIf(Len(out) > 0, vbLf, "") & row
+        rs.MoveNext
+    Loop
+    rs.Close
+    ServerQueryRows = out
+    Exit Function
+Failed:
+    m_lastError = OdbcError()
+End Function
+
+Public Function ServerLastError() As String
+    ServerLastError = m_lastError
+End Function
+
+'------------------------------------------------------------------------------
+' Backup and restore of the server database (plan 5C, docs/70); used by modBackup
+'------------------------------------------------------------------------------
+Public Function SqlName(ByVal Name As String) As String
+    SqlName = "[" & Replace(Name, "]", "]]") & "]"
+End Function
+
+Public Function ConnectDatabase(ByVal Connect As String) As String
+    ' The DATABASE= of an ODBC connection.
+    Dim p As Long, q As Long
+    p = InStr(1, Connect, ";DATABASE=", vbTextCompare)
+    If p = 0 Then Exit Function
+    q = InStr(p + 10, Connect, ";")
+    If q = 0 Then q = Len(Connect) + 1
+    ConnectDatabase = Mid$(Connect, p + 10, q - p - 10)
+End Function
+
+Public Function ConnectToDatabase(ByVal Connect As String, ByVal Database As String) As String
+    ' The same connection to another database of the server (master for a restore).
+    Dim p As Long, q As Long
+    p = InStr(1, Connect, ";DATABASE=", vbTextCompare)
+    If p = 0 Then
+        ConnectToDatabase = Connect
+        Exit Function
+    End If
+    q = InStr(p + 10, Connect, ";")
+    If q = 0 Then q = Len(Connect) + 1
+    ConnectToDatabase = Left$(Connect, p + 9) & Database & Mid$(Connect, q)
+End Function
+
+Public Function BackupDatabaseSql(ByVal Database As String, ByVal BackupFile As String) As String
+    ' COPY_ONLY: a backup of the program never disturbs the backup chain an administrator may keep.
+    BackupDatabaseSql = "BACKUP DATABASE " & SqlName(Database) & " TO DISK = " & SqlLiteral(BackupFile, 10) & _
+                        " WITH COPY_ONLY, INIT, CHECKSUM, NAME = N'RetailStore';"
+End Function
+
+Public Function VerifyBackupSql(ByVal BackupFile As String) As String
+    VerifyBackupSql = "RESTORE VERIFYONLY FROM DISK = " & SqlLiteral(BackupFile, 10) & " WITH CHECKSUM;"
+End Function
+
+Public Function RestoreDatabaseSql(ByVal Database As String, ByVal BackupFile As String) As String
+    ' Run on master: every other connection is closed, the database replaced, then opened to all again
+    ' (also when the restore fails).
+    Dim d As String
+    d = SqlName(Database)
+    RestoreDatabaseSql = "ALTER DATABASE " & d & " SET SINGLE_USER WITH ROLLBACK IMMEDIATE;" & vbLf & _
+        "BEGIN TRY" & vbLf & _
+        "    RESTORE DATABASE " & d & " FROM DISK = " & SqlLiteral(BackupFile, 10) & " WITH REPLACE;" & vbLf & _
+        "END TRY" & vbLf & _
+        "BEGIN CATCH" & vbLf & _
+        "    ALTER DATABASE " & d & " SET MULTI_USER;" & vbLf & _
+        "    THROW;" & vbLf & _
+        "END CATCH;" & vbLf & _
+        "ALTER DATABASE " & d & " SET MULTI_USER;"
+End Function
+
+Public Function ServerBackupHistorySql() As String
+    ' The program's backups of this database the server remembers (msdb), newest first.
+    ServerBackupHistorySql = "SELECT TOP 100 f.physical_device_name, CONVERT(VARCHAR(19), s.backup_finish_date, 120), " & _
+        "CAST(s.backup_size / 1048576.0 AS DECIMAL(12, 1)) FROM msdb.dbo.backupset AS s " & _
+        "INNER JOIN msdb.dbo.backupmediafamily AS f ON f.media_set_id = s.media_set_id " & _
+        "WHERE s.database_name = DB_NAME() AND s.type = 'D' AND s.name = N'RetailStore' ORDER BY s.backup_finish_date DESC;"
+End Function
+
+Public Function ServerLiveSince(ByVal Connect As String) As Variant
+    ' When the program started to work on this server database (Settings.ServerLiveSince), Null = not yet:
+    ' from then on the server holds the real data (docs/70).
+    ServerLiveSince = ServerValue(Connect, "SELECT ServerLiveSince FROM [dbo].[Settings] WHERE SettingID = 1")
+End Function
+
 Public Function TestServerConnection(ByVal Connect As String) As String
     ' "" when the server answers and the database exists, else why not.
     Dim v As Variant
@@ -339,6 +439,13 @@ Public Function TransferAllData(ByVal Connect As String, ByRef Report As String)
     If Len(msg) = 0 Then
         If ServerTablesMissing(Connect) > 0 Then msg = "قاعدة الخادم ليس فيها كل الجداول: شغّل «تجهيز القاعدة» أولًا."
     End If
+    If Len(msg) = 0 Then                                        ' never over the real data (docs/70)
+        If Not IsNull(ServerLiveSince(Connect)) Then
+            msg = "قاعدة الخادم فيها البيانات الفعلية للبرنامج منذ " & GDate(ServerLiveSince(Connect), True) & _
+                  "، والنقل يحذفها." & vbCrLf & "اربط هذا الجهاز بالخادم بزر «التشغيل على الخادم» بدل النقل." & _
+                  vbCrLf & "وللبدء من ملف Access من جديد: «الرجوع إلى Access» مع جعل ملف Access هو البيانات الفعلية."
+        End If
+    End If
     If Len(msg) > 0 Then
         TransferAllData = msg
         Exit Function
@@ -441,8 +548,11 @@ Private Sub RelinkTable(ByVal db As DAO.Database, ByVal TableName As String, ByV
 End Sub
 
 Public Function LinkToServer(ByVal Connect As String) As String
-    ' The program's tables linked to the server, when its data matches the Access file.
+    ' The program's tables linked to the server: the first time when its data matches the Access file (then the
+    ' server is marked as holding the real data); a server already live is linked as it is (another PC, a new
+    ' front-end).
     Dim names As Variant, i As Long, rows As String, diffs As Long, db As DAO.Database, msg As String
+    Dim live As Boolean
     If Not HasPermission("SQL_SERVER") Then
         LinkToServer = "لا تملك صلاحية قاعدة SQL Server."
         Exit Function
@@ -451,8 +561,24 @@ Public Function LinkToServer(ByVal Connect As String) As String
         LinkToServer = "البرنامج يعمل على الخادم بالفعل."
         Exit Function
     End If
-    msg = CompareAllData(Connect, rows, diffs)
-    If Len(msg) = 0 And diffs > 0 Then msg = "بيانات الخادم لا تطابق ملف Access في " & diffs & " جدول: انقل البيانات ثم طابقها أولًا."
+    msg = TestServerConnection(Connect)
+    If Len(msg) = 0 Then
+        If ServerTablesMissing(Connect) > 0 Then msg = "قاعدة الخادم ليس فيها كل الجداول: شغّل «تجهيز القاعدة» أولًا."
+    End If
+    If Len(msg) = 0 Then
+        live = Not IsNull(ServerLiveSince(Connect))
+        If Not live Then
+            msg = CompareAllData(Connect, rows, diffs)
+            If Len(msg) = 0 And diffs > 0 Then msg = "بيانات الخادم لا تطابق ملف Access في " & diffs & " جدول: انقل البيانات ثم طابقها أولًا."
+            If Len(msg) = 0 Then msg = ServerExec(Connect, "UPDATE [dbo].[Settings] SET ServerLiveSince = GETDATE() WHERE SettingID = 1;")
+            If Len(msg) = 0 Then                                ' the Access file knows it is no longer the real data
+                Set db = CurrentDb                              ' (a file BuildSchema has not upgraded yet: no warning)
+                On Error Resume Next
+                db.Execute "UPDATE Settings SET ServerLiveSince = Now() WHERE SettingID = 1", dbFailOnError + dbSeeChanges
+                On Error GoTo 0
+            End If
+        End If
+    End If
     If Len(msg) > 0 Then
         LinkToServer = msg
         Exit Function
@@ -467,13 +593,21 @@ Public Function LinkToServer(ByVal Connect As String) As String
     LogAction "SQL_LINK", "SqlServer", SqlSetting("SqlDatabase"), SqlSetting("SqlServer")
 End Function
 
-Public Function LinkToAccess(Optional ByVal BackEndPath As String = "") As String
-    ' Back to the .accdb file the program used before the server (its data is as it was then).
-    Dim names As Variant, i As Long, db As DAO.Database
+Public Function LinkToAccess(Optional ByVal BackEndPath As String = "", Optional ByVal ReleaseServer As Boolean = False) As String
+    ' Back to the .accdb file the program used before the server (its data is as it was then). ReleaseServer:
+    ' the Access file is the real data again, so the server may receive a new transfer.
+    Dim names As Variant, i As Long, db As DAO.Database, msg As String
     If Len(BackEndPath) = 0 Then BackEndPath = SqlSetting("SqlAccessPath")
     If Len(BackEndPath) = 0 Or Len(Dir$(BackEndPath)) = 0 Then
         LinkToAccess = "ملف بيانات Access غير موجود: " & BackEndPath
         Exit Function
+    End If
+    If ReleaseServer And IsLinkedToServer() Then
+        msg = ServerExec(LinkConnect(), "UPDATE [dbo].[Settings] SET ServerLiveSince = NULL WHERE SettingID = 1;")
+        If Len(msg) > 0 Then
+            LinkToAccess = msg
+            Exit Function
+        End If
     End If
     Set db = CurrentDb
     names = Split(SchemaTableList(), ",")
@@ -481,7 +615,24 @@ Public Function LinkToAccess(Optional ByVal BackEndPath As String = "") As Strin
         RelinkTable db, names(i), ";DATABASE=" & BackEndPath, names(i), False
     Next
     db.TableDefs.Refresh
+    If ReleaseServer Then
+        On Error Resume Next
+        db.Execute "UPDATE Settings SET ServerLiveSince = Null WHERE SettingID = 1", dbFailOnError + dbSeeChanges
+        On Error GoTo 0
+    End If
     LogAction "SQL_UNLINK", "SqlServer", BackEndPath
+End Function
+
+Public Function StaleAccessWarning() As String
+    ' A front-end on the Access file after the real data moved to SQL Server (a rebuilt front-end, a temporary
+    ' return): "" when not the case, else the warning of the login screen.
+    Dim v As Variant
+    If IsLinkedToServer() Then Exit Function
+    On Error Resume Next
+    v = DbValue("SELECT ServerLiveSince FROM Settings WHERE SettingID = 1")
+    If IsNull(v) Or IsEmpty(v) Then Exit Function
+    StaleAccessWarning = "البيانات الفعلية للبرنامج على SQL Server منذ " & GDate(v, True) & "، وهذا الجهاز يعمل على ملف Access القديم." & _
+                         vbCrLf & "سجّل الدخول ثم: «نسخة احتياطية» ثم «SQL Server» ثم «التشغيل على الخادم»."
 End Function
 
 Public Function CheckServerAtStartup() As String
@@ -640,7 +791,8 @@ Public Sub SqlServerLink(ByVal frm As Access.Form)
         Exit Sub
     End If
     If Not AskYesNo("ربط البرنامج على هذا الجهاز بالخادم؟" & vbCrLf & vbCrLf & _
-                    "قبل المرحلة 5ج: للتجربة فقط، واعمل على نسخة. يبقى ملف Access كما هو للرجوع إليه.") Then Exit Sub
+                    "أول جهاز: تُطابَق البيانات أولًا، ثم يصير الخادم هو البيانات الفعلية. الأجهزة التالية تُربط مباشرة." & vbCrLf & _
+                    "يبقى ملف Access كما هو للرجوع إليه.") Then Exit Sub
     DoCmd.Hourglass True
     msg = LinkToServer(ScreenConnect(frm))
     DoCmd.Hourglass False
@@ -654,14 +806,17 @@ Public Sub SqlServerLink(ByVal frm As Access.Form)
 End Sub
 
 Public Sub SqlServerBackToAccess(ByVal frm As Access.Form)
-    Dim msg As String
+    Dim msg As String, release As Boolean
     If Not IsLinkedToServer() Then
         ShowInfo "البرنامج يعمل على ملف Access بالفعل."
         Exit Sub
     End If
     If Not AskYesNo("الرجوع إلى ملف Access:" & vbCrLf & SqlSetting("SqlAccessPath") & "؟" & vbCrLf & vbCrLf & _
                     "ما سُجّل على الخادم بعد الربط لا يظهر في ملف Access.") Then Exit Sub
-    msg = LinkToAccess()
+    release = AskYesNo("هل يصير ملف Access هو البيانات الفعلية من جديد؟" & vbCrLf & vbCrLf & _
+                       "نعم: يُسمح بنقل البيانات إلى الخادم من جديد، وكل الأجهزة يجب أن ترجع إلى Access." & vbCrLf & _
+                       "لا: رجوع مؤقت لهذا الجهاز فقط، والخادم يبقى البيانات الفعلية.")
+    msg = LinkToAccess(, release)
     If Len(msg) > 0 Then
         ShowWarning msg
     Else
@@ -703,6 +858,21 @@ Public Function TestSqlServer() As Boolean
     CheckSql UBound(Split(SchemaTableList(), ",")) > 50, "قائمة جداول البرنامج", passed, failed, Report
     CheckSql Len(SqlDriverList()) >= 0 And (IsLinkedToServer() Or Len(AccessBackEndPath()) > 0), _
              "ملف البيانات الحالي", passed, failed, Report
+    ' plan 5C (docs/70)
+    CheckSql SqlName("Retail]Store") = "[Retail]]Store]", "اسم القاعدة بين أقواس", passed, failed, Report
+    c = ServerConnect("srv", "RetailStore", "", "", "ODBC Driver 18 for SQL Server")
+    CheckSql ConnectDatabase(c) = "RetailStore" And ConnectDatabase(ConnectToDatabase(c, "master")) = "master" And _
+             InStr(ConnectToDatabase(c, "master"), "TrustServerCertificate=Yes;") > 0, _
+             "الاتصال بقاعدة master للاستعادة", passed, failed, Report
+    CheckSql BackupDatabaseSql("RetailStore", "D:\B\x.bak") = "BACKUP DATABASE [RetailStore] TO DISK = N'D:\B\x.bak' " & _
+             "WITH COPY_ONLY, INIT, CHECKSUM, NAME = N'RetailStore';", "أمر النسخ الاحتياطي على الخادم", passed, failed, Report
+    CheckSql InStr(RestoreDatabaseSql("RetailStore", "x.bak"), "SET SINGLE_USER WITH ROLLBACK IMMEDIATE") > 0 And _
+             InStrRev(RestoreDatabaseSql("RetailStore", "x.bak"), "END CATCH;" & vbLf & "ALTER DATABASE [RetailStore] SET MULTI_USER;") > 0, _
+             "أمر الاستعادة يعيد القاعدة لكل المستخدمين", passed, failed, Report
+    If IsLinkedToServer() Then                                  ' on the server: the real data is marked
+        CheckSql Not IsNull(ServerLiveSince(LinkConnect())), "الخادم معلَّم بأنه البيانات الفعلية", passed, failed, Report
+        CheckSql Len(StaleAccessWarning()) = 0, "لا تحذير ملف Access القديم على الخادم", passed, failed, Report
+    End If
     Debug.Print "--- نجح: " & passed & " | فشل: " & failed
     If failed = 0 Then
         TestMsg "جميع اختبارات SQL Server ناجحة (" & passed & " اختبارًا).", vbInformation + MSG_RTL, "TestSqlServer"

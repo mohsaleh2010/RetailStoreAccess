@@ -148,11 +148,25 @@ Private m_inTrans As Boolean
 '------------------------------------------------------------------------------
 ' Public entry points
 '------------------------------------------------------------------------------
+Private Function TablesOnServer() As Boolean
+    ' The tables of this front-end are linked to SQL Server (docs/70).
+    Dim db As DAO.Database
+    On Error Resume Next
+    Set db = CurrentDb
+    TablesOnServer = (Left$(db.TableDefs("Settings").Connect, 5) = "ODBC;")
+End Function
+
 Public Function BuildSchema(Optional ByVal BackEndPath As String = "") As Boolean
     On Error GoTo EH
     If Len(BackEndPath) = 0 Then BackEndPath = DefaultBackEndPath()
     If StrComp(BackEndPath, CurrentProject.FullName, vbTextCompare) = 0 Then
         MsgBox "مسار ملف البيانات يجب أن يختلف عن ملف الواجهة الحالي.", vbExclamation + MSG_RTL
+        Exit Function
+    End If
+    If TablesOnServer() Then                 ' plan 5C: never relink a server front-end to the old Access file
+        MsgBox "البرنامج يعمل على SQL Server: قاعدة الخادم تُحدَّث من شاشة «SQL Server» بزر «تجهيز القاعدة»." & vbCrLf & _
+               "BuildSchema لم يغيّر شيئًا.", vbInformation + MSG_RTL, "BuildSchema"
+        BuildSchema = True
         Exit Function
     End If
 
@@ -593,7 +607,7 @@ Private Sub EnsureDeveloperUser()
     ' Created only with the password typed now: there is never a programmer account without one.
     ' (PasswordHash / NewSalt of modSecurity through Application.Run: no compile-time dependency.)
     Dim pwd As String, salt As String
-    If DCountIn("Employees", "[IsDeveloper] = True") > 0 Then Exit Sub
+    If DCountIn("Employees", "[IsDeveloper] <> 0") > 0 Then Exit Sub
     If DCountIn("Employees", "[Username] = 'developer'") > 0 Then
         LogLine "تنبيه: يوجد مستخدم باسم developer وليس هو المبرمج؛ لم يُنشأ حساب المبرمج."
         Exit Sub

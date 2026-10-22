@@ -826,7 +826,7 @@ SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuant
        CCur(Nz(s.NetQty, 0)) AS NetQtySold, CCur(Nz(s.NetSales, 0)) AS NetSalesAmount
 FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN SalesByProductQuery AS s ON p.ProductID = s.ProductID
-WHERE p.IsActive = True
+WHERE p.IsActive <> 0
 ORDER BY CCur(Nz(s.NetQty, 0)), p.ProductName
 ```
 
@@ -936,7 +936,7 @@ SELECT p.ProductID, p.ProductCode, p.Barcode, p.ProductName, c.CategoryName,
        s.SupplierName, s.Mobile AS SupplierMobile
 FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN [@Suppliers] AS s ON p.SupplierID = s.SupplierID
-WHERE p.IsActive = True AND p.TrackStock = True AND p.CurrentQuantity <= p.MinimumQuantity
+WHERE p.IsActive <> 0 AND p.TrackStock <> 0 AND p.CurrentQuantity <= p.MinimumQuantity
 ORDER BY p.MinimumQuantity - p.CurrentQuantity DESC, p.ProductName
 ```
 
@@ -1088,7 +1088,7 @@ SELECT p.ProductID, p.ProductCode, p.ProductName, c.CategoryName, p.CurrentQuant
        DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) AS DaysWithoutSale
 FROM (Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID)
      LEFT JOIN qryProductLastSale AS ls ON p.ProductID = ls.ProductID
-WHERE p.IsActive = True AND p.CurrentQuantity > 0
+WHERE p.IsActive <> 0 AND p.CurrentQuantity > 0
   AND DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) >=
       (SELECT SlowMovingDays FROM Settings)
 ORDER BY DateDiff('d', Nz(ls.LastSaleDate, p.CreatedAt), Date()) DESC
@@ -1104,7 +1104,7 @@ SELECT c.CategoryID, c.CategoryName, Count(*) AS ProductCount,
        Sum(p.CurrentQuantity * p.AverageCost) AS StockCostValue,
        Sum(p.CurrentQuantity * p.SellingPrice) AS StockSalesValue
 FROM Products AS p INNER JOIN [@Categories] AS c ON p.CategoryID = c.CategoryID
-WHERE p.IsActive = True
+WHERE p.IsActive <> 0
 GROUP BY c.CategoryID, c.CategoryName
 ORDER BY c.CategoryName
 ```
@@ -1912,7 +1912,7 @@ SELECT (SELECT CCur(Nz(Sum(d.GrossAmount), 0)) FROM qrySalesDocuments AS d
        (SELECT Count(*) FROM Customers AS c WHERE c.CurrentBalance > 0) AS DebtorCount,
        (SELECT CCur(Nz(Sum(s.CurrentBalance), 0)) FROM Suppliers AS s WHERE s.CurrentBalance > 0) AS SupplierDue,
        (SELECT CCur(Nz(Sum(p.CurrentQuantity * p.AverageCost), 0)) FROM Products AS p
-        WHERE p.IsActive = True AND p.CurrentQuantity > 0) AS StockValue,
+        WHERE p.IsActive <> 0 AND p.CurrentQuantity > 0) AS StockValue,
        (SELECT Count(*) FROM LowStockQuery) AS LowStockCount
 FROM Settings AS st
 WHERE st.SettingID = 1
@@ -2002,7 +2002,7 @@ SELECT s.SalesRepID, s.RepCode, s.RepName, s.Region, s.IsActive, s.CommissionRat
            0) AS Commission
 FROM ([@SalesReps] AS s LEFT JOIN qryRepPeriodTotals AS t ON s.SalesRepID = t.SalesRepID)
      LEFT JOIN qryRepTargetTotals AS g ON s.SalesRepID = g.SalesRepID
-WHERE s.IsActive = True OR CCur(Nz(t.SumSales, 0)) <> 0 OR CCur(Nz(t.SumCollected, 0)) <> 0
+WHERE s.IsActive <> 0 OR CCur(Nz(t.SumSales, 0)) <> 0 OR CCur(Nz(t.SumCollected, 0)) <> 0
 ```
 
 ## RepCustomersQuery
@@ -2272,7 +2272,7 @@ UNION ALL
 SELECT v.ToCashBoxID, IIf(v.InTransit, v.ReceivedAt, v.VoucherDate), 'TRANSFER_IN', 'تحويل من صندوق آخر',
        v.VoucherNumber, b.BoxName, v.Description, v.Amount, CCur(0), v.EmployeeID
 FROM CashVouchers AS v INNER JOIN [@CashBoxes] AS b ON v.CashBoxID = b.CashBoxID
-WHERE v.VoucherType = 'TRANSFER' AND (v.InTransit = False OR v.ReceivedAt Is Not Null)
+WHERE v.VoucherType = 'TRANSFER' AND (v.InTransit = 0 OR v.ReceivedAt Is Not Null)
 UNION ALL
 SELECT t.CashBoxID, t.TxDate, 'BANK_DEPOSIT', 'إيداع في البنك', t.TxNumber, k.BankName, t.Description,
        CCur(0), t.Amount, t.EmployeeID
@@ -2793,11 +2793,11 @@ WHERE t.Status <> 'DRAFT' AND v.TransferValue <> 0
 UNION ALL
 SELECT 'STOCK_RECEIVE' AS SourceType, t.StockTransferID AS SourceID, t.TransferNumber AS SourceNumber, t.ReceivedAt AS SourceDate, 'استلام تحويل مخزني' AS Party, 1 AS LineOrder, IIf(t.ToWarehouseID = 1, 1400, 140000 + t.ToWarehouseID) AS AccountCode, v.TransferValue AS Debit, CCur(0) AS Credit, t.Notes AS LineText, 0 AS CostCenter
 FROM StockTransfers AS t INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID
-WHERE t.Status = 'RECEIVED' AND t.InTransit = True AND v.TransferValue <> 0
+WHERE t.Status = 'RECEIVED' AND t.InTransit <> 0 AND v.TransferValue <> 0
 UNION ALL
 SELECT 'STOCK_RECEIVE' AS SourceType, t.StockTransferID AS SourceID, t.TransferNumber AS SourceNumber, t.ReceivedAt AS SourceDate, 'استلام تحويل مخزني' AS Party, 2 AS LineOrder, 1410 AS AccountCode, CCur(0) AS Debit, v.TransferValue AS Credit, 'بضاعة بالطريق' AS LineText, 0 AS CostCenter
 FROM StockTransfers AS t INNER JOIN qryStockTransferValue AS v ON t.StockTransferID = v.StockTransferID
-WHERE t.Status = 'RECEIVED' AND t.InTransit = True AND v.TransferValue <> 0
+WHERE t.Status = 'RECEIVED' AND t.InTransit <> 0 AND v.TransferValue <> 0
 ```
 
 ## qryJournalStockNote
@@ -3063,11 +3063,11 @@ WHERE v.VoucherType = 'TRANSFER'
 UNION ALL
 SELECT 'CASH_RECEIVE' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.ReceivedAt AS SourceDate, v.Description AS Party, 1 AS LineOrder, 110000 + v.ToCashBoxID AS AccountCode, v.Amount AS Debit, CCur(0) AS Credit, v.Description AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v
-WHERE v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Not Null
+WHERE v.VoucherType = 'TRANSFER' AND v.InTransit <> 0 AND v.ReceivedAt Is Not Null
 UNION ALL
 SELECT 'CASH_RECEIVE' AS SourceType, v.CashVoucherID AS SourceID, v.VoucherNumber AS SourceNumber, v.ReceivedAt AS SourceDate, v.Description AS Party, 2 AS LineOrder, 1195 AS AccountCode, CCur(0) AS Debit, v.Amount AS Credit, 'نقدية بالطريق' AS LineText, IIf(v.CostCenterID Is Null, 0, v.CostCenterID) AS CostCenter
 FROM CashVouchers AS v
-WHERE v.VoucherType = 'TRANSFER' AND v.InTransit = True AND v.ReceivedAt Is Not Null
+WHERE v.VoucherType = 'TRANSFER' AND v.InTransit <> 0 AND v.ReceivedAt Is Not Null
 ```
 
 ## qryJournalStock
@@ -4420,7 +4420,7 @@ UNION ALL
 SELECT 'CREDIT_NOT_ALLOWED', 'بيع آجل لعميل غير مسموح له بالآجل', 'SalesInvoices',
        h.SalesInvoiceID, CCur(0), CCur(h.RemainingAmount)
 FROM SalesInvoices AS h INNER JOIN Customers AS c ON h.CustomerID = c.CustomerID
-WHERE h.RemainingAmount > 0 AND c.AllowCredit = False
+WHERE h.RemainingAmount > 0 AND c.AllowCredit = 0
 UNION ALL
 SELECT 'RETURN_CUSTOMER', 'عميل المرتجع يختلف عن عميل الفاتورة الأصلية', 'SalesReturns',
        r.SalesReturnID, CCur(h.CustomerID), CCur(r.CustomerID)

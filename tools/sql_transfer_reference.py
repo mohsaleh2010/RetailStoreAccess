@@ -159,3 +159,41 @@ def compare(source: sqlite3.Connection, server: sqlite3.Connection) -> List[Tupl
         a, b = source.execute(q).fetchone(), server.execute(q).fetchone()
         out.append((t.name, a[0] == b[0] and abs((a[1] or 0) - (b[1] or 0)) < 0.00005 and a[2] == b[2]))
     return out
+
+
+# --------------------------------------------------------------------------
+# Plan 5C (docs/70): backup and restore of the server database
+# --------------------------------------------------------------------------
+def sql_name(name: str) -> str:
+    return "[" + name.replace("]", "]]") + "]"
+
+
+def connect_database(connect: str) -> str:
+    m = re.search(r";DATABASE=([^;]*)", connect, re.I)
+    return m.group(1) if m else ""
+
+
+def connect_to_database(connect: str, database: str) -> str:
+    return re.sub(r"(;DATABASE=)[^;]*", lambda m: m.group(1) + database, connect, count=1, flags=re.I)
+
+
+def backup_database_sql(database: str, backup_file: str) -> str:
+    return (f"BACKUP DATABASE {sql_name(database)} TO DISK = {sql_literal(backup_file, 10)} "
+            "WITH COPY_ONLY, INIT, CHECKSUM, NAME = N'RetailStore';")
+
+
+def verify_backup_sql(backup_file: str) -> str:
+    return f"RESTORE VERIFYONLY FROM DISK = {sql_literal(backup_file, 10)} WITH CHECKSUM;"
+
+
+def restore_database_sql(database: str, backup_file: str) -> str:
+    d = sql_name(database)
+    return (f"ALTER DATABASE {d} SET SINGLE_USER WITH ROLLBACK IMMEDIATE;\n"
+            "BEGIN TRY\n"
+            f"    RESTORE DATABASE {d} FROM DISK = {sql_literal(backup_file, 10)} WITH REPLACE;\n"
+            "END TRY\n"
+            "BEGIN CATCH\n"
+            f"    ALTER DATABASE {d} SET MULTI_USER;\n"
+            "    THROW;\n"
+            "END CATCH;\n"
+            f"ALTER DATABASE {d} SET MULTI_USER;")

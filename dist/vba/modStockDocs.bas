@@ -24,12 +24,12 @@ Public Const TT_PARTY_RECEIPT As Long = 12
 Public Function StockPartyIsActive(ByVal StockPartyID As Variant) As Boolean
     If IsNull(StockPartyID) Then Exit Function
     If Not IsNumeric(StockPartyID) Then Exit Function
-    StockPartyIsActive = Nz(DbValue("SELECT COUNT(*) FROM StockParties WHERE IsActive = True AND StockPartyID = " & _
+    StockPartyIsActive = Nz(DbValue("SELECT COUNT(*) FROM StockParties WHERE IsActive <> 0 AND StockPartyID = " & _
                                     CLng(StockPartyID)), 0) > 0
 End Function
 
 Public Function StockPartyRows() As String
-    StockPartyRows = Tr("SELECT p.StockPartyID, p.PartyName FROM [@StockParties] AS p WHERE p.IsActive = True " & _
+    StockPartyRows = Tr("SELECT p.StockPartyID, p.PartyName FROM [@StockParties] AS p WHERE p.IsActive <> 0 " & _
                         "ORDER BY p.PartyName")
 End Function
 
@@ -61,7 +61,7 @@ Public Function CreateStockDocument(ByVal DocType As String, ByVal WarehouseID A
         CreateStockDocument = "«Œ — «·ÃÂ…."
     End If
     If Len(CreateStockDocument) > 0 Then Exit Function
-    Set rs = CurrentDb.OpenRecordset("StockDocuments", dbOpenDynaset, dbAppendOnly)
+    Set rs = CurrentDb.OpenRecordset("StockDocuments", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!DocNumber = NextNumber(IIf(DocType = "ISSUE", "STOCK_ISSUE", "STOCK_RECEIPT"))
     rs!DocType = DocType
@@ -140,7 +140,7 @@ Public Function PostStockDocument(ByVal StockDocumentID As Long) As String
     ws.BeginTrans
     inTrans = True
     Set rs = db.OpenRecordset("SELECT StockDocumentLineID, ProductID, Quantity, UnitCost FROM StockDocumentLines " & _
-                              "WHERE StockDocumentID = " & StockDocumentID & " ORDER BY StockDocumentLineID", dbOpenDynaset)
+                              "WHERE StockDocumentID = " & StockDocumentID & " ORDER BY StockDocumentLineID", dbOpenDynaset, dbSeeChanges)
     Do Until rs.EOF
         If docKind = "ISSUE" Then
             cost = Nz(DbValue("SELECT AverageCost FROM Products WHERE ProductID = " & rs!ProductID), 0)
@@ -157,7 +157,7 @@ Public Function PostStockDocument(ByVal StockDocumentID As Long) As String
     Loop
     rs.Close
     db.Execute "UPDATE StockDocuments SET DocDate = Now(), Status = 'POSTED' WHERE StockDocumentID = " & StockDocumentID, _
-               dbFailOnError
+               dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     LogAction "STOCK_DOC_POST", "StockDocuments", docNo, docKind & " Warehouse=" & wh & " Party=" & party
@@ -212,7 +212,7 @@ Public Function UnpostStockDocument(ByVal StockDocumentID As Long) As String
                               "'STOCK_DOC' AND ReferenceID = " & StockDocumentID, dbOpenSnapshot)
     Do Until rs.EOF
         Set cur = db.OpenRecordset("SELECT ProductID, CurrentQuantity, AverageCost, UpdatedAt FROM Products " & _
-                                   "WHERE ProductID = " & rs!ProductID, dbOpenDynaset)
+                                   "WHERE ProductID = " & rs!ProductID, dbOpenDynaset, dbSeeChanges)
         cur.Edit
         newAvg = cur!AverageCost
         If docKind = "RECEIPT" Then newAvg = WeightedAverage(cur!CurrentQuantity, cur!AverageCost, -rs!Quantity, rs!UnitCost)
@@ -225,8 +225,8 @@ Public Function UnpostStockDocument(ByVal StockDocumentID As Long) As String
     Loop
     rs.Close
     db.Execute "DELETE FROM InventoryTransactions WHERE ReferenceType = 'STOCK_DOC' AND ReferenceID = " & StockDocumentID, _
-               dbFailOnError
-    db.Execute "UPDATE StockDocuments SET Status = 'DRAFT' WHERE StockDocumentID = " & StockDocumentID, dbFailOnError
+               dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE StockDocuments SET Status = 'DRAFT' WHERE StockDocumentID = " & StockDocumentID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
     AuditEdited "STOCK_DOC_UNPOST", "StockDocuments", "StockDocumentID", StockDocumentID, before
@@ -248,8 +248,8 @@ Public Function DeleteStockDocument(ByVal StockDocumentID As Long) As String
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("StockDocuments", "StockDocumentID", StockDocumentID)
-    CurrentDb.Execute "DELETE FROM StockDocumentLines WHERE StockDocumentID = " & StockDocumentID, dbFailOnError
-    CurrentDb.Execute "DELETE FROM StockDocuments WHERE StockDocumentID = " & StockDocumentID, dbFailOnError
+    CurrentDb.Execute "DELETE FROM StockDocumentLines WHERE StockDocumentID = " & StockDocumentID, dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "DELETE FROM StockDocuments WHERE StockDocumentID = " & StockDocumentID, dbFailOnError + dbSeeChanges
     AuditDeleted "STOCK_DOC_DELETE", "StockDocuments", StockDocumentID, auditBefore
 End Function
 
@@ -394,7 +394,7 @@ Public Sub StockDocRemoveLine(ByVal frm As Access.Form)
     End If
     If frm.Dirty Then frm.Undo
     Set auditBefore = AuditSnapshot("StockDocumentLines", "StockDocumentLineID", id)
-    CurrentDb.Execute "DELETE FROM StockDocumentLines WHERE StockDocumentLineID = " & CLng(id), dbFailOnError
+    CurrentDb.Execute "DELETE FROM StockDocumentLines WHERE StockDocumentLineID = " & CLng(id), dbFailOnError + dbSeeChanges
     AuditDeleted "STOCK_DOC_LINE_DELETE", "StockDocumentLines", id, auditBefore
     frm.Requery
     StockDocShow frm.Parent
@@ -416,12 +416,12 @@ Public Function TestStockDocs() As Boolean
     ws.BeginTrans
     inTrans = True
     CurrentDb.Execute "INSERT INTO StockParties (PartyCode, PartyName, PartyType) VALUES " & _
-                      "('TEST-SP', 'TEST ’«·… «·≈‰ «Ã', 'PRODUCTION')", dbFailOnError
+                      "('TEST-SP', 'TEST ’«·… «·≈‰ «Ã', 'PRODUCTION')", dbFailOnError + dbSeeChanges
     partyID = DbValue("SELECT Max(StockPartyID) FROM StockParties")
     CurrentDb.Execute "INSERT INTO Products (ProductCode, ProductName, CategoryID, UnitID, SellingPrice, " & _
                       "CurrentQuantity, AverageCost) VALUES ('TEST-SD-P', 'TEST ’‰› «·”‰œ« ', " & _
                       Nz(DbValue("SELECT Min(CategoryID) FROM Categories"), 1) & ", " & _
-                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 0, 0)", dbFailOnError
+                      Nz(DbValue("SELECT Min(UnitID) FROM Units"), 1) & ", 20, 0, 0)", dbFailOnError + dbSeeChanges
     pid = DbValue("SELECT ProductID FROM Products WHERE ProductCode = 'TEST-SD-P'")
     msg = PostManualStock(pid, TT_STOCK_IN, 10, 6, "TEST", refNo, MAIN_WAREHOUSE_ID)
     CheckSd Len(msg) = 0, "≈÷«›… 10 » ﬂ·›… 6 " & msg, passed, failed, report
@@ -429,7 +429,7 @@ Public Function TestStockDocs() As Boolean
     ' an issue to the production hall at the average cost
     msg = CreateStockDocument("ISSUE", MAIN_WAREHOUSE_ID, partyID, "TEST", docID)
     CurrentDb.Execute "INSERT INTO StockDocumentLines (StockDocumentID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      docID & ", " & pid & ", 4, 0)", dbFailOnError
+                      docID & ", " & pid & ", 4, 0)", dbFailOnError + dbSeeChanges
     msg = msg & PostStockDocument(docID)
     CheckSd Len(msg) = 0 And StockDocStatus(docID) = "POSTED" And WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 6, _
             "”‰œ «·’—› ÌŒ’„ „‰ «·„Œ“‰ " & msg, passed, failed, report
@@ -446,7 +446,7 @@ Public Function TestStockDocs() As Boolean
     ' a receipt at its own cost updates the average; unposting it gives the average back
     msg = CreateStockDocument("RECEIPT", MAIN_WAREHOUSE_ID, partyID, "TEST", docID)
     CurrentDb.Execute "INSERT INTO StockDocumentLines (StockDocumentID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      docID & ", " & pid & ", 10, 10)", dbFailOnError
+                      docID & ", " & pid & ", 10, 10)", dbFailOnError + dbSeeChanges
     msg = msg & PostStockDocument(docID)
     CheckSd Len(msg) = 0 And WarehouseStock(pid, MAIN_WAREHOUSE_ID) = 20 And _
             Nz(DbValue("SELECT AverageCost FROM Products WHERE ProductID = " & pid), 0) = 8, _
@@ -460,8 +460,8 @@ Public Function TestStockDocs() As Boolean
     ' not more than the stock of the warehouse
     msg = CreateStockDocument("ISSUE", MAIN_WAREHOUSE_ID, 1, "TEST", docID)
     CurrentDb.Execute "INSERT INTO StockDocumentLines (StockDocumentID, ProductID, Quantity, UnitCost) VALUES (" & _
-                      docID & ", " & pid & ", 999, 0)", dbFailOnError
-    CurrentDb.Execute "UPDATE Settings SET AllowNegativeStock = False", dbFailOnError
+                      docID & ", " & pid & ", 999, 0)", dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE Settings SET AllowNegativeStock = False", dbFailOnError + dbSeeChanges
     g_AutoAnswer = False
     CheckSd Len(PostStockDocument(docID)) > 0 And StockDocStatus(docID) = "DRAFT", "·« Ìı’—› √ﬂÀ— „‰ —’Ìœ «·„Œ“‰", _
             passed, failed, report

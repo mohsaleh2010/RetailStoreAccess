@@ -349,7 +349,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     invDate = Now
     subType = InvoiceSubType(CustomerID)
 
-    Set rs = db.OpenRecordset("SalesInvoices", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("SalesInvoices", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!InvoiceNumber = invNo
     rs!InvoiceDate = invDate
@@ -388,7 +388,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     invoiceID = rs!SalesInvoiceID
     rs.Close
 
-    Set rs = db.OpenRecordset("SalesInvoiceDetails", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("SalesInvoiceDetails", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     For i = 0 To n - 1
         rs.AddNew
         rs!SalesInvoiceID = invoiceID
@@ -450,7 +450,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
         Exit Function
     End If
     Set inv = db.OpenRecordset("SELECT * FROM SalesInvoices WHERE SalesInvoiceID = " & SalesInvoiceID, _
-                               dbOpenSnapshot)
+                               dbOpenSnapshot, dbSeeChanges)
     If inv.EOF Then
         inv.Close
         PostSalesReturn = "الفاتورة الأصلية غير موجودة."
@@ -517,7 +517,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     inTrans = True
     retNo = NextNumber("SALES_RETURN")
     retDate = Now
-    Set rs = db.OpenRecordset("SalesReturns", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("SalesReturns", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!ReturnNumber = retNo
     rs!ReturnDate = retDate
@@ -545,7 +545,7 @@ Public Function PostSalesReturn(ByVal SalesInvoiceID As Long, ByVal Reason As St
     retID = rs!SalesReturnID
     rs.Close
 
-    Set rs = db.OpenRecordset("SalesReturnDetails", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("SalesReturnDetails", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     For i = 0 To n - 1
         rs.AddNew
         rs!SalesReturnID = retID
@@ -628,7 +628,7 @@ Public Function PostCustomerPayment(ByVal CustomerID As Long, ByVal Amount As Cu
     ws.BeginTrans
     inTrans = True
     payNo = NextNumber("CUSTOMER_PAYMENT")
-    Set rs = db.OpenRecordset("CustomerPayments", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("CustomerPayments", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!PaymentNumber = payNo
     rs!CustomerID = CustomerID
@@ -676,7 +676,7 @@ Public Sub ApplyStockMovement(ByVal db As DAO.Database, ByVal ProductID As Long,
     If Not ProductTracksStock(ProductID) Then Exit Sub
     If WarehouseID = 0 Then WarehouseID = CurrentWarehouseID()
     Set rs = db.OpenRecordset("SELECT ProductID, CurrentQuantity, AverageCost, PurchasePrice, UpdatedAt " & _
-                              "FROM Products WHERE ProductID = " & ProductID, dbOpenDynaset)
+                              "FROM Products WHERE ProductID = " & ProductID, dbOpenDynaset, dbSeeChanges)
     rs.Edit
     curQty = rs!CurrentQuantity
     newQty = curQty + Qty
@@ -686,7 +686,7 @@ Public Sub ApplyStockMovement(ByVal db As DAO.Database, ByVal ProductID As Long,
     rs.Update
     rs.Close
 
-    Set rs = db.OpenRecordset("InventoryTransactions", dbOpenDynaset, dbAppendOnly)
+    Set rs = db.OpenRecordset("InventoryTransactions", dbOpenDynaset, dbAppendOnly + dbSeeChanges)
     rs.AddNew
     rs!TransactionDate = Now
     rs!ProductID = ProductID
@@ -708,7 +708,7 @@ Public Sub AdjustBalance(ByVal db As DAO.Database, ByVal TableName As String, By
                          ByVal KeyValue As Long, ByVal Delta As Currency)
     Dim rs As DAO.Recordset
     Set rs = db.OpenRecordset("SELECT " & KeyField & ", CurrentBalance FROM " & TableName & _
-                              " WHERE " & KeyField & " = " & KeyValue, dbOpenDynaset)
+                              " WHERE " & KeyField & " = " & KeyValue, dbOpenDynaset, dbSeeChanges)
     rs.Edit
     rs!CurrentBalance = rs!CurrentBalance + Delta
     rs.Update

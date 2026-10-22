@@ -6,7 +6,7 @@ from typing import List
 
 from forms import Control, FormModel, Sym, button, cm, fit_window, labelled, shrink_area, title_band
 
-ACTIVE_EXPENSE_TYPES = ("SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x WHERE x.IsActive = True "
+ACTIVE_EXPENSE_TYPES = ("SELECT x.ExpenseTypeID, x.ExpenseTypeName FROM [@ExpenseTypes] AS x WHERE x.IsActive <> 0 "
                         "ORDER BY x.ExpenseTypeName")
 
 
@@ -123,7 +123,7 @@ def layout_cash_voucher() -> FormModel:
                       {"FontSize": 14, "Format": "#,##0.00"}))
     labelled(m, "txtAmount", "المبلغ *", c)
     c = table_combo(m, "cboEmployee", cm(0.4), cm(7.6), cm(7.4), events=(),
-                    rows="SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive = True ORDER BY EmployeeName")
+                    rows="SELECT EmployeeID, EmployeeName FROM Employees WHERE IsActive <> 0 ORDER BY EmployeeName")
     labelled(m, "cboEmployee", "الموظف صاحب السلفة *", c)
     c = m.add(Control("text", "txtParty", cm(0.4), cm(9.0), width - cm(0.8), cm(0.8), {}))
     labelled(m, "txtParty", "المستلم", c)

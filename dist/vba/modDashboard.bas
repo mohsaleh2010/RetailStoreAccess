@@ -118,9 +118,9 @@ Public Sub DashboardTileClick(ByVal TileKey As String)
         Case "LOW":   OpenReportOrQuery "rptLowStock", "LowStockQuery", ""
         Case "DEBT":  OpenReportOrQuery "rptCustomerBalances", "CustomerBalanceQuery", "[Balance] > 0"
         Case "DUE":   OpenReportOrQuery "rptSupplierBalances", "SupplierBalanceQuery", "[Balance] > 0"
-        Case "STOCK": OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", "[IsActive] = True"
+        Case "STOCK": OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", "[IsActive] <> 0"
         Case "MARGIN", "LIQUIDITY": OpenScreen "frmFinancials", 0        ' income statement / balance sheet
-        Case "TURNOVER": OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", "[IsActive] = True"
+        Case "TURNOVER": OpenReportOrQuery "rptStockBalance", "StockBalanceQuery", "[IsActive] <> 0"
         Case "COLLECTION": OpenScreen "frmAging", 0, "C"
     End Select
 End Sub

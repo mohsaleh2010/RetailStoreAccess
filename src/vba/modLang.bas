@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3232
+Private Const ENTRY_COUNT As Long = 3252
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("AS [مبلغ الشيك], StatusName AS [الحالة], Format(StatusDate, 'yyyy/mm/dd') AS [في], Nz(BankName, DrawerBank) AS [البنك] ") = "AS [Cheque amount], StatusName AS [Status], Format(StatusDate, 'yyyy/mm/dd') AS [in], Nz(BankName, DrawerBank) AS [Bank] ", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إعادة تقييم الأصل إلى ") = "Revalue the asset to ", "Tr sample 2", passed, failed, report
-    CheckLang Tr("البنوك") = "Banks", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المبيعات اليومية") = "Daily sales", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذرت النسخة الوقائية قبل الاستعادة، فلم تتم الاستعادة: ") = "The safety copy before restoring failed, so nothing was restored: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("سجل التدقيق يحتاج صلاحية «سجل التدقيق».") = "The audit trail needs the permission Audit trail.", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا يمكن تغيير دولة التشغيل بعد تسجيل عمليات في البرنامج.") = "The operating country cannot change after operations are recorded.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("ActionName(a.ActionType) AS [العملية], a.ObjectName AS [الجدول], a.RecordID AS [الرقم], ") = "ActionName(a.ActionType) AS [Transaction], a.ObjectName AS [Table], a.RecordID AS [Number], ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("إعادة طباعة") = "Reprint", "Tr sample 2", passed, failed, report
+    CheckLang Tr("البيئة الفعلية") = "Production environment", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المبيعات حسب فترة") = "Sales by period", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعذّر إنشاء الشهادة: ") = "Could not create the certificate: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("سجّل الدخول أولًا.") = "Log in first.", "Tr sample 6", passed, failed, report
+    CheckLang Tr("لا يمكنك تعطيل حسابك وأنت مسجل الدخول به.") = "You cannot deactivate your own account while logged in with it.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة") = "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة", "العربية: من اليمين ولا ترجمة", _

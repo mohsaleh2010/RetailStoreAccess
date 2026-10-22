@@ -130,8 +130,8 @@ def date_(name, caption, required=True, default="Date()"):
     return Field(name, "DATE", caption, required=required, default=default)
 
 
-def datetime_(name, caption, required=False, default=None):
-    return Field(name, "DATETIME", caption, required=required, default=default)
+def datetime_(name, caption, required=False, default=None, note=""):
+    return Field(name, "DATETIME", caption, required=required, default=default, note=note)
 
 
 def fx_fields(foreign_caption="المبلغ بالعملة"):
@@ -327,6 +327,9 @@ TABLES: List[Table] = [
                  rule='In ("TEST","SIMULATION","PRODUCTION")',
                  rule_text="TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية",
                  note="السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45)"),
+            datetime_("ServerLiveSince", "البيانات الفعلية على SQL Server منذ",
+                      note="يُكتب على الخادم عند ربط البرنامج به (docs/70): لا يُنقل فوقه من ملف Access، "
+                           "والأجهزة الأخرى تُربط بلا مطابقة"),
         ],
         pk=["SettingID"],
         seed_columns=["SettingID", "StoreName", "CountryCode", "VATRate", "PricesIncludeVAT",
