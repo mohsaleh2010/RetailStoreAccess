@@ -63,6 +63,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
 | `modSqlServer` | الاتصال بالخادم، وتشغيل السكربت، ونقل البيانات ومطابقتها، وربط الجداول بالخادم أو بملف Access، وفحص الخادم عند الدخول (الخطة 5ب، `docs/68`، شاشة `frmSqlServer`)؛ وأوامر النسخ والاستعادة على الخادم، وعلامة البيانات الفعلية `ServerLiveSince` وتحذير ملف Access القديم (5ج، `docs/70`) |
 | `src/vba/modProductUnits.bas` | الوحدات المتعددة للصنف (`docs/72`): معامل الوحدة وسعرها، ومسح باركودها، والتحقق، و`TestProductUnits` |
 | `src/vba/modPurchaseOrders.bas` | أوامر الشراء واقتراح الشراء (`docs/74`): دورة الأمر، وإذن الاستلام منه وحالته، والاقتراح من حد إعادة الطلب، والشاشة، و`TestPurchaseOrders` |
+| `src/vba/modQuotations.bas` | عروض الأسعار للعملاء (`docs/75`): المسودة والإصدار بحساب الفاتورة (`CalcRun`)، و«منتهي» بعد الصلاحية، والتحويل إلى طلبية أو فاتورة (`PostSaleFromCart` بالوسيط `QuotationID`)، والشاشة، و`TestQuotations` |
 | `src/vba/modPriceLists.bas` | قوائم الأسعار (`docs/73`): قائمة العميل، وسعر الصنف بوحدته وتاريخ سريانه، وخصم القائمة، والتحقق، و`TestPriceLists` |
 | `tools/gen_sql_views.py` ← `dist/sql/RetailStore_Queries.sql`، `modServerQueryData` | الاستعلامات المحفوظة عروضًا على SQL Server (5د، `docs/71`): التحويل من لغة Access، ومجموعتا `dbo` (عربي) و`en` (إنجليزي)، وجدول المعاملات `QueryParams`. `modServerQueries` ينقل الاستعلامات إلى العروض المربوطة `sv_*` عند الربط بالخادم ويعيدها |
 | `tools/server_code.py` | قواعد الكود على SQL Server (5ج، `docs/70`): `see_changes` يضيف `dbSeeChanges` للوحدات المكتوبة يدويًا والمولَّدة؛ وفحص رقم السجل قبل الحفظ ومقارنات نعم/لا |

@@ -390,6 +390,11 @@ End Function
 '''
 
 
+def chunks(items, size):
+    items = list(items)
+    return [items[i:i + size] for i in range(0, len(items), size)]
+
+
 def build_relations_vba() -> str:
     rels = relations()
     specs = "\n".join(
@@ -405,7 +410,8 @@ def build_relations_vba() -> str:
     for key, value in {
         "@@COUNT@@": str(len(rels)),
         "@@SPECS@@": specs,
-        "@@RETIRED@@": ", _\n                             ".join(vba_str(n) for n in retired_relations()),
+        "@@RETIRED@@": ", _\n                             ".join(          # 3 a line: under 24 continuations
+            ", ".join(vba_str(n) for n in names) for names in chunks(retired_relations(), 3)),
         "@@REJECTED_INSERTS@@": ins,
         "@@REJECTED_DELETES@@": dels,
         "@@CASCADE_PRODUCT_SQL@@": vba_str(CASCADE_PRODUCT_SQL),

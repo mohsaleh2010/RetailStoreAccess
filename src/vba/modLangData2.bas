@@ -15,6 +15,13 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "يُمسح في نقطة البيع والمشتريات فيُضاف السطر بهذه الوحدة", "Scanned in the POS and purchases, it adds the line in this unit"
+    LangAdd "أغلق البرنامج وانسخ ملف النسخة الاحتياطية مكانه يدويًا", "Close the program and copy the backup file in its place by hand"
+    LangAdd "إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية", "Total VAT due for the current period"
+    LangAdd "اختر شاشة واحدة على الأقل، أو ألغِ «صلاحيات شاشات خاصة", "Choose at least one screen, or clear Custom screen permissions"
+    LangAdd "الرقم الضريبي في السعودية 15 رقمًا ويبدأ وينتهي بالرقم", "The Saudi tax number has 15 digits and starts and ends with the digit"
+    LangAdd "الضريبة والقيمة المتبقية والإهلاك السابق لا تكون سالبة", "VAT, residual value and previous depreciation are never negative"
+    LangAdd "بيانات دخول البرنامج للفاتورة الإلكترونية (Client ID و", "Credentials of the program for the e-invoice (Client ID and"
     LangAdd "تأكد من تشغيل الخادم والشبكة، ثم افتح البرنامج من جديد", "Make sure the server and the network are running, then open the program again"
     LangAdd "تعذرت النسخة الوقائية قبل الاستعادة، فلم تتم الاستعادة", "The safety copy before restoring failed, so nothing was restored"
     LangAdd "تم حفظ صلاحيات الشاشات. تسري من الدخول التالي للمستخدم", "The screen permissions were saved. They apply from the next login of the user"
@@ -97,6 +104,7 @@ Private Sub D2_1()
     LangAdd "تُحذف التسوية الجارية فقط (أعد فتح المعتمدة أولًا", "Only the open reconciliation is deleted (reopen the approved one first"
     LangAdd "تُحفظ قيمه كما هي الآن، ويُنشأ قيد التسوية بتاريخ", "Its values are kept as they are now, and the settlement entry is created on"
     LangAdd "صُرف له جزء من هذه العمولات. ألغِ سند الصرف أولًا", "Part of these commissions was paid to him. Cancel the payment voucher first"
+    LangAdd "عروض الأسعار للعملاء: الصادرة والمنتهية والمحوّلة", "Customer quotations: issued, expired and converted"
     LangAdd "لا تملك صلاحية الحذف في شاشة ربط السداد بالفواتير", "You do not have the permission to delete in the payment matching screen"
     LangAdd "لا يمكن حذف هذا السجل لأنه مستخدم في عمليات سابقة", "This record cannot be deleted because it is used in earlier transactions"
     LangAdd "للأمر إذن استلام لم يُرحَّل. رحّله أو احذفه أولًا", "The order has a receipt note not posted. Post or delete it first"
@@ -108,6 +116,7 @@ Private Sub D2_1()
     LangAdd "الصغير؛ سعر الوسط أو الكبير يجعل للمشروب أحجامًا", "small, a medium or large price gives the drink sizes"
     LangAdd "المخزن الذي تُحمَّل منه السيارة غير مخزن السيارة", "The van cannot load from itself"
     LangAdd "الهدف الشهري لصافي مبيعات كل مندوب (بدون الضريبة", "The monthly target for the net sales of each sales rep (without VAT"
+    LangAdd "تُعدَّل أسطر المسودة فقط. أعد العرض لمسودة أولًا", "Only the lines of a draft are changed. Return the quotation to a draft first"
     LangAdd "غير متاح في ملف ACCDE. غيّر كلمة المرور من نسختك", "Not available in an ACCDE file. Change the password from your copy"
     LangAdd "لتصحيح الكمية الآن استخدم الجرد أو الإضافة/الخصم", "To correct the quantity now use the stock count or the addition/deduction"
     LangAdd "لهذا الحساب حسابات تابعة. احذفها أو انقلها أولًا", "This account has sub-accounts. Delete them or move them first"
@@ -126,6 +135,9 @@ Private Sub D2_1()
     LangAdd "صنفًا بكمية صفر. اكتب الكميات، ثم «ترحيل الرصيد", "items with a zero quantity. Write the quantities, then Post the stock"
     LangAdd "قاعدة الخادم فيها البيانات الفعلية للبرنامج منذ", "The server database holds the real data of the program since"
     LangAdd "لطابعة الملصقات، وأكثر لورق A4 فيه أعمدة ملصقات", "for a label printer, and more for A4 paper with columns of labels"
+End Sub
+
+Private Sub D2_2()
     LangAdd "أولًا: رصيده المرحَّل قد يعتمد على هذا الإقرار", "first: its carried balance may depend on this return"
     LangAdd "أُنشئت الموازنة بسطر لكل حساب إيرادات ومصروفات", "The budget was created with a line for each revenue and expense account"
     LangAdd "إنشاء كل المصروفات المتكررة المستحقة حتى اليوم", "Create all recurring expenses due up to today"
@@ -135,11 +147,9 @@ Private Sub D2_1()
     LangAdd "الصرف مطابق في تسوية بنكية: ألغِ مطابقته أولًا", "The payment is matched in a bank reconciliation: unmatch it first"
     LangAdd "الكمية المرتجعة للمورد أكبر من الكمية المشتراة", "The quantity returned to the supplier is more than the quantity bought"
     LangAdd "الكمية تتغير فقط من المشتريات والمبيعات والجرد", "The quantity changes only through purchases, sales and stock counts"
-End Sub
-
-Private Sub D2_2()
     LangAdd "تأكيد كلمة المرور لا يطابق كلمة المرور الجديدة", "The password confirmation does not match the new password"
     LangAdd "تغيرت ضريبة مستندات الفترة بعد الاعتماد بمقدار", "The VAT of the documents of the period changed after approval by"
+    LangAdd "تُحذف المسودة فقط. العرض الصادر يُرفض بدل حذفه", "Only a draft is deleted. An issued quotation is rejected instead"
     LangAdd "رفضت المصلحة بيانات دخول البرنامج (Client ID و", "The Tax Authority refused the credentials of the program (Client ID and"
     LangAdd "في القيد أصل مستبعد بعده: ألغِ الاستبعاد أولًا", "The entry has an asset disposed after it: cancel the disposal first"
     LangAdd "لا تملك صلاحية الإضافة في شاشة التسوية البنكية", "You do not have the permission to add in the bank reconciliation screen"
@@ -211,6 +221,7 @@ Private Sub D2_2()
     LangAdd "الفاتورة الإلكترونية غير مفعّلة (الإعدادات", "E-invoicing is not enabled (settings"
     LangAdd "بياناتك الحالية لم تتغير، ونسختها الوقائية", "Your current data did not change, and its safety copy"
     LangAdd "تاريخ الفاتورة لا يمكن أن يكون في المستقبل", "The invoice date cannot be in the future"
+    LangAdd "تحويل العرض إلى طلبية عميل (مسودة في مخزنك", "Turn the quotation into a customer order (a draft in your warehouse"
     LangAdd "حذف آخر نقل للأصل وإرجاعه إلى مركزه السابق", "Delete the last transfer of the asset and return it to its previous centre"
     LangAdd "سعرها × العدد، ما لم يكن للكرتونة سعر فيها", "its price x the count, unless the carton has its own price in the list"
     LangAdd "عملاء خط السير موجودون في زيارات هذا اليوم", "The route customers are already in the visits of this day"
@@ -247,6 +258,9 @@ Private Sub D2_2()
     LangAdd "شجرة الحسابات: الحسابات الرئيسية والفرعية", "Account tree: main and sub-accounts"
     LangAdd "طلبيات العملاء المفتوحة: الباقي بلا تسليم", "Open customer orders: what is left to deliver"
     LangAdd "فاتورة إذن التسليم بالوحدة الصغرى للأصناف", "The invoice of a delivery note is in the smallest unit of the products"
+End Sub
+
+Private Sub D2_3()
     LangAdd "فعّل الإرسال من شاشة الفاتورة الإلكترونية", "Enable sending in the e-invoicing screen"
     LangAdd "لا تملك هذه الصلاحية في شاشة مسير الرواتب", "You do not have this permission in the payroll screen"
     LangAdd "لا توجد مبالغ غير مربوطة أو فواتير مفتوحة", "There are no unlinked amounts or open invoices"
@@ -258,9 +272,6 @@ Private Sub D2_2()
     LangAdd "ملف المفتاح الخاص غير محدد في إعداد الربط", "The private key file is not set in the connection setup"
     LangAdd "منتج وصلت كميته إلى حد إعادة الطلب أو أقل", "products have reached the reorder level or less"
     LangAdd "نسبة القسط المتناقص للطريقة المتناقصة فقط", "A declining balance rate is for the declining balance method only"
-End Sub
-
-Private Sub D2_3()
     LangAdd "هل تريد عرض تقرير المنتجات منخفضة المخزون", "Do you want to show the low-stock products report"
     LangAdd "يغيّرها المستخدم عند أول دخول (كلمة مؤقتة", "The user changes it at the first login (temporary password"
     LangAdd "أدخل النقدية الفعلية الموجودة في الصندوق", "Enter the actual cash in the box"
@@ -288,6 +299,7 @@ Private Sub D2_3()
     LangAdd "هذه الشاشة ستكون متاحة بعد تنفيذ المرحلة", "This screen will be available after phase"
     LangAdd "واحدة. تُحذف آخر فترة فقط، وهي غير مقفلة", "year. Only the last period can be deleted, while it is not closed"
     LangAdd "يجب أن يبقى مدير نظام نشط واحد على الأقل", "At least one active system administrator must remain"
+    LangAdd "يعود للمسودة العرض الصادر الذي لم يتحوّل", "An issued quotation not yet converted returns to a draft"
     LangAdd "يُقفل ما قبل اليوم فقط: اختر تاريخًا قبل", "Only the days before today are closed: choose a date before"
     LangAdd "أذونات التسليم والاستلام التي لم تُفوتر", "Delivery and goods receipt notes not invoiced"
     LangAdd "أرصدة أول المدة (في بداية تاريخ البداية", "Opening balances (at the start of the start date"
@@ -331,6 +343,7 @@ Private Sub D2_3()
     LangAdd "الكمية المرتجعة أكبر من المتاح للإرجاع", "The returned quantity is more than what can be returned"
     LangAdd "المبلغ أكبر من عمولات المندوب المستحقة", "The amount is more than the commissions payable to the sales rep"
     LangAdd "بيانات المحل الضريبية وإعدادات التشغيل", "Tax data of the store and operating settings"
+    LangAdd "تحتاج صلاحيتي عروض الأسعار ونقطة البيع", "You need the quotations and point of sale permissions"
     LangAdd "ترتيب الزر في شاشة اللمس (الأصغر أولًا", "Order of the button on the touch screen (smallest first"
     LangAdd "تسوية أيام المندوبين: البضاعة والنقدية", "Rep day settlements: goods and cash"
     LangAdd "تم نقل البيانات. الآن «مطابقة البيانات", "The data was transferred. Now Compare the data"
@@ -368,6 +381,9 @@ Private Sub D2_3()
     LangAdd "عرض فقط - التصحيح يكون بمرتجع مشتريات", "View only - a correction is made with a purchase return"
     LangAdd "غير نشط. فعّله من شاشة المنتجات أولًا", "is not active. Activate it in the Products screen first"
     LangAdd "فحص سلامة البيانات: لا توجد أي مشكلات", "Data integrity check: no problems at all"
+End Sub
+
+Private Sub D2_4()
     LangAdd "لا تملك صلاحية اعتماد التسوية البنكية", "You do not have the permission to approve the bank reconciliation"
     LangAdd "لا تملك صلاحية تسجيل فواتير المشتريات", "You do not have the permission to record purchase invoices"
     LangAdd "لا تملك هذه الصلاحية في شاشة الموازنة", "You do not have this permission in the budget screen"
@@ -381,24 +397,4 @@ Private Sub D2_3()
     LangAdd "هل تريد إنشاء المصروفات المستحقة الآن", "Do you want to create the due expenses now"
     LangAdd "أرصدة الموردين بالعملات وفروق العملة", "Supplier balances by currency and exchange differences"
     LangAdd "أُنشئ مفتاح وشهادة تجريبية في المجلد", "A test key and certificate were created in the folder"
-End Sub
-
-Private Sub D2_4()
-    LangAdd "إجمالي المصروفات التشغيلية والإدارية", "Total operating and administrative expenses"
-    LangAdd "إلغاء سداد الإقرار؟ يُحذف قيد السداد", "Cancel the payment of the return? The payment entry is deleted"
-    LangAdd "احذف قيود الإهلاك من شهر النقل أولًا", "delete the depreciation entries from the month of the transfer first"
-    LangAdd "اختر المخزن الذي تُحمَّل منه السيارة", "Choose the warehouse the van loads from"
-    LangAdd "اكتب سبب إلغاء الاعتماد في الملاحظات", "Type the reason for cancelling the approval in the notes"
-    LangAdd "السماح لمدير النظام بتغيير اسم المحل", "Allow the system administrator to change the store name"
-    LangAdd "العمولة وضريبتها أقل من مبلغ التسوية", "The fee and its VAT are less than the settled amount"
-    LangAdd "القيمة الجديدة تساوي القيمة الدفترية", "The new value equals the book value"
-    LangAdd "الكمية الفعلية لا يمكن أن تكون سالبة", "The actual quantity cannot be negative"
-    LangAdd "بالفعل. لإرجاعها استخدم «إعادة الفتح", "already. To undo it use Reopen"
-    LangAdd "بيانات الخادم لا تطابق ملف Access في", "The server data does not match the Access file in"
-    LangAdd "تبدأ الفترة الأولى بعد آخر سنة مقفلة", "The first period starts after the last closed year"
-    LangAdd "تسجيل الإهلاك لكل شهر لم يُسجَّل حتى", "Record depreciation for every month not recorded up to"
-    LangAdd "تعذّر فحص إعداد الفاتورة الإلكترونية", "Could not check the e-invoicing setup"
-    LangAdd "تقارير الخزينة تحتاج صلاحية «الخزينة", "The treasury reports need the permission Treasury"
-    LangAdd "جهاز نقطة البيع (الإيصال): تم الدخول", "POS device (receipt): logged in"
-    LangAdd "رمز الوحدة لدى مصلحة الضرائب المصرية", "Unit code of the Egyptian Tax Authority"
 End Sub

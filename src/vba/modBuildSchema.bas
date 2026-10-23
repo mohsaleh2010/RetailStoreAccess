@@ -28,13 +28,14 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,CashBoxUsers,Warehouses,Suppliers,PriceLists,Customers,Products,ProductUnits,PriceListItems,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails," & _
     "CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques,FixedAssets,DepreciationRuns,AssetDepreciations,AssetRevaluations,AssetTransfers,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings," & _
-    "Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalPeriods,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,OpeningBalances,OpeningStock,TransactionTypes,InventoryTransactions,StockTransfers,StockTransferLines,StockParties,StockDocuments,StockDocumentLines,StockNotes,StockNoteLines,SalesOrders,PurchaseOrders,PurchaseOrderLines,RepDays," & _
-    "RouteStops,RepVisits,RepPrices,SalesOrderLines,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
+    "Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalPeriods,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,OpeningBalances,OpeningStock,TransactionTypes,InventoryTransactions,StockTransfers,StockTransferLines,StockParties,StockDocuments,StockDocumentLines,StockNotes,StockNoteLines,SalesOrders,Quotations,QuotationLines,PurchaseOrders," & _
+    "PurchaseOrderLines,RepDays,RouteStops,RepVisits,RepPrices,SalesOrderLines,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
 Private Const EXPECTED_FIELD_COUNTS As String = "Settings=71;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;PriceLists=7;Customers=26;Products=26;ProductUnits=9;PriceListItems=8;SalesInvoices=47;SalesInvoiceDetails=16;SalesReturns=40;SalesReturnDetails=16;" & _
     "PurchaseInvoices=24;PurchaseInvoiceDetails=13;PurchaseReturns=23;PurchaseReturnDetails=13;CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;" & _
     "BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;" & _
-    "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=13;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;EInvoiceLog=15"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=35;Roles=3;Permissions=47;RolePermissions=92;Employees=1;Screens=82;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=38;TransactionTypes=14;StockParties=1;LabelSettings=1"
+    "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=13;Quotations=16;QuotationLines=9;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;" & _
+    "EInvoiceLog=15"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=36;Roles=3;Permissions=48;RolePermissions=94;Employees=1;Screens=83;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=38;TransactionTypes=14;StockParties=1;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -711,6 +712,8 @@ Private Sub CreateAllTables()
     CreateTable_StockNotes
     CreateTable_StockNoteLines
     CreateTable_SalesOrders
+    CreateTable_Quotations
+    CreateTable_QuotationLines
     CreateTable_PurchaseOrders
     CreateTable_PurchaseOrderLines
     CreateTable_RepDays
@@ -3583,6 +3586,74 @@ Private Sub CreateTable_SalesOrders()
     EndTable tdf, "طلبيات العملاء: طلبية عميل (docs/62): مسودة، ثم «اعتماد» يحجز الكمية في المخزن فلا تُباع لغيرها، ثم «قيد التجهيز»، ثم التسليم بأذونات التسليم (كليًا أو جزئيًا) ثم فوترتها، أو الإلغاء.", "", ""
 End Sub
 
+Private Sub CreateTable_Quotations()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "Quotations") Then Exit Sub
+    AddField tdf, "QuotationID", "AUTO", 0, False, "", _
+             "", "", "رقم داخلي", ""
+    AddField tdf, "QuotationNumber", "TEXT", 20, True, "", _
+             "", "", "رقم العرض", ""
+    AddField tdf, "QuoteDate", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ العرض", ""
+    AddField tdf, "CustomerID", "LONG", 0, True, "", _
+             "", "", "العميل", ""
+    AddField tdf, "ValidUntil", "DATE", 0, True, "Date()", _
+             "", "", "ساري حتى", ""
+    AddField tdf, "Status", "TEXT", 10, True, """DRAFT""", _
+             "In (""DRAFT"",""ISSUED"",""ORDERED"",""INVOICED"",""REJECTED"")", "مسودة، صادر، تحوّل إلى طلبية، تحوّل إلى فاتورة، رفضه العميل", "الحالة", ""
+    AddField tdf, "IssuedAt", "DATETIME", 0, False, "", _
+             "", "", "وقت الإصدار", ""
+    AddField tdf, "SubTotal", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "القيمة بدون الضريبة", "تُحسب عند الإصدار"
+    AddField tdf, "Tax", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "ضريبة القيمة المضافة", "تُحسب عند الإصدار"
+    AddField tdf, "TotalAmount", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "الإجمالي شامل الضريبة", "تُحسب عند الإصدار"
+    AddField tdf, "SalesOrderID", "LONG", 0, False, "", _
+             "", "", "الطلبية التي تحوّل إليها", ""
+    AddField tdf, "SalesInvoiceID", "LONG", 0, False, "", _
+             "", "", "فاتورة البيع التي تحوّل إليها", ""
+    AddField tdf, "EmployeeID", "LONG", 0, True, "", _
+             "", "", "سجّله", ""
+    AddField tdf, "Terms", "TEXT", 255, False, "", _
+             "", "", "الشروط (الدفع والتسليم)", "تُطبع في العرض"
+    AddField tdf, "Notes", "TEXT", 255, False, "", _
+             "", "", "ملاحظات", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "QuotationID", True, True, False
+    AddIndex tdf, "UX_QuotationNumber", "QuotationNumber", False, True, False
+    AddIndex tdf, "IX_QuoteDate", "QuoteDate", False, False, False
+    AddIndex tdf, "IX_Status", "Status", False, False, False
+    EndTable tdf, "عروض الأسعار للعملاء: عرض سعر لعميل (docs/75): مسودة، ثم «إصدار» بصلاحية حتى تاريخ (تُحسب قيمته وضريبته ويُطبع)، ثم يتحول بضغطة إلى طلبية أو فاتورة بيع، أو يرفضه العميل. العرض الصادر بعد تاريخ صلاحيته «منتهي» ولا يتحول.", "", ""
+End Sub
+
+Private Sub CreateTable_QuotationLines()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "QuotationLines") Then Exit Sub
+    AddField tdf, "QuotationLineID", "AUTO", 0, False, "", _
+             "", "", "رقم السطر", ""
+    AddField tdf, "QuotationID", "LONG", 0, True, "", _
+             "", "", "عرض السعر", ""
+    AddField tdf, "ProductID", "LONG", 0, True, "", _
+             "", "", "الصنف", ""
+    AddField tdf, "Quantity", "QTY", 0, True, "", _
+             ">0", "الكمية أكبر من صفر", "الكمية", ""
+    AddField tdf, "UnitPrice", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "سعر البيع", ""
+    AddField tdf, "NetAmount", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "الصافي بدون الضريبة", ""
+    AddField tdf, "Tax", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "الضريبة", ""
+    AddField tdf, "LineTotal", "MONEY", 0, True, "0", _
+             ">=0", "المبلغ لا يمكن أن يكون سالبًا", "الإجمالي شامل الضريبة", ""
+    AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
+             "", "", "تاريخ الإنشاء", ""
+    AddIndex tdf, "PrimaryKey", "QuotationLineID", True, True, False
+    AddIndex tdf, "IX_QuotationID", "QuotationID", False, False, False
+    EndTable tdf, "أسطر عروض الأسعار: الأصناف وكمياتها وسعر البيع (بالوحدة الصغرى، والسعر كسعر الصنف: شامل الضريبة أو بدونها حسب الإعدادات). الصافي والضريبة والإجمالي تُحسب عند الإصدار بحساب الفاتورة نفسه.", "", ""
+End Sub
+
 Private Sub CreateTable_PurchaseOrders()
     Dim tdf As DAO.TableDef
     If Not BeginTable(tdf, "PurchaseOrders") Then Exit Sub
@@ -4012,6 +4083,7 @@ Private Sub Seed_Sequences()
     SeedRow "[SequenceName] = 'RECEIPT_NOTE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('RECEIPT_NOTE', 'GRN-', 1, 6, 'أذونات الاستلام من الموردين')"
     SeedRow "[SequenceName] = 'SALES_ORDER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('SALES_ORDER', 'SO-', 1, 6, 'طلبيات العملاء')"
     SeedRow "[SequenceName] = 'PURCHASE_ORDER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PURCHASE_ORDER', 'PO-', 1, 6, 'أوامر الشراء')"
+    SeedRow "[SequenceName] = 'QUOTATION'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('QUOTATION', 'QT-', 1, 6, 'عروض الأسعار للعملاء')"
     SeedRow "[SequenceName] = 'REP_DAY'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('REP_DAY', 'RD-', 1, 6, 'أيام المندوبين (البيع من السيارة)')"
     SeedRow "[SequenceName] = 'PRODUCT_CODE'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('PRODUCT_CODE', 'P', 1, 5, 'أكواد المنتجات')"
     SeedRow "[SequenceName] = 'ZATCA_ICV'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ZATCA_ICV', Null, 1, 0, 'عدّاد ICV لمستندات فاتورة')"
@@ -4029,7 +4101,7 @@ Private Sub Seed_Sequences()
     SeedRow "[SequenceName] = 'DEPRECIATION'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('DEPRECIATION', 'DEP-', 1, 6, 'قيود الإهلاك الشهرية')"
     SeedRow "[SequenceName] = 'ASSET_REVAL'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ASSET_REVAL', 'AR-', 1, 5, 'إعادة تقييم الأصول الثابتة')"
     SeedRow "[SequenceName] = 'ASSET_TRANSFER'", "INSERT INTO [Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES ('ASSET_TRANSFER', 'AT-', 1, 5, 'نقل الأصول الثابتة بين مراكز التكلفة')"
-    EndSeed "Sequences", 35
+    EndSeed "Sequences", 36
 End Sub
 
 Private Sub Seed_Roles()
@@ -4051,6 +4123,7 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'SALES_ORDERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SALES_ORDERS', 'طلبيات العملاء: التسجيل والاعتماد والتجهيز والإلغاء', 'المبيعات', 16)") Then GrantNewPermission "SALES_ORDERS", "1,2"
     If SeedRow("[PermissionKey] = 'REP_DAYS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REP_DAYS', 'يوم المندوب: تحميل السيارة والبيع باسمه وتسويته', 'المبيعات', 17)") Then GrantNewPermission "REP_DAYS", "1,2"
     If SeedRow("[PermissionKey] = 'REP_ROUTES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('REP_ROUTES', 'خط السير وزيارات المندوبين وأسعارهم', 'المبيعات', 18)") Then GrantNewPermission "REP_ROUTES", "1,2"
+    If SeedRow("[PermissionKey] = 'QUOTATIONS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('QUOTATIONS', 'عروض الأسعار للعملاء: التسجيل والإصدار والتحويل', 'المبيعات', 19)") Then GrantNewPermission "QUOTATIONS", "1,2"
     If SeedRow("[PermissionKey] = 'CUSTOMERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMERS', 'إدارة العملاء', 'العملاء', 20)") Then GrantNewPermission "CUSTOMERS", "1,2,3"
     If SeedRow("[PermissionKey] = 'CUSTOMER_PAYMENTS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('CUSTOMER_PAYMENTS', 'سندات القبض', 'العملاء', 21)") Then GrantNewPermission "CUSTOMER_PAYMENTS", "1,2,3"
     If SeedRow("[PermissionKey] = 'PURCHASES'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('PURCHASES', 'فواتير المشتريات', 'المشتريات', 30)") Then GrantNewPermission "PURCHASES", "1,2"
@@ -4089,7 +4162,7 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'SQL_SERVER'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SQL_SERVER', 'قاعدة SQL Server: الاتصال ونقل البيانات وتشغيل البرنامج على الخادم', 'النظام', 84)") Then GrantNewPermission "SQL_SERVER", "1"
     If SeedRow("[PermissionKey] = 'AUDIT_LOG'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('AUDIT_LOG', 'سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد', 'النظام', 83)") Then GrantNewPermission "AUDIT_LOG", "1"
     If SeedRow("[PermissionKey] = 'EINVOICE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EINVOICE', 'الفاتورة الإلكترونية: المتابعة وإعادة الإرسال', 'المبيعات', 16)") Then GrantNewPermission "EINVOICE", "1,2"
-    EndSeed "Permissions", 47
+    EndSeed "Permissions", 48
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -4103,6 +4176,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'SALES_ORDERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REP_DAYS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'REP_ROUTES')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'QUOTATIONS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'PURCHASES')"
@@ -4149,6 +4223,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'SALES_ORDERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REP_DAYS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'REP_ROUTES')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'QUOTATIONS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'PURCHASES')"
@@ -4186,7 +4261,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 92
+    EndSeed "RolePermissions", 94
 End Sub
 
 Private Sub Seed_Employees()
@@ -4233,53 +4308,54 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmStockNote'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmStockNote', 'أذونات التسليم والاستلام', 'المخزون', 340, 'STOCK_NOTES', True, True, True)"
     SeedRow "[ScreenName] = 'frmSalesOrder'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSalesOrder', 'طلبيات العملاء', 'المبيعات', 350, 'SALES_ORDERS', True, True, True)"
     SeedRow "[ScreenName] = 'frmPurchaseOrder'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPurchaseOrder', 'أوامر الشراء', 'المشتريات', 360, 'PURCHASE_ORDERS', True, True, True)"
-    SeedRow "[ScreenName] = 'frmRepDay'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRepDay', 'يوم المندوب والبيع من السيارة', 'المبيعات', 370, 'REP_DAYS', True, True, True)"
-    SeedRow "[ScreenName] = 'frmRepVisits'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRepVisits', 'زيارات المندوبين وخطة اليوم', 'المبيعات', 380, 'REP_ROUTES', True, True, True)"
-    SeedRow "[ScreenName] = 'frmRouteStops'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRouteStops', 'خط سير المندوبين', 'المبيعات', 390, 'REP_ROUTES', True, True, True)"
-    SeedRow "[ScreenName] = 'frmRepPrices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRepPrices', 'أسعار المندوبين', 'المبيعات', 400, 'REP_ROUTES', True, True, True)"
-    SeedRow "[ScreenName] = 'frmCashBoxUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashBoxUsers', 'أمناء الصناديق', 'الخزينة', 410, 'CASH_ALL_BOXES', True, True, True)"
-    SeedRow "[ScreenName] = 'frmCashTransfers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashTransfers', 'استلام التحويلات بين الصناديق', 'الخزينة', 420, 'CASH_CLOSING', False, True, True)"
-    SeedRow "[ScreenName] = 'frmAccounting'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAccounting', 'المحاسبة والمالية', 'الحسابات', 430, Null, False, False, False)"
-    SeedRow "[ScreenName] = 'frmJournal'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmJournal', 'قيود اليومية', 'الحسابات', 440, 'JOURNAL', False, False, False)"
-    SeedRow "[ScreenName] = 'frmAccounts'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAccounts', 'دليل الحسابات', 'الحسابات', 450, 'JOURNAL', True, True, True)"
-    SeedRow "[ScreenName] = 'frmManualEntry'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmManualEntry', 'القيود اليدوية', 'الحسابات', 460, 'MANUAL_ENTRY', True, True, True)"
-    SeedRow "[ScreenName] = 'frmLedger'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmLedger', 'كشف حساب ودفتر الأستاذ', 'الحسابات', 470, 'JOURNAL', False, False, False)"
-    SeedRow "[ScreenName] = 'frmFinancials'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmFinancials', 'القوائم المالية', 'الحسابات', 480, 'REPORTS_PROFIT', False, False, False)"
-    SeedRow "[ScreenName] = 'frmPeriodClosing'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPeriodClosing', 'إقفال الفترات والسنة المالية', 'الحسابات', 490, 'PERIOD_CLOSE', False, False, False)"
-    SeedRow "[ScreenName] = 'frmFiscalPeriods'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmFiscalPeriods', 'الفترات المالية', 'الحسابات', 500, 'PERIOD_CLOSE', True, False, True)"
-    SeedRow "[ScreenName] = 'frmVatReturn'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmVatReturn', 'إقرار ضريبة القيمة المضافة', 'الحسابات', 510, 'VAT_RETURN', True, True, True)"
-    SeedRow "[ScreenName] = 'frmOpeningBalances'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmOpeningBalances', 'أرصدة بداية التشغيل', 'الحسابات', 520, 'OPENING_BALANCES', True, True, True)"
-    SeedRow "[ScreenName] = 'frmAging'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAging', 'أعمار الديون (العملاء والموردون)', 'التقارير', 530, 'REPORTS', False, False, False)"
-    SeedRow "[ScreenName] = 'frmBanks'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBanks', 'البنوك', 'الخزينة', 540, 'BANKS', True, True, True)"
-    SeedRow "[ScreenName] = 'frmBankTx'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBankTx', 'الحركات البنكية', 'الخزينة', 550, 'BANKS', True, False, True)"
-    SeedRow "[ScreenName] = 'frmBankRecon'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBankRecon', 'التسوية البنكية', 'الخزينة', 560, 'BANKS', True, True, False)"
-    SeedRow "[ScreenName] = 'frmCheques'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCheques', 'الشيكات الواردة والصادرة', 'الخزينة', 570, 'CHEQUES', True, True, True)"
-    SeedRow "[ScreenName] = 'frmAssets'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAssets', 'الأصول الثابتة', 'الحسابات', 580, 'FIXED_ASSETS', True, True, True)"
-    SeedRow "[ScreenName] = 'frmDepreciation'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmDepreciation', 'الإهلاك الشهري', 'الحسابات', 590, 'FIXED_ASSETS', True, False, True)"
-    SeedRow "[ScreenName] = 'frmAssetChanges'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAssetChanges', 'إعادة تقييم الأصول ونقلها', 'الحسابات', 600, 'FIXED_ASSETS', True, False, True)"
-    SeedRow "[ScreenName] = 'frmPayroll'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPayroll', 'مسير الرواتب', 'الحسابات', 610, 'PAYROLL', True, True, True)"
-    SeedRow "[ScreenName] = 'frmCostCenters'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCostCenters', 'مراكز التكلفة والفروع', 'الحسابات', 620, 'JOURNAL', True, True, True)"
-    SeedRow "[ScreenName] = 'frmBudget'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBudget', 'الموازنة التقديرية', 'الحسابات', 630, 'BUDGET', True, True, True)"
-    SeedRow "[ScreenName] = 'frmCurrencies'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCurrencies', 'العملات', 'الحسابات', 640, 'CURRENCIES', True, True, True)"
-    SeedRow "[ScreenName] = 'frmSalesReps'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSalesReps', 'المندوبين', 'المبيعات', 650, 'SALES_REPS', True, True, True)"
-    SeedRow "[ScreenName] = 'frmRepTargets'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRepTargets', 'أهداف المندوبين', 'المبيعات', 660, 'SALES_REPS', True, True, True)"
-    SeedRow "[ScreenName] = 'frmCommissions'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCommissions', 'عمولات المندوبين', 'المبيعات', 670, 'SALES_REPS', True, True, True)"
-    SeedRow "[ScreenName] = 'frmCurrencyRates'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCurrencyRates', 'أسعار العملات', 'الحسابات', 680, 'CURRENCIES', True, True, True)"
-    SeedRow "[ScreenName] = 'frmAllocation'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAllocation', 'ربط السداد بالفواتير', 'العملاء', 690, 'CUSTOMER_PAYMENTS', True, False, True)"
-    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 700, 'REPORTS', False, False, False)"
-    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 710, Null, False, False, False)"
-    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 720, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 730, 'USERS', True, True, False)"
-    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 740, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 750, 'USERS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmAuditLog'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAuditLog', 'سجل التدقيق', 'النظام', 760, 'AUDIT_LOG', False, False, False)"
-    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 770, 'BACKUP', False, False, False)"
-    SeedRow "[ScreenName] = 'frmSqlServer'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSqlServer', 'قاعدة البيانات على SQL Server', 'النظام', 780, 'SQL_SERVER', False, False, False)"
-    SeedRow "[ScreenName] = 'frmEnglishNames'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEnglishNames', 'الأسماء الإنجليزية', 'النظام', 790, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmEInvoices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEInvoices', 'الفاتورة الإلكترونية', 'المبيعات', 800, 'EINVOICE', False, True, False)"
-    SeedRow "[ScreenName] = 'frmZatcaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmZatcaSetup', 'إعداد ربط منصة فاتورة', 'النظام', 810, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmEtaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEtaSetup', 'إعداد ربط منظومة الإيصال الإلكتروني', 'النظام', 820, 'SETTINGS', False, True, False)"
-    EndSeed "Screens", 82
+    SeedRow "[ScreenName] = 'frmQuotation'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmQuotation', 'عروض الأسعار للعملاء', 'المبيعات', 370, 'QUOTATIONS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmRepDay'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRepDay', 'يوم المندوب والبيع من السيارة', 'المبيعات', 380, 'REP_DAYS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmRepVisits'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRepVisits', 'زيارات المندوبين وخطة اليوم', 'المبيعات', 390, 'REP_ROUTES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmRouteStops'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRouteStops', 'خط سير المندوبين', 'المبيعات', 400, 'REP_ROUTES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmRepPrices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRepPrices', 'أسعار المندوبين', 'المبيعات', 410, 'REP_ROUTES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmCashBoxUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashBoxUsers', 'أمناء الصناديق', 'الخزينة', 420, 'CASH_ALL_BOXES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmCashTransfers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCashTransfers', 'استلام التحويلات بين الصناديق', 'الخزينة', 430, 'CASH_CLOSING', False, True, True)"
+    SeedRow "[ScreenName] = 'frmAccounting'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAccounting', 'المحاسبة والمالية', 'الحسابات', 440, Null, False, False, False)"
+    SeedRow "[ScreenName] = 'frmJournal'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmJournal', 'قيود اليومية', 'الحسابات', 450, 'JOURNAL', False, False, False)"
+    SeedRow "[ScreenName] = 'frmAccounts'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAccounts', 'دليل الحسابات', 'الحسابات', 460, 'JOURNAL', True, True, True)"
+    SeedRow "[ScreenName] = 'frmManualEntry'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmManualEntry', 'القيود اليدوية', 'الحسابات', 470, 'MANUAL_ENTRY', True, True, True)"
+    SeedRow "[ScreenName] = 'frmLedger'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmLedger', 'كشف حساب ودفتر الأستاذ', 'الحسابات', 480, 'JOURNAL', False, False, False)"
+    SeedRow "[ScreenName] = 'frmFinancials'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmFinancials', 'القوائم المالية', 'الحسابات', 490, 'REPORTS_PROFIT', False, False, False)"
+    SeedRow "[ScreenName] = 'frmPeriodClosing'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPeriodClosing', 'إقفال الفترات والسنة المالية', 'الحسابات', 500, 'PERIOD_CLOSE', False, False, False)"
+    SeedRow "[ScreenName] = 'frmFiscalPeriods'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmFiscalPeriods', 'الفترات المالية', 'الحسابات', 510, 'PERIOD_CLOSE', True, False, True)"
+    SeedRow "[ScreenName] = 'frmVatReturn'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmVatReturn', 'إقرار ضريبة القيمة المضافة', 'الحسابات', 520, 'VAT_RETURN', True, True, True)"
+    SeedRow "[ScreenName] = 'frmOpeningBalances'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmOpeningBalances', 'أرصدة بداية التشغيل', 'الحسابات', 530, 'OPENING_BALANCES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmAging'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAging', 'أعمار الديون (العملاء والموردون)', 'التقارير', 540, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmBanks'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBanks', 'البنوك', 'الخزينة', 550, 'BANKS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmBankTx'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBankTx', 'الحركات البنكية', 'الخزينة', 560, 'BANKS', True, False, True)"
+    SeedRow "[ScreenName] = 'frmBankRecon'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBankRecon', 'التسوية البنكية', 'الخزينة', 570, 'BANKS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmCheques'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCheques', 'الشيكات الواردة والصادرة', 'الخزينة', 580, 'CHEQUES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmAssets'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAssets', 'الأصول الثابتة', 'الحسابات', 590, 'FIXED_ASSETS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmDepreciation'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmDepreciation', 'الإهلاك الشهري', 'الحسابات', 600, 'FIXED_ASSETS', True, False, True)"
+    SeedRow "[ScreenName] = 'frmAssetChanges'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAssetChanges', 'إعادة تقييم الأصول ونقلها', 'الحسابات', 610, 'FIXED_ASSETS', True, False, True)"
+    SeedRow "[ScreenName] = 'frmPayroll'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmPayroll', 'مسير الرواتب', 'الحسابات', 620, 'PAYROLL', True, True, True)"
+    SeedRow "[ScreenName] = 'frmCostCenters'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCostCenters', 'مراكز التكلفة والفروع', 'الحسابات', 630, 'JOURNAL', True, True, True)"
+    SeedRow "[ScreenName] = 'frmBudget'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBudget', 'الموازنة التقديرية', 'الحسابات', 640, 'BUDGET', True, True, True)"
+    SeedRow "[ScreenName] = 'frmCurrencies'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCurrencies', 'العملات', 'الحسابات', 650, 'CURRENCIES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmSalesReps'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSalesReps', 'المندوبين', 'المبيعات', 660, 'SALES_REPS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmRepTargets'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRepTargets', 'أهداف المندوبين', 'المبيعات', 670, 'SALES_REPS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmCommissions'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCommissions', 'عمولات المندوبين', 'المبيعات', 680, 'SALES_REPS', True, True, True)"
+    SeedRow "[ScreenName] = 'frmCurrencyRates'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmCurrencyRates', 'أسعار العملات', 'الحسابات', 690, 'CURRENCIES', True, True, True)"
+    SeedRow "[ScreenName] = 'frmAllocation'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAllocation', 'ربط السداد بالفواتير', 'العملاء', 700, 'CUSTOMER_PAYMENTS', True, False, True)"
+    SeedRow "[ScreenName] = 'frmReportCenter'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmReportCenter', 'التقارير', 'التقارير', 710, 'REPORTS', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSearch'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSearch', 'البحث', 'النظام', 720, Null, False, False, False)"
+    SeedRow "[ScreenName] = 'frmSettings'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSettings', 'إعدادات المحل', 'النظام', 730, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUsers'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUsers', 'المستخدمون', 'النظام', 740, 'USERS', True, True, False)"
+    SeedRow "[ScreenName] = 'frmRoles'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmRoles', 'الأدوار والصلاحيات', 'النظام', 750, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmUserScreens'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmUserScreens', 'صلاحيات الشاشات للمستخدمين', 'النظام', 760, 'USERS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmAuditLog'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAuditLog', 'سجل التدقيق', 'النظام', 770, 'AUDIT_LOG', False, False, False)"
+    SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 780, 'BACKUP', False, False, False)"
+    SeedRow "[ScreenName] = 'frmSqlServer'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSqlServer', 'قاعدة البيانات على SQL Server', 'النظام', 790, 'SQL_SERVER', False, False, False)"
+    SeedRow "[ScreenName] = 'frmEnglishNames'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEnglishNames', 'الأسماء الإنجليزية', 'النظام', 800, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmEInvoices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEInvoices', 'الفاتورة الإلكترونية', 'المبيعات', 810, 'EINVOICE', False, True, False)"
+    SeedRow "[ScreenName] = 'frmZatcaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmZatcaSetup', 'إعداد ربط منصة فاتورة', 'النظام', 820, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmEtaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEtaSetup', 'إعداد ربط منظومة الإيصال الإلكتروني', 'النظام', 830, 'SETTINGS', False, True, False)"
+    EndSeed "Screens", 83
 End Sub
 
 Private Sub Seed_Categories()
@@ -4801,6 +4877,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Stock issue and receipt vouchers and their parties' WHERE [PermissionKey] = 'STOCK_DOCS' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Delivery notes to customers and goods receipt notes from suppliers' WHERE [PermissionKey] = 'STOCK_NOTES' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Customer orders: entry, approval, preparation and cancellation' WHERE [PermissionKey] = 'SALES_ORDERS' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Customer quotations: entry, issue and conversion' WHERE [PermissionKey] = 'QUOTATIONS' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Rep day: van loading, selling in the rep name and settlement' WHERE [PermissionKey] = 'REP_DAYS' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Rep routes, visits and rep price lists' WHERE [PermissionKey] = 'REP_ROUTES' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Journal entries, chart of accounts and trial balance' WHERE [PermissionKey] = 'JOURNAL' AND [PermissionNameEn] Is Null", dbFailOnError
@@ -4852,6 +4929,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Product units' WHERE [ScreenName] = 'frmProductUnits' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Price lists' WHERE [ScreenName] = 'frmPriceLists' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Purchase orders' WHERE [ScreenName] = 'frmPurchaseOrder' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Customer quotations' WHERE [ScreenName] = 'frmQuotation' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Price list prices' WHERE [ScreenName] = 'frmPriceListItems' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Stock and manual moves' WHERE [ScreenName] = 'frmInventory' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Stock count' WHERE [ScreenName] = 'frmStockCount' AND [ScreenTitleEn] Is Null", dbFailOnError

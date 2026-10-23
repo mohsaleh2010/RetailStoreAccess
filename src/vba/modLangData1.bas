@@ -40,6 +40,7 @@ Private Sub D1_1()
     LangAdd "عدّل النسبة أو التعديل ثم «ترحيل المسير». الصرف بسند صرف نقدية من بند «صرف عمولة مندوب", "Edit the rate or the adjustment, then Post the run. The payment is a cash payment voucher with the item Sales rep commission payment"
     LangAdd "كمية كل صنف وتكلفة وحدته يوم بدء التشغيل، ثم «ترحيل الرصيد». «كل الأصناف» يضيف الأصناف", "The quantity and unit cost of each item on the start-up date, then Post the stock. All items adds the items"
     LangAdd "سعر الصنف في القائمة لكل وحدة، بتاريخ سريان؛ بين الأسعار السارية يُؤخذ الذي بدأ آخرًا", "The price of a product in the list for each unit, with validity dates, among the valid prices the one that starts last is used"
+    LangAdd "إصدار» يحسب القيمة والضريبة ويطبع العرض بصلاحيته، ثم يتحول بضغطة إلى طلبية أو فاتورة", "Issue works out the value and VAT and prints the quotation with its validity, then one click turns it into an order or an invoice"
     LangAdd "الأقسام وصالات الإنتاج والهالك: يُصرف لها من المخزون أو يُستلم منها، ولكل جهة حسابها", "Departments, production halls and waste: stock is issued to them or received from them, each party has its account"
     LangAdd "الاتصال بالخادم، وتجهيز القاعدة، ونقل البيانات ومطابقتها، وتشغيل البرنامج على الخادم", "The server connection, the database setup, the data transfer and comparison, and running the program on the server"
     LangAdd "الحساب المقابل حساب فرعي نشط، وليس صندوقًا ولا بنكًا ولا مدى ولا العملاء أو الموردين", "The contra account is an active sub-account, not a box, a bank, Mada, customers or suppliers"
@@ -133,10 +134,10 @@ Private Sub D1_1()
     LangAdd "يجب أن يكون البرنامج مغلقًا على كل الأجهزة الأخرى. هل تريد المتابعة", "The program must be closed on all other computers. Do you want to continue"
     LangAdd "ابدأ جردًا، أدخل الكمية الفعلية أو امسح الباركود، ثم رحّل الفروقات", "Start a count, enter the actual quantity or scan the barcode, then post the differences"
     LangAdd "الشاشات التي يفتحها كل مستخدم، والإضافة والتعديل والحذف في كل شاشة", "The screens each user opens, and add, edit and delete in each screen"
-    LangAdd "بعدها لا يُضاف ولا يُعدَّل ولا يُحذف أي مستند بتاريخ حتى هذا اليوم", "After that, no document dated up to this day is added, edited or deleted"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "بعدها لا يُضاف ولا يُعدَّل ولا يُحذف أي مستند بتاريخ حتى هذا اليوم", "After that, no document dated up to this day is added, edited or deleted"
     LangAdd "سيُنشأ مفتاح جديد ويُعاد تسجيل الجهاز من البداية. هل تريد المتابعة", "A new key will be created and the device registered again from the start. Continue"
     LangAdd "شهادة الجهاز (CSID): تُملأ من الخطوة 3، أو تُلصق كما تصدرها الهيئة", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
     LangAdd "قائمة أسعار المندوب: سعر خاص للصنف حين يبيع المندوب أو يُباع باسمه", "Rep price list: a special price of a product when the rep sells or a sale is made in his name"
@@ -145,10 +146,12 @@ Private Sub D1_2()
     LangAdd "أرصدة المنتجات وحركاتها، والرصيد الافتتاحي والإضافة والخصم اليدوي", "Product balances and moves, opening balance and manual additions and deductions"
     LangAdd "إقرار غير محفوظ: الأرقام من المستندات الآن. احفظه مسودة أو اعتمده", "Unsaved return: the figures come from the documents now. Save it as a draft or approve it"
     LangAdd "الجهاز غير مسجّل. اكتب رمز التحقق (OTP) من بوابة فاتورة ثم الخطوة", "The device is not registered. Enter the verification code (OTP) from the Fatoora portal, then step"
+    LangAdd "انتهت صلاحية العرض. أنشئ منه عرضًا جديدًا («عرض جديد منه») وأصدره", "The quotation has expired. Make a new quotation from it (New from it) and issue it"
     LangAdd "تحويلات بين الصناديق تنتظر تأكيد الاستلام من أمين الصندوق المستلم", "Transfers between boxes waiting for the receipt of the custodian of the receiving box"
     LangAdd "تم حفظ نسب التأمينات. تُطبَّق على المسودات عند تعديلها أو ترحيلها", "The social insurance rates were saved. They apply to the drafts when they are edited or posted"
     LangAdd "سُجّل الجهاز في بيئة أخرى. سجّله في البيئة الحالية من إعداد الربط", "The device was registered in another environment. Register it in the current one from the connection setup"
     LangAdd "صدرت من الطلبية أذونات تسليم. احذف المسودات منها، أو ألغِ الطلبية", "Delivery notes were made from the order. Delete the drafts among them, or cancel the order"
+    LangAdd "في العرض سعر يختلف عن سعر العميل، ولا تملك صلاحية تعديل سعر البيع", "The quotation has a price other than the customer price, and you may not change the sale price"
     LangAdd "يُنشأ المصروف في يوم الاستحقاق من كل فترة، بدءًا من تاريخ البداية", "The expense is created on the due day of each period, starting from the start date"
     LangAdd "الاستيرادات الخاضعة للنسبة الأساسية والمدفوعة ضريبتها في الجمارك", "Imports subject to the standard rate with VAT paid at customs"
     LangAdd "على الأصل إعادة تقييم أو نقل: لا تتغير بياناته المالية ولا يُحذف", "The asset has a revaluation or a transfer: its financial data cannot change and it cannot be deleted"
@@ -167,6 +170,7 @@ Private Sub D1_2()
     LangAdd "الأصل الموجود قبل البرنامج بلا ضريبة مدخلات (سُجِّلت وقت شرائه", "An asset owned before the program has no input VAT (it was recorded when bought"
     LangAdd "الكافيه: أصناف هذه الفئة تظهر كإضافات للمشروب (حليب، شوت إضافي", "Cafe: the items of this category appear as extras of the drink (milk, extra shot"
     LangAdd "المشتريات الخاضعة للنسبة الأساسية (مع المصروفات بفاتورة ضريبية", "Purchases at the standard rate (with expenses with a tax invoice"
+    LangAdd "تاريخ صلاحية المسودة مضى. أنشئ منها عرضًا جديدًا بصلاحية جديدة", "The validity date of the draft has passed. Make a new quotation from it with a new validity"
     LangAdd "صدرت فاتورة هذا الإذن، فلا يُلغى ترحيله. اعمل مرتجعًا للفاتورة", "This note is invoiced and cannot be unposted. Make a return of the invoice"
     LangAdd "صدرت من الأمر أذونات استلام. احذف المسودات منها، أو ألغِ الأمر", "Receipt notes were made from the order. Delete their drafts, or cancel the order"
     LangAdd "قيد إهلاك كل شهر بالترتيب: مصروف الإهلاك ومجمع الإهلاك لكل أصل", "A depreciation entry for each month in order: depreciation expense and accumulated depreciation of each asset"
@@ -232,6 +236,7 @@ Private Sub D1_2()
     LangAdd "في هذا اليوم حركة (تحميل أو بيع أو تحصيل). سوِّه بدل حذفه", "This day has activity (loading, sales or collections). Settle it instead of deleting it"
     LangAdd "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه", "Saved entry: edit and save, and its journal entry is updated with the same number"
     LangAdd "لا توجد أصناف وصلت لحد إعادة الطلب (أو هي في مسودات أوامر", "No products are at their reorder level (or they are in draft orders"
+    LangAdd "لا يوجد عرض سعر. اختر العميل وتاريخ الصلاحية ثم «عرض جديد", "No quotation. Choose the customer and the validity date then New quotation"
     LangAdd "يُحذف الشيك تحت التحصيل فقط: ألغِ تحصيله أو ارتداده أولًا", "Only a cheque under collection is deleted: cancel its collection or bounce first"
     LangAdd "إرجاع الشيك إلى «تحت التحصيل» وحذف قيد تحصيله أو ارتداده", "Return the cheque to Under collection and delete the entry of its collection or bounce"
     LangAdd "إنشاء مسودات أوامر شراء من اقتراح الشراء (مسودة لكل مورد", "Create draft purchase orders from the purchase suggestion (one draft per supplier"
@@ -252,22 +257,15 @@ Private Sub D1_2()
     LangAdd "الاستعادة تحتاج صلاحية dbcreator أو sysadmin على الخادم", "A restore needs the dbcreator or sysadmin role on the server"
     LangAdd "البرنامج يعمل على ملف Access الآن. أغلقه وافتحه من جديد", "The program works on the Access file now. Close it and open it again"
     LangAdd "العملاء والموردون والصناديق والبنوك والمخزون في أقسامها", "Customers, suppliers, cash boxes, banks and stock have their own parts"
+End Sub
+
+Private Sub D1_3()
     LangAdd "الملف يحتاج عمودين على الأقل: الكود والكمية، ثم التكلفة", "The file needs at least two columns: the code and the quantity, then the cost"
     LangAdd "تأكد من الطابعة الافتراضية، ويمكنك إعادة الطباعة لاحقًا", "Check the default printer, you can reprint later"
     LangAdd "توجد فاتورة غير مكتملة من جلسة سابقة. هل تريد استكمالها", "There is an unfinished invoice from a previous session. Do you want to continue it"
     LangAdd "لا توجد بيانات لعرضها في هذا التقرير للاختيارات المحددة", "There is no data to show in this report for the choices made"
     LangAdd "لا يمكن الحذف أو التعديل لوجود عمليات مرتبطة بهذا السجل", "Cannot delete or edit because there are transactions linked to this record"
-End Sub
-
-Private Sub D1_3()
     LangAdd "لا يمكن تغيير دولة التشغيل بعد تسجيل عمليات في البرنامج", "The operating country cannot change after operations are recorded"
     LangAdd "ليست في الفترات المالية. أضفها في شاشة «الفترات المالية", "is not in the fiscal periods. Add it in the Fiscal periods screen"
     LangAdd "هذا الصنف لا يتابع المخزون، فلا يُسلَّم ولا يُستلم بإذن", "This item does not track stock, so it has no delivery or receipt note"
-    LangAdd "يُمسح في نقطة البيع والمشتريات فيُضاف السطر بهذه الوحدة", "Scanned in the POS and purchases, it adds the line in this unit"
-    LangAdd "أغلق البرنامج وانسخ ملف النسخة الاحتياطية مكانه يدويًا", "Close the program and copy the backup file in its place by hand"
-    LangAdd "إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية", "Total VAT due for the current period"
-    LangAdd "اختر شاشة واحدة على الأقل، أو ألغِ «صلاحيات شاشات خاصة", "Choose at least one screen, or clear Custom screen permissions"
-    LangAdd "الرقم الضريبي في السعودية 15 رقمًا ويبدأ وينتهي بالرقم", "The Saudi tax number has 15 digits and starts and ends with the digit"
-    LangAdd "الضريبة والقيمة المتبقية والإهلاك السابق لا تكون سالبة", "VAT, residual value and previous depreciation are never negative"
-    LangAdd "بيانات دخول البرنامج للفاتورة الإلكترونية (Client ID و", "Credentials of the program for the e-invoice (Client ID and"
 End Sub

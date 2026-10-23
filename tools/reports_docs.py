@@ -3,6 +3,7 @@
   rptVoucher            receipt voucher / payment voucher      (qryVoucherPrint)
   rptStockCount         stocktake sheet: blank to count on paper while the
                         count is open, with the differences once counted
+  rptQuotation          customer quotation (docs/75)             (qryQuotationPrint)
 """
 
 from typing import List
@@ -99,6 +100,59 @@ def purchase_document() -> ReportModel:
     txt(m, F, "txtRemainingAmount", "RemainingAmount", tx + lw, y, vw, cm(0.45), 9, align=1, fmt=MONEY)
     txt(m, F, "txtWords", "=AmountInWords([TotalAmount])", 0, cm(0.2), cm(11.0), cm(1.0), 10, grow=True)
     signatures(m, F, cm(4.3), ["المستلم", "أمين المخزن", "المدير"])
+    return m
+
+
+def quotation() -> ReportModel:
+    m = ReportModel("rptQuotation", "عرض سعر", W,
+                    {SEC_HEADER: cm(5.0), SEC_DETAIL: cm(0.6), SEC_FOOTER: cm(5.6)},
+                    record_source="qryQuotationPrint", group="QuotationID", sorts=[("QuotationLineID", False)],
+                    page_setup=True, no_data="عرض السعر غير موجود أو بلا أصناف.")
+    H = SEC_HEADER
+    half = cm(9.3)
+    store_block(m, half)
+    x2 = W - half
+    txt(m, H, "txtTitle", '="عرض سعر"', x2, cm(0.1), half, cm(0.85), 16, True, align=1)
+    y = cm(1.0)
+    for name, src in [
+            ("txtDocNumber", '="الرقم: " & [QuotationNumber]'),
+            ("txtDocDate", '="التاريخ: " & GDate([QuoteDate])'),
+            ("txtValidUntil", '="ساري حتى: " & GDate([ValidUntil])')]:
+        txt(m, H, name, src, x2, y, half, cm(0.45), 9 if name != "txtValidUntil" else 10, name == "txtValidUntil",
+            align=1)
+        y += cm(0.45)
+    by = cm(2.6)
+    m.add(H, Control("rect", "boxCustomer", 0, by, W, cm(1.35), {"BorderStyle": 1}, decorative=True))
+    txt(m, H, "txtCustomer", '="السادة: " & [CustomerName]', cm(0.2), by + cm(0.1), cm(9.0), cm(0.5), 10, True)
+    txt(m, H, "txtCustomerVat", '=IIf(Len(Nz([CustomerVAT],""))>0,"الرقم الضريبي: " & [CustomerVAT],"")',
+        cm(9.4), by + cm(0.1), cm(9.4), cm(0.5), 9)
+    txt(m, H, "txtCustomerMobile", '=IIf(Len(Nz([CustomerMobile],""))>0,"الجوال: " & [CustomerMobile],"")',
+        cm(0.2), by + cm(0.7), cm(9.0), cm(0.5), 9)
+    txt(m, H, "txtEmployee", '="أعدّه: " & [EmployeeName]', cm(9.4), by + cm(0.7), cm(9.4), cm(0.5), 9)
+    columns(m, cm(4.25), [
+        ("#", "=1", 0.8, None, {"RunningSum": 1}), ("الكود", "ProductCode", 2.2, None, {}),
+        ("الصنف", "ProductName", 5.2, None, {}), ("الوحدة", "UnitName", 1.4, None, {}),
+        ("الكمية", "Quantity", 1.5, QTY, {}), ("السعر", "UnitPrice", 2.0, "#,##0.00##", {}),
+        ("الصافي", "NetAmount", 2.0, MONEY, {}), ("الضريبة", "LineTax", 1.6, MONEY, {}),
+        ("الإجمالي", "LineTotal", 2.3, MONEY, {})])
+
+    F = SEC_FOOTER
+    hline(m, F, "lnTotals", cm(0.08), W)
+    tx, lw, vw = cm(11.4), cm(4.4), cm(3.2)
+    y = cm(0.2)
+    for cap, src, bold in [("الإجمالي بدون الضريبة", "SubTotal", False), ("ضريبة القيمة المضافة", "DocTax", False),
+                           ("الإجمالي شامل الضريبة", "TotalAmount", True)]:
+        lbl(m, F, f"lblCap{src}", cap, tx, y, lw, cm(0.45), 10 if bold else 9, bold)
+        txt(m, F, f"txt{src}", src, tx + lw, y, vw, cm(0.45), 10 if bold else 9, bold, align=1, fmt=MONEY)
+        y += cm(0.5)
+    txt(m, F, "txtWords", "=AmountInWords([TotalAmount])", 0, cm(0.2), cm(11.0), cm(1.0), 10, grow=True)
+    txt(m, F, "txtTerms", '=IIf(Len(Nz([Terms],""))>0,"الشروط: " & [Terms],"")', 0, cm(1.9), W, cm(0.5), 9,
+        grow=True)
+    txt(m, F, "txtNotes", '=IIf(Len(Nz([Notes],""))>0,"ملاحظات: " & [Notes],"")', 0, cm(2.5), W, cm(0.5), 9,
+        grow=True)
+    txt(m, F, "txtValidity", '="الأسعار سارية حتى " & GDate([ValidUntil]) & "، وتخضع لتوفر الكميات عند الطلب."',
+        0, cm(3.1), W, cm(0.5), 9, True)
+    signatures(m, F, cm(4.6), ["المبيعات", "المدير", "اعتماد العميل"])
     return m
 
 
@@ -219,4 +273,4 @@ def statistics() -> ReportModel:
 
 
 def document_reports() -> List[ReportModel]:
-    return [purchase_document(), voucher(), stock_count_sheet(), barcode_labels(), statistics()]
+    return [purchase_document(), quotation(), voucher(), stock_count_sheet(), barcode_labels(), statistics()]

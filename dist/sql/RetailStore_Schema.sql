@@ -12,7 +12,7 @@
   Then run this file in that database:
       sqlcmd -S .\SQLEXPRESS -d RetailStore -E -f 65001 -i RetailStore_Schema.sql
 
-  95 tables, 1212 fields, 144 indexes, 226 relationships, 446 seed rows
+  97 tables, 1237 fields, 148 indexes, 231 relationships, 451 seed rows
 ==============================================================================*/
 SET NOCOUNT ON;
 SET ANSI_NULLS ON;
@@ -1511,6 +1511,41 @@ IF OBJECT_ID(N'dbo.SalesOrders', N'U') IS NULL
         [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_SalesOrders_CreatedAt] DEFAULT (GETDATE()),
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_SalesOrders] PRIMARY KEY ([SalesOrderID])
+    );
+IF OBJECT_ID(N'dbo.Quotations', N'U') IS NULL
+    CREATE TABLE [dbo].[Quotations] (
+        [QuotationID] INT IDENTITY(1,1) NOT NULL,
+        [QuotationNumber] NVARCHAR(20) NOT NULL,
+        [QuoteDate] DATETIME NOT NULL CONSTRAINT [DF_Quotations_QuoteDate] DEFAULT (GETDATE()),
+        [CustomerID] INT NOT NULL,
+        [ValidUntil] DATETIME NOT NULL CONSTRAINT [DF_Quotations_ValidUntil] DEFAULT (CONVERT(DATETIME, CONVERT(DATE, GETDATE()))),
+        [Status] NVARCHAR(10) NOT NULL CONSTRAINT [DF_Quotations_Status] DEFAULT (N'DRAFT'),
+        [IssuedAt] DATETIME NULL,
+        [SubTotal] MONEY NOT NULL CONSTRAINT [DF_Quotations_SubTotal] DEFAULT (0),
+        [Tax] MONEY NOT NULL CONSTRAINT [DF_Quotations_Tax] DEFAULT (0),
+        [TotalAmount] MONEY NOT NULL CONSTRAINT [DF_Quotations_TotalAmount] DEFAULT (0),
+        [SalesOrderID] INT NULL,
+        [SalesInvoiceID] INT NULL,
+        [EmployeeID] INT NOT NULL,
+        [Terms] NVARCHAR(255) NULL,
+        [Notes] NVARCHAR(255) NULL,
+        [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_Quotations_CreatedAt] DEFAULT (GETDATE()),
+        [RowVer] ROWVERSION NOT NULL,
+        CONSTRAINT [PK_Quotations] PRIMARY KEY ([QuotationID])
+    );
+IF OBJECT_ID(N'dbo.QuotationLines', N'U') IS NULL
+    CREATE TABLE [dbo].[QuotationLines] (
+        [QuotationLineID] INT IDENTITY(1,1) NOT NULL,
+        [QuotationID] INT NOT NULL,
+        [ProductID] INT NOT NULL,
+        [Quantity] MONEY NOT NULL,
+        [UnitPrice] MONEY NOT NULL CONSTRAINT [DF_QuotationLines_UnitPrice] DEFAULT (0),
+        [NetAmount] MONEY NOT NULL CONSTRAINT [DF_QuotationLines_NetAmount] DEFAULT (0),
+        [Tax] MONEY NOT NULL CONSTRAINT [DF_QuotationLines_Tax] DEFAULT (0),
+        [LineTotal] MONEY NOT NULL CONSTRAINT [DF_QuotationLines_LineTotal] DEFAULT (0),
+        [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_QuotationLines_CreatedAt] DEFAULT (GETDATE()),
+        [RowVer] ROWVERSION NOT NULL,
+        CONSTRAINT [PK_QuotationLines] PRIMARY KEY ([QuotationLineID])
     );
 IF OBJECT_ID(N'dbo.PurchaseOrders', N'U') IS NULL
     CREATE TABLE [dbo].[PurchaseOrders] (
@@ -4037,6 +4072,60 @@ IF COL_LENGTH(N'dbo.SalesOrders', N'CreatedAt') IS NULL
     ALTER TABLE [dbo].[SalesOrders] ADD [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_SalesOrders_CreatedAt] DEFAULT (GETDATE());
 IF COL_LENGTH(N'dbo.SalesOrders', N'RowVer') IS NULL
     ALTER TABLE [dbo].[SalesOrders] ADD [RowVer] ROWVERSION NOT NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'QuotationID') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [QuotationID] INT IDENTITY(1,1) NOT NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'QuotationNumber') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [QuotationNumber] NVARCHAR(20) NOT NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'QuoteDate') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [QuoteDate] DATETIME NOT NULL CONSTRAINT [DF_Quotations_QuoteDate] DEFAULT (GETDATE());
+IF COL_LENGTH(N'dbo.Quotations', N'CustomerID') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [CustomerID] INT NOT NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'ValidUntil') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [ValidUntil] DATETIME NOT NULL CONSTRAINT [DF_Quotations_ValidUntil] DEFAULT (CONVERT(DATETIME, CONVERT(DATE, GETDATE())));
+IF COL_LENGTH(N'dbo.Quotations', N'Status') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [Status] NVARCHAR(10) NOT NULL CONSTRAINT [DF_Quotations_Status] DEFAULT (N'DRAFT');
+IF COL_LENGTH(N'dbo.Quotations', N'IssuedAt') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [IssuedAt] DATETIME NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'SubTotal') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [SubTotal] MONEY NOT NULL CONSTRAINT [DF_Quotations_SubTotal] DEFAULT (0);
+IF COL_LENGTH(N'dbo.Quotations', N'Tax') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [Tax] MONEY NOT NULL CONSTRAINT [DF_Quotations_Tax] DEFAULT (0);
+IF COL_LENGTH(N'dbo.Quotations', N'TotalAmount') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [TotalAmount] MONEY NOT NULL CONSTRAINT [DF_Quotations_TotalAmount] DEFAULT (0);
+IF COL_LENGTH(N'dbo.Quotations', N'SalesOrderID') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [SalesOrderID] INT NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'SalesInvoiceID') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [SalesInvoiceID] INT NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'EmployeeID') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [EmployeeID] INT NOT NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'Terms') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [Terms] NVARCHAR(255) NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'Notes') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [Notes] NVARCHAR(255) NULL;
+IF COL_LENGTH(N'dbo.Quotations', N'CreatedAt') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_Quotations_CreatedAt] DEFAULT (GETDATE());
+IF COL_LENGTH(N'dbo.Quotations', N'RowVer') IS NULL
+    ALTER TABLE [dbo].[Quotations] ADD [RowVer] ROWVERSION NOT NULL;
+IF COL_LENGTH(N'dbo.QuotationLines', N'QuotationLineID') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [QuotationLineID] INT IDENTITY(1,1) NOT NULL;
+IF COL_LENGTH(N'dbo.QuotationLines', N'QuotationID') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [QuotationID] INT NOT NULL;
+IF COL_LENGTH(N'dbo.QuotationLines', N'ProductID') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [ProductID] INT NOT NULL;
+IF COL_LENGTH(N'dbo.QuotationLines', N'Quantity') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [Quantity] MONEY NOT NULL;
+IF COL_LENGTH(N'dbo.QuotationLines', N'UnitPrice') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [UnitPrice] MONEY NOT NULL CONSTRAINT [DF_QuotationLines_UnitPrice] DEFAULT (0);
+IF COL_LENGTH(N'dbo.QuotationLines', N'NetAmount') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [NetAmount] MONEY NOT NULL CONSTRAINT [DF_QuotationLines_NetAmount] DEFAULT (0);
+IF COL_LENGTH(N'dbo.QuotationLines', N'Tax') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [Tax] MONEY NOT NULL CONSTRAINT [DF_QuotationLines_Tax] DEFAULT (0);
+IF COL_LENGTH(N'dbo.QuotationLines', N'LineTotal') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [LineTotal] MONEY NOT NULL CONSTRAINT [DF_QuotationLines_LineTotal] DEFAULT (0);
+IF COL_LENGTH(N'dbo.QuotationLines', N'CreatedAt') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_QuotationLines_CreatedAt] DEFAULT (GETDATE());
+IF COL_LENGTH(N'dbo.QuotationLines', N'RowVer') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] ADD [RowVer] ROWVERSION NOT NULL;
 IF COL_LENGTH(N'dbo.PurchaseOrders', N'PurchaseOrderID') IS NULL
     ALTER TABLE [dbo].[PurchaseOrders] ADD [PurchaseOrderID] INT IDENTITY(1,1) NOT NULL;
 IF COL_LENGTH(N'dbo.PurchaseOrders', N'OrderNumber') IS NULL
@@ -5183,6 +5272,33 @@ ALTER TABLE [dbo].[StockNoteLines] WITH CHECK ADD CONSTRAINT [CK_StockNoteLines_
 IF OBJECT_ID(N'dbo.CK_SalesOrders_Status', N'C') IS NOT NULL
     ALTER TABLE [dbo].[SalesOrders] DROP CONSTRAINT [CK_SalesOrders_Status];
 ALTER TABLE [dbo].[SalesOrders] WITH CHECK ADD CONSTRAINT [CK_SalesOrders_Status] CHECK ([Status] IN (N'DRAFT',N'APPROVED',N'PREPARING',N'PARTIAL',N'DELIVERED',N'INVOICED',N'CANCELLED',N'CLOSED'));
+IF OBJECT_ID(N'dbo.CK_Quotations_Status', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[Quotations] DROP CONSTRAINT [CK_Quotations_Status];
+ALTER TABLE [dbo].[Quotations] WITH CHECK ADD CONSTRAINT [CK_Quotations_Status] CHECK ([Status] IN (N'DRAFT',N'ISSUED',N'ORDERED',N'INVOICED',N'REJECTED'));
+IF OBJECT_ID(N'dbo.CK_Quotations_SubTotal', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[Quotations] DROP CONSTRAINT [CK_Quotations_SubTotal];
+ALTER TABLE [dbo].[Quotations] WITH CHECK ADD CONSTRAINT [CK_Quotations_SubTotal] CHECK ([SubTotal] >=0);
+IF OBJECT_ID(N'dbo.CK_Quotations_Tax', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[Quotations] DROP CONSTRAINT [CK_Quotations_Tax];
+ALTER TABLE [dbo].[Quotations] WITH CHECK ADD CONSTRAINT [CK_Quotations_Tax] CHECK ([Tax] >=0);
+IF OBJECT_ID(N'dbo.CK_Quotations_TotalAmount', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[Quotations] DROP CONSTRAINT [CK_Quotations_TotalAmount];
+ALTER TABLE [dbo].[Quotations] WITH CHECK ADD CONSTRAINT [CK_Quotations_TotalAmount] CHECK ([TotalAmount] >=0);
+IF OBJECT_ID(N'dbo.CK_QuotationLines_Quantity', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[QuotationLines] DROP CONSTRAINT [CK_QuotationLines_Quantity];
+ALTER TABLE [dbo].[QuotationLines] WITH CHECK ADD CONSTRAINT [CK_QuotationLines_Quantity] CHECK ([Quantity] >0);
+IF OBJECT_ID(N'dbo.CK_QuotationLines_UnitPrice', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[QuotationLines] DROP CONSTRAINT [CK_QuotationLines_UnitPrice];
+ALTER TABLE [dbo].[QuotationLines] WITH CHECK ADD CONSTRAINT [CK_QuotationLines_UnitPrice] CHECK ([UnitPrice] >=0);
+IF OBJECT_ID(N'dbo.CK_QuotationLines_NetAmount', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[QuotationLines] DROP CONSTRAINT [CK_QuotationLines_NetAmount];
+ALTER TABLE [dbo].[QuotationLines] WITH CHECK ADD CONSTRAINT [CK_QuotationLines_NetAmount] CHECK ([NetAmount] >=0);
+IF OBJECT_ID(N'dbo.CK_QuotationLines_Tax', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[QuotationLines] DROP CONSTRAINT [CK_QuotationLines_Tax];
+ALTER TABLE [dbo].[QuotationLines] WITH CHECK ADD CONSTRAINT [CK_QuotationLines_Tax] CHECK ([Tax] >=0);
+IF OBJECT_ID(N'dbo.CK_QuotationLines_LineTotal', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[QuotationLines] DROP CONSTRAINT [CK_QuotationLines_LineTotal];
+ALTER TABLE [dbo].[QuotationLines] WITH CHECK ADD CONSTRAINT [CK_QuotationLines_LineTotal] CHECK ([LineTotal] >=0);
 IF OBJECT_ID(N'dbo.CK_PurchaseOrders_Status', N'C') IS NOT NULL
     ALTER TABLE [dbo].[PurchaseOrders] DROP CONSTRAINT [CK_PurchaseOrders_Status];
 ALTER TABLE [dbo].[PurchaseOrders] WITH CHECK ADD CONSTRAINT [CK_PurchaseOrders_Status] CHECK ([Status] IN (N'DRAFT',N'APPROVED',N'PARTIAL',N'RECEIVED',N'INVOICED',N'CANCELLED',N'CLOSED'));
@@ -5531,6 +5647,14 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_OrderDate' AND object
     CREATE INDEX [IX_OrderDate] ON [dbo].[SalesOrders] ([OrderDate]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Status' AND object_id = OBJECT_ID(N'dbo.SalesOrders'))
     CREATE INDEX [IX_Status] ON [dbo].[SalesOrders] ([Status]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_QuotationNumber' AND object_id = OBJECT_ID(N'dbo.Quotations'))
+    CREATE UNIQUE INDEX [UX_QuotationNumber] ON [dbo].[Quotations] ([QuotationNumber]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_QuoteDate' AND object_id = OBJECT_ID(N'dbo.Quotations'))
+    CREATE INDEX [IX_QuoteDate] ON [dbo].[Quotations] ([QuoteDate]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Status' AND object_id = OBJECT_ID(N'dbo.Quotations'))
+    CREATE INDEX [IX_Status] ON [dbo].[Quotations] ([Status]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_QuotationID' AND object_id = OBJECT_ID(N'dbo.QuotationLines'))
+    CREATE INDEX [IX_QuotationID] ON [dbo].[QuotationLines] ([QuotationID]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_OrderNumber' AND object_id = OBJECT_ID(N'dbo.PurchaseOrders'))
     CREATE UNIQUE INDEX [UX_OrderNumber] ON [dbo].[PurchaseOrders] ([OrderNumber]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_OrderDate' AND object_id = OBJECT_ID(N'dbo.PurchaseOrders'))
@@ -5581,7 +5705,7 @@ IF NOT EXISTS (SELECT 1 FROM [dbo].[Settings])
 BEGIN
     INSERT INTO [dbo].[Settings] ([SettingID], [StoreName], [CountryCode], [VATRate], [PricesIncludeVAT], [AllowNegativeStock], [CurrencyCode], [DefaultCustomerID], [ZatcaPhase], [LastInvoiceHash], [BackupKeepCount], [SlowMovingDays], [ReceiptFooter]) VALUES (1, N'اسم المحل', N'SA', 0.15, 1, 0, N'SAR', 1, 1, N'NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==', 30, 90, N'شكرًا لزيارتكم');
 END;
--- Sequences: 35 rows (the missing ones)
+-- Sequences: 36 rows (the missing ones)
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Sequences] WHERE [SequenceName] = N'SALES_INVOICE')
         INSERT INTO [dbo].[Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES (N'SALES_INVOICE', N'INV-', 1, 6, N'فواتير المبيعات');
@@ -5619,6 +5743,8 @@ BEGIN
         INSERT INTO [dbo].[Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES (N'SALES_ORDER', N'SO-', 1, 6, N'طلبيات العملاء');
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Sequences] WHERE [SequenceName] = N'PURCHASE_ORDER')
         INSERT INTO [dbo].[Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES (N'PURCHASE_ORDER', N'PO-', 1, 6, N'أوامر الشراء');
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[Sequences] WHERE [SequenceName] = N'QUOTATION')
+        INSERT INTO [dbo].[Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES (N'QUOTATION', N'QT-', 1, 6, N'عروض الأسعار للعملاء');
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Sequences] WHERE [SequenceName] = N'REP_DAY')
         INSERT INTO [dbo].[Sequences] ([SequenceName], [Prefix], [NextValue], [PadLength], [Description]) VALUES (N'REP_DAY', N'RD-', 1, 6, N'أيام المندوبين (البيع من السيارة)');
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Sequences] WHERE [SequenceName] = N'PRODUCT_CODE')
@@ -5661,7 +5787,7 @@ BEGIN
     INSERT INTO [dbo].[Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (2, N'MANAGER', N'مدير', N'المبيعات والمشتريات والمخزون والتقارير');
     INSERT INTO [dbo].[Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (3, N'CASHIER', N'كاشير', N'المبيعات والعملاء فقط');
 END;
--- Permissions: 47 rows (the missing ones)
+-- Permissions: 48 rows (the missing ones)
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'SALES_POS')
     BEGIN
@@ -5743,6 +5869,15 @@ BEGIN
         BEGIN
             INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'REP_ROUTES');
             INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'REP_ROUTES');
+        END
+    END
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'QUOTATIONS')
+    BEGIN
+        INSERT INTO [dbo].[Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES (N'QUOTATIONS', N'عروض الأسعار للعملاء: التسجيل والإصدار والتحويل', N'المبيعات', 19);
+        IF EXISTS (SELECT 1 FROM [dbo].[RolePermissions])
+        BEGIN
+            INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'QUOTATIONS');
+            INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'QUOTATIONS');
         END
     END
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'CUSTOMERS')
@@ -6085,7 +6220,7 @@ BEGIN
         END
     END
 END;
--- RolePermissions: 92 rows (an empty table)
+-- RolePermissions: 94 rows (an empty table)
 IF NOT EXISTS (SELECT 1 FROM [dbo].[RolePermissions])
 BEGIN
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SALES_POS');
@@ -6097,6 +6232,7 @@ BEGIN
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SALES_ORDERS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'REP_DAYS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'REP_ROUTES');
+    INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'QUOTATIONS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'CUSTOMERS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'CUSTOMER_PAYMENTS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'PURCHASES');
@@ -6143,6 +6279,7 @@ BEGIN
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'SALES_ORDERS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'REP_DAYS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'REP_ROUTES');
+    INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'QUOTATIONS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'CUSTOMERS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'CUSTOMER_PAYMENTS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'PURCHASES');
@@ -6188,7 +6325,7 @@ BEGIN
     INSERT INTO [dbo].[Employees] ([EmployeeID], [EmployeeName], [JobTitle], [Username], [RoleID], [MaxDiscountPercent], [MustChangePassword], [IsActive]) VALUES (1, N'مدير النظام', N'مدير النظام', N'admin', 1, 1, 1, 1);
 END;
 SET IDENTITY_INSERT [dbo].[Employees] OFF;
--- Screens: 82 rows (the missing ones)
+-- Screens: 83 rows (the missing ones)
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmPOS')
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmPOS', N'نقطة البيع (المحلات)', N'المبيعات', 10, N'SALES_POS', 1, 0, 0);
@@ -6262,98 +6399,100 @@ BEGIN
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSalesOrder', N'طلبيات العملاء', N'المبيعات', 350, N'SALES_ORDERS', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmPurchaseOrder')
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmPurchaseOrder', N'أوامر الشراء', N'المشتريات', 360, N'PURCHASE_ORDERS', 1, 1, 1);
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmQuotation')
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmQuotation', N'عروض الأسعار للعملاء', N'المبيعات', 370, N'QUOTATIONS', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmRepDay')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRepDay', N'يوم المندوب والبيع من السيارة', N'المبيعات', 370, N'REP_DAYS', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRepDay', N'يوم المندوب والبيع من السيارة', N'المبيعات', 380, N'REP_DAYS', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmRepVisits')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRepVisits', N'زيارات المندوبين وخطة اليوم', N'المبيعات', 380, N'REP_ROUTES', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRepVisits', N'زيارات المندوبين وخطة اليوم', N'المبيعات', 390, N'REP_ROUTES', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmRouteStops')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRouteStops', N'خط سير المندوبين', N'المبيعات', 390, N'REP_ROUTES', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRouteStops', N'خط سير المندوبين', N'المبيعات', 400, N'REP_ROUTES', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmRepPrices')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRepPrices', N'أسعار المندوبين', N'المبيعات', 400, N'REP_ROUTES', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRepPrices', N'أسعار المندوبين', N'المبيعات', 410, N'REP_ROUTES', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmCashBoxUsers')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCashBoxUsers', N'أمناء الصناديق', N'الخزينة', 410, N'CASH_ALL_BOXES', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCashBoxUsers', N'أمناء الصناديق', N'الخزينة', 420, N'CASH_ALL_BOXES', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmCashTransfers')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCashTransfers', N'استلام التحويلات بين الصناديق', N'الخزينة', 420, N'CASH_CLOSING', 0, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCashTransfers', N'استلام التحويلات بين الصناديق', N'الخزينة', 430, N'CASH_CLOSING', 0, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmAccounting')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAccounting', N'المحاسبة والمالية', N'الحسابات', 430, NULL, 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAccounting', N'المحاسبة والمالية', N'الحسابات', 440, NULL, 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmJournal')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmJournal', N'قيود اليومية', N'الحسابات', 440, N'JOURNAL', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmJournal', N'قيود اليومية', N'الحسابات', 450, N'JOURNAL', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmAccounts')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAccounts', N'دليل الحسابات', N'الحسابات', 450, N'JOURNAL', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAccounts', N'دليل الحسابات', N'الحسابات', 460, N'JOURNAL', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmManualEntry')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmManualEntry', N'القيود اليدوية', N'الحسابات', 460, N'MANUAL_ENTRY', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmManualEntry', N'القيود اليدوية', N'الحسابات', 470, N'MANUAL_ENTRY', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmLedger')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmLedger', N'كشف حساب ودفتر الأستاذ', N'الحسابات', 470, N'JOURNAL', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmLedger', N'كشف حساب ودفتر الأستاذ', N'الحسابات', 480, N'JOURNAL', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmFinancials')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmFinancials', N'القوائم المالية', N'الحسابات', 480, N'REPORTS_PROFIT', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmFinancials', N'القوائم المالية', N'الحسابات', 490, N'REPORTS_PROFIT', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmPeriodClosing')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmPeriodClosing', N'إقفال الفترات والسنة المالية', N'الحسابات', 490, N'PERIOD_CLOSE', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmPeriodClosing', N'إقفال الفترات والسنة المالية', N'الحسابات', 500, N'PERIOD_CLOSE', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmFiscalPeriods')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmFiscalPeriods', N'الفترات المالية', N'الحسابات', 500, N'PERIOD_CLOSE', 1, 0, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmFiscalPeriods', N'الفترات المالية', N'الحسابات', 510, N'PERIOD_CLOSE', 1, 0, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmVatReturn')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmVatReturn', N'إقرار ضريبة القيمة المضافة', N'الحسابات', 510, N'VAT_RETURN', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmVatReturn', N'إقرار ضريبة القيمة المضافة', N'الحسابات', 520, N'VAT_RETURN', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmOpeningBalances')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmOpeningBalances', N'أرصدة بداية التشغيل', N'الحسابات', 520, N'OPENING_BALANCES', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmOpeningBalances', N'أرصدة بداية التشغيل', N'الحسابات', 530, N'OPENING_BALANCES', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmAging')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAging', N'أعمار الديون (العملاء والموردون)', N'التقارير', 530, N'REPORTS', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAging', N'أعمار الديون (العملاء والموردون)', N'التقارير', 540, N'REPORTS', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmBanks')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBanks', N'البنوك', N'الخزينة', 540, N'BANKS', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBanks', N'البنوك', N'الخزينة', 550, N'BANKS', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmBankTx')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBankTx', N'الحركات البنكية', N'الخزينة', 550, N'BANKS', 1, 0, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBankTx', N'الحركات البنكية', N'الخزينة', 560, N'BANKS', 1, 0, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmBankRecon')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBankRecon', N'التسوية البنكية', N'الخزينة', 560, N'BANKS', 1, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBankRecon', N'التسوية البنكية', N'الخزينة', 570, N'BANKS', 1, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmCheques')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCheques', N'الشيكات الواردة والصادرة', N'الخزينة', 570, N'CHEQUES', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCheques', N'الشيكات الواردة والصادرة', N'الخزينة', 580, N'CHEQUES', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmAssets')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAssets', N'الأصول الثابتة', N'الحسابات', 580, N'FIXED_ASSETS', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAssets', N'الأصول الثابتة', N'الحسابات', 590, N'FIXED_ASSETS', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmDepreciation')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmDepreciation', N'الإهلاك الشهري', N'الحسابات', 590, N'FIXED_ASSETS', 1, 0, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmDepreciation', N'الإهلاك الشهري', N'الحسابات', 600, N'FIXED_ASSETS', 1, 0, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmAssetChanges')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAssetChanges', N'إعادة تقييم الأصول ونقلها', N'الحسابات', 600, N'FIXED_ASSETS', 1, 0, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAssetChanges', N'إعادة تقييم الأصول ونقلها', N'الحسابات', 610, N'FIXED_ASSETS', 1, 0, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmPayroll')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmPayroll', N'مسير الرواتب', N'الحسابات', 610, N'PAYROLL', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmPayroll', N'مسير الرواتب', N'الحسابات', 620, N'PAYROLL', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmCostCenters')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCostCenters', N'مراكز التكلفة والفروع', N'الحسابات', 620, N'JOURNAL', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCostCenters', N'مراكز التكلفة والفروع', N'الحسابات', 630, N'JOURNAL', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmBudget')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBudget', N'الموازنة التقديرية', N'الحسابات', 630, N'BUDGET', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBudget', N'الموازنة التقديرية', N'الحسابات', 640, N'BUDGET', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmCurrencies')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCurrencies', N'العملات', N'الحسابات', 640, N'CURRENCIES', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCurrencies', N'العملات', N'الحسابات', 650, N'CURRENCIES', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmSalesReps')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSalesReps', N'المندوبين', N'المبيعات', 650, N'SALES_REPS', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSalesReps', N'المندوبين', N'المبيعات', 660, N'SALES_REPS', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmRepTargets')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRepTargets', N'أهداف المندوبين', N'المبيعات', 660, N'SALES_REPS', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRepTargets', N'أهداف المندوبين', N'المبيعات', 670, N'SALES_REPS', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmCommissions')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCommissions', N'عمولات المندوبين', N'المبيعات', 670, N'SALES_REPS', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCommissions', N'عمولات المندوبين', N'المبيعات', 680, N'SALES_REPS', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmCurrencyRates')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCurrencyRates', N'أسعار العملات', N'الحسابات', 680, N'CURRENCIES', 1, 1, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmCurrencyRates', N'أسعار العملات', N'الحسابات', 690, N'CURRENCIES', 1, 1, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmAllocation')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAllocation', N'ربط السداد بالفواتير', N'العملاء', 690, N'CUSTOMER_PAYMENTS', 1, 0, 1);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAllocation', N'ربط السداد بالفواتير', N'العملاء', 700, N'CUSTOMER_PAYMENTS', 1, 0, 1);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmReportCenter')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmReportCenter', N'التقارير', N'التقارير', 700, N'REPORTS', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmReportCenter', N'التقارير', N'التقارير', 710, N'REPORTS', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmSearch')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSearch', N'البحث', N'النظام', 710, NULL, 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSearch', N'البحث', N'النظام', 720, NULL, 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmSettings')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSettings', N'إعدادات المحل', N'النظام', 720, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSettings', N'إعدادات المحل', N'النظام', 730, N'SETTINGS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmUsers')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmUsers', N'المستخدمون', N'النظام', 730, N'USERS', 1, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmUsers', N'المستخدمون', N'النظام', 740, N'USERS', 1, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmRoles')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRoles', N'الأدوار والصلاحيات', N'النظام', 740, N'USERS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmRoles', N'الأدوار والصلاحيات', N'النظام', 750, N'USERS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmUserScreens')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmUserScreens', N'صلاحيات الشاشات للمستخدمين', N'النظام', 750, N'USERS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmUserScreens', N'صلاحيات الشاشات للمستخدمين', N'النظام', 760, N'USERS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmAuditLog')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAuditLog', N'سجل التدقيق', N'النظام', 760, N'AUDIT_LOG', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmAuditLog', N'سجل التدقيق', N'النظام', 770, N'AUDIT_LOG', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmBackup')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBackup', N'النسخ الاحتياطي', N'النظام', 770, N'BACKUP', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBackup', N'النسخ الاحتياطي', N'النظام', 780, N'BACKUP', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmSqlServer')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSqlServer', N'قاعدة البيانات على SQL Server', N'النظام', 780, N'SQL_SERVER', 0, 0, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSqlServer', N'قاعدة البيانات على SQL Server', N'النظام', 790, N'SQL_SERVER', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEnglishNames')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEnglishNames', N'الأسماء الإنجليزية', N'النظام', 790, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEnglishNames', N'الأسماء الإنجليزية', N'النظام', 800, N'SETTINGS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEInvoices')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEInvoices', N'الفاتورة الإلكترونية', N'المبيعات', 800, N'EINVOICE', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEInvoices', N'الفاتورة الإلكترونية', N'المبيعات', 810, N'EINVOICE', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmZatcaSetup')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmZatcaSetup', N'إعداد ربط منصة فاتورة', N'النظام', 810, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmZatcaSetup', N'إعداد ربط منصة فاتورة', N'النظام', 820, N'SETTINGS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEtaSetup')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEtaSetup', N'إعداد ربط منظومة الإيصال الإلكتروني', N'النظام', 820, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEtaSetup', N'إعداد ربط منظومة الإيصال الإلكتروني', N'النظام', 830, N'SETTINGS', 0, 1, 0);
 END;
 -- Categories: 1 rows (an empty table)
 SET IDENTITY_INSERT [dbo].[Categories] ON;
@@ -6941,6 +7080,7 @@ UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Transfers between warehous
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Stock issue and receipt vouchers and their parties' WHERE [PermissionKey] = N'STOCK_DOCS' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Delivery notes to customers and goods receipt notes from suppliers' WHERE [PermissionKey] = N'STOCK_NOTES' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Customer orders: entry, approval, preparation and cancellation' WHERE [PermissionKey] = N'SALES_ORDERS' AND [PermissionNameEn] IS NULL;
+UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Customer quotations: entry, issue and conversion' WHERE [PermissionKey] = N'QUOTATIONS' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Rep day: van loading, selling in the rep name and settlement' WHERE [PermissionKey] = N'REP_DAYS' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Rep routes, visits and rep price lists' WHERE [PermissionKey] = N'REP_ROUTES' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Journal entries, chart of accounts and trial balance' WHERE [PermissionKey] = N'JOURNAL' AND [PermissionNameEn] IS NULL;
@@ -6992,6 +7132,7 @@ UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Units' WHERE [ScreenName] = N'frm
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Product units' WHERE [ScreenName] = N'frmProductUnits' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Price lists' WHERE [ScreenName] = N'frmPriceLists' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Purchase orders' WHERE [ScreenName] = N'frmPurchaseOrder' AND [ScreenTitleEn] IS NULL;
+UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Customer quotations' WHERE [ScreenName] = N'frmQuotation' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Price list prices' WHERE [ScreenName] = N'frmPriceListItems' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Stock and manual moves' WHERE [ScreenName] = N'frmInventory' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Stock count' WHERE [ScreenName] = N'frmStockCount' AND [ScreenTitleEn] IS NULL;
@@ -7498,6 +7639,16 @@ IF OBJECT_ID(N'dbo.FK_SalesOrders_WarehouseID', N'F') IS NULL
     ALTER TABLE [dbo].[SalesOrders] WITH CHECK ADD CONSTRAINT [FK_SalesOrders_WarehouseID] FOREIGN KEY ([WarehouseID]) REFERENCES [dbo].[Warehouses] ([WarehouseID]);
 IF OBJECT_ID(N'dbo.FK_SalesOrders_SalesRepID', N'F') IS NULL
     ALTER TABLE [dbo].[SalesOrders] WITH CHECK ADD CONSTRAINT [FK_SalesOrders_SalesRepID] FOREIGN KEY ([SalesRepID]) REFERENCES [dbo].[SalesReps] ([SalesRepID]);
+IF OBJECT_ID(N'dbo.FK_Quotations_CustomerID', N'F') IS NULL
+    ALTER TABLE [dbo].[Quotations] WITH CHECK ADD CONSTRAINT [FK_Quotations_CustomerID] FOREIGN KEY ([CustomerID]) REFERENCES [dbo].[Customers] ([CustomerID]);
+IF OBJECT_ID(N'dbo.FK_Quotations_SalesOrderID', N'F') IS NULL
+    ALTER TABLE [dbo].[Quotations] WITH CHECK ADD CONSTRAINT [FK_Quotations_SalesOrderID] FOREIGN KEY ([SalesOrderID]) REFERENCES [dbo].[SalesOrders] ([SalesOrderID]);
+IF OBJECT_ID(N'dbo.FK_Quotations_SalesInvoiceID', N'F') IS NULL
+    ALTER TABLE [dbo].[Quotations] WITH CHECK ADD CONSTRAINT [FK_Quotations_SalesInvoiceID] FOREIGN KEY ([SalesInvoiceID]) REFERENCES [dbo].[SalesInvoices] ([SalesInvoiceID]);
+IF OBJECT_ID(N'dbo.FK_QuotationLines_QuotationID', N'F') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] WITH CHECK ADD CONSTRAINT [FK_QuotationLines_QuotationID] FOREIGN KEY ([QuotationID]) REFERENCES [dbo].[Quotations] ([QuotationID]) ON DELETE CASCADE;
+IF OBJECT_ID(N'dbo.FK_QuotationLines_ProductID', N'F') IS NULL
+    ALTER TABLE [dbo].[QuotationLines] WITH CHECK ADD CONSTRAINT [FK_QuotationLines_ProductID] FOREIGN KEY ([ProductID]) REFERENCES [dbo].[Products] ([ProductID]);
 IF OBJECT_ID(N'dbo.FK_PurchaseOrders_SupplierID', N'F') IS NULL
     ALTER TABLE [dbo].[PurchaseOrders] WITH CHECK ADD CONSTRAINT [FK_PurchaseOrders_SupplierID] FOREIGN KEY ([SupplierID]) REFERENCES [dbo].[Suppliers] ([SupplierID]);
 IF OBJECT_ID(N'dbo.FK_PurchaseOrders_WarehouseID', N'F') IS NULL
@@ -7570,6 +7721,8 @@ IF OBJECT_ID(N'dbo.FK_PeriodClosings_EmployeeID', N'F') IS NOT NULL
     ALTER TABLE [dbo].[PeriodClosings] DROP CONSTRAINT [FK_PeriodClosings_EmployeeID];
 IF OBJECT_ID(N'dbo.FK_PurchaseOrders_EmployeeID', N'F') IS NOT NULL
     ALTER TABLE [dbo].[PurchaseOrders] DROP CONSTRAINT [FK_PurchaseOrders_EmployeeID];
+IF OBJECT_ID(N'dbo.FK_Quotations_EmployeeID', N'F') IS NOT NULL
+    ALTER TABLE [dbo].[Quotations] DROP CONSTRAINT [FK_Quotations_EmployeeID];
 IF OBJECT_ID(N'dbo.FK_RepDays_AdvanceEmployeeID', N'F') IS NOT NULL
     ALTER TABLE [dbo].[RepDays] DROP CONSTRAINT [FK_RepDays_AdvanceEmployeeID];
 IF OBJECT_ID(N'dbo.FK_RepDays_EmployeeID', N'F') IS NOT NULL
@@ -7602,5 +7755,5 @@ GO
 IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
     ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
 GO
-PRINT N'RetailStore schema: done (95 tables, 1212 fields, 144 indexes, 226 relationships, 446 seed rows).';
+PRINT N'RetailStore schema: done (97 tables, 1237 fields, 148 indexes, 231 relationships, 451 seed rows).';
 GO

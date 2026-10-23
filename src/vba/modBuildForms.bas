@@ -29,7 +29,7 @@ Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppli
     "frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword," & _
     "frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx," & _
     "frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmAssetChanges,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines," & _
-    "frmSalesOrder,frmPurchaseOrderLines,frmPurchaseOrder,frmRepDay,frmRepVisits,frmSqlServer"
+    "frmSalesOrder,frmPurchaseOrderLines,frmPurchaseOrder,frmQuotationLines,frmQuotation,frmRepDay,frmRepVisits,frmSqlServer"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -688,6 +688,8 @@ Private Sub BuildAllForms()
     BuildForm_frmSalesOrder
     BuildForm_frmPurchaseOrderLines
     BuildForm_frmPurchaseOrder
+    BuildForm_frmQuotationLines
+    BuildForm_frmQuotation
     BuildForm_frmRepDay
     BuildForm_frmRepVisits
     BuildForm_frmSqlServer
@@ -11793,6 +11795,8 @@ Private Sub BuildForm_frmSalesOrder()
     c.OnClick = EP
     Set c = AddButton("btnDelete", "حذف المسودة", 4081, 9129, 1814, 624, "danger")
     c.OnClick = EP
+    Set c = AddButton("btnQuotations", "عروض الأسعار", 6008, 9129, 1928, 624, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 10433, 9129, 1474, 624, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -11830,6 +11834,9 @@ Private Sub BuildForm_frmSalesOrder()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnDelete_Click()" & vbCrLf
     s = s & "    SalesOrderAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnQuotations_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmQuotation"", 0" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -11989,6 +11996,157 @@ Private Sub BuildForm_frmPurchaseOrder()
     Exit Sub
 EH:
     AbortForm "frmPurchaseOrder", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmQuotationLines()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmQuotationLines", "أسطر عرض السعر", "SELECT * FROM QuotationLines WHERE QuotationID = 0", 11680, 425, False, True, True, _
+              ""
+    SetFormProp "DefaultView", 1
+    SetFormProp "ScrollBars", 2
+    SetFormProp "Cycle", 0
+    SetFormProp "AllowDeletions", False
+    Set c = AddCombo("ProductID", "ProductID", 28, 0, 5783, 425, "SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p WHERE p.IsActive <> 0 ORDER BY p.ProductName", 2, "0;5670")
+    SetCtlProp c, "BoundColumn", 1
+    SetCtlProp c, "LimitToList", True
+    Set c = AddText("Quantity", "Quantity", 5839, 0, 1474, 425)
+    SetCtlProp c, "Format", "#,##0.###"
+    Set c = AddText("UnitPrice", "UnitPrice", 7341, 0, 1701, 425)
+    SetCtlProp c, "Format", "#,##0.00##"
+    Set c = AddText("txtValue", "=Nz([Quantity],0)*Nz([UnitPrice],0)", 9070, 0, 2041, 425)
+    SetCtlProp c, "Locked", True
+    c.BackColor = CLR_LOCKED
+    SetCtlProp c, "TabStop", False
+    SetCtlProp c, "Format", "#,##0.00"
+    Set c = AddButton("btnRemove", "Sym(code='ChrW(&HE74D)')", 11139, 17, 454, 391, "danger")
+    SetCtlProp c, "FontName", ICON_FONT
+    c.OnClick = EP
+    m_frm.BeforeUpdate = EP
+    m_frm.AfterUpdate = EP
+    s = ""
+    s = s & "Private Sub Form_BeforeUpdate(Cancel As Integer)" & vbCrLf
+    s = s & "    QuotationLineBeforeUpdate Me, Cancel" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_AfterUpdate()" & vbCrLf
+    s = s & "    QuotationLineAfterUpdate Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRemove_Click()" & vbCrLf
+    s = s & "    QuotationRemoveLine Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmQuotationLines", s
+    Exit Sub
+EH:
+    AbortForm "frmQuotationLines", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmQuotation()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmQuotation", "عروض الأسعار للعملاء", "", 12134, 10206, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12134, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE7BF), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "عروض الأسعار للعملاء", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "«إصدار» يحسب القيمة والضريبة ويطبع العرض بصلاحيته، ثم يتحول بضغطة إلى طلبية أو فاتورة", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddCombo("cboQuote", "", 227, 1304, 9412, 454, "", 6, "0;1361;1247;3402;1361;1701")
+    SetCtlProp c, "LimitToList", True
+    c.AfterUpdate = EP
+    Set c = AddLabel("lblQuote", "عرض السعر (الأحدث أولًا)", 227, 992, 9412, 284, 9, False, CLR_MUTED, "cboQuote", 0)
+    Set c = AddCombo("cboCustomer", "", 227, 2155, 2835, 454, "", 2, "0;2722")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddLabel("lblCustomer", "العميل", 227, 1843, 2835, 284, 9, False, CLR_MUTED, "cboCustomer", 0)
+    Set c = AddText("txtValidUntil", "", 3175, 2155, 1701, 454)
+    SetCtlProp c, "Format", "yyyy/mm/dd"
+    Set c = AddLabel("lblValidUntil", "ساري حتى", 3175, 1843, 1701, 284, 9, False, CLR_MUTED, "txtValidUntil", 0)
+    Set c = AddText("txtTerms", "", 4990, 2155, 2381, 454)
+    Set c = AddLabel("lblTerms", "الشروط (الدفع والتسليم)", 4990, 1843, 2381, 284, 9, False, CLR_MUTED, "txtTerms", 0)
+    Set c = AddText("txtNotes", "", 7484, 2155, 2268, 454)
+    Set c = AddLabel("lblNotes", "ملاحظات", 7484, 1843, 2268, 284, 9, False, CLR_MUTED, "txtNotes", 0)
+    Set c = AddButton("btnNew", "عرض جديد", 9866, 2138, 2041, 482, "primary")
+    c.OnClick = EP
+    Set c = AddLabel("lblInfo", " ", 227, 2778, 11680, 397, 11, True, CLR_PRIMARY, "", 0)
+    Set c = AddLabel("lblCol1", "الصنف", 255, 3260, 5783, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol2", "الكمية", 6066, 3260, 1474, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol3", "سعر البيع", 7568, 3260, 1701, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddLabel("lblCol4", "قيمة السطر", 9297, 3260, 2041, 312, 9, True, CLR_MUTED, "", 2)
+    Set c = AddSubform("subLines", "frmQuotationLines", 227, 3600, 11680, 3969)
+    Set c = AddButton("btnIssue", "إصدار", 227, 7995, 1474, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnPrint", "طباعة", 1814, 7995, 1361, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnToOrder", "إلى طلبية", 3288, 7995, 1701, 482, "primary")
+    c.OnClick = EP
+    Set c = AddCombo("cboPayType", "", 5102, 7995, 1588, 454, "", 2, "0;1474")
+    SetCtlProp c, "LimitToList", True
+    Set c = AddButton("btnToInvoice", "إلى فاتورة", 6803, 7995, 1701, 482, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnReport", "تقرير العروض", 8617, 7995, 1814, 482, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnUnissue", "إعادة لمسودة", 227, 9129, 1814, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnReject", "رفضه العميل", 2154, 9129, 1701, 624, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnDelete", "حذف المسودة", 3968, 9129, 1814, 624, "danger")
+    c.OnClick = EP
+    Set c = AddButton("btnCopy", "عرض جديد منه", 5895, 9129, 1928, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnOpenDoc", "الطلبية / الفاتورة", 7936, 9129, 2041, 624, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnClose", "إغلاق", 10433, 9129, 1474, 624, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    m_frm.OnActivate = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    QuotationLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub Form_Activate()" & vbCrLf
+    s = s & "    QuotationShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub cboQuote_AfterUpdate()" & vbCrLf
+    s = s & "    QuotationShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnNew_Click()" & vbCrLf
+    s = s & "    QuotationNew Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnIssue_Click()" & vbCrLf
+    s = s & "    QuotationAction Me, ""ISSUE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnPrint_Click()" & vbCrLf
+    s = s & "    QuotationPrint Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnToOrder_Click()" & vbCrLf
+    s = s & "    QuotationAction Me, ""ORDER""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnToInvoice_Click()" & vbCrLf
+    s = s & "    QuotationAction Me, ""INVOICE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReport_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmReportCenter"", 0, ""QUOTATIONS""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnUnissue_Click()" & vbCrLf
+    s = s & "    QuotationAction Me, ""UNISSUE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnReject_Click()" & vbCrLf
+    s = s & "    QuotationAction Me, ""REJECT""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnDelete_Click()" & vbCrLf
+    s = s & "    QuotationAction Me, ""DELETE""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnCopy_Click()" & vbCrLf
+    s = s & "    QuotationAction Me, ""COPY""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOpenDoc_Click()" & vbCrLf
+    s = s & "    QuotationOpenDoc Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmQuotation", s
+    Exit Sub
+EH:
+    AbortForm "frmQuotation", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildForm_frmRepDay()

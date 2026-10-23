@@ -380,6 +380,7 @@ TABLES: List[Table] = [
             ("RECEIPT_NOTE", "GRN-", 1, 6, "أذونات الاستلام من الموردين"),
             ("SALES_ORDER", "SO-", 1, 6, "طلبيات العملاء"),
             ("PURCHASE_ORDER", "PO-", 1, 6, "أوامر الشراء"),
+            ("QUOTATION", "QT-", 1, 6, "عروض الأسعار للعملاء"),
             ("REP_DAY", "RD-", 1, 6, "أيام المندوبين (البيع من السيارة)"),
             ("PRODUCT_CODE", "P", 1, 5, "أكواد المنتجات"),
             ("ZATCA_ICV", None, 1, 0, "عدّاد ICV لمستندات فاتورة"),
@@ -444,6 +445,7 @@ TABLES: List[Table] = [
             ("SALES_ORDERS", "طلبيات العملاء: التسجيل والاعتماد والتجهيز والإلغاء", "المبيعات", 16),
             ("REP_DAYS", "يوم المندوب: تحميل السيارة والبيع باسمه وتسويته", "المبيعات", 17),
             ("REP_ROUTES", "خط السير وزيارات المندوبين وأسعارهم", "المبيعات", 18),
+            ("QUOTATIONS", "عروض الأسعار للعملاء: التسجيل والإصدار والتحويل", "المبيعات", 19),
             ("CUSTOMERS", "إدارة العملاء", "العملاء", 20),
             ("CUSTOMER_PAYMENTS", "سندات القبض", "العملاء", 21),
             ("PURCHASES", "فواتير المشتريات", "المشتريات", 30),
@@ -2410,6 +2412,53 @@ TABLES: List[Table] = [
     ),
 
     Table(
+        "Quotations", "عروض الأسعار للعملاء",
+        "عرض سعر لعميل (docs/75): مسودة، ثم «إصدار» بصلاحية حتى تاريخ (تُحسب قيمته وضريبته ويُطبع)، ثم يتحول "
+        "بضغطة إلى طلبية أو فاتورة بيع، أو يرفضه العميل. العرض الصادر بعد تاريخ صلاحيته «منتهي» ولا يتحول.",
+        [
+            auto("QuotationID", "رقم داخلي"),
+            text("QuotationNumber", 20, "رقم العرض", required=True),
+            datetime_("QuoteDate", "تاريخ العرض", required=True, default="Now()"),
+            long_("CustomerID", "العميل", required=True, fk="Customers.CustomerID"),
+            date_("ValidUntil", "ساري حتى", required=True),
+            text("Status", 10, "الحالة", required=True, default='"DRAFT"',
+                 rule='In ("DRAFT","ISSUED","ORDERED","INVOICED","REJECTED")',
+                 rule_text="مسودة، صادر، تحوّل إلى طلبية، تحوّل إلى فاتورة، رفضه العميل"),
+            datetime_("IssuedAt", "وقت الإصدار"),
+            money("SubTotal", "القيمة بدون الضريبة", note="تُحسب عند الإصدار"),
+            money("Tax", "ضريبة القيمة المضافة", note="تُحسب عند الإصدار"),
+            money("TotalAmount", "الإجمالي شامل الضريبة", note="تُحسب عند الإصدار"),
+            long_("SalesOrderID", "الطلبية التي تحوّل إليها", fk="SalesOrders.SalesOrderID"),
+            long_("SalesInvoiceID", "فاتورة البيع التي تحوّل إليها", fk="SalesInvoices.SalesInvoiceID"),
+            long_("EmployeeID", "سجّله", required=True, fk="Employees.EmployeeID"),
+            text("Terms", 255, "الشروط (الدفع والتسليم)", note="تُطبع في العرض"),
+            text("Notes", 255, "ملاحظات"),
+            created_at(),
+        ],
+        pk=["QuotationID"],
+        indexes=[ux("QuotationNumber"), ix("QuoteDate"), ix("Status")],
+    ),
+
+    Table(
+        "QuotationLines", "أسطر عروض الأسعار",
+        "الأصناف وكمياتها وسعر البيع (بالوحدة الصغرى، والسعر كسعر الصنف: شامل الضريبة أو بدونها حسب الإعدادات). "
+        "الصافي والضريبة والإجمالي تُحسب عند الإصدار بحساب الفاتورة نفسه.",
+        [
+            auto("QuotationLineID", "رقم السطر"),
+            long_("QuotationID", "عرض السعر", required=True, fk="Quotations.QuotationID", cascade=True),
+            long_("ProductID", "الصنف", required=True, fk="Products.ProductID"),
+            qty("Quantity", "الكمية", rule=">0", rule_text="الكمية أكبر من صفر", default=None),
+            money("UnitPrice", "سعر البيع"),
+            money("NetAmount", "الصافي بدون الضريبة"),
+            money("Tax", "الضريبة"),
+            money("LineTotal", "الإجمالي شامل الضريبة"),
+            created_at(),
+        ],
+        pk=["QuotationLineID"],
+        indexes=[ix("QuotationID")],
+    ),
+
+    Table(
         "PurchaseOrders", "أوامر الشراء",
         "أمر شراء لمورد (docs/74): مسودة (يدويًا أو من اقتراح الشراء)، ثم «اعتماد» فتُحسب كمياته «تحت الطلب»، "
         "ثم الاستلام بأذونات الاستلام منه (كليًا أو جزئيًا) ثم فوترتها، أو الإلغاء.",
@@ -2757,6 +2806,7 @@ SCREEN_LIST = [
     ("frmStockNote", "أذونات التسليم والاستلام", "المخزون", "STOCK_NOTES", True, True, True),
     ("frmSalesOrder", "طلبيات العملاء", "المبيعات", "SALES_ORDERS", True, True, True),
     ("frmPurchaseOrder", "أوامر الشراء", "المشتريات", "PURCHASE_ORDERS", True, True, True),
+    ("frmQuotation", "عروض الأسعار للعملاء", "المبيعات", "QUOTATIONS", True, True, True),
     ("frmRepDay", "يوم المندوب والبيع من السيارة", "المبيعات", "REP_DAYS", True, True, True),
     ("frmRepVisits", "زيارات المندوبين وخطة اليوم", "المبيعات", "REP_ROUTES", True, True, True),
     ("frmRouteStops", "خط سير المندوبين", "المبيعات", "REP_ROUTES", True, True, True),

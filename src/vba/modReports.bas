@@ -9,7 +9,7 @@ Attribute VB_Name = "modReports"
 '   AmountInWords     amount in Arabic words for vouchers (same as tools/tafqeet.py)
 '   ReportNoData      message instead of an empty report
 ' Printing of single documents:
-'   PrintPurchaseDocument, PrintVoucher, PrintStockCount, PrintPartyStatement
+'   PrintPurchaseDocument, PrintQuotation, PrintVoucher, PrintStockCount, PrintPartyStatement
 '==============================================================================
 Option Compare Database
 Option Explicit
@@ -214,6 +214,19 @@ Public Sub PrintPurchaseDocument(ByVal DocKind As String, ByVal DocID As Variant
     ' DocKind: "PURCHASE" (invoice) or "RETURN" (purchase return)
     If IsNull(DocID) Then Exit Sub
     OpenDocumentReport "rptPurchaseDocument", "[DocKind] = '" & DocKind & "' AND [DocID] = " & CLng(DocID)
+End Sub
+
+Public Sub PrintQuotation(ByVal QuotationID As Variant)
+    ' A customer quotation (modQuotations, docs/75).
+    If IsNull(QuotationID) Then
+        ShowWarning "اختر العرض أولًا."
+        Exit Sub
+    End If
+    If Nz(DbValue("SELECT Status FROM Quotations WHERE QuotationID = " & CLng(QuotationID)), "DRAFT") = "DRAFT" Then
+        ShowWarning "أصدر العرض أولًا."                          ' its totals are worked out at issue
+        Exit Sub
+    End If
+    OpenDocumentReport "rptQuotation", "[QuotationID] = " & CLng(QuotationID)
 End Sub
 
 Public Sub PrintVoucher(ByVal DocKind As String, ByVal DocID As Variant)

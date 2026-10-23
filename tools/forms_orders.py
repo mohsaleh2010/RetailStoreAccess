@@ -1,4 +1,5 @@
-"""Customer orders (docs/62, plan 4A): frmSalesOrder and its lines frmSalesOrderLines.
+"""Customer orders (docs/62, plan 4A): frmSalesOrder and its lines frmSalesOrderLines; purchase orders (docs/74);
+customer quotations (docs/75): frmQuotation and its lines frmQuotationLines.
 Layout conventions are the same as forms.py (twips, x from the start edge)."""
 
 from typing import List, Tuple
@@ -71,7 +72,8 @@ def layout_sales_order(line_heads) -> FormModel:
     for name, caption, style, w, call in [
             ("btnUnapprove", "إعادة لمسودة", "secondary", 3.2, 'SalesOrderAction Me, "UNAPPROVE"'),
             ("btnCancel", "إلغاء الطلبية", "danger", 3.2, 'SalesOrderAction Me, "CANCEL"'),
-            ("btnDelete", "حذف المسودة", "danger", 3.2, 'SalesOrderAction Me, "DELETE"')]:
+            ("btnDelete", "حذف المسودة", "danger", 3.2, 'SalesOrderAction Me, "DELETE"'),
+            ("btnQuotations", "عروض الأسعار", "secondary", 3.4, 'OpenScreen "frmQuotation", 0')]:
         button(m, name, caption, bx, cm(16.1), style, w=cm(w), h=cm(1.1), call=call)
         bx += cm(w) + cm(0.2)
     button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(16.1), "secondary", w=cm(2.6), h=cm(1.1),
@@ -162,12 +164,99 @@ def layout_purchase_order(line_heads) -> FormModel:
     return m
 
 
+QUOTATION_TITLES = ["الصنف", "الكمية", "سعر البيع", "قيمة السطر"]
+QUOTE_PRODUCTS = ("SELECT p.ProductID, p.ProductCode & '  ' & p.ProductName AS Item FROM Products AS p "
+                  "WHERE p.IsActive <> 0 ORDER BY p.ProductName")
+
+
+def layout_quotation_lines() -> Tuple[FormModel, list]:
+    row_h = cm(0.75)
+    m = FormModel("frmQuotationLines", "أسطر عرض السعر", cm(20.6), row_h, popup=False,
+                  record_source="SELECT * FROM QuotationLines WHERE QuotationID = 0", allow_add=True)
+    m.form_props = {"DefaultView": 1, "ScrollBars": 2, "Cycle": 0, "AllowDeletions": False}
+    heads = grid_row(m, [
+        ("ProductID", "ProductID", 10.2, {"_kind": "combo", "RowSource": QUOTE_PRODUCTS, "ColumnCount": 2,
+                                          "ColumnWidths": "0;10", "BoundColumn": 1, "LimitToList": True}, []),
+        ("Quantity", "Quantity", 2.6, {"Format": "#,##0.###"}, []),
+        ("UnitPrice", "UnitPrice", 3.0, {"Format": "#,##0.00##"}, []),
+        ("txtValue", "=Nz([Quantity],0)*Nz([UnitPrice],0)", 3.6, {**LOCKED, "Format": "#,##0.00"}, []),
+        ("btnRemove", "", 0.8, {"_kind": "button", "Caption": Sym(f"ChrW(&H{0xE74D:X})"),
+                               "Style": "danger", "FontName": Sym("ICON_FONT")}, ["Click"]),
+    ], row_h)
+    m.form_events = ["BeforeUpdate", "AfterUpdate"]
+    m.code = ["Private Sub Form_BeforeUpdate(Cancel As Integer)", "    QuotationLineBeforeUpdate Me, Cancel", "End Sub",
+              "Private Sub Form_AfterUpdate()", "    QuotationLineAfterUpdate Me", "End Sub",
+              "Private Sub btnRemove_Click()", "    QuotationRemoveLine Me", "End Sub"]
+    return m, heads
+
+
+def layout_quotation(line_heads) -> FormModel:
+    width, height = cm(21.4), cm(18.0)
+    m = FormModel("frmQuotation", "عروض الأسعار للعملاء", width, height, popup=True, allow_add=False)
+    title_band(m, "عروض الأسعار للعملاء",
+               "«إصدار» يحسب القيمة والضريبة ويطبع العرض بصلاحيته، ثم يتحول بضغطة إلى طلبية أو فاتورة",
+               "sales")
+    c = m.add(Control("combo", "cboQuote", cm(0.4), cm(2.3), cm(16.6), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 6, "ColumnWidths": "0;2.4;2.2;6;2.4;3", "LimitToList": True},
+                      events=["AfterUpdate"]))
+    labelled(m, "cboQuote", "عرض السعر (الأحدث أولًا)", c)
+    y = cm(3.8)
+    c = m.add(Control("combo", "cboCustomer", cm(0.4), y, cm(5.0), cm(0.8),
+                      {"RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;4.8", "LimitToList": True}))
+    labelled(m, "cboCustomer", "العميل", c)
+    c = m.add(Control("text", "txtValidUntil", cm(5.6), y, cm(3.0), cm(0.8), {"Format": "yyyy/mm/dd"}))
+    labelled(m, "txtValidUntil", "ساري حتى", c)
+    c = m.add(Control("text", "txtTerms", cm(8.8), y, cm(4.2), cm(0.8), {}))
+    labelled(m, "txtTerms", "الشروط (الدفع والتسليم)", c)
+    c = m.add(Control("text", "txtNotes", cm(13.2), y, cm(4.0), cm(0.8), {}))
+    labelled(m, "txtNotes", "ملاحظات", c)
+    button(m, "btnNew", "عرض جديد", cm(17.4), y - cm(0.03), "primary", w=cm(3.6), call="QuotationNew Me")
+    m.add(Control("label", "lblInfo", cm(0.4), cm(4.9), width - cm(0.8), cm(0.7),
+                  {"Caption": " ", "FontSize": 11, "FontBold": True, "ForeColor": Sym("CLR_PRIMARY")}))
+    header_labels(m, cm(0.4), cm(5.75), QUOTATION_TITLES, line_heads)
+    m.add(Control("subform", "subLines", cm(0.4), cm(6.35), cm(20.6), cm(7.0),
+                  {"SourceObject": "frmQuotationLines"}))
+    bx = cm(0.4)                                        # the way of the quotation
+    for name, caption, style, w, call in [
+            ("btnIssue", "إصدار", "primary", 2.6, 'QuotationAction Me, "ISSUE"'),
+            ("btnPrint", "طباعة", "secondary", 2.4, "QuotationPrint Me"),
+            ("btnToOrder", "إلى طلبية", "primary", 3.0, 'QuotationAction Me, "ORDER"')]:
+        button(m, name, caption, bx, cm(14.1), style, w=cm(w), call=call)
+        bx += cm(w) + cm(0.2)
+    m.add(Control("combo", "cboPayType", bx, cm(14.1), cm(2.8), cm(0.8),
+                  {"RowSourceType": "Value List", "RowSource": "", "ColumnCount": 2, "ColumnWidths": "0;2.6",
+                   "LimitToList": True}))
+    bx += cm(2.8) + cm(0.2)
+    for name, caption, style, w, call in [
+            ("btnToInvoice", "إلى فاتورة", "primary", 3.0, 'QuotationAction Me, "INVOICE"'),
+            ("btnReport", "تقرير العروض", "secondary", 3.2, 'OpenScreen "frmReportCenter", 0, "QUOTATIONS"')]:
+        button(m, name, caption, bx, cm(14.1), style, w=cm(w), call=call)
+        bx += cm(w) + cm(0.2)
+    bx = cm(0.4)
+    for name, caption, style, w, call in [
+            ("btnUnissue", "إعادة لمسودة", "secondary", 3.2, 'QuotationAction Me, "UNISSUE"'),
+            ("btnReject", "رفضه العميل", "danger", 3.0, 'QuotationAction Me, "REJECT"'),
+            ("btnDelete", "حذف المسودة", "danger", 3.2, 'QuotationAction Me, "DELETE"'),
+            ("btnCopy", "عرض جديد منه", "secondary", 3.4, 'QuotationAction Me, "COPY"'),
+            ("btnOpenDoc", "الطلبية / الفاتورة", "secondary", 3.6, "QuotationOpenDoc Me")]:
+        button(m, name, caption, bx, cm(16.1), style, w=cm(w), h=cm(1.1), call=call)
+        bx += cm(w) + cm(0.2)
+    button(m, "btnClose", "إغلاق", width - cm(0.4) - cm(2.6), cm(16.1), "secondary", w=cm(2.6), h=cm(1.1),
+           call="DoCmd.Close acForm, Me.Name")
+    m.form_events = ["Load", "Activate"]
+    m.code = (["Private Sub Form_Load()", "    QuotationLoad Me", "End Sub",
+               "Private Sub Form_Activate()", "    QuotationShow Me", "End Sub",       # back from its order
+               "Private Sub cboQuote_AfterUpdate()", "    QuotationShow Me", "End Sub"] + m.code)
+    return m
+
+
 def order_forms() -> List[FormModel]:
     lines, heads = layout_sales_order_lines()
     po_lines, po_heads = layout_purchase_order_lines()
+    q_lines, q_heads = layout_quotation_lines()
     # the subform first: the parent form embeds it by name
-    return [lines, layout_sales_order(heads), po_lines, layout_purchase_order(po_heads), layout_rep_day(),
-            layout_rep_visits()]
+    return [lines, layout_sales_order(heads), po_lines, layout_purchase_order(po_heads), q_lines,
+            layout_quotation(q_heads), layout_rep_day(), layout_rep_visits()]
 
 
 # ---------------------------------------------------------------- the rep day and van sales (docs/63)

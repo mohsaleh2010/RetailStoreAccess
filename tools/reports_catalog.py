@@ -204,6 +204,13 @@ LIST_SPECS: List[ListSpec] = [
         Col("الحالة", "StatusName", 2.0), Col("أيام التأخير", "DaysLate", 1.4, INT)],
         [("OrderDate", False), ("OrderNumber", False), ("ProductName", False)], landscape=True,
         no_data="لا توجد أوامر شراء مفتوحة باقٍ منها شيء."),
+    ListSpec("QUOTATIONS", [
+        Col("رقم العرض", "QuotationNumber", 2.6), Col("التاريخ", "=GDate([QuoteDate])", 2.3),
+        Col("ساري حتى", "=GDate([ValidUntil])", 2.3), Col("العميل", "CustomerName", 6.0, grow=True),
+        Col("الإجمالي شامل الضريبة", "TotalAmount", 3.2, MONEY, True), Col("الحالة", "StatusName", 3.4),
+        Col("تحوّل إلى", "ConvertedNumber", 2.8), Col("محوّل", "IsConverted", 1.6, INT, True)],
+        [("QuoteDate", False), ("QuotationNumber", False)], landscape=True,
+        no_data="لا توجد عروض أسعار في الفترة."),
     ListSpec("PRICE_LISTS", [
         Col("القائمة", "ListName", 3.0), Col("الكود", "ProductCode", 2.2),
         Col("الصنف", "ProductName", 5.0, grow=True), Col("الوحدة", "PriceUnit", 1.9),

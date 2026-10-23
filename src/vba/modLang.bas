@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3383
+Private Const ENTRY_COUNT As Long = 3448
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("C;العملاء;S;الموردون") = "C;Customers;S;Suppliers", "Tr sample 1", passed, failed, report
-    CheckLang Tr("إعادة الفتح إلى هذا اليوم") = "Reopen up to this day", "Tr sample 2", passed, failed, report
-    CheckLang Tr("البنك") = "Bank", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المتبقي من كل فاتورة آجلة حسب تأخيرها عن تاريخ الاستحقاق") = "The remainder of each credit invoice by its delay after the due date", "Tr sample 4", passed, failed, report
-    CheckLang Tr("تعذّر تشغيل OpenSSL: ") = "Could not run OpenSSL: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("سعر الحجم الوسط") = "Medium size price", "Tr sample 6", passed, failed, report
-    CheckLang Tr("لا يوجد تحويل. اختر المخزنين ثم «تحويل جديد».") = "No transfer. Choose the two warehouses, then New transfer.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("ActionName(a.ActionType) AS [العملية], a.ObjectName AS [الجدول], a.RecordID AS [الرقم], ") = "ActionName(a.ActionType) AS [Transaction], a.ObjectName AS [Table], a.RecordID AS [Number], ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("إعادة إنشاء أسطر المسير من بيانات الموظفين؟ تضيع التعديلات المكتوبة فيه.") = "Rebuild the run lines from the employee data? The changes typed in it are lost.", "Tr sample 2", passed, failed, report
+    CheckLang Tr("البرنامج يعمل على ملف Access بالفعل.") = "The program already works on the Access file.", "Tr sample 3", passed, failed, report
+    CheckLang Tr("المتبقي في الصندوق (عهدة)") = "Left in the box (float)", "Tr sample 4", passed, failed, report
+    CheckLang Tr("تعذّر الاتصال بالمنظومة.") = "Could not connect to the platform.", "Tr sample 5", passed, failed, report
+    CheckLang Tr("سعر الحبة في القائمة يجعل سعر الكرتونة = سعرها × العدد، ما لم يكن للكرتونة سعر فيها") = "A piece price in the list makes the carton price = its price x the count, unless the carton has its own price in the list", "Tr sample 6", passed, failed, report
+    CheckLang Tr("لا يوجد أمر شراء. اختر المورد والمخزن ثم «أمر جديد»، أو «أوامر من الاقتراح».") = "No purchase order. Choose the supplier and warehouse then New order, or Orders from suggestion.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST و 12.50: وية") = "TEST and 12.50: وية", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة") = "رمز التحقق من بوابة فاتورة (في البيئة التجريبية أي رقم مثل 123345). الخطوة 1 تنشئ مفتاحًا جديدًا في مجلد ZATCA بجانب البرنامج. بعد الخطوة 3 فعّل الإرسال من شاشة الفاتورة الإلكترونية. للتجربة بلا هيئة: «شهادة تجريبية» ثم «ملف XML لفاتورة", "العربية: من اليمين ولا ترجمة", _

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/forms*.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الشاشات: **115**. شرح طريقة بناء الشاشات في [03-Forms.md](03-Forms.md).
+عدد الشاشات: **117**. شرح طريقة بناء الشاشات في [03-Forms.md](03-Forms.md).
 
 | # | الشاشة | العنوان | النوع | الجدول | الصلاحية | تُفتح من |
 |---|---|---|---|---|---|---|
@@ -36,7 +36,7 @@
 | 28 | `frmSettings` | الإعدادات | نافذة منبثقة | Settings | SETTINGS | frmMain، القائمة الجانبية |
 | 29 | `frmLabelSettings` | إعدادات ملصقات الباركود | نافذة منبثقة | LabelSettings | PRODUCTS | frmBarcodeLabels، frmSettings |
 | 30 | `frmSearch` | البحث المتقدم | شاشة كاملة | - | الكل | frmMain، القائمة الجانبية |
-| 31 | `frmReportCenter` | التقارير | شاشة كاملة | - | REPORTS | frmMain، frmProducts، frmPurchaseOrder، frmRepVisits، frmSalesReps، frmWarehouses، القائمة الجانبية |
+| 31 | `frmReportCenter` | التقارير | شاشة كاملة | - | REPORTS | frmMain، frmProducts، frmPurchaseOrder، frmQuotation، frmRepVisits، frmSalesReps، frmWarehouses، القائمة الجانبية |
 | 32 | `frmPOSLines` | أسطر الفاتورة | شاشة فرعية في frmPOS | tmpPOSLines | مع الشاشة الأم | - |
 | 33 | `frmPOS` | نقطة البيع | شاشة كاملة | - | SALES_POS | frmMain، القائمة الجانبية |
 | 34 | `frmReturnLines` | أسطر المرتجع | شاشة فرعية في frmSalesReturn | tmpReturnLines | مع الشاشة الأم | - |
@@ -118,6 +118,8 @@
 | 110 | `frmSalesOrder` | طلبيات العملاء | نافذة منبثقة | - | SALES_ORDERS | frmAccounting، frmSalesReps |
 | 111 | `frmPurchaseOrderLines` | أسطر أمر الشراء | شاشة فرعية في frmPurchaseOrder | PurchaseOrderLines | مع الشاشة الأم | - |
 | 112 | `frmPurchaseOrder` | أوامر الشراء | نافذة منبثقة | - | PURCHASE_ORDERS | frmInventory |
-| 113 | `frmRepDay` | يوم المندوب | شاشة كاملة | - | REP_DAYS | frmAccounting |
-| 114 | `frmRepVisits` | زيارات المندوبين | شاشة كاملة | - | REP_ROUTES | frmAccounting |
-| 115 | `frmSqlServer` | قاعدة البيانات على SQL Server | نافذة منبثقة | - | SQL_SERVER | frmBackup |
+| 113 | `frmQuotationLines` | أسطر عرض السعر | شاشة فرعية في frmQuotation | QuotationLines | مع الشاشة الأم | - |
+| 114 | `frmQuotation` | عروض الأسعار للعملاء | نافذة منبثقة | - | QUOTATIONS | frmSalesOrder |
+| 115 | `frmRepDay` | يوم المندوب | شاشة كاملة | - | REP_DAYS | frmAccounting |
+| 116 | `frmRepVisits` | زيارات المندوبين | شاشة كاملة | - | REP_ROUTES | frmAccounting |
+| 117 | `frmSqlServer` | قاعدة البيانات على SQL Server | نافذة منبثقة | - | SQL_SERVER | frmBackup |

@@ -25,7 +25,7 @@ Private Const REL_CASCADE_DELETE As Long = 4096    ' dbRelationDeleteCascade
 Private Const REL_DONT_ENFORCE As Long = 2         ' dbRelationDontEnforce
 Private Const ERR_HAS_RELATED_RECORDS As Long = 3200
 Private Const ERR_RELATED_RECORD_REQUIRED As Long = 3201
-Private Const EXPECTED_RELATION_COUNT As Long = 226
+Private Const EXPECTED_RELATION_COUNT As Long = 231
 
 Private m_db As DAO.Database
 Private m_created As Long
@@ -588,6 +588,11 @@ Private Function RelationSpecs() As Collection
     c.Add Array("FK_SalesOrders_CustomerID", "Customers", "CustomerID", "SalesOrders", "CustomerID", 0&)
     c.Add Array("FK_SalesOrders_WarehouseID", "Warehouses", "WarehouseID", "SalesOrders", "WarehouseID", 0&)
     c.Add Array("FK_SalesOrders_SalesRepID", "SalesReps", "SalesRepID", "SalesOrders", "SalesRepID", 0&)
+    c.Add Array("FK_Quotations_CustomerID", "Customers", "CustomerID", "Quotations", "CustomerID", 0&)
+    c.Add Array("FK_Quotations_SalesOrderID", "SalesOrders", "SalesOrderID", "Quotations", "SalesOrderID", 0&)
+    c.Add Array("FK_Quotations_SalesInvoiceID", "SalesInvoices", "SalesInvoiceID", "Quotations", "SalesInvoiceID", 0&)
+    c.Add Array("FK_QuotationLines_QuotationID", "Quotations", "QuotationID", "QuotationLines", "QuotationID", 4096&)
+    c.Add Array("FK_QuotationLines_ProductID", "Products", "ProductID", "QuotationLines", "ProductID", 0&)
     c.Add Array("FK_PurchaseOrders_SupplierID", "Suppliers", "SupplierID", "PurchaseOrders", "SupplierID", 0&)
     c.Add Array("FK_PurchaseOrders_WarehouseID", "Warehouses", "WarehouseID", "PurchaseOrders", "WarehouseID", 0&)
     c.Add Array("FK_PurchaseOrderLines_PurchaseOrderID", "PurchaseOrders", "PurchaseOrderID", "PurchaseOrderLines", "PurchaseOrderID", 4096&)
@@ -616,28 +621,13 @@ Private Function RelationSpecs() As Collection
 End Function
 
 Private Function RetiredRelations() As Variant
-    RetiredRelations = Array("FK_AssetRevaluations_EmployeeID", _
-                             "FK_AssetTransfers_EmployeeID", _
-                             "FK_AuditLog_EmployeeID", _
-                             "FK_BankReconciliations_EmployeeID", _
-                             "FK_Budgets_EmployeeID", _
-                             "FK_CashVouchers_ReceivedByID", _
-                             "FK_CommissionRuns_EmployeeID", _
-                             "FK_CustomerAllocations_EmployeeID", _
-                             "FK_DepreciationRuns_EmployeeID", _
-                             "FK_FiscalYearClosings_EmployeeID", _
-                             "FK_PeriodClosings_EmployeeID", _
-                             "FK_PurchaseOrders_EmployeeID", _
-                             "FK_RepDays_AdvanceEmployeeID", _
-                             "FK_RepDays_EmployeeID", _
-                             "FK_RepVisits_EmployeeID", _
-                             "FK_SalesOrders_EmployeeID", _
-                             "FK_StockCounts_PostedByID", _
-                             "FK_StockDocuments_EmployeeID", _
-                             "FK_StockNotes_EmployeeID", _
-                             "FK_StockTransfers_EmployeeID", _
-                             "FK_StockTransfers_ReceivedByID", _
-                             "FK_SupplierAllocations_EmployeeID", _
-                             "FK_VatReturns_EmployeeID", _
+    RetiredRelations = Array("FK_AssetRevaluations_EmployeeID", "FK_AssetTransfers_EmployeeID", "FK_AuditLog_EmployeeID", _
+                             "FK_BankReconciliations_EmployeeID", "FK_Budgets_EmployeeID", "FK_CashVouchers_ReceivedByID", _
+                             "FK_CommissionRuns_EmployeeID", "FK_CustomerAllocations_EmployeeID", "FK_DepreciationRuns_EmployeeID", _
+                             "FK_FiscalYearClosings_EmployeeID", "FK_PeriodClosings_EmployeeID", "FK_PurchaseOrders_EmployeeID", _
+                             "FK_Quotations_EmployeeID", "FK_RepDays_AdvanceEmployeeID", "FK_RepDays_EmployeeID", _
+                             "FK_RepVisits_EmployeeID", "FK_SalesOrders_EmployeeID", "FK_StockCounts_PostedByID", _
+                             "FK_StockDocuments_EmployeeID", "FK_StockNotes_EmployeeID", "FK_StockTransfers_EmployeeID", _
+                             "FK_StockTransfers_ReceivedByID", "FK_SupplierAllocations_EmployeeID", "FK_VatReturns_EmployeeID", _
                              "FK_Warehouses_KeeperID")
 End Function

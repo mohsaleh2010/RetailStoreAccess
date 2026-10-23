@@ -15,6 +15,13 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "íõãÓÍ İí äŞØÉ ÇáÈíÚ æÇáãÔÊÑíÇÊ İíõÖÇİ ÇáÓØÑ ÈåĞå ÇáæÍÏÉ", "Scanned in the POS and purchases, it adds the line in this unit"
+    LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ æÇäÓÎ ãáİ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ ãßÇäå íÏæíğÇ", "Close the program and copy the backup file in its place by hand"
+    LangAdd "ÅÌãÇáí ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÓÊÍŞÉ Úä ÇáİÊÑÉ ÇáÍÇáíÉ", "Total VAT due for the current period"
+    LangAdd "ÇÎÊÑ ÔÇÔÉ æÇÍÏÉ Úáì ÇáÃŞá¡ Ãæ ÃáÛö «ÕáÇÍíÇÊ ÔÇÔÇÊ ÎÇÕÉ", "Choose at least one screen, or clear Custom screen permissions"
+    LangAdd "ÇáÑŞã ÇáÖÑíÈí İí ÇáÓÚæÏíÉ 15 ÑŞãğÇ æíÈÏÃ æíäÊåí ÈÇáÑŞã", "The Saudi tax number has 15 digits and starts and ends with the digit"
+    LangAdd "ÇáÖÑíÈÉ æÇáŞíãÉ ÇáãÊÈŞíÉ æÇáÅåáÇß ÇáÓÇÈŞ áÇ Êßæä ÓÇáÈÉ", "VAT, residual value and previous depreciation are never negative"
+    LangAdd "ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ ááİÇÊæÑÉ ÇáÅáßÊÑæäíÉ (Client ID æ", "Credentials of the program for the e-invoice (Client ID and"
     LangAdd "ÊÃßÏ ãä ÊÔÛíá ÇáÎÇÏã æÇáÔÈßÉ¡ Ëã ÇİÊÍ ÇáÈÑäÇãÌ ãä ÌÏíÏ", "Make sure the server and the network are running, then open the program again"
     LangAdd "ÊÚĞÑÊ ÇáäÓÎÉ ÇáæŞÇÆíÉ ŞÈá ÇáÇÓÊÚÇÏÉ¡ İáã ÊÊã ÇáÇÓÊÚÇÏÉ", "The safety copy before restoring failed, so nothing was restored"
     LangAdd "Êã ÍİÙ ÕáÇÍíÇÊ ÇáÔÇÔÇÊ. ÊÓÑí ãä ÇáÏÎæá ÇáÊÇáí ááãÓÊÎÏã", "The screen permissions were saved. They apply from the next login of the user"
@@ -97,6 +104,7 @@ Private Sub D2_1()
     LangAdd "ÊõÍĞİ ÇáÊÓæíÉ ÇáÌÇÑíÉ İŞØ (ÃÚÏ İÊÍ ÇáãÚÊãÏÉ ÃæáğÇ", "Only the open reconciliation is deleted (reopen the approved one first"
     LangAdd "ÊõÍİÙ Şíãå ßãÇ åí ÇáÂä¡ æíõäÔÃ ŞíÏ ÇáÊÓæíÉ ÈÊÇÑíÎ", "Its values are kept as they are now, and the settlement entry is created on"
     LangAdd "ÕõÑİ áå ÌÒÁ ãä åĞå ÇáÚãæáÇÊ. ÃáÛö ÓäÏ ÇáÕÑİ ÃæáğÇ", "Part of these commissions was paid to him. Cancel the payment voucher first"
+    LangAdd "ÚÑæÖ ÇáÃÓÚÇÑ ááÚãáÇÁ: ÇáÕÇÏÑÉ æÇáãäÊåíÉ æÇáãÍæøáÉ", "Customer quotations: issued, expired and converted"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÍĞİ İí ÔÇÔÉ ÑÈØ ÇáÓÏÇÏ ÈÇáİæÇÊíÑ", "You do not have the permission to delete in the payment matching screen"
     LangAdd "áÇ íãßä ÍĞİ åĞÇ ÇáÓÌá áÃäå ãÓÊÎÏã İí ÚãáíÇÊ ÓÇÈŞÉ", "This record cannot be deleted because it is used in earlier transactions"
     LangAdd "ááÃãÑ ÅĞä ÇÓÊáÇã áã íõÑÍóøá. ÑÍøáå Ãæ ÇÍĞİå ÃæáğÇ", "The order has a receipt note not posted. Post or delete it first"
@@ -108,6 +116,7 @@ Private Sub D2_1()
     LangAdd "ÇáÕÛíÑº ÓÚÑ ÇáæÓØ Ãæ ÇáßÈíÑ íÌÚá ááãÔÑæÈ ÃÍÌÇãğÇ", "small, a medium or large price gives the drink sizes"
     LangAdd "ÇáãÎÒä ÇáĞí ÊõÍãóøá ãäå ÇáÓíÇÑÉ ÛíÑ ãÎÒä ÇáÓíÇÑÉ", "The van cannot load from itself"
     LangAdd "ÇáåÏİ ÇáÔåÑí áÕÇİí ãÈíÚÇÊ ßá ãäÏæÈ (ÈÏæä ÇáÖÑíÈÉ", "The monthly target for the net sales of each sales rep (without VAT"
+    LangAdd "ÊõÚÏóøá ÃÓØÑ ÇáãÓæÏÉ İŞØ. ÃÚÏ ÇáÚÑÖ áãÓæÏÉ ÃæáğÇ", "Only the lines of a draft are changed. Return the quotation to a draft first"
     LangAdd "ÛíÑ ãÊÇÍ İí ãáİ ACCDE. ÛíøÑ ßáãÉ ÇáãÑæÑ ãä äÓÎÊß", "Not available in an ACCDE file. Change the password from your copy"
     LangAdd "áÊÕÍíÍ ÇáßãíÉ ÇáÂä ÇÓÊÎÏã ÇáÌÑÏ Ãæ ÇáÅÖÇİÉ/ÇáÎÕã", "To correct the quantity now use the stock count or the addition/deduction"
     LangAdd "áåĞÇ ÇáÍÓÇÈ ÍÓÇÈÇÊ ÊÇÈÚÉ. ÇÍĞİåÇ Ãæ ÇäŞáåÇ ÃæáğÇ", "This account has sub-accounts. Delete them or move them first"
@@ -126,6 +135,9 @@ Private Sub D2_1()
     LangAdd "ÕäİğÇ ÈßãíÉ ÕİÑ. ÇßÊÈ ÇáßãíÇÊ¡ Ëã «ÊÑÍíá ÇáÑÕíÏ", "items with a zero quantity. Write the quantities, then Post the stock"
     LangAdd "ŞÇÚÏÉ ÇáÎÇÏã İíåÇ ÇáÈíÇäÇÊ ÇáİÚáíÉ ááÈÑäÇãÌ ãäĞ", "The server database holds the real data of the program since"
     LangAdd "áØÇÈÚÉ ÇáãáÕŞÇÊ¡ æÃßËÑ áæÑŞ A4 İíå ÃÚãÏÉ ãáÕŞÇÊ", "for a label printer, and more for A4 paper with columns of labels"
+End Sub
+
+Private Sub D2_2()
     LangAdd "ÃæáğÇ: ÑÕíÏå ÇáãÑÍóøá ŞÏ íÚÊãÏ Úáì åĞÇ ÇáÅŞÑÇÑ", "first: its carried balance may depend on this return"
     LangAdd "ÃõäÔÆÊ ÇáãæÇÒäÉ ÈÓØÑ áßá ÍÓÇÈ ÅíÑÇÏÇÊ æãÕÑæİÇÊ", "The budget was created with a line for each revenue and expense account"
     LangAdd "ÅäÔÇÁ ßá ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ ÇáãÓÊÍŞÉ ÍÊì Çáíæã", "Create all recurring expenses due up to today"
@@ -135,11 +147,9 @@ Private Sub D2_1()
     LangAdd "ÇáÕÑİ ãØÇÈŞ İí ÊÓæíÉ ÈäßíÉ: ÃáÛö ãØÇÈŞÊå ÃæáğÇ", "The payment is matched in a bank reconciliation: unmatch it first"
     LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ááãæÑÏ ÃßÈÑ ãä ÇáßãíÉ ÇáãÔÊÑÇÉ", "The quantity returned to the supplier is more than the quantity bought"
     LangAdd "ÇáßãíÉ ÊÊÛíÑ İŞØ ãä ÇáãÔÊÑíÇÊ æÇáãÈíÚÇÊ æÇáÌÑÏ", "The quantity changes only through purchases, sales and stock counts"
-End Sub
-
-Private Sub D2_2()
     LangAdd "ÊÃßíÏ ßáãÉ ÇáãÑæÑ áÇ íØÇÈŞ ßáãÉ ÇáãÑæÑ ÇáÌÏíÏÉ", "The password confirmation does not match the new password"
     LangAdd "ÊÛíÑÊ ÖÑíÈÉ ãÓÊäÏÇÊ ÇáİÊÑÉ ÈÚÏ ÇáÇÚÊãÇÏ ÈãŞÏÇÑ", "The VAT of the documents of the period changed after approval by"
+    LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÇáÚÑÖ ÇáÕÇÏÑ íõÑİÖ ÈÏá ÍĞİå", "Only a draft is deleted. An issued quotation is rejected instead"
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÏÎæá ÇáÈÑäÇãÌ (Client ID æ", "The Tax Authority refused the credentials of the program (Client ID and"
     LangAdd "İí ÇáŞíÏ ÃÕá ãÓÊÈÚÏ ÈÚÏå: ÃáÛö ÇáÇÓÊÈÚÇÏ ÃæáğÇ", "The entry has an asset disposed after it: cancel the disposal first"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇáÅÖÇİÉ İí ÔÇÔÉ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to add in the bank reconciliation screen"
@@ -211,6 +221,7 @@ Private Sub D2_2()
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ (ÇáÅÚÏÇÏÇÊ", "E-invoicing is not enabled (settings"
     LangAdd "ÈíÇäÇÊß ÇáÍÇáíÉ áã ÊÊÛíÑ¡ æäÓÎÊåÇ ÇáæŞÇÆíÉ", "Your current data did not change, and its safety copy"
     LangAdd "ÊÇÑíÎ ÇáİÇÊæÑÉ áÇ íãßä Ãä íßæä İí ÇáãÓÊŞÈá", "The invoice date cannot be in the future"
+    LangAdd "ÊÍæíá ÇáÚÑÖ Åáì ØáÈíÉ Úãíá (ãÓæÏÉ İí ãÎÒäß", "Turn the quotation into a customer order (a draft in your warehouse"
     LangAdd "ÍĞİ ÂÎÑ äŞá ááÃÕá æÅÑÌÇÚå Åáì ãÑßÒå ÇáÓÇÈŞ", "Delete the last transfer of the asset and return it to its previous centre"
     LangAdd "ÓÚÑåÇ × ÇáÚÏÏ¡ ãÇ áã íßä ááßÑÊæäÉ ÓÚÑ İíåÇ", "its price x the count, unless the carton has its own price in the list"
     LangAdd "ÚãáÇÁ ÎØ ÇáÓíÑ ãæÌæÏæä İí ÒíÇÑÇÊ åĞÇ Çáíæã", "The route customers are already in the visits of this day"
@@ -247,6 +258,9 @@ Private Sub D2_2()
     LangAdd "ÔÌÑÉ ÇáÍÓÇÈÇÊ: ÇáÍÓÇÈÇÊ ÇáÑÆíÓíÉ æÇáİÑÚíÉ", "Account tree: main and sub-accounts"
     LangAdd "ØáÈíÇÊ ÇáÚãáÇÁ ÇáãİÊæÍÉ: ÇáÈÇŞí ÈáÇ ÊÓáíã", "Open customer orders: what is left to deliver"
     LangAdd "İÇÊæÑÉ ÅĞä ÇáÊÓáíã ÈÇáæÍÏÉ ÇáÕÛÑì ááÃÕäÇİ", "The invoice of a delivery note is in the smallest unit of the products"
+End Sub
+
+Private Sub D2_3()
     LangAdd "İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Enable sending in the e-invoicing screen"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ãÓíÑ ÇáÑæÇÊÈ", "You do not have this permission in the payroll screen"
     LangAdd "áÇ ÊæÌÏ ãÈÇáÛ ÛíÑ ãÑÈæØÉ Ãæ İæÇÊíÑ ãİÊæÍÉ", "There are no unlinked amounts or open invoices"
@@ -258,9 +272,6 @@ Private Sub D2_2()
     LangAdd "ãáİ ÇáãİÊÇÍ ÇáÎÇÕ ÛíÑ ãÍÏÏ İí ÅÚÏÇÏ ÇáÑÈØ", "The private key file is not set in the connection setup"
     LangAdd "ãäÊÌ æÕáÊ ßãíÊå Åáì ÍÏ ÅÚÇÏÉ ÇáØáÈ Ãæ ÃŞá", "products have reached the reorder level or less"
     LangAdd "äÓÈÉ ÇáŞÓØ ÇáãÊäÇŞÕ ááØÑíŞÉ ÇáãÊäÇŞÕÉ İŞØ", "A declining balance rate is for the declining balance method only"
-End Sub
-
-Private Sub D2_3()
     LangAdd "åá ÊÑíÏ ÚÑÖ ÊŞÑíÑ ÇáãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "Do you want to show the low-stock products report"
     LangAdd "íÛíøÑåÇ ÇáãÓÊÎÏã ÚäÏ Ãæá ÏÎæá (ßáãÉ ãÄŞÊÉ", "The user changes it at the first login (temporary password"
     LangAdd "ÃÏÎá ÇáäŞÏíÉ ÇáİÚáíÉ ÇáãæÌæÏÉ İí ÇáÕäÏæŞ", "Enter the actual cash in the box"
@@ -288,6 +299,7 @@ Private Sub D2_3()
     LangAdd "åĞå ÇáÔÇÔÉ ÓÊßæä ãÊÇÍÉ ÈÚÏ ÊäİíĞ ÇáãÑÍáÉ", "This screen will be available after phase"
     LangAdd "æÇÍÏÉ. ÊõÍĞİ ÂÎÑ İÊÑÉ İŞØ¡ æåí ÛíÑ ãŞİáÉ", "year. Only the last period can be deleted, while it is not closed"
     LangAdd "íÌÈ Ãä íÈŞì ãÏíÑ äÙÇã äÔØ æÇÍÏ Úáì ÇáÃŞá", "At least one active system administrator must remain"
+    LangAdd "íÚæÏ ááãÓæÏÉ ÇáÚÑÖ ÇáÕÇÏÑ ÇáĞí áã íÊÍæøá", "An issued quotation not yet converted returns to a draft"
     LangAdd "íõŞİá ãÇ ŞÈá Çáíæã İŞØ: ÇÎÊÑ ÊÇÑíÎğÇ ŞÈá", "Only the days before today are closed: choose a date before"
     LangAdd "ÃĞæäÇÊ ÇáÊÓáíã æÇáÇÓÊáÇã ÇáÊí áã ÊõİæÊÑ", "Delivery and goods receipt notes not invoiced"
     LangAdd "ÃÑÕÏÉ Ãæá ÇáãÏÉ (İí ÈÏÇíÉ ÊÇÑíÎ ÇáÈÏÇíÉ", "Opening balances (at the start of the start date"
@@ -331,6 +343,7 @@ Private Sub D2_3()
     LangAdd "ÇáßãíÉ ÇáãÑÊÌÚÉ ÃßÈÑ ãä ÇáãÊÇÍ ááÅÑÌÇÚ", "The returned quantity is more than what can be returned"
     LangAdd "ÇáãÈáÛ ÃßÈÑ ãä ÚãæáÇÊ ÇáãäÏæÈ ÇáãÓÊÍŞÉ", "The amount is more than the commissions payable to the sales rep"
     LangAdd "ÈíÇäÇÊ ÇáãÍá ÇáÖÑíÈíÉ æÅÚÏÇÏÇÊ ÇáÊÔÛíá", "Tax data of the store and operating settings"
+    LangAdd "ÊÍÊÇÌ ÕáÇÍíÊí ÚÑæÖ ÇáÃÓÚÇÑ æäŞØÉ ÇáÈíÚ", "You need the quotations and point of sale permissions"
     LangAdd "ÊÑÊíÈ ÇáÒÑ İí ÔÇÔÉ ÇááãÓ (ÇáÃÕÛÑ ÃæáğÇ", "Order of the button on the touch screen (smallest first"
     LangAdd "ÊÓæíÉ ÃíÇã ÇáãäÏæÈíä: ÇáÈÖÇÚÉ æÇáäŞÏíÉ", "Rep day settlements: goods and cash"
     LangAdd "Êã äŞá ÇáÈíÇäÇÊ. ÇáÂä «ãØÇÈŞÉ ÇáÈíÇäÇÊ", "The data was transferred. Now Compare the data"
@@ -368,6 +381,9 @@ Private Sub D2_3()
     LangAdd "ÚÑÖ İŞØ - ÇáÊÕÍíÍ íßæä ÈãÑÊÌÚ ãÔÊÑíÇÊ", "View only - a correction is made with a purchase return"
     LangAdd "ÛíÑ äÔØ. İÚøáå ãä ÔÇÔÉ ÇáãäÊÌÇÊ ÃæáğÇ", "is not active. Activate it in the Products screen first"
     LangAdd "İÍÕ ÓáÇãÉ ÇáÈíÇäÇÊ: áÇ ÊæÌÏ Ãí ãÔßáÇÊ", "Data integrity check: no problems at all"
+End Sub
+
+Private Sub D2_4()
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇÚÊãÇÏ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to approve the bank reconciliation"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÓÌíá İæÇÊíÑ ÇáãÔÊÑíÇÊ", "You do not have the permission to record purchase invoices"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÇáãæÇÒäÉ", "You do not have this permission in the budget screen"
@@ -381,24 +397,4 @@ Private Sub D2_3()
     LangAdd "åá ÊÑíÏ ÅäÔÇÁ ÇáãÕÑæİÇÊ ÇáãÓÊÍŞÉ ÇáÂä", "Do you want to create the due expenses now"
     LangAdd "ÃÑÕÏÉ ÇáãæÑÏíä ÈÇáÚãáÇÊ æİÑæŞ ÇáÚãáÉ", "Supplier balances by currency and exchange differences"
     LangAdd "ÃõäÔÆ ãİÊÇÍ æÔåÇÏÉ ÊÌÑíÈíÉ İí ÇáãÌáÏ", "A test key and certificate were created in the folder"
-End Sub
-
-Private Sub D2_4()
-    LangAdd "ÅÌãÇáí ÇáãÕÑæİÇÊ ÇáÊÔÛíáíÉ æÇáÅÏÇÑíÉ", "Total operating and administrative expenses"
-    LangAdd "ÅáÛÇÁ ÓÏÇÏ ÇáÅŞÑÇÑ¿ íõÍĞİ ŞíÏ ÇáÓÏÇÏ", "Cancel the payment of the return? The payment entry is deleted"
-    LangAdd "ÇÍĞİ ŞíæÏ ÇáÅåáÇß ãä ÔåÑ ÇáäŞá ÃæáğÇ", "delete the depreciation entries from the month of the transfer first"
-    LangAdd "ÇÎÊÑ ÇáãÎÒä ÇáĞí ÊõÍãóøá ãäå ÇáÓíÇÑÉ", "Choose the warehouse the van loads from"
-    LangAdd "ÇßÊÈ ÓÈÈ ÅáÛÇÁ ÇáÇÚÊãÇÏ İí ÇáãáÇÍÙÇÊ", "Type the reason for cancelling the approval in the notes"
-    LangAdd "ÇáÓãÇÍ áãÏíÑ ÇáäÙÇã ÈÊÛííÑ ÇÓã ÇáãÍá", "Allow the system administrator to change the store name"
-    LangAdd "ÇáÚãæáÉ æÖÑíÈÊåÇ ÃŞá ãä ãÈáÛ ÇáÊÓæíÉ", "The fee and its VAT are less than the settled amount"
-    LangAdd "ÇáŞíãÉ ÇáÌÏíÏÉ ÊÓÇæí ÇáŞíãÉ ÇáÏİÊÑíÉ", "The new value equals the book value"
-    LangAdd "ÇáßãíÉ ÇáİÚáíÉ áÇ íãßä Ãä Êßæä ÓÇáÈÉ", "The actual quantity cannot be negative"
-    LangAdd "ÈÇáİÚá. áÅÑÌÇÚåÇ ÇÓÊÎÏã «ÅÚÇÏÉ ÇáİÊÍ", "already. To undo it use Reopen"
-    LangAdd "ÈíÇäÇÊ ÇáÎÇÏã áÇ ÊØÇÈŞ ãáİ Access İí", "The server data does not match the Access file in"
-    LangAdd "ÊÈÏÃ ÇáİÊÑÉ ÇáÃæáì ÈÚÏ ÂÎÑ ÓäÉ ãŞİáÉ", "The first period starts after the last closed year"
-    LangAdd "ÊÓÌíá ÇáÅåáÇß áßá ÔåÑ áã íõÓÌóøá ÍÊì", "Record depreciation for every month not recorded up to"
-    LangAdd "ÊÚĞøÑ İÍÕ ÅÚÏÇÏ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Could not check the e-invoicing setup"
-    LangAdd "ÊŞÇÑíÑ ÇáÎÒíäÉ ÊÍÊÇÌ ÕáÇÍíÉ «ÇáÎÒíäÉ", "The treasury reports need the permission Treasury"
-    LangAdd "ÌåÇÒ äŞØÉ ÇáÈíÚ (ÇáÅíÕÇá): Êã ÇáÏÎæá", "POS device (receipt): logged in"
-    LangAdd "ÑãÒ ÇáæÍÏÉ áÏì ãÕáÍÉ ÇáÖÑÇÆÈ ÇáãÕÑíÉ", "Unit code of the Egyptian Tax Authority"
 End Sub

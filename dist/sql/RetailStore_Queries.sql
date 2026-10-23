@@ -1668,6 +1668,29 @@ FROM ((([dbo].[qryPurchaseOrderLineStatus] AS l INNER JOIN [dbo].[PurchaseOrders
      INNER JOIN [dbo].[Products] AS p ON l.ProductID = p.ProductID
 WHERE o.Status In (N'APPROVED', N'PARTIAL') AND l.RemainingQty > 0;
 GO
+CREATE OR ALTER VIEW [dbo].[QuotationListQuery] AS
+-- عروض الأسعار للعملاء: قيمتها وصلاحيتها وحالتها وما تحوّلت إليه (docs/75)
+SELECT q.QuotationID, q.QuotationNumber, q.QuoteDate, q.ValidUntil, q.CustomerID, c.CustomerName, q.Status,
+       q.TotalAmount,
+       IIF(q.Status = N'DRAFT', N'مسودة', IIF(q.Status = N'ISSUED', IIF(q.ValidUntil < DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0), N'منتهي', N'صادر'), IIF(q.Status = N'ORDERED', N'تحوّل إلى طلبية', IIF(q.Status = N'INVOICED', N'تحوّل إلى فاتورة', N'رفضه العميل')))) AS StatusName,
+       IIF(q.Status = N'ORDERED', o.OrderNumber, IIF(q.Status = N'INVOICED', i.InvoiceNumber, N'')) AS ConvertedNumber,
+       IIF(q.Status = N'ORDERED' Or q.Status = N'INVOICED', 1, 0) AS IsConverted
+FROM (([dbo].[Quotations] AS q INNER JOIN [dbo].[Customers] AS c ON q.CustomerID = c.CustomerID)
+      LEFT JOIN [dbo].[SalesOrders] AS o ON q.SalesOrderID = o.SalesOrderID)
+     LEFT JOIN [dbo].[SalesInvoices] AS i ON q.SalesInvoiceID = i.SalesInvoiceID;
+GO
+CREATE OR ALTER VIEW [dbo].[qryQuotationPrint] AS
+-- بيانات طباعة عرض السعر (سطر لكل صنف، docs/75)
+SELECT q.QuotationID, q.QuotationNumber, q.QuoteDate, q.ValidUntil, q.Status, q.SubTotal, q.Tax AS DocTax,
+       q.TotalAmount, q.Terms, q.Notes, c.CustomerName, c.VATNumber AS CustomerVAT, c.Mobile AS CustomerMobile,
+       e.EmployeeName, l.QuotationLineID, p.ProductCode, p.ProductName, u.UnitName, l.Quantity, l.UnitPrice,
+       l.NetAmount, l.Tax AS LineTax, l.LineTotal
+FROM (((([dbo].[Quotations] AS q INNER JOIN [dbo].[QuotationLines] AS l ON q.QuotationID = l.QuotationID)
+        INNER JOIN [dbo].[Products] AS p ON l.ProductID = p.ProductID)
+       INNER JOIN [dbo].[Units] AS u ON p.UnitID = u.UnitID)
+      INNER JOIN [dbo].[Customers] AS c ON q.CustomerID = c.CustomerID)
+     INNER JOIN [dbo].[Employees] AS e ON q.EmployeeID = e.EmployeeID;
+GO
 CREATE OR ALTER VIEW [dbo].[qryRepDayStock] AS
 -- حركة مخزن سيارة المندوب في يومه بالتكلفة: المحمَّل والمفرَّغ والمباع والمرتجع وفرق الجرد (docs/63)
 SELECT d.RepDayID,
@@ -4639,6 +4662,29 @@ FROM ((([en].[qryPurchaseOrderLineStatus] AS l INNER JOIN [dbo].[PurchaseOrders]
      INNER JOIN [dbo].[Products] AS p ON l.ProductID = p.ProductID
 WHERE o.Status In (N'APPROVED', N'PARTIAL') AND l.RemainingQty > 0;
 GO
+CREATE OR ALTER VIEW [en].[QuotationListQuery] AS
+-- عروض الأسعار للعملاء: قيمتها وصلاحيتها وحالتها وما تحوّلت إليه (docs/75)
+SELECT q.QuotationID, q.QuotationNumber, q.QuoteDate, q.ValidUntil, q.CustomerID, c.CustomerName, q.Status,
+       q.TotalAmount,
+       IIF(q.Status = N'DRAFT', N'Draft', IIF(q.Status = N'ISSUED', IIF(q.ValidUntil < DATEADD(day, DATEDIFF(day, 0, GETDATE()), 0), N'Expired', N'Issued'), IIF(q.Status = N'ORDERED', N'Turned into an order', IIF(q.Status = N'INVOICED', N'Turned into an invoice', N'Rejected by the customer')))) AS StatusName,
+       IIF(q.Status = N'ORDERED', o.OrderNumber, IIF(q.Status = N'INVOICED', i.InvoiceNumber, N'')) AS ConvertedNumber,
+       IIF(q.Status = N'ORDERED' Or q.Status = N'INVOICED', 1, 0) AS IsConverted
+FROM (([dbo].[Quotations] AS q INNER JOIN [en].[qryLocCustomers] AS c ON q.CustomerID = c.CustomerID)
+      LEFT JOIN [dbo].[SalesOrders] AS o ON q.SalesOrderID = o.SalesOrderID)
+     LEFT JOIN [dbo].[SalesInvoices] AS i ON q.SalesInvoiceID = i.SalesInvoiceID;
+GO
+CREATE OR ALTER VIEW [en].[qryQuotationPrint] AS
+-- بيانات طباعة عرض السعر (سطر لكل صنف، docs/75)
+SELECT q.QuotationID, q.QuotationNumber, q.QuoteDate, q.ValidUntil, q.Status, q.SubTotal, q.Tax AS DocTax,
+       q.TotalAmount, q.Terms, q.Notes, c.CustomerName, c.VATNumber AS CustomerVAT, c.Mobile AS CustomerMobile,
+       e.EmployeeName, l.QuotationLineID, p.ProductCode, p.ProductName, u.UnitName, l.Quantity, l.UnitPrice,
+       l.NetAmount, l.Tax AS LineTax, l.LineTotal
+FROM (((([dbo].[Quotations] AS q INNER JOIN [dbo].[QuotationLines] AS l ON q.QuotationID = l.QuotationID)
+        INNER JOIN [dbo].[Products] AS p ON l.ProductID = p.ProductID)
+       INNER JOIN [en].[qryLocUnits] AS u ON p.UnitID = u.UnitID)
+      INNER JOIN [en].[qryLocCustomers] AS c ON q.CustomerID = c.CustomerID)
+     INNER JOIN [dbo].[Employees] AS e ON q.EmployeeID = e.EmployeeID;
+GO
 CREATE OR ALTER VIEW [en].[qryRepDayStock] AS
 -- حركة مخزن سيارة المندوب في يومه بالتكلفة: المحمَّل والمفرَّغ والمباع والمرتجع وفرق الجرد (docs/63)
 SELECT d.RepDayID,
@@ -6004,5 +6050,5 @@ WHERE q.QtyReturned > o.Quantity;
 GO
 CREATE OR ALTER VIEW [dbo].[QueriesVersion] AS
 -- the version of these views: the front-end links to them only when it is its own
-SELECT N'0252e2fff168' AS Version;
+SELECT N'927ae28d0cdc' AS Version;
 GO

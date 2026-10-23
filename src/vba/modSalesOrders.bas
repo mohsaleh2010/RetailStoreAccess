@@ -210,6 +210,7 @@ Public Function DeleteSalesOrder(ByVal SalesOrderID As Long) As String
         Exit Function
     End If
     Set auditBefore = AuditSnapshot("SalesOrders", "SalesOrderID", SalesOrderID)
+    QuotationOrderDeleted SalesOrderID                      ' its quotation is issued again (modQuotations)
     CurrentDb.Execute "DELETE FROM SalesOrderLines WHERE SalesOrderID = " & SalesOrderID, dbFailOnError + dbSeeChanges
     CurrentDb.Execute "DELETE FROM SalesOrders WHERE SalesOrderID = " & SalesOrderID, dbFailOnError + dbSeeChanges
     AuditDeleted "SALES_ORDER_DELETE", "SalesOrders", SalesOrderID, auditBefore

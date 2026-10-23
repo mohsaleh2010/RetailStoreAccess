@@ -1981,6 +1981,28 @@ FROM (((qryPurchaseOrderLineStatus AS l INNER JOIN PurchaseOrders AS o ON l.Purc
      INNER JOIN Products AS p ON l.ProductID = p.ProductID
 WHERE o.Status In ('APPROVED', 'PARTIAL') AND l.RemainingQty > 0
 ORDER BY o.OrderDate, o.OrderNumber"""),
+    Query("QuotationListQuery", "عروض الأسعار للعملاء: قيمتها وصلاحيتها وحالتها وما تحوّلت إليه (docs/75)", """
+SELECT q.QuotationID, q.QuotationNumber, q.QuoteDate, q.ValidUntil, q.CustomerID, c.CustomerName, q.Status,
+       q.TotalAmount,
+       IIf(q.Status = 'DRAFT', 'مسودة', IIf(q.Status = 'ISSUED', IIf(q.ValidUntil < Date(), 'منتهي', 'صادر'),
+           IIf(q.Status = 'ORDERED', 'تحوّل إلى طلبية', IIf(q.Status = 'INVOICED', 'تحوّل إلى فاتورة',
+           'رفضه العميل')))) AS StatusName,
+       IIf(q.Status = 'ORDERED', o.OrderNumber, IIf(q.Status = 'INVOICED', i.InvoiceNumber, '')) AS ConvertedNumber,
+       IIf(q.Status = 'ORDERED' Or q.Status = 'INVOICED', 1, 0) AS IsConverted
+FROM ((Quotations AS q INNER JOIN [@Customers] AS c ON q.CustomerID = c.CustomerID)
+      LEFT JOIN SalesOrders AS o ON q.SalesOrderID = o.SalesOrderID)
+     LEFT JOIN SalesInvoices AS i ON q.SalesInvoiceID = i.SalesInvoiceID
+ORDER BY q.QuoteDate, q.QuotationNumber"""),
+    Query("qryQuotationPrint", "بيانات طباعة عرض السعر (سطر لكل صنف، docs/75)", """
+SELECT q.QuotationID, q.QuotationNumber, q.QuoteDate, q.ValidUntil, q.Status, q.SubTotal, q.Tax AS DocTax,
+       q.TotalAmount, q.Terms, q.Notes, c.CustomerName, c.VATNumber AS CustomerVAT, c.Mobile AS CustomerMobile,
+       e.EmployeeName, l.QuotationLineID, p.ProductCode, p.ProductName, u.UnitName, l.Quantity, l.UnitPrice,
+       l.NetAmount, l.Tax AS LineTax, l.LineTotal
+FROM ((((Quotations AS q INNER JOIN QuotationLines AS l ON q.QuotationID = l.QuotationID)
+        INNER JOIN Products AS p ON l.ProductID = p.ProductID)
+       INNER JOIN [@Units] AS u ON p.UnitID = u.UnitID)
+      INNER JOIN [@Customers] AS c ON q.CustomerID = c.CustomerID)
+     INNER JOIN Employees AS e ON q.EmployeeID = e.EmployeeID"""),
     Query("qryRepDayStock", "حركة مخزن سيارة المندوب في يومه بالتكلفة: المحمَّل والمفرَّغ والمباع والمرتجع وفرق الجرد (docs/63)", """
 SELECT d.RepDayID,
        Sum(IIf(t.ReferenceType = 'TRANSFER' AND t.Quantity > 0, t.Quantity * t.UnitCost, 0)) AS LoadedVal,

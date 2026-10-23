@@ -251,11 +251,14 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
                                  ByRef NewInvoiceID As Long, Optional ByVal OrderType As String = "", _
                                  Optional ByVal TableNo As String = "", Optional ByVal DeliveryPhone As String = "", _
                                  Optional ByVal DeliveryAddress As String = "", _
-                                 Optional ByVal OrderName As String = "", Optional ByVal StockNoteID As Long = 0) As String
+                                 Optional ByVal OrderName As String = "", Optional ByVal StockNoteID As Long = 0, _
+                                 Optional ByVal QuotationID As Long = 0) As String
     ' OrderType / TableNo / Delivery* / OrderName: restaurant and café orders (touch screens).
     ' A cart line may carry a note (café size and options) and a size price of the product.
     ' StockNoteID: the invoice of a posted delivery note (modStockNotes, docs/61): the note already took the
     ' goods out of its warehouse, so no stock moves here; each line keeps the cost of the note line.
+    ' QuotationID: the invoice of an issued quotation (modQuotations, docs/75): its prices are not a price
+    ' change, and the quotation is marked INVOICED inside the transaction.
     Dim db As DAO.Database, ws As DAO.Workspace, rs As DAO.Recordset, inTrans As Boolean
     Dim n As Long, i As Long, msg As String, vatRate As Currency, rate As Currency
     Dim productIDs() As Long, costs() As Currency, vatCats() As String
@@ -303,7 +306,9 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
             rs.Close
             Exit Function
         End If
-        If IsCustomerListPrice(CustomerID, rs!ProductID, rs!UnitID, rs!UnitPrice) Then
+        If IsQuotationPrice(QuotationID, rs!ProductID, rs!UnitID, rs!UnitPrice) Then
+            ' the price of the quotation being invoiced (modQuotations): checked when it was issued
+        ElseIf IsCustomerListPrice(CustomerID, rs!ProductID, rs!UnitID, rs!UnitPrice) Then
             ' the price of the customer's price list (modPriceLists): not a price change
         ElseIf factors(n) <> 1 Then
             If Not IsListedUnitPrice(rs!ProductID, rs!UnitID, rs!UnitPrice) Then priceChanged = True   ' modProductUnits
@@ -439,6 +444,7 @@ Public Function PostSaleFromCart(ByVal CustomerID As Long, ByVal PaymentType As 
     Else
         MarkNoteInvoiced db, StockNoteID, "SalesInvoiceID", invoiceID                  ' modStockNotes
     End If
+    If QuotationID > 0 Then MarkQuotationInvoiced db, QuotationID, invoiceID            ' modQuotations
     If remaining <> 0 Then AdjustBalance db, "Customers", "CustomerID", CustomerID, remaining
 
     ws.CommitTrans

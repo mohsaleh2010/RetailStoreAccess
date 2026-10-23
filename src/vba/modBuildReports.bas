@@ -29,9 +29,9 @@ Private m_built As Long
 Private m_failed As Long
 Private m_report As String
 Private m_passed As Long
-Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptCashDayBook,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptVatReturnEG,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling," & _
-    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptStockValueByWarehouse,rptTransfersInTransit,rptNotesNotInvoiced,rptPendingOrders,rptReservedStock,rptRepDays,rptRouteExecution,rptRepVisits,rptRepVanStock,rptPurchaseSuggest,rptPendingPurchaseOrders,rptPriceLists,rptStockCountDiff,rptLowStock,rptItemCard,rptProductMovement,rptCustomerStatement,rptSupplierStatement,rptExpenses," & _
-    "rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers," & _
+Private Const REPORT_NAMES As String = "rptSalesReceipt,rptSalesInvoiceA4,rptPurchaseDocument,rptQuotation,rptVoucher,rptStockCount,rptBarcodeLabels,rptStatistics,rptCashVoucher,rptCashClosing,rptCashDayBook,rptJournalEntry,rptAccountStatement,rptGeneralLedger,rptIncomeStatement,rptBalanceSheet,rptVatReturn,rptVatReturnEG,rptAging,rptPayroll,rptCommissionRun,rptDailySales,rptMonthlySales,rptSalesByPeriod,rptSalesByProduct,rptBestSelling," & _
+    "rptLeastSelling,rptPurchases,rptStockBalance,rptStockByWarehouse,rptStockValueByWarehouse,rptTransfersInTransit,rptNotesNotInvoiced,rptPendingOrders,rptReservedStock,rptRepDays,rptRouteExecution,rptRepVisits,rptRepVanStock,rptPurchaseSuggest,rptPendingPurchaseOrders,rptQuotations,rptPriceLists,rptStockCountDiff,rptLowStock,rptItemCard,rptProductMovement,rptCustomerStatement,rptSupplierStatement," & _
+    "rptExpenses,rptExpensesByType,rptCashStatement,rptCashDaily,rptCostCenterProfit,rptCostCenterAccounts,rptBudgetVsActual,rptEInvoiceDocs,rptAuditTrail,rptFixedAssets,rptCashBalances,rptCashClosings,rptJournal,rptOpeningBalances,rptTrialBalance,rptTrialBalanceTree,rptAccountTree,rptSlowMoving,rptStockByCategory,rptCustomerBalances,rptSupplierBalances,rptSupplierFx,rptRepPerformance,rptRepCustomers," & _
     "rptRepCommissionBalance,rptIntegrityCheck,rptProfit,rptVatSummary"
 
 Public Function BuildReports() As Boolean
@@ -45,6 +45,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptSalesReceipt
     BuildReport_rptSalesInvoiceA4
     BuildReport_rptPurchaseDocument
+    BuildReport_rptQuotation
     BuildReport_rptVoucher
     BuildReport_rptStockCount
     BuildReport_rptBarcodeLabels
@@ -82,6 +83,7 @@ Public Function BuildReports() As Boolean
     BuildReport_rptRepVanStock
     BuildReport_rptPurchaseSuggest
     BuildReport_rptPendingPurchaseOrders
+    BuildReport_rptQuotations
     BuildReport_rptPriceLists
     BuildReport_rptStockCountDiff
     BuildReport_rptLowStock
@@ -720,6 +722,89 @@ Private Sub BuildReport_rptPurchaseDocument()
     Exit Sub
 EH:
     AbortReport "rptPurchaseDocument", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptQuotation()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptQuotation", "عرض سعر", "qryQuotationPrint", 10773, "QuotationID", "QuotationLineID", False, True
+    SetSection 0, 340
+    SetSection 5, 2835
+    SetSection 6, 3175
+    HideSection 1
+    HideSection 2
+    HideSection 3
+    HideSection 4
+    Set c = RText(0, "txtCol1", "=1", 0, 23, 454, 284, 8, False, 0)
+    SetCtl c, "RunningSum", 1
+    Set c = RText(0, "txtCol2", "ProductCode", 454, 23, 1247, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "ProductName", 1701, 23, 2948, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol4", "UnitName", 4649, 23, 794, 284, 8, False, 0)
+    Set c = RText(0, "txtCol5", "Quantity", 5443, 23, 850, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.###"
+    Set c = RText(0, "txtCol6", "UnitPrice", 6293, 23, 1134, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00##"
+    Set c = RText(0, "txtCol7", "NetAmount", 7427, 23, 1134, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol8", "LineTax", 8561, 23, 907, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol9", "LineTotal", 9468, 23, 1305, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(5, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 57, 5273, 425, 14, True, 0)
+    Set c = RText(5, "txtStoreVat", "=""الرقم الضريبي: "" & Nz(SettingValue(""VATNumber""),"""")", 0, 510, 5273, 284, 9, False, 0)
+    Set c = RText(5, "txtStorePhone", "=""هاتف: "" & Nz(SettingValue(""Phone""),""-"") & ""   "" & Nz(SettingValue(""City""),"""")", 0, 794, 5273, 284, 9, False, 0)
+    Set c = RText(5, "txtTitle", "=""عرض سعر""", 5500, 57, 5273, 482, 16, True, 1)
+    Set c = RText(5, "txtDocNumber", "=""الرقم: "" & [QuotationNumber]", 5500, 567, 5273, 255, 9, False, 1)
+    Set c = RText(5, "txtDocDate", "=""التاريخ: "" & GDate([QuoteDate])", 5500, 822, 5273, 255, 9, False, 1)
+    Set c = RText(5, "txtValidUntil", "=""ساري حتى: "" & GDate([ValidUntil])", 5500, 1077, 5273, 255, 10, True, 1)
+    Set c = RBox(5, "boxCustomer", 0, 1474, 10773, 765)
+    SetCtl c, "BorderStyle", 1
+    Set c = RText(5, "txtCustomer", "=""السادة: "" & [CustomerName]", 113, 1531, 5103, 284, 10, True, 0)
+    Set c = RText(5, "txtCustomerVat", "=IIf(Len(Nz([CustomerVAT],""""))>0,""الرقم الضريبي: "" & [CustomerVAT],"""")", 5330, 1531, 5330, 284, 9, False, 0)
+    Set c = RText(5, "txtCustomerMobile", "=IIf(Len(Nz([CustomerMobile],""""))>0,""الجوال: "" & [CustomerMobile],"""")", 113, 1871, 5103, 284, 9, False, 0)
+    Set c = RText(5, "txtEmployee", "=""أعدّه: "" & [EmployeeName]", 5330, 1871, 5330, 284, 9, False, 0)
+    Set c = RBox(5, "boxColumns", 0, 2410, 10773, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(5, "lblCol1", "#", 0, 2455, 454, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol2", "الكود", 454, 2455, 1247, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol3", "الصنف", 1701, 2455, 2948, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol4", "الوحدة", 4649, 2455, 794, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol5", "الكمية", 5443, 2455, 850, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol6", "السعر", 6293, 2455, 1134, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol7", "الصافي", 7427, 2455, 1134, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol8", "الضريبة", 8561, 2455, 907, 284, 8, True, 2)
+    Set c = RLabel(5, "lblCol9", "الإجمالي", 9468, 2455, 1305, 284, 8, True, 2)
+    Set c = RLine(6, "lnTotals", 45, 10773)
+    Set c = RLabel(6, "lblCapSubTotal", "الإجمالي بدون الضريبة", 6464, 113, 2495, 255, 9, False, 0)
+    Set c = RText(6, "txtSubTotal", "SubTotal", 8959, 113, 1814, 255, 9, False, 1)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(6, "lblCapDocTax", "ضريبة القيمة المضافة", 6464, 397, 2495, 255, 9, False, 0)
+    Set c = RText(6, "txtDocTax", "DocTax", 8959, 397, 1814, 255, 9, False, 1)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RLabel(6, "lblCapTotalAmount", "الإجمالي شامل الضريبة", 6464, 681, 2495, 255, 10, True, 0)
+    Set c = RText(6, "txtTotalAmount", "TotalAmount", 8959, 681, 1814, 255, 10, True, 1)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(6, "txtWords", "=AmountInWords([TotalAmount])", 0, 113, 6237, 567, 10, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(6, "txtTerms", "=IIf(Len(Nz([Terms],""""))>0,""الشروط: "" & [Terms],"""")", 0, 1077, 10773, 284, 9, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(6, "txtNotes", "=IIf(Len(Nz([Notes],""""))>0,""ملاحظات: "" & [Notes],"""")", 0, 1418, 10773, 284, 9, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(6, "txtValidity", "=""الأسعار سارية حتى "" & GDate([ValidUntil]) & ""، وتخضع لتوفر الكميات عند الطلب.""", 0, 1758, 10773, 284, 9, True, 0)
+    Set c = RLabel(6, "lblSign1", "المبيعات: ....................", 0, 2608, 3591, 312, 10, False, 0)
+    Set c = RLabel(6, "lblSign2", "المدير: ....................", 3591, 2608, 3591, 312, 10, False, 0)
+    Set c = RLabel(6, "lblSign3", "اعتماد العميل: ....................", 7182, 2608, 3591, 312, 10, False, 0)
+    m_rpt.OnNoData = EP
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""عرض السعر غير موجود أو بلا أصناف.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptQuotation", s
+    Exit Sub
+EH:
+    AbortReport "rptQuotation", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptVoucher()
@@ -2994,6 +3079,61 @@ Private Sub BuildReport_rptPendingPurchaseOrders()
     Exit Sub
 EH:
     AbortReport "rptPendingPurchaseOrders", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildReport_rptQuotations()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartReport "rptQuotations", "عروض الأسعار للعملاء: الصادرة والمنتهية والمحوّلة", "QuotationListQuery", 15536, "", "QuoteDate,QuotationNumber", True, True
+    SetSection 3, 1673
+    SetSection 4, 340
+    SetSection 2, 454
+    SetSection 0, 318
+    HideSection 1
+    Set c = RText(3, "txtStoreName", "=Nz(SettingValue(""StoreName""),"""")", 0, 28, 7768, 340, 11, True, 0)
+    Set c = RText(3, "txtStoreVat", "=IIf(Len(Nz(SettingValue(""VATNumber""),""""))>0,""الرقم الضريبي: "" & SettingValue(""VATNumber""),"""")", 7768, 28, 7768, 340, 9, False, 1)
+    Set c = RLabel(3, "lblTitle", "عروض الأسعار للعملاء: الصادرة والمنتهية والمحوّلة", 0, 397, 15536, 482, 16, True, 2)
+    Set c = RText(3, "txtCriteria", "=ReportCriteria()", 0, 907, 15536, 284, 10, False, 2)
+    Set c = RBox(3, "boxColumns", 0, 1247, 15536, 369)
+    SetCtl c, "BackStyle", 1
+    SetCtl c, "BackColor", CLR_SECONDARY
+    Set c = RLabel(3, "lblCol1", "رقم العرض", 0, 1292, 1474, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol2", "التاريخ", 1474, 1292, 1304, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol3", "ساري حتى", 2778, 1292, 1304, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol4", "العميل", 4082, 1292, 3402, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol5", "الإجمالي شامل الضريبة", 7484, 1292, 1814, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol6", "الحالة", 9298, 1292, 1928, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol7", "تحوّل إلى", 11226, 1292, 1588, 284, 8, True, 2)
+    Set c = RLabel(3, "lblCol8", "محوّل", 12814, 1292, 2722, 284, 8, True, 2)
+    Set c = RText(4, "txtPrinted", "=ReportPrintedAt()", 0, 57, 9321, 255, 8, False, 0)
+    Set c = RText(4, "txtPage", "=""صفحة "" & [Page] & "" من "" & [Pages]", 9321, 57, 6215, 255, 8, False, 1)
+    Set c = RText(2, "txtTotal5", "=Sum([TotalAmount])", 7484, 85, 1814, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(2, "txtTotal8", "=Sum([IsConverted])", 12814, 85, 2722, 284, 8, True, 2)
+    SetCtl c, "Format", "#,##0"
+    Set c = RLine(2, "lnTotals", 28, 15536)
+    Set c = RText(2, "txtCount", "=""الإجمالي ("" & Count(*) & "" سجل)""", 0, 85, 7484, 284, 8, True, 0)
+    Set c = RText(0, "txtCol1", "QuotationNumber", 0, 17, 1474, 284, 8, False, 0)
+    Set c = RText(0, "txtCol2", "=GDate([QuoteDate])", 1474, 17, 1304, 284, 8, False, 0)
+    Set c = RText(0, "txtCol3", "=GDate([ValidUntil])", 2778, 17, 1304, 284, 8, False, 0)
+    Set c = RText(0, "txtCol4", "CustomerName", 4082, 17, 3402, 284, 8, False, 0)
+    SetCtl c, "CanGrow", True
+    Set c = RText(0, "txtCol5", "TotalAmount", 7484, 17, 1814, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0.00"
+    Set c = RText(0, "txtCol6", "StatusName", 9298, 17, 1928, 284, 8, False, 0)
+    Set c = RText(0, "txtCol7", "ConvertedNumber", 11226, 17, 1588, 284, 8, False, 0)
+    Set c = RText(0, "txtCol8", "IsConverted", 12814, 17, 2722, 284, 8, False, 2)
+    SetCtl c, "Format", "#,##0"
+    m_rpt.OnNoData = EP
+    SetSecProp 0, "AlternateBackColor", 15921906
+    s = ""
+    s = s & "Private Sub Report_NoData(Cancel As Integer)" & vbCrLf
+    s = s & "    ReportNoData Cancel, ""لا توجد عروض أسعار في الفترة.""" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishReport "rptQuotations", s
+    Exit Sub
+EH:
+    AbortReport "rptQuotations", Err.Number, Err.Description
 End Sub
 
 Private Sub BuildReport_rptPriceLists()

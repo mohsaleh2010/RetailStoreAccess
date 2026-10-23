@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3383
+Private Const ENTRY_COUNT As Long = 3448
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,13 +227,13 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("C;ÇáÚãáÇÁ;S;ÇáãæÑÏæä") = "C;Customers;S;Suppliers", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÚÇÏÉ ÇáİÊÍ Åáì åĞÇ Çáíæã") = "Reopen up to this day", "Tr sample 2", passed, failed, report
-    CheckLang Tr("ÇáÈäß") = "Bank", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ") = "The remainder of each credit invoice by its delay after the due date", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞøÑ ÊÔÛíá OpenSSL: ") = "Could not run OpenSSL: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÚÑ ÇáÍÌã ÇáæÓØ") = "Medium size price", "Tr sample 6", passed, failed, report
-    CheckLang Tr("áÇ íæÌÏ ÊÍæíá. ÇÎÊÑ ÇáãÎÒäíä Ëã «ÊÍæíá ÌÏíÏ».") = "No transfer. Choose the two warehouses, then New transfer.", "Tr sample 7", passed, failed, report
+    CheckLang Tr("ActionName(a.ActionType) AS [ÇáÚãáíÉ], a.ObjectName AS [ÇáÌÏæá], a.RecordID AS [ÇáÑŞã], ") = "ActionName(a.ActionType) AS [Transaction], a.ObjectName AS [Table], a.RecordID AS [Number], ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÚÇÏÉ ÅäÔÇÁ ÃÓØÑ ÇáãÓíÑ ãä ÈíÇäÇÊ ÇáãæÙİíä¿ ÊÖíÚ ÇáÊÚÏíáÇÊ ÇáãßÊæÈÉ İíå.") = "Rebuild the run lines from the employee data? The changes typed in it are lost.", "Tr sample 2", passed, failed, report
+    CheckLang Tr("ÇáÈÑäÇãÌ íÚãá Úáì ãáİ Access ÈÇáİÚá.") = "The program already works on the Access file.", "Tr sample 3", passed, failed, report
+    CheckLang Tr("ÇáãÊÈŞí İí ÇáÕäÏæŞ (ÚåÏÉ)") = "Left in the box (float)", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞøÑ ÇáÇÊÕÇá ÈÇáãäÙæãÉ.") = "Could not connect to the platform.", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÓÚÑ ÇáÍÈÉ İí ÇáŞÇÆãÉ íÌÚá ÓÚÑ ÇáßÑÊæäÉ = ÓÚÑåÇ × ÇáÚÏÏ¡ ãÇ áã íßä ááßÑÊæäÉ ÓÚÑ İíåÇ") = "A piece price in the list makes the carton price = its price x the count, unless the carton has its own price in the list", "Tr sample 6", passed, failed, report
+    CheckLang Tr("áÇ íæÌÏ ÃãÑ ÔÑÇÁ. ÇÎÊÑ ÇáãæÑÏ æÇáãÎÒä Ëã «ÃãÑ ÌÏíÏ»¡ Ãæ «ÃæÇãÑ ãä ÇáÇŞÊÑÇÍ».") = "No purchase order. Choose the supplier and warehouse then New order, or Orders from suggestion.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"
     CheckLang MSG_RTL = &H180000 And UiAlign(1) = 1 And Tr("ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ") = "ÑãÒ ÇáÊÍŞŞ ãä ÈæÇÈÉ İÇÊæÑÉ (İí ÇáÈíÆÉ ÇáÊÌÑíÈíÉ Ãí ÑŞã ãËá 123345). ÇáÎØæÉ 1 ÊäÔÆ ãİÊÇÍğÇ ÌÏíÏğÇ İí ãÌáÏ ZATCA ÈÌÇäÈ ÇáÈÑäÇãÌ. ÈÚÏ ÇáÎØæÉ 3 İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ááÊÌÑÈÉ ÈáÇ åíÆÉ: «ÔåÇÏÉ ÊÌÑíÈíÉ» Ëã «ãáİ XML áİÇÊæÑÉ", "ÇáÚÑÈíÉ: ãä Çáíãíä æáÇ ÊÑÌãÉ", _

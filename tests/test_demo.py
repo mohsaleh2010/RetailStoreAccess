@@ -118,6 +118,8 @@ class ReplayTests(unittest.TestCase):
                     continue                          # needs an approved customer order (not demo data)
                 if rep.key == "PENDING_PURCHASE_ORDERS":
                     continue                          # needs an approved purchase order (not demo data)
+                if rep.key == "QUOTATIONS":
+                    continue                          # needs a customer quotation (not demo data)
                 if rep.key == "PRICE_LISTS":
                     continue                          # needs a price list, entered by the user (not demo data)
                 if rep.key == "AUDIT_TRAIL":

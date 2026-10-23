@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **95** | عدد الحقول: **1212**
+عدد الجداول: **97** | عدد الحقول: **1237**
 
 ## الفهرس
 
@@ -88,19 +88,21 @@
 80. [`StockNotes`](#stocknotes) – أذونات التسليم والاستلام
 81. [`StockNoteLines`](#stocknotelines) – أسطر أذونات التسليم والاستلام
 82. [`SalesOrders`](#salesorders) – طلبيات العملاء
-83. [`PurchaseOrders`](#purchaseorders) – أوامر الشراء
-84. [`PurchaseOrderLines`](#purchaseorderlines) – أسطر أوامر الشراء
-85. [`RepDays`](#repdays) – أيام المندوبين
-86. [`RouteStops`](#routestops) – خط سير المندوبين
-87. [`RepVisits`](#repvisits) – زيارات المندوبين
-88. [`RepPrices`](#repprices) – أسعار المندوبين
-89. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
-90. [`StockCounts`](#stockcounts) – جلسات الجرد
-91. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
-92. [`AuditLog`](#auditlog) – سجل العمليات
-93. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
-94. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
-95. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+83. [`Quotations`](#quotations) – عروض الأسعار للعملاء
+84. [`QuotationLines`](#quotationlines) – أسطر عروض الأسعار
+85. [`PurchaseOrders`](#purchaseorders) – أوامر الشراء
+86. [`PurchaseOrderLines`](#purchaseorderlines) – أسطر أوامر الشراء
+87. [`RepDays`](#repdays) – أيام المندوبين
+88. [`RouteStops`](#routestops) – خط سير المندوبين
+89. [`RepVisits`](#repvisits) – زيارات المندوبين
+90. [`RepPrices`](#repprices) – أسعار المندوبين
+91. [`SalesOrderLines`](#salesorderlines) – أسطر طلبيات العملاء
+92. [`StockCounts`](#stockcounts) – جلسات الجرد
+93. [`StockCountDetails`](#stockcountdetails) – تفاصيل الجرد
+94. [`AuditLog`](#auditlog) – سجل العمليات
+95. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
+96. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
+97. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
 
 ## Settings
 
@@ -196,7 +198,7 @@
 | 5 | Description | Short Text | 100 |  |  |  |  | الوصف |
 
 - المفتاح الأساسي: `SequenceName`
-- بيانات أساسية: 35 سجل
+- بيانات أساسية: 36 سجل
 
 ## Roles
 
@@ -228,7 +230,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 47 سجل
+- بيانات أساسية: 48 سجل
 
 ## RolePermissions
 
@@ -240,7 +242,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 92 سجل
+- بيانات أساسية: 94 سجل
 
 ## Employees
 
@@ -302,7 +304,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 82 سجل
+- بيانات أساسية: 83 سجل
 
 ## UserScreens
 
@@ -2079,6 +2081,53 @@
 - فهرس فريد: `OrderNumber`
 - فهرس عادي: `OrderDate`
 - فهرس عادي: `Status`
+
+## Quotations
+
+**عروض الأسعار للعملاء** – عرض سعر لعميل (docs/75): مسودة، ثم «إصدار» بصلاحية حتى تاريخ (تُحسب قيمته وضريبته ويُطبع)، ثم يتحول بضغطة إلى طلبية أو فاتورة بيع، أو يرفضه العميل. العرض الصادر بعد تاريخ صلاحيته «منتهي» ولا يتحول.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **QuotationID** 🔑 | AutoNumber |  |  |  |  |  | رقم داخلي |
+| 2 | QuotationNumber | Short Text | 20 | ✔ |  |  |  | رقم العرض |
+| 3 | QuoteDate | Date/Time |  | ✔ | `Now()` |  |  | تاريخ العرض |
+| 4 | CustomerID | Number (Long) |  | ✔ |  |  | `Customers.CustomerID` | العميل |
+| 5 | ValidUntil | Date/Time (تاريخ) |  | ✔ | `Date()` |  |  | ساري حتى |
+| 6 | Status | Short Text | 10 | ✔ | `"DRAFT"` | `In ("DRAFT","ISSUED","ORDERED","INVOICED","REJECTED")` |  | الحالة |
+| 7 | IssuedAt | Date/Time |  |  |  |  |  | وقت الإصدار |
+| 8 | SubTotal | Currency |  | ✔ | `0` | `>=0` |  | القيمة بدون الضريبة – تُحسب عند الإصدار |
+| 9 | Tax | Currency |  | ✔ | `0` | `>=0` |  | ضريبة القيمة المضافة – تُحسب عند الإصدار |
+| 10 | TotalAmount | Currency |  | ✔ | `0` | `>=0` |  | الإجمالي شامل الضريبة – تُحسب عند الإصدار |
+| 11 | SalesOrderID | Number (Long) |  |  |  |  | `SalesOrders.SalesOrderID` | الطلبية التي تحوّل إليها |
+| 12 | SalesInvoiceID | Number (Long) |  |  |  |  | `SalesInvoices.SalesInvoiceID` | فاتورة البيع التي تحوّل إليها |
+| 13 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | سجّله |
+| 14 | Terms | Short Text | 255 |  |  |  |  | الشروط (الدفع والتسليم) – تُطبع في العرض |
+| 15 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
+| 16 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `QuotationID`
+- فهرس فريد: `QuotationNumber`
+- فهرس عادي: `QuoteDate`
+- فهرس عادي: `Status`
+
+## QuotationLines
+
+**أسطر عروض الأسعار** – الأصناف وكمياتها وسعر البيع (بالوحدة الصغرى، والسعر كسعر الصنف: شامل الضريبة أو بدونها حسب الإعدادات). الصافي والضريبة والإجمالي تُحسب عند الإصدار بحساب الفاتورة نفسه.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **QuotationLineID** 🔑 | AutoNumber |  |  |  |  |  | رقم السطر |
+| 2 | QuotationID | Number (Long) |  | ✔ |  |  | `Quotations.QuotationID` | عرض السعر |
+| 3 | ProductID | Number (Long) |  | ✔ |  |  | `Products.ProductID` | الصنف |
+| 4 | Quantity | Currency (كمية) |  | ✔ |  | `>0` |  | الكمية |
+| 5 | UnitPrice | Currency |  | ✔ | `0` | `>=0` |  | سعر البيع |
+| 6 | NetAmount | Currency |  | ✔ | `0` | `>=0` |  | الصافي بدون الضريبة |
+| 7 | Tax | Currency |  | ✔ | `0` | `>=0` |  | الضريبة |
+| 8 | LineTotal | Currency |  | ✔ | `0` | `>=0` |  | الإجمالي شامل الضريبة |
+| 9 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+
+- المفتاح الأساسي: `QuotationLineID`
+- فهرس عادي: `QuotationID`
 
 ## PurchaseOrders
 
