@@ -240,7 +240,7 @@ and Egypt (e-receipt, B2B e-invoice, form 10 return; plan `docs/43`, phases A-F)
 quotations (`docs/75`) are done: every module the owner picked from `docs/69-Remaining-Modules.md`. Plan 6, decided: one C# system, Blazor (Razor) on .NET 10 for the web and .NET MAUI Blazor Hybrid sharing the same
 Razor components for Windows (POS), Android (rep app) and iOS (`docs/51`, plan 6). Phase 6A, the web foundation (`docs/76`, approved:
 login, permissions, Arabic / English, products, customers, suppliers, warehouses, the journal logic in C#);
-phase 6B, the REST API and its documentation (`docs/77`), waits for approval; next 4D (the rep app on Android).
+phase 6B, the REST API and its documentation (`docs/77`), approved; next 4D (the rep app on Android).
 
 ## Standard procedures
 **Run the tests:** `python3 tools/generate.py`, then `python3 -m unittest discover -s tests`; report the
