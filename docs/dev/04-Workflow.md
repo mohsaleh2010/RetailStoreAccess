@@ -110,6 +110,7 @@
 | تنفيذ VBA | `tests/vba_harness.py` (LibreOffice) | الدوال الحسابية الصافية |
 | فحص الكود | `VbaModuleChecks` و`ProjectStaticTests` | التصريح عن المتغيرات، والأسماء، والأطوال، والترميز، وقواعد القسم 3 |
 | داخل Access | `RunAllTests` (يشغّله المستخدم) | السلوك الحقيقي داخل معاملات تُلغى. يعمل بالعربية حتى في ملف إنجليزي |
+| الويب (`docs/76`) | `tests/test_web.py` و`dotnet test` في `web` (xUnit على SQLite في الذاكرة) | الكود المولَّد، والترجمة، والدخول، والصلاحيات، والحفظ والحذف وسجل التدقيق، والقيود مقارنة بمرجع Python |
 
 **ملاحظات على LibreOffice:**
 - قيمة من نوع `Currency` لا تعود من LibreOffice إلى Python، فتصل `None`. لذلك تغلّف الاختبارات الدالة بدالة ترجع `Double`، كما في `test_indicators.py`.
@@ -126,3 +127,5 @@
 | أضيف صلاحية | `Permissions` في schema، و`_role_permissions` |
 | أضيف عنصرًا في القائمة الجانبية أو شاشة المحاسبة | `NAV_ITEMS` أو `HUB_TILES` |
 | أترجم نصًا للواجهة الإنجليزية | `tools/i18n_en.py` (ثم `generate.py`) |
+| أضيف شاشة بيانات إلى الويب | سطر في `gen_web.WEB_SCREENS` (شاشة `DataScreen` موجودة في Access) وصفحتها في `web/src/RetailStore.UI/Pages` |
+| أترجم نصًا يخص الويب وحده | `tools/i18n_web.py` (`test_web` يذكر الناقص) |

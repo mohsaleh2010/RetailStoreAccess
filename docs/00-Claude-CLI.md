@@ -10,7 +10,8 @@
 | 3 | ثبّت **Claude Code CLI**:<br>• Windows (PowerShell): `irm https://claude.ai/install.ps1 \| iex`<br>• Mac وLinux: `curl -fsSL https://claude.ai/install.sh \| bash`<br>• أو عبر Node.js 18+: `npm install -g @anthropic-ai/claude-code` |
 | 4 | انسخ المستودع وانتقل إلى فرع العمل:<br>`git clone https://github.com/mohsaleh2010/RetailStoreAccess.git`<br>`cd RetailStoreAccess`<br>`git checkout claude/retail-store-management-access-enwx66` |
 | 5 | **اختياري:** `pip install -r requirements-dev.txt` لاختبارات إضافية. بدونها تُتخطى بعض الاختبارات ولا تفشل |
-| 6 | داخل المجلد اكتب `claude`، وسجّل الدخول بحسابك في أول مرة |
+| 6 | **لنسخة الويب (الخطة 6، `docs/76`):** ثبّت **.NET 10 SDK** (dotnet.microsoft.com). بدونه يُتخطى اختبار بناء الويب ولا يفشل |
+| 7 | داخل المجلد اكتب `claude`، وسجّل الدخول بحسابك في أول مرة |
 
 **إذا كان لديك نسخة قديمة من المستودع:** `git fetch origin` ثم `git checkout claude/retail-store-management-access-enwx66` ثم `git pull`.
 

@@ -1,0 +1,7 @@
+@inherits LayoutComponentBase
+@inject UiLanguage L
+
+<main class="account" dir="@L.Dir">
+    @Body
+    <p><a href="@("lang/" + (L.English ? "ar" : "en") + "?returnUrl=/account/login")">@(L.English ? "العربية" : "English")</a></p>
+</main>

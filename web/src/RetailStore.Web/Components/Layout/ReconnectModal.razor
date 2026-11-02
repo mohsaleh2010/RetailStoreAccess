@@ -1,0 +1,20 @@
+@inject UiLanguage L
+<script type="module" src="@Assets["Components/Layout/ReconnectModal.razor.js"]"></script>
+
+<dialog id="components-reconnect-modal" data-nosnippet dir="@L.Dir">
+    <div class="components-reconnect-container">
+        <div class="components-rejoining-animation" aria-hidden="true">
+            <div></div>
+            <div></div>
+        </div>
+        <p class="components-reconnect-first-attempt-visible">@L.T("جارٍ إعادة الاتصال بالخادم...")</p>
+        <p class="components-reconnect-repeated-attempt-visible">
+            @L.T("تعذر الاتصال. محاولة جديدة بعد") <span id="components-seconds-to-next-attempt"></span> @L.T("ثانية")
+        </p>
+        <p class="components-reconnect-failed-visible">@L.T("تعذر الاتصال بالخادم. أعد المحاولة أو أعد تحميل الصفحة.")</p>
+        <button id="components-reconnect-button" class="components-reconnect-failed-visible">@L.T("إعادة المحاولة")</button>
+        <p class="components-pause-visible">@L.T("أوقف الخادم الجلسة مؤقتًا.")</p>
+        <p class="components-resume-failed-visible">@L.T("تعذر استئناف الجلسة. أعد المحاولة أو أعد تحميل الصفحة.")</p>
+        <button id="components-resume-button" class="components-pause-visible components-resume-failed-visible">@L.T("استئناف")</button>
+    </div>
+</dialog>

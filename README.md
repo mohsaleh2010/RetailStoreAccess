@@ -100,6 +100,7 @@
 | + | **قوائم الأسعار** (`docs/69` رقم 2): تجزئة / جملة / موزع تُسند للعميل؛ سعر لكل صنف ووحدة بتاريخ سريان (العرض المؤقت يغلب السعر الدائم)، وخصم للأصناف غير المسعّرة؛ في نقطة البيع (وإعادة التسعير عند تغيير العميل) والطلبيات وأذونات التسليم، وتقرير القوائم | ✅ تمت الموافقة | [docs/73-Price-Lists.md](docs/73-Price-Lists.md) |
 | + | **أوامر الشراء واقتراح الشراء** (`docs/69` رقم 4): اقتراح الشراء من حد إعادة الطلب (وكمية إعادة الطلب)، ومسودة أمر لكل مورد منه، والاعتماد (تحت الطلب)، والاستلام بأذونات من الأمر كليًا أو جزئيًا ثم الفاتورة، وحالة الأمر تتبع أذوناته، وتقريرا الاقتراح والأوامر المفتوحة | ✅ تمت الموافقة | [docs/74-Purchase-Orders.md](docs/74-Purchase-Orders.md) |
 | + | **عروض الأسعار للعملاء** (`docs/69` رقم 3): عرض سعر بصلاحية حتى تاريخ، يبدأ بسعر العميل (قائمته)، ويُحسب ويُطبع كالفاتورة عند إصداره، ثم يتحول بضغطة إلى طلبية أو فاتورة بيع بأسعاره، أو يرفضه العميل؛ والمنتهي لا يتحول ويُجدَّد بـ «عرض جديد منه»؛ وتقرير العروض ونسبة التحويل | ✅ تمت الموافقة | [docs/75-Customer-Quotations.md](docs/75-Customer-Quotations.md) |
+| 6أ | **أساس نسخة الويب** (الخطة 6، Blazor على .NET 10): الدخول بنفس المستخدمين وكلمات المرور، والصلاحيات نفسها، والعربية والإنجليزية، ويعمل على الجوال؛ وشاشات المنتجات والعملاء والموردين والمخازن بنفس فحوص Access وسجل تدقيقه، على نفس قاعدة SQL Server؛ ومنطق القيود بـ C# مطابق لـ Access | ✅ بانتظار الموافقة | [docs/76-Web-Foundation.md](docs/76-Web-Foundation.md) |
 
 ## هيكل المستودع
 
@@ -124,6 +125,7 @@
 | `tests/vba_harness.py` | تشغيل كود VBA الحسابي فعليًا عبر LibreOffice للتحقق منه |
 | `tools/generate.py` | يولّد الكود والمرجع: `python3 tools/generate.py` |
 | `tests/` | الاختبارات الآلية: `python3 -m unittest discover -s tests -v` |
+| `web/` | نسخة الويب (الخطة 6، `docs/76`): حل .NET 10 (`RetailStore.slnx`)؛ الكود المولَّد في مجلدات `Generated` يكتبه `tools/gen_web.py` |
 
 ## الطريقة الأسرع: بناء ملف الواجهة تلقائيًا
 على جهاز Windows عليه Microsoft Access 2010 أو أحدث:
@@ -220,6 +222,7 @@
 | 68 | `modPurchaseOrders` (جديدة)، واستبدال `modStockNotes` و`modSalesOrders` و`modTestAll` والوحدات المولَّدة (أو **`BuildFrontEnd.vbs`**) | `BuildSchema`, `BuildRelationships`؛ وعلى الخادم «تجهيز القاعدة» | `TestPurchaseOrders`، ثم «المخزون» ← «أوامر الشراء» (`docs/74` القسم 5) |
 | 69 | `modQuotations` (جديدة)، واستبدال `modSales` و`modSalesOrders` و`modReports` و`modTestAll` والوحدات المولَّدة (أو **`BuildFrontEnd.vbs`**) | `BuildSchema`, `BuildRelationships`؛ وعلى الخادم «تجهيز القاعدة» | `TestQuotations`، ثم «طلبيات العملاء» ← «عروض الأسعار» (`docs/75` القسم 5) |
 | 65 | `modServerQueries` و`modServerQueryData` (جديدتان)، واستبدال `modSqlServer` و`modQueryParams` و`modDashboard` و`modIndicators` و`modSecurityScreens` و`modBuildQueries` و`modTestAll` و`modLang` و`modLangData*` (أو **`BuildFrontEnd.vbs`**)، ومجلد `dist\sql` (فيه `RetailStore_Queries.sql`) | على الخادم: «تجهيز القاعدة» ثم «التشغيل على الخادم» | `TestServerQueries`، ثم التقارير على قاعدة تجربة على الخادم (`docs/71` القسم 4) |
+| 70 | لا شيء في Access. الموقع: ثبّت .NET 10 SDK ثم `dotnet run` في `web\src\RetailStore.Web` (قاعدة تجربة)، أو اربطه بقاعدة SQL Server في `appsettings.json` (`docs/76` القسم 4) | — | `python3 -m unittest discover -s tests -p "test_web.py"` أو `dotnet test` في `web`، ثم الخطوات اليدوية (`docs/76` القسم 5) |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

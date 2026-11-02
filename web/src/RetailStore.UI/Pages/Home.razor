@@ -1,0 +1,46 @@
+@page "/"
+@attribute [Authorize]
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("الرئيسية")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("مرحبًا") @UserInfo.Name(user)</h1>
+            <p class="subtitle">@L.T("نسخة الويب: البيانات الأساسية على نفس قاعدة بيانات البرنامج")</p>
+        </div>
+    </header>
+    <div class="tiles">
+        @foreach (var s in screens)
+        {
+            <a class="tile" href="@s.Route">
+                <strong>@L.T(s.Caption)</strong>
+                <span>@L.T(s.Subtitle)</span>
+            </a>
+        }
+    </div>
+    @if (screens.Count == 0)
+    {
+        <p class="empty">@L.T("لا توجد شاشات متاحة لك على الويب بعد. راجع مدير النظام.")</p>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private List<IScreenSpec> screens = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        foreach (var s in ScreenSpecs.All)
+        {
+            if (await Permissions.CanOpenScreenAsync(UserInfo.EmployeeId(user), s.Name))
+            {
+                screens.Add(s);
+            }
+        }
+    }
+}

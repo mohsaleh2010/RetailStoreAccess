@@ -1,0 +1,28 @@
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<ul class="nav">
+    <li><NavLink href="" Match="NavLinkMatch.All">@L.T("الرئيسية")</NavLink></li>
+    @foreach (var s in screens)
+    {
+        <li><NavLink href="@s.Route">@L.T(s.Caption)</NavLink></li>
+    }
+</ul>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private List<IScreenSpec> screens = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = AuthState is null ? null : (await AuthState).User;
+        int id = UserInfo.EmployeeId(user);
+        foreach (var s in ScreenSpecs.All)
+        {
+            if (id > 0 && await Permissions.CanOpenScreenAsync(id, s.Name))
+            {
+                screens.Add(s);
+            }
+        }
+    }
+}

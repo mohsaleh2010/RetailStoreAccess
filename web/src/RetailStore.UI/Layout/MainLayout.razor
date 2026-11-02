@@ -1,0 +1,44 @@
+@inherits LayoutComponentBase
+@inject UiLanguage L
+@inject NavigationManager Nav
+
+<div class="app" dir="@L.Dir" lang="@L.Code">
+    <input type="checkbox" id="menu-toggle" class="menu-toggle" aria-hidden="true" />
+    <header class="topbar">
+        <label for="menu-toggle" class="menu-button" aria-label="@L.T("القائمة")">&#9776;</label>
+        <a class="brand" href="">@storeName</a>
+        <AuthorizeView>
+            <Authorized>
+                <span class="user">@context.User.Identity?.Name</span>
+                <a class="topbar-link" href="account/change-password">@L.T("تغيير كلمة المرور")</a>
+                <form method="post" action="account/logout" class="inline">
+                    <AntiforgeryToken />
+                    <button type="submit" class="topbar-link">@L.T("تسجيل الخروج")</button>
+                </form>
+            </Authorized>
+        </AuthorizeView>
+        <a class="topbar-link" href="@LanguageLink">@(L.English ? "العربية" : "English")</a>
+    </header>
+    <nav class="sidebar">
+        <NavMenu />
+    </nav>
+    <main class="content">
+        <MustChangePasswordGuard />
+        @Body
+    </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    @L.T("حدث خطأ غير متوقع.")
+    <a href="." class="reload">@L.T("إعادة التحميل")</a>
+</div>
+
+@code {
+    [Inject] private IStoreInfo Store { get; set; } = default!;
+    private string storeName = "";
+
+    private string LanguageLink =>
+        "lang/" + (L.English ? "ar" : "en") + "?returnUrl=" + Uri.EscapeDataString("/" + Nav.ToBaseRelativePath(Nav.Uri));
+
+    protected override async Task OnInitializedAsync() => storeName = await Store.StoreNameAsync(L.English);
+}

@@ -1,0 +1,22 @@
+@inject UiLanguage L
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="[typeof(RetailStore.UI.Layout.MainLayout).Assembly]"
+            NotFoundPage="typeof(Pages.NotFound)">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(RetailStore.UI.Layout.MainLayout)">
+                <NotAuthorized>
+                    <RetailStore.UI.Components.RedirectToLogin />
+                </NotAuthorized>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    /// <summary>The language of the request (App.razor), kept by the interactive session.</summary>
+    [Parameter] public string? Lang { get; set; }
+
+    protected override void OnInitialized() => L.Set(Lang);
+}

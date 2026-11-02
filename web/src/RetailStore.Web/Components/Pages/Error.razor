@@ -1,0 +1,22 @@
+@page "/Error"
+@using System.Diagnostics
+@attribute [ExcludeFromInteractiveRouting]
+@layout AccountLayout
+@inject UiLanguage L
+
+<PageTitle>@L.T("خطأ")</PageTitle>
+<div class="card">
+    <h1>@L.T("حدث خطأ غير متوقع.")</h1>
+    @if (!string.IsNullOrEmpty(RequestId))
+    {
+        <p><code>@RequestId</code></p>
+    }
+    <a href="">@L.T("الرئيسية")</a>
+</div>
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+    private string? RequestId { get; set; }
+
+    protected override void OnInitialized() => RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

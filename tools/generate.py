@@ -23,6 +23,7 @@ import gen_test_sales  # noqa: E402
 import gen_test_purchases  # noqa: E402
 import gen_test_security  # noqa: E402
 import gen_demo  # noqa: E402
+import gen_web  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_MODULES = ["modQueryParams", "modCommon", "modStartup", "modForms", "modScreens",
@@ -934,6 +935,10 @@ def main():
             m = re.fullmatch(r"modLangData(\d+)\.bas", name)
             if m and int(m.group(1)) > n:
                 os.remove(os.path.join(ROOT, folder, name))
+
+    # plan 6A (docs/76): the C# entities, EF model, seed rows, web screens and dictionary of the web system
+    for path, text in gen_web.build_all().items():
+        write(path, text)
 
     # hand-written modules: readable copy in src/, import copy in dist/
     for name in STATIC_MODULES:

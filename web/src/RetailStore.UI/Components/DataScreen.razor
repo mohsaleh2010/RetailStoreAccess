@@ -1,0 +1,421 @@
+@typeparam T where T : class, new()
+@using System.Globalization
+@inject DataScreenService Service
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T(Spec.Caption)</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T(Spec.Caption)</h1>
+            <p class="subtitle">@L.T(Spec.Subtitle)</p>
+        </div>
+        @if (allowed)
+        {
+            <button class="btn primary" @onclick="NewRecord">@L.T("جديد")</button>
+        }
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="screen-body @(showForm ? "editing" : "")">
+            <div class="list-pane">
+                <div class="list-tools">
+                    <input type="search" class="search" placeholder="@L.T("بحث")" aria-label="@L.T("بحث")"
+                           value="@search" @oninput="SearchChanged" />
+                    @if (Spec.ActiveField is not null)
+                    {
+                        <label class="check">
+                            <input type="checkbox" checked="@showInactive" @onchange="InactiveChanged" />
+                            @L.T("إظهار غير النشط")
+                        </label>
+                    }
+                </div>
+                <table class="list">
+                    <thead>
+                        <tr>
+                            @foreach (var c in Spec.Columns)
+                            {
+                                <th>@L.T(c.Header)</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var row in rows)
+                        {
+                            <tr class="@(row.Key == currentKey ? "selected" : "") @(row.Active ? "" : "inactive")"
+                                @onclick="() => Open(row.Key)" tabindex="0" @onkeydown="e => RowKey(e, row.Key)">
+                                @for (int i = 0; i < row.Cells.Length; i++)
+                                {
+                                    <td data-label="@L.T(Spec.Columns[i].Header)">@row.Cells[i]</td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (rows.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+                else if (rows.Count >= DataScreenService.MaxListRows)
+                {
+                    <p class="empty">@L.T("ضيّق البحث لعرض باقي السجلات")</p>
+                }
+            </div>
+
+            <div class="form-pane">
+                @if (current is not null)
+                {
+                    <button class="btn link back" @onclick="BackToList">@L.T("القائمة")</button>
+                    <form class="record" @onsubmit="() => Save(false)" @onsubmit:preventDefault>
+                        @foreach (var f in Spec.Fields)
+                        {
+                            @if (f.Kind == FieldKind.Info)
+                            {
+                                @if (f.Label.Trim().Length > 0)
+                                {
+                                    <p class="info span-2">@L.T(f.Label)</p>
+                                }
+                                continue;
+                            }
+                            bool locked = f.Locked || state.LockedFields.Contains(f.Name);
+                            <div class="field @(f.Span > 1 || f.Kind == FieldKind.Memo ? "span-2" : "") @(f.Name == problemField ? "invalid" : "")">
+                                @if (f.Kind == FieldKind.Bool)
+                                {
+                                    <label class="check">
+                                        <input type="checkbox" checked="@(f.Get(current) is true)" disabled="@locked"
+                                               @onchange="e => Set(f, e.Value is true)" />
+                                        @L.T(f.Label)
+                                    </label>
+                                }
+                                else
+                                {
+                                    <label for="@InputId(f)">@L.T(f.Label)@(f.Required ? " *" : "")</label>
+                                    @switch (f.Kind)
+                                    {
+                                        case FieldKind.Memo:
+                                            <textarea id="@InputId(f)" rows="3" disabled="@locked"
+                                                      @onchange="e => Set(f, e.Value)">@(f.Get(current))</textarea>
+                                            break;
+                                        case FieldKind.Choice:
+                                            <select id="@InputId(f)" disabled="@locked" @onchange="e => Set(f, e.Value)">
+                                                @if (!f.Required)
+                                                {
+                                                    <option value=""></option>
+                                                }
+                                                @foreach (var o in f.Options!)
+                                                {
+                                                    <option value="@o.Value" selected="@(Equals(f.Get(current)?.ToString(), o.Value))">@L.T(o.Text)</option>
+                                                }
+                                            </select>
+                                            break;
+                                        case FieldKind.Lookup:
+                                            <select id="@InputId(f)" disabled="@locked" @onchange="e => Set(f, e.Value)">
+                                                @if (!f.Required)
+                                                {
+                                                    <option value=""></option>
+                                                }
+                                                @foreach (var item in LookupItems(f))
+                                                {
+                                                    <option value="@item.Key" selected="@(item.Key.ToString() == f.Get(current)?.ToString())">@item.Text</option>
+                                                }
+                                            </select>
+                                            break;
+                                        case FieldKind.Money:
+                                        case FieldKind.Quantity:
+                                        case FieldKind.Rate:
+                                        case FieldKind.Integer:
+                                            <input id="@InputId(f)" type="number" inputmode="decimal" step="@(f.Kind == FieldKind.Integer ? "1" : "any")"
+                                                   value="@Number(f.Get(current))" disabled="@locked" @onchange="e => Set(f, e.Value)" />
+                                            break;
+                                        case FieldKind.Date:
+                                        case FieldKind.DateTime:
+                                            <input id="@InputId(f)" type="date" value="@DateValue(f.Get(current))" disabled="@locked"
+                                                   @onchange="e => Set(f, e.Value)" />
+                                            break;
+                                        default:
+                                            <input id="@InputId(f)" type="text" maxlength="@(f.MaxLength > 0 ? f.MaxLength : 255)"
+                                                   value="@(f.Get(current))" disabled="@locked" @onchange="e => Set(f, e.Value)" />
+                                            break;
+                                    }
+                                }
+                                @if (f.Hint.Length > 0)
+                                {
+                                    <small class="hint">@L.T(f.Hint)</small>
+                                }
+                            </div>
+                        }
+                        <div class="actions span-2">
+                            <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ")</button>
+                            <button type="button" class="btn" @onclick="NewRecord" disabled="@busy">@L.T("جديد")</button>
+                            @if (!isNew)
+                            {
+                                <button type="button" class="btn danger" @onclick="AskDelete" disabled="@busy">@L.T("حذف")</button>
+                            }
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <p class="empty">@L.T("اختر سجلًا من القائمة أو اضغط جديد")</p>
+                }
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">@L.T(message)</div>
+    }
+
+    @if (question is not null)
+    {
+        <div class="dialog-backdrop">
+            <div class="dialog" role="dialog" aria-modal="true">
+                <p>@L.T(question)</p>
+                <div class="actions">
+                    <button class="btn primary" @onclick="() => Answer(true)">@L.T("نعم")</button>
+                    <button class="btn" @onclick="() => Answer(false)">@L.T("لا")</button>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public ScreenSpec<T> Spec { get; set; } = default!;
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    private ClaimsPrincipal? user;
+    private bool allowed;
+    private string denied = "";
+    private List<ListRow> rows = [];
+    private string search = "";
+    private bool showInactive;
+    private T? current;
+    private bool isNew;
+    private int currentKey;
+    private bool showForm;
+    private RecordState state = new(new HashSet<string>());
+    private readonly Dictionary<string, List<LookupItem>> lookups = [];
+    private string message = "";
+    private string messageKind = "";
+    private string problemField = "";
+    private string? question;
+    private Func<Task>? onYes;
+    private bool busy;
+    private CancellationTokenSource? typing;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), Spec.Name);
+        allowed = denied.Length == 0;
+        if (!allowed)
+        {
+            return;
+        }
+        foreach (var f in Spec.Fields.Where(f => f.Lookup is not null))
+        {
+            lookups[f.Name] = await Service.LookupAsync(f.Lookup!, L.English);
+        }
+        await Refresh();
+    }
+
+    private string InputId(FieldSpec<T> f) => "f_" + Spec.Name + "_" + f.Name;
+
+    private async Task Refresh() => rows = await Service.ListAsync(Spec, search, showInactive, L.English);
+
+    private async Task SearchChanged(ChangeEventArgs e)
+    {
+        search = e.Value?.ToString() ?? "";
+        typing?.Cancel();
+        typing = new CancellationTokenSource();
+        try
+        {
+            await Task.Delay(300, typing.Token);
+            await Refresh();
+        }
+        catch (TaskCanceledException)
+        {
+        }
+    }
+
+    private async Task InactiveChanged(ChangeEventArgs e)
+    {
+        showInactive = e.Value is true;
+        await Refresh();
+    }
+
+    private async Task RowKey(KeyboardEventArgs e, int key)
+    {
+        if (e.Key is "Enter" or " ")
+        {
+            await Open(key);
+        }
+    }
+
+    private async Task Open(int key)
+    {
+        current = await Service.LoadAsync(Spec, key);
+        isNew = false;
+        currentKey = key;
+        showForm = current is not null;
+        problemField = "";
+        state = current is null ? new(new HashSet<string>()) : await Service.StateAsync(Spec, current, false);
+        Show("", "");
+    }
+
+    private async Task NewRecord()
+    {
+        current = await Service.NewAsync(Spec);
+        isNew = true;
+        currentKey = 0;
+        showForm = true;
+        problemField = "";
+        state = new(new HashSet<string>());
+        Show("", "");
+    }
+
+    private void BackToList() => showForm = false;
+
+    private void Set(FieldSpec<T> f, object? value)
+    {
+        if (current is null)
+        {
+            return;
+        }
+        try
+        {
+            if (value is string s && f.Kind is FieldKind.Money or FieldKind.Quantity or FieldKind.Rate or FieldKind.Integer)
+            {
+                value = s.Trim().Length == 0 ? null : decimal.Parse(s, NumberStyles.Number, CultureInfo.InvariantCulture);
+            }
+            f.Set(current, value);
+            if (problemField == f.Name)
+            {
+                problemField = "";
+            }
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException or InvalidCastException)
+        {
+            problemField = f.Name;
+            Show(L.T("القيمة في حقل") + " «" + L.T(f.Label) + "» " + L.T("غير صحيحة."), "error");
+        }
+    }
+
+    private IEnumerable<LookupItem> LookupItems(FieldSpec<T> f)
+    {
+        var all = lookups.TryGetValue(f.Name, out var list) ? list : [];
+        string? chosen = current is null ? null : f.Get(current)?.ToString();
+        var shown = all.Where(i => i.Active || i.Key.ToString() == chosen).ToList();
+        if (chosen is not null && shown.All(i => i.Key.ToString() != chosen))
+        {
+            shown.Add(new LookupItem(chosen, "(" + chosen + ")", false));
+        }
+        return shown;
+    }
+
+    private static string Number(object? v) => v switch
+    {
+        decimal d => d.ToString("0.####", CultureInfo.InvariantCulture),
+        IFormattable n => n.ToString(null, CultureInfo.InvariantCulture),
+        _ => "",
+    };
+
+    private static string DateValue(object? v) => v is DateTime d ? d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) : "";
+
+    private void Show(string text, string kind)
+    {
+        message = text;
+        messageKind = kind;
+    }
+
+    private async Task Save(bool confirmed)
+    {
+        if (current is null || busy)
+        {
+            return;
+        }
+        busy = true;
+        try
+        {
+            var r = await Service.SaveAsync(Spec, current, isNew, UserInfo.Acting(user), confirmed);
+            await Handle(r, () => Save(true));
+            if (r.Status == SaveStatus.Saved)
+            {
+                await Refresh();
+                await Open(r.Key);
+                Show(r.Message, "success");
+            }
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private void AskDelete() => Ask(L.T("هل تريد حذف هذا السجل نهائيًا؟"), () => Delete(false));
+
+    private async Task Delete(bool deactivate)
+    {
+        if (current is null || isNew)
+        {
+            return;
+        }
+        var r = await Service.DeleteAsync(Spec, currentKey, UserInfo.Acting(user), deactivate);
+        await Handle(r, () => Delete(true));
+        if (r.Status == SaveStatus.Saved)
+        {
+            await Refresh();
+            if (deactivate)
+            {
+                await Open(r.Key);
+            }
+            else
+            {
+                current = null;
+                showForm = false;
+            }
+            Show(r.Message, deactivate ? "warning" : "success");
+        }
+    }
+
+    private Task Handle(SaveResult r, Func<Task> again)
+    {
+        problemField = r.Field;
+        switch (r.Status)
+        {
+            case SaveStatus.Refused:
+                Show(r.Message, "error");
+                break;
+            case SaveStatus.NeedsConfirmation:
+                Ask(r.Message, again);
+                break;
+        }
+        return Task.CompletedTask;
+    }
+
+    private void Ask(string text, Func<Task> yes)
+    {
+        question = text;
+        onYes = yes;
+    }
+
+    private async Task Answer(bool yes)
+    {
+        var next = onYes;
+        question = null;
+        onYes = null;
+        if (yes && next is not null)
+        {
+            await next();
+        }
+    }
+}

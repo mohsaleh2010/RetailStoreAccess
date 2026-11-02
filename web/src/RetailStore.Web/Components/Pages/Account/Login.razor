@@ -1,0 +1,50 @@
+@page "/account/login"
+@attribute [ExcludeFromInteractiveRouting]
+@attribute [AllowAnonymous]
+@layout AccountLayout
+@inject SecurityService Security
+@inject UiLanguage L
+@inject NavigationManager Nav
+
+<PageTitle>@L.T("تسجيل الدخول")</PageTitle>
+
+<EditForm Model="Input" method="post" OnSubmit="SignIn" FormName="login" class="card">
+    <h1>@L.T("تسجيل الدخول")</h1>
+    <label for="username">@L.T("اسم المستخدم")</label>
+    <InputText id="username" @bind-Value="Input.Username" autocomplete="username" autofocus />
+    <label for="password">@L.T("كلمة المرور")</label>
+    <InputText id="password" type="password" @bind-Value="Input.Password" autocomplete="current-password" />
+    <button type="submit" class="btn primary">@L.T("دخول")</button>
+    @if (message.Length > 0)
+    {
+        <div class="message error" role="alert">@L.T(message)</div>
+    }
+</EditForm>
+
+@code {
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+    [SupplyParameterFromForm] private LoginInput Input { get; set; } = default!;
+    [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
+    private string message = "";
+
+    protected override void OnInitialized() => Input ??= new();
+
+    private async Task SignIn()
+    {
+        string computer = AccountEndpoints.ComputerOf(HttpContext);
+        var r = await Security.LoginAsync(Input.Username ?? "", Input.Password ?? "", computer);
+        if (!r.Ok)
+        {
+            message = r.Message;
+            return;
+        }
+        await AccountEndpoints.SignInAsync(HttpContext, r.EmployeeID, r.EmployeeName, computer, r.MustChangePassword);
+        Nav.NavigateTo(r.MustChangePassword ? "account/change-password" : AccountEndpoints.SafeReturn(ReturnUrl), forceLoad: true);
+    }
+
+    private sealed class LoginInput
+    {
+        public string? Username { get; set; }
+        public string? Password { get; set; }
+    }
+}
