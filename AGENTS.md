@@ -232,8 +232,8 @@ currencies, sales reps with commissions, customer orders with reservation, the r
 and Egypt (e-receipt, B2B e-invoice, form 10 return; plan `docs/43`, phases A-F) are done
 (see `README.md` for approval status). Multiple units per product (`docs/72`), price lists (`docs/73`), purchase orders (`docs/74`) and customer
 quotations (`docs/75`) are done: every module the owner picked from `docs/69-Remaining-Modules.md`. Plan 6, decided: one C# system, Blazor (Razor) on .NET 10 for the web and .NET MAUI Blazor Hybrid sharing the same
-Razor components for Windows (POS), Android (rep app) and iOS (`docs/51`, plan 6). Phase 6A, the web foundation (`docs/76`:
-login, permissions, Arabic / English, products, customers, suppliers, warehouses, the journal logic in C#), waits for approval;
+Razor components for Windows (POS), Android (rep app) and iOS (`docs/51`, plan 6). Phase 6A, the web foundation (`docs/76`, approved:
+login, permissions, Arabic / English, products, customers, suppliers, warehouses, the journal logic in C#);
 next 6B (the APIs and the rep app).
 
 ## Standard procedures
