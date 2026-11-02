@@ -26,6 +26,9 @@ tested on Linux/macOS/Windows with `unittest`.
   2. which modules to import or replace and which `Build*` commands to run (in order),
   3. how to test it (the in-Access `Test*` procedure and manual steps),
   then **wait for approval** before starting the next feature.
+- **End of every task** (a feature report, a fix, an approval, an answer): remind the owner to run `/clear`,
+  then give the exact prompt to paste for the next task (in a code block), written so a fresh session
+  can start from it alone (it names the task, the branch and `/continue` or the skill to use).
 - When the user reports an error from Access (a message box, `BuildFrontEnd.log`, `RunAllTests.log`):
   find the root cause, fix it, **add a test that fails without the fix**, look for the same pattern
   elsewhere in the code, then report.
