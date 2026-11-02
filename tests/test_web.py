@@ -198,6 +198,55 @@ class WebRulesTests(unittest.TestCase):
         self.assertIn("FixedTimeEquals", hasher)
 
 
+class ApiTests(unittest.TestCase):
+    """Plan 6B (docs/77): the REST API /api/v1."""
+
+    API = "web/src/RetailStore.Web/Api/"
+
+    def test_messages_of_the_rep_service_are_those_of_access(self):
+        code = read("web/src/RetailStore.Data/Services/RepService.cs")
+        vba = "".join(read(f"src/vba/{m}.bas") for m in ("modRepRoutes", "modSalesOrders", "modPriceLists"))
+        own = {"هذا المستخدم ليس مندوبًا نشطًا. اربطه بمندوب في شاشة المندوبين.", "أضف أسطر الطلبية."}
+        messages = set(re.findall(r'"([^"]*[\u0600-\u06FF][^"]*)"', code)) - own
+        self.assertGreater(len(messages), 10)
+        for m in messages:
+            with self.subTest(m):
+                self.assertIn(m, vba)
+
+    def test_tokens_are_safe(self):
+        security = read(self.API + "ApiSecurity.cs")
+        self.assertIn("SecurityAlgorithms.HmacSha256", security)
+        self.assertIn("RandomNumberGenerator.GetBytes(64)", security)
+        self.assertIn("ValidateLifetime = true", security)
+        self.assertIn("SecurityService.PasswordStamp", security, "a new password ends the old tokens")
+        self.assertIn("!e.IsActive", security, "a disabled user loses his token")
+        settings = json.loads(read("web/src/RetailStore.Web/appsettings.json"))
+        self.assertEqual(settings["Api"]["JwtKey"], "", "never a signing key in the repository")
+        self.assertIn("App_Data/", read("web/.gitignore"), "the key file of App_Data is never committed")
+        setup = read(self.API + "ApiSetup.cs")
+        self.assertIn("MapInboundClaims = false", setup)
+        self.assertIn("RequireRateLimiting(ApiSetup.TokenLimit)", read(self.API + "ApiEndpoints.cs"))
+        self.assertIn("DisableAgent().DisableMcp().DisableTelemetry()", setup, "the API document never leaves the shop")
+
+    def test_errors_of_the_api_are_never_pages(self):
+        program = read("web/src/RetailStore.Web/Program.cs")
+        self.assertIn("app.UseWhen(context => !ApiSetup.IsApi(context)", program)
+        self.assertIn("app.UseWhen(ApiSetup.IsApi, api => api.UseExceptionHandler());", program)
+
+    def test_every_operation_has_its_permission(self):
+        """Each mapped operation of the secured group names its permission (.Needs), except the user's own ones."""
+        own = {"/auth/token", "/auth/password", "/me", "/profile"}
+        for name in ("ApiEndpoints.cs", "RepApi.cs"):
+            code = read(self.API + name)
+            for m in re.finditer(r'\.Map(Get|Post|Put|Delete)\("([^"]*)"', code):
+                route = m.group(2)
+                end = code.find(".Map", m.end())
+                body = code[m.end():end if end > 0 else len(code)]
+                with self.subTest(f"{name} {m.group(1)} {route}"):
+                    self.assertEqual(".Needs(" in body, route not in own)
+                    self.assertIn(".WithSummary(", body)
+
+
 def journal_vectors(path):
     """The source lines of the fixture business and the entries of the Python mirror of SyncJournal."""
     from access_sqlite import AccessOnSqlite, day

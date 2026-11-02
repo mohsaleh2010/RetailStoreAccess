@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RetailStore.Data;
 using RetailStore.UI;
 using RetailStore.Web;
+using RetailStore.Web.Api;
 using RetailStore.Web.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +38,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 builder.Services.AddAuthorization();
+builder.AddRetailApi();             // the REST API /api/v1 (docs/77): JWT tokens, OpenAPI
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddRetailStoreUi();
 
@@ -55,18 +57,28 @@ if (!provider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+// The screens answer errors with pages; the API (/api) with problem details (JSON), never a page.
+app.UseWhen(context => !ApiSetup.IsApi(context), screens =>
+{
+    if (!app.Environment.IsDevelopment())
+    {
+        screens.UseExceptionHandler("/Error", createScopeForErrors: true);
+    }
+    screens.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+});
+app.UseWhen(ApiSetup.IsApi, api => api.UseExceptionHandler());
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRetailApi();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapAccountEndpoints();
+app.MapRetailApiDocs();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddAdditionalAssemblies(typeof(RetailStore.UI.Layout.MainLayout).Assembly);

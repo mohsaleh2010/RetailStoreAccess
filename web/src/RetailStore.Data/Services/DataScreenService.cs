@@ -52,6 +52,27 @@ public sealed class DataScreenService(IDbContextFactory<RetailDbContext> factory
                                             spec.ActiveField is null || (bool)(Prop(e, spec.ActiveField) ?? true))).ToList();
     }
 
+    /// <summary>The records of a screen for the API: the same filter and search as the list, in its order, a page of
+    /// them (take at most MaxListRows) and how many there are.</summary>
+    public async Task<(int Total, List<T> Rows)> RecordsAsync<T>(ScreenSpec<T> spec, string? search, bool showInactive,
+                                                                  int skip, int take) where T : class, new()
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        IQueryable<T> q = spec.Query(db).AsNoTracking();
+        if (spec.ActiveField is not null && !showInactive)
+        {
+            q = q.Where(e => EF.Property<bool>(e, spec.ActiveField));
+        }
+        string text = (search ?? "").Trim();
+        if (text.Length > 0 && spec.Search.Length > 0)
+        {
+            q = q.Where(SearchPredicate<T>(spec.Search, text));
+        }
+        int total = await q.CountAsync();
+        var rows = await spec.OrderBy(q).Skip(Math.Max(skip, 0)).Take(Math.Clamp(take, 1, MaxListRows)).ToListAsync();
+        return (total, rows);
+    }
+
     private static Expression<Func<T, bool>> SearchPredicate<T>(IEnumerable<string> fields, string text)
     {
         var e = Expression.Parameter(typeof(T), "e");

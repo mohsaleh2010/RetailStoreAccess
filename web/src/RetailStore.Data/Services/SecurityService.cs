@@ -18,7 +18,8 @@ public sealed class SecurityService(IDbContextFactory<RetailDbContext> factory)
     /// <summary>modSecurity.LoginUser: lock after AppData.MaxFailedLogins wrong passwords for AppData.LockMinutes;
     /// the same message for an unknown user and a wrong password; the built-in administrator (1) enters without a
     /// password only until one is set (then the password screen is forced).</summary>
-    public async Task<LoginResult> LoginAsync(string username, string password, string computer, DateTime? now = null)
+    public async Task<LoginResult> LoginAsync(string username, string password, string computer, DateTime? now = null,
+                                              string channel = "web")
     {
         DateTime at = now ?? DateTime.Now;
         await using var db = await factory.CreateDbContextAsync();
@@ -77,7 +78,7 @@ public sealed class SecurityService(IDbContextFactory<RetailDbContext> factory)
             e.FailedLoginCount = 0;
             e.LockedUntil = null;
             e.LastLoginAt = at;
-            Audit.LogAction(db, new ActingUser(id, computer), "LOGIN", "Employees", id.ToString(), "web");
+            Audit.LogAction(db, new ActingUser(id, computer), "LOGIN", "Employees", id.ToString(), channel);
         }
         await db.SaveChangesAsync();
         return id > 0
@@ -152,6 +153,11 @@ public sealed class SecurityService(IDbContextFactory<RetailDbContext> factory)
         }
         return await SetUserPasswordAsync(user.EmployeeID, newPassword, false, user);
     }
+
+    /// <summary>The stamp of the user's password (API tokens carry it): a new password ends the tokens given before.</summary>
+    public static string PasswordStamp(string? hash, string? salt) =>
+        Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(
+            System.Text.Encoding.UTF8.GetBytes((hash ?? "") + "|" + (salt ?? ""))))[..16];
 
     private static string Left(string s, int n) => s.Length <= n ? s : s[..n];
 }

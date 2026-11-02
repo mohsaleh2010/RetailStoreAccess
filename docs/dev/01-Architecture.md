@@ -106,6 +106,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
   - `RetailStore.Tests`: xUnit.
 - **كل قاعدة في الويب لها أصل في VBA** وتتبعه: نفس الفحوص بالترتيب نفسه، ونفس الرسائل العربية، ونفس صفوف سجل التدقيق.
 - **منطق القيود:** `JournalPlanner` (C#) يطابق `SyncJournal`، والأسطر من عروض `qryJournal*` على الخادم (`docs/71`). يُتحقق منه بمقارنته بمرجع Python على عمليات الاختبار.
+- **الـ API (`docs/77`):** REST تحت `/api/v1` في `RetailStore.Web/Api`، بدخول JWT (`ApiTokens`) بجانب كوكي الشاشات. كل طلب يمر بـ `ApiUserFilter` (المستخدم نشط، وبصمة كلمة مروره في الرمز) و`PermissionFilter` (صلاحية `ApiPermission` لكل عملية: `.Needs(...)`)، وعمليات المندوب بـ `RepFilter` (المندوب المرتبط بالمستخدم). العمليات تستعمل خدمات `RetailStore.Data` نفسها (`DataScreenService`، و`RepService` = نسخة `modRepRoutes` و`modSalesOrders` و`modPriceLists`). الأخطاء Problem Details، والتوثيق OpenAPI في `/api/openapi/v1.json` وصفحة `/api/docs`.
 
 ## 7) المراجع المولَّدة (تتحدث تلقائيًا)
 | الملف | المحتوى |

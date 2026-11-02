@@ -101,6 +101,7 @@
 | + | **أوامر الشراء واقتراح الشراء** (`docs/69` رقم 4): اقتراح الشراء من حد إعادة الطلب (وكمية إعادة الطلب)، ومسودة أمر لكل مورد منه، والاعتماد (تحت الطلب)، والاستلام بأذونات من الأمر كليًا أو جزئيًا ثم الفاتورة، وحالة الأمر تتبع أذوناته، وتقريرا الاقتراح والأوامر المفتوحة | ✅ تمت الموافقة | [docs/74-Purchase-Orders.md](docs/74-Purchase-Orders.md) |
 | + | **عروض الأسعار للعملاء** (`docs/69` رقم 3): عرض سعر بصلاحية حتى تاريخ، يبدأ بسعر العميل (قائمته)، ويُحسب ويُطبع كالفاتورة عند إصداره، ثم يتحول بضغطة إلى طلبية أو فاتورة بيع بأسعاره، أو يرفضه العميل؛ والمنتهي لا يتحول ويُجدَّد بـ «عرض جديد منه»؛ وتقرير العروض ونسبة التحويل | ✅ تمت الموافقة | [docs/75-Customer-Quotations.md](docs/75-Customer-Quotations.md) |
 | 6أ | **أساس نسخة الويب** (الخطة 6، Blazor على .NET 10): الدخول بنفس المستخدمين وكلمات المرور، والصلاحيات نفسها، والعربية والإنجليزية، ويعمل على الجوال؛ وشاشات المنتجات والعملاء والموردين والمخازن بنفس فحوص Access وسجل تدقيقه، على نفس قاعدة SQL Server؛ ومنطق القيود بـ C# مطابق لـ Access | ✅ تمت الموافقة | [docs/76-Web-Foundation.md](docs/76-Web-Foundation.md) |
+| 6ب | **الـ APIs وتوثيقها** (الخطة 6): REST تحت `/api/v1` بدخول JWT بنفس المستخدمين وكلمات المرور، وصلاحية Access لكل عملية، وسجل التدقيق نفسه؛ شاشات البيانات الأساسية بفحوصها، وعمل المندوب لتطبيقه (عملاؤه، والأصناف بسعر العميل، ورصيد السيارة، والزيارات وخطة اليوم، وطلبية العميل)؛ وتوثيق OpenAPI بصفحة تفاعلية تعمل بلا إنترنت | ✅ بانتظار الموافقة | [docs/77-Web-API.md](docs/77-Web-API.md) |
 
 ## هيكل المستودع
 
@@ -223,6 +224,7 @@
 | 69 | `modQuotations` (جديدة)، واستبدال `modSales` و`modSalesOrders` و`modReports` و`modTestAll` والوحدات المولَّدة (أو **`BuildFrontEnd.vbs`**) | `BuildSchema`, `BuildRelationships`؛ وعلى الخادم «تجهيز القاعدة» | `TestQuotations`، ثم «طلبيات العملاء» ← «عروض الأسعار» (`docs/75` القسم 5) |
 | 65 | `modServerQueries` و`modServerQueryData` (جديدتان)، واستبدال `modSqlServer` و`modQueryParams` و`modDashboard` و`modIndicators` و`modSecurityScreens` و`modBuildQueries` و`modTestAll` و`modLang` و`modLangData*` (أو **`BuildFrontEnd.vbs`**)، ومجلد `dist\sql` (فيه `RetailStore_Queries.sql`) | على الخادم: «تجهيز القاعدة» ثم «التشغيل على الخادم» | `TestServerQueries`، ثم التقارير على قاعدة تجربة على الخادم (`docs/71` القسم 4) |
 | 70 | لا شيء في Access. الموقع: ثبّت .NET 10 SDK ثم `dotnet run` في `web\src\RetailStore.Web` (قاعدة تجربة)، أو اربطه بقاعدة SQL Server في `appsettings.json` (`docs/76` القسم 4) | — | `python3 -m unittest discover -s tests -p "test_web.py"` أو `dotnet test` في `web`، ثم الخطوات اليدوية (`docs/76` القسم 5) |
+| 71 | لا شيء في Access. الموقع نفسه (`dotnet run` في `web\src\RetailStore.Web`)؛ الإعدادات الجديدة في قسم `Api` من `appsettings.json`، وانسخ `App_Data\api-jwt.key` مع نسخة الموقع الاحتياطية (`docs/77` القسمان 1 و5) | — | `test_web.py` أو `dotnet test` في `web`، ثم صفحة `/api/docs` والخطوات اليدوية (`docs/77` القسم 7) |
 
 > عند تحديث وحدة موجودة: احذفها أولًا من محرر VBA ثم استورد النسخة الجديدة.
 >

@@ -18,6 +18,7 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    'أضف أسطر الطلبية': 'Add the lines of the order',
     'أطول من': 'is longer than',
     'أوقف الخادم الجلسة مؤقتًا': 'The server paused the session',
     'إعادة التحميل': 'Reload',
@@ -28,6 +29,7 @@ WEB_EN = {
     'السجل غير موجود': 'The record does not exist',
     'الصفحة غير موجودة': 'Page not found',
     'القيمة في حقل': 'The value in the field',
+    'انتهت صلاحية الدخول. سجّل الدخول من جديد': 'The login has expired. Log in again',
     'تأكيد كلمة المرور': 'Confirm the password',
     'تعذر استئناف الجلسة. أعد المحاولة أو أعد تحميل الصفحة': 'The session could not be resumed. Retry or reload the page',
     'تعذر الاتصال بالخادم. أعد المحاولة أو أعد تحميل الصفحة': 'Could not reach the server. Retry or reload the page',
@@ -35,17 +37,21 @@ WEB_EN = {
     'ثانية': 'seconds',
     'جارٍ إعادة الاتصال بالخادم': 'Reconnecting to the server',
     'حدث خطأ غير متوقع': 'An unexpected error occurred',
+    'حقل غير معروف': 'Unknown field',
     'خارج الحدود المسموحة': 'is outside the allowed limits',
     'خطأ': 'Error',
     'ضيّق البحث لعرض باقي السجلات': 'Narrow the search to see the other records',
     'غير صحيحة': 'is not valid',
     'غيّر مستخدم آخر هذا السجل الآن. أعد فتحه ثم عدّل': 'Another user has just changed this record. Open it again, then edit it',
     'قيمة غير مقبولة في حقل': 'A value that is not accepted in the field',
+    'لا تملك صلاحية هذه العملية. راجع مدير النظام': 'You do not have the permission for this operation. Contact the system administrator',
     'لا توجد سجلات': 'No records',
     'لا توجد شاشات متاحة لك على الويب بعد. راجع مدير النظام': 'No web screens are open to you yet. Ask the system administrator',
+    'لا مخزن سيارة للمندوب. أضفه في شاشة المخازن (النوع سيارة': 'The rep has no van warehouse. Add it in the warehouses screen (type van',
     'لا يمكن حذف هذا السجل لأنه مستخدم في عمليات سابقة. هل تريد تعطيله بدلًا من ذلك': 'This record cannot be deleted because earlier operations use it. Deactivate it instead',
     'مرحبًا': 'Welcome',
     'نسخة الويب: البيانات الأساسية على نفس قاعدة بيانات البرنامج': 'Web edition: the master data on the same database as the program',
+    'هذا المستخدم ليس مندوبًا نشطًا. اربطه بمندوب في شاشة المندوبين': 'This user is not an active sales rep. Link the user to a rep in the sales reps screen',
     'يجب تغيير كلمة المرور قبل المتابعة': 'Change the password before you go on',
     'يختفي من القوائم ويبقى في التقارير': 'it leaves the lists and stays in the reports',
 }
