@@ -28,7 +28,9 @@ tested on Linux/macOS/Windows with `unittest`.
   then **wait for approval** before starting the next feature.
 - **End of every task** (a feature report, a fix, an approval, an answer): remind the owner to run `/clear`,
   then give the exact prompt to paste for the next task (in a code block), written so a fresh session
-  can start from it alone (it names the task, the branch and `/continue` or the skill to use).
+  can start from it alone (it names the task, the branch and the skill to use). The prompt starts with plain
+  words (`تابع الخطة ...`), never with `/continue`: the Claude app reads `/continue` as resuming a terminal
+  session and refuses it in the cloud ("Terminal sessions can only be resumed in a Local environment").
 - When the user reports an error from Access (a message box, `BuildFrontEnd.log`, `RunAllTests.log`):
   find the root cause, fix it, **add a test that fails without the fix**, look for the same pattern
   elsewhere in the code, then report.
