@@ -534,7 +534,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         if (stock.ShortList.Length > 0)
         {
             Audit.LogAction(db, user, "NEGATIVE_STOCK", "Products", "",
-                            stock.Status == SaveStatus.Saved ? stock.Message : "البيع - approved by user:" + stock.ShortList);
+                            stock.Status == SaveStatus.Saved ? stock.Message : "البيع" + " - approved by user:" + stock.ShortList);
         }
         var now = DateTime.Now;
         int? method = sale.PaymentMethodID;

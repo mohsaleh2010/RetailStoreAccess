@@ -170,6 +170,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .list tr:focus 
 .qr svg { width: 100%; height: auto; display: block; }
 .invoice .list tbody tr { cursor: default; }
 .form-pane h2 { margin: 0 0 12px; font-size: 1.1rem; }
+.message a { margin-inline-start: 8px; }
 
 @media (max-width: 760px) {
     .pos { grid-template-columns: 1fr; }

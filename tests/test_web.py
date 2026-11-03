@@ -216,6 +216,27 @@ class ApiTests(unittest.TestCase):
             with self.subTest(m):
                 self.assertIn(m, vba)
 
+    def test_messages_of_the_sales_service_are_those_of_access(self):
+        """Plan 6C (docs/79): the C# of PostSaleFromCart / PostCustomerPayment answers with the messages of Access."""
+        code = read("web/src/RetailStore.Data/Services/SalesService.cs") + read(
+            "web/src/RetailStore.Domain/Sales/InvoiceCalculator.cs") + read("web/src/RetailStore.Domain/Sales/CustomerAging.cs")
+        vba = "".join(read(f"src/vba/{m}.bas") for m in ("modSales", "modAging", "modRepRoutes", "modCurrency", "modProductUnits"))
+        own = {"رصيد افتتاحي"}                     # a text of qryAgingDebits / qryAgingCredits (tools/queries.py)
+        messages = {m.replace("\\n", "") for m in re.findall(r'"([^"]*[\u0600-\u06FF][^"]*)"', code)} - own
+        self.assertGreater(len(messages), 30)
+        for m in messages:
+            with self.subTest(m):
+                self.assertIn(m, vba)
+
+    def test_the_sale_follows_the_order_of_access(self):
+        code = read("web/src/RetailStore.Data/Services/SalesService.cs")
+        sale = code[code.index("public async Task<SaleResult> PostSaleAsync"):code.index("private static async Task SetZatcaFieldsAsync")]
+        order = ["UnitFactorOfAsync", "InvoiceCalculator.Calc(", "PRICE_OVERRIDE", "CheckDiscountAsync", "InvoiceCalculator.Settle(",
+                 "CheckCustomerAsync", "RepCreditProblemAsync", "CheckStockAsync", "BeginTransactionAsync", "\"SALES_INVOICE\"",
+                 "SetZatcaFieldsAsync", "ApplyStockMovementAsync", "AdjustBalanceAsync", "\"SALE\", \"SalesInvoices\"", "CommitAsync"]
+        self.assertEqual([sale.index(x) for x in order], sorted(sale.index(x) for x in order))
+        self.assertIn("p.AverageCost * factors[i]", sale, "UnitCost of a line = the piece cost x its factor (docs/72)")
+
     def test_tokens_are_safe(self):
         security = read(self.API + "ApiSecurity.cs")
         self.assertIn("SecurityAlgorithms.HmacSha256", security)
