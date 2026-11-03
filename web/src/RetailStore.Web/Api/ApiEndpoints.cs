@@ -31,7 +31,8 @@ public sealed record VisitResultRequest(
     [property: Description("ORDER, SALE, PAYMENT, NO_SALE or CLOSED; empty = read from the customer's documents that day")] string? Result,
     string? Notes);
 
-public sealed record OrderRequest(int CustomerID, int? WarehouseID, DateTime? RequiredDate, string? Notes, OrderLineInput[] Lines);
+public sealed record OrderRequest(int CustomerID, int? WarehouseID, DateTime? RequiredDate, string? Notes, OrderLineInput[] Lines,
+                                  string? ClientRef = null, DateTime? OrderDate = null);
 
 public sealed record CreatedId(int Id, string Message);
 

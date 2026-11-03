@@ -12,7 +12,7 @@
   Then run this file in that database:
       sqlcmd -S .\SQLEXPRESS -d RetailStore -E -f 65001 -i RetailStore_Schema.sql
 
-  97 tables, 1237 fields, 148 indexes, 231 relationships, 451 seed rows
+  97 tables, 1238 fields, 149 indexes, 231 relationships, 451 seed rows
 ==============================================================================*/
 SET NOCOUNT ON;
 SET ANSI_NULLS ON;
@@ -1508,6 +1508,7 @@ IF OBJECT_ID(N'dbo.SalesOrders', N'U') IS NULL
         [PreparedAt] DATETIME NULL,
         [EmployeeID] INT NOT NULL,
         [Notes] NVARCHAR(255) NULL,
+        [ClientRef] NVARCHAR(40) NULL,
         [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_SalesOrders_CreatedAt] DEFAULT (GETDATE()),
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_SalesOrders] PRIMARY KEY ([SalesOrderID])
@@ -4068,6 +4069,8 @@ IF COL_LENGTH(N'dbo.SalesOrders', N'EmployeeID') IS NULL
     ALTER TABLE [dbo].[SalesOrders] ADD [EmployeeID] INT NOT NULL;
 IF COL_LENGTH(N'dbo.SalesOrders', N'Notes') IS NULL
     ALTER TABLE [dbo].[SalesOrders] ADD [Notes] NVARCHAR(255) NULL;
+IF COL_LENGTH(N'dbo.SalesOrders', N'ClientRef') IS NULL
+    ALTER TABLE [dbo].[SalesOrders] ADD [ClientRef] NVARCHAR(40) NULL;
 IF COL_LENGTH(N'dbo.SalesOrders', N'CreatedAt') IS NULL
     ALTER TABLE [dbo].[SalesOrders] ADD [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_SalesOrders_CreatedAt] DEFAULT (GETDATE());
 IF COL_LENGTH(N'dbo.SalesOrders', N'RowVer') IS NULL
@@ -5647,6 +5650,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_OrderDate' AND object
     CREATE INDEX [IX_OrderDate] ON [dbo].[SalesOrders] ([OrderDate]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_Status' AND object_id = OBJECT_ID(N'dbo.SalesOrders'))
     CREATE INDEX [IX_Status] ON [dbo].[SalesOrders] ([Status]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_ClientRef' AND object_id = OBJECT_ID(N'dbo.SalesOrders'))
+    CREATE UNIQUE INDEX [UX_ClientRef] ON [dbo].[SalesOrders] ([ClientRef]) WHERE [ClientRef] IS NOT NULL;
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_QuotationNumber' AND object_id = OBJECT_ID(N'dbo.Quotations'))
     CREATE UNIQUE INDEX [UX_QuotationNumber] ON [dbo].[Quotations] ([QuotationNumber]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_QuoteDate' AND object_id = OBJECT_ID(N'dbo.Quotations'))
@@ -7755,5 +7760,5 @@ GO
 IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
     ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
 GO
-PRINT N'RetailStore schema: done (97 tables, 1237 fields, 148 indexes, 231 relationships, 451 seed rows).';
+PRINT N'RetailStore schema: done (97 tables, 1238 fields, 149 indexes, 231 relationships, 451 seed rows).';
 GO

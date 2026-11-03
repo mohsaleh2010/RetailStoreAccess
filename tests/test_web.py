@@ -180,7 +180,9 @@ class WebRulesTests(unittest.TestCase):
                     text = fh.read()
                 self.assertNotRegex(text.lower(), r"\b(claude|opus|sonnet|haiku|gpt-\d|chatgpt|gemini)\b")
                 self.assertNotIn("LICENSE_SECRET", text)
-                if path.endswith(".csproj"):
+                if path.endswith("RetailStore.App.csproj"):
+                    self.assertIn("<TargetFrameworks>net10.0-android</TargetFrameworks>", text)
+                elif path.endswith(".csproj"):
                     self.assertIn("<TargetFramework>net10.0</TargetFramework>", text)
 
     def test_sql_server_reads_the_views_of_docs_71(self):
@@ -206,7 +208,8 @@ class ApiTests(unittest.TestCase):
     def test_messages_of_the_rep_service_are_those_of_access(self):
         code = read("web/src/RetailStore.Data/Services/RepService.cs")
         vba = "".join(read(f"src/vba/{m}.bas") for m in ("modRepRoutes", "modSalesOrders", "modPriceLists"))
-        own = {"هذا المستخدم ليس مندوبًا نشطًا. اربطه بمندوب في شاشة المندوبين.", "أضف أسطر الطلبية."}
+        own = {"هذا المستخدم ليس مندوبًا نشطًا. اربطه بمندوب في شاشة المندوبين.", "أضف أسطر الطلبية.",
+               "رقم الطلبية في الجهاز أطول من 40 حرفًا.", "رقم الطلبية في الجهاز مستعمل لمستخدم آخر."}
         messages = set(re.findall(r'"([^"]*[\u0600-\u06FF][^"]*)"', code)) - own
         self.assertGreater(len(messages), 10)
         for m in messages:
@@ -245,6 +248,45 @@ class ApiTests(unittest.TestCase):
                 with self.subTest(f"{name} {m.group(1)} {route}"):
                     self.assertEqual(".Needs(" in body, route not in own)
                     self.assertIn(".WithSummary(", body)
+
+
+class RepAppTests(unittest.TestCase):
+    """Plan 4D (docs/78): the rep app on Android (MAUI Blazor Hybrid), offline first, synced through /api/v1/rep."""
+
+    APP = "web/src/RetailStore.RepApp/"
+
+    def test_the_phone_never_reaches_the_database(self):
+        project = read(self.APP + "RetailStore.RepApp.csproj")
+        self.assertNotIn("RetailStore.Data", project)
+        self.assertNotIn("EntityFrameworkCore", project)
+        self.assertIn("RetailStore.RepApp.csproj", read("web/src/RetailStore.App/RetailStore.App.csproj"))
+
+    def test_the_solutions(self):
+        main = read("web/RetailStore.slnx")
+        self.assertIn("RetailStore.RepApp.csproj", main)
+        self.assertNotIn("RetailStore.App.csproj", main, "the web builds on a machine without the MAUI workload")
+        self.assertIn("RetailStore.App.csproj", read("web/RetailStore.Mobile.slnx"))
+
+    def test_the_token_is_in_the_secure_storage(self):
+        session = read(self.APP + "Offline/RepSession.cs")
+        self.assertIn("platform.SetSecretAsync(TokenKey", session)
+        self.assertNotRegex(session, r'store\.Set\("[^"]*Token')
+        self.assertIn("SecureStorage.Default", read("web/src/RetailStore.App/Platforms/Android/PhonePlatform.cs"))
+
+    def test_orders_are_sent_once_and_first(self):
+        sync = read(self.APP + "Offline/SyncService.cs")
+        self.assertIn("pending.Where(i => i.Kind == OutboxKinds.Order).Concat(", sync)
+        self.assertIn("ClientRef", read(self.APP + "Offline/LocalStore.cs"))
+        self.assertEqual(next(f for f in table("SalesOrders").fields if f.name == "ClientRef").size, 40)
+        self.assertTrue(any(ix.fields == ["ClientRef"] and ix.unique and ix.ignore_nulls for ix in table("SalesOrders").indexes))
+        self.assertIn("o.ClientRef == reference", read("web/src/RetailStore.Data/Services/RepService.cs"))
+
+    def test_the_messages_of_an_order_line_are_those_of_access(self):
+        draft = read(self.APP + "Offline/OrderDraft.cs")
+        vba = read("src/vba/modSalesOrders.bas")
+        for m in set(re.findall(r'"([^"]*[\u0600-\u06FF][^"]*)"', draft)) - {"أضف أسطر الطلبية."}:
+            with self.subTest(m):
+                self.assertIn(m, vba)
 
 
 def journal_vectors(path):

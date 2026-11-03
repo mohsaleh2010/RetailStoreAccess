@@ -1,0 +1,66 @@
+@page "/orders"
+@implements IDisposable
+@inject RepSession S
+
+<section class="rep-card">
+    <h2>@S.T("الطلبيات")</h2>
+    @if (message.Length > 0)
+    {
+        <p class="rep-error">@message</p>
+    }
+    @foreach (var p in S.Problems().Where(i => i.Kind != OutboxKinds.Order))
+    {
+        <div class="rep-problem">
+            <strong>@S.T("زيارة رفضها البرنامج")</strong>
+            <p>@p.Message</p>
+            <div class="rep-buttons">
+                <button @onclick="() => S.RetryItem(p.Id)">@S.T("إعادة الإرسال")</button>
+                <button @onclick="() => S.DeleteItem(p.Id)">@S.T("حذف من الجهاز")</button>
+            </div>
+        </div>
+    }
+    <ul class="rep-list">
+        @foreach (var r in S.Orders())
+        {
+            <li class="@(r.State == OutboxKinds.Rejected ? "rep-problem" : "")">
+                <div class="rep-row">
+                    <strong>@r.Order.CustomerName</strong>
+                    <span class="rep-amount">@OrderSlip.Amount(r.Order.Total)</span>
+                </div>
+                <small>@(r.OrderNumber ?? r.Order.ClientRef[..8].ToUpperInvariant()) - @r.Order.TakenAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</small>
+                <span class="rep-tag">@StateText(r)</span>
+                @if (r.State == OutboxKinds.Rejected)
+                {
+                    <p>@r.Message</p>
+                }
+                <div class="rep-buttons">
+                    <button @onclick="() => PrintAsync(r)">@S.T("طباعة")</button>
+                    @if (r.State == OutboxKinds.Rejected)
+                    {
+                        <button @onclick="() => S.RetryItem(r.OutboxId)">@S.T("إعادة الإرسال")</button>
+                        <button @onclick="() => S.DeleteItem(r.OutboxId)">@S.T("حذف من الجهاز")</button>
+                    }
+                </div>
+            </li>
+        }
+    </ul>
+</section>
+
+@code {
+    private string message = "";
+
+    protected override void OnInitialized() => S.Changed += Refresh;
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => S.Changed -= Refresh;
+
+    private string StateText(OrderRow r) => r.State switch
+    {
+        OutboxKinds.Pending => S.T("بانتظار الإرسال"),
+        OutboxKinds.Rejected => S.T("رفضها البرنامج"),
+        _ => r.Status is null ? S.T("أُرسلت") : S.OrderStatusText(r.Status),
+    };
+
+    private async Task PrintAsync(OrderRow r) => message = await S.PrintAsync(r.Order, r.OrderNumber);
+}

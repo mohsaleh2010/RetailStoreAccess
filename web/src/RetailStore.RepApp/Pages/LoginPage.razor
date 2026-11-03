@@ -1,0 +1,51 @@
+@page "/login"
+@inject RepSession S
+@inject NavigationManager Nav
+
+<section class="rep-card rep-login">
+    <h1>@S.T("تطبيق المندوب")</h1>
+    <label>@S.T("عنوان الخادم")<input dir="ltr" @bind="server" placeholder="https://" /></label>
+    <label>@S.T("اسم المستخدم")<input dir="ltr" @bind="user" autocomplete="username" /></label>
+    <label>@S.T("كلمة المرور")<input dir="ltr" type="password" @bind="password" autocomplete="current-password" /></label>
+    @if (message.Length > 0)
+    {
+        <p class="rep-error">@message</p>
+    }
+    <button class="rep-primary" disabled="@busy" @onclick="LoginAsync">@S.T("دخول")</button>
+    <button class="rep-link" @onclick="() => S.SetLanguage(!S.English)">@(S.English ? "العربية" : "English")</button>
+</section>
+
+@code {
+    private string server = "", user = "", password = "", message = "";
+    private bool busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await S.LoadAsync();
+        server = S.ServerUrl;
+        user = S.Username;
+    }
+
+    private async Task LoginAsync()
+    {
+        busy = true;
+        message = await S.LoginAsync(server, user, password);
+        busy = false;
+        if (message.Length > 0)
+        {
+            return;
+        }
+        password = "";
+        if (S.MustChangePassword)
+        {
+            Nav.NavigateTo("password");
+            return;
+        }
+        var report = await S.SyncAsync();
+        message = report.SnapshotAt is null ? report.Message : "";
+        if (message.Length == 0)
+        {
+            Nav.NavigateTo("");
+        }
+    }
+}

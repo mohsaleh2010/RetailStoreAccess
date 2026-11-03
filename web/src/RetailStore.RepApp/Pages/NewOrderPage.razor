@@ -1,0 +1,115 @@
+@page "/orders/new/{CustomerId:int}"
+@inject RepSession S
+@inject NavigationManager Nav
+
+@if (draft is null)
+{
+    <p class="rep-empty">@S.T("العميل غير موجود على الجهاز. زامن أولًا.")</p>
+}
+else if (saved is not null)
+{
+    <section class="rep-card">
+        <h2>@S.T("حُفظت الطلبية على الجهاز")</h2>
+        <p>@S.T("تُرسل إلى المكتب عند المزامنة، ويعتمدها المكتب.")</p>
+        <p class="rep-total">@S.T("الإجمالي"): @OrderSlip.Amount(saved.Total)</p>
+        @if (message.Length > 0)
+        {
+            <p class="rep-error">@message</p>
+        }
+        <div class="rep-buttons">
+            <button class="rep-primary" @onclick="PrintAsync">@S.T("طباعة نسخة العميل")</button>
+            <button @onclick="@(() => Nav.NavigateTo($"customers/{CustomerId}"))">@S.T("رجوع إلى العميل")</button>
+        </div>
+    </section>
+}
+else
+{
+    <section class="rep-card">
+        <h2>@S.T("طلبية جديدة"): @draft.Customer.CustomerName</h2>
+        <input class="rep-search" @bind="search" @bind:event="oninput" placeholder="@S.T("ابحث عن صنف أو اكتب الباركود")" />
+        @if (search.Trim().Length > 0)
+        {
+            <ul class="rep-list rep-pick">
+                @foreach (var p in Found())
+                {
+                    <li>
+                        <button @onclick="() => Add(p)">
+                            <strong>@p.ProductName</strong>
+                            <span class="rep-amount">@OrderSlip.Amount(draft.PriceOf(p))</span>
+                            <small>@S.T("في السيارة"): @OrderSlip.Quantity(p.VanQuantity)</small>
+                        </button>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+    <section class="rep-card">
+        <table class="rep-lines">
+            <thead><tr><th>@S.T("الصنف")</th><th>@S.T("الكمية")</th><th>@S.T("السعر")</th><th>@S.T("القيمة")</th><th></th></tr></thead>
+            <tbody>
+                @foreach (var l in draft.Lines)
+                {
+                    <tr>
+                        <td>@l.Product.ProductName</td>
+                        <td><input type="number" inputmode="decimal" min="0" step="any" value="@l.Quantity"
+                                   @onchange="e => SetQuantity(l, e.Value)" /></td>
+                        <td>@OrderSlip.Amount(l.UnitPrice)</td>
+                        <td>@OrderSlip.Amount(l.Amount)</td>
+                        <td><button class="rep-link" @onclick="() => draft.Remove(l.Product.ProductID)">×</button></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p class="rep-total">@S.T("الإجمالي"): @OrderSlip.Amount(draft.Total)</p>
+        <label>@S.T("تاريخ التسليم المطلوب")<input type="date" @bind="draft.RequiredDate" /></label>
+        <label>@S.T("ملاحظات")<input @bind="draft.Notes" maxlength="255" /></label>
+        @if (message.Length > 0)
+        {
+            <p class="rep-error">@message</p>
+        }
+        <button class="rep-primary" @onclick="Save">@S.T("حفظ الطلبية")</button>
+    </section>
+}
+
+@code {
+    [Parameter] public int CustomerId { get; set; }
+
+    private OrderDraft? draft;
+    private PendingOrder? saved;
+    private string search = "", message = "";
+
+    protected override void OnInitialized() => draft = S.NewOrder(CustomerId);
+
+    private IEnumerable<RepProduct> Found()
+    {
+        var text = search.Trim();
+        return S.Snapshot!.Products.Where(p => p.TrackStock && (p.ProductName.Contains(text, StringComparison.OrdinalIgnoreCase)
+                                                                || p.ProductCode.Equals(text, StringComparison.OrdinalIgnoreCase)
+                                                                || (p.Barcode ?? "") == text)).Take(30);
+    }
+
+    private void Add(RepProduct p)
+    {
+        message = S.T(draft!.Add(p.ProductID, 1));
+        search = "";
+    }
+
+    private void SetQuantity(DraftLine line, object? value)
+    {
+        decimal.TryParse(Convert.ToString(value, CultureInfo.InvariantCulture), NumberStyles.Number, CultureInfo.InvariantCulture, out var q);
+        message = S.T(draft!.SetQuantity(line.Product.ProductID, q));
+    }
+
+    private void Save()
+    {
+        var (problem, order) = S.SaveOrder(draft!);
+        message = problem;
+        saved = order;
+        if (order is not null)
+        {
+            _ = S.SyncAsync();
+        }
+    }
+
+    private async Task PrintAsync() => message = await S.PrintAsync(saved!, null);
+}

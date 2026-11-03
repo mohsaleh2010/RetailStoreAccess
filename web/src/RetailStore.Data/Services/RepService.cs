@@ -27,9 +27,16 @@ public sealed record OrderLineInput(int ProductID, decimal Quantity, decimal? Un
 
 public sealed record OrderLineView(int SalesOrderLineID, int ProductID, string ProductName, decimal Quantity, decimal UnitPrice);
 
+/// <summary>Everything the rep app keeps on the phone to work without the internet (docs/78): the store name, the profile,
+/// the customers with their price group, the products with the price without a customer and the van stock, the prices of
+/// each price group (the prices that differ only), the visits of the day and the orders of the last days.</summary>
+public sealed record RepSnapshot(DateTime ServerTime, string StoreName, RepProfile Profile, List<RepCustomer> Customers, List<RepProduct> Products,
+                                 Dictionary<string, Dictionary<int, decimal>> PriceGroups, Dictionary<int, string> CustomerPriceGroups,
+                                 List<RepVisit> Visits, List<OrderView> Orders, bool CanVisits);
+
 public sealed record OrderView(int SalesOrderID, string OrderNumber, DateTime OrderDate, int CustomerID, string CustomerName,
                                int WarehouseID, int? SalesRepID, DateTime? RequiredDate, string Status, string? Notes,
-                               decimal Total, OrderLineView[] Lines);
+                               decimal Total, OrderLineView[] Lines, string? ClientRef = null);
 
 /// <summary>The work of a sales rep through the API (docs/77), first used by the rep app (plan 4D): the same rules and
 /// messages as modRepRoutes (visits), modSalesOrders (a draft order and its lines), modPriceLists / modRepRoutes (the
@@ -37,6 +44,8 @@ public sealed record OrderView(int SalesOrderID, string OrderNumber, DateTime Or
 public sealed class RepService(IDbContextFactory<RetailDbContext> factory, PermissionService permissions)
 {
     public const string NotARep = "هذا المستخدم ليس مندوبًا نشطًا. اربطه بمندوب في شاشة المندوبين.";
+    public const string ClientRefTooLong = "رقم الطلبية في الجهاز أطول من 40 حرفًا.";
+    public const string ClientRefUsed = "رقم الطلبية في الجهاز مستعمل لمستخدم آخر.";
     public const int MainWarehouseId = 1;
     public static readonly string[] VisitResults = ["ORDER", "SALE", "PAYMENT", "NO_SALE", "CLOSED"];
 
@@ -137,26 +146,75 @@ public sealed class RepService(IDbContextFactory<RetailDbContext> factory, Permi
     {
         await using var db = await factory.CreateDbContextAsync();
         var products = await db.Products.AsNoTracking().Where(p => p.IsActive).OrderBy(p => p.ProductName).ToListAsync();
-        // the rep of the order (SalesRepFor): the active rep of the customer, else this rep
-        int priceRep = customerId == 0 ? repId
-            : await (from c in db.Customers
-                     join r in db.SalesReps on c.SalesRepID equals r.SalesRepID
-                     where r.IsActive && c.CustomerID == customerId
-                     select (int?)r.SalesRepID).FirstOrDefaultAsync() ?? repId;
+        int priceRep = customerId == 0 ? repId : await PriceRepAsync(db, customerId, repId);
+        var list = await CustomerListAsync(db, customerId);
+        var prices = await PricesAsync(db, products, priceRep, list, (today ?? DateTime.Today).Date);
+        var van = vanWarehouseId is { } w ? await WarehouseStockAsync(db, w) : [];
+        return products.Select(p => new RepProduct(p.ProductID, p.ProductCode, p.Barcode, Name(p.ProductName, p.ProductNameEn, english),
+                                                   p.UnitID, p.VATCategory, p.SellingPrice, prices[p.ProductID].Price,
+                                                   prices[p.ProductID].Rep, p.TrackStock, van.GetValueOrDefault(p.ProductID))).ToList();
+    }
+
+    /// <summary>The rep of an order of the customer (SalesRepFor): the active rep of the customer, else this rep.</summary>
+    private static async Task<int> PriceRepAsync(RetailDbContext db, int customerId, int repId) =>
+        await (from c in db.Customers
+               join r in db.SalesReps on c.SalesRepID equals r.SalesRepID
+               where r.IsActive && c.CustomerID == customerId
+               select (int?)r.SalesRepID).FirstOrDefaultAsync() ?? repId;
+
+    /// <summary>OrderDefaultPrice of every product for the rep of the order and the customer's list on a day; Rep = the
+    /// usual price came from the rep's price list.</summary>
+    private static async Task<Dictionary<int, (decimal Price, bool Rep)>> PricesAsync(RetailDbContext db, List<Products> products,
+                                                                                      int priceRep, CustomerList? list, DateTime day)
+    {
         var repPrices = await db.RepPrices.AsNoTracking().Where(r => r.SalesRepID == priceRep)
             .ToDictionaryAsync(r => r.ProductID, r => r.UnitPrice);
-        var list = await CustomerListAsync(db, customerId);
-        var van = vanWarehouseId is { } w ? await WarehouseStockAsync(db, w) : [];
-        var day = (today ?? DateTime.Today).Date;
         var items = list is null ? [] : await ListItemsAsync(db, list.PriceListID, day);
-        return products.Select(p =>
+        return products.ToDictionary(p => p.ProductID, p =>
         {
             bool rep = repPrices.TryGetValue(p.ProductID, out var rp);
-            decimal usual = rep ? rp : p.SellingPrice;
-            return new RepProduct(p.ProductID, p.ProductCode, p.Barcode, Name(p.ProductName, p.ProductNameEn, english), p.UnitID,
-                                  p.VATCategory, p.SellingPrice, CustomerPrice(list, items, p.ProductID, usual), rep,
-                                  p.TrackStock, van.GetValueOrDefault(p.ProductID));
-        }).ToList();
+            return (CustomerPrice(list, items, p.ProductID, rep ? rp : p.SellingPrice), rep);
+        });
+    }
+
+    /// <summary>The data of the rep app (docs/78) in one read: the customers share a price group when they have the same
+    /// rep of the order and the same active price list, so the phone prices every customer without asking the server;
+    /// a group keeps only the prices that differ from the price without a customer.</summary>
+    public async Task<RepSnapshot?> SnapshotAsync(int employeeId, bool english, int orderDays = 14, DateTime? today = null)
+    {
+        var profile = await ProfileAsync(employeeId, english);
+        if (profile is null)
+        {
+            return null;
+        }
+        int repId = profile.SalesRepID;
+        var day = (today ?? DateTime.Today).Date;
+        var customers = await CustomersAsync(repId, english);
+        var products = await ProductsAsync(repId, 0, profile.VanWarehouseID, english, day);
+        await using var db = await factory.CreateDbContextAsync();
+        var rows = await db.Products.AsNoTracking().Where(p => p.IsActive).ToListAsync();
+        var plain = products.ToDictionary(p => p.ProductID, p => p.Price);
+        var groups = new Dictionary<string, Dictionary<int, decimal>>();
+        var ofCustomer = new Dictionary<int, string>();
+        foreach (var c in customers)
+        {
+            int priceRep = await PriceRepAsync(db, c.CustomerID, repId);
+            var list = await CustomerListAsync(db, c.CustomerID);
+            string key = "R" + priceRep + "-L" + (list?.PriceListID ?? 0);
+            ofCustomer[c.CustomerID] = key;
+            if (!groups.ContainsKey(key))
+            {
+                var prices = await PricesAsync(db, rows, priceRep, list, day);
+                groups[key] = prices.Where(x => x.Value.Price != plain.GetValueOrDefault(x.Key))
+                                    .ToDictionary(x => x.Key, x => x.Value.Price);
+            }
+        }
+        bool canVisits = await permissions.HasPermissionAsync(employeeId, "REP_ROUTES");
+        var visits = canVisits ? await VisitsAsync(repId, day, english) : [];
+        var orders = await OrdersAsync(repId, employeeId, day.AddDays(-orderDays), day, english);
+        var settings = await SettingsReader.ReadAsync(db);
+        string store = english && !string.IsNullOrWhiteSpace(settings.StoreNameEn) ? settings.StoreNameEn! : (settings.StoreName ?? "");
+        return new RepSnapshot(DateTime.Now, store, profile, customers, products, groups, ofCustomer, visits, orders, canVisits);
     }
 
     // ------------------------------------------------------------------ prices (modPriceLists, pieces only)
@@ -469,27 +527,45 @@ public sealed class RepService(IDbContextFactory<RetailDbContext> factory, Permi
     /// <summary>modSalesOrders.CreateSalesOrder and its lines (SalesOrderLineBeforeUpdate) in one transaction: a DRAFT for
     /// an active customer in the user's warehouse (or the one given), number SO-, the rep of the customer; each line
     /// checked, a line without a price at OrderDefaultPrice. The office approves it in Access (the reservation).</summary>
-    public async Task<(string Problem, int OrderID)> CreateOrderAsync(ActingUser user, int customerId, int? warehouseId,
-                                                                      DateTime? requiredDate, string? notes,
-                                                                      IReadOnlyList<OrderLineInput> lines)
+    /// <summary>From the rep app (docs/78): clientRef = the number of the order on the phone. An order sent again with the
+    /// same number by the same user is not added twice (Existing = true, its id); orderDate = when it was taken on the
+    /// phone (never later than now).</summary>
+    public async Task<(string Problem, int OrderID, bool Existing)> CreateOrderAsync(ActingUser user, int customerId, int? warehouseId,
+                                                                                     DateTime? requiredDate, string? notes,
+                                                                                     IReadOnlyList<OrderLineInput> lines,
+                                                                                     string? clientRef = null, DateTime? orderDate = null)
     {
         if (!await permissions.HasPermissionAsync(user.EmployeeID, "SALES_ORDERS"))
         {
-            return ("ليست لديك صلاحية طلبيات العملاء.", 0);
+            return ("ليست لديك صلاحية طلبيات العملاء.", 0, false);
         }
         await using var db = await factory.CreateDbContextAsync();
+        string reference = (clientRef ?? "").Trim();
+        if (reference.Length > 40)
+        {
+            return (ClientRefTooLong, 0, false);
+        }
+        if (reference.Length > 0)
+        {
+            var sent = await db.SalesOrders.Where(o => o.ClientRef == reference)
+                .Select(o => new { o.SalesOrderID, o.EmployeeID }).FirstOrDefaultAsync();
+            if (sent is not null)
+            {
+                return sent.EmployeeID == user.EmployeeID ? ("", sent.SalesOrderID, true) : (ClientRefUsed, 0, false);
+            }
+        }
         if (!await db.Customers.AnyAsync(c => c.IsActive && c.CustomerID == customerId))
         {
-            return ("اختر العميل.", 0);
+            return ("اختر العميل.", 0, false);
         }
         int warehouse = warehouseId ?? await UserWarehouseAsync(db, user.EmployeeID);
         if (!await db.Warehouses.AnyAsync(w => w.IsActive && w.WarehouseID == warehouse))
         {
-            return ("اختر المخزن.", 0);
+            return ("اختر المخزن.", 0, false);
         }
         if (lines.Count == 0)
         {
-            return ("أضف أسطر الطلبية.", 0);
+            return ("أضف أسطر الطلبية.", 0, false);
         }
         var ids = lines.Select(l => l.ProductID).Distinct().ToList();
         var products = await db.Products.AsNoTracking().Where(p => ids.Contains(p.ProductID)).ToDictionaryAsync(p => p.ProductID);
@@ -498,7 +574,7 @@ public sealed class RepService(IDbContextFactory<RetailDbContext> factory, Permi
             string lineProblem = LineProblem(products.GetValueOrDefault(l.ProductID), l.Quantity, l.UnitPrice);
             if (lineProblem.Length > 0)
             {
-                return (lineProblem, 0);
+                return (lineProblem, 0, false);
             }
         }
         int? rep = await SalesRepForAsync(db, customerId, user.EmployeeID);
@@ -506,13 +582,16 @@ public sealed class RepService(IDbContextFactory<RetailDbContext> factory, Permi
         string text = (notes ?? "").Trim();
         var order = new SalesOrders
         {
-            OrderNumber = await NumberSequences.NextNumberAsync(db, "SALES_ORDER"), OrderDate = DateTime.Now,
+            OrderNumber = await NumberSequences.NextNumberAsync(db, "SALES_ORDER"),
+            OrderDate = orderDate is { } taken && taken < DateTime.Now ? taken : DateTime.Now,
             CustomerID = customerId, WarehouseID = warehouse, SalesRepID = rep, RequiredDate = requiredDate?.Date,
             Status = "DRAFT", EmployeeID = user.EmployeeID, Notes = text.Length == 0 ? null : (text.Length <= 255 ? text : text[..255]),
+            ClientRef = reference.Length == 0 ? null : reference,
         };
         db.SalesOrders.Add(order);
         await db.SaveChangesAsync();
-        Audit.LogAction(db, user, "SALES_ORDER_NEW", "SalesOrders", order.SalesOrderID.ToString(), "api");
+        Audit.LogAction(db, user, "SALES_ORDER_NEW", "SalesOrders", order.SalesOrderID.ToString(),
+                        reference.Length == 0 ? "api" : "api " + reference);
         await db.SaveChangesAsync();
         foreach (var l in lines)
         {
@@ -532,7 +611,7 @@ public sealed class RepService(IDbContextFactory<RetailDbContext> factory, Permi
                 ]);
         }
         await tx.CommitAsync();
-        return ("", order.SalesOrderID);
+        return ("", order.SalesOrderID, false);
     }
 
     /// <summary>The orders of a rep (SalesOrders.SalesRepID) or entered by the user, between two days, newest first,
@@ -560,7 +639,7 @@ public sealed class RepService(IDbContextFactory<RetailDbContext> factory, Permi
                                                l.l.Quantity, l.l.UnitPrice)).ToArray();
             return new OrderView(x.o.SalesOrderID, x.o.OrderNumber, x.o.OrderDate, x.o.CustomerID,
                                  Name(x.CustomerName, x.CustomerNameEn, english), x.o.WarehouseID, x.o.SalesRepID, x.o.RequiredDate,
-                                 x.o.Status, x.o.Notes, RoundMoney(mine.Sum(l => l.Quantity * l.UnitPrice)), mine);
+                                 x.o.Status, x.o.Notes, RoundMoney(mine.Sum(l => l.Quantity * l.UnitPrice)), mine, x.o.ClientRef);
         }).ToList();
     }
 }

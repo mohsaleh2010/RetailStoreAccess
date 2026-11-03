@@ -1,0 +1,69 @@
+@page "/settings"
+@inject RepSession S
+@inject NavigationManager Nav
+
+<section class="rep-card">
+    <h2>@S.T("الإعدادات")</h2>
+    <dl class="rep-facts">
+        <dt>@S.T("المستخدم")</dt><dd>@S.EmployeeName (@S.Username)</dd>
+        <dt>@S.T("عنوان الخادم")</dt><dd dir="ltr">@S.ServerUrl</dd>
+        <dt>@S.T("الجهاز")</dt><dd>@S.Platform.DeviceName</dd>
+    </dl>
+    <button class="rep-link" @onclick="() => S.SetLanguage(!S.English)">@(S.English ? "العربية" : "English")</button>
+</section>
+
+<section class="rep-card">
+    <h2>@S.T("طابعة بلوتوث")</h2>
+    <label>@S.T("الطابعة")
+        <select @bind="printer">
+            <option value="">-</option>
+            @foreach (var p in printers)
+            {
+                <option value="@p">@p</option>
+            }
+        </select>
+    </label>
+    <label>@S.T("عرض الورق")
+        <select @bind="paper">
+            <option value="58">58 mm</option>
+            <option value="80">80 mm</option>
+        </select>
+    </label>
+    <p><small>@S.T("اربط الطابعة أولًا من إعدادات البلوتوث في الجوال.")</small></p>
+    <button class="rep-primary" @onclick="Save">@S.T("حفظ")</button>
+    @if (message.Length > 0)
+    {
+        <p>@message</p>
+    }
+</section>
+
+<section class="rep-card">
+    <button @onclick="@(() => Nav.NavigateTo("password"))">@S.T("تغيير كلمة المرور")</button>
+    <button @onclick="LogoutAsync">@S.T("خروج")</button>
+    <p><small>@S.T("بعد الخروج تبقى البيانات والعمليات غير المرسلة على الجهاز حتى يدخل المستخدم نفسه.")</small></p>
+</section>
+
+@code {
+    private IReadOnlyList<string> printers = [];
+    private string printer = "", message = "";
+    private int paper = 58;
+
+    protected override async Task OnInitializedAsync()
+    {
+        printer = S.Printer;
+        paper = S.PaperMillimetres;
+        printers = await S.Platform.PrintersAsync();
+    }
+
+    private void Save()
+    {
+        S.SetPrinter(printer, paper);
+        message = S.T("تم الحفظ");
+    }
+
+    private async Task LogoutAsync()
+    {
+        await S.LogoutAsync();
+        Nav.NavigateTo("login");
+    }
+}

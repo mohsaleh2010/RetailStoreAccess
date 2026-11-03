@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/RetailStore.Data/RetailStore.Data.csproj" />
     <Project Path="src/RetailStore.Domain/RetailStore.Domain.csproj" />
+    <Project Path="src/RetailStore.RepApp/RetailStore.RepApp.csproj" />
     <Project Path="src/RetailStore.UI/RetailStore.UI.csproj" />
     <Project Path="src/RetailStore.Web/RetailStore.Web.csproj" />
   </Folder>

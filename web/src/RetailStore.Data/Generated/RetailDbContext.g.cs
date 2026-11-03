@@ -1553,9 +1553,11 @@ public partial class RetailDbContext : DbContext
             e.Property(x => x.OrderNumber).HasMaxLength(20).IsRequired();
             e.Property(x => x.Status).HasMaxLength(10).IsRequired();
             e.Property(x => x.Notes).HasMaxLength(255);
+            e.Property(x => x.ClientRef).HasMaxLength(40);
             if (!sqlServer) e.HasIndex(x => x.OrderNumber).HasDatabaseName("SalesOrders_UX_OrderNumber").IsUnique();
             if (!sqlServer) e.HasIndex(x => x.OrderDate).HasDatabaseName("SalesOrders_IX_OrderDate");
             if (!sqlServer) e.HasIndex(x => x.Status).HasDatabaseName("SalesOrders_IX_Status");
+            if (!sqlServer) e.HasIndex(x => x.ClientRef).HasDatabaseName("SalesOrders_UX_ClientRef").IsUnique();
             e.HasOne<Customers>().WithMany().HasForeignKey(x => x.CustomerID).HasConstraintName("FK_SalesOrders_CustomerID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<Warehouses>().WithMany().HasForeignKey(x => x.WarehouseID).HasConstraintName("FK_SalesOrders_WarehouseID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<SalesReps>().WithMany().HasForeignKey(x => x.SalesRepID).HasConstraintName("FK_SalesOrders_SalesRepID").OnDelete(DeleteBehavior.ClientSetNull);

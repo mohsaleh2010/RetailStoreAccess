@@ -2405,10 +2405,12 @@ TABLES: List[Table] = [
             datetime_("PreparedAt", "وقت بدء التجهيز"),
             long_("EmployeeID", "سجّلها", required=True, fk="Employees.EmployeeID"),
             text("Notes", 255, "ملاحظات"),
+            text("ClientRef", 40, "رقم الطلبية في جهاز المندوب",
+                 note="من تطبيق المندوب (docs/78): يمنع تكرار الطلبية إذا أُعيد إرسالها بعد انقطاع الاتصال"),
             created_at(),
         ],
         pk=["SalesOrderID"],
-        indexes=[ux("OrderNumber"), ix("OrderDate"), ix("Status")],
+        indexes=[ux("OrderNumber"), ix("OrderDate"), ix("Status"), ux("ClientRef", ignore_nulls=True)],
     ),
 
     Table(

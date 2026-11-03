@@ -2567,6 +2567,8 @@ public partial class SalesOrders
     public int EmployeeID { get; set; }
     /// <summary>ملاحظات</summary>
     public string? Notes { get; set; }
+    /// <summary>رقم الطلبية في جهاز المندوب</summary>
+    public string? ClientRef { get; set; }
     /// <summary>تاريخ الإنشاء</summary>
     public DateTime CreatedAt { get; set; } = DateTime.Now;
 }

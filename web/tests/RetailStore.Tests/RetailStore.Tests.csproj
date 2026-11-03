@@ -17,6 +17,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\RetailStore.Data\RetailStore.Data.csproj" />
     <ProjectReference Include="..\..\src\RetailStore.Web\RetailStore.Web.csproj" />
+    <ProjectReference Include="..\..\src\RetailStore.RepApp\RetailStore.RepApp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

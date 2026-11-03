@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **97** | عدد الحقول: **1237**
+عدد الجداول: **97** | عدد الحقول: **1238**
 
 ## الفهرس
 
@@ -2075,12 +2075,14 @@
 | 10 | PreparedAt | Date/Time |  |  |  |  |  | وقت بدء التجهيز |
 | 11 | EmployeeID | Number (Long) |  | ✔ |  |  | `Employees.EmployeeID` | سجّلها |
 | 12 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
-| 13 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 13 | ClientRef | Short Text | 40 |  |  |  |  | رقم الطلبية في جهاز المندوب – من تطبيق المندوب (docs/78): يمنع تكرار الطلبية إذا أُعيد إرسالها بعد انقطاع الاتصال |
+| 14 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
 
 - المفتاح الأساسي: `SalesOrderID`
 - فهرس فريد: `OrderNumber`
 - فهرس عادي: `OrderDate`
 - فهرس عادي: `Status`
+- فهرس فريد (يتجاهل الفارغ): `ClientRef`
 
 ## Quotations
 

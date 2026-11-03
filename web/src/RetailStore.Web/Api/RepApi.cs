@@ -16,6 +16,20 @@ public static class RepApi
                          "CustomersBalance = the positive balances of his customers (modRepRoutes.RepCustomersBalance).")
         .Produces<RepProfile>();
 
+        rep.MapGet("/sync", async (HttpContext http, RepService reps, int? orderDays) =>
+        {
+            var snapshot = await reps.SnapshotAsync(UserInfo.EmployeeId(http.User), ApiResults.English(http),
+                                                    Math.Clamp(orderDays ?? 14, 1, 90));
+            return snapshot is null ? ApiResults.Refused(http, RepService.NotARep) : Results.Ok(snapshot);
+        })
+        .Needs("SALES_ORDERS").WithName("RepSync")
+        .WithSummary("Everything the rep app keeps on the phone to work offline (docs/78), in one read")
+        .WithDescription("The store name, the profile, the customers (CustomerPriceGroups: the price group of each one), the " +
+                         "products with the price without a customer and the van stock, PriceGroups = the OrderDefaultPrice " +
+                         "of each group where it differs, the visits of today (with REP_ROUTES) and the orders of the last " +
+                         "orderDays days (default 14). The phone reads it again after sending what it recorded offline.")
+        .Produces<RepSnapshot>().ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+
         rep.MapGet("/customers", async (HttpContext http, RepService reps) =>
             Results.Ok(await reps.CustomersAsync(RepFilter.RepOf(http), ApiResults.English(http))))
         .Needs("REP_ROUTES").WithName("RepCustomers")
@@ -105,15 +119,20 @@ public static class RepApi
 
         rep.MapPost("/orders", async (OrderRequest body, HttpContext http, RepService reps) =>
         {
-            var (problem, id) = await reps.CreateOrderAsync(UserInfo.Acting(http.User), body.CustomerID, body.WarehouseID,
-                                                            body.RequiredDate, body.Notes, body.Lines ?? []);
-            return ApiResults.OfMessage(http, problem, () => Results.Created(ApiEndpoints.Prefix + "/rep/orders/" + id, new CreatedId(id, "")));
+            var (problem, id, existing) = await reps.CreateOrderAsync(UserInfo.Acting(http.User), body.CustomerID, body.WarehouseID,
+                                                                      body.RequiredDate, body.Notes, body.Lines ?? [],
+                                                                      body.ClientRef, body.OrderDate);
+            return ApiResults.OfMessage(http, problem, () => existing
+                ? Results.Ok(new CreatedId(id, ""))
+                : Results.Created(ApiEndpoints.Prefix + "/rep/orders/" + id, new CreatedId(id, "")));
         })
         .Needs("SALES_ORDERS").WithName("AddRepOrder")
         .WithSummary("A customer order as a draft, with its lines (modSalesOrders.CreateSalesOrder)")
         .WithDescription("Number SO-, the warehouse of the user unless given, the rep of the customer; each line checked " +
                          "(SalesOrderLineProblem), a line without a price at OrderDefaultPrice. The office approves it in " +
-                         "Access, which reserves the quantities.")
-        .Produces<CreatedId>(StatusCodes.Status201Created).ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+                         "Access, which reserves the quantities. ClientRef (the number of the order on the phone, docs/78): " +
+                         "sent again by the same user, the order is not added twice (200 with its id); OrderDate = when it " +
+                         "was taken on the phone (never later than now).")
+        .Produces<CreatedId>(StatusCodes.Status201Created).Produces<CreatedId>().ProducesProblem(StatusCodes.Status422UnprocessableEntity);
     }
 }

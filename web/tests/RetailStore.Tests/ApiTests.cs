@@ -207,7 +207,7 @@ public class ApiTests
     }
 
     /// <summary>A rep user: his own screens are the visits and the customer orders only.</summary>
-    private static async Task<(int Rep, int Customer, int Van, int Product)> MakeRepAsync(ApiHost host)
+    internal static async Task<(int Rep, int Customer, int Van, int Product)> MakeRepAsync(ApiHost host)
     {
         await using var db = host.Db.CreateDbContext();
         var user = new Employees { EmployeeName = "مندوب", Username = "rep1", RoleID = 3, CustomScreens = true, MustChangePassword = false };
@@ -398,7 +398,7 @@ public class ApiTests
                 Assert.Equal(path.Name != "/api/v1/auth/token", op.Value.TryGetProperty("security", out _));
             }
         }
-        Assert.Equal(3 + 4 * 6 + 12, operations);
+        Assert.Equal(3 + 4 * 6 + 13, operations);
         Assert.Equal(HttpStatusCode.OK, (await c.GetAsync("/api/docs")).StatusCode);
     }
 }

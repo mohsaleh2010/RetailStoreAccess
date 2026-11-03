@@ -1,0 +1,74 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject RepSession S
+@inject NavigationManager Nav
+
+<div class="rep" dir="@S.Dir" lang="@(S.English ? "en" : "ar")">
+    <header class="rep-top">
+        <div class="rep-title">
+            <strong>@(S.Snapshot?.Profile.RepName ?? S.T("تطبيق المندوب"))</strong>
+            <small>@SyncLine()</small>
+        </div>
+        <button class="rep-sync" disabled="@(S.Syncing || !S.LoggedIn)" @onclick="SyncAsync">
+            @(S.Syncing ? S.T("جارٍ المزامنة") : S.T("مزامنة"))
+            @if (S.Waiting > 0)
+            {
+                <span class="rep-badge">@S.Waiting</span>
+            }
+        </button>
+    </header>
+    @if (S.Refused > 0)
+    {
+        <a class="rep-alert" href="orders">@S.T("عمليات رفضها البرنامج"): @S.Refused</a>
+    }
+    @if (!S.LoggedIn && S.Snapshot is not null)
+    {
+        <a class="rep-alert" href="login">@S.T("سجّل الدخول للمزامنة")</a>
+    }
+    <main class="rep-main">@Body</main>
+    @if (S.Snapshot is not null)
+    {
+        <nav class="rep-nav">
+            <NavLink href="" Match="NavLinkMatch.All">@S.T("اليوم")</NavLink>
+            <NavLink href="customers">@S.T("العملاء")</NavLink>
+            <NavLink href="orders">@S.T("الطلبيات")</NavLink>
+            <NavLink href="settings">@S.T("الإعدادات")</NavLink>
+        </nav>
+    }
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        S.Changed += Refresh;
+        await S.LoadAsync();
+        string here = Nav.ToBaseRelativePath(Nav.Uri);
+        if (S.Snapshot is null && !S.LoggedIn && here != "login")
+        {
+            Nav.NavigateTo("login");
+        }
+        else if (S.LoggedIn && S.MustChangePassword && here != "password")
+        {
+            Nav.NavigateTo("password");
+        }
+        else if (S.LoggedIn)
+        {
+            _ = SyncAsync();
+        }
+    }
+
+    private async Task SyncAsync() => await S.SyncAsync();
+
+    private string SyncLine()
+    {
+        if (S.LastSync is { Message.Length: > 0 } last)
+        {
+            return last.Message;
+        }
+        return S.SnapshotAt is { } at ? S.T("آخر مزامنة") + " " + at.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture) : "";
+    }
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => S.Changed -= Refresh;
+}

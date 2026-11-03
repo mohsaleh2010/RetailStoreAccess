@@ -1,0 +1,36 @@
+@page "/customers"
+@inject RepSession S
+
+@if (S.Snapshot is { } snap)
+{
+    <section class="rep-card">
+        <input class="rep-search" @bind="search" @bind:event="oninput" placeholder="@S.T("بحث")" />
+        <label class="rep-check"><input type="checkbox" @bind="onlyToday" /> @S.T("خط سير اليوم")</label>
+        <ul class="rep-list">
+            @foreach (var c in Filter(snap))
+            {
+                <li>
+                    <a href="@($"customers/{c.CustomerID}")">
+                        <strong>@c.CustomerName</strong>
+                        <small>@string.Join(" - ", new[] { c.City, c.District }.Where(x => !string.IsNullOrWhiteSpace(x)))</small>
+                        <span class="rep-amount">@OrderSlip.Amount(c.CurrentBalance)</span>
+                    </a>
+                </li>
+            }
+        </ul>
+    </section>
+}
+
+@code {
+    private string search = "";
+    private bool onlyToday;
+
+    private IEnumerable<RepCustomer> Filter(RepSnapshot snap)
+    {
+        int weekday = VisitBoard.WeekdayOf(S.Clock());
+        var text = search.Trim();
+        return snap.Customers.Where(c => (!onlyToday || c.RouteWeekdays.Contains(weekday))
+                                         && (text.Length == 0 || c.CustomerName.Contains(text, StringComparison.OrdinalIgnoreCase)
+                                             || (c.Mobile ?? "").Contains(text, StringComparison.Ordinal)));
+    }
+}

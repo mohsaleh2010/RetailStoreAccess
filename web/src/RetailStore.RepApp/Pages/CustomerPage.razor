@@ -1,0 +1,80 @@
+@page "/customers/{Id:int}"
+@inject RepSession S
+@inject NavigationManager Nav
+
+@if (S.Customer(Id) is { } c)
+{
+    <section class="rep-card">
+        <h2>@c.CustomerName</h2>
+        <dl class="rep-facts">
+            <dt>@S.T("الرصيد")</dt><dd>@OrderSlip.Amount(c.CurrentBalance)</dd>
+            @if (c.AllowCredit)
+            {
+                <dt>@S.T("حد الائتمان")</dt><dd>@OrderSlip.Amount(c.CreditLimit)</dd>
+            }
+            @if (!string.IsNullOrWhiteSpace(c.Mobile))
+            {
+                <dt>@S.T("الجوال")</dt><dd><a dir="ltr" href="@($"tel:{c.Mobile}")">@c.Mobile</a></dd>
+            }
+            @if (!string.IsNullOrWhiteSpace(c.Address))
+            {
+                <dt>@S.T("العنوان")</dt><dd>@c.Address</dd>
+            }
+        </dl>
+        <button class="rep-primary" @onclick="@(() => Nav.NavigateTo($"orders/new/{Id}"))">@S.T("طلبية جديدة")</button>
+    </section>
+
+    @if (S.Snapshot!.CanVisits)
+    {
+        var visit = S.Visits(today).FirstOrDefault(v => v.CustomerID == Id);
+        <section class="rep-card">
+            <h2>@S.T("زيارة اليوم")</h2>
+            @if (visit is null)
+            {
+                <button @onclick="AddVisit">@S.T("زيارة خارج خط السير")</button>
+            }
+            else
+            {
+                <p>@S.VisitResultText(visit.Result)
+                    @if (visit.Waiting)
+                    {
+                        <small class="rep-wait">@S.T("بانتظار الإرسال")</small>
+                    }
+                </p>
+                <label>@S.T("ملاحظات")<input @bind="notes" maxlength="255" /></label>
+                <div class="rep-buttons">
+                    <button @onclick="@(() => Record(visit, ""))">@S.T("من مستندات اليوم")</button>
+                    <button @onclick="@(() => Record(visit, "NO_SALE"))">@S.T("لا شيء")</button>
+                    <button @onclick="@(() => Record(visit, "CLOSED"))">@S.T("المحل مغلق")</button>
+                    <button @onclick="@(() => Record(visit, "PAYMENT"))">@S.T("تحصيل")</button>
+                </div>
+            }
+            @if (message.Length > 0)
+            {
+                <p class="rep-error">@message</p>
+            }
+        </section>
+    }
+}
+else
+{
+    <p class="rep-empty">@S.T("العميل غير موجود على الجهاز. زامن أولًا.")</p>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private string notes = "", message = "";
+    private DateTime today;
+
+    protected override void OnInitialized() => today = S.Clock().Date;
+
+    private void AddVisit() => message = S.AddVisit(Id, today);
+
+    private void Record(BoardVisit visit, string result)
+    {
+        S.RecordVisit(visit, today, result, notes);
+        notes = "";
+        _ = S.SyncAsync();
+    }
+}

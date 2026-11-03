@@ -33,7 +33,7 @@ Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,Ro
 Private Const EXPECTED_FIELD_COUNTS As String = "Settings=71;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;PriceLists=7;Customers=26;Products=26;ProductUnits=9;PriceListItems=8;SalesInvoices=47;SalesInvoiceDetails=16;SalesReturns=40;SalesReturnDetails=16;" & _
     "PurchaseInvoices=24;PurchaseInvoiceDetails=13;PurchaseReturns=23;PurchaseReturnDetails=13;CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;" & _
     "BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;" & _
-    "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=13;Quotations=16;QuotationLines=9;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;" & _
+    "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=14;Quotations=16;QuotationLines=9;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;" & _
     "EInvoiceLog=15"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=36;Roles=3;Permissions=48;RolePermissions=94;Employees=1;Screens=83;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=38;TransactionTypes=14;StockParties=1;LabelSettings=1"
 
@@ -3577,12 +3577,15 @@ Private Sub CreateTable_SalesOrders()
              "", "", "سجّلها", ""
     AddField tdf, "Notes", "TEXT", 255, False, "", _
              "", "", "ملاحظات", ""
+    AddField tdf, "ClientRef", "TEXT", 40, False, "", _
+             "", "", "رقم الطلبية في جهاز المندوب", "من تطبيق المندوب (docs/78): يمنع تكرار الطلبية إذا أُعيد إرسالها بعد انقطاع الاتصال"
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
     AddIndex tdf, "PrimaryKey", "SalesOrderID", True, True, False
     AddIndex tdf, "UX_OrderNumber", "OrderNumber", False, True, False
     AddIndex tdf, "IX_OrderDate", "OrderDate", False, False, False
     AddIndex tdf, "IX_Status", "Status", False, False, False
+    AddIndex tdf, "UX_ClientRef", "ClientRef", False, True, True
     EndTable tdf, "طلبيات العملاء: طلبية عميل (docs/62): مسودة، ثم «اعتماد» يحجز الكمية في المخزن فلا تُباع لغيرها، ثم «قيد التجهيز»، ثم التسليم بأذونات التسليم (كليًا أو جزئيًا) ثم فوترتها، أو الإلغاء.", "", ""
 End Sub
 

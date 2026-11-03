@@ -1,0 +1,64 @@
+@page "/"
+@implements IDisposable
+@inject RepSession S
+
+@if (S.Snapshot is { } snap)
+{
+    <section class="rep-card">
+        <h2>@S.T("زيارات اليوم") <small>@today.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)</small></h2>
+        @if (!snap.CanVisits)
+        {
+            <p class="rep-empty">@S.T("ليست لديك صلاحية خط السير وزيارات المندوبين.")</p>
+        }
+        else
+        {
+            var visits = S.Visits(today);
+            if (visits.Count == 0)
+            {
+                <p class="rep-empty">@S.T("لا زيارات لهذا اليوم بعد.")</p>
+                <button class="rep-primary" @onclick="() => S.PlanDay(today)">@S.T("خطة اليوم من خط السير")</button>
+            }
+            <ul class="rep-list">
+                @foreach (var v in visits)
+                {
+                    <li>
+                        <a href="@($"customers/{v.CustomerID}")">
+                            <strong>@v.CustomerName</strong>
+                            <span class="rep-tag @Css(v.Result)">@S.VisitResultText(v.Result)</span>
+                            @if (!v.IsPlanned)
+                            {
+                                <small>@S.T("خارج خط السير")</small>
+                            }
+                            @if (v.Waiting)
+                            {
+                                <small class="rep-wait">@S.T("بانتظار الإرسال")</small>
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+    <section class="rep-card rep-numbers">
+        <div><small>@S.T("عملائي")</small><b>@snap.Customers.Count(c => c.Assigned)</b></div>
+        <div><small>@S.T("أرصدة عملائي")</small><b>@OrderSlip.Amount(snap.Profile.CustomersBalance)</b></div>
+        <div><small>@S.T("حد الائتمان")</small><b>@OrderSlip.Amount(snap.Profile.CreditLimit)</b></div>
+        <div><small>@S.T("مخزن السيارة")</small><b>@(snap.Profile.VanWarehouseName ?? "-")</b></div>
+    </section>
+}
+
+@code {
+    private DateTime today;
+
+    protected override void OnInitialized()
+    {
+        today = S.Clock().Date;
+        S.Changed += Refresh;
+    }
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() => S.Changed -= Refresh;
+
+    private static string Css(string result) => result == "PENDING" ? "rep-tag-open" : "rep-tag-done";
+}
