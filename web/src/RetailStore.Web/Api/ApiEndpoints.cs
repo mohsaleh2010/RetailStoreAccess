@@ -139,6 +139,9 @@ public static class ApiEndpoints
         MapScreen(secured, ScreenSpecs.Suppliers, "SUPPLIERS");
         MapScreen(secured, ScreenSpecs.Warehouses, "PRODUCTS");
 
+        // ---------------------------------------------------------------- sales and receipts (docs/79)
+        SalesApi.Map(secured);
+
         // ---------------------------------------------------------------- the sales rep
         RepApi.Map(secured.MapGroup("/rep").AddEndpointFilter<RepFilter>().WithTags("Sales rep")
                           .ProducesProblem(StatusCodes.Status403Forbidden));

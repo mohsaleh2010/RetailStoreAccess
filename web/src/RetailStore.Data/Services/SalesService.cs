@@ -28,7 +28,7 @@ public sealed record PaymentRequest(int CustomerID, decimal Amount, int PaymentM
 
 /// <summary>A product found by a code or a name, with the unit of the code and the price of a new line.</summary>
 public sealed record SaleProduct(int ProductID, string ProductCode, string? Barcode, string ProductName, int? UnitID, string UnitName,
-                                 decimal Price, decimal Available, bool TrackStock);
+                                 decimal Price, decimal Available, bool TrackStock, string VATCategory);
 
 public sealed record UnitChoice(int UnitID, string UnitName, decimal Factor);
 
@@ -366,7 +366,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         }
         if (!c.AllowCredit)
         {
-            return "العميل «" + c.CustomerName + "» غير مسموح له بالبيع الآجل.\nللبيع الآجل اختر عميلًا مسجلًا.";
+            return "العميل «" + c.CustomerName + "» غير مسموح له بالبيع الآجل.\n" + "للبيع الآجل اختر عميلًا مسجلًا.";
         }
         if (c.CreditLimit > 0 && c.CurrentBalance + remaining > c.CreditLimit)
         {
@@ -379,8 +379,8 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
             int late = CustomerAging.MaxDaysLate(await CustomerAgingAsync(db, c.CustomerID, DateTime.Today), DateTime.Today);
             if (late > blockDays)
             {
-                return "على العميل «" + c.CustomerName + "» فاتورة متأخرة " + late + " يومًا عن استحقاقها (الحد " + blockDays +
-                       " يومًا).\nحصّل المتأخر أولًا، أو بِع نقدًا.";
+                return "على العميل «" + c.CustomerName + "» فاتورة متأخرة " + late + " يومًا عن استحقاقها " + "(الحد " + blockDays +
+                       " يومًا).\n" + "حصّل المتأخر أولًا، أو بِع نقدًا.";
             }
         }
         return "";
@@ -684,7 +684,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         {
             return new SaleResult(SaveStatus.NeedsConfirmation,
                                   "المبلغ (" + InvoiceCalculator.Money(amount) + ") أكبر من الرصيد المستحق (" + InvoiceCalculator.Money(balance) +
-                                  ")، وسيصبح للعميل رصيد دائن.\nهل تريد المتابعة؟");
+                                  ")، وسيصبح للعميل رصيد دائن.\n" + "هل تريد المتابعة؟");
         }
         await using var tx = await db.Database.BeginTransactionAsync();
         var p = new CustomerPayments
@@ -773,7 +773,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
             string unitName = units.TryGetValue(u, out var un) ? Name(un.UnitName, un.UnitNameEn, english) : "";
             list.Add(new SaleProduct(p.ProductID, p.ProductCode, p.Barcode, Name(p.ProductName, p.ProductNameEn, english), unitId, unitName,
                                      await UnitSalePriceAsync(db, p, unitId, customerId, repId),
-                                     await AvailableQtyAsync(db, p.ProductID, warehouse), p.TrackStock));
+                                     await AvailableQtyAsync(db, p.ProductID, warehouse), p.TrackStock, p.VATCategory));
         }
         return list;
     }

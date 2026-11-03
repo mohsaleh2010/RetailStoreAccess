@@ -1,0 +1,25 @@
+@using QRCoder
+
+@if (svg.Length > 0)
+{
+    <div class="qr" role="img" aria-label="@Label">@((MarkupString)svg)</div>
+}
+
+@code {
+    /// <summary>The text of the code (the Base64 TLV of ZATCA).</summary>
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string Label { get; set; } = "";
+
+    private string svg = "";
+
+    protected override void OnParametersSet()
+    {
+        svg = "";
+        if (!string.IsNullOrEmpty(Text))
+        {
+            using var gen = new QRCodeGenerator();
+            using var data = gen.CreateQrCode(Text, QRCodeGenerator.ECCLevel.M);
+            svg = new SvgQRCode(data).GetGraphic(4, "#000000", "#ffffff", true, SvgQRCode.SizingMode.ViewBoxAttribute);
+        }
+    }
+}

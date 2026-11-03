@@ -378,6 +378,54 @@ public class ApiTests
     }
 
     [Fact]
+    public async Task A_sale_and_a_receipt_through_the_api_follow_modSales()
+    {
+        using var host = new ApiHost();
+        var admin = await host.AdminAsync();
+        int rice, ali;
+        await using (var db = host.Db.CreateDbContext())
+        {
+            var p = new Products { ProductCode = "R1", Barcode = "628100", ProductName = "أرز", SellingPrice = 23, CurrentQuantity = 1 };
+            var c = new Customers { CustomerName = "علي" };
+            db.AddRange(p, c);
+            await db.SaveChangesAsync();
+            (rice, ali) = (p.ProductID, c.CustomerID);
+        }
+        var found = await Json(await admin.GetAsync("/api/v1/sales/products?code=628100"));
+        Assert.Equal(23m, found[0].GetProperty("price").GetDecimal());
+        var sale = new { customerID = ali, paymentType = "CREDIT", invoiceDiscount = 0, tendered = 0,
+                         lines = new[] { new { productID = rice, quantity = 2, unitPrice = 23 } } };
+        var ask = await admin.PostAsJsonAsync("/api/v1/sales", sale);
+        Assert.Equal(HttpStatusCode.Conflict, ask.StatusCode);                       // more than the stock: the question
+        Assert.Equal("confirm", await Code(ask));
+        var made = await admin.PostAsJsonAsync("/api/v1/sales?confirm=true", sale);
+        Assert.Equal(HttpStatusCode.Created, made.StatusCode);
+        var id = (await Json(made)).GetProperty("id").GetInt32();
+        var invoice = await Json(await admin.GetAsync($"/api/v1/sales/{id}"));
+        Assert.Equal(46m, invoice.GetProperty("remainingAmount").GetDecimal());
+        Assert.Single((await Json(await admin.GetAsync("/api/v1/sales"))).EnumerateArray());
+
+        var pay = await admin.PostAsJsonAsync("/api/v1/customer-payments", new { customerID = ali, amount = 50, paymentMethodID = 1 });
+        Assert.Equal(HttpStatusCode.Conflict, pay.StatusCode);
+        pay = await admin.PostAsJsonAsync("/api/v1/customer-payments?confirm=true", new { customerID = ali, amount = 50, paymentMethodID = 1 });
+        Assert.Equal(HttpStatusCode.Created, pay.StatusCode);
+        var cash = await admin.PostAsJsonAsync("/api/v1/customer-payments?lang=en", new { customerID = 1, amount = 5, paymentMethodID = 1 });
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, cash.StatusCode);
+        Assert.DoesNotContain((await Json(cash)).GetProperty("title").GetString()!, c => c >= '\u0600' && c <= '\u06FF');
+
+        await using var check = host.Db.CreateDbContext();
+        Assert.Equal(-4m, (await check.Customers.FindAsync(ali))!.CurrentBalance);
+        var cashier = new Employees { EmployeeName = "مخزن", Username = "store1", RoleID = 2 };
+        check.Employees.Add(cashier);
+        await check.SaveChangesAsync();
+        check.RolePermissions.RemoveRange(check.RolePermissions.Where(r => r.RoleID == 2 && r.PermissionKey == "SALES_POS"));
+        await check.SaveChangesAsync();
+        await new SecurityService(host.Db).SetUserPasswordAsync(cashier.EmployeeID, ApiHost.AdminPassword, false, TestDb.Admin);
+        var other = await host.ClientAsync("store1", ApiHost.AdminPassword);
+        Assert.Equal(HttpStatusCode.Forbidden, (await other.PostAsJsonAsync("/api/v1/sales", sale)).StatusCode);
+    }
+
+    [Fact]
     public async Task The_OpenAPI_document_lists_every_operation_with_its_permission()
     {
         using var host = new ApiHost();
@@ -398,7 +446,7 @@ public class ApiTests
                 Assert.Equal(path.Name != "/api/v1/auth/token", op.Value.TryGetProperty("security", out _));
             }
         }
-        Assert.Equal(3 + 4 * 6 + 13, operations);
+        Assert.Equal(3 + 4 * 6 + 13 + 6, operations);
         Assert.Equal(HttpStatusCode.OK, (await c.GetAsync("/api/docs")).StatusCode);
     }
 }

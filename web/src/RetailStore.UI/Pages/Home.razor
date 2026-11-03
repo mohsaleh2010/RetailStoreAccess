@@ -9,7 +9,7 @@
     <header class="screen-head">
         <div>
             <h1>@L.T("مرحبًا") @UserInfo.Name(user)</h1>
-            <p class="subtitle">@L.T("نسخة الويب: البيانات الأساسية على نفس قاعدة بيانات البرنامج")</p>
+            <p class="subtitle">@L.T("نسخة الويب: البيانات الأساسية والمبيعات على نفس قاعدة بيانات البرنامج")</p>
         </div>
     </header>
     <div class="tiles">
@@ -20,8 +20,15 @@
                 <span>@L.T(s.Subtitle)</span>
             </a>
         }
+        @foreach (var w in work)
+        {
+            <a class="tile" href="@w.Route">
+                <strong>@L.T(w.Caption)</strong>
+                <span>@L.T(w.Subtitle)</span>
+            </a>
+        }
     </div>
-    @if (screens.Count == 0)
+    @if (screens.Count == 0 && work.Count == 0)
     {
         <p class="empty">@L.T("لا توجد شاشات متاحة لك على الويب بعد. راجع مدير النظام.")</p>
     }
@@ -31,6 +38,7 @@
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
     private List<IScreenSpec> screens = [];
+    private List<WorkPage> work = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -40,6 +48,13 @@
             if (await Permissions.CanOpenScreenAsync(UserInfo.EmployeeId(user), s.Name))
             {
                 screens.Add(s);
+            }
+        }
+        foreach (var w in WorkPages.All)
+        {
+            if (await Permissions.CanOpenScreenAsync(UserInfo.EmployeeId(user), w.FormName))
+            {
+                work.Add(w);
             }
         }
     }

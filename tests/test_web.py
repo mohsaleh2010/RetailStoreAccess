@@ -239,7 +239,7 @@ class ApiTests(unittest.TestCase):
     def test_every_operation_has_its_permission(self):
         """Each mapped operation of the secured group names its permission (.Needs), except the user's own ones."""
         own = {"/auth/token", "/auth/password", "/me", "/profile"}
-        for name in ("ApiEndpoints.cs", "RepApi.cs"):
+        for name in ("ApiEndpoints.cs", "RepApi.cs", "SalesApi.cs"):
             code = read(self.API + name)
             for m in re.finditer(r'\.Map(Get|Post|Put|Delete)\("([^"]*)"', code):
                 route = m.group(2)

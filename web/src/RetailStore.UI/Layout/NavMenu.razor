@@ -7,11 +7,16 @@
     {
         <li><NavLink href="@s.Route">@L.T(s.Caption)</NavLink></li>
     }
+    @foreach (var w in work)
+    {
+        <li><NavLink href="@w.Route">@L.T(w.Caption)</NavLink></li>
+    }
 </ul>
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private List<IScreenSpec> screens = [];
+    private List<WorkPage> work = [];
 
     protected override async Task OnInitializedAsync()
     {
@@ -22,6 +27,13 @@
             if (id > 0 && await Permissions.CanOpenScreenAsync(id, s.Name))
             {
                 screens.Add(s);
+            }
+        }
+        foreach (var w in WorkPages.All)
+        {
+            if (id > 0 && await Permissions.CanOpenScreenAsync(id, w.FormName))
+            {
+                work.Add(w);
             }
         }
     }

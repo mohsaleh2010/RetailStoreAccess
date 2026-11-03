@@ -1,0 +1,192 @@
+@page "/payments"
+@attribute [Authorize]
+@inject SalesService Sales
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("سندات القبض")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("سندات القبض")</h1>
+            <p class="subtitle">@L.T("تحصيل من العملاء نقدًا أو بالبطاقة أو التحويل")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="pos">
+            <div class="list-pane">
+                <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
+                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+                    <input type="search" class="search" placeholder="@L.T("بحث")" aria-label="@L.T("بحث")" @bind="search" />
+                    <button type="submit" class="btn">@L.T("عرض")</button>
+                </form>
+                <table class="list">
+                    <thead>
+                        <tr>
+                            <th>@L.T("رقم السند")</th>
+                            <th>@L.T("التاريخ")</th>
+                            <th>@L.T("العميل")</th>
+                            <th>@L.T("المبلغ")</th>
+                            <th>@L.T("طريقة الدفع")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in rows)
+                        {
+                            <tr>
+                                <td data-label="@L.T("رقم السند")">@r.PaymentNumber</td>
+                                <td data-label="@L.T("التاريخ")">@r.PaymentDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td data-label="@L.T("العميل")">@r.CustomerName</td>
+                                <td data-label="@L.T("المبلغ")">@WorkPages.Money(r.Amount)@(r.CurrencyCode is { } cur && cur != currency ? " (" + WorkPages.Money(r.ForeignAmount) + " " + cur + ")" : "")</td>
+                                <td data-label="@L.T("طريقة الدفع")">@r.MethodName</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (rows.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+            </div>
+
+            <div class="form-pane">
+                <h2>@L.T("سند قبض جديد")</h2>
+                <form class="record" @onsubmit="() => Save(false)" @onsubmit:preventDefault>
+                    <div class="field span-2">
+                        <label for="pay-customer">@L.T("العميل") *</label>
+                        <select id="pay-customer" @bind="customerId">
+                            <option value="0"></option>
+                            @foreach (var c in customers.Where(c => c.Id != cashCustomer))
+                            {
+                                <option value="@c.Id">@c.Name (@WorkPages.Money(c.Balance))</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="pay-amount">@L.T("المبلغ") *</label>
+                        <input id="pay-amount" type="number" step="any" min="0" @bind="amount" />
+                    </div>
+                    <div class="field">
+                        <label for="pay-method">@L.T("طريقة الدفع")</label>
+                        <select id="pay-method" @bind="methodId">
+                            @foreach (var m in methods)
+                            {
+                                <option value="@m.Id">@m.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field span-2">
+                        <label for="pay-notes">@L.T("ملاحظات")</label>
+                        <input id="pay-notes" type="text" maxlength="255" @bind="notes" />
+                    </div>
+                    <div class="actions span-2">
+                        <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ السند")</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">@L.T(message)</div>
+    }
+
+    @if (question is not null)
+    {
+        <div class="dialog-backdrop">
+            <div class="dialog" role="dialog" aria-modal="true">
+                <p>@L.T(question)</p>
+                <div class="actions">
+                    <button class="btn primary" @onclick="() => Answer(true)">@L.T("نعم")</button>
+                    <button class="btn" @onclick="() => Answer(false)">@L.T("لا")</button>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy;
+    private string denied = "", notes = "", message = "", messageKind = "", currency = "";
+    private string? search, question;
+    private int customerId, methodId = 1, cashCustomer;
+    private decimal amount;
+    private DateTime from = DateTime.Today, to = DateTime.Today;
+    private List<PaymentRow> rows = [];
+    private List<(int Id, string Name, decimal Balance, bool AllowCredit)> customers = [];
+    private List<(int Id, string Name)> methods = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmCustomerPayment");
+        allowed = denied.Length == 0;
+        if (!allowed)
+        {
+            return;
+        }
+        (_, _, cashCustomer, currency) = await Sales.SaleSettingsAsync();
+        customers = await Sales.CustomersAsync(L.English);
+        methods = await Sales.PaymentMethodsAsync(L.English);
+        await Load();
+    }
+
+    private async Task Load() => rows = await Sales.PaymentsAsync(from, to, search, L.English);
+
+    private async Task Save(bool confirmed)
+    {
+        message = "";
+        if (customerId == 0)
+        {
+            message = WorkPages.ChooseCustomer;
+            messageKind = "error";
+            return;
+        }
+        busy = true;
+        try
+        {
+            var r = await Sales.PostPaymentAsync(UserInfo.Acting(user), new PaymentRequest(customerId, amount, methodId, notes), confirmed);
+            if (r.Status == SaveStatus.NeedsConfirmation)
+            {
+                question = r.Message;
+                return;
+            }
+            if (r.Status == SaveStatus.Refused)
+            {
+                message = r.Message;
+                messageKind = "error";
+                return;
+            }
+            message = WorkPages.PaymentSaved + r.InvoiceNumber;
+            messageKind = "success";
+            amount = 0;
+            notes = "";
+            customers = await Sales.CustomersAsync(L.English);
+            await Load();
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task Answer(bool yes)
+    {
+        question = null;
+        if (yes)
+        {
+            await Save(true);
+        }
+    }
+}
