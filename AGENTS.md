@@ -20,7 +20,9 @@ tested on Linux/macOS/Windows with `unittest`.
 - `RetailStore_FE.accdb` — the program (built in one step by `dist/tools/BuildFrontEnd.vbs`).
 
 ## Working conventions (the owner's rules)
-- **Reply in Arabic.** Code, comments, commit messages and identifiers stay in English.
+- **Reply in Arabic, Egyptian colloquial (العامية المصرية)**, written so it reads right to left: start every line and bullet
+  with Arabic words, keep code, paths and English names inside the sentence or in code blocks. Code, comments, commit
+  messages and identifiers stay in English; the feature documents `docs/NN-*.md` stay in standard Arabic.
 - Work **one feature at a time**. After each feature, report in Arabic:
   1. what was made and the problems found,
   2. which modules to import or replace and which `Build*` commands to run (in order),
