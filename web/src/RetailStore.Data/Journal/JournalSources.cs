@@ -14,7 +14,8 @@ public interface IJournalSourceReader
 }
 
 /// <summary>SQL Server: each journal source query is a view of the same name (docs/71, dist/sql/RetailStore_Queries.sql),
-/// the very rules Access runs; the web does not write them again.</summary>
+/// the very rules Access runs; the web does not write them again. SQLite (development and tests): the same saved queries as
+/// views of the database (Reports.SavedQueryRunner, docs/82).</summary>
 public sealed class ServerViewJournalReader : IJournalSourceReader
 {
     public async Task<List<JournalSourceLine>> ReadAsync(RetailDbContext db, string view)
@@ -28,10 +29,15 @@ public sealed class ServerViewJournalReader : IJournalSourceReader
         {
             await db.Database.OpenConnectionAsync();
         }
+        bool sqlite = Reports.SavedQueryRunner.IsSqlite(db);
+        if (sqlite)
+        {
+            Reports.SavedQueryRunner.RegisterFunctions((Microsoft.Data.Sqlite.SqliteConnection)cn, new Dictionary<string, object?>());
+        }
         await using var cmd = cn.CreateCommand();
         cmd.Transaction = db.Database.CurrentTransaction?.GetDbTransaction();
         cmd.CommandText = "SELECT SourceType, SourceID, SourceNumber, SourceDate, Party, LineOrder, AccountCode, Debit, Credit, " +
-                          "LineText, CostCenter FROM [dbo].[" + view + "]";
+                          "LineText, CostCenter FROM " + (sqlite ? "[" + view + "]" : "[dbo].[" + view + "]");
         var list = new List<JournalSourceLine>();
         await using var r = await cmd.ExecuteReaderAsync();
         while (await r.ReadAsync())

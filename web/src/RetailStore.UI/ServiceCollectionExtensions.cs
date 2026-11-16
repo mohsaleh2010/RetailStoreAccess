@@ -23,6 +23,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<TreasuryService>();
         services.AddScoped<AccountingService>();
         services.AddScoped<DashboardService>();
+        services.AddScoped<IndicatorsService>();
+        services.AddScoped<ReportService>();
         return services;
     }
 }

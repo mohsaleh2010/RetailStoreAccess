@@ -228,7 +228,8 @@ def screen_strings() -> List[str]:
 
 
 def strings() -> List[str]:
-    return code_strings() + screen_strings()
+    import gen_web_reports
+    return code_strings() + screen_strings() + gen_web_reports.report_strings()
 
 
 def keys() -> set:

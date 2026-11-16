@@ -132,7 +132,8 @@ def _model_entity(t: Table, rels: List[R.Relation]) -> str:
             if line != p:
                 out.append(f"            {line};")
         if f.kind in ("MONEY", "QTY", "RATE"):
-            out.append(f'            if (sqlServer) {p}.HasColumnType("money"); else {p}.HasPrecision(19, 4);')
+            # SQLite: NUMERIC, so that the saved queries of the report centre compare and add numbers (docs/82)
+            out.append(f'            if (sqlServer) {p}.HasColumnType("money"); else {p}.HasColumnType("NUMERIC");')
     for i in t.indexes:
         if i.primary:
             continue
@@ -654,4 +655,5 @@ FILES = {
 
 
 def build_all() -> Dict[str, str]:
-    return {path: fn() for path, fn in FILES.items()}
+    import gen_web_reports
+    return {path: fn() for path, fn in {**FILES, **gen_web_reports.FILES}.items()}
