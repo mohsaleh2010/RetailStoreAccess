@@ -1,12 +1,8 @@
 using System.Globalization;
+using RetailStore.Domain.Printing;
 using RetailStore.RepApp.Offline;
 
 namespace RetailStore.RepApp.Printing;
-
-public enum SlipAlign { Start, Center, End }
-
-/// <summary>A line of a printed slip: the phone draws it (Arabic shaped, right to left) and the printer gets a picture.</summary>
-public sealed record SlipLine(string Text, SlipAlign Align = SlipAlign.Start, bool Bold = false, bool Large = false);
 
 /// <summary>The customer's copy of an order taken on the phone (docs/78), printed on the rep's Bluetooth printer: the
 /// number on the phone until the server gives the SO- number, the customer, the rep, each line, the total. Prices include

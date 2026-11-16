@@ -1,5 +1,6 @@
 using RetailStore.Domain.Localization;
 using RetailStore.RepApp.Client;
+using RetailStore.Domain.Printing;
 using RetailStore.RepApp.Printing;
 
 namespace RetailStore.RepApp.Offline;

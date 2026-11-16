@@ -809,6 +809,8 @@ public partial class SalesInvoices
     public int? SalesRepID { get; set; }
     /// <summary>المخزن</summary>
     public int WarehouseID { get; set; } = 1;
+    /// <summary>رقم الفاتورة في جهاز نقطة البيع</summary>
+    public string? ClientRef { get; set; }
 }
 
 /// <summary>تفاصيل فواتير المبيعات: أسطر فاتورة البيع، مع حفظ تكلفة الصنف لحظة البيع لحساب الربح بدقة.</summary>

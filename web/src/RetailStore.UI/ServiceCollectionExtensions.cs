@@ -15,6 +15,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<PermissionService>();
         services.AddScoped<DataScreenService>();
         services.AddScoped<SalesService>();
+        services.AddScoped<PosService>();
         services.AddScoped<PurchaseService>();
         services.AddScoped<StockService>();
         services.AddScoped<SecurityService>();

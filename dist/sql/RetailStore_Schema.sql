@@ -12,7 +12,7 @@
   Then run this file in that database:
       sqlcmd -S .\SQLEXPRESS -d RetailStore -E -f 65001 -i RetailStore_Schema.sql
 
-  97 tables, 1238 fields, 149 indexes, 231 relationships, 451 seed rows
+  97 tables, 1239 fields, 150 indexes, 231 relationships, 451 seed rows
 ==============================================================================*/
 SET NOCOUNT ON;
 SET ANSI_NULLS ON;
@@ -484,6 +484,7 @@ IF OBJECT_ID(N'dbo.SalesInvoices', N'U') IS NULL
         [CostCenterID] INT NULL,
         [SalesRepID] INT NULL,
         [WarehouseID] INT NOT NULL CONSTRAINT [DF_SalesInvoices_WarehouseID] DEFAULT (1),
+        [ClientRef] NVARCHAR(40) NULL,
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_SalesInvoices] PRIMARY KEY ([SalesInvoiceID])
     );
@@ -2485,6 +2486,8 @@ IF COL_LENGTH(N'dbo.SalesInvoices', N'SalesRepID') IS NULL
     ALTER TABLE [dbo].[SalesInvoices] ADD [SalesRepID] INT NULL;
 IF COL_LENGTH(N'dbo.SalesInvoices', N'WarehouseID') IS NULL
     ALTER TABLE [dbo].[SalesInvoices] ADD [WarehouseID] INT NOT NULL CONSTRAINT [DF_SalesInvoices_WarehouseID] DEFAULT (1);
+IF COL_LENGTH(N'dbo.SalesInvoices', N'ClientRef') IS NULL
+    ALTER TABLE [dbo].[SalesInvoices] ADD [ClientRef] NVARCHAR(40) NULL;
 IF COL_LENGTH(N'dbo.SalesInvoices', N'RowVer') IS NULL
     ALTER TABLE [dbo].[SalesInvoices] ADD [RowVer] ROWVERSION NOT NULL;
 IF COL_LENGTH(N'dbo.SalesInvoiceDetails', N'SalesDetailID') IS NULL
@@ -5454,6 +5457,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_InvoiceUUID' AND obje
     CREATE UNIQUE INDEX [UX_InvoiceUUID] ON [dbo].[SalesInvoices] ([InvoiceUUID]) WHERE [InvoiceUUID] IS NOT NULL;
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ZatcaStatus' AND object_id = OBJECT_ID(N'dbo.SalesInvoices'))
     CREATE INDEX [IX_ZatcaStatus] ON [dbo].[SalesInvoices] ([ZatcaStatus]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_ClientRef' AND object_id = OBJECT_ID(N'dbo.SalesInvoices'))
+    CREATE UNIQUE INDEX [UX_ClientRef] ON [dbo].[SalesInvoices] ([ClientRef]) WHERE [ClientRef] IS NOT NULL;
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_SalesInvoiceID_LineNumber' AND object_id = OBJECT_ID(N'dbo.SalesInvoiceDetails'))
     CREATE UNIQUE INDEX [UX_SalesInvoiceID_LineNumber] ON [dbo].[SalesInvoiceDetails] ([SalesInvoiceID], [LineNumber]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_ReturnNumber' AND object_id = OBJECT_ID(N'dbo.SalesReturns'))
@@ -7760,5 +7765,5 @@ GO
 IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
     ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
 GO
-PRINT N'RetailStore schema: done (97 tables, 1238 fields, 149 indexes, 231 relationships, 451 seed rows).';
+PRINT N'RetailStore schema: done (97 tables, 1239 fields, 150 indexes, 231 relationships, 451 seed rows).';
 GO

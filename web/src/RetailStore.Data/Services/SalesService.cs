@@ -15,6 +15,11 @@ public sealed record CartLine(int ProductID, decimal Quantity, decimal UnitPrice
 public sealed record SaleRequest(int CustomerID, string PaymentType, int? PaymentMethodID, decimal InvoiceDiscount, decimal? Tendered,
                                  string? Notes, IReadOnlyList<CartLine> Lines);
 
+/// <summary>A sale recorded on a POS device (docs/83): its number on the device (ClientRef, kept in
+/// SalesInvoices.ClientRef so a sale sent twice is added once), the invoice number the device printed, and the time it was
+/// made (not after the time it reaches the server).</summary>
+public sealed record DeviceSaleInfo(string ClientRef, string InvoiceNumber, DateTime TakenAt);
+
 public sealed record SaleResult(SaveStatus Status, string Message, int InvoiceID = 0, string InvoiceNumber = "", decimal Total = 0,
                                 decimal Change = 0)
 {
@@ -444,7 +449,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
 
     /// <summary>modSales.PostSaleFromCart (a POS sale: no delivery note, quotation or restaurant order). confirmStock = the
     /// user answered yes to the question on the stock (ALLOW_NEGATIVE_STOCK).</summary>
-    public async Task<SaleResult> PostSaleAsync(ActingUser user, SaleRequest sale, bool confirmStock = false)
+    public async Task<SaleResult> PostSaleAsync(ActingUser user, SaleRequest sale, bool confirmStock = false, DeviceSaleInfo? device = null)
     {
         string open = await permissions.OpenProblemAsync(user.EmployeeID, "frmPOS");
         if (open.Length > 0)
@@ -537,10 +542,15 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
                             stock.Status == SaveStatus.Saved ? stock.Message : "البيع" + " - approved by user:" + stock.ShortList);
         }
         var now = DateTime.Now;
+        if (device is not null && device.TakenAt < now)
+        {
+            now = device.TakenAt;
+        }
         int? method = sale.PaymentMethodID;
         var inv = new SalesInvoices
         {
-            InvoiceNumber = await NumberSequences.NextNumberAsync(db, "SALES_INVOICE"),
+            InvoiceNumber = device?.InvoiceNumber ?? await NumberSequences.NextNumberAsync(db, "SALES_INVOICE"),
+            ClientRef = device?.ClientRef,
             InvoiceDate = now, CustomerID = sale.CustomerID, EmployeeID = user.EmployeeID, PaymentType = sale.PaymentType,
             PaymentMethodID = method, SubTotal = calc.SubTotal, Discount = calc.Discount, TaxableAmount = calc.Taxable, Tax = calc.Tax,
             TotalAmount = calc.Total, PaidAmount = settle.Paid, RemainingAmount = settle.Remaining,
@@ -572,13 +582,14 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         {
             var p = products[sale.Lines[i].ProductID];
             await ApplyStockMovementAsync(db, user, p.ProductID, -calc.Lines[i].Quantity * factors[i], TtSale, p.AverageCost, "SALE",
-                                          inv.SalesInvoiceID, inv.InvoiceNumber, warehouse);
+                                          inv.SalesInvoiceID, inv.InvoiceNumber, warehouse, when: now);
         }
         if (settle.Remaining != 0)
         {
             await AdjustBalanceAsync(db, sale.CustomerID, settle.Remaining);
         }
-        Audit.LogAction(db, user, "SALE", "SalesInvoices", inv.InvoiceNumber, "Total=" + InvoiceCalculator.Plain(calc.Total));
+        Audit.LogAction(db, user, "SALE", "SalesInvoices", inv.InvoiceNumber, "Total=" + InvoiceCalculator.Plain(calc.Total) +
+                                                                            (device is null ? "" : " pos " + device.ClientRef));
         await db.SaveChangesAsync();
         await tx.CommitAsync();
         // the e-invoice: a PENDING document is sent by Access (modEInvoice, frmEInvoices); it never fails the sale
@@ -605,7 +616,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
     /// track stock). QuantityAfter = the total of every warehouse.</summary>
     public static async Task ApplyStockMovementAsync(RetailDbContext db, ActingUser user, int productId, decimal qty, int typeId,
                                                      decimal unitCost, string refType, int refId, string refNumber, int warehouseId,
-                                                     bool recalcAverage = false)
+                                                     bool recalcAverage = false, DateTime? when = null)
     {
         var p = await db.Products.FirstAsync(x => x.ProductID == productId);
         if (!p.TrackStock)
@@ -621,7 +632,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         p.UpdatedAt = DateTime.Now;
         db.InventoryTransactions.Add(new InventoryTransactions
         {
-            TransactionDate = DateTime.Now, ProductID = productId, TransactionTypeID = typeId, Quantity = qty, UnitCost = unitCost,
+            TransactionDate = when ?? DateTime.Now, ProductID = productId, TransactionTypeID = typeId, Quantity = qty, UnitCost = unitCost,
             QuantityAfter = newQty, ReferenceType = refType, ReferenceID = refId > 0 ? refId : null,
             ReferenceNumber = Clip(refNumber, 20), EmployeeID = user.EmployeeID, WarehouseID = warehouseId,
         });

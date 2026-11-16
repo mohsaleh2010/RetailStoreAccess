@@ -995,10 +995,12 @@ TABLES: List[Table] = [
             long_("CostCenterID", "مركز التكلفة", fk="CostCenters.CostCenterID", note="من مركز الكاشير، وإلا المركز الافتراضي"),
             long_("SalesRepID", "المندوب", fk="SalesReps.SalesRepID", note="من مندوب العميل، وإلا مندوب المستخدم"),
             long_("WarehouseID", "المخزن", required=True, default="1", fk="Warehouses.WarehouseID"),
+            text("ClientRef", 40, "رقم الفاتورة في جهاز نقطة البيع",
+                 note="من نقطة البيع على Windows (docs/83): يمنع تكرار الفاتورة إذا أُعيد إرسالها بعد انقطاع الاتصال"),
         ],
         pk=["SalesInvoiceID"],
         indexes=[ux("InvoiceNumber"), ix("InvoiceDate"), ux("InvoiceUUID", ignore_nulls=True),
-                 ix("ZatcaStatus")],
+                 ix("ZatcaStatus"), ux("ClientRef", ignore_nulls=True)],
         rule=PAID_RULE, rule_text=PAID_TEXT,
     ),
 

@@ -1,4 +1,4 @@
-using RetailStore.RepApp.Printing;
+using RetailStore.Domain.Printing;
 
 namespace RetailStore.RepApp;
 

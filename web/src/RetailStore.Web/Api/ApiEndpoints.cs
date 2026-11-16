@@ -141,6 +141,7 @@ public static class ApiEndpoints
 
         // ---------------------------------------------------------------- sales and receipts (docs/79)
         SalesApi.Map(secured);
+        PosApi.Map(secured);
         PurchaseApi.Map(secured);
         StockApi.Map(secured);
         TreasuryApi.Map(secured);

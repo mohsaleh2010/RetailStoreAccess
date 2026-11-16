@@ -4,7 +4,7 @@ using Android.Graphics;
 using Android.Text;
 using Java.Util;
 using RetailStore.RepApp;
-using RetailStore.RepApp.Printing;
+using RetailStore.Domain.Printing;
 using AColor = Android.Graphics.Color;
 using ALayout = Android.Text.Layout;
 

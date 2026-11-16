@@ -1,0 +1,278 @@
+@page "/"
+@inject PosSession S
+@inject NavigationManager Nav
+
+@if (cart is null)
+{
+    <p class="pos-empty">@S.T("سجّل الدخول أولًا.")</p>
+}
+else if (S.Snapshot!.User.SellProblem.Length > 0)
+{
+    <p class="pos-error">@S.Snapshot.User.SellProblem</p>
+}
+else
+{
+    <div class="pos-sale">
+        <section class="pos-card pos-lines">
+            <div class="pos-find">
+                <input @ref="codeBox" @bind="code" @bind:event="oninput" @onkeyup="CodeKeyAsync"
+                       placeholder="@S.T("الباركود أو الرمز أو جزء من الاسم")" />
+                <button @onclick="FindAsync">@S.T("بحث")</button>
+            </div>
+            @if (found.Count > 0)
+            {
+                <ul class="pos-found">
+                    @foreach (var f in found)
+                    {
+                        <li><button @onclick="() => Pick(f.Product, f.Unit)">
+                            @f.Product.ProductName <small>@f.Product.ProductCode · @Money(cart.PriceFor(f.Product, f.Unit?.UnitID, cart.CustomerID))
+                            · @S.T("المتوفر") @Qty(f.Product.Available)</small></button></li>
+                    }
+                </ul>
+            }
+            <table class="pos-table">
+                <thead>
+                    <tr><th>@S.T("الصنف")</th><th>@S.T("الوحدة")</th><th>@S.T("الكمية")</th><th>@S.T("السعر")</th>
+                        <th>@S.T("الخصم")</th><th>@S.T("الإجمالي")</th><th></th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in cart.Items)
+                    {
+                        <tr>
+                            <td>@item.Product.ProductName</td>
+                            <td>
+                                @if (item.Product.Units.Length > 0)
+                                {
+                                    <select value="@(item.UnitID ?? 0)" @onchange="e => ChangeUnit(item, e.Value)">
+                                        <option value="0">@item.Product.UnitName</option>
+                                        @foreach (var u in item.Product.Units)
+                                        {
+                                            <option value="@u.UnitID">@u.UnitName</option>
+                                        }
+                                    </select>
+                                }
+                                else
+                                {
+                                    @item.UnitName
+                                }
+                            </td>
+                            <td><input class="pos-num" type="number" step="any" @bind="item.Quantity" @bind:after="Changed" /></td>
+                            <td><input class="pos-num" type="number" step="any" @bind="item.UnitPrice" @bind:after="Changed" /></td>
+                            <td><input class="pos-num" type="number" step="any" @bind="item.LineDiscount" @bind:after="Changed" /></td>
+                            <td class="pos-amount">@Money(item.Gross)</td>
+                            <td><button class="pos-link" @onclick="() => Remove(item)">✕</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </section>
+
+        <section class="pos-card pos-pay">
+            <label>@S.T("العميل")
+                <select value="@cart.CustomerID" @onchange="e => ChangeCustomer(e.Value)">
+                    @foreach (var c in S.Snapshot.Customers)
+                    {
+                        <option value="@c.CustomerID">@c.CustomerName</option>
+                    }
+                </select>
+            </label>
+            @if (cart.Customer is { } cust && cust.CustomerID != S.Snapshot.Settings.DefaultCustomerID)
+            {
+                <p class="pos-muted">@S.T("الرصيد") @Money(cust.CurrentBalance) · @S.T("حد الائتمان") @Money(cust.CreditLimit)</p>
+            }
+            <div class="pos-choice">
+                <label class="pos-check"><input type="radio" name="pay" checked="@(cart.PaymentType == "CASH")"
+                                                @onchange="@(() => SetPayment("CASH"))" />@S.T("نقدي")</label>
+                <label class="pos-check"><input type="radio" name="pay" checked="@(cart.PaymentType == "CREDIT")"
+                                                @onchange="@(() => SetPayment("CREDIT"))" />@S.T("آجل")</label>
+            </div>
+            <label>@S.T("طريقة الدفع")
+                <select value="@(cart.PaymentMethodID ?? 0)" @onchange="e => cart.PaymentMethodID = int.TryParse(e.Value as string, out var m) && m > 0 ? m : null">
+                    @if (cart.PaymentType == "CREDIT")
+                    {
+                        <option value="0">-</option>
+                    }
+                    @foreach (var m in S.Snapshot.Methods)
+                    {
+                        <option value="@m.PaymentMethodID">@m.MethodName</option>
+                    }
+                </select>
+            </label>
+            <label>@S.T("خصم الفاتورة")<input class="pos-num" type="number" step="any" @bind="cart.InvoiceDiscount" @bind:after="Changed" /></label>
+            <label>@S.T("المبلغ المستلم")<input class="pos-num" type="number" step="any" @bind="cart.Tendered" @bind:after="Changed" /></label>
+            <label>@S.T("ملاحظات")<input @bind="cart.Notes" maxlength="255" /></label>
+            <dl class="pos-totals">
+                <dt>@S.T("قبل الضريبة")</dt><dd>@Money(totals.SubTotal - totals.Discount)</dd>
+                <dt>@S.T("الضريبة")</dt><dd>@Money(totals.Tax)</dd>
+                <dt class="pos-total">@S.T("الإجمالي")</dt><dd class="pos-total">@Money(totals.Total) @S.Snapshot.Settings.Currency</dd>
+                @if (cart.PaymentType == "CASH" && cart.Tendered is { } t && t > totals.Total)
+                {
+                    <dt>@S.T("الباقي للعميل")</dt><dd>@Money(t - totals.Total)</dd>
+                }
+            </dl>
+            @if (question.Length > 0)
+            {
+                <div class="pos-question">
+                    <p>@question</p>
+                    <button class="pos-primary" @onclick="() => SaveAsync(true)">@S.T("نعم")</button>
+                    <button @onclick="() => question = string.Empty">@S.T("لا")</button>
+                </div>
+            }
+            else
+            {
+                <button class="pos-primary pos-big" disabled="@(busy || cart.Items.Count == 0)" @onclick="() => SaveAsync(false)">
+                    @S.T("حفظ وطباعة") (F9)</button>
+            }
+            @if (message.Length > 0)
+            {
+                <p class="@(error ? "pos-error" : "pos-ok")">@message</p>
+            }
+            <button class="pos-link" disabled="@(cart.Items.Count == 0)" @onclick="NewSale">@S.T("فاتورة جديدة")</button>
+        </section>
+    </div>
+}
+
+@code {
+    private PosCart? cart;
+    private CartTotals totals = new("", 0, 0, 0, 0);
+    private string code = "", message = "", question = "";
+    private bool busy, error;
+    private List<(PosProduct Product, PosUnit? Unit)> found = [];
+    private ElementReference codeBox;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await S.LoadAsync();
+        if (!S.LoggedIn)
+        {
+            Nav.NavigateTo(S.Connection is null ? "database" : "login");
+            return;
+        }
+        cart = S.NewCart();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && cart is not null)
+        {
+            try
+            {
+                await codeBox.FocusAsync();
+            }
+            catch (InvalidOperationException)
+            {
+                // not rendered yet
+            }
+        }
+    }
+
+    private static string Money(decimal v) => v.ToString("#,##0.00", CultureInfo.InvariantCulture);
+
+    private static string Qty(decimal v) => v.ToString("0.###", CultureInfo.InvariantCulture);
+
+    private void Changed()
+    {
+        totals = cart!.Totals();
+        question = "";
+    }
+
+    private async Task CodeKeyAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await FindAsync();
+        }
+        else if (e.Key == "F9")
+        {
+            await SaveAsync(false);
+        }
+    }
+
+    private async Task FindAsync()
+    {
+        found = cart!.Find(code);
+        bool exact = found.Count == 1 && (found[0].Unit is not null || found[0].Product.Barcode == code.Trim()
+                                         || found[0].Product.ProductCode == code.Trim());
+        if (exact)
+        {
+            Pick(found[0].Product, found[0].Unit);
+        }
+        else if (found.Count == 0 && code.Trim().Length > 0)
+        {
+            Show(S.T("لا يوجد صنف بهذا الرمز."), true);
+        }
+        await Task.CompletedTask;
+    }
+
+    private void Pick(PosProduct p, PosUnit? unit)
+    {
+        string problem = cart!.Add(p.ProductID, unit?.UnitID);
+        Show(S.T(problem), problem.Length > 0);
+        found = [];
+        code = "";
+        Changed();
+    }
+
+    private void ChangeUnit(CartItem item, object? value)
+    {
+        int id = int.TryParse(value as string, out var v) ? v : 0;
+        Show(S.T(cart!.SetUnit(item, id == 0 ? null : id)), true);
+        Changed();
+    }
+
+    private void ChangeCustomer(object? value)
+    {
+        cart!.ChangeCustomer(int.TryParse(value as string, out var v) ? v : S.Snapshot!.Settings.DefaultCustomerID);
+        Changed();
+    }
+
+    private void SetPayment(string type)
+    {
+        cart!.PaymentType = type;
+        cart.PaymentMethodID = type == "CASH" ? SalesService.CashMethodId : null;
+        Changed();
+    }
+
+    private void Remove(CartItem item)
+    {
+        cart!.Items.Remove(item);
+        Changed();
+    }
+
+    private void Show(string text, bool isError)
+    {
+        message = text;
+        error = isError && text.Length > 0;
+    }
+
+    private void NewSale()
+    {
+        cart!.Clear();
+        message = question = "";
+        Changed();
+    }
+
+    private async Task SaveAsync(bool confirmStock)
+    {
+        if (busy || cart is null || cart.Items.Count == 0)
+        {
+            return;
+        }
+        busy = true;
+        var (status, text, sale) = S.SaveSale(cart, confirmStock);
+        question = status == SaveStatus.NeedsConfirmation ? text : "";
+        if (sale is null)
+        {
+            Show(status == SaveStatus.NeedsConfirmation ? "" : text, true);
+            busy = false;
+            return;
+        }
+        string printed = await S.PrintAsync(sale);
+        Show(S.T("تم حفظ الفاتورة") + " " + sale.InvoiceNumber + " · " + S.T("الباقي للعميل") + " " + Money(sale.Receipt.Change) +
+             (printed.Length > 0 ? " · " + printed : ""), printed.Length > 0);
+        cart.Clear();
+        totals = cart.Totals();
+        busy = false;
+        _ = S.SyncAsync();
+    }
+}

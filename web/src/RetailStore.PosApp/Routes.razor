@@ -1,0 +1,15 @@
+@* The router of the POS (docs/83): the Windows program (RetailStore.Pos) shows it in its BlazorWebView. *@
+<Router AppAssembly="typeof(Routes).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(PosLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(PosLayout)">
+            <p class="pos-empty">@S.T("الصفحة غير موجودة")</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    [Inject] private PosSession S { get; set; } = default!;
+}

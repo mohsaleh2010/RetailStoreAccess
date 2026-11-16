@@ -1,0 +1,113 @@
+@page "/database"
+@inject PosSession S
+@inject NavigationManager Nav
+
+@if (!S.CanEditDatabase)
+{
+    <p class="pos-error">@S.T("إعدادات قاعدة البيانات لمدير النظام فقط.")</p>
+}
+else
+{
+    <section class="pos-card pos-db">
+        <h2>@S.T("إعدادات قاعدة البيانات")</h2>
+        @if (S.Connection is null)
+        {
+            <p class="pos-muted">@S.T("أول تشغيل على هذا الجهاز: اختر مكان بيانات البرنامج. بعد الحفظ لا يغيّرها إلا مدير النظام.")</p>
+        }
+        <div class="pos-choice">
+            <label class="pos-check"><input type="radio" name="mode" checked="@(mode == PosConnection.Local)"
+                                            @onchange="@(() => mode = PosConnection.Local)" />@S.T("قاعدة بيانات محلية")</label>
+            <label class="pos-check"><input type="radio" name="mode" checked="@(mode == PosConnection.Remote)"
+                                            @onchange="@(() => mode = PosConnection.Remote)" />@S.T("خادم بعيد")</label>
+        </div>
+        @if (mode == PosConnection.Local)
+        {
+            <p class="pos-muted">@S.T("SQL Server على هذا الجهاز أو على شبكة المحل، وهو القاعدة نفسها التي يربط بها Access والموقع. يعمل البيع إن انقطع الإنترنت.")</p>
+            <label>@S.T("النوع")
+                <select @bind="provider">
+                    <option value="@PosConnection.SqlServer">SQL Server</option>
+                    <option value="@PosConnection.Sqlite">@S.T("ملف تجربة SQLite")</option>
+                </select>
+            </label>
+            @if (provider == PosConnection.Sqlite)
+            {
+                <label>@S.T("ملف قاعدة التجربة")<input dir="ltr" @bind="sqliteFile" placeholder="C:\RetailStore\trial.db" /></label>
+            }
+            else
+            {
+                <label>@S.T("اسم الخادم")<input dir="ltr" @bind="server" placeholder=".\SQLEXPRESS" /></label>
+                <label>@S.T("قاعدة البيانات")<input dir="ltr" @bind="database" /></label>
+                <label class="pos-check"><input type="checkbox" @bind="windowsLogin" />@S.T("الدخول بحساب Windows")</label>
+                @if (!windowsLogin)
+                {
+                    <label>@S.T("مستخدم SQL Server")<input dir="ltr" @bind="sqlUser" /></label>
+                    <label>@S.T("كلمة المرور")<input dir="ltr" type="password" @bind="password" placeholder="@(S.Connection is null ? "" : "••••")" /></label>
+                }
+                <label class="pos-check"><input type="checkbox" @bind="trust" />@S.T("الوثوق بشهادة خادم المحل")</label>
+            }
+        }
+        else
+        {
+            <p class="pos-muted">@S.T("خادم البرنامج في مكان آخر، عبر الـ API بعنوانه وبـ HTTPS. إن انقطع الإنترنت يبيع الجهاز ويحفظ الفواتير، وتُرسل عند عودته.")</p>
+            <label>@S.T("عنوان الخادم")<input dir="ltr" @bind="url" placeholder="https://" /></label>
+        }
+        <label>@S.T("رمز الجهاز")<input dir="ltr" @bind="deviceCode" maxlength="8" /></label>
+        <p class="pos-muted">@S.T("يبدأ به رقم كل فاتورة من هذا الجهاز، مثل POS1-000001. اجعل لكل جهاز رمزًا مختلفًا.")</p>
+        @if (message.Length > 0)
+        {
+            <p class="@(ok ? "pos-ok" : "pos-error")">@message</p>
+        }
+        <button disabled="@busy" @onclick="TestAsync">@S.T("اختبار الاتصال")</button>
+        <button class="pos-primary" disabled="@busy" @onclick="SaveAsync">@S.T("حفظ")</button>
+    </section>
+}
+
+@code {
+    private string mode = PosConnection.Local, provider = PosConnection.SqlServer, server = "", database = "", sqlUser = "",
+                   password = "", sqliteFile = "", url = "", deviceCode = "", message = "";
+    private bool windowsLogin = true, trust = true, busy, ok;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await S.LoadAsync();
+        var c = S.Connection ?? PosConnection.Empty;
+        (mode, provider, server, database, windowsLogin, sqlUser, trust, sqliteFile, url, deviceCode) =
+            (c.Mode, c.Provider, c.Server, c.Database, c.WindowsLogin, c.User, c.TrustCertificate, c.SqliteFile, c.ServerUrl, c.DeviceCode);
+    }
+
+    private PosConnection Current() => new(mode, provider, server, database, windowsLogin, sqlUser, trust, sqliteFile, url, deviceCode);
+
+    /// <summary>The password typed, else the one kept when the same SQL login is saved again.</summary>
+    private async Task<string?> PasswordAsync() =>
+        password.Length > 0 ? password : await S.Platform.GetSecretAsync(PosSession.PasswordKey);
+
+    private async Task TestAsync()
+    {
+        busy = true;
+        message = await S.TestConnectionAsync(Current(), await PasswordAsync());
+        ok = message.Length == 0;
+        if (ok)
+        {
+            message = S.T("الاتصال ناجح.");
+        }
+        busy = false;
+    }
+
+    private async Task SaveAsync()
+    {
+        busy = true;
+        bool first = S.Connection is null;
+        message = await S.SaveConnectionAsync(Current(), await PasswordAsync());
+        ok = message.Length == 0;
+        busy = false;
+        if (ok)
+        {
+            password = "";
+            message = S.T("تم الحفظ");
+            if (first || !S.LoggedIn)
+            {
+                Nav.NavigateTo("login");
+            }
+        }
+    }
+}

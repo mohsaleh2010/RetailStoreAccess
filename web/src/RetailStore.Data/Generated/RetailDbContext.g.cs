@@ -524,10 +524,12 @@ public partial class RetailDbContext : DbContext
             e.Property(x => x.DeliveryPhone).HasMaxLength(20);
             e.Property(x => x.DeliveryAddress).HasMaxLength(255);
             e.Property(x => x.OrderName).HasMaxLength(50);
+            e.Property(x => x.ClientRef).HasMaxLength(40);
             if (!sqlServer) e.HasIndex(x => x.InvoiceNumber).HasDatabaseName("SalesInvoices_UX_InvoiceNumber").IsUnique();
             if (!sqlServer) e.HasIndex(x => x.InvoiceDate).HasDatabaseName("SalesInvoices_IX_InvoiceDate");
             if (!sqlServer) e.HasIndex(x => x.InvoiceUUID).HasDatabaseName("SalesInvoices_UX_InvoiceUUID").IsUnique();
             if (!sqlServer) e.HasIndex(x => x.ZatcaStatus).HasDatabaseName("SalesInvoices_IX_ZatcaStatus");
+            if (!sqlServer) e.HasIndex(x => x.ClientRef).HasDatabaseName("SalesInvoices_UX_ClientRef").IsUnique();
             e.HasOne<Customers>().WithMany().HasForeignKey(x => x.CustomerID).HasConstraintName("FK_SalesInvoices_CustomerID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<Employees>().WithMany().HasForeignKey(x => x.EmployeeID).HasConstraintName("FK_SalesInvoices_EmployeeID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<PaymentMethods>().WithMany().HasForeignKey(x => x.PaymentMethodID).HasConstraintName("FK_SalesInvoices_PaymentMethodID").OnDelete(DeleteBehavior.ClientSetNull);

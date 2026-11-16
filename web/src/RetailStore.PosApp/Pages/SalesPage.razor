@@ -1,0 +1,63 @@
+@page "/sales"
+@inject PosSession S
+
+<section class="pos-card">
+    <h2>@S.T("فواتير الجهاز") <small>@S.T("بانتظار الإرسال") @S.Waiting · @S.T("رفضها البرنامج") @S.Refused</small></h2>
+    @if (message.Length > 0)
+    {
+        <p class="pos-error">@message</p>
+    }
+    <table class="pos-table">
+        <thead>
+            <tr><th>@S.T("رقم الفاتورة")</th><th>@S.T("التاريخ")</th><th>@S.T("العميل")</th><th>@S.T("الكاشير")</th>
+                <th>@S.T("الإجمالي")</th><th>@S.T("الحالة")</th><th></th></tr>
+        </thead>
+        <tbody>
+            @foreach (var s in S.Sales())
+            {
+                <tr class="@(s.State == SaleStates.Rejected ? "pos-bad" : "")">
+                    <td dir="ltr">@s.InvoiceNumber</td>
+                    <td dir="ltr">@s.CreatedAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</td>
+                    <td>@s.Receipt.CustomerName</td>
+                    <td>@s.EmployeeName</td>
+                    <td class="pos-amount">@s.Receipt.Total.ToString("#,##0.00", CultureInfo.InvariantCulture)</td>
+                    <td>@StateText(s)@if (s.Message is { Length: > 0 } m) { <br /><small>@m</small> }</td>
+                    <td class="pos-actions">
+                        <button @onclick="() => PrintAsync(s)">@S.T("طباعة")</button>
+                        @if (s.State == SaleStates.Rejected)
+                        {
+                            <button @onclick="() => Retry(s, false)">@S.T("إعادة الإرسال")</button>
+                            @if (S.User?.IsAdmin == true)
+                            {
+                                <button @onclick="() => Retry(s, true)">@S.T("إعادة الإرسال بالموافقة على المخزون")</button>
+                                <button @onclick="() => Delete(s)">@S.T("حذف من الجهاز")</button>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p class="pos-muted">@S.T("تبقى الفواتير المرسلة هنا سبعة أيام للطباعة، وهي في البرنامج بأرقامها نفسها.")</p>
+</section>
+
+@code {
+    private string message = "";
+
+    private string StateText(StoredSale s) => s.State switch
+    {
+        SaleStates.Sent => S.T("وصلت إلى البرنامج"),
+        SaleStates.Rejected => S.T("رفضها البرنامج"),
+        _ => S.T("بانتظار الإرسال"),
+    };
+
+    private async Task PrintAsync(StoredSale s) => message = await S.PrintAsync(s, reprint: true);
+
+    private void Retry(StoredSale s, bool confirmStock)
+    {
+        message = S.Retry(s.Id, confirmStock);
+        _ = S.SyncAsync();
+    }
+
+    private void Delete(StoredSale s) => message = S.Delete(s.Id);
+}

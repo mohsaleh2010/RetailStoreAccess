@@ -1,0 +1,77 @@
+@inherits LayoutComponentBase
+@implements IDisposable
+@inject PosSession S
+@inject NavigationManager Nav
+
+<div class="pos" dir="@S.Dir" lang="@(S.English ? "en" : "ar")">
+    <header class="pos-top">
+        <strong class="pos-brand">@(S.Snapshot?.Settings.StoreName is { Length: > 0 } store ? store : S.T("نقطة البيع"))</strong>
+        @if (S.LoggedIn)
+        {
+            <nav class="pos-nav">
+                <NavLink href="" Match="NavLinkMatch.All">@S.T("البيع")</NavLink>
+                <NavLink href="sales">@S.T("فواتير الجهاز")</NavLink>
+                <NavLink href="settings">@S.T("الإعدادات")</NavLink>
+                @if (S.CanEditDatabase)
+                {
+                    <NavLink href="database">@S.T("إعدادات قاعدة البيانات")</NavLink>
+                }
+            </nav>
+            <span class="pos-user">@S.User!.EmployeeName</span>
+        }
+        <span class="@(S.WorkingOffline ? "pos-state pos-off" : "pos-state pos-on")">
+            @(S.WorkingOffline ? S.T("بلا اتصال") : S.T("متصل"))
+        </span>
+        <button class="pos-sync" disabled="@(S.Syncing || !S.LoggedIn)" @onclick="() => S.SyncAsync(refresh: true)">
+            @(S.Syncing ? S.T("جارٍ الإرسال") : S.T("إرسال وتحديث"))
+            @if (S.Waiting > 0)
+            {
+                <span class="pos-badge">@S.Waiting</span>
+            }
+        </button>
+    </header>
+    @if (S.Refused > 0 && S.LoggedIn)
+    {
+        <a class="pos-alert" href="sales">@S.T("فواتير رفضها البرنامج"): @S.Refused</a>
+    }
+    @if (S.LastSync is { Message.Length: > 0 } last)
+    {
+        <div class="pos-note">@last.Message</div>
+    }
+    <main class="pos-main">@Body</main>
+</div>
+
+@code {
+    private System.Threading.Timer? timer;
+
+    protected override async Task OnInitializedAsync()
+    {
+        S.Changed += Refresh;
+        await S.LoadAsync();
+        string here = Nav.ToBaseRelativePath(Nav.Uri);
+        if (S.Connection is null && here != "database")
+        {
+            Nav.NavigateTo("database");
+        }
+        else if (S.Connection is not null && !S.LoggedIn && here != "login")
+        {
+            Nav.NavigateTo("login");
+        }
+        // the sales of the PC are sent every minute while the program is open
+        timer = new System.Threading.Timer(_ => InvokeAsync(async () =>
+        {
+            if (S.LoggedIn && !S.Syncing)
+            {
+                await S.SyncAsync();
+            }
+        }), null, TimeSpan.FromSeconds(5), TimeSpan.FromMinutes(1));
+    }
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        S.Changed -= Refresh;
+        timer?.Dispose();
+    }
+}

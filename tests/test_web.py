@@ -182,6 +182,8 @@ class WebRulesTests(unittest.TestCase):
                 self.assertNotIn("LICENSE_SECRET", text)
                 if path.endswith("RetailStore.App.csproj"):
                     self.assertIn("<TargetFrameworks>net10.0-android</TargetFrameworks>", text)
+                elif path.endswith("RetailStore.Pos.csproj"):
+                    self.assertIn("<TargetFrameworks>net10.0-windows10.0.19041.0</TargetFrameworks>", text)
                 elif path.endswith(".csproj"):
                     self.assertIn("<TargetFramework>net10.0</TargetFramework>", text)
 
@@ -369,6 +371,65 @@ class RepAppTests(unittest.TestCase):
         for m in set(re.findall(r'"([^"]*[\u0600-\u06FF][^"]*)"', draft)) - {"أضف أسطر الطلبية."}:
             with self.subTest(m):
                 self.assertIn(m, vba)
+
+
+class PosAppTests(unittest.TestCase):
+    """Plan 6G (docs/83): the point of sale on Windows (MAUI Blazor Hybrid), offline first, with its database settings."""
+
+    APP = "web/src/RetailStore.PosApp/"
+
+    def test_the_solutions(self):
+        main = read("web/RetailStore.slnx")
+        self.assertIn("RetailStore.PosApp.csproj", main)
+        self.assertNotIn("RetailStore.Pos.csproj", main, "the web builds on a machine without the MAUI workload")
+        self.assertIn("RetailStore.Pos.csproj", read("web/RetailStore.Windows.slnx"))
+        self.assertIn("RetailStore.PosApp.csproj", read("web/src/RetailStore.Pos/RetailStore.Pos.csproj"))
+        self.assertIn("<WindowsPackageType>None</WindowsPackageType>", read("web/src/RetailStore.Pos/RetailStore.Pos.csproj"))
+
+    def test_secrets_stay_out_of_the_file_of_the_pc(self):
+        session = read(self.APP + "Offline/PosSession.cs")
+        self.assertIn("platform.SetSecretAsync(PasswordKey", session)
+        self.assertIn("platform.SetSecretAsync(TokenPrefix", session)
+        self.assertNotRegex(read(self.APP + "Offline/PosStore.cs") + session, r'store\.Set\("[^"]*(Token|Password)')
+        self.assertIn("Rfc2898DeriveBytes.Pbkdf2", read(self.APP + "Offline/PosStore.cs"))
+        self.assertIn("FixedTimeEquals", read(self.APP + "Offline/PosStore.cs"))
+        self.assertIn("ProtectedData.Protect", read("web/src/RetailStore.Pos/Platforms/Windows/WindowsPlatform.cs"))
+        connection = read(self.APP + "Connection/PosConnection.cs")
+        self.assertIn("Encrypt = true", connection)
+        self.assertNotIn("Password", re.sub(r"(?s)public string ConnectionString.*?\n    }\n", "", connection).split("record PosConnection(")[1]
+                         .split(")")[0])
+
+    def test_the_database_settings_are_for_the_administrator(self):
+        session = read(self.APP + "Offline/PosSession.cs")
+        self.assertIn("public bool CanEditDatabase => Connection is null || User?.IsAdmin == true;", session)
+        save = session[session.index("public async Task<string> SaveConnectionAsync"):]
+        self.assertLess(save.index("if (!CanEditDatabase)"), save.index("store.SaveConnection("))
+        self.assertIn("e.IsDeveloper || e.RoleID == AppData.AdminRoleId", read("web/src/RetailStore.Data/Services/PosService.cs"))
+        self.assertIn("@if (!S.CanEditDatabase)", read(self.APP + "Pages/DatabasePage.razor"))
+
+    def test_a_sale_is_sent_once(self):
+        self.assertEqual(next(f for f in table("SalesInvoices").fields if f.name == "ClientRef").size, 40)
+        self.assertTrue(any(ix.fields == ["ClientRef"] and ix.unique and ix.ignore_nulls for ix in table("SalesInvoices").indexes))
+        self.assertIn("h.ClientRef == reference", read("web/src/RetailStore.Data/Services/PosService.cs"))
+        self.assertIn("InvoiceNumber = device?.InvoiceNumber ?? await NumberSequences.NextNumberAsync",
+                      read("web/src/RetailStore.Data/Services/SalesService.cs"))
+
+    def test_the_messages_of_the_cart_are_those_of_access(self):
+        cart = read(self.APP + "Offline/PosCart.cs")
+        vba = "".join(read(f"src/vba/{m}.bas") for m in ("modSales", "modRepRoutes", "modProductUnits"))
+        messages = {m.replace("\\n", "") for m in re.findall(r'"([^"]*[\u0600-\u06FF][^"]*)"', cart)}
+        self.assertGreater(len(messages), 12)
+        for m in messages:
+            with self.subTest(m):
+                self.assertIn(m, vba)
+
+    def test_the_cart_follows_the_order_of_the_sale(self):
+        cart = read(self.APP + "Offline/PosCart.cs")
+        check = cart[cart.index("public (SaveStatus Status, string Message, CalcResult? Calc, Settlement? Settle) Check("):
+                     cart.index("private string DiscountProblem")]
+        order = ["SellProblem", "Calc()", "PriceChanged", "DiscountProblem", "InvoiceCalculator.Settle(", "CustomerProblem",
+                 "RepCreditProblem", "StockProblem"]
+        self.assertEqual([check.index(x) for x in order], sorted(check.index(x) for x in order))
 
 
 def journal_vectors(path):

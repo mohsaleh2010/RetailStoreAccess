@@ -7,6 +7,7 @@ using RetailStore.Domain.Localization;
 using RetailStore.RepApp;
 using RetailStore.RepApp.Client;
 using RetailStore.RepApp.Offline;
+using RetailStore.Domain.Printing;
 using RetailStore.RepApp.Printing;
 
 namespace RetailStore.Tests;

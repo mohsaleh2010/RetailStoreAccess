@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **97** | عدد الحقول: **1238**
+عدد الجداول: **97** | عدد الحقول: **1239**
 
 ## الفهرس
 
@@ -699,12 +699,14 @@
 | 45 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – من مركز الكاشير، وإلا المركز الافتراضي |
 | 46 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – من مندوب العميل، وإلا مندوب المستخدم |
 | 47 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
+| 48 | ClientRef | Short Text | 40 |  |  |  |  | رقم الفاتورة في جهاز نقطة البيع – من نقطة البيع على Windows (docs/83): يمنع تكرار الفاتورة إذا أُعيد إرسالها بعد انقطاع الاتصال |
 
 - المفتاح الأساسي: `SalesInvoiceID`
 - فهرس فريد: `InvoiceNumber`
 - فهرس عادي: `InvoiceDate`
 - فهرس فريد (يتجاهل الفارغ): `InvoiceUUID`
 - فهرس عادي: `ZatcaStatus`
+- فهرس فريد (يتجاهل الفارغ): `ClientRef`
 - قاعدة تحقق على مستوى الجدول: `[PaidAmount]<=[TotalAmount] And [RemainingAmount]=[TotalAmount]-[PaidAmount]` – المدفوع لا يتجاوز الإجمالي، والمتبقي = الإجمالي − المدفوع
 
 ## SalesInvoiceDetails

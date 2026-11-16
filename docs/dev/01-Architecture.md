@@ -102,6 +102,7 @@ RetailStore_BE.accdb  (البيانات فقط: الجداول والعلاقا�
   - `RetailStore.Domain`: القواعد بلا قاعدة بيانات (كلمة المرور، والبلد، والترجمة، وتخطيط القيود).
   - `RetailStore.Data`: الخدمات على الجداول نفسها (الدخول، والصلاحيات، وشاشات البيانات، والقيود، وسجل التدقيق).
   - `RetailStore.UI`: الشاشات، ويستعملها برنامج MAUI لاحقًا.
+  - `RetailStore.PosApp` و`RetailStore.Pos` (`docs/83`): نقطة البيع على Windows. مكتبة شاشات Razor ومنطق البيع بلا اتصال (ملف SQLite على الجهاز فيه صورة البيانات والمستخدمون للدخول بلا اتصال وفواتير الجهاز، وإرسال كل فاتورة مرة واحدة بـ `ClientRef` ورقم الجهاز `POS1-000001`)، وطريقان إلى البيانات: قاعدة محلية مباشرة (`DirectBackend` بخدمات `RetailStore.Data`) أو خادم بعيد بالـ API (`ApiBackend`، `/api/v1/pos`)، يختارهما مدير النظام في «إعدادات قاعدة البيانات»؛ وبرنامج Windows بـ MAUI Blazor Hybrid (`WindowsPlatform`: DPAPI والطابعة RAW) في `RetailStore.Windows.slnx` وحده.
   - `RetailStore.RepApp` و`RetailStore.App` (`docs/78`): تطبيق المندوب. مكتبة شاشات Razor ومنطق العمل بلا إنترنت (ملف SQLite على الجوال، وصندوق إرسال، ومزامنة بالـ API فقط، لا اتصال بالقاعدة)، وتطبيق Android بـ MAUI Blazor Hybrid في `RetailStore.Mobile.slnx` وحده.
   - `RetailStore.Web`: الموقع.
   - `RetailStore.Tests`: xUnit.

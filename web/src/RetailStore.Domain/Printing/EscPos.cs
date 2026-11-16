@@ -1,6 +1,7 @@
-namespace RetailStore.RepApp.Printing;
+namespace RetailStore.Domain.Printing;
 
-/// <summary>ESC/POS commands of a Bluetooth receipt printer (docs/78). The slip is sent as a picture (GS v 0), never as
+/// <summary>ESC/POS commands of a receipt printer: the rep app's Bluetooth printer (docs/78) and the POS printer on
+/// Windows (docs/83). The slip is sent as a picture (GS v 0), never as
 /// text: the printers do not join Arabic letters nor write right to left, the phone does. A picture of many rows is
 /// sent in bands, which the small printers' buffers accept.</summary>
 public static class EscPos
@@ -39,6 +40,9 @@ public static class EscPos
         return data;
     }
 
+    /// <summary>ESC p 0: the pulse that opens the cash drawer plugged into the printer.</summary>
+    public static readonly byte[] OpenDrawer = [0x1B, 0x70, 0x00, 0x19, 0xFA];
+
     /// <summary>The whole job: initialize, the picture in bands, feed, cut.</summary>
     public static byte[] Picture(bool[,] dots, int feedLines = 4)
     {
@@ -67,3 +71,8 @@ public static class EscPos
         return dots;
     }
 }
+
+public enum SlipAlign { Start, Center, End }
+
+/// <summary>A line of a printed slip: the device draws it (Arabic shaped, right to left) and the printer gets a picture.</summary>
+public sealed record SlipLine(string Text, SlipAlign Align = SlipAlign.Start, bool Bold = false, bool Large = false);

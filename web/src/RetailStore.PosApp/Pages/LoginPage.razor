@@ -1,0 +1,49 @@
+@page "/login"
+@inject PosSession S
+@inject NavigationManager Nav
+
+<section class="pos-card pos-login">
+    <h1>@S.T("نقطة البيع")</h1>
+    @if (S.Connection is { } c)
+    {
+        <p class="pos-muted">@(c.IsLocal ? S.T("قاعدة بيانات محلية") : S.T("خادم بعيد")): <span dir="ltr">@c.Describe()</span>
+            · @S.T("رمز الجهاز") <span dir="ltr">@c.DeviceCode</span></p>
+    }
+    <label>@S.T("اسم المستخدم")<input dir="ltr" @bind="user" autocomplete="username" /></label>
+    <label>@S.T("كلمة المرور")<input dir="ltr" type="password" @bind="password" @onkeyup="KeyAsync" autocomplete="current-password" /></label>
+    @if (message.Length > 0)
+    {
+        <p class="pos-error">@message</p>
+    }
+    <button class="pos-primary" disabled="@busy" @onclick="LoginAsync">@S.T("دخول")</button>
+    <button class="pos-link" @onclick="() => S.SetLanguage(!S.English)">@(S.English ? "العربية" : "English")</button>
+    <p class="pos-muted">@S.T("بلا اتصال بقاعدة البيانات يدخل من دخل على هذا الجهاز من قبل، ويبيع، وتُرسل فواتيره عند عودة الاتصال.")</p>
+</section>
+
+@code {
+    private string user = "", password = "", message = "";
+    private bool busy;
+
+    protected override async Task OnInitializedAsync() => await S.LoadAsync();
+
+    private async Task KeyAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await LoginAsync();
+        }
+    }
+
+    private async Task LoginAsync()
+    {
+        busy = true;
+        message = await S.LoginAsync(user, password);
+        busy = false;
+        if (message.Length == 0)
+        {
+            password = "";
+            Nav.NavigateTo("");
+            _ = S.SyncAsync();
+        }
+    }
+}

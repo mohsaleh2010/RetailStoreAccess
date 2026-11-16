@@ -1,0 +1,73 @@
+@page "/settings"
+@inject PosSession S
+@inject NavigationManager Nav
+
+<section class="pos-card">
+    <h2>@S.T("الإعدادات")</h2>
+    <dl class="pos-facts">
+        <dt>@S.T("المستخدم")</dt><dd>@S.User?.EmployeeName (@S.User?.Username)</dd>
+        <dt>@S.T("المخزن")</dt><dd>@S.Snapshot?.User.WarehouseName</dd>
+        <dt>@S.T("الجهاز")</dt><dd>@S.Platform.DeviceName</dd>
+        <dt>@S.T("قاعدة البيانات")</dt><dd dir="ltr">@S.Connection?.Describe()</dd>
+        <dt>@S.T("آخر تحديث للأسعار والأرصدة")</dt><dd dir="ltr">@S.SnapshotAt?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</dd>
+    </dl>
+    <button class="pos-link" @onclick="() => S.SetLanguage(!S.English)">@(S.English ? "العربية" : "English")</button>
+</section>
+
+<section class="pos-card">
+    <h2>@S.T("طابعة الإيصالات")</h2>
+    <label>@S.T("الطابعة")
+        <select @bind="printer">
+            <option value="">-</option>
+            @foreach (var p in printers)
+            {
+                <option value="@p">@p</option>
+            }
+        </select>
+    </label>
+    <label>@S.T("عرض الورق")
+        <select @bind="paper">
+            <option value="58">58 mm</option>
+            <option value="80">80 mm</option>
+        </select>
+    </label>
+    <label class="pos-check"><input type="checkbox" @bind="drawer" />@S.T("فتح درج النقود مع البيع النقدي")</label>
+    <p class="pos-muted">@S.T("طابعة إيصالات ESC/POS معرّفة في Windows، والدرج موصول بها.")</p>
+    <button class="pos-primary" @onclick="Save">@S.T("حفظ")</button>
+    @if (message.Length > 0)
+    {
+        <p>@message</p>
+    }
+</section>
+
+<section class="pos-card">
+    <button @onclick="Logout">@S.T("خروج")</button>
+    <p class="pos-muted">@S.T("بعد الخروج تبقى فواتير الجهاز وتُرسل، ويدخل كاشير آخر.")</p>
+</section>
+
+@code {
+    private IReadOnlyList<string> printers = [];
+    private string printer = "", message = "";
+    private int paper = 80;
+    private bool drawer = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        printer = S.Printer;
+        paper = S.PaperMillimetres;
+        drawer = S.OpenDrawer;
+        printers = await S.Platform.PrintersAsync();
+    }
+
+    private void Save()
+    {
+        S.SetPrinter(printer, paper, drawer);
+        message = S.T("تم الحفظ");
+    }
+
+    private void Logout()
+    {
+        S.Logout();
+        Nav.NavigateTo("login");
+    }
+}
