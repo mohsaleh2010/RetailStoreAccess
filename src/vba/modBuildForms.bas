@@ -29,7 +29,7 @@ Private Const FORM_NAMES As String = "frmMain,frmProducts,frmCustomers,frmSuppli
     "frmReportCenter,frmPOSLines,frmPOS,frmReturnLines,frmSalesReturn,frmCustomerPayment,frmSalesInvoice,frmPurchaseLines,frmPurchaseInvoice,frmPurchaseReturnLines,frmPurchaseReturn,frmSupplierPayment,frmPurchaseView,frmInventory,frmStockCountLines,frmStockCount,frmStockTransferLines,frmStockTransfer,frmStockDocumentLines,frmStockDocument,frmStockNoteLines,frmStockNote,frmLogin,frmChangePassword," & _
     "frmRolePermLines,frmRoles,frmUserScreenLines,frmUserScreens,frmActivation,frmBackup,frmLabelLines,frmBarcodeLabels,frmTouchLines,frmTouchPOS,frmTouchPay,frmCafePOS,frmCafeItem,frmTreasury,frmCashVoucher,frmCashClosing,frmCashTransfers,frmJournal,frmJournalEntry,frmManualLines,frmManualEntry,frmLedger,frmFinancials,frmPeriodClosing,frmFiscalPeriods,frmVatReturn,frmAging,frmAllocation,frmBankTx," & _
     "frmBankRecon,frmCheques,frmAssets,frmDepreciation,frmAssetChanges,frmPayrollLines,frmPayroll,frmBudgetLines,frmBudget,frmAccounting,frmAuditLog,frmCommissionLines,frmCommissions,frmEnglishNameLines,frmEnglishNames,frmEInvoices,frmZatcaSetup,frmEtaSetup,frmOpeningAccountLines,frmOpeningCustomers,frmOpeningSuppliers,frmOpeningBoxes,frmOpeningBanks,frmOpeningStock,frmOpeningBalances,frmSalesOrderLines," & _
-    "frmSalesOrder,frmPurchaseOrderLines,frmPurchaseOrder,frmQuotationLines,frmQuotation,frmRepDay,frmRepVisits,frmSqlServer"
+    "frmSalesOrder,frmPurchaseOrderLines,frmPurchaseOrder,frmQuotationLines,frmQuotation,frmRepDay,frmRepVisits,frmSqlServer,frmOfficeSync"
 
 Private m_frm As Access.Form
 Private m_tmpName As String
@@ -693,6 +693,7 @@ Private Sub BuildAllForms()
     BuildForm_frmRepDay
     BuildForm_frmRepVisits
     BuildForm_frmSqlServer
+    BuildForm_frmOfficeSync
 End Sub
 
 Private Sub BuildForm_frmMain()
@@ -6918,6 +6919,8 @@ Private Sub BuildForm_frmBackup()
     c.OnClick = EP
     Set c = AddButton("btnSqlServer", "SQL Server", 5556, 7484, 1701, 567, "secondary")
     c.OnClick = EP
+    Set c = AddButton("btnOfficeSync", "مهام المكتب", 7370, 7484, 1701, 567, "secondary")
+    c.OnClick = EP
     Set c = AddButton("btnClose", "إغلاق", 9639, 7484, 1474, 567, "secondary")
     c.OnClick = EP
     m_frm.OnLoad = EP
@@ -6942,6 +6945,9 @@ Private Sub BuildForm_frmBackup()
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnSqlServer_Click()" & vbCrLf
     s = s & "    OpenScreen ""frmSqlServer"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnOfficeSync_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmOfficeSync"", 0" & vbCrLf
     s = s & "End Sub" & vbCrLf
     s = s & "Private Sub btnClose_Click()" & vbCrLf
     s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
@@ -12460,4 +12466,63 @@ Private Sub BuildForm_frmSqlServer()
     Exit Sub
 EH:
     AbortForm "frmSqlServer", Err.Number, Err.Description
+End Sub
+
+Private Sub BuildForm_frmOfficeSync()
+    Dim c As Access.Control, s As String
+    On Error GoTo EH
+    StartForm "frmOfficeSync", "مهام المكتب", "", 12474, 8845, True, False, True, _
+              ""
+    Set c = AddRect("boxTitle", 0, 0, 12474, 850, CLR_PRIMARY)
+    Set c = AddIcon("icoTitle", ChrW(&HE8B7), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblTitle", "مهام المكتب", 850, 102, 7938, 425, 16, True, CLR_SURFACE, "", 0)
+    Set c = AddLabel("lblSubtitle", "تحديث القيود وإرسال الفواتير الإلكترونية لمستندات الويب ونقاط البيع وتطبيق المندوب", 850, 510, 7938, 284, 9, False, CLR_SIDEBAR_TEXT, "", 0)
+    Set c = AddLabel("lblThisComputer", " ", 227, 1021, 12020, 340, 9, False, CLR_TEXT, "", 0)
+    Set c = AddText("txtComputer", "", 227, 1758, 3402, 454)
+    Set c = AddLabel("lblComputer", "جهاز مهام المكتب (فارغ = يدويًا فقط)", 227, 1446, 3402, 284, 9, False, CLR_MUTED, "txtComputer", 0)
+    Set c = AddButton("btnThisComputer", "هذا الجهاز", 3742, 1758, 1588, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddText("txtMinutes", "", 5557, 1758, 1701, 454)
+    SetCtlProp c, "Format", "0"
+    Set c = AddLabel("lblMinutes", "كل (دقيقة)", 5557, 1446, 1701, 284, 9, False, CLR_MUTED, "txtMinutes", 0)
+    Set c = AddButton("btnSave", "حفظ الإعداد", 7371, 1758, 1701, 454, "secondary")
+    c.OnClick = EP
+    Set c = AddLabel("lblState", " ", 227, 2381, 12020, 369, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblWaiting", " ", 227, 2778, 12020, 369, 10, True, CLR_PRIMARY, "", 0)
+    Set c = AddButton("btnRunNow", "تشغيل الآن", 227, 3260, 1928, 510, "primary")
+    c.OnClick = EP
+    Set c = AddButton("btnRefresh", "تحديث", 2268, 3260, 1474, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddButton("btnEInvoices", "الفاتورة الإلكترونية", 3856, 3260, 2268, 510, "secondary")
+    c.OnClick = EP
+    Set c = AddList("lstLog", 227, 3969, 12020, 4082, 9, "1814;1474;907;850;850;850;907;907;3402", True)
+    Set c = AddButton("btnClose", "إغلاق", 10773, 8193, 1474, 510, "secondary")
+    c.OnClick = EP
+    m_frm.OnLoad = EP
+    s = ""
+    s = s & "Private Sub Form_Load()" & vbCrLf
+    s = s & "    OfficeSyncLoad Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnThisComputer_Click()" & vbCrLf
+    s = s & "    OfficeSyncUseThisComputer Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnSave_Click()" & vbCrLf
+    s = s & "    OfficeSyncSave Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRunNow_Click()" & vbCrLf
+    s = s & "    OfficeSyncRunNow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnRefresh_Click()" & vbCrLf
+    s = s & "    OfficeSyncShow Me" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnEInvoices_Click()" & vbCrLf
+    s = s & "    OpenScreen ""frmEInvoices"", 0" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    s = s & "Private Sub btnClose_Click()" & vbCrLf
+    s = s & "    DoCmd.Close acForm, Me.Name" & vbCrLf
+    s = s & "End Sub" & vbCrLf
+    FinishForm "frmOfficeSync", s
+    Exit Sub
+EH:
+    AbortForm "frmOfficeSync", Err.Number, Err.Description
 End Sub

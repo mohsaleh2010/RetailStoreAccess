@@ -15,6 +15,8 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "ليست في الفترات المالية. أضفها في شاشة «الفترات المالية", "is not in the fiscal periods. Add it in the Fiscal periods screen"
+    LangAdd "هذا الصنف لا يتابع المخزون، فلا يُسلَّم ولا يُستلم بإذن", "This item does not track stock, so it has no delivery or receipt note"
     LangAdd "يُمسح في نقطة البيع والمشتريات فيُضاف السطر بهذه الوحدة", "Scanned in the POS and purchases, it adds the line in this unit"
     LangAdd "أغلق البرنامج وانسخ ملف النسخة الاحتياطية مكانه يدويًا", "Close the program and copy the backup file in its place by hand"
     LangAdd "إجمالي ضريبة القيمة المضافة المستحقة عن الفترة الحالية", "Total VAT due for the current period"
@@ -133,11 +135,11 @@ Private Sub D2_1()
     LangAdd "تُحسب الفروقات على الكميات الحالية لحظة الترحيل", "The differences are calculated on the current quantities at the time of posting"
     LangAdd "حسابات لا يمكن وضعها في الشجرة (حلقة أو أكثر من", "Accounts that cannot be placed in the tree (a loop or more than"
     LangAdd "صنفًا بكمية صفر. اكتب الكميات، ثم «ترحيل الرصيد", "items with a zero quantity. Write the quantities, then Post the stock"
-    LangAdd "قاعدة الخادم فيها البيانات الفعلية للبرنامج منذ", "The server database holds the real data of the program since"
-    LangAdd "لطابعة الملصقات، وأكثر لورق A4 فيه أعمدة ملصقات", "for a label printer, and more for A4 paper with columns of labels"
 End Sub
 
 Private Sub D2_2()
+    LangAdd "قاعدة الخادم فيها البيانات الفعلية للبرنامج منذ", "The server database holds the real data of the program since"
+    LangAdd "لطابعة الملصقات، وأكثر لورق A4 فيه أعمدة ملصقات", "for a label printer, and more for A4 paper with columns of labels"
     LangAdd "أولًا: رصيده المرحَّل قد يعتمد على هذا الإقرار", "first: its carried balance may depend on this return"
     LangAdd "أُنشئت الموازنة بسطر لكل حساب إيرادات ومصروفات", "The budget was created with a line for each revenue and expense account"
     LangAdd "إنشاء كل المصروفات المتكررة المستحقة حتى اليوم", "Create all recurring expenses due up to today"
@@ -256,11 +258,11 @@ Private Sub D2_2()
     LangAdd "سطر في الإذن لا يطابق سطرًا في أمر الشراء", "A note line does not match a line of the purchase order"
     LangAdd "سطر في الإذن لا يطابق صنف سطره في الطلبية", "A note line does not match the product of its order line"
     LangAdd "شجرة الحسابات: الحسابات الرئيسية والفرعية", "Account tree: main and sub-accounts"
-    LangAdd "طلبيات العملاء المفتوحة: الباقي بلا تسليم", "Open customer orders: what is left to deliver"
-    LangAdd "فاتورة إذن التسليم بالوحدة الصغرى للأصناف", "The invoice of a delivery note is in the smallest unit of the products"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "طلبيات العملاء المفتوحة: الباقي بلا تسليم", "Open customer orders: what is left to deliver"
+    LangAdd "فاتورة إذن التسليم بالوحدة الصغرى للأصناف", "The invoice of a delivery note is in the smallest unit of the products"
     LangAdd "فعّل الإرسال من شاشة الفاتورة الإلكترونية", "Enable sending in the e-invoicing screen"
     LangAdd "لا تملك هذه الصلاحية في شاشة مسير الرواتب", "You do not have this permission in the payroll screen"
     LangAdd "لا توجد مبالغ غير مربوطة أو فواتير مفتوحة", "There are no unlinked amounts or open invoices"
@@ -379,11 +381,11 @@ Private Sub D2_3()
     LangAdd "سجل التدقيق يحتاج صلاحية «سجل التدقيق", "The audit trail needs the permission Audit trail"
     LangAdd "شامل الضريبة كسعر البيع في نقطة البيع", "Including VAT, as the selling price in the POS"
     LangAdd "عرض فقط - التصحيح يكون بمرتجع مشتريات", "View only - a correction is made with a purchase return"
-    LangAdd "غير نشط. فعّله من شاشة المنتجات أولًا", "is not active. Activate it in the Products screen first"
-    LangAdd "فحص سلامة البيانات: لا توجد أي مشكلات", "Data integrity check: no problems at all"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "غير نشط. فعّله من شاشة المنتجات أولًا", "is not active. Activate it in the Products screen first"
+    LangAdd "فحص سلامة البيانات: لا توجد أي مشكلات", "Data integrity check: no problems at all"
     LangAdd "لا تملك صلاحية اعتماد التسوية البنكية", "You do not have the permission to approve the bank reconciliation"
     LangAdd "لا تملك صلاحية تسجيل فواتير المشتريات", "You do not have the permission to record purchase invoices"
     LangAdd "لا تملك هذه الصلاحية في شاشة الموازنة", "You do not have this permission in the budget screen"
@@ -394,7 +396,4 @@ Private Sub D2_4()
     LangAdd "مقفلة بقيد إقفال. أعد فتح السنة أولًا", "closed with a closing entry. Reopen the year first"
     LangAdd "من بداية الصندوق (لا توجد تصفية سابقة", "since the box started (no previous closing"
     LangAdd "هذا سجل أساسي في النظام ولا يمكن حذفه", "This is a system record and cannot be deleted"
-    LangAdd "هل تريد إنشاء المصروفات المستحقة الآن", "Do you want to create the due expenses now"
-    LangAdd "أرصدة الموردين بالعملات وفروق العملة", "Supplier balances by currency and exchange differences"
-    LangAdd "أُنشئ مفتاح وشهادة تجريبية في المجلد", "A test key and certificate were created in the folder"
 End Sub

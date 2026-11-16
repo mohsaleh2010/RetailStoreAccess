@@ -14,9 +14,47 @@ Public Sub LangData6()
     D6_4
     D6_5
     D6_6
+    D6_7
 End Sub
 
 Private Sub D6_1()
+    LangAdd "مبلغ الشيك", "Cheque amount"
+    LangAdd "مجمل الربح", "Gross profit"
+    LangAdd "مخزن رئيسي", "Main warehouse"
+    LangAdd "مرتجع شراء", "Purchase return"
+    LangAdd "مرجع البنك", "Bank reference"
+    LangAdd "مرحَّلة في", "posted on"
+    LangAdd "مسودة مسير", "Run draft"
+    LangAdd "من البداية", "from the start"
+    LangAdd "من القائمة", "from the list"
+    LangAdd "منها ضريبة", "of which VAT"
+    LangAdd "مُرحَّل في", "Posted on"
+    LangAdd "مُستلَم في", "Received on"
+    LangAdd "نسبة صفرية", "Zero rate"
+    LangAdd "نقطة البيع", "Point of sale"
+    LangAdd "نوع الحركة", "Move type"
+    LangAdd "نوع الحساب", "Account type"
+    LangAdd "نوع الشراء", "Purchase type"
+    LangAdd "نوع المخزن", "Warehouse type"
+    LangAdd "هذا الجهاز", "This computer"
+    LangAdd "وحدة السعر", "Price unit"
+    LangAdd "ورقة الجرد", "Count sheet"
+    LangAdd "يدويًا فقط", "by hand only"
+    LangAdd "آخر تحديث", "Last update"
+    LangAdd "آخر تشغيل", "Last run"
+    LangAdd "آخر تصفية", "Last closing"
+    LangAdd "آخر معامل", "Last rate"
+    LangAdd "أربعة عشر", "fourteen"
+    LangAdd "أصل الإذن", "Note origin"
+    LangAdd "أُنشئ منه", "Created from it"
+    LangAdd "إعادة فتح", "Reopen"
+    LangAdd "إقفال سنة", "Close a year"
+    LangAdd "إلى تاريخ", "To date"
+    LangAdd "إلى صندوق", "To box"
+    LangAdd "إلى طلبية", "To an order"
+    LangAdd "إيصال بيع", "Sales receipt"
+    LangAdd "استلام في", "Receipt in"
+    LangAdd "اسم الأصل", "Asset name"
     LangAdd "اسم الجهة", "Party name"
     LangAdd "اسم الصنف", "Item name"
     LangAdd "اسم الفرع", "Branch name"
@@ -40,6 +78,7 @@ Private Sub D6_1()
     LangAdd "بدل السكن", "Housing allowance"
     LangAdd "بدل النقل", "Transport allowance"
     LangAdd "بعد اليوم", "after today"
+    LangAdd "بلا مشكلة", "No problem"
     LangAdd "بلا نتيجة", "No result"
     LangAdd "بلا نهاية", "No end"
     LangAdd "تحت الطلب", "On order"
@@ -99,8 +138,12 @@ Private Sub D6_1()
     LangAdd "فتح القيد", "Open the entry"
     LangAdd "في المسير", "in the run"
     LangAdd "قسط الشهر", "Month depreciation"
+End Sub
+
+Private Sub D6_2()
     LangAdd "قيد محذوف", "Deleted entry"
     LangAdd "قيد يومية", "Journal entry"
+    LangAdd "كل (دقيقة", "Every (minutes"
     LangAdd "كل 3 أشهر", "Every 3 months"
     LangAdd "كود الجهة", "Party code"
     LangAdd "كود الصنف", "Item code"
@@ -137,9 +180,6 @@ Private Sub D6_1()
     LangAdd "الأربعاء", "Wednesday"
     LangAdd "الإجمالي", "Total"
     LangAdd "الإضافات", "Extras"
-End Sub
-
-Private Sub D6_2()
     LangAdd "الارتداد", "Bounce"
     LangAdd "الاستلام", "Receipt"
     LangAdd "الانحراف", "Variance"
@@ -214,12 +254,16 @@ Private Sub D6_2()
     LangAdd "قيد يدوي", "Manual entry"
     LangAdd "كشف حساب", "Account statement"
     LangAdd "لا يُرسل", "Not sent"
+    LangAdd "لم تُرسل", "Not sent"
     LangAdd "لم يُؤخذ", "Not taken:"
     LangAdd "لم يُنشأ", "Not created"
     LangAdd "لون الزر", "Button color"
     LangAdd "مخزن فرع", "Branch warehouse"
     LangAdd "معتمد في", "Approved on"
     LangAdd "مقفل حتى", "Closed up to"
+End Sub
+
+Private Sub D6_3()
     LangAdd "من البنك", "From the bank"
     LangAdd "من تاريخ", "From date"
     LangAdd "من صندوق", "From a box"
@@ -260,9 +304,6 @@ Private Sub D6_2()
     LangAdd "التسوية", "Reconciliation"
     LangAdd "التصنيف", "Category"
     LangAdd "التعديل", "Adjustment"
-End Sub
-
-Private Sub D6_3()
     LangAdd "التقييم", "Valuation"
     LangAdd "التكرار", "Frequency"
     LangAdd "التكلفة", "Cost"
@@ -343,6 +384,9 @@ Private Sub D6_3()
     LangAdd "في شاشة", "in the screen"
     LangAdd "لا توجد", "None"
     LangAdd "للإضافة", "to add"
+End Sub
+
+Private Sub D6_4()
     LangAdd "لم تجتز", "Failed:"
     LangAdd "متوازنة", "Balanced"
     LangAdd "مرة/سنة", "times/year"
@@ -383,9 +427,6 @@ Private Sub D6_3()
     LangAdd "الحركة", "Move"
     LangAdd "الحساب", "Account"
     LangAdd "الخميس", "Thursday"
-End Sub
-
-Private Sub D6_4()
     LangAdd "الدائن", "Credit"
     LangAdd "الدخول", "Login"
     LangAdd "الرصيد", "Balance"
@@ -402,6 +443,7 @@ Private Sub D6_4()
     LangAdd "الفترة", "Period"
     LangAdd "الفعلي", "Actual"
     LangAdd "القيمة", "Value"
+    LangAdd "القيود", "Journal"
     LangAdd "الكمية", "Quantity"
     LangAdd "المالك", "Owner"
     LangAdd "المباع", "Sold"
@@ -428,6 +470,7 @@ Private Sub D6_4()
     LangAdd "بنفسجي", "Purple"
     LangAdd "بواسطة", "by"
     LangAdd "تغيّرت", "changed"
+    LangAdd "تلقائي", "Automatic"
     LangAdd "تم حفظ", "Saved"
     LangAdd "تم عدّ", "Counted"
     LangAdd "ثلاثون", "thirty"
@@ -464,6 +507,9 @@ Private Sub D6_4()
     LangAdd "مكافآت", "Bonuses"
     LangAdd "ملايين", "million"
     LangAdd "ممنوحة", "Granted"
+End Sub
+
+Private Sub D6_5()
     LangAdd "من بنك", "From a bank"
     LangAdd "موازنة", "Budget"
     LangAdd "موردًا", "suppliers"
@@ -506,9 +552,6 @@ Private Sub D6_4()
     LangAdd "السبت", "Saturday"
     LangAdd "السجل", "Record"
     LangAdd "السعر", "Price"
-End Sub
-
-Private Sub D6_5()
     LangAdd "السكن", "Housing"
     LangAdd "السنة", "Year"
     LangAdd "السند", "Voucher"
@@ -570,6 +613,7 @@ Private Sub D6_5()
     LangAdd "كاشير", "Cashier"
     LangAdd "متوقف", "Stopped"
     LangAdd "مجموع", "Total"
+    LangAdd "محذوف", "deleted"
     LangAdd "محوّل", "Converted"
     LangAdd "مختلف", "Different"
     LangAdd "مدفوع", "Paid"
@@ -583,8 +627,12 @@ Private Sub D6_5()
     LangAdd "مطابق", "Matched"
     LangAdd "مطلوب", "is required"
     LangAdd "معتمد", "Approved"
+    LangAdd "معدّل", "changed"
     LangAdd "مغلقة", "Closed"
     LangAdd "مفتوح", "Open"
+End Sub
+
+Private Sub D6_6()
     LangAdd "مفوتر", "Invoiced"
     LangAdd "مقبوض", "Received"
     LangAdd "مقفلة", "Closed"
@@ -629,9 +677,6 @@ Private Sub D6_5()
     LangAdd "رجوع", "Back"
     LangAdd "رصيد", "Balance"
     LangAdd "ريال", "SAR"
-End Sub
-
-Private Sub D6_6()
     LangAdd "ساري", "Valid"
     LangAdd "سبعة", "seven"
     LangAdd "ستون", "sixty"
@@ -672,6 +717,7 @@ Private Sub D6_6()
     LangAdd "واحد", "one"
     LangAdd "وارد", "Received"
     LangAdd "وردي", "Pink"
+    LangAdd "يدوي", "Manual"
     LangAdd "يوجد", "There are"
     LangAdd "آجل", "Credit"
     LangAdd "ألف", "thousand"
@@ -707,6 +753,9 @@ Private Sub D6_6()
     LangAdd "مصر", "Egypt"
     LangAdd "ملف", "File"
     LangAdd "نشط", "Active"
+End Sub
+
+Private Sub D6_7()
     LangAdd "نعم", "Yes"
     LangAdd "وسط", "Medium"
     LangAdd "في", "in"

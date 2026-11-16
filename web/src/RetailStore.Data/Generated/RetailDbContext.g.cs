@@ -5,7 +5,7 @@ using RetailStore.Data.Entities;
 
 namespace RetailStore.Data;
 
-/// <summary>The back-end of the Access program (97 tables). On SQL Server the tables come from
+/// <summary>The back-end of the Access program (98 tables). On SQL Server the tables come from
 /// dist/sql/RetailStore_Schema.sql (each with its RowVer for the concurrency of Access and the web);
 /// a SQLite development or test database is created from this model (DbSetup).</summary>
 public partial class RetailDbContext : DbContext
@@ -109,6 +109,7 @@ public partial class RetailDbContext : DbContext
     public DbSet<AuditChanges> AuditChanges => Set<AuditChanges>();
     public DbSet<LabelSettings> LabelSettings => Set<LabelSettings>();
     public DbSet<EInvoiceLog> EInvoiceLog => Set<EInvoiceLog>();
+    public DbSet<OfficeSyncLog> OfficeSyncLog => Set<OfficeSyncLog>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
@@ -169,6 +170,8 @@ public partial class RetailDbContext : DbContext
             e.Property(x => x.EtaSignerArgs).HasMaxLength(255);
             e.Property(x => x.EtaTokenPin).HasMaxLength(50);
             e.Property(x => x.EInvoiceEnvironment).HasMaxLength(12).IsRequired();
+            e.Property(x => x.OfficeSyncComputer).HasMaxLength(64);
+            e.Property(x => x.OfficeSyncLastResult).HasMaxLength(255);
             e.HasOne<Customers>().WithMany().HasForeignKey(x => x.DefaultCustomerID).HasConstraintName("FK_Settings_DefaultCustomerID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<Banks>().WithMany().HasForeignKey(x => x.DefaultBankID).HasConstraintName("FK_Settings_DefaultBankID").OnDelete(DeleteBehavior.ClientSetNull);
             if (sqlServer) e.Property<byte[]>("RowVer").IsRowVersion();
@@ -1787,6 +1790,17 @@ public partial class RetailDbContext : DbContext
             e.Property(x => x.Message).HasMaxLength(255);
             if (!sqlServer) e.HasIndex(x => x.LoggedAt).HasDatabaseName("EInvoiceLog_IX_LoggedAt");
             if (!sqlServer) e.HasIndex(x => new { x.DocKind, x.DocID }).HasDatabaseName("EInvoiceLog_IX_DocKind_DocID");
+            if (sqlServer) e.Property<byte[]>("RowVer").IsRowVersion();
+        });
+        b.Entity<OfficeSyncLog>(e =>
+        {
+            e.ToTable("OfficeSyncLog");
+            e.HasKey(x => x.OfficeSyncLogID);
+            e.Property(x => x.OfficeSyncLogID).ValueGeneratedOnAdd();
+            e.Property(x => x.ComputerName).HasMaxLength(64);
+            e.Property(x => x.RunKind).HasMaxLength(10).IsRequired();
+            e.Property(x => x.Problem).HasMaxLength(255);
+            if (!sqlServer) e.HasIndex(x => x.RunAt).HasDatabaseName("OfficeSyncLog_IX_RunAt");
             if (sqlServer) e.Property<byte[]>("RowVer").IsRowVersion();
         });
     }

@@ -29,13 +29,13 @@ Private Const MSG_RTL As Long = &H180000        ' vbMsgBoxRight + vbMsgBoxRtlRea
 Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,RolePermissions,Employees,Screens,UserScreens,Activations,Categories,Units,PaymentMethods,Currencies,CurrencyRates,CashBoxes,CashBoxUsers,Warehouses,Suppliers,PriceLists,Customers,Products,ProductUnits,PriceListItems,SalesInvoices,SalesInvoiceDetails,SalesReturns,SalesReturnDetails,PurchaseInvoices,PurchaseInvoiceDetails,PurchaseReturns,PurchaseReturnDetails," & _
     "CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques,FixedAssets,DepreciationRuns,AssetDepreciations,AssetRevaluations,AssetTransfers,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings," & _
     "Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalPeriods,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,OpeningBalances,OpeningStock,TransactionTypes,InventoryTransactions,StockTransfers,StockTransferLines,StockParties,StockDocuments,StockDocumentLines,StockNotes,StockNoteLines,SalesOrders,Quotations,QuotationLines,PurchaseOrders," & _
-    "PurchaseOrderLines,RepDays,RouteStops,RepVisits,RepPrices,SalesOrderLines,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=71;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;PriceLists=7;Customers=26;Products=26;ProductUnits=9;PriceListItems=8;SalesInvoices=48;SalesInvoiceDetails=16;SalesReturns=40;SalesReturnDetails=16;" & _
+    "PurchaseOrderLines,RepDays,RouteStops,RepVisits,RepPrices,SalesOrderLines,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog,OfficeSyncLog"
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=75;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;PriceLists=7;Customers=26;Products=26;ProductUnits=9;PriceListItems=8;SalesInvoices=48;SalesInvoiceDetails=16;SalesReturns=40;SalesReturnDetails=16;" & _
     "PurchaseInvoices=24;PurchaseInvoiceDetails=13;PurchaseReturns=23;PurchaseReturnDetails=13;CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;" & _
     "BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;" & _
     "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=14;Quotations=16;QuotationLines=9;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;" & _
-    "EInvoiceLog=15"
-Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=36;Roles=3;Permissions=48;RolePermissions=94;Employees=1;Screens=83;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=38;TransactionTypes=14;StockParties=1;LabelSettings=1"
+    "EInvoiceLog=15;OfficeSyncLog=12"
+Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=36;Roles=3;Permissions=49;RolePermissions=95;Employees=1;Screens=84;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=38;TransactionTypes=14;StockParties=1;LabelSettings=1"
 
 Private m_db As DAO.Database
 Private m_pending As Collection
@@ -727,6 +727,7 @@ Private Sub CreateAllTables()
     CreateTable_AuditChanges
     CreateTable_LabelSettings
     CreateTable_EInvoiceLog
+    CreateTable_OfficeSyncLog
 End Sub
 
 Private Sub CreateTable_Settings()
@@ -874,6 +875,14 @@ Private Sub CreateTable_Settings()
              "In (""TEST"",""SIMULATION"",""PRODUCTION"")", "TEST = تجريبية، SIMULATION = محاكاة، PRODUCTION = فعلية", "بيئة الفاتورة الإلكترونية", "السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45)"
     AddField tdf, "ServerLiveSince", "DATETIME", 0, False, "", _
              "", "", "البيانات الفعلية على SQL Server منذ", "يُكتب على الخادم عند ربط البرنامج به (docs/70): لا يُنقل فوقه من ملف Access، والأجهزة الأخرى تُربط بلا مطابقة"
+    AddField tdf, "OfficeSyncComputer", "TEXT", 64, False, "", _
+             "", "", "جهاز مهام المكتب", "اسم جهاز Access الذي يحدّث القيود ويرسل الفواتير الإلكترونية تلقائيًا (docs/84)؛ فارغ = لا تشغيل تلقائي"
+    AddField tdf, "OfficeSyncMinutes", "INT", 0, False, "15", _
+             ">=0 And <=1440", "من 0 إلى 1440 دقيقة؛ 0 = يدويًا فقط", "تشغيل مهام المكتب كل (دقيقة)", ""
+    AddField tdf, "OfficeSyncLastAt", "DATETIME", 0, False, "", _
+             "", "", "آخر تشغيل لمهام المكتب", ""
+    AddField tdf, "OfficeSyncLastResult", "TEXT", 255, False, "", _
+             "", "", "نتيجة آخر تشغيل لمهام المكتب", "فارغ = بلا مشكلة"
     AddIndex tdf, "PrimaryKey", "SettingID", True, True, False
     EndTable tdf, "إعدادات المحل: سجل واحد فقط يحتوي بيانات المحل الضريبية وإعدادات التشغيل.", "", ""
 End Sub
@@ -4036,6 +4045,38 @@ Private Sub CreateTable_EInvoiceLog()
     EndTable tdf, "سجل الفاتورة الإلكترونية: كل طلب للمنظومة الإلكترونية (هيئة الزكاة والضريبة والجمارك أو مصلحة الضرائب المصرية) ورده: الإرسال والاستعلام وتسجيل الجهاز.", "", ""
 End Sub
 
+Private Sub CreateTable_OfficeSyncLog()
+    Dim tdf As DAO.TableDef
+    If Not BeginTable(tdf, "OfficeSyncLog") Then Exit Sub
+    AddField tdf, "OfficeSyncLogID", "AUTO", 0, False, "", _
+             "", "", "رقم السجل", ""
+    AddField tdf, "RunAt", "DATETIME", 0, True, "Now()", _
+             "", "", "الوقت", ""
+    AddField tdf, "ComputerName", "TEXT", 64, False, "", _
+             "", "", "الجهاز", ""
+    AddField tdf, "RunKind", "TEXT", 10, True, """MANUAL""", _
+             "In (""AUTO"",""MANUAL"")", "AUTO = تلقائي، MANUAL = يدوي", "طريقة التشغيل", ""
+    AddField tdf, "JournalAdded", "LONG", 0, False, "0", _
+             "", "", "قيود جديدة", ""
+    AddField tdf, "JournalUpdated", "LONG", 0, False, "0", _
+             "", "", "قيود معدّلة", ""
+    AddField tdf, "JournalRemoved", "LONG", 0, False, "0", _
+             "", "", "قيود محذوفة", ""
+    AddField tdf, "EInvoicesSent", "LONG", 0, False, "0", _
+             "", "", "فواتير أُرسلت", ""
+    AddField tdf, "EInvoicesFailed", "LONG", 0, False, "0", _
+             "", "", "فواتير لم تُرسل", ""
+    AddField tdf, "EInvoicesChecked", "LONG", 0, False, "0", _
+             "", "", "فواتير تمت متابعتها", ""
+    AddField tdf, "Problem", "TEXT", 255, False, "", _
+             "", "", "المشكلة", "فارغ = تم بلا مشكلة"
+    AddField tdf, "EmployeeID", "LONG", 0, False, "", _
+             "", "", "الموظف", "بدون علاقة: Employees قريب من حد الفهارس"
+    AddIndex tdf, "PrimaryKey", "OfficeSyncLogID", True, True, False
+    AddIndex tdf, "IX_RunAt", "RunAt", False, False, False
+    EndTable tdf, "سجل مهام المكتب: كل تشغيل لمهام المكتب في Access: تحديث القيود من مستندات الويب ونقاط البيع وتطبيق المندوب، وإرسال الفواتير الإلكترونية المعلّقة ومتابعتها.", "", ""
+End Sub
+
 '------------------------------------------------------------------------------
 ' Generated: lookup / initial data
 '------------------------------------------------------------------------------
@@ -4166,9 +4207,10 @@ Private Sub Seed_Permissions()
     If SeedRow("[PermissionKey] = 'USERS'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('USERS', 'المستخدمون والصلاحيات', 'النظام', 81)") Then GrantNewPermission "USERS", "1"
     If SeedRow("[PermissionKey] = 'BACKUP'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('BACKUP', 'النسخ الاحتياطي', 'النظام', 82)") Then GrantNewPermission "BACKUP", "1"
     If SeedRow("[PermissionKey] = 'SQL_SERVER'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('SQL_SERVER', 'قاعدة SQL Server: الاتصال ونقل البيانات وتشغيل البرنامج على الخادم', 'النظام', 84)") Then GrantNewPermission "SQL_SERVER", "1"
+    If SeedRow("[PermissionKey] = 'OFFICE_SYNC'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('OFFICE_SYNC', 'مهام المكتب: تحديث القيود وإرسال الفواتير الإلكترونية لمستندات الويب ونقاط البيع', 'النظام', 85)") Then GrantNewPermission "OFFICE_SYNC", "1"
     If SeedRow("[PermissionKey] = 'AUDIT_LOG'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('AUDIT_LOG', 'سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد', 'النظام', 83)") Then GrantNewPermission "AUDIT_LOG", "1"
     If SeedRow("[PermissionKey] = 'EINVOICE'", "INSERT INTO [Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES ('EINVOICE', 'الفاتورة الإلكترونية: المتابعة وإعادة الإرسال', 'المبيعات', 16)") Then GrantNewPermission "EINVOICE", "1,2"
-    EndSeed "Permissions", 48
+    EndSeed "Permissions", 49
 End Sub
 
 Private Sub Seed_RolePermissions()
@@ -4219,6 +4261,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'USERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'BACKUP')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'SQL_SERVER')"
+    ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'OFFICE_SYNC')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'AUDIT_LOG')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, 'EINVOICE')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, 'SALES_POS')"
@@ -4267,7 +4310,7 @@ Private Sub Seed_RolePermissions()
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMERS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CUSTOMER_PAYMENTS')"
     ExecSeed "INSERT INTO [RolePermissions] ([RoleID], [PermissionKey]) VALUES (3, 'CASH_CLOSING')"
-    EndSeed "RolePermissions", 94
+    EndSeed "RolePermissions", 95
 End Sub
 
 Private Sub Seed_Employees()
@@ -4357,11 +4400,12 @@ Private Sub Seed_Screens()
     SeedRow "[ScreenName] = 'frmAuditLog'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmAuditLog', 'سجل التدقيق', 'النظام', 770, 'AUDIT_LOG', False, False, False)"
     SeedRow "[ScreenName] = 'frmBackup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmBackup', 'النسخ الاحتياطي', 'النظام', 780, 'BACKUP', False, False, False)"
     SeedRow "[ScreenName] = 'frmSqlServer'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmSqlServer', 'قاعدة البيانات على SQL Server', 'النظام', 790, 'SQL_SERVER', False, False, False)"
-    SeedRow "[ScreenName] = 'frmEnglishNames'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEnglishNames', 'الأسماء الإنجليزية', 'النظام', 800, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmEInvoices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEInvoices', 'الفاتورة الإلكترونية', 'المبيعات', 810, 'EINVOICE', False, True, False)"
-    SeedRow "[ScreenName] = 'frmZatcaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmZatcaSetup', 'إعداد ربط منصة فاتورة', 'النظام', 820, 'SETTINGS', False, True, False)"
-    SeedRow "[ScreenName] = 'frmEtaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEtaSetup', 'إعداد ربط منظومة الإيصال الإلكتروني', 'النظام', 830, 'SETTINGS', False, True, False)"
-    EndSeed "Screens", 83
+    SeedRow "[ScreenName] = 'frmOfficeSync'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmOfficeSync', 'مهام المكتب', 'النظام', 800, 'OFFICE_SYNC', False, False, False)"
+    SeedRow "[ScreenName] = 'frmEnglishNames'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEnglishNames', 'الأسماء الإنجليزية', 'النظام', 810, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmEInvoices'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEInvoices', 'الفاتورة الإلكترونية', 'المبيعات', 820, 'EINVOICE', False, True, False)"
+    SeedRow "[ScreenName] = 'frmZatcaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmZatcaSetup', 'إعداد ربط منصة فاتورة', 'النظام', 830, 'SETTINGS', False, True, False)"
+    SeedRow "[ScreenName] = 'frmEtaSetup'", "INSERT INTO [Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES ('frmEtaSetup', 'إعداد ربط منظومة الإيصال الإلكتروني', 'النظام', 840, 'SETTINGS', False, True, False)"
+    EndSeed "Screens", 84
 End Sub
 
 Private Sub Seed_Categories()
@@ -4905,6 +4949,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Users and permissions' WHERE [PermissionKey] = 'USERS' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Backup' WHERE [PermissionKey] = 'BACKUP' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'SQL Server database: connection, data transfer and running on the server' WHERE [PermissionKey] = 'SQL_SERVER' AND [PermissionNameEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Office tasks: journal update and e-invoice sending for web and POS documents' WHERE [PermissionKey] = 'OFFICE_SYNC' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'Audit trail: who added, edited or deleted, with the values before and after' WHERE [PermissionKey] = 'AUDIT_LOG' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [PermissionNameEn] = 'E-invoicing: follow-up and resending' WHERE [PermissionKey] = 'EINVOICE' AND [PermissionNameEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Permissions] SET [ModuleNameEn] = 'Sales' WHERE [ModuleName] = 'المبيعات' AND [ModuleNameEn] Is Null", dbFailOnError
@@ -4996,6 +5041,7 @@ Private Sub SeedEnglishNames()
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Audit trail' WHERE [ScreenName] = 'frmAuditLog' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Backup' WHERE [ScreenName] = 'frmBackup' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'SQL Server database' WHERE [ScreenName] = 'frmSqlServer' AND [ScreenTitleEn] Is Null", dbFailOnError
+    m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Office tasks' WHERE [ScreenName] = 'frmOfficeSync' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'English names' WHERE [ScreenName] = 'frmEnglishNames' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'E-invoicing' WHERE [ScreenName] = 'frmEInvoices' AND [ScreenTitleEn] Is Null", dbFailOnError
     m_db.Execute "UPDATE [Screens] SET [ScreenTitleEn] = 'Fatoora connection setup' WHERE [ScreenName] = 'frmZatcaSetup' AND [ScreenTitleEn] Is Null", dbFailOnError

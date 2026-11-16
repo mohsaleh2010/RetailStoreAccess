@@ -55,6 +55,7 @@ Private Sub D1_1()
     LangAdd "الأرصدة المدينة (الأصول) أكبر من الدائنة بهذا المبلغ: أكمل رأس المال أو الالتزامات", "The debit balances (assets) exceed the credit balances by this amount: complete the capital or the liabilities"
     LangAdd "البرنامج يعمل الآن على الخادم: النقل يكون من ملف Access. ارجع إلى ملف Access أولًا", "The program now works on the server: the transfer is made from the Access file. Go back to the Access file first"
     LangAdd "العملة والضريبة والرقم الضريبي والفاتورة الإلكترونية. تتغير قبل تسجيل أي عملية فقط", "Currency, tax, tax number and e-invoicing. It changes only before any operation is recorded"
+    LangAdd "تحديث القيود وإرسال الفواتير الإلكترونية لمستندات الويب ونقاط البيع وتطبيق المندوب", "Journal update and e-invoice sending for the documents of the web, the POS and the rep app"
     LangAdd "خطة اليوم من خط السير، ثم تسجيل كل زيارة ونتيجتها: طلبية أو بيع أو تحصيل أو لا شيء", "The day plan from the route, then each visit and its result: order, sale, collection or nothing"
     LangAdd "البرنامج غير مفعّل على هذا الجهاز: أرسل رقم الجهاز للمبرمج واكتب الكود الذي يرسله", "The program is not activated on this computer: send the computer number to the developer and type the code he sends"
     LangAdd "الموجب مستحق للهيئة، والسالب رصيد مسترد. راجع الأرقام مع محاسبك قبل تقديم الإقرار", "A positive amount is due to the Authority, a negative one is a refundable balance. Review the figures with your accountant before filing the return"
@@ -133,10 +134,10 @@ Private Sub D1_1()
     LangAdd "لم تُعيَّن كلمة مرور لهذا المستخدم بعد. اطلب من مدير النظام تعيينها", "No password is set for this user yet. Ask the system administrator to set one"
     LangAdd "يجب أن يكون البرنامج مغلقًا على كل الأجهزة الأخرى. هل تريد المتابعة", "The program must be closed on all other computers. Do you want to continue"
     LangAdd "ابدأ جردًا، أدخل الكمية الفعلية أو امسح الباركود، ثم رحّل الفروقات", "Start a count, enter the actual quantity or scan the barcode, then post the differences"
-    LangAdd "الشاشات التي يفتحها كل مستخدم، والإضافة والتعديل والحذف في كل شاشة", "The screens each user opens, and add, edit and delete in each screen"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "الشاشات التي يفتحها كل مستخدم، والإضافة والتعديل والحذف في كل شاشة", "The screens each user opens, and add, edit and delete in each screen"
     LangAdd "بعدها لا يُضاف ولا يُعدَّل ولا يُحذف أي مستند بتاريخ حتى هذا اليوم", "After that, no document dated up to this day is added, edited or deleted"
     LangAdd "سيُنشأ مفتاح جديد ويُعاد تسجيل الجهاز من البداية. هل تريد المتابعة", "A new key will be created and the device registered again from the start. Continue"
     LangAdd "شهادة الجهاز (CSID): تُملأ من الخطوة 3، أو تُلصق كما تصدرها الهيئة", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
@@ -243,6 +244,7 @@ Private Sub D1_2()
     LangAdd "اكتب سبب الحركة في الملاحظات (مثال: تالف، هدية من المورد", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
     LangAdd "الإعداد مكتمل. فعّل الإرسال من شاشة الفاتورة الإلكترونية", "The setup is complete. Enable sending in the e-invoicing screen"
     LangAdd "الإلغاء للفاتورة الإلكترونية فقط. الإيصال يُصحَّح بمرتجع", "Only an e-invoice can be cancelled. A receipt is corrected by a return"
+    LangAdd "الفاتورة الإلكترونية غير مفعّلة: المهام تحدّث القيود فقط", "E-invoicing is off: the tasks update the journal only"
     LangAdd "المبلغ المدفوع (F8) - اتركه فارغًا إذا دفع المبلغ بالضبط", "Amount paid (F8) - leave it empty if the exact amount is paid"
     LangAdd "المتبقي من كل فاتورة آجلة حسب تأخيرها عن تاريخ الاستحقاق", "The remainder of each credit invoice by its delay after the due date"
     LangAdd "دور مدير النظام يملك كل الصلاحيات دائمًا ولا يمكن تقييده", "The system administrator role always has all the permissions and cannot be restricted"
@@ -255,17 +257,15 @@ Private Sub D1_2()
     LangAdd "للأصل نقل في يوم إعادة التقييم أو بعده: احذف النقل أولًا", "The asset has a transfer on or after the revaluation day: delete the transfer first"
     LangAdd "لم تُعيَّن كلمة مرور بعد، ولا يستطيع هذا المستخدم الدخول", "No password is set yet, and this user cannot log in"
     LangAdd "الاستعادة تحتاج صلاحية dbcreator أو sysadmin على الخادم", "A restore needs the dbcreator or sysadmin role on the server"
-    LangAdd "البرنامج يعمل على ملف Access الآن. أغلقه وافتحه من جديد", "The program works on the Access file now. Close it and open it again"
-    LangAdd "العملاء والموردون والصناديق والبنوك والمخزون في أقسامها", "Customers, suppliers, cash boxes, banks and stock have their own parts"
 End Sub
 
 Private Sub D1_3()
+    LangAdd "البرنامج يعمل على ملف Access الآن. أغلقه وافتحه من جديد", "The program works on the Access file now. Close it and open it again"
+    LangAdd "العملاء والموردون والصناديق والبنوك والمخزون في أقسامها", "Customers, suppliers, cash boxes, banks and stock have their own parts"
     LangAdd "الملف يحتاج عمودين على الأقل: الكود والكمية، ثم التكلفة", "The file needs at least two columns: the code and the quantity, then the cost"
     LangAdd "تأكد من الطابعة الافتراضية، ويمكنك إعادة الطباعة لاحقًا", "Check the default printer, you can reprint later"
     LangAdd "توجد فاتورة غير مكتملة من جلسة سابقة. هل تريد استكمالها", "There is an unfinished invoice from a previous session. Do you want to continue it"
     LangAdd "لا توجد بيانات لعرضها في هذا التقرير للاختيارات المحددة", "There is no data to show in this report for the choices made"
     LangAdd "لا يمكن الحذف أو التعديل لوجود عمليات مرتبطة بهذا السجل", "Cannot delete or edit because there are transactions linked to this record"
     LangAdd "لا يمكن تغيير دولة التشغيل بعد تسجيل عمليات في البرنامج", "The operating country cannot change after operations are recorded"
-    LangAdd "ليست في الفترات المالية. أضفها في شاشة «الفترات المالية", "is not in the fiscal periods. Add it in the Fiscal periods screen"
-    LangAdd "هذا الصنف لا يتابع المخزون، فلا يُسلَّم ولا يُستلم بإذن", "This item does not track stock, so it has no delivery or receipt note"
 End Sub

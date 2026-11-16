@@ -18,6 +18,11 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    # the office tasks of Access on the dashboard (docs/84)
+    'افتح شاشة مهام المكتب في': 'Open the office tasks screen in',
+    'توقفت مهام المكتب في Access: آخر تشغيل': 'The office tasks of Access stopped: last run',
+    'على الجهاز': 'on the computer',
+    'لا يعمل جهاز مهام المكتب تلقائيًا، وتنتظر فواتير إلكترونية الإرسال': 'No office computer runs the tasks automatically, and e-invoices wait to be sent',
     # plan 6G (docs/83): the point of sale on Windows and its database settings
     'آخر تحديث للأسعار والأرصدة': 'Prices and balances last read',
     'أول تشغيل على هذا الجهاز: اختر مكان بيانات البرنامج. بعد الحفظ لا يغيّرها إلا مدير النظام': 'First run on this PC: choose where the data of the program is. Once saved, only the administrator changes it',

@@ -25,7 +25,7 @@
 ## 2) الجداول حسب المجال
 | المجال | الجداول | ملاحظات |
 |---|---|---|
-| **النظام** | `Settings` (سجل واحد)، `Sequences`، `Roles`، `Permissions`، `RolePermissions`، `Employees`، `Screens`، `UserScreens`، `Activations`، `AuditLog`، `AuditChanges`، `LabelSettings` | كل مستخدم هو موظف. المبرمج (`IsDeveloper`) مخفي. كلمات المرور SHA-256 مع salt |
+| **النظام** | `Settings` (سجل واحد)، `Sequences`، `Roles`، `Permissions`، `RolePermissions`، `Employees`، `Screens`، `UserScreens`، `Activations`، `AuditLog`، `AuditChanges`، `OfficeSyncLog` (كل تشغيل لمهام المكتب، `docs/84`؛ وإعدادها في `Settings.OfficeSync*`)، `LabelSettings` | كل مستخدم هو موظف. المبرمج (`IsDeveloper`) مخفي. كلمات المرور SHA-256 مع salt |
 | **البيانات الأساسية** | `Categories`، `Units`، `PaymentMethods`، `Products`، `Customers`، `Suppliers`، `ExpenseTypes`، `CashBoxes`، `Banks`، `CostCenters` | العميل رقم 1 هو «عميل نقدي» |
 | **المبيعات** | `SalesInvoices` + `SalesInvoiceDetails` (`ClientRef` = رقم الفاتورة في جهاز نقطة البيع على Windows، لا يتكرر، `docs/83`)، `SalesReturns` + `SalesReturnDetails`، `CustomerPayments`، `CustomerAllocations` | تكلفة الصنف تُحفظ في السطر لحظة البيع |
 | **المندوبين** | `SalesReps`، `SalesRepTargets`، `CommissionRuns` + `CommissionLines` | `SalesRepID` على العملاء والفواتير والمرتجعات وسندات القبض وسندات النقدية |

@@ -15,6 +15,8 @@ Public Sub LangData2()
 End Sub
 
 Private Sub D2_1()
+    LangAdd "áíÓÊ İí ÇáİÊÑÇÊ ÇáãÇáíÉ. ÃÖİåÇ İí ÔÇÔÉ «ÇáİÊÑÇÊ ÇáãÇáíÉ", "is not in the fiscal periods. Add it in the Fiscal periods screen"
+    LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÓáóøã æáÇ íõÓÊáã ÈÅĞä", "This item does not track stock, so it has no delivery or receipt note"
     LangAdd "íõãÓÍ İí äŞØÉ ÇáÈíÚ æÇáãÔÊÑíÇÊ İíõÖÇİ ÇáÓØÑ ÈåĞå ÇáæÍÏÉ", "Scanned in the POS and purchases, it adds the line in this unit"
     LangAdd "ÃÛáŞ ÇáÈÑäÇãÌ æÇäÓÎ ãáİ ÇáäÓÎÉ ÇáÇÍÊíÇØíÉ ãßÇäå íÏæíğÇ", "Close the program and copy the backup file in its place by hand"
     LangAdd "ÅÌãÇáí ÖÑíÈÉ ÇáŞíãÉ ÇáãÖÇİÉ ÇáãÓÊÍŞÉ Úä ÇáİÊÑÉ ÇáÍÇáíÉ", "Total VAT due for the current period"
@@ -133,11 +135,11 @@ Private Sub D2_1()
     LangAdd "ÊõÍÓÈ ÇáİÑæŞÇÊ Úáì ÇáßãíÇÊ ÇáÍÇáíÉ áÍÙÉ ÇáÊÑÍíá", "The differences are calculated on the current quantities at the time of posting"
     LangAdd "ÍÓÇÈÇÊ áÇ íãßä æÖÚåÇ İí ÇáÔÌÑÉ (ÍáŞÉ Ãæ ÃßËÑ ãä", "Accounts that cannot be placed in the tree (a loop or more than"
     LangAdd "ÕäİğÇ ÈßãíÉ ÕİÑ. ÇßÊÈ ÇáßãíÇÊ¡ Ëã «ÊÑÍíá ÇáÑÕíÏ", "items with a zero quantity. Write the quantities, then Post the stock"
-    LangAdd "ŞÇÚÏÉ ÇáÎÇÏã İíåÇ ÇáÈíÇäÇÊ ÇáİÚáíÉ ááÈÑäÇãÌ ãäĞ", "The server database holds the real data of the program since"
-    LangAdd "áØÇÈÚÉ ÇáãáÕŞÇÊ¡ æÃßËÑ áæÑŞ A4 İíå ÃÚãÏÉ ãáÕŞÇÊ", "for a label printer, and more for A4 paper with columns of labels"
 End Sub
 
 Private Sub D2_2()
+    LangAdd "ŞÇÚÏÉ ÇáÎÇÏã İíåÇ ÇáÈíÇäÇÊ ÇáİÚáíÉ ááÈÑäÇãÌ ãäĞ", "The server database holds the real data of the program since"
+    LangAdd "áØÇÈÚÉ ÇáãáÕŞÇÊ¡ æÃßËÑ áæÑŞ A4 İíå ÃÚãÏÉ ãáÕŞÇÊ", "for a label printer, and more for A4 paper with columns of labels"
     LangAdd "ÃæáğÇ: ÑÕíÏå ÇáãÑÍóøá ŞÏ íÚÊãÏ Úáì åĞÇ ÇáÅŞÑÇÑ", "first: its carried balance may depend on this return"
     LangAdd "ÃõäÔÆÊ ÇáãæÇÒäÉ ÈÓØÑ áßá ÍÓÇÈ ÅíÑÇÏÇÊ æãÕÑæİÇÊ", "The budget was created with a line for each revenue and expense account"
     LangAdd "ÅäÔÇÁ ßá ÇáãÕÑæİÇÊ ÇáãÊßÑÑÉ ÇáãÓÊÍŞÉ ÍÊì Çáíæã", "Create all recurring expenses due up to today"
@@ -256,11 +258,11 @@ Private Sub D2_2()
     LangAdd "ÓØÑ İí ÇáÅĞä áÇ íØÇÈŞ ÓØÑğÇ İí ÃãÑ ÇáÔÑÇÁ", "A note line does not match a line of the purchase order"
     LangAdd "ÓØÑ İí ÇáÅĞä áÇ íØÇÈŞ Õäİ ÓØÑå İí ÇáØáÈíÉ", "A note line does not match the product of its order line"
     LangAdd "ÔÌÑÉ ÇáÍÓÇÈÇÊ: ÇáÍÓÇÈÇÊ ÇáÑÆíÓíÉ æÇáİÑÚíÉ", "Account tree: main and sub-accounts"
-    LangAdd "ØáÈíÇÊ ÇáÚãáÇÁ ÇáãİÊæÍÉ: ÇáÈÇŞí ÈáÇ ÊÓáíã", "Open customer orders: what is left to deliver"
-    LangAdd "İÇÊæÑÉ ÅĞä ÇáÊÓáíã ÈÇáæÍÏÉ ÇáÕÛÑì ááÃÕäÇİ", "The invoice of a delivery note is in the smallest unit of the products"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "ØáÈíÇÊ ÇáÚãáÇÁ ÇáãİÊæÍÉ: ÇáÈÇŞí ÈáÇ ÊÓáíã", "Open customer orders: what is left to deliver"
+    LangAdd "İÇÊæÑÉ ÅĞä ÇáÊÓáíã ÈÇáæÍÏÉ ÇáÕÛÑì ááÃÕäÇİ", "The invoice of a delivery note is in the smallest unit of the products"
     LangAdd "İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Enable sending in the e-invoicing screen"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ãÓíÑ ÇáÑæÇÊÈ", "You do not have this permission in the payroll screen"
     LangAdd "áÇ ÊæÌÏ ãÈÇáÛ ÛíÑ ãÑÈæØÉ Ãæ İæÇÊíÑ ãİÊæÍÉ", "There are no unlinked amounts or open invoices"
@@ -379,11 +381,11 @@ Private Sub D2_3()
     LangAdd "ÓÌá ÇáÊÏŞíŞ íÍÊÇÌ ÕáÇÍíÉ «ÓÌá ÇáÊÏŞíŞ", "The audit trail needs the permission Audit trail"
     LangAdd "ÔÇãá ÇáÖÑíÈÉ ßÓÚÑ ÇáÈíÚ İí äŞØÉ ÇáÈíÚ", "Including VAT, as the selling price in the POS"
     LangAdd "ÚÑÖ İŞØ - ÇáÊÕÍíÍ íßæä ÈãÑÊÌÚ ãÔÊÑíÇÊ", "View only - a correction is made with a purchase return"
-    LangAdd "ÛíÑ äÔØ. İÚøáå ãä ÔÇÔÉ ÇáãäÊÌÇÊ ÃæáğÇ", "is not active. Activate it in the Products screen first"
-    LangAdd "İÍÕ ÓáÇãÉ ÇáÈíÇäÇÊ: áÇ ÊæÌÏ Ãí ãÔßáÇÊ", "Data integrity check: no problems at all"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "ÛíÑ äÔØ. İÚøáå ãä ÔÇÔÉ ÇáãäÊÌÇÊ ÃæáğÇ", "is not active. Activate it in the Products screen first"
+    LangAdd "İÍÕ ÓáÇãÉ ÇáÈíÇäÇÊ: áÇ ÊæÌÏ Ãí ãÔßáÇÊ", "Data integrity check: no problems at all"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇÚÊãÇÏ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to approve the bank reconciliation"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÊÓÌíá İæÇÊíÑ ÇáãÔÊÑíÇÊ", "You do not have the permission to record purchase invoices"
     LangAdd "áÇ Êãáß åĞå ÇáÕáÇÍíÉ İí ÔÇÔÉ ÇáãæÇÒäÉ", "You do not have this permission in the budget screen"
@@ -394,7 +396,4 @@ Private Sub D2_4()
     LangAdd "ãŞİáÉ ÈŞíÏ ÅŞİÇá. ÃÚÏ İÊÍ ÇáÓäÉ ÃæáğÇ", "closed with a closing entry. Reopen the year first"
     LangAdd "ãä ÈÏÇíÉ ÇáÕäÏæŞ (áÇ ÊæÌÏ ÊÕİíÉ ÓÇÈŞÉ", "since the box started (no previous closing"
     LangAdd "åĞÇ ÓÌá ÃÓÇÓí İí ÇáäÙÇã æáÇ íãßä ÍĞİå", "This is a system record and cannot be deleted"
-    LangAdd "åá ÊÑíÏ ÅäÔÇÁ ÇáãÕÑæİÇÊ ÇáãÓÊÍŞÉ ÇáÂä", "Do you want to create the due expenses now"
-    LangAdd "ÃÑÕÏÉ ÇáãæÑÏíä ÈÇáÚãáÇÊ æİÑæŞ ÇáÚãáÉ", "Supplier balances by currency and exchange differences"
-    LangAdd "ÃõäÔÆ ãİÊÇÍ æÔåÇÏÉ ÊÌÑíÈíÉ İí ÇáãÌáÏ", "A test key and certificate were created in the folder"
 End Sub

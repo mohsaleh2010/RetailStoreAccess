@@ -338,6 +338,12 @@ TABLES: List[Table] = [
             datetime_("ServerLiveSince", "البيانات الفعلية على SQL Server منذ",
                       note="يُكتب على الخادم عند ربط البرنامج به (docs/70): لا يُنقل فوقه من ملف Access، "
                            "والأجهزة الأخرى تُربط بلا مطابقة"),
+            text("OfficeSyncComputer", 64, "جهاز مهام المكتب",
+                 note="اسم جهاز Access الذي يحدّث القيود ويرسل الفواتير الإلكترونية تلقائيًا (docs/84)؛ فارغ = لا تشغيل تلقائي"),
+            int_("OfficeSyncMinutes", "تشغيل مهام المكتب كل (دقيقة)", default="15",
+                 rule=">=0 And <=1440", rule_text="من 0 إلى 1440 دقيقة؛ 0 = يدويًا فقط"),
+            datetime_("OfficeSyncLastAt", "آخر تشغيل لمهام المكتب"),
+            text("OfficeSyncLastResult", 255, "نتيجة آخر تشغيل لمهام المكتب", note="فارغ = بلا مشكلة"),
         ],
         pk=["SettingID"],
         seed_columns=["SettingID", "StoreName", "CountryCode", "VATRate", "PricesIncludeVAT",
@@ -483,6 +489,7 @@ TABLES: List[Table] = [
             ("USERS", "المستخدمون والصلاحيات", "النظام", 81),
             ("BACKUP", "النسخ الاحتياطي", "النظام", 82),
             ("SQL_SERVER", "قاعدة SQL Server: الاتصال ونقل البيانات وتشغيل البرنامج على الخادم", "النظام", 84),
+            ("OFFICE_SYNC", "مهام المكتب: تحديث القيود وإرسال الفواتير الإلكترونية لمستندات الويب ونقاط البيع", "النظام", 85),
             ("AUDIT_LOG", "سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد", "النظام", 83),
             ("EINVOICE", "الفاتورة الإلكترونية: المتابعة وإعادة الإرسال", "المبيعات", 16),
         ],
@@ -2753,6 +2760,30 @@ TABLES: List[Table] = [
         pk=["LogID"],
         indexes=[ix("LoggedAt"), ix("DocKind", "DocID")],
     ),
+
+    # ------------------------------------------------------- Access kept for the office (docs/84, plan 6H)
+    Table(
+        "OfficeSyncLog", "سجل مهام المكتب",
+        "كل تشغيل لمهام المكتب في Access: تحديث القيود من مستندات الويب ونقاط البيع وتطبيق المندوب، "
+        "وإرسال الفواتير الإلكترونية المعلّقة ومتابعتها.",
+        [
+            auto("OfficeSyncLogID", "رقم السجل"),
+            datetime_("RunAt", "الوقت", required=True, default="Now()"),
+            text("ComputerName", 64, "الجهاز"),
+            text("RunKind", 10, "طريقة التشغيل", required=True, default='"MANUAL"',
+                 rule='In ("AUTO","MANUAL")', rule_text="AUTO = تلقائي، MANUAL = يدوي"),
+            long_("JournalAdded", "قيود جديدة", default="0"),
+            long_("JournalUpdated", "قيود معدّلة", default="0"),
+            long_("JournalRemoved", "قيود محذوفة", default="0"),
+            long_("EInvoicesSent", "فواتير أُرسلت", default="0"),
+            long_("EInvoicesFailed", "فواتير لم تُرسل", default="0"),
+            long_("EInvoicesChecked", "فواتير تمت متابعتها", default="0"),
+            text("Problem", 255, "المشكلة", note="فارغ = تم بلا مشكلة"),
+            long_("EmployeeID", "الموظف", note="بدون علاقة: Employees قريب من حد الفهارس"),
+        ],
+        pk=["OfficeSyncLogID"],
+        indexes=[ix("RunAt")],
+    ),
 ]
 
 
@@ -2762,7 +2793,7 @@ TABLES: List[Table] = [
 def _role_permissions():
     perms = [r[0] for r in table("Permissions").seed_rows]
     cashier = ["SALES_POS", "SALES_VIEW", "CUSTOMERS", "CUSTOMER_PAYMENTS", "CASH_CLOSING"]
-    manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK", "PERIOD_CLOSE", "AUDIT_LOG", "SQL_SERVER"}
+    manager_excluded = {"SETTINGS", "USERS", "BACKUP", "ALLOW_NEGATIVE_STOCK", "PERIOD_CLOSE", "AUDIT_LOG", "SQL_SERVER", "OFFICE_SYNC"}
     rows = [(1, p) for p in perms]
     rows += [(2, p) for p in perms if p not in manager_excluded]
     rows += [(3, p) for p in cashier]
@@ -2853,6 +2884,7 @@ SCREEN_LIST = [
     ("frmAuditLog", "سجل التدقيق", "النظام", "AUDIT_LOG", False, False, False),
     ("frmBackup", "النسخ الاحتياطي", "النظام", "BACKUP", False, False, False),
     ("frmSqlServer", "قاعدة البيانات على SQL Server", "النظام", "SQL_SERVER", False, False, False),
+    ("frmOfficeSync", "مهام المكتب", "النظام", "OFFICE_SYNC", False, False, False),
     ("frmEnglishNames", "الأسماء الإنجليزية", "النظام", "SETTINGS", False, True, False),
     ("frmEInvoices", "الفاتورة الإلكترونية", "المبيعات", "EINVOICE", False, True, False),
     ("frmZatcaSetup", "إعداد ربط منصة فاتورة", "النظام", "SETTINGS", False, True, False),

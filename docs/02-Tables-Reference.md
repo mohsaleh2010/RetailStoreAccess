@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **97** | عدد الحقول: **1239**
+عدد الجداول: **98** | عدد الحقول: **1255**
 
 ## الفهرس
 
@@ -103,6 +103,7 @@
 95. [`AuditChanges`](#auditchanges) – تفاصيل سجل التدقيق
 96. [`LabelSettings`](#labelsettings) – إعدادات ملصقات الباركود
 97. [`EInvoiceLog`](#einvoicelog) – سجل الفاتورة الإلكترونية
+98. [`OfficeSyncLog`](#officesynclog) – سجل مهام المكتب
 
 ## Settings
 
@@ -181,6 +182,10 @@
 | 69 | EtaTokenPin | Short Text | 50 |  |  |  |  | مصر: الرقم السري لفلاشة التوقيع – فارغ إذا كان برنامج التوقيع يطلبه بنفسه |
 | 70 | EInvoiceEnvironment | Short Text | 12 | ✔ | `"TEST"` | `In ("TEST","SIMULATION","PRODUCTION")` |  | بيئة الفاتورة الإلكترونية – السعودية: بوابة المطورين / المحاكاة / الفعلية؛ مصر: ما قبل الإنتاج / الفعلية (docs/45) |
 | 71 | ServerLiveSince | Date/Time |  |  |  |  |  | البيانات الفعلية على SQL Server منذ – يُكتب على الخادم عند ربط البرنامج به (docs/70): لا يُنقل فوقه من ملف Access، والأجهزة الأخرى تُربط بلا مطابقة |
+| 72 | OfficeSyncComputer | Short Text | 64 |  |  |  |  | جهاز مهام المكتب – اسم جهاز Access الذي يحدّث القيود ويرسل الفواتير الإلكترونية تلقائيًا (docs/84)؛ فارغ = لا تشغيل تلقائي |
+| 73 | OfficeSyncMinutes | Number (Integer) |  |  | `15` | `>=0 And <=1440` |  | تشغيل مهام المكتب كل (دقيقة) |
+| 74 | OfficeSyncLastAt | Date/Time |  |  |  |  |  | آخر تشغيل لمهام المكتب |
+| 75 | OfficeSyncLastResult | Short Text | 255 |  |  |  |  | نتيجة آخر تشغيل لمهام المكتب – فارغ = بلا مشكلة |
 
 - المفتاح الأساسي: `SettingID`
 - بيانات أساسية: 1 سجل
@@ -230,7 +235,7 @@
 | 6 | SortOrder | Number (Integer) |  | ✔ | `0` |  |  | الترتيب |
 
 - المفتاح الأساسي: `PermissionKey`
-- بيانات أساسية: 48 سجل
+- بيانات أساسية: 49 سجل
 
 ## RolePermissions
 
@@ -242,7 +247,7 @@
 | 2 | **PermissionKey** 🔑 | Short Text | 50 | ✔ |  |  | `Permissions.PermissionKey` | الصلاحية |
 
 - المفتاح الأساسي: `RoleID, PermissionKey`
-- بيانات أساسية: 94 سجل
+- بيانات أساسية: 95 سجل
 
 ## Employees
 
@@ -304,7 +309,7 @@
 | 10 | HasDelete | Yes/No |  |  | `False` |  |  | فيها حذف |
 
 - المفتاح الأساسي: `ScreenName`
-- بيانات أساسية: 83 سجل
+- بيانات أساسية: 84 سجل
 
 ## UserScreens
 
@@ -2402,3 +2407,25 @@
 - المفتاح الأساسي: `LogID`
 - فهرس عادي: `LoggedAt`
 - فهرس عادي: `DocKind, DocID`
+
+## OfficeSyncLog
+
+**سجل مهام المكتب** – كل تشغيل لمهام المكتب في Access: تحديث القيود من مستندات الويب ونقاط البيع وتطبيق المندوب، وإرسال الفواتير الإلكترونية المعلّقة ومتابعتها.
+
+| # | الحقل | النوع | الحجم | إلزامي | افتراضي | قاعدة التحقق | يرتبط بـ | الوصف |
+|---|---|---|---|---|---|---|---|---|
+| 1 | **OfficeSyncLogID** 🔑 | AutoNumber |  |  |  |  |  | رقم السجل |
+| 2 | RunAt | Date/Time |  | ✔ | `Now()` |  |  | الوقت |
+| 3 | ComputerName | Short Text | 64 |  |  |  |  | الجهاز |
+| 4 | RunKind | Short Text | 10 | ✔ | `"MANUAL"` | `In ("AUTO","MANUAL")` |  | طريقة التشغيل |
+| 5 | JournalAdded | Number (Long) |  |  | `0` |  |  | قيود جديدة |
+| 6 | JournalUpdated | Number (Long) |  |  | `0` |  |  | قيود معدّلة |
+| 7 | JournalRemoved | Number (Long) |  |  | `0` |  |  | قيود محذوفة |
+| 8 | EInvoicesSent | Number (Long) |  |  | `0` |  |  | فواتير أُرسلت |
+| 9 | EInvoicesFailed | Number (Long) |  |  | `0` |  |  | فواتير لم تُرسل |
+| 10 | EInvoicesChecked | Number (Long) |  |  | `0` |  |  | فواتير تمت متابعتها |
+| 11 | Problem | Short Text | 255 |  |  |  |  | المشكلة – فارغ = تم بلا مشكلة |
+| 12 | EmployeeID | Number (Long) |  |  |  |  |  | الموظف – بدون علاقة: Employees قريب من حد الفهارس |
+
+- المفتاح الأساسي: `OfficeSyncLogID`
+- فهرس عادي: `RunAt`

@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/forms*.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الشاشات: **117**. شرح طريقة بناء الشاشات في [03-Forms.md](03-Forms.md).
+عدد الشاشات: **118**. شرح طريقة بناء الشاشات في [03-Forms.md](03-Forms.md).
 
 | # | الشاشة | العنوان | النوع | الجدول | الصلاحية | تُفتح من |
 |---|---|---|---|---|---|---|
@@ -104,7 +104,7 @@
 | 96 | `frmCommissions` | عمولات المندوبين | نافذة منبثقة | - | SALES_REPS | frmAccounting، frmSalesReps |
 | 97 | `frmEnglishNameLines` | الأسماء الإنجليزية | شاشة فرعية في frmEnglishNames | tmpEnglishNames | مع الشاشة الأم | - |
 | 98 | `frmEnglishNames` | الأسماء الإنجليزية | نافذة منبثقة | - | SETTINGS | frmSettings |
-| 99 | `frmEInvoices` | الفاتورة الإلكترونية | نافذة منبثقة | - | EINVOICE | frmSettings |
+| 99 | `frmEInvoices` | الفاتورة الإلكترونية | نافذة منبثقة | - | EINVOICE | frmOfficeSync، frmSettings |
 | 100 | `frmZatcaSetup` | إعداد ربط منصة فاتورة | نافذة منبثقة | - | SETTINGS | - |
 | 101 | `frmEtaSetup` | إعداد ربط منظومة الإيصال الإلكتروني | نافذة منبثقة | - | SETTINGS | - |
 | 102 | `frmOpeningAccountLines` | الأرصدة الافتتاحية للحسابات | شاشة فرعية في frmOpeningBalances | OpeningBalances | مع الشاشة الأم | - |
@@ -123,3 +123,4 @@
 | 115 | `frmRepDay` | يوم المندوب | شاشة كاملة | - | REP_DAYS | frmAccounting |
 | 116 | `frmRepVisits` | زيارات المندوبين | شاشة كاملة | - | REP_ROUTES | frmAccounting |
 | 117 | `frmSqlServer` | قاعدة البيانات على SQL Server | نافذة منبثقة | - | SQL_SERVER | frmBackup |
+| 118 | `frmOfficeSync` | مهام المكتب | نافذة منبثقة | - | OFFICE_SYNC | frmBackup |

@@ -55,6 +55,7 @@ Public Sub DashboardRefresh(ByVal frm As Access.Form, Optional ByVal Force As Bo
     frm!lblUpdated.Caption = Tr("ÂÎÑ ÊÍÏíË: " & Format$(Now, "hh:nn"))
     m_lastRefresh = Now
     RefreshIntegrityStatus frm
+    OfficeSyncTick                                    ' modOfficeSync: the office computer runs its tasks (docs/84)
     Exit Sub
 EH:
     frm!lblUpdated.Caption = Tr("ÊÚĞÑ ÊÍÏíË ÇáãÄÔÑÇÊ: " & Err.Description)

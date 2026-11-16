@@ -148,6 +148,14 @@ public partial class Settings
     public string EInvoiceEnvironment { get; set; } = "TEST";
     /// <summary>البيانات الفعلية على SQL Server منذ</summary>
     public DateTime? ServerLiveSince { get; set; }
+    /// <summary>جهاز مهام المكتب</summary>
+    public string? OfficeSyncComputer { get; set; }
+    /// <summary>تشغيل مهام المكتب كل (دقيقة)</summary>
+    public short? OfficeSyncMinutes { get; set; } = (short)15;
+    /// <summary>آخر تشغيل لمهام المكتب</summary>
+    public DateTime? OfficeSyncLastAt { get; set; }
+    /// <summary>نتيجة آخر تشغيل لمهام المكتب</summary>
+    public string? OfficeSyncLastResult { get; set; }
 }
 
 /// <summary>عدّادات الترقيم: يولّد أرقامًا تسلسلية بدون فجوات للفواتير والسندات (يُزاد داخل نفس معاملة الحفظ).</summary>
@@ -2962,6 +2970,35 @@ public partial class EInvoiceLog
     public string? ResponseBody { get; set; }
     /// <summary>المدة (مللي ثانية)</summary>
     public int? DurationMs { get; set; } = 0;
+    /// <summary>الموظف</summary>
+    public int? EmployeeID { get; set; }
+}
+
+/// <summary>سجل مهام المكتب: كل تشغيل لمهام المكتب في Access: تحديث القيود من مستندات الويب ونقاط البيع وتطبيق المندوب، وإرسال الفواتير الإلكترونية المعلّقة ومتابعتها.</summary>
+public partial class OfficeSyncLog
+{
+    /// <summary>رقم السجل</summary>
+    public int OfficeSyncLogID { get; set; }
+    /// <summary>الوقت</summary>
+    public DateTime RunAt { get; set; } = DateTime.Now;
+    /// <summary>الجهاز</summary>
+    public string? ComputerName { get; set; }
+    /// <summary>طريقة التشغيل</summary>
+    public string RunKind { get; set; } = "MANUAL";
+    /// <summary>قيود جديدة</summary>
+    public int? JournalAdded { get; set; } = 0;
+    /// <summary>قيود معدّلة</summary>
+    public int? JournalUpdated { get; set; } = 0;
+    /// <summary>قيود محذوفة</summary>
+    public int? JournalRemoved { get; set; } = 0;
+    /// <summary>فواتير أُرسلت</summary>
+    public int? EInvoicesSent { get; set; } = 0;
+    /// <summary>فواتير لم تُرسل</summary>
+    public int? EInvoicesFailed { get; set; } = 0;
+    /// <summary>فواتير تمت متابعتها</summary>
+    public int? EInvoicesChecked { get; set; } = 0;
+    /// <summary>المشكلة</summary>
+    public string? Problem { get; set; }
     /// <summary>الموظف</summary>
     public int? EmployeeID { get; set; }
 }

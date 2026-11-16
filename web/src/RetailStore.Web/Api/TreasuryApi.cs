@@ -195,6 +195,13 @@ public static class TreasuryApi
         .WithDescription("Every user sees the dashboard (frmMain); without DASHBOARD_FINANCIAL the amounts are null and only the " +
                          "counts are given, as in Access.")
         .Produces<DashboardFigures>();
+
+        secured.MapGet("/dashboard/office-sync", async (DashboardService service) => Results.Ok(await service.OfficeSyncAsync(DateTime.Now)))
+        .Needs("OFFICE_SYNC", "frmOfficeSync").WithTags("Dashboard").WithName("OfficeSyncStatus")
+        .WithSummary("The office tasks of Access (modOfficeSync): the computer, the period, the last run and its problem, the pending e-invoices, stale or not")
+        .WithDescription("Access is kept for the office (docs/84): one Access computer updates the journal and sends the e-invoices of the " +
+                         "documents made on the web, the Windows POS and the rep app. NeedsAttention = they stopped, failed, or nobody runs them.")
+        .Produces<OfficeSyncStatus>();
     }
 
     /// <summary>A statement as JSON (the tuples of its figures as objects).</summary>

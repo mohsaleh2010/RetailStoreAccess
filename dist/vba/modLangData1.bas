@@ -55,6 +55,7 @@ Private Sub D1_1()
     LangAdd "ÇáÃÑÕÏÉ ÇáãÏíäÉ (ÇáÃÕæá) ÃßÈÑ ãä ÇáÏÇÆäÉ ÈåĞÇ ÇáãÈáÛ: Ãßãá ÑÃÓ ÇáãÇá Ãæ ÇáÇáÊÒÇãÇÊ", "The debit balances (assets) exceed the credit balances by this amount: complete the capital or the liabilities"
     LangAdd "ÇáÈÑäÇãÌ íÚãá ÇáÂä Úáì ÇáÎÇÏã: ÇáäŞá íßæä ãä ãáİ Access. ÇÑÌÚ Åáì ãáİ Access ÃæáğÇ", "The program now works on the server: the transfer is made from the Access file. Go back to the Access file first"
     LangAdd "ÇáÚãáÉ æÇáÖÑíÈÉ æÇáÑŞã ÇáÖÑíÈí æÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ. ÊÊÛíÑ ŞÈá ÊÓÌíá Ãí ÚãáíÉ İŞØ", "Currency, tax, tax number and e-invoicing. It changes only before any operation is recorded"
+    LangAdd "ÊÍÏíË ÇáŞíæÏ æÅÑÓÇá ÇáİæÇÊíÑ ÇáÅáßÊÑæäíÉ áãÓÊäÏÇÊ ÇáæíÈ æäŞÇØ ÇáÈíÚ æÊØÈíŞ ÇáãäÏæÈ", "Journal update and e-invoice sending for the documents of the web, the POS and the rep app"
     LangAdd "ÎØÉ Çáíæã ãä ÎØ ÇáÓíÑ¡ Ëã ÊÓÌíá ßá ÒíÇÑÉ æäÊíÌÊåÇ: ØáÈíÉ Ãæ ÈíÚ Ãæ ÊÍÕíá Ãæ áÇ ÔíÁ", "The day plan from the route, then each visit and its result: order, sale, collection or nothing"
     LangAdd "ÇáÈÑäÇãÌ ÛíÑ ãİÚøá Úáì åĞÇ ÇáÌåÇÒ: ÃÑÓá ÑŞã ÇáÌåÇÒ ááãÈÑãÌ æÇßÊÈ ÇáßæÏ ÇáĞí íÑÓáå", "The program is not activated on this computer: send the computer number to the developer and type the code he sends"
     LangAdd "ÇáãæÌÈ ãÓÊÍŞ ááåíÆÉ¡ æÇáÓÇáÈ ÑÕíÏ ãÓÊÑÏ. ÑÇÌÚ ÇáÃÑŞÇã ãÚ ãÍÇÓÈß ŞÈá ÊŞÏíã ÇáÅŞÑÇÑ", "A positive amount is due to the Authority, a negative one is a refundable balance. Review the figures with your accountant before filing the return"
@@ -133,10 +134,10 @@ Private Sub D1_1()
     LangAdd "áã ÊõÚíóøä ßáãÉ ãÑæÑ áåĞÇ ÇáãÓÊÎÏã ÈÚÏ. ÇØáÈ ãä ãÏíÑ ÇáäÙÇã ÊÚííäåÇ", "No password is set for this user yet. Ask the system administrator to set one"
     LangAdd "íÌÈ Ãä íßæä ÇáÈÑäÇãÌ ãÛáŞğÇ Úáì ßá ÇáÃÌåÒÉ ÇáÃÎÑì. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "The program must be closed on all other computers. Do you want to continue"
     LangAdd "ÇÈÏÃ ÌÑÏğÇ¡ ÃÏÎá ÇáßãíÉ ÇáİÚáíÉ Ãæ ÇãÓÍ ÇáÈÇÑßæÏ¡ Ëã ÑÍøá ÇáİÑæŞÇÊ", "Start a count, enter the actual quantity or scan the barcode, then post the differences"
-    LangAdd "ÇáÔÇÔÇÊ ÇáÊí íİÊÍåÇ ßá ãÓÊÎÏã¡ æÇáÅÖÇİÉ æÇáÊÚÏíá æÇáÍĞİ İí ßá ÔÇÔÉ", "The screens each user opens, and add, edit and delete in each screen"
 End Sub
 
 Private Sub D1_2()
+    LangAdd "ÇáÔÇÔÇÊ ÇáÊí íİÊÍåÇ ßá ãÓÊÎÏã¡ æÇáÅÖÇİÉ æÇáÊÚÏíá æÇáÍĞİ İí ßá ÔÇÔÉ", "The screens each user opens, and add, edit and delete in each screen"
     LangAdd "ÈÚÏåÇ áÇ íõÖÇİ æáÇ íõÚÏóøá æáÇ íõÍĞİ Ãí ãÓÊäÏ ÈÊÇÑíÎ ÍÊì åĞÇ Çáíæã", "After that, no document dated up to this day is added, edited or deleted"
     LangAdd "ÓíõäÔÃ ãİÊÇÍ ÌÏíÏ æíõÚÇÏ ÊÓÌíá ÇáÌåÇÒ ãä ÇáÈÏÇíÉ. åá ÊÑíÏ ÇáãÊÇÈÚÉ", "A new key will be created and the device registered again from the start. Continue"
     LangAdd "ÔåÇÏÉ ÇáÌåÇÒ (CSID): ÊõãáÃ ãä ÇáÎØæÉ 3¡ Ãæ ÊõáÕŞ ßãÇ ÊÕÏÑåÇ ÇáåíÆÉ", "Device certificate (CSID): filled by step 3, or pasted as issued by ZATCA"
@@ -243,6 +244,7 @@ Private Sub D1_2()
     LangAdd "ÇßÊÈ ÓÈÈ ÇáÍÑßÉ İí ÇáãáÇÍÙÇÊ (ãËÇá: ÊÇáİ¡ åÏíÉ ãä ÇáãæÑÏ", "Type the reason for the move in the notes (example: damaged, gift from the supplier"
     LangAdd "ÇáÅÚÏÇÏ ãßÊãá. İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "The setup is complete. Enable sending in the e-invoicing screen"
     LangAdd "ÇáÅáÛÇÁ ááİÇÊæÑÉ ÇáÅáßÊÑæäíÉ İŞØ. ÇáÅíÕÇá íõÕÍóøÍ ÈãÑÊÌÚ", "Only an e-invoice can be cancelled. A receipt is corrected by a return"
+    LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ ÛíÑ ãİÚøáÉ: ÇáãåÇã ÊÍÏøË ÇáŞíæÏ İŞØ", "E-invoicing is off: the tasks update the journal only"
     LangAdd "ÇáãÈáÛ ÇáãÏİæÚ (F8) - ÇÊÑßå İÇÑÛğÇ ÅĞÇ ÏİÚ ÇáãÈáÛ ÈÇáÖÈØ", "Amount paid (F8) - leave it empty if the exact amount is paid"
     LangAdd "ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ", "The remainder of each credit invoice by its delay after the due date"
     LangAdd "ÏæÑ ãÏíÑ ÇáäÙÇã íãáß ßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ æáÇ íãßä ÊŞííÏå", "The system administrator role always has all the permissions and cannot be restricted"
@@ -255,17 +257,15 @@ Private Sub D1_2()
     LangAdd "ááÃÕá äŞá İí íæã ÅÚÇÏÉ ÇáÊŞííã Ãæ ÈÚÏå: ÇÍĞİ ÇáäŞá ÃæáğÇ", "The asset has a transfer on or after the revaluation day: delete the transfer first"
     LangAdd "áã ÊõÚíóøä ßáãÉ ãÑæÑ ÈÚÏ¡ æáÇ íÓÊØíÚ åĞÇ ÇáãÓÊÎÏã ÇáÏÎæá", "No password is set yet, and this user cannot log in"
     LangAdd "ÇáÇÓÊÚÇÏÉ ÊÍÊÇÌ ÕáÇÍíÉ dbcreator Ãæ sysadmin Úáì ÇáÎÇÏã", "A restore needs the dbcreator or sysadmin role on the server"
-    LangAdd "ÇáÈÑäÇãÌ íÚãá Úáì ãáİ Access ÇáÂä. ÃÛáŞå æÇİÊÍå ãä ÌÏíÏ", "The program works on the Access file now. Close it and open it again"
-    LangAdd "ÇáÚãáÇÁ æÇáãæÑÏæä æÇáÕäÇÏíŞ æÇáÈäæß æÇáãÎÒæä İí ÃŞÓÇãåÇ", "Customers, suppliers, cash boxes, banks and stock have their own parts"
 End Sub
 
 Private Sub D1_3()
+    LangAdd "ÇáÈÑäÇãÌ íÚãá Úáì ãáİ Access ÇáÂä. ÃÛáŞå æÇİÊÍå ãä ÌÏíÏ", "The program works on the Access file now. Close it and open it again"
+    LangAdd "ÇáÚãáÇÁ æÇáãæÑÏæä æÇáÕäÇÏíŞ æÇáÈäæß æÇáãÎÒæä İí ÃŞÓÇãåÇ", "Customers, suppliers, cash boxes, banks and stock have their own parts"
     LangAdd "Çáãáİ íÍÊÇÌ ÚãæÏíä Úáì ÇáÃŞá: ÇáßæÏ æÇáßãíÉ¡ Ëã ÇáÊßáİÉ", "The file needs at least two columns: the code and the quantity, then the cost"
     LangAdd "ÊÃßÏ ãä ÇáØÇÈÚÉ ÇáÇİÊÑÇÖíÉ¡ æíãßäß ÅÚÇÏÉ ÇáØÈÇÚÉ áÇÍŞğÇ", "Check the default printer, you can reprint later"
     LangAdd "ÊæÌÏ İÇÊæÑÉ ÛíÑ ãßÊãáÉ ãä ÌáÓÉ ÓÇÈŞÉ. åá ÊÑíÏ ÇÓÊßãÇáåÇ", "There is an unfinished invoice from a previous session. Do you want to continue it"
     LangAdd "áÇ ÊæÌÏ ÈíÇäÇÊ áÚÑÖåÇ İí åĞÇ ÇáÊŞÑíÑ ááÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "There is no data to show in this report for the choices made"
     LangAdd "áÇ íãßä ÇáÍĞİ Ãæ ÇáÊÚÏíá áæÌæÏ ÚãáíÇÊ ãÑÊÈØÉ ÈåĞÇ ÇáÓÌá", "Cannot delete or edit because there are transactions linked to this record"
     LangAdd "áÇ íãßä ÊÛííÑ ÏæáÉ ÇáÊÔÛíá ÈÚÏ ÊÓÌíá ÚãáíÇÊ İí ÇáÈÑäÇãÌ", "The operating country cannot change after operations are recorded"
-    LangAdd "áíÓÊ İí ÇáİÊÑÇÊ ÇáãÇáíÉ. ÃÖİåÇ İí ÔÇÔÉ «ÇáİÊÑÇÊ ÇáãÇáíÉ", "is not in the fiscal periods. Add it in the Fiscal periods screen"
-    LangAdd "åĞÇ ÇáÕäİ áÇ íÊÇÈÚ ÇáãÎÒæä¡ İáÇ íõÓáóøã æáÇ íõÓÊáã ÈÅĞä", "This item does not track stock, so it has no delivery or receipt note"
 End Sub

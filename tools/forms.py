@@ -723,7 +723,7 @@ SCREEN_PERMISSIONS = {
     "frmStockCount": "STOCK_COUNT", "frmExpenses": "EXPENSES", "frmExpenseTypes": "EXPENSES",
     "frmReportCenter": "REPORTS", "frmSettings": "SETTINGS", "frmUsers": "USERS", "frmRoles": "USERS",
     "frmUserScreens": "USERS", "frmActivation": "",
-    "frmBackup": "BACKUP", "frmSqlServer": "SQL_SERVER",
+    "frmBackup": "BACKUP", "frmSqlServer": "SQL_SERVER", "frmOfficeSync": "OFFICE_SYNC",
     "frmBarcodeLabels": "PRODUCTS", "frmLabelSettings": "PRODUCTS",
     "frmTouchPOS": "SALES_POS", "frmTouchPay": "SALES_POS", "frmCafePOS": "SALES_POS",
     "frmCafeItem": "SALES_POS",
@@ -1478,9 +1478,10 @@ def all_forms() -> List[FormModel]:
     from forms_opening import opening_forms
     from forms_orders import order_forms
     from forms_sql import sql_forms
+    from forms_office import office_forms
     return ([layout_main()] + [layout_data_screen(s) for s in DATA_SCREENS]
             + [layout_search(), layout_report_center()] + sales_forms() + purchase_forms()
             + security_forms() + label_forms() + touch_forms() + cash_forms() + journal_forms() + aging_forms()
             + bank_forms() + asset_forms() + payroll_forms() + budget_forms() + accounting_forms()
             + audit_forms() + sales_rep_forms() + names_forms() + einvoice_forms() + [layout_zatca_setup(), layout_eta_setup()]
-            + opening_forms() + order_forms() + sql_forms())
+            + opening_forms() + order_forms() + sql_forms() + office_forms())

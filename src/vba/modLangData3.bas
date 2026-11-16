@@ -16,6 +16,9 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "هل تريد إنشاء المصروفات المستحقة الآن", "Do you want to create the due expenses now"
+    LangAdd "أرصدة الموردين بالعملات وفروق العملة", "Supplier balances by currency and exchange differences"
+    LangAdd "أُنشئ مفتاح وشهادة تجريبية في المجلد", "A test key and certificate were created in the folder"
     LangAdd "إجمالي المصروفات التشغيلية والإدارية", "Total operating and administrative expenses"
     LangAdd "إلغاء سداد الإقرار؟ يُحذف قيد السداد", "Cancel the payment of the return? The payment entry is deleted"
     LangAdd "احذف قيود الإهلاك من شهر النقل أولًا", "delete the depreciation entries from the month of the transfer first"
@@ -133,12 +136,12 @@ Private Sub D3_1()
     LangAdd "حوّل العرض إلى فاتورة بدل الطلبية", "Turn the quotation into an invoice instead of an order"
     LangAdd "خصم الغياب أكبر من الأساسي والسكن", "The absence deduction is more than the basic and housing"
     LangAdd "رحّله أو ألغه قبل بدء جرد جديد له", "Post or cancel it before starting a new count for it"
-    LangAdd "رقمنا (PUR-) أو رقم فاتورة المورد", "Our number (PUR-) or the supplier invoice number"
-    LangAdd "سطر لا ينتمي إلى الفاتورة الأصلية", "A line that does not belong to the original invoice"
-    LangAdd "طلب سفري: يُغلَّف ويُسلَّم للعميل", "Takeaway order: packed and handed to the customer"
 End Sub
 
 Private Sub D3_2()
+    LangAdd "رقمنا (PUR-) أو رقم فاتورة المورد", "Our number (PUR-) or the supplier invoice number"
+    LangAdd "سطر لا ينتمي إلى الفاتورة الأصلية", "A line that does not belong to the original invoice"
+    LangAdd "طلب سفري: يُغلَّف ويُسلَّم للعميل", "Takeaway order: packed and handed to the customer"
     LangAdd "كل الأرصدة الافتتاحية تصبح بتاريخ", "Every opening balance will be dated"
     LangAdd "لا تملك صلاحية تعيين كلمات المرور", "You do not have the permission to set passwords"
     LangAdd "لا توجد بضاعة في سيارات المندوبين", "There are no goods in the rep vans"
@@ -242,6 +245,7 @@ Private Sub D3_2()
     LangAdd "حساب إجمالي الأرصدة الافتتاحية", "Total opening balances account"
     LangAdd "رصيد دائن يُرحَّل للشهر التالي", "a credit balance carried to the next month"
     LangAdd "فروقات الجرد المرحّلة لكل مخزن", "Posted stock count differences by warehouse"
+    LangAdd "فواتير إلكترونية تنتظر الإرسال", "E-invoices waiting to be sent"
     LangAdd "قيمة وحدة واحدة بعملة البرنامج", "Value of one unit in the program currency"
     LangAdd "كل شاشات الحسابات في مكان واحد", "All the accounting screens in one place"
     LangAdd "لا تملك صلاحية إدارة الصلاحيات", "You do not have the permission to manage permissions"
@@ -255,13 +259,13 @@ Private Sub D3_2()
     LangAdd "لم تُصدر الهيئة شهادة الامتثال", "ZATCA did not issue the compliance certificate"
     LangAdd "ليست لديك صلاحية سندات الخزينة", "You do not have the permission for treasury vouchers"
     LangAdd "مجلد Images بجانب ملف البيانات", "Images folder next to the data file"
+End Sub
+
+Private Sub D3_3()
     LangAdd "مجموع أرصدة المستوى الأول (صفر", "Total of the first-level balances (zero"
     LangAdd "من 1 إلى 28 (يوم الإيجار مثلًا", "From 1 to 28 (the rent day, for example"
     LangAdd "نقر مزدوج على السطر يفتح القيد", "Double-click a line to open the entry"
     LangAdd "أرسل إيصال البيع الأصلي أولًا", "Send the receipt of the original sale first"
-End Sub
-
-Private Sub D3_3()
     LangAdd "أسطر الفاتورة ليست أسطر الإذن", "The invoice lines are not the lines of the note"
     LangAdd "أولًا: السنوات تُقفل بالترتيب", "first: years are closed in order"
     LangAdd "إضافة وتعديل الأصناف والأسعار", "Add and edit items and prices"
@@ -344,6 +348,7 @@ Private Sub D3_3()
     LangAdd "الرمز البريدي للمحل (5 أرقام", "Store postal code (5 digits"
     LangAdd "السند غير موجود أو تم ترحيله", "The voucher does not exist or is already posted"
     LangAdd "العمر الإنتاجي شهر على الأقل", "The useful life is at least one month"
+    LangAdd "الفواتير الإلكترونية: أُرسلت", "E-invoices: sent"
     LangAdd "المبلغ بالعملة (بدون الضريبة", "Amount in currency (without VAT"
     LangAdd "المحل مدين للمورد (له)، سالب", "the shop owes the supplier (credit), negative"
     LangAdd "المندوب غير موجود أو غير نشط", "The rep does not exist or is not active"
@@ -377,14 +382,14 @@ Private Sub D3_3()
     LangAdd "ليست لديك صلاحية يوم المندوب", "You do not have the rep day permission"
     LangAdd "مبالغ الموازنة لا تكون سالبة", "Budget amounts are never negative"
     LangAdd "مسودة: أضف الأصناف ثم «ترحيل", "Draft: add the products, then Post"
+End Sub
+
+Private Sub D3_4()
     LangAdd "مطابق: لا يوجد عجز ولا زيادة", "Matched: no shortage and no overage"
     LangAdd "منظومة مصلحة الضرائب المصرية", "the Egyptian Tax Authority system"
     LangAdd "نسبة القسط المتناقص بين 0% و", "The declining balance rate is between 0% and"
     LangAdd "وضع المطوّر لمدير النظام فقط", "Developer mode is for the system administrator only"
     LangAdd "يتطلب صلاحية الأرقام المالية", "Needs the permission Financial figures"
-End Sub
-
-Private Sub D3_4()
     LangAdd "أرسل الفاتورة الأصلية أولًا", "Send the original invoice first"
     LangAdd "إجمالي الخصوم وحقوق الملكية", "Total liabilities and equity"
     LangAdd "إقفال الفترة والسنة المالية", "Period and fiscal year closing"
@@ -463,6 +468,7 @@ Private Sub D3_4()
     LangAdd "تعذر عمل النسخة الاحتياطية", "Could not make the backup"
     LangAdd "تعذرت الاستعادة على الخادم", "The restore on the server failed"
     LangAdd "تعذّر تشغيل برنامج التوقيع", "Could not run the signing program"
+    LangAdd "تعمل تلقائيًا على جهاز آخر", "run automatically on another computer"
     LangAdd "تغيير أو تعيين كلمة المرور", "Change or set the password"
     LangAdd "تكلفة الوحدة لا تكون سالبة", "The unit cost cannot be negative"
     LangAdd "حين يبيع هو أو يُباع باسمه", "When he sells or a sale is made in his name"
@@ -493,11 +499,15 @@ Private Sub D3_4()
     LangAdd "إلغاء تفعيل الجهاز المحدد", "Deactivate the selected computer"
     LangAdd "اكتب القيمة الجديدة للأصل", "Enter the new value of the asset"
     LangAdd "اكتب المبلغ بعملة المصروف", "Type the amount in the currency of the expense"
+    LangAdd "اكتب عدد الدقائق من 0 إلى", "Type the minutes from 0 to"
     LangAdd "اكتب معامل التحويل للعملة", "Type the exchange rate of the currency"
     LangAdd "الأرقام من المستندات الآن", "The figures come from the documents now"
     LangAdd "الأصل غير موجود أو مستبعد", "The asset does not exist or is disposed"
     LangAdd "الإقرارات تُعتمد بالترتيب", "Returns are approved in order"
     LangAdd "التحويل بين بنكين مختلفين", "Transfer between two different banks"
+End Sub
+
+Private Sub D3_5()
     LangAdd "الحسابات البنكية والتسوية", "Bank accounts and reconciliation"
     LangAdd "السطر الأول أسفل الباركود", "First line below the barcode"
     LangAdd "السطر الأول أعلى الباركود", "First line above the barcode"
@@ -505,9 +515,6 @@ Private Sub D3_4()
     LangAdd "الكمية المتوفرة غير كافية", "The available quantity is not enough"
     LangAdd "المبلغ أقل من الإجمالي بـ", "The amount is less than the total by"
     LangAdd "المقبوض نقدًا من الفواتير", "Cash received on invoices"
-End Sub
-
-Private Sub D3_5()
     LangAdd "المنصرف خلال الفترة (كمية", "Out in the period (quantity"
     LangAdd "بانتظار الإرسال أو التحقق", "Waiting to be sent or validated"
     LangAdd "تأكيد كلمة المرور الجديدة", "Confirm the new password"
@@ -528,12 +535,4 @@ Private Sub D3_5()
     LangAdd "رصيد الكشف في هذا التاريخ", "Statement balance on this date"
     LangAdd "رفضت المصلحة الإلغاء (رمز", "The Tax Authority refused the cancellation (code"
     LangAdd "رقم الهوية / الرقم القومي", "ID / national ID number"
-    LangAdd "زيارات المندوبين بالتفصيل", "Rep visits in detail"
-    LangAdd "سداد ضريبة القيمة المضافة", "VAT payment"
-    LangAdd "صرف العمولة يكون بسند صرف", "A commission is paid with a payment voucher"
-    LangAdd "طلب التوصيل يحتاج العنوان", "A delivery order needs the address"
-    LangAdd "عمولات المندوبين المستحقة", "Sales rep commissions payable"
-    LangAdd "غير مسموح له بالبيع الآجل", "is not allowed to buy on credit"
-    LangAdd "قيد يكتبه المحاسب: المدين", "An entry written by the accountant: debit"
-    LangAdd "كل القيود وميزان المراجعة", "All entries and the trial balance"
 End Sub

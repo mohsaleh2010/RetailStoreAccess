@@ -57,6 +57,7 @@ public static partial class AppData
         ["frmLogin"] = "",
         ["frmMain"] = "",
         ["frmManualEntry"] = "MANUAL_ENTRY",
+        ["frmOfficeSync"] = "OFFICE_SYNC",
         ["frmOpeningBalances"] = "OPENING_BALANCES",
         ["frmOpeningBanks"] = "OPENING_BALANCES",
         ["frmOpeningBoxes"] = "OPENING_BALANCES",

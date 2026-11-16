@@ -12,7 +12,7 @@
   Then run this file in that database:
       sqlcmd -S .\SQLEXPRESS -d RetailStore -E -f 65001 -i RetailStore_Schema.sql
 
-  97 tables, 1239 fields, 150 indexes, 231 relationships, 451 seed rows
+  98 tables, 1255 fields, 151 indexes, 231 relationships, 454 seed rows
 ==============================================================================*/
 SET NOCOUNT ON;
 SET ANSI_NULLS ON;
@@ -96,6 +96,10 @@ IF OBJECT_ID(N'dbo.Settings', N'U') IS NULL
         [EtaTokenPin] NVARCHAR(50) NULL,
         [EInvoiceEnvironment] NVARCHAR(12) NOT NULL CONSTRAINT [DF_Settings_EInvoiceEnvironment] DEFAULT (N'TEST'),
         [ServerLiveSince] DATETIME NULL,
+        [OfficeSyncComputer] NVARCHAR(64) NULL,
+        [OfficeSyncMinutes] SMALLINT NULL CONSTRAINT [DF_Settings_OfficeSyncMinutes] DEFAULT (15),
+        [OfficeSyncLastAt] DATETIME NULL,
+        [OfficeSyncLastResult] NVARCHAR(255) NULL,
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_Settings] PRIMARY KEY ([SettingID])
     );
@@ -1747,6 +1751,23 @@ IF OBJECT_ID(N'dbo.EInvoiceLog', N'U') IS NULL
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_EInvoiceLog] PRIMARY KEY ([LogID])
     );
+IF OBJECT_ID(N'dbo.OfficeSyncLog', N'U') IS NULL
+    CREATE TABLE [dbo].[OfficeSyncLog] (
+        [OfficeSyncLogID] INT IDENTITY(1,1) NOT NULL,
+        [RunAt] DATETIME NOT NULL CONSTRAINT [DF_OfficeSyncLog_RunAt] DEFAULT (GETDATE()),
+        [ComputerName] NVARCHAR(64) NULL,
+        [RunKind] NVARCHAR(10) NOT NULL CONSTRAINT [DF_OfficeSyncLog_RunKind] DEFAULT (N'MANUAL'),
+        [JournalAdded] INT NULL CONSTRAINT [DF_OfficeSyncLog_JournalAdded] DEFAULT (0),
+        [JournalUpdated] INT NULL CONSTRAINT [DF_OfficeSyncLog_JournalUpdated] DEFAULT (0),
+        [JournalRemoved] INT NULL CONSTRAINT [DF_OfficeSyncLog_JournalRemoved] DEFAULT (0),
+        [EInvoicesSent] INT NULL CONSTRAINT [DF_OfficeSyncLog_EInvoicesSent] DEFAULT (0),
+        [EInvoicesFailed] INT NULL CONSTRAINT [DF_OfficeSyncLog_EInvoicesFailed] DEFAULT (0),
+        [EInvoicesChecked] INT NULL CONSTRAINT [DF_OfficeSyncLog_EInvoicesChecked] DEFAULT (0),
+        [Problem] NVARCHAR(255) NULL,
+        [EmployeeID] INT NULL,
+        [RowVer] ROWVERSION NOT NULL,
+        CONSTRAINT [PK_OfficeSyncLog] PRIMARY KEY ([OfficeSyncLogID])
+    );
 GO
 
 /*------------------------------------------------------------------------------
@@ -1894,6 +1915,14 @@ IF COL_LENGTH(N'dbo.Settings', N'EInvoiceEnvironment') IS NULL
     ALTER TABLE [dbo].[Settings] ADD [EInvoiceEnvironment] NVARCHAR(12) NOT NULL CONSTRAINT [DF_Settings_EInvoiceEnvironment] DEFAULT (N'TEST');
 IF COL_LENGTH(N'dbo.Settings', N'ServerLiveSince') IS NULL
     ALTER TABLE [dbo].[Settings] ADD [ServerLiveSince] DATETIME NULL;
+IF COL_LENGTH(N'dbo.Settings', N'OfficeSyncComputer') IS NULL
+    ALTER TABLE [dbo].[Settings] ADD [OfficeSyncComputer] NVARCHAR(64) NULL;
+IF COL_LENGTH(N'dbo.Settings', N'OfficeSyncMinutes') IS NULL
+    ALTER TABLE [dbo].[Settings] ADD [OfficeSyncMinutes] SMALLINT NULL CONSTRAINT [DF_Settings_OfficeSyncMinutes] DEFAULT (15);
+IF COL_LENGTH(N'dbo.Settings', N'OfficeSyncLastAt') IS NULL
+    ALTER TABLE [dbo].[Settings] ADD [OfficeSyncLastAt] DATETIME NULL;
+IF COL_LENGTH(N'dbo.Settings', N'OfficeSyncLastResult') IS NULL
+    ALTER TABLE [dbo].[Settings] ADD [OfficeSyncLastResult] NVARCHAR(255) NULL;
 IF COL_LENGTH(N'dbo.Settings', N'RowVer') IS NULL
     ALTER TABLE [dbo].[Settings] ADD [RowVer] ROWVERSION NOT NULL;
 IF COL_LENGTH(N'dbo.Sequences', N'SequenceName') IS NULL
@@ -4424,6 +4453,32 @@ IF COL_LENGTH(N'dbo.EInvoiceLog', N'EmployeeID') IS NULL
     ALTER TABLE [dbo].[EInvoiceLog] ADD [EmployeeID] INT NULL;
 IF COL_LENGTH(N'dbo.EInvoiceLog', N'RowVer') IS NULL
     ALTER TABLE [dbo].[EInvoiceLog] ADD [RowVer] ROWVERSION NOT NULL;
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'OfficeSyncLogID') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [OfficeSyncLogID] INT IDENTITY(1,1) NOT NULL;
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'RunAt') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [RunAt] DATETIME NOT NULL CONSTRAINT [DF_OfficeSyncLog_RunAt] DEFAULT (GETDATE());
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'ComputerName') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [ComputerName] NVARCHAR(64) NULL;
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'RunKind') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [RunKind] NVARCHAR(10) NOT NULL CONSTRAINT [DF_OfficeSyncLog_RunKind] DEFAULT (N'MANUAL');
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'JournalAdded') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [JournalAdded] INT NULL CONSTRAINT [DF_OfficeSyncLog_JournalAdded] DEFAULT (0);
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'JournalUpdated') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [JournalUpdated] INT NULL CONSTRAINT [DF_OfficeSyncLog_JournalUpdated] DEFAULT (0);
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'JournalRemoved') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [JournalRemoved] INT NULL CONSTRAINT [DF_OfficeSyncLog_JournalRemoved] DEFAULT (0);
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'EInvoicesSent') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [EInvoicesSent] INT NULL CONSTRAINT [DF_OfficeSyncLog_EInvoicesSent] DEFAULT (0);
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'EInvoicesFailed') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [EInvoicesFailed] INT NULL CONSTRAINT [DF_OfficeSyncLog_EInvoicesFailed] DEFAULT (0);
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'EInvoicesChecked') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [EInvoicesChecked] INT NULL CONSTRAINT [DF_OfficeSyncLog_EInvoicesChecked] DEFAULT (0);
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'Problem') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [Problem] NVARCHAR(255) NULL;
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'EmployeeID') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [EmployeeID] INT NULL;
+IF COL_LENGTH(N'dbo.OfficeSyncLog', N'RowVer') IS NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] ADD [RowVer] ROWVERSION NOT NULL;
 GO
 
 /*------------------------------------------------------------------------------
@@ -4474,6 +4529,9 @@ ALTER TABLE [dbo].[Settings] WITH CHECK ADD CONSTRAINT [CK_Settings_CreditBlockD
 IF OBJECT_ID(N'dbo.CK_Settings_EInvoiceEnvironment', N'C') IS NOT NULL
     ALTER TABLE [dbo].[Settings] DROP CONSTRAINT [CK_Settings_EInvoiceEnvironment];
 ALTER TABLE [dbo].[Settings] WITH CHECK ADD CONSTRAINT [CK_Settings_EInvoiceEnvironment] CHECK ([EInvoiceEnvironment] IN (N'TEST',N'SIMULATION',N'PRODUCTION'));
+IF OBJECT_ID(N'dbo.CK_Settings_OfficeSyncMinutes', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[Settings] DROP CONSTRAINT [CK_Settings_OfficeSyncMinutes];
+ALTER TABLE [dbo].[Settings] WITH CHECK ADD CONSTRAINT [CK_Settings_OfficeSyncMinutes] CHECK (([OfficeSyncMinutes] >=0 AND [OfficeSyncMinutes] <=1440));
 IF OBJECT_ID(N'dbo.CK_Sequences_NextValue', N'C') IS NOT NULL
     ALTER TABLE [dbo].[Sequences] DROP CONSTRAINT [CK_Sequences_NextValue];
 ALTER TABLE [dbo].[Sequences] WITH CHECK ADD CONSTRAINT [CK_Sequences_NextValue] CHECK ([NextValue] >=1);
@@ -5398,6 +5456,9 @@ ALTER TABLE [dbo].[LabelSettings] WITH CHECK ADD CONSTRAINT [CK_LabelSettings_Fo
 IF OBJECT_ID(N'dbo.CK_EInvoiceLog_Result', N'C') IS NOT NULL
     ALTER TABLE [dbo].[EInvoiceLog] DROP CONSTRAINT [CK_EInvoiceLog_Result];
 ALTER TABLE [dbo].[EInvoiceLog] WITH CHECK ADD CONSTRAINT [CK_EInvoiceLog_Result] CHECK ([Result] IN (N'OK',N'WARNING',N'REJECTED',N'ERROR',N'NETWORK'));
+IF OBJECT_ID(N'dbo.CK_OfficeSyncLog_RunKind', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[OfficeSyncLog] DROP CONSTRAINT [CK_OfficeSyncLog_RunKind];
+ALTER TABLE [dbo].[OfficeSyncLog] WITH CHECK ADD CONSTRAINT [CK_OfficeSyncLog_RunKind] CHECK ([RunKind] IN (N'AUTO',N'MANUAL'));
 GO
 
 /*------------------------------------------------------------------------------
@@ -5703,6 +5764,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_LoggedAt' AND object_
     CREATE INDEX [IX_LoggedAt] ON [dbo].[EInvoiceLog] ([LoggedAt]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_DocKind_DocID' AND object_id = OBJECT_ID(N'dbo.EInvoiceLog'))
     CREATE INDEX [IX_DocKind_DocID] ON [dbo].[EInvoiceLog] ([DocKind], [DocID]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_RunAt' AND object_id = OBJECT_ID(N'dbo.OfficeSyncLog'))
+    CREATE INDEX [IX_RunAt] ON [dbo].[OfficeSyncLog] ([RunAt]);
 IF EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_ProductID' AND object_id = OBJECT_ID(N'dbo.OpeningStock'))
     DROP INDEX [UX_ProductID] ON [dbo].[OpeningStock];
 GO
@@ -5797,7 +5860,7 @@ BEGIN
     INSERT INTO [dbo].[Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (2, N'MANAGER', N'مدير', N'المبيعات والمشتريات والمخزون والتقارير');
     INSERT INTO [dbo].[Roles] ([RoleID], [RoleCode], [RoleName], [Description]) VALUES (3, N'CASHIER', N'كاشير', N'المبيعات والعملاء فقط');
 END;
--- Permissions: 48 rows (the missing ones)
+-- Permissions: 49 rows (the missing ones)
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'SALES_POS')
     BEGIN
@@ -6212,6 +6275,14 @@ BEGIN
             INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SQL_SERVER');
         END
     END
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'OFFICE_SYNC')
+    BEGIN
+        INSERT INTO [dbo].[Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES (N'OFFICE_SYNC', N'مهام المكتب: تحديث القيود وإرسال الفواتير الإلكترونية لمستندات الويب ونقاط البيع', N'النظام', 85);
+        IF EXISTS (SELECT 1 FROM [dbo].[RolePermissions])
+        BEGIN
+            INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'OFFICE_SYNC');
+        END
+    END
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Permissions] WHERE [PermissionKey] = N'AUDIT_LOG')
     BEGIN
         INSERT INTO [dbo].[Permissions] ([PermissionKey], [PermissionName], [ModuleName], [SortOrder]) VALUES (N'AUDIT_LOG', N'سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد', N'النظام', 83);
@@ -6230,7 +6301,7 @@ BEGIN
         END
     END
 END;
--- RolePermissions: 94 rows (an empty table)
+-- RolePermissions: 95 rows (an empty table)
 IF NOT EXISTS (SELECT 1 FROM [dbo].[RolePermissions])
 BEGIN
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SALES_POS');
@@ -6279,6 +6350,7 @@ BEGIN
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'USERS');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'BACKUP');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'SQL_SERVER');
+    INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'OFFICE_SYNC');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'AUDIT_LOG');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (1, N'EINVOICE');
     INSERT INTO [dbo].[RolePermissions] ([RoleID], [PermissionKey]) VALUES (2, N'SALES_POS');
@@ -6335,7 +6407,7 @@ BEGIN
     INSERT INTO [dbo].[Employees] ([EmployeeID], [EmployeeName], [JobTitle], [Username], [RoleID], [MaxDiscountPercent], [MustChangePassword], [IsActive]) VALUES (1, N'مدير النظام', N'مدير النظام', N'admin', 1, 1, 1, 1);
 END;
 SET IDENTITY_INSERT [dbo].[Employees] OFF;
--- Screens: 83 rows (the missing ones)
+-- Screens: 84 rows (the missing ones)
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmPOS')
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmPOS', N'نقطة البيع (المحلات)', N'المبيعات', 10, N'SALES_POS', 1, 0, 0);
@@ -6495,14 +6567,16 @@ BEGIN
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmBackup', N'النسخ الاحتياطي', N'النظام', 780, N'BACKUP', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmSqlServer')
         INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmSqlServer', N'قاعدة البيانات على SQL Server', N'النظام', 790, N'SQL_SERVER', 0, 0, 0);
+    IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmOfficeSync')
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmOfficeSync', N'مهام المكتب', N'النظام', 800, N'OFFICE_SYNC', 0, 0, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEnglishNames')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEnglishNames', N'الأسماء الإنجليزية', N'النظام', 800, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEnglishNames', N'الأسماء الإنجليزية', N'النظام', 810, N'SETTINGS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEInvoices')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEInvoices', N'الفاتورة الإلكترونية', N'المبيعات', 810, N'EINVOICE', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEInvoices', N'الفاتورة الإلكترونية', N'المبيعات', 820, N'EINVOICE', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmZatcaSetup')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmZatcaSetup', N'إعداد ربط منصة فاتورة', N'النظام', 820, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmZatcaSetup', N'إعداد ربط منصة فاتورة', N'النظام', 830, N'SETTINGS', 0, 1, 0);
     IF NOT EXISTS (SELECT 1 FROM [dbo].[Screens] WHERE [ScreenName] = N'frmEtaSetup')
-        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEtaSetup', N'إعداد ربط منظومة الإيصال الإلكتروني', N'النظام', 830, N'SETTINGS', 0, 1, 0);
+        INSERT INTO [dbo].[Screens] ([ScreenName], [ScreenTitle], [ModuleName], [SortOrder], [PermissionKey], [HasAdd], [HasEdit], [HasDelete]) VALUES (N'frmEtaSetup', N'إعداد ربط منظومة الإيصال الإلكتروني', N'النظام', 840, N'SETTINGS', 0, 1, 0);
 END;
 -- Categories: 1 rows (an empty table)
 SET IDENTITY_INSERT [dbo].[Categories] ON;
@@ -7112,6 +7186,7 @@ UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Store settings' WHERE [Per
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Users and permissions' WHERE [PermissionKey] = N'USERS' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Backup' WHERE [PermissionKey] = N'BACKUP' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'SQL Server database: connection, data transfer and running on the server' WHERE [PermissionKey] = N'SQL_SERVER' AND [PermissionNameEn] IS NULL;
+UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Office tasks: journal update and e-invoice sending for web and POS documents' WHERE [PermissionKey] = N'OFFICE_SYNC' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'Audit trail: who added, edited or deleted, with the values before and after' WHERE [PermissionKey] = N'AUDIT_LOG' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [PermissionNameEn] = N'E-invoicing: follow-up and resending' WHERE [PermissionKey] = N'EINVOICE' AND [PermissionNameEn] IS NULL;
 UPDATE [dbo].[Permissions] SET [ModuleNameEn] = N'Sales' WHERE [ModuleName] = N'المبيعات' AND [ModuleNameEn] IS NULL;
@@ -7203,6 +7278,7 @@ UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Screen permissions of users' WHER
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Audit trail' WHERE [ScreenName] = N'frmAuditLog' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Backup' WHERE [ScreenName] = N'frmBackup' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'SQL Server database' WHERE [ScreenName] = N'frmSqlServer' AND [ScreenTitleEn] IS NULL;
+UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Office tasks' WHERE [ScreenName] = N'frmOfficeSync' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'English names' WHERE [ScreenName] = N'frmEnglishNames' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'E-invoicing' WHERE [ScreenName] = N'frmEInvoices' AND [ScreenTitleEn] IS NULL;
 UPDATE [dbo].[Screens] SET [ScreenTitleEn] = N'Fatoora connection setup' WHERE [ScreenName] = N'frmZatcaSetup' AND [ScreenTitleEn] IS NULL;
@@ -7765,5 +7841,5 @@ GO
 IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
     ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
 GO
-PRINT N'RetailStore schema: done (97 tables, 1239 fields, 150 indexes, 231 relationships, 451 seed rows).';
+PRINT N'RetailStore schema: done (98 tables, 1255 fields, 151 indexes, 231 relationships, 454 seed rows).';
 GO

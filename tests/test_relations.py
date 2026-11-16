@@ -84,9 +84,9 @@ class RelationDefinitionTests(unittest.TestCase):
         connected = {r.parent for r in self.rels} | {r.child for r in self.rels}
         # PeriodClosings points only to Employees, without an enforced relationship; EInvoiceLog.DocID points
         # to an invoice or a return (DocKind), so it has no relationship either (docs/45); FiscalPeriods is linked to
-        # the closings by the year of its end (docs/54)
+        # the closings by the year of its end (docs/54); OfficeSyncLog is a log of runs with no relationship (docs/84)
         self.assertEqual({t.name for t in TABLES} - connected,
-                         {"Sequences", "LabelSettings", "PeriodClosings", "EInvoiceLog", "FiscalPeriods"})
+                         {"Sequences", "LabelSettings", "PeriodClosings", "EInvoiceLog", "FiscalPeriods", "OfficeSyncLog"})
 
     def test_attribute_values(self):
         by_name = {r.name: r for r in self.rels}

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RetailStore.Domain.Common;
 
 namespace RetailStore.Data.Services;
 
@@ -7,6 +8,15 @@ namespace RetailStore.Data.Services;
 public sealed record DashboardFigures(bool Financial, decimal? TodaySales, int TodayInvoices, decimal? MonthSales, decimal? MonthVAT,
                                       int MonthInvoices, decimal? MonthNetProfit, int LowStockCount, decimal? CustomerDebt, int DebtorCount,
                                       decimal? SupplierDue, decimal? StockValue, decimal? MonthExpenses, decimal? CashBalance, decimal? BankBalance);
+
+/// <summary>The state of the office tasks of Access (plan 6H, docs/84, modOfficeSync): the computer that runs them, every how many
+/// minutes, the last run and its problem, the e-invoices still waiting, and Stale = they stopped (OfficeSyncRules.IsStale).</summary>
+public sealed record OfficeSyncStatus(string? Computer, int Minutes, DateTime? LastAt, string? LastResult, bool EInvoiceEnabled,
+                                      int PendingEInvoices, bool Stale)
+{
+    /// <summary>The web warns: the tasks stopped, the last run had a problem, or nobody runs them while e-invoices wait.</summary>
+    public bool NeedsAttention => Stale || !string.IsNullOrEmpty(LastResult) || (PendingEInvoices > 0 && (Minutes == 0 || string.IsNullOrWhiteSpace(Computer)));
+}
 
 /// <summary>The month profit of ProfitQuery: net sales, cost of sales, stock adjustments, expenses.</summary>
 public sealed record ProfitFigures(decimal NetSales, decimal CostOfSales, decimal GrossProfit, decimal InventoryAdjustments, decimal TotalExpenses,
@@ -41,6 +51,21 @@ public sealed class DashboardService(IDbContextFactory<RetailDbContext> factory,
         decimal adjust = adjustments.Sum();
         decimal expenses = (await db.Expenses.Where(e => e.ExpenseDate >= start && e.ExpenseDate < end).Select(e => e.Amount).ToListAsync()).Sum();
         return new ProfitFigures(net, cost, net - cost, adjust, expenses, net - cost + adjust - expenses);
+    }
+
+    /// <summary>The office tasks of Access (modOfficeSync): read from Settings and the pending documents of qryEInvoiceDocs.</summary>
+    public async Task<OfficeSyncStatus> OfficeSyncAsync(DateTime now)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var st = await SettingsReader.ReadAsync(db);
+        int minutes = st.OfficeSyncMinutes ?? 0;
+        int pending = 0;
+        if (st.EInvoiceEnabled)
+            pending = await db.SalesInvoices.CountAsync(h => h.ZatcaStatus == "PENDING")
+                      + await db.SalesReturns.CountAsync(r => r.ZatcaStatus == "PENDING");
+        string? computer = string.IsNullOrWhiteSpace(st.OfficeSyncComputer) ? null : st.OfficeSyncComputer.Trim();
+        bool stale = computer is not null && OfficeSyncRules.IsStale(st.OfficeSyncLastAt, minutes, now);
+        return new OfficeSyncStatus(computer, minutes, st.OfficeSyncLastAt, st.OfficeSyncLastResult, st.EInvoiceEnabled, pending, stale);
     }
 
     /// <summary>DashboardQuery for a day: today (the day) and the month until the day.</summary>

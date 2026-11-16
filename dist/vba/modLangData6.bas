@@ -14,9 +14,47 @@ Public Sub LangData6()
     D6_4
     D6_5
     D6_6
+    D6_7
 End Sub
 
 Private Sub D6_1()
+    LangAdd "ãÈáÛ ÇáÔíß", "Cheque amount"
+    LangAdd "ãÌãá ÇáÑÈÍ", "Gross profit"
+    LangAdd "ãÎÒä ÑÆíÓí", "Main warehouse"
+    LangAdd "ãÑÊÌÚ ÔÑÇÁ", "Purchase return"
+    LangAdd "ãÑÌÚ ÇáÈäß", "Bank reference"
+    LangAdd "ãÑÍóøáÉ İí", "posted on"
+    LangAdd "ãÓæÏÉ ãÓíÑ", "Run draft"
+    LangAdd "ãä ÇáÈÏÇíÉ", "from the start"
+    LangAdd "ãä ÇáŞÇÆãÉ", "from the list"
+    LangAdd "ãäåÇ ÖÑíÈÉ", "of which VAT"
+    LangAdd "ãõÑÍóøá İí", "Posted on"
+    LangAdd "ãõÓÊáóã İí", "Received on"
+    LangAdd "äÓÈÉ ÕİÑíÉ", "Zero rate"
+    LangAdd "äŞØÉ ÇáÈíÚ", "Point of sale"
+    LangAdd "äæÚ ÇáÍÑßÉ", "Move type"
+    LangAdd "äæÚ ÇáÍÓÇÈ", "Account type"
+    LangAdd "äæÚ ÇáÔÑÇÁ", "Purchase type"
+    LangAdd "äæÚ ÇáãÎÒä", "Warehouse type"
+    LangAdd "åĞÇ ÇáÌåÇÒ", "This computer"
+    LangAdd "æÍÏÉ ÇáÓÚÑ", "Price unit"
+    LangAdd "æÑŞÉ ÇáÌÑÏ", "Count sheet"
+    LangAdd "íÏæíğÇ İŞØ", "by hand only"
+    LangAdd "ÂÎÑ ÊÍÏíË", "Last update"
+    LangAdd "ÂÎÑ ÊÔÛíá", "Last run"
+    LangAdd "ÂÎÑ ÊÕİíÉ", "Last closing"
+    LangAdd "ÂÎÑ ãÚÇãá", "Last rate"
+    LangAdd "ÃÑÈÚÉ ÚÔÑ", "fourteen"
+    LangAdd "ÃÕá ÇáÅĞä", "Note origin"
+    LangAdd "ÃõäÔÆ ãäå", "Created from it"
+    LangAdd "ÅÚÇÏÉ İÊÍ", "Reopen"
+    LangAdd "ÅŞİÇá ÓäÉ", "Close a year"
+    LangAdd "Åáì ÊÇÑíÎ", "To date"
+    LangAdd "Åáì ÕäÏæŞ", "To box"
+    LangAdd "Åáì ØáÈíÉ", "To an order"
+    LangAdd "ÅíÕÇá ÈíÚ", "Sales receipt"
+    LangAdd "ÇÓÊáÇã İí", "Receipt in"
+    LangAdd "ÇÓã ÇáÃÕá", "Asset name"
     LangAdd "ÇÓã ÇáÌåÉ", "Party name"
     LangAdd "ÇÓã ÇáÕäİ", "Item name"
     LangAdd "ÇÓã ÇáİÑÚ", "Branch name"
@@ -40,6 +78,7 @@ Private Sub D6_1()
     LangAdd "ÈÏá ÇáÓßä", "Housing allowance"
     LangAdd "ÈÏá ÇáäŞá", "Transport allowance"
     LangAdd "ÈÚÏ Çáíæã", "after today"
+    LangAdd "ÈáÇ ãÔßáÉ", "No problem"
     LangAdd "ÈáÇ äÊíÌÉ", "No result"
     LangAdd "ÈáÇ äåÇíÉ", "No end"
     LangAdd "ÊÍÊ ÇáØáÈ", "On order"
@@ -99,8 +138,12 @@ Private Sub D6_1()
     LangAdd "İÊÍ ÇáŞíÏ", "Open the entry"
     LangAdd "İí ÇáãÓíÑ", "in the run"
     LangAdd "ŞÓØ ÇáÔåÑ", "Month depreciation"
+End Sub
+
+Private Sub D6_2()
     LangAdd "ŞíÏ ãÍĞæİ", "Deleted entry"
     LangAdd "ŞíÏ íæãíÉ", "Journal entry"
+    LangAdd "ßá (ÏŞíŞÉ", "Every (minutes"
     LangAdd "ßá 3 ÃÔåÑ", "Every 3 months"
     LangAdd "ßæÏ ÇáÌåÉ", "Party code"
     LangAdd "ßæÏ ÇáÕäİ", "Item code"
@@ -137,9 +180,6 @@ Private Sub D6_1()
     LangAdd "ÇáÃÑÈÚÇÁ", "Wednesday"
     LangAdd "ÇáÅÌãÇáí", "Total"
     LangAdd "ÇáÅÖÇİÇÊ", "Extras"
-End Sub
-
-Private Sub D6_2()
     LangAdd "ÇáÇÑÊÏÇÏ", "Bounce"
     LangAdd "ÇáÇÓÊáÇã", "Receipt"
     LangAdd "ÇáÇäÍÑÇİ", "Variance"
@@ -214,12 +254,16 @@ Private Sub D6_2()
     LangAdd "ŞíÏ íÏæí", "Manual entry"
     LangAdd "ßÔİ ÍÓÇÈ", "Account statement"
     LangAdd "áÇ íõÑÓá", "Not sent"
+    LangAdd "áã ÊõÑÓá", "Not sent"
     LangAdd "áã íõÄÎĞ", "Not taken:"
     LangAdd "áã íõäÔÃ", "Not created"
     LangAdd "áæä ÇáÒÑ", "Button color"
     LangAdd "ãÎÒä İÑÚ", "Branch warehouse"
     LangAdd "ãÚÊãÏ İí", "Approved on"
     LangAdd "ãŞİá ÍÊì", "Closed up to"
+End Sub
+
+Private Sub D6_3()
     LangAdd "ãä ÇáÈäß", "From the bank"
     LangAdd "ãä ÊÇÑíÎ", "From date"
     LangAdd "ãä ÕäÏæŞ", "From a box"
@@ -260,9 +304,6 @@ Private Sub D6_2()
     LangAdd "ÇáÊÓæíÉ", "Reconciliation"
     LangAdd "ÇáÊÕäíİ", "Category"
     LangAdd "ÇáÊÚÏíá", "Adjustment"
-End Sub
-
-Private Sub D6_3()
     LangAdd "ÇáÊŞííã", "Valuation"
     LangAdd "ÇáÊßÑÇÑ", "Frequency"
     LangAdd "ÇáÊßáİÉ", "Cost"
@@ -343,6 +384,9 @@ Private Sub D6_3()
     LangAdd "İí ÔÇÔÉ", "in the screen"
     LangAdd "áÇ ÊæÌÏ", "None"
     LangAdd "ááÅÖÇİÉ", "to add"
+End Sub
+
+Private Sub D6_4()
     LangAdd "áã ÊÌÊÒ", "Failed:"
     LangAdd "ãÊæÇÒäÉ", "Balanced"
     LangAdd "ãÑÉ/ÓäÉ", "times/year"
@@ -383,9 +427,6 @@ Private Sub D6_3()
     LangAdd "ÇáÍÑßÉ", "Move"
     LangAdd "ÇáÍÓÇÈ", "Account"
     LangAdd "ÇáÎãíÓ", "Thursday"
-End Sub
-
-Private Sub D6_4()
     LangAdd "ÇáÏÇÆä", "Credit"
     LangAdd "ÇáÏÎæá", "Login"
     LangAdd "ÇáÑÕíÏ", "Balance"
@@ -402,6 +443,7 @@ Private Sub D6_4()
     LangAdd "ÇáİÊÑÉ", "Period"
     LangAdd "ÇáİÚáí", "Actual"
     LangAdd "ÇáŞíãÉ", "Value"
+    LangAdd "ÇáŞíæÏ", "Journal"
     LangAdd "ÇáßãíÉ", "Quantity"
     LangAdd "ÇáãÇáß", "Owner"
     LangAdd "ÇáãÈÇÚ", "Sold"
@@ -428,6 +470,7 @@ Private Sub D6_4()
     LangAdd "ÈäİÓÌí", "Purple"
     LangAdd "ÈæÇÓØÉ", "by"
     LangAdd "ÊÛíøÑÊ", "changed"
+    LangAdd "ÊáŞÇÆí", "Automatic"
     LangAdd "Êã ÍİÙ", "Saved"
     LangAdd "Êã ÚÏø", "Counted"
     LangAdd "ËáÇËæä", "thirty"
@@ -464,6 +507,9 @@ Private Sub D6_4()
     LangAdd "ãßÇİÂÊ", "Bonuses"
     LangAdd "ãáÇííä", "million"
     LangAdd "ããäæÍÉ", "Granted"
+End Sub
+
+Private Sub D6_5()
     LangAdd "ãä Èäß", "From a bank"
     LangAdd "ãæÇÒäÉ", "Budget"
     LangAdd "ãæÑÏğÇ", "suppliers"
@@ -506,9 +552,6 @@ Private Sub D6_4()
     LangAdd "ÇáÓÈÊ", "Saturday"
     LangAdd "ÇáÓÌá", "Record"
     LangAdd "ÇáÓÚÑ", "Price"
-End Sub
-
-Private Sub D6_5()
     LangAdd "ÇáÓßä", "Housing"
     LangAdd "ÇáÓäÉ", "Year"
     LangAdd "ÇáÓäÏ", "Voucher"
@@ -570,6 +613,7 @@ Private Sub D6_5()
     LangAdd "ßÇÔíÑ", "Cashier"
     LangAdd "ãÊæŞİ", "Stopped"
     LangAdd "ãÌãæÚ", "Total"
+    LangAdd "ãÍĞæİ", "deleted"
     LangAdd "ãÍæøá", "Converted"
     LangAdd "ãÎÊáİ", "Different"
     LangAdd "ãÏİæÚ", "Paid"
@@ -583,8 +627,12 @@ Private Sub D6_5()
     LangAdd "ãØÇÈŞ", "Matched"
     LangAdd "ãØáæÈ", "is required"
     LangAdd "ãÚÊãÏ", "Approved"
+    LangAdd "ãÚÏøá", "changed"
     LangAdd "ãÛáŞÉ", "Closed"
     LangAdd "ãİÊæÍ", "Open"
+End Sub
+
+Private Sub D6_6()
     LangAdd "ãİæÊÑ", "Invoiced"
     LangAdd "ãŞÈæÖ", "Received"
     LangAdd "ãŞİáÉ", "Closed"
@@ -629,9 +677,6 @@ Private Sub D6_5()
     LangAdd "ÑÌæÚ", "Back"
     LangAdd "ÑÕíÏ", "Balance"
     LangAdd "ÑíÇá", "SAR"
-End Sub
-
-Private Sub D6_6()
     LangAdd "ÓÇÑí", "Valid"
     LangAdd "ÓÈÚÉ", "seven"
     LangAdd "ÓÊæä", "sixty"
@@ -672,6 +717,7 @@ Private Sub D6_6()
     LangAdd "æÇÍÏ", "one"
     LangAdd "æÇÑÏ", "Received"
     LangAdd "æÑÏí", "Pink"
+    LangAdd "íÏæí", "Manual"
     LangAdd "íæÌÏ", "There are"
     LangAdd "ÂÌá", "Credit"
     LangAdd "Ãáİ", "thousand"
@@ -707,6 +753,9 @@ Private Sub D6_6()
     LangAdd "ãÕÑ", "Egypt"
     LangAdd "ãáİ", "File"
     LangAdd "äÔØ", "Active"
+End Sub
+
+Private Sub D6_7()
     LangAdd "äÚã", "Yes"
     LangAdd "æÓØ", "Medium"
     LangAdd "İí", "in"

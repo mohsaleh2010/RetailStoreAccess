@@ -59,7 +59,7 @@ public static partial class SeedData
             new Roles { RoleID = 2, RoleCode = "MANAGER", RoleName = "مدير", Description = "المبيعات والمشتريات والمخزون والتقارير", RoleNameEn = "Manager" },
             new Roles { RoleID = 3, RoleCode = "CASHIER", RoleName = "كاشير", Description = "المبيعات والعملاء فقط", RoleNameEn = "Cashier" }
         );
-        // Permissions: 48 rows
+        // Permissions: 49 rows
         db.Permissions.AddRange(
             new Permissions { PermissionKey = "SALES_POS", PermissionName = "نقطة البيع", ModuleName = "المبيعات", SortOrder = (short)10, PermissionNameEn = "Point of sale", ModuleNameEn = "Sales" },
             new Permissions { PermissionKey = "SALES_VIEW", PermissionName = "عرض وإعادة طباعة الفواتير", ModuleName = "المبيعات", SortOrder = (short)11, PermissionNameEn = "View and reprint invoices", ModuleNameEn = "Sales" },
@@ -107,10 +107,11 @@ public static partial class SeedData
             new Permissions { PermissionKey = "USERS", PermissionName = "المستخدمون والصلاحيات", ModuleName = "النظام", SortOrder = (short)81, PermissionNameEn = "Users and permissions", ModuleNameEn = "System" },
             new Permissions { PermissionKey = "BACKUP", PermissionName = "النسخ الاحتياطي", ModuleName = "النظام", SortOrder = (short)82, PermissionNameEn = "Backup", ModuleNameEn = "System" },
             new Permissions { PermissionKey = "SQL_SERVER", PermissionName = "قاعدة SQL Server: الاتصال ونقل البيانات وتشغيل البرنامج على الخادم", ModuleName = "النظام", SortOrder = (short)84, PermissionNameEn = "SQL Server database: connection, data transfer and running on the server", ModuleNameEn = "System" },
+            new Permissions { PermissionKey = "OFFICE_SYNC", PermissionName = "مهام المكتب: تحديث القيود وإرسال الفواتير الإلكترونية لمستندات الويب ونقاط البيع", ModuleName = "النظام", SortOrder = (short)85, PermissionNameEn = "Office tasks: journal update and e-invoice sending for web and POS documents", ModuleNameEn = "System" },
             new Permissions { PermissionKey = "AUDIT_LOG", PermissionName = "سجل التدقيق: من أضاف أو عدّل أو حذف، والقيم قبل وبعد", ModuleName = "النظام", SortOrder = (short)83, PermissionNameEn = "Audit trail: who added, edited or deleted, with the values before and after", ModuleNameEn = "System" },
             new Permissions { PermissionKey = "EINVOICE", PermissionName = "الفاتورة الإلكترونية: المتابعة وإعادة الإرسال", ModuleName = "المبيعات", SortOrder = (short)16, PermissionNameEn = "E-invoicing: follow-up and resending", ModuleNameEn = "Sales" }
         );
-        // RolePermissions: 94 rows
+        // RolePermissions: 95 rows
         db.RolePermissions.AddRange(
             new RolePermissions { RoleID = 1, PermissionKey = "SALES_POS" },
             new RolePermissions { RoleID = 1, PermissionKey = "SALES_VIEW" },
@@ -158,6 +159,7 @@ public static partial class SeedData
             new RolePermissions { RoleID = 1, PermissionKey = "USERS" },
             new RolePermissions { RoleID = 1, PermissionKey = "BACKUP" },
             new RolePermissions { RoleID = 1, PermissionKey = "SQL_SERVER" },
+            new RolePermissions { RoleID = 1, PermissionKey = "OFFICE_SYNC" },
             new RolePermissions { RoleID = 1, PermissionKey = "AUDIT_LOG" },
             new RolePermissions { RoleID = 1, PermissionKey = "EINVOICE" },
             new RolePermissions { RoleID = 2, PermissionKey = "SALES_POS" },
@@ -211,7 +213,7 @@ public static partial class SeedData
         db.Employees.AddRange(
             new Employees { EmployeeID = 1, EmployeeName = "مدير النظام", JobTitle = "مدير النظام", Username = "admin", RoleID = 1, MaxDiscountPercent = 1m, MustChangePassword = true, IsActive = true }
         );
-        // Screens: 83 rows
+        // Screens: 84 rows
         db.Screens.AddRange(
             new Screens { ScreenName = "frmPOS", ScreenTitle = "نقطة البيع (المحلات)", ModuleName = "المبيعات", SortOrder = (short)10, PermissionKey = "SALES_POS", HasAdd = true, HasEdit = false, HasDelete = false, ScreenTitleEn = "Point of sale (shops)", ModuleNameEn = "Sales" },
             new Screens { ScreenName = "frmTouchPOS", ScreenTitle = "نقطة البيع (المطاعم)", ModuleName = "المبيعات", SortOrder = (short)20, PermissionKey = "SALES_POS", HasAdd = true, HasEdit = false, HasDelete = false, ScreenTitleEn = "Point of sale (restaurants)", ModuleNameEn = "Sales" },
@@ -292,10 +294,11 @@ public static partial class SeedData
             new Screens { ScreenName = "frmAuditLog", ScreenTitle = "سجل التدقيق", ModuleName = "النظام", SortOrder = (short)770, PermissionKey = "AUDIT_LOG", HasAdd = false, HasEdit = false, HasDelete = false, ScreenTitleEn = "Audit trail", ModuleNameEn = "System" },
             new Screens { ScreenName = "frmBackup", ScreenTitle = "النسخ الاحتياطي", ModuleName = "النظام", SortOrder = (short)780, PermissionKey = "BACKUP", HasAdd = false, HasEdit = false, HasDelete = false, ScreenTitleEn = "Backup", ModuleNameEn = "System" },
             new Screens { ScreenName = "frmSqlServer", ScreenTitle = "قاعدة البيانات على SQL Server", ModuleName = "النظام", SortOrder = (short)790, PermissionKey = "SQL_SERVER", HasAdd = false, HasEdit = false, HasDelete = false, ScreenTitleEn = "SQL Server database", ModuleNameEn = "System" },
-            new Screens { ScreenName = "frmEnglishNames", ScreenTitle = "الأسماء الإنجليزية", ModuleName = "النظام", SortOrder = (short)800, PermissionKey = "SETTINGS", HasAdd = false, HasEdit = true, HasDelete = false, ScreenTitleEn = "English names", ModuleNameEn = "System" },
-            new Screens { ScreenName = "frmEInvoices", ScreenTitle = "الفاتورة الإلكترونية", ModuleName = "المبيعات", SortOrder = (short)810, PermissionKey = "EINVOICE", HasAdd = false, HasEdit = true, HasDelete = false, ScreenTitleEn = "E-invoicing", ModuleNameEn = "Sales" },
-            new Screens { ScreenName = "frmZatcaSetup", ScreenTitle = "إعداد ربط منصة فاتورة", ModuleName = "النظام", SortOrder = (short)820, PermissionKey = "SETTINGS", HasAdd = false, HasEdit = true, HasDelete = false, ScreenTitleEn = "Fatoora connection setup", ModuleNameEn = "System" },
-            new Screens { ScreenName = "frmEtaSetup", ScreenTitle = "إعداد ربط منظومة الإيصال الإلكتروني", ModuleName = "النظام", SortOrder = (short)830, PermissionKey = "SETTINGS", HasAdd = false, HasEdit = true, HasDelete = false, ScreenTitleEn = "E-receipt connection setup", ModuleNameEn = "System" }
+            new Screens { ScreenName = "frmOfficeSync", ScreenTitle = "مهام المكتب", ModuleName = "النظام", SortOrder = (short)800, PermissionKey = "OFFICE_SYNC", HasAdd = false, HasEdit = false, HasDelete = false, ScreenTitleEn = "Office tasks", ModuleNameEn = "System" },
+            new Screens { ScreenName = "frmEnglishNames", ScreenTitle = "الأسماء الإنجليزية", ModuleName = "النظام", SortOrder = (short)810, PermissionKey = "SETTINGS", HasAdd = false, HasEdit = true, HasDelete = false, ScreenTitleEn = "English names", ModuleNameEn = "System" },
+            new Screens { ScreenName = "frmEInvoices", ScreenTitle = "الفاتورة الإلكترونية", ModuleName = "المبيعات", SortOrder = (short)820, PermissionKey = "EINVOICE", HasAdd = false, HasEdit = true, HasDelete = false, ScreenTitleEn = "E-invoicing", ModuleNameEn = "Sales" },
+            new Screens { ScreenName = "frmZatcaSetup", ScreenTitle = "إعداد ربط منصة فاتورة", ModuleName = "النظام", SortOrder = (short)830, PermissionKey = "SETTINGS", HasAdd = false, HasEdit = true, HasDelete = false, ScreenTitleEn = "Fatoora connection setup", ModuleNameEn = "System" },
+            new Screens { ScreenName = "frmEtaSetup", ScreenTitle = "إعداد ربط منظومة الإيصال الإلكتروني", ModuleName = "النظام", SortOrder = (short)840, PermissionKey = "SETTINGS", HasAdd = false, HasEdit = true, HasDelete = false, ScreenTitleEn = "E-receipt connection setup", ModuleNameEn = "System" }
         );
         // Categories: 1 rows
         db.Categories.AddRange(

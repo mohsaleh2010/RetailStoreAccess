@@ -15,6 +15,26 @@
         </div>
         <button class="btn" @onclick="Refresh">@L.T("تحديث")</button>
     </header>
+    @if (office is { NeedsAttention: true } o)
+    {
+        @* the office tasks of Access (modOfficeSync, docs/84): the journal and the e-invoices of the web documents *@
+        <div class="message warning" role="alert">
+            @if (o.Stale)
+            {
+                @L.T("توقفت مهام المكتب في Access: آخر تشغيل") @(" " + (o.LastAt is { } t ? t.ToString("yyyy-MM-dd HH:mm") : "-") + " ")
+                @L.T("على الجهاز") @(" " + o.Computer + ". ")
+            }
+            @if (!string.IsNullOrEmpty(o.LastResult))
+            {
+                @L.T(o.LastResult) @(" ")
+            }
+            @if (o.PendingEInvoices > 0 && (o.Minutes == 0 || o.Computer is null))
+            {
+                @L.T("لا يعمل جهاز مهام المكتب تلقائيًا، وتنتظر فواتير إلكترونية الإرسال:") @(" " + o.PendingEInvoices + " ")
+            }
+            @L.T("افتح شاشة مهام المكتب في Access.")
+        </div>
+    }
     @if (figures is { } f)
     {
         <div class="tiles dashboard">
@@ -85,6 +105,7 @@
     private List<WorkPage> work = [];
     private DashboardFigures? figures;
     private IndicatorsView? indicators;
+    private OfficeSyncStatus? office;
 
     /// <summary>modDashboard.Money: the amount, or hidden without the financial figures.</summary>
     private static string Money(decimal? v) => v is { } x ? WorkPages.Money(x) : "••••";
@@ -96,6 +117,8 @@
             figures = await Dashboard.FiguresAsync(UserInfo.EmployeeId(user), DateTime.Today);
             var ind = await Indicators.IndicatorsAsync(UserInfo.Acting(user), DateTime.Today, force);
             indicators = ind.Financial ? ind : null;          // without DASHBOARD_FINANCIAL the cards are not shown
+            office = await Permissions.HasPermissionAsync(UserInfo.EmployeeId(user), "OFFICE_SYNC")
+                ? await Dashboard.OfficeSyncAsync(DateTime.Now) : null;   // only who may run the office tasks is warned
         }
     }
 
