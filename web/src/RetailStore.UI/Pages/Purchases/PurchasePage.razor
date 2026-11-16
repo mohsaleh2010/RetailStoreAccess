@@ -1,0 +1,347 @@
+@page "/purchase"
+@attribute [Authorize]
+@using RetailStore.Domain.Sales
+@inject PurchaseService Purchases
+@inject SalesService Sales
+@inject StockService Stock
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("فاتورة شراء")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("فاتورة شراء")</h1>
+            <p class="subtitle">@L.T("الأصناف بسعر الشراء ووحدتها، والمورد، والدفع، والمخزن")</p>
+        </div>
+        @if (allowed && lines.Count > 0)
+        {
+            <button class="btn" @onclick="Clear">@L.T("فاتورة جديدة")</button>
+        }
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="pos">
+            <div class="pos-cart list-pane">
+                <form class="pos-scan" @onsubmit="Find" @onsubmit:preventDefault>
+                    <input type="search" class="search" placeholder="@L.T("ابحث عن صنف أو اكتب الباركود")"
+                           aria-label="@L.T("ابحث عن صنف أو اكتب الباركود")" @bind="code" @bind:event="oninput" autofocus />
+                    <button type="submit" class="btn">@L.T("إضافة")</button>
+                </form>
+                @if (choices.Count > 0)
+                {
+                    <ul class="pos-choices">
+                        @foreach (var p in choices)
+                        {
+                            <li><button class="btn link" @onclick="() => Add(p)">@p.ProductName (@p.ProductCode) - @WorkPages.Money(p.Cost)</button></li>
+                        }
+                    </ul>
+                }
+                <table class="list pos-lines">
+                    <thead>
+                        <tr>
+                            <th>@L.T("الصنف")</th>
+                            <th>@L.T("الوحدة")</th>
+                            <th>@L.T("الكمية")</th>
+                            <th>@L.T("سعر الشراء")</th>
+                            <th>@L.T("الخصم")</th>
+                            <th>@L.T("سعر البيع الجديد")</th>
+                            <th>@L.T("الإجمالي")</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < lines.Count; i++)
+                        {
+                            var line = lines[i];
+                            int index = i;
+                            <tr>
+                                <td data-label="@L.T("الصنف")">@line.Name</td>
+                                <td data-label="@L.T("الوحدة")">
+                                    @if (line.Units.Count > 1)
+                                    {
+                                        <select aria-label="@L.T("الوحدة")" @onchange="e => UnitChanged(line, e.Value)">
+                                            @foreach (var u in line.Units)
+                                            {
+                                                <option value="@u.UnitID" selected="@(u.UnitID == line.UnitID)">@u.UnitName</option>
+                                            }
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        @line.UnitName
+                                    }
+                                </td>
+                                <td data-label="@L.T("الكمية")"><input type="number" step="any" min="0" aria-label="@L.T("الكمية")" @bind="line.Quantity" @bind:after="Recalc" /></td>
+                                <td data-label="@L.T("سعر الشراء")"><input type="number" step="any" min="0" aria-label="@L.T("سعر الشراء")" @bind="line.Cost" @bind:after="Recalc" /></td>
+                                <td data-label="@L.T("الخصم")"><input type="number" step="any" min="0" aria-label="@L.T("الخصم")" @bind="line.Discount" @bind:after="Recalc" /></td>
+                                <td data-label="@L.T("سعر البيع الجديد")"><input type="number" step="any" min="0" aria-label="@L.T("سعر البيع الجديد")" placeholder="@WorkPages.Money(line.SellingPrice)" @bind="line.NewPrice" /></td>
+                                <td data-label="@L.T("الإجمالي")">@WorkPages.Money(LineTotal(index))</td>
+                                <td><button class="btn link" aria-label="@L.T("حذف")" @onclick="() => Remove(index)">&#10005;</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (lines.Count == 0)
+                {
+                    <p class="empty">@L.T("امسح الباركود أو ابحث عن صنف لإضافته")</p>
+                }
+                else
+                {
+                    <p class="hint">@L.T("أسعار الشراء بدون الضريبة")</p>
+                }
+            </div>
+
+            <div class="pos-pay form-pane">
+                <div class="record">
+                    <div class="field span-2">
+                        <label for="pur-supplier">@L.T("المورد") *</label>
+                        <select id="pur-supplier" @bind="supplierId">
+                            <option value="0"></option>
+                            @foreach (var s in suppliers)
+                            {
+                                <option value="@s.Id">@s.Name (@WorkPages.Money(s.Balance))</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="pur-number">@L.T("رقم فاتورة المورد")</label>
+                        <input id="pur-number" type="text" maxlength="30" @bind="supplierNo" />
+                    </div>
+                    <div class="field">
+                        <label for="pur-date">@L.T("تاريخ الفاتورة")</label>
+                        <input id="pur-date" type="date" @bind="invoiceDate" />
+                    </div>
+                    <div class="field">
+                        <label for="pur-warehouse">@L.T("المخزن")</label>
+                        <select id="pur-warehouse" @bind="warehouseId">
+                            @foreach (var w in warehouses)
+                            {
+                                <option value="@w.Id">@w.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label class="check"><input type="checkbox" @bind="chargeVat" @bind:after="Recalc" /> @L.T("بضريبة القيمة المضافة")</label>
+                    </div>
+                    <div class="field">
+                        <label for="pur-type">@L.T("نوع الدفع")</label>
+                        <select id="pur-type" @bind="paymentType">
+                            <option value="CASH">@L.T("نقدي")</option>
+                            <option value="CREDIT">@L.T("آجل")</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="pur-method">@L.T("طريقة الدفع")</label>
+                        <select id="pur-method" @bind="methodId">
+                            @foreach (var m in methods)
+                            {
+                                <option value="@m.Id">@m.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="pur-discount">@L.T("خصم الفاتورة")</label>
+                        <input id="pur-discount" type="number" step="any" min="0" @bind="invoiceDiscount" @bind:after="Recalc" />
+                    </div>
+                    <div class="field">
+                        <label for="pur-paid">@L.T("المبلغ المدفوع")</label>
+                        <input id="pur-paid" type="number" step="any" min="0" @bind="paid" placeholder="@WorkPages.Money(paymentType == "CREDIT" ? 0 : calc?.Total ?? 0)" />
+                    </div>
+                    <div class="field span-2">
+                        <label for="pur-notes">@L.T("ملاحظات")</label>
+                        <input id="pur-notes" type="text" maxlength="255" @bind="notes" />
+                    </div>
+                </div>
+                <dl class="totals">
+                    <dt>@L.T("قبل الضريبة")</dt><dd>@WorkPages.Money(calc?.Taxable ?? 0)</dd>
+                    <dt>@L.T("الخصم")</dt><dd>@WorkPages.Money(calc?.Discount ?? 0)</dd>
+                    <dt>@L.T("ضريبة القيمة المضافة")</dt><dd>@WorkPages.Money(calc?.Tax ?? 0)</dd>
+                    <dt class="grand">@L.T("الإجمالي")</dt><dd class="grand">@WorkPages.Money(calc?.Total ?? 0) @currency</dd>
+                </dl>
+                @if (calc is { Ok: false } && lines.Count > 0)
+                {
+                    <div class="message warning">@L.T(calc.Problem)</div>
+                }
+                <div class="actions">
+                    <button class="btn primary" disabled="@(busy || lines.Count == 0)" @onclick="Save">@L.T("حفظ الفاتورة")</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">
+            @L.T(message)
+            @if (savedId > 0)
+            {
+                <a href="purchases/@savedId">@L.T("عرض الفاتورة")</a>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    private sealed class Line
+    {
+        public int ProductID;
+        public string Name = "";
+        public int? UnitID;
+        public string UnitName = "";
+        public List<UnitChoice> Units = [];
+        public decimal Quantity = 1;
+        public decimal Cost;
+        public decimal Discount;
+        public decimal SellingPrice;
+        public decimal? NewPrice;
+        public string VatCategory = "S";
+    }
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy, chargeVat = true;
+    private string denied = "", code = "", paymentType = "CASH", notes = "", currency = "", message = "", messageKind = "";
+    private string? supplierNo;
+    private int supplierId, methodId = 1, warehouseId, savedId;
+    private decimal invoiceDiscount, vatRate;
+    private decimal? paid;
+    private DateTime invoiceDate = DateTime.Today;
+    private List<Line> lines = [];
+    private List<PurchaseProduct> choices = [];
+    private List<(int Id, string Name, decimal Balance)> suppliers = [];
+    private List<(int Id, string Name)> methods = [], warehouses = [];
+    private CalcResult? calc;
+
+    private int EmployeeId => UserInfo.EmployeeId(user);
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(EmployeeId, "frmPurchaseInvoice");
+        allowed = denied.Length == 0;
+        if (!allowed)
+        {
+            return;
+        }
+        (vatRate, _, currency) = await Purchases.PurchaseSettingsAsync();
+        suppliers = await Purchases.SuppliersAsync(L.English);
+        methods = await Sales.PaymentMethodsAsync(L.English);
+        (warehouses, warehouseId) = await Stock.WarehousesAsync(EmployeeId, L.English);
+    }
+
+    private async Task Find()
+    {
+        message = "";
+        choices = await Purchases.FindProductsAsync(EmployeeId, code, L.English, warehouseId);
+        if (choices.Count == 0)
+        {
+            message = WorkPages.NoProduct;
+            messageKind = "warning";
+        }
+        else if (choices.Count == 1)
+        {
+            await Add(choices[0]);
+        }
+    }
+
+    private async Task Add(PurchaseProduct p)
+    {
+        choices = [];
+        code = "";
+        var same = lines.FirstOrDefault(l => l.ProductID == p.ProductID && l.UnitID == p.UnitID);
+        if (same is not null)
+        {
+            same.Quantity += 1;
+        }
+        else
+        {
+            var units = await Sales.UnitsAsync(p.ProductID, L.English);
+            int baseUnit = units.Count > 0 ? units[0].UnitID : 0;
+            lines.Add(new Line
+            {
+                ProductID = p.ProductID, Name = p.ProductName, UnitID = p.UnitID ?? baseUnit, UnitName = p.UnitName, Units = units,
+                Cost = p.Cost, SellingPrice = p.SellingPrice, VatCategory = p.VATCategory,
+            });
+        }
+        Recalc();
+    }
+
+    private async Task UnitChanged(Line line, object? value)
+    {
+        if (int.TryParse(value?.ToString(), out int unit))
+        {
+            line.UnitID = unit;
+            line.UnitName = line.Units.FirstOrDefault(u => u.UnitID == unit)?.UnitName ?? "";
+            (line.Cost, line.SellingPrice) = await Purchases.LineCostAsync(line.ProductID, unit);
+            line.NewPrice = null;
+            Recalc();
+        }
+    }
+
+    private void Remove(int index)
+    {
+        lines.RemoveAt(index);
+        Recalc();
+    }
+
+    private void Recalc() =>
+        calc = lines.Count == 0 ? null
+            : InvoiceCalculator.Calc(lines.Select(l => new CalcLineIn(l.Quantity, l.Cost, l.Discount, chargeVat && l.VatCategory == "S" ? vatRate : 0)).ToList(),
+                                     invoiceDiscount, false);
+
+    private decimal LineTotal(int index) => calc is { Ok: true } c && index < c.Lines.Count ? c.Lines[index].Total : 0;
+
+    private void Clear()
+    {
+        lines = [];
+        choices = [];
+        invoiceDiscount = 0;
+        paid = null;
+        notes = "";
+        supplierNo = null;
+        invoiceDate = DateTime.Today;
+        calc = null;
+    }
+
+    private async Task Save()
+    {
+        message = "";
+        savedId = 0;
+        if (supplierId == 0)
+        {
+            message = WorkPages.ChooseSupplier;
+            messageKind = "error";
+            return;
+        }
+        busy = true;
+        try
+        {
+            var r = await Purchases.PostPurchaseAsync(UserInfo.Acting(user),
+                new PurchaseRequest(supplierId, supplierNo, invoiceDate, paymentType, methodId, chargeVat, invoiceDiscount, paid, notes,
+                                    lines.Select(l => new PurchaseLine(l.ProductID, l.Quantity, l.Cost, l.Discount, l.UnitID, l.NewPrice)).ToList(),
+                                    WarehouseID: warehouseId));
+            if (r.Status != SaveStatus.Saved)
+            {
+                message = r.Message;
+                messageKind = "error";
+                return;
+            }
+            savedId = r.InvoiceID;
+            message = WorkPages.PurchaseSaved + r.InvoiceNumber;
+            messageKind = "success";
+            Clear();
+            suppliers = await Purchases.SuppliersAsync(L.English);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+}

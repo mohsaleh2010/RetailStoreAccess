@@ -1,0 +1,371 @@
+@page "/transfers"
+@attribute [Authorize]
+@inject StockService Stock
+@inject PurchaseService Purchases
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("التحويل بين المخازن")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("التحويل بين المخازن")</h1>
+            <p class="subtitle">@L.T("إرسال الأصناف من مخزن إلى آخر واستلامها")</p>
+        </div>
+        @if (allowed && current is not null)
+        {
+            <button class="btn" @onclick="New">@L.T("تحويل جديد")</button>
+        }
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="pos">
+            <div class="list-pane">
+                <div class="list-tools">
+                    <select aria-label="@L.T("الحالة")" @bind="status" @bind:after="Load">
+                        <option value="">@L.T("الكل")</option>
+                        <option value="DRAFT">@L.T("مسودة")</option>
+                        <option value="SENT">@L.T("بالطريق")</option>
+                        <option value="RECEIVED">@L.T("مستلم")</option>
+                    </select>
+                </div>
+                <table class="list">
+                    <thead>
+                        <tr>
+                            <th>@L.T("رقم التحويل")</th>
+                            <th>@L.T("التاريخ")</th>
+                            <th>@L.T("من مخزن")</th>
+                            <th>@L.T("إلى مخزن")</th>
+                            <th>@L.T("الحالة")</th>
+                            <th>@L.T("الكمية")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in rows)
+                        {
+                            <tr tabindex="0" class="@(current?.StockTransferID == r.StockTransferID ? "selected" : "")"
+                                @onclick="() => Open(r.StockTransferID)" @onkeydown="e => Key(e, r.StockTransferID)">
+                                <td data-label="@L.T("رقم التحويل")">@r.TransferNumber</td>
+                                <td data-label="@L.T("التاريخ")">@r.TransferDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td data-label="@L.T("من مخزن")">@r.FromName</td>
+                                <td data-label="@L.T("إلى مخزن")">@r.ToName</td>
+                                <td data-label="@L.T("الحالة")">@L.T(WorkPages.TransferStatusName(r.Status))</td>
+                                <td data-label="@L.T("الكمية")">@WorkPages.Qty(r.Quantity) (@r.LineCount)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (rows.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+            </div>
+
+            <div class="form-pane">
+                @if (current is { } t)
+                {
+                    <h2>@t.TransferNumber - @L.T(WorkPages.TransferStatusName(t.Status))</h2>
+                    <p>@L.T("من مخزن"): @t.FromName - @L.T("إلى مخزن"): @t.ToName</p>
+                    <p class="hint">@t.TransferDate.ToString("yyyy-MM-dd HH:mm") - @t.EmployeeName @(t.ReceivedAt is { } at ? " - " + at.ToString("yyyy-MM-dd HH:mm") + " " + t.ReceivedBy : "")</p>
+                    @if (!string.IsNullOrEmpty(t.Notes))
+                    {
+                        <p class="hint">@t.Notes</p>
+                    }
+                    <table class="list">
+                        <thead>
+                            <tr>
+                                <th>@L.T("الصنف")</th>
+                                <th>@L.T("الكمية")</th>
+                                <th>@(t.Status == "DRAFT" ? L.T("المتوفر") : L.T("التكلفة"))</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var l in t.Lines)
+                            {
+                                <tr class="@(t.Status == "DRAFT" && l.Quantity > l.Available ? "low" : "")">
+                                    <td data-label="@L.T("الصنف")">@l.ProductName (@l.ProductCode)</td>
+                                    <td data-label="@L.T("الكمية")">@WorkPages.Qty(l.Quantity) @l.UnitName</td>
+                                    <td>@(t.Status == "DRAFT" ? WorkPages.Qty(l.Available) : l.UnitCost.ToString("0.00##"))</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="actions">
+                        @if (t.Status == "DRAFT")
+                        {
+                            <button class="btn primary" disabled="@busy" @onclick="() => Send(false)">@L.T("إرسال")</button>
+                            <button class="btn" disabled="@busy" @onclick="Delete">@L.T("حذف")</button>
+                        }
+                        else if (t.Status == "SENT")
+                        {
+                            @if (t.CanReceive)
+                            {
+                                <button class="btn primary" disabled="@busy" @onclick="Receive">@L.T("تأكيد الاستلام")</button>
+                            }
+                            <button class="btn" disabled="@busy" @onclick="Unpost">@L.T("إلغاء الترحيل")</button>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <h2>@L.T("تحويل جديد")</h2>
+                    <div class="record">
+                        <div class="field">
+                            <label for="tr-from">@L.T("من مخزن")</label>
+                            <select id="tr-from" @bind="fromId">
+                                @foreach (var w in warehouses)
+                                {
+                                    <option value="@w.Id">@w.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="tr-to">@L.T("إلى مخزن")</label>
+                            <select id="tr-to" @bind="toId">
+                                <option value="0"></option>
+                                @foreach (var w in warehouses.Where(w => w.Id != fromId))
+                                {
+                                    <option value="@w.Id">@w.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="field span-2">
+                            <label for="tr-notes">@L.T("ملاحظات")</label>
+                            <input id="tr-notes" type="text" maxlength="255" @bind="notes" />
+                        </div>
+                    </div>
+                    <form class="pos-scan" @onsubmit="Find" @onsubmit:preventDefault>
+                        <input type="search" class="search" placeholder="@L.T("ابحث عن صنف أو اكتب الباركود")"
+                               aria-label="@L.T("ابحث عن صنف أو اكتب الباركود")" @bind="code" @bind:event="oninput" />
+                        <button type="submit" class="btn">@L.T("إضافة")</button>
+                    </form>
+                    @if (choices.Count > 0)
+                    {
+                        <ul class="pos-choices">
+                            @foreach (var p in choices)
+                            {
+                                <li><button class="btn link" @onclick="() => Add(p)">@p.ProductName (@p.ProductCode) - @WorkPages.Qty(p.Available)</button></li>
+                            }
+                        </ul>
+                    }
+                    <table class="list pos-lines">
+                        <thead>
+                            <tr>
+                                <th>@L.T("الصنف")</th>
+                                <th>@L.T("الكمية")</th>
+                                <th>@L.T("المتوفر")</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < lines.Count; i++)
+                            {
+                                var line = lines[i];
+                                int index = i;
+                                <tr>
+                                    <td data-label="@L.T("الصنف")">@line.Name</td>
+                                    <td data-label="@L.T("الكمية")"><input type="number" step="any" min="0" aria-label="@L.T("الكمية")" @bind="line.Quantity" /></td>
+                                    <td data-label="@L.T("المتوفر")">@WorkPages.Qty(line.Available)</td>
+                                    <td><button class="btn link" aria-label="@L.T("حذف")" @onclick="() => lines.RemoveAt(index)">&#10005;</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <p class="hint">@L.T("الكميات بالوحدة الصغرى للصنف")</p>
+                    <div class="actions">
+                        <button class="btn primary" disabled="@(busy || lines.Count == 0)" @onclick="Create">@L.T("حفظ مسودة")</button>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">@L.T(message)</div>
+    }
+
+    @if (question is not null)
+    {
+        <div class="dialog-backdrop">
+            <div class="dialog" role="dialog" aria-modal="true">
+                <p>@L.T(question)</p>
+                <div class="actions">
+                    <button class="btn primary" @onclick="() => Answer(true)">@L.T("نعم")</button>
+                    <button class="btn" @onclick="() => Answer(false)">@L.T("لا")</button>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    private sealed class Line
+    {
+        public int ProductID;
+        public string Name = "";
+        public decimal Quantity = 1;
+        public decimal Available;
+    }
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy;
+    private string denied = "", status = "", notes = "", code = "", message = "", messageKind = "";
+    private string? question;
+    private int fromId, toId;
+    private TransferView? current;
+    private List<TransferRow> rows = [];
+    private List<Line> lines = [];
+    private List<PurchaseProduct> choices = [];
+    private List<(int Id, string Name)> warehouses = [];
+
+    private int EmployeeId => UserInfo.EmployeeId(user);
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(EmployeeId, StockService.TransferForm);
+        allowed = denied.Length == 0;
+        if (allowed)
+        {
+            (warehouses, fromId) = await Stock.WarehousesAsync(EmployeeId, L.English);
+            await Load();
+        }
+    }
+
+    private async Task Load() => rows = await Stock.TransfersAsync(status, 0, L.English);
+
+    private async Task Open(int id)
+    {
+        message = "";
+        current = await Stock.TransferAsync(id, EmployeeId, L.English);
+    }
+
+    private async Task Key(KeyboardEventArgs e, int id)
+    {
+        if (e.Key == "Enter")
+        {
+            await Open(id);
+        }
+    }
+
+    private void New()
+    {
+        current = null;
+        lines = [];
+        notes = "";
+        toId = 0;
+    }
+
+    private async Task Find()
+    {
+        message = "";
+        choices = await Purchases.FindProductsAsync(EmployeeId, code, L.English, fromId);
+        if (choices.Count == 0)
+        {
+            message = WorkPages.NoProduct;
+            messageKind = "warning";
+        }
+        else if (choices.Count == 1)
+        {
+            Add(choices[0]);
+        }
+    }
+
+    private void Add(PurchaseProduct p)
+    {
+        choices = [];
+        code = "";
+        var same = lines.FirstOrDefault(l => l.ProductID == p.ProductID);
+        if (same is not null)
+        {
+            same.Quantity += 1;
+        }
+        else
+        {
+            lines.Add(new Line { ProductID = p.ProductID, Name = p.ProductName, Available = p.Available });
+        }
+    }
+
+    private async Task Create()
+    {
+        busy = true;
+        message = "";
+        try
+        {
+            var r = await Stock.CreateTransferAsync(UserInfo.Acting(user),
+                new TransferRequest(fromId, toId, notes, lines.Select(l => new TransferLineInput(l.ProductID, l.Quantity)).ToList()));
+            if (r.Status != SaveStatus.Saved)
+            {
+                message = r.Message;
+                messageKind = "error";
+                return;
+            }
+            message = WorkPages.TransferSaved + r.Number;
+            messageKind = "success";
+            await Load();
+            await Open(r.Id);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task Done(StockResult r)
+    {
+        if (r.Status == SaveStatus.NeedsConfirmation)
+        {
+            question = r.Message;
+            return;
+        }
+        if (r.Status == SaveStatus.Refused)
+        {
+            message = r.Message;
+            messageKind = "error";
+            return;
+        }
+        message = WorkPages.TransferDone + r.Number;
+        messageKind = "success";
+        await Load();
+        current = await Stock.TransferAsync(r.Id, EmployeeId, L.English);
+    }
+
+    private async Task Act(Func<Task<StockResult>> action)
+    {
+        busy = true;
+        message = "";
+        try
+        {
+            await Done(await action());
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private Task Send(bool confirmed) => Act(() => Stock.SendTransferAsync(UserInfo.Acting(user), current!.StockTransferID, confirmed));
+
+    private Task Receive() => Act(() => Stock.ReceiveTransferAsync(UserInfo.Acting(user), current!.StockTransferID));
+
+    private Task Unpost() => Act(() => Stock.UnpostTransferAsync(UserInfo.Acting(user), current!.StockTransferID));
+
+    private Task Delete() => Act(() => Stock.DeleteTransferAsync(UserInfo.Acting(user), current!.StockTransferID));
+
+    private async Task Answer(bool yes)
+    {
+        question = null;
+        if (yes)
+        {
+            await Send(true);
+        }
+    }
+}

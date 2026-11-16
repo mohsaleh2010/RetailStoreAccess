@@ -10,7 +10,7 @@ public sealed record PostedDocument(int Id, string Number, decimal Total, decima
 /// checks, messages and rows as modSales.PostSaleFromCart / PostCustomerPayment in Access.</summary>
 public static class SalesApi
 {
-    private static IResult Posted(HttpContext http, SaleResult r, string route) => r.Status switch
+    internal static IResult Posted(HttpContext http, SaleResult r, string route) => r.Status switch
     {
         SaveStatus.Saved => Results.Created(ApiEndpoints.Prefix + route + r.InvoiceID, new PostedDocument(r.InvoiceID, r.InvoiceNumber, r.Total, r.Change)),
         SaveStatus.NeedsConfirmation => ApiResults.Problem(http, StatusCodes.Status409Conflict, "confirm", r.Message),

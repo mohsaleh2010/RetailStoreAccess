@@ -112,7 +112,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
 
     // ------------------------------------------------------------------ units and prices (modProductUnits, modPriceLists)
 
-    private static bool IsBaseUnit(Products p, int? unitId) => unitId is null || unitId == 0 || unitId == p.UnitID;
+    internal static bool IsBaseUnit(Products p, int? unitId) => unitId is null || unitId == 0 || unitId == p.UnitID;
 
     /// <summary>modProductUnits.UnitFactorOf: 1 for the smallest unit, 0 when the unit is not one of its active units.</summary>
     public static async Task<decimal> UnitFactorOfAsync(RetailDbContext db, Products p, int? unitId) =>
@@ -120,7 +120,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
             : await db.ProductUnits.Where(u => u.IsActive && u.ProductID == p.ProductID && u.UnitID == unitId)
                 .Select(u => (decimal?)u.UnitFactor).FirstOrDefaultAsync() ?? 0;
 
-    private static async Task<decimal> OwnUnitPriceAsync(RetailDbContext db, Products p, int? unitId) =>
+    internal static async Task<decimal> OwnUnitPriceAsync(RetailDbContext db, Products p, int? unitId) =>
         IsBaseUnit(p, unitId) ? 0
             : await db.ProductUnits.Where(u => u.IsActive && u.ProductID == p.ProductID && u.UnitID == unitId)
                 .Select(u => (decimal?)u.SellingPrice).FirstOrDefaultAsync() ?? 0;
@@ -273,7 +273,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
 
     /// <summary>modSales.CheckStockAvailable for a sale: Refused, NeedsConfirmation (the user may approve: the question),
     /// or Saved ("" = enough stock, else the list approved by the settings).</summary>
-    private async Task<(SaveStatus Status, string Message, string ShortList)> CheckStockAsync(
+    internal async Task<(SaveStatus Status, string Message, string ShortList)> CheckStockAsync(
         RetailDbContext db, Settings settings, int employeeId, List<(Products P, decimal Pieces)> needs, int warehouseId, string operation)
     {
         string shortList = "";
@@ -636,7 +636,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         await db.SaveChangesAsync();
     }
 
-    private static string? Clip(string? s, int n)
+    internal static string? Clip(string? s, int n)
     {
         string t = (s ?? "").Trim();
         return t.Length == 0 ? null : (t.Length <= n ? t : t[..n]);
@@ -706,7 +706,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
     }
 
     /// <summary>modCurrency.CurrencyProblem.</summary>
-    private static async Task<string> CurrencyProblemAsync(RetailDbContext db, string code, decimal rate, string baseCurrency)
+    internal static async Task<string> CurrencyProblemAsync(RetailDbContext db, string code, decimal rate, string baseCurrency)
     {
         if (code.Length == 0)
         {
@@ -725,7 +725,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
 
     // ------------------------------------------------------------------ what the screens read
 
-    private static string Name(string arabic, string? english, bool inEnglish) =>
+    internal static string Name(string arabic, string? english, bool inEnglish) =>
         inEnglish && !string.IsNullOrWhiteSpace(english) ? english : arabic;
 
     /// <summary>modProductUnits.FindProductCode, then the active products whose name or code contains the text.</summary>

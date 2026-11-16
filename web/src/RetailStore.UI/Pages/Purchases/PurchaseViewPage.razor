@@ -1,0 +1,110 @@
+@page "/purchases/{Id:int}"
+@attribute [Authorize]
+@inject PurchaseService Purchases
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("فاتورة شراء") @(invoice?.InvoiceNumber)</PageTitle>
+
+<section class="screen invoice-screen">
+    <header class="screen-head no-print">
+        <div>
+            <h1>@L.T("فاتورة شراء") @(invoice?.InvoiceNumber)</h1>
+            <p class="subtitle"><a href="purchases">@L.T("فواتير المشتريات")</a></p>
+        </div>
+        @if (invoice is not null)
+        {
+            <button class="btn primary" onclick="window.print()">@L.T("طباعة")</button>
+        }
+    </header>
+
+    @if (denied.Length > 0)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else if (invoice is null)
+    {
+        <p class="empty">@L.T("السجل غير موجود")</p>
+    }
+    else
+    {
+        <article class="invoice">
+            <header class="invoice-head">
+                <div>
+                    <p>@L.T("رقم الفاتورة"): @invoice.InvoiceNumber - @invoice.InvoiceDate.ToString("yyyy-MM-dd HH:mm")</p>
+                    <p>@L.T("المورد"): @invoice.SupplierName @(string.IsNullOrEmpty(invoice.SupplierVAT) ? "" : " - " + invoice.SupplierVAT)</p>
+                    @if (!string.IsNullOrEmpty(invoice.SupplierInvoiceNo))
+                    {
+                        <p>@L.T("رقم فاتورة المورد"): @invoice.SupplierInvoiceNo</p>
+                    }
+                    <p>@L.T("نوع الدفع"): @L.T(WorkPages.PaymentTypeName(invoice.PaymentType)) @(invoice.MethodName is null ? "" : " - " + invoice.MethodName)</p>
+                    <p>@L.T("المخزن"): @invoice.WarehouseName</p>
+                </div>
+            </header>
+            <table class="list invoice-lines">
+                <thead>
+                    <tr>
+                        <th>@L.T("الصنف")</th>
+                        <th>@L.T("الوحدة")</th>
+                        <th>@L.T("الكمية")</th>
+                        <th>@L.T("سعر الشراء")</th>
+                        <th>@L.T("الخصم")</th>
+                        <th>@L.T("الضريبة")</th>
+                        <th>@L.T("الإجمالي")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var l in invoice.Lines)
+                    {
+                        <tr>
+                            <td data-label="@L.T("الصنف")">@l.ProductName</td>
+                            <td data-label="@L.T("الوحدة")">@l.UnitName</td>
+                            <td data-label="@L.T("الكمية")">@WorkPages.Qty(l.Quantity)</td>
+                            <td data-label="@L.T("سعر الشراء")">@l.UnitCost.ToString("0.00##")</td>
+                            <td data-label="@L.T("الخصم")">@WorkPages.Money(l.Discount)</td>
+                            <td data-label="@L.T("الضريبة")">@WorkPages.Money(l.Tax)</td>
+                            <td data-label="@L.T("الإجمالي")">@WorkPages.Money(l.LineTotal)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <dl class="totals">
+                <dt>@L.T("الإجمالي قبل الخصم")</dt><dd>@WorkPages.Money(invoice.SubTotal)</dd>
+                <dt>@L.T("الخصم")</dt><dd>@WorkPages.Money(invoice.Discount)</dd>
+                <dt>@L.T("قبل الضريبة")</dt><dd>@WorkPages.Money(invoice.TaxableAmount)</dd>
+                <dt>@L.T("ضريبة القيمة المضافة")</dt><dd>@WorkPages.Money(invoice.Tax)</dd>
+                <dt class="grand">@L.T("الإجمالي")</dt><dd class="grand">@WorkPages.Money(invoice.TotalAmount)</dd>
+                @if (invoice.ExchangeRate != 1)
+                {
+                    <dt>@invoice.CurrencyCode</dt><dd>@WorkPages.Money(invoice.ForeignAmount) (@invoice.ExchangeRate.ToString("0.####"))</dd>
+                }
+                <dt>@L.T("المدفوع")</dt><dd>@WorkPages.Money(invoice.PaidAmount)</dd>
+                @if (invoice.RemainingAmount != 0)
+                {
+                    <dt>@L.T("المتبقي")</dt><dd>@WorkPages.Money(invoice.RemainingAmount) @(invoice.DueDate is { } due ? "(" + due.ToString("yyyy-MM-dd") + ")" : "")</dd>
+                }
+            </dl>
+            @if (!string.IsNullOrEmpty(invoice.Notes))
+            {
+                <p class="hint">@invoice.Notes</p>
+            }
+        </article>
+    }
+</section>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private PurchaseView? invoice;
+    private string denied = "";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmPurchaseView");
+        if (denied.Length == 0)
+        {
+            invoice = await Purchases.PurchaseAsync(Id, L.English);
+        }
+    }
+}

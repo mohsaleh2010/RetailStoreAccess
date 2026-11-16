@@ -1,0 +1,102 @@
+@page "/purchases"
+@attribute [Authorize]
+@inject PurchaseService Purchases
+@inject PermissionService Permissions
+@inject NavigationManager Nav
+@inject UiLanguage L
+
+<PageTitle>@L.T("فواتير المشتريات")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("فواتير المشتريات")</h1>
+            <p class="subtitle">@L.T("فواتير الموردين بتاريخها وأسطرها")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="list-pane">
+            <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
+                <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+                <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+                <input type="search" class="search" placeholder="@L.T("بحث")" aria-label="@L.T("بحث")" @bind="search" />
+                <button type="submit" class="btn">@L.T("عرض")</button>
+            </form>
+            <table class="list">
+                <thead>
+                    <tr>
+                        <th>@L.T("رقم الفاتورة")</th>
+                        <th>@L.T("رقم فاتورة المورد")</th>
+                        <th>@L.T("التاريخ")</th>
+                        <th>@L.T("المورد")</th>
+                        <th>@L.T("نوع الدفع")</th>
+                        <th>@L.T("الإجمالي")</th>
+                        <th>@L.T("المتبقي")</th>
+                        <th>@L.T("المخزن")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in rows)
+                    {
+                        <tr tabindex="0" @onclick="() => Open(r.PurchaseInvoiceID)" @onkeydown="e => Key(e, r.PurchaseInvoiceID)">
+                            <td data-label="@L.T("رقم الفاتورة")">@r.InvoiceNumber</td>
+                            <td data-label="@L.T("رقم فاتورة المورد")">@r.SupplierInvoiceNo</td>
+                            <td data-label="@L.T("التاريخ")">@r.InvoiceDate.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td data-label="@L.T("المورد")">@r.SupplierName</td>
+                            <td data-label="@L.T("نوع الدفع")">@L.T(WorkPages.PaymentTypeName(r.PaymentType))</td>
+                            <td data-label="@L.T("الإجمالي")">@WorkPages.Money(r.TotalAmount)</td>
+                            <td data-label="@L.T("المتبقي")">@WorkPages.Money(r.RemainingAmount)</td>
+                            <td data-label="@L.T("المخزن")">@r.WarehouseName</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (rows.Count == 0)
+            {
+                <p class="empty">@L.T("لا توجد سجلات")</p>
+            }
+            else
+            {
+                <p class="hint">@L.T("المجموع"): @WorkPages.Money(rows.Sum(r => r.TotalAmount)) (@rows.Count)</p>
+            }
+        </div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private bool allowed;
+    private string denied = "";
+    private string? search;
+    private DateTime from = DateTime.Today, to = DateTime.Today;
+    private List<PurchaseRow> rows = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmPurchaseView");
+        allowed = denied.Length == 0;
+        if (allowed)
+        {
+            await Load();
+        }
+    }
+
+    private async Task Load() => rows = await Purchases.PurchasesAsync(from, to, search, L.English);
+
+    private void Open(int id) => Nav.NavigateTo("purchases/" + id);
+
+    private void Key(KeyboardEventArgs e, int id)
+    {
+        if (e.Key == "Enter")
+        {
+            Open(id);
+        }
+    }
+}

@@ -1,0 +1,177 @@
+@page "/stock"
+@attribute [Authorize]
+@inject StockService Stock
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("المخزون")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("المخزون")</h1>
+            <p class="subtitle">@L.T("رصيد كل صنف في كل مخزن، وكارت الصنف")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="pos">
+            <div class="list-pane">
+                <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
+                    <select aria-label="@L.T("المخزن")" @bind="warehouseId" @bind:after="Load">
+                        <option value="0">@L.T("كل المخازن")</option>
+                        @foreach (var w in warehouses)
+                        {
+                            <option value="@w.Id">@w.Name</option>
+                        }
+                    </select>
+                    <input type="search" class="search" placeholder="@L.T("بحث")" aria-label="@L.T("بحث")" @bind="search" />
+                    <label class="check"><input type="checkbox" @bind="lowOnly" @bind:after="Load" /> @L.T("الأصناف تحت حد الطلب")</label>
+                    <button type="submit" class="btn">@L.T("عرض")</button>
+                </form>
+                <table class="list">
+                    <thead>
+                        <tr>
+                            <th>@L.T("الرمز")</th>
+                            <th>@L.T("الصنف")</th>
+                            <th>@L.T("الوحدة")</th>
+                            <th>@L.T("الكمية")</th>
+                            @if (warehouseId > 0)
+                            {
+                                <th>@L.T("محجوز")</th>
+                            }
+                            <th>@L.T("الحد الأدنى")</th>
+                            <th>@L.T("متوسط التكلفة")</th>
+                            <th>@L.T("القيمة")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in rows)
+                        {
+                            <tr tabindex="0" class="@(r.IsLow ? "low" : "") @(r.ProductID == productId ? "selected" : "")"
+                                @onclick="() => Card(r)" @onkeydown="e => Key(e, r)">
+                                <td data-label="@L.T("الرمز")">@r.ProductCode</td>
+                                <td data-label="@L.T("الصنف")">@r.ProductName</td>
+                                <td data-label="@L.T("الوحدة")">@r.UnitName</td>
+                                <td data-label="@L.T("الكمية")">@WorkPages.Qty(r.Quantity)</td>
+                                @if (warehouseId > 0)
+                                {
+                                    <td data-label="@L.T("محجوز")">@WorkPages.Qty(r.Reserved)</td>
+                                }
+                                <td data-label="@L.T("الحد الأدنى")">@WorkPages.Qty(r.MinimumQuantity)</td>
+                                <td data-label="@L.T("متوسط التكلفة")">@r.AverageCost.ToString("0.00##")</td>
+                                <td data-label="@L.T("القيمة")">@WorkPages.Money(r.Value)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (rows.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+                else
+                {
+                    <p class="hint">@L.T("قيمة المخزون"): @WorkPages.Money(rows.Sum(r => r.Value)) (@rows.Count)</p>
+                }
+            </div>
+
+            <div class="form-pane">
+                <h2>@L.T("كارت الصنف") @productName</h2>
+                @if (productId == 0)
+                {
+                    <p class="empty">@L.T("اختر صنفًا من القائمة لعرض حركته")</p>
+                }
+                else
+                {
+                    <form class="list-tools" @onsubmit="LoadCard" @onsubmit:preventDefault>
+                        <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+                        <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+                        <button type="submit" class="btn">@L.T("عرض")</button>
+                    </form>
+                    <table class="list">
+                        <thead>
+                            <tr>
+                                <th>@L.T("التاريخ")</th>
+                                <th>@L.T("الحركة")</th>
+                                <th>@L.T("المرجع")</th>
+                                <th>@L.T("الجهة")</th>
+                                <th>@L.T("وارد")</th>
+                                <th>@L.T("صادر")</th>
+                                <th>@L.T("الرصيد")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var c in card)
+                            {
+                                <tr>
+                                    <td data-label="@L.T("التاريخ")">@c.MovementDate.ToString(c.MoveID == 0 ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")</td>
+                                    <td data-label="@L.T("الحركة")">@L.T(c.MovementType)</td>
+                                    <td data-label="@L.T("المرجع")">@c.ReferenceNumber</td>
+                                    <td data-label="@L.T("الجهة")">@c.PartyName @(warehouseId == 0 && c.WarehouseName is { } wn ? "(" + wn + ")" : "")</td>
+                                    <td data-label="@L.T("وارد")">@(c.QtyIn != 0 ? WorkPages.Qty(c.QtyIn) : "")</td>
+                                    <td data-label="@L.T("صادر")">@(c.QtyOut != 0 ? WorkPages.Qty(c.QtyOut) : "")</td>
+                                    <td data-label="@L.T("الرصيد")">@WorkPages.Qty(c.Balance)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private bool allowed, lowOnly;
+    private string denied = "", productName = "";
+    private string? search;
+    private int warehouseId, productId;
+    private DateTime from = DateTime.Today.AddDays(1 - DateTime.Today.Day), to = DateTime.Today;
+    private List<StockRow> rows = [];
+    private List<ItemCardLine> card = [];
+    private List<(int Id, string Name)> warehouses = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmInventory");
+        allowed = denied.Length == 0;
+        if (allowed)
+        {
+            (warehouses, _) = await Stock.WarehousesAsync(UserInfo.EmployeeId(user), L.English);
+            await Load();
+        }
+    }
+
+    private async Task Load()
+    {
+        rows = await Stock.StockAsync(warehouseId, search, lowOnly, L.English);
+        if (productId > 0)
+        {
+            await LoadCard();
+        }
+    }
+
+    private async Task Card(StockRow r)
+    {
+        productId = r.ProductID;
+        productName = r.ProductName;
+        await LoadCard();
+    }
+
+    private async Task LoadCard() => card = await Stock.ItemCardAsync(productId, warehouseId, from, to, L.English);
+
+    private async Task Key(KeyboardEventArgs e, StockRow r)
+    {
+        if (e.Key == "Enter")
+        {
+            await Card(r);
+        }
+    }
+}
