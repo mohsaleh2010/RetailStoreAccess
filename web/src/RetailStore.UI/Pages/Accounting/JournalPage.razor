@@ -1,0 +1,171 @@
+@page "/journal"
+@attribute [Authorize]
+@inject AccountingService Accounting
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("قيود اليومية")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("قيود اليومية")</h1>
+            <p class="subtitle">@L.T("القيود المبنية من العمليات، وسطور كل قيد")</p>
+        </div>
+        @if (allowed)
+        {
+            <button class="btn" disabled="@busy" @onclick="Sync">@L.T("تحديث القيود")</button>
+        }
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="pos">
+            <div class="list-pane">
+                <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
+                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+                    <select aria-label="@L.T("نوع العملية")" @bind="kind" @bind:after="Load">
+                        <option value="">@L.T("كل العمليات")</option>
+                        @foreach (var k in kinds)
+                        {
+                            <option value="@k.Key">@k.Name</option>
+                        }
+                    </select>
+                    <input type="search" class="search" placeholder="@L.T("بحث")" aria-label="@L.T("بحث")" @bind="search" />
+                    <button type="submit" class="btn">@L.T("عرض")</button>
+                </form>
+                <table class="list">
+                    <thead>
+                        <tr>
+                            <th>@L.T("القيد")</th>
+                            <th>@L.T("التاريخ")</th>
+                            <th>@L.T("العملية")</th>
+                            <th>@L.T("المستند")</th>
+                            <th>@L.T("البيان")</th>
+                            <th>@L.T("المبلغ")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var e in rows)
+                        {
+                            <tr tabindex="0" class="@(entry?.Entry.EntryID == e.EntryID ? "selected" : "")" @onclick="() => Open(e.EntryID)"
+                                @onkeydown="k => Key(k, e.EntryID)">
+                                <td data-label="@L.T("القيد")">@e.EntryNumber</td>
+                                <td data-label="@L.T("التاريخ")">@e.EntryDate.ToString("yyyy-MM-dd")</td>
+                                <td data-label="@L.T("العملية")">@e.KindName</td>
+                                <td data-label="@L.T("المستند")">@e.SourceNumber</td>
+                                <td data-label="@L.T("البيان")">@e.Description</td>
+                                <td data-label="@L.T("المبلغ")">@WorkPages.Money(e.TotalDebit)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (rows.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+            </div>
+
+            <div class="form-pane">
+                @if (entry is null)
+                {
+                    <p class="empty">@L.T("اختر قيدًا من القائمة لعرض سطوره")</p>
+                }
+                else
+                {
+                    <h2>@L.T("القيد") @entry.Entry.EntryNumber</h2>
+                    <p class="hint">@entry.Entry.KindName @entry.Entry.SourceNumber - @entry.Entry.EntryDate.ToString("yyyy-MM-dd")</p>
+                    <table class="list">
+                        <thead>
+                            <tr>
+                                <th>@L.T("الحساب")</th>
+                                <th>@L.T("مدين")</th>
+                                <th>@L.T("دائن")</th>
+                                <th>@L.T("البيان")</th>
+                                <th>@L.T("مركز التكلفة")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var l in entry.Lines)
+                            {
+                                <tr>
+                                    <td data-label="@L.T("الحساب")"><a href="ledger?account=@l.AccountCode">@l.AccountCode @l.AccountName</a></td>
+                                    <td data-label="@L.T("مدين")">@(l.Debit != 0 ? WorkPages.Money(l.Debit) : "")</td>
+                                    <td data-label="@L.T("دائن")">@(l.Credit != 0 ? WorkPages.Money(l.Credit) : "")</td>
+                                    <td data-label="@L.T("البيان")">@l.LineText</td>
+                                    <td data-label="@L.T("مركز التكلفة")">@l.CostCenterName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <dl class="totals">
+                        <dt>@L.T("مدين")</dt><dd>@WorkPages.Money(entry.Entry.TotalDebit)</dd>
+                        <dt>@L.T("دائن")</dt><dd>@WorkPages.Money(entry.Entry.TotalCredit)</dd>
+                    </dl>
+                }
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">@L.T(message)</div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy;
+    private string denied = "", message = "", messageKind = "", kind = "";
+    private string? search;
+    private DateTime from = DateTime.Today.AddDays(1 - DateTime.Today.Day), to = DateTime.Today;
+    private List<JournalEntryRow> rows = [];
+    private List<(string Key, string Name)> kinds = [];
+    private JournalEntryView? entry;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmJournal");
+        allowed = denied.Length == 0;
+        if (allowed)
+        {
+            kinds = await Accounting.EntryKindsAsync(L.English);
+            await Load();
+        }
+    }
+
+    private async Task Load() => rows = await Accounting.EntriesAsync(from, to, kind, search, L.English);
+
+    private async Task Open(int id) => entry = await Accounting.EntryAsync(id, L.English);
+
+    private async Task Key(KeyboardEventArgs e, int id)
+    {
+        if (e.Key == "Enter")
+        {
+            await Open(id);
+        }
+    }
+
+    private async Task Sync()
+    {
+        busy = true;
+        try
+        {
+            var r = await Accounting.SyncAsync(UserInfo.Acting(user));
+            message = r.Ok ? WorkPages.JournalUpdated : r.Message;
+            messageKind = r.Ok ? "success" : "error";
+            await Load();
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+}

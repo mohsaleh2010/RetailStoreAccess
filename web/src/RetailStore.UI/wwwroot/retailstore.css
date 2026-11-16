@@ -99,6 +99,13 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .list tr:focus 
 .list tbody tr:hover, .list tr.selected { background: var(--selected); }
 .list tr.inactive td { color: var(--muted); text-decoration: line-through; }
 .list tr.low td { color: var(--danger); }
+.list tfoot th { text-align: start; border-top: 2px solid var(--line); }
+.statement tr.row-h td, .statement tr.row-c td, .statement tr.row-g td { font-weight: 700; }
+.statement tr.row-t td, .statement tr.row-r td { font-weight: 700; border-top: 1px solid var(--line); }
+.tile strong { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.tile .negative { color: var(--danger); }
+.dashboard { margin-bottom: 20px; }
+.stack { display: grid; gap: 16px; }
 
 .record { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
 .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }

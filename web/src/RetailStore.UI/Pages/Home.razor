@@ -1,6 +1,7 @@
 @page "/"
 @attribute [Authorize]
 @inject PermissionService Permissions
+@inject DashboardService Dashboard
 @inject UiLanguage L
 
 <PageTitle>@L.T("الرئيسية")</PageTitle>
@@ -11,7 +12,30 @@
             <h1>@L.T("مرحبًا") @UserInfo.Name(user)</h1>
             <p class="subtitle">@L.T("نسخة الويب: البيانات الأساسية والمبيعات على نفس قاعدة بيانات البرنامج")</p>
         </div>
+        <button class="btn" @onclick="LoadFigures">@L.T("تحديث")</button>
     </header>
+    @if (figures is { } f)
+    {
+        <div class="tiles dashboard">
+            <div class="tile"><span>@L.T("مبيعات اليوم")</span><strong>@Money(f.TodaySales)</strong><span>@f.TodayInvoices @L.T("فاتورة اليوم")</span></div>
+            <div class="tile">
+                <span>@L.T("مبيعات الشهر")</span><strong>@Money(f.MonthSales)</strong>
+                <span>@(f.Financial ? L.T("منها ضريبة") + " " + WorkPages.Money(f.MonthVAT ?? 0) : f.MonthInvoices + " " + L.T("فاتورة"))</span>
+            </div>
+            <div class="tile">
+                <span>@L.T("صافي ربح الشهر")</span><strong class="@((f.MonthNetProfit ?? 0) < 0 ? "negative" : "")">@Money(f.MonthNetProfit)</strong>
+                <span>@(f.Financial ? L.T("بعد المصروفات وفروقات المخزون") : L.T("يتطلب صلاحية الأرقام المالية"))</span>
+            </div>
+            <a class="tile" href="stock"><span>@L.T("أصناف تحت حد الطلب")</span><strong class="@(f.LowStockCount > 0 ? "negative" : "")">@f.LowStockCount</strong>
+                <span>@(f.LowStockCount > 0 ? L.T("اضغط لعرض الأصناف") : L.T("لا توجد نواقص"))</span></a>
+            <div class="tile"><span>@L.T("ديون العملاء")</span><strong>@Money(f.CustomerDebt)</strong><span>@f.DebtorCount @L.T("عميل عليه رصيد")</span></div>
+            <div class="tile"><span>@L.T("مستحق للموردين")</span><strong>@Money(f.SupplierDue)</strong></div>
+            <div class="tile"><span>@L.T("قيمة المخزون")</span><strong>@Money(f.StockValue)</strong><span>@L.T("بمتوسط التكلفة")</span></div>
+            <div class="tile"><span>@L.T("مصروفات الشهر")</span><strong>@Money(f.MonthExpenses)</strong><span>@L.T("بدون الضريبة")</span></div>
+            <div class="tile"><span>@L.T("النقدية في الصناديق")</span><strong>@Money(f.CashBalance)</strong></div>
+            <div class="tile"><span>@L.T("أرصدة البنوك")</span><strong>@Money(f.BankBalance)</strong><span>@L.T("من القيود")</span></div>
+        </div>
+    }
     <div class="tiles">
         @foreach (var s in screens)
         {
@@ -39,10 +63,23 @@
     private ClaimsPrincipal? user;
     private List<IScreenSpec> screens = [];
     private List<WorkPage> work = [];
+    private DashboardFigures? figures;
+
+    /// <summary>modDashboard.Money: the amount, or hidden without the financial figures.</summary>
+    private static string Money(decimal? v) => v is { } x ? WorkPages.Money(x) : "••••";
+
+    private async Task LoadFigures()
+    {
+        if (UserInfo.EmployeeId(user) > 0)
+        {
+            figures = await Dashboard.FiguresAsync(UserInfo.EmployeeId(user), DateTime.Today);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
+        await LoadFigures();
         foreach (var s in ScreenSpecs.All)
         {
             if (await Permissions.CanOpenScreenAsync(UserInfo.EmployeeId(user), s.Name))

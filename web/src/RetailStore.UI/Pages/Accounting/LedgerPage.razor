@@ -1,0 +1,122 @@
+@page "/ledger"
+@attribute [Authorize]
+@inject AccountingService Accounting
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("كشف حساب ودفتر الأستاذ")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("كشف حساب ودفتر الأستاذ")</h1>
+            <p class="subtitle">@L.T("رصيد أول المدة، ثم كل سطر قيد بالرصيد بعده")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
+            <select aria-label="@L.T("الحساب")" @bind="account" @bind:after="Load">
+                <option value="0">@L.T("اختر الحساب، ثم الفترة.")</option>
+                @foreach (var a in accounts)
+                {
+                    <option value="@a.AccountCode">@(new string(' ', (a.Level - 1) * 2))@a.AccountCode @a.AccountName</option>
+                }
+            </select>
+            <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+            <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+            <button type="submit" class="btn">@L.T("عرض")</button>
+        </form>
+
+        @if (ledger is not null)
+        {
+            <dl class="totals">
+                <dt>@L.T("رصيد أول المدة")</dt><dd>@L.T(AccountingService.BalanceText(ledger.Opening))</dd>
+                <dt>@L.T("مدين")</dt><dd>@WorkPages.Money(ledger.Debit)</dd>
+                <dt>@L.T("دائن")</dt><dd>@WorkPages.Money(ledger.Credit)</dd>
+                <dt class="grand">@L.T("الرصيد")</dt><dd class="grand">@L.T(AccountingService.BalanceText(ledger.Closing))</dd>
+            </dl>
+            <p class="hint">@ledger.LineCount @L.T("سطر قيد")@(ledger.IsMain ? "   (" + L.T("حساب رئيسي: يشمل كل حساباته التابعة") + ")" : "")</p>
+            <table class="list">
+                <thead>
+                    <tr>
+                        <th>@L.T("التاريخ")</th>
+                        <th>@L.T("القيد")</th>
+                        <th>@L.T("العملية")</th>
+                        <th>@L.T("المستند")</th>
+                        <th>@L.T("البيان")</th>
+                        <th>@L.T("الحساب")</th>
+                        <th>@L.T("مدين")</th>
+                        <th>@L.T("دائن")</th>
+                        <th>@L.T("الرصيد")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var l in ledger.Lines)
+                    {
+                        <tr>
+                            <td data-label="@L.T("التاريخ")">@l.LineDate.ToString("yyyy-MM-dd")</td>
+                            <td data-label="@L.T("القيد")">@l.EntryNo</td>
+                            <td data-label="@L.T("العملية")">@l.KindName</td>
+                            <td data-label="@L.T("المستند")">@l.DocNo</td>
+                            <td data-label="@L.T("البيان")">@l.Details</td>
+                            <td data-label="@L.T("الحساب")">@l.SubName</td>
+                            <td data-label="@L.T("مدين")">@(l.Debit != 0 ? WorkPages.Money(l.Debit) : "")</td>
+                            <td data-label="@L.T("دائن")">@(l.Credit != 0 ? WorkPages.Money(l.Credit) : "")</td>
+                            <td data-label="@L.T("الرصيد")">@L.T(AccountingService.BalanceText(l.Balance))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message error" role="status">@L.T(message)</div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    [SupplyParameterFromQuery(Name = "account")] public int? AccountParam { get; set; }
+    private bool allowed;
+    private string denied = "", message = "";
+    private int account;
+    private DateTime from = new(DateTime.Today.Year, 1, 1), to = DateTime.Today;
+    private List<AccountChoice> accounts = [];
+    private LedgerView? ledger;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmLedger");
+        allowed = denied.Length == 0;
+        if (allowed)
+        {
+            accounts = await Accounting.AccountsAsync(L.English);
+            account = AccountParam ?? 0;
+            await Load();
+        }
+    }
+
+    private async Task Load()
+    {
+        message = "";
+        ledger = null;
+        if (account == 0)
+        {
+            return;
+        }
+        message = AccountingService.PeriodProblem(from, to);
+        if (message.Length == 0)
+        {
+            ledger = await Accounting.LedgerAsync(account, from, to, L.English);
+        }
+    }
+}

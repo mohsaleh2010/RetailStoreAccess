@@ -266,6 +266,35 @@ class ApiTests(unittest.TestCase):
                  "CheckStockAsync", "ConfirmReceipt", "BeginTransactionAsync", "TtTransferOut", "TtTransferIn", "CommitAsync", "STOCK_TRANSFER_SEND"]
         self.assertEqual([send.index(x) for x in order], sorted(send.index(x) for x in order))
 
+    def test_messages_of_the_treasury_and_accounting_services_are_those_of_access(self):
+        """Plan 6E (docs/81): the C# of modCash / modBank / modLedger / modFinancials answers with the messages and names of
+        Access (the names of the cash movements and of the statement rows are those of tools/queries.py)."""
+        code = "".join(read(f"web/src/RetailStore.Data/Services/{f}.cs") for f in ("TreasuryService", "AccountingService"))
+        code = re.sub(r"//[^\n]*", "", code)                       # the comments quote Arabic outputs
+        vba = "".join(read(f"src/vba/{m}.bas") for m in ("modCash", "modBank", "modLedger", "modFinancials", "modClosing"))
+        vba_q = read("tools/queries.py")
+        messages = {m.replace("\\n", "") for m in re.findall(r'"([^"]*[\u0600-\u06FF][^"]*)"', code)}
+        self.assertGreater(len(messages), 60)
+        for m in messages:
+            with self.subTest(m):
+                self.assertTrue(m in vba or m in vba_q, m)
+
+    def test_the_cash_voucher_and_the_bank_transaction_follow_the_order_of_access(self):
+        code = read("web/src/RetailStore.Data/Services/TreasuryService.cs")
+        post = code[code.index("public async Task<TreasuryResult> PostCashVoucherAsync"):code.index("public async Task<List<CashVoucherRow>> VouchersAsync")]
+        order = ["\"CASH_BOX\"", "VoucherProblemAsync", "BoxUseProblemAsync", "CashBoxBalanceAsync", "BeginTransactionAsync", "NextNumberAsync(db, seq)",
+                 "\"EXPENSE\")", "ConfirmReceipt", "CommitAsync", "\"CASH_\" + v.VoucherType"]
+        self.assertEqual([post.index(x) for x in order], sorted(post.index(x) for x in order))
+        bank = code[code.index("public async Task<TreasuryResult> PostBankTxAsync"):code.index("public async Task<TreasuryResult> DeleteBankTxAsync")]
+        order = ["\"BANKS\"", "ScreenAction.Add", "BankTxProblemAsync", "\"BANK_TX\")", "LogAction", "SyncJournalAsync"]
+        self.assertEqual([bank.index(x) for x in order], sorted(bank.index(x) for x in order))
+        # every branch of qryCashMovements is read (its MoveType)
+        q = next(x for x in Q.QUERIES if x.name == "qryCashMovements").sql
+        for kind in re.findall(r"'([A-Z_]+)' AS MoveType|, '([A-Z_]+)', '", q):
+            k = kind[0] or kind[1]
+            with self.subTest(k):
+                self.assertIn(f'"{k}"', code)
+
     def test_tokens_are_safe(self):
         security = read(self.API + "ApiSecurity.cs")
         self.assertIn("SecurityAlgorithms.HmacSha256", security)

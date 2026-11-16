@@ -1,0 +1,95 @@
+@page "/trial-balance"
+@attribute [Authorize]
+@inject AccountingService Accounting
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("ميزان المراجعة")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("ميزان المراجعة")</h1>
+            <p class="subtitle">@L.T("رصيد أول المدة وحركة الفترة والرصيد الختامي لكل حساب")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
+            <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+            <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+            <button type="submit" class="btn">@L.T("عرض")</button>
+        </form>
+        <table class="list">
+            <thead>
+                <tr>
+                    <th>@L.T("الحساب")</th>
+                    <th>@L.T("رصيد أول المدة")</th>
+                    <th>@L.T("مدين")</th>
+                    <th>@L.T("دائن")</th>
+                    <th>@L.T("الرصيد الختامي")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in rows)
+                {
+                    <tr>
+                        <td data-label="@L.T("الحساب")"><a href="ledger?account=@r.AccountCode">@r.AccountCode @r.AccountName</a></td>
+                        <td data-label="@L.T("رصيد أول المدة")">@L.T(AccountingService.BalanceText(r.OpeningBalance))</td>
+                        <td data-label="@L.T("مدين")">@WorkPages.Money(r.PeriodDebit)</td>
+                        <td data-label="@L.T("دائن")">@WorkPages.Money(r.PeriodCredit)</td>
+                        <td data-label="@L.T("الرصيد الختامي")">@L.T(AccountingService.BalanceText(r.ClosingBalance))</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>@L.T("الإجمالي")</th>
+                    <th></th>
+                    <th>@WorkPages.Money(rows.Sum(r => r.PeriodDebit))</th>
+                    <th>@WorkPages.Money(rows.Sum(r => r.PeriodCredit))</th>
+                    <th>@L.T(AccountingService.BalanceText(rows.Sum(r => r.ClosingBalance)))</th>
+                </tr>
+            </tfoot>
+        </table>
+        @if (rows.Count == 0)
+        {
+            <p class="empty">@L.T("لا توجد سجلات")</p>
+        }
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message error" role="status">@L.T(message)</div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private bool allowed;
+    private string denied = "", message = "";
+    private DateTime from = new(DateTime.Today.Year, 1, 1), to = DateTime.Today;
+    private List<TrialBalanceRow> rows = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmLedger");
+        allowed = denied.Length == 0;
+        if (allowed)
+        {
+            await Load();
+        }
+    }
+
+    private async Task Load()
+    {
+        message = AccountingService.PeriodProblem(from, to);
+        rows = message.Length == 0 ? await Accounting.TrialBalanceAsync(from, to, L.English) : [];
+    }
+}

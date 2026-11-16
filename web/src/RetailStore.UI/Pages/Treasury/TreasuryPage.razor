@@ -1,0 +1,218 @@
+@page "/treasury"
+@attribute [Authorize]
+@inject TreasuryService Treasury
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("الخزينة")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("الخزينة")</h1>
+            <p class="subtitle">@L.T("رصيد كل صندوق وحركته، واستلام التحويلات بين الصناديق")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="stack">
+            <div class="list-pane">
+                <table class="list">
+                    <thead>
+                        <tr>
+                            <th>@L.T("الصندوق")</th>
+                            <th>@L.T("النوع")</th>
+                            <th>@L.T("الداخل")</th>
+                            <th>@L.T("الخارج")</th>
+                            <th>@L.T("الرصيد")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var b in boxes)
+                        {
+                            <tr tabindex="0" class="@(b.IsActive ? "" : "inactive") @(b.CashBoxID == boxId ? "selected" : "")" @onclick="() => Pick(b.CashBoxID)"
+                                @onkeydown="e => Key(e, b.CashBoxID)">
+                                <td data-label="@L.T("الصندوق")">@b.BoxName</td>
+                                <td data-label="@L.T("النوع")">@b.BoxTypeName</td>
+                                <td data-label="@L.T("الداخل")">@WorkPages.Money(b.TotalIn)</td>
+                                <td data-label="@L.T("الخارج")">@WorkPages.Money(b.TotalOut)</td>
+                                <td data-label="@L.T("الرصيد")">@WorkPages.Money(b.Balance)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <p class="hint">@L.T("إجمالي النقدية"): @WorkPages.Money(boxes.Sum(b => b.Balance))</p>
+
+                <h2>@L.T("تحويلات بانتظار الاستلام")</h2>
+                @if (pending.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+                else
+                {
+                    <table class="list">
+                        <thead>
+                            <tr>
+                                <th>@L.T("رقم السند")</th>
+                                <th>@L.T("التاريخ")</th>
+                                <th>@L.T("من")</th>
+                                <th>@L.T("إلى")</th>
+                                <th>@L.T("المبلغ")</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var v in pending)
+                            {
+                                <tr>
+                                    <td data-label="@L.T("رقم السند")">@v.VoucherNumber</td>
+                                    <td data-label="@L.T("التاريخ")">@v.VoucherDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td data-label="@L.T("من")">@v.BoxName</td>
+                                    <td data-label="@L.T("إلى")">@v.ToBoxName</td>
+                                    <td data-label="@L.T("المبلغ")">@WorkPages.Money(v.Amount)</td>
+                                    <td class="actions">
+                                        <button class="btn primary" disabled="@busy" @onclick="() => Receive(v.CashVoucherID)">@L.T("تأكيد الاستلام")</button>
+                                        <button class="btn" disabled="@busy" @onclick="() => Cancel(v.CashVoucherID)">@L.T("إلغاء التحويل")</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+
+            <div class="form-pane">
+                <h2>@L.T("حركة الصندوق") @boxName</h2>
+                <form class="list-tools" @onsubmit="LoadStatement" @onsubmit:preventDefault>
+                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+                    <button type="submit" class="btn">@L.T("عرض")</button>
+                </form>
+                <table class="list">
+                    <thead>
+                        <tr>
+                            <th>@L.T("التاريخ")</th>
+                            <th>@L.T("الحركة")</th>
+                            <th>@L.T("المستند")</th>
+                            <th>@L.T("الجهة")</th>
+                            <th>@L.T("داخل")</th>
+                            <th>@L.T("خارج")</th>
+                            <th>@L.T("الرصيد")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var m in statement)
+                        {
+                            <tr>
+                                <td data-label="@L.T("التاريخ")">@m.MoveDate.ToString(m.MoveType == "BALANCE_FWD" ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")</td>
+                                <td data-label="@L.T("الحركة")">@m.MoveTypeName</td>
+                                <td data-label="@L.T("المستند")">@m.DocNumber</td>
+                                <td data-label="@L.T("الجهة")">@m.PartyName</td>
+                                <td data-label="@L.T("داخل")">@(m.AmountIn != 0 ? WorkPages.Money(m.AmountIn) : "")</td>
+                                <td data-label="@L.T("خارج")">@(m.AmountOut != 0 ? WorkPages.Money(m.AmountOut) : "")</td>
+                                <td data-label="@L.T("الرصيد")">@WorkPages.Money(m.Balance)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">@L.T(message)</div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy;
+    private string denied = "", boxName = "", message = "", messageKind = "";
+    private int boxId;
+    private DateTime from = DateTime.Today, to = DateTime.Today;
+    private List<BoxBalance> boxes = [];
+    private List<BoxStatementLine> statement = [];
+    private List<CashVoucherRow> pending = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmTreasury");
+        allowed = denied.Length == 0;
+        if (allowed)
+        {
+            boxId = await Treasury.UserBoxAsync(UserInfo.EmployeeId(user));
+            await Load();
+        }
+    }
+
+    private async Task Load()
+    {
+        boxes = await Treasury.BoxBalancesAsync(L.English);
+        pending = await Treasury.VouchersAsync(DateTime.Today, DateTime.Today, 0, true, L.English);
+        await LoadStatement();
+    }
+
+    private async Task LoadStatement()
+    {
+        boxName = boxes.FirstOrDefault(b => b.CashBoxID == boxId)?.BoxName ?? "";
+        string p = AccountingService.PeriodProblem(from, to);
+        if (p.Length > 0)
+        {
+            message = p;
+            messageKind = "error";
+            return;
+        }
+        statement = boxId > 0 ? await Treasury.BoxStatementAsync(boxId, from, to, L.English) : [];
+    }
+
+    private async Task Pick(int id)
+    {
+        boxId = id;
+        await LoadStatement();
+    }
+
+    private async Task Key(KeyboardEventArgs e, int id)
+    {
+        if (e.Key == "Enter")
+        {
+            await Pick(id);
+        }
+    }
+
+    private async Task Receive(int id) => await Run(() => Treasury.ReceiveTransferAsync(UserInfo.Acting(user), id));
+
+    private async Task Cancel(int id) => await Run(() => Treasury.CancelTransferAsync(UserInfo.Acting(user), id));
+
+    private async Task Run(Func<Task<TreasuryResult>> action)
+    {
+        busy = true;
+        message = "";
+        try
+        {
+            var r = await action();
+            if (r.Status == SaveStatus.Saved)
+            {
+                message = WorkPages.TransferDone + r.Number;
+                messageKind = "success";
+                await Load();
+            }
+            else
+            {
+                message = r.Message;
+                messageKind = "error";
+            }
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+}

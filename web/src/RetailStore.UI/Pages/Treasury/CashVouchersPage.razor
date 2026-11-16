@@ -1,0 +1,210 @@
+@page "/cash-vouchers"
+@attribute [Authorize]
+@inject TreasuryService Treasury
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("سندات النقدية والتحويل")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("سندات النقدية والتحويل")</h1>
+            <p class="subtitle">@L.T("قبض وصرف نقدية من الصناديق، والتحويل بينها")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="pos">
+            <div class="list-pane">
+                <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
+                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+                    <button type="submit" class="btn">@L.T("عرض")</button>
+                </form>
+                <table class="list">
+                    <thead>
+                        <tr>
+                            <th>@L.T("رقم السند")</th>
+                            <th>@L.T("التاريخ")</th>
+                            <th>@L.T("النوع")</th>
+                            <th>@L.T("الصندوق")</th>
+                            <th>@L.T("المبلغ")</th>
+                            <th>@L.T("الجهة")</th>
+                            <th>@L.T("البيان")</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var r in rows)
+                        {
+                            <tr>
+                                <td data-label="@L.T("رقم السند")">@r.VoucherNumber</td>
+                                <td data-label="@L.T("التاريخ")">@r.VoucherDate.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td data-label="@L.T("النوع")">@L.T(WorkPages.VoucherTypeName(r.VoucherType))@(r.InTransit && r.ReceivedAt is null ? " (" + L.T("بالطريق") + ")" : "")</td>
+                                <td data-label="@L.T("الصندوق")">@r.BoxName@(r.ToBoxName is { } tb ? " ← " + tb : "")</td>
+                                <td data-label="@L.T("المبلغ")">@WorkPages.Money(r.Amount)</td>
+                                <td data-label="@L.T("الجهة")">@r.PartyName</td>
+                                <td data-label="@L.T("البيان")">@r.Description</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (rows.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+            </div>
+
+            <div class="form-pane">
+                <h2>@L.T("سند جديد")</h2>
+                <form class="record" @onsubmit="Save" @onsubmit:preventDefault>
+                    <div class="field">
+                        <label for="cv-type">@L.T("نوع السند") *</label>
+                        <select id="cv-type" @bind="voucherType" @bind:after="TypeChanged">
+                            @foreach (var t in new[] { "IN", "OUT", "TRANSFER" })
+                            {
+                                <option value="@t">@L.T(WorkPages.VoucherTypeName(t))</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="cv-box">@L.T("الصندوق") *</label>
+                        <select id="cv-box" @bind="boxId">
+                            @foreach (var b in boxes)
+                            {
+                                <option value="@b.Id">@b.Name (@WorkPages.Money(b.Balance))</option>
+                            }
+                        </select>
+                    </div>
+                    @if (voucherType == "TRANSFER")
+                    {
+                        <div class="field span-2">
+                            <label for="cv-to">@L.T("إلى الصندوق") *</label>
+                            <select id="cv-to" @bind="toBoxId">
+                                <option value="0"></option>
+                                @foreach (var b in boxes.Where(b => b.Id != boxId))
+                                {
+                                    <option value="@b.Id">@b.Name</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="field">
+                            <label for="cv-category">@L.T("البند") *</label>
+                            <select id="cv-category" @bind="category">
+                                @foreach (var c in voucherType == "IN" ? WorkPages.CashInCategories : WorkPages.CashOutCategories)
+                                {
+                                    <option value="@c.Key">@L.T(c.Name)</option>
+                                }
+                            </select>
+                        </div>
+                        @if (voucherType == "OUT" && category == "EXPENSE")
+                        {
+                            <div class="field">
+                                <label for="cv-expense">@L.T("نوع المصروف") *</label>
+                                <select id="cv-expense" @bind="expenseTypeId">
+                                    <option value="0"></option>
+                                    @foreach (var t in expenseTypes)
+                                    {
+                                        <option value="@t.Id">@t.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                    }
+                    <div class="field">
+                        <label for="cv-amount">@L.T("المبلغ") *</label>
+                        <input id="cv-amount" type="number" step="any" min="0" @bind="amount" />
+                    </div>
+                    @if (voucherType != "TRANSFER")
+                    {
+                        <div class="field">
+                            <label for="cv-party">@L.T("الجهة")</label>
+                            <input id="cv-party" type="text" maxlength="100" @bind="party" />
+                        </div>
+                    }
+                    <div class="field span-2">
+                        <label for="cv-desc">@L.T("البيان")</label>
+                        <input id="cv-desc" type="text" maxlength="255" @bind="description" />
+                    </div>
+                    <div class="actions span-2">
+                        <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ السند")</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">@L.T(message)</div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy;
+    private string denied = "", message = "", messageKind = "", voucherType = "IN", category = "OTHER";
+    private string? party, description;
+    private int boxId, toBoxId, expenseTypeId;
+    private decimal amount;
+    private DateTime from = DateTime.Today, to = DateTime.Today;
+    private List<CashVoucherRow> rows = [];
+    private List<(int Id, string Name, decimal Balance)> boxes = [];
+    private List<(int Id, string Name)> expenseTypes = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmCashVoucher");
+        allowed = denied.Length == 0;
+        if (!allowed)
+        {
+            return;
+        }
+        boxes = await Treasury.BoxesAsync(L.English);
+        expenseTypes = await Treasury.ExpenseTypesAsync(L.English);
+        boxId = await Treasury.UserBoxAsync(UserInfo.EmployeeId(user));
+        await Load();
+    }
+
+    private async Task Load() => rows = await Treasury.VouchersAsync(from, to, 0, false, L.English);
+
+    private void TypeChanged() => category = voucherType == "OUT" ? "EXPENSE" : "OTHER";
+
+    private async Task Save()
+    {
+        message = "";
+        busy = true;
+        try
+        {
+            var req = new CashVoucherRequest(voucherType, boxId, toBoxId == 0 ? null : toBoxId, voucherType == "TRANSFER" ? null : category, amount, party,
+                                             description, expenseTypeId == 0 ? null : expenseTypeId);
+            var r = await Treasury.PostCashVoucherAsync(UserInfo.Acting(user), req);
+            if (r.Status != SaveStatus.Saved)
+            {
+                message = r.Message;
+                messageKind = "error";
+                return;
+            }
+            message = WorkPages.VoucherSaved + r.Number;
+            messageKind = "success";
+            amount = 0;
+            party = description = null;
+            boxes = await Treasury.BoxesAsync(L.English);
+            await Load();
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+}

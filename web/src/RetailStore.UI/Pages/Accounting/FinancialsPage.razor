@@ -1,0 +1,115 @@
+@page "/financials"
+@attribute [Authorize]
+@inject AccountingService Accounting
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("القوائم المالية")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("القوائم المالية")</h1>
+            <p class="subtitle">@L.T("قائمة الدخل والميزانية من القيود، مع فترة المقارنة")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
+            <select aria-label="@L.T("القائمة")" @bind="kind" @bind:after="Load">
+                <option value="INCOME">@L.T("قائمة الدخل")</option>
+                <option value="BALANCE">@L.T("الميزانية")</option>
+            </select>
+            <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+            <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+            <button type="submit" class="btn">@L.T("عرض")</button>
+        </form>
+
+        @if (view is not null)
+        {
+            <div class="tiles">
+                @foreach (var f in view.Figures)
+                {
+                    <div class="tile">
+                        <span>@f.Caption</span>
+                        <strong class="@(f.Amount < 0 ? "negative" : "")">@WorkPages.Money(f.Amount)</strong>
+                    </div>
+                }
+            </div>
+            <p class="hint">@L.T("المقارنة"): @L.T("من") <bdi>@view.CompareFrom.ToString("yyyy-MM-dd")</bdi> @L.T("إلى") <bdi>@view.CompareTo.ToString("yyyy-MM-dd")</bdi></p>
+            <table class="list statement">
+                <thead>
+                    <tr>
+                        <th>@L.T("البند")</th>
+                        <th>@L.T("الفترة: الحساب")</th>
+                        <th>@L.T("الفترة: المجموع")</th>
+                        <th>@L.T("المقارنة: الحساب")</th>
+                        <th>@L.T("المقارنة: المجموع")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var r in view.Rows)
+                    {
+                        bool account = r.RowKind == "A";
+                        bool sum = r.RowKind is "S" or "T" or "R";
+                        <tr class="row-@r.RowKind.ToLowerInvariant()">
+                            <td data-label="@L.T("البند")">
+                                @if (r.LineAccount is { } code)
+                                {
+                                    <a href="ledger?account=@(code)">@r.Caption</a>
+                                }
+                                else
+                                {
+                                    @(r.RowKind == "S" ? L.T("إجمالي") + " " + r.Caption : r.Caption)
+                                }
+                            </td>
+                            <td data-label="@L.T("الفترة: الحساب")">@(account ? WorkPages.Money(r.CurrentValue ?? 0) : "")</td>
+                            <td data-label="@L.T("الفترة: المجموع")">@(sum ? WorkPages.Money(r.CurrentValue ?? 0) : "")</td>
+                            <td data-label="@L.T("المقارنة: الحساب")">@(account ? WorkPages.Money(r.PriorValue ?? 0) : "")</td>
+                            <td data-label="@L.T("المقارنة: المجموع")">@(sum ? WorkPages.Money(r.PriorValue ?? 0) : "")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message error" role="status">@L.T(message)</div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private bool allowed;
+    private string denied = "", message = "", kind = "INCOME";
+    private DateTime from = new(DateTime.Today.Year, 1, 1), to = DateTime.Today;
+    private StatementView? view;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmFinancials");
+        allowed = denied.Length == 0;
+        if (allowed)
+        {
+            await Load();
+        }
+    }
+
+    private async Task Load()
+    {
+        message = AccountingService.PeriodProblem(from, to);
+        view = null;
+        if (message.Length == 0)
+        {
+            view = kind == "BALANCE" ? await Accounting.BalanceSheetAsync(from, to, L.English) : await Accounting.IncomeStatementAsync(from, to, L.English);
+        }
+    }
+}
