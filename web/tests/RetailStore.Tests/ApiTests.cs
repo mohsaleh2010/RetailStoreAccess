@@ -433,7 +433,8 @@ public class ApiTests
         var doc = await Json(await c.GetAsync("/api/openapi/v1.json"));
         Assert.Equal("RetailStore API", doc.GetProperty("info").GetProperty("title").GetString());
         Assert.True(doc.GetProperty("components").GetProperty("securitySchemes").TryGetProperty("Bearer", out _));
-        var open = new HashSet<string> { "/api/v1/auth/token", "/api/v1/auth/password", "/api/v1/me", "/api/v1/rep/profile" };
+        var open = new HashSet<string> { "/api/v1/auth/token", "/api/v1/auth/password", "/api/v1/me", "/api/v1/rep/profile",
+                                         "/api/v1/dashboard" };
         int operations = 0;
         foreach (var path in doc.GetProperty("paths").EnumerateObject())
         {
@@ -446,7 +447,7 @@ public class ApiTests
                 Assert.Equal(path.Name != "/api/v1/auth/token", op.Value.TryGetProperty("security", out _));
             }
         }
-        Assert.Equal(3 + 4 * 6 + 13 + 6 + 6 + 10, operations);
+        Assert.Equal(3 + 4 * 6 + 13 + 6 + 6 + 10 + 19, operations);
         Assert.Equal(HttpStatusCode.OK, (await c.GetAsync("/api/docs")).StatusCode);
     }
 }

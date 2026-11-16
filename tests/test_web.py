@@ -288,9 +288,10 @@ class ApiTests(unittest.TestCase):
 
     def test_every_operation_has_its_permission(self):
         """Each mapped operation of the secured group names its permission (.Needs), except the user's own ones."""
-        own = {"/auth/token", "/auth/password", "/me", "/profile"}
+        own = {"/auth/token", "/auth/password", "/me", "/profile", "/dashboard"}
         names = sorted(f for f in os.listdir(os.path.join(ROOT, self.API)) if f.endswith("Api.cs") or f == "ApiEndpoints.cs")
-        self.assertTrue({"ApiEndpoints.cs", "RepApi.cs", "SalesApi.cs", "PurchaseApi.cs", "StockApi.cs"} <= set(names))
+        self.assertTrue({"ApiEndpoints.cs", "RepApi.cs", "SalesApi.cs", "PurchaseApi.cs", "StockApi.cs",
+                "TreasuryApi.cs"} <= set(names))
         for name in names:
             code = read(self.API + name)
             for m in re.finditer(r'\.Map(Get|Post|Put|Delete)\("([^"]*)"', code):
