@@ -75,7 +75,7 @@
 | `web/src/RetailStore.UI/Pages/Treasury/`، `Pages/Accounting/`، `Pages/Home.razor` | الشاشات: `TreasuryPage`، و`CashVouchersPage`، و`BankTxPage`، و`JournalPage`، و`LedgerPage`، و`TrialBalancePage`، و`FinancialsPage`، ولوحة التحكم؛ وسطورها في `WorkPages` بصلاحية شاشة Access (`frmTreasury`، و`frmCashVoucher`، و`frmBankTx`، و`frmJournal`، و`frmLedger`، و`frmFinancials`) |
 
 - **قاعدة التجربة SQLite** تُبنى الآن بمستويات شجرة الحسابات (`EnsureAccountsAsync`)، كما يفعل `BuildSchema` في Access، فالكشوف والقوائم تعمل عليها.
-- **تحديث القيود من الويب** يحتاج قاعدة SQL Server بعروض `docs/71`؛ على قاعدة التجربة SQLite يرد برسالة «تعذر تحديث القيود» ولا يتوقف شيء.
+- **تحديث القيود من الويب** يقرأ عروض SQL Server من `docs/71`. على قاعدة التجربة SQLite صار يعمل أيضًا منذ 6و (`docs/82`): استعلامات Access المحفوظة صارت عروضًا فيها.
 - **القواعد** نفسها: الفحوص وترتيبها ورسائلها من VBA (`test_web` يقارن رسائل `TreasuryService` و`AccountingService` بـ `modCash` و`modBank` و`modLedger` و`modFinancials` و`tools/queries.py`، وترتيب خطوات السند والحركة البنكية، وأن كل فرع من `qryCashMovements` مقروء).
 
 ## 8) طريقة الاختبار
@@ -102,5 +102,5 @@
 
 ## 9) ما لم يُبنَ بعد
 - **تصفية يومية الكاشير** (`PostCashClosing`)، و**سلفة الموظف وصرف العمولة** من سند النقدية، و**التسوية البنكية**، و**القيد اليدوي**، و**الشيكات**، و**إقفال السنة**: تبقى في Access.
-- **المؤشرات المالية** الأربعة في لوحة التحكم (هامش الربح، ودوران المخزون، ومدة التحصيل، ونسبة التداول: `modIndicators`)، و**مركز التقارير** بتقاريره التشغيلية (المبيعات اليومية، والأرباح، وأعمار الديون، والإقرار الضريبي …): المرحلة التالية إن أردت، أو تبقى في Access.
+- **المؤشرات المالية** و**مركز التقارير**: بُنيا في 6و (`docs/82`).
 - طباعة الكشوف والقوائم من الويب (تُطبع من المتصفح الآن).

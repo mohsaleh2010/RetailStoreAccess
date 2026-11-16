@@ -1,3 +1,6 @@
+using System.Net;
+using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using RetailStore.Data.Entities;
 using RetailStore.Data.Journal;
@@ -210,5 +213,28 @@ public class ReportsTests
         Assert.Equal(10m, statement[5].Value(row));
         Assert.Equal(("1,234.50", "12.5%", "3", "1,234.568"), (ReportRow.Cell(1234.5m, "money"), ReportRow.Cell(0.125, "pct"),
                      ReportRow.Cell(3L, "int"), ReportRow.Cell(1234.5678m, "qty")));
+    }
+
+    [Fact]
+    public async Task The_api_lists_and_runs_the_reports_and_gives_the_indicators()
+    {
+        await using var host = new ApiHost();
+        var client = await host.AdminAsync();
+        var list = await client.GetFromJsonAsync<JsonElement>("/api/v1/reports");
+        Assert.Equal(ReportCatalog.All.Count, list.GetArrayLength());
+        var stock = await client.GetFromJsonAsync<JsonElement>("/api/v1/reports/STOCK");
+        Assert.Equal("المخزون الحالي", stock.GetProperty("title").GetString());
+        Assert.True(stock.GetProperty("columns").GetArrayLength() > 3);
+        var r = await client.GetAsync("/api/v1/reports/CUSTOMER_STATEMENT?from=2026-01-01&to=2026-01-31");
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, r.StatusCode);
+        Assert.Equal("اختر العميل.", (await r.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("title").GetString());
+        Assert.Equal(HttpStatusCode.NotFound, (await client.GetAsync("/api/v1/reports/NONE")).StatusCode);
+        var request = new HttpRequestMessage(HttpMethod.Get, "/api/v1/reports/DAILY_SALES?from=2026-01-01&to=2026-01-31");
+        request.Headers.AcceptLanguage.ParseAdd("en");
+        var en = await (await client.SendAsync(request)).Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal("Daily sales", en.GetProperty("title").GetString());
+        var ind = await client.GetFromJsonAsync<JsonElement>("/api/v1/dashboard/indicators?refresh=true");
+        Assert.True(ind.GetProperty("financial").GetBoolean());
+        Assert.Equal(4, ind.GetProperty("cards").GetArrayLength());
     }
 }

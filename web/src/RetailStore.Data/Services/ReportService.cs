@@ -9,6 +9,10 @@ namespace RetailStore.Data.Services;
 public sealed record ReportChoices(DateTime? From = null, DateTime? To = null, int? CustomerId = null, int? SupplierId = null,
                                    int? ProductId = null, int? WarehouseId = null, int? CashBoxId = null, int? ExpenseTypeId = null);
 
+/// <summary>The lists of the combo boxes of the report centre.</summary>
+public sealed record ReportLists(List<(int Id, string Name)> Customers, List<(int Id, string Name)> Suppliers, List<(int Id, string Name)> Products,
+                                 List<(int Id, string Name)> Warehouses, List<(int Id, string Name)> CashBoxes, List<(int Id, string Name)> ExpenseTypes);
+
 /// <summary>A report run: its records in the order of the report, the line printed under its title (Criteria), the message
 /// that stopped it, and a warning that did not (the journal update).</summary>
 public sealed record ReportResult(ReportDef? Report, List<ReportRow> Rows, string Criteria, string Message, string Warning)
@@ -264,6 +268,42 @@ public sealed class ReportService(IDbContextFactory<RetailDbContext> factory, Pe
             }
         }
         return criteria.Trim();
+    }
+
+    /// <summary>The combo boxes of frmReportCenter: active customers, suppliers, products, warehouses, cash boxes, expense types.</summary>
+    public async Task<ReportLists> ListsAsync(bool english)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        static string Pick(string ar, string? en, bool english) => english && !string.IsNullOrWhiteSpace(en) ? en : ar;
+        var customers = (await db.Customers.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.CustomerName)
+            .Select(x => new { x.CustomerID, x.CustomerName, x.CustomerNameEn }).ToListAsync())
+            .Select(x => (x.CustomerID, Pick(x.CustomerName, x.CustomerNameEn, english))).ToList();
+        var suppliers = (await db.Suppliers.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.SupplierName)
+            .Select(x => new { x.SupplierID, x.SupplierName, x.SupplierNameEn }).ToListAsync())
+            .Select(x => (x.SupplierID, Pick(x.SupplierName, x.SupplierNameEn, english))).ToList();
+        var products = (await db.Products.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.ProductName)
+            .Select(x => new { x.ProductID, x.ProductCode, x.ProductName }).ToListAsync())
+            .Select(x => (x.ProductID, x.ProductCode + " - " + x.ProductName)).ToList();
+        var warehouses = (await db.Warehouses.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.WarehouseID)
+            .Select(x => new { x.WarehouseID, x.WarehouseName, x.WarehouseNameEn }).ToListAsync())
+            .Select(x => (x.WarehouseID, Pick(x.WarehouseName, x.WarehouseNameEn, english))).ToList();
+        var boxes = (await db.CashBoxes.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.CashBoxID)
+            .Select(x => new { x.CashBoxID, x.BoxName, x.BoxNameEn }).ToListAsync())
+            .Select(x => (x.CashBoxID, Pick(x.BoxName, x.BoxNameEn, english))).ToList();
+        var types = (await db.ExpenseTypes.AsNoTracking().Where(x => x.IsActive).OrderBy(x => x.ExpenseTypeName)
+            .Select(x => new { x.ExpenseTypeID, x.ExpenseTypeName, x.ExpenseTypeNameEn }).ToListAsync())
+            .Select(x => (x.ExpenseTypeID, Pick(x.ExpenseTypeName, x.ExpenseTypeNameEn, english))).ToList();
+        return new ReportLists(customers, suppliers, products, warehouses, boxes, types);
+    }
+
+    /// <summary>modFiscal.FiscalPeriodOf: the fiscal period of a day, else its calendar year (the quick periods of the centre).</summary>
+    public async Task<(DateTime Start, DateTime End)> FiscalPeriodOfAsync(DateTime day)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var d = day.Date;
+        var p = await db.FiscalPeriods.AsNoTracking().Where(x => x.StartDate <= d && x.EndDate >= d)
+            .Select(x => new { x.StartDate, x.EndDate }).FirstOrDefaultAsync();
+        return p is null ? (new DateTime(d.Year, 1, 1), new DateTime(d.Year, 12, 31)) : (p.StartDate.Date, p.EndDate.Date);
     }
 
     public static string DateText(DateTime d) => d.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);

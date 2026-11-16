@@ -447,7 +447,7 @@ public class ApiTests
                 Assert.Equal(path.Name != "/api/v1/auth/token", op.Value.TryGetProperty("security", out _));
             }
         }
-        Assert.Equal(3 + 4 * 6 + 13 + 6 + 6 + 10 + 19, operations);
+        Assert.Equal(3 + 4 * 6 + 13 + 6 + 6 + 10 + 19 + 3, operations);
         Assert.Equal(HttpStatusCode.OK, (await c.GetAsync("/api/docs")).StatusCode);
     }
 }

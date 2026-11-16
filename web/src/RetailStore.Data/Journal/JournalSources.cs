@@ -37,7 +37,7 @@ public sealed class ServerViewJournalReader : IJournalSourceReader
         await using var cmd = cn.CreateCommand();
         cmd.Transaction = db.Database.CurrentTransaction?.GetDbTransaction();
         cmd.CommandText = "SELECT SourceType, SourceID, SourceNumber, SourceDate, Party, LineOrder, AccountCode, Debit, Credit, " +
-                          "LineText, CostCenter FROM " + (sqlite ? "[" + view + "]" : "[dbo].[" + view + "]");
+                          "LineText, CostCenter " + (sqlite ? "FROM [" + view + "]" : "FROM [dbo].[" + view + "]");
         var list = new List<JournalSourceLine>();
         await using var r = await cmd.ExecuteReaderAsync();
         while (await r.ReadAsync())

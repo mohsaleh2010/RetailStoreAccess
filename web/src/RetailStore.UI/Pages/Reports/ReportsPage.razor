@@ -1,0 +1,278 @@
+@page "/reports"
+@attribute [Authorize]
+@using RetailStore.Data.Reports
+@inject ReportService Reports
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+<PageTitle>@L.T("مركز التقارير")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head no-print">
+        <div>
+            <h1>@L.T("مركز التقارير")</h1>
+            <p class="subtitle">@L.T("تقارير البرنامج كلها من استعلاماته: المبيعات والمخزون والخزينة والحسابات")</p>
+        </div>
+        @if (result is { Ok: true } && result.Report is { Link.Length: 0 })
+        {
+            <div class="actions">
+                <button class="btn" onclick="window.print()">@L.T("طباعة")</button>
+                <a class="btn" href="@CsvLink()" download="@(result.Report.Key + ".csv")">@L.T("تصدير إلى Excel")</a>
+            </div>
+        }
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <form class="report-choices no-print" @onsubmit="Run" @onsubmit:preventDefault>
+            <div class="field span-2">
+                <label for="report">@L.T("التقرير")</label>
+                <select id="report" @bind="key" @bind:after="Selected">
+                    <option value="">@L.T("اختر تقريرًا من القائمة")</option>
+                    @foreach (var r in ReportCatalog.All)
+                    {
+                        <option value="@r.Key">@L.T(r.Title)</option>
+                    }
+                </select>
+                <span class="hint">@L.T(ReportService.NeedsHint(current))</span>
+            </div>
+            @if (current?.Dated == true)
+            {
+                <div class="field"><label for="from">@L.T("من")</label><input id="from" type="date" @bind="from" /></div>
+                <div class="field"><label for="to">@L.T("إلى")</label><input id="to" type="date" @bind="to" /></div>
+                <div class="field span-2 quick">
+                    <button type="button" class="btn" @onclick="@(() => Quick("TODAY"))">@L.T("اليوم")</button>
+                    <button type="button" class="btn" @onclick="@(() => Quick("MONTH"))">@L.T("هذا الشهر")</button>
+                    <button type="button" class="btn" @onclick="@(() => Quick("LASTMONTH"))">@L.T("الشهر الماضي")</button>
+                    <button type="button" class="btn" @onclick="@(() => Quick("YEAR"))">@L.T("هذه السنة")</button>
+                </div>
+            }
+            @if (lists is { } x && current is { } sel)
+            {
+                @if (sel.Has('C') || sel.Has('c'))
+                {
+                    <div class="field"><label for="customer">@L.T("العميل")</label>
+                        <select id="customer" @bind="customerId"><option value="">@(sel.Has('C') ? L.T("اختر العميل") : L.T("الكل"))</option>
+                            @foreach (var o in x.Customers) { <option value="@o.Id">@o.Name</option> }</select></div>
+                }
+                @if (sel.Has('S') || sel.Has('s'))
+                {
+                    <div class="field"><label for="supplier">@L.T("المورد")</label>
+                        <select id="supplier" @bind="supplierId"><option value="">@(sel.Has('S') ? L.T("اختر المورد") : L.T("الكل"))</option>
+                            @foreach (var o in x.Suppliers) { <option value="@o.Id">@o.Name</option> }</select></div>
+                }
+                @if (sel.Has('R') || sel.Has('r'))
+                {
+                    <div class="field"><label for="product">@L.T("المنتج")</label>
+                        <select id="product" @bind="productId"><option value="">@(sel.Has('R') ? L.T("اختر المنتج") : L.T("الكل"))</option>
+                            @foreach (var o in x.Products) { <option value="@o.Id">@o.Name</option> }</select></div>
+                }
+                @if (sel.Has('W') || sel.Has('w'))
+                {
+                    <div class="field"><label for="warehouse">@L.T("المخزن")</label>
+                        <select id="warehouse" @bind="warehouseId"><option value="">@L.T("كل المخازن")</option>
+                            @foreach (var o in x.Warehouses) { <option value="@o.Id">@o.Name</option> }</select></div>
+                }
+                @if (sel.Has('b'))
+                {
+                    <div class="field"><label for="box">@L.T("الصندوق")</label>
+                        <select id="box" @bind="cashBoxId"><option value="">@L.T("كل الصناديق")</option>
+                            @foreach (var o in x.CashBoxes) { <option value="@o.Id">@o.Name</option> }</select></div>
+                }
+                @if (sel.Has('e'))
+                {
+                    <div class="field"><label for="etype">@L.T("نوع المصروف")</label>
+                        <select id="etype" @bind="expenseTypeId"><option value="">@L.T("الكل")</option>
+                            @foreach (var o in x.ExpenseTypes) { <option value="@o.Id">@o.Name</option> }</select></div>
+                }
+            }
+            <div class="span-2">
+                <button type="submit" class="btn primary" disabled="@(current is null || busy)">@L.T("عرض التقرير")</button>
+            </div>
+        </form>
+
+        @if (message.Length > 0)
+        {
+            <div class="message error" role="alert">@L.T(message)</div>
+        }
+        @if (result is { Ok: true, Report: { } rep })
+        {
+            @if (result.Warning.Length > 0)
+            {
+                <div class="message error" role="status">@L.T(result.Warning)</div>
+            }
+            <article class="report">
+                <h2>@L.T(rep.Title)</h2>
+                @if (result.Criteria.Length > 0)
+                {
+                    <p class="subtitle">@L.T(result.Criteria)</p>
+                }
+                @if (rep.Link.Length > 0)
+                {
+                    <p>@L.T("يُعرض هذا التقرير في صفحة القوائم المالية مع فترة المقارنة.")</p>
+                    <a class="btn primary" href="@rep.Link">@L.T("القوائم المالية")</a>
+                }
+                else if (result.Rows.Count == 0)
+                {
+                    <p class="empty">@L.T(rep.NoData)</p>
+                }
+                else if (rep.Card.Count > 0)
+                {
+                    <table class="list card-report">
+                        <tbody>
+                            @foreach (var cr in rep.Card)
+                            {
+                                <tr class="@(cr.Bold ? "bold" : "")">
+                                    <th>@L.T(cr.Caption)</th>
+                                    <td class="num">@ReportRow.Cell(cr.Value(result.Rows[0]), cr.Format)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    @if (rep.Note.Length > 0)
+                    {
+                        <p class="hint">@L.T(rep.Note)</p>
+                    }
+                }
+                else
+                {
+                    <div class="table-wrap">
+                        <table class="list report-table">
+                            <thead>
+                                <tr>
+                                    @foreach (var c in rep.Columns)
+                                    {
+                                        <th class="@(c.Format.Length > 0 ? "num" : "")">@L.T(c.Caption)</th>
+                                    }
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int i = 0; i < result.Rows.Count; i++)
+                                {
+                                    int row = i;
+                                    <tr>
+                                        @for (int col = 0; col < rep.Columns.Count; col++)
+                                        {
+                                            var c = rep.Columns[col];
+                                            <td data-label="@L.T(c.Caption)" class="@(c.Format.Length > 0 ? "num" : "")">@ReportService.CellText(rep, result.Rows, running!, row, col)</td>
+                                        }
+                                    </tr>
+                                }
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    @for (int col = 0; col < rep.Columns.Count; col++)
+                                    {
+                                        var c = rep.Columns[col];
+                                        <th class="num">@(c.Total ? ReportService.TotalText(rep, result.Rows, col) : col == 0 ? L.T("الإجمالي") + " (" + result.Rows.Count + ")" : "")</th>
+                                    }
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    @if (rep.Summary.Count > 0)
+                    {
+                        <table class="list summary">
+                            <tbody>
+                                @foreach (var sm in rep.Summary)
+                                {
+                                    <tr><th>@L.T(sm.Caption)</th><td class="num">@ReportRow.Cell(sm.Value(result.Rows), "money")</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                }
+            </article>
+        }
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    [SupplyParameterFromQuery(Name = "report")] public string? ReportParam { get; set; }
+    [SupplyParameterFromQuery(Name = "product")] public int? ProductParam { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy;
+    private string denied = "", message = "", key = "";
+    private ReportDef? current;
+    private ReportLists? lists;
+    private ReportResult? result;
+    private decimal?[,]? running;
+    private DateTime from = new(DateTime.Today.Year, DateTime.Today.Month, 1), to = DateTime.Today;
+    private int? customerId, supplierId, productId, warehouseId, cashBoxId, expenseTypeId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmReportCenter");
+        allowed = denied.Length == 0;
+        if (!allowed)
+        {
+            return;
+        }
+        lists = await Reports.ListsAsync(L.English);
+        if (ReportCatalog.Find(ReportParam) is { } r)          // a report chosen by the caller ("KEY|ProductID" in Access)
+        {
+            key = r.Key;
+            Selected();
+            if (ProductParam is > 0)
+            {
+                productId = ProductParam;
+                from = (await Reports.FiscalPeriodOfAsync(DateTime.Today)).Start;   // a card covers the year so far
+            }
+        }
+    }
+
+    private void Selected()
+    {
+        current = ReportCatalog.Find(key);
+        result = null;
+        message = "";
+    }
+
+    private async Task Quick(string which)
+    {
+        var d = DateTime.Today;
+        switch (which)
+        {
+            case "TODAY":
+                (from, to) = (d, d);
+                break;
+            case "MONTH":
+                (from, to) = (new DateTime(d.Year, d.Month, 1), d);
+                break;
+            case "LASTMONTH":
+                var first = new DateTime(d.Year, d.Month, 1);
+                (from, to) = (first.AddMonths(-1), first.AddDays(-1));
+                break;
+            default:
+                from = (await Reports.FiscalPeriodOfAsync(d)).Start;
+                to = d;
+                break;
+        }
+    }
+
+    private async Task Run()
+    {
+        busy = true;
+        try
+        {
+            result = await Reports.RunAsync(UserInfo.Acting(user), key, new ReportChoices(from, to, customerId, supplierId, productId, warehouseId,
+                                                                                         cashBoxId, expenseTypeId), L.English);
+            message = result.Message;
+            running = result.Report is { } r && result.Ok ? ReportService.Running(r, result.Rows) : null;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    /// <summary>The report as a CSV file for Excel (UTF-8 with its BOM), in the language of the page.</summary>
+    private string CsvLink() =>
+        result?.Report is { } r ? "data:text/csv;charset=utf-8," + Uri.EscapeDataString("﻿" + ReportService.Csv(r, result.Rows, L.T)) : "";
+}

@@ -105,6 +105,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .list tr:focus 
 .tile strong { font-size: 1.3rem; font-variant-numeric: tabular-nums; }
 .tile .negative { color: var(--danger); }
 .dashboard { margin-bottom: 20px; }
+.section-title { font-size: 1.05rem; margin: 4px 0 10px; color: var(--muted); }
 .stack { display: grid; gap: 16px; }
 
 .record { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
@@ -118,6 +119,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .list tr:focus 
 
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .btn { padding: 8px 16px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--text); cursor: pointer; font: inherit; }
+a.btn { text-decoration: none; display: inline-block; }
 .btn.primary { background: var(--primary); border-color: var(--primary); color: var(--primary-text); }
 .btn.danger { color: var(--danger); border-color: var(--danger); }
 .btn.link { border: 0; background: none; color: var(--primary); padding: 4px 0; }
@@ -185,9 +187,26 @@ input:focus, select:focus, textarea:focus, button:focus-visible, .list tr:focus 
     .invoice-head { flex-direction: column-reverse; }
 }
 
+/* the report centre (docs/82) */
+.report-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-bottom: 16px; }
+.report-choices .quick { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+.report h2 { margin: 8px 0 4px; }
+.table-wrap { overflow-x: auto; }
+.list .num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.report-table td { white-space: pre-wrap; }
+.list.card-report, .list.summary { max-width: 640px; margin-top: 12px; }
+.list.card-report tr.bold th, .list.card-report tr.bold td { font-weight: 700; }
+.tile.ind-danger strong { color: var(--danger); }
+.tile.ind-warning strong { color: var(--warning); }
+.tile.ind-success strong { color: var(--success); }
+.tile.ind-muted strong { color: var(--muted); }
+@media (max-width: 640px) { .report-choices { grid-template-columns: 1fr; } }
+
 @media print {
     .topbar, .sidebar, .no-print, #blazor-error-ui { display: none !important; }
     .app { display: block; }
     .content { padding: 0; }
     .invoice { border: 0; max-width: none; }
+    .table-wrap { overflow: visible; }
+    .report-table { font-size: 9pt; }
 }

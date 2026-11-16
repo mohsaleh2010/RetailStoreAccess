@@ -2,6 +2,7 @@
 @attribute [Authorize]
 @inject PermissionService Permissions
 @inject DashboardService Dashboard
+@inject IndicatorsService Indicators
 @inject UiLanguage L
 
 <PageTitle>@L.T("الرئيسية")</PageTitle>
@@ -12,7 +13,7 @@
             <h1>@L.T("مرحبًا") @UserInfo.Name(user)</h1>
             <p class="subtitle">@L.T("نسخة الويب: البيانات الأساسية والمبيعات على نفس قاعدة بيانات البرنامج")</p>
         </div>
-        <button class="btn" @onclick="LoadFigures">@L.T("تحديث")</button>
+        <button class="btn" @onclick="Refresh">@L.T("تحديث")</button>
     </header>
     @if (figures is { } f)
     {
@@ -35,6 +36,25 @@
             <div class="tile"><span>@L.T("النقدية في الصناديق")</span><strong>@Money(f.CashBalance)</strong></div>
             <div class="tile"><span>@L.T("أرصدة البنوك")</span><strong>@Money(f.BankBalance)</strong><span>@L.T("من القيود")</span></div>
         </div>
+    }
+    @if (indicators is { } ind)
+    {
+        @* the financial indicators (modIndicators, docs/34 and docs/82): from the journal, like the financial statements *@
+        <h2 class="section-title">@L.T("المؤشرات المالية")</h2>
+        <div class="tiles dashboard indicators">
+            <a class="tile ind-@ind.Cards[0].Tone" href="financials"><span>@L.T("هامش الربح الإجمالي (الشهر)")</span>
+                <strong>@L.T(ind.Cards[0].Value)</strong><span>@L.T(ind.Cards[0].Sub)</span></a>
+            <a class="tile ind-@ind.Cards[1].Tone" href="reports?report=STOCK"><span>@L.T("دوران المخزون (12 شهرًا)")</span>
+                <strong>@L.T(ind.Cards[1].Value)</strong><span>@L.T(ind.Cards[1].Sub)</span></a>
+            <a class="tile ind-@ind.Cards[2].Tone" href="reports?report=CUSTOMER_BALANCES"><span>@L.T("متوسط فترة التحصيل")</span>
+                <strong>@L.T(ind.Cards[2].Value)</strong><span>@L.T(ind.Cards[2].Sub)</span></a>
+            <a class="tile ind-@ind.Cards[3].Tone" href="financials"><span>@L.T("نسبة السيولة (التداول)")</span>
+                <strong>@L.T(ind.Cards[3].Value)</strong><span>@L.T(ind.Cards[3].Sub)</span></a>
+        </div>
+        @if (ind.JournalMessage.Length > 0)
+        {
+            <p class="hint">@L.T(ind.JournalMessage)</p>
+        }
     }
     <div class="tiles">
         @foreach (var s in screens)
@@ -64,17 +84,23 @@
     private List<IScreenSpec> screens = [];
     private List<WorkPage> work = [];
     private DashboardFigures? figures;
+    private IndicatorsView? indicators;
 
     /// <summary>modDashboard.Money: the amount, or hidden without the financial figures.</summary>
     private static string Money(decimal? v) => v is { } x ? WorkPages.Money(x) : "••••";
 
-    private async Task LoadFigures()
+    private async Task LoadFigures(bool force = false)
     {
         if (UserInfo.EmployeeId(user) > 0)
         {
             figures = await Dashboard.FiguresAsync(UserInfo.EmployeeId(user), DateTime.Today);
+            var ind = await Indicators.IndicatorsAsync(UserInfo.Acting(user), DateTime.Today, force);
+            indicators = ind.Financial ? ind : null;          // without DASHBOARD_FINANCIAL the cards are not shown
         }
     }
+
+    /// <summary>The Refresh button: the indicators are computed again at once (not from the 10 minutes kept).</summary>
+    private Task Refresh() => LoadFigures(true);
 
     protected override async Task OnInitializedAsync()
     {

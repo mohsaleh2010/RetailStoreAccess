@@ -4,7 +4,7 @@ namespace RetailStore.UI.Services;
 /// caption and subtitle.</summary>
 public sealed record WorkPage(string Route, string FormName, string Caption, string Subtitle);
 
-/// <summary>The work screens of the web (plan 6C, docs/79; plan 6D, docs/80; plan 6E, docs/81), in the menu after the data
+/// <summary>The work screens of the web (plan 6C, docs/79; plan 6D, docs/80; plan 6E, docs/81; plan 6F, docs/82), in the menu after the data
 /// screens.</summary>
 public static class WorkPages
 {
@@ -25,6 +25,7 @@ public static class WorkPages
         new("ledger", "frmLedger", "كشف حساب ودفتر الأستاذ", "رصيد أول المدة، ثم كل سطر قيد بالرصيد بعده"),
         new("trial-balance", "frmLedger", "ميزان المراجعة", "رصيد أول المدة وحركة الفترة والرصيد الختامي لكل حساب"),
         new("financials", "frmFinancials", "القوائم المالية", "قائمة الدخل والميزانية من القيود، مع فترة المقارنة"),
+        new("reports", "frmReportCenter", "مركز التقارير", "تقارير البرنامج كلها من استعلاماته: المبيعات والمخزون والخزينة والحسابات"),
     ];
 
     /// <summary>The name of a ZatcaStatus, as EInvoiceReportQuery shows it (tools/queries.py).</summary>

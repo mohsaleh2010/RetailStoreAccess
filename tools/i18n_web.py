@@ -18,6 +18,13 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    # plan 6F (docs/82): the financial indicators and the report centre on the web
+    'التقرير': 'Report',
+    'المؤشرات المالية': 'Financial indicators',
+    'تصدير إلى': 'Export to',
+    'تقارير البرنامج كلها من استعلاماته: المبيعات والمخزون والخزينة والحسابات': 'Every report of the program from its queries: sales, stock, treasury and accounts',
+    'مجمل الربح ± فروقات المخزون − المصروفات. الرصيد الافتتاحي لا يدخل في الربح': 'Gross profit plus or minus stock differences less expenses. The opening balance is not part of the profit',
+    'يُعرض هذا التقرير في صفحة القوائم المالية مع فترة المقارنة': 'This report is shown on the financial statements page with its comparison period',
     'آخر مزامنة': 'Last sync',
     'أرصدة عملائي': 'Balances of my customers',
     'أضف أسطر الطلبية': 'Add the lines of the order',

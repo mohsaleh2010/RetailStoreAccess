@@ -144,6 +144,7 @@ public static class ApiEndpoints
         PurchaseApi.Map(secured);
         StockApi.Map(secured);
         TreasuryApi.Map(secured);
+        ReportsApi.Map(secured);
 
         // ---------------------------------------------------------------- the sales rep
         RepApi.Map(secured.MapGroup("/rep").AddEndpointFilter<RepFilter>().WithTags("Sales rep")
