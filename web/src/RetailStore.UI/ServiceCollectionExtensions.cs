@@ -20,6 +20,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<SecurityService>();
         services.AddScoped<IJournalSourceReader, ServerViewJournalReader>();
         services.AddScoped<JournalService>();
+        services.AddScoped<TreasuryService>();
+        services.AddScoped<AccountingService>();
+        services.AddScoped<DashboardService>();
         return services;
     }
 }

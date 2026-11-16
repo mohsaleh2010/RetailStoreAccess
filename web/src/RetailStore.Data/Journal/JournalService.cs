@@ -79,7 +79,7 @@ public sealed class JournalService(IDbContextFactory<RetailDbContext> factory, I
             await tx.CommitAsync();
             return new JournalSyncResult(plan.Added.Count, plan.Updated.Count, plan.Removed.Count, Message(plan));
         }
-        catch (Exception ex) when (ex is DbUpdateException or InvalidOperationException)
+        catch (Exception ex) when (ex is DbUpdateException or InvalidOperationException or System.Data.Common.DbException)
         {
             await tx.RollbackAsync();
             return new JournalSyncResult(0, 0, 0, "تعذر تحديث القيود: " + ex.Message);
