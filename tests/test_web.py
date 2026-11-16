@@ -237,6 +237,35 @@ class ApiTests(unittest.TestCase):
         self.assertEqual([sale.index(x) for x in order], sorted(sale.index(x) for x in order))
         self.assertIn("p.AverageCost * factors[i]", sale, "UnitCost of a line = the piece cost x its factor (docs/72)")
 
+    def test_messages_of_the_purchase_and_stock_services_are_those_of_access(self):
+        """Plan 6D (docs/80): the C# of PostPurchaseFromCart / PostSupplierPayment and of the transfers of modWarehouses
+        answers with the messages of Access."""
+        code = read("web/src/RetailStore.Data/Services/PurchaseService.cs") + read("web/src/RetailStore.Data/Services/StockService.cs")
+        vba = "".join(read(f"src/vba/{m}.bas") for m in ("modPurchases", "modWarehouses", "modSales", "modClosing", "modCurrency",
+                                                          "modProductUnits"))
+        vba_q = read("tools/queries.py")         # the opening line of ItemCardQuery
+        messages = {m.replace("\\n", "") for m in re.findall(r'"([^"]*[\u0600-\u06FF][^"]*)"', code)}
+        self.assertGreater(len(messages), 25)
+        for m in messages:
+            with self.subTest(m):
+                self.assertTrue(m in vba or m in vba_q, m)
+
+    def test_the_purchase_follows_the_order_of_access(self):
+        code = read("web/src/RetailStore.Data/Services/PurchaseService.cs")
+        buy = code[code.index("public async Task<SaleResult> PostPurchaseAsync"):code.index("private static async Task UpdateProductPricesAsync")]
+        order = ["frmPurchaseInvoice", "CheckSupplierAsync", "CurrencyProblemAsync", "PurchaseDocDate(", "مسجلة مسبقًا", "UnitFactorOfAsync",
+                 "InvoiceCalculator.Calc(", "\"PRODUCTS\"", "WarehouseProblemAsync", "InvoiceCalculator.Settle(", "BeginTransactionAsync",
+                 "\"PURCHASE_INVOICE\"", "ApplyStockMovementAsync", "UpdateProductPricesAsync", "AdjustSupplierBalanceAsync", "CommitAsync",
+                 "\"PURCHASE\", \"PurchaseInvoices\"", "\"PRICE_CHANGE\""]
+        self.assertEqual([buy.index(x) for x in order], sorted(buy.index(x) for x in order))
+        self.assertIn("recalcAverage: true", buy, "a purchase updates the average cost")
+        self.assertIn("PurchaseUnitCost(c.Net, c.Total, pieces, reclaim)", buy, "the cost of one piece (docs/72)")
+        stock = read("web/src/RetailStore.Data/Services/StockService.cs")
+        send = stock[stock.index("public async Task<StockResult> SendTransferAsync"):stock.index("public async Task<bool> CanReceiveInAsync")]
+        order = ["TransferPermissionAsync", "\"DRAFT\"", "WarehouseProblemAsync", "ClosedPeriodProblem", "TransferLineProblemAsync",
+                 "CheckStockAsync", "ConfirmReceipt", "BeginTransactionAsync", "TtTransferOut", "TtTransferIn", "CommitAsync", "STOCK_TRANSFER_SEND"]
+        self.assertEqual([send.index(x) for x in order], sorted(send.index(x) for x in order))
+
     def test_tokens_are_safe(self):
         security = read(self.API + "ApiSecurity.cs")
         self.assertIn("SecurityAlgorithms.HmacSha256", security)
@@ -260,7 +289,9 @@ class ApiTests(unittest.TestCase):
     def test_every_operation_has_its_permission(self):
         """Each mapped operation of the secured group names its permission (.Needs), except the user's own ones."""
         own = {"/auth/token", "/auth/password", "/me", "/profile"}
-        for name in ("ApiEndpoints.cs", "RepApi.cs", "SalesApi.cs"):
+        names = sorted(f for f in os.listdir(os.path.join(ROOT, self.API)) if f.endswith("Api.cs") or f == "ApiEndpoints.cs")
+        self.assertTrue({"ApiEndpoints.cs", "RepApi.cs", "SalesApi.cs", "PurchaseApi.cs", "StockApi.cs"} <= set(names))
+        for name in names:
             code = read(self.API + name)
             for m in re.finditer(r'\.Map(Get|Post|Put|Delete)\("([^"]*)"', code):
                 route = m.group(2)

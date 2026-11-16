@@ -117,6 +117,26 @@ WEB_EN = {
     'هذا المستخدم ليس مندوبًا نشطًا. اربطه بمندوب في شاشة المندوبين': 'This user is not an active sales rep. Link the user to a rep in the sales reps screen',
     'يجب تغيير كلمة المرور قبل المتابعة': 'Change the password before you go on',
     'يختفي من القوائم ويبقى في التقارير': 'it leaves the lists and stays in the reports',
+    # plan 6D (docs/80): purchases, stock and transfers on the web
+    'أسعار الشراء بدون الضريبة': 'Purchase prices without VAT',
+    'إرسال': 'Send',
+    'إرسال الأصناف من مخزن إلى آخر واستلامها': 'Send items from one warehouse to another and receive them',
+    'اختر صنفًا من القائمة لعرض حركته': 'Choose an item from the list to show its moves',
+    'الأصناف بسعر الشراء ووحدتها، والمورد، والدفع، والمخزن': 'Items at their purchase price and unit, the supplier, payment and warehouse',
+    'الأصناف تحت حد الطلب': 'Items at or under the minimum',
+    'الدفع للموردين نقدًا أو بالتحويل': 'Payments to suppliers in cash or by transfer',
+    'الكميات بالوحدة الصغرى للصنف': 'Quantities in the smallest unit of the item',
+    'المرجع': 'Reference',
+    'تم حفظ التحويل': 'Transfer saved',
+    'تمت العملية على التحويل': 'Done on transfer',
+    'رصيد كل صنف في كل مخزن، وكارت الصنف': 'The stock of each item in each warehouse, and the item card',
+    'سعر البيع الجديد': 'New selling price',
+    'سند صرف جديد': 'New payment voucher',
+    'سندات الصرف': 'Payment vouchers',
+    'عرض الفاتورة': 'Show the invoice',
+    'فواتير المشتريات': 'Purchase invoices',
+    'فواتير الموردين بتاريخها وأسطرها': 'Supplier invoices with their dates and lines',
+    'محجوز': 'Reserved',
 }
 
 _CS_LITERAL = re.compile(r'"((?:[^"\\\n]|\\.)*)"')
