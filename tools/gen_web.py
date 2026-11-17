@@ -655,5 +655,6 @@ FILES = {
 
 
 def build_all() -> Dict[str, str]:
+    import gen_web_einvoice
     import gen_web_reports
-    return {path: fn() for path, fn in {**FILES, **gen_web_reports.FILES}.items()}
+    return {path: fn() for path, fn in {**FILES, **gen_web_reports.FILES, **gen_web_einvoice.FILES}.items()}
