@@ -38,7 +38,7 @@ Private Function IsDigits(ByVal s As String) As Boolean
     Dim i As Long
     If Len(s) = 0 Then Exit Function
     For i = 1 To Len(s)
-        If Not Mid$(s, i, 1) Like "#" Then Exit Function
+        If Not (Mid$(s, i, 1) Like "#") Then Exit Function
     Next
     IsDigits = True
 End Function
