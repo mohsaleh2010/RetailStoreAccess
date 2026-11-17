@@ -1,0 +1,241 @@
+@page "/closing"
+@inject PosSession S
+@inject NavigationManager Nav
+
+@* The cashier closing on the POS (docs/86): the book balance of the box since its last closing, the counted cash, the
+   shortage or overage, and where the cash goes; saved on the program at once (modCash.PostCashClosing) and printed. *@
+@if (!S.LoggedIn)
+{
+    <p class="pos-empty">@S.T("سجّل الدخول أولًا.")</p>
+}
+else if (S.Snapshot!.User.ClosingProblem.Length > 0)
+{
+    <p class="pos-error">@S.T(S.Snapshot.User.ClosingProblem)</p>
+}
+else
+{
+    <div class="pos-sale">
+        <section class="pos-card">
+            <h2>@S.T("تصفية يومية الكاشير")</h2>
+            @if (boxes is not null)
+            {
+                <label>@S.T("الصندوق")
+                    <select value="@boxId" @onchange="e => ChooseAsync(e.Value)">
+                        @foreach (var b in boxes.Boxes)
+                        {
+                            <option value="@b.CashBoxID">@b.BoxName</option>
+                        }
+                    </select>
+                </label>
+            }
+            @if (preview is { } p)
+            {
+                <p class="pos-muted">@(p.PeriodStart is { } since
+                    ? S.T("من آخر تصفية") + ": " + since.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)
+                    : S.T("من بداية الصندوق (لا توجد تصفية سابقة)")) · @S.T("حتى الآن")</p>
+                <dl class="pos-totals">
+                    <dt>@S.T("رصيد البداية")</dt><dd>@Money(p.Opening)</dd>
+                    <dt>@S.T("المقبوضات")</dt><dd>@Money(p.CashIn)</dd>
+                    <dt>@S.T("المدفوعات")</dt><dd>@Money(p.CashOut)</dd>
+                    <dt class="pos-total">@S.T("الرصيد الدفتري")</dt><dd class="pos-total">@Money(p.Expected)</dd>
+                </dl>
+                <table class="pos-table">
+                    <thead><tr><th>@S.T("البند")</th><th>@S.T("العدد")</th><th>@S.T("مقبوض")</th><th>@S.T("مدفوع")</th></tr></thead>
+                    <tbody>
+                        @foreach (var line in p.Breakdown)
+                        {
+                            <tr><td>@line.MoveTypeName</td><td class="pos-amount">@line.Count</td>
+                                <td class="pos-amount">@Money(line.AmountIn)</td><td class="pos-amount">@Money(line.AmountOut)</td></tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </section>
+        <section class="pos-card pos-pay">
+            @if (preview is { } q)
+            {
+                <label>@S.T("النقدية الفعلية")
+                    <input class="pos-num" type="number" step="any" min="0" value="@counted" @onchange="e => CountChanged(e.Value)" /></label>
+                <p class="@DiffClass">@DiffText</p>
+                <label>@S.T("الترحيل إلى")
+                    <select value="@destination" @onchange="e => DestinationChanged(e.Value)">
+                        <option value="MAIN">@S.T("ترحيل إلى الخزينة الرئيسية")</option>
+                        <option value="OWNER">@S.T("تسليم للمالك (تسوية)")</option>
+                        <option value="KEEP">@S.T("يبقى في الصندوق")</option>
+                    </select>
+                </label>
+                @if (destination == "MAIN" && boxes is not null)
+                {
+                    <label>@S.T("الخزينة المستلمة")
+                        <select value="@toBox" @onchange="e => { toBox = int.TryParse(e.Value as string, out var t) ? t : 0; Edited(); }">
+                            @foreach (var b in boxes.Safes)
+                            {
+                                <option value="@b.CashBoxID">@b.BoxName</option>
+                            }
+                        </select>
+                    </label>
+                }
+                <label>@S.T("المبلغ المرحَّل")
+                    <input class="pos-num" type="number" step="any" min="0" disabled="@(destination == "KEEP")" @bind="transfer" @bind:after="Edited" /></label>
+                @if (counted is { } c)
+                {
+                    <p class="pos-muted">@S.T("يبقى في الصندوق (عهدة الكاشير)"): @Money(c - (destination == "KEEP" ? 0 : transfer ?? 0))</p>
+                }
+                <label>@S.T("ملاحظات")<input @bind="notes" @bind:after="Edited" maxlength="255" /></label>
+                @if (asking)
+                {
+                    <div class="pos-question">
+                        <p>@(S.T("حفظ تصفية") + " " + boxes?.Boxes.FirstOrDefault(b => b.CashBoxID == boxId)?.BoxName + "؟")
+                            <br />@DiffText<br />@S.T("لا يمكن تعديل التصفية بعد الحفظ.")</p>
+                        <button class="pos-primary" @onclick="SaveAsync">@S.T("نعم")</button>
+                        <button @onclick="() => asking = false">@S.T("لا")</button>
+                    </div>
+                }
+                else
+                {
+                    <button class="pos-primary pos-big" disabled="@(busy || counted is null)" @onclick="Ask">@S.T("حفظ وطباعة")</button>
+                }
+            }
+            @if (message.Length > 0)
+            {
+                <p class="@(error ? "pos-error" : "pos-ok")">@message</p>
+            }
+            @if (last is not null)
+            {
+                <button class="pos-link" @onclick="ReprintAsync">@S.T("طباعة مرة أخرى") @last.Number</button>
+            }
+        </section>
+    </div>
+}
+
+@code {
+    private PosClosingBoxes? boxes;
+    private ClosingPreview? preview;
+    private int boxId, toBox;
+    private decimal? counted, transfer;
+    private string destination = "MAIN", notes = "", message = "", reference = PosSession.NewReference();
+    private bool busy, error, asking;
+    private PosDocument? last;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await S.LoadAsync();
+        if (!S.LoggedIn)
+        {
+            Nav.NavigateTo(S.Connection is null ? "database" : "login");
+            return;
+        }
+        if (S.Snapshot!.User.ClosingProblem.Length > 0)
+        {
+            return;
+        }
+        var (b, text) = await S.ClosingBoxesAsync();
+        boxes = b;
+        Show(text, text.Length > 0);
+        if (b is not null)
+        {
+            toBox = b.Safes.FirstOrDefault()?.CashBoxID ?? 0;
+            await LoadAsync(b.DefaultBoxID);
+        }
+    }
+
+    private static string Money(decimal v) => v.ToString("#,##0.00", CultureInfo.InvariantCulture);
+
+    private decimal Difference => (counted ?? 0) - (preview?.Expected ?? 0);
+
+    /// <summary>modCash.ClosingRecalc.</summary>
+    private string DiffText => counted is null ? S.T("أدخل النقدية الموجودة فعلًا في الصندوق")
+        : Difference < 0 ? S.T("عجز") + ": " + Money(-Difference)
+        : Difference > 0 ? S.T("زيادة") + ": " + Money(Difference)
+        : S.T("مطابق: لا يوجد عجز ولا زيادة");
+
+    private string DiffClass => counted is null ? "pos-muted" : Difference == 0 ? "pos-ok" : "pos-error";
+
+    private async Task LoadAsync(int box)
+    {
+        boxId = box;
+        counted = transfer = null;
+        asking = false;
+        Edited();
+        if (box == 0)
+        {
+            preview = null;
+            return;
+        }
+        busy = true;
+        var (p, text) = await S.ClosingPreviewAsync(box);
+        preview = p;
+        Show(text, text.Length > 0);
+        busy = false;
+    }
+
+    private Task ChooseAsync(object? value) => LoadAsync(int.TryParse(value as string, out var v) ? v : 0);
+
+    /// <summary>modCash.ClosingCountChanged: the whole count goes to the safe unless another amount is typed.</summary>
+    private void CountChanged(object? value)
+    {
+        counted = decimal.TryParse(value as string, NumberStyles.Number, CultureInfo.InvariantCulture, out var v) ? v : null;
+        transfer = destination == "KEEP" ? 0 : counted;
+        Edited();
+    }
+
+    private void DestinationChanged(object? value)
+    {
+        destination = value as string ?? "MAIN";
+        transfer = destination == "KEEP" ? 0 : counted;
+        Edited();
+    }
+
+    private void Edited()
+    {
+        reference = PosSession.NewReference();
+        asking = false;
+    }
+
+    private void Show(string text, bool isError)
+    {
+        message = text;
+        error = isError && text.Length > 0;
+    }
+
+    private void Ask()
+    {
+        if (counted is null)
+        {
+            Show(S.T("أدخل النقدية الفعلية الموجودة في الصندوق."), true);
+            return;
+        }
+        asking = true;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (busy || counted is not { } c)
+        {
+            return;
+        }
+        busy = true;
+        asking = false;
+        var request = new DeviceClosingRequest(reference, boxId, c, destination, destination == "MAIN" ? toBox : null,
+                                               destination == "KEEP" ? 0 : transfer ?? 0, notes);
+        var (status, text, doc) = await S.SaveClosingAsync(request);
+        if (status != SaveStatus.Saved || doc is null)
+        {
+            Show(text, true);
+            busy = false;
+            return;
+        }
+        last = doc;
+        string printed = await S.PrintDocumentAsync(doc, false);
+        notes = "";
+        busy = false;
+        await LoadAsync(boxId);
+        Show(S.T("تم حفظ التصفية") + " " + doc.Number + (printed.Length > 0 ? " · " + printed : ""), printed.Length > 0);
+    }
+
+    private async Task ReprintAsync()
+    {
+        string printed = await S.PrintDocumentAsync(last!, false, reprint: true);
+        Show(printed, printed.Length > 0);
+    }
+}

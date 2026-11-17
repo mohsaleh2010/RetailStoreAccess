@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3479
+Private Const ENTRY_COUNT As Long = 3492
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -227,12 +227,12 @@ Public Function TestLang() As Boolean
     CheckLang MSG_RTL = 0 And UiAlign(1) = 3 And UiAlign(3) = 1 And UiAlign(2) = 2, "English: left to right", _
               passed, failed, report
     CheckLang Tr(12) = 12 And Tr("ABC") = "ABC", "Tr leaves numbers and Latin text", passed, failed, report
-    CheckLang Tr("ATTENTION;ÊÍÊÇÌ ãÊÇÈÚÉ (ÈÇäÊÙÇÑ ÇáÅÑÓÇá¡ ãÑİæÖÉ¡ ÊÍĞíÑ);SENT;ÃõÑÓáÊ;NOT_SENT;ŞÈá ÇáÊİÚíá;ALL;Çáßá") = "ATTENTION;Need follow-up (waiting, rejected, warning);SENT;Sent;NOT_SENT;Before enabling;ALL;All", "Tr sample 1", passed, failed, report
-    CheckLang Tr("ÅÖÇİÉ ááØáÈ") = "Add to order", "Tr sample 2", passed, failed, report
+    CheckLang Tr("AS [ãÈáÛ ÇáÔíß], StatusName AS [ÇáÍÇáÉ], Format(StatusDate, 'yyyy/mm/dd') AS [İí], Nz(BankName, DrawerBank) AS [ÇáÈäß] ") = "AS [Cheque amount], StatusName AS [Status], Format(StatusDate, 'yyyy/mm/dd') AS [in], Nz(BankName, DrawerBank) AS [Bank] ", "Tr sample 1", passed, failed, report
+    CheckLang Tr("ÅÖÇİÉ İÊÑÉ ÈÚÏ ÂÎÑ İÊÑÉ") = "Add a period after the last one", "Tr sample 2", passed, failed, report
     CheckLang Tr("ÇáÈÑäÇãÌ íÚãá Úáì ÇáÎÇÏã ÈÇáİÚá.") = "The program already works on the server.", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÊÈŞí") = "Remaining", "Tr sample 4", passed, failed, report
-    CheckLang Tr("ÊÚĞøÑ ÇáÅÑÓÇá: ") = "Could not send: ", "Tr sample 5", passed, failed, report
-    CheckLang Tr("ÓÚÑ ÇáÍÈÉ İí ÇáŞÇÆãÉ íÌÚá ÓÚÑ ÇáßÑÊæäÉ = ÓÚÑåÇ × ÇáÚÏÏ¡ ãÇ áã íßä ááßÑÊæäÉ ÓÚÑ İíåÇ") = "A piece price in the list makes the carton price = its price x the count, unless the carton has its own price in the list", "Tr sample 6", passed, failed, report
+    CheckLang Tr("ÇáãÊÈŞí İí ÇáÕäÏæŞ (ÚåÏÉ)") = "Left in the box (float)", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÊÚĞøÑ ÅäÔÇÁ ØáÈ ÇáÔåÇÏÉ: ") = "Could not create the certificate request: ", "Tr sample 5", passed, failed, report
+    CheckLang Tr("ÓÚÑ ÇáÈíÚ ááãäÏæÈ") = "Selling price for the rep", "Tr sample 6", passed, failed, report
     CheckLang Tr("áÇ íæÌÏ ÅĞä. ÇÎÊÑ ÇáäæÚ æÇáãÎÒä æÇáÚãíá Ãæ ÇáãæÑÏ Ëã «ÅĞä ÌÏíÏ».") = "No note. Choose the type, the warehouse and the customer or supplier, then New note.", "Tr sample 7", passed, failed, report
     CheckLang Tr("TEST æ 12.50: æíÉ") = "TEST and 12.50: æíÉ", "Tr sample 8", passed, failed, report
     UseLanguage "AR"

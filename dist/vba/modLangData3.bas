@@ -16,6 +16,9 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "ãŞİáÉ ÈŞíÏ ÅŞİÇá. ÃÚÏ İÊÍ ÇáÓäÉ ÃæáğÇ", "closed with a closing entry. Reopen the year first"
+    LangAdd "ãä ÈÏÇíÉ ÇáÕäÏæŞ (áÇ ÊæÌÏ ÊÕİíÉ ÓÇÈŞÉ", "since the box started (no previous closing"
+    LangAdd "åĞÇ ÓÌá ÃÓÇÓí İí ÇáäÙÇã æáÇ íãßä ÍĞİå", "This is a system record and cannot be deleted"
     LangAdd "åá ÊÑíÏ ÅäÔÇÁ ÇáãÕÑæİÇÊ ÇáãÓÊÍŞÉ ÇáÂä", "Do you want to create the due expenses now"
     LangAdd "ÃÑÕÏÉ ÇáãæÑÏíä ÈÇáÚãáÇÊ æİÑæŞ ÇáÚãáÉ", "Supplier balances by currency and exchange differences"
     LangAdd "ÃõäÔÆ ãİÊÇÍ æÔåÇÏÉ ÊÌÑíÈíÉ İí ÇáãÌáÏ", "A test key and certificate were created in the folder"
@@ -133,12 +136,12 @@ Private Sub D3_1()
     LangAdd "ÍĞİ ÇáÊÓæíÉ ÇáÌÇÑíÉ æßá ãØÇÈŞÇÊåÇ", "Delete the open reconciliation and all its matches"
     LangAdd "ÍĞİ ÇáÍÑßÉ ÇáÈäßíÉ ÇáãÍÏÏÉ æŞíÏåÇ", "Delete the selected bank transaction and its entry"
     LangAdd "ÍÓÈ ÕÇİí ÇáßãíÉ ÎáÇá İÊÑÉ ÇáÊŞÑíÑ", "By net quantity during the report period"
-    LangAdd "Íæøá ÇáÚÑÖ Åáì İÇÊæÑÉ ÈÏá ÇáØáÈíÉ", "Turn the quotation into an invoice instead of an order"
-    LangAdd "ÎÕã ÇáÛíÇÈ ÃßÈÑ ãä ÇáÃÓÇÓí æÇáÓßä", "The absence deduction is more than the basic and housing"
-    LangAdd "ÑÍøáå Ãæ ÃáÛå ŞÈá ÈÏÁ ÌÑÏ ÌÏíÏ áå", "Post or cancel it before starting a new count for it"
 End Sub
 
 Private Sub D3_2()
+    LangAdd "Íæøá ÇáÚÑÖ Åáì İÇÊæÑÉ ÈÏá ÇáØáÈíÉ", "Turn the quotation into an invoice instead of an order"
+    LangAdd "ÎÕã ÇáÛíÇÈ ÃßÈÑ ãä ÇáÃÓÇÓí æÇáÓßä", "The absence deduction is more than the basic and housing"
+    LangAdd "ÑÍøáå Ãæ ÃáÛå ŞÈá ÈÏÁ ÌÑÏ ÌÏíÏ áå", "Post or cancel it before starting a new count for it"
     LangAdd "ÑŞãäÇ (PUR-) Ãæ ÑŞã İÇÊæÑÉ ÇáãæÑÏ", "Our number (PUR-) or the supplier invoice number"
     LangAdd "ÓØÑ áÇ íäÊãí Åáì ÇáİÇÊæÑÉ ÇáÃÕáíÉ", "A line that does not belong to the original invoice"
     LangAdd "ØáÈ ÓİÑí: íõÛáóøİ æíõÓáóøã ááÚãíá", "Takeaway order: packed and handed to the customer"
@@ -256,12 +259,12 @@ Private Sub D3_2()
     LangAdd "áÇ íæÌÏ ÓÏÇÏ ãÓÌá áåĞÇ ÇáÅŞÑÇÑ", "No payment is recorded for this return"
     LangAdd "ááÈíÚ ÇáÂÌá ÇÎÊÑ ÚãíáğÇ ãÓÌáğÇ", "For a credit sale choose a registered customer"
     LangAdd "ááÚãáÇÁ ÇáãäÔÂÊ (İÇÊæÑÉ ÖÑíÈíÉ", "For business customers (tax invoice"
-    LangAdd "áã ÊõÕÏÑ ÇáåíÆÉ ÔåÇÏÉ ÇáÇãÊËÇá", "ZATCA did not issue the compliance certificate"
-    LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ ÓäÏÇÊ ÇáÎÒíäÉ", "You do not have the permission for treasury vouchers"
-    LangAdd "ãÌáÏ Images ÈÌÇäÈ ãáİ ÇáÈíÇäÇÊ", "Images folder next to the data file"
 End Sub
 
 Private Sub D3_3()
+    LangAdd "áã ÊõÕÏÑ ÇáåíÆÉ ÔåÇÏÉ ÇáÇãÊËÇá", "ZATCA did not issue the compliance certificate"
+    LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ ÓäÏÇÊ ÇáÎÒíäÉ", "You do not have the permission for treasury vouchers"
+    LangAdd "ãÌáÏ Images ÈÌÇäÈ ãáİ ÇáÈíÇäÇÊ", "Images folder next to the data file"
     LangAdd "ãÌãæÚ ÃÑÕÏÉ ÇáãÓÊæì ÇáÃæá (ÕİÑ", "Total of the first-level balances (zero"
     LangAdd "ãä 1 Åáì 28 (íæã ÇáÅíÌÇÑ ãËáğÇ", "From 1 to 28 (the rent day, for example"
     LangAdd "äŞÑ ãÒÏæÌ Úáì ÇáÓØÑ íİÊÍ ÇáŞíÏ", "Double-click a line to open the entry"
@@ -379,12 +382,12 @@ Private Sub D3_3()
     LangAdd "áÇ ÊæÌÏ ßãíÇÊ ãÍÌæÒÉ áØáÈíÇÊ", "Nothing is reserved for orders"
     LangAdd "áÇ ÊæÌÏ ãÈíÚÇÊ İí åĞå ÇáİÊÑÉ", "There are no sales in this period"
     LangAdd "áãä áÇ ãÑßÒ áå ãä ÇáãÓÊÎÏãíä", "for users without a center"
-    LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ íæã ÇáãäÏæÈ", "You do not have the rep day permission"
-    LangAdd "ãÈÇáÛ ÇáãæÇÒäÉ áÇ Êßæä ÓÇáÈÉ", "Budget amounts are never negative"
-    LangAdd "ãÓæÏÉ: ÃÖİ ÇáÃÕäÇİ Ëã «ÊÑÍíá", "Draft: add the products, then Post"
 End Sub
 
 Private Sub D3_4()
+    LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ íæã ÇáãäÏæÈ", "You do not have the rep day permission"
+    LangAdd "ãÈÇáÛ ÇáãæÇÒäÉ áÇ Êßæä ÓÇáÈÉ", "Budget amounts are never negative"
+    LangAdd "ãÓæÏÉ: ÃÖİ ÇáÃÕäÇİ Ëã «ÊÑÍíá", "Draft: add the products, then Post"
     LangAdd "ãØÇÈŞ: áÇ íæÌÏ ÚÌÒ æáÇ ÒíÇÏÉ", "Matched: no shortage and no overage"
     LangAdd "ãäÙæãÉ ãÕáÍÉ ÇáÖÑÇÆÈ ÇáãÕÑíÉ", "the Egyptian Tax Authority system"
     LangAdd "äÓÈÉ ÇáŞÓØ ÇáãÊäÇŞÕ Èíä 0% æ", "The declining balance rate is between 0% and"
@@ -502,12 +505,12 @@ Private Sub D3_4()
     LangAdd "ÇßÊÈ ÚÏÏ ÇáÏŞÇÆŞ ãä 0 Åáì", "Type the minutes from 0 to"
     LangAdd "ÇßÊÈ ãÚÇãá ÇáÊÍæíá ááÚãáÉ", "Type the exchange rate of the currency"
     LangAdd "ÇáÃÑŞÇã ãä ÇáãÓÊäÏÇÊ ÇáÂä", "The figures come from the documents now"
-    LangAdd "ÇáÃÕá ÛíÑ ãæÌæÏ Ãæ ãÓÊÈÚÏ", "The asset does not exist or is disposed"
-    LangAdd "ÇáÅŞÑÇÑÇÊ ÊõÚÊãÏ ÈÇáÊÑÊíÈ", "Returns are approved in order"
-    LangAdd "ÇáÊÍæíá Èíä Èäßíä ãÎÊáİíä", "Transfer between two different banks"
 End Sub
 
 Private Sub D3_5()
+    LangAdd "ÇáÃÕá ÛíÑ ãæÌæÏ Ãæ ãÓÊÈÚÏ", "The asset does not exist or is disposed"
+    LangAdd "ÇáÅŞÑÇÑÇÊ ÊõÚÊãÏ ÈÇáÊÑÊíÈ", "Returns are approved in order"
+    LangAdd "ÇáÊÍæíá Èíä Èäßíä ãÎÊáİíä", "Transfer between two different banks"
     LangAdd "ÇáÍÓÇÈÇÊ ÇáÈäßíÉ æÇáÊÓæíÉ", "Bank accounts and reconciliation"
     LangAdd "ÇáÓØÑ ÇáÃæá ÃÓİá ÇáÈÇÑßæÏ", "First line below the barcode"
     LangAdd "ÇáÓØÑ ÇáÃæá ÃÚáì ÇáÈÇÑßæÏ", "First line above the barcode"
@@ -531,8 +534,4 @@ Private Sub D3_5()
     LangAdd "ÍĞİ ÂÎÑ ÅÚÇÏÉ ÊŞííã ááÃÕá", "Delete the last revaluation of the asset"
     LangAdd "ÍĞİ ÇáãæÇÒäÉ ßáåÇ ÈÃÓØÑåÇ", "Delete the whole budget with its lines"
     LangAdd "ÎÓÇÑÉ ÈíÚ / ÇÓÊÈÚÇÏ ÇáÃÕá", "Loss on sale / disposal of the asset"
-    LangAdd "ÏİÊÑ ÇáÃÓÊÇĞ (ßá ÇáÍÓÇÈÇÊ", "General ledger (all accounts"
-    LangAdd "ÑÕíÏ ÇáßÔİ İí åĞÇ ÇáÊÇÑíÎ", "Statement balance on this date"
-    LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÇáÅáÛÇÁ (ÑãÒ", "The Tax Authority refused the cancellation (code"
-    LangAdd "ÑŞã ÇáåæíÉ / ÇáÑŞã ÇáŞæãí", "ID / national ID number"
 End Sub

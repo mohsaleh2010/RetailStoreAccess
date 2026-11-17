@@ -49,6 +49,8 @@ public sealed class DirectBackend : IPosBackend, IDbContextFactory<RetailDbConte
 
     private PosService Pos => new(this, Permissions, Sales);
 
+    private TreasuryService Treasury => new(this, Permissions);
+
     /// <summary>A SQLite trial file is created with the seed rows the first time (DbSetup); a SQL Server database never
     /// is: it comes from the script of docs/67.</summary>
     private void EnsureCreated()
@@ -136,6 +138,67 @@ public sealed class DirectBackend : IPosBackend, IDbContextFactory<RetailDbConte
                 _ => BackendResult<DeviceSaleResult>.Refused(Tr(r.Message, english)),
             };
         });
+
+    /// <summary>The screen of an operation: refused (403) as the API's PermissionFilter would refuse it.</summary>
+    private async Task<string> ScreenProblemAsync(int employeeId, string form, ScreenAction? action = null)
+    {
+        string open = await Permissions.OpenProblemAsync(employeeId, form);
+        return open.Length > 0 || action is null ? open : await Permissions.ActionProblemAsync(employeeId, form, action.Value);
+    }
+
+    private static BackendResult<PosDocument> Answer(DeviceDocResult r, bool english) => r.Status switch
+    {
+        SaveStatus.Saved => new BackendResult<PosDocument>(r.Document, r.Duplicate ? 200 : 201, "", ""),
+        SaveStatus.NeedsConfirmation => BackendResult<PosDocument>.Refused(Tr(r.Message, english), 409, "confirm"),
+        _ => BackendResult<PosDocument>.Refused(Tr(r.Message, english)),
+    };
+
+    public Task<BackendResult<ReturnableInvoice>> ReturnableAsync(PosCredential who, string invoiceNumber, bool english,
+                                                                 CancellationToken ct = default) =>
+        RunAsync(async () =>
+        {
+            string problem = await ScreenProblemAsync(who.EmployeeID, "frmSalesReturn");
+            if (problem.Length > 0)
+            {
+                return BackendResult<ReturnableInvoice>.Refused(Tr(problem, english), 403, "forbidden");
+            }
+            var inv = await Sales.ReturnableAsync(invoiceNumber, english);
+            return inv is null ? BackendResult<ReturnableInvoice>.Refused(Tr("لا توجد فاتورة بهذا الرقم.", english), 404, "not_found")
+                               : BackendResult<ReturnableInvoice>.Of(inv);
+        });
+
+    public Task<BackendResult<PosDocument>> SendReturnAsync(PosCredential who, DeviceReturnRequest request, bool english,
+                                                           CancellationToken ct = default) =>
+        RunAsync(async () => Answer(await Pos.PostDeviceReturnAsync(new ActingUser(who.EmployeeID, "POS"), request, english), english));
+
+    public Task<BackendResult<PosDocument>> SendPaymentAsync(PosCredential who, DevicePaymentRequest request, bool english,
+                                                            CancellationToken ct = default) =>
+        RunAsync(async () => Answer(await Pos.PostDevicePaymentAsync(new ActingUser(who.EmployeeID, "POS"), request, english), english));
+
+    public Task<BackendResult<PosClosingBoxes>> ClosingBoxesAsync(PosCredential who, bool english, CancellationToken ct = default) =>
+        RunAsync(async () =>
+        {
+            string problem = await ScreenProblemAsync(who.EmployeeID, TreasuryService.ClosingForm);
+            return problem.Length > 0 ? BackendResult<PosClosingBoxes>.Refused(Tr(problem, english), 403, "forbidden")
+                                      : BackendResult<PosClosingBoxes>.Of(await Pos.ClosingBoxesAsync(who.EmployeeID, english));
+        });
+
+    public Task<BackendResult<ClosingPreview>> ClosingPreviewAsync(PosCredential who, int boxId, bool english, CancellationToken ct = default) =>
+        RunAsync(async () =>
+        {
+            string problem = await ScreenProblemAsync(who.EmployeeID, TreasuryService.ClosingForm);
+            if (problem.Length > 0)
+            {
+                return BackendResult<ClosingPreview>.Refused(Tr(problem, english), 403, "forbidden");
+            }
+            var p = await Treasury.ClosingPreviewAsync(boxId, english);
+            return p is null ? BackendResult<ClosingPreview>.Refused(Tr("السجل غير موجود.", english), 404, "not_found")
+                             : BackendResult<ClosingPreview>.Of(p);
+        });
+
+    public Task<BackendResult<PosDocument>> SendClosingAsync(PosCredential who, DeviceClosingRequest request, bool english,
+                                                            CancellationToken ct = default) =>
+        RunAsync(async () => Answer(await Pos.PostDeviceClosingAsync(new ActingUser(who.EmployeeID, "POS"), request, english), english));
 
     private static string Tr(string arabic, bool english) => english ? Translator.ToEnglish(arabic) : arabic;
 

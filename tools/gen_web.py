@@ -24,6 +24,7 @@ import master_en
 import queries as Q
 import relations as R
 import pricing as PR
+import scale_reference as SCALE
 import security_reference as SEC
 import zatca_reference as ZQ
 from schema import TABLES, Field, Table, table
@@ -536,10 +537,17 @@ def build_vectors() -> str:
     tr = "\n".join(f"        ({cs_str(s)}, {cs_str(i18n.translate(s, words, keys))}),"
                    for s in TRANSLATION_SAMPLES)
     pricing = pricing_vectors()
+
+    def dec(x):
+        return "null" if x is None else f"{x}m"
+    scale = "\n".join(
+        f"        ({cs_str(c)}, {cs_str(p)}, {d}, {cs_str(k)}, {dec(price)}, {'null' if item is None else cs_str(item)}, "
+        f"{'null' if value is None else str(value) + 'L'}, {dec(q) if q is not None else '0m'}),"
+        for c, p, d, k, price, item, value, q in SCALE.vector_results())
     return f"""{HEADER}namespace RetailStore.Tests;
 
 /// <summary>Expected values computed by the Python mirrors (security_reference, i18n.translate, pricing,
-/// zatca_reference).</summary>
+/// zatca_reference, scale_reference).</summary>
 public static class Vectors
 {{
     public static readonly (string Password, string Salt, string Hash)[] Passwords =
@@ -555,6 +563,12 @@ public static class Vectors
     public static readonly (string Arabic, string English)[] Translations =
     [
 {tr}
+    ];
+
+    /// <summary>tools/scale_reference.py: (code, prefixes, item digits, kind, price) -> (item, value, quantity); docs/86.</summary>
+    public static readonly (string Code, string Prefixes, int Digits, string Kind, decimal? Price, string? Item, long? Value, decimal Quantity)[] Scale =
+    [
+{scale}
     ];
 {pricing}}}
 """

@@ -11,6 +11,18 @@
             <nav class="pos-nav">
                 <NavLink href="" Match="NavLinkMatch.All">@S.T("البيع")</NavLink>
                 <NavLink href="sales">@S.T("فواتير الجهاز")</NavLink>
+                @if (S.Snapshot?.User.ReturnProblem.Length == 0)
+                {
+                    <NavLink href="return">@S.T("مرتجع")</NavLink>
+                }
+                @if (S.Snapshot?.User.PaymentProblem.Length == 0)
+                {
+                    <NavLink href="payment">@S.T("سند قبض")</NavLink>
+                }
+                @if (S.Snapshot?.User.ClosingProblem.Length == 0)
+                {
+                    <NavLink href="closing">@S.T("تصفية الصندوق")</NavLink>
+                }
                 <NavLink href="settings">@S.T("الإعدادات")</NavLink>
                 @if (S.CanEditDatabase)
                 {

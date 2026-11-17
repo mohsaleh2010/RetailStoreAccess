@@ -190,7 +190,16 @@ else
 
     private async Task FindAsync()
     {
-        found = cart!.Find(code);
+        var (scale, problem) = cart!.ScanScale(code);
+        if (scale)
+        {
+            Show(S.T(problem), problem.Length > 0);
+            found = [];
+            code = "";
+            Changed();
+            return;
+        }
+        found = cart.Find(code);
         bool exact = found.Count == 1 && (found[0].Unit is not null || found[0].Product.Barcode == code.Trim()
                                          || found[0].Product.ProductCode == code.Trim());
         if (exact)

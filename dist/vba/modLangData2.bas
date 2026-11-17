@@ -170,6 +170,7 @@ Private Sub D2_2()
     LangAdd "ÇáãÈíÚÇÊ ÇáãÍáíÉ ÇáÎÇÖÚÉ ááÖÑíÈÉ ÈÇáÓÚÑ ÇáÚÇã", "Local sales taxed at the general rate"
     LangAdd "ÇáãÑÊÌÚÇÊ Úáì åĞå ÇáİÇÊæÑÉ (äŞÑ ãÒÏæÌ ááØÈÇÚÉ", "Returns on this invoice (double-click to print"
     LangAdd "ÇáæÇÑÏÇÊ ãä ÇáÓáÚ (ÇáãÓÏÏÉ ÖÑíÈÊåÇ İí ÇáÌãÇÑß", "Imported goods (VAT paid at customs"
+    LangAdd "ÈÇÑßæÏ ÇáãíÒÇä: íŞÑÄå ÇáÈíÚ İí Access æÈÑäÇãÌ", "Scale barcodes: read by the sale in Access and the"
     LangAdd "ÈÑäÇãÌ ÇáÊæŞíÚ (İáÇÔÉ ÇáÊæŞíÚ) İí ÅÚÏÇÏ ÇáÑÈØ", "Signing program (USB token) in the connection setup"
     LangAdd "ÈÚÏ ÇáÍİÙ Úíøä ßáãÉ ÇáãÑæÑ ãä ÒÑ «ßáãÉ ÇáãÑæÑ", "After saving, set the password with the button Password"
     LangAdd "ÑÕíÏ ÇáÍÓÇÈ İí ÇáÈäß ÚäÏ ÈÏÁ ÇÓÊÎÏÇã ÇáÈÑäÇãÌ", "The account balance in the bank when the program is first used"
@@ -257,10 +258,10 @@ Private Sub D2_2()
     LangAdd "ÊõÍĞİ ÇáãÓæÏÉ İŞØ. ÃáÛö ÊÑÍíá ÇáÓäÏ ÃæáğÇ", "Only a draft is deleted. Unpost the voucher first"
     LangAdd "ÓØÑ İí ÇáÅĞä áÇ íØÇÈŞ ÓØÑğÇ İí ÃãÑ ÇáÔÑÇÁ", "A note line does not match a line of the purchase order"
     LangAdd "ÓØÑ İí ÇáÅĞä áÇ íØÇÈŞ Õäİ ÓØÑå İí ÇáØáÈíÉ", "A note line does not match the product of its order line"
-    LangAdd "ÔÌÑÉ ÇáÍÓÇÈÇÊ: ÇáÍÓÇÈÇÊ ÇáÑÆíÓíÉ æÇáİÑÚíÉ", "Account tree: main and sub-accounts"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "ÔÌÑÉ ÇáÍÓÇÈÇÊ: ÇáÍÓÇÈÇÊ ÇáÑÆíÓíÉ æÇáİÑÚíÉ", "Account tree: main and sub-accounts"
     LangAdd "ØáÈíÇÊ ÇáÚãáÇÁ ÇáãİÊæÍÉ: ÇáÈÇŞí ÈáÇ ÊÓáíã", "Open customer orders: what is left to deliver"
     LangAdd "İÇÊæÑÉ ÅĞä ÇáÊÓáíã ÈÇáæÍÏÉ ÇáÕÛÑì ááÃÕäÇİ", "The invoice of a delivery note is in the smallest unit of the products"
     LangAdd "İÚøá ÇáÅÑÓÇá ãä ÔÇÔÉ ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "Enable sending in the e-invoicing screen"
@@ -290,6 +291,7 @@ Private Sub D2_3()
     LangAdd "ÏæÑ ãÏíÑ ÇáäÙÇã íãáß ßá ÇáÕáÇÍíÇÊ ÏÇÆãğÇ", "The system administrator role always has all the permissions"
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÈíÇäÇÊ ÌåÇÒ äŞØÉ ÇáÈíÚ (ÑãÒ", "The Tax Authority refused the POS device data (code"
     LangAdd "ÓØÑ ÇáãÑÊÌÚ ãä İÇÊæÑÉ ÛíÑ İÇÊæÑÉ ÇáãÑÊÌÚ", "A return line from an invoice other than the invoice of the return"
+    LangAdd "ÓÚÑ ÇáÕäİ ÕİÑ¡ İáÇ ÊõÍÓÈ ÇáßãíÉ ãä ÇáÓÚÑ", "the price of the product is zero, so the quantity cannot come from the price"
     LangAdd "Úáì åĞÇ ÇáÍÓÇÈ ŞíæÏ¡ İíÈŞì ÍÓÇÈğÇ İÑÚíğÇ", "This account has entries, so it stays a sub-account"
     LangAdd "ŞæÇÆã ÇáÃÓÚÇÑ: ÃÓÚÇÑ ÇáÃÕäÇİ İí ßá ŞÇÆãÉ", "Price lists: the product prices in each list"
     LangAdd "ßáãÊÇ ÇáãÑæÑ ÛíÑ ãÊØÇÈŞÊíä. áã íÊÛíÑ ÔíÁ", "The two passwords do not match. Nothing changed"
@@ -379,11 +381,12 @@ Private Sub D2_3()
     LangAdd "ÍÑßÉ ÇáÎÒíäÉ ÇáíæãíÉ (Ãæá Çáíæã æÂÎÑå", "Daily treasury moves (start and end of the day"
     LangAdd "ÑŞã ÌÏíÏ áÇ íÊßÑÑº áÇ íÊÛíÑ ÈÚÏ ÇáÍİÙ", "A new number that is not repeated, it does not change after saving"
     LangAdd "ÓÌá ÇáÊÏŞíŞ íÍÊÇÌ ÕáÇÍíÉ «ÓÌá ÇáÊÏŞíŞ", "The audit trail needs the permission Audit trail"
-    LangAdd "ÔÇãá ÇáÖÑíÈÉ ßÓÚÑ ÇáÈíÚ İí äŞØÉ ÇáÈíÚ", "Including VAT, as the selling price in the POS"
-    LangAdd "ÚÑÖ İŞØ - ÇáÊÕÍíÍ íßæä ÈãÑÊÌÚ ãÔÊÑíÇÊ", "View only - a correction is made with a purchase return"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "ÔÇãá ÇáÖÑíÈÉ ßÓÚÑ ÇáÈíÚ İí äŞØÉ ÇáÈíÚ", "Including VAT, as the selling price in the POS"
+    LangAdd "ÚÏÏ ÃÑŞÇã ÑãÒ ÇáÕäİ İí ÈÇÑßæÏ ÇáãíÒÇä", "Item code digits in a scale barcode"
+    LangAdd "ÚÑÖ İŞØ - ÇáÊÕÍíÍ íßæä ÈãÑÊÌÚ ãÔÊÑíÇÊ", "View only - a correction is made with a purchase return"
     LangAdd "ÛíÑ äÔØ. İÚøáå ãä ÔÇÔÉ ÇáãäÊÌÇÊ ÃæáğÇ", "is not active. Activate it in the Products screen first"
     LangAdd "İÍÕ ÓáÇãÉ ÇáÈíÇäÇÊ: áÇ ÊæÌÏ Ãí ãÔßáÇÊ", "Data integrity check: no problems at all"
     LangAdd "áÇ Êãáß ÕáÇÍíÉ ÇÚÊãÇÏ ÇáÊÓæíÉ ÇáÈäßíÉ", "You do not have the permission to approve the bank reconciliation"
@@ -393,7 +396,4 @@ Private Sub D2_4()
     LangAdd "áÇ ÊæÌÏ ÍÑßÉ äŞÏíÉ ááÇÎÊíÇÑÇÊ ÇáãÍÏÏÉ", "There is no cash move for the choices made"
     LangAdd "áÇ íæÌÏ íæã. ÇÎÊÑ ÇáãäÏæÈ Ëã «İÊÍ íæã", "No day. Choose the rep, then Open day"
     LangAdd "áã ÊÚÏ ãä æÍÏÇÊå. ÇÎÊÑ ÇáæÍÏÉ ãä ÌÏíÏ", "is no longer one of its units. Choose the unit again"
-    LangAdd "ãŞİáÉ ÈŞíÏ ÅŞİÇá. ÃÚÏ İÊÍ ÇáÓäÉ ÃæáğÇ", "closed with a closing entry. Reopen the year first"
-    LangAdd "ãä ÈÏÇíÉ ÇáÕäÏæŞ (áÇ ÊæÌÏ ÊÕİíÉ ÓÇÈŞÉ", "since the box started (no previous closing"
-    LangAdd "åĞÇ ÓÌá ÃÓÇÓí İí ÇáäÙÇã æáÇ íãßä ÍĞİå", "This is a system record and cannot be deleted"
 End Sub

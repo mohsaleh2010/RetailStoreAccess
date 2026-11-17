@@ -592,9 +592,11 @@ public partial class RetailDbContext : DbContext
             e.Property(x => x.EtaPreviousUUID).HasMaxLength(64);
             e.Property(x => x.EtaSubmissionId).HasMaxLength(50);
             e.Property(x => x.EtaLongId).HasMaxLength(100);
+            e.Property(x => x.ClientRef).HasMaxLength(40);
             if (!sqlServer) e.HasIndex(x => x.ReturnNumber).HasDatabaseName("SalesReturns_UX_ReturnNumber").IsUnique();
             if (!sqlServer) e.HasIndex(x => x.ReturnDate).HasDatabaseName("SalesReturns_IX_ReturnDate");
             if (!sqlServer) e.HasIndex(x => x.InvoiceUUID).HasDatabaseName("SalesReturns_UX_InvoiceUUID").IsUnique();
+            if (!sqlServer) e.HasIndex(x => x.ClientRef).HasDatabaseName("SalesReturns_UX_ClientRef").IsUnique();
             e.HasOne<SalesInvoices>().WithMany().HasForeignKey(x => x.SalesInvoiceID).HasConstraintName("FK_SalesReturns_SalesInvoiceID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<Customers>().WithMany().HasForeignKey(x => x.CustomerID).HasConstraintName("FK_SalesReturns_CustomerID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<Employees>().WithMany().HasForeignKey(x => x.EmployeeID).HasConstraintName("FK_SalesReturns_EmployeeID").OnDelete(DeleteBehavior.Restrict);
@@ -737,8 +739,10 @@ public partial class RetailDbContext : DbContext
             e.Property(x => x.CurrencyCode).HasMaxLength(3);
             if (sqlServer) e.Property(x => x.ExchangeRate).HasColumnType("money"); else e.Property(x => x.ExchangeRate).HasColumnType("NUMERIC");
             if (sqlServer) e.Property(x => x.ForeignAmount).HasColumnType("money"); else e.Property(x => x.ForeignAmount).HasColumnType("NUMERIC");
+            e.Property(x => x.ClientRef).HasMaxLength(40);
             if (!sqlServer) e.HasIndex(x => x.PaymentNumber).HasDatabaseName("CustomerPayments_UX_PaymentNumber").IsUnique();
             if (!sqlServer) e.HasIndex(x => x.PaymentDate).HasDatabaseName("CustomerPayments_IX_PaymentDate");
+            if (!sqlServer) e.HasIndex(x => x.ClientRef).HasDatabaseName("CustomerPayments_UX_ClientRef").IsUnique();
             e.HasOne<Customers>().WithMany().HasForeignKey(x => x.CustomerID).HasConstraintName("FK_CustomerPayments_CustomerID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<PaymentMethods>().WithMany().HasForeignKey(x => x.PaymentMethodID).HasConstraintName("FK_CustomerPayments_PaymentMethodID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<SalesInvoices>().WithMany().HasForeignKey(x => x.SalesInvoiceID).HasConstraintName("FK_CustomerPayments_SalesInvoiceID").OnDelete(DeleteBehavior.ClientSetNull);
@@ -1218,8 +1222,10 @@ public partial class RetailDbContext : DbContext
             if (sqlServer) e.Property(x => x.TransferAmount).HasColumnType("money"); else e.Property(x => x.TransferAmount).HasColumnType("NUMERIC");
             if (sqlServer) e.Property(x => x.KeptAmount).HasColumnType("money"); else e.Property(x => x.KeptAmount).HasColumnType("NUMERIC");
             e.Property(x => x.Notes).HasMaxLength(255);
+            e.Property(x => x.ClientRef).HasMaxLength(40);
             if (!sqlServer) e.HasIndex(x => x.ClosingNumber).HasDatabaseName("CashClosings_UX_ClosingNumber").IsUnique();
             if (!sqlServer) e.HasIndex(x => new { x.CashBoxID, x.ClosingDate }).HasDatabaseName("CashClosings_IX_CashBoxID_ClosingDate");
+            if (!sqlServer) e.HasIndex(x => x.ClientRef).HasDatabaseName("CashClosings_UX_ClientRef").IsUnique();
             e.HasOne<CashBoxes>().WithMany().HasForeignKey(x => x.CashBoxID).HasConstraintName("FK_CashClosings_CashBoxID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<Employees>().WithMany().HasForeignKey(x => x.EmployeeID).HasConstraintName("FK_CashClosings_EmployeeID").OnDelete(DeleteBehavior.Restrict);
             e.HasOne<CashBoxes>().WithMany().HasForeignKey(x => x.ToCashBoxID).HasConstraintName("FK_CashClosings_ToCashBoxID").OnDelete(DeleteBehavior.ClientSetNull);
@@ -1774,6 +1780,8 @@ public partial class RetailDbContext : DbContext
             e.Property(x => x.BottomLine1).HasMaxLength(10).IsRequired();
             e.Property(x => x.BottomLine2).HasMaxLength(10).IsRequired();
             e.Property(x => x.ShortName).HasMaxLength(30);
+            e.Property(x => x.ScalePrefixes).HasMaxLength(20);
+            e.Property(x => x.ScaleValueKind).HasMaxLength(6).IsRequired();
             if (sqlServer) e.Property<byte[]>("RowVer").IsRowVersion();
         });
         b.Entity<EInvoiceLog>(e =>

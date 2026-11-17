@@ -30,10 +30,10 @@ Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,Ro
     "CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques,FixedAssets,DepreciationRuns,AssetDepreciations,AssetRevaluations,AssetTransfers,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings," & _
     "Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalPeriods,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,OpeningBalances,OpeningStock,TransactionTypes,InventoryTransactions,StockTransfers,StockTransferLines,StockParties,StockDocuments,StockDocumentLines,StockNotes,StockNoteLines,SalesOrders,Quotations,QuotationLines,PurchaseOrders," & _
     "PurchaseOrderLines,RepDays,RouteStops,RepVisits,RepPrices,SalesOrderLines,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog,OfficeSyncLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=75;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;PriceLists=7;Customers=26;Products=26;ProductUnits=9;PriceListItems=8;SalesInvoices=48;SalesInvoiceDetails=16;SalesReturns=40;SalesReturnDetails=16;" & _
-    "PurchaseInvoices=24;PurchaseInvoiceDetails=13;PurchaseReturns=23;PurchaseReturnDetails=13;CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;" & _
-    "BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;" & _
-    "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=14;Quotations=16;QuotationLines=9;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=75;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;PriceLists=7;Customers=26;Products=26;ProductUnits=9;PriceListItems=8;SalesInvoices=48;SalesInvoiceDetails=16;SalesReturns=41;SalesReturnDetails=16;" & _
+    "PurchaseInvoices=24;PurchaseInvoiceDetails=13;PurchaseReturns=23;PurchaseReturnDetails=13;CustomerPayments=17;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;" & _
+    "BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=19;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;" & _
+    "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=14;Quotations=16;QuotationLines=9;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=22;" & _
     "EInvoiceLog=15;OfficeSyncLog=12"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=36;Roles=3;Permissions=49;RolePermissions=95;Employees=1;Screens=84;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=38;TransactionTypes=14;StockParties=1;LabelSettings=1"
 
@@ -1747,10 +1747,13 @@ Private Sub CreateTable_SalesReturns()
              "", "", "ÇáãäÏæÈ", "ãäÏæÈ ÇáİÇÊæÑÉ ÇáÃÕáíÉ"
     AddField tdf, "WarehouseID", "LONG", 0, True, "1", _
              "", "", "ÇáãÎÒä", ""
+    AddField tdf, "ClientRef", "TEXT", 40, False, "", _
+             "", "", "ÑŞã ÇáãÑÊÌÚ İí ÌåÇÒ äŞØÉ ÇáÈíÚ", "ãä äŞØÉ ÇáÈíÚ Úáì Windows (docs/86): íãäÚ ÊßÑÇÑ ÇáãÑÊÌÚ ÅĞÇ ÃõÚíÏ ÅÑÓÇáå ÈÚÏ ÇäŞØÇÚ ÇáÇÊÕÇá"
     AddIndex tdf, "PrimaryKey", "SalesReturnID", True, True, False
     AddIndex tdf, "UX_ReturnNumber", "ReturnNumber", False, True, False
     AddIndex tdf, "IX_ReturnDate", "ReturnDate", False, False, False
     AddIndex tdf, "UX_InvoiceUUID", "InvoiceUUID", False, True, True
+    AddIndex tdf, "UX_ClientRef", "ClientRef", False, True, True
     EndTable tdf, "ãÑÊÌÚÇÊ ÇáãÈíÚÇÊ: ÅÔÚÇÑ ÏÇÆä ãÑÊÈØ ÈÇáİÇÊæÑÉ ÇáÃÕáíÉº íÚíÏ ÇáßãíÉ ááãÎÒæä æíÚßÓ ÇáãÈáÛ.", "[RefundedAmount]<=[TotalAmount]", "ÇáãÈáÛ ÇáãÑÏæÏ áÇ íÊÌÇæÒ ŞíãÉ ÇáãÑÊÌÚ"
 End Sub
 
@@ -2008,9 +2011,12 @@ Private Sub CreateTable_CustomerPayments()
              ">=0", "ÇáãÈáÛ áÇ íãßä Ãä íßæä ÓÇáÈğÇ", "ÇáãÈáÛ ÈÇáÚãáÉ", "ÇáÅÌãÇáí ÈÚãáÉ ÇáãÓÊäÏ (0 ááãÓÊäÏÇÊ ÇáŞÏíãÉ)"
     AddField tdf, "SalesRepID", "LONG", 0, False, "", _
              "", "", "ÇáãäÏæÈ", "ÇáãÍÕöøá: ãäÏæÈ ÇáÚãíá¡ æÅáÇ ãäÏæÈ ÇáãÓÊÎÏã"
+    AddField tdf, "ClientRef", "TEXT", 40, False, "", _
+             "", "", "ÑŞã ÇáÓäÏ İí ÌåÇÒ äŞØÉ ÇáÈíÚ", "ãä äŞØÉ ÇáÈíÚ Úáì Windows (docs/86): íãäÚ ÊßÑÇÑ ÇáÓäÏ ÅĞÇ ÃõÚíÏ ÅÑÓÇáå ÈÚÏ ÇäŞØÇÚ ÇáÇÊÕÇá"
     AddIndex tdf, "PrimaryKey", "PaymentID", True, True, False
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
+    AddIndex tdf, "UX_ClientRef", "ClientRef", False, True, True
     EndTable tdf, "ÏİÚÇÊ ÇáÚãáÇÁ (ÓäÏÇÊ ÇáŞÈÖ): ÇáãÈÇáÛ ÇáãÓÊáãÉ ãä ÇáÚãáÇÁ áÓÏÇÏ ÃÑÕÏÊåã ÇáÂÌáÉ.", "", ""
 End Sub
 
@@ -2920,9 +2926,12 @@ Private Sub CreateTable_CashClosings()
              "", "", "ãáÇÍÙÇÊ", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "ÊÇÑíÎ ÇáÅäÔÇÁ", ""
+    AddField tdf, "ClientRef", "TEXT", 40, False, "", _
+             "", "", "ÑŞã ÇáÊÕİíÉ İí ÌåÇÒ äŞØÉ ÇáÈíÚ", "ãä äŞØÉ ÇáÈíÚ Úáì Windows (docs/86): íãäÚ ÊßÑÇÑ ÇáÊÕİíÉ ÅĞÇ ÃõÚíÏ ÅÑÓÇáåÇ ÈÚÏ ÇäŞØÇÚ ÇáÇÊÕÇá"
     AddIndex tdf, "PrimaryKey", "ClosingID", True, True, False
     AddIndex tdf, "UX_ClosingNumber", "ClosingNumber", False, True, False
     AddIndex tdf, "IX_CashBoxID_ClosingDate", "CashBoxID,ClosingDate", False, False, False
+    AddIndex tdf, "UX_ClientRef", "ClientRef", False, True, True
     EndTable tdf, "ÊÕİíÉ íæãíÉ ÇáßÇÔíÑ: ÌÑÏ äŞÏíÉ ÕäÏæŞ ÇáßÇÔíÑ İí äåÇíÉ ÇáæÑÏíÉ æÊÑÍíáåÇ ááÎÒíäÉ ÇáÑÆíÓíÉ Ãæ ÊÓæíÊåÇ ãÚ ÇáãÇáß.", "[TransferAmount]+[KeptAmount]=[CountedAmount]", "ÇáãÑÍóøá + ÇáãÊÈŞí = ÇáäŞÏíÉ ÇáİÚáíÉ"
 End Sub
 
@@ -4002,6 +4011,12 @@ Private Sub CreateTable_LabelSettings()
              "", "", "ÇáÇÓã ÇáãÎÊÕÑ ááãÍá", "íõØÈÚ ÅĞÇ ÇÎÊÑÊ «ÇáÇÓã ÇáãÎÊÕÑ»"
     AddField tdf, "FontSize", "BYTE", 0, True, "7", _
              "Between 5 And 16", "ÍÌã ÇáÎØ ãä 5 Åáì 16", "ÍÌã ÇáÎØ", ""
+    AddField tdf, "ScalePrefixes", "TEXT", 20, False, "", _
+             "", "", "ÈÇÏÆÇÊ ÈÇÑßæÏ ÇáãíÒÇä", "ãËá 20,21 (docs/86): ÈÇÑßæÏ ãä 13 ÑŞãğÇ íÈÏÃ ÈÅÍÏÇåÇ = ÑãÒ ÇáÕäİ Ëã ÇáæÒä Ãæ ÇáÓÚÑº İÇÑÛ = áÇ ãíÒÇä"
+    AddField tdf, "ScaleItemDigits", "BYTE", 0, True, "5", _
+             "Between 4 And 6", "ãä 4 Åáì 6 ÃÑŞÇã", "ÚÏÏ ÃÑŞÇã ÑãÒ ÇáÕäİ İí ÈÇÑßæÏ ÇáãíÒÇä", ""
+    AddField tdf, "ScaleValueKind", "TEXT", 6, True, """WEIGHT""", _
+             "In (""WEIGHT"",""PRICE"")", "WEIGHT = ÇáæÒä ÈÇáÌÑÇã¡ PRICE = ÇáÓÚÑ ÈÇáåááÉ Ãæ ÇáŞÑÔ", "ÈÇÑßæÏ ÇáãíÒÇä íÍãá", ""
     AddIndex tdf, "PrimaryKey", "LabelSettingID", True, True, False
     EndTable tdf, "ÅÚÏÇÏÇÊ ãáÕŞÇÊ ÇáÈÇÑßæÏ: ÓÌá æÇÍÏ: ãŞÇÓ ÇáãáÕŞ æÇáæÑŞ æÇáåæÇãÔ¡ æÍÌã ÇáÈÇÑßæÏ¡ æÇáäÕæÕ ÃÚáÇå æÃÓİáå.", "", ""
 End Sub

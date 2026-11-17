@@ -94,6 +94,29 @@ public sealed class ApiBackend(HttpClient http, string serverUrl, bool ownsClien
             : new BackendResult<DeviceSaleResult>(null, r.Status, r.Code, r.Message);
     }
 
+    public Task<BackendResult<ReturnableInvoice>> ReturnableAsync(PosCredential who, string invoiceNumber, bool english,
+                                                                 CancellationToken ct = default) =>
+        SendAsync<ReturnableInvoice>(HttpMethod.Get, "pos/returns/" + Uri.EscapeDataString((invoiceNumber ?? "").Trim()), null, who.Token,
+                                     english, ct);
+
+    public Task<BackendResult<PosDocument>> SendReturnAsync(PosCredential who, DeviceReturnRequest request, bool english,
+                                                           CancellationToken ct = default) =>
+        SendAsync<PosDocument>(HttpMethod.Post, "pos/returns", request, who.Token, english, ct);
+
+    public Task<BackendResult<PosDocument>> SendPaymentAsync(PosCredential who, DevicePaymentRequest request, bool english,
+                                                            CancellationToken ct = default) =>
+        SendAsync<PosDocument>(HttpMethod.Post, "pos/payments", request, who.Token, english, ct);
+
+    public Task<BackendResult<PosClosingBoxes>> ClosingBoxesAsync(PosCredential who, bool english, CancellationToken ct = default) =>
+        SendAsync<PosClosingBoxes>(HttpMethod.Get, "pos/closing", null, who.Token, english, ct);
+
+    public Task<BackendResult<ClosingPreview>> ClosingPreviewAsync(PosCredential who, int boxId, bool english, CancellationToken ct = default) =>
+        SendAsync<ClosingPreview>(HttpMethod.Get, "pos/closing/" + boxId, null, who.Token, english, ct);
+
+    public Task<BackendResult<PosDocument>> SendClosingAsync(PosCredential who, DeviceClosingRequest request, bool english,
+                                                            CancellationToken ct = default) =>
+        SendAsync<PosDocument>(HttpMethod.Post, "pos/closing", request, who.Token, english, ct);
+
     public void Dispose()
     {
         if (ownsClient)

@@ -12,7 +12,7 @@
   Then run this file in that database:
       sqlcmd -S .\SQLEXPRESS -d RetailStore -E -f 65001 -i RetailStore_Schema.sql
 
-  98 tables, 1255 fields, 151 indexes, 231 relationships, 454 seed rows
+  98 tables, 1261 fields, 154 indexes, 231 relationships, 454 seed rows
 ==============================================================================*/
 SET NOCOUNT ON;
 SET ANSI_NULLS ON;
@@ -555,6 +555,7 @@ IF OBJECT_ID(N'dbo.SalesReturns', N'U') IS NULL
         [CostCenterID] INT NULL,
         [SalesRepID] INT NULL,
         [WarehouseID] INT NOT NULL CONSTRAINT [DF_SalesReturns_WarehouseID] DEFAULT (1),
+        [ClientRef] NVARCHAR(40) NULL,
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_SalesReturns] PRIMARY KEY ([SalesReturnID])
     );
@@ -690,6 +691,7 @@ IF OBJECT_ID(N'dbo.CustomerPayments', N'U') IS NULL
         [ExchangeRate] MONEY NOT NULL CONSTRAINT [DF_CustomerPayments_ExchangeRate] DEFAULT (1),
         [ForeignAmount] MONEY NOT NULL CONSTRAINT [DF_CustomerPayments_ForeignAmount] DEFAULT (0),
         [SalesRepID] INT NULL,
+        [ClientRef] NVARCHAR(40) NULL,
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_CustomerPayments] PRIMARY KEY ([PaymentID])
     );
@@ -1162,6 +1164,7 @@ IF OBJECT_ID(N'dbo.CashClosings', N'U') IS NULL
         [KeptAmount] MONEY NOT NULL CONSTRAINT [DF_CashClosings_KeptAmount] DEFAULT (0),
         [Notes] NVARCHAR(255) NULL,
         [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_CashClosings_CreatedAt] DEFAULT (GETDATE()),
+        [ClientRef] NVARCHAR(40) NULL,
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_CashClosings] PRIMARY KEY ([ClosingID])
     );
@@ -1728,6 +1731,9 @@ IF OBJECT_ID(N'dbo.LabelSettings', N'U') IS NULL
         [BottomLine2] NVARCHAR(10) NOT NULL CONSTRAINT [DF_LabelSettings_BottomLine2] DEFAULT (N'PRICE'),
         [ShortName] NVARCHAR(30) NULL,
         [FontSize] TINYINT NOT NULL CONSTRAINT [DF_LabelSettings_FontSize] DEFAULT (7),
+        [ScalePrefixes] NVARCHAR(20) NULL,
+        [ScaleItemDigits] TINYINT NOT NULL CONSTRAINT [DF_LabelSettings_ScaleItemDigits] DEFAULT (5),
+        [ScaleValueKind] NVARCHAR(6) NOT NULL CONSTRAINT [DF_LabelSettings_ScaleValueKind] DEFAULT (N'WEIGHT'),
         [RowVer] ROWVERSION NOT NULL,
         CONSTRAINT [PK_LabelSettings] PRIMARY KEY ([LabelSettingID])
     );
@@ -2633,6 +2639,8 @@ IF COL_LENGTH(N'dbo.SalesReturns', N'SalesRepID') IS NULL
     ALTER TABLE [dbo].[SalesReturns] ADD [SalesRepID] INT NULL;
 IF COL_LENGTH(N'dbo.SalesReturns', N'WarehouseID') IS NULL
     ALTER TABLE [dbo].[SalesReturns] ADD [WarehouseID] INT NOT NULL CONSTRAINT [DF_SalesReturns_WarehouseID] DEFAULT (1);
+IF COL_LENGTH(N'dbo.SalesReturns', N'ClientRef') IS NULL
+    ALTER TABLE [dbo].[SalesReturns] ADD [ClientRef] NVARCHAR(40) NULL;
 IF COL_LENGTH(N'dbo.SalesReturns', N'RowVer') IS NULL
     ALTER TABLE [dbo].[SalesReturns] ADD [RowVer] ROWVERSION NOT NULL;
 IF COL_LENGTH(N'dbo.SalesReturnDetails', N'ReturnDetailID') IS NULL
@@ -2855,6 +2863,8 @@ IF COL_LENGTH(N'dbo.CustomerPayments', N'ForeignAmount') IS NULL
     ALTER TABLE [dbo].[CustomerPayments] ADD [ForeignAmount] MONEY NOT NULL CONSTRAINT [DF_CustomerPayments_ForeignAmount] DEFAULT (0);
 IF COL_LENGTH(N'dbo.CustomerPayments', N'SalesRepID') IS NULL
     ALTER TABLE [dbo].[CustomerPayments] ADD [SalesRepID] INT NULL;
+IF COL_LENGTH(N'dbo.CustomerPayments', N'ClientRef') IS NULL
+    ALTER TABLE [dbo].[CustomerPayments] ADD [ClientRef] NVARCHAR(40) NULL;
 IF COL_LENGTH(N'dbo.CustomerPayments', N'RowVer') IS NULL
     ALTER TABLE [dbo].[CustomerPayments] ADD [RowVer] ROWVERSION NOT NULL;
 IF COL_LENGTH(N'dbo.SupplierPayments', N'PaymentID') IS NULL
@@ -3583,6 +3593,8 @@ IF COL_LENGTH(N'dbo.CashClosings', N'Notes') IS NULL
     ALTER TABLE [dbo].[CashClosings] ADD [Notes] NVARCHAR(255) NULL;
 IF COL_LENGTH(N'dbo.CashClosings', N'CreatedAt') IS NULL
     ALTER TABLE [dbo].[CashClosings] ADD [CreatedAt] DATETIME NOT NULL CONSTRAINT [DF_CashClosings_CreatedAt] DEFAULT (GETDATE());
+IF COL_LENGTH(N'dbo.CashClosings', N'ClientRef') IS NULL
+    ALTER TABLE [dbo].[CashClosings] ADD [ClientRef] NVARCHAR(40) NULL;
 IF COL_LENGTH(N'dbo.CashClosings', N'RowVer') IS NULL
     ALTER TABLE [dbo].[CashClosings] ADD [RowVer] ROWVERSION NOT NULL;
 IF COL_LENGTH(N'dbo.Accounts', N'AccountCode') IS NULL
@@ -4419,6 +4431,12 @@ IF COL_LENGTH(N'dbo.LabelSettings', N'ShortName') IS NULL
     ALTER TABLE [dbo].[LabelSettings] ADD [ShortName] NVARCHAR(30) NULL;
 IF COL_LENGTH(N'dbo.LabelSettings', N'FontSize') IS NULL
     ALTER TABLE [dbo].[LabelSettings] ADD [FontSize] TINYINT NOT NULL CONSTRAINT [DF_LabelSettings_FontSize] DEFAULT (7);
+IF COL_LENGTH(N'dbo.LabelSettings', N'ScalePrefixes') IS NULL
+    ALTER TABLE [dbo].[LabelSettings] ADD [ScalePrefixes] NVARCHAR(20) NULL;
+IF COL_LENGTH(N'dbo.LabelSettings', N'ScaleItemDigits') IS NULL
+    ALTER TABLE [dbo].[LabelSettings] ADD [ScaleItemDigits] TINYINT NOT NULL CONSTRAINT [DF_LabelSettings_ScaleItemDigits] DEFAULT (5);
+IF COL_LENGTH(N'dbo.LabelSettings', N'ScaleValueKind') IS NULL
+    ALTER TABLE [dbo].[LabelSettings] ADD [ScaleValueKind] NVARCHAR(6) NOT NULL CONSTRAINT [DF_LabelSettings_ScaleValueKind] DEFAULT (N'WEIGHT');
 IF COL_LENGTH(N'dbo.LabelSettings', N'RowVer') IS NULL
     ALTER TABLE [dbo].[LabelSettings] ADD [RowVer] ROWVERSION NOT NULL;
 IF COL_LENGTH(N'dbo.EInvoiceLog', N'LogID') IS NULL
@@ -5453,6 +5471,12 @@ ALTER TABLE [dbo].[LabelSettings] WITH CHECK ADD CONSTRAINT [CK_LabelSettings_Bo
 IF OBJECT_ID(N'dbo.CK_LabelSettings_FontSize', N'C') IS NOT NULL
     ALTER TABLE [dbo].[LabelSettings] DROP CONSTRAINT [CK_LabelSettings_FontSize];
 ALTER TABLE [dbo].[LabelSettings] WITH CHECK ADD CONSTRAINT [CK_LabelSettings_FontSize] CHECK ([FontSize] BETWEEN 5 AND 16);
+IF OBJECT_ID(N'dbo.CK_LabelSettings_ScaleItemDigits', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[LabelSettings] DROP CONSTRAINT [CK_LabelSettings_ScaleItemDigits];
+ALTER TABLE [dbo].[LabelSettings] WITH CHECK ADD CONSTRAINT [CK_LabelSettings_ScaleItemDigits] CHECK ([ScaleItemDigits] BETWEEN 4 AND 6);
+IF OBJECT_ID(N'dbo.CK_LabelSettings_ScaleValueKind', N'C') IS NOT NULL
+    ALTER TABLE [dbo].[LabelSettings] DROP CONSTRAINT [CK_LabelSettings_ScaleValueKind];
+ALTER TABLE [dbo].[LabelSettings] WITH CHECK ADD CONSTRAINT [CK_LabelSettings_ScaleValueKind] CHECK ([ScaleValueKind] IN (N'WEIGHT',N'PRICE'));
 IF OBJECT_ID(N'dbo.CK_EInvoiceLog_Result', N'C') IS NOT NULL
     ALTER TABLE [dbo].[EInvoiceLog] DROP CONSTRAINT [CK_EInvoiceLog_Result];
 ALTER TABLE [dbo].[EInvoiceLog] WITH CHECK ADD CONSTRAINT [CK_EInvoiceLog_Result] CHECK ([Result] IN (N'OK',N'WARNING',N'REJECTED',N'ERROR',N'NETWORK'));
@@ -5528,6 +5552,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ReturnDate' AND objec
     CREATE INDEX [IX_ReturnDate] ON [dbo].[SalesReturns] ([ReturnDate]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_InvoiceUUID' AND object_id = OBJECT_ID(N'dbo.SalesReturns'))
     CREATE UNIQUE INDEX [UX_InvoiceUUID] ON [dbo].[SalesReturns] ([InvoiceUUID]) WHERE [InvoiceUUID] IS NOT NULL;
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_ClientRef' AND object_id = OBJECT_ID(N'dbo.SalesReturns'))
+    CREATE UNIQUE INDEX [UX_ClientRef] ON [dbo].[SalesReturns] ([ClientRef]) WHERE [ClientRef] IS NOT NULL;
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_InvoiceNumber' AND object_id = OBJECT_ID(N'dbo.PurchaseInvoices'))
     CREATE UNIQUE INDEX [UX_InvoiceNumber] ON [dbo].[PurchaseInvoices] ([InvoiceNumber]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_InvoiceDate' AND object_id = OBJECT_ID(N'dbo.PurchaseInvoices'))
@@ -5544,6 +5570,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_PaymentNumber' AND ob
     CREATE UNIQUE INDEX [UX_PaymentNumber] ON [dbo].[CustomerPayments] ([PaymentNumber]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_PaymentDate' AND object_id = OBJECT_ID(N'dbo.CustomerPayments'))
     CREATE INDEX [IX_PaymentDate] ON [dbo].[CustomerPayments] ([PaymentDate]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_ClientRef' AND object_id = OBJECT_ID(N'dbo.CustomerPayments'))
+    CREATE UNIQUE INDEX [UX_ClientRef] ON [dbo].[CustomerPayments] ([ClientRef]) WHERE [ClientRef] IS NOT NULL;
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_PaymentNumber' AND object_id = OBJECT_ID(N'dbo.SupplierPayments'))
     CREATE UNIQUE INDEX [UX_PaymentNumber] ON [dbo].[SupplierPayments] ([PaymentNumber]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_PaymentDate' AND object_id = OBJECT_ID(N'dbo.SupplierPayments'))
@@ -5642,6 +5670,8 @@ IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_ClosingNumber' AND ob
     CREATE UNIQUE INDEX [UX_ClosingNumber] ON [dbo].[CashClosings] ([ClosingNumber]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_CashBoxID_ClosingDate' AND object_id = OBJECT_ID(N'dbo.CashClosings'))
     CREATE INDEX [IX_CashBoxID_ClosingDate] ON [dbo].[CashClosings] ([CashBoxID], [ClosingDate]);
+IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'UX_ClientRef' AND object_id = OBJECT_ID(N'dbo.CashClosings'))
+    CREATE UNIQUE INDEX [UX_ClientRef] ON [dbo].[CashClosings] ([ClientRef]) WHERE [ClientRef] IS NOT NULL;
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_ParentCode' AND object_id = OBJECT_ID(N'dbo.Accounts'))
     CREATE INDEX [IX_ParentCode] ON [dbo].[Accounts] ([ParentCode]);
 IF NOT EXISTS (SELECT 1 FROM sys.indexes WHERE name = N'IX_TreeKey' AND object_id = OBJECT_ID(N'dbo.Accounts'))
@@ -7841,5 +7871,5 @@ GO
 IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
     ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
 GO
-PRINT N'RetailStore schema: done (98 tables, 1255 fields, 151 indexes, 231 relationships, 454 seed rows).';
+PRINT N'RetailStore schema: done (98 tables, 1261 fields, 154 indexes, 231 relationships, 454 seed rows).';
 GO

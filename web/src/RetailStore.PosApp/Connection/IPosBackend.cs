@@ -37,4 +37,20 @@ public interface IPosBackend : IDisposable
 
     /// <summary>Send a sale made on the POS: the invoice id and number (Duplicate = it was already there).</summary>
     Task<BackendResult<DeviceSaleResult>> SendSaleAsync(PosCredential who, DeviceSaleRequest sale, bool english, CancellationToken ct = default);
+
+    // ---- docs/86: made on the program at once (they need the data), each sent once by its number on the device
+
+    /// <summary>The invoice of a number with its lines to return from (404 = no such invoice).</summary>
+    Task<BackendResult<ReturnableInvoice>> ReturnableAsync(PosCredential who, string invoiceNumber, bool english, CancellationToken ct = default);
+
+    Task<BackendResult<PosDocument>> SendReturnAsync(PosCredential who, DeviceReturnRequest request, bool english, CancellationToken ct = default);
+
+    /// <summary>A customer receipt (409 = the question on an amount over the balance).</summary>
+    Task<BackendResult<PosDocument>> SendPaymentAsync(PosCredential who, DevicePaymentRequest request, bool english, CancellationToken ct = default);
+
+    Task<BackendResult<PosClosingBoxes>> ClosingBoxesAsync(PosCredential who, bool english, CancellationToken ct = default);
+
+    Task<BackendResult<ClosingPreview>> ClosingPreviewAsync(PosCredential who, int boxId, bool english, CancellationToken ct = default);
+
+    Task<BackendResult<PosDocument>> SendClosingAsync(PosCredential who, DeviceClosingRequest request, bool english, CancellationToken ct = default);
 }

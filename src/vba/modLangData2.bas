@@ -170,6 +170,7 @@ Private Sub D2_2()
     LangAdd "المبيعات المحلية الخاضعة للضريبة بالسعر العام", "Local sales taxed at the general rate"
     LangAdd "المرتجعات على هذه الفاتورة (نقر مزدوج للطباعة", "Returns on this invoice (double-click to print"
     LangAdd "الواردات من السلع (المسددة ضريبتها في الجمارك", "Imported goods (VAT paid at customs"
+    LangAdd "باركود الميزان: يقرؤه البيع في Access وبرنامج", "Scale barcodes: read by the sale in Access and the"
     LangAdd "برنامج التوقيع (فلاشة التوقيع) في إعداد الربط", "Signing program (USB token) in the connection setup"
     LangAdd "بعد الحفظ عيّن كلمة المرور من زر «كلمة المرور", "After saving, set the password with the button Password"
     LangAdd "رصيد الحساب في البنك عند بدء استخدام البرنامج", "The account balance in the bank when the program is first used"
@@ -257,10 +258,10 @@ Private Sub D2_2()
     LangAdd "تُحذف المسودة فقط. ألغِ ترحيل السند أولًا", "Only a draft is deleted. Unpost the voucher first"
     LangAdd "سطر في الإذن لا يطابق سطرًا في أمر الشراء", "A note line does not match a line of the purchase order"
     LangAdd "سطر في الإذن لا يطابق صنف سطره في الطلبية", "A note line does not match the product of its order line"
-    LangAdd "شجرة الحسابات: الحسابات الرئيسية والفرعية", "Account tree: main and sub-accounts"
 End Sub
 
 Private Sub D2_3()
+    LangAdd "شجرة الحسابات: الحسابات الرئيسية والفرعية", "Account tree: main and sub-accounts"
     LangAdd "طلبيات العملاء المفتوحة: الباقي بلا تسليم", "Open customer orders: what is left to deliver"
     LangAdd "فاتورة إذن التسليم بالوحدة الصغرى للأصناف", "The invoice of a delivery note is in the smallest unit of the products"
     LangAdd "فعّل الإرسال من شاشة الفاتورة الإلكترونية", "Enable sending in the e-invoicing screen"
@@ -290,6 +291,7 @@ Private Sub D2_3()
     LangAdd "دور مدير النظام يملك كل الصلاحيات دائمًا", "The system administrator role always has all the permissions"
     LangAdd "رفضت المصلحة بيانات جهاز نقطة البيع (رمز", "The Tax Authority refused the POS device data (code"
     LangAdd "سطر المرتجع من فاتورة غير فاتورة المرتجع", "A return line from an invoice other than the invoice of the return"
+    LangAdd "سعر الصنف صفر، فلا تُحسب الكمية من السعر", "the price of the product is zero, so the quantity cannot come from the price"
     LangAdd "على هذا الحساب قيود، فيبقى حسابًا فرعيًا", "This account has entries, so it stays a sub-account"
     LangAdd "قوائم الأسعار: أسعار الأصناف في كل قائمة", "Price lists: the product prices in each list"
     LangAdd "كلمتا المرور غير متطابقتين. لم يتغير شيء", "The two passwords do not match. Nothing changed"
@@ -379,11 +381,12 @@ Private Sub D2_3()
     LangAdd "حركة الخزينة اليومية (أول اليوم وآخره", "Daily treasury moves (start and end of the day"
     LangAdd "رقم جديد لا يتكرر؛ لا يتغير بعد الحفظ", "A new number that is not repeated, it does not change after saving"
     LangAdd "سجل التدقيق يحتاج صلاحية «سجل التدقيق", "The audit trail needs the permission Audit trail"
-    LangAdd "شامل الضريبة كسعر البيع في نقطة البيع", "Including VAT, as the selling price in the POS"
-    LangAdd "عرض فقط - التصحيح يكون بمرتجع مشتريات", "View only - a correction is made with a purchase return"
 End Sub
 
 Private Sub D2_4()
+    LangAdd "شامل الضريبة كسعر البيع في نقطة البيع", "Including VAT, as the selling price in the POS"
+    LangAdd "عدد أرقام رمز الصنف في باركود الميزان", "Item code digits in a scale barcode"
+    LangAdd "عرض فقط - التصحيح يكون بمرتجع مشتريات", "View only - a correction is made with a purchase return"
     LangAdd "غير نشط. فعّله من شاشة المنتجات أولًا", "is not active. Activate it in the Products screen first"
     LangAdd "فحص سلامة البيانات: لا توجد أي مشكلات", "Data integrity check: no problems at all"
     LangAdd "لا تملك صلاحية اعتماد التسوية البنكية", "You do not have the permission to approve the bank reconciliation"
@@ -393,7 +396,4 @@ Private Sub D2_4()
     LangAdd "لا توجد حركة نقدية للاختيارات المحددة", "There is no cash move for the choices made"
     LangAdd "لا يوجد يوم. اختر المندوب ثم «فتح يوم", "No day. Choose the rep, then Open day"
     LangAdd "لم تعد من وحداته. اختر الوحدة من جديد", "is no longer one of its units. Choose the unit again"
-    LangAdd "مقفلة بقيد إقفال. أعد فتح السنة أولًا", "closed with a closing entry. Reopen the year first"
-    LangAdd "من بداية الصندوق (لا توجد تصفية سابقة", "since the box started (no previous closing"
-    LangAdd "هذا سجل أساسي في النظام ولا يمكن حذفه", "This is a system record and cannot be deleted"
 End Sub

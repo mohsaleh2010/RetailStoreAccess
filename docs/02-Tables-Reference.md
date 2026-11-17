@@ -2,7 +2,7 @@
 
 > ملف مُولَّد تلقائيًا من `tools/schema.py` بواسطة `tools/generate.py` – لا تعدّله يدويًا.
 
-عدد الجداول: **98** | عدد الحقول: **1255**
+عدد الجداول: **98** | عدد الحقول: **1261**
 
 ## الفهرس
 
@@ -786,11 +786,13 @@
 | 38 | CostCenterID | Number (Long) |  |  |  |  | `CostCenters.CostCenterID` | مركز التكلفة – مركز الفاتورة الأصلية |
 | 39 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – مندوب الفاتورة الأصلية |
 | 40 | WarehouseID | Number (Long) |  | ✔ | `1` |  | `Warehouses.WarehouseID` | المخزن |
+| 41 | ClientRef | Short Text | 40 |  |  |  |  | رقم المرتجع في جهاز نقطة البيع – من نقطة البيع على Windows (docs/86): يمنع تكرار المرتجع إذا أُعيد إرساله بعد انقطاع الاتصال |
 
 - المفتاح الأساسي: `SalesReturnID`
 - فهرس فريد: `ReturnNumber`
 - فهرس عادي: `ReturnDate`
 - فهرس فريد (يتجاهل الفارغ): `InvoiceUUID`
+- فهرس فريد (يتجاهل الفارغ): `ClientRef`
 - قاعدة تحقق على مستوى الجدول: `[RefundedAmount]<=[TotalAmount]` – المبلغ المردود لا يتجاوز قيمة المرتجع
 
 ## SalesReturnDetails
@@ -957,10 +959,12 @@
 | 14 | ExchangeRate | Currency (نسبة) |  | ✔ | `1` | `>0` |  | معامل التحويل – قيمة وحدة واحدة من العملة بعملة البرنامج |
 | 15 | ForeignAmount | Currency |  | ✔ | `0` | `>=0` |  | المبلغ بالعملة – الإجمالي بعملة المستند (0 للمستندات القديمة) |
 | 16 | SalesRepID | Number (Long) |  |  |  |  | `SalesReps.SalesRepID` | المندوب – المحصِّل: مندوب العميل، وإلا مندوب المستخدم |
+| 17 | ClientRef | Short Text | 40 |  |  |  |  | رقم السند في جهاز نقطة البيع – من نقطة البيع على Windows (docs/86): يمنع تكرار السند إذا أُعيد إرساله بعد انقطاع الاتصال |
 
 - المفتاح الأساسي: `PaymentID`
 - فهرس فريد: `PaymentNumber`
 - فهرس عادي: `PaymentDate`
+- فهرس فريد (يتجاهل الفارغ): `ClientRef`
 
 ## SupplierPayments
 
@@ -1592,10 +1596,12 @@
 | 16 | KeptAmount | Currency |  | ✔ | `0` | `>=0` |  | المتبقي في الصندوق (عهدة) |
 | 17 | Notes | Short Text | 255 |  |  |  |  | ملاحظات |
 | 18 | CreatedAt | Date/Time |  | ✔ | `Now()` |  |  | تاريخ الإنشاء |
+| 19 | ClientRef | Short Text | 40 |  |  |  |  | رقم التصفية في جهاز نقطة البيع – من نقطة البيع على Windows (docs/86): يمنع تكرار التصفية إذا أُعيد إرسالها بعد انقطاع الاتصال |
 
 - المفتاح الأساسي: `ClosingID`
 - فهرس فريد: `ClosingNumber`
 - فهرس عادي: `CashBoxID, ClosingDate`
+- فهرس فريد (يتجاهل الفارغ): `ClientRef`
 - قاعدة تحقق على مستوى الجدول: `[TransferAmount]+[KeptAmount]=[CountedAmount]` – المرحَّل + المتبقي = النقدية الفعلية
 
 ## Accounts
@@ -2378,6 +2384,9 @@
 | 17 | BottomLine2 | Short Text | 10 | ✔ | `"PRICE"` | `In ("NONE","STORE","NAME","PRICE","CODE","BARCODE")` |  | السطر الثاني أسفل الباركود |
 | 18 | ShortName | Short Text | 30 |  |  |  |  | الاسم المختصر للمحل – يُطبع إذا اخترت «الاسم المختصر» |
 | 19 | FontSize | Number (Byte) |  | ✔ | `7` | `Between 5 And 16` |  | حجم الخط |
+| 20 | ScalePrefixes | Short Text | 20 |  |  |  |  | بادئات باركود الميزان – مثل 20,21 (docs/86): باركود من 13 رقمًا يبدأ بإحداها = رمز الصنف ثم الوزن أو السعر؛ فارغ = لا ميزان |
+| 21 | ScaleItemDigits | Number (Byte) |  | ✔ | `5` | `Between 4 And 6` |  | عدد أرقام رمز الصنف في باركود الميزان |
+| 22 | ScaleValueKind | Short Text | 6 | ✔ | `"WEIGHT"` | `In ("WEIGHT","PRICE")` |  | باركود الميزان يحمل |
 
 - المفتاح الأساسي: `LabelSettingID`
 - بيانات أساسية: 1 سجل

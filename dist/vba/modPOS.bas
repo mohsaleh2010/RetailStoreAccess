@@ -187,7 +187,7 @@ End Sub
 Public Function ScanCode(ByVal frm As Access.Form, ByVal Code As String) As Boolean
     ' "3*6281234567890" adds 3 units. Matches the barcode or the product code, or the barcode of a unit of a
     ' product (a carton, modProductUnits): the line is then in that unit.
-    Dim qty As Currency, pid As Long, unit As Variant, p As Long
+    Dim qty As Currency, pid As Long, unit As Variant, p As Long, msg As String
     qty = Nz(frm!txtQty.Value, 1)
     p = InStr(Code, "*")
     If p > 1 Then
@@ -195,6 +195,17 @@ Public Function ScanCode(ByVal frm As Access.Form, ByVal Code As String) As Bool
         Code = Mid$(Code, p + 1)
     End If
     If Not FindProductCode(Code, pid, unit) Then
+        If ScaleLine(Code, CartCustomerID(frm), pid, qty, msg) Then         ' a scale label (modScale, docs/86)
+            If Len(msg) > 0 Then
+                Beep
+                SetPOSStatus frm, msg, CLR_DANGER
+                Exit Function
+            End If
+            AddLine frm, pid, qty
+            frm!txtQty.Value = 1
+            ScanCode = True
+            Exit Function
+        End If
         Beep
         SetPOSStatus frm, "·„ Ì „ «·⁄ÀÊ— ⁄·Ï „‰ Ã »«·»«—ﬂÊœ √Ê «·ﬂÊœ: " & Code, CLR_DANGER
         Exit Function

@@ -171,6 +171,8 @@ TILE_COLORS = ("BLUE;أزرق;GREEN;أخضر;ORANGE;برتقالي;PURPLE;بنف
 COUNTRIES = "SA;المملكة العربية السعودية;EG;جمهورية مصر العربية"
 POS_MODES = "RETAIL;المحلات (باركود);RESTAURANT;المطاعم (شاشة لمس);CAFE;الكافيهات (شاشة لمس)"
 
+SCALE_KINDS = "WEIGHT;الوزن (بالجرام);PRICE;السعر (بالهللة أو القرش)"
+
 INVOICE_PRINT_MODES = ("DIRECT;طباعة مباشرة بدون معاينة;PREVIEW;عرض معاينة الطباعة;"
                        "NONE;بدون طباعة")
 
@@ -677,6 +679,10 @@ DATA_SCREENS: List[DataScreen] = [
             Fld("TopLine1", rows=LABEL_LINES), Fld("TopLine2", rows=LABEL_LINES),
             Fld("BottomLine1", rows=LABEL_LINES), Fld("BottomLine2", rows=LABEL_LINES),
             Fld("ShortName", hint="مثال: النخبة. فارغ = اسم المحل من الإعدادات"), Fld("FontSize"),
+            Info("lblInfoScale", "باركود الميزان: يقرؤه البيع في Access وبرنامج Windows"),
+            Fld("ScalePrefixes", hint="مثال: 20,21. فارغ = لا ميزان"),
+            Fld("ScaleItemDigits", hint="رمز الصنف في الميزان = كود الصنف"),
+            Fld("ScaleValueKind", rows=SCALE_KINDS, widths="0;6"),
         ]),
 ]
 

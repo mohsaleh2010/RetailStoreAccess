@@ -18,6 +18,25 @@ Public Sub LangData6()
 End Sub
 
 Private Sub D6_1()
+    LangAdd "›∆… ≈÷«›« ", "Extras category"
+    LangAdd "›« Ê—… »Ì⁄", "Sales invoice"
+    LangAdd "› Õ «·„Ã·œ", "Open the folder"
+    LangAdd "›—ﬁ «·⁄„·…", "Exchange difference"
+    LangAdd "ﬁÌ„… «·√’·", "Asset value"
+    LangAdd "ﬁÌ„… «·”ÿ—", "Line value"
+    LangAdd "ﬁÌ„… «·›—ﬁ", "Difference value"
+    LangAdd "ﬁÌÊœ ÃœÌœ…", "New entries"
+    LangAdd "ﬂ«—  «·’‰›", "Item card"
+    LangAdd "ﬂ· «·√’‰«›", "All items"
+    LangAdd "ﬂ· «·Ãœ«Ê·", "All tables"
+    LangAdd "ﬂ· «·‘«‘« ", "All screens"
+    LangAdd "ﬂ· «·„Œ«“‰", "All warehouses"
+    LangAdd "ﬂ· «·„—«ﬂ“", "All centers"
+    LangAdd "ﬂ„Ì… «·’‰›", "Item quantity"
+    LangAdd "ﬂÊœ «·„Œ“‰", "Warehouse code"
+    LangAdd "ﬂÊœ «·„‰ Ã", "Product code"
+    LangAdd "·„ Ìı—ÕÛ¯·", "Not posted"
+    LangAdd "„»·€ «·”‰œ", "Voucher amount"
     LangAdd "„»·€ «·‘Ìﬂ", "Cheque amount"
     LangAdd "„Ã„· «·—»Õ", "Gross profit"
     LangAdd "„Œ“‰ —∆Ì”Ì", "Main warehouse"
@@ -119,6 +138,9 @@ Private Sub D6_1()
     LangAdd "”Õ» ‰ﬁœÌ…", "Cash withdrawal"
     LangAdd "”⁄— «·»Ì⁄", "Sale price"
     LangAdd "”·›… „ÊŸ›", "Employee advance"
+End Sub
+
+Private Sub D6_2()
     LangAdd "”‰… ÃœÌœ…", "New year"
     LangAdd "”‰œ ‰ﬁœÌ…", "Cash voucher"
     LangAdd "”ıÃˆ¯· ›Ì", "Recorded on"
@@ -138,15 +160,12 @@ Private Sub D6_1()
     LangAdd "› Õ «·ﬁÌœ", "Open the entry"
     LangAdd "›Ì «·„”Ì—", "in the run"
     LangAdd "ﬁ”ÿ «·‘Â—", "Month depreciation"
-End Sub
-
-Private Sub D6_2()
     LangAdd "ﬁÌœ „Õ–Ê›", "Deleted entry"
     LangAdd "ﬁÌœ ÌÊ„Ì…", "Journal entry"
     LangAdd "ﬂ· (œﬁÌﬁ…", "Every (minutes"
     LangAdd "ﬂ· 3 √‘Â—", "Every 3 months"
     LangAdd "ﬂÊœ «·ÃÂ…", "Party code"
-    LangAdd "ﬂÊœ «·’‰›", "Item code"
+    LangAdd "ﬂÊœ «·’‰›", "Product code"
     LangAdd "·Ì” »’Ì€…", "is not in the format of"
     LangAdd "„»·€ ”‰ÊÌ", "Yearly amount"
     LangAdd "„— Ã⁄ »Ì⁄", "Sales return"
@@ -242,6 +261,9 @@ Private Sub D6_2()
     LangAdd "’—› ·ÃÂ…", "Issue to a party"
     LangAdd "’›— Ã‰ÌÂ", "zero pounds"
     LangAdd "’›— —Ì«·", "zero riyals"
+End Sub
+
+Private Sub D6_3()
     LangAdd "ÿ·» ”›—Ì", "Takeaway order"
     LangAdd "⁄—÷ ÃœÌœ", "New quotation"
     LangAdd "€Ì— ’«·Õ", "Invalid"
@@ -253,6 +275,7 @@ Private Sub D6_2()
     LangAdd "ﬁÌœ ⁄ﬂ”Ì", "Reversing entry"
     LangAdd "ﬁÌœ ÌœÊÌ", "Manual entry"
     LangAdd "ﬂ‘› Õ”«»", "Account statement"
+    LangAdd "·« „Ì“«‰", "no scale"
     LangAdd "·« Ìı—”·", "Not sent"
     LangAdd "·„  ı—”·", "Not sent"
     LangAdd "·„ ÌıƒŒ–", "Not taken:"
@@ -261,9 +284,6 @@ Private Sub D6_2()
     LangAdd "„Œ“‰ ›—⁄", "Branch warehouse"
     LangAdd "„⁄ „œ ›Ì", "Approved on"
     LangAdd "„ﬁ›· Õ Ï", "Closed up to"
-End Sub
-
-Private Sub D6_3()
     LangAdd "„‰ «·»‰ﬂ", "From the bank"
     LangAdd "„‰  «—ÌŒ", "From date"
     LangAdd "„‰ ’‰œÊﬁ", "From a box"
@@ -364,6 +384,9 @@ Private Sub D6_3()
     LangAdd "»œÊ‰ Õœ", "No limit"
     LangAdd "»— ﬁ«·Ì", "Orange"
     LangAdd "»·« Œ’„", "no discount"
+End Sub
+
+Private Sub D6_4()
     LangAdd " Ã—Ì»Ì…", "Test"
     LangAdd " ”⁄„«∆…", "nine hundred"
     LangAdd "Œ„”„«∆…", "five hundred"
@@ -384,9 +407,6 @@ Private Sub D6_3()
     LangAdd "›Ì ‘«‘…", "in the screen"
     LangAdd "·«  ÊÃœ", "None"
     LangAdd "··≈÷«›…", "to add"
-End Sub
-
-Private Sub D6_4()
     LangAdd "·„  Ã “", "Failed:"
     LangAdd "„ Ê«“‰…", "Balanced"
     LangAdd "„—…/”‰…", "times/year"
@@ -487,6 +507,9 @@ Private Sub D6_4()
     LangAdd "›»—«Ì—", "February"
     LangAdd "›Ì Õﬁ·", "in the field"
     LangAdd "›Ì ÌÊ„", "on day"
+End Sub
+
+Private Sub D6_5()
     LangAdd "›Ì—Ê“Ì", "Teal"
     LangAdd "·« €Ì—", "only"
     LangAdd "· ’‰Ì›", "for category"
@@ -507,9 +530,6 @@ Private Sub D6_4()
     LangAdd "„ﬂ«›¬ ", "Bonuses"
     LangAdd "„·«ÌÌ‰", "million"
     LangAdd "„„‰ÊÕ…", "Granted"
-End Sub
-
-Private Sub D6_5()
     LangAdd "„‰ »‰ﬂ", "From a bank"
     LangAdd "„Ê«“‰…", "Budget"
     LangAdd "„Ê—œ«", "suppliers"
@@ -610,6 +630,9 @@ Private Sub D6_5()
     LangAdd "⁄‘—Ê‰", "twenty"
     LangAdd "⁄„·Ì…", "Transaction"
     LangAdd "›⁄·Ì…", "Production"
+End Sub
+
+Private Sub D6_6()
     LangAdd "ﬂ«‘Ì—", "Cashier"
     LangAdd "„ Êﬁ›", "Stopped"
     LangAdd "„Ã„Ê⁄", "Total"
@@ -630,9 +653,6 @@ Private Sub D6_5()
     LangAdd "„⁄œ¯·", "changed"
     LangAdd "„€·ﬁ…", "Closed"
     LangAdd "„› ÊÕ", "Open"
-End Sub
-
-Private Sub D6_6()
     LangAdd "„›Ê —", "Invoiced"
     LangAdd "„ﬁ»Ê÷", "Received"
     LangAdd "„ﬁ›·…", "Closed"
@@ -733,6 +753,9 @@ Private Sub D6_6()
     LangAdd "—.”", "SAR"
     LangAdd "—»ÿ", "The connection to"
     LangAdd "—ﬁ„", "Number"
+End Sub
+
+Private Sub D6_7()
     LangAdd "” …", "six"
     LangAdd "”Ã·", "Record"
     LangAdd "”Õ»", "Withdrawal"
@@ -753,9 +776,6 @@ Private Sub D6_6()
     LangAdd "„’—", "Egypt"
     LangAdd "„·›", "File"
     LangAdd "‰‘ÿ", "Active"
-End Sub
-
-Private Sub D6_7()
     LangAdd "‰⁄„", "Yes"
     LangAdd "Ê”ÿ", "Medium"
     LangAdd "›Ì", "in"

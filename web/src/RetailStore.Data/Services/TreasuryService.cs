@@ -40,6 +40,22 @@ public sealed record BankTxRow(int BankTxID, string TxNumber, DateTime TxDate, s
 public sealed record BankBalance(int BankID, string BankName, string? AccountNo, string? IBAN, bool IsActive, decimal Balance,
                                  DateTime? LastItemDate);
 
+/// <summary>A cashier closing (modCash.PostCashClosing): the counted cash of a box; Destination MAIN (TransferAmount to the main
+/// safe ToCashBoxID), OWNER (TransferAmount handed to the owner) or KEEP (all stays in the box).</summary>
+public sealed record CashClosingRequest(int CashBoxID, decimal Counted, string Destination, int? ToCashBoxID, decimal TransferAmount,
+                                        string? Notes);
+
+/// <summary>A line of the breakdown of a closing (frmCashClosing.lstBreakdown): the moves of one kind since the last closing.</summary>
+public sealed record ClosingBreakdownLine(string MoveTypeName, int Count, decimal AmountIn, decimal AmountOut);
+
+/// <summary>What a closing of a box finds now (ClosingBoxChanged): PeriodStart = the last closing (null = the start of the box),
+/// the balance then, the cash in and out since, and the book balance.</summary>
+public sealed record ClosingPreview(int CashBoxID, string BoxName, DateTime? PeriodStart, decimal Opening, decimal CashIn, decimal CashOut,
+                                    decimal Expected, List<ClosingBreakdownLine> Breakdown);
+
+/// <summary>A box the user may close, and the main safes that can receive the cash.</summary>
+public sealed record ClosingBox(int CashBoxID, string BoxName, string BoxType);
+
 public sealed record TreasuryResult(SaveStatus Status, string Message, int Id = 0, string Number = "")
 {
     public static TreasuryResult Refused(string message) => new(SaveStatus.Refused, message);
@@ -48,8 +64,8 @@ public sealed record TreasuryResult(SaveStatus Status, string Message, int Id = 
 /// <summary>The treasury and the banks on the web and the API (plan 6E, docs/81): the cash movements of each box
 /// (qryCashMovements), the balances and the statement of a box, the cash vouchers (modCash.PostCashVoucher, with the expense of
 /// an expense voucher), the transfers between boxes waiting for their receipt (ReceiveCashTransfer / CancelCashTransfer), the
-/// bank balances in the books and the bank transactions (modBank.PostBankTx / DeleteBankTx), with the checks, messages, rows
-/// and audit of Access. The cash closing and the bank reconciliation stay in Access.</summary>
+/// bank balances in the books and the bank transactions (modBank.PostBankTx / DeleteBankTx), the cashier closing (modCash.PostCashClosing,
+/// docs/86), with the checks, messages, rows and audit of Access. The bank reconciliation stays in Access.</summary>
 public sealed class TreasuryService(IDbContextFactory<RetailDbContext> factory, PermissionService permissions, JournalService? journal = null)
 {
     public const string VoucherForm = "frmCashVoucher";
@@ -533,6 +549,209 @@ public sealed class TreasuryService(IDbContextFactory<RetailDbContext> factory, 
     {
         await using var db = await factory.CreateDbContextAsync();
         return await Sales.CurrentCashBoxAsync(db, employeeId);
+    }
+
+    // ------------------------------------------------------------------ the cashier closing (docs/86)
+
+    public const string ClosingForm = "frmCashClosing";
+
+    /// <summary>modCash.ClosingAllowed: a cashier closes his own box; who manages the treasury closes the boxes he may use.</summary>
+    public async Task<bool> ClosingAllowedAsync(RetailDbContext db, int employeeId, int boxId)
+    {
+        if (boxId == await Sales.CurrentCashBoxAsync(db, employeeId) || await IsBoxCustodianAsync(db, employeeId, boxId))
+        {
+            return true;
+        }
+        return await permissions.HasPermissionAsync(employeeId, "CASH_BOX") && await CanUseBoxAsync(db, employeeId, boxId);
+    }
+
+    /// <summary>ClosingLoad: the active boxes the user may close (all with CASH_ALL_BOXES), his own first, and the main safes.</summary>
+    public async Task<(List<ClosingBox> Boxes, List<ClosingBox> Safes, int Default)> ClosingBoxesAsync(int employeeId, bool english)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        bool all = await permissions.HasPermissionAsync(employeeId, "CASH_ALL_BOXES");
+        var boxes = await db.CashBoxes.AsNoTracking().Where(b => b.IsActive).OrderBy(b => b.BoxType).ThenBy(b => b.BoxName).ToListAsync();
+        var mine = new List<ClosingBox>();
+        foreach (var b in boxes)
+        {
+            if (all || await ClosingAllowedAsync(db, employeeId, b.CashBoxID))
+            {
+                mine.Add(new ClosingBox(b.CashBoxID, Name(b.BoxName, b.BoxNameEn, english), b.BoxType));
+            }
+        }
+        var safes = boxes.Where(b => b.BoxType == "MAIN").Select(b => new ClosingBox(b.CashBoxID, Name(b.BoxName, b.BoxNameEn, english), b.BoxType))
+            .ToList();
+        int own = await Sales.CurrentCashBoxAsync(db, employeeId);
+        return (mine, safes, mine.Any(b => b.CashBoxID == own) ? own : mine.FirstOrDefault()?.CashBoxID ?? 0);
+    }
+
+    /// <summary>modCash.ClosingBoxChanged: the period, the balance at the last closing, the cash in and out since, the book
+    /// balance and the moves by kind.</summary>
+    public async Task<ClosingPreview?> ClosingPreviewAsync(int boxId, bool english)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var box = await db.CashBoxes.AsNoTracking().FirstOrDefaultAsync(b => b.CashBoxID == boxId);
+        if (box is null)
+        {
+            return null;
+        }
+        var t = await ClosingTotalsAsync(db, boxId, english);
+        var breakdown = t.Moves.GroupBy(m => m.MoveTypeName).OrderBy(g => g.Key, StringComparer.Ordinal)
+            .Select(g => new ClosingBreakdownLine(g.Key, g.Count(), g.Sum(m => m.AmountIn), g.Sum(m => m.AmountOut))).ToList();
+        return new ClosingPreview(boxId, Name(box.BoxName, box.BoxNameEn, english), t.Since, t.Opening, t.CashIn, t.CashOut,
+                                  t.Opening + t.CashIn - t.CashOut, breakdown);
+    }
+
+    /// <summary>LastClosingDate, CashBoxBalance(box, since, inclusive) and CashMovesTotal IN / OUT after it.</summary>
+    private static async Task<(DateTime? Since, decimal Opening, decimal CashIn, decimal CashOut, List<CashMove> Moves)> ClosingTotalsAsync(
+        RetailDbContext db, int boxId, bool english)
+    {
+        DateTime? since = await db.CashClosings.Where(c => c.CashBoxID == boxId).MaxAsync(c => (DateTime?)c.ClosingDate);
+        var moves = await CashMovesAsync(db, boxId, english);
+        decimal opening = since is { } s ? moves.Where(m => m.MoveDate <= s).Sum(m => m.AmountIn - m.AmountOut) : 0;
+        var after = moves.Where(m => since is null || m.MoveDate > since).ToList();
+        return (since, opening, after.Sum(m => m.AmountIn), after.Sum(m => m.AmountOut), after);
+    }
+
+    /// <summary>modCash.ShortageEmployeeFor: the user of the rep who keeps a custody box (docs/66); null = a box of the shop.</summary>
+    private static async Task<int?> ShortageEmployeeForAsync(RetailDbContext db, int boxId) =>
+        await (from b in db.CashBoxes
+               join r in db.SalesReps on b.SalesRepID equals r.SalesRepID
+               where b.BoxType == "CUSTODY" && r.EmployeeID != null && b.CashBoxID == boxId
+               select r.EmployeeID).FirstOrDefaultAsync();
+
+    /// <summary>modCash.PostCashClosing (and SaveCashClosing: the screen and its ADD action): the closing, then the voucher of a
+    /// shortage (an advance on the rep of a custody box) or an overage, then the transfer to the safe or the owner's voucher, in
+    /// one transaction; clientRef = its number on a POS device (docs/86).</summary>
+    public async Task<TreasuryResult> PostCashClosingAsync(ActingUser user, CashClosingRequest c, string? clientRef = null)
+    {
+        string open = await permissions.OpenProblemAsync(user.EmployeeID, ClosingForm);
+        if (open.Length == 0)
+        {
+            open = await permissions.ActionProblemAsync(user.EmployeeID, ClosingForm, ScreenAction.Add);
+        }
+        if (open.Length > 0)
+        {
+            return TreasuryResult.Refused(open);
+        }
+        if (!await permissions.HasPermissionAsync(user.EmployeeID, "CASH_CLOSING"))
+        {
+            return TreasuryResult.Refused("ليست لديك صلاحية تصفية يومية الكاشير.");
+        }
+        await using var db = await factory.CreateDbContextAsync();
+        if (!await BoxIsActiveAsync(db, c.CashBoxID))
+        {
+            return TreasuryResult.Refused("اختر الصندوق.");
+        }
+        if (!await ClosingAllowedAsync(db, user.EmployeeID, c.CashBoxID))
+        {
+            return TreasuryResult.Refused("يمكنك تصفية صناديقك فقط.");
+        }
+        if (c.Counted < 0)
+        {
+            return TreasuryResult.Refused("النقدية الفعلية لا تكون سالبة.");
+        }
+        string destination = c.Destination ?? "";
+        decimal transfer = destination == "KEEP" ? 0 : c.TransferAmount;
+        if (transfer < 0 || transfer > c.Counted)
+        {
+            return TreasuryResult.Refused("المبلغ المرحَّل يجب أن يكون بين صفر والنقدية الفعلية (" + Money(c.Counted) + ").");
+        }
+        if (destination == "MAIN" && transfer > 0)
+        {
+            if (!await BoxIsActiveAsync(db, c.ToCashBoxID))
+            {
+                return TreasuryResult.Refused("اختر الخزينة التي تستلم المبلغ.");
+            }
+            if (c.ToCashBoxID == c.CashBoxID)
+            {
+                return TreasuryResult.Refused("لا يمكن الترحيل إلى نفس الصندوق.");
+            }
+        }
+        else if (destination != "MAIN" && destination != "OWNER" && destination != "KEEP")
+        {
+            return TreasuryResult.Refused("اختر جهة الترحيل.");
+        }
+
+        var t = await ClosingTotalsAsync(db, c.CashBoxID, false);
+        decimal expected = t.Opening + t.CashIn - t.CashOut;
+        decimal diff = c.Counted - expected;
+        await using var tx = await db.Database.BeginTransactionAsync();
+        var now = DateTime.Now;
+        string notes = (c.Notes ?? "").Trim();
+        var closing = new CashClosings
+        {
+            ClosingNumber = await NumberSequences.NextNumberAsync(db, "CASH_CLOSING"), ClosingDate = now, CashBoxID = c.CashBoxID,
+            EmployeeID = user.EmployeeID, PeriodStart = t.Since, OpeningBalance = t.Opening, CashIn = t.CashIn, CashOut = t.CashOut,
+            ExpectedBalance = expected, CountedAmount = c.Counted, Difference = diff, Destination = destination,
+            ToCashBoxID = destination == "MAIN" && transfer > 0 ? c.ToCashBoxID : null, TransferAmount = transfer,
+            KeptAmount = c.Counted - transfer, Notes = notes.Length > 0 ? SalesService.Clip(notes, 255) : null, ClientRef = clientRef,
+        };
+        db.CashClosings.Add(closing);
+        await db.SaveChangesAsync();
+        int? center = await SalesService.CostCenterForAsync(db, user.EmployeeID);
+        if (diff < 0)
+        {
+            int? advanceTo = await ShortageEmployeeForAsync(db, c.CashBoxID);
+            if (advanceTo is null)
+            {
+                await InsertClosingVoucherAsync(db, user, center, "OUT", c.CashBoxID, null, "SHORTAGE", -diff, "",
+                                                "عجز تصفية " + closing.ClosingNumber, closing.ClosingID, now);
+            }
+            else
+            {
+                // a rep's custody box: the shortage is an advance on the rep (docs/66), deducted from his pay
+                var v = await InsertClosingVoucherAsync(db, user, center, "OUT", c.CashBoxID, null, "ADVANCE", -diff, "",
+                                                        "عجز تصفية " + closing.ClosingNumber + " سلفة على المندوب", closing.ClosingID, now);
+                v.AdvanceEmployeeID = advanceTo;
+                await db.SaveChangesAsync();
+            }
+        }
+        else if (diff > 0)
+        {
+            await InsertClosingVoucherAsync(db, user, center, "IN", c.CashBoxID, null, "OVERAGE", diff, "", "زيادة تصفية " + closing.ClosingNumber,
+                                            closing.ClosingID, now);
+        }
+        if (transfer > 0)
+        {
+            if (destination == "MAIN")
+            {
+                await InsertClosingVoucherAsync(db, user, center, "TRANSFER", c.CashBoxID, c.ToCashBoxID, "TRANSFER", transfer, "",
+                                                "ترحيل تصفية " + closing.ClosingNumber, closing.ClosingID, now);
+            }
+            else
+            {
+                await InsertClosingVoucherAsync(db, user, center, "OUT", c.CashBoxID, null, "OWNER", transfer, "المالك",
+                                                "تسوية تصفية " + closing.ClosingNumber, closing.ClosingID, now);
+            }
+        }
+        await tx.CommitAsync();
+        Audit.LogAction(db, user, "CASH_CLOSING", "CashClosings", closing.ClosingNumber,
+                        "Expected=" + Domain.Sales.InvoiceCalculator.Plain(expected) + " Counted=" + Domain.Sales.InvoiceCalculator.Plain(c.Counted) +
+                        (clientRef is null ? "" : " pos " + clientRef));
+        await db.SaveChangesAsync();
+        return new TreasuryResult(SaveStatus.Saved, "", closing.ClosingID, closing.ClosingNumber);
+    }
+
+    /// <summary>modCash.InsertVoucher for a closing (no expense): inside the caller's transaction.</summary>
+    private static async Task<CashVouchers> InsertClosingVoucherAsync(RetailDbContext db, ActingUser user, int? center, string type, int boxId,
+                                                                      int? toBoxId, string category, decimal amount, string party,
+                                                                      string description, int closingId, DateTime when)
+    {
+        string seq = type switch { "IN" => "CASH_IN", "OUT" => "CASH_OUT", _ => "CASH_TRANSFER" };
+        string number = await NumberSequences.NextNumberAsync(db, seq);
+        bool transfer = type == "TRANSFER";
+        var v = new CashVouchers
+        {
+            VoucherNumber = number, VoucherDate = when, VoucherType = type, CashBoxID = boxId, ToCashBoxID = transfer ? toBoxId : null,
+            Category = transfer ? "TRANSFER" : category,
+            InTransit = transfer && await db.CashBoxes.Where(b => b.CashBoxID == toBoxId).Select(b => b.ConfirmReceipt).FirstOrDefaultAsync(),
+            Amount = amount, PartyName = party.Length > 0 ? SalesService.Clip(party, 100) : null, Description = SalesService.Clip(description, 255),
+            ClosingID = closingId, EmployeeID = user.EmployeeID, CostCenterID = center,
+        };
+        db.CashVouchers.Add(v);
+        await db.SaveChangesAsync();
+        return v;
     }
 
     // ------------------------------------------------------------------ banks

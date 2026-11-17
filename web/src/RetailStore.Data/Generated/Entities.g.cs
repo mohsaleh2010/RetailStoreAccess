@@ -941,6 +941,8 @@ public partial class SalesReturns
     public int? SalesRepID { get; set; }
     /// <summary>المخزن</summary>
     public int WarehouseID { get; set; } = 1;
+    /// <summary>رقم المرتجع في جهاز نقطة البيع</summary>
+    public string? ClientRef { get; set; }
 }
 
 /// <summary>تفاصيل مرتجعات المبيعات: الأسطر المرتجعة، كل سطر يشير إلى سطر الفاتورة الأصلي لمنع إرجاع أكثر مما بيع.</summary>
@@ -1181,6 +1183,8 @@ public partial class CustomerPayments
     public decimal ForeignAmount { get; set; } = 0m;
     /// <summary>المندوب</summary>
     public int? SalesRepID { get; set; }
+    /// <summary>رقم السند في جهاز نقطة البيع</summary>
+    public string? ClientRef { get; set; }
 }
 
 /// <summary>دفعات الموردين (سندات الصرف): المبالغ المدفوعة للموردين لسداد أرصدتهم.</summary>
@@ -1990,6 +1994,8 @@ public partial class CashClosings
     public string? Notes { get; set; }
     /// <summary>تاريخ الإنشاء</summary>
     public DateTime CreatedAt { get; set; } = DateTime.Now;
+    /// <summary>رقم التصفية في جهاز نقطة البيع</summary>
+    public string? ClientRef { get; set; }
 }
 
 /// <summary>دليل الحسابات (شجرة الحسابات): شجرة من خمسة مستويات على الأكثر: الحسابات الرئيسية (تجميعية) والحسابات الفرعية التي تُرحَّل إليها القيود. حسابات الصناديق (110000 + رقم الصندوق) وأنواع المصروفات (530000 + رقم النوع) تُنشأ تلقائيًا.</summary>
@@ -2937,6 +2943,12 @@ public partial class LabelSettings
     public string? ShortName { get; set; }
     /// <summary>حجم الخط</summary>
     public byte FontSize { get; set; } = (byte)7;
+    /// <summary>بادئات باركود الميزان</summary>
+    public string? ScalePrefixes { get; set; }
+    /// <summary>عدد أرقام رمز الصنف في باركود الميزان</summary>
+    public byte ScaleItemDigits { get; set; } = (byte)5;
+    /// <summary>باركود الميزان يحمل</summary>
+    public string ScaleValueKind { get; set; } = "WEIGHT";
 }
 
 /// <summary>سجل الفاتورة الإلكترونية: كل طلب للمنظومة الإلكترونية (هيئة الزكاة والضريبة والجمارك أو مصلحة الضرائب المصرية) ورده: الإرسال والاستعلام وتسجيل الجهاز.</summary>

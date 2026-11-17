@@ -1,5 +1,6 @@
 using System.Globalization;
 using QRCoder;
+using RetailStore.Data.Services;
 using RetailStore.Domain.Printing;
 using RetailStore.PosApp.Offline;
 
@@ -74,6 +75,51 @@ public static class ReceiptSlip
         if (r.Footer is { Length: > 0 } footer)
         {
             lines.Add(new SlipLine(footer, SlipAlign.Center));
+        }
+        return lines;
+    }
+
+    /// <summary>A document the POS made on the program (docs/86): a credit note, a receipt voucher or a cashier closing, with
+    /// the store, its title and number, the time, the cashier, the customer or the box, its lines and totals, and the QR of a
+    /// Saudi credit note.</summary>
+    public static List<SlipLine> Document(PosDocument d, string storeName, string? storeVat, string currency, Func<string, string> T)
+    {
+        var inv = CultureInfo.InvariantCulture;
+        var lines = new List<SlipLine> { new(storeName, SlipAlign.Center, Bold: true, Large: true) };
+        if (storeVat is { Length: > 0 } vat)
+        {
+            lines.Add(new SlipLine(T("الرقم الضريبي") + ": " + vat, SlipAlign.Center));
+        }
+        lines.Add(new SlipLine(T(d.Title), SlipAlign.Center, Bold: true));
+        lines.Add(new SlipLine(T("الرقم") + ": " + d.Number, Bold: true));
+        lines.Add(new SlipLine(T("التاريخ") + ": " + d.Date.ToString("yyyy-MM-dd HH:mm:ss", inv)));
+        lines.Add(new SlipLine(T("الكاشير") + ": " + d.CashierName));
+        lines.Add(new SlipLine(T(d.Kind == "CLOSING" ? "الصندوق" : "العميل") + ": " + d.PartyName));
+        if (d.Note is { Length: > 0 } note)
+        {
+            lines.Add(new SlipLine(T(d.Kind switch { "RETURN" => "عن الفاتورة", "PAYMENT" => "طريقة الدفع", _ => "ملاحظات" }) + ": " + note));
+        }
+        lines.Add(new SlipLine(Rule));
+        foreach (var l in d.Lines)
+        {
+            lines.Add(new SlipLine(l.Text));
+            lines.Add(new SlipLine(Quantity(l.Quantity) + " = " + Amount(l.Amount), SlipAlign.End));
+        }
+        if (d.Lines.Length > 0)
+        {
+            lines.Add(new SlipLine(Rule));
+        }
+        for (int i = 0; i < d.Rows.Length; i++)
+        {
+            var r = d.Rows[i];
+            bool main = d.Kind == "PAYMENT" ? i == 0 : d.Kind == "RETURN" && r.Label == "الإجمالي شامل الضريبة";
+            lines.Add(new SlipLine(T(r.Label) + ": " + Amount(r.Amount) + (main ? " " + currency : ""), Bold: main, Large: main));
+        }
+        if (d.Kind == "CLOSING")
+        {
+            lines.Add(new SlipLine(Rule));
+            lines.Add(new SlipLine(T("توقيع الكاشير") + ": ................"));
+            lines.Add(new SlipLine(T("توقيع المستلم") + ": ................"));
         }
         return lines;
     }

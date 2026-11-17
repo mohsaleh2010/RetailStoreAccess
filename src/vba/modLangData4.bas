@@ -17,6 +17,10 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "دفتر الأستاذ (كل الحسابات", "General ledger (all accounts"
+    LangAdd "رصيد الكشف في هذا التاريخ", "Statement balance on this date"
+    LangAdd "رفضت المصلحة الإلغاء (رمز", "The Tax Authority refused the cancellation (code"
+    LangAdd "رقم الهوية / الرقم القومي", "ID / national ID number"
     LangAdd "زيارات المندوبين بالتفصيل", "Rep visits in detail"
     LangAdd "سداد ضريبة القيمة المضافة", "VAT payment"
     LangAdd "صرف العمولة يكون بسند صرف", "A commission is paid with a payment voucher"
@@ -124,6 +128,7 @@ Private Sub D4_1()
     LangAdd "الحجز والتسليم والفوترة", "Reservation, delivery and invoicing"
     LangAdd "الخصومات أكبر من الراتب", "The deductions are more than the salary"
     LangAdd "الرصيد الدفتري (المفروض", "Book balance (expected"
+    LangAdd "السعر (بالهللة أو القرش", "Price (in cents"
     LangAdd "الشهر التالي للإهلاك هو", "The next month to depreciate is"
     LangAdd "المبلغ (المرتجع بالسالب", "Amount (returns negative"
     LangAdd "المجلد الافتراضي للخادم", "The default folder of the server"
@@ -132,14 +137,14 @@ Private Sub D4_1()
     LangAdd "المصروفات (بدون الضريبة", "Expenses (without VAT"
     LangAdd "المطابقة في هذه التسوية", "Matched in this reconciliation"
     LangAdd "المنتجات منخفضة المخزون", "Low-stock products"
+End Sub
+
+Private Sub D4_2()
     LangAdd "الميزانية الافتتاحية لـ", "Opening balance sheet of"
     LangAdd "بآخر سعر (عملة البرنامج", "At the last rate (program currency"
     LangAdd "بالدفاتر (عملة البرنامج", "In the books (program currency"
     LangAdd "بيانات العملاء وأرصدتهم", "Customer data and balances"
     LangAdd "بيع أو استبعاد الأصل في", "Sale or disposal of the asset on"
-End Sub
-
-Private Sub D4_2()
     LangAdd "تاريخ الفاتورة غير صحيح", "The invoice date is not valid"
     LangAdd "تجاوز حد ائتمان المندوب", "Over the credit limit of the rep"
     LangAdd "تحصيل الشيكات وارتدادها", "Collection and bounce of cheques"
@@ -255,17 +260,18 @@ Private Sub D4_2()
     LangAdd "صدر العرض. طباعته الآن", "The quotation is issued. Print it now"
     LangAdd "صندوق من يُنشئ المصروف", "Box of the user who creates the expense"
     LangAdd "ضريبة العمولة / الرسوم", "VAT on the fee / charges"
+End Sub
+
+Private Sub D4_3()
     LangAdd "ضريبة مدخلات المشتريات", "Input VAT on purchases"
     LangAdd "ضريبة مدخلات المصروفات", "Input VAT on expenses"
     LangAdd "غير موجودة أو غير نشطة", "does not exist or is not active"
     LangAdd "فاتورة / مرتجع مشتريات", "Purchase invoice / return"
     LangAdd "قائمة الدخل والميزانية", "Income statement and balance sheet"
-End Sub
-
-Private Sub D4_3()
     LangAdd "قيود التسوية والافتتاح", "Adjusting and opening entries"
     LangAdd "كشف حساب ودفتر الأستاذ", "Account statement and general ledger"
     LangAdd "لا تملك صلاحية الشيكات", "You do not have the permission for cheques"
+    LangAdd "لا يوجد صنف نشط بالكود", "no active product has the code"
     LangAdd "متأخرة أكثر من 20 ساعة", "Late more than 20 hours"
     LangAdd "محاولات الدخول الفاشلة", "Failed login attempts"
     LangAdd "محجوزة لطلبيات العملاء", "reserved for customer orders"
@@ -306,6 +312,7 @@ Private Sub D4_3()
     LangAdd "المبلغ لا يكون سالبًا", "The amount is never negative"
     LangAdd "المنتجات غير المتحركة", "Slow-moving products"
     LangAdd "الموازنة مقابل الفعلي", "Budget vs actual"
+    LangAdd "بادئات باركود الميزان", "Scale barcode prefixes"
     LangAdd "بداية الفترة الضريبية", "Start of the tax period"
     LangAdd "بضريبة القيمة المضافة", "With VAT"
     LangAdd "تاريخ الصرف بعد اليوم", "The payment date is after today"
@@ -376,6 +383,9 @@ Private Sub D4_3()
     LangAdd "السعر لا يكون سالبًا", "The price cannot be negative"
     LangAdd "الشهر التالي للتسجيل", "Next month to record"
     LangAdd "الصندوق (إيداع / سحب", "Box (deposit / withdrawal"
+End Sub
+
+Private Sub D4_4()
     LangAdd "الفاتورة الإلكترونية", "E-invoicing"
     LangAdd "المبلغ (بدون الضريبة", "Amount (without VAT"
     LangAdd "المبيعات حسب التصنيف", "Sales by category"
@@ -383,9 +393,6 @@ Private Sub D4_3()
     LangAdd "المدفوعات والمصروفات", "Payments and expenses"
     LangAdd "المرتجعات بدون ضريبة", "Returns without VAT"
     LangAdd "المورد يحتسب الضريبة", "The supplier charges VAT"
-End Sub
-
-Private Sub D4_4()
     LangAdd "الميزانية الافتتاحية", "Opening balance sheet"
     LangAdd "انخفاض قيمة أصل ثابت", "Fixed asset impairment"
     LangAdd "بدون اسم إنجليزي فقط", "Without English name only"
@@ -414,6 +421,7 @@ Private Sub D4_4()
     LangAdd "رقم الفاتورة الأصلية", "Original invoice number"
     LangAdd "رقم الهوية / الإقامة", "ID / iqama number"
     LangAdd "رقمًا يبدأ وينتهي بـ", "a number starting and ending with"
+    LangAdd "رمز الصنف في الميزان", "Item code on the scale"
     LangAdd "سكربت قاعدة البيانات", "Database script"
     LangAdd "شيك وارد تحت التحصيل", "Received cheque under collection"
     LangAdd "شيكات صادرة لم تُصرف", "Issued cheques not yet cashed"
@@ -475,6 +483,7 @@ Private Sub D4_4()
     LangAdd "المسير مصروف بالفعل", "The run is already paid"
     LangAdd "المندوب صاحب العهدة", "Sales rep holding the custody"
     LangAdd "اليوم (الأحدث أولًا", "Day (newest first"
+    LangAdd "باركود الميزان يحمل", "Scale barcode holds"
     LangAdd "بدء / تحديث التسوية", "Start / refresh the reconciliation"
     LangAdd "تاريخها + هذه المدة", "its date + this period"
     LangAdd "تحويل إلى صندوق آخر", "Transfer to another box"
@@ -497,6 +506,9 @@ Private Sub D4_4()
     LangAdd "سحب نقدية إلى صندوق", "Cash withdrawal to a box"
     LangAdd "صافي إيرادات النشاط", "Net operating revenue"
     LangAdd "صافي الربح (الخسارة", "Net profit (loss"
+End Sub
+
+Private Sub D4_5()
     LangAdd "عدد الخانات العشرية", "Decimal places"
     LangAdd "فاتورة ضريبية مبسطة", "Simplified tax invoice"
     LangAdd "قيد عكسي جديد للقيد", "New reversing entry for the entry"
@@ -506,9 +518,6 @@ Private Sub D4_4()
     LangAdd "لا مبيعات هذا الشهر", "No sales this month"
     LangAdd "لا يتبع الحساب نفسه", "An account cannot belong to itself"
     LangAdd "لكل المنتجات النشطة", "for all active products"
-End Sub
-
-Private Sub D4_5()
     LangAdd "لمخزن سيارة المندوب", "For the van warehouse of a sales rep"
     LangAdd "معامل عملة البرنامج", "Rate of the program currency"
     LangAdd "نقدي أو بطاقة للدفع", "Cash or card for payment"
@@ -620,6 +629,9 @@ Private Sub D4_5()
     LangAdd "إضافة كل الحسابات", "Add all accounts"
     LangAdd "اختر تاريخًا بعده", "Choose a date after it"
     LangAdd "ارتفاع الملصق (مم", "Label height (mm"
+End Sub
+
+Private Sub D4_6()
     LangAdd "اضغط لعرض التقرير", "Click to show the report"
     LangAdd "اكتب اسم المستخدم", "Type the user name"
     LangAdd "اكتب النسب الثلاث", "Type the three rates"
@@ -629,9 +641,6 @@ Private Sub D4_5()
     LangAdd "الإقرار غير موجود", "The return does not exist"
     LangAdd "الاسم بالإنجليزية", "English name"
     LangAdd "البريد الإلكتروني", "E-mail"
-End Sub
-
-Private Sub D4_6()
     LangAdd "البضاعة (بالتكلفة", "Goods (at cost"
     LangAdd "التاريخ بعد اليوم", "The date is after today"
     LangAdd "التحويلات بالطريق", "Transfers in transit"
@@ -702,22 +711,11 @@ Private Sub D4_6()
     LangAdd "لا يوجد نقل للأصل", "The asset has no transfer"
     LangAdd "للمندوب يوم مفتوح", "The rep has an open day"
     LangAdd "لم تُحدد الفاتورة", "The invoice was not set"
+    LangAdd "مثال: 20,21. فارغ", "Example: 20,21. Empty"
     LangAdd "مثال: 38 أو 40 أو", "Example: 38 or 40 or"
     LangAdd "مجلد صور المنتجات", "Product pictures folder"
     LangAdd "مخزن الجرد الجديد", "Warehouse of the new count"
     LangAdd "مستند مفتوح. اختر", "An open document. Choose"
     LangAdd "ملف سكربت القاعدة", "Database script file"
     LangAdd "نسبة الضريبة ليست", "The VAT rate is not"
-    LangAdd "نشاط المنشأة (مثل", "Business activity (such as"
-    LangAdd "و - لتعديل الكمية", "and - to change the quantity"
-    LangAdd "يسمح بالبيع الآجل", "Allows credit sales"
-    LangAdd "يُولَّد عند الحفظ", "Generated when saved"
-    LangAdd "آخر حركات المنتج", "Latest product moves"
-    LangAdd "أصدر العرض أولًا", "Issue the quotation first"
-    LangAdd "أقصى خصم للمندوب", "Maximum discount of the rep"
-    LangAdd "إجمالي المشتريات", "Total purchases"
-    LangAdd "إجمالي المصروفات", "Total paid"
-    LangAdd "إجمالي المقبوضات", "Total received"
-    LangAdd "إرسال كل المعلّق", "Send all pending"
-    LangAdd "إشعار دائن ضريبي", "Standard credit note"
 End Sub

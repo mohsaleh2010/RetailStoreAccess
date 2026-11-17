@@ -31,6 +31,29 @@ public sealed record SaleResult(SaveStatus Status, string Message, int InvoiceID
 public sealed record PaymentRequest(int CustomerID, decimal Amount, int PaymentMethodID, string? Notes, string? CurrencyCode = null,
                                     decimal ExchangeRate = 1);
 
+/// <summary>A line of a sales return (tmpReturnLines): the invoice line, the quantity returned in the unit of that line,
+/// and ToStock = the goods go back to the stock.</summary>
+public sealed record ReturnLineRequest(int SalesDetailID, decimal Quantity, bool ToStock = true);
+
+/// <summary>A sales return (modSales.PostSalesReturn): RefundType CASH (paid back, PaymentMethodID) or CREDIT (taken off the
+/// customer's balance); the cash customer is always paid back.</summary>
+public sealed record SalesReturnRequest(int SalesInvoiceID, string? Reason, string RefundType, int? PaymentMethodID,
+                                        ReturnLineRequest[] Lines);
+
+/// <summary>A line of an invoice as the return screen shows it (LoadInvoiceForReturn): sold, returned before, what is left.</summary>
+public sealed record ReturnableLine(int SalesDetailID, int ProductID, string ProductName, string UnitName, decimal SoldQty,
+                                    decimal ReturnedQty, decimal AvailableQty, decimal UnitPrice, decimal LineTotal, decimal Tax,
+                                    decimal ReturnedTotal, decimal ReturnedTax)
+{
+    /// <summary>modPOS.RecalcReturn: the credit-note value of a quantity of this line (the rule used for posting).</summary>
+    public (string Problem, decimal Net, decimal Tax, decimal Total) Amounts(decimal qty) =>
+        InvoiceCalculator.ReturnAmounts(SoldQty, LineTotal, this.Tax, ReturnedQty, ReturnedTotal, ReturnedTax, qty);
+}
+
+/// <summary>An invoice to return from: CashCustomer = the cash customer (always paid back in cash).</summary>
+public sealed record ReturnableInvoice(int SalesInvoiceID, string InvoiceNumber, DateTime InvoiceDate, int CustomerID, string CustomerName,
+                                       bool CashCustomer, string PaymentType, decimal TotalAmount, List<ReturnableLine> Lines);
+
 /// <summary>A product found by a code or a name, with the unit of the code and the price of a new line.</summary>
 public sealed record SaleProduct(int ProductID, string ProductCode, string? Barcode, string ProductName, int? UnitID, string UnitName,
                                  decimal Price, decimal Available, bool TrackStock, string VATCategory);
@@ -653,11 +676,169 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         return t.Length == 0 ? null : (t.Length <= n ? t : t[..n]);
     }
 
+    // ------------------------------------------------------------------ the sales return (credit note)
+
+    public const int TtSalesReturn = 4;
+
+    /// <summary>modPOS.ReturnFindInvoice + LoadInvoiceForReturn: the invoice of a number with its lines (sold, returned
+    /// before, what is left to return); null = no invoice has this number.</summary>
+    public async Task<ReturnableInvoice?> ReturnableAsync(string invoiceNumber, bool english)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        string number = (invoiceNumber ?? "").Trim(), upper = number.ToUpperInvariant();      // Access compares without case
+        var h = await db.SalesInvoices.AsNoTracking().FirstOrDefaultAsync(x => x.InvoiceNumber == number || x.InvoiceNumber == upper);
+        if (h is null)
+        {
+            return null;
+        }
+        var settings = await SettingsReader.ReadAsync(db);
+        var c = await db.Customers.AsNoTracking().FirstAsync(x => x.CustomerID == h.CustomerID);
+        var details = await db.SalesInvoiceDetails.AsNoTracking().Where(d => d.SalesInvoiceID == h.SalesInvoiceID)
+            .OrderBy(d => d.LineNumber).ToListAsync();
+        var ids = details.Select(d => d.SalesDetailID).ToList();
+        var returned = await db.SalesReturnDetails.AsNoTracking().Where(r => ids.Contains(r.SalesDetailID))
+            .GroupBy(r => r.SalesDetailID).Select(g => new { g.Key, Qty = g.Sum(r => r.Quantity), Total = g.Sum(r => r.LineTotal), Tax = g.Sum(r => r.Tax) })
+            .ToDictionaryAsync(g => g.Key);
+        var pids = details.Select(d => d.ProductID).Distinct().ToList();
+        var products = await db.Products.AsNoTracking().Where(p => pids.Contains(p.ProductID)).ToDictionaryAsync(p => p.ProductID);
+        var units = await db.Units.AsNoTracking().ToDictionaryAsync(u => u.UnitID, u => Name(u.UnitName, u.UnitNameEn, english));
+        var lines = details.Select(d =>
+        {
+            var p = products[d.ProductID];
+            var back = returned.GetValueOrDefault(d.SalesDetailID);
+            string unit = units.GetValueOrDefault(d.UnitID ?? p.UnitID) ?? "";
+            decimal qty = back?.Qty ?? 0;
+            return new ReturnableLine(d.SalesDetailID, d.ProductID, Name(p.ProductName, p.ProductNameEn, english), unit, d.Quantity, qty,
+                                      d.Quantity - qty, d.UnitPrice, d.LineTotal, d.Tax, back?.Total ?? 0, back?.Tax ?? 0);
+        }).ToList();
+        return new ReturnableInvoice(h.SalesInvoiceID, h.InvoiceNumber, h.InvoiceDate, h.CustomerID, Name(c.CustomerName, c.CustomerNameEn, english),
+                                     h.CustomerID == settings.DefaultCustomerID, h.PaymentType, h.TotalAmount, lines);
+    }
+
+    /// <summary>modSales.PrevReturned: what was returned before from an invoice line.</summary>
+    private static async Task<(decimal Qty, decimal Total, decimal Tax)> PrevReturnedAsync(RetailDbContext db, int salesDetailId)
+    {
+        var rows = await db.SalesReturnDetails.AsNoTracking().Where(r => r.SalesDetailID == salesDetailId)
+            .Select(r => new { r.Quantity, r.LineTotal, r.Tax }).ToListAsync();
+        return (rows.Sum(r => r.Quantity), rows.Sum(r => r.LineTotal), rows.Sum(r => r.Tax));
+    }
+
+    /// <summary>modSales.PostSalesReturn (and SaveReturn: the screen and its ADD action): the credit note of an invoice with
+    /// the same checks, order, messages and rows as Access; clientRef = its number on a POS device (docs/86).</summary>
+    public async Task<SaleResult> PostSalesReturnAsync(ActingUser user, SalesReturnRequest ret, string? clientRef = null)
+    {
+        string open = await permissions.OpenProblemAsync(user.EmployeeID, "frmSalesReturn");
+        if (open.Length == 0)
+        {
+            open = await permissions.ActionProblemAsync(user.EmployeeID, "frmSalesReturn", ScreenAction.Add);
+        }
+        if (open.Length > 0)
+        {
+            return SaleResult.Refused(open);
+        }
+        string reason = (ret.Reason ?? "").Trim();
+        if (reason.Length == 0)
+        {
+            return SaleResult.Refused("سبب الإرجاع مطلوب (إلزامي في الإشعار الدائن).");
+        }
+        await using var db = await factory.CreateDbContextAsync();
+        var settings = await SettingsReader.ReadAsync(db);
+        var inv = await db.SalesInvoices.AsNoTracking().FirstOrDefaultAsync(h => h.SalesInvoiceID == ret.SalesInvoiceID);
+        if (inv is null)
+        {
+            return SaleResult.Refused("الفاتورة الأصلية غير موجودة.");
+        }
+        string refundType = inv.CustomerID == settings.DefaultCustomerID ? "CASH" : ret.RefundType;
+        var lines = new List<(SalesInvoiceDetails D, ReturnLineRequest R, decimal Net, decimal Tax, decimal Total, decimal Disc, decimal Factor)>();
+        foreach (var r in (ret.Lines ?? []).Where(l => l.Quantity > 0))
+        {
+            var d = await db.SalesInvoiceDetails.AsNoTracking().FirstOrDefaultAsync(x => x.SalesDetailID == r.SalesDetailID);
+            if (d is null || d.SalesInvoiceID != ret.SalesInvoiceID)
+            {
+                return SaleResult.Refused("سطر لا ينتمي إلى الفاتورة الأصلية.");
+            }
+            decimal factor = d.UnitFactor <= 0 ? 1 : d.UnitFactor;          // the unit of the invoice line (docs/72)
+            var prev = await PrevReturnedAsync(db, d.SalesDetailID);
+            var a = InvoiceCalculator.ReturnAmounts(d.Quantity, d.LineTotal, d.Tax, prev.Qty, prev.Total, prev.Tax, r.Quantity);
+            if (a.Problem.Length > 0)
+            {
+                return SaleResult.Refused(a.Problem);
+            }
+            decimal disc = Math.Max(0, MoneyMath.RoundMoney(r.Quantity * d.UnitPrice) - a.Net);
+            lines.Add((d, r, a.Net, a.Tax, a.Total, disc, factor));
+        }
+        if (lines.Count == 0)
+        {
+            return SaleResult.Refused("حدد الكمية المرتجعة لصنف واحد على الأقل.");
+        }
+        decimal sumNet = lines.Sum(l => l.Net), sumTax = lines.Sum(l => l.Tax), sumTotal = lines.Sum(l => l.Total), sumDisc = lines.Sum(l => l.Disc);
+        decimal refunded = refundType == "CASH" ? sumTotal : 0;
+
+        await using var tx = await db.Database.BeginTransactionAsync();
+        var now = DateTime.Now;
+        var row = new SalesReturns
+        {
+            ReturnNumber = await NumberSequences.NextNumberAsync(db, "SALES_RETURN"), ReturnDate = now, SalesInvoiceID = inv.SalesInvoiceID,
+            CostCenterID = inv.CostCenterID, SalesRepID = inv.SalesRepID,
+            WarehouseID = inv.WarehouseID > 0 ? inv.WarehouseID : await RepService.UserWarehouseAsync(db, user.EmployeeID),
+            CustomerID = inv.CustomerID, EmployeeID = user.EmployeeID, Reason = reason.Length <= 255 ? reason : reason[..255],
+            RefundType = refundType, PaymentMethodID = ret.PaymentMethodID, SubTotal = sumNet + sumDisc, Discount = sumDisc,
+            TaxableAmount = sumNet, Tax = sumTax, TotalAmount = sumTotal, RefundedAmount = refunded,
+            CashBoxID = await CashBoxForAsync(db, user.EmployeeID, ret.PaymentMethodID ?? CashMethodId, refunded),
+            BankID = await BankForAsync(db, settings, ret.PaymentMethodID, refunded), ClientRef = clientRef,
+        };
+        await SetReturnZatcaFieldsAsync(db, settings, row, inv.InvoiceSubType, now);
+        db.SalesReturns.Add(row);
+        await db.SaveChangesAsync();
+        foreach (var l in lines)
+        {
+            db.SalesReturnDetails.Add(new SalesReturnDetails
+            {
+                SalesReturnID = row.SalesReturnID, SalesDetailID = l.D.SalesDetailID, ProductID = l.D.ProductID, Quantity = l.R.Quantity,
+                UnitPrice = l.D.UnitPrice, Discount = l.Disc, NetAmount = l.Net, VATCategory = l.D.VATCategory, VATRate = l.D.VATRate,
+                Tax = l.Tax, LineTotal = l.Total, UnitCost = l.D.UnitCost, ReturnToStock = l.R.ToStock, UnitID = l.D.UnitID,
+                UnitFactor = l.Factor,
+            });
+        }
+        await db.SaveChangesAsync();
+        foreach (var l in lines.Where(l => l.R.ToStock))
+        {
+            await ApplyStockMovementAsync(db, user, l.D.ProductID, l.R.Quantity * l.Factor, TtSalesReturn, l.D.UnitCost / l.Factor, "SALES_RETURN",
+                                          row.SalesReturnID, row.ReturnNumber, row.WarehouseID, recalcAverage: true, when: now);
+        }
+        if (refunded - sumTotal != 0)
+        {
+            await AdjustBalanceAsync(db, inv.CustomerID, refunded - sumTotal);
+        }
+        Audit.LogAction(db, user, "SALES_RETURN", "SalesReturns", row.ReturnNumber,
+                        "Invoice=" + inv.SalesInvoiceID + " Total=" + InvoiceCalculator.Plain(sumTotal) + (clientRef is null ? "" : " pos " + clientRef));
+        await db.SaveChangesAsync();
+        await tx.CommitAsync();
+        // the e-invoice of the credit note: PENDING, sent by the office tasks (docs/84, docs/85)
+        return new SaleResult(SaveStatus.Saved, "", row.SalesReturnID, row.ReturnNumber, sumTotal, refunded);
+    }
+
+    /// <summary>modSales.SetZatcaFields for a credit note (type 381, the subtype of its invoice).</summary>
+    private static async Task SetReturnZatcaFieldsAsync(RetailDbContext db, Settings settings, SalesReturns row, string subType, DateTime when)
+    {
+        row.InvoiceSubType = subType;
+        row.InvoiceTypeCode = "381";
+        row.InvoiceUUID = Guid.NewGuid().ToString().ToLowerInvariant();
+        row.ICV = int.Parse(await NumberSequences.NextNumberAsync(db, "ZATCA_ICV"));
+        row.ZatcaStatus = settings.EInvoiceEnabled || settings.ZatcaPhase == 2 ? "PENDING" : "NOT_SENT";
+        string vat = settings.VATNumber ?? "";
+        if (vat.Length > 0 && CountryRules.Normalize(settings.CountryCode) == "SA")
+        {
+            row.QRCodeData = ZatcaQr.Build(settings.StoreName ?? "", vat, when, row.TotalAmount, row.Tax);
+        }
+    }
+
     // ------------------------------------------------------------------ the receipt voucher
 
     /// <summary>modSales.PostCustomerPayment: confirmOverBalance = the user answered yes to the question on an amount over
-    /// the balance.</summary>
-    public async Task<SaleResult> PostPaymentAsync(ActingUser user, PaymentRequest pay, bool confirmOverBalance = false)
+    /// the balance; clientRef = its number on a POS device (docs/86).</summary>
+    public async Task<SaleResult> PostPaymentAsync(ActingUser user, PaymentRequest pay, bool confirmOverBalance = false,
+                                                   string? clientRef = null)
     {
         string open = await permissions.OpenProblemAsync(user.EmployeeID, "frmCustomerPayment");
         if (open.Length > 0)
@@ -705,7 +886,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
             ForeignAmount = foreign, SalesRepID = await RepService.SalesRepForAsync(db, pay.CustomerID, user.EmployeeID),
             PaymentMethodID = pay.PaymentMethodID, CashBoxID = await CashBoxForAsync(db, user.EmployeeID, pay.PaymentMethodID, amount),
             BankID = await BankForAsync(db, settings, pay.PaymentMethodID, amount), EmployeeID = user.EmployeeID,
-            Notes = Clip(pay.Notes, 255),
+            Notes = Clip(pay.Notes, 255), ClientRef = clientRef,
         };
         db.CustomerPayments.Add(p);
         await db.SaveChangesAsync();

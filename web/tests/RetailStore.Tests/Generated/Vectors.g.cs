@@ -2,7 +2,7 @@
 namespace RetailStore.Tests;
 
 /// <summary>Expected values computed by the Python mirrors (security_reference, i18n.translate, pricing,
-/// zatca_reference).</summary>
+/// zatca_reference, scale_reference).</summary>
 public static class Vectors
 {
     public static readonly (string Password, string Salt, string Hash)[] Passwords =
@@ -34,6 +34,22 @@ public static class Vectors
         ("الحقل «اسم المنتج» مطلوب.", "Field Product name is required."),
         ("العملاء، الموردون؛ المخازن؟", "Customers, Suppliers, Warehouses?"),
         ("الرصيد: 15", "Balance: 15"),
+    ];
+
+    /// <summary>tools/scale_reference.py: (code, prefixes, item digits, kind, price) -> (item, value, quantity); docs/86.</summary>
+    public static readonly (string Code, string Prefixes, int Digits, string Kind, decimal? Price, string? Item, long? Value, decimal Quantity)[] Scale =
+    [
+        ("2012345012509", "20,21", 5, "WEIGHT", null, "12345", 1250L, 1.25m),
+        ("2100042007505", "20, 21", 5, "WEIGHT", null, "00042", 750L, 0.75m),
+        ("2123456999990", "2", 6, "WEIGHT", null, "123456", 99999L, 99.999m),
+        ("2012345012509", "20", 5, "PRICE", 25.00m, "12345", 1250L, 0.500m),
+        ("2012345010000", "20", 5, "PRICE", 3.00m, "12345", 1000L, 3.333m),
+        ("2012345012509", "20", 5, "PRICE", 0m, "12345", 1250L, 0m),
+        ("2212345012503", "20,21", 5, "WEIGHT", null, null, null, 0m),
+        ("2012345012500", "20", 5, "WEIGHT", null, null, null, 0m),
+        ("6281234567890", "20", 5, "WEIGHT", null, null, null, 0m),
+        ("2012345012509", "", 5, "WEIGHT", null, null, null, 0m),
+        ("2012340125006", "20,x,1234", 4, "WEIGHT", null, "1234", 12500L, 12.5m),
     ];
 
     public static readonly (string Label, bool IncludeVat, decimal InvoiceDiscount, (decimal Qty, decimal Price, decimal Discount, decimal Rate)[] Lines,

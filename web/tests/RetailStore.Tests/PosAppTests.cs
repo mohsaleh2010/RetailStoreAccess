@@ -28,6 +28,28 @@ public sealed class SwitchableBackend(IPosBackend inner) : IPosBackend
                                                                CancellationToken ct = default) =>
         Down ? Task.FromResult(BackendResult<DeviceSaleResult>.Unreachable("down")) : inner.SendSaleAsync(who, sale, english, ct);
 
+    public Task<BackendResult<ReturnableInvoice>> ReturnableAsync(PosCredential who, string invoiceNumber, bool english,
+                                                                 CancellationToken ct = default) =>
+        Down ? Task.FromResult(BackendResult<ReturnableInvoice>.Unreachable("down")) : inner.ReturnableAsync(who, invoiceNumber, english, ct);
+
+    public Task<BackendResult<PosDocument>> SendReturnAsync(PosCredential who, DeviceReturnRequest request, bool english,
+                                                           CancellationToken ct = default) =>
+        Down ? Task.FromResult(BackendResult<PosDocument>.Unreachable("down")) : inner.SendReturnAsync(who, request, english, ct);
+
+    public Task<BackendResult<PosDocument>> SendPaymentAsync(PosCredential who, DevicePaymentRequest request, bool english,
+                                                            CancellationToken ct = default) =>
+        Down ? Task.FromResult(BackendResult<PosDocument>.Unreachable("down")) : inner.SendPaymentAsync(who, request, english, ct);
+
+    public Task<BackendResult<PosClosingBoxes>> ClosingBoxesAsync(PosCredential who, bool english, CancellationToken ct = default) =>
+        Down ? Task.FromResult(BackendResult<PosClosingBoxes>.Unreachable("down")) : inner.ClosingBoxesAsync(who, english, ct);
+
+    public Task<BackendResult<ClosingPreview>> ClosingPreviewAsync(PosCredential who, int boxId, bool english, CancellationToken ct = default) =>
+        Down ? Task.FromResult(BackendResult<ClosingPreview>.Unreachable("down")) : inner.ClosingPreviewAsync(who, boxId, english, ct);
+
+    public Task<BackendResult<PosDocument>> SendClosingAsync(PosCredential who, DeviceClosingRequest request, bool english,
+                                                            CancellationToken ct = default) =>
+        Down ? Task.FromResult(BackendResult<PosDocument>.Unreachable("down")) : inner.SendClosingAsync(who, request, english, ct);
+
     public void Dispose()
     {
     }
@@ -401,5 +423,205 @@ public class PosAppTests
         Assert.Equal(new byte[] { 0x1D, 0x76, 0x30, 0x00, 72, 0 }, jobs[1].Job[2..8]);         // 576 dots = 72 bytes a row
         var qr = ReceiptSlip.Qr(sale.Receipt.Qr!, 5);
         Assert.True(qr.GetLength(0) > 100 && qr.GetLength(0) == qr.GetLength(1));
+    }
+
+    // ------------------------------------------------------------------ docs/86: returns, receipts, closings, scale barcodes
+
+    /// <summary>A manager (role 2: returns, receipts, closings) who keeps the cashier box.</summary>
+    private static async Task<int> MakeManagerAsync(TestDb t)
+    {
+        await using var db = t.CreateDbContext();
+        var m = new Employees { EmployeeName = "مشرف", Username = "m1", RoleID = 2, CashBoxID = 2, MaxDiscountPercent = 0.1m };
+        db.Employees.Add(m);
+        await db.SaveChangesAsync();
+        await new SecurityService(t).SetUserPasswordAsync(m.EmployeeID, Password, false, TestDb.Admin);
+        return m.EmployeeID;
+    }
+
+    [Fact]
+    public async Task Returns_receipts_and_closings_are_made_on_the_program_and_sent_once()
+    {
+        using var host = new ApiHost();
+        var shop = await MakeShopAsync(host.Db);
+        int manager = await MakeManagerAsync(host.Db);
+        using var pc = await ReadyAsync(new ApiBackend(host.CreateClient(), ""), Remote, "m1");
+        var s = pc.Session;
+        Assert.Equal(("", "", ""), (s.Snapshot!.User.ReturnProblem, s.Snapshot.User.PaymentProblem, s.Snapshot.User.ClosingProblem));
+        var who = new PosCredential(manager, await pc.Platform.GetSecretAsync(PosSession.TokenPrefix + manager));
+
+        // a cash sale of two rice, sent; then one comes back
+        var cart = s.NewCart()!;
+        cart.Add(shop.Rice, null, 2);
+        var sale = s.SaveSale(cart).Sale!;
+        await s.SyncAsync();
+        var (inv, found) = await s.FindForReturnAsync(sale.InvoiceNumber.ToLowerInvariant());
+        Assert.Equal("", found);
+        var line = inv!.Lines.Single();
+        Assert.Equal((2m, 0m, 2m, 23m), (line.SoldQty, line.ReturnedQty, line.AvailableQty, line.Amounts(1).Total));
+        var request = new DeviceReturnRequest("ret-1", inv.SalesInvoiceID, "تالف", "CASH", SalesService.CashMethodId,
+                                              [new ReturnLineRequest(line.SalesDetailID, 1)]);
+        Assert.Equal("سبب الإرجاع مطلوب (إلزامي في الإشعار الدائن).",
+                     (await s.SaveReturnAsync(request with { ClientRef = "ret-0", Reason = " " })).Message);
+        var (status, message, doc) = await s.SaveReturnAsync(request);
+        Assert.Equal((SaveStatus.Saved, ""), (status, message));
+        Assert.Equal(("RETURN", "إشعار دائن", 23m), (doc!.Kind, doc.Title, doc.Rows.Single(r => r.Label == "المبلغ المردود نقدًا").Amount));
+        Assert.Equal("23.00", ZatcaQr.Decode(doc.Qr!)[4]);
+        var again = await pc.Data.SendReturnAsync(who, request, false);                      // its answer was lost: sent again
+        Assert.Equal((200, doc.Number), (again.Status, again.Value!.Number));
+        Assert.Equal("الكمية المرتجعة (2) أكبر من المتبقي (1).",
+                     (await s.SaveReturnAsync(request with { ClientRef = "ret-2", Lines = [new ReturnLineRequest(line.SalesDetailID, 2)] })).Message);
+        await using (var db = host.Db.CreateDbContext())
+        {
+            var r = await db.SalesReturns.SingleAsync();
+            Assert.Equal(("ret-1", 23m, 23m, 2, "381"), (r.ClientRef, r.TotalAmount, r.RefundedAmount, r.CashBoxID, r.InvoiceTypeCode));
+            Assert.Equal(9m, (await db.Products.FirstAsync(p => p.ProductID == shop.Rice)).CurrentQuantity);
+            var move = await db.InventoryTransactions.SingleAsync(m => m.ReferenceType == "SALES_RETURN");
+            Assert.Equal((SalesService.TtSalesReturn, 1m, 12m), (move.TransactionTypeID, move.Quantity, move.UnitCost));
+        }
+
+        // a sale of the PC not sent yet is returned after it reaches the program; offline nothing is returned
+        pc.Data.Down = true;
+        cart = s.NewCart()!;
+        cart.Add(shop.Delivery);
+        var waiting = s.SaveSale(cart).Sale!;
+        Assert.Equal("هذه الفاتورة على الجهاز ولم تصل إلى البرنامج بعد. أرسلها أولًا، ثم أرجعها.",
+                     (await s.FindForReturnAsync(waiting.InvoiceNumber)).Message);
+        Assert.StartsWith("تعذر الاتصال بقاعدة البيانات. المرتجع", (await s.FindForReturnAsync(sale.InvoiceNumber)).Message);
+        pc.Data.Down = false;
+
+        // a receipt from Ali: over his balance it asks first, and it is added once
+        cart = s.NewCart()!;
+        cart.ChangeCustomer(shop.Ali);
+        cart.PaymentType = "CREDIT";
+        cart.PaymentMethodID = null;
+        cart.Add(shop.Sugar, null, 10);
+        Assert.Equal(SaveStatus.Saved, s.SaveSale(cart).Status);
+        await s.SyncAsync();
+        var pay = new DevicePaymentRequest("pay-1", shop.Ali, 150, SalesService.CashMethodId, "دفعة");
+        var asked = await s.SavePaymentAsync(pay);
+        Assert.Equal(SaveStatus.NeedsConfirmation, asked.Status);
+        Assert.StartsWith("المبلغ (150.00) أكبر من الرصيد المستحق (100.00)", asked.Message);
+        var paid = await s.SavePaymentAsync(pay with { ConfirmOverBalance = true });
+        Assert.Equal(SaveStatus.Saved, paid.Status);
+        Assert.Equal(("PAYMENT", 150m, -50m), (paid.Document!.Kind, paid.Document.Rows[0].Amount, paid.Document.Rows[1].Amount));
+        Assert.Equal(200, (await pc.Data.SendPaymentAsync(who, pay with { ConfirmOverBalance = true }, false)).Status);
+        Assert.Equal(-50m, s.Snapshot!.Customers.Single(c => c.CustomerID == shop.Ali).CurrentBalance);   // read again after it
+
+        // the closing of the cashier box: 46 + 5 + 150 - 23 in it, 8 short, the rest to the main safe
+        var (boxes, none) = await s.ClosingBoxesAsync();
+        Assert.Equal(("", 2), (none, boxes!.DefaultBoxID));
+        Assert.Equal(1, boxes.Safes.Single().CashBoxID);
+        var (preview, note) = await s.ClosingPreviewAsync(2);
+        Assert.Equal("", note);
+        Assert.Equal((178m, (DateTime?)null), (preview!.Expected, preview.PeriodStart));
+        var closing = new DeviceClosingRequest("cls-1", 2, 170, "MAIN", 1, 170, "TEST");
+        Assert.Equal("المبلغ المرحَّل يجب أن يكون بين صفر والنقدية الفعلية (170.00).",
+                     (await s.SaveClosingAsync(closing with { ClientRef = "cls-0", TransferAmount = 171 })).Message);
+        var closed = await s.SaveClosingAsync(closing);
+        Assert.Equal(SaveStatus.Saved, closed.Status);
+        Assert.Equal(-8m, closed.Document!.Rows.Single(r => r.Label == "الفرق").Amount);
+        Assert.Equal(200, (await pc.Data.SendClosingAsync(who, closing, false)).Status);
+        await using (var db = host.Db.CreateDbContext())
+        {
+            Assert.Equal("cls-1", (await db.CashClosings.SingleAsync()).ClientRef);
+            var vouchers = await db.CashVouchers.OrderBy(v => v.CashVoucherID).Select(v => new { v.VoucherType, v.Category, v.Amount, v.ToCashBoxID })
+                .ToListAsync();
+            Assert.Equal(2, vouchers.Count);
+            Assert.Equal(("OUT", "SHORTAGE", 8m), (vouchers[0].VoucherType, vouchers[0].Category, vouchers[0].Amount));
+            Assert.Equal(("TRANSFER", 170m, (int?)1), (vouchers[1].VoucherType, vouchers[1].Amount, vouchers[1].ToCashBoxID));
+        }
+        Assert.Equal(0m, (await s.ClosingPreviewAsync(2)).Preview!.Expected);
+
+        // the printed documents
+        var slip = ReceiptSlip.Document(paid.Document, "متجري", "300000000000003", "SAR", x => x);
+        Assert.Contains(slip, l => l.Text == "سند قبض");
+        Assert.Contains(slip, l => l.Text == "المبلغ: 150.00 SAR");
+        s.SetPrinter("Receipt printer", 80, true);
+        Assert.Equal("", await s.PrintDocumentAsync(paid.Document, true));
+        Assert.Equal("", await s.PrintDocumentAsync(closed.Document, false));
+        Assert.Equal(EscPos.Initialize.Concat(EscPos.OpenDrawer), pc.Platform.Printed[^2].Job[..7]);    // cash received opens the drawer
+        Assert.Equal(EscPos.Initialize, pc.Platform.Printed[^1].Job[..2]);
+    }
+
+    [Fact]
+    public async Task A_cashier_without_the_permission_cannot_return_and_a_closing_waits_for_his_sales()
+    {
+        using var t = new TestDb();
+        var shop = await MakeShopAsync(t);
+        using var pc = await ReadyAsync(new DirectBackend(t), Local);
+        var s = pc.Session;
+        Assert.NotEqual("", s.Snapshot!.User.ReturnProblem);                         // the cashier role has no SALES_RETURN
+        Assert.Equal(s.Snapshot.User.ReturnProblem, (await s.FindForReturnAsync("POS1-000001")).Message);
+        Assert.Equal(("", ""), (s.Snapshot.User.PaymentProblem, s.Snapshot.User.ClosingProblem));
+        Assert.Equal("لا تُسجَّل دفعات على العميل النقدي.",
+                     (await s.SavePaymentAsync(new DevicePaymentRequest("p", s.Snapshot.Settings.DefaultCustomerID, 5, 1, null))).Message);
+
+        pc.Data.Down = true;
+        var cart = s.NewCart()!;
+        cart.Add(shop.Rice, null, 1);
+        Assert.Equal(SaveStatus.Saved, s.SaveSale(cart).Status);
+        pc.Data.Down = false;
+        var (preview, note) = await s.ClosingPreviewAsync(2);                          // the sale is sent first
+        Assert.Equal(("", 23m, 0), (note, preview!.Expected, s.Waiting));
+        var closed = await s.SaveClosingAsync(new DeviceClosingRequest("c", 2, 23, "KEEP", null, 5, null));
+        Assert.Equal(SaveStatus.Saved, closed.Status);
+        await using var db = t.CreateDbContext();
+        var c = await db.CashClosings.SingleAsync();
+        Assert.Equal((0m, 23m, 0m), (c.TransferAmount, c.KeptAmount, c.Difference));
+        Assert.Empty(await db.CashVouchers.ToListAsync());
+    }
+
+    [Fact]
+    public void Scale_barcodes_are_read_as_the_python_mirror_reads_them()
+    {
+        foreach (var v in Vectors.Scale)
+        {
+            var parts = ScaleBarcode.Parts(v.Code, new ScaleSettings(v.Prefixes, v.Digits, v.Kind));
+            Assert.Equal(v.Item, parts?.ItemCode);
+            Assert.Equal(v.Value, parts?.Value);
+            if (parts is not null)
+            {
+                Assert.Equal(v.Quantity, ScaleBarcode.Quantity(parts.Value, v.Kind, v.Price ?? 0));
+            }
+        }
+        Assert.Equal(new[] { "00042", "42" }, ScaleBarcode.ItemCodes("00042"));
+        Assert.Equal(3, ScaleBarcode.CheckDigit("629104150021"));
+    }
+
+    [Fact]
+    public async Task The_pos_adds_the_weight_or_the_price_of_a_scale_label()
+    {
+        using var t = new TestDb();
+        var shop = await MakeShopAsync(t);
+        await using (var db = t.CreateDbContext())
+        {
+            db.Products.Add(new Products { ProductCode = "42", ProductName = "جبن", SellingPrice = 40, AverageCost = 20, CurrentQuantity = 50 });
+            var l = await db.LabelSettings.FirstAsync();
+            l.ScalePrefixes = "20,21";
+            await db.SaveChangesAsync();
+        }
+        using var pc = await ReadyAsync(new DirectBackend(t), Local);
+        var cart = pc.Session.NewCart()!;
+        Assert.True(pc.Session.Snapshot!.Settings.Scale!.Enabled);
+        string Label(string prefix, string item, int value)
+        {
+            string body = prefix + item + value.ToString("00000");
+            return body + ScaleBarcode.CheckDigit(body);
+        }
+        Assert.Equal((true, ""), cart.ScanScale(Label("21", "00042", 1250)));
+        Assert.Equal((1.25m, 40m), (cart.Items.Single().Quantity, cart.Items.Single().UnitPrice));
+        Assert.Equal((true, "باركود الميزان " + Label("20", "00099", 500) + ": لا يوجد صنف نشط بالكود 00099."), cart.ScanScale(Label("20", "00099", 500)));
+        Assert.False(cart.ScanScale("628100").Done);                                  // the barcode of a product is not a label
+        Assert.False(cart.ScanScale(Label("22", "00042", 500)).Done);                 // not a prefix of the settings
+        await using (var db = t.CreateDbContext())
+        {
+            (await db.LabelSettings.FirstAsync()).ScaleValueKind = "PRICE";
+            await db.SaveChangesAsync();
+        }
+        await pc.Session.SyncAsync(refresh: true);
+        cart = pc.Session.NewCart()!;
+        Assert.Equal((true, ""), cart.ScanScale(Label("20", "00042", 1000)));          // 10.00 at 40 a kilo = 0.25
+        Assert.Equal(0.25m, cart.Items.Single().Quantity);
+        Assert.Equal(SaveStatus.Saved, pc.Session.SaveSale(cart).Status);
     }
 }

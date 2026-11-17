@@ -13,13 +13,15 @@ namespace RetailStore.Data.Services;
 /// <summary>The settings a sale needs (modSales, modCountry).</summary>
 public sealed record PosSettings(string StoreName, string? VATNumber, string CountryCode, decimal VATRate, bool PricesIncludeVAT,
                                  int DefaultCustomerID, string Currency, bool AllowNegativeStock, int CreditBlockDays,
-                                 string InvoicePrefix, string? ReceiptFooter);
+                                 string InvoicePrefix, string? ReceiptFooter, ScaleSettings? Scale = null);
 
 /// <summary>The user at the POS: his permissions as the sale checks them (PostSaleFromCart), his limits, warehouse and box.
-/// MaxDiscountPercent = the limit that applies (the rep's when the user is a rep with a limit).</summary>
+/// MaxDiscountPercent = the limit that applies (the rep's when the user is a rep with a limit). ReturnProblem / PaymentProblem
+/// / ClosingProblem = why he may not make a return, a receipt or a closing ("" = he may; docs/86).</summary>
 public sealed record PosUser(int EmployeeID, string Username, string EmployeeName, bool IsAdmin, string SellProblem, bool PriceOverride,
                              bool DiscountOverride, bool AllowNegativeStock, decimal MaxDiscountPercent, int RepID, int WarehouseID,
-                             string WarehouseName, int CashBoxID);
+                             string WarehouseName, int CashBoxID, string ReturnProblem = "", string PaymentProblem = "",
+                             string ClosingProblem = "");
 
 /// <summary>A bigger unit of a product: its barcode, its own price (0 = piece price x factor) and the price of a new line
 /// without a customer.</summary>
@@ -58,10 +60,49 @@ public sealed record DeviceSaleRequest(string ClientRef, string InvoiceNumber, D
 /// <summary>The answer to a device sale: Duplicate = it was already on the server (sent before), nothing added.</summary>
 public sealed record DeviceSaleResult(SaveStatus Status, string Message, int InvoiceID, string InvoiceNumber, bool Duplicate);
 
+/// <summary>A sales return made on the POS (docs/86): ClientRef = its number on the device, so a return sent again after a
+/// lost answer is added once.</summary>
+public sealed record DeviceReturnRequest(string ClientRef, int SalesInvoiceID, string? Reason, string RefundType, int? PaymentMethodID,
+                                         ReturnLineRequest[] Lines)
+{
+    public SalesReturnRequest ToReturn() => new(SalesInvoiceID, Reason, RefundType, PaymentMethodID, Lines ?? []);
+}
+
+/// <summary>A customer receipt made on the POS: ConfirmOverBalance = the answer yes to the question on an amount over the
+/// balance.</summary>
+public sealed record DevicePaymentRequest(string ClientRef, int CustomerID, decimal Amount, int PaymentMethodID, string? Notes,
+                                          bool ConfirmOverBalance = false);
+
+/// <summary>A cashier closing made on the POS.</summary>
+public sealed record DeviceClosingRequest(string ClientRef, int CashBoxID, decimal Counted, string Destination, int? ToCashBoxID,
+                                          decimal TransferAmount, string? Notes)
+{
+    public CashClosingRequest ToClosing() => new(CashBoxID, Counted, Destination, ToCashBoxID, TransferAmount, Notes);
+}
+
+/// <summary>A line of a printed document: the product (its unit) and the quantity, and the amount.</summary>
+public sealed record PosSlipLine(string Text, decimal Quantity, decimal Amount);
+
+/// <summary>A row of the totals of a printed document (its Arabic label, translated when printed).</summary>
+public sealed record PosSlipRow(string Label, decimal Amount);
+
+/// <summary>A document the POS made on the program and prints (docs/86): Kind RETURN / PAYMENT / CLOSING, its number, date,
+/// title, who made it, the customer or the box, its lines and totals, Note (the invoice of a return, the method of a receipt)
+/// and the QR of a Saudi credit note.</summary>
+public sealed record PosDocument(string Kind, int Id, string Number, DateTime Date, string Title, string CashierName, string PartyName,
+                                 PosSlipLine[] Lines, PosSlipRow[] Rows, string? Note, string? Qr);
+
+/// <summary>The answer to a document of the POS: Duplicate = it was already on the server (sent before), nothing added.</summary>
+public sealed record DeviceDocResult(SaveStatus Status, string Message, bool Duplicate, PosDocument? Document);
+
+/// <summary>The boxes the user may close, the main safes, and his own box (ClosingLoad).</summary>
+public sealed record PosClosingBoxes(List<ClosingBox> Boxes, List<ClosingBox> Safes, int DefaultBoxID);
+
 /// <summary>The POS on Windows (docs/83): the snapshot and the device sale, used by the API (/api/v1/pos) and directly by a
 /// POS connected to the database of the store.</summary>
 public sealed class PosService(IDbContextFactory<RetailDbContext> factory, PermissionService permissions, SalesService sales)
 {
+    public const string DocRefUsed = "رقم المستند في الجهاز مستعمل لمستخدم آخر.";
     public const string ClientRefMissing = "رقم الفاتورة في الجهاز مطلوب.";
     public const string ClientRefTooLong = "رقم الفاتورة في الجهاز أطول من 40 حرفًا.";
     public const string ClientRefUsed = "رقم الفاتورة في الجهاز مستعمل لمستخدم آخر.";
@@ -114,13 +155,27 @@ public sealed class PosService(IDbContextFactory<RetailDbContext> factory, Permi
         }
         int warehouse = await RepService.UserWarehouseAsync(db, employeeId);
         var w = await db.Warehouses.AsNoTracking().FirstOrDefaultAsync(x => x.WarehouseID == warehouse);
+        string returnProblem = await AddProblemAsync(employeeId, "frmSalesReturn");
+        string closingProblem = await AddProblemAsync(employeeId, TreasuryService.ClosingForm);
+        if (closingProblem.Length == 0 && !await permissions.HasPermissionAsync(employeeId, "CASH_CLOSING"))
+        {
+            closingProblem = "ليست لديك صلاحية تصفية يومية الكاشير.";
+        }
         return new PosUser(employeeId, e.Username ?? "", e.EmployeeName, e.IsDeveloper || e.RoleID == AppData.AdminRoleId,
                            await permissions.OpenProblemAsync(employeeId, "frmPOS"),
                            await permissions.HasPermissionAsync(employeeId, "PRICE_OVERRIDE"),
                            await permissions.HasPermissionAsync(employeeId, "DISCOUNT_OVERRIDE"),
                            await permissions.HasPermissionAsync(employeeId, "ALLOW_NEGATIVE_STOCK"), maxDiscount, repId, warehouse,
                            w is null ? "" : Name(w.WarehouseName, w.WarehouseNameEn, english),
-                           await sales.CurrentCashBoxAsync(db, employeeId));
+                           await sales.CurrentCashBoxAsync(db, employeeId), returnProblem,
+                           await permissions.OpenProblemAsync(employeeId, "frmCustomerPayment"), closingProblem);
+    }
+
+    /// <summary>The screen opens and its ADD action is allowed (modSecurity.CanOpenScreen + CanScreenAction).</summary>
+    private async Task<string> AddProblemAsync(int employeeId, string form)
+    {
+        string open = await permissions.OpenProblemAsync(employeeId, form);
+        return open.Length > 0 ? open : await permissions.ActionProblemAsync(employeeId, form, ScreenAction.Add);
     }
 
     // ------------------------------------------------------------------ the snapshot
@@ -139,7 +194,8 @@ public sealed class PosService(IDbContextFactory<RetailDbContext> factory, Permi
         string prefix = await db.Sequences.Where(q => q.SequenceName == "SALES_INVOICE").Select(q => q.Prefix).FirstOrDefaultAsync() ?? "";
         var settings = new PosSettings(s.StoreName ?? "", s.VATNumber, CountryRules.Normalize(s.CountryCode), s.VATRate, s.PricesIncludeVAT,
                                        s.DefaultCustomerID, string.IsNullOrWhiteSpace(s.CurrencyCode) ? "SAR" : s.CurrencyCode,
-                                       s.AllowNegativeStock, s.CreditBlockDays ?? 0, prefix, s.ReceiptFooter);
+                                       s.AllowNegativeStock, s.CreditBlockDays ?? 0, prefix, s.ReceiptFooter,
+                                       await ScaleSettingsAsync(db));
         var units = await db.Units.AsNoTracking().ToDictionaryAsync(u => u.UnitID);
         string UnitName(int id) => units.TryGetValue(id, out var u) ? Name(u.UnitName, u.UnitNameEn, english) : "";
         var stock = await RepService.WarehouseStockAsync(db, user.WarehouseID);
@@ -256,5 +312,170 @@ public sealed class PosService(IDbContextFactory<RetailDbContext> factory, Permi
         var r = await sales.PostSaleAsync(user, request.ToSale(), request.ConfirmStock,
                                           new DeviceSaleInfo(reference, number, request.TakenAt));
         return new DeviceSaleResult(r.Status, r.Message, r.InvoiceID, r.InvoiceNumber, false);
+    }
+
+    // ------------------------------------------------------------------ returns, receipts and closings of a device (docs/86)
+
+    /// <summary>The scale barcodes of the settings (LabelSettings, modScale).</summary>
+    public static async Task<ScaleSettings> ScaleSettingsAsync(RetailDbContext db) =>
+        await db.LabelSettings.AsNoTracking().Where(l => l.LabelSettingID == 1)
+            .Select(l => new ScaleSettings(l.ScalePrefixes, l.ScaleItemDigits, l.ScaleValueKind)).FirstOrDefaultAsync() ?? ScaleSettings.None;
+
+    private static string RefProblem(string reference) =>
+        reference.Length == 0 ? "رقم المستند في الجهاز مطلوب." : reference.Length > 40 ? "رقم المستند في الجهاز أطول من 40 حرفًا." : "";
+
+    /// <summary>A document already on the server with this number of the device: its id for the same user (sent again), a
+    /// refusal for another user, null = new.</summary>
+    private static DeviceDocResult? Sent(int? id, int employeeId, int userId) =>
+        id is null ? null : employeeId == userId ? new DeviceDocResult(SaveStatus.Saved, "", true, null) : new DeviceDocResult(SaveStatus.Refused, DocRefUsed, false, null);
+
+    /// <summary>A sales return of the POS (modSales.PostSalesReturn), sent once.</summary>
+    public async Task<DeviceDocResult> PostDeviceReturnAsync(ActingUser user, DeviceReturnRequest request, bool english)
+    {
+        string reference = (request.ClientRef ?? "").Trim();
+        string problem = RefProblem(reference);
+        if (problem.Length > 0)
+        {
+            return new DeviceDocResult(SaveStatus.Refused, problem, false, null);
+        }
+        await using (var db = await factory.CreateDbContextAsync())
+        {
+            var sent = await db.SalesReturns.AsNoTracking().Where(r => r.ClientRef == reference)
+                .Select(r => new { r.SalesReturnID, r.EmployeeID }).FirstOrDefaultAsync();
+            if (Sent(sent?.SalesReturnID, sent?.EmployeeID ?? 0, user.EmployeeID) is { } done)
+            {
+                return done with { Document = done.Status == SaveStatus.Saved ? await ReturnDocumentAsync(sent!.SalesReturnID, english) : null };
+            }
+        }
+        var r = await sales.PostSalesReturnAsync(user, request.ToReturn(), reference);
+        return r.Status == SaveStatus.Saved
+            ? new DeviceDocResult(SaveStatus.Saved, "", false, await ReturnDocumentAsync(r.InvoiceID, english))
+            : new DeviceDocResult(r.Status, r.Message, false, null);
+    }
+
+    /// <summary>A customer receipt of the POS (modSales.PostCustomerPayment), sent once.</summary>
+    public async Task<DeviceDocResult> PostDevicePaymentAsync(ActingUser user, DevicePaymentRequest request, bool english)
+    {
+        string reference = (request.ClientRef ?? "").Trim();
+        string problem = RefProblem(reference);
+        if (problem.Length > 0)
+        {
+            return new DeviceDocResult(SaveStatus.Refused, problem, false, null);
+        }
+        await using (var db = await factory.CreateDbContextAsync())
+        {
+            var sent = await db.CustomerPayments.AsNoTracking().Where(p => p.ClientRef == reference)
+                .Select(p => new { p.PaymentID, p.EmployeeID }).FirstOrDefaultAsync();
+            if (Sent(sent?.PaymentID, sent?.EmployeeID ?? 0, user.EmployeeID) is { } done)
+            {
+                return done with { Document = done.Status == SaveStatus.Saved ? await PaymentDocumentAsync(sent!.PaymentID, english) : null };
+            }
+        }
+        var r = await sales.PostPaymentAsync(user, new PaymentRequest(request.CustomerID, request.Amount, request.PaymentMethodID, request.Notes),
+                                             request.ConfirmOverBalance, reference);
+        return r.Status == SaveStatus.Saved
+            ? new DeviceDocResult(SaveStatus.Saved, "", false, await PaymentDocumentAsync(r.InvoiceID, english))
+            : new DeviceDocResult(r.Status, r.Message, false, null);
+    }
+
+    /// <summary>A cashier closing of the POS (modCash.PostCashClosing), sent once.</summary>
+    public async Task<DeviceDocResult> PostDeviceClosingAsync(ActingUser user, DeviceClosingRequest request, bool english)
+    {
+        string reference = (request.ClientRef ?? "").Trim();
+        string problem = RefProblem(reference);
+        if (problem.Length > 0)
+        {
+            return new DeviceDocResult(SaveStatus.Refused, problem, false, null);
+        }
+        await using (var db = await factory.CreateDbContextAsync())
+        {
+            var sent = await db.CashClosings.AsNoTracking().Where(c => c.ClientRef == reference)
+                .Select(c => new { c.ClosingID, c.EmployeeID }).FirstOrDefaultAsync();
+            if (Sent(sent?.ClosingID, sent?.EmployeeID ?? 0, user.EmployeeID) is { } done)
+            {
+                return done with { Document = done.Status == SaveStatus.Saved ? await ClosingDocumentAsync(sent!.ClosingID, english) : null };
+            }
+        }
+        var r = await new TreasuryService(factory, permissions).PostCashClosingAsync(user, request.ToClosing(), reference);
+        return r.Status == SaveStatus.Saved
+            ? new DeviceDocResult(SaveStatus.Saved, "", false, await ClosingDocumentAsync(r.Id, english))
+            : new DeviceDocResult(r.Status, r.Message, false, null);
+    }
+
+    /// <summary>The boxes the user may close (ClosingLoad).</summary>
+    public async Task<PosClosingBoxes> ClosingBoxesAsync(int employeeId, bool english)
+    {
+        var (boxes, safes, own) = await new TreasuryService(factory, permissions).ClosingBoxesAsync(employeeId, english);
+        return new PosClosingBoxes(boxes, safes, own);
+    }
+
+    private static async Task<string> EmployeeNameAsync(RetailDbContext db, int id) =>
+        await db.Employees.Where(e => e.EmployeeID == id).Select(e => e.EmployeeName).FirstOrDefaultAsync() ?? "";
+
+    private static async Task<string> CustomerNameAsync(RetailDbContext db, int id, bool english) =>
+        await db.Customers.Where(c => c.CustomerID == id).Select(c => english && c.CustomerNameEn != null && c.CustomerNameEn != "" ? c.CustomerNameEn : c.CustomerName)
+            .FirstOrDefaultAsync() ?? "";
+
+    /// <summary>The credit note as the POS prints it.</summary>
+    public async Task<PosDocument?> ReturnDocumentAsync(int returnId, bool english)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var r = await db.SalesReturns.AsNoTracking().FirstOrDefaultAsync(x => x.SalesReturnID == returnId);
+        if (r is null)
+        {
+            return null;
+        }
+        var units = await db.Units.AsNoTracking().ToDictionaryAsync(u => u.UnitID, u => Name(u.UnitName, u.UnitNameEn, english));
+        var rows = await (from d in db.SalesReturnDetails
+                          join p in db.Products on d.ProductID equals p.ProductID
+                          where d.SalesReturnID == returnId
+                          orderby d.ReturnDetailID
+                          select new { p.ProductName, p.ProductNameEn, Unit = d.UnitID ?? p.UnitID, d.Quantity, d.LineTotal }).ToListAsync();
+        var lines = rows.Select(x => new PosSlipLine(Name(x.ProductName, x.ProductNameEn, english) + " - " + units.GetValueOrDefault(x.Unit, ""),
+                                                     x.Quantity, x.LineTotal)).ToArray();
+        string invoice = await db.SalesInvoices.Where(h => h.SalesInvoiceID == r.SalesInvoiceID).Select(h => h.InvoiceNumber).FirstAsync();
+        var totals = new List<PosSlipRow>
+        {
+            new("الإجمالي قبل الضريبة", r.TaxableAmount), new("الضريبة", r.Tax), new("الإجمالي شامل الضريبة", r.TotalAmount),
+            r.RefundedAmount > 0 ? new PosSlipRow("المبلغ المردود نقدًا", r.RefundedAmount) : new PosSlipRow("خصم من رصيد العميل", r.TotalAmount),
+        };
+        return new PosDocument("RETURN", r.SalesReturnID, r.ReturnNumber, r.ReturnDate, "إشعار دائن", await EmployeeNameAsync(db, r.EmployeeID),
+                               await CustomerNameAsync(db, r.CustomerID, english), lines, totals.ToArray(), invoice + " - " + r.Reason, r.QRCodeData);
+    }
+
+    /// <summary>The receipt voucher as the POS prints it.</summary>
+    public async Task<PosDocument?> PaymentDocumentAsync(int paymentId, bool english)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var p = await db.CustomerPayments.AsNoTracking().FirstOrDefaultAsync(x => x.PaymentID == paymentId);
+        if (p is null)
+        {
+            return null;
+        }
+        decimal balance = await db.Customers.Where(c => c.CustomerID == p.CustomerID).Select(c => c.CurrentBalance).FirstAsync();
+        string? method = (await sales.PaymentMethodsAsync(english)).Where(m => m.Id == p.PaymentMethodID).Select(m => m.Name).FirstOrDefault();
+        return new PosDocument("PAYMENT", p.PaymentID, p.PaymentNumber, p.PaymentDate, "سند قبض", await EmployeeNameAsync(db, p.EmployeeID),
+                               await CustomerNameAsync(db, p.CustomerID, english), [],
+                               [new PosSlipRow("المبلغ", p.Amount), new PosSlipRow("الرصيد المستحق", balance)], method, null);
+    }
+
+    /// <summary>The cashier closing as the POS prints it.</summary>
+    public async Task<PosDocument?> ClosingDocumentAsync(int closingId, bool english)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var c = await db.CashClosings.AsNoTracking().FirstOrDefaultAsync(x => x.ClosingID == closingId);
+        if (c is null)
+        {
+            return null;
+        }
+        var box = await db.CashBoxes.AsNoTracking().FirstAsync(b => b.CashBoxID == c.CashBoxID);
+        var rows = new List<PosSlipRow>
+        {
+            new("رصيد البداية", c.OpeningBalance), new("المقبوضات", c.CashIn), new("المدفوعات", c.CashOut), new("الرصيد الدفتري", c.ExpectedBalance),
+            new("النقدية الفعلية", c.CountedAmount), new("الفرق", c.Difference), new("المبلغ المرحَّل", c.TransferAmount),
+            new("المتبقي في الصندوق (عهدة)", c.KeptAmount),
+        };
+        return new PosDocument("CLOSING", c.ClosingID, c.ClosingNumber, c.ClosingDate, "تصفية يومية الكاشير", await EmployeeNameAsync(db, c.EmployeeID),
+                               Name(box.BoxName, box.BoxNameEn, english), [], rows.ToArray(), c.Notes, null);
     }
 }

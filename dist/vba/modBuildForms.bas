@@ -4668,7 +4668,7 @@ End Sub
 Private Sub BuildForm_frmLabelSettings()
     Dim c As Access.Control, s As String
     On Error GoTo EH
-    StartForm "frmLabelSettings", "≈⁄œ«œ«  „·’ﬁ«  «·»«—ﬂÊœ", "SELECT * FROM LabelSettings WHERE LabelSettingID = 1", 15309, 8731, True, False, True, _
+    StartForm "frmLabelSettings", "≈⁄œ«œ«  „·’ﬁ«  «·»«—ﬂÊœ", "SELECT * FROM LabelSettings WHERE LabelSettingID = 1", 15309, 10432, True, False, True, _
               "KIND=SINGLE|TABLE=LabelSettings|PK=LabelSettingID"
     Set c = AddRect("boxTitle", 0, 0, 15309, 850, CLR_PRIMARY)
     Set c = AddIcon("icoTitle", ChrW(&HE713), 227, 170, 510, 510, 20, False, CLR_SURFACE, "", 0)
@@ -4740,7 +4740,18 @@ Private Sub BuildForm_frmLabelSettings()
     Set c = AddLabel("lblShortName", "«·«”„ «·„Œ ’— ··„Õ·", 227, 7371, 2268, 425, 10, False, CLR_MUTED, "ShortName", 0)
     Set c = AddText("FontSize", "FontSize", 10093, 7371, 4989, 425)
     Set c = AddLabel("lblFontSize", "ÕÃ„ «·Œÿ", 7768, 7371, 2268, 425, 10, False, CLR_MUTED, "FontSize", 0)
-    Set c = AddLabel("lblStatus", " ", 227, 8051, 14855, 340, 10, True, CLR_MUTED, "", 0)
+    Set c = AddLabel("lblInfoScale", "»«—ﬂÊœ «·„Ì“«‰: Ìﬁ—ƒÂ «·»Ì⁄ ›Ì Access Ê»—‰«„Ã Windows", 227, 7938, 14855, 425, 10, True, CLR_ACCENT, "", 0)
+    Set c = AddText("ScalePrefixes", "ScalePrefixes", 2552, 8505, 4989, 425)
+    SetCtlProp c, "ControlTipText", "„À«·: 20,21. ›«—€ = ·« „Ì“«‰"
+    SetCtlProp c, "StatusBarText", "„À«·: 20,21. ›«—€ = ·« „Ì“«‰"
+    Set c = AddLabel("lblScalePrefixes", "»«œ∆«  »«—ﬂÊœ «·„Ì“«‰", 227, 8505, 2268, 425, 10, False, CLR_MUTED, "ScalePrefixes", 0)
+    Set c = AddText("ScaleItemDigits", "ScaleItemDigits", 10093, 8505, 4989, 425)
+    SetCtlProp c, "ControlTipText", "—„“ «·’‰› ›Ì «·„Ì“«‰ = ﬂÊœ «·’‰›"
+    SetCtlProp c, "StatusBarText", "—„“ «·’‰› ›Ì «·„Ì“«‰ = ﬂÊœ «·’‰›"
+    Set c = AddLabel("lblScaleItemDigits", "⁄œœ √—ﬁ«„ —„“ «·’‰› ›Ì »«—ﬂÊœ «·„Ì“«‰", 7768, 8505, 2268, 425, 10, False, CLR_MUTED, "ScaleItemDigits", 0)
+    Set c = AddCombo("ScaleValueKind", "ScaleValueKind", 2552, 9072, 4989, 425, "WEIGHT;«·Ê“‰ (»«·Ã—«„);PRICE;«·”⁄— (»«·Â··… √Ê «·ﬁ—‘)", 2, "0;3402")
+    Set c = AddLabel("lblScaleValueKind", "»«—ﬂÊœ «·„Ì“«‰ ÌÕ„·", 227, 9072, 2268, 425, 10, False, CLR_MUTED, "ScaleValueKind", 0)
+    Set c = AddLabel("lblStatus", " ", 227, 9752, 14855, 340, 10, True, CLR_MUTED, "", 0)
     m_frm.OnLoad = EP
     m_frm.OnCurrent = EP
     m_frm.BeforeUpdate = EP

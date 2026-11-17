@@ -1,0 +1,134 @@
+@page "/payment"
+@inject PosSession S
+@inject NavigationManager Nav
+
+@* A customer receipt on the POS (docs/86): saved on the program at once (modSales.PostCustomerPayment) and printed. *@
+@if (!S.LoggedIn)
+{
+    <p class="pos-empty">@S.T("سجّل الدخول أولًا.")</p>
+}
+else if (S.Snapshot!.User.PaymentProblem.Length > 0)
+{
+    <p class="pos-error">@S.T(S.Snapshot.User.PaymentProblem)</p>
+}
+else
+{
+    <section class="pos-card pos-narrow">
+        <h2>@S.T("سند قبض من عميل")</h2>
+        <label>@S.T("العميل")
+            <select value="@customerId" @onchange="e => Choose(e.Value)">
+                <option value="0">-</option>
+                @foreach (var c in S.Snapshot.Customers.Where(c => c.CustomerID != S.Snapshot.Settings.DefaultCustomerID))
+                {
+                    <option value="@c.CustomerID">@c.CustomerName</option>
+                }
+            </select>
+        </label>
+        @if (Customer is { } cust)
+        {
+            <p class="pos-muted">@S.T("الرصيد المستحق"): @Money(cust.CurrentBalance)</p>
+        }
+        <label>@S.T("المبلغ")<input class="pos-num" type="number" step="any" min="0" @bind="amount" @bind:after="Edited" /></label>
+        <label>@S.T("طريقة الدفع")
+            <select value="@method" @onchange="e => { method = int.TryParse(e.Value as string, out var m) ? m : SalesService.CashMethodId; Edited(); }">
+                @foreach (var m in S.Snapshot.Methods)
+                {
+                    <option value="@m.PaymentMethodID">@m.MethodName</option>
+                }
+            </select>
+        </label>
+        <label>@S.T("ملاحظات")<input @bind="notes" @bind:after="Edited" maxlength="255" /></label>
+        @if (question.Length > 0)
+        {
+            <div class="pos-question">
+                <p>@question</p>
+                <button class="pos-primary" @onclick="() => SaveAsync(true)">@S.T("نعم")</button>
+                <button @onclick="() => question = string.Empty">@S.T("لا")</button>
+            </div>
+        }
+        else
+        {
+            <button class="pos-primary pos-big" disabled="@(busy || customerId == 0 || amount is not > 0)" @onclick="() => SaveAsync(false)">
+                @S.T("حفظ وطباعة")</button>
+        }
+        @if (message.Length > 0)
+        {
+            <p class="@(error ? "pos-error" : "pos-ok")">@message</p>
+        }
+        @if (last is not null)
+        {
+            <button class="pos-link" @onclick="ReprintAsync">@S.T("طباعة مرة أخرى") @last.Number</button>
+        }
+    </section>
+}
+
+@code {
+    private int customerId, method = SalesService.CashMethodId;
+    private decimal? amount;
+    private string notes = "", message = "", question = "", reference = PosSession.NewReference();
+    private bool busy, error, lastCash;
+    private PosDocument? last;
+
+    private PosCustomer? Customer => S.Snapshot?.Customers.FirstOrDefault(c => c.CustomerID == customerId);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await S.LoadAsync();
+        if (!S.LoggedIn)
+        {
+            Nav.NavigateTo(S.Connection is null ? "database" : "login");
+        }
+    }
+
+    private static string Money(decimal v) => v.ToString("#,##0.00", CultureInfo.InvariantCulture);
+
+    private void Choose(object? value)
+    {
+        customerId = int.TryParse(value as string, out var v) ? v : 0;
+        Edited();
+    }
+
+    /// <summary>Another receipt: a new number on the PC (the same one is kept to send it again after a lost answer).</summary>
+    private void Edited()
+    {
+        reference = PosSession.NewReference();
+        question = "";
+    }
+
+    private void Show(string text, bool isError)
+    {
+        message = text;
+        error = isError && text.Length > 0;
+    }
+
+    private async Task SaveAsync(bool confirm)
+    {
+        if (busy || customerId == 0 || amount is not { } a)
+        {
+            return;
+        }
+        busy = true;
+        var (status, text, doc) = await S.SavePaymentAsync(new DevicePaymentRequest(reference, customerId, a, method, notes, confirm));
+        question = status == SaveStatus.NeedsConfirmation ? text : "";
+        if (status != SaveStatus.Saved || doc is null)
+        {
+            Show(status == SaveStatus.NeedsConfirmation ? "" : text, true);
+            busy = false;
+            return;
+        }
+        last = doc;
+        lastCash = method == SalesService.CashMethodId;
+        string printed = await S.PrintDocumentAsync(doc, lastCash);
+        Show(S.T("تم حفظ سند القبض") + " " + doc.Number + (printed.Length > 0 ? " · " + printed : ""), printed.Length > 0);
+        amount = null;
+        notes = "";
+        Edited();
+        busy = false;
+    }
+
+    private async Task ReprintAsync()
+    {
+        string printed = await S.PrintDocumentAsync(last!, lastCash, reprint: true);
+        Show(printed, printed.Length > 0);
+    }
+}

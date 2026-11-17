@@ -16,6 +16,9 @@ Public Sub LangData3()
 End Sub
 
 Private Sub D3_1()
+    LangAdd "مقفلة بقيد إقفال. أعد فتح السنة أولًا", "closed with a closing entry. Reopen the year first"
+    LangAdd "من بداية الصندوق (لا توجد تصفية سابقة", "since the box started (no previous closing"
+    LangAdd "هذا سجل أساسي في النظام ولا يمكن حذفه", "This is a system record and cannot be deleted"
     LangAdd "هل تريد إنشاء المصروفات المستحقة الآن", "Do you want to create the due expenses now"
     LangAdd "أرصدة الموردين بالعملات وفروق العملة", "Supplier balances by currency and exchange differences"
     LangAdd "أُنشئ مفتاح وشهادة تجريبية في المجلد", "A test key and certificate were created in the folder"
@@ -133,12 +136,12 @@ Private Sub D3_1()
     LangAdd "حذف التسوية الجارية وكل مطابقاتها", "Delete the open reconciliation and all its matches"
     LangAdd "حذف الحركة البنكية المحددة وقيدها", "Delete the selected bank transaction and its entry"
     LangAdd "حسب صافي الكمية خلال فترة التقرير", "By net quantity during the report period"
-    LangAdd "حوّل العرض إلى فاتورة بدل الطلبية", "Turn the quotation into an invoice instead of an order"
-    LangAdd "خصم الغياب أكبر من الأساسي والسكن", "The absence deduction is more than the basic and housing"
-    LangAdd "رحّله أو ألغه قبل بدء جرد جديد له", "Post or cancel it before starting a new count for it"
 End Sub
 
 Private Sub D3_2()
+    LangAdd "حوّل العرض إلى فاتورة بدل الطلبية", "Turn the quotation into an invoice instead of an order"
+    LangAdd "خصم الغياب أكبر من الأساسي والسكن", "The absence deduction is more than the basic and housing"
+    LangAdd "رحّله أو ألغه قبل بدء جرد جديد له", "Post or cancel it before starting a new count for it"
     LangAdd "رقمنا (PUR-) أو رقم فاتورة المورد", "Our number (PUR-) or the supplier invoice number"
     LangAdd "سطر لا ينتمي إلى الفاتورة الأصلية", "A line that does not belong to the original invoice"
     LangAdd "طلب سفري: يُغلَّف ويُسلَّم للعميل", "Takeaway order: packed and handed to the customer"
@@ -256,12 +259,12 @@ Private Sub D3_2()
     LangAdd "لا يوجد سداد مسجل لهذا الإقرار", "No payment is recorded for this return"
     LangAdd "للبيع الآجل اختر عميلًا مسجلًا", "For a credit sale choose a registered customer"
     LangAdd "للعملاء المنشآت (فاتورة ضريبية", "For business customers (tax invoice"
-    LangAdd "لم تُصدر الهيئة شهادة الامتثال", "ZATCA did not issue the compliance certificate"
-    LangAdd "ليست لديك صلاحية سندات الخزينة", "You do not have the permission for treasury vouchers"
-    LangAdd "مجلد Images بجانب ملف البيانات", "Images folder next to the data file"
 End Sub
 
 Private Sub D3_3()
+    LangAdd "لم تُصدر الهيئة شهادة الامتثال", "ZATCA did not issue the compliance certificate"
+    LangAdd "ليست لديك صلاحية سندات الخزينة", "You do not have the permission for treasury vouchers"
+    LangAdd "مجلد Images بجانب ملف البيانات", "Images folder next to the data file"
     LangAdd "مجموع أرصدة المستوى الأول (صفر", "Total of the first-level balances (zero"
     LangAdd "من 1 إلى 28 (يوم الإيجار مثلًا", "From 1 to 28 (the rent day, for example"
     LangAdd "نقر مزدوج على السطر يفتح القيد", "Double-click a line to open the entry"
@@ -379,12 +382,12 @@ Private Sub D3_3()
     LangAdd "لا توجد كميات محجوزة لطلبيات", "Nothing is reserved for orders"
     LangAdd "لا توجد مبيعات في هذه الفترة", "There are no sales in this period"
     LangAdd "لمن لا مركز له من المستخدمين", "for users without a center"
-    LangAdd "ليست لديك صلاحية يوم المندوب", "You do not have the rep day permission"
-    LangAdd "مبالغ الموازنة لا تكون سالبة", "Budget amounts are never negative"
-    LangAdd "مسودة: أضف الأصناف ثم «ترحيل", "Draft: add the products, then Post"
 End Sub
 
 Private Sub D3_4()
+    LangAdd "ليست لديك صلاحية يوم المندوب", "You do not have the rep day permission"
+    LangAdd "مبالغ الموازنة لا تكون سالبة", "Budget amounts are never negative"
+    LangAdd "مسودة: أضف الأصناف ثم «ترحيل", "Draft: add the products, then Post"
     LangAdd "مطابق: لا يوجد عجز ولا زيادة", "Matched: no shortage and no overage"
     LangAdd "منظومة مصلحة الضرائب المصرية", "the Egyptian Tax Authority system"
     LangAdd "نسبة القسط المتناقص بين 0% و", "The declining balance rate is between 0% and"
@@ -502,12 +505,12 @@ Private Sub D3_4()
     LangAdd "اكتب عدد الدقائق من 0 إلى", "Type the minutes from 0 to"
     LangAdd "اكتب معامل التحويل للعملة", "Type the exchange rate of the currency"
     LangAdd "الأرقام من المستندات الآن", "The figures come from the documents now"
-    LangAdd "الأصل غير موجود أو مستبعد", "The asset does not exist or is disposed"
-    LangAdd "الإقرارات تُعتمد بالترتيب", "Returns are approved in order"
-    LangAdd "التحويل بين بنكين مختلفين", "Transfer between two different banks"
 End Sub
 
 Private Sub D3_5()
+    LangAdd "الأصل غير موجود أو مستبعد", "The asset does not exist or is disposed"
+    LangAdd "الإقرارات تُعتمد بالترتيب", "Returns are approved in order"
+    LangAdd "التحويل بين بنكين مختلفين", "Transfer between two different banks"
     LangAdd "الحسابات البنكية والتسوية", "Bank accounts and reconciliation"
     LangAdd "السطر الأول أسفل الباركود", "First line below the barcode"
     LangAdd "السطر الأول أعلى الباركود", "First line above the barcode"
@@ -531,8 +534,4 @@ Private Sub D3_5()
     LangAdd "حذف آخر إعادة تقييم للأصل", "Delete the last revaluation of the asset"
     LangAdd "حذف الموازنة كلها بأسطرها", "Delete the whole budget with its lines"
     LangAdd "خسارة بيع / استبعاد الأصل", "Loss on sale / disposal of the asset"
-    LangAdd "دفتر الأستاذ (كل الحسابات", "General ledger (all accounts"
-    LangAdd "رصيد الكشف في هذا التاريخ", "Statement balance on this date"
-    LangAdd "رفضت المصلحة الإلغاء (رمز", "The Tax Authority refused the cancellation (code"
-    LangAdd "رقم الهوية / الرقم القومي", "ID / national ID number"
 End Sub

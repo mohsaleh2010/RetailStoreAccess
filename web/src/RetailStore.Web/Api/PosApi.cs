@@ -43,5 +43,59 @@ public static class PosApi
                          "POST /sales; ConfirmStock = the answer to the question on the stock.")
         .Produces<PostedDocument>(StatusCodes.Status201Created).Produces<PostedDocument>()
         .ProducesProblem(StatusCodes.Status409Conflict).ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+
+        // ---- returns, receipts and cashier closings (docs/86): made on the program at once, each sent once (its ClientRef)
+        pos.MapGet("/returns/{number}", async (string number, HttpContext http, SalesService service) =>
+            await service.ReturnableAsync(number, ApiResults.English(http)) is { } inv
+                ? Results.Ok(inv) : ApiResults.Problem(http, StatusCodes.Status404NotFound, "not_found", "لا توجد فاتورة بهذا الرقم."))
+        .Needs("SALES_RETURN", "frmSalesReturn").WithName("PosReturnSource")
+        .WithSummary("The invoice of a number with its lines to return from (modPOS.LoadInvoiceForReturn)")
+        .Produces<ReturnableInvoice>().ProducesProblem(StatusCodes.Status404NotFound);
+
+        pos.MapPost("/returns", async (DeviceReturnRequest body, HttpContext http, PosService service) =>
+            Document(http, await service.PostDeviceReturnAsync(UserInfo.Acting(http.User), body with { Lines = body.Lines ?? [] },
+                                                               ApiResults.English(http))))
+        .Needs("SALES_RETURN", "frmSalesReturn", ScreenAction.Add).WithName("PostPosReturn")
+        .WithSummary("A sales return made on the POS, with its number on the device (modSales.PostSalesReturn)")
+        .WithDescription("ClientRef = the number of the return on the device (at most 40 characters): a return sent again by the " +
+                         "same user answers 200 with its document and adds nothing. Lines = the invoice lines and the quantities " +
+                         "returned in their unit; RefundType CASH or CREDIT (the cash customer is always paid back).")
+        .Produces<PosDocument>(StatusCodes.Status201Created).Produces<PosDocument>().ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+
+        pos.MapPost("/payments", async (DevicePaymentRequest body, HttpContext http, PosService service) =>
+            Document(http, await service.PostDevicePaymentAsync(UserInfo.Acting(http.User), body, ApiResults.English(http))))
+        .Needs("CUSTOMER_PAYMENTS", "frmCustomerPayment").WithName("PostPosPayment")
+        .WithSummary("A customer receipt made on the POS, with its number on the device (modSales.PostCustomerPayment)")
+        .WithDescription("An amount over the balance answers 409 confirm; send it again with ConfirmOverBalance = true.")
+        .Produces<PosDocument>(StatusCodes.Status201Created).Produces<PosDocument>()
+        .ProducesProblem(StatusCodes.Status409Conflict).ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+
+        pos.MapGet("/closing", async (HttpContext http, PosService service) =>
+            Results.Ok(await service.ClosingBoxesAsync(UserInfo.EmployeeId(http.User), ApiResults.English(http))))
+        .Needs("CASH_CLOSING", "frmCashClosing").WithName("PosClosingBoxes")
+        .WithSummary("The boxes the user may close, the main safes and his own box (modCash.ClosingLoad)")
+        .Produces<PosClosingBoxes>();
+
+        pos.MapGet("/closing/{box:int}", async (int box, HttpContext http, TreasuryService service) =>
+            await service.ClosingPreviewAsync(box, ApiResults.English(http)) is { } p ? Results.Ok(p) : ApiResults.NotFound(http))
+        .Needs("CASH_CLOSING", "frmCashClosing").WithName("PosClosingPreview")
+        .WithSummary("What the closing of a box finds now: the last closing, the cash in and out since, the book balance (ClosingBoxChanged)")
+        .Produces<ClosingPreview>().ProducesProblem(StatusCodes.Status404NotFound);
+
+        pos.MapPost("/closing", async (DeviceClosingRequest body, HttpContext http, PosService service) =>
+            Document(http, await service.PostDeviceClosingAsync(UserInfo.Acting(http.User), body, ApiResults.English(http))))
+        .Needs("CASH_CLOSING", "frmCashClosing", ScreenAction.Add).WithName("PostPosClosing")
+        .WithSummary("A cashier closing made on the POS, with its number on the device (modCash.PostCashClosing)")
+        .WithDescription("Destination MAIN (TransferAmount to the safe ToCashBoxID), OWNER or KEEP; the shortage or overage is booked " +
+                         "with a voucher, a shortage of a rep's custody box is an advance on him.")
+        .Produces<PosDocument>(StatusCodes.Status201Created).Produces<PosDocument>().ProducesProblem(StatusCodes.Status422UnprocessableEntity);
     }
+
+    private static IResult Document(HttpContext http, DeviceDocResult r) => r.Status switch
+    {
+        SaveStatus.Saved when r.Duplicate => Results.Ok(r.Document),
+        SaveStatus.Saved => Results.Created(ApiEndpoints.Prefix + "/pos/documents/" + r.Document?.Number, r.Document),
+        SaveStatus.NeedsConfirmation => ApiResults.Problem(http, StatusCodes.Status409Conflict, "confirm", r.Message),
+        _ => ApiResults.Refused(http, r.Message),
+    };
 }

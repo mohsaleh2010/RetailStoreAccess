@@ -30,10 +30,10 @@ Private Const SCHEMA_TABLES As String = "Settings,Sequences,Roles,Permissions,Ro
     "CustomerPayments,SupplierPayments,Banks,BankTransactions,Cheques,FixedAssets,DepreciationRuns,AssetDepreciations,AssetRevaluations,AssetTransfers,CostCenters,SalesReps,SalesRepTargets,CommissionRuns,CommissionLines,Budgets,BudgetLines,PayrollRuns,PayrollLines,BankReconciliations,BankClearings,CustomerAllocations,SupplierAllocations,ExpenseTypes,Expenses,RecurringExpenses,CashVouchers,CashClosings," & _
     "Accounts,JournalSourceTypes,JournalEntries,JournalLines,PeriodClosings,FiscalPeriods,FiscalYearClosings,FiscalYearClosingLines,VatReturns,ManualEntries,ManualEntryLines,OpeningBalances,OpeningStock,TransactionTypes,InventoryTransactions,StockTransfers,StockTransferLines,StockParties,StockDocuments,StockDocumentLines,StockNotes,StockNoteLines,SalesOrders,Quotations,QuotationLines,PurchaseOrders," & _
     "PurchaseOrderLines,RepDays,RouteStops,RepVisits,RepPrices,SalesOrderLines,StockCounts,StockCountDetails,AuditLog,AuditChanges,LabelSettings,EInvoiceLog,OfficeSyncLog"
-Private Const EXPECTED_FIELD_COUNTS As String = "Settings=75;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;PriceLists=7;Customers=26;Products=26;ProductUnits=9;PriceListItems=8;SalesInvoices=48;SalesInvoiceDetails=16;SalesReturns=40;SalesReturnDetails=16;" & _
-    "PurchaseInvoices=24;PurchaseInvoiceDetails=13;PurchaseReturns=23;PurchaseReturnDetails=13;CustomerPayments=16;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;" & _
-    "BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=18;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;" & _
-    "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=14;Quotations=16;QuotationLines=9;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=19;" & _
+Private Const EXPECTED_FIELD_COUNTS As String = "Settings=75;Sequences=5;Roles=5;Permissions=6;RolePermissions=2;Employees=31;Screens=10;UserScreens=6;Activations=6;Categories=9;Units=6;PaymentMethods=6;Currencies=7;CurrencyRates=6;CashBoxes=11;CashBoxUsers=4;Warehouses=12;Suppliers=18;PriceLists=7;Customers=26;Products=26;ProductUnits=9;PriceListItems=8;SalesInvoices=48;SalesInvoiceDetails=16;SalesReturns=41;SalesReturnDetails=16;" & _
+    "PurchaseInvoices=24;PurchaseInvoiceDetails=13;PurchaseReturns=23;PurchaseReturnDetails=13;CustomerPayments=17;SupplierPayments=15;Banks=10;BankTransactions=15;Cheques=16;FixedAssets=29;DepreciationRuns=6;AssetDepreciations=6;AssetRevaluations=14;AssetTransfers=11;CostCenters=8;SalesReps=15;SalesRepTargets=5;CommissionRuns=9;CommissionLines=13;Budgets=6;BudgetLines=17;PayrollRuns=12;PayrollLines=19;" & _
+    "BankReconciliations=12;BankClearings=7;CustomerAllocations=6;SupplierAllocations=6;ExpenseTypes=4;Expenses=20;RecurringExpenses=18;CashVouchers=20;CashClosings=19;Accounts=15;JournalSourceTypes=4;JournalEntries=16;JournalLines=8;PeriodClosings=8;FiscalPeriods=6;FiscalYearClosings=8;FiscalYearClosingLines=7;VatReturns=28;ManualEntries=13;ManualEntryLines=10;OpeningBalances=6;OpeningStock=7;" & _
+    "TransactionTypes=6;InventoryTransactions=14;StockTransfers=12;StockTransferLines=6;StockParties=10;StockDocuments=10;StockDocumentLines=6;StockNotes=15;StockNoteLines=9;SalesOrders=14;Quotations=16;QuotationLines=9;PurchaseOrders=11;PurchaseOrderLines=6;RepDays=17;RouteStops=8;RepVisits=11;RepPrices=5;SalesOrderLines=6;StockCounts=10;StockCountDetails=9;AuditLog=9;AuditChanges=7;LabelSettings=22;" & _
     "EInvoiceLog=15;OfficeSyncLog=12"
 Private Const EXPECTED_SEED_COUNTS As String = "Settings=1;Sequences=36;Roles=3;Permissions=49;RolePermissions=95;Employees=1;Screens=84;Categories=1;Units=8;PaymentMethods=4;Currencies=11;CurrencyRates=5;CashBoxes=2;Warehouses=1;Customers=1;ExpenseTypes=9;Accounts=89;JournalSourceTypes=38;TransactionTypes=14;StockParties=1;LabelSettings=1"
 
@@ -1747,10 +1747,13 @@ Private Sub CreateTable_SalesReturns()
              "", "", "المندوب", "مندوب الفاتورة الأصلية"
     AddField tdf, "WarehouseID", "LONG", 0, True, "1", _
              "", "", "المخزن", ""
+    AddField tdf, "ClientRef", "TEXT", 40, False, "", _
+             "", "", "رقم المرتجع في جهاز نقطة البيع", "من نقطة البيع على Windows (docs/86): يمنع تكرار المرتجع إذا أُعيد إرساله بعد انقطاع الاتصال"
     AddIndex tdf, "PrimaryKey", "SalesReturnID", True, True, False
     AddIndex tdf, "UX_ReturnNumber", "ReturnNumber", False, True, False
     AddIndex tdf, "IX_ReturnDate", "ReturnDate", False, False, False
     AddIndex tdf, "UX_InvoiceUUID", "InvoiceUUID", False, True, True
+    AddIndex tdf, "UX_ClientRef", "ClientRef", False, True, True
     EndTable tdf, "مرتجعات المبيعات: إشعار دائن مرتبط بالفاتورة الأصلية؛ يعيد الكمية للمخزون ويعكس المبلغ.", "[RefundedAmount]<=[TotalAmount]", "المبلغ المردود لا يتجاوز قيمة المرتجع"
 End Sub
 
@@ -2008,9 +2011,12 @@ Private Sub CreateTable_CustomerPayments()
              ">=0", "المبلغ لا يمكن أن يكون سالبًا", "المبلغ بالعملة", "الإجمالي بعملة المستند (0 للمستندات القديمة)"
     AddField tdf, "SalesRepID", "LONG", 0, False, "", _
              "", "", "المندوب", "المحصِّل: مندوب العميل، وإلا مندوب المستخدم"
+    AddField tdf, "ClientRef", "TEXT", 40, False, "", _
+             "", "", "رقم السند في جهاز نقطة البيع", "من نقطة البيع على Windows (docs/86): يمنع تكرار السند إذا أُعيد إرساله بعد انقطاع الاتصال"
     AddIndex tdf, "PrimaryKey", "PaymentID", True, True, False
     AddIndex tdf, "UX_PaymentNumber", "PaymentNumber", False, True, False
     AddIndex tdf, "IX_PaymentDate", "PaymentDate", False, False, False
+    AddIndex tdf, "UX_ClientRef", "ClientRef", False, True, True
     EndTable tdf, "دفعات العملاء (سندات القبض): المبالغ المستلمة من العملاء لسداد أرصدتهم الآجلة.", "", ""
 End Sub
 
@@ -2920,9 +2926,12 @@ Private Sub CreateTable_CashClosings()
              "", "", "ملاحظات", ""
     AddField tdf, "CreatedAt", "DATETIME", 0, True, "Now()", _
              "", "", "تاريخ الإنشاء", ""
+    AddField tdf, "ClientRef", "TEXT", 40, False, "", _
+             "", "", "رقم التصفية في جهاز نقطة البيع", "من نقطة البيع على Windows (docs/86): يمنع تكرار التصفية إذا أُعيد إرسالها بعد انقطاع الاتصال"
     AddIndex tdf, "PrimaryKey", "ClosingID", True, True, False
     AddIndex tdf, "UX_ClosingNumber", "ClosingNumber", False, True, False
     AddIndex tdf, "IX_CashBoxID_ClosingDate", "CashBoxID,ClosingDate", False, False, False
+    AddIndex tdf, "UX_ClientRef", "ClientRef", False, True, True
     EndTable tdf, "تصفية يومية الكاشير: جرد نقدية صندوق الكاشير في نهاية الوردية وترحيلها للخزينة الرئيسية أو تسويتها مع المالك.", "[TransferAmount]+[KeptAmount]=[CountedAmount]", "المرحَّل + المتبقي = النقدية الفعلية"
 End Sub
 
@@ -4002,6 +4011,12 @@ Private Sub CreateTable_LabelSettings()
              "", "", "الاسم المختصر للمحل", "يُطبع إذا اخترت «الاسم المختصر»"
     AddField tdf, "FontSize", "BYTE", 0, True, "7", _
              "Between 5 And 16", "حجم الخط من 5 إلى 16", "حجم الخط", ""
+    AddField tdf, "ScalePrefixes", "TEXT", 20, False, "", _
+             "", "", "بادئات باركود الميزان", "مثل 20,21 (docs/86): باركود من 13 رقمًا يبدأ بإحداها = رمز الصنف ثم الوزن أو السعر؛ فارغ = لا ميزان"
+    AddField tdf, "ScaleItemDigits", "BYTE", 0, True, "5", _
+             "Between 4 And 6", "من 4 إلى 6 أرقام", "عدد أرقام رمز الصنف في باركود الميزان", ""
+    AddField tdf, "ScaleValueKind", "TEXT", 6, True, """WEIGHT""", _
+             "In (""WEIGHT"",""PRICE"")", "WEIGHT = الوزن بالجرام، PRICE = السعر بالهللة أو القرش", "باركود الميزان يحمل", ""
     AddIndex tdf, "PrimaryKey", "LabelSettingID", True, True, False
     EndTable tdf, "إعدادات ملصقات الباركود: سجل واحد: مقاس الملصق والورق والهوامش، وحجم الباركود، والنصوص أعلاه وأسفله.", "", ""
 End Sub

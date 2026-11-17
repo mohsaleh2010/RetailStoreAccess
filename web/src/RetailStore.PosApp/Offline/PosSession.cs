@@ -360,6 +360,169 @@ public sealed class PosSession(PosStore store, IPosPlatform platform, Func<PosCo
         return "";
     }
 
+    // ------------------------------------------------------------------ returns, receipts and closings (docs/86)
+
+    /// <summary>A new number of a document on this PC: kept by the screen until the program answers, so a document sent again
+    /// after a lost answer is added once.</summary>
+    public static string NewReference() => Guid.NewGuid().ToString("N");
+
+    /// <summary>The credential of the user for a document made on the program at once: "" or why not.</summary>
+    private async Task<(PosCredential? Who, string Problem)> OnlineAsync(Func<PosUser, string> permission)
+    {
+        if (User is null || Snapshot is null || _backend is null)
+        {
+            return (null, T("سجّل الدخول أولًا."));
+        }
+        string problem = permission(Snapshot.User);
+        if (problem.Length > 0)
+        {
+            return (null, T(problem));
+        }
+        var who = await CredentialOfAsync(User.EmployeeID);
+        return who is null ? (null, T("انتهى الدخول على الخادم: اخرج وادخل من جديد لتحديث الأسعار والأرصدة.")) : (who, "");
+    }
+
+    /// <summary>The answer of the data as a message: not reached = these documents need the connection; 401 = log in again.</summary>
+    private string Problem<TV>(BackendResult<TV> r)
+    {
+        if (r.Retry)
+        {
+            WorkingOffline = r.Status == 0 || WorkingOffline;
+            Notify();
+            return T("تعذر الاتصال بقاعدة البيانات. المرتجع وسند القبض والتصفية تحتاج الاتصال، والبيع يعمل بدونه.");
+        }
+        return r.Status == 401 ? T("انتهى الدخول على الخادم: اخرج وادخل من جديد لتحديث الأسعار والأرصدة.") : r.Message;
+    }
+
+    /// <summary>The invoice of a number with its lines to return from. A sale of this PC not sent yet cannot be returned
+    /// before it reaches the program.</summary>
+    public async Task<(ReturnableInvoice? Invoice, string Message)> FindForReturnAsync(string invoiceNumber)
+    {
+        string number = (invoiceNumber ?? "").Trim();
+        if (number.Length == 0)
+        {
+            return (null, T("اكتب رقم الفاتورة."));
+        }
+        if (store.Sales(SaleStates.Pending, SaleStates.Rejected).Any(x => string.Equals(x.InvoiceNumber, number, StringComparison.OrdinalIgnoreCase)))
+        {
+            return (null, T("هذه الفاتورة على الجهاز ولم تصل إلى البرنامج بعد. أرسلها أولًا، ثم أرجعها."));
+        }
+        var (who, problem) = await OnlineAsync(u => u.ReturnProblem);
+        if (who is null)
+        {
+            return (null, problem);
+        }
+        var r = await _backend!.ReturnableAsync(who, number, English);
+        return r.Ok ? (r.Value, "") : (null, Problem(r));
+    }
+
+    /// <summary>Save a return on the program (modSales.PostSalesReturn) and print it; the stock and balances are read again.</summary>
+    public async Task<(SaveStatus Status, string Message, PosDocument? Document)> SaveReturnAsync(DeviceReturnRequest request)
+    {
+        var (who, problem) = await OnlineAsync(u => u.ReturnProblem);
+        if (who is null)
+        {
+            return (SaveStatus.Refused, problem, null);
+        }
+        var r = await _backend!.SendReturnAsync(who, request, English);
+        return await AfterDocumentAsync(r);
+    }
+
+    /// <summary>Save a customer receipt on the program (modSales.PostCustomerPayment): NeedsConfirmation = the question on an
+    /// amount over the balance (send it again with ConfirmOverBalance).</summary>
+    public async Task<(SaveStatus Status, string Message, PosDocument? Document)> SavePaymentAsync(DevicePaymentRequest request)
+    {
+        var (who, problem) = await OnlineAsync(u => u.PaymentProblem);
+        if (who is null)
+        {
+            return (SaveStatus.Refused, problem, null);
+        }
+        var r = await _backend!.SendPaymentAsync(who, request, English);
+        return r.Status == 409 ? (SaveStatus.NeedsConfirmation, r.Message, null) : await AfterDocumentAsync(r);
+    }
+
+    /// <summary>The boxes the user may close and the main safes.</summary>
+    public async Task<(PosClosingBoxes? Boxes, string Message)> ClosingBoxesAsync()
+    {
+        var (who, problem) = await OnlineAsync(u => u.ClosingProblem);
+        if (who is null)
+        {
+            return (null, problem);
+        }
+        var r = await _backend!.ClosingBoxesAsync(who, English);
+        return r.Ok ? (r.Value, "") : (null, Problem(r));
+    }
+
+    /// <summary>What the closing of a box finds now; the sales of this PC are sent first so the program has them.</summary>
+    public async Task<(ClosingPreview? Preview, string Message)> ClosingPreviewAsync(int boxId)
+    {
+        var (who, problem) = await OnlineAsync(u => u.ClosingProblem);
+        if (who is null)
+        {
+            return (null, problem);
+        }
+        string waiting = await SendBeforeClosingAsync();
+        var r = await _backend!.ClosingPreviewAsync(who, boxId, English);
+        return r.Ok ? (r.Value, waiting) : (null, Problem(r));
+    }
+
+    /// <summary>The sales of this PC are sent before a closing: "" when none of the user waits, else the reason.</summary>
+    private async Task<string> SendBeforeClosingAsync()
+    {
+        if (store.Sales(SaleStates.Pending).Any(x => x.EmployeeID == User!.EmployeeID))
+        {
+            await SyncAsync();
+        }
+        return store.Sales(SaleStates.Pending, SaleStates.Rejected).Any(x => x.EmployeeID == User!.EmployeeID)
+            ? T("على الجهاز فواتير لك لم تصل إلى البرنامج: أرسلها أولًا (أو احذف المرفوضة)، ثم صفِّ الصندوق.")
+            : "";
+    }
+
+    /// <summary>Save a cashier closing on the program (modCash.PostCashClosing): refused while sales of the user wait on this PC.</summary>
+    public async Task<(SaveStatus Status, string Message, PosDocument? Document)> SaveClosingAsync(DeviceClosingRequest request)
+    {
+        var (who, problem) = await OnlineAsync(u => u.ClosingProblem);
+        if (who is null)
+        {
+            return (SaveStatus.Refused, problem, null);
+        }
+        string waiting = await SendBeforeClosingAsync();
+        if (waiting.Length > 0)
+        {
+            return (SaveStatus.Refused, waiting, null);
+        }
+        var r = await _backend!.SendClosingAsync(who, request, English);
+        return await AfterDocumentAsync(r);
+    }
+
+    private async Task<(SaveStatus Status, string Message, PosDocument? Document)> AfterDocumentAsync(BackendResult<PosDocument> r)
+    {
+        if (!r.Ok || r.Value is null)
+        {
+            return (SaveStatus.Refused, Problem(r), null);
+        }
+        WorkingOffline = false;
+        await SyncAsync(refresh: true);
+        return (SaveStatus.Saved, "", r.Value);
+    }
+
+    /// <summary>Print a document of the program (a credit note, a receipt voucher, a closing): "" or the reason. Cash paid back
+    /// or received (cash = true) opens the drawer.</summary>
+    public async Task<string> PrintDocumentAsync(PosDocument document, bool cash, bool reprint = false)
+    {
+        if (Printer.Length == 0)
+        {
+            return T("اختر الطابعة في الإعدادات.");
+        }
+        var s = Snapshot?.Settings;
+        int width = EscPos.DotsFor(PaperMillimetres);
+        var text = platform.DrawSlip(ReceiptSlip.Document(document, s?.StoreName ?? "", s?.VATNumber, s?.Currency ?? "", T), width, !English);
+        var qr = document.Qr is { Length: > 0 } q ? ReceiptSlip.Qr(q, PaperMillimetres >= 80 ? 5 : 4) : null;
+        bool drawer = !reprint && OpenDrawer && cash;
+        string problem = await platform.PrintAsync(Printer, ReceiptSlip.Job(ReceiptSlip.Stack(text, qr), drawer));
+        return problem.Length == 0 ? "" : T("تعذرت الطباعة:") + " " + problem;
+    }
+
     // ------------------------------------------------------------------ printing
 
     /// <summary>Print the receipt on the chosen printer (the drawer opens for a new cash sale): "" or the reason.</summary>

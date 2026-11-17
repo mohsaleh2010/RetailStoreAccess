@@ -18,6 +18,25 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    # returns, receipts and cashier closings on the Windows POS (docs/86)
+    'إلى المخزون': 'To stock',
+    'اكتب رقم الفاتورة': 'Type the invoice number',
+    'الرصيد الدفتري': 'Book balance',
+    'المبلغ المردود نقدًا': 'Cash paid back',
+    'المرتجع سابقًا': 'Returned before',
+    'تعذر الاتصال بقاعدة البيانات. المرتجع وسند القبض والتصفية تحتاج الاتصال، والبيع يعمل بدونه':
+        'The database cannot be reached. Returns, receipts and closings need the connection, selling works without it',
+    'توقيع الكاشير': 'Cashier signature',
+    'توقيع المستلم': 'Receiver signature',
+    'رقم المستند في الجهاز أطول من 40 حرفًا': 'The number of the document on the device is longer than 40 characters',
+    'رقم المستند في الجهاز مستعمل لمستخدم آخر': 'The number of the document on the device is used by another user',
+    'رقم المستند في الجهاز مطلوب': 'The number of the document on the device is required',
+    'طباعة مرة أخرى': 'Print again',
+    'على الجهاز فواتير لك لم تصل إلى البرنامج: أرسلها أولًا (أو احذف المرفوضة)، ثم صفِّ الصندوق':
+        'This computer has invoices of yours that have not reached the program: send them first (or delete the refused ones), then close the box',
+    'عن الفاتورة': 'For invoice',
+    'هذه الفاتورة على الجهاز ولم تصل إلى البرنامج بعد. أرسلها أولًا، ثم أرجعها':
+        'This invoice is on this computer and has not reached the program yet. Send it first, then return it',
     # the office tasks of Access on the dashboard (docs/84)
     'افتح شاشة مهام المكتب في': 'Open the office tasks screen in',
     'توقفت مهام المكتب في Access: آخر تشغيل': 'The office tasks of Access stopped: last run',

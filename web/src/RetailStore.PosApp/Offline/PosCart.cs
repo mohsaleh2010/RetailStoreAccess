@@ -88,6 +88,37 @@ public sealed class PosCart(PosSnapshot snapshot)
             .Take(take).Select(p => (p, (PosUnit?)null)).ToList();
     }
 
+    /// <summary>modPOS.ScanCode with modScale (docs/86): a code that is not the barcode or code of a product or unit but a scale
+    /// label of the settings adds its product with the weight, or the quantity of the price. Done = it was a scale label (then
+    /// Message = "" or why it was not added); not done = look the text up with Find.</summary>
+    public (bool Done, string Message) ScanScale(string? text)
+    {
+        string t = (text ?? "").Trim();
+        if (Snapshot.Products.Any(p => p.Barcode == t || p.ProductCode == t) || Snapshot.Products.Any(p => p.Units.Any(u => u.Barcode == t)))
+        {
+            return (false, "");
+        }
+        var scale = Snapshot.Settings.Scale ?? ScaleSettings.None;
+        if (ScaleBarcode.Parts(t, scale) is not { } code)
+        {
+            return (false, "");
+        }
+        var product = ScaleBarcode.ItemCodes(code.ItemCode)
+            .Select(c => Snapshot.Products.Where(p => p.ProductCode == c).OrderBy(p => p.ProductID).FirstOrDefault())
+            .FirstOrDefault(p => p is not null);
+        if (product is null)
+        {
+            return (true, ScaleBarcode.NoProduct(t, code.ItemCode));
+        }
+        decimal price = PriceFor(product, null, CustomerID);
+        if (scale.ValueKind == "PRICE" && price <= 0)
+        {
+            return (true, ScaleBarcode.NoPrice(t));
+        }
+        decimal qty = ScaleBarcode.Quantity(code.Value, scale.ValueKind, price);
+        return qty <= 0 ? (true, ScaleBarcode.ZeroQuantity(t)) : (true, Add(product.ProductID, null, qty));
+    }
+
     private static bool IsBaseUnit(PosProduct p, int? unitId) => unitId is null || unitId == 0 || unitId == p.UnitID;
 
     private static PosUnit? UnitOf(PosProduct p, int? unitId) => IsBaseUnit(p, unitId) ? null : p.Units.FirstOrDefault(u => u.UnitID == unitId);

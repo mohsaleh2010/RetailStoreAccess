@@ -1,0 +1,223 @@
+@page "/return"
+@inject PosSession S
+@inject NavigationManager Nav
+
+@* A sales return on the POS (docs/86): the invoice by its number, the quantities of its lines, the reason and the refund,
+   saved on the program at once (modSales.PostSalesReturn) and printed as a credit note. *@
+@if (!S.LoggedIn)
+{
+    <p class="pos-empty">@S.T("سجّل الدخول أولًا.")</p>
+}
+else if (S.Snapshot!.User.ReturnProblem.Length > 0)
+{
+    <p class="pos-error">@S.T(S.Snapshot.User.ReturnProblem)</p>
+}
+else
+{
+    <section class="pos-card">
+        <h2>@S.T("مرتجع مبيعات")</h2>
+        <div class="pos-find">
+            <input @bind="number" @bind:event="oninput" @onkeyup="KeyAsync" placeholder="@S.T("رقم الفاتورة")" dir="ltr" />
+            <button @onclick="FindAsync" disabled="@busy">@S.T("بحث")</button>
+        </div>
+        @if (invoice is { } inv)
+        {
+            <p class="pos-muted">
+                @S.T("التاريخ"): <span dir="ltr">@inv.InvoiceDate.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</span>
+                · @S.T("العميل"): @inv.CustomerName · @S.T("الإجمالي"): @Money(inv.TotalAmount)
+                · @(inv.PaymentType == "CREDIT" ? S.T("آجل") : S.T("نقدي"))
+            </p>
+            <table class="pos-table">
+                <thead>
+                    <tr><th>@S.T("الصنف")</th><th>@S.T("الوحدة")</th><th>@S.T("المباع")</th><th>@S.T("المرتجع سابقًا")</th>
+                        <th>@S.T("المتاح للإرجاع")</th><th>@S.T("الكمية المرتجعة")</th><th>@S.T("إلى المخزون")</th><th>@S.T("القيمة")</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var l in inv.Lines)
+                    {
+                        var amount = Amount(l);
+                        <tr>
+                            <td>@l.ProductName</td>
+                            <td>@l.UnitName</td>
+                            <td class="pos-amount">@Qty(l.SoldQty)</td>
+                            <td class="pos-amount">@Qty(l.ReturnedQty)</td>
+                            <td class="pos-amount">@Qty(l.AvailableQty)</td>
+                            <td><input class="pos-num" type="number" step="any" min="0" max="@l.AvailableQty" disabled="@(l.AvailableQty <= 0)"
+                                       value="@QtyOf(l)" @onchange="e => SetQty(l, e.Value)" /></td>
+                            <td><input type="checkbox" checked="@ToStock(l)" @onchange="e => SetStock(l, e.Value)" /></td>
+                            <td class="pos-amount">@(amount.Problem.Length > 0 ? "" : Money(amount.Total))</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button class="pos-link" @onclick="ReturnAll">@S.T("إرجاع الكل")</button>
+            <div class="pos-sale">
+                <div>
+                    <label>@S.T("سبب الإرجاع")<input @bind="reason" maxlength="255" /></label>
+                    <label>@S.T("طريقة رد المبلغ")
+                        <select value="@refund" disabled="@inv.CashCustomer" @onchange="SetRefund">
+                            <option value="CASH">@S.T("رد نقدي")</option>
+                            <option value="CREDIT">@S.T("خصم من رصيد العميل")</option>
+                        </select>
+                    </label>
+                    @if (Refund == "CASH")
+                    {
+                        <label>@S.T("طريقة الرد")
+                            <select value="@method" @onchange="e => method = int.TryParse(e.Value as string, out var m) ? m : SalesService.CashMethodId">
+                                @foreach (var m in S.Snapshot.Methods)
+                                {
+                                    <option value="@m.PaymentMethodID">@m.MethodName</option>
+                                }
+                            </select>
+                        </label>
+                    }
+                </div>
+                <div>
+                    <dl class="pos-totals">
+                        <dt class="pos-total">@S.T("قيمة المرتجع")</dt><dd class="pos-total">@Money(Total) @S.Snapshot.Settings.Currency</dd>
+                    </dl>
+                    <button class="pos-primary pos-big" disabled="@(busy || Total <= 0)" @onclick="SaveAsync">@S.T("حفظ وطباعة")</button>
+                </div>
+            </div>
+        }
+        @if (message.Length > 0)
+        {
+            <p class="@(error ? "pos-error" : "pos-ok")">@message</p>
+        }
+        @if (last is not null)
+        {
+            <button class="pos-link" @onclick="ReprintAsync">@S.T("طباعة مرة أخرى") @last.Number</button>
+        }
+    </section>
+}
+
+@code {
+    private string number = "", reason = "", refund = "CASH", message = "", reference = "";
+    private int method = SalesService.CashMethodId;
+    private bool busy, error;
+    private ReturnableInvoice? invoice;
+    private PosDocument? last;
+    private bool lastCash;
+    private readonly Dictionary<int, decimal> qty = [];
+    private readonly Dictionary<int, bool> toStock = [];
+
+    private string Refund => invoice?.CashCustomer == true ? "CASH" : refund;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await S.LoadAsync();
+        if (!S.LoggedIn)
+        {
+            Nav.NavigateTo(S.Connection is null ? "database" : "login");
+        }
+    }
+
+    private static string Money(decimal v) => v.ToString("#,##0.00", CultureInfo.InvariantCulture);
+
+    private static string Qty(decimal v) => v.ToString("0.###", CultureInfo.InvariantCulture);
+
+    private string QtyOf(ReturnableLine l) => qty.TryGetValue(l.SalesDetailID, out var q) && q > 0 ? Qty(q) : "";
+
+    private bool ToStock(ReturnableLine l) => toStock.GetValueOrDefault(l.SalesDetailID, true);
+
+    private (string Problem, decimal Net, decimal Tax, decimal Total) Amount(ReturnableLine l) =>
+        qty.TryGetValue(l.SalesDetailID, out var q) && q > 0 ? l.Amounts(q) : ("-", 0, 0, 0);
+
+    private decimal Total => invoice?.Lines.Select(Amount).Where(a => a.Problem.Length == 0).Sum(a => a.Total) ?? 0;
+
+    private async Task KeyAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await FindAsync();
+        }
+    }
+
+    private async Task FindAsync()
+    {
+        busy = true;
+        var (inv, text) = await S.FindForReturnAsync(number);
+        Load(inv);
+        Show(text, text.Length > 0);
+        busy = false;
+    }
+
+    private void Load(ReturnableInvoice? inv)
+    {
+        invoice = inv;
+        qty.Clear();
+        toStock.Clear();
+        reason = "";
+        reference = PosSession.NewReference();
+        refund = inv is { PaymentType: "CREDIT", CashCustomer: false } ? "CREDIT" : "CASH";
+        method = SalesService.CashMethodId;
+    }
+
+    /// <summary>modPOS.ReturnLineChanged: not below zero, not above what is left.</summary>
+    private void SetQty(ReturnableLine l, object? value)
+    {
+        decimal q = decimal.TryParse(value as string, NumberStyles.Number, CultureInfo.InvariantCulture, out var v) ? v : 0;
+        if (q < 0)
+        {
+            q = 0;
+        }
+        if (q > l.AvailableQty)
+        {
+            Show(S.T("الكمية المرتجعة أكبر من المتاح للإرجاع") + " (" + Qty(l.AvailableQty) + ").", true);
+            q = l.AvailableQty;
+        }
+        qty[l.SalesDetailID] = q;
+        reference = PosSession.NewReference();
+    }
+
+    private void SetRefund(ChangeEventArgs e) => refund = e.Value as string ?? "CASH";
+
+    private void SetStock(ReturnableLine l, object? value) => toStock[l.SalesDetailID] = value is true;
+
+    private void ReturnAll()
+    {
+        foreach (var l in invoice!.Lines)
+        {
+            qty[l.SalesDetailID] = l.AvailableQty;
+        }
+        reference = PosSession.NewReference();
+    }
+
+    private void Show(string text, bool isError)
+    {
+        message = text;
+        error = isError && text.Length > 0;
+    }
+
+    private async Task SaveAsync()
+    {
+        if (busy || invoice is null)
+        {
+            return;
+        }
+        busy = true;
+        var lines = invoice.Lines.Where(l => qty.GetValueOrDefault(l.SalesDetailID) > 0)
+            .Select(l => new ReturnLineRequest(l.SalesDetailID, qty[l.SalesDetailID], ToStock(l))).ToArray();
+        int? how = Refund == "CASH" ? method : null;
+        var (status, text, doc) = await S.SaveReturnAsync(new DeviceReturnRequest(reference, invoice.SalesInvoiceID, reason, Refund, how, lines));
+        if (status != SaveStatus.Saved || doc is null)
+        {
+            Show(text, true);
+            busy = false;
+            return;
+        }
+        last = doc;
+        lastCash = Refund == "CASH" && how == SalesService.CashMethodId;
+        string printed = await S.PrintDocumentAsync(doc, lastCash);
+        Show(S.T("تم حفظ المرتجع") + " " + doc.Number + (printed.Length > 0 ? " · " + printed : ""), printed.Length > 0);
+        var (inv, _) = await S.FindForReturnAsync(invoice.InvoiceNumber);
+        Load(inv);
+        busy = false;
+    }
+
+    private async Task ReprintAsync()
+    {
+        string printed = await S.PrintDocumentAsync(last!, lastCash, reprint: true);
+        Show(printed, printed.Length > 0);
+    }
+}
