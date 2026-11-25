@@ -415,17 +415,51 @@ def sql_connect(settings: dict, connect=None):
         raise DeployError(sql_error_help(ex)) from None
 
 
-def cmd_sql_check(args, settings: dict, connect=None, log=print) -> None:
+# What the two scripts and the programs need, checked one by one (a host gives roles, not always db_owner):
+# (label, SQL Server permission expression, what needs it).
+PERMISSION_CHECKS = [
+    ("CREATE TABLE", "HAS_PERMS_BY_NAME(DB_NAME(), 'DATABASE', 'CREATE TABLE')", "the 98 tables of RetailStore_Schema.sql"),
+    ("ALTER on dbo", "HAS_PERMS_BY_NAME(N'dbo', 'SCHEMA', 'ALTER')",
+     "new columns, CHECK rules, indexes (ALTER TABLE, CREATE INDEX) and the data transfer of Access"),
+    ("REFERENCES on dbo", "HAS_PERMS_BY_NAME(N'dbo', 'SCHEMA', 'REFERENCES')", "the relationships (FOREIGN KEY)"),
+    ("CREATE VIEW", "HAS_PERMS_BY_NAME(DB_NAME(), 'DATABASE', 'CREATE VIEW')", "the 518 views of RetailStore_Queries.sql"),
+    ("schema [en]", "CASE WHEN SCHEMA_ID(N'en') IS NULL THEN HAS_PERMS_BY_NAME(DB_NAME(), 'DATABASE', 'CREATE SCHEMA') "
+                    "ELSE HAS_PERMS_BY_NAME(N'en', 'SCHEMA', 'ALTER') END",
+     "the English views (CREATE SCHEMA [en] once, then ALTER on it)"),
+    ("SELECT", "HAS_PERMS_BY_NAME(N'dbo', 'SCHEMA', 'SELECT')", "reading the data"),
+    ("INSERT", "HAS_PERMS_BY_NAME(N'dbo', 'SCHEMA', 'INSERT')", "saving documents"),
+    ("UPDATE", "HAS_PERMS_BY_NAME(N'dbo', 'SCHEMA', 'UPDATE')", "changing documents and balances"),
+    ("DELETE", "HAS_PERMS_BY_NAME(N'dbo', 'SCHEMA', 'DELETE')", "deleting drafts and rebuilding the journal"),
+]
+
+
+def permission_query() -> str:
+    return ("SELECT DB_NAME(), CAST(SERVERPROPERTY('ProductVersion') AS NVARCHAR(40)), "
+            + ", ".join(expr for _label, expr, _why in PERMISSION_CHECKS))
+
+
+def missing_permissions(values) -> list:
+    """(label, why) of every permission the user does not have (1 = has it; 0 or NULL = has not)."""
+    return [(label, why) for (label, _expr, why), value in zip(PERMISSION_CHECKS, values) if value != 1]
+
+
+def cmd_sql_check(args, settings: dict, connect=None, log=print) -> bool:
     connection = sql_connect(settings, connect)
     try:
         cursor = connection.cursor()
-        cursor.execute("SELECT DB_NAME(), CAST(SERVERPROPERTY('ProductVersion') AS NVARCHAR(40)), "
-                       "IS_ROLEMEMBER('db_owner')")
-        name, version, owner = cursor.fetchone()
+        cursor.execute(permission_query())
+        row = cursor.fetchone()
+        name, version, values = row[0], row[1], row[2:]
         log(f"Connected to {name} (SQL Server {version}).")
-        if owner != 1:
-            log("Warning: the user is not db_owner of the database: the schema script needs it "
-                "(CREATE TABLE, ALTER, CREATE VIEW). Ask the host or give it in the control panel.")
+        missing = missing_permissions(values)
+        if not missing:
+            log("Every permission the scripts and the programs need is there. Next:  python tools/deploy_web.py sql")
+            return True
+        log("Missing permissions of this user (ask the host, or give the user db_owner, or the roles "
+            "db_ddladmin + db_datareader + db_datawriter, in the control panel):")
+        for label, why in missing:
+            log(f"  - {label}: {why}")
+        return False
     finally:
         connection.close()
 
@@ -458,7 +492,7 @@ def main(argv=None) -> int:
         if args.command in ("upload", "all"):
             cmd_upload(args, settings)
         if args.command == "sql-check":
-            cmd_sql_check(args, settings)
+            return 0 if cmd_sql_check(args, settings) else 1
         if args.command == "sql":
             cmd_sql(args, settings)
         if args.command in ("check", "all"):

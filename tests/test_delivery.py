@@ -560,13 +560,45 @@ class SqlErrorTests(unittest.TestCase):
         deploy_web.sql_connect({**SETTINGS, "sql_server": "sql1.host.net"}, connect)
         self.assertEqual(seen["port"], "1433")
 
-    def test_sql_check(self):
+    def test_sql_check_all_permissions(self):
         said = []
-        connection = FakeSqlConnection(row=("shop", "16.0", 0))
-        deploy_web.cmd_sql_check(None, SETTINGS, connect=lambda **_kw: connection, log=said.append)
+        ones = (1,) * len(deploy_web.PERMISSION_CHECKS)
+        connection = FakeSqlConnection(row=("shop", "16.0.1220.3") + ones)
+        self.assertTrue(deploy_web.cmd_sql_check(None, SETTINGS, connect=lambda **_kw: connection, log=said.append))
         self.assertIn("Connected to shop", said[0])
-        self.assertIn("db_owner", said[1])
+        self.assertIn("Next:", said[1])
+        self.assertEqual(len(said), 2)
         self.assertTrue(connection.closed)
+        query = connection.batches[0]
+        self.assertNotIn("IS_ROLEMEMBER", query, "a user with the needed permissions but not db_owner is fine")
+        self.assertEqual(query.count("HAS_PERMS_BY_NAME"), len(deploy_web.PERMISSION_CHECKS) + 1)
+
+    def test_sql_check_read_write_and_create_table_only(self):
+        """The owner's host: read / write and CREATE TABLE, not db_owner: only what is really missing is named."""
+        said = []
+        values = {"CREATE TABLE": 1, "ALTER on dbo": 1, "REFERENCES on dbo": 1, "CREATE VIEW": 0, "schema [en]": None,
+                  "SELECT": 1, "INSERT": 1, "UPDATE": 1, "DELETE": 1}
+        row = ("shop", "16.0") + tuple(values[label] for label, _e, _w in deploy_web.PERMISSION_CHECKS)
+        connection = FakeSqlConnection(row=row)
+        self.assertFalse(deploy_web.cmd_sql_check(None, SETTINGS, connect=lambda **_kw: connection, log=said.append))
+        missing = [line for line in said if line.startswith("  - ")]
+        self.assertEqual([m.split(":")[0] for m in missing], ["  - CREATE VIEW", "  - schema [en]"])
+        self.assertIn("db_ddladmin", said[1])
+
+    def test_permissions_cover_the_scripts(self):
+        schema = read("dist", "sql", "RetailStore_Schema.sql", encoding="utf-8-sig")
+        views = read("dist", "sql", "RetailStore_Queries.sql", encoding="utf-8-sig")
+        labels = [label for label, _e, _w in deploy_web.PERMISSION_CHECKS]
+        if "CREATE TABLE" in schema:
+            self.assertIn("CREATE TABLE", labels)
+        if "ALTER TABLE" in schema or "CREATE INDEX" in schema:
+            self.assertIn("ALTER on dbo", labels)
+        if "FOREIGN KEY" in schema:
+            self.assertIn("REFERENCES on dbo", labels)
+        if "CREATE OR ALTER VIEW" in views:
+            self.assertIn("CREATE VIEW", labels)
+        if "CREATE SCHEMA [en]" in views:
+            self.assertIn("schema [en]", labels)
 
     def test_main_prints_no_traceback(self):
         out = io.StringIO()
