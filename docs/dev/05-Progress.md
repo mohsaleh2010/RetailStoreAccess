@@ -15,7 +15,7 @@
 | آخر عملية | **7ج: إكمال الويب وتطبيق المندوب** (`docs/87-Web-Completion.md`): صفحات الموقع `/sales-returns` و`/purchase-returns` (`PurchaseService.PostPurchaseReturnAsync` = `PostPurchaseReturn`) و`/cash-closing` و`/bank-reconciliation` (`BankReconService` = تسوية `modBank`) و`/manual-entries` (`ManualEntryService` = `modManualEntry`)، وعملياتها في `OfficeApi`؛ والفاتورة والتحصيل من تطبيق المندوب باسم يومه المفتوح (`RepDocService`، `ActingUser.RepDay`: السيارة وصندوق العهدة، `/rep/sales` و`/rep/payments` بـ `ClientRef`)؛ لا تغيير في Access ولا في SQL Server |
 | بانتظار موافقة صاحب المشروع | **7ج** (`docs/87`). قرار الاستضافة في 7د |
 | الخطوة التالية | بعد الموافقة على 7ج: **7د التجهيز للتسليم** (قرار الاستضافة IIS في المحل أو سحابة والنشر، وتغيير `LICENSE_SECRET`، وملف ACCDE، ودليل التثبيت النهائي) |
-| الاختبارات | TESTS_LINE |
+| الاختبارات | 1574 اختبار Python: 1561 ناجحة و13 متخطّاة (SQL Server حقيقي ومكتبات اختيارية)، و106 اختبار xUnit ناجحة (`dotnet test RetailStore.slnx`، منها 5 جديدة لـ 7ج)، بتاريخ 2026-11-25. برنامج Windows (`RetailStore.Pos`) وتطبيق Android لا يُبنيان في السحابة |
 | آخر وثيقة | `docs/87-Web-Completion.md`، فالوثيقة التالية `docs/88-...md` |
 | آخر صف في جدول التثبيت في `README.md` | 81 |
 
@@ -120,7 +120,7 @@
 | العملية | النتيجة |
 |---|---|
 | 7ج: إكمال الويب (المرتجعات، وتصفية الكاشير، والتسوية البنكية، والقيد اليدوي) والفاتورة والتحصيل من تطبيق المندوب (`docs/87`) | ✅ بانتظار الموافقة |
-| TESTS_LOG | ✅ |
+| تشغيل كل الاختبارات لـ 7ج: 1574 Python (13 متخطّاة) و106 xUnit، كلها ناجحة | ✅ |
 | الموافقة على 7ب؛ بدء 7ج | ✅ |
 | 7ب: إكمال برنامج Windows: المرتجع وسند القبض وتصفية الكاشير وباركود الميزان (`docs/86`) | ✅ تمت الموافقة |
 | تشغيل كل الاختبارات لـ 7ب: 1564 Python (13 متخطّاة) و101 xUnit، كلها ناجحة | ✅ |
