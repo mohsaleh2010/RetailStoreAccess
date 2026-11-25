@@ -71,8 +71,9 @@ def shown(path: str) -> str:
         return os.path.abspath(path)
 
 
-YES_WORDS = ("y", "yes", "true", "1", "نعم", "ن")
-NO_WORDS = ("n", "no", "false", "0", "لا", "ل")
+# On an Arabic keyboard the keys y and n type غ and ى: both are understood (the owner answered غ for y).
+YES_WORDS = ("y", "yes", "true", "1", "نعم", "ن", "غ")
+NO_WORDS = ("n", "no", "false", "0", "لا", "ل", "ى")
 
 
 def yes(text) -> bool:
@@ -472,8 +473,18 @@ def cmd_sql_check(args, settings: dict, connect=None, log=print) -> bool:
         connection.close()
 
 
-def cmd_sql(args, settings: dict, connect=None) -> None:
-    if not args.yes and not yes(input(f"Create / upgrade the schema of {settings['sql_database']}? yes/no: ")):
+def confirm(question: str, ask=input, log=print) -> bool:
+    """yes / no asked again until it is one of them (never a silent no)."""
+    while True:
+        answer = yes_no_value(ask(f"{question} yes/no: "))
+        if answer:
+            return answer == "yes"
+        log("  answer yes or no (y / n)")
+
+
+def cmd_sql(args, settings: dict, connect=None, ask=input, log=print) -> None:
+    if not args.yes and not confirm(f"Create / upgrade the schema of {settings['sql_database']}?", ask, log):
+        log("Nothing was run.")
         return
     connection = sql_connect(settings, connect)
     try:

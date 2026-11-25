@@ -464,7 +464,7 @@ class InitAnswersTests(unittest.TestCase):
         self.assertEqual(deploy_web.settings_problem(settings), "")
 
     def test_wrong_answers_asked_again(self):
-        settings, said = self.run_init(self.BASE + ["ى", "y", "http://store.example.net", "https://store.example.net", "no"])
+        settings, said = self.run_init(self.BASE + ["x", "y", "http://store.example.net", "https://store.example.net", "no"])
         self.assertEqual(settings["ftp_tls"], "yes")
         self.assertEqual(settings["api_docs"], "no")
         self.assertEqual(len(said), 2)
@@ -487,7 +487,25 @@ class InitAnswersTests(unittest.TestCase):
         self.assertTrue(deploy_web.normalize_site_url("")[1])
         self.assertTrue(deploy_web.normalize_site_url("a b")[1])
         self.assertEqual(deploy_web.yes_no_value("نعم"), "yes")
-        self.assertIsNone(deploy_web.yes_no_value("ى"))
+        self.assertIsNone(deploy_web.yes_no_value("x"))
+        # the keys y and n of an Arabic keyboard
+        self.assertEqual(deploy_web.yes_no_value("غ"), "yes")
+        self.assertEqual(deploy_web.yes_no_value("ى"), "no")
+
+    def test_sql_confirmation_is_never_a_silent_no(self):
+        """The owner answered غ (the y key) and the command ended without a word."""
+        for answers, runs in ((["غ"], True), (["?", "y"], True), (["n"], False)):
+            typed, said = list(answers), []
+            with mock.patch.object(deploy_web, "sql_connect", return_value=FakeSqlConnection()) as connect, \
+                    mock.patch.object(deploy_web, "run_scripts") as run:
+                deploy_web.cmd_sql(mock.Mock(yes=False), SETTINGS, ask=lambda _q: typed.pop(0), log=said.append)
+            self.assertEqual(typed, [])
+            self.assertEqual(run.called, runs, answers)
+            self.assertEqual(connect.called, runs)
+            if not runs:
+                self.assertIn("Nothing was run.", said)
+            if answers[0] == "?":
+                self.assertIn("  answer yes or no (y / n)", said)
 
     def test_ctrl_c_is_not_a_traceback(self):
         out = io.StringIO()
