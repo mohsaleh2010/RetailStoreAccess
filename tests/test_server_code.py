@@ -212,7 +212,10 @@ class ScriptTests(unittest.TestCase):
             text = fh.read()
         options = text.index("ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;")
         guard = text.rindex("is_read_committed_snapshot_on = 0", 0, options)
-        self.assertLess(options - guard, 120, "only once: guarded")
+        self.assertNotIn("\nGO", text[guard:options], "only once: guarded in the same batch")
+        self.assertIn("IF @@TRANCOUNT > 0", text[guard:options], "never inside a transaction (error 226)")
+        self.assertIn("IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;", text[options:text.index("\nGO", options)],
+                      "an uncommittable transaction is rolled back in CATCH (error 3998)")
         self.assertGreater(options, text.index("7. Relationships"))
         self.assertIn("ServerLiveSince", text)
 

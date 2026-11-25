@@ -354,3 +354,4 @@
 | إصلاح تشغيل الاختبارات والأدوات على Windows بقرصين (`os.path.join`، `shown(...)`، `WindowsPathTests`) | ✅ |
 | التسليم، الخطوة 3: `deploy_web.py init` يعيد السؤال عن الإجابة الخاطئة، و`sql-check`، ورسائل أخطاء SQL Server بلا تتبّع | ✅ |
 | التسليم، الخطوة 3: `sql-check` يفحص الصلاحيات اللازمة واحدة واحدة بدل `db_owner` | ✅ |
+| التسليم، الخطوة 3: سكربت القاعدة يتوقف في `ALTER DATABASE` داخل معاملة (3998): `autocommit` في `deploy_web.py`، و`@@TRANCOUNT` / `XACT_STATE()` في السكربت | ✅ |

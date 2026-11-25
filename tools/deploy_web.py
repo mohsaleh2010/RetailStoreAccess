@@ -348,7 +348,15 @@ def split_batches(script: str) -> list:
     return batches
 
 
+def first_statement(batch: str) -> str:
+    """The first line of a batch that is not a comment (for the message of a failed part)."""
+    text = re.sub(r"/\*.*?\*/", "", batch, flags=re.S)
+    return next((l.strip() for l in text.splitlines() if l.strip() and not l.strip().startswith("--")), "")
+
+
 def run_scripts(connection, files: list, log=print) -> int:
+    """Each batch on its own (the connection is in autocommit, as the pass-through of Access): ALTER DATABASE is
+    refused inside a transaction, and every batch of the two scripts is safe to run again."""
     count = 0
     cursor = connection.cursor()
     for path in files:
@@ -363,7 +371,7 @@ def run_scripts(connection, files: list, log=print) -> int:
                     connection.rollback()
                 except Exception:  # noqa: BLE001
                     pass
-                first = next((l.strip() for l in batch.splitlines() if l.strip() and not l.strip().startswith("--")), "")
+                first = first_statement(batch)
                 raise DeployError(f"{os.path.basename(path)}, part {number} of {len(batches)} ({first[:120]}):\n"
                                   f"  {str(ex).splitlines()[0][:400] if str(ex) else type(ex).__name__}\n"
                                   "  The parts before it are saved; the script can be run again (it is safe to repeat).") from None
@@ -409,7 +417,7 @@ def sql_connect(settings: dict, connect=None):
     server, _, port = settings["sql_server"].partition(",")
     try:
         return connect(server=server.strip(), port=(port.strip() or "1433"), user=settings["sql_user"],
-                       password=settings["sql_password"], database=settings["sql_database"], autocommit=False,
+                       password=settings["sql_password"], database=settings["sql_database"], autocommit=True,
                        login_timeout=30)
     except Exception as ex:  # noqa: BLE001 - pymssql raises its own classes
         raise DeployError(sql_error_help(ex)) from None

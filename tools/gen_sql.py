@@ -348,13 +348,23 @@ GO"""
 # keeps a document and its stock moves and journal in one transaction). Set once: WITH ROLLBACK IMMEDIATE ends
 # the other connections, which Access opens again. A shared hosting database (docs/88) may refuse ALTER DATABASE:
 # the script then only prints a warning (the host can switch it on) instead of failing after the whole schema.
+# ALTER DATABASE is refused inside a transaction (error 226), and with XACT_ABORT ON a caught error leaves the
+# transaction uncommittable (error 3998 at the end of the batch): only outside a transaction, and CATCH rolls back.
 DATABASE_OPTIONS = """IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
-BEGIN TRY
-    ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
-END TRY
-BEGIN CATCH
-    PRINT N'RetailStore schema: READ_COMMITTED_SNAPSHOT could not be set (' + ERROR_MESSAGE() + N'). Ask the host to set it on.';
-END CATCH"""
+BEGIN
+    IF @@TRANCOUNT > 0
+        PRINT N'RetailStore schema: READ_COMMITTED_SNAPSHOT not set (the script runs inside a transaction). Run the script without one, or ask the host to set it on.';
+    ELSE
+    BEGIN
+        BEGIN TRY
+            ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
+        END TRY
+        BEGIN CATCH
+            IF XACT_STATE() <> 0 ROLLBACK TRANSACTION;
+            PRINT N'RetailStore schema: READ_COMMITTED_SNAPSHOT could not be set (' + ERROR_MESSAGE() + N'). Ask the host to set it on.';
+        END CATCH
+    END
+END"""
 
 
 def section(title: str) -> str:

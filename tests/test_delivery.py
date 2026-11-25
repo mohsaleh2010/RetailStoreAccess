@@ -557,6 +557,7 @@ class SqlErrorTests(unittest.TestCase):
             return FakeSqlConnection()
         deploy_web.sql_connect({**SETTINGS, "sql_server": " sql1.host.net , 1533 "}, connect)
         self.assertEqual((seen["server"], seen["port"], seen["database"]), ("sql1.host.net", "1533", "shop"))
+        self.assertTrue(seen["autocommit"], "ALTER DATABASE is refused inside a transaction (errors 226 / 3998)")
         deploy_web.sql_connect({**SETTINGS, "sql_server": "sql1.host.net"}, connect)
         self.assertEqual(seen["port"], "1433")
 
@@ -619,6 +620,8 @@ class SqlErrorTests(unittest.TestCase):
                 deploy_web.run_scripts(connection, [path], log=lambda _t: None)
         message = str(caught.exception)
         self.assertIn("x.sql, part 2 of 2 (CREATE VIEW V", message)
+        self.assertEqual(deploy_web.first_statement("/*----\n  8. Database options\n----*/\nIF EXISTS (SELECT 1)"),
+                         "IF EXISTS (SELECT 1)")
         self.assertIn("2714", message)
         self.assertEqual(connection.rolled_back, 1)
 
