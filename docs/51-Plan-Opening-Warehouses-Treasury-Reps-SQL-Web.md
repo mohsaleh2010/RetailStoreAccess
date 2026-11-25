@@ -341,5 +341,6 @@
 | 7أ: الفاتورة الإلكترونية بـ C# (`RetailStore.Domain/EInvoicing`، `EInvoiceService`: توقيع هيئة الزكاة بمفتاح الجهاز والإبلاغ والاعتماد، والإيصال والفاتورة المصريين والمتابعة والإلغاء) وخدمة Windows لمهام المكتب (`RetailStore.OfficeService`، `OfficeSyncService`) بلا Access مفتوح | ✅ تمت الموافقة (`docs/85-EInvoice-CSharp.md`) |
 | تشغيل كل الاختبارات لـ 7أ: 1541 Python (13 متخطّاة) و97 xUnit، كلها ناجحة | ✅ |
 | الموافقة على 7أ؛ بدء 7ب (إكمال برنامج Windows: المرتجع، وسند القبض، وتصفية الكاشير، والميزان) | ✅ |
-| 7ب: المرتجع وسند القبض وتصفية الكاشير في برنامج Windows (تُحفظ في البرنامج فورًا بـ `ClientRef` لا يتكرر، `PostSalesReturnAsync` / `PostCashClosingAsync` بـ C#)، وباركود الميزان في Access (`modScale`) وبرنامج Windows (`ScaleBarcode`) | ✅ بانتظار الموافقة (`docs/86-Windows-POS-Documents.md`) |
+| 7ب: المرتجع وسند القبض وتصفية الكاشير في برنامج Windows (تُحفظ في البرنامج فورًا بـ `ClientRef` لا يتكرر، `PostSalesReturnAsync` / `PostCashClosingAsync` بـ C#)، وباركود الميزان في Access (`modScale`) وبرنامج Windows (`ScaleBarcode`) | ✅ تمت الموافقة (`docs/86-Windows-POS-Documents.md`) |
 | تشغيل كل الاختبارات لـ 7ب: 1564 Python (13 متخطّاة) و101 xUnit، كلها ناجحة | ✅ |
+| الموافقة على 7ب؛ بدء 7ج (إكمال الويب: تصفية الكاشير، والتسوية البنكية، والقيد اليدوي، والمرتجعات؛ والفاتورة والتحصيل من تطبيق المندوب) | ✅ |
