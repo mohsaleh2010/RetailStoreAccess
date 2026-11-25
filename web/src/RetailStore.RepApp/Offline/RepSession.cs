@@ -326,7 +326,7 @@ public sealed class RepSession(LocalStore store, RepApiClient api, IRepPlatform 
     {
         if (r.Ok && r.Value is not null)
         {
-            _ = SyncAsync();                                   // the balance and the van stock after it
+            await SyncAsync();                                 // the balance and the van stock after it
             return new DocAnswer(DocAnswer.Saved, "", r.Value);
         }
         if (r.NeedsLogin)

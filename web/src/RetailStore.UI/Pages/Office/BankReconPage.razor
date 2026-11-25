@@ -128,7 +128,7 @@
                                 <td data-label="@L.T("التسوية")">@r.ReconNumber</td>
                                 <td data-label="@L.T("تاريخ الكشف")">@r.StatementDate.ToString("yyyy-MM-dd")</td>
                                 <td data-label="@L.T("رصيد الكشف")">@WorkPages.Money(r.StatementBalance)</td>
-                                <td data-label="@L.T("حالة التسوية")">@L.T(r.Status == "DONE" ? "معتمدة" : "جارية")</td>
+                                <td data-label="@L.T("حالة التسوية")">@(r.Status == "DONE" ? L.T("معتمدة") : L.T("جارية"))</td>
                             </tr>
                         }
                     </tbody>
@@ -146,7 +146,7 @@
     {
         <div class="dialog-backdrop">
             <div class="dialog" role="dialog" aria-modal="true">
-                <p>@L.T(asking == "DELETE" ? "حذف التسوية الجارية وكل مطابقاتها؟" : "إعادة فتح التسوية المعتمدة؟")</p>
+                <p>@(asking == "DELETE" ? L.T("حذف التسوية الجارية وكل مطابقاتها؟") : L.T("إعادة فتح التسوية المعتمدة؟"))</p>
                 <div class="actions">
                     <button class="btn primary" @onclick="AnswerAsync">@L.T("نعم")</button>
                     <button class="btn" @onclick="@(() => asking = "")">@L.T("لا")</button>
@@ -227,12 +227,12 @@
         message = "";
         if (bankId == 0)
         {
-            (message, messageKind) = ("اختر البنك.", "error");
+            (message, messageKind) = (L.T("اختر البنك."), "error");
             return;
         }
         if (statementBalance is null)
         {
-            (message, messageKind) = ("اكتب الرصيد الظاهر في كشف البنك في هذا التاريخ.", "error");
+            (message, messageKind) = (L.T("اكتب الرصيد الظاهر في كشف البنك في هذا التاريخ."), "error");
             return;
         }
         var r = await Recon.OpenAsync(UserInfo.Acting(user), bankId, statementDate, statementBalance.Value);
@@ -261,7 +261,7 @@
         var chosen = list.Where(i => picked.Contains(i.Key)).ToList();
         if (chosen.Count == 0)
         {
-            (message, messageKind) = ("اختر عملية أو أكثر من القائمة.", "error");
+            (message, messageKind) = (L.T("اختر عملية أو أكثر من القائمة."), "error");
             return;
         }
         busy = true;

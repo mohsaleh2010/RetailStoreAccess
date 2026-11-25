@@ -184,7 +184,7 @@
         invoice = await Purchases.ReturnableAsync(number, L.English);
         if (invoice is null)
         {
-            (message, messageKind) = ("لا توجد فاتورة شراء بهذا الرقم.", "error");
+            (message, messageKind) = (L.T("لا توجد فاتورة شراء بهذا الرقم."), "error");
             return;
         }
         qty = invoice.Lines.ToDictionary(l => l.PurchaseDetailID, _ => 0m);
@@ -200,7 +200,7 @@
         q = Math.Max(0, q);
         if (q > l.AvailableQty)
         {
-            (message, messageKind) = ("الكمية المرتجعة أكبر من المتاح للإرجاع (" + WorkPages.Qty(l.AvailableQty) + ").", "error");
+            (message, messageKind) = (L.T("الكمية المرتجعة أكبر من المتاح للإرجاع (") + WorkPages.Qty(l.AvailableQty) + ").", "error");
             q = l.AvailableQty;
         }
         qty[l.PurchaseDetailID] = q;

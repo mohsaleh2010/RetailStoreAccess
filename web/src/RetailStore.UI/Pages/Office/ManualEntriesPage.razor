@@ -51,7 +51,7 @@
 
             <div class="form-pane">
                 <h2>@(entryId == 0 ? L.T("قيد جديد") : number)</h2>
-                <p class="hint">@L.T(status)</p>
+                <p class="hint">@status</p>
                 <form class="record" @onsubmit="SaveAsync" @onsubmit:preventDefault>
                     <div class="field">
                         <label for="me-date">@L.T("التاريخ") *</label>
@@ -184,7 +184,7 @@
     {
         (entryId, reversalOf, number, description, reference, entryDate, currency, rate) = (0, null, "", null, null, DateTime.Today, null, 1);
         lines = [new Row(), new Row()];
-        status = "اكتب التاريخ والبيان، ثم سطرًا لكل حساب: المبلغ في المدين أو في الدائن.";
+        status = L.T("اكتب التاريخ والبيان، ثم سطرًا لكل حساب: المبلغ في المدين أو في الدائن.");
     }
 
     /// <summary>ManualOpen.</summary>
@@ -199,8 +199,8 @@
             return;
         }
         Show(v.ManualEntryID, v.EntryNumber, v.EntryDate, v.Description, v.Reference, v.ReversalOfID, v.CurrencyCode, v.ExchangeRate, v.Lines);
-        status = v.InClosedPeriod ? "قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح."
-                                  : "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه.";
+        status = v.InClosedPeriod ? L.T("قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح.")
+                                  : L.T("قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه.");
     }
 
     private void Show(int id, string no, DateTime? d, string? desc, string? refText, int? reversal, string? code, decimal fx, IEnumerable<ManualLineInput> input)
@@ -242,7 +242,7 @@
         }
         var r = ManualEntryService.Reversal(v, DateTime.Today);
         Show(0, "", r.EntryDate, r.Description, r.Reference, r.ReversalOfID, r.CurrencyCode, r.ExchangeRate, r.Lines);
-        status = "قيد عكسي جديد للقيد " + v.EntryNumber + ": راجع التاريخ والأسطر ثم اضغط «حفظ القيد».";
+        status = L.T("قيد عكسي جديد للقيد ") + v.EntryNumber + L.T(": راجع التاريخ والأسطر ثم اضغط «حفظ القيد».");
     }
 
     private async Task SaveAsync()
@@ -261,7 +261,7 @@
             await OpenAsync(r.Id);
             var v = await Manual.EntryAsync(r.Id);
             message = WorkPages.ManualSaved + r.Number + "." + (r.Message.Length > 0 ? "\n" + r.Message
-                      : v?.JournalNumber is { } jv ? "\n" + "قيد اليومية: " + jv : "");
+                      : v?.JournalNumber is { } jv ? "\n" + L.T("قيد اليومية: ") + jv : "");
             messageKind = r.Message.Length > 0 ? "error" : "success";
             await LoadAsync();
         }

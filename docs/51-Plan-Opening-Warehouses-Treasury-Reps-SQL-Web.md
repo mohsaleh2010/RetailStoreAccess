@@ -344,3 +344,4 @@
 | 7ب: المرتجع وسند القبض وتصفية الكاشير في برنامج Windows (تُحفظ في البرنامج فورًا بـ `ClientRef` لا يتكرر، `PostSalesReturnAsync` / `PostCashClosingAsync` بـ C#)، وباركود الميزان في Access (`modScale`) وبرنامج Windows (`ScaleBarcode`) | ✅ تمت الموافقة (`docs/86-Windows-POS-Documents.md`) |
 | تشغيل كل الاختبارات لـ 7ب: 1564 Python (13 متخطّاة) و101 xUnit، كلها ناجحة | ✅ |
 | الموافقة على 7ب؛ بدء 7ج (إكمال الويب: تصفية الكاشير، والتسوية البنكية، والقيد اليدوي، والمرتجعات؛ والفاتورة والتحصيل من تطبيق المندوب) | ✅ |
+| 7ج: إكمال الويب (مرتجعات المبيعات والمشتريات، وتصفية الكاشير، والتسوية البنكية، والقيود اليدوية؛ `BankReconService`، `ManualEntryService`، `PostPurchaseReturnAsync`، صفحات `Pages/Office`، `OfficeApi`) والفاتورة والتحصيل من تطبيق المندوب باسم يومه المفتوح (`RepDocService`، `ActingUser.RepDay`، `/rep/sales`، `/rep/payments`) | ✅ بانتظار الموافقة (`docs/87-Web-Completion.md`) |
