@@ -32,9 +32,27 @@ public sealed record OrderView(int SalesOrderID, string OrderNumber, DateTime Or
 /// <summary>GET /api/v1/rep/sync: everything the phone keeps to work offline.</summary>
 public sealed record RepSnapshot(DateTime ServerTime, string StoreName, RepProfile Profile, List<RepCustomer> Customers, List<RepProduct> Products,
                                  Dictionary<string, Dictionary<int, decimal>> PriceGroups, Dictionary<int, string> CustomerPriceGroups,
-                                 List<RepVisit> Visits, List<OrderView> Orders, bool CanVisits);
+                                 List<RepVisit> Visits, List<OrderView> Orders, bool CanVisits, bool DayOpen = false);
 
 public sealed record OrderLineInput(int ProductID, decimal Quantity, decimal? UnitPrice);
 
 public sealed record OrderRequest(int CustomerID, int? WarehouseID, DateTime? RequiredDate, string? Notes, OrderLineInput[] Lines,
                                   string? ClientRef, DateTime? OrderDate);
+
+// ---- the invoice and the receipt of the rep (docs/87): made on the program at once, each with its number on the phone
+
+public sealed record CartLine(int ProductID, decimal Quantity, decimal UnitPrice);
+
+public sealed record RepSaleRequest(string ClientRef, int CustomerID, string PaymentType, int? PaymentMethodID, decimal InvoiceDiscount,
+                                    string? Notes, CartLine[] Lines, bool ConfirmStock = false);
+
+public sealed record RepPaymentRequest(string ClientRef, int CustomerID, decimal Amount, int PaymentMethodID, string? Notes,
+                                       bool ConfirmOverBalance = false);
+
+public sealed record DocLine(string Text, decimal Quantity, decimal Amount);
+
+public sealed record DocRow(string Label, decimal Amount);
+
+/// <summary>The document the program made (PosDocument on the server): SALE or PAYMENT, to print.</summary>
+public sealed record RepDocument(string Kind, int Id, string Number, DateTime Date, string Title, string CashierName, string PartyName,
+                                 DocLine[] Lines, DocRow[] Rows, string? Note, string? Qr);

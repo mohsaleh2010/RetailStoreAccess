@@ -1,0 +1,228 @@
+@page "/sales-returns"
+@attribute [Authorize]
+@inject SalesService Sales
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+@* The sales return on the web (docs/87): frmSalesReturn, modSales.PostSalesReturn. *@
+<PageTitle>@L.T("مرتجعات المبيعات")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("مرتجعات المبيعات")</h1>
+            <p class="subtitle">@L.T("إشعار دائن من رقم الفاتورة: الكمية المرتجعة، والرد نقدًا أو الخصم من الرصيد")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="pos">
+            <div class="list-pane">
+                <form class="list-tools" @onsubmit="FindAsync" @onsubmit:preventDefault>
+                    <input type="search" class="search" placeholder="@L.T("رقم الفاتورة")" aria-label="@L.T("رقم الفاتورة")" @bind="number" />
+                    <button type="submit" class="btn">@L.T("بحث")</button>
+                </form>
+                @if (invoice is { } inv)
+                {
+                    <p class="hint">@inv.InvoiceNumber · @inv.InvoiceDate.ToString("yyyy-MM-dd") · @inv.CustomerName · @WorkPages.Money(inv.TotalAmount) · @L.T(WorkPages.PaymentTypeName(inv.PaymentType))</p>
+                    <table class="list">
+                        <thead>
+                            <tr>
+                                <th>@L.T("الصنف")</th>
+                                <th>@L.T("المباع")</th>
+                                <th>@L.T("المرتجع سابقًا")</th>
+                                <th>@L.T("المتاح للإرجاع")</th>
+                                <th>@L.T("الكمية المرتجعة")</th>
+                                <th>@L.T("إلى المخزون")</th>
+                                <th>@L.T("القيمة")</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var l in inv.Lines)
+                            {
+                                <tr>
+                                    <td data-label="@L.T("الصنف")">@l.ProductName - @l.UnitName</td>
+                                    <td data-label="@L.T("المباع")">@WorkPages.Qty(l.SoldQty)</td>
+                                    <td data-label="@L.T("المرتجع سابقًا")">@WorkPages.Qty(l.ReturnedQty)</td>
+                                    <td data-label="@L.T("المتاح للإرجاع")">@WorkPages.Qty(l.AvailableQty)</td>
+                                    <td data-label="@L.T("الكمية المرتجعة")">
+                                        <input type="number" step="any" min="0" value="@qty[l.SalesDetailID]" @onchange="e => SetQty(l, e.Value)" />
+                                    </td>
+                                    <td data-label="@L.T("إلى المخزون")"><input type="checkbox" @bind="toStock[l.SalesDetailID]" /></td>
+                                    <td data-label="@L.T("القيمة")">@WorkPages.Money(Amount(l))</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <div class="actions">
+                        <button class="btn" @onclick="All">@L.T("إرجاع الكل")</button>
+                    </div>
+                }
+                <h2>@L.T("المرتجعات")</h2>
+                <table class="list">
+                    <thead><tr><th>@L.T("المرتجع")</th><th>@L.T("التاريخ")</th><th>@L.T("العميل")</th><th>@L.T("الفاتورة")</th><th>@L.T("القيمة")</th></tr></thead>
+                    <tbody>
+                        @foreach (var r in rows)
+                        {
+                            <tr>
+                                <td data-label="@L.T("المرتجع")">@r.Number</td>
+                                <td data-label="@L.T("التاريخ")">@r.Date.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td data-label="@L.T("العميل")">@r.PartyName</td>
+                                <td data-label="@L.T("الفاتورة")">@r.InvoiceNumber</td>
+                                <td data-label="@L.T("القيمة")">@WorkPages.Money(r.Total)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (rows.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+            </div>
+
+            <div class="form-pane">
+                <h2>@L.T("إشعار دائن")</h2>
+                @if (invoice is { } h)
+                {
+                    <form class="record" @onsubmit="SaveAsync" @onsubmit:preventDefault>
+                        <div class="field span-2">
+                            <label for="sr-reason">@L.T("سبب الإرجاع") *</label>
+                            <input id="sr-reason" type="text" maxlength="255" @bind="reason" />
+                        </div>
+                        <div class="field span-2">
+                            <label for="sr-refund">@L.T("طريقة رد المبلغ")</label>
+                            <select id="sr-refund" @bind="refund" disabled="@h.CashCustomer">
+                                <option value="CASH">@L.T("رد نقدي")</option>
+                                <option value="CREDIT">@L.T("خصم من رصيد العميل")</option>
+                            </select>
+                        </div>
+                        @if (refund == "CASH" || h.CashCustomer)
+                        {
+                            <div class="field span-2">
+                                <label for="sr-method">@L.T("طريقة الدفع")</label>
+                                <select id="sr-method" @bind="method">
+                                    @foreach (var m in methods)
+                                    {
+                                        <option value="@m.Id">@m.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                        <div class="field span-2">
+                            <label>@L.T("قيمة المرتجع")</label>
+                            <p class="total">@WorkPages.Money(h.Lines.Sum(Amount))</p>
+                        </div>
+                        <div class="actions span-2">
+                            <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ المرتجع")</button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <p class="hint">@L.T("اكتب رقم الفاتورة ثم «بحث».")</p>
+                }
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">@L.T(message)</div>
+    }
+</section>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy;
+    private string denied = "", message = "", messageKind = "", number = "", reason = "", refund = "CREDIT";
+    private int method = 1;
+    private ReturnableInvoice? invoice;
+    private Dictionary<int, decimal> qty = [];
+    private Dictionary<int, bool> toStock = [];
+    private List<(int Id, string Name)> methods = [];
+    private List<ReturnRow> rows = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmSalesReturn");
+        allowed = denied.Length == 0;
+        if (!allowed)
+        {
+            return;
+        }
+        methods = await Sales.PaymentMethodsAsync(L.English);
+        await LoadListAsync();
+    }
+
+    private async Task LoadListAsync() => rows = await Sales.SalesReturnsAsync(DateTime.Today.AddDays(1 - DateTime.Today.Day), DateTime.Today, L.English);
+
+    private async Task FindAsync()
+    {
+        message = "";
+        invoice = await Sales.ReturnableAsync(number, L.English);
+        if (invoice is null)
+        {
+            (message, messageKind) = ("لا توجد فاتورة بهذا الرقم.", "error");
+            return;
+        }
+        qty = invoice.Lines.ToDictionary(l => l.SalesDetailID, _ => 0m);
+        toStock = invoice.Lines.ToDictionary(l => l.SalesDetailID, _ => true);
+        // modPOS.LoadInvoiceForReturn: still owed -> taken off the balance; paid -> cash back
+        refund = invoice.CashCustomer || invoice.PaymentType != "CREDIT" ? "CASH" : "CREDIT";
+    }
+
+    private decimal Amount(ReturnableLine l) => qty.GetValueOrDefault(l.SalesDetailID) is > 0 and var q && l.Amounts(q) is { Problem.Length: 0 } a ? a.Total : 0;
+
+    private void SetQty(ReturnableLine l, object? value)
+    {
+        decimal.TryParse(Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture), System.Globalization.NumberStyles.Number,
+                         System.Globalization.CultureInfo.InvariantCulture, out var q);
+        q = Math.Max(0, q);
+        if (q > l.AvailableQty)
+        {
+            (message, messageKind) = ("الكمية المرتجعة أكبر من المتاح للإرجاع (" + WorkPages.Qty(l.AvailableQty) + ").", "error");
+            q = l.AvailableQty;
+        }
+        qty[l.SalesDetailID] = q;
+    }
+
+    private void All()
+    {
+        foreach (var l in invoice!.Lines)
+        {
+            qty[l.SalesDetailID] = l.AvailableQty;
+        }
+    }
+
+    private async Task SaveAsync()
+    {
+        message = "";
+        busy = true;
+        try
+        {
+            var req = new SalesReturnRequest(invoice!.SalesInvoiceID, reason, invoice.CashCustomer ? "CASH" : refund, method,
+                                             invoice.Lines.Select(l => new ReturnLineRequest(l.SalesDetailID, qty[l.SalesDetailID], toStock[l.SalesDetailID])).ToArray());
+            var r = await Sales.PostSalesReturnAsync(UserInfo.Acting(user), req);
+            if (r.Status != SaveStatus.Saved)
+            {
+                (message, messageKind) = (r.Message, "error");
+                return;
+            }
+            (message, messageKind) = (WorkPages.SalesReturnSaved + r.InvoiceNumber + " - " + WorkPages.Money(r.Total), "success");
+            reason = "";
+            invoice = null;
+            await LoadListAsync();
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+}

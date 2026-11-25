@@ -22,6 +22,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJournalSourceReader, ServerViewJournalReader>();
         services.AddScoped<JournalService>();
         services.AddScoped<TreasuryService>();
+        services.AddScoped<BankReconService>();
+        services.AddScoped<ManualEntryService>();
+        services.AddScoped<RepDocService>();
         services.AddScoped<AccountingService>();
         services.AddScoped<DashboardService>();
         services.AddScoped<IndicatorsService>();

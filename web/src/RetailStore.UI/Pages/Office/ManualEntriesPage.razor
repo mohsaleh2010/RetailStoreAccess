@@ -1,0 +1,287 @@
+@page "/manual-entries"
+@attribute [Authorize]
+@inject ManualEntryService Manual
+@inject PermissionService Permissions
+@inject UiLanguage L
+
+@* The manual journal entries on the web (docs/87): frmManualEntry, modManualEntry. *@
+<PageTitle>@L.T("القيود اليدوية")</PageTitle>
+
+<section class="screen">
+    <header class="screen-head">
+        <div>
+            <h1>@L.T("القيود اليدوية")</h1>
+            <p class="subtitle">@L.T("قيد يومية يدوي بأسطره المدينة والدائنة، وتعديله وحذفه وعكسه")</p>
+        </div>
+    </header>
+
+    @if (!allowed)
+    {
+        <div class="message error" role="alert">@L.T(denied)</div>
+    }
+    else
+    {
+        <div class="pos">
+            <div class="list-pane">
+                <form class="list-tools" @onsubmit="LoadAsync" @onsubmit:preventDefault>
+                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
+                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
+                    <button type="submit" class="btn">@L.T("عرض")</button>
+                    <button type="button" class="btn" @onclick="New">@L.T("قيد جديد")</button>
+                </form>
+                <table class="list">
+                    <thead><tr><th>@L.T("رقم القيد")</th><th>@L.T("التاريخ")</th><th>@L.T("البيان")</th><th>@L.T("المبلغ")</th></tr></thead>
+                    <tbody>
+                        @foreach (var r in rows)
+                        {
+                            <tr class="clickable" @onclick="() => OpenAsync(r.ManualEntryID)">
+                                <td data-label="@L.T("رقم القيد")">@r.EntryNumber</td>
+                                <td data-label="@L.T("التاريخ")">@r.EntryDate.ToString("yyyy-MM-dd")</td>
+                                <td data-label="@L.T("البيان")">@r.Description</td>
+                                <td data-label="@L.T("المبلغ")">@WorkPages.Money(r.TotalAmount)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                @if (rows.Count == 0)
+                {
+                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                }
+            </div>
+
+            <div class="form-pane">
+                <h2>@(entryId == 0 ? L.T("قيد جديد") : number)</h2>
+                <p class="hint">@L.T(status)</p>
+                <form class="record" @onsubmit="SaveAsync" @onsubmit:preventDefault>
+                    <div class="field">
+                        <label for="me-date">@L.T("التاريخ") *</label>
+                        <input id="me-date" type="date" @bind="entryDate" />
+                    </div>
+                    <div class="field">
+                        <label for="me-ref">@L.T("المرجع")</label>
+                        <input id="me-ref" type="text" maxlength="50" @bind="reference" />
+                    </div>
+                    <div class="field span-2">
+                        <label for="me-desc">@L.T("البيان") *</label>
+                        <input id="me-desc" type="text" maxlength="255" @bind="description" />
+                    </div>
+                    <div class="span-2">
+                        <table class="list">
+                            <thead><tr><th>@L.T("الحساب")</th><th>@L.T("مدين")</th><th>@L.T("دائن")</th><th>@L.T("البيان")</th><th>@L.T("مركز التكلفة")</th><th></th></tr></thead>
+                            <tbody>
+                                @foreach (var l in lines)
+                                {
+                                    <tr>
+                                        <td data-label="@L.T("الحساب")">
+                                            <select @bind="l.Account">
+                                                <option value="0"></option>
+                                                @foreach (var a in accounts)
+                                                {
+                                                    <option value="@a.Code">@a.Code @a.Name</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td data-label="@L.T("مدين")"><input type="number" step="any" min="0" value="@l.Debit" @onchange="e => SetSide(l, e.Value, true)" /></td>
+                                        <td data-label="@L.T("دائن")"><input type="number" step="any" min="0" value="@l.Credit" @onchange="e => SetSide(l, e.Value, false)" /></td>
+                                        <td data-label="@L.T("البيان")"><input type="text" maxlength="150" @bind="l.Text" /></td>
+                                        <td data-label="@L.T("مركز التكلفة")">
+                                            <select @bind="l.Center">
+                                                <option value="0"></option>
+                                                @foreach (var c in centers)
+                                                {
+                                                    <option value="@c.Id">@c.Name</option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td><button type="button" class="btn" @onclick="() => lines.Remove(l)">×</button></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn" @onclick="() => lines.Add(new Row())">@L.T("سطر جديد")</button>
+                        <p class="hint">@L.T(ManualEntryService.TotalsText(Inputs()))</p>
+                    </div>
+                    <div class="actions span-2">
+                        <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ القيد")</button>
+                        @if (entryId > 0)
+                        {
+                            <button type="button" class="btn" disabled="@busy" @onclick="Reverse">@L.T("قيد عكسي")</button>
+                            <button type="button" class="btn" disabled="@busy" @onclick="@(() => asking = true)">@L.T("حذف")</button>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (message.Length > 0)
+    {
+        <div class="message @messageKind" role="status">@L.T(message)</div>
+    }
+
+    @if (asking)
+    {
+        <div class="dialog-backdrop">
+            <div class="dialog" role="dialog" aria-modal="true">
+                <p>@(L.T("حذف القيد") + " " + number + " " + L.T("نهائيًا؟ يُحذف قيده من اليومية أيضًا."))</p>
+                <div class="actions">
+                    <button class="btn primary" @onclick="DeleteAsync">@L.T("نعم")</button>
+                    <button class="btn" @onclick="() => asking = false">@L.T("لا")</button>
+                </div>
+            </div>
+        </div>
+    }
+</section>
+
+@code {
+    private sealed class Row
+    {
+        public int Account { get; set; }
+        public decimal Debit { get; set; }
+        public decimal Credit { get; set; }
+        public string? Text { get; set; }
+        public int Center { get; set; }
+    }
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+    private ClaimsPrincipal? user;
+    private bool allowed, busy, asking;
+    private string denied = "", message = "", messageKind = "", number = "", status = "";
+    private string? description, reference;
+    private int entryId;
+    private int? reversalOf;
+    private string? currency;
+    private decimal rate = 1;
+    private DateTime? entryDate = DateTime.Today;
+    private DateTime from = DateTime.Today.AddDays(1 - DateTime.Today.Day), to = DateTime.Today;
+    private List<Row> lines = [];
+    private List<ManualEntryRow> rows = [];
+    private List<(int Code, string Name)> accounts = [];
+    private List<(int Id, string Name)> centers = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = AuthState is null ? null : (await AuthState).User;
+        denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), ManualEntryService.Form);
+        allowed = denied.Length == 0;
+        if (!allowed)
+        {
+            return;
+        }
+        accounts = await Manual.AccountsAsync(L.English);
+        centers = await Manual.CostCentersAsync(L.English);
+        New();
+        await LoadAsync();
+    }
+
+    private async Task LoadAsync() => rows = await Manual.EntriesAsync(from, to);
+
+    private List<ManualLineInput> Inputs() =>
+        lines.Select(l => new ManualLineInput(l.Account == 0 ? null : l.Account, l.Debit, l.Credit, l.Text, l.Center == 0 ? null : l.Center)).ToList();
+
+    /// <summary>ManualNew.</summary>
+    private void New()
+    {
+        (entryId, reversalOf, number, description, reference, entryDate, currency, rate) = (0, null, "", null, null, DateTime.Today, null, 1);
+        lines = [new Row(), new Row()];
+        status = "اكتب التاريخ والبيان، ثم سطرًا لكل حساب: المبلغ في المدين أو في الدائن.";
+    }
+
+    /// <summary>ManualOpen.</summary>
+    private async Task OpenAsync(int id)
+    {
+        message = "";
+        var v = await Manual.EntryAsync(id);
+        if (v is null)
+        {
+            (message, messageKind) = (ManualEntryService.NotFound, "error");
+            New();
+            return;
+        }
+        Show(v.ManualEntryID, v.EntryNumber, v.EntryDate, v.Description, v.Reference, v.ReversalOfID, v.CurrencyCode, v.ExchangeRate, v.Lines);
+        status = v.InClosedPeriod ? "قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح."
+                                  : "قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه.";
+    }
+
+    private void Show(int id, string no, DateTime? d, string? desc, string? refText, int? reversal, string? code, decimal fx, IEnumerable<ManualLineInput> input)
+    {
+        (entryId, number, entryDate, description, reference, reversalOf, currency, rate) = (id, no, d, desc, refText, reversal, code, fx);
+        lines = input.Select(l => new Row { Account = l.AccountCode ?? 0, Debit = l.Debit, Credit = l.Credit, Text = l.LineText, Center = l.CostCenterID ?? 0 }).ToList();
+    }
+
+    /// <summary>ManualLineChanged: one side per line, an amount on one side clears the other.</summary>
+    private static void SetSide(Row l, object? value, bool debit)
+    {
+        decimal.TryParse(Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture), System.Globalization.NumberStyles.Number,
+                         System.Globalization.CultureInfo.InvariantCulture, out var v);
+        if (debit)
+        {
+            l.Debit = v;
+            if (v != 0)
+            {
+                l.Credit = 0;
+            }
+        }
+        else
+        {
+            l.Credit = v;
+            if (v != 0)
+            {
+                l.Debit = 0;
+            }
+        }
+    }
+
+    /// <summary>ReverseManualEntry: a new entry with debit and credit swapped, dated today, to review before saving.</summary>
+    private async Task Reverse()
+    {
+        var v = await Manual.EntryAsync(entryId);
+        if (v is null)
+        {
+            return;
+        }
+        var r = ManualEntryService.Reversal(v, DateTime.Today);
+        Show(0, "", r.EntryDate, r.Description, r.Reference, r.ReversalOfID, r.CurrencyCode, r.ExchangeRate, r.Lines);
+        status = "قيد عكسي جديد للقيد " + v.EntryNumber + ": راجع التاريخ والأسطر ثم اضغط «حفظ القيد».";
+    }
+
+    private async Task SaveAsync()
+    {
+        message = "";
+        busy = true;
+        try
+        {
+            var r = await Manual.SaveAsync(UserInfo.Acting(user),
+                new ManualEntryRequest(entryId, entryDate, description, reference, reversalOf, Inputs(), currency, rate));
+            if (r.Status != SaveStatus.Saved)
+            {
+                (message, messageKind) = (r.Message, "error");
+                return;
+            }
+            await OpenAsync(r.Id);
+            var v = await Manual.EntryAsync(r.Id);
+            message = WorkPages.ManualSaved + r.Number + "." + (r.Message.Length > 0 ? "\n" + r.Message
+                      : v?.JournalNumber is { } jv ? "\n" + "قيد اليومية: " + jv : "");
+            messageKind = r.Message.Length > 0 ? "error" : "success";
+            await LoadAsync();
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        asking = false;
+        var r = await Manual.DeleteAsync(UserInfo.Acting(user), entryId);
+        if (r.Status != SaveStatus.Saved)
+        {
+            (message, messageKind) = (r.Message, "error");
+            return;
+        }
+        (message, messageKind) = (WorkPages.ManualDeleted, "success");
+        New();
+        await LoadAsync();
+    }
+}

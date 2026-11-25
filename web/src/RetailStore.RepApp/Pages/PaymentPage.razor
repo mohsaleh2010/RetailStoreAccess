@@ -1,0 +1,95 @@
+@page "/payment/{CustomerId:int}"
+@inject RepSession S
+@inject NavigationManager Nav
+
+@if (S.Customer(CustomerId) is not { } c)
+{
+    <p class="rep-empty">@S.T("العميل غير موجود على الجهاز. زامن أولًا.")</p>
+}
+else if (!S.CanSell)
+{
+    <p class="rep-empty">@S.T("لا يوجد يوم مفتوح لك: افتح يوم المندوب في البرنامج (شاشة يوم المندوب)، ثم أعد المحاولة.")</p>
+}
+else if (done is not null)
+{
+    <section class="rep-card">
+        <h2>@S.T("تم حفظ سند القبض ")@done.Number</h2>
+        @foreach (var r in done.Rows)
+        {
+            <p>@S.T(r.Label): @OrderSlip.Amount(r.Amount)</p>
+        }
+        @if (message.Length > 0)
+        {
+            <p class="rep-error">@message</p>
+        }
+        <div class="rep-buttons">
+            <button class="rep-primary" @onclick="PrintAsync">@S.T("طباعة نسخة العميل")</button>
+            <button @onclick="@(() => Nav.NavigateTo($"customers/{CustomerId}"))">@S.T("رجوع إلى العميل")</button>
+        </div>
+    </section>
+}
+else
+{
+    <section class="rep-card">
+        <h2>@S.T("تحصيل"): @c.CustomerName</h2>
+        <p>@S.T("الرصيد"): @OrderSlip.Amount(c.CurrentBalance)</p>
+        <label>@S.T("المبلغ")<input type="number" inputmode="decimal" min="0" step="any" value="@amount" @onchange="SetAmount" /></label>
+        <label>@S.T("ملاحظات")<input value="@notes" @onchange="SetNotes" maxlength="255" /></label>
+        @if (message.Length > 0)
+        {
+            <p class="rep-error">@message</p>
+        }
+        @if (question)
+        {
+            <div class="rep-buttons">
+                <button class="rep-primary" disabled="@busy" @onclick="@(() => SendAsync(true))">@S.T("نعم")</button>
+                <button @onclick="@(() => { question = false; message = ""; })">@S.T("لا")</button>
+            </div>
+        }
+        else
+        {
+            <button class="rep-primary" disabled="@busy" @onclick="@(() => SendAsync(false))">@S.T("حفظ سند القبض")</button>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public int CustomerId { get; set; }
+
+    private RepDocument? done;
+    private decimal amount;
+    private string notes = "", message = "", clientRef = Guid.NewGuid().ToString("N");
+    private bool busy, question;
+
+    // any change gives a new number on the phone; sending again unchanged keeps it (never two receipts)
+    private void SetAmount(ChangeEventArgs e)
+    {
+        decimal.TryParse(Convert.ToString(e.Value, CultureInfo.InvariantCulture), NumberStyles.Number, CultureInfo.InvariantCulture, out amount);
+        clientRef = Guid.NewGuid().ToString("N");
+        question = false;
+    }
+
+    private void SetNotes(ChangeEventArgs e)
+    {
+        notes = Convert.ToString(e.Value) ?? "";
+        clientRef = Guid.NewGuid().ToString("N");
+    }
+
+    private async Task SendAsync(bool confirm)
+    {
+        busy = true;
+        try
+        {
+            var a = await S.CollectAsync(clientRef, CustomerId, amount, notes, confirm);
+            message = a.Message;
+            question = a.State == DocAnswer.Confirm;
+            done = a.Document;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task PrintAsync() => message = await S.PrintDocumentAsync(done!);
+}

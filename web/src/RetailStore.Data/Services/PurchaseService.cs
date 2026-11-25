@@ -48,6 +48,32 @@ public sealed record SupplierPaymentRow(int PaymentID, string PaymentNumber, Dat
 /// messages and the same rows (the invoice and its lines, the stock moves at the cost of one piece with the new average,
 /// the last purchase price and the new shelf prices, the supplier's balance, the audit trail), so Access rebuilds the
 /// same journal entry (SyncJournal). A purchase from a receipt note (StockNoteID) stays in Access.</summary>
+/// <summary>A line of a purchase return (tmpPurchaseReturnLines): the invoice line and the quantity returned in its unit.</summary>
+public sealed record PurchaseReturnLineRequest(int PurchaseDetailID, decimal Quantity);
+
+/// <summary>A purchase return (modPurchases.PostPurchaseReturn): RefundType CASH (the supplier pays back, PaymentMethodID) or
+/// CREDIT (taken off what the shop owes him).</summary>
+public sealed record PurchaseReturnRequest(int PurchaseInvoiceID, string? Reason, string RefundType, int? PaymentMethodID,
+                                           PurchaseReturnLineRequest[] Lines);
+
+/// <summary>A line of a purchase invoice as the return screen shows it (LoadPurchaseForReturn).</summary>
+public sealed record PurchaseReturnableLine(int PurchaseDetailID, int ProductID, string ProductName, decimal BoughtQty, decimal ReturnedQty,
+                                            decimal AvailableQty, decimal InStock, decimal LineTotal, decimal Tax, decimal ReturnedTotal,
+                                            decimal ReturnedTax)
+{
+    /// <summary>RecalcPurchaseReturn: the value of a quantity of this line.</summary>
+    public (string Problem, decimal Net, decimal Tax, decimal Total) Amounts(decimal qty) =>
+        InvoiceCalculator.ReturnAmounts(BoughtQty, LineTotal, this.Tax, ReturnedQty, ReturnedTotal, ReturnedTax, qty);
+}
+
+/// <summary>A purchase invoice ready to return: still owed = CREDIT by default, paid = CASH (LoadPurchaseForReturn).</summary>
+public sealed record PurchaseReturnable(int PurchaseInvoiceID, string InvoiceNumber, string? SupplierInvoiceNo, DateTime InvoiceDate,
+                                        int SupplierID, string SupplierName, string PaymentType, decimal TotalAmount, string DefaultRefund,
+                                        List<PurchaseReturnableLine> Lines);
+
+/// <summary>A return in the list of the return screens (sales or purchases).</summary>
+public sealed record ReturnRow(int Id, string Number, DateTime Date, string PartyName, string InvoiceNumber, decimal Total, decimal Refunded);
+
 public sealed class PurchaseService(IDbContextFactory<RetailDbContext> factory, PermissionService permissions)
 {
     public const int TtPurchase = 1;
@@ -351,6 +377,181 @@ public sealed class PurchaseService(IDbContextFactory<RetailDbContext> factory, 
         Audit.LogAction(db, user, "SUPPLIER_PAYMENT", "SupplierPayments", p.PaymentNumber, "Amount=" + InvoiceCalculator.Plain(amount));
         await db.SaveChangesAsync();
         return new SaleResult(SaveStatus.Saved, "", p.PaymentID, p.PaymentNumber, amount);
+    }
+
+    // ------------------------------------------------------------------ the purchase return
+
+    public const int TtPurchaseReturn = 3;
+
+    /// <summary>modPurchaseScreens.PurReturnFind + LoadPurchaseForReturn: the last invoice whose number or supplier invoice
+    /// number is the one typed, with its lines; null = none.</summary>
+    public async Task<PurchaseReturnable?> ReturnableAsync(string number, bool english)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        string typed = (number ?? "").Trim(), upper = typed.ToUpperInvariant();
+        var h = await db.PurchaseInvoices.AsNoTracking()
+            .Where(x => x.InvoiceNumber == typed || x.InvoiceNumber == upper || x.SupplierInvoiceNo == typed)
+            .OrderByDescending(x => x.PurchaseInvoiceID).FirstOrDefaultAsync();
+        if (h is null)
+        {
+            return null;
+        }
+        var s = await db.Suppliers.AsNoTracking().FirstAsync(x => x.SupplierID == h.SupplierID);
+        var details = await db.PurchaseInvoiceDetails.AsNoTracking().Where(d => d.PurchaseInvoiceID == h.PurchaseInvoiceID)
+            .OrderBy(d => d.PurchaseDetailID).ToListAsync();
+        var ids = details.Select(d => d.PurchaseDetailID).ToList();
+        var back = await db.PurchaseReturnDetails.AsNoTracking().Where(r => ids.Contains(r.PurchaseDetailID))
+            .GroupBy(r => r.PurchaseDetailID).Select(g => new { g.Key, Qty = g.Sum(r => r.Quantity), Total = g.Sum(r => r.LineTotal), Tax = g.Sum(r => r.Tax) })
+            .ToDictionaryAsync(g => g.Key);
+        var pids = details.Select(d => d.ProductID).Distinct().ToList();
+        var products = await db.Products.AsNoTracking().Where(p => pids.Contains(p.ProductID)).ToDictionaryAsync(p => p.ProductID);
+        var units = await db.Units.AsNoTracking().ToDictionaryAsync(u => u.UnitID, u => Name(u.UnitName, u.UnitNameEn, english));
+        var lines = details.Select(d =>
+        {
+            var p = products[d.ProductID];
+            var b = back.GetValueOrDefault(d.PurchaseDetailID);
+            decimal factor = d.UnitFactor <= 0 ? 1 : d.UnitFactor;
+            string name = Name(p.ProductName, p.ProductNameEn, english) + (d.UnitID is { } u ? " - " + units.GetValueOrDefault(u, "") : "");
+            decimal qty = b?.Qty ?? 0;
+            return new PurchaseReturnableLine(d.PurchaseDetailID, d.ProductID, name, d.Quantity, qty, d.Quantity - qty, p.CurrentQuantity / factor,
+                                              d.LineTotal, d.Tax, b?.Total ?? 0, b?.Tax ?? 0);
+        }).ToList();
+        return new PurchaseReturnable(h.PurchaseInvoiceID, h.InvoiceNumber, h.SupplierInvoiceNo, h.InvoiceDate, h.SupplierID,
+                                      Name(s.SupplierName, s.SupplierNameEn, english), h.PaymentType, h.TotalAmount,
+                                      h.RemainingAmount > 0 ? "CREDIT" : "CASH", lines);
+    }
+
+    /// <summary>modPurchases.PostPurchaseReturn (and SavePurchaseReturn: the screen and its ADD action), with the same checks,
+    /// order, messages and rows as Access: the goods leave the warehouse they entered at the cost they came in with.</summary>
+    public async Task<SaleResult> PostPurchaseReturnAsync(ActingUser user, PurchaseReturnRequest ret, bool confirmStock = false)
+    {
+        string open = await permissions.OpenProblemAsync(user.EmployeeID, "frmPurchaseReturn");
+        if (open.Length == 0)
+        {
+            open = await permissions.ActionProblemAsync(user.EmployeeID, "frmPurchaseReturn", ScreenAction.Add);
+        }
+        if (open.Length > 0)
+        {
+            return SaleResult.Refused(open);
+        }
+        if (!await permissions.HasPermissionAsync(user.EmployeeID, "PURCHASE_RETURN"))
+        {
+            return SaleResult.Refused("لا تملك صلاحية تسجيل مرتجعات المشتريات.");
+        }
+        string reason = (ret.Reason ?? "").Trim();
+        if (reason.Length == 0)
+        {
+            return SaleResult.Refused("سبب الإرجاع مطلوب.");
+        }
+        string refundType = ret.RefundType is "CASH" or "CREDIT" ? ret.RefundType : "CREDIT";
+        await using var db = await factory.CreateDbContextAsync();
+        var settings = await SettingsReader.ReadAsync(db);
+        var inv = await db.PurchaseInvoices.AsNoTracking().FirstOrDefaultAsync(h => h.PurchaseInvoiceID == ret.PurchaseInvoiceID);
+        if (inv is null)
+        {
+            return SaleResult.Refused("فاتورة الشراء الأصلية غير موجودة.");
+        }
+        bool reclaim = !string.IsNullOrEmpty(settings.VATNumber);
+        var lines = new List<(PurchaseInvoiceDetails D, decimal Qty, decimal Net, decimal Tax, decimal Total, decimal Disc, decimal Factor, decimal Cost)>();
+        foreach (var r in (ret.Lines ?? []).Where(l => l.Quantity > 0))
+        {
+            var d = await db.PurchaseInvoiceDetails.AsNoTracking().FirstOrDefaultAsync(x => x.PurchaseDetailID == r.PurchaseDetailID);
+            if (d is null || d.PurchaseInvoiceID != ret.PurchaseInvoiceID)
+            {
+                return SaleResult.Refused("سطر لا ينتمي إلى فاتورة الشراء الأصلية.");
+            }
+            decimal factor = d.UnitFactor <= 0 ? 1 : d.UnitFactor;          // the unit of the invoice line (docs/72)
+            decimal cost = PurchaseUnitCost(d.NetAmount, d.LineTotal, d.Quantity * factor, reclaim);
+            var prev = await db.PurchaseReturnDetails.AsNoTracking().Where(x => x.PurchaseDetailID == d.PurchaseDetailID)
+                .Select(x => new { x.Quantity, x.LineTotal, x.Tax }).ToListAsync();
+            var a = InvoiceCalculator.ReturnAmounts(d.Quantity, d.LineTotal, d.Tax, prev.Sum(x => x.Quantity), prev.Sum(x => x.LineTotal),
+                                                    prev.Sum(x => x.Tax), r.Quantity);
+            if (a.Problem.Length > 0)
+            {
+                return SaleResult.Refused(a.Problem);
+            }
+            decimal disc = Math.Max(0, MoneyMath.RoundMoney(r.Quantity * d.UnitCost) - a.Net);
+            lines.Add((d, r.Quantity, a.Net, a.Tax, a.Total, disc, factor, cost));
+        }
+        if (lines.Count == 0)
+        {
+            return SaleResult.Refused("حدد الكمية المرتجعة لصنف واحد على الأقل.");
+        }
+        int warehouse = inv.WarehouseID > 0 ? inv.WarehouseID : RepService.MainWarehouseId;   // the goods leave the warehouse they entered
+        var pids = lines.Select(l => l.D.ProductID).Distinct().ToList();
+        var products = await db.Products.AsNoTracking().Where(p => pids.Contains(p.ProductID)).ToDictionaryAsync(p => p.ProductID);
+        var stock = await Sales.CheckStockAsync(db, settings, user.EmployeeID,
+                                                lines.Select(l => (products[l.D.ProductID], l.Qty * l.Factor)).ToList(), warehouse, "الإرجاع للمورد");
+        if (stock.Status == SaveStatus.Refused || (stock.Status == SaveStatus.NeedsConfirmation && !confirmStock))
+        {
+            return new SaleResult(stock.Status, stock.Message);
+        }
+        decimal sumNet = lines.Sum(l => l.Net), sumTax = lines.Sum(l => l.Tax), sumTotal = lines.Sum(l => l.Total), sumDisc = lines.Sum(l => l.Disc);
+        decimal refunded = refundType == "CASH" ? sumTotal : 0;
+
+        await using var tx = await db.Database.BeginTransactionAsync();
+        if (stock.ShortList.Length > 0)
+        {
+            Audit.LogAction(db, user, "NEGATIVE_STOCK", "Products", "",
+                            stock.Status == SaveStatus.Saved ? stock.Message : "الإرجاع للمورد" + " - approved by user:" + stock.ShortList);
+        }
+        var now = DateTime.Now;
+        decimal rate = inv.ExchangeRate;
+        var row = new PurchaseReturns
+        {
+            ReturnNumber = await NumberSequences.NextNumberAsync(db, "PURCHASE_RETURN"), ReturnDate = now, PurchaseInvoiceID = inv.PurchaseInvoiceID,
+            SupplierID = inv.SupplierID, EmployeeID = user.EmployeeID, Reason = reason.Length <= 255 ? reason : reason[..255],
+            RefundType = refundType, PaymentMethodID = ret.PaymentMethodID, SubTotal = sumNet + sumDisc, Discount = sumDisc,
+            TaxableAmount = sumNet, Tax = sumTax, TotalAmount = sumTotal, RefundedAmount = refunded,
+            CurrencyCode = string.IsNullOrEmpty(inv.CurrencyCode) ? (string.IsNullOrWhiteSpace(settings.CurrencyCode) ? "SAR" : settings.CurrencyCode) : inv.CurrencyCode,
+            ExchangeRate = rate, ForeignAmount = rate <= 0 ? sumTotal : MoneyMath.RoundMoney(sumTotal / rate),
+            CashBoxID = await Sales.CashBoxForAsync(db, user.EmployeeID, ret.PaymentMethodID ?? SalesService.CashMethodId, refunded),
+            BankID = await SalesService.BankForAsync(db, settings, ret.PaymentMethodID, refunded), WarehouseID = warehouse,
+        };
+        db.PurchaseReturns.Add(row);
+        await db.SaveChangesAsync();
+        foreach (var l in lines)
+        {
+            db.PurchaseReturnDetails.Add(new PurchaseReturnDetails
+            {
+                PurchaseReturnID = row.PurchaseReturnID, PurchaseDetailID = l.D.PurchaseDetailID, ProductID = l.D.ProductID, Quantity = l.Qty,
+                UnitCost = l.D.UnitCost, Discount = l.Disc, NetAmount = l.Net, VATRate = l.D.VATRate, Tax = l.Tax, LineTotal = l.Total,
+                UnitID = l.D.UnitID, UnitFactor = l.Factor,
+            });
+        }
+        await db.SaveChangesAsync();
+        foreach (var l in lines)
+        {
+            await SalesService.ApplyStockMovementAsync(db, user, l.D.ProductID, -(l.Qty * l.Factor), TtPurchaseReturn, l.Cost, "PURCHASE_RETURN",
+                                                       row.PurchaseReturnID, row.ReturnNumber, warehouse, recalcAverage: true, when: now);
+        }
+        if (refunded - sumTotal != 0)
+        {
+            await AdjustSupplierBalanceAsync(db, inv.SupplierID, refunded - sumTotal);
+        }
+        Audit.LogAction(db, user, "PURCHASE_RETURN", "PurchaseReturns", row.ReturnNumber,
+                        "Invoice=" + inv.PurchaseInvoiceID + " Total=" + InvoiceCalculator.Plain(sumTotal));
+        await db.SaveChangesAsync();
+        await tx.CommitAsync();
+        return new SaleResult(SaveStatus.Saved, "", row.PurchaseReturnID, row.ReturnNumber, sumTotal, refunded);
+    }
+
+    /// <summary>The purchase returns of a period (frmPurchaseReturn lstReturns).</summary>
+    public async Task<List<ReturnRow>> PurchaseReturnsAsync(
+        DateTime from, DateTime to, bool english, int take = 200)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var start = from.Date;
+        var end = to.Date.AddDays(1);
+        var rows = await (from r in db.PurchaseReturns
+                          join s in db.Suppliers on r.SupplierID equals s.SupplierID
+                          join h in db.PurchaseInvoices on r.PurchaseInvoiceID equals h.PurchaseInvoiceID
+                          where r.ReturnDate >= start && r.ReturnDate < end
+                          orderby r.ReturnDate descending
+                          select new { r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, s.SupplierName, s.SupplierNameEn, h.InvoiceNumber, r.TotalAmount, r.RefundedAmount })
+            .Take(take).ToListAsync();
+        return rows.Select(r => new ReturnRow(r.PurchaseReturnID, r.ReturnNumber, r.ReturnDate, Name(r.SupplierName, r.SupplierNameEn, english), r.InvoiceNumber,
+                                 r.TotalAmount, r.RefundedAmount)).ToList();
     }
 
     // ------------------------------------------------------------------ what the screens read

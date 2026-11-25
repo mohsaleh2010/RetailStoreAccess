@@ -120,6 +120,16 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         return box > 0 ? box : null;
     }
 
+    /// <summary>CashBoxFor while acting as a rep: the custody box of the rep day (modVanSales.CurrentCashBoxID).</summary>
+    public async Task<int?> CashBoxForAsync(RetailDbContext db, ActingUser user, int? methodId, decimal amount)
+    {
+        if (user.RepDay is { } day && (methodId ?? 0) == CashMethodId && amount != 0)
+        {
+            return day.CashBoxID;
+        }
+        return await CashBoxForAsync(db, user.EmployeeID, methodId, amount);
+    }
+
     /// <summary>modBank.BankFor: a bank transfer goes to the default bank when it is active.</summary>
     public static async Task<int?> BankForAsync(RetailDbContext db, Settings settings, int? methodId, decimal amount)
     {
@@ -472,7 +482,8 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
 
     /// <summary>modSales.PostSaleFromCart (a POS sale: no delivery note, quotation or restaurant order). confirmStock = the
     /// user answered yes to the question on the stock (ALLOW_NEGATIVE_STOCK).</summary>
-    public async Task<SaleResult> PostSaleAsync(ActingUser user, SaleRequest sale, bool confirmStock = false, DeviceSaleInfo? device = null)
+    public async Task<SaleResult> PostSaleAsync(ActingUser user, SaleRequest sale, bool confirmStock = false, DeviceSaleInfo? device = null,
+                                                string? clientRef = null)
     {
         string open = await permissions.OpenProblemAsync(user.EmployeeID, "frmPOS");
         if (open.Length > 0)
@@ -482,7 +493,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         await using var db = await factory.CreateDbContextAsync();
         var settings = await SettingsReader.ReadAsync(db);
         decimal vatRate = settings.VATRate;
-        int repId = await RepService.RepIdOfAsync(db, user.EmployeeID);
+        int repId = user.RepDay?.SalesRepID ?? await RepService.RepIdOfAsync(db, user.EmployeeID);
 
         // ---- 1. cart -> calculation engine
         var ids = sale.Lines.Select(l => l.ProductID).Distinct().ToList();
@@ -539,7 +550,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         }
         var customer = await db.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.CustomerID == sale.CustomerID);
         msg = await CheckCustomerAsync(db, settings, customer, isCredit, settle.Remaining);
-        int? rep = msg.Length == 0 ? await RepService.SalesRepForAsync(db, sale.CustomerID, user.EmployeeID) : null;
+        int? rep = msg.Length == 0 ? user.RepDay?.SalesRepID ?? await RepService.SalesRepForAsync(db, sale.CustomerID, user.EmployeeID) : null;
         if (msg.Length == 0)
         {
             msg = await RepCreditProblemAsync(db, rep, settle.Remaining);
@@ -548,7 +559,7 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         {
             return SaleResult.Refused(msg);
         }
-        int warehouse = await RepService.UserWarehouseAsync(db, user.EmployeeID);
+        int warehouse = user.RepDay?.WarehouseID ?? await RepService.UserWarehouseAsync(db, user.EmployeeID);
         var stock = await CheckStockAsync(db, settings, user.EmployeeID,
                                           sale.Lines.Select((l, i) => (products[l.ProductID], calc.Lines[i].Quantity * factors[i])).ToList(),
                                           warehouse, "البيع");
@@ -573,13 +584,13 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         var inv = new SalesInvoices
         {
             InvoiceNumber = device?.InvoiceNumber ?? await NumberSequences.NextNumberAsync(db, "SALES_INVOICE"),
-            ClientRef = device?.ClientRef,
+            ClientRef = device?.ClientRef ?? clientRef,
             InvoiceDate = now, CustomerID = sale.CustomerID, EmployeeID = user.EmployeeID, PaymentType = sale.PaymentType,
             PaymentMethodID = method, SubTotal = calc.SubTotal, Discount = calc.Discount, TaxableAmount = calc.Taxable, Tax = calc.Tax,
             TotalAmount = calc.Total, PaidAmount = settle.Paid, RemainingAmount = settle.Remaining,
             DueDate = settle.Remaining > 0 ? now.Date.AddDays(customer!.PaymentTermsDays ?? 0) : null,
             AmountTendered = tend, ChangeDue = settle.Change,
-            CashBoxID = await CashBoxForAsync(db, user.EmployeeID, method ?? CashMethodId, settle.Paid),
+            CashBoxID = await CashBoxForAsync(db, user, method ?? CashMethodId, settle.Paid),
             BankID = await BankForAsync(db, settings, method, settle.Paid),
             CostCenterID = await CostCenterForAsync(db, user.EmployeeID), SalesRepID = rep, WarehouseID = warehouse,
             Notes = Clip(sale.Notes, 255),
@@ -818,6 +829,23 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         return new SaleResult(SaveStatus.Saved, "", row.SalesReturnID, row.ReturnNumber, sumTotal, refunded);
     }
 
+    /// <summary>The sales returns of a period (frmSalesReturn, the list of credit notes).</summary>
+    public async Task<List<ReturnRow>> SalesReturnsAsync(DateTime from, DateTime to, bool english, int take = 200)
+    {
+        await using var db = await factory.CreateDbContextAsync();
+        var start = from.Date;
+        var end = to.Date.AddDays(1);
+        var rows = await (from r in db.SalesReturns
+                          join c in db.Customers on r.CustomerID equals c.CustomerID
+                          join h in db.SalesInvoices on r.SalesInvoiceID equals h.SalesInvoiceID
+                          where r.ReturnDate >= start && r.ReturnDate < end
+                          orderby r.ReturnDate descending
+                          select new { r.SalesReturnID, r.ReturnNumber, r.ReturnDate, c.CustomerName, c.CustomerNameEn, h.InvoiceNumber, r.TotalAmount, r.RefundedAmount })
+            .Take(take).ToListAsync();
+        return rows.Select(r => new ReturnRow(r.SalesReturnID, r.ReturnNumber, r.ReturnDate, Name(r.CustomerName, r.CustomerNameEn, english), r.InvoiceNumber,
+                                              r.TotalAmount, r.RefundedAmount)).ToList();
+    }
+
     /// <summary>modSales.SetZatcaFields for a credit note (type 381, the subtype of its invoice).</summary>
     private static async Task SetReturnZatcaFieldsAsync(RetailDbContext db, Settings settings, SalesReturns row, string subType, DateTime when)
     {
@@ -883,8 +911,8 @@ public sealed class SalesService(IDbContextFactory<RetailDbContext> factory, Per
         {
             PaymentNumber = await NumberSequences.NextNumberAsync(db, "CUSTOMER_PAYMENT"),
             CustomerID = pay.CustomerID, PaymentDate = DateTime.Now, Amount = amount, CurrencyCode = code, ExchangeRate = rate,
-            ForeignAmount = foreign, SalesRepID = await RepService.SalesRepForAsync(db, pay.CustomerID, user.EmployeeID),
-            PaymentMethodID = pay.PaymentMethodID, CashBoxID = await CashBoxForAsync(db, user.EmployeeID, pay.PaymentMethodID, amount),
+            ForeignAmount = foreign, SalesRepID = user.RepDay?.SalesRepID ?? await RepService.SalesRepForAsync(db, pay.CustomerID, user.EmployeeID),
+            PaymentMethodID = pay.PaymentMethodID, CashBoxID = await CashBoxForAsync(db, user, pay.PaymentMethodID, amount),
             BankID = await BankForAsync(db, settings, pay.PaymentMethodID, amount), EmployeeID = user.EmployeeID,
             Notes = Clip(pay.Notes, 255), ClientRef = clientRef,
         };

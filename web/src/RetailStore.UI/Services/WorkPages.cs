@@ -25,6 +25,11 @@ public static class WorkPages
         new("ledger", "frmLedger", "كشف حساب ودفتر الأستاذ", "رصيد أول المدة، ثم كل سطر قيد بالرصيد بعده"),
         new("trial-balance", "frmLedger", "ميزان المراجعة", "رصيد أول المدة وحركة الفترة والرصيد الختامي لكل حساب"),
         new("financials", "frmFinancials", "القوائم المالية", "قائمة الدخل والميزانية من القيود، مع فترة المقارنة"),
+        new("sales-returns", "frmSalesReturn", "مرتجعات المبيعات", "إشعار دائن من رقم الفاتورة: الكمية المرتجعة، والرد نقدًا أو الخصم من الرصيد"),
+        new("purchase-returns", "frmPurchaseReturn", "مرتجعات المشتريات", "إرجاع أصناف فاتورة شراء للمورد: نقدًا أو خصمًا من المستحق له"),
+        new("cash-closing", "frmCashClosing", "تصفية يومية الكاشير", "الرصيد الدفتري للصندوق من آخر تصفية، والنقدية الفعلية، والعجز أو الزيادة، والترحيل للخزينة"),
+        new("bank-reconciliation", "frmBankRecon", "التسوية البنكية", "مطابقة كشف البنك مع الدفاتر واعتماد التسوية"),
+        new("manual-entries", "frmManualEntry", "القيود اليدوية", "قيد يومية يدوي بأسطره المدينة والدائنة، وتعديله وحذفه وعكسه"),
         new("reports", "frmReportCenter", "مركز التقارير", "تقارير البرنامج كلها من استعلاماته: المبيعات والمخزون والخزينة والحسابات"),
     ];
 
@@ -61,6 +66,12 @@ public static class WorkPages
     public const string BankTxSaved = "تم حفظ الحركة ";
     public const string BankTxDeleted = "تم حذف الحركة ";
     public const string JournalUpdated = "تم تحديث القيود.";
+    public const string ClosingSaved = "تم حفظ التصفية ";
+    public const string SalesReturnSaved = "تم حفظ المرتجع ";
+    public const string PurchaseReturnSaved = "تم حفظ مرتجع المشتريات ";
+    public const string ManualSaved = "تم حفظ القيد ";
+    public const string ManualDeleted = "تم حذف القيد.";
+    public const string ReconFinished = "تم اعتماد التسوية البنكية.";
 
     /// <summary>modCash VOUCHER_TYPES.</summary>
     public static string VoucherTypeName(string type) => type switch

@@ -32,7 +32,7 @@ public sealed record OrderLineView(int SalesOrderLineID, int ProductID, string P
 /// each price group (the prices that differ only), the visits of the day and the orders of the last days.</summary>
 public sealed record RepSnapshot(DateTime ServerTime, string StoreName, RepProfile Profile, List<RepCustomer> Customers, List<RepProduct> Products,
                                  Dictionary<string, Dictionary<int, decimal>> PriceGroups, Dictionary<int, string> CustomerPriceGroups,
-                                 List<RepVisit> Visits, List<OrderView> Orders, bool CanVisits);
+                                 List<RepVisit> Visits, List<OrderView> Orders, bool CanVisits, bool DayOpen = false);
 
 public sealed record OrderView(int SalesOrderID, string OrderNumber, DateTime OrderDate, int CustomerID, string CustomerName,
                                int WarehouseID, int? SalesRepID, DateTime? RequiredDate, string Status, string? Notes,
@@ -214,7 +214,8 @@ public sealed class RepService(IDbContextFactory<RetailDbContext> factory, Permi
         var orders = await OrdersAsync(repId, employeeId, day.AddDays(-orderDays), day, english);
         var settings = await SettingsReader.ReadAsync(db);
         string store = english && !string.IsNullOrWhiteSpace(settings.StoreNameEn) ? settings.StoreNameEn! : (settings.StoreName ?? "");
-        return new RepSnapshot(DateTime.Now, store, profile, customers, products, groups, ofCustomer, visits, orders, canVisits);
+        bool dayOpen = await RepDocService.OpenDayAsync(db, repId) is not null;           // the invoice and the receipt need it (docs/87)
+        return new RepSnapshot(DateTime.Now, store, profile, customers, products, groups, ofCustomer, visits, orders, canVisits, dayOpen);
     }
 
     // ------------------------------------------------------------------ prices (modPriceLists, pieces only)

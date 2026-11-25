@@ -134,5 +134,36 @@ public static class RepApi
                          "sent again by the same user, the order is not added twice (200 with its id); OrderDate = when it " +
                          "was taken on the phone (never later than now).")
         .Produces<CreatedId>(StatusCodes.Status201Created).Produces<CreatedId>().ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+
+        // ---- the invoice and the receipt of the rep (docs/87): made on the program at once, in his open rep day, each sent once
+        rep.MapPost("/sales", async (RepSaleRequest body, HttpContext http, RepDocService docs) =>
+            RepDocument(http, await docs.PostSaleAsync(UserInfo.Acting(http.User), RepFilter.RepOf(http), body with { Lines = body.Lines ?? [] },
+                                                       ApiResults.English(http))))
+        .Needs("SALES_POS", "frmPOS").WithName("PostRepSale")
+        .WithSummary("A sales invoice of the rep from his van, in his open rep day (modSales.PostSaleFromCart acting as the rep)")
+        .WithDescription("The rep day open for the rep in Access (frmRepDay) gives the warehouse (the van), the box of the cash (the " +
+                         "custody box) and the rep; without one the invoice is refused. The checks of POST /sales in their order; " +
+                         "ConfirmStock = the answer to the question on the stock (409 confirm). ClientRef = the number of the " +
+                         "invoice on the phone (at most 40 characters): sent again by the same user it answers 200 with the " +
+                         "document and adds nothing. The answer is the document to print (number INV-, totals, QR).")
+        .Produces<PosDocument>(StatusCodes.Status201Created).Produces<PosDocument>()
+        .ProducesProblem(StatusCodes.Status409Conflict).ProducesProblem(StatusCodes.Status422UnprocessableEntity);
+
+        rep.MapPost("/payments", async (DevicePaymentRequest body, HttpContext http, RepDocService docs) =>
+            RepDocument(http, await docs.PostPaymentAsync(UserInfo.Acting(http.User), RepFilter.RepOf(http), body, ApiResults.English(http))))
+        .Needs("CUSTOMER_PAYMENTS", "frmCustomerPayment").WithName("PostRepPayment")
+        .WithSummary("A receipt from a customer by the rep, into his custody box, in his open rep day (modSales.PostCustomerPayment)")
+        .WithDescription("An amount over the balance answers 409 confirm; send it again with ConfirmOverBalance = true. ClientRef as " +
+                         "for the invoice.")
+        .Produces<PosDocument>(StatusCodes.Status201Created).Produces<PosDocument>()
+        .ProducesProblem(StatusCodes.Status409Conflict).ProducesProblem(StatusCodes.Status422UnprocessableEntity);
     }
+
+    private static IResult RepDocument(HttpContext http, DeviceDocResult r) => r.Status switch
+    {
+        SaveStatus.Saved when r.Duplicate => Results.Ok(r.Document),
+        SaveStatus.Saved => Results.Created(ApiEndpoints.Prefix + "/rep/documents/" + r.Document?.Number, r.Document),
+        SaveStatus.NeedsConfirmation => ApiResults.Problem(http, StatusCodes.Status409Conflict, "confirm", r.Message),
+        _ => ApiResults.Refused(http, r.Message),
+    };
 }

@@ -21,7 +21,18 @@
                 <dt>@S.T("العنوان")</dt><dd>@c.Address</dd>
             }
         </dl>
-        <button class="rep-primary" @onclick="@(() => Nav.NavigateTo($"orders/new/{Id}"))">@S.T("طلبية جديدة")</button>
+        <div class="rep-buttons">
+            <button class="rep-primary" @onclick="@(() => Nav.NavigateTo($"orders/new/{Id}"))">@S.T("طلبية جديدة")</button>
+            @if (S.CanSell)
+            {
+                <button @onclick="@(() => Nav.NavigateTo($"invoice/{Id}"))">@S.T("فاتورة بيع")</button>
+                <button @onclick="@(() => Nav.NavigateTo($"payment/{Id}"))">@S.T("تحصيل")</button>
+            }
+        </div>
+        @if (!S.CanSell)
+        {
+            <small>@S.T("الفاتورة والتحصيل بعد فتح يوم المندوب في البرنامج.")</small>
+        }
     </section>
 
     @if (S.Snapshot!.CanVisits)

@@ -113,4 +113,10 @@ public sealed class RepApiClient(HttpClient http)
 
     public Task<ApiResult<List<RepVisit>>> VisitsAsync(DateTime day, CancellationToken ct = default) =>
         SendAsync<List<RepVisit>>(HttpMethod.Get, "rep/visits?date=" + day.ToString("yyyy-MM-dd"), null, ct);
+
+    public Task<ApiResult<RepDocument>> PostSaleAsync(RepSaleRequest sale, CancellationToken ct = default) =>
+        SendAsync<RepDocument>(HttpMethod.Post, "rep/sales", sale, ct);
+
+    public Task<ApiResult<RepDocument>> PostPaymentAsync(RepPaymentRequest payment, CancellationToken ct = default) =>
+        SendAsync<RepDocument>(HttpMethod.Post, "rep/payments", payment, ct);
 }

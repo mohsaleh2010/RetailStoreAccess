@@ -1,5 +1,4 @@
 using System.Globalization;
-using QRCoder;
 using RetailStore.Data.Services;
 using RetailStore.Domain.Printing;
 using RetailStore.PosApp.Offline;
@@ -124,59 +123,11 @@ public static class ReceiptSlip
         return lines;
     }
 
-    /// <summary>The QR as dots: each module a square of the given size, with its quiet zone.</summary>
-    public static bool[,] Qr(string text, int moduleDots)
-    {
-        using var gen = new QRCodeGenerator();
-        using var data = gen.CreateQrCode(text, QRCodeGenerator.ECCLevel.M);
-        var m = data.ModuleMatrix;
-        int n = m.Count;
-        var dots = new bool[n * moduleDots, n * moduleDots];
-        for (int y = 0; y < n; y++)
-        {
-            for (int x = 0; x < n; x++)
-            {
-                if (!m[y][x])
-                {
-                    continue;
-                }
-                for (int dy = 0; dy < moduleDots; dy++)
-                {
-                    for (int dx = 0; dx < moduleDots; dx++)
-                    {
-                        dots[y * moduleDots + dy, x * moduleDots + dx] = true;
-                    }
-                }
-            }
-        }
-        return dots;
-    }
+    /// <summary>The QR of a document (SlipPicture.Qr, shared with the rep app).</summary>
+    public static bool[,] Qr(string text, int moduleDots) => SlipPicture.Qr(text, moduleDots);
 
-    /// <summary>The text picture and the QR under it, centred, in one picture of the width of the text.</summary>
-    public static bool[,] Stack(bool[,] text, bool[,]? qr)
-    {
-        int width = text.GetLength(1);
-        int textRows = text.GetLength(0);
-        int qrRows = qr?.GetLength(0) ?? 0;
-        int qrCols = qr?.GetLength(1) ?? 0;
-        var all = new bool[textRows + qrRows, width];
-        for (int y = 0; y < textRows; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                all[y, x] = text[y, x];
-            }
-        }
-        int left = Math.Max(0, (width - qrCols) / 2);
-        for (int y = 0; y < qrRows; y++)
-        {
-            for (int x = 0; x < qrCols && left + x < width; x++)
-            {
-                all[textRows + y, left + x] = qr![y, x];
-            }
-        }
-        return all;
-    }
+    /// <summary>The text with the QR centred under it (SlipPicture.Stack).</summary>
+    public static bool[,] Stack(bool[,] text, bool[,]? qr) => SlipPicture.Stack(text, qr);
 
     /// <summary>The whole job: the drawer pulse for a cash sale, then the picture (EscPos.Picture: bands, feed, cut).</summary>
     public static byte[] Job(bool[,] picture, bool openDrawer)

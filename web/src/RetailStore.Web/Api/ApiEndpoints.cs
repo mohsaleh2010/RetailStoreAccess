@@ -145,6 +145,7 @@ public static class ApiEndpoints
         PurchaseApi.Map(secured);
         StockApi.Map(secured);
         TreasuryApi.Map(secured);
+        OfficeApi.Map(secured);
         ReportsApi.Map(secured);
 
         // ---------------------------------------------------------------- the sales rep

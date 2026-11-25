@@ -8,6 +8,14 @@ namespace RetailStore.RepApp.Offline;
 /// <summary>An order in the list of the phone: taken on the phone (waiting, sent or refused) or read from the server.</summary>
 public sealed record OrderRow(long OutboxId, string State, string? Message, PendingOrder Order, string? OrderNumber, string? Status);
 
+/// <summary>The answer to an invoice or a receipt sent to the program (docs/87): Saved with the document, Confirm = a question
+/// (the stock, an amount over the balance) to answer and send again, Refused, or Offline (not reached: send again, with the
+/// same number on the phone).</summary>
+public sealed record DocAnswer(string State, string Message, RepDocument? Document)
+{
+    public const string Saved = "SAVED", Confirm = "CONFIRM", Refused = "REFUSED", Offline = "OFFLINE";
+}
+
 /// <summary>The rep app on the phone (docs/78): the settings, the login, the data kept for offline work, the outbox and
 /// the sync, and printing. One instance for the life of the app; the screens listen to Changed.</summary>
 public sealed class RepSession(LocalStore store, RepApiClient api, IRepPlatform platform)
@@ -303,6 +311,88 @@ public sealed class RepSession(LocalStore store, RepApiClient api, IRepPlatform 
     }
 
     public List<OutboxItem> Problems() => store.Outbox(OutboxKinds.Rejected);
+
+    // ------------------------------------------------------------------ the invoice and the receipt (docs/87)
+
+    public const string NeedsConnection = "الفاتورة والتحصيل تحتاج الاتصال بالبرنامج، والطلبيات والزيارات تعمل بدونه.";
+
+    /// <summary>The invoice and the receipt need the rep day open in the program (the van and the custody box).</summary>
+    public bool CanSell => Snapshot?.DayOpen == true;
+
+    public SaleDraft? NewSale(int customerId) =>
+        Snapshot is not null && Customer(customerId) is { } c ? new SaleDraft(Snapshot, c) : null;
+
+    private async Task<DocAnswer> AnswerAsync(ApiResult<RepDocument> r)
+    {
+        if (r.Ok && r.Value is not null)
+        {
+            _ = SyncAsync();                                   // the balance and the van stock after it
+            return new DocAnswer(DocAnswer.Saved, "", r.Value);
+        }
+        if (r.NeedsLogin)
+        {
+            await LogoutAsync();
+            return new DocAnswer(DocAnswer.Refused, T("سجّل الدخول أولًا."), null);
+        }
+        if (r.Retry)
+        {
+            return new DocAnswer(DocAnswer.Offline, T("تعذر الوصول إلى البرنامج. أعد الإرسال عند عودة الاتصال: لن يتكرر المستند."), null);
+        }
+        return new DocAnswer(r.Code == "confirm" ? DocAnswer.Confirm : DocAnswer.Refused, r.Message, null);
+    }
+
+    /// <summary>Send the invoice to the program (never kept on the phone).</summary>
+    public async Task<DocAnswer> SellAsync(SaleDraft draft, bool confirmStock = false)
+    {
+        if (!LoggedIn)
+        {
+            return new DocAnswer(DocAnswer.Refused, T("سجّل الدخول أولًا."), null);
+        }
+        if (!platform.HasNetwork)
+        {
+            return new DocAnswer(DocAnswer.Offline, T(NeedsConnection), null);
+        }
+        var (problem, request) = draft.ToRequest(confirmStock);
+        if (request is null)
+        {
+            return new DocAnswer(DocAnswer.Refused, T(problem), null);
+        }
+        return await AnswerAsync(await api.PostSaleAsync(request));
+    }
+
+    /// <summary>Send a receipt to the program: clientRef = its number on the phone, the same until the program answers.</summary>
+    public async Task<DocAnswer> CollectAsync(string clientRef, int customerId, decimal amount, string? notes, bool confirmOverBalance = false)
+    {
+        if (!LoggedIn)
+        {
+            return new DocAnswer(DocAnswer.Refused, T("سجّل الدخول أولًا."), null);
+        }
+        if (!platform.HasNetwork)
+        {
+            return new DocAnswer(DocAnswer.Offline, T(NeedsConnection), null);
+        }
+        if (amount <= 0)
+        {
+            return new DocAnswer(DocAnswer.Refused, T("المبلغ يجب أن يكون أكبر من صفر."), null);
+        }
+        string text = (notes ?? "").Trim();
+        return await AnswerAsync(await api.PostPaymentAsync(new RepPaymentRequest(clientRef, customerId, amount, 1,
+                                                                                   text.Length == 0 ? null : text, confirmOverBalance)));
+    }
+
+    /// <summary>Print the customer's copy of a document of the program (with its QR): "" or the reason.</summary>
+    public async Task<string> PrintDocumentAsync(RepDocument document)
+    {
+        if (Printer.Length == 0)
+        {
+            return T("اختر الطابعة في الإعدادات.");
+        }
+        var lines = DocSlip.Build(document, Snapshot?.StoreName ?? "", Snapshot?.Profile.RepName ?? EmployeeName, T);
+        var text = platform.DrawSlip(lines, EscPos.DotsFor(PaperMillimetres), !English);
+        var qr = document.Qr is { Length: > 0 } q ? SlipPicture.Qr(q, PaperMillimetres >= 80 ? 5 : 4) : null;
+        string problem = await platform.PrintAsync(Printer, EscPos.Picture(SlipPicture.Stack(text, qr)));
+        return problem.Length == 0 ? "" : T("تعذرت الطباعة:") + " " + problem;
+    }
 
     // ------------------------------------------------------------------ printing
 
