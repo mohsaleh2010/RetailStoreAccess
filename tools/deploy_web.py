@@ -62,6 +62,14 @@ class DeployError(Exception):
     pass
 
 
+def shown(path: str) -> str:
+    """A path to print: relative to the repository, or whole when it is on another drive (Windows: C: and E:)."""
+    try:
+        return os.path.relpath(path, ROOT)
+    except ValueError:
+        return os.path.abspath(path)
+
+
 def yes(text) -> bool:
     return str(text).strip().lower() in ("y", "yes", "true", "1", "نعم")
 
@@ -73,7 +81,7 @@ def new_jwt_key() -> str:
 
 def load_settings(path: str = SETTINGS_FILE) -> dict:
     if not os.path.exists(path):
-        raise DeployError(f"{os.path.relpath(path, ROOT)} not found: run  python tools/deploy_web.py init  first")
+        raise DeployError(f"{shown(path)} not found: run  python tools/deploy_web.py init  first")
     with open(path, encoding="utf-8") as fh:
         return json.load(fh)
 
@@ -171,7 +179,7 @@ def cmd_publish(args, settings: dict) -> None:
     with open(os.path.join(PUBLISH_DIR, "appsettings.Production.json"), "w", encoding="utf-8") as fh:
         json.dump(production_settings(settings), fh, indent=2)
     set_stdout_log(PUBLISH_DIR, args.stdout_log)
-    print(f"Published to {os.path.relpath(PUBLISH_DIR, ROOT)}")
+    print(f"Published to {shown(PUBLISH_DIR)}")
 
 
 def upload_plan(publish_dir: str) -> list:

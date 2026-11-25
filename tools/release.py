@@ -40,6 +40,14 @@ class ReleaseError(Exception):
     pass
 
 
+def shown(path: str) -> str:
+    """A path to print: relative to the repository, or whole when it is on another drive (Windows: C: and E:)."""
+    try:
+        return os.path.relpath(path, ROOT)
+    except ValueError:
+        return os.path.abspath(path)
+
+
 def new_secret() -> str:
     alphabet = string.ascii_letters + string.digits
     return "".join(secrets.choice(alphabet) for _ in range(SECRET_LENGTH))
@@ -138,7 +146,7 @@ def main(argv=None) -> int:
                 print("release/license-secret.txt is already there: kept (a new one would make every code given invalid).")
         elif argv[0] == "package":
             build_package(read_secret())
-            print(f"Package: {os.path.relpath(PACKAGE, ROOT)} (modActivation has the release secret).")
+            print(f"Package: {shown(PACKAGE)} (modActivation has the release secret).")
         elif argv[0] == "code":
             secret = read_secret()
             for machine in argv[1:]:

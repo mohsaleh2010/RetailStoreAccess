@@ -89,6 +89,7 @@
 | SQL Server: معامل الاستعلامات (`QDate` / `QLong`) يُضبط بـ `SetPeriod` / `SetQueryParam(s)` / `RemoveQueryParams` فقط، لا بـ `TempVars.Add` (`docs/71`) | عروض الخادم لا تعرف الفترة: تقرير بفترة قديمة |
 | SQL Server: دالة Access جديدة في استعلام محفوظ تحتاج تحويلها في `gen_sql_views._call`؛ و`ORDER BY` على أعمدة الاستعلام نفسه | `generate.py` يرفض الدالة؛ والترتيب على عمود غير موجود يُبقي الاستعلام في Access |
 | قائمة طويلة تكتبها المولّدات في VBA تُقسَّم على عدة عناصر في السطر (`gen_relations.chunks`) | خطأ «too many line continuations» (حد 24) عند البناء |
+| أدوات Python والاختبارات تعمل على Windows أيضًا: المسار يُبنى بـ `os.path.join` لا باستبدال `/` في `__file__`، و`os.path.relpath` للعرض فقط عبر `shown(...)` (المستودع على قرص والملفات المؤقتة على قرص آخر) | على جهاز صاحب المشروع (`E:` و`C:`): `test_queries` قرأ `gen_queries.py` بدل `modQueryParams.bas`، و`release.py package` توقف بـ `ValueError: path is on mount` |
 
 ## 4) تشخيص خطأ يأتي من Access
 1. **اطلب الدليل الكامل:**

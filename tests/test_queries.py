@@ -4,6 +4,7 @@ lint for every saved query, and the generated VBA module.
 Run:  python3 -m unittest discover -s tests -v
 """
 
+import os
 import re
 import unittest
 
@@ -257,8 +258,8 @@ class GeneratedQueriesModuleTests(VbaModuleChecks, unittest.TestCase):
 
 class StaticModuleTests(VbaModuleChecks, unittest.TestCase):
     module_name = "modQueryParams"
-    with open(gen_queries.__file__.replace("tools/gen_queries.py", "src/vba/modQueryParams.bas"),
-              encoding="utf-8") as _fh:
+    with open(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(gen_queries.__file__))),
+                           "src", "vba", "modQueryParams.bas"), encoding="utf-8") as _fh:
         vba = _fh.read()
 
     def test_public_api(self):

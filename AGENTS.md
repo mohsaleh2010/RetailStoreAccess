@@ -246,6 +246,7 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   `ClientRef`); the token stays in the platform secure storage, never in the SQLite file; `RetailStore.App` stays out of
   `RetailStore.slnx` (a machine without the MAUI workload builds and tests the web).
 - **Delivery (`docs/88`)**: the real `LICENSE_SECRET` lives only in `release/license-secret.txt` and the package `release/RetailStore/` (both ignored by git); the secret in `src/vba/modActivation.bas` is the development one and stays; never print the release secret. Secrets of the site (SQL password, `Api:JwtKey`) go only into `release/web-deploy.json` and the uploaded `appsettings.Production.json`, never the repository; an upload never touches the server `App_Data`. A T-SQL statement that needs more than `db_owner` goes inside `BEGIN TRY ... BEGIN CATCH PRINT ...` (shared hosting).
+- **Python on Windows**: the tools and tests run on the owner's Windows PC too: build paths with `os.path.join`, never by replacing `/` in `__file__`; `os.path.relpath` raises `ValueError` across drives (repository on `E:`, temp on `C:`), so a path printed goes through `shown(...)` (`test_delivery.WindowsPathTests`).
 - Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness
   cannot return a `Currency` either — wrap it in a `Double` function, see `tests/test_indicators.py`).
 

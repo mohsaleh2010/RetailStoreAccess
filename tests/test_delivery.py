@@ -17,6 +17,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import redirect_stdout
+from unittest import mock
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 sys.path.insert(0, os.path.join(ROOT, "tools"))
@@ -321,7 +322,8 @@ class DeployUploadTests(unittest.TestCase):
         with open(path, "w", encoding="utf-8") as fh:
             fh.write(config)
         deploy_web.set_stdout_log(self.tmp, True)
-        text = open(path, encoding="utf-8").read()
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
         self.assertIn('stdoutLogEnabled="true"', text)
         self.assertIn('stdoutLogFile=".\\App_Data\\logs\\stdout"', text)
         with open(path, "w", encoding="utf-8") as fh:
@@ -403,6 +405,44 @@ class SharedHostingTests(unittest.TestCase):
         self.assertIn("App_Data/", read("web", ".gitignore").splitlines())
         self.assertIn("release", deploy_web.SETTINGS_FILE.replace(os.sep, "/"))
         self.assertTrue(release.SECRET_FILE.replace(os.sep, "/").endswith("release/license-secret.txt"))
+
+
+class WindowsPathTests(unittest.TestCase):
+    """On Windows the repository and the temporary folder can be on two drives (E: and C:): os.path.relpath then
+    raises ValueError. The tools print such a path whole; no file builds a path by replacing '/' in __file__."""
+
+    def test_shown_on_another_drive(self):
+        for module in (release, deploy_web):
+            with mock.patch("os.path.relpath", side_effect=ValueError("path is on mount 'C:', start on mount 'E:'")):
+                self.assertEqual(module.shown(os.path.join(ROOT, "release", "x")),
+                                 os.path.abspath(os.path.join(ROOT, "release", "x")))
+            self.assertEqual(module.shown(os.path.join(ROOT, "release", "x")), os.path.join("release", "x"))
+
+    def test_commands_on_another_drive(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            saved = (release.SECRET_FILE, release.PACKAGE)
+            release.SECRET_FILE = os.path.join(tmp, "license-secret.txt")
+            release.PACKAGE = os.path.join(tmp, "RetailStore")
+            try:
+                release.make_secret()
+                out = io.StringIO()
+                with mock.patch("os.path.relpath", side_effect=ValueError("another drive")), redirect_stdout(out):
+                    self.assertEqual(release.main(["package"]), 0)
+                self.assertIn(release.PACKAGE, out.getvalue())
+                with mock.patch("os.path.relpath", side_effect=ValueError("another drive")):
+                    with self.assertRaises(deploy_web.DeployError) as caught:
+                        deploy_web.load_settings(os.path.join(tmp, "web-deploy.json"))
+                self.assertIn(tmp, str(caught.exception))
+            finally:
+                release.SECRET_FILE, release.PACKAGE = saved
+
+    def test_no_path_built_with_a_slash_replace(self):
+        pattern = re.compile(r"__file__\.replace\(")
+        for folder in ("tools", "tests"):
+            for name in os.listdir(os.path.join(ROOT, folder)):
+                if name.endswith(".py") and name != "test_delivery.py":
+                    with open(os.path.join(ROOT, folder, name), encoding="utf-8") as fh:
+                        self.assertIsNone(pattern.search(fh.read()), f"{folder}/{name}: use os.path.join")
 
 
 class DocsTests(unittest.TestCase):
