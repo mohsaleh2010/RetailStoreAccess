@@ -7869,7 +7869,12 @@ GO
   8. Database options (plan 5C, docs/70)
 ------------------------------------------------------------------------------*/
 IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
+BEGIN TRY
     ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
+END TRY
+BEGIN CATCH
+    PRINT N'RetailStore schema: READ_COMMITTED_SNAPSHOT could not be set (' + ERROR_MESSAGE() + N'). Ask the host to set it on.';
+END CATCH
 GO
 PRINT N'RetailStore schema: done (98 tables, 1261 fields, 154 indexes, 231 relationships, 454 seed rows).';
 GO

@@ -7,3 +7,7 @@ BuildFrontEnd.log
 *.accdb
 *.accde
 RunAllTests.log
+
+# Delivery (docs/88): the release secret, the deployment settings and the packages stay on the owner computer
+release/
+appsettings.Production.json

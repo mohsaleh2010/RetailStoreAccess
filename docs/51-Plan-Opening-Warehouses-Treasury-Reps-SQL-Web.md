@@ -347,3 +347,5 @@
 | 7ج: إكمال الويب (مرتجعات المبيعات والمشتريات، وتصفية الكاشير، والتسوية البنكية، والقيود اليدوية؛ `BankReconService`، `ManualEntryService`، `PostPurchaseReturnAsync`، صفحات `Pages/Office`، `OfficeApi`) والفاتورة والتحصيل من تطبيق المندوب باسم يومه المفتوح (`RepDocService`، `ActingUser.RepDay`، `/rep/sales`، `/rep/payments`) | ✅ تمت الموافقة (`docs/87-Web-Completion.md`) |
 | تشغيل كل الاختبارات لـ 7ج: 1574 Python (13 متخطّاة) و106 xUnit، كلها ناجحة | ✅ |
 | الموافقة على 7ج؛ بدء 7د (التجهيز للتسليم: الاستضافة والنشر، و`LICENSE_SECRET`، وملف ACCDE، ودليل التثبيت النهائي) | ✅ |
+| 7د: التجهيز للتسليم: قرار الاستضافة = استضافة Windows مشتركة فيها SQL Server والرفع بـ FTP (`tools/deploy_web.py`، `/health`، مفاتيح الدخول في `App_Data/keys`)، وسر تفعيل الإصدار وحزمة التسليم (`tools/release.py`)، وملف ACCDE (`MakeAccde.vbs`)، و`READ_COMMITTED_SNAPSHOT` داخل `TRY`، ودليل التثبيت | ✅ بانتظار الموافقة (`docs/88-Delivery-Installation.md`) |
+| تشغيل كل الاختبارات لـ 7د: 1607 Python (14 متخطّاة) و109 xUnit، كلها ناجحة | ✅ |

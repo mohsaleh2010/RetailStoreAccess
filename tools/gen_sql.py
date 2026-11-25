@@ -346,9 +346,15 @@ GO"""
 
 # Readers see the last committed rows instead of waiting for another user's posting transaction (the program
 # keeps a document and its stock moves and journal in one transaction). Set once: WITH ROLLBACK IMMEDIATE ends
-# the other connections, which Access opens again.
+# the other connections, which Access opens again. A shared hosting database (docs/88) may refuse ALTER DATABASE:
+# the script then only prints a warning (the host can switch it on) instead of failing after the whole schema.
 DATABASE_OPTIONS = """IF EXISTS (SELECT 1 FROM sys.databases WHERE database_id = DB_ID() AND is_read_committed_snapshot_on = 0)
-    ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;"""
+BEGIN TRY
+    ALTER DATABASE CURRENT SET READ_COMMITTED_SNAPSHOT ON WITH ROLLBACK IMMEDIATE;
+END TRY
+BEGIN CATCH
+    PRINT N'RetailStore schema: READ_COMMITTED_SNAPSHOT could not be set (' + ERROR_MESSAGE() + N'). Ask the host to set it on.';
+END CATCH"""
 
 
 def section(title: str) -> str:

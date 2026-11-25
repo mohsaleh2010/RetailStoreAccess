@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using RetailStore.Data;
 using RetailStore.UI;
@@ -23,6 +25,26 @@ builder.Services.AddDbContextFactory<RetailDbContext>(options =>
         options.UseSqlite(builder.Configuration.GetConnectionString("Sqlite") ?? "Data Source=App_Data/retailstore-dev.db");
     }
 });
+
+// Hosting (docs/88). The keys that protect the login cookie and the forms are kept in App_Data/keys (Hosting:KeysFolder),
+// so a restart of the site (a shared host recycles it often) does not log everybody out. Behind a proxy that ends HTTPS,
+// Hosting:ForwardedHeaders = true reads the client address and scheme from X-Forwarded-For / X-Forwarded-Proto.
+string keysFolder = builder.Configuration["Hosting:KeysFolder"] is { Length: > 0 } folder
+    ? folder
+    : Path.Combine(builder.Environment.ContentRootPath, "App_Data", "keys");
+builder.Services.AddDataProtection()
+    .SetApplicationName("RetailStore.Web")
+    .PersistKeysToFileSystem(new DirectoryInfo(keysFolder));
+bool forwardedHeaders = builder.Configuration.GetValue("Hosting:ForwardedHeaders", false);
+if (forwardedHeaders)
+{
+    builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    {
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        options.KnownIPNetworks.Clear();
+        options.KnownProxies.Clear();
+    });
+}
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -55,6 +77,10 @@ if (!provider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
     DbSetup.EnsureSqliteDatabase(db);
 }
 
+if (forwardedHeaders)
+{
+    app.UseForwardedHeaders();
+}
 if (!app.Environment.IsDevelopment())
 {
     app.UseHsts();
@@ -77,6 +103,7 @@ app.UseRetailApi();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+app.MapHealth();                    // GET /health: the site answers and reaches its database (docs/88)
 app.MapAccountEndpoints();
 app.MapRetailApiDocs();
 app.MapRazorComponents<App>()
