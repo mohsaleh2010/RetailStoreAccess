@@ -8,6 +8,7 @@
   * the site: keys kept in App_Data, GET /health; the SQL script does not fail on a shared host;
   * release/ and appsettings.Production.json are never committed.
 """
+import ftplib
 import io
 import json
 import os
@@ -213,6 +214,12 @@ class FakeFtp:
     def mkd(self, path):
         self.calls.append(("MKD", path))
 
+    def voidcmd(self, command):
+        return "200 OK"
+
+    def size(self, path):
+        return len(self.files[path])
+
     def delete(self, path):
         self.files.pop(path, None)
         self.calls.append(("DELE", path))
@@ -304,7 +311,7 @@ class DeployUploadTests(unittest.TestCase):
 
     def test_failure_keeps_the_site_offline(self):
         ftp = FakeFtp(fail_at="web.config")
-        with self.assertRaises(OSError):
+        with self.assertRaises(deploy_web.DeployError):
             deploy_web.upload(ftp, SETTINGS, self.tmp, log=lambda _t: None)
         self.assertIn("/site/wwwroot/app_offline.htm", ftp.files, "half a program is never started")
 
@@ -642,6 +649,195 @@ class SqlErrorTests(unittest.TestCase):
                          "IF EXISTS (SELECT 1)")
         self.assertIn("2714", message)
         self.assertEqual(connection.rolled_back, 1)
+
+
+class FtpsTests(unittest.TestCase):
+    """The owner's host: TimeoutError in ssl unwrap() after the first STOR of ftplib.FTP_TLS."""
+
+    class Conn:
+        def __init__(self, log, unwrap_error=TimeoutError("The read operation timed out")):
+            self.log, self.sent, self.unwrap_error = log, b"", unwrap_error
+
+        def sendall(self, data):
+            self.sent += data
+
+        def settimeout(self, seconds):
+            self.log.append(("timeout", seconds))
+
+        def unwrap(self):
+            self.log.append("unwrap")
+            if self.unwrap_error:
+                raise self.unwrap_error
+            return self
+
+        def shutdown(self, how):
+            self.log.append("shutdown")
+
+        def close(self):
+            self.log.append("close")
+
+    def store(self, unwrap_error):
+        ftp = deploy_web.SafeFtpTls()
+        log = []
+        conn = self.Conn(log, unwrap_error)
+        ftp.voidcmd = lambda c: log.append(c)
+        ftp.transfercmd = lambda c, rest=None: (log.append(c), conn)[1]
+        ftp.voidresp = lambda: (log.append("226"), "226 Transfer complete")[1]
+        answer = ftp.storbinary("STOR /a.txt", io.BytesIO(b"x" * 200000))
+        return answer, conn, log
+
+    def test_store_survives_a_server_without_tls_close(self):
+        for error in (TimeoutError("The read operation timed out"), None):
+            answer, conn, log = self.store(error)
+            self.assertEqual(answer, "226 Transfer complete")
+            self.assertEqual(len(conn.sent), 200000)
+            self.assertEqual(log, ["TYPE I", "STOR /a.txt", ("timeout", deploy_web.SafeFtpTls.UNWRAP_SECONDS),
+                                   "unwrap", "shutdown", "226", "close"],
+                             "the socket is closed only after the 226 (closing at once cut the file)")
+
+    def test_size_checked(self):
+        ftp = mock.Mock()
+        ftp.size.return_value = 10
+        deploy_web.check_size(ftp, "/a", 10)
+        with self.assertRaises(ftplib.error_reply):
+            deploy_web.check_size(ftp, "/a", 11)
+        ftp.size.side_effect = ftplib.error_perm("500 SIZE not understood")
+        deploy_web.check_size(ftp, "/a", 11)
+
+    def test_data_connection_reuses_the_tls_session(self):
+        ftp = deploy_web.SafeFtpTls()
+        ftp._prot_p = True
+        ftp.host = "ftp.host.net"
+        ftp.sock = mock.Mock(session="SESSION")
+        ftp.context = mock.Mock()
+        ftp.context.wrap_socket.return_value = "wrapped"
+        with mock.patch("ftplib.FTP.ntransfercmd", return_value=("raw", 10)):
+            self.assertEqual(ftp.ntransfercmd("STOR x"), ("wrapped", 10))
+        ftp.context.wrap_socket.assert_called_once_with("raw", server_hostname="ftp.host.net", session="SESSION")
+
+    def test_ftps_by_default(self):
+        with mock.patch.object(deploy_web.SafeFtpTls, "connect"), mock.patch.object(deploy_web.SafeFtpTls, "login"), \
+                mock.patch.object(deploy_web.SafeFtpTls, "prot_p") as prot:
+            ftp = deploy_web.ftp_connect(SETTINGS, "pw")
+        self.assertIsInstance(ftp, deploy_web.SafeFtpTls)
+        self.assertTrue(prot.called)
+
+    def test_errors_explained(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            for name in ("RetailStore.Web.dll", "appsettings.Production.json", "web.config"):
+                with open(os.path.join(tmp, name), "w") as fh:
+                    fh.write(name)
+
+            class Failing(FakeFtp):
+                def storbinary(self, command, fh):
+                    raise TimeoutError("The read operation timed out")
+            with self.assertRaises(deploy_web.DeployError) as caught:
+                deploy_web.upload(Failing(), SETTINGS, tmp, log=lambda _t: None)
+            self.assertIn("app_offline.htm", str(caught.exception))
+            self.assertIn("plain FTP", str(caught.exception))
+            with self.assertRaises(deploy_web.DeployError) as caught:
+                deploy_web.upload(FakeFtp(fail_at="web.config"), SETTINGS, tmp, log=lambda _t: None)
+            self.assertIn("stopped at web.config (2 of 3 files sent)", str(caught.exception))
+            self.assertIn("upload  again", str(caught.exception))
+
+
+def _ftps_server_available():
+    try:
+        import pyftpdlib  # noqa: F401
+        import OpenSSL  # noqa: F401
+    except ImportError:
+        return False
+    return shutil.which("openssl") is not None
+
+
+@unittest.skipUnless(_ftps_server_available(), "pip install pyftpdlib pyopenssl (and openssl on the PATH)")
+class FtpsServerTests(unittest.TestCase):
+    """A real FTPS server (pyftpdlib, TLS on the control and data connections), also one that never sends its TLS
+    close like the owner's host: every byte arrives, App_Data is never sent, app_offline.htm is removed."""
+
+    @classmethod
+    def setUpClass(cls):
+        import subprocess
+        cls.tmp = tempfile.mkdtemp()
+        key, crt = os.path.join(cls.tmp, "k.pem"), os.path.join(cls.tmp, "c.pem")
+        subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-keyout", key, "-out", crt,
+                        "-days", "1", "-subj", "/CN=localhost"], check=True, capture_output=True)
+        cls.pem = os.path.join(cls.tmp, "both.pem")
+        with open(cls.pem, "w") as out:
+            out.write(open(key).read() + open(crt).read())
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp)
+
+    def serve(self, no_tls_close):
+        import threading
+        import OpenSSL.SSL
+        from pyftpdlib.authorizers import DummyAuthorizer
+        from pyftpdlib.handlers import TLS_FTPHandler
+        from pyftpdlib.servers import FTPServer
+        if no_tls_close:
+            patcher = mock.patch.object(OpenSSL.SSL.Connection, "shutdown", lambda _self: True)
+            patcher.start()
+            self.addCleanup(patcher.stop)
+        root = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, root)
+        os.makedirs(os.path.join(root, "site"))
+        auth = DummyAuthorizer()
+        auth.add_user("u", "p", root, perm="elradfmwMT")
+
+        class Handler(TLS_FTPHandler):
+            pass
+        Handler.certfile, Handler.authorizer = self.pem, auth
+        Handler.tls_control_required = Handler.tls_data_required = True
+        Handler.log_prefix = ""
+        server = FTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, kwargs={"timeout": 0.2}, daemon=True)
+        thread.start()
+        self.addCleanup(server.close_all)
+        return root, server.address[1]
+
+    def publish(self):
+        pub = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, pub)
+        files = {"RetailStore.Web.dll": 3_000_000, "appsettings.Production.json": 200, "wwwroot/css/app.css": 5000,
+                 "App_Data/keys/key.xml": 10, "web.config": 400}
+        for rel, size in files.items():
+            path = os.path.join(pub, *rel.split("/"))
+            os.makedirs(os.path.dirname(path), exist_ok=True)
+            with open(path, "wb") as fh:
+                fh.write(os.urandom(size))
+        return pub, files
+
+    def check(self, no_tls_close):
+        import logging
+        logging.getLogger("pyftpdlib").setLevel(logging.ERROR)
+        root, port = self.serve(no_tls_close)
+        pub, files = self.publish()
+        ftp = deploy_web.SafeFtpTls(timeout=20)
+        ftp.connect("127.0.0.1", port)
+        ftp.login("u", "p")
+        ftp.prot_p()
+        try:
+            sent = deploy_web.upload(ftp, {"ftp_dir": "/site"}, pub, log=lambda _t: None)
+        finally:
+            ftp.quit()
+        site = os.path.join(root, "site")
+        self.assertEqual(sent, 4)
+        for rel, size in files.items():
+            path = os.path.join(site, *rel.split("/"))
+            if rel.startswith("App_Data"):
+                self.assertFalse(os.path.exists(path))
+            else:
+                with open(path, "rb") as a, open(os.path.join(pub, *rel.split("/")), "rb") as b:
+                    self.assertEqual(a.read(), b.read(), rel)
+        self.assertFalse(os.path.exists(os.path.join(site, "app_offline.htm")))
+
+    def test_upload(self):
+        self.check(no_tls_close=False)
+
+    def test_upload_to_a_server_without_tls_close(self):
+        self.check(no_tls_close=True)
 
 
 class DocsTests(unittest.TestCase):

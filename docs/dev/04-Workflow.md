@@ -91,6 +91,7 @@
 | قائمة طويلة تكتبها المولّدات في VBA تُقسَّم على عدة عناصر في السطر (`gen_relations.chunks`) | خطأ «too many line continuations» (حد 24) عند البناء |
 | أدوات Python والاختبارات تعمل على Windows أيضًا: المسار يُبنى بـ `os.path.join` لا باستبدال `/` في `__file__`، و`os.path.relpath` للعرض فقط عبر `shown(...)` (المستودع على قرص والملفات المؤقتة على قرص آخر) | على جهاز صاحب المشروع (`E:` و`C:`): `test_queries` قرأ `gen_queries.py` بدل `modQueryParams.bas`، و`release.py package` توقف بـ `ValueError: path is on mount` |
 | سكربت SQL Server: `ALTER DATABASE` فقط خارج معاملة (`@@TRANCOUNT = 0`)، و`CATCH` يتراجع عن معاملة غير قابلة للحفظ (`XACT_STATE()`)، وأداة تشغيل السكربت تتصل `autocommit` | `deploy_web.py sql` على الاستضافة: الخطأ 3998 «Uncommittable transaction» في الجزء 9 |
+| رفع FTPS: لا يُغلق اتصال البيانات قبل رد الخادم 226 (وبعد FIN)، وإغلاق TLS من الخادم لا يُنتظر طويلًا، ويُفحص حجم كل ملف | `deploy_web.py upload`: `TimeoutError` في `ssl unwrap` على خادم الاستضافة، والإغلاق الفوري يقطع الملف مع رد 226 |
 
 ## 4) تشخيص خطأ يأتي من Access
 1. **اطلب الدليل الكامل:**

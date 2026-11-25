@@ -23,6 +23,7 @@ import os
 import posixpath
 import re
 import secrets
+import socket
 import string
 import subprocess
 import sys
@@ -255,8 +256,50 @@ def upload_plan(publish_dir: str) -> list:
     return plan
 
 
+class SafeFtpTls(ftplib.FTP_TLS):
+    """FTPS that works with IIS and FileZilla Server (the owner's host: TimeoutError in ssl unwrap() after STOR).
+
+    The data connection reuses the TLS session of the control connection (servers that require it refuse or hang
+    without it). At the end of a file the TLS close is sent but the server's TLS close is waited for only a few
+    seconds (some servers never send it); the sending side is then closed (FIN) and the socket is closed only after
+    the server's 226, which it sends once it has every byte. Closing the socket at once instead cut the file (a real
+    FTPS server kept 98304 of 300000 bytes and still answered 226)."""
+
+    UNWRAP_SECONDS = 5
+
+    def ntransfercmd(self, cmd, rest=None):
+        conn, size = ftplib.FTP.ntransfercmd(self, cmd, rest)
+        if self._prot_p:
+            conn = self.context.wrap_socket(conn, server_hostname=self.host, session=self.sock.session)
+        return conn, size
+
+    def storbinary(self, cmd, fp, blocksize=65536, callback=None, rest=None):
+        self.voidcmd("TYPE I")
+        conn = self.transfercmd(cmd, rest)
+        try:
+            while True:
+                buf = fp.read(blocksize)
+                if not buf:
+                    break
+                conn.sendall(buf)
+                if callback:
+                    callback(buf)
+            try:
+                conn.settimeout(self.UNWRAP_SECONDS)
+                conn = conn.unwrap()        # sends the TLS close; a server that never answers it times out here
+            except (OSError, ValueError):
+                pass
+            try:
+                conn.shutdown(socket.SHUT_WR)   # FIN: the end of the data, without a reset
+            except OSError:
+                pass
+            return self.voidresp()          # 226 = the server has the whole file
+        finally:
+            conn.close()
+
+
 def ftp_connect(settings: dict, password: str):
-    ftp = ftplib.FTP_TLS(timeout=60) if yes(settings.get("ftp_tls", "yes")) else ftplib.FTP(timeout=60)
+    ftp = SafeFtpTls(timeout=60) if yes(settings.get("ftp_tls", "yes")) else ftplib.FTP(timeout=60)
     ftp.connect(settings["ftp_host"], 21)
     ftp.login(settings["ftp_user"], password)
     if isinstance(ftp, ftplib.FTP_TLS):
@@ -277,6 +320,17 @@ def ensure_dirs(ftp, base: str, rel_dir: str, made: set) -> None:
         made.add(path)
 
 
+def check_size(ftp, remote: str, expected: int) -> None:
+    """The size on the server (SIZE) is the size of the file; a server without SIZE is trusted (its 226)."""
+    try:
+        ftp.voidcmd("TYPE I")
+        found = ftp.size(remote)
+    except ftplib.error_perm:
+        return
+    if found is not None and found != expected:
+        raise ftplib.error_reply(f"{remote}: {found} bytes on the server, {expected} sent")
+
+
 def upload(ftp, settings: dict, publish_dir: str, log=print) -> int:
     """app_offline.htm first (IIS stops the site and frees its files), every file, then app_offline.htm removed."""
     base = settings.get("ftp_dir", "/").rstrip("/") or ""
@@ -286,14 +340,28 @@ def upload(ftp, settings: dict, publish_dir: str, log=print) -> int:
     if not any(rel == "appsettings.Production.json" for rel, _ in plan):
         raise DeployError("appsettings.Production.json is not in the publish folder: run publish first")
     from io import BytesIO
-    ftp.storbinary(f"STOR {base}/app_offline.htm", BytesIO(APP_OFFLINE.encode("utf-8")))
+    try:
+        ftp.storbinary(f"STOR {base}/app_offline.htm", BytesIO(APP_OFFLINE.encode("utf-8")))
+    except ftplib.all_errors as ex:
+        raise DeployError(f"the first file (app_offline.htm) could not be sent: {type(ex).__name__}: {ex}\n"
+                          "  Check the FTP folder of the site (init), and if it is FTPS try plain FTP: "
+                          "init again, n to FTP over TLS.") from None
     made = set()
     sent = 0
     try:
         for rel, local in plan:
             ensure_dirs(ftp, base, posixpath.dirname(rel), made)
-            with open(local, "rb") as fh:
-                ftp.storbinary(f"STOR {base}/{rel}", fh)
+            try:
+                with open(local, "rb") as fh:
+                    ftp.storbinary(f"STOR {base}/{rel}", fh)
+                check_size(ftp, f"{base}/{rel}", os.path.getsize(local))
+            except ftplib.all_errors as ex:
+                raise DeployError(f"the upload stopped at {rel} ({sent} of {len(plan)} files sent): "
+                                  f"{type(ex).__name__}: {ex}\n"
+                                  "  The site shows the update page (app_offline.htm) until every file is sent: "
+                                  "run  python tools/deploy_web.py upload  again.\n"
+                                  "  If it stops on the first file every time, try plain FTP: run init again "
+                                  "and answer n to FTP over TLS.") from None
             sent += 1
             if sent % 50 == 0:
                 log(f"  {sent} / {len(plan)} files")
@@ -306,7 +374,13 @@ def upload(ftp, settings: dict, publish_dir: str, log=print) -> int:
 
 def cmd_upload(args, settings: dict) -> None:
     password = os.environ.get("RETAIL_FTP_PASSWORD") or getpass.getpass("FTP password: ")
-    ftp = ftp_connect(settings, password)
+    try:
+        ftp = ftp_connect(settings, password)
+    except ftplib.error_perm as ex:
+        raise DeployError(f"the FTP server refused the login: {ex} (check the FTP user and password)") from None
+    except ftplib.all_errors as ex:
+        raise DeployError(f"the FTP server does not answer: {type(ex).__name__}: {ex} "
+                          "(check the FTP host; if it is FTPS, try plain FTP: init again, n to FTP over TLS)") from None
     try:
         upload(ftp, settings, PUBLISH_DIR)
     finally:
