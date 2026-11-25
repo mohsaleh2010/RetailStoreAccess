@@ -56,9 +56,11 @@ python tools\release.py check
 
 ### ب) قاعدة البيانات على الاستضافة
 1. أنشئ القاعدة ومستخدمها من لوحة تحكم الاستضافة.
-2. `python tools\deploy_web.py init` (العنوان، والقاعدة، والمستخدم، وكلمة المرور، وFTP، وعنوان الموقع).
-3. أنشئ الجداول والعروض: `python tools\deploy_web.py sql` (يشغّل `dist\sql\RetailStore_Schema.sql` ثم `dist\sql\RetailStore_Queries.sql`)، أو من شاشة **SQL Server** في Access (`docs/68`)، أو من SQL Server Management Studio.
-4. **البيانات الموجودة** (محل يعمل على Access): من شاشة SQL Server في Access: نقل البيانات `TransferAllData` ثم المطابقة `CompareAllData` ثم الربط `LinkToServer` (`docs/68` و`docs/70`). محل جديد: لا نقل، والبيانات الأولية في السكربت.
+2. `python tools\deploy_web.py init` (العنوان، والقاعدة، والمستخدم، وكلمة المرور، وFTP، وعنوان الموقع). الإجابة الخاطئة يُسأل عنها مرة أخرى دون ضياع ما قبلها، وعنوان الموقع بلا `https://` يُكمَّل، و`http://` مرفوض، وEnter يُبقي القيمة السابقة (لتغيير كلمة المرور وحدها أعد `init` واضغط Enter في الباقي).
+3. **جرّب الاتصال وحده:** `python tools\deploy_web.py sql-check` يطبع اسم القاعدة وإصدار SQL Server، وينبّه إن لم يكن المستخدم `db_owner`. إن رُفض الدخول (الخطأ **18456**) فالخادم وصل والعنوان صحيح، والسبب كلمة المرور أو المستخدم أو أن المستخدم غير مُعطى لهذه القاعدة في لوحة التحكم: جرّب البيانات نفسها في SQL Server Management Studio (SQL Server Authentication). والخطأ 4060 = اسم القاعدة؛ وعدم الرد = العنوان أو المنفذ أو الاتصال البعيد غير مسموح.
+4. أنشئ الجداول والعروض: `python tools\deploy_web.py sql` (يشغّل `dist\sql\RetailStore_Schema.sql` ثم `dist\sql\RetailStore_Queries.sql`)، أو من شاشة **SQL Server** في Access (`docs/68`)، أو من SQL Server Management Studio.
+   إن توقف جزء من السكربت يُذكر الملف ورقم الجزء ورسالة الخادم؛ ما قبله محفوظ، والسكربت يُعاد بأمان.
+5. **البيانات الموجودة** (محل يعمل على Access): من شاشة SQL Server في Access: نقل البيانات `TransferAllData` ثم المطابقة `CompareAllData` ثم الربط `LinkToServer` (`docs/68` و`docs/70`). محل جديد: لا نقل، والبيانات الأولية في السكربت.
 
 ### ج) الموقع
 ```bat

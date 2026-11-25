@@ -7,6 +7,7 @@ release/web-deploy.json, holds the SQL Server password and the key of the API to
     python tools/deploy_web.py publish     dotnet publish (Windows x64) into release/web-publish + appsettings.Production.json
     python tools/deploy_web.py upload      app_offline.htm, every file but App_Data and the development files, then remove it
     python tools/deploy_web.py check       GET <site>/health: {"status":"ok"} = the site runs and reads its database
+    python tools/deploy_web.py sql-check   connect to SQL Server only: the user, the password, the database, db_owner
     python tools/deploy_web.py sql         run dist/sql/RetailStore_Schema.sql then RetailStore_Queries.sql (pip install pymssql)
     python tools/deploy_web.py all         publish, upload, check
 
@@ -70,8 +71,39 @@ def shown(path: str) -> str:
         return os.path.abspath(path)
 
 
+YES_WORDS = ("y", "yes", "true", "1", "نعم", "ن")
+NO_WORDS = ("n", "no", "false", "0", "لا", "ل")
+
+
 def yes(text) -> bool:
-    return str(text).strip().lower() in ("y", "yes", "true", "1", "نعم")
+    return str(text).strip().lower() in YES_WORDS
+
+
+def yes_no_value(text: str):
+    """'yes' / 'no' from an answer, None when it is neither (an Arabic keyboard letter, a typo): asked again."""
+    word = str(text).strip().lower()
+    if word in YES_WORDS:
+        return "yes"
+    if word in NO_WORDS:
+        return "no"
+    return None
+
+
+def normalize_site_url(text: str):
+    """(address, problem): https:// is added when no scheme is typed, the last '/' is removed; http:// is refused."""
+    url = str(text).strip().rstrip("/")
+    if not url:
+        return "", "the address of the site is needed"
+    if re.match(r"^http://", url, re.I):
+        return "", "the address of the site must be https:// (the rep app and the POS send passwords to it)"
+    if not re.match(r"^https://", url, re.I):
+        url = "https://" + url
+    if not re.match(r"^https://[A-Za-z0-9.-]+(:\d+)?(/[^\s]*)?$", url, re.I):
+        return "", "not a site address (e.g. https://erp.mysite.com)"
+    return url, ""
+
+
+YES_NO_FIELDS = ("ftp_tls", "api_docs")
 
 
 def new_jwt_key() -> str:
@@ -129,25 +161,49 @@ def production_settings(s: dict) -> dict:
     }
 
 
-def cmd_init(args) -> None:
-    old = {}
-    if os.path.exists(SETTINGS_FILE):
-        old = load_settings()
+def field_answer(key: str, value: str):
+    """(value to keep, problem) of one answer of init: a wrong answer is asked again, never loses the others."""
+    value = str(value).strip()
+    if key == "site_url":
+        return normalize_site_url(value)
+    if key in YES_NO_FIELDS:
+        answer = yes_no_value(value)
+        return (answer, "") if answer else ("", "answer yes or no (y / n)")
+    if not value:
+        return "", "an answer is needed"
+    if key.startswith("sql_") and (";" in value or value[:1] in ("'", '"')):
+        return "", "';' is not allowed, nor a quote at the start"
+    return value, ""
+
+
+def ask_settings(old: dict, ask=input, ask_secret=getpass.getpass, log=print) -> dict:
     settings = dict(old)
-    print("RetailStore web: deployment settings (kept in release/web-deploy.json on this computer only)")
     for key, question, default, secret in FIELDS:
         current = old.get(key, default)
-        if secret:
-            value = getpass.getpass(f"{question}{' [keep]' if current else ''}: ")
-        else:
-            value = input(f"{question}{f' [{current}]' if current else ''}: ")
-        settings[key] = value.strip() or current
+        while True:
+            if secret:
+                typed = ask_secret(f"{question}{' [Enter = keep]' if current else ''}: ")
+            else:
+                typed = ask(f"{question}{f' [{current}]' if current else ''}: ")
+            value, problem = field_answer(key, typed.strip() or current)
+            if not problem:
+                settings[key] = value
+                break
+            log(f"  {problem}")
     settings.setdefault("jwt_key", new_jwt_key())  # once: a new key would end every token of the phones and PCs
+    return settings
+
+
+def cmd_init(args) -> None:
+    old = load_settings() if os.path.exists(SETTINGS_FILE) else {}
+    print("RetailStore web: deployment settings (kept in release/web-deploy.json on this computer only)")
+    print("Enter keeps the value in [ ]. The password is not shown while you type it.")
+    settings = ask_settings(old)
     problem = settings_problem(settings)
     if problem:
         raise DeployError(problem)
     save_settings(settings)
-    print("Saved. Next:  python tools/deploy_web.py all")
+    print("Saved. Next:  python tools/deploy_web.py sql-check")
 
 
 def publish_command(output: str, framework_dependent: bool) -> list:
@@ -298,24 +354,86 @@ def run_scripts(connection, files: list, log=print) -> int:
     for path in files:
         with open(path, encoding="utf-8-sig") as fh:
             batches = split_batches(fh.read())
-        for batch in batches:
-            cursor.execute(batch)
-            connection.commit()
+        for number, batch in enumerate(batches, 1):
+            try:
+                cursor.execute(batch)
+                connection.commit()
+            except Exception as ex:  # noqa: BLE001 - the server's message, with where it happened
+                try:
+                    connection.rollback()
+                except Exception:  # noqa: BLE001
+                    pass
+                first = next((l.strip() for l in batch.splitlines() if l.strip() and not l.strip().startswith("--")), "")
+                raise DeployError(f"{os.path.basename(path)}, part {number} of {len(batches)} ({first[:120]}):\n"
+                                  f"  {str(ex).splitlines()[0][:400] if str(ex) else type(ex).__name__}\n"
+                                  "  The parts before it are saved; the script can be run again (it is safe to repeat).") from None
             count += 1
+            if number % 100 == 0:
+                log(f"  {os.path.basename(path)}: {number} / {len(batches)}")
         log(f"{os.path.basename(path)}: {len(batches)} batches")
     return count
 
 
-def cmd_sql(args, settings: dict) -> None:
-    try:
-        import pymssql  # noqa: WPS433 - optional
-    except ImportError as ex:
-        raise DeployError("pip install pymssql (or run the two scripts from frmSqlServer / SQL Server Management Studio)") from ex
+SQL_LOGIN_HELP = (
+    "SQL Server refused the login (error 18456): the server answered, so the address is right.\n"
+    "  - the password: run  python tools/deploy_web.py init  again (Enter keeps every other answer) and type it again;\n"
+    "  - the user: it must be the database user of the control panel, and it must be given to this database;\n"
+    "  - try the same user and password in SQL Server Management Studio (SQL Server Authentication).")
+SQL_REACH_HELP = (
+    "SQL Server does not answer: check the address and the port (address,port), that remote access to the "
+    "database is allowed in the control panel, and that no firewall blocks port 1433.")
+SQL_DATABASE_HELP = (
+    "SQL Server knows the user but not this database for it (error 4060): check the database name in the control "
+    "panel and that the user is given to it.")
+
+
+def sql_error_help(error: Exception) -> str:
+    """The advice for a refused connection, from the SQL Server error number in the message of pymssql."""
+    text = str(error)
+    numbers = [int(n) for n in re.findall(r"\((\d{3,5}),", text)] + [int(n) for n in re.findall(r"error (\d{3,5})", text, re.I)]
+    if 18456 in numbers or "Login failed" in text:
+        return SQL_LOGIN_HELP
+    if 4060 in numbers or "Cannot open database" in text:
+        return SQL_DATABASE_HELP
+    return SQL_REACH_HELP + f"\n  ({text.splitlines()[0][:200] if text else type(error).__name__})"
+
+
+def sql_connect(settings: dict, connect=None):
+    if connect is None:
+        try:
+            import pymssql  # noqa: WPS433 - optional
+        except ImportError as ex:
+            raise DeployError("pip install pymssql (or run the two scripts from frmSqlServer / "
+                              "SQL Server Management Studio)") from ex
+        connect = pymssql.connect
     server, _, port = settings["sql_server"].partition(",")
+    try:
+        return connect(server=server.strip(), port=(port.strip() or "1433"), user=settings["sql_user"],
+                       password=settings["sql_password"], database=settings["sql_database"], autocommit=False,
+                       login_timeout=30)
+    except Exception as ex:  # noqa: BLE001 - pymssql raises its own classes
+        raise DeployError(sql_error_help(ex)) from None
+
+
+def cmd_sql_check(args, settings: dict, connect=None, log=print) -> None:
+    connection = sql_connect(settings, connect)
+    try:
+        cursor = connection.cursor()
+        cursor.execute("SELECT DB_NAME(), CAST(SERVERPROPERTY('ProductVersion') AS NVARCHAR(40)), "
+                       "IS_ROLEMEMBER('db_owner')")
+        name, version, owner = cursor.fetchone()
+        log(f"Connected to {name} (SQL Server {version}).")
+        if owner != 1:
+            log("Warning: the user is not db_owner of the database: the schema script needs it "
+                "(CREATE TABLE, ALTER, CREATE VIEW). Ask the host or give it in the control panel.")
+    finally:
+        connection.close()
+
+
+def cmd_sql(args, settings: dict, connect=None) -> None:
     if not args.yes and not yes(input(f"Create / upgrade the schema of {settings['sql_database']}? yes/no: ")):
         return
-    connection = pymssql.connect(server=server, port=port or "1433", user=settings["sql_user"],
-                                 password=settings["sql_password"], database=settings["sql_database"], autocommit=False)
+    connection = sql_connect(settings, connect)
     try:
         run_scripts(connection, [os.path.join(SQL_DIR, "RetailStore_Schema.sql"),
                                  os.path.join(SQL_DIR, "RetailStore_Queries.sql")])
@@ -325,7 +443,7 @@ def cmd_sql(args, settings: dict) -> None:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("command", choices=["init", "publish", "upload", "check", "sql", "all"])
+    parser.add_argument("command", choices=["init", "publish", "upload", "check", "sql-check", "sql", "all"])
     parser.add_argument("--framework-dependent", action="store_true")
     parser.add_argument("--stdout-log", action="store_true")
     parser.add_argument("--yes", action="store_true")
@@ -339,6 +457,8 @@ def main(argv=None) -> int:
             cmd_publish(args, settings)
         if args.command in ("upload", "all"):
             cmd_upload(args, settings)
+        if args.command == "sql-check":
+            cmd_sql_check(args, settings)
         if args.command == "sql":
             cmd_sql(args, settings)
         if args.command in ("check", "all"):
@@ -347,6 +467,9 @@ def main(argv=None) -> int:
     except DeployError as ex:
         print(f"Error: {ex}")
         return 2
+    except KeyboardInterrupt:
+        print("\nCancelled: nothing was saved or sent.")
+        return 130
 
 
 if __name__ == "__main__":

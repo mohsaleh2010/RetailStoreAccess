@@ -445,6 +445,152 @@ class WindowsPathTests(unittest.TestCase):
                         self.assertIsNone(pattern.search(fh.read()), f"{folder}/{name}: use os.path.join")
 
 
+class InitAnswersTests(unittest.TestCase):
+    """init asks a wrong answer again instead of stopping at the end and losing every answer (owner's PC)."""
+
+    def run_init(self, answers, secrets_=("pw",), old=None):
+        typed, hidden, said = list(answers), list(secrets_), []
+        settings = deploy_web.ask_settings(old or {}, ask=lambda _q: typed.pop(0),
+                                           ask_secret=lambda _q: hidden.pop(0), log=said.append)
+        self.assertEqual(typed, [], "every answer used")
+        return settings, said
+
+    BASE = ["sql1.host.net", "shop", "u1", "ftp.host.net", "f1", "/"]
+
+    def test_site_without_https_is_completed(self):
+        settings, said = self.run_init(self.BASE + ["y", "store.example.net/", "y"])
+        self.assertEqual(settings["site_url"], "https://store.example.net")
+        self.assertEqual(said, [])
+        self.assertEqual(deploy_web.settings_problem(settings), "")
+
+    def test_wrong_answers_asked_again(self):
+        settings, said = self.run_init(self.BASE + ["ى", "y", "http://store.example.net", "https://store.example.net", "no"])
+        self.assertEqual(settings["ftp_tls"], "yes")
+        self.assertEqual(settings["api_docs"], "no")
+        self.assertEqual(len(said), 2)
+        self.assertIn("yes or no", said[0])
+        self.assertIn("https://", said[1])
+
+    def test_enter_keeps_the_old_values_and_the_key(self):
+        old = {"sql_server": "s", "sql_database": "d", "sql_user": "u", "sql_password": "old", "ftp_host": "f",
+               "ftp_user": "fu", "ftp_dir": "/", "ftp_tls": "yes", "site_url": "https://a.example.net",
+               "api_docs": "no", "jwt_key": "k" * 64}
+        settings, _ = self.run_init([""] * 9, secrets_=("",), old=old)
+        self.assertEqual(settings, old)
+        settings, _ = self.run_init([""] * 9, secrets_=("new",), old=old)
+        self.assertEqual(settings["sql_password"], "new")
+        self.assertEqual(settings["jwt_key"], "k" * 64)
+
+    def test_normalize(self):
+        self.assertEqual(deploy_web.normalize_site_url("HTTPS://Erp.Example.com/"), ("HTTPS://Erp.Example.com", ""))
+        self.assertTrue(deploy_web.normalize_site_url("http://a.b")[1])
+        self.assertTrue(deploy_web.normalize_site_url("")[1])
+        self.assertTrue(deploy_web.normalize_site_url("a b")[1])
+        self.assertEqual(deploy_web.yes_no_value("نعم"), "yes")
+        self.assertIsNone(deploy_web.yes_no_value("ى"))
+
+    def test_ctrl_c_is_not_a_traceback(self):
+        out = io.StringIO()
+        with mock.patch.object(deploy_web, "cmd_init", side_effect=KeyboardInterrupt), redirect_stdout(out):
+            self.assertEqual(deploy_web.main(["init"]), 130)
+        self.assertIn("Cancelled", out.getvalue())
+
+
+LOGIN_FAILED = ("(18456, b\"Login failed for user 'shop_user'.DB-Lib error message 20018, severity 14:\\n"
+                "General SQL Server error: Check messages from the SQL Server\\nDB-Lib error message 20002, severity 9:"
+                "\\nTDS server connection failed (sql1.host.net)\\n\")")
+
+
+class FakeSqlConnection:
+    def __init__(self, row=("shop", "16.0.4135.4", 1), fail_on=None):
+        self.row, self.fail_on, self.closed, self.rolled_back, self.batches = row, fail_on, False, 0, []
+
+    def cursor(self):
+        connection = self
+
+        class Cursor:
+            def execute(self, sql):
+                if connection.fail_on and connection.fail_on in sql:
+                    raise RuntimeError("(2714, b'There is already an object named X in the database.')")
+                connection.batches.append(sql)
+
+            def fetchone(self):
+                return connection.row
+        return Cursor()
+
+    def commit(self):
+        pass
+
+    def rollback(self):
+        self.rolled_back += 1
+
+    def close(self):
+        self.closed = True
+
+
+class SqlErrorTests(unittest.TestCase):
+    """deploy_web.py sql on the owner's PC: error 18456 came out as a traceback of pymssql."""
+
+    def refused(self, text):
+        def connect(**_kw):
+            raise RuntimeError(text)
+        return connect
+
+    def test_login_failed_explained(self):
+        with self.assertRaises(deploy_web.DeployError) as caught:
+            deploy_web.sql_connect(SETTINGS, self.refused(LOGIN_FAILED))
+        message = str(caught.exception)
+        self.assertIn("18456", message)
+        self.assertIn("password", message)
+        self.assertNotIn("p=w#1", message, "the password is never shown")
+
+    def test_other_errors(self):
+        self.assertEqual(deploy_web.sql_error_help(RuntimeError("(4060, b'Cannot open database shop')")),
+                         deploy_web.SQL_DATABASE_HELP)
+        self.assertIn("port", deploy_web.sql_error_help(RuntimeError("(20009, b'Unable to connect')")))
+
+    def test_connect_arguments(self):
+        seen = {}
+
+        def connect(**kw):
+            seen.update(kw)
+            return FakeSqlConnection()
+        deploy_web.sql_connect({**SETTINGS, "sql_server": " sql1.host.net , 1533 "}, connect)
+        self.assertEqual((seen["server"], seen["port"], seen["database"]), ("sql1.host.net", "1533", "shop"))
+        deploy_web.sql_connect({**SETTINGS, "sql_server": "sql1.host.net"}, connect)
+        self.assertEqual(seen["port"], "1433")
+
+    def test_sql_check(self):
+        said = []
+        connection = FakeSqlConnection(row=("shop", "16.0", 0))
+        deploy_web.cmd_sql_check(None, SETTINGS, connect=lambda **_kw: connection, log=said.append)
+        self.assertIn("Connected to shop", said[0])
+        self.assertIn("db_owner", said[1])
+        self.assertTrue(connection.closed)
+
+    def test_main_prints_no_traceback(self):
+        out = io.StringIO()
+        with mock.patch.object(deploy_web, "load_settings", return_value=SETTINGS), \
+                mock.patch.object(deploy_web, "sql_connect", side_effect=deploy_web.DeployError(deploy_web.SQL_LOGIN_HELP)), \
+                redirect_stdout(out):
+            self.assertEqual(deploy_web.main(["sql-check"]), 2)
+            self.assertEqual(deploy_web.main(["sql", "--yes"]), 2)
+        self.assertIn("Error: SQL Server refused the login", out.getvalue())
+
+    def test_failed_part_named(self):
+        connection = FakeSqlConnection(fail_on="CREATE VIEW")
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "x.sql")
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write("CREATE TABLE A (x INT)\nGO\n-- the view\nCREATE VIEW V AS SELECT 1 AS x\nGO\n")
+            with self.assertRaises(deploy_web.DeployError) as caught:
+                deploy_web.run_scripts(connection, [path], log=lambda _t: None)
+        message = str(caught.exception)
+        self.assertIn("x.sql, part 2 of 2 (CREATE VIEW V", message)
+        self.assertIn("2714", message)
+        self.assertEqual(connection.rolled_back, 1)
+
+
 class DocsTests(unittest.TestCase):
 
     def test_guide_and_rows(self):
