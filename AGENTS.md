@@ -182,6 +182,9 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
 - Controls: a check box has no `BackColor`; set only properties the control type has.
   A button paints over a label lying on it — put a **transparent** button on top of icon + label.
 - Local temp tables (`tmp*`, created in `modPOS.EnsureLocalTables`) have no defaults: write 0 explicitly.
+- A right-to-left form keeps its controls at the same distance from its right edge when its `Width` changes:
+  `FitControls` puts back the `Left` of every control its spec does not move and moves the fitted ones again after
+  the last width change (the side menu of `frmMain` had gone behind the tiles on a wide screen; `test_forms.WindowFitTests`).
 - Two screens on one table (`frmUsers` / `frmEmployeePay` on `Employees`): table handlers in
   `modForms` must check `frm.Name`.
 - Dates: set `Calendar = vbCalGreg` (Saudi PCs may default to Hijri); show dates with `GDate`.

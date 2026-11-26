@@ -431,6 +431,51 @@ class WindowFitTests(unittest.TestCase):
                         for b in solid[i + 1:]:
                             self.assertFalse(overlaps(a, b), f"{m.name} dw={dw} dh={dh}: {a.name} / {b.name}")
 
+    def test_right_to_left_width_change_puts_every_control_back(self):
+        """A right-to-left Access form keeps its controls at the same distance from its right edge when
+        FitControls changes its Width: the side menu and the header buttons of frmMain (not in the spec)
+        moved right by the extra width and went behind the dashboard tiles. FitControls keeps the Left of
+        every control the spec does not move and moves the fitted ones again after the last width change."""
+        with open(os.path.join(ROOT, "src", "vba", "modForms.bas"), encoding="utf-8") as fh:
+            text = fh.read()
+        body = text[text.index("Public Sub FitControls("):]
+        body = body[:body.index("End Sub")]
+        order = ["lefts.Add ctl.Left, ctl.Name", "If newW > frm.Width Then frm.Width = newW",
+                 "MoveFitted frm, items, dw, dh, newW, Mirror", "frm.Width = newW                             ' then",
+                 "If ctl.Left <> lefts(ctl.Name) Then ctl.Left = lefts(ctl.Name)"]
+        at = [body.index(x) for x in order]
+        self.assertEqual(at, sorted(at))
+        self.assertEqual(body.count("MoveFitted frm, items, dw, dh, newW, Mirror"), 2)
+        self.assertGreater(body.rindex("MoveFitted frm"), body.index("If ctl.Left <> lefts(ctl.Name)"))
+
+        # replay on frmMain with a form that shifts every control when its width changes (right-to-left)
+        m = next(x for x in MODELS if x.name == "frmMain")
+        design = {c.name: c.x for c in m.controls}
+        for dw in (F.cm(3), F.cm(8)):
+            left = dict(design)
+            width = m.width
+
+            def set_width(new):
+                nonlocal width
+                for k in left:
+                    left[k] += new - width
+                width = new
+
+            def move_fitted():
+                for name, (mx, mw, my, mh) in m.fit.items():
+                    left[name] = design[name] + dw * mx // 1000
+
+            kept = {k: v for k, v in left.items() if k not in m.fit}
+            set_width(m.width + dw)
+            move_fitted()
+            set_width(m.width + dw)
+            for k, v in kept.items():
+                left[k] = v
+            move_fitted()
+            for name in ("btnNavBackup", "lblNavBackup", "icoBackup", "lblAppTitle", "btnRefresh", "lblUser"):
+                self.assertEqual(left[name], design[name], (name, dw))
+            self.assertEqual(left["boxSidebar"], 0)
+
     def test_spec_names_exist_and_line_lengths(self):
         for m in MODELS:
             names = {c.name for c in m.controls}

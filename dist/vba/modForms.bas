@@ -42,8 +42,12 @@ Public Sub FitControls(ByVal frm As Access.Form, ByVal DesignW As Long, ByVal De
     ' Form_Resize of the large screens: the screen is designed at its smallest size; extra window
     ' width/height goes to the lists and grids, and the buttons follow the window edges.
     ' Spec: "name,Left,Top,Width,Height,mx,mw,my,mh;..." (m* = share of the extra size, per mille)
+    ' A right-to-left form keeps its controls at the same distance from its right edge when its width
+    ' changes: every control shifted with the width. The controls the spec does not move are put back
+    ' where they were and the fitted ones are moved again after the last width change (the side menu of
+    ' frmMain had gone behind the dashboard tiles on a wide screen).
     Dim dw As Long, dh As Long, newW As Long, newH As Long, items As Variant, f As Variant, i As Long
-    Dim L As Long, T As Long, W As Long, H As Long
+    Dim lefts As Collection, ctl As Access.Control, fitted As String
     On Error Resume Next                         ' resizing must never interrupt the user
     dw = frm.InsideWidth - DesignW
     If dw < 0 Then dw = 0
@@ -51,9 +55,34 @@ Public Sub FitControls(ByVal frm As Access.Form, ByVal DesignW As Long, ByVal De
     If dh < MinDH Then dh = MinDH
     newW = DesignW + dw
     newH = DesignH + dh
+    items = Split(Spec, ";")
+    fitted = ";"
+    For i = LBound(items) To UBound(items)
+        f = Split(items(i), ",")
+        If UBound(f) = 8 Then fitted = fitted & CStr(f(0)) & ";"
+    Next
+    Set lefts = New Collection
+    For Each ctl In frm.Controls
+        If InStr(fitted, ";" & ctl.Name & ";") = 0 Then lefts.Add ctl.Left, ctl.Name
+    Next
     If newW > frm.Width Then frm.Width = newW    ' grow first, so the controls fit while moving
     If newH > frm.Section(0).Height Then frm.Section(0).Height = newH
-    items = Split(Spec, ";")
+    MoveFitted frm, items, dw, dh, newW, Mirror
+    frm.Width = newW                             ' then shrink to the new size
+    frm.Section(0).Height = newH
+    For Each ctl In frm.Controls
+        If InStr(fitted, ";" & ctl.Name & ";") = 0 Then
+            If ctl.Left <> lefts(ctl.Name) Then ctl.Left = lefts(ctl.Name)
+        End If
+    Next
+    MoveFitted frm, items, dw, dh, newW, Mirror
+End Sub
+
+Private Sub MoveFitted(ByVal frm As Access.Form, ByVal items As Variant, ByVal dw As Long, ByVal dh As Long, _
+                       ByVal newW As Long, ByVal Mirror As Boolean)
+    ' The controls of the spec at their place for the extra width dw and height dh.
+    Dim f As Variant, i As Long, L As Long, T As Long, W As Long, H As Long
+    On Error Resume Next
     For i = LBound(items) To UBound(items)
         f = Split(items(i), ",")
         If UBound(f) = 8 Then
@@ -65,8 +94,6 @@ Public Sub FitControls(ByVal frm As Access.Form, ByVal DesignW As Long, ByVal De
             frm.Controls(CStr(f(0))).Move L, T, W, H
         End If
     Next
-    frm.Width = newW                             ' then shrink to the new size
-    frm.Section(0).Height = newH
 End Sub
 
 Public Sub FormCurrent(ByVal frm As Access.Form)

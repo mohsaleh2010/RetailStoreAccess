@@ -362,3 +362,4 @@
 | التسليم، الخطوة 5: إصلاح 9 اختبارات فشلت في أول `RunAllTests` على الخادم (كلمة محجوزة، `SET`، `ByRef`، `DLookup`، `Now()` بساعة الخادم، `DateDiff`، سر التفعيل) | ✅ |
 | التسليم، الخطوة 5: `RunAllTests` الثاني: إصلاح `TestOfficeSync` (`WholeMinutes`)، وقيم «ملخص اليوم» تظهر عند فشل `TestRepDays` | ✅ |
 | التسليم، الخطوة 5: `TestOfficeSync`: `Date - Date` رقم و`IsDate` عليه False (`OfficeSyncDue` يقبل `IsNumeric`) | ✅ |
+| التسليم، الخطوة 5: القائمة الجانبية خلف المربعات على شاشة عريضة (`FitControls` يعيد مكان العناصر بعد تغيير العرض) | ✅ |
