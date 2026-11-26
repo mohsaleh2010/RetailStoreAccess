@@ -1,0 +1,251 @@
+@page "/dev/components"
+@attribute [Authorize]
+@inject UiLanguage L
+@inject IWebHostEnvironment Env
+@inject NavigationManager Nav
+@inject IDialogService Dialogs
+@inject ISnackbar Snackbar
+
+@* The shared components of the redesign (docs/ERP-Redesign-Prompt.md, phase 3) on one page, with sample data: only in
+   Development (elsewhere the page is not found), never in the menu. *@
+@if (!Env.IsDevelopment())
+{
+    return;
+}
+
+<PageHeader Title="@L.T("معرض المكونات")" Group="@L.T("التطوير")" Icon="@Icons.Material.Outlined.Widgets"
+            Description="@L.T("المكونات المشتركة لكل الشاشات ببيانات تجريبية")">
+    <Status><StatusChip Status="DRAFT" /></Status>
+    <Actions>
+        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">@L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd></MudButton>
+        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Save" OnClick="Save">@L.T("حفظ")<kbd class="erp-kbd">F2</kbd></MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Add" OnClick="NewAsync">@L.T("جديد")<kbd class="erp-kbd">F4</kbd></MudButton>
+    </Actions>
+</PageHeader>
+<KeyboardShortcuts OnSave="Save" OnNew="NewAsync" OnPrint="Print" OnClose="CloseAll" />
+
+<MudText Typo="Typo.h6" Class="mb-2">StatCard</MudText>
+<MudGrid Spacing="3" Class="mb-4">
+    <MudItem xs="12" sm="6" md="3">
+        <StatCard Title="@L.T("مبيعات الشهر")" Icon="@Icons.Material.Outlined.PointOfSale" Change="0.124m">
+            <ValueContent><MoneyText Value="48250.75m" ShowCurrency="true" /></ValueContent>
+        </StatCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+        <StatCard Title="@L.T("مصروفات الشهر")" Icon="@Icons.Material.Outlined.Payments" Color="Color.Warning" Change="-0.035m" DownIsGood="true">
+            <ValueContent><MoneyText Value="9120m" ShowCurrency="true" /></ValueContent>
+        </StatCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+        <StatCard Title="@L.T("صافي ربح الشهر")" Icon="@Icons.Material.Outlined.TrendingDown" Color="Color.Error" Change="-0.21m">
+            <ValueContent><MoneyText Value="-1340.5m" ShowCurrency="true" /></ValueContent>
+        </StatCard>
+    </MudItem>
+    <MudItem xs="12" sm="6" md="3">
+        <StatCard Title="@L.T("أصناف تحت حد الطلب")" Value="7" Icon="@Icons.Material.Outlined.Inventory2" Color="Color.Secondary"
+                  Subtitle="@L.T("اضغط لعرض الأصناف")" Href="stock" />
+    </MudItem>
+</MudGrid>
+
+<MudPaper Outlined="true" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-3">MoneyText · QtyText · StatusChip</MudText>
+    <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="4" AlignItems="AlignItems.Center" Class="mb-3">
+        <span><MoneyText Value="1234567.5m" /></span>
+        <span><MoneyText Value="-250m" ShowCurrency="true" /></span>
+        <span><MoneyText Value="99.999m" Decimals="3" Bold="true" /></span>
+        <span><MoneyText Value="null" /></span>
+        <span><QtyText Value="12m" Unit="@items[2].Unit" /></span>
+        <span><QtyText Value="1.25m" /></span>
+        <span><QtyText Value="-3m" Unit="@items[4].Unit" /></span>
+    </MudStack>
+    <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="1">
+        @foreach (var st in statuses)
+        {
+            <StatusChip Status="@st" />
+        }
+    </MudStack>
+</MudPaper>
+
+<FilterPanel @bind-Range="period" OnShow="ShowReport" OnClear="ClearFilters" Busy="loading">
+    <MudItem xs="12" sm="6" md="4">
+        <MudSelect T="string" @bind-Value="statusFilter" Label="@L.T("الحالة")" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="true">
+            @foreach (var st in new[] { "DRAFT", "POSTED", "CANCELLED" })
+            {
+                <MudSelectItem Value="@st">@L.T(StatusStyles.For(st).Caption)</MudSelectItem>
+            }
+        </MudSelect>
+    </MudItem>
+</FilterPanel>
+
+<EntityGrid T="DemoItem" Items="Shown" SearchText="@(i => i.Code + " " + L.T(i.Name))" Export="export" ExportName="@L.T("الأصناف")"
+            Title="@L.T("الأصناف")" Loading="loading" RowClick="EditAsync" EmptyText="@L.T("أضف صنفًا بزر جديد")" Class="mb-4">
+    <Columns>
+        <PropertyColumn Property="i => i.Code" Title="@L.T("الكود")" />
+        <PropertyColumn Property="i => i.Name" Title="@L.T("الاسم")">
+            <CellTemplate>@L.T(context.Item.Name)</CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="i => i.Date" Title="@L.T("التاريخ")" HeaderClass="erp-num" CellClass="erp-num">
+            <CellTemplate>@ErpFormat.Date(context.Item.Date)</CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="i => i.Balance" Title="@L.T("الرصيد")" HeaderClass="erp-num" CellClass="erp-num">
+            <CellTemplate><QtyText Value="context.Item.Balance" Unit="@context.Item.Unit" /></CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="i => i.Price" Title="@L.T("السعر")" HeaderClass="erp-num" CellClass="erp-num">
+            <CellTemplate><MoneyText Value="context.Item.Price" /></CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="i => i.Status" Title="@L.T("الحالة")">
+            <CellTemplate><StatusChip Status="@context.Item.Status" /></CellTemplate>
+        </PropertyColumn>
+        <TemplateColumn Title="" Sortable="false" Filterable="false" CellClass="erp-num">
+            <CellTemplate>
+                <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Small" OnClick="() => EditAsync(context.Item)" aria-label="@L.T("تعديل")" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Size="Size.Small" Color="Color.Error" OnClick="() => DeleteAsync(context.Item)" aria-label="@L.T("حذف")" />
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</EntityGrid>
+
+<MudPaper Outlined="true" Class="pa-4 mb-4">
+    <MudText Typo="Typo.h6" Class="mb-3">LookupField · InvoiceLinesEditor</MudText>
+    <MudGrid Spacing="3" Class="mb-2">
+        <MudItem xs="12" md="6">
+            <LookupField T="DemoItem" Label="@L.T("الصنف")" Items="items" @bind-Value="picked" CodeOf="i => i.Code" NameOf="i => L.T(i.Name)"
+                         HelperText="@L.T("بالكود أو الاسم")">
+                <InfoTemplate Context="i"><MoneyText Value="i.Price" /></InfoTemplate>
+            </LookupField>
+        </MudItem>
+        <MudItem xs="12" md="6" Class="d-flex align-center">
+            @if (picked is { } p)
+            {
+                <MudText Typo="Typo.body2">@L.T("السعر") <MoneyText Value="p.Price" ShowCurrency="true" /> · @L.T("الرصيد") <QtyText Value="p.Balance" Unit="@p.Unit" /></MudText>
+            }
+        </MudItem>
+    </MudGrid>
+    <InvoiceLinesEditor TProduct="DemoItem" Lines="lines" Products="items" CodeOf="i => i.Code" NameOf="i => L.T(i.Name)"
+                        PriceOf="i => i.Price" VatRate="0.15m" PricesIncludeVat="true">
+        <InfoTemplate Context="i"><MoneyText Value="i.Price" /></InfoTemplate>
+    </InvoiceLinesEditor>
+</MudPaper>
+
+<MudGrid Spacing="3" Class="mb-4">
+    <MudItem xs="12" md="6">
+        <MudPaper Outlined="true" Class="pa-4" Style="height:100%">
+            <MudText Typo="Typo.h6" Class="mb-3">ConfirmDialog · EntityDialog</MudText>
+            <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="2">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="NewAsync">@L.T("صنف جديد")</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="PostAsync">@L.T("ترحيل")</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => DeleteAsync(items[0])">@L.T("حذف")</MudButton>
+            </MudStack>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" md="6">
+        <MudPaper Outlined="true">
+            <EmptyState Title="@L.T("لا توجد فواتير")" Text="@L.T("أضف أول فاتورة لتظهر هنا")" ActionText="@L.T("فاتورة جديدة")"
+                        Icon="@Icons.Material.Outlined.ReceiptLong" OnAction="NewAsync" />
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@code {
+    private static readonly string[] statuses = ["DRAFT", "APPROVED", "POSTED", "PARTIAL_PAID", "PAID", "UNPAID", "IN_TRANSIT", "PENDING", "CLOSED", "CANCELLED"];
+
+    private readonly List<DemoItem> items = DemoItem.Samples();
+
+    private List<GridExport<DemoItem>> export = [];
+    private readonly List<InvoiceLine<DemoItem>> lines = [];
+    private DateRange? period = FilterPanel.ThisMonth();
+    private string? statusFilter;
+    private string? shownStatus;
+    private bool loading;
+    private DemoItem? picked;
+
+    private IEnumerable<DemoItem> Shown => shownStatus is null ? items : items.Where(i => i.Status == shownStatus);
+
+    protected override void OnInitialized()
+    {
+        if (!Env.IsDevelopment())
+        {
+            Nav.NotFound();
+            return;
+        }
+        export =
+        [
+            new(L.T("الكود"), i => i.Code),
+            new(L.T("الاسم"), i => L.T(i.Name)),
+            new(L.T("التاريخ"), i => i.Date),
+            new(L.T("الرصيد"), i => i.Balance),
+            new(L.T("السعر"), i => i.Price),
+            new(L.T("الحالة"), i => L.T(StatusStyles.For(i.Status).Caption)),
+        ];
+        lines.Add(new InvoiceLine<DemoItem> { Product = items[0], Quantity = 2, Price = items[0].Price, VatRate = 0.15m });
+        lines.Add(new InvoiceLine<DemoItem> { Product = items[1], Quantity = 1, Price = items[1].Price, Discount = 2.75m, VatRate = 0.15m });
+    }
+
+    private async Task ShowReport()
+    {
+        loading = true;
+        await Task.Delay(400);
+        shownStatus = statusFilter;
+        loading = false;
+    }
+
+    private void ClearFilters()
+    {
+        period = FilterPanel.ThisMonth();
+        statusFilter = null;
+        shownStatus = null;
+    }
+
+    private void Save() => Snackbar.Add(L.T("تم الحفظ"), Severity.Success);
+
+    private void Print() => Snackbar.Add(L.T("طباعة"), Severity.Info);
+
+    private void CloseAll() => Snackbar.Add(L.T("إغلاق"), Severity.Normal);
+
+    private async Task NewAsync()
+    {
+        var item = new DemoItem { Date = DateTime.Today };
+        if (await ShowDialogAsync(L.T("صنف جديد"), item))
+        {
+            items.Add(item);
+            Snackbar.Add(L.T("تم الحفظ"), Severity.Success);
+        }
+    }
+
+    private async Task EditAsync(DemoItem item)
+    {
+        var copy = new DemoItem { Code = item.Code, Name = L.T(item.Name), Unit = item.Unit, Price = item.Price, Balance = item.Balance, Status = item.Status, Date = item.Date };
+        if (await ShowDialogAsync(L.T("تعديل"), copy))
+        {
+            item.Code = copy.Code;
+            item.Name = copy.Name;
+            item.Price = copy.Price;
+            Snackbar.Add(L.T("تم الحفظ"), Severity.Success);
+        }
+    }
+
+    private async Task<bool> ShowDialogAsync(string title, DemoItem item)
+    {
+        var parameters = new DialogParameters<DemoItemDialog> { { x => x.Title, title }, { x => x.Item, item } };
+        var dialog = await Dialogs.ShowAsync<DemoItemDialog>(title, parameters, EntityDialog.Options);
+        return await dialog.Result is { Canceled: false };
+    }
+
+    private async Task DeleteAsync(DemoItem item)
+    {
+        if (await ConfirmDialog.AskAsync(Dialogs, L.T("حذف الصنف"), L.T("سيُحذف الصنف نهائيًا ولا يمكن التراجع") + ": " + L.T(item.Name), L.T("حذف")))
+        {
+            items.Remove(item);
+            Snackbar.Add(L.T("تم الحذف"), Severity.Success);
+        }
+    }
+
+    private async Task PostAsync()
+    {
+        if (await ConfirmDialog.AskAsync(Dialogs, L.T("ترحيل"), L.T("بعد الترحيل لا يعدل المستند إلا بإلغاء ترحيله"), L.T("ترحيل"),
+                                         Color.Primary, Icons.Material.Outlined.TaskAlt))
+        {
+            Snackbar.Add(L.T("تم الترحيل"), Severity.Success);
+        }
+    }
+}

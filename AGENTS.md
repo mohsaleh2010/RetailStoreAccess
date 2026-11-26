@@ -232,6 +232,11 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   The web UI is MudBlazor (redesign `docs/ERP-Redesign-Prompt.md`, `docs/ui-inventory.md`): colors and fonts only from
   `RetailStore.UI/Theme/ErpTheme.cs`, `MudRTLProvider` follows `L.Dir`, the dark mode is the cookie `theme` (`UiTheme`), the side
   menu groups come from `Layout/NavGroups.cs` (a new page is a row of `WorkPages` and gets its group and icon there).
+  Pages are built from the shared components of `RetailStore.UI/Components/Shared` (`PageHeader`, `EntityGrid`, `EntityDialog`,
+  `LookupField`, `InvoiceLinesEditor`, `FilterPanel`, `MoneyText` / `QtyText`, `StatusChip`, `ConfirmDialog`, `StatCard`, `EmptyState`,
+  `KeyboardShortcuts`; gallery `/dev/components`, Development only): amounts through `MoneyText` (currency of the settings, `UiCurrency`),
+  line amounts from `InvoiceCalculator` never from the screen, dates Gregorian (`ErpFormat.DateCulture`), shortcuts through `ShortcutService`
+  (F2 save, F3 search, F4 new, Esc close, Ctrl+P print); MudBlazor texts in Arabic come from `ErpMudLocalizer`.
 - **API (`docs/77`)**: every operation under `/api/v1` names its permission with `.Needs(...)` (the user's own ones aside:
   token, password, `/me`, `/rep/profile`) and a `.WithSummary(...)` (`test_web` checks both); its logic is a service of
   `RetailStore.Data` that follows the VBA (messages identical to the VBA module, `test_web` compares those of `RepService`);

@@ -1,0 +1,140 @@
+@typeparam T
+@attribute [CascadingTypeParameter(nameof(T))]
+@inject UiLanguage L
+@inject IJSRuntime JS
+
+@* MudDataGrid as every list of the program shows it: dense, hover, striped; a quick search (SearchText, F3 goes to it),
+   column filters and sorting, pages of 25 rows, the CSV export Excel opens, a loading bar and an empty state. With
+   ServerData the server pages (phase 7); else Items are paged in memory.
+   Example: <EntityGrid T="Product" Items="products" SearchText="p => p.ProductCode + ' ' + p.ProductName"
+                        Export="exportColumns" ExportName="@L.T("الأصناف")">
+                <Columns><PropertyColumn Property="p => p.ProductName" Title="@L.T("الاسم")" /></Columns></EntityGrid> *@
+<MudDataGrid @ref="grid" T="T" Items="@(ServerData is null ? Items : null)" ServerData="ServerData" QuickFilter="Quick"
+             Dense="true" Hover="true" Striped="true" Bordered="false" Outlined="true" Elevation="0"
+             Filterable="Filterable" FilterMode="DataGridFilterMode.ColumnFilterMenu" SortMode="SortMode.Multiple"
+             ShowMenuIcon="Filterable" Loading="Loading" LoadingProgressColor="Color.Primary" RowsPerPage="RowsPerPage"
+             FixedHeader="FixedHeader" Height="@Height" Virtualize="Virtualize" RowClick="Clicked" RowClassFunc="RowClass"
+             Class="@("erp-grid " + (RowClick.HasDelegate ? "erp-grid-clickable " : "") + Class)">
+    <ToolBarContent>
+        @if (!string.IsNullOrEmpty(Title))
+        {
+            <MudText Typo="Typo.subtitle1" Class="erp-grid-title">@Title</MudText>
+        }
+        @if (ShowCount)
+        {
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Text" Class="erp-num">@Count</MudChip>
+        }
+        <MudSpacer />
+        @ToolBarContent
+        @if (SearchText is not null || SearchChanged.HasDelegate)
+        {
+            <MudTextField T="string" Value="search" ValueChanged="SearchFor" Placeholder="@(SearchPlaceholder ?? L.T("بحث"))"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Immediate="true"
+                          DebounceInterval="250" Variant="Variant.Outlined" Margin="Margin.Dense" Clearable="true"
+                          Class="erp-grid-search" data-erp-search="true" aria-label="@L.T("بحث")" />
+        }
+        @if (Export is { Count: > 0 })
+        {
+            <MudTooltip Text="@L.T("تصدير إلى Excel")">
+                <MudIconButton Icon="@Icons.Material.Outlined.FileDownload" OnClick="ExportAsync" aria-label="@L.T("تصدير إلى Excel")" />
+            </MudTooltip>
+        }
+    </ToolBarContent>
+    <Columns>@Columns</Columns>
+    <NoRecordsContent>
+        @if (NoRecordsContent is not null)
+        {
+            @NoRecordsContent
+        }
+        else
+        {
+            <EmptyState Icon="@Icons.Material.Outlined.SearchOff" Title="@(string.IsNullOrEmpty(search) ? L.T("لا توجد بيانات") : L.T("لا توجد نتائج"))"
+                        Text="@(string.IsNullOrEmpty(search) ? EmptyText : L.T("جرّب كلمة بحث أخرى"))" Class="erp-empty-compact" />
+        }
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    </LoadingContent>
+    <PagerContent>
+        @if (!Virtualize)
+        {
+            <MudDataGridPager T="T" PageSizeOptions="PageSizes" />
+        }
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    [Parameter] public IEnumerable<T>? Items { get; set; }
+    /// <summary>The rows from the server, page by page (deferred to phase 7: the services do not page yet).</summary>
+    [Parameter] public Func<GridState<T>, CancellationToken, Task<GridData<T>>>? ServerData { get; set; }
+    [Parameter] public RenderFragment? Columns { get; set; }
+    [Parameter] public RenderFragment? ToolBarContent { get; set; }
+    [Parameter] public RenderFragment? NoRecordsContent { get; set; }
+    /// <summary>The text of a row the quick search looks in (code, name ...); null = no search box.</summary>
+    [Parameter] public Func<T, string?>? SearchText { get; set; }
+    /// <summary>The search typed (with ServerData the page reloads with it).</summary>
+    [Parameter] public EventCallback<string> SearchChanged { get; set; }
+    [Parameter] public string? SearchPlaceholder { get; set; }
+    /// <summary>The columns of the CSV export; null = no export button.</summary>
+    [Parameter] public IReadOnlyList<GridExport<T>>? Export { get; set; }
+    [Parameter] public string? ExportName { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? EmptyText { get; set; }
+    [Parameter] public bool Loading { get; set; }
+    [Parameter] public bool Filterable { get; set; } = true;
+    [Parameter] public int RowsPerPage { get; set; } = 25;
+    [Parameter] public bool FixedHeader { get; set; }
+    [Parameter] public string? Height { get; set; }
+    /// <summary>A long list in one scroll instead of pages (needs Height).</summary>
+    [Parameter] public bool Virtualize { get; set; }
+    [Parameter] public bool ShowCount { get; set; } = true;
+    [Parameter] public EventCallback<T> RowClick { get; set; }
+    [Parameter] public Func<T, int, string>? RowClass { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private static readonly int[] PageSizes = [10, 25, 50, 100];
+    private MudDataGrid<T>? grid;
+    private string search = "";
+
+    /// <summary>The search typed in the box.</summary>
+    public string Search => search;
+
+    /// <summary>The rows after the search and the column filters (the export takes these).</summary>
+    public IEnumerable<T> FilteredItems => grid is null ? [] : ServerData is null ? grid.FilteredItems : grid.ServerItems;
+
+    private int Count => grid is null ? Items?.Count() ?? 0 : ServerData is null ? grid.GetFilteredItemsCount() : grid.ServerItems?.Count() ?? 0;
+
+    private bool Quick(T item)
+    {
+        if (SearchText is null || string.IsNullOrWhiteSpace(search))
+        {
+            return true;
+        }
+        return LookupMatch.Fold(SearchText(item)).Contains(LookupMatch.Fold(search), StringComparison.Ordinal);
+    }
+
+    private async Task SearchFor(string? text)
+    {
+        search = text ?? "";
+        await SearchChanged.InvokeAsync(search);
+        if (ServerData is not null && grid is not null)
+        {
+            await grid.ReloadServerData();
+        }
+    }
+
+    /// <summary>Loads the server rows again (ServerData).</summary>
+    public Task ReloadAsync() => grid?.ReloadServerData() ?? Task.CompletedTask;
+
+    private Task Clicked(DataGridRowClickEventArgs<T> e) => RowClick.InvokeAsync(e.Item);
+
+    private async Task ExportAsync()
+    {
+        if (Export is null)
+        {
+            return;
+        }
+        string csv = GridCsv.Build(FilteredItems, Export);
+        await JS.InvokeVoidAsync("erp.download", GridCsv.FileName(ExportName ?? Title ?? "export"), csv, "text/csv;charset=utf-8");
+    }
+}

@@ -1,0 +1,102 @@
+@inject UiLanguage L
+
+@* The options of a report: the period (from / to, Gregorian), the choices of the report (ChildContent, each in a MudItem)
+   and the buttons Show and Clear. Collapsible; Enter in a field does not submit anything by itself.
+   Example: <FilterPanel @bind-Range="period" OnShow="LoadAsync" OnClear="Reset">
+                <MudItem xs="12" sm="6" md="3"><MudSelect ... /></MudItem></FilterPanel> *@
+<MudPaper Outlined="true" Class="@("erp-filter mb-4 " + Class)">
+    <div class="erp-filter-head" @onclick="Toggle" role="button" tabindex="0" aria-expanded="@(expanded ? "true" : "false")"
+         @onkeydown="ToggleByKey">
+        <MudIcon Icon="@Icons.Material.Outlined.FilterList" Size="Size.Small" />
+        <MudText Typo="Typo.subtitle2">@(Title ?? L.T("خيارات التقرير"))</MudText>
+        @if (!expanded && Range is { Start: not null } r)
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary erp-num" dir="ltr">@ErpFormat.Date(r.Start) - @ErpFormat.Date(r.End)</MudText>
+        }
+        <MudSpacer />
+        @if (Collapsible)
+        {
+            <MudIcon Icon="@(expanded ? Icons.Material.Filled.ExpandLess : Icons.Material.Filled.ExpandMore)" Size="Size.Small" />
+        }
+    </div>
+    <MudCollapse Expanded="expanded">
+        <div class="pa-3 pt-0">
+            <MudGrid Spacing="3">
+                @if (ShowDates)
+                {
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudDateRangePicker DateRange="Range" DateRangeChanged="RangeChanged" Label="@L.T("الفترة")"
+                                            Variant="Variant.Outlined" Margin="Margin.Dense" DateFormat="yyyy-MM-dd"
+                                            Culture="@ErpFormat.DateCulture(L.English)" AutoClose="true" Clearable="false"
+                                            PlaceholderStart="@L.T("من تاريخ")" PlaceholderEnd="@L.T("إلى تاريخ")" />
+                    </MudItem>
+                }
+                @ChildContent
+                <MudItem xs="12" sm="6" md="4" Class="erp-filter-buttons">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Search"
+                               OnClick="Show" Disabled="Busy">@(ShowText ?? L.T("عرض"))</MudButton>
+                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.FilterAltOff" OnClick="Clear"
+                               Disabled="Busy">@L.T("مسح")</MudButton>
+                </MudItem>
+            </MudGrid>
+        </div>
+    </MudCollapse>
+</MudPaper>
+
+@code {
+    [Parameter] public DateRange? Range { get; set; }
+    [Parameter] public EventCallback<DateRange?> RangeChanged { get; set; }
+    [Parameter] public bool ShowDates { get; set; } = true;
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public EventCallback OnShow { get; set; }
+    /// <summary>Puts the options back (the owner page knows their defaults).</summary>
+    [Parameter] public EventCallback OnClear { get; set; }
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? ShowText { get; set; }
+    [Parameter] public bool Collapsible { get; set; } = true;
+    [Parameter] public bool Expanded { get; set; } = true;
+    /// <summary>A report is loading: the buttons wait.</summary>
+    [Parameter] public bool Busy { get; set; }
+    /// <summary>Folds the panel once the report is shown (more room for the results).</summary>
+    [Parameter] public bool CollapseOnShow { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private bool expanded = true;
+
+    protected override void OnInitialized() => expanded = Expanded;
+
+    /// <summary>This month: the default period of a report.</summary>
+    public static DateRange ThisMonth(DateTime? today = null)
+    {
+        var d = (today ?? DateTime.Today).Date;
+        var first = new DateTime(d.Year, d.Month, 1);
+        return new DateRange(first, first.AddMonths(1).AddDays(-1));
+    }
+
+    private void Toggle()
+    {
+        if (Collapsible)
+        {
+            expanded = !expanded;
+        }
+    }
+
+    private void ToggleByKey(KeyboardEventArgs e)
+    {
+        if (e.Key is "Enter" or " ")
+        {
+            Toggle();
+        }
+    }
+
+    private async Task Show()
+    {
+        await OnShow.InvokeAsync();
+        if (CollapseOnShow && Collapsible)
+        {
+            expanded = false;
+        }
+    }
+
+    private Task Clear() => OnClear.InvokeAsync();
+}

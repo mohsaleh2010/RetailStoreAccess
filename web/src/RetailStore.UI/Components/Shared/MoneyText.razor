@@ -1,0 +1,27 @@
+@inject UiCurrency Currency
+
+@* An amount: two decimals, thousands separators, red when negative, the currency word of the program (riyal / pound,
+   from the settings) when ShowCurrency. Example: <MoneyText Value="invoice.Total" ShowCurrency="true" /> *@
+<span class="@ClassNames"><bdi dir="ltr">@ErpFormat.Money(Value, Decimals)</bdi>@if (ShowCurrency && Value is not null && Currency.Word.Length > 0)
+{<span class="erp-currency">@Currency.Word</span>}</span>
+
+@code {
+    [Parameter] public decimal? Value { get; set; }
+    [Parameter] public bool ShowCurrency { get; set; }
+    [Parameter] public int Decimals { get; set; } = 2;
+    [Parameter] public bool Bold { get; set; }
+    /// <summary>Red when negative (default); false for a column where the sign is the meaning (debit / credit).</summary>
+    [Parameter] public bool ColorNegative { get; set; } = true;
+    [Parameter] public string? Class { get; set; }
+
+    private string ClassNames =>
+        "erp-num erp-money" + (Bold ? " erp-bold" : "") + (ColorNegative && Value < 0 ? " erp-negative" : "") + (Class is null ? "" : " " + Class);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (ShowCurrency)
+        {
+            await Currency.EnsureAsync();
+        }
+    }
+}

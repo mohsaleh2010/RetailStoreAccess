@@ -12,6 +12,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<UiLanguage>();
         services.AddScoped<UiTheme>();
+        services.AddScoped<UiCurrency>();
+        services.AddScoped<ShortcutService>();
+        services.AddTransient<MudBlazor.MudLocalizer, ErpMudLocalizer>();   // before AddMudServices of the host
         services.AddScoped<IStoreInfo, StoreInfo>();
         services.AddScoped<PermissionService>();
         services.AddScoped<DataScreenService>();

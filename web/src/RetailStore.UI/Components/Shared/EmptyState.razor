@@ -1,0 +1,31 @@
+@* Nothing to show yet: an icon, a title, a line of help and an action.
+   Example: <EmptyState Title="@L.T("لا توجد فواتير")" Text="..." ActionText="@L.T("فاتورة جديدة")" OnAction="New" /> *@
+<div class="erp-empty @Class" role="status">
+    <MudIcon Icon="@Icon" Class="erp-empty-icon" />
+    @if (!string.IsNullOrEmpty(Title))
+    {
+        <MudText Typo="Typo.subtitle1" Class="erp-empty-title">@Title</MudText>
+    }
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <MudText Typo="Typo.body2" Class="mud-text-secondary">@Text</MudText>
+    }
+    @if (!string.IsNullOrEmpty(ActionText))
+    {
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@ActionIcon" Href="@ActionHref"
+                   OnClick="OnAction" Class="mt-3">@ActionText</MudButton>
+    }
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public string Icon { get; set; } = Icons.Material.Outlined.Inbox;
+    [Parameter] public string? Title { get; set; }
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public string? ActionText { get; set; }
+    [Parameter] public string ActionIcon { get; set; } = Icons.Material.Outlined.Add;
+    [Parameter] public string? ActionHref { get; set; }
+    [Parameter] public EventCallback OnAction { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public string? Class { get; set; }
+}

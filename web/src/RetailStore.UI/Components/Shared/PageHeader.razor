@@ -1,0 +1,59 @@
+@inject UiLanguage L
+
+@* The head of every page: the title (the h1 the router focuses), the path of the page, a description, the status of the
+   document and the action buttons. Texts are passed already in the interface language.
+   Example: <PageHeader Title="@L.T("الأصناف")" Group="@L.T("المخازن")" Icon="@Icons.Material.Outlined.Category">
+                <Actions><MudButton Variant="Variant.Filled" Color="Color.Primary">@L.T("جديد")</MudButton></Actions></PageHeader> *@
+@if (SetPageTitle)
+{
+    <PageTitle>@Title</PageTitle>
+}
+<header class="erp-page-header mb-4">
+    @if (Crumbs is { Count: > 0 } items)
+    {
+        <MudBreadcrumbs Items="items" Class="erp-breadcrumbs" />
+    }
+    <div class="erp-page-header-row">
+        <div class="erp-page-title">
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <span class="erp-page-icon"><MudIcon Icon="@Icon" /></span>
+            }
+            <div>
+                <div class="erp-page-title-line">
+                    <MudText Typo="Typo.h5" HtmlTag="h1" tabindex="-1">@Title</MudText>
+                    @Status
+                </div>
+                @if (!string.IsNullOrEmpty(Description))
+                {
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">@Description</MudText>
+                }
+            </div>
+        </div>
+        @if (Actions is not null)
+        {
+            <div class="erp-page-actions no-print">@Actions</div>
+        }
+    </div>
+</header>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = "";
+    [Parameter] public string? Description { get; set; }
+    [Parameter] public string? Icon { get; set; }
+    /// <summary>The group of the menu: the path becomes Home / group / title.</summary>
+    [Parameter] public string? Group { get; set; }
+    /// <summary>The whole path, when Group is not enough.</summary>
+    [Parameter] public IReadOnlyList<BreadcrumbItem>? Breadcrumbs { get; set; }
+    [Parameter] public RenderFragment? Status { get; set; }
+    [Parameter] public RenderFragment? Actions { get; set; }
+    [Parameter] public bool SetPageTitle { get; set; } = true;
+
+    private IReadOnlyList<BreadcrumbItem>? Crumbs =>
+        Breadcrumbs ?? (Group is null ? null :
+        [
+            new BreadcrumbItem(L.T("الرئيسية"), href: "", icon: Icons.Material.Outlined.Home),
+            new BreadcrumbItem(Group, href: null, disabled: true),
+            new BreadcrumbItem(Title, href: null, disabled: true),
+        ]);
+}

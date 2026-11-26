@@ -1,0 +1,111 @@
+@implements IAsyncDisposable
+@inject UiLanguage L
+@inject ShortcutService Shortcuts
+
+@* The frame of an add / edit dialog: a MudForm (the fields marked Required are checked first), the message of the
+   service when it refuses, and the fixed Save / Cancel buttons (F2 saves, Esc closes). The rules and messages stay
+   those of the service: OnSave returns "" or its message (in Arabic, shown through L.T).
+   Example, in a dialog component shown with Dialogs.ShowAsync<ProductDialog>(title, parameters, EntityDialog.Options):
+       <EntityDialog Title="@L.T("صنف جديد")" OnSave="SaveAsync">
+           <MudTextField @bind-Value="name" Label="@L.T("الاسم")" Required="true" Variant="Variant.Outlined" Margin="Margin.Dense" />
+       </EntityDialog> *@
+<MudDialog Class="erp-dialog" ContentClass="erp-dialog-content">
+    <TitleContent>
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <MudIcon Icon="@Icon" Color="Color.Primary" />
+            }
+            <MudText Typo="Typo.h6">@Title</MudText>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudForm @ref="form" Model="Model" Spacing="3">
+            @if (!string.IsNullOrEmpty(problem))
+            {
+                <MudAlert Severity="Severity.Error" Dense="true" Variant="Variant.Outlined" role="alert">@L.T(problem)</MudAlert>
+            }
+            @ChildContent
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Cancel" Disabled="saving">@L.T("إلغاء")</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save" OnClick="SaveAsync"
+                   Disabled="saving || ReadOnly">
+            @(SaveText ?? L.T("حفظ"))<kbd class="erp-kbd">F2</kbd>
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    /// <summary>The options of an add / edit dialog: medium width, Esc closes, a click outside does not.</summary>
+    public static DialogOptions Options => new() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseOnEscapeKey = true, BackdropClick = false };
+
+    [CascadingParameter] private IMudDialogInstance Dialog { get; set; } = default!;
+
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string? Icon { get; set; }
+    [Parameter] public object? Model { get; set; }
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    /// <summary>Saves; "" = saved (the dialog closes with true), else the message of the service.</summary>
+    [Parameter] public Func<Task<string>>? OnSave { get; set; }
+    [Parameter] public string? SaveText { get; set; }
+    [Parameter] public bool ReadOnly { get; set; }
+
+    private MudForm? form;
+    private string problem = "";
+    private bool saving;
+    private IAsyncDisposable? f2;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            f2 = await Shortcuts.RegisterAsync(ErpKey.Save, () => InvokeAsync(SaveAsync));
+        }
+    }
+
+    /// <summary>The problem to show (a message of the service kept outside OnSave).</summary>
+    public void ShowProblem(string message)
+    {
+        problem = message;
+        StateHasChanged();
+    }
+
+    private async Task SaveAsync()
+    {
+        if (saving || ReadOnly || form is null)
+        {
+            return;
+        }
+        await form.ValidateAsync();
+        if (!form.IsValid)
+        {
+            return;
+        }
+        saving = true;
+        problem = "";
+        try
+        {
+            problem = OnSave is null ? "" : await OnSave();
+        }
+        finally
+        {
+            saving = false;
+        }
+        if (problem.Length == 0)
+        {
+            Dialog.Close(DialogResult.Ok(true));
+        }
+    }
+
+    private void Cancel() => Dialog.Cancel();
+
+    public async ValueTask DisposeAsync()
+    {
+        if (f2 is not null)
+        {
+            await f2.DisposeAsync();
+        }
+    }
+}

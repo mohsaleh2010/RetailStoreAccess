@@ -1,0 +1,17 @@
+@inject UiLanguage L
+
+@* The status of a document in its color: DRAFT, POSTED, APPROVED, PARTIAL_PAID, PAID, CANCELLED ... (StatusStyles).
+   Example: <StatusChip Status="@order.Status" /> ; <StatusChip Text="@L.T("مُرحَّل")" Color="Color.Success" /> *@
+<MudChip T="string" Size="Size.Small" Variant="Variant.Text" Color="@(Color ?? style.Color)" Icon="@style.Icon"
+         Class="erp-status-chip" title="@Status">@(Text ?? L.T(style.Caption))</MudChip>
+
+@code {
+    [Parameter] public string? Status { get; set; }
+    /// <summary>The caption, already in the interface language (else that of the status).</summary>
+    [Parameter] public string? Text { get; set; }
+    [Parameter] public Color? Color { get; set; }
+
+    private StatusStyle style = StatusStyles.For(null);
+
+    protected override void OnParametersSet() => style = StatusStyles.For(Status);
+}

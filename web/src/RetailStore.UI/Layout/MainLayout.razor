@@ -10,7 +10,7 @@
 <MudRTLProvider RightToLeft="@(L.Dir == "rtl")">
     <MudThemeProvider Theme="ErpTheme.Theme" IsDarkMode="@Mode.Dark" />
     <MudPopoverProvider />
-    <MudDialogProvider />
+    <MudDialogProvider CloseOnEscapeKey="true" />
     <MudSnackbarProvider />
 
     <MudLayout Class="erp-app">

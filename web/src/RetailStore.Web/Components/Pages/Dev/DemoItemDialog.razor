@@ -1,0 +1,21 @@
+@inject UiLanguage L
+
+@* The EntityDialog of the gallery: a required name, a price the "service" refuses below zero. *@
+<EntityDialog Title="@Title" Icon="@Icons.Material.Outlined.Category" Model="Item" OnSave="SaveAsync">
+    <MudTextField @bind-Value="Item.Code" Label="@L.T("الكود")" Variant="Variant.Outlined" Margin="Margin.Dense" />
+    <MudTextField @bind-Value="Item.Name" Label="@L.T("الاسم")" Required="true" RequiredError="@L.T("مطلوب")"
+                  Variant="Variant.Outlined" Margin="Margin.Dense" AutoFocus="true" />
+    <MudNumericField @bind-Value="Item.Price" Label="@L.T("السعر")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                     HideSpinButtons="true" Format="0.00" />
+</EntityDialog>
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public DemoItem Item { get; set; } = new();
+
+    private async Task<string> SaveAsync()
+    {
+        await Task.Delay(300);
+        return Item.Price < 0 ? DemoItem.NegativePrice : "";
+    }
+}

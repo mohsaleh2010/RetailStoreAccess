@@ -1,0 +1,16 @@
+@inject UiLanguage L
+
+@* A quantity: up to three decimals, red when negative (stock below zero), the unit after it.
+   Example: <QtyText Value="line.Quantity" Unit="@line.UnitName" /> *@
+<span class="@ClassNames"><bdi dir="ltr">@ErpFormat.Qty(Value)</bdi>@if (!string.IsNullOrEmpty(Unit) && Value is not null)
+{<span class="erp-unit">@L.T(Unit)</span>}</span>
+
+@code {
+    [Parameter] public decimal? Value { get; set; }
+    /// <summary>The unit (Arabic, translated here).</summary>
+    [Parameter] public string? Unit { get; set; }
+    [Parameter] public bool ColorNegative { get; set; } = true;
+    [Parameter] public string? Class { get; set; }
+
+    private string ClassNames => "erp-num erp-qty" + (ColorNegative && Value < 0 ? " erp-negative" : "") + (Class is null ? "" : " " + Class);
+}

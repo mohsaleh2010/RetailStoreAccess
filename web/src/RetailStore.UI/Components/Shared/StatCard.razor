@@ -1,0 +1,55 @@
+@inject UiLanguage L
+
+@* A figure of the dashboard: a large number, its title, an icon and the change from the period before.
+   Example: <StatCard Title="@L.T("مبيعات الشهر")" Icon="@Icons.Material.Outlined.PointOfSale" Change="0.124m">
+                <ValueContent><MoneyText Value="f.MonthSales" ShowCurrency="true" /></ValueContent></StatCard> *@
+<MudPaper Outlined="true" Class="@("erp-stat pa-4 " + (Href is null ? "" : "erp-stat-link ") + Class)" @onclick="Open">
+    <div class="erp-stat-top">
+        <MudText Typo="Typo.body2" Class="erp-stat-title">@Title</MudText>
+        <span class="@($"erp-stat-icon mud-{Color.ToString().ToLowerInvariant()}-text")"><MudIcon Icon="@Icon" /></span>
+    </div>
+    <div class="erp-stat-value erp-num">@if (ValueContent is not null) { @ValueContent } else { @Value }</div>
+    <div class="erp-stat-foot">
+        @if (Change is { } c)
+        {
+            bool good = DownIsGood ? c <= 0 : c >= 0;
+            <span class="@("erp-stat-change " + (c == 0 ? "" : good ? "mud-success-text" : "mud-error-text"))" dir="ltr">
+                <MudIcon Icon="@(c > 0 ? Icons.Material.Filled.ArrowUpward : c < 0 ? Icons.Material.Filled.ArrowDownward : Icons.Material.Filled.Remove)"
+                         Size="Size.Small" />@ErpFormat.Percent(Math.Abs(c))
+            </span>
+            <span class="mud-text-secondary">@(ChangeLabel ?? L.T("عن الفترة السابقة"))</span>
+        }
+        else if (!string.IsNullOrEmpty(Subtitle))
+        {
+            <span class="mud-text-secondary">@Subtitle</span>
+        }
+    </div>
+</MudPaper>
+
+@code {
+    [Inject] private NavigationManager Nav { get; set; } = default!;
+
+    [Parameter] public string? Title { get; set; }
+    /// <summary>The figure as text; ValueContent for a MoneyText / QtyText.</summary>
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public RenderFragment? ValueContent { get; set; }
+    [Parameter] public string Icon { get; set; } = Icons.Material.Outlined.Insights;
+    [Parameter] public Color Color { get; set; } = Color.Primary;
+    /// <summary>The change from the period before, a fraction (0.12 = up 12%).</summary>
+    [Parameter] public decimal? Change { get; set; }
+    /// <summary>For a cost: a fall is shown in green.</summary>
+    [Parameter] public bool DownIsGood { get; set; }
+    [Parameter] public string? ChangeLabel { get; set; }
+    [Parameter] public string? Subtitle { get; set; }
+    /// <summary>A screen the card opens.</summary>
+    [Parameter] public string? Href { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    private void Open()
+    {
+        if (Href is not null)
+        {
+            Nav.NavigateTo(Href);
+        }
+    }
+}

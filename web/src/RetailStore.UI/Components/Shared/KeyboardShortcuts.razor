@@ -1,0 +1,46 @@
+@implements IAsyncDisposable
+@inject ShortcutService Shortcuts
+
+@* The shortcuts of a page: F2 save, F3 search, F4 new, Esc close, Ctrl+P print. Only the keys given a handler are
+   taken from the browser (F3 without one focuses the search box of the page).
+   Example: <KeyboardShortcuts OnSave="Save" OnNew="New" OnPrint="Print" /> *@
+
+@code {
+    [Parameter] public EventCallback OnSave { get; set; }
+    [Parameter] public EventCallback OnSearch { get; set; }
+    [Parameter] public EventCallback OnNew { get; set; }
+    [Parameter] public EventCallback OnClose { get; set; }
+    [Parameter] public EventCallback OnPrint { get; set; }
+
+    private readonly List<IAsyncDisposable> registrations = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+        await Add(ErpKey.Save, OnSave);
+        await Add(ErpKey.Search, OnSearch);
+        await Add(ErpKey.New, OnNew);
+        await Add(ErpKey.Close, OnClose);
+        await Add(ErpKey.Print, OnPrint);
+    }
+
+    private async Task Add(ErpKey key, EventCallback callback)
+    {
+        if (callback.HasDelegate)
+        {
+            registrations.Add(await Shortcuts.RegisterAsync(key, () => InvokeAsync(() => callback.InvokeAsync())));
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        foreach (var r in registrations)
+        {
+            await r.DisposeAsync();
+        }
+        registrations.Clear();
+    }
+}

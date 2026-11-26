@@ -1,0 +1,55 @@
+@inject UiLanguage L
+
+@* A question before a delete or a posting, said plainly. Texts are passed already in the interface language.
+   Example: if (await ConfirmDialog.AskAsync(Dialogs, L.T("حذف الصنف"), L.T("..."), L.T("حذف"))) { ... } *@
+<MudDialog Class="erp-dialog erp-confirm">
+    <TitleContent>
+        <MudStack Row="true" AlignItems="AlignItems.Center" Spacing="2">
+            <MudIcon Icon="@(Icon ?? DefaultIcon)" Color="Color" />
+            <MudText Typo="Typo.h6">@Title</MudText>
+        </MudStack>
+    </TitleContent>
+    <DialogContent>
+        <MudText Typo="Typo.body1" Class="erp-confirm-message">@Message</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Text" OnClick="Cancel">@(CancelText ?? L.T("إلغاء"))</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color" OnClick="Confirm" autofocus>@(ConfirmText ?? L.T("تأكيد"))</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] private IMudDialogInstance Dialog { get; set; } = default!;
+
+    [Parameter] public string Title { get; set; } = "";
+    [Parameter] public string Message { get; set; } = "";
+    [Parameter] public string? ConfirmText { get; set; }
+    [Parameter] public string? CancelText { get; set; }
+    /// <summary>Error for a delete (the default), Primary for a posting.</summary>
+    [Parameter] public Color Color { get; set; } = Color.Error;
+    [Parameter] public string? Icon { get; set; }
+
+    private string DefaultIcon => Color == Color.Error ? Icons.Material.Outlined.DeleteForever : Icons.Material.Outlined.HelpOutline;
+
+    private void Confirm() => Dialog.Close(DialogResult.Ok(true));
+
+    private void Cancel() => Dialog.Cancel();
+
+    /// <summary>Asks and answers true only on the confirm button (Esc, the backdrop or cancel = false).</summary>
+    public static async Task<bool> AskAsync(IDialogService dialogs, string title, string message, string? confirmText = null,
+                                            Color color = Color.Error, string? icon = null)
+    {
+        var parameters = new DialogParameters<ConfirmDialog>
+        {
+            { x => x.Title, title },
+            { x => x.Message, message },
+            { x => x.ConfirmText, confirmText },
+            { x => x.Color, color },
+            { x => x.Icon, icon },
+        };
+        var options = new DialogOptions { MaxWidth = MaxWidth.ExtraSmall, FullWidth = true, CloseOnEscapeKey = true, BackdropClick = true };
+        var dialog = await dialogs.ShowAsync<ConfirmDialog>(title, parameters, options);
+        var result = await dialog.Result;
+        return result is { Canceled: false };
+    }
+}

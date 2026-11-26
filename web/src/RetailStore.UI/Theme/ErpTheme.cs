@@ -34,6 +34,8 @@ public static class ErpTheme
             ActionDefault = "#4B5563",
             LinesDefault = "#E2E8F0",
             TableLines = "#E2E8F0",
+            TableStriped = "rgba(15,23,42,0.025)",
+            TableHover = "rgba(30,58,95,0.06)",
             Divider = "#E2E8F0",
         },
         PaletteDark = new PaletteDark
@@ -61,6 +63,8 @@ public static class ErpTheme
             ActionDefault = "#CBD5E1",
             LinesDefault = "#334155",
             TableLines = "#334155",
+            TableStriped = "rgba(255,255,255,0.03)",
+            TableHover = "rgba(96,165,250,0.08)",
             Divider = "#334155",
         },
         Typography = new Typography

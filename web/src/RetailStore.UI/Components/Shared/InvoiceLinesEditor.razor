@@ -1,0 +1,247 @@
+@typeparam TProduct
+@implements IAsyncDisposable
+@inject UiLanguage L
+@inject IJSRuntime JS
+
+@* The lines of a document: the item (LookupField), quantity, price, discount, VAT rate, and the amounts of each line
+   and the totals from the invoice engine of the program (InvoiceCalculator = modSales.CalcRun; its message shows when
+   a line is wrong). Keyboard: Enter goes to the next cell, after the last cell a new line; Delete on an empty cell (or
+   Ctrl+Delete) removes the line. The posting service checks and computes everything again.
+   Example: <InvoiceLinesEditor TProduct="Product" Lines="lines" Products="products" CodeOf="p => p.ProductCode"
+                                NameOf="p => p.ProductName" PriceOf="p => p.SalePrice" VatRate="0.15m" PricesIncludeVat="true"
+                                OnChange="Recalculated" /> *@
+<div class="erp-lines @Class">
+    <MudSimpleTable Dense="true" Hover="true" Bordered="false" Striped="false" Elevation="0" Outlined="true" Class="erp-lines-table">
+        <thead>
+            <tr>
+                <th class="erp-lines-no">#</th>
+                <th class="erp-lines-product">@L.T("الصنف")</th>
+                <th class="erp-num erp-lines-qty">@L.T("الكمية")</th>
+                <th class="erp-num erp-lines-price">@L.T("السعر")</th>
+                <th class="erp-num erp-lines-disc">@L.T("الخصم")</th>
+                @if (ShowVat)
+                {
+                    <th class="erp-num erp-lines-rate">@L.T("الضريبة %")</th>
+                    <th class="erp-num">@L.T("الضريبة")</th>
+                }
+                <th class="erp-num">@L.T("الإجمالي")</th>
+                <th class="erp-lines-del"><span class="erp-sr-only">@L.T("حذف السطر")</span></th>
+            </tr>
+        </thead>
+        <tbody @ref="body">
+            @for (int i = 0; i < Lines.Count; i++)
+            {
+                int row = i;
+                var line = Lines[row];
+                <tr data-row="@row" @key="line">
+                    <td class="erp-lines-no erp-num">@(row + 1)</td>
+                    <td data-cell class="erp-lines-product">
+                        <LookupField T="TProduct" Value="line.Product" ValueChanged="p => Picked(row, p)" Items="Products"
+                                     SearchFunc="SearchProducts" CodeOf="CodeOf" NameOf="NameOf" InfoTemplate="InfoTemplate"
+                                     Placeholder="@L.T("الصنف بالكود أو الاسم")" ReadOnly="ReadOnly" />
+                    </td>
+                    <td data-cell class="erp-lines-qty">
+                        <MudNumericField T="decimal" Value="line.Quantity" ValueChanged="v => Set(row, l => l.Quantity = v)"
+                                         Min="0" HideSpinButtons="true" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                         ReadOnly="ReadOnly" Class="erp-cell-num" aria-label="@L.T("الكمية")" />
+                    </td>
+                    <td data-cell class="erp-lines-price">
+                        <MudNumericField T="decimal" Value="line.Price" ValueChanged="v => Set(row, l => l.Price = v)"
+                                         Min="0" HideSpinButtons="true" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                         ReadOnly="ReadOnly || !PriceEditable" Format="0.00##" Class="erp-cell-num"
+                                         aria-label="@L.T("السعر")" />
+                    </td>
+                    <td data-cell class="erp-lines-disc">
+                        <MudNumericField T="decimal" Value="line.Discount" ValueChanged="v => Set(row, l => l.Discount = v)"
+                                         Min="0" HideSpinButtons="true" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                         ReadOnly="ReadOnly" Format="0.00" Class="erp-cell-num" aria-label="@L.T("الخصم")" />
+                    </td>
+                    @if (ShowVat)
+                    {
+                        <td class="erp-num erp-lines-rate">@ErpFormat.Percent(line.VatRate)</td>
+                        <td class="erp-num"><MoneyText Value="line.Amounts?.Tax" /></td>
+                    }
+                    <td class="erp-num erp-lines-total"><MoneyText Value="line.Amounts?.Total" Bold="true" /></td>
+                    <td class="erp-lines-del">
+                        @if (!ReadOnly && !(line.IsEmpty && row == Lines.Count - 1))
+                        {
+                            <MudIconButton Icon="@Icons.Material.Outlined.DeleteOutline" Size="Size.Small" Color="Color.Error"
+                                           OnClick="() => RemoveAsync(row)" aria-label="@L.T("حذف السطر")" tabindex="-1" />
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+        @if (ShowTotals)
+        {
+            <tfoot>
+                <tr class="erp-lines-sum">
+                    <td colspan="@(ShowVat ? 6 : 5)" class="erp-lines-hint">
+                        @if (!ReadOnly)
+                        {
+                            <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Outlined.Add" OnClick="AddLineAsync">@L.T("سطر جديد")</MudButton>
+                            <span class="mud-text-secondary erp-keys-hint"><kbd class="erp-kbd">Enter</kbd> @L.T("الخانة التالية") <kbd class="erp-kbd">Delete</kbd> @L.T("حذف السطر من خانة فارغة")</span>
+                        }
+                    </td>
+                    @if (ShowVat)
+                    {
+                        <td class="erp-num"><MoneyText Value="Result.Tax" /></td>
+                    }
+                    <td class="erp-num"><MoneyText Value="Result.Total" Bold="true" /></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        }
+    </MudSimpleTable>
+    @if (!Result.Ok)
+    {
+        <MudAlert Severity="Severity.Warning" Dense="true" Variant="Variant.Outlined" Class="mt-2" role="alert">@L.T(Result.Problem)</MudAlert>
+    }
+    @if (ShowTotals && ShowSummary)
+    {
+        <div class="erp-lines-totals">
+            <div><span>@L.T("الإجمالي قبل الخصم")</span><MoneyText Value="Result.SubTotal" /></div>
+            <div><span>@L.T("الخصم")</span><MoneyText Value="Result.Discount" /></div>
+            <div><span>@L.T("الإجمالي قبل الضريبة")</span><MoneyText Value="Result.Taxable" /></div>
+            @if (ShowVat)
+            {
+                <div><span>@L.T("الضريبة")</span><MoneyText Value="Result.Tax" /></div>
+            }
+            <div class="erp-lines-grand"><span>@L.T("الإجمالي")</span><MoneyText Value="Result.Total" ShowCurrency="true" Bold="true" /></div>
+        </div>
+    }
+</div>
+
+@code {
+    /// <summary>The lines, changed in place; an empty line is kept at the end for the next item.</summary>
+    [Parameter, EditorRequired] public List<InvoiceLine<TProduct>> Lines { get; set; } = [];
+    [Parameter] public IEnumerable<TProduct>? Products { get; set; }
+    [Parameter] public Func<string?, CancellationToken, Task<IEnumerable<TProduct>>>? SearchProducts { get; set; }
+    [Parameter] public Func<TProduct, string?>? CodeOf { get; set; }
+    [Parameter, EditorRequired] public Func<TProduct, string?> NameOf { get; set; } = default!;
+    /// <summary>The price a line takes when its item is chosen (the price rules stay those of the service).</summary>
+    [Parameter] public Func<TProduct, decimal>? PriceOf { get; set; }
+    /// <summary>The VAT rate of an item (a fraction); else VatRate.</summary>
+    [Parameter] public Func<TProduct, decimal>? VatRateOf { get; set; }
+    [Parameter] public decimal VatRate { get; set; }
+    [Parameter] public bool PricesIncludeVat { get; set; }
+    [Parameter] public decimal InvoiceDiscount { get; set; }
+    [Parameter] public RenderFragment<TProduct>? InfoTemplate { get; set; }
+    [Parameter] public bool ShowVat { get; set; } = true;
+    [Parameter] public bool ShowTotals { get; set; } = true;
+    /// <summary>The block of totals under the table (the B template puts its own card beside it).</summary>
+    [Parameter] public bool ShowSummary { get; set; } = true;
+    [Parameter] public bool PriceEditable { get; set; } = true;
+    [Parameter] public bool ReadOnly { get; set; }
+    /// <summary>After every change: the result of the engine (totals, or the problem).</summary>
+    [Parameter] public EventCallback<CalcResult> OnChange { get; set; }
+    [Parameter] public string? Class { get; set; }
+
+    /// <summary>The totals of the lines as the engine computed them.</summary>
+    public CalcResult Result { get; private set; } = new("", [], 0, 0, 0, 0, 0, 0);
+
+    private ElementReference body;
+    private DotNetObjectReference<InvoiceLinesEditor<TProduct>>? self;
+    private (int Row, int Cell)? focus;
+
+    protected override void OnParametersSet()
+    {
+        EnsureEmptyLine();
+        Result = InvoiceLines.Calculate(Lines, InvoiceDiscount, PricesIncludeVat);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !ReadOnly)
+        {
+            self = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("erp.lines.attach", body, self);
+        }
+        if (focus is { } f)
+        {
+            focus = null;
+            await JS.InvokeVoidAsync("erp.lines.focusCell", body, f.Row, f.Cell);
+        }
+    }
+
+    private void EnsureEmptyLine()
+    {
+        if (!ReadOnly && (Lines.Count == 0 || !Lines[^1].IsEmpty))
+        {
+            Lines.Add(new InvoiceLine<TProduct> { VatRate = VatRate });
+        }
+    }
+
+    private async Task ChangedAsync()
+    {
+        EnsureEmptyLine();
+        Result = InvoiceLines.Calculate(Lines, InvoiceDiscount, PricesIncludeVat);
+        await OnChange.InvokeAsync(Result);
+    }
+
+    private async Task Picked(int row, TProduct? product)
+    {
+        var line = Lines[row];
+        line.Product = product;
+        if (product is not null)
+        {
+            if (PriceOf is not null)
+            {
+                line.Price = PriceOf(product);
+            }
+            line.VatRate = VatRateOf?.Invoke(product) ?? VatRate;
+            if (line.Quantity <= 0)
+            {
+                line.Quantity = 1;
+            }
+            focus = (row, 1);
+        }
+        await ChangedAsync();
+    }
+
+    private Task Set(int row, Action<InvoiceLine<TProduct>> change)
+    {
+        change(Lines[row]);
+        return ChangedAsync();
+    }
+
+    private async Task AddLineAsync()
+    {
+        EnsureEmptyLine();
+        focus = (Lines.Count - 1, 0);
+        await ChangedAsync();
+    }
+
+    private async Task RemoveAsync(int row)
+    {
+        if (row < 0 || row >= Lines.Count || (Lines[row].IsEmpty && row == Lines.Count - 1))
+        {
+            return;
+        }
+        Lines.RemoveAt(row);
+        focus = (Math.Min(row, Lines.Count - 1), 0);
+        await ChangedAsync();
+    }
+
+    /// <summary>Enter after the last cell (erp.js): the empty line at the end, or a new one.</summary>
+    [JSInvokable]
+    public async Task AddLineFromKeyboard()
+    {
+        await AddLineAsync();
+        StateHasChanged();
+    }
+
+    /// <summary>Delete on an empty cell, or Ctrl+Delete (erp.js).</summary>
+    [JSInvokable]
+    public async Task RemoveLineFromKeyboard(int row)
+    {
+        await RemoveAsync(row);
+        StateHasChanged();
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        self?.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}
