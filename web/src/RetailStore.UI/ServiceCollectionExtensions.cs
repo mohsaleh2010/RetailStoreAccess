@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddRetailStoreUi(this IServiceCollection services)
     {
         services.AddScoped<UiLanguage>();
+        services.AddScoped<UiTheme>();
         services.AddScoped<IStoreInfo, StoreInfo>();
         services.AddScoped<PermissionService>();
         services.AddScoped<DataScreenService>();

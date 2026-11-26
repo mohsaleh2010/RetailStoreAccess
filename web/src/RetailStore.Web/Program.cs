@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using MudBlazor;
+using MudBlazor.Services;
 using RetailStore.Data;
 using RetailStore.UI;
 using RetailStore.Web;
@@ -63,6 +65,14 @@ builder.Services.AddAuthorization();
 builder.AddRetailApi();             // the REST API /api/v1 (docs/77): JWT tokens, OpenAPI
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddRetailStoreUi();
+builder.Services.AddMudServices(options =>
+{
+    // the messages of the screens: bottom-left, three seconds
+    options.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomLeft;
+    options.SnackbarConfiguration.VisibleStateDuration = 3000;
+    options.SnackbarConfiguration.PreventDuplicates = true;
+    options.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+});
 
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();

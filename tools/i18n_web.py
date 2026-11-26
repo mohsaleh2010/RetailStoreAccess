@@ -18,6 +18,11 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    # the frame of the MudBlazor redesign (docs/ERP-Redesign-Prompt.md, phase 2)
+    'الخزينة والبنوك': 'Treasury and banks',
+    'الوضع الفاتح': 'Light mode',
+    'الوضع الليلي': 'Dark mode',
+    'بحث عن شاشة': 'Find a screen',
     # the rest of the web and the invoice and receipt of the rep app (docs/87)
     'أضف أصناف الفاتورة': 'Add the items of the invoice',
     'إرجاع أصناف فاتورة شراء للمورد: نقدًا أو خصمًا من المستحق له': 'Return the items of a purchase invoice to the supplier: in cash or off what is owed to him',

@@ -229,6 +229,9 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   fragment needs an English text in `i18n_en.EN` or `i18n_web.WEB_EN` (`test_web` lists the missing ones). A new web
   data screen = a row of `gen_web.WEB_SCREENS` (an Access `DataScreen`) + its page in `RetailStore.UI/Pages`. The SQL
   Server schema is never created by the web (`DbSetup` creates only SQLite development / test databases).
+  The web UI is MudBlazor (redesign `docs/ERP-Redesign-Prompt.md`, `docs/ui-inventory.md`): colors and fonts only from
+  `RetailStore.UI/Theme/ErpTheme.cs`, `MudRTLProvider` follows `L.Dir`, the dark mode is the cookie `theme` (`UiTheme`), the side
+  menu groups come from `Layout/NavGroups.cs` (a new page is a row of `WorkPages` and gets its group and icon there).
 - **API (`docs/77`)**: every operation under `/api/v1` names its permission with `.Needs(...)` (the user's own ones aside:
   token, password, `/me`, `/rep/profile`) and a `.WithSummary(...)` (`test_web` checks both); its logic is a service of
   `RetailStore.Data` that follows the VBA (messages identical to the VBA module, `test_web` compares those of `RepService`);

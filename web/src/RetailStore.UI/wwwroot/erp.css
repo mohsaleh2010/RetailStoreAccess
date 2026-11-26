@@ -1,0 +1,66 @@
+/* RetailStore web on MudBlazor: only what the theme (Theme/ErpTheme.cs) cannot say. Logical properties only, so the
+   same rules serve Arabic (rtl) and English (ltr). */
+
+/* the font of the theme everywhere, MudBlazor components included */
+html, body, .mud-typography, .mud-input, .mud-button-root, .mud-nav-link, .mud-table, .mud-chip {
+    font-family: Cairo, "Segoe UI", Tahoma, sans-serif;
+}
+
+/* the page styles of retailstore.css take the colors of the MudBlazor palette, so the pages not yet redesigned follow
+   the theme and its dark mode */
+.erp-app {
+    --bg: var(--mud-palette-background);
+    --surface: var(--mud-palette-surface);
+    --text: var(--mud-palette-text-primary);
+    --muted: var(--mud-palette-text-secondary);
+    --line: var(--mud-palette-lines-default);
+    --primary: var(--mud-palette-primary);
+    --primary-text: var(--mud-palette-primary-text);
+    --danger: var(--mud-palette-error);
+    --radius: var(--mud-default-borderradius);
+    background: var(--mud-palette-background);
+    color: var(--mud-palette-text-primary);
+    min-height: 100vh;
+}
+
+/* numbers: same width digits, so the columns of amounts line up */
+.erp-num, .num, td.num, th.num, .mud-table-cell.erp-num, .amount, .total {
+    font-variant-numeric: tabular-nums;
+}
+
+/* app bar */
+.erp-appbar { border-block-end: 1px solid rgba(255, 255, 255, .08); }
+.erp-brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; margin-inline-start: 4px; }
+.erp-brand-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 32vw; }
+.erp-screen-search { max-width: 300px; margin-inline-end: 8px; }
+.erp-appbar .erp-screen-search .mud-input-outlined-border { border-color: rgba(255, 255, 255, .35); }
+.erp-appbar .erp-screen-search .mud-input,
+.erp-appbar .erp-screen-search .mud-input-adornment .mud-icon-root { color: inherit; }
+.erp-appbar .erp-screen-search input::placeholder { color: inherit; opacity: .75; }
+.erp-appbar .erp-screen-search .mud-input-control { margin: 0; }
+.erp-user-chip { color: inherit !important; }
+.erp-logout { margin: 0; }
+
+/* side menu */
+.erp-drawer { border-inline-end: 1px solid var(--mud-palette-lines-default); }
+.erp-nav .mud-nav-link { border-radius: 6px; margin-inline: 8px; width: auto; }
+.erp-nav .mud-nav-group .mud-nav-link-text { font-weight: 600; }
+.erp-nav .mud-navmenu .mud-nav-link-text { font-weight: 400; }
+.erp-nav .mud-nav-link.active:not(.mud-nav-link-disabled) { font-weight: 600; }
+
+/* main area */
+.erp-main { min-width: 0; }
+h1:focus { outline: none; }
+
+@media (max-width: 599.98px) {
+    .erp-screen-search { display: none; }
+    .erp-brand-name { max-width: 45vw; }
+}
+
+/* print: the page only, never the frame */
+@media print {
+    .mud-appbar, .mud-drawer, .mud-snackbar-provider, #blazor-error-ui, .no-print { display: none !important; }
+    .mud-main-content { padding: 0 !important; margin: 0 !important; }
+    .mud-container { max-width: none !important; padding: 0 !important; }
+    .erp-app, body { background: #fff !important; color: #000 !important; }
+}

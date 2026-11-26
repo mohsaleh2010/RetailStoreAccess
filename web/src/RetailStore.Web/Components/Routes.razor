@@ -1,4 +1,5 @@
 @inject UiLanguage L
+@inject UiTheme Mode
 
 <CascadingAuthenticationState>
     <Router AppAssembly="typeof(Program).Assembly" AdditionalAssemblies="[typeof(RetailStore.UI.Layout.MainLayout).Assembly]"
@@ -18,5 +19,12 @@
     /// <summary>The language of the request (App.razor), kept by the interactive session.</summary>
     [Parameter] public string? Lang { get; set; }
 
-    protected override void OnInitialized() => L.Set(Lang);
+    /// <summary>The light or dark mode of the request (cookie "theme"), kept by the interactive session.</summary>
+    [Parameter] public string? Theme { get; set; }
+
+    protected override void OnInitialized()
+    {
+        L.Set(Lang);
+        Mode.Set(Theme);
+    }
 }

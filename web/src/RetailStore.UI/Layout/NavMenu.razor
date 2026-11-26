@@ -1,40 +1,20 @@
-@inject PermissionService Permissions
 @inject UiLanguage L
 
-<ul class="nav">
-    <li><NavLink href="" Match="NavLinkMatch.All">@L.T("الرئيسية")</NavLink></li>
-    @foreach (var s in screens)
+@* The side menu: the home page, then one group per module (Layout/NavGroups.cs) with the screens the user may open. *@
+<MudNavMenu Color="Color.Primary" Bordered="true" Dense="true" Class="erp-nav py-2">
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Outlined.Dashboard">@L.T("الرئيسية")</MudNavLink>
+    @foreach (var g in Groups)
     {
-        <li><NavLink href="@s.Route">@L.T(s.Caption)</NavLink></li>
+        <MudNavGroup Title="@L.T(g.Caption)" Icon="@g.Icon" Expanded="true">
+            @foreach (var item in g.Items)
+            {
+                <MudNavLink Href="@item.Route" Match="NavLinkMatch.Prefix" Icon="@item.Icon">@L.T(item.Caption)</MudNavLink>
+            }
+        </MudNavGroup>
     }
-    @foreach (var w in work)
-    {
-        <li><NavLink href="@w.Route">@L.T(w.Caption)</NavLink></li>
-    }
-</ul>
+</MudNavMenu>
 
 @code {
-    [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
-    private List<IScreenSpec> screens = [];
-    private List<WorkPage> work = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        var user = AuthState is null ? null : (await AuthState).User;
-        int id = UserInfo.EmployeeId(user);
-        foreach (var s in ScreenSpecs.All)
-        {
-            if (id > 0 && await Permissions.CanOpenScreenAsync(id, s.Name))
-            {
-                screens.Add(s);
-            }
-        }
-        foreach (var w in WorkPages.All)
-        {
-            if (id > 0 && await Permissions.CanOpenScreenAsync(id, w.FormName))
-            {
-                work.Add(w);
-            }
-        }
-    }
+    /// <summary>The groups of the signed-in user (NavGroups.ForUserAsync, computed once by MainLayout).</summary>
+    [Parameter] public IReadOnlyList<NavGroup> Groups { get; set; } = [];
 }

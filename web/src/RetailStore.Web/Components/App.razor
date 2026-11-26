@@ -1,22 +1,30 @@
 @inject UiLanguage L
+@inject UiTheme Mode
 <!DOCTYPE html>
-<html lang="@L.Code" dir="@L.Dir">
+<html lang="@L.Code" dir="@L.Dir" data-theme="@Mode.CookieValue">
 
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <ResourcePreloader />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@@400;600;700&display=swap" />
+    <link rel="stylesheet" href="@Assets["_content/MudBlazor/MudBlazor.min.css"]" />
     <link rel="stylesheet" href="@Assets["_content/RetailStore.UI/retailstore.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/RetailStore.UI/erp.css"]" />
     <link rel="stylesheet" href="@Assets["RetailStore.Web.styles.css"]" />
     <ImportMap />
     <HeadOutlet @rendermode="PageRenderMode" />
 </head>
 
 <body>
-    <Routes @rendermode="PageRenderMode" Lang="@L.Code" />
+    <Routes @rendermode="PageRenderMode" Lang="@L.Code" Theme="@Mode.CookieValue" />
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="@Assets["_content/MudBlazor/MudBlazor.min.js"]"></script>
+    <script src="@Assets["_content/RetailStore.UI/erp.js"]"></script>
 </body>
 
 </html>
@@ -28,5 +36,9 @@
     private IComponentRenderMode? PageRenderMode =>
         HttpContext.AcceptsInteractiveRouting() ? InteractiveServer : null;
 
-    protected override void OnInitialized() => L.Set(HttpContext.Request.Cookies[UiLanguage.CookieName]);
+    protected override void OnInitialized()
+    {
+        L.Set(HttpContext.Request.Cookies[UiLanguage.CookieName]);
+        Mode.Set(HttpContext.Request.Cookies[UiTheme.CookieName]);
+    }
 }

@@ -19,24 +19,23 @@
     color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg: #12161c;
-        --surface: #1b222b;
-        --text: #e4e7eb;
-        --muted: #9aa5b1;
-        --line: #323f4b;
-        --primary: #5b9cf0;
-        --primary-text: #0b1220;
-        --danger: #f97066;
-        --success-bg: #12301d;
-        --success: #7ad398;
-        --warning-bg: #3a2b0c;
-        --warning: #f5c56b;
-        --error-bg: #3d1614;
-        --selected: #1f3352;
-        color-scheme: dark;
-    }
+/* the dark mode chosen in the app bar (cookie "theme", App.razor sets data-theme on html) */
+:root[data-theme="dark"] {
+    --bg: #12161c;
+    --surface: #1b222b;
+    --text: #e4e7eb;
+    --muted: #9aa5b1;
+    --line: #323f4b;
+    --primary: #5b9cf0;
+    --primary-text: #0b1220;
+    --danger: #f97066;
+    --success-bg: #12301d;
+    --success: #7ad398;
+    --warning-bg: #3a2b0c;
+    --warning: #f5c56b;
+    --error-bg: #3d1614;
+    --selected: #1f3352;
+    color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
@@ -45,7 +44,7 @@ html, body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-family: "Segoe UI", Tahoma, "Noto Sans Arabic", Arial, sans-serif;
+    font-family: Cairo, "Segoe UI", Tahoma, "Noto Sans Arabic", Arial, sans-serif;
     font-size: 15px;
 }
 
