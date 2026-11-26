@@ -1,0 +1,113 @@
+# جرد واجهات Blazor (المرحلة 1 من إعادة التصميم بـ MudBlazor)
+
+> وثيقة عمل لخطة إعادة تصميم الواجهات. لم يُعدَّل أي كود في هذه المرحلة.
+> عمود «الحالة» يُحدَّث بعد كل دفعة: ⬜ لم تبدأ · 🟨 جارية · ✅ معتمدة.
+
+## قرارات صاحب المشروع (2026-11-26)
+- **اللغتان باقيتان**: `MudRTLProvider` مربوط بلغة الواجهة (عربي RTL / إنجليزي LTR)، وكل النصوص عبر `L.T`.
+- **النطاق**: الويب أولًا (`RetailStore.UI` + `RetailStore.Web`)؛ `RetailStore.PosApp` و`RetailStore.RepApp` يُقرَّر فيهما بعد اكتمال الويب.
+- **Git**: فرع واحد `claude/gifted-cray-56ahux` وcommit لكل دفعة.
+- **العملة**: من إعدادات البلد (ريال / جنيه)؛ **التصدير**: CSV يفتح في Excel، بلا مكتبات جديدة.
+
+## 1) البيئة الحالية
+
+| البند | القيمة |
+|---|---|
+| إصدار .NET | `net10.0` لكل المشاريع؛ `RetailStore.Pos` = `net10.0-windows10.0.19041.0` (MAUI)، `RetailStore.App` = `net10.0-android` (MAUI) |
+| نوع مشروع الويب | Blazor Web App (`RetailStore.Web`) والصفحات في Razor Class Library مشتركة (`RetailStore.UI`) |
+| وضع العرض | `InteractiveServer` على `<Routes>` و`<HeadOutlet>` (`App.razor`)، ما عدا صفحتي الدخول وتغيير كلمة المرور: نماذج ثابتة (Static SSR) لأنها تكتب الكوكي |
+| مكتبات الواجهة | **لا يوجد Bootstrap ولا أي مكتبة**: CSS يدوي فقط (`RetailStore.UI/wwwroot/retailstore.css` 212 سطرًا، `posapp.css` 65، `repapp.css` 64، `ReconnectModal.razor.css`) |
+| اللغة والاتجاه | عربي RTL وإنجليزي LTR بالتبديل (`UiLanguage`: `L.Code` / `L.Dir`، كوكي، `/lang/{code}`)؛ كل نص عربي في Razor يمر بـ `L.T("...")` (يفحصه `tests/test_web.py`) |
+| التنقل | `NavMenu.razor`: قائمة مسطحة (الرئيسية + 4 شاشات بيانات + 21 صفحة عمل من `WorkPages.All`) تظهر حسب صلاحية كل شاشة، بلا تجميع ولا أيقونات |
+| تطبيقات أخرى بواجهات Razor | `RetailStore.PosApp` (نقطة البيع على Windows، 8 صفحات) و`RetailStore.RepApp` (تطبيق المندوب على Android، 10 صفحات)، لكل منهما Layout وCSS خاص |
+
+## 2) جرد الصفحات — الويب (`RetailStore.UI` + `RetailStore.Web`)
+
+| # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
+|---|---|---|---|---|---|---|
+| 1 | `/` | `Pages/Home.razor` | الرئيسية | D | 147 | ⬜ |
+| 2 | `/account/login` | `RetailStore.Web/Components/Pages/Account/Login.razor` | إعدادات/دخول | D (SSR) | 50 | ⬜ |
+| 3 | `/account/change-password` | `RetailStore.Web/Components/Pages/Account/ChangePassword.razor` | إعدادات/دخول | D (SSR) | 65 | ⬜ |
+| 4 | `/products` | `Pages/ProductsPage.razor` → `Components/DataScreen.razor` | مخازن | A | 4 (+421) | ⬜ |
+| 5 | `/customers` | `Pages/CustomersPage.razor` → `DataScreen` | مبيعات | A | 4 | ⬜ |
+| 6 | `/suppliers` | `Pages/SuppliersPage.razor` → `DataScreen` | مشتريات | A | 4 | ⬜ |
+| 7 | `/warehouses` | `Pages/WarehousesPage.razor` → `DataScreen` | مخازن | A | 4 | ⬜ |
+| 8 | `/pos` | `Pages/Sales/PosPage.razor` | مبيعات | B | 361 | ⬜ |
+| 9 | `/sales` | `Pages/Sales/SalesListPage.razor` | مبيعات | C (قائمة مستندات) | 100 | ⬜ |
+| 10 | `/sales/{Id}` | `Pages/Sales/InvoicePage.razor` | مبيعات | B (عرض/طباعة) | 107 | ⬜ |
+| 11 | `/payments` | `Pages/Sales/PaymentsPage.razor` | مبيعات | B (سند) | 192 | ⬜ |
+| 12 | `/sales-returns` | `Pages/Office/SalesReturnsPage.razor` | مبيعات | B | 228 | ⬜ |
+| 13 | `/purchase` | `Pages/Purchases/PurchasePage.razor` | مشتريات | B | 347 | ⬜ |
+| 14 | `/purchases` | `Pages/Purchases/PurchasesListPage.razor` | مشتريات | C (قائمة مستندات) | 102 | ⬜ |
+| 15 | `/purchases/{Id}` | `Pages/Purchases/PurchaseViewPage.razor` | مشتريات | B (عرض/طباعة) | 110 | ⬜ |
+| 16 | `/supplier-payments` | `Pages/Purchases/SupplierPaymentsPage.razor` | مشتريات | B (سند) | 193 | ⬜ |
+| 17 | `/purchase-returns` | `Pages/Office/PurchaseReturnsPage.razor` | مشتريات | B | 254 | ⬜ |
+| 18 | `/stock` | `Pages/Stock/StockPage.razor` | مخازن | C (رصيد + كارت صنف) | 177 | ⬜ |
+| 19 | `/transfers` | `Pages/Stock/TransfersPage.razor` | مخازن | B | 371 | ⬜ |
+| 20 | `/treasury` | `Pages/Treasury/TreasuryPage.razor` | حسابات (خزينة) | C (أرصدة + كشف صندوق) | 218 | ⬜ |
+| 21 | `/cash-vouchers` | `Pages/Treasury/CashVouchersPage.razor` | حسابات (خزينة) | B (سند) | 210 | ⬜ |
+| 22 | `/cash-closing` | `Pages/Office/CashClosingPage.razor` | حسابات (خزينة) | B | 213 | ⬜ |
+| 23 | `/bank-transactions` | `Pages/Treasury/BankTxPage.razor` | حسابات (بنوك) | B | 291 | ⬜ |
+| 24 | `/bank-reconciliation` | `Pages/Office/BankReconPage.razor` | حسابات (بنوك) | B (خاصة) | 316 | ⬜ |
+| 25 | `/journal` | `Pages/Accounting/JournalPage.razor` | حسابات | C (قيود + سطورها) | 171 | ⬜ |
+| 26 | `/manual-entries` | `Pages/Office/ManualEntriesPage.razor` | حسابات | B | 287 | ⬜ |
+| 27 | `/ledger` | `Pages/Accounting/LedgerPage.razor` | تقارير | C | 122 | ⬜ |
+| 28 | `/trial-balance` | `Pages/Accounting/TrialBalancePage.razor` | تقارير | C | 95 | ⬜ |
+| 29 | `/financials` | `Pages/Accounting/FinancialsPage.razor` | تقارير | C | 115 | ⬜ |
+| 30 | `/reports` | `Pages/Reports/ReportsPage.razor` | تقارير | C (مركز التقارير: كل تقارير `forms.REPORTS`) | 278 | ⬜ |
+| 31 | `/not-found` | `RetailStore.Web/Components/Pages/NotFound.razor` | عام | D | 6 | ⬜ |
+| 32 | `/Error` | `RetailStore.Web/Components/Pages/Error.razor` | عام | D (SSR) | 22 | ⬜ |
+
+مكونات وتخطيط الويب: `Layout/MainLayout.razor` (44)، `Layout/NavMenu.razor` (40)، `Layout/MustChangePasswordGuard.razor`، `Components/DataScreen.razor` (421، الشاشة العامة للبيانات الأساسية)، `Components/QrImage.razor`، `Components/RedirectToLogin.razor`، `RetailStore.Web/Components/Layout/AccountLayout.razor` و`ReconnectModal.razor`.
+
+## 3) جرد الصفحات — نقطة البيع على Windows (`RetailStore.PosApp`، MAUI)
+
+| # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
+|---|---|---|---|---|---|---|
+| P1 | `/login` | `Pages/LoginPage.razor` | دخول | D | 49 | ⬜ |
+| P2 | `/` | `Pages/SalePage.razor` | مبيعات | B | 287 | ⬜ |
+| P3 | `/sales` | `Pages/SalesPage.razor` | مبيعات | C | 63 | ⬜ |
+| P4 | `/return` | `Pages/ReturnPage.razor` | مبيعات | B | 223 | ⬜ |
+| P5 | `/payment` | `Pages/PaymentPage.razor` | مبيعات | B (سند) | 134 | ⬜ |
+| P6 | `/closing` | `Pages/ClosingPage.razor` | خزينة | B | 241 | ⬜ |
+| P7 | `/settings` | `Pages/SettingsPage.razor` | إعدادات | D | 73 | ⬜ |
+| P8 | `/database` | `Pages/DatabasePage.razor` | إعدادات | D | 113 | ⬜ |
+
+## 4) جرد الصفحات — تطبيق المندوب (`RetailStore.RepApp`، MAUI Android)
+
+| # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
+|---|---|---|---|---|---|---|
+| R1 | `/login` | `Pages/LoginPage.razor` | دخول | D | 51 | ⬜ |
+| R2 | `/` | `Pages/TodayPage.razor` | لوحة اليوم | D | 64 | ⬜ |
+| R3 | `/customers` | `Pages/CustomersPage.razor` | مبيعات | A (قائمة فقط) | 36 | ⬜ |
+| R4 | `/customers/{Id}` | `Pages/CustomerPage.razor` | مبيعات | D | 91 | ⬜ |
+| R5 | `/orders` | `Pages/OrdersPage.razor` | مبيعات | C | 66 | ⬜ |
+| R6 | `/orders/new/{CustomerId}` | `Pages/NewOrderPage.razor` | مبيعات | B | 115 | ⬜ |
+| R7 | `/invoice/{CustomerId}` | `Pages/InvoicePage.razor` | مبيعات | B | 145 | ⬜ |
+| R8 | `/payment/{CustomerId}` | `Pages/PaymentPage.razor` | مبيعات | B (سند) | 95 | ⬜ |
+| R9 | `/settings` | `Pages/SettingsPage.razor` | إعدادات | D | 69 | ⬜ |
+| R10 | `/password` | `Pages/PasswordPage.razor` | إعدادات | D | 36 | ⬜ |
+
+## 5) ملاحظات
+
+### هيكلية
+- **شاشات البيانات الأساسية الأربع شاشة واحدة**: الأصناف والعملاء والموردون والمخازن كلها `DataScreen<T>` بمواصفات مولّدة (`Generated/*.g.cs` من `tools/gen_web.py`). إعادة تصميم `DataScreen` تغيّر الأربع مرة واحدة، والحقول والتحقق والترتيب تأتي من المواصفة لا من الصفحة.
+- **لا يوجد Bootstrap** أصلًا؛ «إزالة Bootstrap» في الخطة = إزالة `retailstore.css` القديم بعد النقل.
+- **اللغتان**: الواجهة ثنائية (عربي RTL / إنجليزي LTR)، فيجب ربط `MudRTLProvider` بـ `L.Dir` لا تثبيته على RTL.
+- **صفحتا الدخول وتغيير كلمة المرور Static SSR** (تكتبان الكوكي): مكونات MudBlazor التفاعلية لا تعمل فيها؛ تحتاجان HTML عاديًا بأنماط MudBlazor أو نموذجًا خاصًا.
+- **تكرار مقصود**: البيع والمرتجع والقبض والتصفية موجودة في الويب ونقطة بيع Windows وتطبيق المندوب بثلاث تنفيذات واجهة منفصلة (المنطق مشترك في `RetailStore.Data` / `PosCart` / `SaleDraft`).
+- `/ledger` و`/trial-balance` تفتحان بصلاحية واحدة (`frmLedger`)، و`/sales` و`/purchases` قوائم مستندات أقرب لنوع C.
+
+### أداء
+- القوائم محدودة بعدد من السيرفر بلا ترقيم: `DataScreenService.MaxListRows = 1000` (رسالة «ضيّق البحث»)، وقوائم الفواتير والسندات والقيود والتحويلات بـ `Take(take)`. `MudDataGrid` مع `ServerData` يحتاج دالة بترقيم (skip/take/ترتيب) في الخدمات = تعديل خلفي (يُسأل عنه قبل التنفيذ).
+- **مركز التقارير** (`ReportService`) يقرأ كل صفوف التقرير في الذاكرة ويعرضها في جدول واحد، والتصدير CSV بـ `data:` URI (الملف كله داخل الصفحة)؛ مع تقرير كبير قد تثقل الصفحة. الحل في الواجهة فقط: `Virtualize` / ترقيم على الذاكرة.
+- `NavMenu` يستدعي `CanOpenScreenAsync` لكل شاشة (25 استعلامًا) في كل تحميل للتخطيط.
+
+### تحقق المدخلات
+- لا توجد صفة `required` ولا `EditForm`/`DataAnnotations` في أي صفحة: التحقق كله في الخدمات وبنفس رسائل VBA العربية وترتيبها (قاعدة المشروع، يفحصها `test_web`). أي تحقق في `MudForm` يجب أن يكون إضافيًا (حقول إلزامية فقط) ولا يغيّر الرسائل ولا ترتيب الفحوص.
+
+### قيود يجب احترامها أثناء التصميم
+- كل نص عربي في Razor داخل `L.T("...")` (حتى `Label=` و`Placeholder=` في MudBlazor) وله ترجمة في `tools/i18n_web.py` (`test_web` يفحص ذلك ويسرد الناقص).
+- العملة من إعدادات البلد (`SA` ريال / `EG` جنيه)، لا يُكتب «جنيه» أو «ريال» ثابتًا.
+- `RetailStore.UI` مكتبة مشتركة مع MAUI لاحقًا؛ و`RetailStore.Pos` / `RetailStore.App` لا يُبنيان في السحابة (يحتاجان Windows / workload).
+- لا يوجد `dotnet` SDK في هذه الحاوية الآن؛ يلزم تثبيت .NET 10 SDK قبل المرحلة 2 لتشغيل `dotnet build` واللقطات.
