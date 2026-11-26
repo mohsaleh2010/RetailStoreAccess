@@ -122,8 +122,15 @@
         </MudItem>
     </MudGrid>
     <InvoiceLinesEditor TProduct="DemoItem" Lines="lines" Products="items" CodeOf="i => i.Code" NameOf="i => L.T(i.Name)"
-                        PriceOf="i => i.Price" VatRate="0.15m" PricesIncludeVat="true">
+                        PriceOf="i => i.Price" VatRate="0.15m" PricesIncludeVat="true"
+                        ExtraColumnTitle="@L.T("سعر البيع الجديد")">
         <InfoTemplate Context="i"><MoneyText Value="i.Price" /></InfoTemplate>
+        <ExtraColumn Context="line">
+            @* ExtraColumn: a field the page keeps with the line (Tag), here the new selling price of a purchase line *@
+            <MudNumericField T="decimal?" Value="line.Tag as decimal?" ValueChanged="v => line.Tag = v" Variant="Variant.Outlined"
+                             Margin="Margin.Dense" HideSpinButtons="true" Min="0" Class="erp-cell-num" Placeholder="@ErpFormat.Money(line.Product?.Price)"
+                             Culture="System.Globalization.CultureInfo.InvariantCulture" aria-label="@L.T("سعر البيع الجديد")" />
+        </ExtraColumn>
     </InvoiceLinesEditor>
 </MudPaper>
 

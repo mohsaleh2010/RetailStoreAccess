@@ -2,101 +2,146 @@
 @attribute [Authorize]
 @inject PurchaseService Purchases
 @inject PermissionService Permissions
+@inject NavigationManager Nav
+@inject IJSRuntime JS
 @inject UiLanguage L
 
-<PageTitle>@L.T("فاتورة شراء") @(invoice?.InvoiceNumber)</PageTitle>
-
-<section class="screen invoice-screen">
-    <header class="screen-head no-print">
-        <div>
-            <h1>@L.T("فاتورة شراء") @(invoice?.InvoiceNumber)</h1>
-            <p class="subtitle"><a href="purchases">@L.T("فواتير المشتريات")</a></p>
-        </div>
+@* Template B shown read-only (docs/ui-inventory.md section 8): PageHeader (the number, its payment state, back to the
+   list, print) -> the head of the invoice (supplier, his invoice number, payment, warehouse) -> the lines -> the totals
+   card beside them. The figures are those saved on the invoice (PurchaseService.PurchaseAsync), never computed by the
+   page. *@
+<PageHeader Title="@(L.T("فاتورة شراء") + " " + (invoice?.InvoiceNumber ?? ""))" Icon="@NavGroups.IconOf("purchases")"
+            Breadcrumbs="crumbs">
+    <Status>
         @if (invoice is not null)
         {
-            <button class="btn primary" onclick="window.print()">@L.T("طباعة")</button>
+            <StatusChip Status="@StatusStyles.PaymentState(invoice.PaidAmount, invoice.RemainingAmount)" />
         }
-    </header>
+    </Status>
+    <Actions>
+        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.ListAlt" Href="purchases">@L.T("فواتير المشتريات")</MudButton>
+        @if (invoice is not null)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">
+                @L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-    @if (denied.Length > 0)
-    {
-        <div class="message error" role="alert">@L.T(denied)</div>
-    }
-    else if (invoice is null)
-    {
-        <p class="empty">@L.T("السجل غير موجود")</p>
-    }
-    else
-    {
-        <article class="invoice">
-            <header class="invoice-head">
-                <div>
-                    <p>@L.T("رقم الفاتورة"): @invoice.InvoiceNumber - @invoice.InvoiceDate.ToString("yyyy-MM-dd HH:mm")</p>
-                    <p>@L.T("المورد"): @invoice.SupplierName @(string.IsNullOrEmpty(invoice.SupplierVAT) ? "" : " - " + invoice.SupplierVAT)</p>
+@if (!loaded)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+else if (denied.Length > 0)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
+}
+else if (invoice is null)
+{
+    <EmptyState Icon="@Icons.Material.Outlined.SearchOff" Title="@L.T("السجل غير موجود")" ActionText="@L.T("فواتير المشتريات")"
+                ActionIcon="@Icons.Material.Outlined.ListAlt" ActionHref="purchases" />
+}
+else
+{
+    <KeyboardShortcuts OnPrint="Print" OnClose="Back" />
+    <div class="erp-doc erp-invoice">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4 mb-4">
+                <MudText Typo="Typo.h6" Class="erp-print-title mb-3">@L.T("فاتورة شراء")</MudText>
+                <dl class="erp-info-list">
+                    <dt>@L.T("رقم الفاتورة")</dt><dd><bdi class="erp-num">@invoice.InvoiceNumber</bdi></dd>
+                    <dt>@L.T("التاريخ")</dt><dd><bdi class="erp-num erp-nowrap" dir="ltr">@invoice.InvoiceDate.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)</bdi></dd>
+                    <dt>@L.T("المورد")</dt>
+                    <dd>
+                        @invoice.SupplierName
+                        @if (!string.IsNullOrEmpty(invoice.SupplierVAT))
+                        {
+                            <span class="mud-text-secondary"> - <bdi class="erp-num">@invoice.SupplierVAT</bdi></span>
+                        }
+                    </dd>
                     @if (!string.IsNullOrEmpty(invoice.SupplierInvoiceNo))
                     {
-                        <p>@L.T("رقم فاتورة المورد"): @invoice.SupplierInvoiceNo</p>
+                        <dt>@L.T("رقم فاتورة المورد")</dt><dd><bdi class="erp-num" dir="ltr">@invoice.SupplierInvoiceNo</bdi></dd>
                     }
-                    <p>@L.T("نوع الدفع"): @L.T(WorkPages.PaymentTypeName(invoice.PaymentType)) @(invoice.MethodName is null ? "" : " - " + invoice.MethodName)</p>
-                    <p>@L.T("المخزن"): @invoice.WarehouseName</p>
-                </div>
-            </header>
-            <table class="list invoice-lines">
-                <thead>
-                    <tr>
-                        <th>@L.T("الصنف")</th>
-                        <th>@L.T("الوحدة")</th>
-                        <th>@L.T("الكمية")</th>
-                        <th>@L.T("سعر الشراء")</th>
-                        <th>@L.T("الخصم")</th>
-                        <th>@L.T("الضريبة")</th>
-                        <th>@L.T("الإجمالي")</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var l in invoice.Lines)
+                    <dt>@L.T("نوع الدفع")</dt>
+                    <dd>@L.T(WorkPages.PaymentTypeName(invoice.PaymentType))@(invoice.MethodName is null ? "" : " - " + invoice.MethodName)</dd>
+                    @if (!string.IsNullOrEmpty(invoice.WarehouseName))
                     {
-                        <tr>
-                            <td data-label="@L.T("الصنف")">@l.ProductName</td>
-                            <td data-label="@L.T("الوحدة")">@l.UnitName</td>
-                            <td data-label="@L.T("الكمية")">@WorkPages.Qty(l.Quantity)</td>
-                            <td data-label="@L.T("سعر الشراء")">@l.UnitCost.ToString("0.00##")</td>
-                            <td data-label="@L.T("الخصم")">@WorkPages.Money(l.Discount)</td>
-                            <td data-label="@L.T("الضريبة")">@WorkPages.Money(l.Tax)</td>
-                            <td data-label="@L.T("الإجمالي")">@WorkPages.Money(l.LineTotal)</td>
-                        </tr>
+                        <dt>@L.T("المخزن")</dt><dd>@invoice.WarehouseName</dd>
                     }
-                </tbody>
-            </table>
-            <dl class="totals">
-                <dt>@L.T("الإجمالي قبل الخصم")</dt><dd>@WorkPages.Money(invoice.SubTotal)</dd>
-                <dt>@L.T("الخصم")</dt><dd>@WorkPages.Money(invoice.Discount)</dd>
-                <dt>@L.T("قبل الضريبة")</dt><dd>@WorkPages.Money(invoice.TaxableAmount)</dd>
-                <dt>@L.T("ضريبة القيمة المضافة")</dt><dd>@WorkPages.Money(invoice.Tax)</dd>
-                <dt class="grand">@L.T("الإجمالي")</dt><dd class="grand">@WorkPages.Money(invoice.TotalAmount)</dd>
-                @if (invoice.ExchangeRate != 1)
-                {
-                    <dt>@invoice.CurrencyCode</dt><dd>@WorkPages.Money(invoice.ForeignAmount) (@invoice.ExchangeRate.ToString("0.####"))</dd>
-                }
-                <dt>@L.T("المدفوع")</dt><dd>@WorkPages.Money(invoice.PaidAmount)</dd>
-                @if (invoice.RemainingAmount != 0)
-                {
-                    <dt>@L.T("المتبقي")</dt><dd>@WorkPages.Money(invoice.RemainingAmount) @(invoice.DueDate is { } due ? "(" + due.ToString("yyyy-MM-dd") + ")" : "")</dd>
-                }
-            </dl>
-            @if (!string.IsNullOrEmpty(invoice.Notes))
-            {
-                <p class="hint">@invoice.Notes</p>
-            }
-        </article>
-    }
-</section>
+                    <dt>@L.T("الموظف")</dt><dd>@invoice.EmployeeName</dd>
+                    @if (!string.IsNullOrEmpty(invoice.Notes))
+                    {
+                        <dt>@L.T("ملاحظات")</dt><dd>@invoice.Notes</dd>
+                    }
+                </dl>
+            </MudPaper>
+
+            <EntityGrid T="PurchaseLineView" Items="invoice.Lines" Title="@L.T("أسطر الفاتورة")" Filterable="false" ShowPager="false"
+                        RowsPerPage="1000" Class="erp-invoice-lines">
+                <Columns>
+                    <PropertyColumn T="PurchaseLineView" TProperty="short" Property="l => l.LineNumber" Title="#" CellClass="erp-num" HeaderClass="erp-num" />
+                    <PropertyColumn T="PurchaseLineView" TProperty="string" Property="l => l.ProductName" Title="@L.T("الصنف")" />
+                    <TemplateColumn T="PurchaseLineView" Title="@L.T("الكمية")" SortBy="l => l.Quantity" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate><QtyText Value="context.Item.Quantity" Unit="@context.Item.UnitName" /></CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="PurchaseLineView" Title="@L.T("سعر الشراء")" SortBy="l => l.UnitCost" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate><MoneyText Value="context.Item.UnitCost" Decimals="@(decimal.Round(context.Item.UnitCost, 2) == context.Item.UnitCost ? 2 : 4)" /></CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="PurchaseLineView" Title="@L.T("الخصم")" SortBy="l => l.Discount" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate><MoneyText Value="context.Item.Discount" /></CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="PurchaseLineView" Title="@L.T("الضريبة")" SortBy="l => l.Tax" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate><MoneyText Value="context.Item.Tax" /></CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="PurchaseLineView" Title="@L.T("الإجمالي")" SortBy="l => l.LineTotal" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate><MoneyText Value="context.Item.LineTotal" Bold="true" /></CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </EntityGrid>
+        </div>
+
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("ملخص الفاتورة")</MudText>
+                <dl class="erp-summary-list">
+                    <dt>@L.T("الإجمالي قبل الخصم")</dt><dd><MoneyText Value="invoice.SubTotal" /></dd>
+                    <dt>@L.T("الخصم")</dt><dd><MoneyText Value="invoice.Discount" /></dd>
+                    <dt>@L.T("قبل الضريبة")</dt><dd><MoneyText Value="invoice.TaxableAmount" /></dd>
+                    <dt>@L.T("ضريبة القيمة المضافة")</dt><dd><MoneyText Value="invoice.Tax" /></dd>
+                    <dt class="erp-summary-grand">@L.T("الإجمالي")</dt>
+                    <dd class="erp-summary-grand"><MoneyText Value="invoice.TotalAmount" ShowCurrency="true" Bold="true" /></dd>
+                    @if (invoice.ExchangeRate != 1)
+                    {
+                        <dt><bdi>@invoice.CurrencyCode</bdi></dt>
+                        <dd>
+                            <MoneyText Value="invoice.ForeignAmount" />
+                            <span class="mud-text-secondary erp-num">(@invoice.ExchangeRate.ToString("0.####", System.Globalization.CultureInfo.InvariantCulture))</span>
+                        </dd>
+                    }
+                    <dt>@L.T("المدفوع")</dt><dd><MoneyText Value="invoice.PaidAmount" /></dd>
+                    @if (invoice.RemainingAmount != 0)
+                    {
+                        <dt>@L.T("المتبقي")</dt><dd><MoneyText Value="invoice.RemainingAmount" Bold="true" /></dd>
+                        @if (invoice.DueDate is { } due)
+                        {
+                            <dt>@L.T("تاريخ الاستحقاق")</dt><dd><bdi class="erp-num">@ErpFormat.Date(due)</bdi></dd>
+                        }
+                    }
+                </dl>
+            </MudPaper>
+        </aside>
+    </div>
+}
 
 @code {
     [Parameter] public int Id { get; set; }
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private PurchaseView? invoice;
+    private bool loaded;
     private string denied = "";
+    private IReadOnlyList<BreadcrumbItem> crumbs = [];
 
     protected override async Task OnParametersSetAsync()
     {
@@ -106,5 +151,17 @@
         {
             invoice = await Purchases.PurchaseAsync(Id, L.English);
         }
+        loaded = true;
+        crumbs =
+        [
+            new BreadcrumbItem(L.T("الرئيسية"), href: "", icon: Icons.Material.Outlined.Home),
+            new BreadcrumbItem(L.T("المشتريات"), href: null, disabled: true),
+            new BreadcrumbItem(L.T("فواتير المشتريات"), href: "purchases"),
+            new BreadcrumbItem(invoice?.InvoiceNumber ?? Id.ToString(System.Globalization.CultureInfo.InvariantCulture), href: null, disabled: true),
+        ];
     }
+
+    private async Task Print() => await JS.InvokeVoidAsync("print");
+
+    private void Back() => Nav.NavigateTo("purchases");
 }

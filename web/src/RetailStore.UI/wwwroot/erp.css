@@ -176,11 +176,14 @@ h1:focus { outline: none; }
 dt.erp-summary-grand { color: var(--mud-palette-text-primary); font-weight: 700; }
 .erp-pos-choices { max-height: 260px; overflow-y: auto; }
 .erp-lines-unit { min-width: 80px; width: 96px; }
+.erp-lines-extra { width: 120px; min-width: 104px; }
 /* the VAT of each line is in the totals card: a narrower table */
 .erp-lines-compact .erp-lines-table table { min-width: 640px; }
 .erp-lines-compact .erp-lines-price { width: 116px; min-width: 108px; }
 .erp-lines-compact .erp-lines-disc { width: 96px; min-width: 88px; }
 .erp-lines-compact .erp-lines-qty { width: 76px; min-width: 70px; }
+.erp-lines-compact .erp-lines-extra { width: 96px; min-width: 88px; }
+.erp-lines-compact .erp-lines-product { min-width: 190px; }
 
 /* B shown read-only (/sales/{id}): the head of the invoice beside its QR code; the facts as a two-column list */
 .erp-invoice-head { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; justify-content: space-between; }

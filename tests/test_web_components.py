@@ -61,6 +61,21 @@ class SharedComponentsTests(unittest.TestCase):
         self.assertNotRegex(editor, r"Quantity\s*\*\s*\w*\.?Price", "no amount computed by the screen")
         self.assertIn("@L.T(Result.Problem)", editor)
 
+    def test_the_extra_column_of_the_lines(self):
+        """ExtraColumn (phase 6 batch 2): a column of the page after the discount, a cell of the keyboard, counted in the
+        footer; the purchase invoice puts the new selling price in it and keeps it in the Tag of the line."""
+        editor = read("web", "src", "RetailStore.UI", "Components", "Shared", "InvoiceLinesEditor.razor")
+        self.assertIn("public RenderFragment<InvoiceLine<TProduct>>? ExtraColumn", editor)
+        self.assertIn("public string? ExtraColumnTitle", editor)
+        self.assertIn('<td data-cell class="erp-lines-extra">', editor)
+        self.assertIn("(ExtraColumn is null ? 0 : 1)", editor, "the footer spans the extra column")
+        self.assertLess(editor.index('erp-lines-disc">@L.T'), editor.index("erp-lines-extra"), "after the discount")
+        self.assertIn(".erp-lines-extra", read("web", "src", "RetailStore.UI", "wwwroot", "erp.css"))
+        page = read("web", "src", "RetailStore.UI", "Pages", "Purchases", "PurchasePage.razor")
+        self.assertIn('ExtraColumnTitle="@L.T("سعر البيع الجديد")"', page)
+        self.assertIn("TagOf(l).NewPrice", page, "the new price reaches PurchaseLine.NewSellingPrice")
+        self.assertIn("<ExtraColumn", read("web", "src", "RetailStore.Web", "Components", "Pages", "Dev", "ComponentsGallery.razor"))
+
     def test_dates_are_gregorian(self):
         panel = read("web", "src", "RetailStore.UI", "Components", "Shared", "FilterPanel.razor")
         self.assertIn('Culture="@ErpFormat.DateCulture(L.English)"', panel)

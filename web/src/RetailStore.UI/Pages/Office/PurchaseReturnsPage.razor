@@ -3,180 +3,262 @@
 @inject SalesService Sales
 @inject PurchaseService Purchases
 @inject PermissionService Permissions
+@inject IDialogService Dialogs
 @inject UiLanguage L
 
-@* The purchase return on the web (docs/87): frmPurchaseReturn, modPurchases.PostPurchaseReturn. *@
-<PageTitle>@L.T("مرتجعات المشتريات")</PageTitle>
+@* The purchase return on the web (docs/87): frmPurchaseReturn, modPurchases.PostPurchaseReturn.
+   Template B (docs/ui-inventory.md section 8), as /sales-returns: PageHeader (new F4, save F2) -> the head (the invoice by
+   its number or the supplier's number, the reason, how the amount comes back) -> the lines of the invoice with the
+   quantity returned and the stock in hand -> the card of the return beside them -> the returns of the period. The value
+   of each line is PurchaseReturnableLine.Amounts (InvoiceCalculator.ReturnAmounts = RecalcPurchaseReturn), the posting
+   PurchaseService.PostPurchaseReturnAsync; its question goes through ConfirmDialog and the return is saved again. *@
+<PageHeader Title="@L.T("مرتجعات المشتريات")" Description="@L.T("إرجاع أصناف فاتورة شراء للمورد: نقدًا أو خصمًا من المستحق له")"
+            Icon="@NavGroups.IconOf("purchase-returns")" Group="@L.T("المشتريات")">
+    <Status>
+        @if (allowed && invoice is not null)
+        {
+            <StatusChip Status="DRAFT" />
+        }
+    </Status>
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.NoteAdd" OnClick="New" Disabled="busy">
+                @L.T("مرتجع جديد")<kbd class="erp-kbd">F4</kbd>
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save"
+                       OnClick="() => SaveAsync(false)" Disabled="busy || invoice is null">
+                @L.T("حفظ المرتجع")<kbd class="erp-kbd">F2</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("مرتجعات المشتريات")</h1>
-            <p class="subtitle">@L.T("إرجاع أصناف فاتورة شراء للمورد: نقدًا أو خصمًا من المستحق له")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
-    {
-        <div class="pos">
-            <div class="list-pane">
-                <form class="list-tools" @onsubmit="FindAsync" @onsubmit:preventDefault>
-                    <input type="search" class="search" placeholder="@L.T("رقم الفاتورة أو رقم فاتورة المورد")" aria-label="@L.T("رقم الفاتورة أو رقم فاتورة المورد")" @bind="number" />
-                    <button type="submit" class="btn">@L.T("بحث")</button>
-                </form>
-                @if (invoice is { } inv)
-                {
-                    <p class="hint">@inv.InvoiceNumber · @inv.InvoiceDate.ToString("yyyy-MM-dd") · @inv.SupplierName · @L.T("فاتورة المورد"): @(inv.SupplierInvoiceNo ?? "-") · @WorkPages.Money(inv.TotalAmount) · @L.T(WorkPages.PaymentTypeName(inv.PaymentType))</p>
-                    <table class="list">
-                        <thead>
-                            <tr>
-                                <th>@L.T("الصنف")</th>
-                                <th>@L.T("المشترى")</th>
-                                <th>@L.T("المرتجع سابقًا")</th>
-                                <th>@L.T("المتاح للإرجاع")</th>
-                                <th>@L.T("الكمية المرتجعة")</th>
-                                <th>@L.T("بالمخزون")</th>
-                                <th>@L.T("القيمة")</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var l in inv.Lines)
-                            {
-                                <tr>
-                                    <td data-label="@L.T("الصنف")">@l.ProductName</td>
-                                    <td data-label="@L.T("المشترى")">@WorkPages.Qty(l.BoughtQty)</td>
-                                    <td data-label="@L.T("المرتجع سابقًا")">@WorkPages.Qty(l.ReturnedQty)</td>
-                                    <td data-label="@L.T("المتاح للإرجاع")">@WorkPages.Qty(l.AvailableQty)</td>
-                                    <td data-label="@L.T("الكمية المرتجعة")">
-                                        <input type="number" step="any" min="0" value="@qty[l.PurchaseDetailID]" @onchange="e => SetQty(l, e.Value)" />
-                                    </td>
-                                    <td data-label="@L.T("بالمخزون")">@WorkPages.Qty(l.InStock)</td>
-                                    <td data-label="@L.T("القيمة")">@WorkPages.Money(Amount(l))</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <div class="actions">
-                        <button class="btn" @onclick="All">@L.T("إرجاع الكل")</button>
-                    </div>
-                }
-                <h2>@L.T("المرتجعات")</h2>
-                <table class="list">
-                    <thead><tr><th>@L.T("المرتجع")</th><th>@L.T("التاريخ")</th><th>@L.T("المورد")</th><th>@L.T("الفاتورة")</th><th>@L.T("القيمة")</th></tr></thead>
-                    <tbody>
-                        @foreach (var r in rows)
-                        {
-                            <tr>
-                                <td data-label="@L.T("المرتجع")">@r.Number</td>
-                                <td data-label="@L.T("التاريخ")">@r.Date.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td data-label="@L.T("المورد")">@r.PartyName</td>
-                                <td data-label="@L.T("الفاتورة")">@r.InvoiceNumber</td>
-                                <td data-label="@L.T("القيمة")">@WorkPages.Money(r.Total)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @if (rows.Count == 0)
-                {
-                    <p class="empty">@L.T("لا توجد سجلات")</p>
-                }
-            </div>
-
-            <div class="form-pane">
-                <h2>@L.T("مرتجع للمورد")</h2>
-                @if (invoice is { } h)
-                {
-                    <form class="record" @onsubmit="SaveAsync" @onsubmit:preventDefault>
-                        <div class="field span-2">
-                            <label for="sr-reason">@L.T("سبب الإرجاع") *</label>
-                            <input id="sr-reason" type="text" maxlength="255" @bind="reason" />
-                        </div>
-                        <div class="field span-2">
-                            <label for="sr-refund">@L.T("طريقة رد المبلغ")</label>
-                            <select id="sr-refund" @bind="refund">
-                                <option value="CASH">@L.T("استرداد نقدي من المورد")</option>
-                                <option value="CREDIT">@L.T("خصم من المستحق للمورد")</option>
-                            </select>
-                        </div>
-                        @if (refund == "CASH")
-                        {
-                            <div class="field span-2">
-                                <label for="sr-method">@L.T("طريقة الدفع")</label>
-                                <select id="sr-method" @bind="method">
-                                    @foreach (var m in methods)
-                                    {
-                                        <option value="@m.Id">@m.Name</option>
-                                    }
-                                </select>
-                            </div>
-                        }
-                        <div class="field span-2">
-                            <label>@L.T("قيمة المرتجع")</label>
-                            <p class="total">@WorkPages.Money(h.Lines.Sum(Amount))</p>
-                        </div>
-                        <div class="actions span-2">
-                            <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ المرتجع")</button>
-                        </div>
-                    </form>
-                }
-                else
-                {
-                    <p class="hint">@L.T("اكتب رقم فاتورة الشراء ثم «بحث».")</p>
-                }
-            </div>
-        </div>
-    }
-
+}
+else
+{
+    <KeyboardShortcuts OnSave="() => SaveAsync(false)" OnNew="New" />
     @if (message.Length > 0)
     {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
     }
+    <div class="erp-doc mb-4">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4 mb-4">
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string" @ref="numberField" @bind-Value="number" Label="@L.T("رقم الفاتورة أو رقم فاتورة المورد")"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start" Immediate="true"
+                                      AdornmentIcon="@Icons.Material.Outlined.ReceiptLong" AutoFocus="true" OnKeyDown="NumberKey"
+                                      data-erp-search="true" HelperText="@L.T("Enter للبحث")" />
+                    </MudItem>
+                    <MudItem xs="12" md="6" Class="erp-filter-buttons">
+                        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Search" OnClick="FindAsync" Disabled="busy">
+                            @L.T("بحث")
+                        </MudButton>
+                    </MudItem>
+                    @if (invoice is { } h)
+                    {
+                        <MudItem xs="12">
+                            <div class="erp-chips-row">
+                                <MudChip T="string" Variant="Variant.Outlined" Icon="@Icons.Material.Outlined.ReceiptLong">
+                                    <bdi class="erp-num">@h.InvoiceNumber</bdi>
+                                </MudChip>
+                                <MudChip T="string" Variant="Variant.Outlined" Icon="@Icons.Material.Outlined.Event">
+                                    <bdi class="erp-num">@ErpFormat.Date(h.InvoiceDate)</bdi>
+                                </MudChip>
+                                <MudChip T="string" Variant="Variant.Outlined" Icon="@Icons.Material.Outlined.Storefront">@h.SupplierName</MudChip>
+                                <MudChip T="string" Variant="Variant.Outlined" Icon="@Icons.Material.Outlined.Description">
+                                    <span>@L.T("فاتورة المورد"): <bdi class="erp-num" dir="ltr">@(h.SupplierInvoiceNo ?? "-")</bdi></span>
+                                </MudChip>
+                                <MudChip T="string" Variant="Variant.Outlined" Icon="@Icons.Material.Outlined.Payments">
+                                    @L.T(WorkPages.PaymentTypeName(h.PaymentType))
+                                </MudChip>
+                            </div>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" @bind-Value="reason" Label="@L.T("سبب الإرجاع")" Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" MaxLength="255" Required="true" RequiredError="@L.T("مطلوب")" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="6">
+                            <MudSelect T="string" @bind-Value="refund" Label="@L.T("طريقة رد المبلغ")" Variant="Variant.Outlined"
+                                       Margin="Margin.Dense" Dense="true">
+                                <MudSelectItem T="string" Value="@("CASH")">@L.T("استرداد نقدي من المورد")</MudSelectItem>
+                                <MudSelectItem T="string" Value="@("CREDIT")">@L.T("خصم من المستحق للمورد")</MudSelectItem>
+                            </MudSelect>
+                        </MudItem>
+                        @if (refund == "CASH")
+                        {
+                            <MudItem xs="12" sm="6" md="6">
+                                <MudSelect T="int" @bind-Value="method" Label="@L.T("طريقة الدفع")" Variant="Variant.Outlined"
+                                           Margin="Margin.Dense" Dense="true">
+                                    @foreach (var m in methods)
+                                    {
+                                        <MudSelectItem T="int" Value="@m.Id">@m.Name</MudSelectItem>
+                                    }
+                                </MudSelect>
+                            </MudItem>
+                        }
+                    }
+                </MudGrid>
+            </MudPaper>
 
-    @if (question.Length > 0)
-    {
-        <div class="dialog-backdrop">
-            <div class="dialog" role="dialog" aria-modal="true">
-                <p>@L.T(question)</p>
-                <div class="actions">
-                    <button class="btn primary" @onclick="Yes">@L.T("نعم")</button>
-                    <button class="btn" @onclick="@(() => question = "")">@L.T("لا")</button>
-                </div>
-            </div>
+            @if (invoice is { } inv)
+            {
+                <EntityGrid T="PurchaseReturnableLine" Items="inv.Lines" Title="@L.T("أسطر الفاتورة")" Filterable="false" ShowPager="false"
+                            RowsPerPage="1000" Class="erp-return-lines">
+                    <ToolBarContent>
+                        <MudButton Variant="Variant.Outlined" Size="Size.Small" StartIcon="@Icons.Material.Outlined.DoneAll" OnClick="All">
+                            @L.T("إرجاع الكل")
+                        </MudButton>
+                    </ToolBarContent>
+                    <Columns>
+                        <PropertyColumn T="PurchaseReturnableLine" TProperty="string" Property="l => l.ProductName" Title="@L.T("الصنف")" />
+                        <TemplateColumn T="PurchaseReturnableLine" Title="@L.T("المشترى")" SortBy="l => l.BoughtQty" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><QtyText Value="context.Item.BoughtQty" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="PurchaseReturnableLine" Title="@L.T("المرتجع سابقًا")" SortBy="l => l.ReturnedQty" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><QtyText Value="context.Item.ReturnedQty" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="PurchaseReturnableLine" Title="@L.T("المتاح للإرجاع")" SortBy="l => l.AvailableQty" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><QtyText Value="context.Item.AvailableQty" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="PurchaseReturnableLine" Title="@L.T("الكمية المرتجعة")" Sortable="false" HeaderClass="erp-num" CellClass="erp-return-qty">
+                            <CellTemplate>
+                                <MudNumericField T="decimal" Value="@qty.GetValueOrDefault(context.Item.PurchaseDetailID)"
+                                                 ValueChanged="q => SetQty(context.Item, q)" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                                 HideSpinButtons="true" Min="0" Class="erp-cell-num" Disabled="context.Item.AvailableQty <= 0"
+                                                 Culture="System.Globalization.CultureInfo.InvariantCulture" aria-label="@L.T("الكمية المرتجعة")" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="PurchaseReturnableLine" Title="@L.T("بالمخزون")" SortBy="l => l.InStock" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><QtyText Value="context.Item.InStock" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="PurchaseReturnableLine" Title="@L.T("القيمة")" Sortable="false" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><MoneyText Value="Amount(context.Item)" Bold="true" /></CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </EntityGrid>
+            }
+            else
+            {
+                <EmptyState Icon="@Icons.Material.Outlined.AssignmentReturn" Title="@L.T("اكتب رقم فاتورة الشراء ثم «بحث».")"
+                            Text="@L.T("إرجاع أصناف فاتورة شراء للمورد: نقدًا أو خصمًا من المستحق له")" Class="erp-empty-compact" />
+            }
         </div>
-    }
-</section>
+
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("مرتجع للمورد")</MudText>
+                <dl class="erp-summary-list">
+                    <dt>@L.T("إجمالي الفاتورة")</dt><dd><MoneyText Value="invoice?.TotalAmount" /></dd>
+                    <dt class="erp-summary-grand">@L.T("قيمة المرتجع")</dt>
+                    <dd class="erp-summary-grand"><MoneyText Value="invoice is null ? null : invoice.Lines.Sum(Amount)" ShowCurrency="true" Bold="true" /></dd>
+                </dl>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                           StartIcon="@Icons.Material.Outlined.Save" OnClick="() => SaveAsync(false)" Disabled="busy || invoice is null">
+                    @L.T("حفظ المرتجع")
+                </MudButton>
+            </MudPaper>
+        </aside>
+    </div>
+
+    <FilterPanel Range="range" RangeChanged="r => range = r ?? FilterPanel.ThisMonth()" OnShow="LoadListAsync" OnClear="Reset"
+                 Busy="listBusy" Title="@L.T("المرتجعات")" Class="no-print" />
+    <EntityGrid T="ReturnRow" Items="rows" Title="@L.T("المرتجعات")" Export="export" ExportName="@L.T("مرتجعات المشتريات")"
+                Loading="listBusy" Filterable="false" SearchText="r => r.Number + ' ' + r.PartyName + ' ' + r.InvoiceNumber"
+                EmptyText="@L.T("لا توجد مرتجعات في هذه الفترة")">
+        <Columns>
+            <PropertyColumn T="ReturnRow" TProperty="string" Property="r => r.Number" Title="@L.T("المرتجع")" />
+            <TemplateColumn T="ReturnRow" Title="@L.T("التاريخ")" SortBy="r => r.Date">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@context.Item.Date.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)</bdi></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="ReturnRow" TProperty="string" Property="r => r.PartyName" Title="@L.T("المورد")" />
+            <PropertyColumn T="ReturnRow" TProperty="string" Property="r => r.InvoiceNumber" Title="@L.T("الفاتورة")" />
+            <TemplateColumn T="ReturnRow" Title="@L.T("القيمة")" SortBy="r => r.Total" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.Total" /></CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", message = "", messageKind = "", number = "", reason = "", refund = "CREDIT";
+    private bool allowed, loaded, busy, listBusy;
+    private string denied = "", message = "", number = "", reason = "", refund = "CREDIT";
+    private Severity severity = Severity.Info;
     private int method = 1;
-    private bool confirm;
-    private string question = "";
     private PurchaseReturnable? invoice;
     private Dictionary<int, decimal> qty = [];
     private List<(int Id, string Name)> methods = [];
     private List<ReturnRow> rows = [];
+    private DateRange range = FilterPanel.ThisMonth();
+    private List<GridExport<ReturnRow>> export = [];
+    private MudTextField<string>? numberField;
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmPurchaseReturn");
         allowed = denied.Length == 0;
+        loaded = true;
         if (!allowed)
         {
             return;
         }
+        export =
+        [
+            new(L.T("المرتجع"), r => r.Number),
+            new(L.T("التاريخ"), r => r.Date.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)),
+            new(L.T("المورد"), r => r.PartyName),
+            new(L.T("الفاتورة"), r => r.InvoiceNumber),
+            new(L.T("القيمة"), r => r.Total),
+        ];
         methods = await Sales.PaymentMethodsAsync(L.English);
         await LoadListAsync();
     }
 
-    private async Task LoadListAsync() => rows = await Purchases.PurchaseReturnsAsync(DateTime.Today.AddDays(1 - DateTime.Today.Day), DateTime.Today, L.English);
+    /// <summary>The returns of the period (this month first, as the Access screen).</summary>
+    private async Task LoadListAsync()
+    {
+        listBusy = true;
+        try
+        {
+            rows = await Purchases.PurchaseReturnsAsync(range.Start ?? DateTime.Today, range.End ?? DateTime.Today, L.English);
+        }
+        finally
+        {
+            listBusy = false;
+        }
+    }
+
+    private async Task Reset()
+    {
+        range = FilterPanel.ThisMonth();
+        await LoadListAsync();
+    }
+
+    private void Show(string text, Severity kind)
+    {
+        message = text;
+        severity = kind;
+    }
+
+    private async Task NumberKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await FindAsync();
+        }
+    }
 
     private async Task FindAsync()
     {
@@ -184,7 +266,7 @@
         invoice = await Purchases.ReturnableAsync(number, L.English);
         if (invoice is null)
         {
-            (message, messageKind) = (L.T("لا توجد فاتورة شراء بهذا الرقم."), "error");
+            Show(L.T("لا توجد فاتورة شراء بهذا الرقم."), Severity.Error);
             return;
         }
         qty = invoice.Lines.ToDictionary(l => l.PurchaseDetailID, _ => 0m);
@@ -193,14 +275,12 @@
 
     private decimal Amount(PurchaseReturnableLine l) => qty.GetValueOrDefault(l.PurchaseDetailID) is > 0 and var q && l.Amounts(q) is { Problem.Length: 0 } a ? a.Total : 0;
 
-    private void SetQty(PurchaseReturnableLine l, object? value)
+    private void SetQty(PurchaseReturnableLine l, decimal q)
     {
-        decimal.TryParse(Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture), System.Globalization.NumberStyles.Number,
-                         System.Globalization.CultureInfo.InvariantCulture, out var q);
         q = Math.Max(0, q);
         if (q > l.AvailableQty)
         {
-            (message, messageKind) = (L.T("الكمية المرتجعة أكبر من المتاح للإرجاع (") + WorkPages.Qty(l.AvailableQty) + ").", "error");
+            Show(L.T("الكمية المرتجعة أكبر من المتاح للإرجاع (") + WorkPages.Qty(l.AvailableQty) + ").", Severity.Error);
             q = l.AvailableQty;
         }
         qty[l.PurchaseDetailID] = q;
@@ -214,34 +294,46 @@
         }
     }
 
-    private async Task Yes()
+    private async Task New()
     {
-        question = "";
-        confirm = true;
-        await SaveAsync();
+        invoice = null;
+        number = "";
+        reason = "";
+        message = "";
+        if (numberField is not null)
+        {
+            await numberField.FocusAsync();
+        }
     }
 
-    private async Task SaveAsync()
+    private async Task SaveAsync(bool confirmed)
     {
+        if (busy || invoice is null)
+        {
+            return;
+        }
         message = "";
         busy = true;
         try
         {
             var req = new PurchaseReturnRequest(invoice!.PurchaseInvoiceID, reason, refund, method,
                                                 invoice.Lines.Select(l => new PurchaseReturnLineRequest(l.PurchaseDetailID, qty[l.PurchaseDetailID])).ToArray());
-            var r = await Purchases.PostPurchaseReturnAsync(UserInfo.Acting(user), req, confirm);
-            confirm = false;
+            var r = await Purchases.PostPurchaseReturnAsync(UserInfo.Acting(user), req, confirmed);
             if (r.Status == SaveStatus.NeedsConfirmation)
             {
-                question = r.Message;
+                busy = false;
+                if (await ConfirmDialog.AskAsync(Dialogs, L.T("تأكيد"), L.T(r.Message), L.T("نعم"), Color.Primary))
+                {
+                    await SaveAsync(true);
+                }
                 return;
             }
             if (r.Status != SaveStatus.Saved)
             {
-                (message, messageKind) = (r.Message, "error");
+                Show(r.Message, Severity.Error);
                 return;
             }
-            (message, messageKind) = (WorkPages.PurchaseReturnSaved + r.InvoiceNumber + " - " + WorkPages.Money(r.Total), "success");
+            Show(WorkPages.PurchaseReturnSaved + r.InvoiceNumber + " - " + WorkPages.Money(r.Total), Severity.Success);
             reason = "";
             invoice = null;
             await LoadListAsync();

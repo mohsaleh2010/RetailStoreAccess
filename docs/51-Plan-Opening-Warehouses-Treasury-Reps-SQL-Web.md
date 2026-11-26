@@ -370,3 +370,4 @@
 | الموافقة على المرحلة 5 من إعادة تصميم الويب؛ خطة المرحلة 6، الدفعة الأولى (المبيعات: `/sales` و`/sales/{Id}` و`/payments` و`/sales-returns`) معروضة | ✅ |
 | الموافقة على خطة المرحلة 6، الدفعة 1؛ إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 1 (المبيعات): `/sales` و`/sales/{Id}` و`/payments` (فورمة السند فوق القائمة) و`/sales-returns` بالقوالب المعتمدة (`docs/ui-inventory.md` القسم 10) | ✅ تمت الموافقة |
 | الموافقة على المرحلة 6، الدفعة 1 (المبيعات)؛ عرض خطة الدفعة 2 (المشتريات: `/purchase` و`/purchases` و`/purchases/{Id}` و`/supplier-payments` و`/purchase-returns`) | ✅ |
+| الموافقة على خطة الدفعة 2؛ إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 2 (المشتريات): `/purchase` (بعمود «سعر البيع الجديد» عبر `InvoiceLinesEditor.ExtraColumn`) و`/purchases` و`/purchases/{Id}` و`/supplier-payments` و`/purchase-returns` بالقوالب المعتمدة (`docs/ui-inventory.md` القسم 11) | ✅ بانتظار الموافقة |

@@ -35,7 +35,7 @@ The order of a page, always:
 | `EntityGrid<T>` | `<EntityGrid T="Row" Items="rows" SearchText="r => r.Code + ' ' + r.Name" Export="cols" ExportName="@L.T("...")"><Columns>...</Columns></EntityGrid>` |
 | `EntityDialog` | `<EntityDialog Title="@L.T("صنف جديد")" OnSave="SaveAsync">fields</EntityDialog>`, shown by `Dialogs.ShowAsync<X>(title, p, EntityDialog.Options)` (`WideOptions` for two columns); `OnSave` returns "" or the service message |
 | `LookupField<T>` | `<LookupField T="Customer" Label="@L.T("العميل")" Items="customers" @bind-Value="customer" CodeOf="c => c.Code" NameOf="c => c.Name" />` (+ `InfoTemplate`, or `SearchFunc` for a service) |
-| `InvoiceLinesEditor<TProduct>` | `<InvoiceLinesEditor TProduct="P" Lines="lines" Products="products" CodeOf=... NameOf=... PriceOf=... VatRate=... OnChange="Recalc" />` (+ `UnitTemplate`, `OnProductPicked`) |
+| `InvoiceLinesEditor<TProduct>` | `<InvoiceLinesEditor TProduct="P" Lines="lines" Products="products" CodeOf=... NameOf=... PriceOf=... VatRate=... OnChange="Recalc" />` (+ `UnitTemplate`, `OnProductPicked`, `ExtraColumn` + `ExtraColumnTitle` for a column of the page after the discount) |
 | `FilterPanel` | `<FilterPanel Range="range" RangeChanged="r => range = r" OnShow="Load" OnClear="Reset" Busy="busy"><MudItem ...>choices</MudItem></FilterPanel>`; default `FilterPanel.ThisMonth()` |
 | `MoneyText` / `QtyText` | `<MoneyText Value="x.Total" ShowCurrency="true" />`, `<QtyText Value="l.Quantity" Unit="@l.UnitName" />` |
 | `StatusChip` | `<StatusChip Status="@doc.Status" />` (codes of `StatusStyles`), or `Text` + `Color` |

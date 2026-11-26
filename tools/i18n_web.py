@@ -18,6 +18,11 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    # phase 6, batch 2 of the redesign: the purchase pages (/purchase, /purchases, /purchases/{id}, /supplier-payments,
+    # /purchase-returns)
+    'رقم السند أو اسم المورد': 'Voucher number or supplier name',
+    'رقم الفاتورة أو اسم المورد': 'Invoice number or supplier name',
+    'رصيد المورد': 'Supplier balance',
     # phase 6, batch 1 of the redesign: the sales pages (/sales, /sales/{id}, /payments, /sales-returns)
     'إجمالي الفاتورة': 'Invoice total',
     'المبلغ بالعملة': 'Amount in currency',
