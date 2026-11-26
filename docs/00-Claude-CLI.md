@@ -21,7 +21,7 @@
 | `CLAUDE.md` ← `AGENTS.md` | القواعد: الرد بالعربية، وميزة واحدة في كل مرة، والتقرير والانتظار، وقواعد Access |
 | [`docs/dev/05-Progress.md`](dev/05-Progress.md) | **حالة العمل:** آخر عملية، وما ينتظر الموافقة، والخطوة التالية. يُحدَّث بعد كل عملية |
 | `docs/dev/01..04` | البنية، وقاعدة البيانات، والشاشات، وطريقة العمل |
-| `.claude/skills/*` | الأوامر `/continue` و`/run-tests` و`/new-feature` و`/access-error` |
+| `.claude/skills/*` | الأوامر `/continue` و`/run-tests` و`/new-feature` و`/access-error` و`/mudblazor-erp-ui` |
 | `.claude/settings.json` | يسمح بالتوليد والاختبارات وأوامر git دون سؤالك كل مرة |
 
 ## 3) أول تشغيل على جهازك
@@ -42,6 +42,7 @@
 | ميزة جديدة من خارج الخطة | `/new-feature` ثم وصفها |
 | خطأ ظهر في Access | `/access-error` ثم الصق الرسالة أو `BuildFrontEnd.log` أو `RunAllTests.log` |
 | تشغيل الاختبارات | `/run-tests` |
+| شاشة ويب جديدة أو نقل شاشة إلى MudBlazor | `/mudblazor-erp-ui` ثم اسم الشاشة أو الدفعة |
 
 **بعد كل عملية** يحدّث Claude ملفات Markdown: وثيقة الميزة، و`README.md`، وسجل التنفيذ في `docs/51`، و`AGENTS.md` و`docs/dev/*`، وملف الحالة `docs/dev/05-Progress.md`. ثم يحفظ في git ويرفع إلى الفرع.
 

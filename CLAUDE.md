@@ -6,6 +6,7 @@
 - The project instructions above (AGENTS.md) apply in full; they are shared with every other AI tool,
   so change them there, not here.
 - Skills in `.claude/skills/`: `/continue` (resume from `docs/dev/05-Progress.md`), `/run-tests`, `/new-feature`,
-  `/access-error` (the procedures of AGENTS.md).
+  `/access-error` (the procedures of AGENTS.md), `/mudblazor-erp-ui` (every web page built or moved to
+  MudBlazor: the approved templates A / B / C / D, the shared components, the design rules and the checklist).
 - The human guides (Arabic): Claude Code CLI on the owner's machine `docs/00-Claude-CLI.md`, Claude Desktop
   `docs/00-Claude-Desktop.md`.

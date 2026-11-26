@@ -11,7 +11,7 @@
 | `CLAUDE.md` | يقرؤه Claude تلقائيًا عند فتح المجلد، ويضم `AGENTS.md` |
 | `docs/dev/*.md` | شرح البنية، وقاعدة البيانات، والشاشات، وطريقة العمل والتفكير |
 | `docs/dev/05-Progress.md` | حالة العمل والخطوة التالية، يُحدَّث بعد كل عملية |
-| `.claude/skills/*/SKILL.md` | أوامر جاهزة تكتبها في المحادثة: `/continue` و`/run-tests` و`/new-feature` و`/access-error` |
+| `.claude/skills/*/SKILL.md` | أوامر جاهزة تكتبها في المحادثة: `/continue` و`/run-tests` و`/new-feature` و`/access-error` و`/mudblazor-erp-ui` (تصميم شاشات الويب) |
 | `.claude/settings.json` | يسمح لـ Claude بتشغيل التوليد والاختبارات وأوامر git للقراءة دون أن يسألك كل مرة |
 | `docs/NN-*.md` | شرح كل ميزة بالعربية، و`README.md` يعرض حالة كل ميزة |
 
@@ -88,5 +88,5 @@ python -m unittest discover -s tests
 ابدأ أي محادثة جديدة بجملة مثل:
 > اقرأ AGENTS.md وملفات docs/dev ثم نفّذ: …
 
-الأوامر `/run-tests` و`/new-feature` و`/access-error` خاصة بـ Claude. خطواتها مكتوبة نصًا في قسم «Standard procedures» في `AGENTS.md`، فيمكنك أن تطلبها من أي أداة بالكلمات.
+الأوامر `/run-tests` و`/new-feature` و`/access-error` و`/mudblazor-erp-ui` خاصة بـ Claude. خطوات الثلاثة الأولى مكتوبة نصًا في قسم «Standard procedures» في `AGENTS.md`، وقواعد تصميم الويب في `.claude/skills/mudblazor-erp-ui/SKILL.md` (Markdown عادي)، فيمكنك أن تطلبها من أي أداة بالكلمات.
 

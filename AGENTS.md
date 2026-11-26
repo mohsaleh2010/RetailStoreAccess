@@ -229,14 +229,30 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   fragment needs an English text in `i18n_en.EN` or `i18n_web.WEB_EN` (`test_web` lists the missing ones). A new web
   data screen = a row of `gen_web.WEB_SCREENS` (an Access `DataScreen`) + its page in `RetailStore.UI/Pages`. The SQL
   Server schema is never created by the web (`DbSetup` creates only SQLite development / test databases).
-  The web UI is MudBlazor (redesign `docs/ERP-Redesign-Prompt.md`, `docs/ui-inventory.md`): colors and fonts only from
-  `RetailStore.UI/Theme/ErpTheme.cs`, `MudRTLProvider` follows `L.Dir`, the dark mode is the cookie `theme` (`UiTheme`), the side
-  menu groups come from `Layout/NavGroups.cs` (a new page is a row of `WorkPages` and gets its group and icon there).
-  Pages are built from the shared components of `RetailStore.UI/Components/Shared` (`PageHeader`, `EntityGrid`, `EntityDialog`,
-  `LookupField`, `InvoiceLinesEditor`, `FilterPanel`, `MoneyText` / `QtyText`, `StatusChip`, `ConfirmDialog`, `StatCard`, `EmptyState`,
-  `KeyboardShortcuts`; gallery `/dev/components`, Development only): amounts through `MoneyText` (currency of the settings, `UiCurrency`),
-  line amounts from `InvoiceCalculator` never from the screen, dates Gregorian (`ErpFormat.DateCulture`), shortcuts through `ShortcutService`
-  (F2 save, F3 search, F4 new, Esc close, Ctrl+P print); MudBlazor texts in Arabic come from `ErpMudLocalizer`. The page templates (`docs/ui-inventory.md` section 8, pilots awaiting approval): A data screen = `Components/DataScreen.razor` + `DataScreenDialog.razor`, B document = `Pages/Sales/PosPage.razor`, C report = `Pages/Accounting/LedgerPage.razor`, D dashboard = `Pages/Home.razor` (its reports through `ReportService` in `Services/HomeReports.cs`, kept 10 minutes: each run writes a `REPORT` audit line).
+  **The web UI is MudBlazor only** (redesign `docs/ERP-Redesign-Prompt.md`, decisions and components in
+  `docs/ui-inventory.md`; every web page is built or moved with the skill `.claude/skills/mudblazor-erp-ui`, plain
+  Markdown any tool can read). The redesign touches the UI layer only (`.razor`, CSS): no service, `DbContext`,
+  calculation, check, order or message changes, and a back-end change a screen needs (paging for `ServerData`) is
+  asked first. Each page copies its approved template (`docs/ui-inventory.md` section 8): A data screen =
+  `Components/DataScreen.razor` + `DataScreenDialog.razor` (a master table is a row of `WEB_SCREENS`), B document =
+  `Pages/Sales/PosPage.razor`, C report = `Pages/Accounting/LedgerPage.razor`, D dashboard = `Pages/Home.razor` (its
+  reports through `ReportService` in `Services/HomeReports.cs`, kept 10 minutes: each run writes a `REPORT` audit
+  line). Every page starts with `PageHeader` and is built from the shared components of
+  `RetailStore.UI/Components/Shared` (`PageHeader`, `EntityGrid`, `EntityDialog`, `LookupField`, `InvoiceLinesEditor`,
+  `FilterPanel`, `MoneyText` / `QtyText`, `StatusChip`, `ConfirmDialog`, `StatCard`, `EmptyState`,
+  `KeyboardShortcuts`; gallery `/dev/components`, Development only); a change a page needs in one of them is made once
+  in the component. Fields `Variant.Outlined` + `Margin.Dense`, `MudGrid Spacing="3"`, `mb-4` between sections (the
+  layout gives `pa-4`); the main action `Variant.Filled` `Color.Primary`, the others `Variant.Outlined`, delete
+  `Color.Error`; icons `Icons.Material.Outlined.*` (a menu page: `NavGroups.IconOf`); colors and fonts only from
+  `RetailStore.UI/Theme/ErpTheme.cs` (no hex color, no `style=` in a page, page CSS in `wwwroot/erp.css` with logical
+  properties), `MudRTLProvider` follows `L.Dir`, the dark mode is the cookie `theme` (`UiTheme`), the side menu groups
+  come from `Layout/NavGroups.cs` (a new page is a row of `WorkPages` and gets its group and icon there). Amounts
+  through `MoneyText` (currency of the settings, `UiCurrency`), line amounts from `InvoiceCalculator` never from the
+  screen, dates Gregorian (`ErpFormat.DateCulture`), shortcuts through `ShortcutService` (F2 save, F3 search, F4 new,
+  Esc close, Ctrl+P print); MudBlazor texts in Arabic come from `ErpMudLocalizer`. No markup of the old
+  `retailstore.css` in a moved page, no Bootstrap or second UI library. A page marked ✅ in the table of
+  `docs/ui-inventory.md` is checked by `tests/test_web_rules.py`; a batch is handed over with `dotnet build` clean and
+  screenshots light / dark, Arabic / English, 1440px / 768px.
 - **API (`docs/77`)**: every operation under `/api/v1` names its permission with `.Needs(...)` (the user's own ones aside:
   token, password, `/me`, `/rep/profile`) and a `.WithSummary(...)` (`test_web` checks both); its logic is a service of
   `RetailStore.Data` that follows the VBA (messages identical to the VBA module, `test_web` compares those of `RepService`);

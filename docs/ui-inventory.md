@@ -25,14 +25,14 @@
 
 | # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
 |---|---|---|---|---|---|---|
-| 1 | `/` | `Pages/Home.razor` | الرئيسية | D | 147 | 🟨 تجريبية |
+| 1 | `/` | `Pages/Home.razor` | الرئيسية | D | 147 | ✅ معتمدة (القالب D) |
 | 2 | `/account/login` | `RetailStore.Web/Components/Pages/Account/Login.razor` | إعدادات/دخول | D (SSR) | 50 | ⬜ |
 | 3 | `/account/change-password` | `RetailStore.Web/Components/Pages/Account/ChangePassword.razor` | إعدادات/دخول | D (SSR) | 65 | ⬜ |
-| 4 | `/products` | `Pages/ProductsPage.razor` → `Components/DataScreen.razor` | مخازن | A | 4 (+421) | 🟨 تجريبية |
-| 5 | `/customers` | `Pages/CustomersPage.razor` → `DataScreen` | مبيعات | A | 4 | 🟨 تجريبية |
-| 6 | `/suppliers` | `Pages/SuppliersPage.razor` → `DataScreen` | مشتريات | A | 4 | 🟨 تجريبية |
-| 7 | `/warehouses` | `Pages/WarehousesPage.razor` → `DataScreen` | مخازن | A | 4 | 🟨 تجريبية |
-| 8 | `/pos` | `Pages/Sales/PosPage.razor` | مبيعات | B | 361 | 🟨 تجريبية |
+| 4 | `/products` | `Pages/ProductsPage.razor` → `Components/DataScreen.razor` | مخازن | A | 4 (+421) | ✅ معتمدة (القالب A) |
+| 5 | `/customers` | `Pages/CustomersPage.razor` → `DataScreen` | مبيعات | A | 4 | ✅ معتمدة (القالب A) |
+| 6 | `/suppliers` | `Pages/SuppliersPage.razor` → `DataScreen` | مشتريات | A | 4 | ✅ معتمدة (القالب A) |
+| 7 | `/warehouses` | `Pages/WarehousesPage.razor` → `DataScreen` | مخازن | A | 4 | ✅ معتمدة (القالب A) |
+| 8 | `/pos` | `Pages/Sales/PosPage.razor` | مبيعات | B | 361 | ✅ معتمدة (القالب B) |
 | 9 | `/sales` | `Pages/Sales/SalesListPage.razor` | مبيعات | C (قائمة مستندات) | 100 | ⬜ |
 | 10 | `/sales/{Id}` | `Pages/Sales/InvoicePage.razor` | مبيعات | B (عرض/طباعة) | 107 | ⬜ |
 | 11 | `/payments` | `Pages/Sales/PaymentsPage.razor` | مبيعات | B (سند) | 192 | ⬜ |
@@ -51,7 +51,7 @@
 | 24 | `/bank-reconciliation` | `Pages/Office/BankReconPage.razor` | حسابات (بنوك) | B (خاصة) | 316 | ⬜ |
 | 25 | `/journal` | `Pages/Accounting/JournalPage.razor` | حسابات | C (قيود + سطورها) | 171 | ⬜ |
 | 26 | `/manual-entries` | `Pages/Office/ManualEntriesPage.razor` | حسابات | B | 287 | ⬜ |
-| 27 | `/ledger` | `Pages/Accounting/LedgerPage.razor` | تقارير | C | 122 | 🟨 تجريبية |
+| 27 | `/ledger` | `Pages/Accounting/LedgerPage.razor` | تقارير | C | 122 | ✅ معتمدة (القالب C) |
 | 28 | `/trial-balance` | `Pages/Accounting/TrialBalancePage.razor` | تقارير | C | 95 | ⬜ |
 | 29 | `/financials` | `Pages/Accounting/FinancialsPage.razor` | تقارير | C | 115 | ⬜ |
 | 30 | `/reports` | `Pages/Reports/ReportsPage.razor` | تقارير | C (مركز التقارير: كل تقارير `forms.REPORTS`) | 278 | ⬜ |
@@ -165,3 +165,19 @@
 **مشكلات وُجدت في اللقطات وحُلّت:** الكمية السالبة كانت تظهر «29-» في RTL (صارت `bdi dir=ltr` وحمراء)؛ جدول أسطر نقطة البيع كان أعرض من مكانه بجانب الملخص على 1440px فيختفي عمود الإجمالي (ضريبة السطر انتقلت للملخص، وجدول أضيق `erp-lines-compact`)؛ أعمدة كشف الحساب كانت تفيض بأيقونات الفلاتر (أُلغيت فلاتر الأعمدة في التقرير، والبحث باقٍ)؛ عناوين أعمدة الأرقام صارت بمحاذاة أرقامها.
 
 **الاختبارات:** `tests/test_web_pilots.py` (القوالب ومكوناتها، الخدمات نفسها وترتيب الحفظ / السؤال، الصلاحيات، لا ألوان hex ولا HTML قديم، CSS منطقي) و`PilotsTests.cs` في xUnit (فترات اللوحة وشهورها الاثنا عشر، ألوان الرسوم من الثيم، `InvoiceLine.Tag`).
+
+## 9) المرحلة 5: تثبيت القواعد (✅ بانتظار الموافقة)
+القواعد صارت مكتوبة في مكانين تقرؤهما أي جلسة جديدة وأي أداة، ويفحصها اختبار، حتى تُنقل باقي الشاشات في المرحلة 6 على النمط نفسه:
+
+| الملف | ما فيه |
+|---|---|
+| `AGENTS.md` (فقرة «Web (`docs/76`)») | الواجهة MudBlazor فقط؛ لا تغيير في منطق العمل (والتعديل الخلفي يُسأل عنه أولًا)؛ القوالب المعتمدة الأربعة بمساراتها؛ كل صفحة تبدأ بـ `PageHeader` ومن المكونات المشتركة؛ الحقول `Variant.Outlined` + `Margin.Dense`؛ الأزرار والأيقونات والألوان والعملة والتواريخ والاختصارات؛ لا HTML قديم ولا مكتبة ثانية؛ التسليم بـ `dotnet build` نظيف ولقطات بالوضعين واللغتين و1440px / 768px |
+| `.claude/skills/mudblazor-erp-ui/SKILL.md` (`/mudblazor-erp-ui`) | 1) القوالب: A `Components/DataScreen.razor` + `DataScreenDialog.razor`، B `Pages/Sales/PosPage.razor`، C `Pages/Accounting/LedgerPage.razor`، D `Pages/Home.razor`، وترتيب أقسام كل قالب. 2) المكونات المشتركة الاثنا عشر بسطر استخدام لكل منها، وأي تعديل فيها مرة واحدة في المكون (الوكيل الفرعي لا يعدّلها). 3) قواعد التصميم: المسافات، الحقول، الأزرار، الجداول، الألوان، الأيقونات، النصوص، الاتجاهان، المبالغ، الحالات، الكيبورد، الطباعة. 4) الممنوعات. 5) خطوات الدفعة (الأوامر، التشغيل، اللقطات، تحديث هذا الجرد). 6) قائمة المراجعة |
+| `CLAUDE.md`، `docs/00-Claude-CLI.md`، `docs/00-Claude-Desktop.md` | المهارة الجديدة في قائمة الأوامر |
+| هذا الجرد | الشاشات التجريبية صارت «✅ معتمدة (القالب X)» في جدول القسم 2 |
+
+**الاختبار** `tests/test_web_rules.py`: المهارة بواجهتها (`name` / `description`) وكل مسار تذكره موجود، وجدول مكوناتها = ملفات `Components/Shared` بالضبط، و`AGENTS.md` و`CLAUDE.md` يشيران إليها؛ و**كل صفحة عليها ✅ في جدول القسم 2** (الآن القوالب الأربعة وشاشات البيانات) تُفحص بقواعد المهارة: `PageHeader`، لا HTML قديم، لا ألوان hex ولا `style=`، أيقونات Outlined فقط، لا عملة مكتوبة في الصفحة، لا مبلغ تحسبه الصفحة، وكل حقل Outlined + Dense (وحقول المكونات المشتركة كذلك). فعند تعليم صفوف دفعة بـ ✅ في المرحلة 6 تُفحص صفحاتها تلقائيًا. واختبار يثبت أن الفحص يلتقط صفحة مكتوبة بالطريقة القديمة.
+
+لم يتغير أي كود C# أو Razor في هذه المرحلة.
+
+**التالي (المرحلة 6):** نقل باقي الشاشات على دفعات بالمهارة، بالترتيب: المبيعات (`/sales`، `/sales/{Id}`، `/payments`، `/sales-returns`) ← المشتريات ← المخازن ← الحسابات والخزينة ← التقارير ← الدخول والإعدادات؛ لكل دفعة خطة قصيرة ثم موافقة.
