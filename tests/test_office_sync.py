@@ -84,10 +84,22 @@ class RuleTests(unittest.TestCase):
         self.assertTrue(stale(41, 15))
 
     def test_vba_has_the_same_numbers(self):
-        self.assertIn("DateDiff(\"n\", WholeSecond(CDate(LastAt)), WholeSecond(NowAt)) >= Minutes", proc(VBA, "OfficeSyncDue"))
-        # 10:00 less 14 minutes is 9:45:59.99... as a Double: DateDiff("n") alone said 15 (TestOfficeSync in Access).
-        self.assertIn("WholeSecond(CDate(LastAt)), WholeSecond(NowAt)) > 2 * Minutes + 10", proc(VBA, "OfficeSyncStale"))
-        self.assertIn("Round(CDbl(At) * 86400#, 0) / 86400#", proc(VBA, "WholeSecond"))
+        self.assertIn("OfficeSyncDue = (WholeMinutes(CDate(LastAt), NowAt) >= Minutes)", proc(VBA, "OfficeSyncDue"))
+        self.assertIn("OfficeSyncStale = (WholeMinutes(CDate(LastAt), NowAt) > 2 * Minutes + 10)", proc(VBA, "OfficeSyncStale"))
+
+    def test_whole_minutes_without_date_doubles(self):
+        """10:00 less 15 minutes is not exactly 9:45 as a Double: DateDiff("n") was a minute off in Access, even after
+        rounding each date to the second (TestOfficeSync "التشغيل التالي بعد عدد الدقائق", twice). Minutes are counted
+        from whole seconds as integers, as OfficeSyncRules.WholeMinutes does."""
+        self.assertNotIn('DateDiff("n", CDate(LastAt)', VBA)
+        self.assertIn("secs = Round(CDbl(At) * 86400#, 0)", proc(VBA, "MinuteIndex"))
+        self.assertIn("MinuteIndex = Int(secs / 60#)", proc(VBA, "MinuteIndex"))
+        # the same arithmetic in Python, on the Doubles VBA has: 14 and 15 minutes before 10:00
+        import datetime, math
+        base = (datetime.datetime(2026, 11, 16, 10, 0) - datetime.datetime(1899, 12, 30)).total_seconds() / 86400
+        index = lambda d: math.floor(round(d * 86400) / 60)
+        for m in range(0, 61):
+            self.assertEqual(index(base) - index(base - m * 60 / 86400), m)
         self.assertIn("> 2 * Minutes + 10", proc(VBA, "OfficeSyncStale"))
         cs = read("web", "src", "RetailStore.Domain", "Common", "OfficeSyncRules.cs")
         self.assertIn(">= minutes", cs)

@@ -252,8 +252,8 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   variable is filled by one call per statement, never by two calls of an expression that also reads it (VBA read it after both:
   `test_vba_byref`); code that runs inside an open transaction reads with `DbValue`, never `DLookup` (it does not see the
   transaction on linked server tables); this computer's time goes into SQL as a literal (`SqlNow()`, `SqlDate(Date)`), never
-  `Now()` / `Date()` (the server may evaluate it with its own clock and time zone); minutes between computed times use
-  `WholeSecond` before `DateDiff("n")`; a test never depends on the release `LICENSE_SECRET` (`ActivationCodeWith`).
+  `Now()` / `Date()` (the server may evaluate it with its own clock and time zone); minutes between computed times are counted
+  on whole seconds as integers (`modOfficeSync.WholeMinutes`), never `DateDiff("n")` on date Doubles; a test never depends on the release `LICENSE_SECRET` (`ActivationCodeWith`).
 - **Python on Windows**: the tools and tests run on the owner's Windows PC too: build paths with `os.path.join`, never by replacing `/` in `__file__`; `os.path.relpath` raises `ValueError` across drives (repository on `E:`, temp on `C:`), so a path printed goes through `shown(...)` (`test_delivery.WindowsPathTests`).
 - Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness
   cannot return a `Currency` either — wrap it in a `Double` function, see `tests/test_indicators.py`).

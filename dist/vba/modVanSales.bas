@@ -475,6 +475,8 @@ Public Function TestRepDays() As Boolean
     Dim passed As Long, failed As Long, report As String, rep As Long, van As Long, box As Long, mainBox As Long
     Dim dayID As Long, trID As Long, invID As Long, countID As Long, lines As Long, netValue As Currency
     Dim closingID As Long, expected As Currency, advBefore As Currency
+    Dim sumLoaded As Currency, sumSales As Currency, sumInvoice As Currency, sumCount As Currency, sumCash As Currency
+    Dim sumOk As Boolean, sumInfo As String
     Calendar = vbCalGreg
     EnsureTestUser
     g_SilentMode = True
@@ -567,12 +569,24 @@ Public Function TestRepDays() As Boolean
             "⁄Ã“ «·»÷«⁄… Ê«·‰ﬁœÌ… ”·›… ⁄·Ï «·„‰œÊ» (6 + 5)", passed, failed, report
     CheckRd Len(msg) = 0 And RepDayStatus(dayID) = "SETTLED" And ActingRepDayID() = 0 And CurrentWarehouseID() <> van, _
             "≈€·«ﬁ «·ÌÊ„ ÌÊﬁ› «·⁄„· »«”„ «·„‰œÊ» " & msg, passed, failed, report
-    CheckRd Nz(DbValue("SELECT LoadedValue FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0) = 36 And _
-            Nz(DbValue("SELECT SalesTotal FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0) = _
-            Nz(DbValue("SELECT TotalAmount FROM SalesInvoices WHERE SalesInvoiceID = " & invID), 0) And _
-            Nz(DbValue("SELECT CountDiffValue FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0) = -6 And _
-            Nz(DbValue("SELECT CashDifference FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0) = -5, _
-            "„·Œ’ «·ÌÊ„: «·„Õ„Û¯· Ê«·„»Ì⁄«  Ê›—ﬁ «·Ã—œ Ê›—ﬁ «·‰ﬁœÌ…", passed, failed, report
+    ' The four figures one by one, and shown when the check fails (it failed over the hosting server).
+    sumLoaded = Nz(DbValue("SELECT LoadedValue FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0)
+    sumSales = Nz(DbValue("SELECT SalesTotal FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0)
+    sumInvoice = Nz(DbValue("SELECT TotalAmount FROM SalesInvoices WHERE SalesInvoiceID = " & invID), 0)
+    sumCount = Nz(DbValue("SELECT CountDiffValue FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0)
+    sumCash = Nz(DbValue("SELECT CashDifference FROM RepDaySummaryQuery WHERE RepDayID = " & dayID), 0)
+    sumOk = (sumLoaded = 36 And sumSales = sumInvoice And sumCount = -6 And sumCash = -5)
+    sumInfo = ""
+    If Not sumOk Then
+        sumInfo = " [Loaded=" & sumLoaded & " Sales=" & sumSales & "/" & sumInvoice & " Count=" & sumCount & _
+                  " Cash=" & sumCash & " Opened=" & Format$(DbValue("SELECT OpenedAt FROM RepDays WHERE RepDayID = " & dayID), _
+                  "yyyy-mm-dd hh:nn:ss") & " Settled=" & Format$(DbValue("SELECT SettledAt FROM RepDays WHERE RepDayID = " & _
+                  dayID), "yyyy-mm-dd hh:nn:ss") & " Moves=" & Format$(DbValue("SELECT Min(TransactionDate) FROM " & _
+                  "InventoryTransactions WHERE WarehouseID = " & van), "yyyy-mm-dd hh:nn:ss") & ".." & _
+                  Format$(DbValue("SELECT Max(TransactionDate) FROM InventoryTransactions WHERE WarehouseID = " & van), _
+                  "yyyy-mm-dd hh:nn:ss") & "]"
+    End If
+    CheckRd sumOk, "„·Œ’ «·ÌÊ„: «·„Õ„Û¯· Ê«·„»Ì⁄«  Ê›—ﬁ «·Ã—œ Ê›—ﬁ «·‰ﬁœÌ…" & sumInfo, passed, failed, report
     msg = OpenRepDay(rep, MAIN_WAREHOUSE_ID, dayID)
     CheckRd Len(msg) = 0 And Len(DeleteRepDay(dayID)) = 0 And RepDayStatus(dayID) = "", "Õ–› ÌÊ„ »·« Õ—ﬂ…", _
             passed, failed, report
