@@ -3,98 +3,183 @@
 @inject SalesService Sales
 @inject PermissionService Permissions
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 @inject UiLanguage L
 
-<PageTitle>@L.T("فواتير المبيعات")</PageTitle>
+@* Template C (docs/ui-inventory.md section 8) for a list of documents: PageHeader (print) -> FilterPanel (the period and
+   the search the service looks in) -> the figures of the invoices shown -> EntityGrid of the invoices (a row opens the
+   invoice). The list is SalesService.InvoicesAsync with the permission of frmSalesInvoice. *@
+<PageHeader Title="@L.T("فواتير المبيعات")" Description="@L.T("الفواتير بتاريخها وطباعتها مع رمز الفاتورة الإلكترونية")"
+            Icon="@NavGroups.IconOf("sales")" Group="@L.T("المبيعات")">
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">
+                @L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd>
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.PointOfSale" Href="pos">
+                @L.T("فاتورة جديدة")<kbd class="erp-kbd">F4</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("فواتير المبيعات")</h1>
-            <p class="subtitle">@L.T("الفواتير بتاريخها وطباعتها مع رمز الفاتورة الإلكترونية")</p>
-        </div>
-    </header>
+@if (!allowed)
+{
+    @if (loaded)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
+    }
+}
+else
+{
+    <KeyboardShortcuts OnNew="New" OnPrint="Print" />
+    <FilterPanel Range="range" RangeChanged="r => range = r ?? Today()" OnShow="Load" OnClear="Reset" Busy="busy" Class="no-print">
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField T="string" @bind-Value="search" Label="@L.T("بحث")" Placeholder="@L.T("رقم الفاتورة أو اسم العميل")"
+                          Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Outlined.Search" Clearable="true" AutoFocus="true" Immediate="true"
+                          OnKeyDown="SearchKey" data-erp-search="true" />
+        </MudItem>
+    </FilterPanel>
 
-    @if (!allowed)
+    <MudText Typo="Typo.subtitle1" Class="mb-3 erp-print-title">
+        @L.T("فواتير المبيعات")
+        <span class="mud-text-secondary erp-num" dir="ltr">(@ErpFormat.Date(range.Start) - @ErpFormat.Date(range.End))</span>
+    </MudText>
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("عدد الفواتير")" Value="@rows.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                      Icon="@Icons.Material.Outlined.ReceiptLong" Color="Color.Info" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("الإجمالي")" Icon="@Icons.Material.Outlined.Payments" Color="Color.Primary">
+                <ValueContent><MoneyText Value="rows.Sum(r => r.TotalAmount)" /></ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("المدفوع")" Icon="@Icons.Material.Outlined.Paid" Color="Color.Success">
+                <ValueContent><MoneyText Value="rows.Sum(r => r.PaidAmount)" /></ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("المتبقي")" Icon="@Icons.Material.Outlined.MoneyOff" Color="Color.Warning">
+                <ValueContent><MoneyText Value="rows.Sum(r => r.RemainingAmount)" /></ValueContent>
+            </StatCard>
+        </MudItem>
+    </MudGrid>
+
+    @if (rows.Count >= ListLimit)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Text" Class="mb-3">@L.T("تظهر أحدث 200 سجل فقط: ضيّق الفترة أو ابحث")</MudAlert>
     }
-    else
-    {
-        <div class="list-pane">
-            <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
-                <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-                <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-                <input type="search" class="search" placeholder="@L.T("بحث")" aria-label="@L.T("بحث")" @bind="search" />
-                <button type="submit" class="btn">@L.T("عرض")</button>
-            </form>
-            <table class="list">
-                <thead>
-                    <tr>
-                        <th>@L.T("رقم الفاتورة")</th>
-                        <th>@L.T("التاريخ")</th>
-                        <th>@L.T("العميل")</th>
-                        <th>@L.T("نوع الدفع")</th>
-                        <th>@L.T("الإجمالي")</th>
-                        <th>@L.T("المتبقي")</th>
-                        <th>@L.T("الفاتورة الإلكترونية")</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var r in rows)
-                    {
-                        <tr tabindex="0" @onclick="() => Open(r.SalesInvoiceID)" @onkeydown="e => Key(e, r.SalesInvoiceID)">
-                            <td data-label="@L.T("رقم الفاتورة")">@r.InvoiceNumber</td>
-                            <td data-label="@L.T("التاريخ")">@r.InvoiceDate.ToString("yyyy-MM-dd HH:mm")</td>
-                            <td data-label="@L.T("العميل")">@r.CustomerName</td>
-                            <td data-label="@L.T("نوع الدفع")">@L.T(WorkPages.PaymentTypeName(r.PaymentType))</td>
-                            <td data-label="@L.T("الإجمالي")">@WorkPages.Money(r.TotalAmount)</td>
-                            <td data-label="@L.T("المتبقي")">@WorkPages.Money(r.RemainingAmount)</td>
-                            <td data-label="@L.T("الفاتورة الإلكترونية")">@L.T(WorkPages.StatusName(r.ZatcaStatus))</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            @if (rows.Count == 0)
-            {
-                <p class="empty">@L.T("لا توجد سجلات")</p>
-            }
-            else
-            {
-                <p class="hint">@L.T("المجموع"): @WorkPages.Money(rows.Sum(r => r.TotalAmount)) (@rows.Count)</p>
-            }
-        </div>
-    }
-</section>
+    <EntityGrid T="InvoiceRow" Items="rows" Title="@L.T("الفواتير")" Export="export" ExportName="@L.T("فواتير المبيعات")"
+                Loading="busy" Filterable="false" RowsPerPage="50" RowClick="r => Open(r.SalesInvoiceID)"
+                EmptyText="@L.T("لا توجد فواتير في هذه الفترة")">
+        <Columns>
+            <PropertyColumn T="InvoiceRow" TProperty="string" Property="r => r.InvoiceNumber" Title="@L.T("رقم الفاتورة")" />
+            <TemplateColumn T="InvoiceRow" Title="@L.T("التاريخ")" SortBy="r => r.InvoiceDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@context.Item.InvoiceDate.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)</bdi></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="InvoiceRow" TProperty="string" Property="r => r.CustomerName" Title="@L.T("العميل")" />
+            <TemplateColumn T="InvoiceRow" Title="@L.T("نوع الدفع")" SortBy="r => r.PaymentType">
+                <CellTemplate>@L.T(WorkPages.PaymentTypeName(context.Item.PaymentType))</CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="InvoiceRow" Title="@L.T("الإجمالي")" SortBy="r => r.TotalAmount" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.TotalAmount" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="InvoiceRow" Title="@L.T("المتبقي")" SortBy="r => r.RemainingAmount" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.RemainingAmount" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="InvoiceRow" Title="@L.T("الحالة")" SortBy="r => r.RemainingAmount">
+                <CellTemplate><StatusChip Status="@StatusStyles.PaymentState(context.Item.PaidAmount, context.Item.RemainingAmount)" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="InvoiceRow" Title="@L.T("الفاتورة الإلكترونية")" SortBy="r => r.ZatcaStatus">
+                <CellTemplate>
+                    <StatusChip Text="@L.T(WorkPages.StatusName(context.Item.ZatcaStatus))" Color="@StatusStyles.EInvoiceColor(context.Item.ZatcaStatus)" />
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="InvoiceRow" Title="" Sortable="false" CellClass="erp-actions-col no-print" HeaderClass="erp-actions-col no-print">
+                <CellTemplate>
+                    <MudTooltip Text="@L.T("عرض الفاتورة وطباعتها")">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Visibility" Size="Size.Small" Href="@($"sales/{context.Item.SalesInvoiceID}")"
+                                       aria-label="@L.T("عرض الفاتورة وطباعتها")" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
-    private bool allowed;
+    /// <summary>The rows the service returns at most (InvoicesAsync take).</summary>
+    private const int ListLimit = 200;
+    private bool allowed, loaded, busy;
     private string denied = "";
     private string? search;
-    private DateTime from = DateTime.Today, to = DateTime.Today;
+    private DateRange range = Today();
     private List<InvoiceRow> rows = [];
+    private List<GridExport<InvoiceRow>> export = [];
+
+    /// <summary>The period the Access list opens on: today.</summary>
+    private static DateRange Today() => new(DateTime.Today, DateTime.Today);
 
     protected override async Task OnInitializedAsync()
     {
         var user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmSalesInvoice");
         allowed = denied.Length == 0;
+        loaded = true;
         if (allowed)
+        {
+            export =
+            [
+                new(L.T("رقم الفاتورة"), r => r.InvoiceNumber),
+                new(L.T("التاريخ"), r => r.InvoiceDate.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)),
+                new(L.T("العميل"), r => r.CustomerName),
+                new(L.T("نوع الدفع"), r => L.T(WorkPages.PaymentTypeName(r.PaymentType))),
+                new(L.T("الإجمالي"), r => r.TotalAmount),
+                new(L.T("المدفوع"), r => r.PaidAmount),
+                new(L.T("المتبقي"), r => r.RemainingAmount),
+                new(L.T("الفاتورة الإلكترونية"), r => L.T(WorkPages.StatusName(r.ZatcaStatus))),
+                new(L.T("الكاشير"), r => r.EmployeeName),
+            ];
+            await Load();
+        }
+    }
+
+    private async Task Load()
+    {
+        busy = true;
+        try
+        {
+            rows = await Sales.InvoicesAsync(range.Start ?? DateTime.Today, range.End ?? DateTime.Today, search, L.English);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task Reset()
+    {
+        range = Today();
+        search = null;
+        await Load();
+    }
+
+    private async Task SearchKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
         {
             await Load();
         }
     }
 
-    private async Task Load() => rows = await Sales.InvoicesAsync(from, to, search, L.English);
-
     private void Open(int id) => Nav.NavigateTo("sales/" + id);
 
-    private void Key(KeyboardEventArgs e, int id)
-    {
-        if (e.Key == "Enter")
-        {
-            Open(id);
-        }
-    }
+    private void New() => Nav.NavigateTo("pos");
+
+    private async Task Print() => await JS.InvokeVoidAsync("print");
 }

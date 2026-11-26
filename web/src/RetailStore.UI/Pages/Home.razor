@@ -187,7 +187,7 @@
                             <CellTemplate><MoneyText Value="context.Item.TotalAmount" /></CellTemplate>
                         </TemplateColumn>
                         <TemplateColumn T="InvoiceRow" Title="@L.T("الحالة")" Sortable="false">
-                            <CellTemplate><StatusChip Status="@(context.Item.RemainingAmount <= 0 ? "PAID" : context.Item.PaidAmount > 0 ? "PARTIAL_PAID" : "UNPAID")" /></CellTemplate>
+                            <CellTemplate><StatusChip Status="@StatusStyles.PaymentState(context.Item.PaidAmount, context.Item.RemainingAmount)" /></CellTemplate>
                         </TemplateColumn>
                     </Columns>
                 </EntityGrid>

@@ -182,6 +182,19 @@ dt.erp-summary-grand { color: var(--mud-palette-text-primary); font-weight: 700;
 .erp-lines-compact .erp-lines-disc { width: 96px; min-width: 88px; }
 .erp-lines-compact .erp-lines-qty { width: 76px; min-width: 70px; }
 
+/* B shown read-only (/sales/{id}): the head of the invoice beside its QR code; the facts as a two-column list */
+.erp-invoice-head { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; justify-content: space-between; }
+.erp-invoice-info { min-width: 0; flex: 1 1 280px; }
+.erp-info-list { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 16px; margin: 0; }
+.erp-info-list dt { color: var(--mud-palette-text-secondary); }
+.erp-info-list dd { margin: 0; }
+.erp-nowrap { white-space: nowrap; }
+.erp-chips-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.erp-chips-row .mud-chip { margin: 0; }
+/* the editable quantity of a return line */
+.erp-return-qty { width: 128px; min-width: 112px; }
+.erp-return-lines .erp-grid-title, .erp-invoice-lines .erp-grid-title { margin-inline-end: 12px; }
+
 /* C: a report */
 .erp-row-opening .mud-table-cell { font-weight: 600; background: var(--mud-palette-background-gray); }
 
@@ -209,4 +222,7 @@ dt.erp-summary-grand { color: var(--mud-palette-text-primary); font-weight: 700;
     .mud-main-content { padding: 0 !important; margin: 0 !important; }
     .mud-container { max-width: none !important; padding: 0 !important; }
     .erp-app, body { background: #fff !important; color: #000 !important; }
+    .erp-doc { display: block; }
+    .erp-doc-side { position: static; margin-block-start: 16px; }
+    .erp-grid .mud-toolbar, .erp-grid .mud-table-pagination { display: none !important; }
 }

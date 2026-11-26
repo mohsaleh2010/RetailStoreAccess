@@ -5,8 +5,9 @@
    Either Items (searched here: LookupMatch) or SearchFunc (a search of the service).
    Example: <LookupField T="Customer" Label="@L.T("العميل")" Items="customers" @bind-Value="customer"
                          CodeOf="c => c.CustomerCode" NameOf="c => c.CustomerName">
-                <InfoTemplate Context="c"><MoneyText Value="c.Balance" /></InfoTemplate></LookupField> *@
-<MudAutocomplete T="T" Value="Value" ValueChanged="Changed" Label="@Label" Placeholder="@Placeholder" HelperText="@HelperText"
+                <InfoTemplate Context="c"><MoneyText Value="c.Balance" /></InfoTemplate></LookupField>
+   With @ref="field", await field.FocusAsync() puts the cursor in it (after a new document). *@
+<MudAutocomplete @ref="box" T="T" Value="Value" ValueChanged="Changed" Label="@Label" Placeholder="@Placeholder" HelperText="@HelperText"
                  SearchFunc="Find" ToStringFunc="Display" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true"
                  Clearable="!Required" ResetValueOnEmptyText="true" CoerceText="false" SelectValueOnTab="true" MaxItems="MaxItems"
                  Required="Required" RequiredError="@L.T("مطلوب")" Disabled="Disabled" ReadOnly="ReadOnly" DebounceInterval="200"
@@ -75,5 +76,16 @@
         return Task.FromResult(LookupMatch.Filter(Items ?? [], text, CodeOf, NameOf, MaxItems));
     }
 
+    private MudAutocomplete<T>? box;
+
     private Task Changed(T? item) => ValueChanged.InvokeAsync(item);
+
+    /// <summary>Puts the cursor in the field (a new document starts at its party: @ref then FocusAsync).</summary>
+    public async Task FocusAsync()
+    {
+        if (box is not null)
+        {
+            await box.FocusAsync();
+        }
+    }
 }

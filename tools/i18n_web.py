@@ -18,6 +18,21 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    # phase 6, batch 1 of the redesign: the sales pages (/sales, /sales/{id}, /payments, /sales-returns)
+    'إجمالي الفاتورة': 'Invoice total',
+    'المبلغ بالعملة': 'Amount in currency',
+    'تاريخ الاستحقاق': 'Due date',
+    'تظهر أحدث 200 سجل فقط: ضيّق الفترة أو ابحث': 'Only the latest 200 records are shown: narrow the period or search',
+    'رصيد العميل': 'Customer balance',
+    'رقم السند أو اسم العميل': 'Voucher number or customer name',
+    'رقم الفاتورة أو اسم العميل': 'Invoice number or customer name',
+    'عدد الفواتير': 'Invoices',
+    'لا توجد سندات في هذه الفترة': 'No vouchers in this period',
+    'لا توجد فواتير في هذه الفترة': 'No invoices in this period',
+    'لا توجد مرتجعات في هذه الفترة': 'No returns in this period',
+    'للبحث': 'to search',
+    'مرتجع جديد': 'New return',
+    'ملخص السند': 'Voucher summary',
     # the shared components of the redesign (docs/ERP-Redesign-Prompt.md, phase 3) and the sample data of /dev/components
     'أضف أول فاتورة لتظهر هنا': 'Add the first invoice to see it here',
     'أضف صنفًا بزر جديد': 'Add an item with the New button',

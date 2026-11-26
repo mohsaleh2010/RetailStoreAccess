@@ -37,4 +37,17 @@ public static class StatusStyles
             : new StatusStyle(status ?? "", Color.Default, Icons.Material.Outlined.Circle);
 
     public static IReadOnlyCollection<string> Codes => Known.Keys;
+
+    /// <summary>The color of an e-invoice status (SalesInvoices.ZatcaStatus; its caption is WorkPages.StatusName).</summary>
+    public static Color EInvoiceColor(string? status) => (status ?? "").Trim().ToUpperInvariant() switch
+    {
+        "REPORTED" or "CLEARED" or "VALID" => Color.Success,
+        "WARNING" or "PENDING" or "SUBMITTED" => Color.Warning,
+        "REJECTED" or "INVALID" or "CANCELLED" => Color.Error,
+        _ => Color.Default,
+    };
+
+    /// <summary>The payment state of an invoice for StatusChip: nothing left = PAID, part paid = PARTIAL_PAID, else UNPAID.</summary>
+    public static string PaymentState(decimal paid, decimal remaining) =>
+        remaining <= 0 ? "PAID" : paid > 0 ? "PARTIAL_PAID" : "UNPAID";
 }
