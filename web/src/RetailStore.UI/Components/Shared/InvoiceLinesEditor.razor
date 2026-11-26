@@ -16,6 +16,10 @@
             <tr>
                 <th class="erp-lines-no">#</th>
                 <th class="erp-lines-product">@L.T("الصنف")</th>
+                @if (UnitTemplate is not null)
+                {
+                    <th class="erp-lines-unit">@L.T("الوحدة")</th>
+                }
                 <th class="erp-num erp-lines-qty">@L.T("الكمية")</th>
                 <th class="erp-num erp-lines-price">@L.T("السعر")</th>
                 <th class="erp-num erp-lines-disc">@L.T("الخصم")</th>
@@ -40,6 +44,10 @@
                                      SearchFunc="SearchProducts" CodeOf="CodeOf" NameOf="NameOf" InfoTemplate="InfoTemplate"
                                      Placeholder="@L.T("الصنف بالكود أو الاسم")" ReadOnly="ReadOnly" />
                     </td>
+                    @if (UnitTemplate is not null)
+                    {
+                        <td class="erp-lines-unit">@if (!line.IsEmpty) { @UnitTemplate(line) }</td>
+                    }
                     <td data-cell class="erp-lines-qty">
                         <MudNumericField T="decimal" Value="line.Quantity" ValueChanged="v => Set(row, l => l.Quantity = v)"
                                          Min="0" HideSpinButtons="true" Variant="Variant.Outlined" Margin="Margin.Dense"
@@ -76,7 +84,7 @@
         {
             <tfoot>
                 <tr class="erp-lines-sum">
-                    <td colspan="@(ShowVat ? 6 : 5)" class="erp-lines-hint">
+                    <td colspan="@((ShowVat ? 6 : 5) + (UnitTemplate is null ? 0 : 1))" class="erp-lines-hint">
                         @if (!ReadOnly)
                         {
                             <MudButton Variant="Variant.Text" Size="Size.Small" StartIcon="@Icons.Material.Outlined.Add" OnClick="AddLineAsync">@L.T("سطر جديد")</MudButton>
@@ -127,6 +135,11 @@
     [Parameter] public bool PricesIncludeVat { get; set; }
     [Parameter] public decimal InvoiceDiscount { get; set; }
     [Parameter] public RenderFragment<TProduct>? InfoTemplate { get; set; }
+    /// <summary>A unit column (the unit of the line, chosen by the page: its price comes from the service).</summary>
+    [Parameter] public RenderFragment<InvoiceLine<TProduct>>? UnitTemplate { get; set; }
+    /// <summary>After an item is chosen on a line and its price set from PriceOf: the page completes the line (its unit, the
+    /// price of the service), before the totals.</summary>
+    [Parameter] public Func<InvoiceLine<TProduct>, Task>? OnProductPicked { get; set; }
     [Parameter] public bool ShowVat { get; set; } = true;
     [Parameter] public bool ShowTotals { get; set; } = true;
     /// <summary>The block of totals under the table (the B template puts its own card beside it).</summary>
@@ -193,6 +206,10 @@
             if (line.Quantity <= 0)
             {
                 line.Quantity = 1;
+            }
+            if (OnProductPicked is not null)
+            {
+                await OnProductPicked(line);
             }
             focus = (row, 1);
         }

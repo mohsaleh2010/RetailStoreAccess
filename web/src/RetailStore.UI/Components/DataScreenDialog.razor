@@ -1,0 +1,164 @@
+@typeparam T where T : class, new()
+@inject DataScreenService Service
+@inject IDialogService Dialogs
+@inject UiLanguage L
+
+@* The add / edit dialog of a data screen (template A): the fields of the spec in their order, two columns (a wide
+   field or a memo on the whole row), MudBlazor inputs by kind. Saving is DataScreenService.SaveAsync: its message
+   shows on top and marks its field; its question (a confirmation) is asked with ConfirmDialog and saves again. *@
+<EntityDialog @ref="dialog" Title="@Title" Icon="@(IsNew ? Icons.Material.Outlined.AddCircleOutline : Icons.Material.Outlined.Edit)"
+              Model="Record" OnSave="SaveAsync">
+    <MudGrid Spacing="3">
+        @foreach (var f in Spec.Fields)
+        {
+            @if (f.Kind == FieldKind.Info)
+            {
+                @if (f.Label.Trim().Length > 0)
+                {
+                    <MudItem xs="12">
+                        <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Text">@L.T(f.Label)</MudAlert>
+                    </MudItem>
+                }
+                continue;
+            }
+            bool locked = f.Locked || State.LockedFields.Contains(f.Name);
+            bool wide = f.Span > 1 || f.Kind == FieldKind.Memo;
+            bool bad = f.Name == problemField;
+            string hint = f.Hint.Length > 0 ? L.T(f.Hint) : "";
+            <MudItem xs="12" sm="@(wide ? 12 : 6)">
+                @switch (f.Kind)
+                {
+                    case FieldKind.Bool:
+                        <MudCheckBox T="bool" Value="@(f.Get(Record) is true)" ValueChanged="v => Set(f, v)" Disabled="locked"
+                                     Color="Color.Primary" Label="@L.T(f.Label)" Dense="true" />
+                        @if (hint.Length > 0)
+                        {
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary d-block erp-field-hint">@hint</MudText>
+                        }
+                        break;
+                    case FieldKind.Memo:
+                        <MudTextField T="string" Value="@(f.Get(Record)?.ToString())" ValueChanged="v => Set(f, v)" Label="@L.T(f.Label)"
+                                      Lines="3" Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="locked" HelperText="@hint"
+                                      Error="bad" Required="f.Required" RequiredError="@L.T("مطلوب")" />
+                        break;
+                    case FieldKind.Choice:
+                        <MudSelect T="string" Value="@(f.Get(Record)?.ToString())" ValueChanged="v => Set(f, v)" Label="@L.T(f.Label)"
+                                   Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Disabled="locked" HelperText="@hint"
+                                   Error="bad" Required="f.Required" RequiredError="@L.T("مطلوب")" Clearable="!f.Required"
+                                   AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var o in f.Options!)
+                            {
+                                <MudSelectItem T="string" Value="@o.Value">@L.T(o.Text)</MudSelectItem>
+                            }
+                        </MudSelect>
+                        break;
+                    case FieldKind.Lookup:
+                        <LookupField T="LookupItem" Value="Chosen(f)" ValueChanged="i => Set(f, i?.Key)" Label="@L.T(f.Label)"
+                                     Items="LookupItems(f)" NameOf="i => i.Text" HelperText="@hint" Required="f.Required"
+                                     Disabled="locked" Class="@(bad ? "mud-input-error" : "")" />
+                        break;
+                    case FieldKind.Money:
+                    case FieldKind.Quantity:
+                    case FieldKind.Rate:
+                    case FieldKind.Integer:
+                        <MudNumericField T="decimal?" Value="Number(f.Get(Record))" ValueChanged="v => Set(f, v)" Label="@L.T(f.Label)"
+                                         Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Disabled="locked"
+                                         HelperText="@hint" Error="bad" Required="f.Required" RequiredError="@L.T("مطلوب")"
+                                         Format="@(f.Kind == FieldKind.Money ? "0.00##" : f.Kind == FieldKind.Integer ? "0" : "0.####")"
+                                         Culture="System.Globalization.CultureInfo.InvariantCulture" Class="erp-cell-num" />
+                        break;
+                    case FieldKind.Date:
+                    case FieldKind.DateTime:
+                        <MudDatePicker Date="@(f.Get(Record) as DateTime?)" DateChanged="d => Set(f, d)" Label="@L.T(f.Label)"
+                                       Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="locked" HelperText="@hint"
+                                       DateFormat="yyyy-MM-dd" Culture="@ErpFormat.DateCulture(L.English)" Error="bad"
+                                       Required="f.Required" RequiredError="@L.T("مطلوب")" Clearable="!f.Required" AutoClose="true" />
+                        break;
+                    default:
+                        <MudTextField T="string" Value="@(f.Get(Record)?.ToString())" ValueChanged="v => Set(f, v)" Label="@L.T(f.Label)"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense" Disabled="locked" HelperText="@hint"
+                                      MaxLength="@(f.MaxLength > 0 ? f.MaxLength : 255)" Error="bad" Required="f.Required"
+                                      RequiredError="@L.T("مطلوب")" AutoFocus="@(f == FirstInput)" />
+                        break;
+                }
+            </MudItem>
+        }
+    </MudGrid>
+</EntityDialog>
+
+@code {
+    [Parameter] public ScreenSpec<T> Spec { get; set; } = default!;
+    [Parameter] public T Record { get; set; } = default!;
+    [Parameter] public bool IsNew { get; set; }
+    [Parameter] public RecordState State { get; set; } = new(new HashSet<string>());
+    [Parameter] public IReadOnlyDictionary<string, List<LookupItem>> Lookups { get; set; } = new Dictionary<string, List<LookupItem>>();
+    [Parameter] public ClaimsPrincipal? User { get; set; }
+    [Parameter] public string Title { get; set; } = "";
+    /// <summary>The result of a save that went through (the page refreshes its list and shows the message).</summary>
+    [Parameter] public Action<SaveResult>? OnSaved { get; set; }
+
+    private EntityDialog? dialog;
+    private string problemField = "";
+
+    /// <summary>The first field that can be typed in: the focus of the dialog.</summary>
+    private FieldSpec<T>? FirstInput => Spec.Fields.FirstOrDefault(f => f.Kind == FieldKind.Text && !f.Locked && !State.LockedFields.Contains(f.Name));
+
+    private static decimal? Number(object? v) => v is null ? null : Convert.ToDecimal(v, System.Globalization.CultureInfo.InvariantCulture);
+
+    private void Set(FieldSpec<T> f, object? value)
+    {
+        try
+        {
+            f.Set(Record, value);
+            if (problemField == f.Name)
+            {
+                problemField = "";
+            }
+        }
+        catch (Exception ex) when (ex is FormatException or OverflowException or InvalidCastException)
+        {
+            problemField = f.Name;
+            dialog?.ShowProblem(L.T("القيمة في حقل") + " «" + L.T(f.Label) + "» " + L.T("غير صحيحة."));
+        }
+    }
+
+    private List<LookupItem> LookupItems(FieldSpec<T> f)
+    {
+        var all = Lookups.TryGetValue(f.Name, out var list) ? list : [];
+        string? chosen = f.Get(Record)?.ToString();
+        var shown = all.Where(i => i.Active || i.Key.ToString() == chosen).ToList();
+        if (chosen is not null && shown.All(i => i.Key.ToString() != chosen))
+        {
+            shown.Add(new LookupItem(chosen, "(" + chosen + ")", false));
+        }
+        return shown;
+    }
+
+    private LookupItem? Chosen(FieldSpec<T> f)
+    {
+        string? chosen = f.Get(Record)?.ToString();
+        return chosen is null ? null : LookupItems(f).FirstOrDefault(i => i.Key.ToString() == chosen);
+    }
+
+    /// <summary>DataScreenService.SaveAsync as the Access screen saves: refused = its message (on its field), a question =
+    /// asked, then saved again with the answer; "no" keeps the dialog open as it is.</summary>
+    private async Task<string> SaveAsync()
+    {
+        var r = await Service.SaveAsync(Spec, Record, IsNew, UserInfo.Acting(User), false);
+        if (r.Status == SaveStatus.NeedsConfirmation)
+        {
+            if (!await ConfirmDialog.AskAsync(Dialogs, L.T("تأكيد"), L.T(r.Message), L.T("نعم"), Color.Primary))
+            {
+                return EntityDialog.StayOpen;
+            }
+            r = await Service.SaveAsync(Spec, Record, IsNew, UserInfo.Acting(User), true);
+        }
+        problemField = r.Field;
+        if (r.Status != SaveStatus.Saved)
+        {
+            return r.Message;
+        }
+        OnSaved?.Invoke(r);
+        return "";
+    }
+}

@@ -33,6 +33,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<DashboardService>();
         services.AddScoped<IndicatorsService>();
         services.AddScoped<ReportService>();
+        services.AddScoped<HomeReports>();
         return services;
     }
 }

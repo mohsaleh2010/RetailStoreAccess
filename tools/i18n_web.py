@@ -230,7 +230,6 @@ WEB_EN = {
     'إعادة المحاولة': 'Retry',
     'ابحث عن صنف أو اكتب الباركود': 'Search a product or type the barcode',
     'اختر الطابعة في الإعدادات': 'Choose the printer in the settings',
-    'اختر سجلًا من القائمة أو اضغط جديد': 'Choose a record from the list or press New',
     'ادخل باسمه وزامن أولًا': 'Log in as that user and sync first',
     'اربط الطابعة أولًا من إعدادات البلوتوث في الجوال': 'First pair the printer in the Bluetooth settings of the phone',
     'استئناف': 'Resume',
@@ -372,6 +371,22 @@ WEB_EN = {
     'قائمة الدخل والميزانية من القيود، مع فترة المقارنة': 'The income statement and the balance sheet from the journal, with a comparison period',
     'قبض وصرف نقدية من الصناديق، والتحويل بينها': 'Cash in and out of the boxes, and transfers between them',
     'من القيود': 'From the journal',
+    # web redesign, phase 4: the pilot screens (templates A / B / C / D)
+    'آخر 30 يومًا': 'Last 30 days',
+    'آخر الفواتير': 'Latest invoices',
+    'إجراءات': 'Actions',
+    'إضافة جديد': 'Add new',
+    'إيقاف السجل': 'Deactivate the record',
+    'اضغط إضافة جديد لإضافة أول سجل': 'Press Add new to add the first record',
+    'الفاتورة فارغة': 'The invoice is empty',
+    'بحث بالكود أو الاسم': 'Search by code or name',
+    'سطور القيود': 'Journal lines',
+    'شاشاتك': 'Your screens',
+    'كل الفواتير': 'All invoices',
+    'لا توجد فواتير في آخر 30 يومًا': 'No invoices in the last 30 days',
+    'لا توجد مبيعات في آخر 12 شهرًا': 'No sales in the last 12 months',
+    'لا توجد مبيعات في آخر 30 يومًا': 'No sales in the last 30 days',
+    'ملخص الفاتورة': 'Invoice summary',
 }
 
 _CS_LITERAL = re.compile(r'"((?:[^"\\\n]|\\.)*)"')

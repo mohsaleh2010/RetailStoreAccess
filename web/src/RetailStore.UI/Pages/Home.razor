@@ -1,147 +1,361 @@
 @page "/"
 @attribute [Authorize]
+@using RetailStore.Data.Reports
 @inject PermissionService Permissions
 @inject DashboardService Dashboard
 @inject IndicatorsService Indicators
+@inject SalesService Sales
+@inject HomeReports Reports
+@inject UiTheme Mode
 @inject UiLanguage L
 
-<PageTitle>@L.T("الرئيسية")</PageTitle>
+@* Template D of the redesign (docs/ui-inventory.md section 8): the figures of the dashboard (DashboardService =
+   DashboardQuery + ProfitQuery) and the financial indicators as StatCards -> the charts of the report centre
+   (MONTHLY_SALES, BEST_SELLING) -> the last invoices and the products under their reorder level (LOW_STOCK) -> the
+   screens of the user. Each part shows only with its permission, as before. *@
+<PageHeader Title="@(L.T("مرحبًا") + " " + UserInfo.Name(user))" Icon="@Icons.Material.Outlined.Dashboard"
+            Description="@L.T("نسخة الويب: البيانات الأساسية والمبيعات على نفس قاعدة بيانات البرنامج")">
+    <Actions>
+        <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Refresh" OnClick="Refresh" Disabled="busy">@L.T("تحديث")</MudButton>
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("مرحبًا") @UserInfo.Name(user)</h1>
-            <p class="subtitle">@L.T("نسخة الويب: البيانات الأساسية والمبيعات على نفس قاعدة بيانات البرنامج")</p>
-        </div>
-        <button class="btn" @onclick="Refresh">@L.T("تحديث")</button>
-    </header>
-    @if (office is { NeedsAttention: true } o)
-    {
-        @* the office tasks of Access (modOfficeSync, docs/84): the journal and the e-invoices of the web documents *@
-        <div class="message warning" role="alert">
-            @if (o.Stale)
-            {
-                @L.T("توقفت مهام المكتب في Access: آخر تشغيل") @(" " + (o.LastAt is { } t ? t.ToString("yyyy-MM-dd HH:mm") : "-") + " ")
-                @L.T("على الجهاز") @(" " + o.Computer + ". ")
-            }
-            @if (!string.IsNullOrEmpty(o.LastResult))
-            {
-                @L.T(o.LastResult) @(" ")
-            }
-            @if (o.PendingEInvoices > 0 && (o.Minutes == 0 || o.Computer is null))
-            {
-                @L.T("لا يعمل جهاز مهام المكتب تلقائيًا، وتنتظر فواتير إلكترونية الإرسال:") @(" " + o.PendingEInvoices + " ")
-            }
-            @L.T("افتح شاشة مهام المكتب في Access.")
-        </div>
-    }
-    @if (figures is { } f)
-    {
-        <div class="tiles dashboard">
-            <div class="tile"><span>@L.T("مبيعات اليوم")</span><strong>@Money(f.TodaySales)</strong><span>@f.TodayInvoices @L.T("فاتورة اليوم")</span></div>
-            <div class="tile">
-                <span>@L.T("مبيعات الشهر")</span><strong>@Money(f.MonthSales)</strong>
-                <span>@(f.Financial ? L.T("منها ضريبة") + " " + WorkPages.Money(f.MonthVAT ?? 0) : f.MonthInvoices + " " + L.T("فاتورة"))</span>
-            </div>
-            <div class="tile">
-                <span>@L.T("صافي ربح الشهر")</span><strong class="@((f.MonthNetProfit ?? 0) < 0 ? "negative" : "")">@Money(f.MonthNetProfit)</strong>
-                <span>@(f.Financial ? L.T("بعد المصروفات وفروقات المخزون") : L.T("يتطلب صلاحية الأرقام المالية"))</span>
-            </div>
-            <a class="tile" href="stock"><span>@L.T("أصناف تحت حد الطلب")</span><strong class="@(f.LowStockCount > 0 ? "negative" : "")">@f.LowStockCount</strong>
-                <span>@(f.LowStockCount > 0 ? L.T("اضغط لعرض الأصناف") : L.T("لا توجد نواقص"))</span></a>
-            <div class="tile"><span>@L.T("ديون العملاء")</span><strong>@Money(f.CustomerDebt)</strong><span>@f.DebtorCount @L.T("عميل عليه رصيد")</span></div>
-            <div class="tile"><span>@L.T("مستحق للموردين")</span><strong>@Money(f.SupplierDue)</strong></div>
-            <div class="tile"><span>@L.T("قيمة المخزون")</span><strong>@Money(f.StockValue)</strong><span>@L.T("بمتوسط التكلفة")</span></div>
-            <div class="tile"><span>@L.T("مصروفات الشهر")</span><strong>@Money(f.MonthExpenses)</strong><span>@L.T("بدون الضريبة")</span></div>
-            <div class="tile"><span>@L.T("النقدية في الصناديق")</span><strong>@Money(f.CashBalance)</strong></div>
-            <div class="tile"><span>@L.T("أرصدة البنوك")</span><strong>@Money(f.BankBalance)</strong><span>@L.T("من القيود")</span></div>
-        </div>
-    }
-    @if (indicators is { } ind)
-    {
-        @* the financial indicators (modIndicators, docs/34 and docs/82): from the journal, like the financial statements *@
-        <h2 class="section-title">@L.T("المؤشرات المالية")</h2>
-        <div class="tiles dashboard indicators">
-            <a class="tile ind-@ind.Cards[0].Tone" href="financials"><span>@L.T("هامش الربح الإجمالي (الشهر)")</span>
-                <strong>@L.T(ind.Cards[0].Value)</strong><span>@L.T(ind.Cards[0].Sub)</span></a>
-            <a class="tile ind-@ind.Cards[1].Tone" href="reports?report=STOCK"><span>@L.T("دوران المخزون (12 شهرًا)")</span>
-                <strong>@L.T(ind.Cards[1].Value)</strong><span>@L.T(ind.Cards[1].Sub)</span></a>
-            <a class="tile ind-@ind.Cards[2].Tone" href="reports?report=CUSTOMER_BALANCES"><span>@L.T("متوسط فترة التحصيل")</span>
-                <strong>@L.T(ind.Cards[2].Value)</strong><span>@L.T(ind.Cards[2].Sub)</span></a>
-            <a class="tile ind-@ind.Cards[3].Tone" href="financials"><span>@L.T("نسبة السيولة (التداول)")</span>
-                <strong>@L.T(ind.Cards[3].Value)</strong><span>@L.T(ind.Cards[3].Sub)</span></a>
-        </div>
-        @if (ind.JournalMessage.Length > 0)
+@if (office is { NeedsAttention: true } o)
+{
+    @* the office tasks of Access (modOfficeSync, docs/84): the journal and the e-invoices of the web documents *@
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4" role="alert">
+        @if (o.Stale)
         {
-            <p class="hint">@L.T(ind.JournalMessage)</p>
+            @L.T("توقفت مهام المكتب في Access: آخر تشغيل") @(" " + (o.LastAt is { } t ? t.ToString("yyyy-MM-dd HH:mm") : "-") + " ")
+            @L.T("على الجهاز") @(" " + o.Computer + ". ")
         }
-    }
-    <div class="tiles">
-        @foreach (var s in screens)
+        @if (!string.IsNullOrEmpty(o.LastResult))
         {
-            <a class="tile" href="@s.Route">
-                <strong>@L.T(s.Caption)</strong>
-                <span>@L.T(s.Subtitle)</span>
-            </a>
+            @L.T(o.LastResult) @(" ")
         }
-        @foreach (var w in work)
+        @if (o.PendingEInvoices > 0 && (o.Minutes == 0 || o.Computer is null))
         {
-            <a class="tile" href="@w.Route">
-                <strong>@L.T(w.Caption)</strong>
-                <span>@L.T(w.Subtitle)</span>
-            </a>
+            @L.T("لا يعمل جهاز مهام المكتب تلقائيًا، وتنتظر فواتير إلكترونية الإرسال:") @(" " + o.PendingEInvoices + " ")
         }
-    </div>
-    @if (screens.Count == 0 && work.Count == 0)
+        @L.T("افتح شاشة مهام المكتب في Access.")
+    </MudAlert>
+}
+
+@if (busy && figures is null)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+}
+
+@if (figures is { } f)
+{
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("مبيعات اليوم")" Icon="@Icons.Material.Outlined.PointOfSale" Href="sales"
+                      Subtitle="@(f.TodayInvoices + " " + L.T("فاتورة اليوم"))">
+                <ValueContent>@Amount(f.TodaySales)</ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("مبيعات الشهر")" Icon="@Icons.Material.Outlined.CalendarMonth" Color="Color.Secondary"
+                      Subtitle="@(f.Financial ? L.T("منها ضريبة") + " " + WorkPages.Money(f.MonthVAT ?? 0) : f.MonthInvoices + " " + L.T("فاتورة"))">
+                <ValueContent>@Amount(f.MonthSales)</ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("صافي ربح الشهر")" Icon="@Icons.Material.Outlined.TrendingUp" Color="@((f.MonthNetProfit ?? 0) < 0 ? Color.Error : Color.Success)"
+                      Subtitle="@(f.Financial ? L.T("بعد المصروفات وفروقات المخزون") : L.T("يتطلب صلاحية الأرقام المالية"))">
+                <ValueContent>@Amount(f.MonthNetProfit)</ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("أصناف تحت حد الطلب")" Icon="@Icons.Material.Outlined.Inventory" Href="stock"
+                      Color="@(f.LowStockCount > 0 ? Color.Warning : Color.Success)" Value="@f.LowStockCount.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                      Subtitle="@(f.LowStockCount > 0 ? L.T("اضغط لعرض الأصناف") : L.T("لا توجد نواقص"))" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("ديون العملاء")" Icon="@Icons.Material.Outlined.People" Color="Color.Info"
+                      Subtitle="@(f.DebtorCount + " " + L.T("عميل عليه رصيد"))">
+                <ValueContent>@Amount(f.CustomerDebt)</ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("مستحق للموردين")" Icon="@Icons.Material.Outlined.LocalShipping" Color="Color.Info">
+                <ValueContent>@Amount(f.SupplierDue)</ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("النقدية في الصناديق")" Icon="@Icons.Material.Outlined.Savings" Color="Color.Secondary">
+                <ValueContent>@Amount(f.CashBalance)</ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("أرصدة البنوك")" Icon="@Icons.Material.Outlined.AccountBalance" Color="Color.Secondary" Subtitle="@L.T("من القيود")">
+                <ValueContent>@Amount(f.BankBalance)</ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("قيمة المخزون")" Icon="@Icons.Material.Outlined.Warehouse" Subtitle="@L.T("بمتوسط التكلفة")">
+                <ValueContent>@Amount(f.StockValue)</ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("مصروفات الشهر")" Icon="@Icons.Material.Outlined.ReceiptLong" Color="Color.Error" Subtitle="@L.T("بدون الضريبة")">
+                <ValueContent>@Amount(f.MonthExpenses)</ValueContent>
+            </StatCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@if (indicators is { } ind)
+{
+    @* the financial indicators (modIndicators, docs/34 and docs/82): from the journal, like the financial statements *@
+    <MudText Typo="Typo.h6" HtmlTag="h2" Class="erp-section-title">@L.T("المؤشرات المالية")</MudText>
+    <MudGrid Spacing="3" Class="mb-2">
+        @Indicator(ind, 0, L.T("هامش الربح الإجمالي (الشهر)"), "financials", Icons.Material.Outlined.Percent)
+        @Indicator(ind, 1, L.T("دوران المخزون (12 شهرًا)"), "reports?report=STOCK", Icons.Material.Outlined.Autorenew)
+        @Indicator(ind, 2, L.T("متوسط فترة التحصيل"), "reports?report=CUSTOMER_BALANCES", Icons.Material.Outlined.Schedule)
+        @Indicator(ind, 3, L.T("نسبة السيولة (التداول)"), "financials", Icons.Material.Outlined.WaterDrop)
+    </MudGrid>
+    @if (ind.JournalMessage.Length > 0)
     {
-        <p class="empty">@L.T("لا توجد شاشات متاحة لك على الويب بعد. راجع مدير النظام.")</p>
+        <MudText Typo="Typo.body2" Class="mud-text-secondary mb-2">@L.T(ind.JournalMessage)</MudText>
     }
-</section>
+}
+
+@if (charts is { } c)
+{
+    <MudGrid Spacing="3" Class="mt-2 mb-4">
+        @if (c.Monthly.Ok)
+        {
+            <MudItem xs="12" lg="7">
+                <MudPaper Outlined="true" Class="pa-4 erp-chart">
+                    <div class="erp-stat-top mb-2">
+                        <MudText Typo="Typo.h6" HtmlTag="h2">@L.T("المبيعات الشهرية")</MudText>
+                        <MudLink Href="reports?report=MONTHLY_SALES" Typo="Typo.body2">@L.T("التقرير")</MudLink>
+                    </div>
+                    @if (monthly.Any(m => m.Sales != 0 || m.Profit != 0))
+                    {
+                        <MudChart T="double" ChartType="ChartType.Bar" ChartSeries="monthlySeries" ChartLabels="monthlyLabels"
+                                  ChartOptions="barOptions" Height="300px" Width="100%" />
+                    }
+                    else
+                    {
+                        <EmptyState Icon="@Icons.Material.Outlined.BarChart" Title="@L.T("لا توجد مبيعات في آخر 12 شهرًا")" Class="erp-empty-compact" />
+                    }
+                </MudPaper>
+            </MudItem>
+        }
+        @if (c.Best.Ok)
+        {
+            <MudItem xs="12" lg="5">
+                <MudPaper Outlined="true" Class="pa-4 erp-chart">
+                    <div class="erp-stat-top mb-2">
+                        <MudText Typo="Typo.h6" HtmlTag="h2">@L.T("أفضل المنتجات مبيعًا") <span class="mud-text-secondary erp-chart-note">@L.T("آخر 30 يومًا")</span></MudText>
+                        <MudLink Href="reports?report=BEST_SELLING" Typo="Typo.body2">@L.T("التقرير")</MudLink>
+                    </div>
+                    @if (bestLabels.Length > 0)
+                    {
+                        <MudChart T="double" ChartType="ChartType.Donut" ChartSeries="bestSeries" ChartLabels="bestLabels"
+                                  ChartOptions="donutOptions" Height="300px" Width="100%"
+                                  LegendPosition="Position.Bottom" />
+                    }
+                    else
+                    {
+                        <EmptyState Icon="@Icons.Material.Outlined.DonutLarge" Title="@L.T("لا توجد مبيعات في آخر 30 يومًا")" Class="erp-empty-compact" />
+                    }
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@if (lastInvoices is not null || charts is { LowStock.Ok: true })
+{
+    <MudGrid Spacing="3" Class="mb-4">
+        @if (lastInvoices is not null)
+        {
+            <MudItem xs="12" lg="7">
+                <EntityGrid T="InvoiceRow" Items="lastInvoices" Title="@L.T("آخر الفواتير")" ShowPager="false" Filterable="false"
+                            RowClick="@(r => Nav.NavigateTo($"sales/{r.SalesInvoiceID}"))" EmptyText="@L.T("لا توجد فواتير في آخر 30 يومًا")">
+                    <ToolBarContent><MudLink Href="sales" Typo="Typo.body2">@L.T("كل الفواتير")</MudLink></ToolBarContent>
+                    <Columns>
+                        <PropertyColumn T="InvoiceRow" TProperty="string" Property="r => r.InvoiceNumber" Title="@L.T("الرقم")" CellClass="erp-num" />
+                        <PropertyColumn T="InvoiceRow" TProperty="DateTime" Property="r => r.InvoiceDate" Title="@L.T("التاريخ")" Format="yyyy-MM-dd"
+                                        Culture="System.Globalization.CultureInfo.InvariantCulture" CellClass="erp-num" />
+                        <PropertyColumn T="InvoiceRow" TProperty="string" Property="r => r.CustomerName" Title="@L.T("العميل")" />
+                        <TemplateColumn T="InvoiceRow" Title="@L.T("الإجمالي")" SortBy="r => r.TotalAmount" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><MoneyText Value="context.Item.TotalAmount" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="InvoiceRow" Title="@L.T("الحالة")" Sortable="false">
+                            <CellTemplate><StatusChip Status="@(context.Item.RemainingAmount <= 0 ? "PAID" : context.Item.PaidAmount > 0 ? "PARTIAL_PAID" : "UNPAID")" /></CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </EntityGrid>
+            </MudItem>
+        }
+        @if (charts is { LowStock.Ok: true } ls)
+        {
+            <MudItem xs="12" lg="5">
+                <EntityGrid T="ReportRow" Items="ls.LowStock.Rows.Take(8)" Title="@L.T("أصناف تحت حد الطلب")" ShowPager="false"
+                            Filterable="false" EmptyText="@L.T("لا توجد نواقص")">
+                    <ToolBarContent><MudLink Href="reports?report=LOW_STOCK" Typo="Typo.body2">@L.T("التقرير")</MudLink></ToolBarContent>
+                    <Columns>
+                        <TemplateColumn T="ReportRow" Title="@L.T("المنتج")" SortBy="r => r.Text(Fields.ProductName)">
+                            <CellTemplate>
+                                <span class="erp-lookup-code erp-num">@context.Item.Text(Fields.ProductCode)</span> @context.Item.Text(Fields.ProductName)
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="ReportRow" Title="@L.T("المتوفر")" SortBy="r => r.Num(Fields.CurrentQuantity)" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><QtyText Value="context.Item.Num(Fields.CurrentQuantity)" Class="erp-negative" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="ReportRow" Title="@L.T("الحد الأدنى")" SortBy="r => r.Num(Fields.MinimumQuantity)" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><QtyText Value="context.Item.Num(Fields.MinimumQuantity)" /></CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </EntityGrid>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@if (groups.Count > 0)
+{
+    <MudText Typo="Typo.h6" HtmlTag="h2" Class="erp-section-title">@L.T("شاشاتك")</MudText>
+    <MudGrid Spacing="2">
+        @foreach (var item in groups.SelectMany(g => g.Items))
+        {
+            <MudItem xs="12" sm="6" md="4" xl="3">
+                <MudPaper Outlined="true" Class="erp-quick erp-stat-link" @onclick="@(() => Nav.NavigateTo(item.Route))">
+                    <MudIcon Icon="@item.Icon" Class="erp-quick-icon" />
+                    <div class="erp-quick-text">
+                        <MudLink Href="@item.Route" Typo="Typo.subtitle2" Underline="Underline.None">@L.T(item.Caption)</MudLink>
+                        @if (Subtitles.TryGetValue(item.Route, out var sub) && sub.Length > 0)
+                        {
+                            <MudText Typo="Typo.caption" Class="mud-text-secondary d-block">@L.T(sub)</MudText>
+                        }
+                    </div>
+                </MudPaper>
+            </MudItem>
+        }
+    </MudGrid>
+}
+else if (loaded)
+{
+    <EmptyState Icon="@Icons.Material.Outlined.Lock" Title="@L.T("لا توجد شاشات متاحة لك على الويب بعد. راجع مدير النظام.")" />
+}
 
 @code {
+    [Inject] private NavigationManager Nav { get; set; } = default!;
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
+
+    /// <summary>The fields of LowStockQuery the table shows.</summary>
+    private static class Fields
+    {
+        public const string ProductCode = "ProductCode", ProductName = "ProductName", CurrentQuantity = "CurrentQuantity",
+                            MinimumQuantity = "MinimumQuantity";
+    }
+
+    /// <summary>A card of the financial indicators (modIndicators): its value and line under it, its tone.</summary>
+    private RenderFragment Indicator(IndicatorsView ind, int i, string title, string href, string icon) =>
+        @<MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@title" Value="@L.T(ind.Cards[i].Value)" Subtitle="@L.T(ind.Cards[i].Sub)" Href="@href" Icon="@icon"
+                      Color="@ToneColor(ind.Cards[i].Tone)" />
+        </MudItem>;
+
+    private static readonly Dictionary<string, string> Subtitles =
+        ScreenSpecs.All.Select(s => (s.Route, s.Subtitle)).Concat(WorkPages.All.Select(w => (w.Route, w.Subtitle)))
+            .GroupBy(x => x.Route).ToDictionary(g => g.Key, g => g.First().Subtitle);
+
     private ClaimsPrincipal? user;
-    private List<IScreenSpec> screens = [];
-    private List<WorkPage> work = [];
+    private bool busy, loaded;
     private DashboardFigures? figures;
     private IndicatorsView? indicators;
     private OfficeSyncStatus? office;
+    private HomeReports.Result? charts;
+    private List<InvoiceRow>? lastInvoices;
+    private List<NavGroup> groups = [];
+    private List<(string Label, double Sales, double Profit)> monthly = [];
+    private List<ChartSeries<double>> monthlySeries = [];
+    private string[] monthlyLabels = [];
+    private List<ChartSeries<double>> bestSeries = [];
+    private string[] bestLabels = [];
+    private BarChartOptions barOptions = new();
+    private DonutChartOptions donutOptions = new();
 
     /// <summary>modDashboard.Money: the amount, or hidden without the financial figures.</summary>
-    private static string Money(decimal? v) => v is { } x ? WorkPages.Money(x) : "••••";
+    private RenderFragment Amount(decimal? value) => value is null
+        ? @<span class="mud-text-secondary">••••</span>
+        : @<MoneyText Value="value" ShowCurrency="true" />;
 
-    private async Task LoadFigures(bool force = false)
+    private static Color ToneColor(string tone) => tone switch
     {
-        if (UserInfo.EmployeeId(user) > 0)
-        {
-            figures = await Dashboard.FiguresAsync(UserInfo.EmployeeId(user), DateTime.Today);
-            var ind = await Indicators.IndicatorsAsync(UserInfo.Acting(user), DateTime.Today, force);
-            indicators = ind.Financial ? ind : null;          // without DASHBOARD_FINANCIAL the cards are not shown
-            office = await Permissions.HasPermissionAsync(UserInfo.EmployeeId(user), "OFFICE_SYNC")
-                ? await Dashboard.OfficeSyncAsync(DateTime.Now) : null;   // only who may run the office tasks is warned
-        }
-    }
-
-    /// <summary>The Refresh button: the indicators are computed again at once (not from the 10 minutes kept).</summary>
-    private Task Refresh() => LoadFigures(true);
+        "success" => Color.Success,
+        "danger" => Color.Error,
+        "warning" => Color.Warning,
+        "muted" => Color.Default,
+        _ => Color.Primary,
+    };
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
-        await LoadFigures();
-        foreach (var s in ScreenSpecs.All)
+        groups = await NavGroups.ForUserAsync(Permissions, UserInfo.EmployeeId(user));
+        loaded = true;
+        await LoadAsync(false);
+    }
+
+    /// <summary>The Refresh button: the indicators and the reports are computed again at once (not from the 10 minutes kept).</summary>
+    private Task Refresh() => LoadAsync(true);
+
+    private async Task LoadAsync(bool force)
+    {
+        int emp = UserInfo.EmployeeId(user);
+        if (emp <= 0)
         {
-            if (await Permissions.CanOpenScreenAsync(UserInfo.EmployeeId(user), s.Name))
-            {
-                screens.Add(s);
-            }
+            return;
         }
-        foreach (var w in WorkPages.All)
+        busy = true;
+        try
         {
-            if (await Permissions.CanOpenScreenAsync(UserInfo.EmployeeId(user), w.FormName))
-            {
-                work.Add(w);
-            }
+            figures = await Dashboard.FiguresAsync(emp, DateTime.Today);
+            var ind = await Indicators.IndicatorsAsync(UserInfo.Acting(user), DateTime.Today, force);
+            indicators = ind.Financial ? ind : null;          // without DASHBOARD_FINANCIAL the cards are not shown
+            office = await Permissions.HasPermissionAsync(emp, "OFFICE_SYNC")
+                ? await Dashboard.OfficeSyncAsync(DateTime.Now) : null;   // only who may run the office tasks is warned
+            lastInvoices = await Permissions.CanOpenScreenAsync(emp, "frmSalesInvoice")
+                ? await Sales.InvoicesAsync(DateTime.Today.AddDays(-29), DateTime.Today, null, L.English, 8) : null;
+            charts = await Permissions.CanOpenScreenAsync(emp, "frmReportCenter")
+                ? await Reports.LoadAsync(UserInfo.Acting(user), DateTime.Today, L.English, force) : null;
+            BuildCharts();
         }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private void BuildCharts()
+    {
+        if (charts is null)
+        {
+            return;
+        }
+        string[] palette = ErpTheme.ChartPalette(Mode.Dark);
+        monthly = HomeReports.MonthlySeries(charts.Monthly.Rows, DateTime.Today);
+        monthlyLabels = monthly.Select(m => m.Label).ToArray();
+        monthlySeries =
+        [
+            new() { Name = L.T("شامل الضريبة"), Data = new ChartData<double>(monthly.Select(m => m.Sales).ToList()) },
+            new() { Name = L.T("مجمل الربح"), Data = new ChartData<double>(monthly.Select(m => m.Profit).ToList()) },
+        ];
+        barOptions = new BarChartOptions
+        {
+            ChartPalette = palette, YAxisToStringFunc = v => ErpFormat.Money((decimal)v, 0), XAxisLabelRotation = 0,
+            ShowLegend = true,
+        };
+        var best = charts.Best.Rows.Where(r => r.Num("NetQty") > 0).Take(6).ToList();
+        bestLabels = best.Select(r => r.Text("ProductName")).ToArray();
+        bestSeries = [new() { Name = L.T("الصافي"), Data = new ChartData<double>(best.Select(r => (double)r.Num("NetQty")).ToList()) }];
+        donutOptions = new DonutChartOptions { ChartPalette = palette, ShowLegend = true };
     }
 }

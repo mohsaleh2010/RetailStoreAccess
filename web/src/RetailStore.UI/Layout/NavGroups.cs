@@ -123,7 +123,21 @@ public static class NavGroups
         return groups;
     }
 
-    private static string IconOf(string route)
+    /// <summary>The group of the menu a screen is in (Arabic, through L.T), "" for none: the path of its PageHeader.</summary>
+    public static string GroupOf(string route)
+    {
+        foreach (var (caption, _, entries) in Layout)
+        {
+            if (entries.Any(e => e.Route == route))
+            {
+                return caption;
+            }
+        }
+        return "";
+    }
+
+    /// <summary>The icon of a screen in the menu (the same on its PageHeader).</summary>
+    public static string IconOf(string route)
     {
         foreach (var (_, _, entries) in Layout)
         {

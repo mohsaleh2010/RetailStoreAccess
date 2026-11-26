@@ -41,6 +41,12 @@
     /// <summary>The options of an add / edit dialog: medium width, Esc closes, a click outside does not.</summary>
     public static DialogOptions Options => new() { MaxWidth = MaxWidth.Small, FullWidth = true, CloseOnEscapeKey = true, BackdropClick = false };
 
+    /// <summary>The same for a record of many fields (two columns).</summary>
+    public static DialogOptions WideOptions => new() { MaxWidth = MaxWidth.Medium, FullWidth = true, CloseOnEscapeKey = true, BackdropClick = false };
+
+    /// <summary>What OnSave returns to keep the dialog open without a message (the user said no to a question).</summary>
+    public const string StayOpen = "\u0001stay";
+
     [CascadingParameter] private IMudDialogInstance Dialog { get; set; } = default!;
 
     [Parameter] public string Title { get; set; } = "";
@@ -93,7 +99,11 @@
         {
             saving = false;
         }
-        if (problem.Length == 0)
+        if (problem == StayOpen)
+        {
+            problem = "";
+        }
+        else if (problem.Length == 0)
         {
             Dialog.Close(DialogResult.Ok(true));
         }

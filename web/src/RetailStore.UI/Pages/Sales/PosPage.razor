@@ -3,239 +3,265 @@
 @using RetailStore.Domain.Sales
 @inject SalesService Sales
 @inject PermissionService Permissions
+@inject IDialogService Dialogs
 @inject UiLanguage L
 
-<PageTitle>@L.T("نقطة البيع")</PageTitle>
-
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("نقطة البيع")</h1>
-            <p class="subtitle">@L.T("فاتورة بيع: الأصناف بالباركود أو الاسم، والعميل، والدفع")</p>
-        </div>
-        @if (allowed && lines.Count > 0)
+@* Template B of the redesign (docs/ui-inventory.md section 8): PageHeader (new invoice, save) -> the head of the sale
+   (scan, customer, payment) -> InvoiceLinesEditor (the unit of each line, prices from the service) -> the totals card,
+   sticky beside the lines on a large screen and under them on a small one. The checks, prices, repricing and posting
+   stay those of SalesService (modPOS / modSales.PostSaleFromCart). *@
+<PageHeader Title="@L.T("نقطة البيع")" Description="@L.T("فاتورة بيع: الأصناف بالباركود أو الاسم، والعميل، والدفع")"
+            Icon="@NavGroups.IconOf("pos")" Group="@L.T("المبيعات")">
+    <Status>
+        @if (allowed)
         {
-            <button class="btn" @onclick="Clear">@L.T("فاتورة جديدة")</button>
+            <StatusChip Status="DRAFT" />
         }
-    </header>
+    </Status>
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.NoteAdd" OnClick="Clear" Disabled="busy">
+                @L.T("فاتورة جديدة")<kbd class="erp-kbd">F4</kbd>
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save"
+                       OnClick="() => Save(false)" Disabled="busy || Filled.Count == 0">
+                @L.T("حفظ الفاتورة")<kbd class="erp-kbd">F2</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
-    {
-        <div class="pos">
-            <div class="pos-cart list-pane">
-                <form class="pos-scan" @onsubmit="Find" @onsubmit:preventDefault>
-                    <input type="search" class="search" placeholder="@L.T("ابحث عن صنف أو اكتب الباركود")"
-                           aria-label="@L.T("ابحث عن صنف أو اكتب الباركود")" @bind="code" @bind:event="oninput" autofocus />
-                    <button type="submit" class="btn">@L.T("إضافة")</button>
-                </form>
-                @if (choices.Count > 0)
-                {
-                    <ul class="pos-choices">
-                        @foreach (var p in choices)
-                        {
-                            <li><button class="btn link" @onclick="() => Add(p)">@p.ProductName (@p.ProductCode) - @WorkPages.Money(p.Price)</button></li>
-                        }
-                    </ul>
-                }
-                <table class="list pos-lines">
-                    <thead>
-                        <tr>
-                            <th>@L.T("الصنف")</th>
-                            <th>@L.T("الوحدة")</th>
-                            <th>@L.T("الكمية")</th>
-                            <th>@L.T("السعر")</th>
-                            <th>@L.T("الخصم")</th>
-                            <th>@L.T("الإجمالي")</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @for (int i = 0; i < lines.Count; i++)
-                        {
-                            var line = lines[i];
-                            int index = i;
-                            <tr>
-                                <td data-label="@L.T("الصنف")">@line.Name</td>
-                                <td data-label="@L.T("الوحدة")">
-                                    @if (line.Units.Count > 1)
-                                    {
-                                        <select aria-label="@L.T("الوحدة")" @onchange="e => UnitChanged(line, e.Value)">
-                                            @foreach (var u in line.Units)
-                                            {
-                                                <option value="@u.UnitID" selected="@(u.UnitID == line.UnitID)">@u.UnitName</option>
-                                            }
-                                        </select>
-                                    }
-                                    else
-                                    {
-                                        @line.UnitName
-                                    }
-                                </td>
-                                <td data-label="@L.T("الكمية")"><input type="number" step="any" min="0" aria-label="@L.T("الكمية")" @bind="line.Quantity" @bind:after="Recalc" /></td>
-                                <td data-label="@L.T("السعر")"><input type="number" step="any" min="0" aria-label="@L.T("السعر")" @bind="line.Price" @bind:after="Recalc" /></td>
-                                <td data-label="@L.T("الخصم")"><input type="number" step="any" min="0" aria-label="@L.T("الخصم")" @bind="line.Discount" @bind:after="Recalc" /></td>
-                                <td data-label="@L.T("الإجمالي")">@WorkPages.Money(LineTotal(index))</td>
-                                <td><button class="btn link" aria-label="@L.T("حذف")" @onclick="() => Remove(index)">&#10005;</button></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @if (lines.Count == 0)
-                {
-                    <p class="empty">@L.T("امسح الباركود أو ابحث عن صنف لإضافته")</p>
-                }
-            </div>
-
-            <div class="pos-pay form-pane">
-                <div class="record">
-                    <div class="field span-2">
-                        <label for="pos-customer">@L.T("العميل")</label>
-                        <select id="pos-customer" @onchange="CustomerChanged">
-                            @foreach (var c in customers)
-                            {
-                                <option value="@c.Id" selected="@(c.Id == customerId)">@c.Name</option>
-                            }
-                        </select>
-                        @if (customerId != cashCustomer)
-                        {
-                            <span class="hint">@L.T("الرصيد"): @WorkPages.Money(customers.FirstOrDefault(c => c.Id == customerId).Balance)</span>
-                        }
-                    </div>
-                    <div class="field">
-                        <label for="pos-type">@L.T("نوع الدفع")</label>
-                        <select id="pos-type" @bind="paymentType">
-                            <option value="CASH">@L.T("نقدي")</option>
-                            <option value="CREDIT">@L.T("آجل")</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="pos-method">@L.T("طريقة الدفع")</label>
-                        <select id="pos-method" @bind="methodId">
-                            @foreach (var m in methods)
-                            {
-                                <option value="@m.Id">@m.Name</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="pos-discount">@L.T("خصم الفاتورة")</label>
-                        <input id="pos-discount" type="number" step="any" min="0" @bind="invoiceDiscount" @bind:after="Recalc" />
-                    </div>
-                    <div class="field">
-                        <label for="pos-tendered">@L.T("المبلغ المدفوع")</label>
-                        <input id="pos-tendered" type="number" step="any" min="0" @bind="tendered" @bind:after="Recalc" placeholder="@WorkPages.Money(paymentType == "CREDIT" ? 0 : calc?.Total ?? 0)" />
-                    </div>
-                    <div class="field span-2">
-                        <label for="pos-notes">@L.T("ملاحظات")</label>
-                        <input id="pos-notes" type="text" maxlength="255" @bind="notes" />
-                    </div>
-                </div>
-                <dl class="totals">
-                    <dt>@L.T("قبل الضريبة")</dt><dd>@WorkPages.Money(calc?.Taxable ?? 0)</dd>
-                    <dt>@L.T("الخصم")</dt><dd>@WorkPages.Money(calc?.Discount ?? 0)</dd>
-                    <dt>@L.T("ضريبة القيمة المضافة")</dt><dd>@WorkPages.Money(calc?.Tax ?? 0)</dd>
-                    <dt class="grand">@L.T("الإجمالي")</dt><dd class="grand">@WorkPages.Money(calc?.Total ?? 0) @currency</dd>
-                    @if (Change > 0)
-                    {
-                        <dt>@L.T("الباقي للعميل")</dt><dd>@WorkPages.Money(Change)</dd>
-                    }
-                </dl>
-                @if (calc is { Ok: false } && lines.Count > 0)
-                {
-                    <div class="message warning">@L.T(calc.Problem)</div>
-                }
-                <div class="actions">
-                    <button class="btn primary" disabled="@(busy || lines.Count == 0)" @onclick="() => Save(false)">@L.T("حفظ الفاتورة")</button>
-                </div>
-            </div>
-        </div>
-    }
-
+}
+else
+{
+    <KeyboardShortcuts OnSave="() => Save(false)" OnNew="Clear" />
     @if (message.Length > 0)
     {
-        <div class="message @messageKind" role="status">
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">
             @L.T(message)
             @if (savedId > 0)
             {
-                <a href="sales/@savedId">@L.T("عرض الفاتورة وطباعتها")</a>
+                <MudLink Href="@($"sales/{savedId}")" Class="ms-2">@L.T("عرض الفاتورة وطباعتها")</MudLink>
+            }
+        </MudAlert>
+    }
+    <div class="erp-doc">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4 mb-4">
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string" @ref="scan" @bind-Value="code" Label="@L.T("ابحث عن صنف أو اكتب الباركود")"
+                                      Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"
+                                      AdornmentIcon="@Icons.Material.Outlined.QrCodeScanner" Immediate="true" AutoFocus="true"
+                                      OnKeyDown="ScanKey" data-erp-search="true" Clearable="true" HelperText="@L.T("Enter للإضافة")" />
+                        @if (choices.Count > 0)
+                        {
+                            <MudPaper Outlined="true" Class="erp-pos-choices mt-1">
+                                <MudList T="SaleProduct" Dense="true">
+                                    @foreach (var p in choices)
+                                    {
+                                        <MudListItem T="SaleProduct" OnClick="() => Add(p)">
+                                            <div class="erp-lookup-item">
+                                                <span class="erp-lookup-code erp-num">@p.ProductCode</span>
+                                                <span class="erp-lookup-name">@p.ProductName</span>
+                                                <span class="erp-lookup-info"><MoneyText Value="p.Price" /></span>
+                                            </div>
+                                        </MudListItem>
+                                    }
+                                </MudList>
+                            </MudPaper>
+                        }
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <LookupField T="CustomerChoice" Label="@L.T("العميل")" Items="customers" Value="Customer" ValueChanged="CustomerChanged"
+                                     NameOf="c => c.Name" Required="true"
+                                     HelperText="@(customerId != cashCustomer ? L.T("الرصيد") + ": " + ErpFormat.Money(Customer?.Balance) : "")">
+                            <InfoTemplate Context="c">
+                                @if (c.Id != cashCustomer)
+                                {
+                                    <MoneyText Value="c.Balance" />
+                                }
+                            </InfoTemplate>
+                        </LookupField>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudSelect T="string" @bind-Value="paymentType" Label="@L.T("نوع الدفع")" Variant="Variant.Outlined"
+                                   Margin="Margin.Dense" Dense="true">
+                            <MudSelectItem T="string" Value="@("CASH")">@L.T("نقدي")</MudSelectItem>
+                            <MudSelectItem T="string" Value="@("CREDIT")">@L.T("آجل")</MudSelectItem>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudSelect T="int" @bind-Value="methodId" Label="@L.T("طريقة الدفع")" Variant="Variant.Outlined"
+                                   Margin="Margin.Dense" Dense="true">
+                            @foreach (var m in methods)
+                            {
+                                <MudSelectItem T="int" Value="@m.Id">@m.Name</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string" @bind-Value="notes" Label="@L.T("ملاحظات")" Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" MaxLength="255" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+
+            <InvoiceLinesEditor TProduct="SaleProduct" Lines="lines" SearchProducts="SearchProducts" CodeOf="p => p.ProductCode"
+                                NameOf="p => p.ProductName" PriceOf="p => p.Price" VatRateOf="p => p.VATCategory == VatStandard ? vatRate : 0"
+                                VatRate="vatRate" PricesIncludeVat="includeVat" InvoiceDiscount="invoiceDiscount"
+                                OnProductPicked="Picked" OnChange="_ => StateHasChanged()" ShowSummary="false" ShowVat="false"
+                                Class="erp-lines-compact">
+                <InfoTemplate Context="p"><MoneyText Value="p.Price" /></InfoTemplate>
+                <UnitTemplate Context="line">
+                    @{ var tag = TagOf(line); }
+                    @if (tag.Units.Count > 1)
+                    {
+                        <MudSelect T="int" Value="tag.UnitID ?? 0" ValueChanged="u => UnitChanged(line, u)" Variant="Variant.Outlined"
+                                   Margin="Margin.Dense" Dense="true" aria-label="@L.T("الوحدة")">
+                            @foreach (var u in tag.Units)
+                            {
+                                <MudSelectItem T="int" Value="@u.UnitID">@u.UnitName</MudSelectItem>
+                            }
+                        </MudSelect>
+                    }
+                    else
+                    {
+                        <span>@tag.UnitName</span>
+                    }
+                </UnitTemplate>
+            </InvoiceLinesEditor>
+            @if (Filled.Count == 0)
+            {
+                <EmptyState Icon="@Icons.Material.Outlined.QrCodeScanner" Title="@L.T("الفاتورة فارغة")"
+                            Text="@L.T("امسح الباركود أو ابحث عن صنف لإضافته")" Class="erp-empty-compact" />
             }
         </div>
-    }
 
-    @if (question is not null)
-    {
-        <div class="dialog-backdrop">
-            <div class="dialog" role="dialog" aria-modal="true">
-                <p>@L.T(question)</p>
-                <div class="actions">
-                    <button class="btn primary" @onclick="() => Answer(true)">@L.T("نعم")</button>
-                    <button class="btn" @onclick="() => Answer(false)">@L.T("لا")</button>
-                </div>
-            </div>
-        </div>
-    }
-</section>
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("ملخص الفاتورة")</MudText>
+                <MudNumericField T="decimal" @bind-Value="invoiceDiscount" Label="@L.T("خصم الفاتورة")" Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" HideSpinButtons="true" Min="0" Format="0.00" Class="erp-cell-num mb-3"
+                                 Culture="System.Globalization.CultureInfo.InvariantCulture" />
+                <MudNumericField T="decimal?" @bind-Value="tendered" Label="@L.T("المبلغ المدفوع")" Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" HideSpinButtons="true" Min="0" Format="0.00" Class="erp-cell-num mb-3"
+                                 Placeholder="@ErpFormat.Money(paymentType == "CREDIT" ? 0 : Calc.Total)"
+                                 Culture="System.Globalization.CultureInfo.InvariantCulture" />
+                <dl class="erp-summary-list">
+                    <dt>@L.T("قبل الضريبة")</dt><dd><MoneyText Value="Calc.Taxable" /></dd>
+                    <dt>@L.T("الخصم")</dt><dd><MoneyText Value="Calc.Discount" /></dd>
+                    <dt>@L.T("ضريبة القيمة المضافة")</dt><dd><MoneyText Value="Calc.Tax" /></dd>
+                    <dt class="erp-summary-grand">@L.T("الإجمالي")</dt>
+                    <dd class="erp-summary-grand"><MoneyText Value="Calc.Total" ShowCurrency="true" Bold="true" /></dd>
+                    @if (Change > 0)
+                    {
+                        <dt>@L.T("الباقي للعميل")</dt><dd><MoneyText Value="Change" Bold="true" /></dd>
+                    }
+                </dl>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                           StartIcon="@Icons.Material.Outlined.Save" OnClick="() => Save(false)" Disabled="busy || Filled.Count == 0">
+                    @L.T("حفظ الفاتورة")
+                </MudButton>
+            </MudPaper>
+        </aside>
+    </div>
+}
 
 @code {
-    private sealed class Line
+    /// <summary>What the page keeps with a line: its unit (the units of the item) and the price the program gave it, so a
+    /// new customer reprices only the lines still at it (modPOS.RepriceCart).</summary>
+    private sealed class LineTag
     {
-        public int ProductID;
-        public string Name = "";
         public int? UnitID;
         public string UnitName = "";
         public List<UnitChoice> Units = [];
-        public decimal Quantity = 1;
-        public decimal Price;
-        public decimal ListPrice;            // the price the program gave the line (repriced with the customer)
-        public decimal Discount;
-        public string VatCategory = "S";
+        public decimal ListPrice;
     }
+
+    private sealed record CustomerChoice(int Id, string Name, decimal Balance);
+
+    private const string VatStandard = "S";
 
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", code = "", paymentType = "CASH", notes = "", currency = "", message = "", messageKind = "";
-    private string? question;
+    private bool allowed, loaded, busy;
+    private string denied = "", code = "", paymentType = "CASH", notes = "", message = "";
+    private Severity severity = Severity.Info;
     private int customerId, cashCustomer, methodId = 1, savedId;
     private decimal invoiceDiscount;
     private decimal? tendered;
     private decimal vatRate;
     private bool includeVat;
-    private List<Line> lines = [];
+    private List<InvoiceLine<SaleProduct>> lines = [];
     private List<SaleProduct> choices = [];
-    private List<(int Id, string Name, decimal Balance, bool AllowCredit)> customers = [];
+    private List<CustomerChoice> customers = [];
     private List<(int Id, string Name)> methods = [];
-    private CalcResult? calc;
+    private MudTextField<string>? scan;
 
     private int EmployeeId => UserInfo.EmployeeId(user);
+
+    private CustomerChoice? Customer => customers.FirstOrDefault(c => c.Id == customerId);
+
+    private List<InvoiceLine<SaleProduct>> Filled => lines.Where(l => !l.IsEmpty).ToList();
+
+    /// <summary>The totals of the lines from the invoice engine (InvoiceCalculator = modSales.CalcRun), as the editor shows them.</summary>
+    private CalcResult Calc => InvoiceLines.Calculate(lines, invoiceDiscount, includeVat);
+
+    private decimal Change => Calc is { Ok: true } c && c.Total > 0 && tendered is { } t && t > c.Total ? t - c.Total : 0;
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(EmployeeId, "frmPOS");
         allowed = denied.Length == 0;
+        loaded = true;
         if (!allowed)
         {
             return;
         }
+        string currency;
         (vatRate, includeVat, cashCustomer, currency) = await Sales.SaleSettingsAsync();
         customerId = cashCustomer;
-        customers = await Sales.CustomersAsync(L.English);
+        await LoadCustomers();
         methods = await Sales.PaymentMethodsAsync(L.English);
+    }
+
+    private async Task LoadCustomers() =>
+        customers = (await Sales.CustomersAsync(L.English)).Select(c => new CustomerChoice(c.Id, c.Name, c.Balance)).ToList();
+
+    private static LineTag TagOf(InvoiceLine<SaleProduct> line) => line.Tag as LineTag ?? new LineTag();
+
+    private async Task<IEnumerable<SaleProduct>> SearchProducts(string? text, CancellationToken cancel) =>
+        string.IsNullOrWhiteSpace(text) ? [] : await Sales.FindProductsAsync(EmployeeId, text, customerId, L.English);
+
+    private async Task ScanKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await Find();
+        }
     }
 
     private async Task Find()
     {
         message = "";
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return;
+        }
         choices = await Sales.FindProductsAsync(EmployeeId, code, customerId, L.English);
         if (choices.Count == 0)
         {
-            message = WorkPages.NoProduct;
-            messageKind = "warning";
+            Show(WorkPages.NoProduct, Severity.Warning);
         }
         else if (choices.Count == 1)
         {
@@ -243,81 +269,89 @@
         }
     }
 
+    /// <summary>A scanned or chosen item: one more of the same item and unit, else a new line before the empty one.</summary>
     private async Task Add(SaleProduct p)
     {
         choices = [];
         code = "";
-        var same = lines.FirstOrDefault(l => l.ProductID == p.ProductID && l.UnitID == p.UnitID);
+        var same = Filled.FirstOrDefault(l => l.Product!.ProductID == p.ProductID && TagOf(l).UnitID == (p.UnitID ?? TagOf(l).Units.FirstOrDefault()?.UnitID));
         if (same is not null)
         {
             same.Quantity += 1;
         }
         else
         {
-            var units = await Sales.UnitsAsync(p.ProductID, L.English);
-            int baseUnit = units.Count > 0 ? units[0].UnitID : 0;
-            lines.Add(new Line
+            var line = new InvoiceLine<SaleProduct>
             {
-                ProductID = p.ProductID, Name = p.ProductName, UnitID = p.UnitID ?? baseUnit, UnitName = p.UnitName, Units = units,
-                Price = p.Price, ListPrice = p.Price, VatCategory = p.VATCategory,
-            });
+                Product = p, Quantity = 1, Price = p.Price, VatRate = p.VATCategory == VatStandard ? vatRate : 0,
+            };
+            await Picked(line);
+            int at = lines.Count > 0 && lines[^1].IsEmpty ? lines.Count - 1 : lines.Count;
+            lines.Insert(at, line);
         }
-        Recalc();
+        if (scan is not null)
+        {
+            await scan.FocusAsync();
+        }
     }
 
-    private async Task UnitChanged(Line line, object? value)
+    /// <summary>An item put on a line: its units, the unit of its code (a unit barcode) else the smallest, and the price
+    /// the program gave it.</summary>
+    private async Task Picked(InvoiceLine<SaleProduct> line)
     {
-        if (int.TryParse(value?.ToString(), out int unit))
-        {
-            line.UnitID = unit;
-            line.UnitName = line.Units.FirstOrDefault(u => u.UnitID == unit)?.UnitName ?? "";
-            line.Price = line.ListPrice = await Sales.LinePriceAsync(EmployeeId, line.ProductID, unit, customerId);
-            Recalc();
-        }
+        var p = line.Product!;
+        var units = await Sales.UnitsAsync(p.ProductID, L.English);
+        int baseUnit = units.Count > 0 ? units[0].UnitID : 0;
+        line.Tag = new LineTag { UnitID = p.UnitID ?? baseUnit, UnitName = p.UnitName, Units = units, ListPrice = p.Price };
+    }
+
+    private async Task UnitChanged(InvoiceLine<SaleProduct> line, int unit)
+    {
+        var tag = TagOf(line);
+        tag.UnitID = unit;
+        tag.UnitName = tag.Units.FirstOrDefault(u => u.UnitID == unit)?.UnitName ?? "";
+        line.Price = tag.ListPrice = await Sales.LinePriceAsync(EmployeeId, line.Product!.ProductID, unit, customerId);
     }
 
     /// <summary>modPOS.RepriceCart: the lines still at the price the program gave them take the price of the new customer.</summary>
-    private async Task CustomerChanged(ChangeEventArgs e)
+    private async Task CustomerChanged(CustomerChoice? c)
     {
-        if (!int.TryParse(e.Value?.ToString(), out int id))
+        if (c is null)
         {
             return;
         }
-        customerId = id;
-        foreach (var line in lines.Where(l => l.Price == l.ListPrice))
+        customerId = c.Id;
+        foreach (var line in Filled.Where(l => l.Price == TagOf(l).ListPrice))
         {
-            line.Price = line.ListPrice = await Sales.LinePriceAsync(EmployeeId, line.ProductID, line.UnitID, customerId);
+            line.Price = TagOf(line).ListPrice = await Sales.LinePriceAsync(EmployeeId, line.Product!.ProductID, TagOf(line).UnitID, customerId);
         }
-        Recalc();
     }
 
-    private void Remove(int index)
+    private void Show(string text, Severity kind)
     {
-        lines.RemoveAt(index);
-        Recalc();
+        message = text;
+        severity = kind;
     }
 
-    private void Recalc() =>
-        calc = lines.Count == 0 ? null
-            : InvoiceCalculator.Calc(lines.Select(l => new CalcLineIn(l.Quantity, l.Price, l.Discount, l.VatCategory == "S" ? vatRate : 0)).ToList(),
-                                     invoiceDiscount, includeVat);
-
-    private decimal LineTotal(int index) => calc is { Ok: true } c && index < c.Lines.Count ? c.Lines[index].Total : 0;
-
-    private decimal Change => calc is { Ok: true } c && tendered is { } t && t > c.Total ? t - c.Total : 0;
-
-    private void Clear()
+    private async Task Clear()
     {
         lines = [];
         choices = [];
         invoiceDiscount = 0;
         tendered = null;
         notes = "";
-        calc = null;
+        if (scan is not null)
+        {
+            await scan.FocusAsync();
+        }
     }
 
     private async Task Save(bool confirmed)
     {
+        if (busy || Filled.Count == 0)
+        {
+            return;
+        }
         busy = true;
         message = "";
         savedId = 0;
@@ -325,37 +359,30 @@
         {
             var r = await Sales.PostSaleAsync(UserInfo.Acting(user),
                 new SaleRequest(customerId, paymentType, methodId, invoiceDiscount, tendered, notes,
-                                lines.Select(l => new CartLine(l.ProductID, l.Quantity, l.Price, l.Discount, l.UnitID)).ToList()),
+                                Filled.Select(l => new CartLine(l.Product!.ProductID, l.Quantity, l.Price, l.Discount, TagOf(l).UnitID)).ToList()),
                 confirmed);
             if (r.Status == SaveStatus.NeedsConfirmation)
             {
-                question = r.Message;
+                busy = false;
+                if (await ConfirmDialog.AskAsync(Dialogs, L.T("تأكيد"), L.T(r.Message), L.T("نعم"), Color.Primary))
+                {
+                    await Save(true);
+                }
                 return;
             }
             if (r.Status == SaveStatus.Refused)
             {
-                message = r.Message;
-                messageKind = "error";
+                Show(r.Message, Severity.Error);
                 return;
             }
             savedId = r.InvoiceID;
-            message = WorkPages.InvoiceSaved + r.InvoiceNumber + (r.Change > 0 ? WorkPages.ChangeDue + WorkPages.Money(r.Change) : "");
-            messageKind = "success";
-            Clear();
-            customers = await Sales.CustomersAsync(L.English);
+            Show(WorkPages.InvoiceSaved + r.InvoiceNumber + (r.Change > 0 ? WorkPages.ChangeDue + WorkPages.Money(r.Change) : ""), Severity.Success);
+            await Clear();
+            await LoadCustomers();
         }
         finally
         {
             busy = false;
-        }
-    }
-
-    private async Task Answer(bool yes)
-    {
-        question = null;
-        if (yes)
-        {
-            await Save(true);
         }
     }
 }

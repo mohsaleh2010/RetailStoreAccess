@@ -236,7 +236,7 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   `LookupField`, `InvoiceLinesEditor`, `FilterPanel`, `MoneyText` / `QtyText`, `StatusChip`, `ConfirmDialog`, `StatCard`, `EmptyState`,
   `KeyboardShortcuts`; gallery `/dev/components`, Development only): amounts through `MoneyText` (currency of the settings, `UiCurrency`),
   line amounts from `InvoiceCalculator` never from the screen, dates Gregorian (`ErpFormat.DateCulture`), shortcuts through `ShortcutService`
-  (F2 save, F3 search, F4 new, Esc close, Ctrl+P print); MudBlazor texts in Arabic come from `ErpMudLocalizer`.
+  (F2 save, F3 search, F4 new, Esc close, Ctrl+P print); MudBlazor texts in Arabic come from `ErpMudLocalizer`. The page templates (`docs/ui-inventory.md` section 8, pilots awaiting approval): A data screen = `Components/DataScreen.razor` + `DataScreenDialog.razor`, B document = `Pages/Sales/PosPage.razor`, C report = `Pages/Accounting/LedgerPage.razor`, D dashboard = `Pages/Home.razor` (its reports through `ReportService` in `Services/HomeReports.cs`, kept 10 minutes: each run writes a `REPORT` audit line).
 - **API (`docs/77`)**: every operation under `/api/v1` names its permission with `.Needs(...)` (the user's own ones aside:
   token, password, `/me`, `/rep/profile`) and a `.WithSummary(...)` (`test_web` checks both); its logic is a service of
   `RetailStore.Data` that follows the VBA (messages identical to the VBA module, `test_web` compares those of `RepService`);

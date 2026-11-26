@@ -25,14 +25,14 @@
 
 | # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
 |---|---|---|---|---|---|---|
-| 1 | `/` | `Pages/Home.razor` | الرئيسية | D | 147 | ⬜ |
+| 1 | `/` | `Pages/Home.razor` | الرئيسية | D | 147 | 🟨 تجريبية |
 | 2 | `/account/login` | `RetailStore.Web/Components/Pages/Account/Login.razor` | إعدادات/دخول | D (SSR) | 50 | ⬜ |
 | 3 | `/account/change-password` | `RetailStore.Web/Components/Pages/Account/ChangePassword.razor` | إعدادات/دخول | D (SSR) | 65 | ⬜ |
-| 4 | `/products` | `Pages/ProductsPage.razor` → `Components/DataScreen.razor` | مخازن | A | 4 (+421) | ⬜ |
-| 5 | `/customers` | `Pages/CustomersPage.razor` → `DataScreen` | مبيعات | A | 4 | ⬜ |
-| 6 | `/suppliers` | `Pages/SuppliersPage.razor` → `DataScreen` | مشتريات | A | 4 | ⬜ |
-| 7 | `/warehouses` | `Pages/WarehousesPage.razor` → `DataScreen` | مخازن | A | 4 | ⬜ |
-| 8 | `/pos` | `Pages/Sales/PosPage.razor` | مبيعات | B | 361 | ⬜ |
+| 4 | `/products` | `Pages/ProductsPage.razor` → `Components/DataScreen.razor` | مخازن | A | 4 (+421) | 🟨 تجريبية |
+| 5 | `/customers` | `Pages/CustomersPage.razor` → `DataScreen` | مبيعات | A | 4 | 🟨 تجريبية |
+| 6 | `/suppliers` | `Pages/SuppliersPage.razor` → `DataScreen` | مشتريات | A | 4 | 🟨 تجريبية |
+| 7 | `/warehouses` | `Pages/WarehousesPage.razor` → `DataScreen` | مخازن | A | 4 | 🟨 تجريبية |
+| 8 | `/pos` | `Pages/Sales/PosPage.razor` | مبيعات | B | 361 | 🟨 تجريبية |
 | 9 | `/sales` | `Pages/Sales/SalesListPage.razor` | مبيعات | C (قائمة مستندات) | 100 | ⬜ |
 | 10 | `/sales/{Id}` | `Pages/Sales/InvoicePage.razor` | مبيعات | B (عرض/طباعة) | 107 | ⬜ |
 | 11 | `/payments` | `Pages/Sales/PaymentsPage.razor` | مبيعات | B (سند) | 192 | ⬜ |
@@ -51,7 +51,7 @@
 | 24 | `/bank-reconciliation` | `Pages/Office/BankReconPage.razor` | حسابات (بنوك) | B (خاصة) | 316 | ⬜ |
 | 25 | `/journal` | `Pages/Accounting/JournalPage.razor` | حسابات | C (قيود + سطورها) | 171 | ⬜ |
 | 26 | `/manual-entries` | `Pages/Office/ManualEntriesPage.razor` | حسابات | B | 287 | ⬜ |
-| 27 | `/ledger` | `Pages/Accounting/LedgerPage.razor` | تقارير | C | 122 | ⬜ |
+| 27 | `/ledger` | `Pages/Accounting/LedgerPage.razor` | تقارير | C | 122 | 🟨 تجريبية |
 | 28 | `/trial-balance` | `Pages/Accounting/TrialBalancePage.razor` | تقارير | C | 95 | ⬜ |
 | 29 | `/financials` | `Pages/Accounting/FinancialsPage.razor` | تقارير | C | 115 | ⬜ |
 | 30 | `/reports` | `Pages/Reports/ReportsPage.razor` | تقارير | C (مركز التقارير: كل تقارير `forms.REPORTS`) | 278 | ⬜ |
@@ -147,3 +147,21 @@
 **الاختبارات:** `tests/test_web_components.py` (وجود المكونات وأمثلتها، لا ألوان hex، خصائص منطقية للاتجاهين، العملة من الإعدادات، الأسطر من المحرك، الاختصارات، صفحة العرض في Development فقط) و`ComponentsTests.cs` في xUnit (التنسيق، البحث، CSV، الأسطر مقابل `InvoiceCalculator`، الحالات، كومة الاختصارات، النصوص العربية لـ MudBlazor).
 
 **مشكلة وُجدت وحُلّت:** جدول الأسطر الأعرض من الشاشة في RTL كان يوسّع الصفحة كلها على 768px (تمرير أفقي)؛ الحل `contain: paint` على حاوية الجدول فيُمرَّر داخلها فقط. وفي الوضع الداكن كانت الصفوف المخططة فاتحة جدًا؛ صار لها `TableStriped` / `TableHover` في `ErpTheme`.
+
+## 8) المرحلة 4: الشاشات التجريبية (✅ تمت الموافقة 2026-11-26)
+شاشة من كل قالب، مبنية من المكونات المشتركة فقط؛ لم يتغير أي منطق عمل (الخدمات ورسائلها وترتيب فحوصها كما هي).
+
+| القالب | الشاشة | الملفات | ما تغيّر |
+|---|---|---|---|
+| A بيانات أساسية | كل شاشات البيانات: `/products` و`/customers` و`/suppliers` و`/warehouses` | `Components/DataScreen.razor` + `Components/DataScreenDialog.razor` (جديد) | `PageHeader` بزر «إضافة جديد» (F4) والمسار من مجموعة القائمة ← `EntityGrid` بأعمدة المواصفة (الأرقام بمحاذاة الأرقام وترتيب بالقيمة والسالب أحمر)، ومفتاح «إظهار غير النشط»، وعمود إجراءات (تعديل / حذف)، والتصدير CSV ← الإضافة والتعديل في نافذة `EntityDialog` بعمودين: حقل لكل نوع (نص، ملاحظات، اختيار، بحث `LookupField`، رقم، تاريخ ميلادي، علامة)، ورسالة الخدمة أعلى النافذة وحقلها معلَّم، وسؤالها (تأكيد) بـ `ConfirmDialog` ثم الحفظ مرة أخرى، و«لا» تبقي النافذة مفتوحة (`EntityDialog.StayOpen`)؛ الحذف بتأكيد، والسجل الذي له حركات يُعرض إيقافه بسؤال الخدمة |
+| B حركة | `/pos` | `Pages/Sales/PosPage.razor` | `PageHeader` (مسودة، فاتورة جديدة F4، حفظ F2) ← رأس: مربع الباركود (Enter يضيف، F3 يذهب إليه، نفس الصنف والوحدة يزيد الكمية)، العميل `LookupField` برصيده، نوع وطريقة الدفع، ملاحظات ← `InvoiceLinesEditor` بعمود الوحدة (`UnitTemplate`) وسعر الخدمة عند اختيار الصنف (`OnProductPicked`)، وضريبة كل سطر في الملخص ← كارت الملخص (خصم الفاتورة، المدفوع، الإجماليات من `InvoiceCalculator`، الباقي) ثابت بجانب الأسطر من 1280px وتحتها على الأصغر. إعادة التسعير عند تغيير العميل (`RepriceCart`) والترحيل `PostSaleAsync` كما هما |
+| C تقرير | `/ledger` | `Pages/Accounting/LedgerPage.razor` | `PageHeader` (طباعة) ← `FilterPanel` (الفترة ميلادية، الحساب `LookupField` بالكود أو الاسم و«رئيسي» للحساب غير المرحَّل) ← أربع `StatCard`: أول المدة، مدين (وعدد السطور)، دائن، الرصيد ← `EntityGrid` للسطور (سطر أول المدة مميَّز، بحث، 50 صفًا، تصدير CSV) |
+| D لوحة | `/` | `Pages/Home.razor` + `Services/HomeReports.cs` (جديد) | عشر `StatCard` للأرقام (المخفي بلا صلاحية الأرقام المالية «••••») وأربع للمؤشرات المالية ← رسم أعمدة للمبيعات الشهرية (آخر 12 شهرًا: شامل الضريبة ومجمل الربح) ورسم دائري لأفضل المنتجات مبيعًا (آخر 30 يومًا، صافي الكمية) ← آخر 8 فواتير (آخر 30 يومًا، حالة الدفع) والأصناف تحت حد الطلب ← «شاشاتك» من `NavGroups` |
+
+**مصدر بيانات اللوحة:** الرسمان والأصناف تحت حد الطلب هي تقارير مركز التقارير نفسها (`ReportService.RunAsync`: `MONTHLY_SALES` و`BEST_SELLING` يحتاجان «تقارير الأرباح والضريبة»، وكلها تحتاج فتح مركز التقارير)، وآخر الفواتير من `SalesService.InvoicesAsync` بصلاحية شاشة فواتير المبيعات. كل تشغيل لتقرير يكتب سطر `REPORT` في سجل التدقيق كما في مركز التقارير؛ لذلك تُحفظ النتائج في الجلسة 10 دقائق (`HomeReports`، مثل المؤشرات) وزر «تحديث» يعيدها.
+
+**إضافات صغيرة للمكونات المشتركة:** `EntityDialog.WideOptions` و`EntityDialog.StayOpen`، و`EntityGrid.ShowPager`، و`InvoiceLinesEditor.UnitTemplate` / `OnProductPicked` و`InvoiceLine.Tag`، و`NavGroups.GroupOf` / `IconOf` (عام)، و`ErpTheme.ChartPalette`. الأنماط في `erp.css` قسم «the page templates».
+
+**مشكلات وُجدت في اللقطات وحُلّت:** الكمية السالبة كانت تظهر «29-» في RTL (صارت `bdi dir=ltr` وحمراء)؛ جدول أسطر نقطة البيع كان أعرض من مكانه بجانب الملخص على 1440px فيختفي عمود الإجمالي (ضريبة السطر انتقلت للملخص، وجدول أضيق `erp-lines-compact`)؛ أعمدة كشف الحساب كانت تفيض بأيقونات الفلاتر (أُلغيت فلاتر الأعمدة في التقرير، والبحث باقٍ)؛ عناوين أعمدة الأرقام صارت بمحاذاة أرقامها.
+
+**الاختبارات:** `tests/test_web_pilots.py` (القوالب ومكوناتها، الخدمات نفسها وترتيب الحفظ / السؤال، الصلاحيات، لا ألوان hex ولا HTML قديم، CSS منطقي) و`PilotsTests.cs` في xUnit (فترات اللوحة وشهورها الاثنا عشر، ألوان الرسوم من الثيم، `InvoiceLine.Tag`).

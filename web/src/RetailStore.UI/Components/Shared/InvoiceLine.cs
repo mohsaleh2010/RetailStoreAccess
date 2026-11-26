@@ -17,6 +17,9 @@ public sealed class InvoiceLine<TProduct>
     /// <summary>The line as the engine computed it (net, VAT, total), null while the document has a problem.</summary>
     public CalcLineOut? Amounts { get; internal set; }
 
+    /// <summary>What the page keeps with the line (the unit chosen, the price the program gave it ...).</summary>
+    public object? Tag { get; set; }
+
     public bool IsEmpty => Product is null;
 }
 

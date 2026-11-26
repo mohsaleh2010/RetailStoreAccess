@@ -56,7 +56,7 @@
         <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
     </LoadingContent>
     <PagerContent>
-        @if (!Virtualize)
+        @if (!Virtualize && ShowPager)
         {
             <MudDataGridPager T="T" PageSizeOptions="PageSizes" />
         }
@@ -88,6 +88,8 @@
     /// <summary>A long list in one scroll instead of pages (needs Height).</summary>
     [Parameter] public bool Virtualize { get; set; }
     [Parameter] public bool ShowCount { get; set; } = true;
+    /// <summary>False for a short table of the dashboard (its rows fit one page).</summary>
+    [Parameter] public bool ShowPager { get; set; } = true;
     [Parameter] public EventCallback<T> RowClick { get; set; }
     [Parameter] public Func<T, int, string>? RowClass { get; set; }
     [Parameter] public string? Class { get; set; }

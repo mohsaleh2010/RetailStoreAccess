@@ -83,4 +83,12 @@ public static class ErpTheme
             AppbarHeight = "56px",
         },
     };
+
+    /// <summary>The colors of the chart series (MudChart): primary, secondary, tertiary, info, success, warning of the palette of the mode.</summary>
+    public static string[] ChartPalette(bool dark)
+    {
+        Palette p = dark ? Theme.PaletteDark : Theme.PaletteLight;
+        static string Hex(MudBlazor.Utilities.MudColor c) => c.ToString(MudBlazor.Utilities.MudColorOutputFormats.Hex);
+        return [Hex(p.Primary), Hex(p.Secondary), Hex(p.Tertiary), Hex(p.Info), Hex(p.Success), Hex(p.Warning)];
+    }
 }

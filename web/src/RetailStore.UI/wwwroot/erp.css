@@ -152,6 +152,49 @@ h1:focus { outline: none; }
 /* StatusChip */
 .erp-status-chip { font-weight: 600; margin: 0; }
 
+/* ---- the page templates (phase 4: A data screens, B documents, C reports, D dashboard) ---- */
+
+/* A: the list of a data screen */
+.erp-row-inactive .mud-table-cell { color: var(--mud-palette-text-secondary); }
+.erp-chip-inactive { margin-inline-start: 6px; height: 20px; font-size: .72rem; }
+.erp-grid .mud-table-head .erp-num .column-header { justify-content: flex-end; }
+.erp-actions-col { width: 96px; white-space: nowrap; text-align: center; }
+.erp-grid-switch { margin: 0; }
+.erp-field-hint { margin-inline-start: 40px; }
+
+/* B: a document = the head and lines, and its totals card beside them (sticky) on a large screen, under them on a small one */
+.erp-doc { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.erp-doc-main { min-width: 0; }
+@media (min-width: 1280px) {
+    .erp-doc { grid-template-columns: minmax(0, 1fr) 300px; }
+    .erp-doc-side { position: sticky; inset-block-start: 72px; }
+}
+.erp-summary-list { display: grid; grid-template-columns: 1fr auto; gap: 6px 0; margin: 0; }
+.erp-summary-list dt { color: var(--mud-palette-text-secondary); }
+.erp-summary-list dd { margin: 0; padding-inline-start: 12px; text-align: end; }
+.erp-summary-grand { border-block-start: 1px solid var(--mud-palette-lines-default); padding-block-start: 8px; font-size: 1.15rem; }
+dt.erp-summary-grand { color: var(--mud-palette-text-primary); font-weight: 700; }
+.erp-pos-choices { max-height: 260px; overflow-y: auto; }
+.erp-lines-unit { min-width: 80px; width: 96px; }
+/* the VAT of each line is in the totals card: a narrower table */
+.erp-lines-compact .erp-lines-table table { min-width: 640px; }
+.erp-lines-compact .erp-lines-price { width: 116px; min-width: 108px; }
+.erp-lines-compact .erp-lines-disc { width: 96px; min-width: 88px; }
+.erp-lines-compact .erp-lines-qty { width: 76px; min-width: 70px; }
+
+/* C: a report */
+.erp-row-opening .mud-table-cell { font-weight: 600; background: var(--mud-palette-background-gray); }
+
+/* D: the dashboard */
+.erp-section-title { font-weight: 600; margin-block: 8px 12px; }
+.erp-chart { height: 100%; }
+.erp-chart .mud-chart { width: 100%; }
+.erp-chart-note { font-size: .8rem; font-weight: 400; }
+.erp-quick { display: flex; align-items: center; gap: 10px; padding: 10px 12px; height: 100%; }
+.erp-quick-icon { color: var(--mud-palette-primary); flex: none; }
+.erp-quick-text { min-width: 0; }
+.erp-quick:hover { border-color: var(--mud-palette-primary); }
+
 @media (max-width: 599.98px) {
     .erp-screen-search { display: none; }
     .erp-brand-name { max-width: 45vw; }
