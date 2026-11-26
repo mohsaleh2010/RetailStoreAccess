@@ -87,10 +87,16 @@ class RuleTests(unittest.TestCase):
         self.assertIn("OfficeSyncDue = (WholeMinutes(CDate(LastAt), NowAt) >= Minutes)", proc(VBA, "OfficeSyncDue"))
         self.assertIn("OfficeSyncStale = (WholeMinutes(CDate(LastAt), NowAt) > 2 * Minutes + 10)", proc(VBA, "OfficeSyncStale"))
 
+    def test_a_time_given_as_a_number(self):
+        """In VBA Date - Date is a Double and IsDate(Double) is False: OfficeSyncDue(t0 - TimeSerial(0, 14, 0), ...)
+        took it as "never ran" and said due (TestOfficeSync "التشغيل التالي بعد عدد الدقائق" failed three times)."""
+        body = proc(VBA, "OfficeSyncDue")
+        self.assertIn("If Not IsDate(LastAt) And Not IsNumeric(LastAt) Then", body)
+        self.assertNotIn("If Not IsDate(LastAt) Then", body)
+        self.assertIn('OfficeSyncDue(DateAdd("n", -14, t0), 15, t0)', proc(VBA, "TestOfficeSync"))
+
     def test_whole_minutes_without_date_doubles(self):
-        """10:00 less 15 minutes is not exactly 9:45 as a Double: DateDiff("n") was a minute off in Access, even after
-        rounding each date to the second (TestOfficeSync "التشغيل التالي بعد عدد الدقائق", twice). Minutes are counted
-        from whole seconds as integers, as OfficeSyncRules.WholeMinutes does."""
+        """Minutes are counted from whole seconds as integers, as OfficeSyncRules.WholeMinutes does."""
         self.assertNotIn('DateDiff("n", CDate(LastAt)', VBA)
         self.assertIn("secs = Round(CDbl(At) * 86400#, 0)", proc(VBA, "MinuteIndex"))
         self.assertIn("MinuteIndex = Int(secs / 60#)", proc(VBA, "MinuteIndex"))

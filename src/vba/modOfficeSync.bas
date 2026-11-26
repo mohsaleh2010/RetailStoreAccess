@@ -42,7 +42,8 @@ Public Function OfficeSyncDue(ByVal LastAt As Variant, ByVal Minutes As Long, By
         OfficeSyncDue = True
         Exit Function
     End If
-    If Not IsDate(LastAt) Then
+    ' A time may come as a number: in VBA Date - Date is a Double, and IsDate(Double) is False.
+    If Not IsDate(LastAt) And Not IsNumeric(LastAt) Then
         OfficeSyncDue = True
         Exit Function
     End If
@@ -61,7 +62,7 @@ End Function
 
 Public Function WholeMinutes(ByVal FromAt As Date, ByVal ToAt As Date) As Long
     ' The minute boundaries crossed (= OfficeSyncRules.WholeMinutes), counted on whole seconds as integers.
-    ' A date is a Double: 10:00 less 15 minutes is not exactly 9:45, and DateDiff("n") on it was a minute off.
+    ' Whole seconds as integers: a date is a Double, so DateDiff("n") is not trusted on computed times.
     WholeMinutes = CLng(MinuteIndex(ToAt) - MinuteIndex(FromAt))
 End Function
 
@@ -255,7 +256,8 @@ Public Function TestOfficeSync() As Boolean
     t0 = DateSerial(2026, 11, 16) + TimeSerial(10, 0, 0)
     Check OfficeSyncDue(Null, 15, t0) And Not OfficeSyncDue(Null, 0, t0), "أول تشغيل مستحق، و0 دقيقة = يدويًا فقط", _
           passed, failed, report
-    Check Not OfficeSyncDue(t0 - TimeSerial(0, 14, 0), 15, t0) And OfficeSyncDue(t0 - TimeSerial(0, 15, 0), 15, t0), _
+    Check Not OfficeSyncDue(DateAdd("n", -14, t0), 15, t0) And OfficeSyncDue(DateAdd("n", -15, t0), 15, t0) And _
+          Not OfficeSyncDue(t0 - TimeSerial(0, 14, 0), 15, t0), _
           "التشغيل التالي بعد عدد الدقائق", passed, failed, report
     Check Not OfficeSyncStale(t0 - TimeSerial(0, 40, 0), 15, t0) And OfficeSyncStale(t0 - TimeSerial(0, 41, 0), 15, t0), _
           "التوقف بعد ضعف المدة وعشر دقائق", passed, failed, report
