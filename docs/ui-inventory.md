@@ -112,7 +112,7 @@
 - `RetailStore.UI` مكتبة مشتركة مع MAUI لاحقًا؛ و`RetailStore.Pos` / `RetailStore.App` لا يُبنيان في السحابة (يحتاجان Windows / workload).
 - .NET 10 SDK موجود في الحاوية (10.0.115) ويُبنى به الويب ويُشغَّل للقطات.
 
-## 6) المرحلة 2: نظام التصميم والتخطيط (تمت، بانتظار المراجعة)
+## 6) المرحلة 2: نظام التصميم والتخطيط (✅ تمت الموافقة 2026-11-26)
 - **MudBlazor 9.14.0** في `RetailStore.UI`؛ `AddMudServices` في `RetailStore.Web/Program.cs` (الرسائل أسفل اليسار، 3 ثوانٍ).
 - **`Theme/ErpTheme.cs`**: ألوان الخطة مع تعديلات التباين: Secondary `#0B7A6B`، Warning `#B45309`، نص غامق على Tertiary، ونص غامق على Primary (وSecondary) في الوضع الداكن؛ خط **Cairo** (400/600/700 من Google Fonts)؛ زوايا 8px؛ القائمة 260px.
 - **`Layout/MainLayout.razor`**: `MudRTLProvider` مربوط بـ `L.Dir` (عربي RTL / إنجليزي LTR)، `MudThemeProvider` بالوضع الليلي من كوكي `theme` (يقرؤها `App.razor` ويمررها `Routes` مثل اللغة، ويكتبها `erp.js` عند التبديل مع `data-theme` على `<html>`)، شريط علوي: القائمة، اسم المحل، **بحث عن شاشة** (`MudAutocomplete` على شاشات المستخدم)، الوضع الليلي، اللغة، قائمة المستخدم (تغيير كلمة المرور، الخروج). القائمة الجانبية `Responsive`: ثابتة على الكمبيوتر ومنبثقة على الموبايل.
