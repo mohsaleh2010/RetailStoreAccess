@@ -48,9 +48,15 @@ Public Function MachineIDFrom(ByVal HardwareText As String) As String
 End Function
 
 Public Function ActivationCodeFor(ByVal ForMachineID As String) As String
+    ActivationCodeFor = ActivationCodeWith(LICENSE_SECRET, ForMachineID)
+End Function
+
+Public Function ActivationCodeWith(ByVal Secret As String, ByVal ForMachineID As String) As String
+    ' The code of a machine for a given secret: TestSecurity checks it with a test secret, so the test passes
+    ' in the release package too (its LICENSE_SECRET is not the development one).
     Dim h As String
-    h = UCase$(Sha256Text(LICENSE_SECRET & "|" & NormalizeKey(ForMachineID)))
-    ActivationCodeFor = Mid$(h, 1, 5) & "-" & Mid$(h, 6, 5) & "-" & Mid$(h, 11, 5) & "-" & Mid$(h, 16, 5)
+    h = UCase$(Sha256Text(Secret & "|" & NormalizeKey(ForMachineID)))
+    ActivationCodeWith = Mid$(h, 1, 5) & "-" & Mid$(h, 6, 5) & "-" & Mid$(h, 11, 5) & "-" & Mid$(h, 16, 5)
 End Function
 
 Public Function NormalizeKey(ByVal Text As String) As String
@@ -112,7 +118,7 @@ Public Function SaveActivation(ByVal ForMachineID As String, ByVal Code As Strin
     CurrentDb.Execute "DELETE FROM Activations WHERE MachineID = " & SqlText(id), dbFailOnError + dbSeeChanges
     CurrentDb.Execute "INSERT INTO Activations (MachineID, ActivationCode, ComputerName, ActivatedAt, EmployeeID) " & _
         "VALUES (" & SqlText(id) & ", " & SqlText(UCase$(Trim$(Code))) & ", " & SqlText(Left$(ComputerName, 64)) & _
-        ", Now(), " & CurrentUserID() & ")", dbFailOnError + dbSeeChanges
+        ", " & SqlNow() & ", " & CurrentUserID() & ")", dbFailOnError + dbSeeChanges
     LogAction "ACTIVATE", "Activations", id, ComputerName
 End Function
 

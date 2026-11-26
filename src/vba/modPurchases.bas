@@ -714,7 +714,7 @@ Public Function PostStockCount(ByVal StockCountID As Long, ByVal UncountedAsZero
         rs.MoveNext
     Loop
     rs.Close
-    db.Execute "UPDATE StockCounts SET Status = 'POSTED', PostedAt = Now(), PostedByID = " & CurrentUserID() & _
+    db.Execute "UPDATE StockCounts SET Status = 'POSTED', PostedAt = " & SqlNow() & ", PostedByID = " & CurrentUserID() & _
                " WHERE StockCountID = " & StockCountID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False

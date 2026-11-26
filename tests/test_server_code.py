@@ -118,6 +118,37 @@ class BooleanTests(unittest.TestCase):
         kept = 'x = "UPDATE Settings SET PricesIncludeVAT = True, IsActive = False WHERE SettingID = 1"'
         self.assertEqual(S.server_booleans(kept), kept, "an assignment is converted by the server")
         self.assertEqual(S.server_booleans("If rs!IsActive = True Then"), "If rs!IsActive = True Then", "VBA code")
+        # A function call in the SET list before the field (Access error 3144 "Syntax error in UPDATE").
+        kept = 'x = "UPDATE StockTransfers SET TransferDate = Now(), Status = \'SENT\', InTransit = True WHERE"'
+        self.assertEqual(S.server_booleans(kept), kept)
+        self.assertEqual(S.server_booleans('x = "SELECT IIf(Nz(a, 0) > 0, 1, 0) FROM T WHERE IsActive = True"'),
+                         'x = "SELECT IIf(Nz(a, 0) > 0, 1, 0) FROM T WHERE IsActive <> 0"')
+
+    def test_this_computers_time_in_sql(self):
+        """Now() / Date() in SQL on linked server tables can run on the server, whose clock and time zone are not
+        this computer's: RepDays.SettledAt came before the moves of the day (TestRepDays "ملخص اليوم" in Access).
+        Times go in as literals (SqlNow, SqlDate); only the quotation list may show "expired" by the server's day."""
+        allowed = {"IIf(q.ValidUntil < Date(), "}
+        found = []
+        for name, text in modules():
+            if name.startswith("modBuild"):
+                continue
+            for line in text.split("\n"):
+                if line.lstrip().startswith("'"):
+                    continue
+                for lit in re.finditer(r'"(?:[^"\n]|"")*"', line):
+                    if re.search(r"\b(Now|Date)\(\)", lit.group(0)) and not any(a in lit.group(0) for a in allowed):
+                        found.append(f"{name}: {line.strip()[:100]}")
+        self.assertEqual(found, [])
+        self.assertIn("SqlNow = SqlDate(Now)", read("modCommon"))
+
+    def test_no_comparison_in_an_update_set_list(self):
+        """SET f <> 0 is a syntax error (3144): every UPDATE ... SET list holds assignments only."""
+        joined = re.compile(r'"\s*&\s*_\s*\n\s*"')
+        for name, text in modules():
+            for m in re.finditer(r"UPDATE\s+\S+\s+SET\s+(.*?)(?:\bWHERE\b|\"|$)", joined.sub("", text), re.M):
+                with self.subTest(module=name, sql=m.group(1)[:80]):
+                    self.assertNotIn("<>", re.sub(r"\([^()]*\)", "", m.group(1)))
 
     def test_no_comparison_with_true_in_sql(self):
         for name, text in modules():
@@ -185,7 +216,7 @@ class LiveDataTests(unittest.TestCase):
         self.assertLess(live, body.index("CompareAllData(Connect, rows, diffs)"))
         self.assertIn("If Not live Then", body)
         self.assertLess(body.index("SET ServerLiveSince = GETDATE()"), body.index("RelinkTable"))
-        self.assertLess(body.index("UPDATE Settings SET ServerLiveSince = Now()"), body.index("RelinkTable"))
+        self.assertLess(body.index("UPDATE Settings SET ServerLiveSince = \" & SqlNow()"), body.index("RelinkTable"))
         back = proc(SQL, "LinkToAccess")
         self.assertIn("SET ServerLiveSince = NULL", back)
         self.assertIn("UPDATE Settings SET ServerLiveSince = Null", back)

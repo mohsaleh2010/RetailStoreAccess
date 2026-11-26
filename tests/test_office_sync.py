@@ -84,7 +84,10 @@ class RuleTests(unittest.TestCase):
         self.assertTrue(stale(41, 15))
 
     def test_vba_has_the_same_numbers(self):
-        self.assertIn("DateDiff(\"n\", CDate(LastAt), NowAt) >= Minutes", proc(VBA, "OfficeSyncDue"))
+        self.assertIn("DateDiff(\"n\", WholeSecond(CDate(LastAt)), WholeSecond(NowAt)) >= Minutes", proc(VBA, "OfficeSyncDue"))
+        # 10:00 less 14 minutes is 9:45:59.99... as a Double: DateDiff("n") alone said 15 (TestOfficeSync in Access).
+        self.assertIn("WholeSecond(CDate(LastAt)), WholeSecond(NowAt)) > 2 * Minutes + 10", proc(VBA, "OfficeSyncStale"))
+        self.assertIn("Round(CDbl(At) * 86400#, 0) / 86400#", proc(VBA, "WholeSecond"))
         self.assertIn("> 2 * Minutes + 10", proc(VBA, "OfficeSyncStale"))
         cs = read("web", "src", "RetailStore.Domain", "Common", "OfficeSyncRules.cs")
         self.assertIn(">= minutes", cs)

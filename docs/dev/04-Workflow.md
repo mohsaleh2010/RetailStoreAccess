@@ -92,6 +92,13 @@
 | أدوات Python والاختبارات تعمل على Windows أيضًا: المسار يُبنى بـ `os.path.join` لا باستبدال `/` في `__file__`، و`os.path.relpath` للعرض فقط عبر `shown(...)` (المستودع على قرص والملفات المؤقتة على قرص آخر) | على جهاز صاحب المشروع (`E:` و`C:`): `test_queries` قرأ `gen_queries.py` بدل `modQueryParams.bas`، و`release.py package` توقف بـ `ValueError: path is on mount` |
 | سكربت SQL Server: `ALTER DATABASE` فقط خارج معاملة (`@@TRANCOUNT = 0`)، و`CATCH` يتراجع عن معاملة غير قابلة للحفظ (`XACT_STATE()`)، وأداة تشغيل السكربت تتصل `autocommit` | `deploy_web.py sql` على الاستضافة: الخطأ 3998 «Uncommittable transaction» في الجزء 9 |
 | رفع FTPS: لا يُغلق اتصال البيانات قبل رد الخادم 226 (وبعد FIN)، وإغلاق TLS من الخادم لا يُنتظر طويلًا، ويُفحص حجم كل ملف | `deploy_web.py upload`: `TimeoutError` في `ssl unwrap` على خادم الاستضافة، والإغلاق الفوري يقطع الملف مع رد 226 |
+| لا كلمة محجوزة بعد `AS` في SQL بلا أقواس (`AS Currency`) | `TestForms`: خطأ 3141 عند فتح قائمة العملة في سبع شاشات |
+| قائمة `SET` في `UPDATE` إسنادات فقط (`InTransit = True`)، ومحوّل الخادم (`server_code`) يتخطى الأقواس المغلقة قبل الحقل (`Now()`) | `SET ... InTransit <> 0`: خطأ 3144 في ترحيل التحويل بالطريق |
+| متغير `ByRef` لا يُعطى لاستدعاءين في تعبير واحد يقرؤه (استدعاء في كل سطر) | `TestZatcaApi` و`TestEInvoice`: قرأ VBA المتغير بعد الاستدعاءين |
+| ما يُقرأ داخل معاملة مفتوحة يُقرأ بـ `DbValue` لا `DLookup` | على جداول الخادم المربوطة لا يرى `DLookup` صنفًا أضيف في المعاملة (`TestProductUnits`) |
+| وقت الجهاز في SQL يُكتب قيمة (`SqlNow()`، `SqlDate(Date)`) لا `Now()` / `Date()` | على الخادم قد يُحسب `Now()` بساعة الخادم ومنطقته الزمنية: يوم المندوب أُغلق قبل حركاته (`TestRepDays`) |
+| الفرق بالدقائق بين وقتين محسوبين يقرّب كلًا منهما إلى الثانية (`WholeSecond`) قبل `DateDiff("n")` | 10:00 ناقص 14 دقيقة = 9:45:59.99 فعدّها `DateDiff` 15 دقيقة (`TestOfficeSync`) |
+| اختبار يقارن بسر التفعيل يستخدم سر اختبار (`ActivationCodeWith`) | حزمة التسليم فيها سر آخر ففشل `TestSecurity` |
 
 ## 4) تشخيص خطأ يأتي من Access
 1. **اطلب الدليل الكامل:**

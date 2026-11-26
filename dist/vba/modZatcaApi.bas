@@ -459,7 +459,7 @@ End Sub
 '==============================================================================
 Public Function TestZatcaApi() As Boolean
     Dim passed As Long, failed As Long, report As String, st As String, msg As String, ws As DAO.Workspace
-    Dim inTrans As Boolean, totals As Variant, xml As String
+    Dim inTrans As Boolean, totals As Variant, xml As String, replyOk As Boolean
     g_SilentMode = True
     Debug.Print "=== TestZatcaApi  " & Format$(Now, "yyyy-mm-dd hh:nn:ss") & " ==="
     On Error GoTo EH
@@ -467,8 +467,10 @@ Public Function TestZatcaApi() As Boolean
            "⁄‰Ê«‰ ﬂ· »Ì∆…", passed, failed, report
     Record InStr(ZatcaCsrConfig("SIMULATION", "x", "399999999900003", "a", "b", "c", "d", "e"), _
                  "ASN1:UTF8String:PREZATCA-Code-Signing") > 0, "ÿ·» «·‘Â«œ… ·»Ì∆… «·„Õ«ﬂ«…", passed, failed, report
-    Record ZatcaReplyResult(200, "{}", True, st, msg) = "OK" And st = "CLEARED" And _
-           ZatcaReplyResult(200, "{}", False, st, msg) = "OK" And st = "REPORTED", "ﬁ»Ê· «·«⁄ „«œ Ê«· »·Ì€", passed, failed, report
+    ' One call per statement: VBA read st after both calls of one expression (the check failed in Access).
+    replyOk = (ZatcaReplyResult(200, "{}", True, st, msg) = "OK" And st = "CLEARED")
+    replyOk = replyOk And (ZatcaReplyResult(200, "{}", False, st, msg) = "OK" And st = "REPORTED")
+    Record replyOk, "ﬁ»Ê· «·«⁄ „«œ Ê«· »·Ì€", passed, failed, report
     Record ZatcaReplyResult(400, "{""validationResults"": {""errorMessages"": [{""code"": ""BR-01"", ""message"": ""x""}]}}", _
                             False, st, msg) = "REJECTED" And st = "REJECTED" And msg = "BR-01: x", "ﬁ—«¡… ”»» «·—›÷", _
            passed, failed, report

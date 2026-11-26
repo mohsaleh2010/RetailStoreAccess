@@ -484,10 +484,10 @@ Public Function UnpostOpeningStock(ByVal LineID As Long) As String
     ' the quantity of the other warehouses stays; with nothing left the average cost starts again
     remainQty = Nz(DbValue("SELECT CurrentQuantity FROM Products WHERE ProductID = " & pid), 0) - qty
     If remainQty = 0 Then
-        db.Execute "UPDATE Products SET CurrentQuantity = 0, AverageCost = 0, UpdatedAt = Now() WHERE ProductID = " & pid, _
+        db.Execute "UPDATE Products SET CurrentQuantity = 0, AverageCost = 0, UpdatedAt = " & SqlNow() & " WHERE ProductID = " & pid, _
                    dbFailOnError + dbSeeChanges
     Else
-        db.Execute "UPDATE Products SET CurrentQuantity = " & Str$(remainQty) & ", UpdatedAt = Now() WHERE ProductID = " & pid, _
+        db.Execute "UPDATE Products SET CurrentQuantity = " & Str$(remainQty) & ", UpdatedAt = " & SqlNow() & " WHERE ProductID = " & pid, _
                    dbFailOnError + dbSeeChanges
     End If
     db.Execute "UPDATE OpeningStock SET TransactionID = Null WHERE OpeningStockID = " & LineID, dbFailOnError + dbSeeChanges

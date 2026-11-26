@@ -209,7 +209,7 @@ Public Function PostStockNote(ByVal StockNoteID As Long) As String
         rs.MoveNext
     Loop
     rs.Close
-    db.Execute "UPDATE StockNotes SET NoteDate = Now(), Status = 'POSTED' WHERE StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE StockNotes SET NoteDate = " & SqlNow() & ", Status = 'POSTED' WHERE StockNoteID = " & StockNoteID, dbFailOnError + dbSeeChanges
     If orderID > 0 Then SyncSalesOrder db, orderID                      ' partly or fully delivered
     If NotePurchaseOrderID(StockNoteID) > 0 Then SyncPurchaseOrder db, NotePurchaseOrderID(StockNoteID)   ' received
     ws.CommitTrans

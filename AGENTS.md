@@ -246,6 +246,14 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   `ClientRef`); the token stays in the platform secure storage, never in the SQLite file; `RetailStore.App` stays out of
   `RetailStore.slnx` (a machine without the MAUI workload builds and tests the web).
 - **Delivery (`docs/88`)**: the real `LICENSE_SECRET` lives only in `release/license-secret.txt` and the package `release/RetailStore/` (both ignored by git); the secret in `src/vba/modActivation.bas` is the development one and stays; never print the release secret. Secrets of the site (SQL password, `Api:JwtKey`) go only into `release/web-deploy.json` and the uploaded `appsettings.Production.json`, never the repository; an upload never touches the server `App_Data`. A T-SQL statement that needs more than `db_owner` goes inside `BEGIN TRY ... BEGIN CATCH PRINT ...` (shared hosting); `ALTER DATABASE` runs only when `@@TRANCOUNT = 0` and its `CATCH` rolls back an uncommittable transaction (`XACT_STATE()`, the script has `XACT_ABORT ON`: error 3998); a tool that runs the scripts connects in autocommit, one batch at a time.
+- **First run on the owner's PC over the hosting server (`RunAllTests`)**: no unbracketed reserved word after `AS` in SQL
+  (`AS Currency`: error 3141; `test_schema.ReservedAliasTests`); an `UPDATE ... SET` list holds assignments only, and
+  `server_code` skips closed brackets before a field (`SET d = Now(), f = True` stays; `SET f <> 0` = error 3144); a ByRef
+  variable is filled by one call per statement, never by two calls of an expression that also reads it (VBA read it after both:
+  `test_vba_byref`); code that runs inside an open transaction reads with `DbValue`, never `DLookup` (it does not see the
+  transaction on linked server tables); this computer's time goes into SQL as a literal (`SqlNow()`, `SqlDate(Date)`), never
+  `Now()` / `Date()` (the server may evaluate it with its own clock and time zone); minutes between computed times use
+  `WholeSecond` before `DateDiff("n")`; a test never depends on the release `LICENSE_SECRET` (`ActivationCodeWith`).
 - **Python on Windows**: the tools and tests run on the owner's Windows PC too: build paths with `os.path.join`, never by replacing `/` in `__file__`; `os.path.relpath` raises `ValueError` across drives (repository on `E:`, temp on `C:`), so a path printed goes through `shown(...)` (`test_delivery.WindowsPathTests`).
 - Ratios: divide `CDbl(...)` values, not `Currency` (LibreOffice keeps 4 decimals; a test harness
   cannot return a `Currency` either — wrap it in a `Double` function, see `tests/test_indicators.py`).

@@ -150,7 +150,7 @@ Public Function ApprovePurchaseOrder(ByVal PurchaseOrderID As Long) As String
         ApprovePurchaseOrder = msg
         Exit Function
     End If
-    CurrentDb.Execute "UPDATE PurchaseOrders SET Status = 'APPROVED', ApprovedAt = Now() WHERE PurchaseOrderID = " & _
+    CurrentDb.Execute "UPDATE PurchaseOrders SET Status = 'APPROVED', ApprovedAt = " & SqlNow() & " WHERE PurchaseOrderID = " & _
                       PurchaseOrderID, dbFailOnError + dbSeeChanges
     LogAction "PURCHASE_ORDER_APPROVE", "PurchaseOrders", CStr(PurchaseOrderID)
 End Function

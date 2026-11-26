@@ -1629,7 +1629,7 @@ Private Sub BuildForm_frmSuppliers()
     SetCtlProp c, "ControlTipText", "«” Õﬁ«ﬁ ›« Ê—… «·‘—«¡ «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
     SetCtlProp c, "StatusBarText", "«” Õﬁ«ﬁ ›« Ê—… «·‘—«¡ «·¬Ã·… =  «—ÌŒÂ« + Â–Â «·„œ…"
     Set c = AddLabel("lblPaymentTermsDays", "„œ… «·”œ«œ (ÌÊ„)", 5443, 6237, 1701, 425, 10, False, CLR_MUTED, "PaymentTermsDays", 0)
-    Set c = AddCombo("CurrencyCode", "CurrencyCode", 12134, 6237, 2948, 425, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
+    Set c = AddCombo("CurrencyCode", "CurrencyCode", 12134, 6237, 2948, 425, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
     SetCtlProp c, "ControlTipText", " ıﬁ —Õ ›Ì ›Ê« Ì—Â Ê”‰œ« Â"
     SetCtlProp c, "StatusBarText", " ıﬁ —Õ ›Ì ›Ê« Ì—Â Ê”‰œ« Â"
     Set c = AddLabel("lblCurrencyCode", "⁄„·… «· ⁄«„·", 10376, 6237, 1701, 425, 10, False, CLR_MUTED, "CurrencyCode", 0)
@@ -1752,7 +1752,7 @@ Private Sub BuildForm_frmExpenses()
     SetCtlProp c, "Format", "yyyy/mm/dd"
     c.AfterUpdate = EP
     Set c = AddLabel("lblExpenseDate", " «—ÌŒ «·„’—Ê›", 10376, 1701, 1701, 425, 10, False, CLR_MUTED, "ExpenseDate", 0)
-    Set c = AddCombo("CurrencyCode", "CurrencyCode", 7201, 2268, 2948, 425, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
+    Set c = AddCombo("CurrencyCode", "CurrencyCode", 7201, 2268, 2948, 425, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
     SetCtlProp c, "ControlTipText", "«·„’—Ê› »⁄„·… √Œ—Ï: «ﬂ » „»·€Â »Â«"
     SetCtlProp c, "StatusBarText", "«·„’—Ê› »⁄„·… √Œ—Ï: «ﬂ » „»·€Â »Â«"
     c.AfterUpdate = EP
@@ -2041,7 +2041,7 @@ Private Sub BuildForm_frmCurrencyRates()
     c.OnChange = EP
     Set c = AddList("lstItems", 227, 2551, 4990, 5387, 4, "0;1021;1474;1247", True)
     c.AfterUpdate = EP
-    Set c = AddCombo("CurrencyCode", "CurrencyCode", 7201, 1701, 2948, 425, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
+    Set c = AddCombo("CurrencyCode", "CurrencyCode", 7201, 1701, 2948, 425, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
     Set c = AddLabel("lblCurrencyCode", "«·⁄„·… *", 5443, 1701, 1701, 425, 10, False, CLR_MUTED, "CurrencyCode", 0)
     Set c = AddText("RateDate", "RateDate", 12134, 1701, 2948, 425)
     SetCtlProp c, "Format", "yyyy/mm/dd"
@@ -5316,7 +5316,7 @@ Private Sub BuildForm_frmCustomerPayment()
     c.FontSize = 14
     SetCtlProp c, "Format", "#,##0.00"
     Set c = AddLabel("lblAmount", "«·„»·€ *", 227, 2296, 2495, 284, 9, False, CLR_MUTED, "txtAmount", 0)
-    Set c = AddCombo("cboCurrency", "", 2835, 2608, 1474, 510, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
+    Set c = AddCombo("cboCurrency", "", 2835, 2608, 1474, 510, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
     SetCtlProp c, "ListWidth", "5.5cm"
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
@@ -5547,7 +5547,7 @@ Private Sub BuildForm_frmPurchaseInvoice()
     Set c = AddLabel("lblChargeVAT", "«·„Ê—œ ÌÕ ”» «·÷—Ì»…", 16104, 4082, 2664, 454, 10, False, CLR_TEXT, "chkChargeVAT", 0)
     Set c = AddText("txtNotes", "", 12474, 4905, 3033, 454)
     Set c = AddLabel("lblNotes", "„·«ÕŸ« ", 12474, 4593, 3033, 284, 9, False, CLR_MUTED, "txtNotes", 0)
-    Set c = AddCombo("cboCurrency", "", 15735, 4905, 1474, 454, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
+    Set c = AddCombo("cboCurrency", "", 15735, 4905, 1474, 454, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
     SetCtlProp c, "ListWidth", "5.5cm"
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
@@ -5795,7 +5795,7 @@ Private Sub BuildForm_frmSupplierPayment()
     c.FontSize = 14
     SetCtlProp c, "Format", "#,##0.00"
     Set c = AddLabel("lblAmount", "«·„»·€ *", 227, 2296, 2495, 284, 9, False, CLR_MUTED, "txtAmount", 0)
-    Set c = AddCombo("cboCurrency", "", 2835, 2608, 1474, 510, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
+    Set c = AddCombo("cboCurrency", "", 2835, 2608, 1474, 510, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
     SetCtlProp c, "ListWidth", "5.5cm"
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP
@@ -8810,7 +8810,7 @@ Private Sub BuildForm_frmManualEntry()
     Set c = AddLabel("lblReference", "«·„—Ã⁄ («Œ Ì«—Ì)", 4082, 1786, 2381, 284, 9, False, CLR_MUTED, "txtReference", 0)
     Set c = AddText("txtDescription", "", 6577, 2098, 5443, 454)
     Set c = AddLabel("lblDescription", "«·»Ì«‰", 6577, 1786, 5443, 284, 9, False, CLR_MUTED, "txtDescription", 0)
-    Set c = AddCombo("cboCurrency", "", 12134, 2098, 1474, 454, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
+    Set c = AddCombo("cboCurrency", "", 12134, 2098, 1474, 454, "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode", 2, "680;2268")
     SetCtlProp c, "ListWidth", "5.5cm"
     SetCtlProp c, "LimitToList", True
     c.AfterUpdate = EP

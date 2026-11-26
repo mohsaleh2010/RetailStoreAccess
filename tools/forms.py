@@ -129,7 +129,7 @@ PAYMENT_ROWS = "SELECT p.PaymentMethodID, p.MethodName FROM [@PaymentMethods] AS
 BANK_ROWS = "SELECT k.BankID, k.BankName FROM [@Banks] AS k WHERE k.IsActive <> 0 ORDER BY k.BankName"
 CENTER_ROWS = ("SELECT c.CostCenterID, c.CenterName FROM [@CostCenters] AS c WHERE c.IsActive <> 0 "
                "ORDER BY c.CenterCode")
-CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies "
+CURRENCY_ROWS = ("SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies "
                  "WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode")
 PRICE_LIST_ROWS = ("SELECT l.PriceListID, l.ListName FROM [@PriceLists] AS l WHERE l.IsActive <> 0 "
                    "ORDER BY l.ListName")

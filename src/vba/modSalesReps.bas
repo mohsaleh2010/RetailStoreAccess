@@ -206,7 +206,7 @@ Public Function PostCommissionRun(ByVal RunID As Long) As String
         PostCommissionRun = ClosedPeriodProblem(rm)
     End If
     If Len(PostCommissionRun) > 0 Then Exit Function
-    CurrentDb.Execute "UPDATE CommissionRuns SET Status = 'POSTED', PostedAt = Now(), EmployeeID = " & CurrentUserID() & _
+    CurrentDb.Execute "UPDATE CommissionRuns SET Status = 'POSTED', PostedAt = " & SqlNow() & ", EmployeeID = " & CurrentUserID() & _
                       " WHERE CommissionRunID = " & RunID, dbFailOnError + dbSeeChanges
     LogAction "COMMISSION_POST", "CommissionRuns", Format$(rm, "yyyy-mm")
     SyncJournal

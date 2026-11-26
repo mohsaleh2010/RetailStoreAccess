@@ -217,7 +217,7 @@ Public Function IssueQuotation(ByVal QuotationID As Long) As String
                    Str$(CalcLine(i, "TAX")) & ", LineTotal = " & Str$(CalcLine(i, "TOTAL")) & _
                    " WHERE QuotationLineID = " & ids(i), dbFailOnError + dbSeeChanges
     Next
-    db.Execute "UPDATE Quotations SET Status = 'ISSUED', IssuedAt = Now(), SubTotal = " & Str$(CalcTotal("TAXABLE")) & _
+    db.Execute "UPDATE Quotations SET Status = 'ISSUED', IssuedAt = " & SqlNow() & ", SubTotal = " & Str$(CalcTotal("TAXABLE")) & _
                ", Tax = " & Str$(CalcTotal("TAX")) & ", TotalAmount = " & Str$(CalcTotal("TOTAL")) & _
                " WHERE QuotationID = " & QuotationID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
@@ -719,12 +719,12 @@ Public Function TestQuotations() As Boolean
             "بيانات طباعة العرض", passed, failed, Report
 
     ' expired: nothing is made from it
-    CurrentDb.Execute "UPDATE Quotations SET ValidUntil = Date() - 1 WHERE QuotationID = " & qid, dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE Quotations SET ValidUntil = " & SqlDate(Date - 1) & " WHERE QuotationID = " & qid, dbFailOnError + dbSeeChanges
     CheckQt QtState(qid) = "EXPIRED" And Len(QuotationToOrder(qid, orderID)) > 0 And _
             Len(InvoiceQuotation(qid, "CASH", invID)) > 0, "العرض المنتهي لا يتحوّل", passed, failed, Report
     CheckQt Nz(DbValue("SELECT StatusName FROM QuotationListQuery WHERE QuotationID = " & qid), "") = "منتهي", _
             "تقرير العروض: منتهي", passed, failed, Report
-    CurrentDb.Execute "UPDATE Quotations SET ValidUntil = Date() + 14 WHERE QuotationID = " & qid, dbFailOnError + dbSeeChanges
+    CurrentDb.Execute "UPDATE Quotations SET ValidUntil = " & SqlDate(Date + 14) & " WHERE QuotationID = " & qid, dbFailOnError + dbSeeChanges
 
     ' to an order, then the draft order deleted: the quotation is issued again
     msg = QuotationToOrder(qid, orderID)

@@ -179,7 +179,7 @@ End Sub
 '==============================================================================
 Public Sub SetEInvoiceStatus(ByVal DocKind As String, ByVal DocID As Long, ByVal Status As String, _
                              Optional ByVal Response As String = "")
-    CurrentDb.Execute "UPDATE " & DocTableOf(DocKind) & " SET ZatcaStatus = '" & Status & "', ZatcaSubmittedAt = Now(), " & _
+    CurrentDb.Execute "UPDATE " & DocTableOf(DocKind) & " SET ZatcaStatus = '" & Status & "', ZatcaSubmittedAt = " & SqlNow() & ", " & _
                       "ZatcaResponse = " & SqlText(Left$(Response, 60000)) & " WHERE " & DocKeyOf(DocKind) & " = " & _
                       DocID, dbFailOnError + dbSeeChanges
 End Sub
@@ -216,7 +216,7 @@ Public Function EInvoiceOverdueCount() As Long
     ' Documents still PENDING 20 hours after their date (Saudi Arabia: a simplified invoice is reported
     ' within 24 hours).
     EInvoiceOverdueCount = Nz(DbValue("SELECT COUNT(*) FROM qryEInvoiceDocs WHERE EStatus = 'PENDING' AND " & _
-                                      "DocDate < DateAdd('h', -20, Now())"), 0)
+                                      "DocDate < DateAdd('h', -20, " & SqlNow() & ")"), 0)
 End Function
 
 '==============================================================================
@@ -476,7 +476,7 @@ End Sub
 '==============================================================================
 Public Function TestEInvoice() As Boolean
     Dim ws As DAO.Workspace, inTrans As Boolean, passed As Long, failed As Long, report As String, msg As String
-    Dim id As Long, logs As Long
+    Dim id As Long, logs As Long, splitOk As Boolean
     Calendar = vbCalGreg
     EnsureTestUser
     g_SilentMode = True
@@ -486,8 +486,10 @@ Public Function TestEInvoice() As Boolean
            IsNull(JsonGet("{""a"": null}", "a")) And JsonGet("{""n"": 12.50}", "n") = "12.50", "ﬁ—«¡… —œ JSON", _
            passed, failed, report
     Record JsonEscape("a""b\c" & vbLf) = "a\""b\\c\n", "‰’ œ«Œ· JSON", passed, failed, report
-    Record SplitResult("REJECTED|”»»", msg) = "REJECTED" And msg = "”»»" And SplitResult("??", msg) = "ERROR", _
-           "ﬁ—«¡… ‰ ÌÃ… «·„‰ŸÊ„…", passed, failed, report
+    ' One call per statement: VBA read msg after both calls of one expression (the check failed in Access).
+    splitOk = (SplitResult("REJECTED|”»»", msg) = "REJECTED" And msg = "”»»")
+    splitOk = splitOk And (SplitResult("??", msg) = "ERROR")
+    Record splitOk, "ﬁ—«¡… ‰ ÌÃ… «·„‰ŸÊ„…", passed, failed, report
     Set ws = DBEngine.Workspaces(0)
     ws.BeginTrans
     inTrans = True
@@ -504,7 +506,7 @@ Public Function TestEInvoice() As Boolean
                Nz(DbValue("SELECT DocNumber FROM EInvoiceLog WHERE LogID = (SELECT Max(LogID) FROM EInvoiceLog)"), "") = _
                Nz(DbValue("SELECT InvoiceNumber FROM SalesInvoices WHERE SalesInvoiceID = " & id), "-"), _
                "”Ã· «·≈—”«· »—ﬁ„ «·„” ‰œ", passed, failed, report
-        CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'PENDING', InvoiceDate = DateAdd('h', -30, Now()) " & _
+        CurrentDb.Execute "UPDATE SalesInvoices SET ZatcaStatus = 'PENDING', InvoiceDate = DateAdd('h', -30, " & SqlNow() & ") " & _
                           "WHERE SalesInvoiceID = " & id, dbFailOnError + dbSeeChanges
         Record EInvoiceOverdueCount() >= 1, " ‰»ÌÂ «·„” ‰œ«  «·„ √Œ—…", passed, failed, report
     Else

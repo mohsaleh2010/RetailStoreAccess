@@ -193,7 +193,11 @@ _KEYWORD = re.compile(r"(?i)\b(SET|WHERE|AND|OR|ON|HAVING|NOT|WHEN|SELECT|IIf\s*
 
 
 def _is_assignment(before: str) -> bool:
-    """True when the nearest SQL keyword before the field is SET (an UPDATE's SET list)."""
+    """True when the nearest SQL keyword before the field is SET (an UPDATE's SET list).
+    Closed brackets before the field are skipped: `SET d = Now(), f = True` is still an assignment."""
+    prev = None
+    while prev != before:
+        prev, before = before, re.sub(r"\([^()]*\)", "", before)
     found = list(_KEYWORD.finditer(before))
     return bool(found) and found[-1].group(0).upper() == "SET"
 

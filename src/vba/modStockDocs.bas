@@ -156,7 +156,7 @@ Public Function PostStockDocument(ByVal StockDocumentID As Long) As String
         rs.MoveNext
     Loop
     rs.Close
-    db.Execute "UPDATE StockDocuments SET DocDate = Now(), Status = 'POSTED' WHERE StockDocumentID = " & StockDocumentID, _
+    db.Execute "UPDATE StockDocuments SET DocDate = " & SqlNow() & ", Status = 'POSTED' WHERE StockDocumentID = " & StockDocumentID, _
                dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False

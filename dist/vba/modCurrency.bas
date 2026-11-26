@@ -19,7 +19,7 @@ Attribute VB_Name = "modCurrency"
 Option Compare Database
 Option Explicit
 
-Public Const CURRENCY_ROWS As String = "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS Currency FROM Currencies " & _
+Public Const CURRENCY_ROWS As String = "SELECT CurrencyCode, CurrencyCode & '  ' & CurrencyName AS CurrencyLabel FROM Currencies " & _
                                        "WHERE IsActive <> 0 ORDER BY SortOrder, CurrencyCode"
 
 '------------------------------------------------------------------------------

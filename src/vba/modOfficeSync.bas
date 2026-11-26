@@ -46,7 +46,7 @@ Public Function OfficeSyncDue(ByVal LastAt As Variant, ByVal Minutes As Long, By
         OfficeSyncDue = True
         Exit Function
     End If
-    OfficeSyncDue = (DateDiff("n", CDate(LastAt), NowAt) >= Minutes)
+    OfficeSyncDue = (DateDiff("n", WholeSecond(CDate(LastAt)), WholeSecond(NowAt)) >= Minutes)
 End Function
 
 Public Function OfficeSyncStale(ByVal LastAt As Variant, ByVal Minutes As Long, ByVal NowAt As Date) As Boolean
@@ -56,7 +56,13 @@ Public Function OfficeSyncStale(ByVal LastAt As Variant, ByVal Minutes As Long, 
         OfficeSyncStale = True
         Exit Function
     End If
-    OfficeSyncStale = (DateDiff("n", CDate(LastAt), NowAt) > 2 * Minutes + 10)
+    OfficeSyncStale = (DateDiff("n", WholeSecond(CDate(LastAt)), WholeSecond(NowAt)) > 2 * Minutes + 10)
+End Function
+
+Public Function WholeSecond(ByVal At As Date) As Date
+    ' A date is a Double: 10:00 less 14 minutes is 9:45:59.9999..., and DateDiff("n") counts the 9:45 boundary.
+    ' Rounded to the whole second, as the server and .NET keep times.
+    WholeSecond = CDate(Round(CDbl(At) * 86400#, 0) / 86400#)
 End Function
 
 Public Function OfficeSyncMinutes() As Long

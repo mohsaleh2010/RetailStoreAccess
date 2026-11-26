@@ -287,7 +287,7 @@ Public Function SettleRepDay(ByVal RepDayID As Long) As String
                         "WHERE d.RepDayID = " & RepDayID)
     shortage = -RoundMoney(Nz(DbValue("SELECT CountDiffValue FROM RepDaySummaryQuery WHERE RepDayID = " & RepDayID), 0))
     If shortage < 0 Or IsNull(advanceTo) Then shortage = 0
-    CurrentDb.Execute "UPDATE RepDays SET Status = 'SETTLED', SettledAt = Now(), StockCountID = " & countID & _
+    CurrentDb.Execute "UPDATE RepDays SET Status = 'SETTLED', SettledAt = " & SqlNow() & ", StockCountID = " & countID & _
                       ", ClosingID = " & closingID & ", GoodsShortage = " & Str$(shortage) & ", AdvanceEmployeeID = " & _
                       IIf(shortage > 0, CLng(Nz(advanceTo, 0)), "Null") & " WHERE RepDayID = " & RepDayID, dbFailOnError + dbSeeChanges
     If ActingRepDayID() = RepDayID Then StopActingAsRep

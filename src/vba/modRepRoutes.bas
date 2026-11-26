@@ -456,7 +456,7 @@ Public Function TestRepRoutes() As Boolean
     ' the results: an order of customer 1 today, customer 2 closed
     CheckRr Len(RecordRepVisit(v1, Null, Null)) > 0, "لا نتيجة بلا مستند ولا اختيار", passed, failed, report
     CurrentDb.Execute "INSERT INTO SalesOrders (OrderNumber, OrderDate, CustomerID, WarehouseID, Status, EmployeeID) " & _
-                      "VALUES ('TEST-SO-RR', Now(), " & c1 & ", 1, 'DRAFT', " & CurrentUserID() & ")", dbFailOnError + dbSeeChanges
+                      "VALUES ('TEST-SO-RR', " & SqlNow() & ", " & c1 & ", 1, 'DRAFT', " & CurrentUserID() & ")", dbFailOnError + dbSeeChanges
     msg = RecordRepVisit(v1, Null, "TEST")
     CheckRr Len(msg) = 0 And VisitField(v1, "Result") = "ORDER" And Not IsNull(VisitField(v1, "VisitedAt")), _
             "النتيجة من مستندات اليوم: طلبية " & msg, passed, failed, report

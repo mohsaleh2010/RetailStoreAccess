@@ -155,7 +155,7 @@ Private Sub TestUsers()
     Call Record(id = 0 And Not IsNull(DbValue("SELECT LockedUntil FROM Employees WHERE EmployeeID = " & uid)), _
                 "قفل الحساب بعد " & MAX_FAILED_LOGINS & " محاولات خاطئة")
     Call Record(Len(LoginUser("test_cashier", "Kashier#26", id)) > 0 And id = 0, "الحساب المقفل يرفض حتى كلمة المرور الصحيحة")
-    db.Execute "UPDATE Employees SET LockedUntil = DateAdd('n', -1, Now()) WHERE EmployeeID = " & uid, dbFailOnError
+    db.Execute "UPDATE Employees SET LockedUntil = DateAdd('n', -1, " & SqlNow() & ") WHERE EmployeeID = " & uid, dbFailOnError
     msg = LoginUser("test_cashier", "Kashier#26", id)
     Call Record(Len(msg) = 0 And id = uid And CurrentUserID() = uid, "الدخول بعد انتهاء القفل " & msg)
     Call Record(DbValue("SELECT FailedLoginCount FROM Employees WHERE EmployeeID = " & uid) = 0 And _
@@ -288,7 +288,8 @@ Private Sub TestScreens()
 
     ' --- activation of a made-up computer
     mid = "@@MID@@"
-    Call Record(ActivationCodeFor(mid) = "@@CODE@@", "كود التفعيل يطابق المرجع (tools/activation_reference.py)")
+    Call Record(ActivationCodeWith("TEST-SECRET", mid) = "@@CODE@@" And ActivationCodeFor(mid) Like "?????-?????-?????-?????", _
+                "كود التفعيل يطابق المرجع (tools/activation_reference.py)")
     Call Record(Len(SaveActivation(mid, "11111-22222-33333-44444", "TEST-PC")) > 0, "رفض كود تفعيل خاطئ")
     Call Record(Not IsValidCode("1A2B-3C4D-5E6F-7A8C", ActivationCodeFor(mid)), "الكود لا يصلح لجهاز آخر")
     msg = SaveActivation(mid, LCase$(ActivationCodeFor(mid)), "TEST-PC")
@@ -332,6 +333,6 @@ def build_test_security_vba() -> str:
     import activation_reference as A
     mid = "1A2B-3C4D-5E6F-7A8B"
     text = TEMPLATE.replace("@@VECTORS@@", vector_lines()).replace("@@MID@@", mid) \
-        .replace("@@CODE@@", A.activation_code(mid, A.vba_secret()))
+        .replace("@@CODE@@", A.activation_code(mid, "TEST-SECRET"))
     assert not re.search(r"@@[A-Z_]+@@", text)
     return see_changes(text)                                   # plan 5C: SQL Server tables

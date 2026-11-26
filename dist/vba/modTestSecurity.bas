@@ -115,7 +115,7 @@ Private Sub TestUsers()
     Call Record(id = 0 And Not IsNull(DbValue("SELECT LockedUntil FROM Employees WHERE EmployeeID = " & uid)), _
                 "Şİá ÇáÍÓÇÈ ÈÚÏ " & MAX_FAILED_LOGINS & " ãÍÇæáÇÊ ÎÇØÆÉ")
     Call Record(Len(LoginUser("test_cashier", "Kashier#26", id)) > 0 And id = 0, "ÇáÍÓÇÈ ÇáãŞİá íÑİÖ ÍÊì ßáãÉ ÇáãÑæÑ ÇáÕÍíÍÉ")
-    db.Execute "UPDATE Employees SET LockedUntil = DateAdd('n', -1, Now()) WHERE EmployeeID = " & uid, dbFailOnError + dbSeeChanges
+    db.Execute "UPDATE Employees SET LockedUntil = DateAdd('n', -1, " & SqlNow() & ") WHERE EmployeeID = " & uid, dbFailOnError + dbSeeChanges
     msg = LoginUser("test_cashier", "Kashier#26", id)
     Call Record(Len(msg) = 0 And id = uid And CurrentUserID() = uid, "ÇáÏÎæá ÈÚÏ ÇäÊåÇÁ ÇáŞİá " & msg)
     Call Record(DbValue("SELECT FailedLoginCount FROM Employees WHERE EmployeeID = " & uid) = 0 And _
@@ -248,7 +248,8 @@ Private Sub TestScreens()
 
     ' --- activation of a made-up computer
     mid = "1A2B-3C4D-5E6F-7A8B"
-    Call Record(ActivationCodeFor(mid) = "7AAE2-F50AF-20481-9EBAB", "ßæÏ ÇáÊİÚíá íØÇÈŞ ÇáãÑÌÚ (tools/activation_reference.py)")
+    Call Record(ActivationCodeWith("TEST-SECRET", mid) = "FAE50-A5C09-8757E-9A6F2" And ActivationCodeFor(mid) Like "?????-?????-?????-?????", _
+                "ßæÏ ÇáÊİÚíá íØÇÈŞ ÇáãÑÌÚ (tools/activation_reference.py)")
     Call Record(Len(SaveActivation(mid, "11111-22222-33333-44444", "TEST-PC")) > 0, "ÑİÖ ßæÏ ÊİÚíá ÎÇØÆ")
     Call Record(Not IsValidCode("1A2B-3C4D-5E6F-7A8C", ActivationCodeFor(mid)), "ÇáßæÏ áÇ íÕáÍ áÌåÇÒ ÂÎÑ")
     msg = SaveActivation(mid, LCase$(ActivationCodeFor(mid)), "TEST-PC")

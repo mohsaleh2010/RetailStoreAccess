@@ -118,7 +118,8 @@ Public Function FindProductCode(ByVal Code As String, ByRef ProductID As Long, B
     Dim v As Variant, rs As DAO.Recordset
     ProductID = 0
     UnitID = Null
-    v = DLookup("ProductID", "Products", "IsActive <> 0 AND (Barcode = " & SqlText(Code) & _
+    ' DbValue, not DLookup: DLookup does not see a product added in the open transaction (linked server tables).
+    v = DbValue("SELECT ProductID FROM Products WHERE IsActive <> 0 AND (Barcode = " & SqlText(Code) & _
                 " OR ProductCode = " & SqlText(Code) & ")")
     If Not IsNull(v) Then
         ProductID = CLng(v)

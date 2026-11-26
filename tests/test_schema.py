@@ -261,5 +261,23 @@ class GeneratedSchemaModuleTests(VbaModuleChecks, unittest.TestCase):
             self.assertIn(name, defined)
 
 
+class ReservedAliasTests(unittest.TestCase):
+    """An unbracketed reserved word after AS in SQL (AS Currency) fails in Access: error 3141
+    when a combo's row source is opened (TestForms)."""
+
+    def test_no_reserved_word_alias(self):
+        import glob, os
+        root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        paths = glob.glob(os.path.join(root, "src", "vba", "*.bas")) + glob.glob(os.path.join(root, "tools", "*.py"))
+        found = []
+        for path in sorted(paths):
+            with open(path, encoding="utf-8") as fh:
+                for no, line in enumerate(fh, 1):
+                    for m in re.finditer(r"\bAS (\w+)\b", line):
+                        if m.group(1).lower() in RESERVED and m.group(1) != "MONEY":   # T-SQL CAST(x AS MONEY)
+                            found.append(f"{os.path.basename(path)}:{no} {m.group(0)}")
+        self.assertEqual(found, [])
+
+
 if __name__ == "__main__":
     unittest.main()

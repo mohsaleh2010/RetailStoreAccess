@@ -582,7 +582,7 @@ Public Function LinkToServer(ByVal Connect As String) As String
             If Len(msg) = 0 Then                                ' the Access file knows it is no longer the real data
                 Set db = CurrentDb                              ' (a file BuildSchema has not upgraded yet: no warning)
                 On Error Resume Next
-                db.Execute "UPDATE Settings SET ServerLiveSince = Now() WHERE SettingID = 1", dbFailOnError + dbSeeChanges
+                db.Execute "UPDATE Settings SET ServerLiveSince = " & SqlNow() & " WHERE SettingID = 1", dbFailOnError + dbSeeChanges
                 On Error GoTo 0
             End If
         End If

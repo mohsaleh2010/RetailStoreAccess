@@ -144,7 +144,7 @@ Public Function ApproveSalesOrder(ByVal SalesOrderID As Long) As String
         ApproveSalesOrder = msg
         Exit Function
     End If
-    CurrentDb.Execute "UPDATE SalesOrders SET Status = 'APPROVED', ApprovedAt = Now() WHERE SalesOrderID = " & SalesOrderID, _
+    CurrentDb.Execute "UPDATE SalesOrders SET Status = 'APPROVED', ApprovedAt = " & SqlNow() & " WHERE SalesOrderID = " & SalesOrderID, _
                       dbFailOnError + dbSeeChanges
     LogAction "SALES_ORDER_APPROVE", "SalesOrders", CStr(SalesOrderID)
 End Function
@@ -155,7 +155,7 @@ Public Function PrepareSalesOrder(ByVal SalesOrderID As Long) As String
     ElseIf OrderStatus(SalesOrderID) <> "APPROVED" Then
         PrepareSalesOrder = "يبدأ تجهيز الطلبية المعتمدة."
     Else
-        CurrentDb.Execute "UPDATE SalesOrders SET Status = 'PREPARING', PreparedAt = Now() WHERE SalesOrderID = " & _
+        CurrentDb.Execute "UPDATE SalesOrders SET Status = 'PREPARING', PreparedAt = " & SqlNow() & " WHERE SalesOrderID = " & _
                           SalesOrderID, dbFailOnError + dbSeeChanges
         LogAction "SALES_ORDER_PREPARE", "SalesOrders", CStr(SalesOrderID)
     End If

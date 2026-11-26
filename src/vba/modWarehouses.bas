@@ -216,11 +216,11 @@ Public Function SendStockTransfer(ByVal StockTransferID As Long) As String
     Loop
     rs.Close
     If transit Then
-        db.Execute "UPDATE StockTransfers SET TransferDate = Now(), Status = 'SENT', InTransit <> 0 " & _
+        db.Execute "UPDATE StockTransfers SET InTransit = True, Status = 'SENT', TransferDate = " & SqlNow() & " " & _
                    "WHERE StockTransferID = " & StockTransferID, dbFailOnError + dbSeeChanges
     Else
-        db.Execute "UPDATE StockTransfers SET TransferDate = Now(), Status = 'RECEIVED', InTransit = 0, " & _
-                   "ReceivedAt = Now(), ReceivedByID = " & CurrentUserID() & " WHERE StockTransferID = " & _
+        db.Execute "UPDATE StockTransfers SET TransferDate = " & SqlNow() & ", Status = 'RECEIVED', InTransit = 0, " & _
+                   "ReceivedAt = " & SqlNow() & ", ReceivedByID = " & CurrentUserID() & " WHERE StockTransferID = " & _
                    StockTransferID, dbFailOnError + dbSeeChanges
     End If
     ws.CommitTrans
@@ -263,7 +263,7 @@ Public Function ReceiveStockTransfer(ByVal StockTransferID As Long) As String
         rs.MoveNext
     Loop
     rs.Close
-    db.Execute "UPDATE StockTransfers SET Status = 'RECEIVED', ReceivedAt = Now(), ReceivedByID = " & CurrentUserID() & _
+    db.Execute "UPDATE StockTransfers SET Status = 'RECEIVED', ReceivedAt = " & SqlNow() & ", ReceivedByID = " & CurrentUserID() & _
                " WHERE StockTransferID = " & StockTransferID, dbFailOnError + dbSeeChanges
     ws.CommitTrans
     inTrans = False
@@ -300,7 +300,7 @@ Public Function UnpostStockTransfer(ByVal StockTransferID As Long) As String
                               StockTransferID, dbOpenSnapshot)
     Do Until rs.EOF
         db.Execute "UPDATE Products SET CurrentQuantity = CurrentQuantity + " & Str$(rs!Quantity) & _
-                   ", UpdatedAt = Now() WHERE ProductID = " & rs!ProductID, dbFailOnError + dbSeeChanges
+                   ", UpdatedAt = " & SqlNow() & " WHERE ProductID = " & rs!ProductID, dbFailOnError + dbSeeChanges
         rs.MoveNext
     Loop
     rs.Close

@@ -510,7 +510,7 @@ Public Function TestJournal() As Boolean
     ws.BeginTrans
     inTrans = True
     CurrentDb.Execute "INSERT INTO Expenses (ExpenseNumber, ExpenseDate, ExpenseTypeID, Amount, Tax, TotalAmount, " & _
-        "PaymentMethodID, Description, EmployeeID) VALUES ('TEST-JV', Date(), 1, 100, 15, 115, 3, 'TEST-JV', " & _
+        "PaymentMethodID, Description, EmployeeID) VALUES ('TEST-JV', " & SqlDate(Date) & ", 1, 100, 15, 115, 3, 'TEST-JV', " & _
         CurrentUserID() & ")", dbFailOnError + dbSeeChanges
     msg = SyncJournal(added, updated, removed)
     id = Nz(DbValue("SELECT EntryID FROM JournalEntries WHERE SourceType = 'EXPENSE' AND SourceNumber = 'TEST-JV'"), 0)

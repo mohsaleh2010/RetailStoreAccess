@@ -134,6 +134,13 @@ class ReplayTests(unittest.TestCase):
 
 class CodeTests(unittest.TestCase):
 
+    def test_scan_sees_the_open_transaction(self):
+        """DLookup does not see rows added in the open DAO transaction on linked server tables: TestProductUnits
+        failed in Access at "مسح باركود الحبة". The scan reads through CurrentDb (DbValue)."""
+        body = proc(VBA, "FindProductCode")
+        self.assertNotIn("DLookup(", body)
+        self.assertIn('DbValue("SELECT ProductID FROM Products WHERE IsActive <> 0', body)
+
     def test_sale_moves_pieces(self):
         body = proc(read("modSales"), "PostSaleFromCart")
         self.assertIn("factors(n) = UnitFactorOf(rs!ProductID, rs!UnitID)", body, "the factor of now, not of the cart")

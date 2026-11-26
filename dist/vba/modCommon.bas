@@ -182,6 +182,12 @@ End Function
 '------------------------------------------------------------------------------
 ' SQL literals (always Gregorian, whatever the Windows calendar is)
 '------------------------------------------------------------------------------
+Public Function SqlNow() As String
+    ' This computer's time as a literal for SQL. Never Now() / Date() in SQL that writes or compares document times:
+    ' on linked SQL Server tables Access may send it to the server, whose clock and time zone are not this computer's.
+    SqlNow = SqlDate(Now)
+End Function
+
 Public Function SqlDate(ByVal d As Date) As String
     Dim saved As Integer
     saved = Calendar

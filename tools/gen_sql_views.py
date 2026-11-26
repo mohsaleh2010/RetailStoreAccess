@@ -186,7 +186,7 @@ FUNCTIONS = {"ccur", "cdbl", "clng", "cstr", "nz", "iif", "year", "month", "day"
 
 
 def _source_position(prev, toks, i) -> bool:
-    """A name that can be a table or query: not a column (x.Name), not an alias (AS Name), not qualified."""
+    """A name that can be a table or query: not a column (x.Name), not an alias (AS x), not qualified."""
     return prev != "." and _word(prev) != "AS" and (i + 1 >= len(toks) or toks[i + 1] != ".")
 
 
