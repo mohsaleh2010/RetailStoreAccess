@@ -320,7 +320,7 @@
 
 | الدفعة | المحتوى | القالب |
 |---|---|---|
-| **7أ الأساس** (✅ بانتظار الموافقة، القسم 18) | مكتبة Razor جديدة `RetailStore.UI.Kit` (MudBlazor + `RetailStore.Domain` فقط): الثيم `ErpTheme`، والمكونات المشتركة الاثنا عشر و`ErpFormat` / `StatusStyles` / `InvoiceLine`، و`UiLanguage` و`UiCurrency` (بواجهة عملة لا تعرف القاعدة) و`ShortcutService` و`ErpMudLocalizer`، والأساس من `erp.css` / `erp.js`؛ تُنقل كما هي بنفس الـ namespaces، و`RetailStore.UI` يعتمد عليها فلا تتغير صفحة ويب. خط Cairo يُضمَّن ملفًا داخل المكتبة (نقطة البيع تعمل بلا إنترنت). ربط `PosSession` / `RepSession` بـ `UiLanguage` (اللغة من إعدادات الجهاز كما هي). مضيف تجريبي للتطوير فقط `RetailStore.AppPreview` (Blazor Server، منصات وهمية، غير مُسلَّم) لتشغيل صفحات التطبيقين في المتصفح للّقطات والاختبار. وفي `RetailStore.Pos` / `RetailStore.App`: `AddMudServices` وروابط `index.html` (تُبنى على جهاز صاحب المشروع) | — |
+| **7أ الأساس** (✅ تمت الموافقة، القسم 18) | مكتبة Razor جديدة `RetailStore.UI.Kit` (MudBlazor + `RetailStore.Domain` فقط): الثيم `ErpTheme`، والمكونات المشتركة الاثنا عشر و`ErpFormat` / `StatusStyles` / `InvoiceLine`، و`UiLanguage` و`UiCurrency` (بواجهة عملة لا تعرف القاعدة) و`ShortcutService` و`ErpMudLocalizer`، والأساس من `erp.css` / `erp.js`؛ تُنقل كما هي بنفس الـ namespaces، و`RetailStore.UI` يعتمد عليها فلا تتغير صفحة ويب. خط Cairo يُضمَّن ملفًا داخل المكتبة (نقطة البيع تعمل بلا إنترنت). ربط `PosSession` / `RepSession` بـ `UiLanguage` (اللغة من إعدادات الجهاز كما هي). مضيف تجريبي للتطوير فقط `RetailStore.AppPreview` (Blazor Server، منصات وهمية، غير مُسلَّم) لتشغيل صفحات التطبيقين في المتصفح للّقطات والاختبار. وفي `RetailStore.Pos` / `RetailStore.App`: `AddMudServices` وروابط `index.html` (تُبنى على جهاز صاحب المشروع) | — |
 | **7ب نقطة البيع: الإطار والإعدادات** | `PosLayout` (شريط علوي `MudAppBar`: اسم المحل، التنقل، المستخدم، متصل / بلا اتصال، إرسال وتحديث بعدد المعلّق)، P1 `/login`، P7 `/settings`، P8 `/database` | D |
 | **7ج نقطة البيع: البيع** | P2 `/` (الماسح أولًا، الكميات من `PosCart`، الدفع والطباعة والدرج)، P3 `/sales` (فواتير الجهاز وحالتها PENDING / SENT / REJECTED) | B، C |
 | **7د نقطة البيع: المستندات** | P4 `/return`، P5 `/payment`، P6 `/closing` | B |
@@ -331,7 +331,7 @@
 
 **التحقق لكل دفعة:** `dotnet build` و`dotnet test` و`test_web*.py` (يُوسَّع `test_web_rules.py` ليفحص صفحات التطبيقين المعلَّمة ✅، ويفحص أن `RetailStore.UI.Kit` و`RetailStore.RepApp` لا يعتمدان على `RetailStore.Data`)، ولقطات من `RetailStore.AppPreview` (نقطة البيع 1366px و1024px، المندوب 360px و412px، فاتح / داكن، عربي / إنجليزي)، ثم بناء `RetailStore.Pos` و`RetailStore.App` وتجربتهما على جهاز صاحب المشروع.
 
-## 18) المرحلة 7، الدفعة 7أ: الأساس (✅ بانتظار الموافقة)
+## 18) المرحلة 7، الدفعة 7أ: الأساس (✅ تمت الموافقة 2026-11-27)
 لم تتغير صفحة واحدة في الويب ولا في التطبيقين؛ الدفعة تنقل نظام التصميم إلى مكتبة يستطيع التطبيقان الاعتماد عليها، وتربطه بهما.
 
 | البند | ما عُمل |
