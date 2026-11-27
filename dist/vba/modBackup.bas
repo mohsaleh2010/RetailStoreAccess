@@ -11,6 +11,8 @@ Attribute VB_Name = "modBackup"
 ' On SQL Server (plan 5C, docs/70) the same procedures make BACKUP DATABASE files (.bak) written by the
 ' server itself (Settings.BackupFolder as the server sees it, else its default backup folder), verify them with
 ' RESTORE VERIFYONLY and restore them from master; the list comes from the server's backup history (msdb).
+' Where the server refuses BACKUP DATABASE (shared hosting), ServerDataCopy copies every table into an
+' Access file on this PC and counts the rows of each (RemoveDemoData offers it, docs/88).
 ' Pure helpers (BackupFileName, OldBackups) have the same results as
 ' tools/security_reference.py.
 '==============================================================================
@@ -284,6 +286,51 @@ Public Function ServerBackupNow(ByRef BackupFile As String, Optional ByVal Folde
         On Error GoTo 0
     End If
     LogAction "BACKUP", "Backup", "", BackupFile
+End Function
+
+Public Function ServerDataCopy(ByRef CopyFile As String, Optional ByVal Suffix As String = "") As String
+    ' When the server refuses BACKUP DATABASE (shared hosting): every table of the schema copied from the
+    ' linked server tables into a new Access file on this PC (<front-end folder>\Backups), then the rows of
+    ' each table counted in both. "" on success; CopyFile receives the full path of the copy.
+    Dim folder As String, names As Variant, t As Variant, target As DAO.Database, n As Long, m As Long
+    Dim quoted As String, stage As String
+    On Error GoTo EH
+    CopyFile = ""
+    If Not HasPermission("BACKUP") Then
+        ServerDataCopy = "·«  „·ﬂ ’·«ÕÌ… «·‰”Œ «·«Õ Ì«ÿÌ."
+        Exit Function
+    End If
+    folder = CurrentProject.Path & "\Backups"
+    If Len(Dir$(folder, vbDirectory)) = 0 Then MkDir folder
+    CopyFile = folder & "\" & BackupFileName(ConnectDatabase(LinkConnect()) & Suffix & "_Data", Now)
+    stage = CopyFile
+    Set target = DBEngine.CreateDatabase(CopyFile, dbLangGeneral)
+    target.Close
+    Set target = Nothing
+    quoted = Replace(CopyFile, "'", "''")
+    names = Split(SchemaTableList(), ",")                       ' modBuildSchema
+    For Each t In names
+        stage = CStr(t)
+        CurrentDb.Execute "SELECT * INTO [" & t & "] IN '" & quoted & "' FROM [" & t & "]", dbFailOnError + dbSeeChanges
+    Next
+    Set target = DBEngine.OpenDatabase(CopyFile, False, True)
+    For Each t In names
+        stage = CStr(t)
+        n = Nz(DbValue("SELECT COUNT(*) FROM [" & t & "]"), 0)
+        m = target.OpenRecordset("SELECT COUNT(*) FROM [" & t & "]", dbOpenSnapshot).Fields(0).Value
+        If n <> m Then
+            target.Close
+            ServerDataCopy = "‰”Œ… «·»Ì«‰«  ‰«ﬁ’… ›Ì «·ÃœÊ· " & t & ": " & m & " „‰ " & n & " ’›."
+            Exit Function
+        End If
+    Next
+    target.Close
+    LogAction "BACKUP", "Backup", "", CopyFile
+    Exit Function
+EH:
+    ServerDataCopy = " ⁄–—  ‰”Œ… «·»Ì«‰«  (" & stage & "): " & Err.Description & " (" & Err.Number & ")"
+    On Error Resume Next
+    If Not target Is Nothing Then target.Close
 End Function
 
 Public Function ServerBackupRows() As String

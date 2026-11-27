@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3492
+Private Const ENTRY_COUNT As Long = 3495
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -230,7 +230,7 @@ Public Function TestLang() As Boolean
     CheckLang Tr("AS [مبلغ الشيك], StatusName AS [الحالة], Format(StatusDate, 'yyyy/mm/dd') AS [في], Nz(BankName, DrawerBank) AS [البنك] ") = "AS [Cheque amount], StatusName AS [Status], Format(StatusDate, 'yyyy/mm/dd') AS [in], Nz(BankName, DrawerBank) AS [Bank] ", "Tr sample 1", passed, failed, report
     CheckLang Tr("إضافة فترة بعد آخر فترة") = "Add a period after the last one", "Tr sample 2", passed, failed, report
     CheckLang Tr("البرنامج يعمل على الخادم بالفعل.") = "The program already works on the server.", "Tr sample 3", passed, failed, report
-    CheckLang Tr("المتبقي في الصندوق (عهدة)") = "Left in the box (float)", "Tr sample 4", passed, failed, report
+    CheckLang Tr("المتبقي من كل فاتورة آجلة حسب تأخيرها عن تاريخ الاستحقاق") = "The remainder of each credit invoice by its delay after the due date", "Tr sample 4", passed, failed, report
     CheckLang Tr("تعذّر إنشاء طلب الشهادة: ") = "Could not create the certificate request: ", "Tr sample 5", passed, failed, report
     CheckLang Tr("سعر البيع للمندوب") = "Selling price for the rep", "Tr sample 6", passed, failed, report
     CheckLang Tr("لا يوجد إذن. اختر النوع والمخزن والعميل أو المورد ثم «إذن جديد».") = "No note. Choose the type, the warehouse and the customer or supplier, then New note.", "Tr sample 7", passed, failed, report

@@ -740,6 +740,10 @@ Public Function RemoveDemoData() As Boolean
         MsgBox "·„  ıœŒ· »Ì«‰«   Ã—Ì»Ì… ›Ì Â–Â «·ﬁ«⁄œ….", vbInformation + MSG_RTL, "RemoveDemoData"
         Exit Function
     End If
+    If Not IsNull(DMax("LogDate", "AuditLog", "ActionType = 'DEMO_REMOVED' AND LogDate > " & SqlDate(loaded))) Then
+        MsgBox "Õı–›  «·»Ì«‰«  «· Ã—Ì»Ì… „‰ Â–Â «·ﬁ«⁄œ… „‰ ﬁ»·° ›·‰ ÌıÕ–› ‘Ì¡.", vbInformation + MSG_RTL, "RemoveDemoData"
+        Exit Function
+    End If
     For Each t In Array("SalesInvoices", "SalesReturns", "PurchaseInvoices", "PurchaseReturns", "CustomerPayments", _
                         "SupplierPayments", "Expenses", "CashVouchers", "CashClosings")
         later = later + Nz(DbValue("SELECT COUNT(*) FROM [" & t & "] WHERE CreatedAt > " & SqlDate(loaded)), 0)
@@ -755,6 +759,11 @@ Public Function RemoveDemoData() As Boolean
               " ıÕ›Ÿ ‰”Œ… «Õ Ì«ÿÌ… √Ê·«. Â·  —Ìœ «·„ «»⁄…ø", vbQuestion + vbYesNo + vbDefaultButton2 + MSG_RTL, _
               "RemoveDemoData") <> vbYes Then Exit Function
     msg = BackupNow(file, , "_BeforeDemoRemoval")
+    If Len(msg) > 0 And IsLinkedToServer() Then                ' shared hosting: no BACKUP DATABASE (docs/88)
+        If MsgBox(msg & vbCrLf & vbCrLf & " ı⁄„· »œ·Â« ‰”Œ… „‰ ﬂ· «·Ãœ«Ê· ›Ì „·› Access ⁄·Ï Â–« «·ÃÂ«“ø", _
+                  vbQuestion + vbYesNo + vbDefaultButton2 + MSG_RTL, "RemoveDemoData") <> vbYes Then Exit Function
+        msg = ServerDataCopy(file, "_BeforeDemoRemoval")
+    End If
     If Len(msg) > 0 Then
         MsgBox " ⁄–—  «·‰”Œ… «·«Õ Ì«ÿÌ…° ›·„ ÌıÕ–› ‘Ì¡:" & vbCrLf & msg, vbExclamation + MSG_RTL, "RemoveDemoData"
         Exit Function

@@ -326,6 +326,7 @@ Private Sub D3_3()
     LangAdd "مستخدم لوحدة من وحدات الأصناف", "is used by a product unit"
     LangAdd "موجود في الموازنة لنفس المركز", "already in the budget for the same center"
     LangAdd "مُسلَّمة كلها، لم تُفوتر كلها", "Fully delivered, not fully invoiced"
+    LangAdd "نسخة البيانات ناقصة في الجدول", "the data copy is incomplete in the table"
     LangAdd "هذا الإجراء غير موجود في شاشة", "This action does not exist in the screen"
     LangAdd "هل تريد حذف هذا السجل نهائيًا", "Do you want to delete this record for good"
     LangAdd "وتحديث المخزون ومتوسط التكلفة", "and the stock and average cost are updated"
@@ -381,10 +382,10 @@ Private Sub D3_3()
     LangAdd "لا توجد عروض أسعار في الفترة", "No quotations in the period"
     LangAdd "لا توجد كميات محجوزة لطلبيات", "Nothing is reserved for orders"
     LangAdd "لا توجد مبيعات في هذه الفترة", "There are no sales in this period"
-    LangAdd "لمن لا مركز له من المستخدمين", "for users without a center"
 End Sub
 
 Private Sub D3_4()
+    LangAdd "لمن لا مركز له من المستخدمين", "for users without a center"
     LangAdd "ليست لديك صلاحية يوم المندوب", "You do not have the rep day permission"
     LangAdd "مبالغ الموازنة لا تكون سالبة", "Budget amounts are never negative"
     LangAdd "مسودة: أضف الأصناف ثم «ترحيل", "Draft: add the products, then Post"
@@ -504,10 +505,10 @@ Private Sub D3_4()
     LangAdd "اكتب المبلغ بعملة المصروف", "Type the amount in the currency of the expense"
     LangAdd "اكتب عدد الدقائق من 0 إلى", "Type the minutes from 0 to"
     LangAdd "اكتب معامل التحويل للعملة", "Type the exchange rate of the currency"
-    LangAdd "الأرقام من المستندات الآن", "The figures come from the documents now"
 End Sub
 
 Private Sub D3_5()
+    LangAdd "الأرقام من المستندات الآن", "The figures come from the documents now"
     LangAdd "الأصل غير موجود أو مستبعد", "The asset does not exist or is disposed"
     LangAdd "الإقرارات تُعتمد بالترتيب", "Returns are approved in order"
     LangAdd "التحويل بين بنكين مختلفين", "Transfer between two different banks"
@@ -532,6 +533,4 @@ Private Sub D3_5()
     LangAdd "تُقترح في فواتيره وسنداته", "Suggested in his invoices and vouchers"
     LangAdd "حدد ما يستطيع كل دور فعله", "Set what each role can do"
     LangAdd "حذف آخر إعادة تقييم للأصل", "Delete the last revaluation of the asset"
-    LangAdd "حذف الموازنة كلها بأسطرها", "Delete the whole budget with its lines"
-    LangAdd "خسارة بيع / استبعاد الأصل", "Loss on sale / disposal of the asset"
 End Sub

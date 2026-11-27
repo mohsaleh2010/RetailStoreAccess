@@ -166,7 +166,8 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
 - A **Private** procedure cannot be called from another module (compile error). Make it Public.
 - Block `If … End If` instead of single-line `If … Then A Else B` that calls Subs; no `Switch()`.
 - Do not name variables like built-in functions or keywords: `left`, `month`, `line`, `text`, `now`,
-  `dir`, `sub`, `exp_`, `base` … No procedure name may exist Public in two modules.
+  `dir`, `sub`, `exp_`, `base` … nor like a VBA keyword (`step`, `to`, `next`, `type`, `date`, `len`:
+  `test_hosting_cleanup.KeywordNameTests`). No procedure name may exist Public in two modules.
 - VBA binds `*` tighter than `\` (integer division): write `(n \ 4) * 3`, never `n \ 4 * 3` (= `n \ 12`).
 - Lines < 1000 characters and < 24 line continuations (`long_const`, `form_names_const` split strings).
 - Only Windows-1256 characters in VBA (no `−`, smart symbols outside cp1256, no Arabic-Indic digits `٠-٩`: test
@@ -248,7 +249,7 @@ VBA is never compiled here, so these are enforced by tests and must be followed 
   a new operation the phone records offline is an outbox kind sent by `SyncService` and must be safe to send twice (orders carry
   `ClientRef`); the token stays in the platform secure storage, never in the SQLite file; `RetailStore.App` stays out of
   `RetailStore.slnx` (a machine without the MAUI workload builds and tests the web).
-- **Delivery (`docs/88`)**: the real `LICENSE_SECRET` lives only in `release/license-secret.txt` and the package `release/RetailStore/` (both ignored by git); the secret in `src/vba/modActivation.bas` is the development one and stays; never print the release secret. Secrets of the site (SQL password, `Api:JwtKey`) go only into `release/web-deploy.json` and the uploaded `appsettings.Production.json`, never the repository; an upload never touches the server `App_Data`. A T-SQL statement that needs more than `db_owner` goes inside `BEGIN TRY ... BEGIN CATCH PRINT ...` (shared hosting); `ALTER DATABASE` runs only when `@@TRANCOUNT = 0` and its `CATCH` rolls back an uncommittable transaction (`XACT_STATE()`, the script has `XACT_ABORT ON`: error 3998); a tool that runs the scripts connects in autocommit, one batch at a time.
+- **Delivery (`docs/88`)**: the real `LICENSE_SECRET` lives only in `release/license-secret.txt` and the package `release/RetailStore/` (both ignored by git); the secret in `src/vba/modActivation.bas` is the development one and stays; never print the release secret. Secrets of the site (SQL password, `Api:JwtKey`) go only into `release/web-deploy.json` and the uploaded `appsettings.Production.json`, never the repository; an upload never touches the server `App_Data`. A T-SQL statement that needs more than `db_owner` goes inside `BEGIN TRY ... BEGIN CATCH PRINT ...` (shared hosting); `ALTER DATABASE` runs only when `@@TRANCOUNT = 0` and its `CATCH` rolls back an uncommittable transaction (`XACT_STATE()`, the script has `XACT_ABORT ON`: error 3998); a tool that runs the scripts connects in autocommit, one batch at a time. A shared host refuses `BACKUP DATABASE`: a step that needs a backup before it changes server data (`RemoveDemoData`) asks, then falls back to `modBackup.ServerDataCopy` (every table of `SchemaTableList` into an Access file on this PC, the rows of each counted) and changes nothing unless the copy is complete.
 - **First run on the owner's PC over the hosting server (`RunAllTests`)**: no unbracketed reserved word after `AS` in SQL
   (`AS Currency`: error 3141; `test_schema.ReservedAliasTests`); an `UPDATE ... SET` list holds assignments only, and
   `server_code` skips closed brackets before a field (`SET d = Now(), f = True` stays; `SET f <> 0` = error 3144); a ByRef

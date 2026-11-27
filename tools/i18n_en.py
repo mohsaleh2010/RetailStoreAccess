@@ -3513,4 +3513,7 @@ EN = {
     'سعر الصنف صفر، فلا تُحسب الكمية من السعر': 'the price of the product is zero, so the quantity cannot come from the price',
     'لا يوجد صنف نشط بالكود': 'no active product has the code',
     'الكمية صفر': 'the quantity is zero',
+    'تعذرت نسخة البيانات': 'the data copy failed',
+    'نسخة البيانات ناقصة في الجدول': 'the data copy is incomplete in the table',
+    'صف': 'rows',
 }

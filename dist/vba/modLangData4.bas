@@ -17,6 +17,8 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "ÍĞİ ÇáãæÇÒäÉ ßáåÇ ÈÃÓØÑåÇ", "Delete the whole budget with its lines"
+    LangAdd "ÎÓÇÑÉ ÈíÚ / ÇÓÊÈÚÇÏ ÇáÃÕá", "Loss on sale / disposal of the asset"
     LangAdd "ÏİÊÑ ÇáÃÓÊÇĞ (ßá ÇáÍÓÇÈÇÊ", "General ledger (all accounts"
     LangAdd "ÑÕíÏ ÇáßÔİ İí åĞÇ ÇáÊÇÑíÎ", "Statement balance on this date"
     LangAdd "ÑİÖÊ ÇáãÕáÍÉ ÇáÅáÛÇÁ (ÑãÒ", "The Tax Authority refused the cancellation (code"
@@ -135,11 +137,11 @@ Private Sub D4_1()
     LangAdd "ÇáãÑİæÖÉ Ãæ ÛíÑ ÇáÕÇáÍÉ", "Rejected or invalid"
     LangAdd "ÇáãÓÇİÉ Èíä ÇáÃÚãÏÉ (ãã", "Space between columns (mm"
     LangAdd "ÇáãÕÑæİÇÊ (ÈÏæä ÇáÖÑíÈÉ", "Expenses (without VAT"
-    LangAdd "ÇáãØÇÈŞÉ İí åĞå ÇáÊÓæíÉ", "Matched in this reconciliation"
-    LangAdd "ÇáãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "Low-stock products"
 End Sub
 
 Private Sub D4_2()
+    LangAdd "ÇáãØÇÈŞÉ İí åĞå ÇáÊÓæíÉ", "Matched in this reconciliation"
+    LangAdd "ÇáãäÊÌÇÊ ãäÎİÖÉ ÇáãÎÒæä", "Low-stock products"
     LangAdd "ÇáãíÒÇäíÉ ÇáÇİÊÊÇÍíÉ áÜ", "Opening balance sheet of"
     LangAdd "ÈÂÎÑ ÓÚÑ (ÚãáÉ ÇáÈÑäÇãÌ", "At the last rate (program currency"
     LangAdd "ÈÇáÏİÇÊÑ (ÚãáÉ ÇáÈÑäÇãÌ", "In the books (program currency"
@@ -258,11 +260,11 @@ Private Sub D4_2()
     LangAdd "ÑŞã ÇáÅŞÑÇÑ áÏì ÇáåíÆÉ", "Return number at the Authority"
     LangAdd "ÕÇİí ÑÈÍ ÇáÔåÑ (ÊŞÑíÈí", "Net profit of the month (approximate"
     LangAdd "ÕÏÑ ÇáÚÑÖ. ØÈÇÚÊå ÇáÂä", "The quotation is issued. Print it now"
-    LangAdd "ÕäÏæŞ ãä íõäÔÆ ÇáãÕÑæİ", "Box of the user who creates the expense"
-    LangAdd "ÖÑíÈÉ ÇáÚãæáÉ / ÇáÑÓæã", "VAT on the fee / charges"
 End Sub
 
 Private Sub D4_3()
+    LangAdd "ÕäÏæŞ ãä íõäÔÆ ÇáãÕÑæİ", "Box of the user who creates the expense"
+    LangAdd "ÖÑíÈÉ ÇáÚãæáÉ / ÇáÑÓæã", "VAT on the fee / charges"
     LangAdd "ÖÑíÈÉ ãÏÎáÇÊ ÇáãÔÊÑíÇÊ", "Input VAT on purchases"
     LangAdd "ÖÑíÈÉ ãÏÎáÇÊ ÇáãÕÑæİÇÊ", "Input VAT on expenses"
     LangAdd "ÛíÑ ãæÌæÏÉ Ãæ ÛíÑ äÔØÉ", "does not exist or is not active"
@@ -381,11 +383,11 @@ Private Sub D4_3()
     LangAdd "ÇáÑÕíÏ ÇáäåÇÆí (ßãíÉ", "Closing balance (quantity"
     LangAdd "ÇáÑŞã ÇáÖÑíÈí ááÚãíá", "Customer tax number"
     LangAdd "ÇáÓÚÑ áÇ íßæä ÓÇáÈğÇ", "The price cannot be negative"
-    LangAdd "ÇáÔåÑ ÇáÊÇáí ááÊÓÌíá", "Next month to record"
-    LangAdd "ÇáÕäÏæŞ (ÅíÏÇÚ / ÓÍÈ", "Box (deposit / withdrawal"
 End Sub
 
 Private Sub D4_4()
+    LangAdd "ÇáÔåÑ ÇáÊÇáí ááÊÓÌíá", "Next month to record"
+    LangAdd "ÇáÕäÏæŞ (ÅíÏÇÚ / ÓÍÈ", "Box (deposit / withdrawal"
     LangAdd "ÇáİÇÊæÑÉ ÇáÅáßÊÑæäíÉ", "E-invoicing"
     LangAdd "ÇáãÈáÛ (ÈÏæä ÇáÖÑíÈÉ", "Amount (without VAT"
     LangAdd "ÇáãÈíÚÇÊ ÍÓÈ ÇáÊÕäíİ", "Sales by category"
@@ -493,6 +495,7 @@ Private Sub D4_4()
     LangAdd "ÊÚĞÑ ÇÓÊáÇã ÇáÊÍæíá", "Could not receive the transfer"
     LangAdd "ÊÚĞÑ ÊÍÏíË ÇáãÄÔÑÇÊ", "Could not refresh the indicators"
     LangAdd "ÊÚĞÑ ÑÓã ÇáÅÍÕÇÆíÇÊ", "Could not draw the statistics"
+    LangAdd "ÊÚĞÑÊ äÓÎÉ ÇáÈíÇäÇÊ", "the data copy failed"
     LangAdd "ÊÚĞøÑ ÅäÔÇÁ ÇáÔåÇÏÉ", "Could not create the certificate"
     LangAdd "ÊÚĞøÑ ÊæŞíÚ ÇáãÓÊäÏ", "Could not sign the document"
     LangAdd "Êã ÅŞİÇá ÇáİÊÑÉ ÍÊì", "The period was closed up to"
@@ -503,12 +506,12 @@ Private Sub D4_4()
     LangAdd "ÌãåæÑíÉ ãÕÑ ÇáÚÑÈíÉ", "Arab Republic of Egypt"
     LangAdd "ÍÊì ÔåÑ (Ãí íæã İíå", "Up to month (any day in it"
     LangAdd "ÍĞİ ÑÕíÏ åĞÇ ÇáÍÓÇÈ", "Delete the balance of this account"
-    LangAdd "ÓÍÈ äŞÏíÉ Åáì ÕäÏæŞ", "Cash withdrawal to a box"
-    LangAdd "ÕÇİí ÅíÑÇÏÇÊ ÇáäÔÇØ", "Net operating revenue"
-    LangAdd "ÕÇİí ÇáÑÈÍ (ÇáÎÓÇÑÉ", "Net profit (loss"
 End Sub
 
 Private Sub D4_5()
+    LangAdd "ÓÍÈ äŞÏíÉ Åáì ÕäÏæŞ", "Cash withdrawal to a box"
+    LangAdd "ÕÇİí ÅíÑÇÏÇÊ ÇáäÔÇØ", "Net operating revenue"
+    LangAdd "ÕÇİí ÇáÑÈÍ (ÇáÎÓÇÑÉ", "Net profit (loss"
     LangAdd "ÚÏÏ ÇáÎÇäÇÊ ÇáÚÔÑíÉ", "Decimal places"
     LangAdd "İÇÊæÑÉ ÖÑíÈíÉ ãÈÓØÉ", "Simplified tax invoice"
     LangAdd "ŞíÏ ÚßÓí ÌÏíÏ ááŞíÏ", "New reversing entry for the entry"
@@ -626,12 +629,12 @@ Private Sub D4_5()
     LangAdd "ÃÓØÑ ãÓíÑ ÇáÑæÇÊÈ", "Payroll lines"
     LangAdd "ÃäÔÆ ãæÇÒäÉ ááÓäÉ", "Create a budget for the year"
     LangAdd "ÃæÇãÑ ãä ÇáÇŞÊÑÇÍ", "Orders from suggestion"
-    LangAdd "ÅÖÇİÉ ßá ÇáÍÓÇÈÇÊ", "Add all accounts"
-    LangAdd "ÇÎÊÑ ÊÇÑíÎğÇ ÈÚÏå", "Choose a date after it"
-    LangAdd "ÇÑÊİÇÚ ÇáãáÕŞ (ãã", "Label height (mm"
 End Sub
 
 Private Sub D4_6()
+    LangAdd "ÅÖÇİÉ ßá ÇáÍÓÇÈÇÊ", "Add all accounts"
+    LangAdd "ÇÎÊÑ ÊÇÑíÎğÇ ÈÚÏå", "Choose a date after it"
+    LangAdd "ÇÑÊİÇÚ ÇáãáÕŞ (ãã", "Label height (mm"
     LangAdd "ÇÖÛØ áÚÑÖ ÇáÊŞÑíÑ", "Click to show the report"
     LangAdd "ÇßÊÈ ÇÓã ÇáãÓÊÎÏã", "Type the user name"
     LangAdd "ÇßÊÈ ÇáäÓÈ ÇáËáÇË", "Type the three rates"
@@ -714,8 +717,4 @@ Private Sub D4_6()
     LangAdd "ãËÇá: 20,21. İÇÑÛ", "Example: 20,21. Empty"
     LangAdd "ãËÇá: 38 Ãæ 40 Ãæ", "Example: 38 or 40 or"
     LangAdd "ãÌáÏ ÕæÑ ÇáãäÊÌÇÊ", "Product pictures folder"
-    LangAdd "ãÎÒä ÇáÌÑÏ ÇáÌÏíÏ", "Warehouse of the new count"
-    LangAdd "ãÓÊäÏ ãİÊæÍ. ÇÎÊÑ", "An open document. Choose"
-    LangAdd "ãáİ ÓßÑÈÊ ÇáŞÇÚÏÉ", "Database script file"
-    LangAdd "äÓÈÉ ÇáÖÑíÈÉ áíÓÊ", "The VAT rate is not"
 End Sub

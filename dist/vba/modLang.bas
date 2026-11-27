@@ -23,7 +23,7 @@ Attribute VB_Name = "modLang"
 Option Compare Database
 Option Explicit
 
-Private Const ENTRY_COUNT As Long = 3492
+Private Const ENTRY_COUNT As Long = 3495
 
 Private m_lang As String              ' "" = not read yet
 Private m_loaded As Boolean
@@ -230,7 +230,7 @@ Public Function TestLang() As Boolean
     CheckLang Tr("AS [ãÈáÛ ÇáÔíß], StatusName AS [ÇáÍÇáÉ], Format(StatusDate, 'yyyy/mm/dd') AS [İí], Nz(BankName, DrawerBank) AS [ÇáÈäß] ") = "AS [Cheque amount], StatusName AS [Status], Format(StatusDate, 'yyyy/mm/dd') AS [in], Nz(BankName, DrawerBank) AS [Bank] ", "Tr sample 1", passed, failed, report
     CheckLang Tr("ÅÖÇİÉ İÊÑÉ ÈÚÏ ÂÎÑ İÊÑÉ") = "Add a period after the last one", "Tr sample 2", passed, failed, report
     CheckLang Tr("ÇáÈÑäÇãÌ íÚãá Úáì ÇáÎÇÏã ÈÇáİÚá.") = "The program already works on the server.", "Tr sample 3", passed, failed, report
-    CheckLang Tr("ÇáãÊÈŞí İí ÇáÕäÏæŞ (ÚåÏÉ)") = "Left in the box (float)", "Tr sample 4", passed, failed, report
+    CheckLang Tr("ÇáãÊÈŞí ãä ßá İÇÊæÑÉ ÂÌáÉ ÍÓÈ ÊÃÎíÑåÇ Úä ÊÇÑíÎ ÇáÇÓÊÍŞÇŞ") = "The remainder of each credit invoice by its delay after the due date", "Tr sample 4", passed, failed, report
     CheckLang Tr("ÊÚĞøÑ ÅäÔÇÁ ØáÈ ÇáÔåÇÏÉ: ") = "Could not create the certificate request: ", "Tr sample 5", passed, failed, report
     CheckLang Tr("ÓÚÑ ÇáÈíÚ ááãäÏæÈ") = "Selling price for the rep", "Tr sample 6", passed, failed, report
     CheckLang Tr("áÇ íæÌÏ ÅĞä. ÇÎÊÑ ÇáäæÚ æÇáãÎÒä æÇáÚãíá Ãæ ÇáãæÑÏ Ëã «ÅĞä ÌÏíÏ».") = "No note. Choose the type, the warehouse and the customer or supplier, then New note.", "Tr sample 7", passed, failed, report

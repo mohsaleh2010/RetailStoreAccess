@@ -17,6 +17,8 @@ Public Sub LangData4()
 End Sub
 
 Private Sub D4_1()
+    LangAdd "حذف الموازنة كلها بأسطرها", "Delete the whole budget with its lines"
+    LangAdd "خسارة بيع / استبعاد الأصل", "Loss on sale / disposal of the asset"
     LangAdd "دفتر الأستاذ (كل الحسابات", "General ledger (all accounts"
     LangAdd "رصيد الكشف في هذا التاريخ", "Statement balance on this date"
     LangAdd "رفضت المصلحة الإلغاء (رمز", "The Tax Authority refused the cancellation (code"
@@ -135,11 +137,11 @@ Private Sub D4_1()
     LangAdd "المرفوضة أو غير الصالحة", "Rejected or invalid"
     LangAdd "المسافة بين الأعمدة (مم", "Space between columns (mm"
     LangAdd "المصروفات (بدون الضريبة", "Expenses (without VAT"
-    LangAdd "المطابقة في هذه التسوية", "Matched in this reconciliation"
-    LangAdd "المنتجات منخفضة المخزون", "Low-stock products"
 End Sub
 
 Private Sub D4_2()
+    LangAdd "المطابقة في هذه التسوية", "Matched in this reconciliation"
+    LangAdd "المنتجات منخفضة المخزون", "Low-stock products"
     LangAdd "الميزانية الافتتاحية لـ", "Opening balance sheet of"
     LangAdd "بآخر سعر (عملة البرنامج", "At the last rate (program currency"
     LangAdd "بالدفاتر (عملة البرنامج", "In the books (program currency"
@@ -258,11 +260,11 @@ Private Sub D4_2()
     LangAdd "رقم الإقرار لدى الهيئة", "Return number at the Authority"
     LangAdd "صافي ربح الشهر (تقريبي", "Net profit of the month (approximate"
     LangAdd "صدر العرض. طباعته الآن", "The quotation is issued. Print it now"
-    LangAdd "صندوق من يُنشئ المصروف", "Box of the user who creates the expense"
-    LangAdd "ضريبة العمولة / الرسوم", "VAT on the fee / charges"
 End Sub
 
 Private Sub D4_3()
+    LangAdd "صندوق من يُنشئ المصروف", "Box of the user who creates the expense"
+    LangAdd "ضريبة العمولة / الرسوم", "VAT on the fee / charges"
     LangAdd "ضريبة مدخلات المشتريات", "Input VAT on purchases"
     LangAdd "ضريبة مدخلات المصروفات", "Input VAT on expenses"
     LangAdd "غير موجودة أو غير نشطة", "does not exist or is not active"
@@ -381,11 +383,11 @@ Private Sub D4_3()
     LangAdd "الرصيد النهائي (كمية", "Closing balance (quantity"
     LangAdd "الرقم الضريبي للعميل", "Customer tax number"
     LangAdd "السعر لا يكون سالبًا", "The price cannot be negative"
-    LangAdd "الشهر التالي للتسجيل", "Next month to record"
-    LangAdd "الصندوق (إيداع / سحب", "Box (deposit / withdrawal"
 End Sub
 
 Private Sub D4_4()
+    LangAdd "الشهر التالي للتسجيل", "Next month to record"
+    LangAdd "الصندوق (إيداع / سحب", "Box (deposit / withdrawal"
     LangAdd "الفاتورة الإلكترونية", "E-invoicing"
     LangAdd "المبلغ (بدون الضريبة", "Amount (without VAT"
     LangAdd "المبيعات حسب التصنيف", "Sales by category"
@@ -493,6 +495,7 @@ Private Sub D4_4()
     LangAdd "تعذر استلام التحويل", "Could not receive the transfer"
     LangAdd "تعذر تحديث المؤشرات", "Could not refresh the indicators"
     LangAdd "تعذر رسم الإحصائيات", "Could not draw the statistics"
+    LangAdd "تعذرت نسخة البيانات", "the data copy failed"
     LangAdd "تعذّر إنشاء الشهادة", "Could not create the certificate"
     LangAdd "تعذّر توقيع المستند", "Could not sign the document"
     LangAdd "تم إقفال الفترة حتى", "The period was closed up to"
@@ -503,12 +506,12 @@ Private Sub D4_4()
     LangAdd "جمهورية مصر العربية", "Arab Republic of Egypt"
     LangAdd "حتى شهر (أي يوم فيه", "Up to month (any day in it"
     LangAdd "حذف رصيد هذا الحساب", "Delete the balance of this account"
-    LangAdd "سحب نقدية إلى صندوق", "Cash withdrawal to a box"
-    LangAdd "صافي إيرادات النشاط", "Net operating revenue"
-    LangAdd "صافي الربح (الخسارة", "Net profit (loss"
 End Sub
 
 Private Sub D4_5()
+    LangAdd "سحب نقدية إلى صندوق", "Cash withdrawal to a box"
+    LangAdd "صافي إيرادات النشاط", "Net operating revenue"
+    LangAdd "صافي الربح (الخسارة", "Net profit (loss"
     LangAdd "عدد الخانات العشرية", "Decimal places"
     LangAdd "فاتورة ضريبية مبسطة", "Simplified tax invoice"
     LangAdd "قيد عكسي جديد للقيد", "New reversing entry for the entry"
@@ -626,12 +629,12 @@ Private Sub D4_5()
     LangAdd "أسطر مسير الرواتب", "Payroll lines"
     LangAdd "أنشئ موازنة للسنة", "Create a budget for the year"
     LangAdd "أوامر من الاقتراح", "Orders from suggestion"
-    LangAdd "إضافة كل الحسابات", "Add all accounts"
-    LangAdd "اختر تاريخًا بعده", "Choose a date after it"
-    LangAdd "ارتفاع الملصق (مم", "Label height (mm"
 End Sub
 
 Private Sub D4_6()
+    LangAdd "إضافة كل الحسابات", "Add all accounts"
+    LangAdd "اختر تاريخًا بعده", "Choose a date after it"
+    LangAdd "ارتفاع الملصق (مم", "Label height (mm"
     LangAdd "اضغط لعرض التقرير", "Click to show the report"
     LangAdd "اكتب اسم المستخدم", "Type the user name"
     LangAdd "اكتب النسب الثلاث", "Type the three rates"
@@ -714,8 +717,4 @@ Private Sub D4_6()
     LangAdd "مثال: 20,21. فارغ", "Example: 20,21. Empty"
     LangAdd "مثال: 38 أو 40 أو", "Example: 38 or 40 or"
     LangAdd "مجلد صور المنتجات", "Product pictures folder"
-    LangAdd "مخزن الجرد الجديد", "Warehouse of the new count"
-    LangAdd "مستند مفتوح. اختر", "An open document. Choose"
-    LangAdd "ملف سكربت القاعدة", "Database script file"
-    LangAdd "نسبة الضريبة ليست", "The VAT rate is not"
 End Sub

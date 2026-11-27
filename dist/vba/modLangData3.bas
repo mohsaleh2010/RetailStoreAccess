@@ -326,6 +326,7 @@ Private Sub D3_3()
     LangAdd "ãÓÊÎÏã áæÍÏÉ ãä æÍÏÇÊ ÇáÃÕäÇİ", "is used by a product unit"
     LangAdd "ãæÌæÏ İí ÇáãæÇÒäÉ áäİÓ ÇáãÑßÒ", "already in the budget for the same center"
     LangAdd "ãõÓáóøãÉ ßáåÇ¡ áã ÊõİæÊÑ ßáåÇ", "Fully delivered, not fully invoiced"
+    LangAdd "äÓÎÉ ÇáÈíÇäÇÊ äÇŞÕÉ İí ÇáÌÏæá", "the data copy is incomplete in the table"
     LangAdd "åĞÇ ÇáÅÌÑÇÁ ÛíÑ ãæÌæÏ İí ÔÇÔÉ", "This action does not exist in the screen"
     LangAdd "åá ÊÑíÏ ÍĞİ åĞÇ ÇáÓÌá äåÇÆíğÇ", "Do you want to delete this record for good"
     LangAdd "æÊÍÏíË ÇáãÎÒæä æãÊæÓØ ÇáÊßáİÉ", "and the stock and average cost are updated"
@@ -381,10 +382,10 @@ Private Sub D3_3()
     LangAdd "áÇ ÊæÌÏ ÚÑæÖ ÃÓÚÇÑ İí ÇáİÊÑÉ", "No quotations in the period"
     LangAdd "áÇ ÊæÌÏ ßãíÇÊ ãÍÌæÒÉ áØáÈíÇÊ", "Nothing is reserved for orders"
     LangAdd "áÇ ÊæÌÏ ãÈíÚÇÊ İí åĞå ÇáİÊÑÉ", "There are no sales in this period"
-    LangAdd "áãä áÇ ãÑßÒ áå ãä ÇáãÓÊÎÏãíä", "for users without a center"
 End Sub
 
 Private Sub D3_4()
+    LangAdd "áãä áÇ ãÑßÒ áå ãä ÇáãÓÊÎÏãíä", "for users without a center"
     LangAdd "áíÓÊ áÏíß ÕáÇÍíÉ íæã ÇáãäÏæÈ", "You do not have the rep day permission"
     LangAdd "ãÈÇáÛ ÇáãæÇÒäÉ áÇ Êßæä ÓÇáÈÉ", "Budget amounts are never negative"
     LangAdd "ãÓæÏÉ: ÃÖİ ÇáÃÕäÇİ Ëã «ÊÑÍíá", "Draft: add the products, then Post"
@@ -504,10 +505,10 @@ Private Sub D3_4()
     LangAdd "ÇßÊÈ ÇáãÈáÛ ÈÚãáÉ ÇáãÕÑæİ", "Type the amount in the currency of the expense"
     LangAdd "ÇßÊÈ ÚÏÏ ÇáÏŞÇÆŞ ãä 0 Åáì", "Type the minutes from 0 to"
     LangAdd "ÇßÊÈ ãÚÇãá ÇáÊÍæíá ááÚãáÉ", "Type the exchange rate of the currency"
-    LangAdd "ÇáÃÑŞÇã ãä ÇáãÓÊäÏÇÊ ÇáÂä", "The figures come from the documents now"
 End Sub
 
 Private Sub D3_5()
+    LangAdd "ÇáÃÑŞÇã ãä ÇáãÓÊäÏÇÊ ÇáÂä", "The figures come from the documents now"
     LangAdd "ÇáÃÕá ÛíÑ ãæÌæÏ Ãæ ãÓÊÈÚÏ", "The asset does not exist or is disposed"
     LangAdd "ÇáÅŞÑÇÑÇÊ ÊõÚÊãÏ ÈÇáÊÑÊíÈ", "Returns are approved in order"
     LangAdd "ÇáÊÍæíá Èíä Èäßíä ãÎÊáİíä", "Transfer between two different banks"
@@ -532,6 +533,4 @@ Private Sub D3_5()
     LangAdd "ÊõŞÊÑÍ İí İæÇÊíÑå æÓäÏÇÊå", "Suggested in his invoices and vouchers"
     LangAdd "ÍÏÏ ãÇ íÓÊØíÚ ßá ÏæÑ İÚáå", "Set what each role can do"
     LangAdd "ÍĞİ ÂÎÑ ÅÚÇÏÉ ÊŞííã ááÃÕá", "Delete the last revaluation of the asset"
-    LangAdd "ÍĞİ ÇáãæÇÒäÉ ßáåÇ ÈÃÓØÑåÇ", "Delete the whole budget with its lines"
-    LangAdd "ÎÓÇÑÉ ÈíÚ / ÇÓÊÈÚÇÏ ÇáÃÕá", "Loss on sale / disposal of the asset"
 End Sub

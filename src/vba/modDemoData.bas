@@ -740,6 +740,10 @@ Public Function RemoveDemoData() As Boolean
         MsgBox "لم تُدخل بيانات تجريبية في هذه القاعدة.", vbInformation + MSG_RTL, "RemoveDemoData"
         Exit Function
     End If
+    If Not IsNull(DMax("LogDate", "AuditLog", "ActionType = 'DEMO_REMOVED' AND LogDate > " & SqlDate(loaded))) Then
+        MsgBox "حُذفت البيانات التجريبية من هذه القاعدة من قبل، فلن يُحذف شيء.", vbInformation + MSG_RTL, "RemoveDemoData"
+        Exit Function
+    End If
     For Each t In Array("SalesInvoices", "SalesReturns", "PurchaseInvoices", "PurchaseReturns", "CustomerPayments", _
                         "SupplierPayments", "Expenses", "CashVouchers", "CashClosings")
         later = later + Nz(DbValue("SELECT COUNT(*) FROM [" & t & "] WHERE CreatedAt > " & SqlDate(loaded)), 0)
@@ -755,6 +759,11 @@ Public Function RemoveDemoData() As Boolean
               "تُحفظ نسخة احتياطية أولًا. هل تريد المتابعة؟", vbQuestion + vbYesNo + vbDefaultButton2 + MSG_RTL, _
               "RemoveDemoData") <> vbYes Then Exit Function
     msg = BackupNow(file, , "_BeforeDemoRemoval")
+    If Len(msg) > 0 And IsLinkedToServer() Then                ' shared hosting: no BACKUP DATABASE (docs/88)
+        If MsgBox(msg & vbCrLf & vbCrLf & "تُعمل بدلها نسخة من كل الجداول في ملف Access على هذا الجهاز؟", _
+                  vbQuestion + vbYesNo + vbDefaultButton2 + MSG_RTL, "RemoveDemoData") <> vbYes Then Exit Function
+        msg = ServerDataCopy(file, "_BeforeDemoRemoval")
+    End If
     If Len(msg) > 0 Then
         MsgBox "تعذرت النسخة الاحتياطية، فلم يُحذف شيء:" & vbCrLf & msg, vbExclamation + MSG_RTL, "RemoveDemoData"
         Exit Function

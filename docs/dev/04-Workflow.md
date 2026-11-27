@@ -92,6 +92,7 @@
 | أدوات Python والاختبارات تعمل على Windows أيضًا: المسار يُبنى بـ `os.path.join` لا باستبدال `/` في `__file__`، و`os.path.relpath` للعرض فقط عبر `shown(...)` (المستودع على قرص والملفات المؤقتة على قرص آخر) | على جهاز صاحب المشروع (`E:` و`C:`): `test_queries` قرأ `gen_queries.py` بدل `modQueryParams.bas`، و`release.py package` توقف بـ `ValueError: path is on mount` |
 | سكربت SQL Server: `ALTER DATABASE` فقط خارج معاملة (`@@TRANCOUNT = 0`)، و`CATCH` يتراجع عن معاملة غير قابلة للحفظ (`XACT_STATE()`)، وأداة تشغيل السكربت تتصل `autocommit` | `deploy_web.py sql` على الاستضافة: الخطأ 3998 «Uncommittable transaction» في الجزء 9 |
 | رفع FTPS: لا يُغلق اتصال البيانات قبل رد الخادم 226 (وبعد FIN)، وإغلاق TLS من الخادم لا يُنتظر طويلًا، ويُفحص حجم كل ملف | `deploy_web.py upload`: `TimeoutError` في `ssl unwrap` على خادم الاستضافة، والإغلاق الفوري يقطع الملف مع رد 226 |
+| ولا اسم متغير يطابق كلمة من كلمات VBA: `step` (من `For ... Step`) و`to` و`next` و`type` و`date` و`len` ... (`test_hosting_cleanup.KeywordNameTests` يفحص كل الوحدات) | خطأ ترجمة: أول نسخة من `ServerDataCopy` سمّت متغيرًا `step` |
 | لا كلمة محجوزة بعد `AS` في SQL بلا أقواس (`AS Currency`) | `TestForms`: خطأ 3141 عند فتح قائمة العملة في سبع شاشات |
 | قائمة `SET` في `UPDATE` إسنادات فقط (`InTransit = True`)، ومحوّل الخادم (`server_code`) يتخطى الأقواس المغلقة قبل الحقل (`Now()`) | `SET ... InTransit <> 0`: خطأ 3144 في ترحيل التحويل بالطريق |
 | متغير `ByRef` لا يُعطى لاستدعاءين في تعبير واحد يقرؤه (استدعاء في كل سطر) | `TestZatcaApi` و`TestEInvoice`: قرأ VBA المتغير بعد الاستدعاءين |

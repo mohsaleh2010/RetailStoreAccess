@@ -18,6 +18,12 @@ Public Sub LangData6()
 End Sub
 
 Private Sub D6_1()
+    LangAdd "ØÑíŞÉ ÇáÑÏ", "Refund method"
+    LangAdd "ÚÏÏ ÇáŞíæÏ", "Number of entries"
+    LangAdd "Úáì ÇáÍÓÇÈ", "On account"
+    LangAdd "Úáì ÇáÚãíá", "The customer"
+    LangAdd "ÚåÏÉ ãäÏæÈ", "Sales rep custody"
+    LangAdd "ÛíÑ ãÊæÇÒä", "Not balanced"
     LangAdd "İÆÉ ÅÖÇİÇÊ", "Extras category"
     LangAdd "İÇÊæÑÉ ÈíÚ", "Sales invoice"
     LangAdd "İÊÍ ÇáãÌáÏ", "Open the folder"
@@ -132,15 +138,15 @@ Private Sub D6_1()
     LangAdd "ÑŞã ÇáÓäÏ", "Voucher number"
     LangAdd "ÑŞã ÇáÔíß", "Cheque number"
     LangAdd "ÑŞã ÇáÚÑÖ", "Quotation no."
+End Sub
+
+Private Sub D6_2()
     LangAdd "ÑŞã ÇáŞíÏ", "Entry number"
     LangAdd "ÑŞã Çáíæã", "Day number"
     LangAdd "ÓÇÎä ÌÏğÇ", "Extra hot"
     LangAdd "ÓÍÈ äŞÏíÉ", "Cash withdrawal"
     LangAdd "ÓÚÑ ÇáÈíÚ", "Sale price"
     LangAdd "ÓáİÉ ãæÙİ", "Employee advance"
-End Sub
-
-Private Sub D6_2()
     LangAdd "ÓäÉ ÌÏíÏÉ", "New year"
     LangAdd "ÓäÏ äŞÏíÉ", "Cash voucher"
     LangAdd "ÓõÌöøá İí", "Recorded on"
@@ -255,15 +261,15 @@ Private Sub D6_2()
     LangAdd "ÓäÏ ÌÏíÏ", "New voucher"
     LangAdd "ÔÑÇÁ ÂÌá", "Credit purchase"
     LangAdd "ÔåÑ ÌÏíÏ", "New month"
+End Sub
+
+Private Sub D6_3()
     LangAdd "Ôíß ÕÇÏÑ", "Issued cheque"
     LangAdd "Ôíß ãÑÊÏ", "Bounced cheque"
     LangAdd "Ôíß æÇÑÏ", "Received cheque"
     LangAdd "ÕÑİ áÌåÉ", "Issue to a party"
     LangAdd "ÕİÑ Ìäíå", "zero pounds"
     LangAdd "ÕİÑ ÑíÇá", "zero riyals"
-End Sub
-
-Private Sub D6_3()
     LangAdd "ØáÈ ÓİÑí", "Takeaway order"
     LangAdd "ÚÑÖ ÌÏíÏ", "New quotation"
     LangAdd "ÛíÑ ÕÇáÍ", "Invalid"
@@ -378,15 +384,15 @@ Private Sub D6_3()
     LangAdd "ÇáãäİĞÉ", "Done"
     LangAdd "ÇáäÊíÌÉ", "Result of visit"
     LangAdd "ÇáäŞÏíÉ", "Cash"
+End Sub
+
+Private Sub D6_4()
     LangAdd "ÇáæÍÏÇÊ", "Units"
     LangAdd "ÈÇáÎÇÏã", "to the server"
     LangAdd "ÈÇáØÑíŞ", "In transit"
     LangAdd "ÈÏæä ÍÏ", "No limit"
     LangAdd "ÈÑÊŞÇáí", "Orange"
     LangAdd "ÈáÇ ÎÕã", "no discount"
-End Sub
-
-Private Sub D6_4()
     LangAdd "ÊÌÑíÈíÉ", "Test"
     LangAdd "ÊÓÚãÇÆÉ", "nine hundred"
     LangAdd "ÎãÓãÇÆÉ", "five hundred"
@@ -501,15 +507,15 @@ Private Sub D6_4()
     LangAdd "ÓÈÊãÈÑ", "September"
     LangAdd "ÓÊãÇÆÉ", "six hundred"
     LangAdd "ÕÑİ ãä", "Issue from"
+End Sub
+
+Private Sub D6_5()
     LangAdd "ÚãæáÇÊ", "Commissions"
     LangAdd "ÚãíáğÇ", "customers"
     LangAdd "İÇÊæÑÉ", "Invoice"
     LangAdd "İÈÑÇíÑ", "February"
     LangAdd "İí ÍŞá", "in the field"
     LangAdd "İí íæã", "on day"
-End Sub
-
-Private Sub D6_5()
     LangAdd "İíÑæÒí", "Teal"
     LangAdd "áÇ ÛíÑ", "only"
     LangAdd "áÊÕäíİ", "for category"
@@ -624,15 +630,15 @@ Private Sub D6_5()
     LangAdd "ÓÈÚæä", "seventy"
     LangAdd "ÓÌáÇÊ", "Rows"
     LangAdd "ÕäİğÇ", "items"
+End Sub
+
+Private Sub D6_6()
     LangAdd "ØÇæáÉ", "Table"
     LangAdd "ØÈÇÚÉ", "Print"
     LangAdd "ØáÈíÉ", "Order"
     LangAdd "ÚÔÑæä", "twenty"
     LangAdd "ÚãáíÉ", "Transaction"
     LangAdd "İÚáíÉ", "Production"
-End Sub
-
-Private Sub D6_6()
     LangAdd "ßÇÔíÑ", "Cashier"
     LangAdd "ãÊæŞİ", "Stopped"
     LangAdd "ãÌãæÚ", "Total"
@@ -747,15 +753,15 @@ Private Sub D6_6()
     LangAdd "Èäí", "Brown"
     LangAdd "ÈíÚ", "Sale"
     LangAdd "ÊãÊ", "Done"
+End Sub
+
+Private Sub D6_7()
     LangAdd "ÍÊì", "Until"
     LangAdd "ÍĞİ", "Delete"
     LangAdd "ÍİÙ", "Save"
     LangAdd "Ñ.Ó", "SAR"
     LangAdd "ÑÈØ", "The connection to"
     LangAdd "ÑŞã", "Number"
-End Sub
-
-Private Sub D6_7()
     LangAdd "ÓÊÉ", "six"
     LangAdd "ÓÌá", "Record"
     LangAdd "ÓÍÈ", "Withdrawal"
@@ -778,6 +784,7 @@ Private Sub D6_7()
     LangAdd "äÔØ", "Active"
     LangAdd "äÚã", "Yes"
     LangAdd "æÓØ", "Medium"
+    LangAdd "Õİ", "rows"
     LangAdd "İí", "in"
     LangAdd "áÇ", "No"
     LangAdd "ãä", "From"
