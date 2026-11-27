@@ -18,6 +18,14 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    # phase 6, batch 4b of the redesign: banks and entries (/bank-transactions, /bank-reconciliation, /journal, /manual-entries)
+    'ملخص الحركة': 'Transaction summary',
+    'ملخص التسوية': 'Reconciliation summary',
+    'سطور القيد': 'Entry lines',
+    'أسطر القيد': 'Entry lines',
+    'أضف سطرًا لكل حساب': 'Add a line for each account',
+    'ملخص القيد': 'Entry summary',
+    'عدد الأسطر': 'Lines',
     # phase 6, batch 4a of the redesign: the treasury pages (/treasury, /cash-vouchers, /cash-closing)
     'اختر صندوقًا من القائمة لعرض حركته': 'Choose a cash box in the list to see its moves',
     'موقوف': 'Inactive',

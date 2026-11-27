@@ -2,155 +2,263 @@
 @attribute [Authorize]
 @inject AccountingService Accounting
 @inject PermissionService Permissions
+@inject IJSRuntime JS
 @inject UiLanguage L
 
-<PageTitle>@L.T("قيود اليومية")</PageTitle>
-
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("قيود اليومية")</h1>
-            <p class="subtitle">@L.T("القيود المبنية من العمليات، وسطور كل قيد")</p>
-        </div>
+@* Template C (docs/ui-inventory.md section 8) for the journal: PageHeader (update the journal, print) -> FilterPanel (the
+   period, the kind of operation, the search of the service) -> the figures of the entries shown -> EntityGrid of the
+   entries (a row opens its lines) -> the lines of the chosen entry under them (each account opens its ledger). The data
+   is AccountingService.EntriesAsync / EntryAsync and SyncAsync (SyncJournal) with the permission of frmJournal. *@
+<PageHeader Title="@L.T("قيود اليومية")" Description="@L.T("القيود المبنية من العمليات، وسطور كل قيد")"
+            Icon="@NavGroups.IconOf("journal")" Group="@L.T("الحسابات")">
+    <Actions>
         @if (allowed)
         {
-            <button class="btn" disabled="@busy" @onclick="Sync">@L.T("تحديث القيود")</button>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Sync" OnClick="Sync" Disabled="busy">
+                @L.T("تحديث القيود")
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">
+                @L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd>
+            </MudButton>
         }
-    </header>
+    </Actions>
+</PageHeader>
 
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
-    {
-        <div class="pos">
-            <div class="list-pane">
-                <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
-                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-                    <select aria-label="@L.T("نوع العملية")" @bind="kind" @bind:after="Load">
-                        <option value="">@L.T("كل العمليات")</option>
-                        @foreach (var k in kinds)
-                        {
-                            <option value="@k.Key">@k.Name</option>
-                        }
-                    </select>
-                    <input type="search" class="search" placeholder="@L.T("بحث")" aria-label="@L.T("بحث")" @bind="search" />
-                    <button type="submit" class="btn">@L.T("عرض")</button>
-                </form>
-                <table class="list">
-                    <thead>
-                        <tr>
-                            <th>@L.T("القيد")</th>
-                            <th>@L.T("التاريخ")</th>
-                            <th>@L.T("العملية")</th>
-                            <th>@L.T("المستند")</th>
-                            <th>@L.T("البيان")</th>
-                            <th>@L.T("المبلغ")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var e in rows)
-                        {
-                            <tr tabindex="0" class="@(entry?.Entry.EntryID == e.EntryID ? "selected" : "")" @onclick="() => Open(e.EntryID)"
-                                @onkeydown="k => Key(k, e.EntryID)">
-                                <td data-label="@L.T("القيد")">@e.EntryNumber</td>
-                                <td data-label="@L.T("التاريخ")">@e.EntryDate.ToString("yyyy-MM-dd")</td>
-                                <td data-label="@L.T("العملية")">@e.KindName</td>
-                                <td data-label="@L.T("المستند")">@e.SourceNumber</td>
-                                <td data-label="@L.T("البيان")">@e.Description</td>
-                                <td data-label="@L.T("المبلغ")">@WorkPages.Money(e.TotalDebit)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @if (rows.Count == 0)
-                {
-                    <p class="empty">@L.T("لا توجد سجلات")</p>
-                }
-            </div>
-
-            <div class="form-pane">
-                @if (entry is null)
-                {
-                    <p class="empty">@L.T("اختر قيدًا من القائمة لعرض سطوره")</p>
-                }
-                else
-                {
-                    <h2>@L.T("القيد") @entry.Entry.EntryNumber</h2>
-                    <p class="hint">@entry.Entry.KindName @entry.Entry.SourceNumber - @entry.Entry.EntryDate.ToString("yyyy-MM-dd")</p>
-                    <table class="list">
-                        <thead>
-                            <tr>
-                                <th>@L.T("الحساب")</th>
-                                <th>@L.T("مدين")</th>
-                                <th>@L.T("دائن")</th>
-                                <th>@L.T("البيان")</th>
-                                <th>@L.T("مركز التكلفة")</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var l in entry.Lines)
-                            {
-                                <tr>
-                                    <td data-label="@L.T("الحساب")"><a href="ledger?account=@l.AccountCode">@l.AccountCode @l.AccountName</a></td>
-                                    <td data-label="@L.T("مدين")">@(l.Debit != 0 ? WorkPages.Money(l.Debit) : "")</td>
-                                    <td data-label="@L.T("دائن")">@(l.Credit != 0 ? WorkPages.Money(l.Credit) : "")</td>
-                                    <td data-label="@L.T("البيان")">@l.LineText</td>
-                                    <td data-label="@L.T("مركز التكلفة")">@l.CostCenterName</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <dl class="totals">
-                        <dt>@L.T("مدين")</dt><dd>@WorkPages.Money(entry.Entry.TotalDebit)</dd>
-                        <dt>@L.T("دائن")</dt><dd>@WorkPages.Money(entry.Entry.TotalCredit)</dd>
-                    </dl>
-                }
-            </div>
-        </div>
-    }
-
+}
+else
+{
+    <KeyboardShortcuts OnPrint="Print" />
     @if (message.Length > 0)
     {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4 no-print" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
     }
-</section>
+
+    <FilterPanel Range="range" RangeChanged="r => range = r ?? MonthToDate()" OnShow="Load" OnClear="Reset" Busy="busy" Class="no-print">
+        <MudItem xs="12" sm="6" md="3">
+            <MudSelect T="string" Value="kind" ValueChanged="KindChanged" Label="@L.T("نوع العملية")" Variant="Variant.Outlined"
+                       Margin="Margin.Dense" Dense="true" ToStringFunc="KindText">
+                <MudSelectItem T="string" Value="@("")">@L.T("كل العمليات")</MudSelectItem>
+                @foreach (var k in kinds)
+                {
+                    <MudSelectItem T="string" Value="@k.Key">@k.Name</MudSelectItem>
+                }
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <MudTextField T="string" @bind-Value="search" Label="@L.T("بحث")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                          Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search" Clearable="true"
+                          OnKeyDown="SearchKey" Immediate="true" />
+        </MudItem>
+    </FilterPanel>
+
+    <MudText Typo="Typo.subtitle1" Class="mb-3 erp-print-title">
+        @L.T("قيود اليومية")
+        <span class="mud-text-secondary erp-num" dir="ltr">(@ErpFormat.Date(range.Start) - @ErpFormat.Date(range.End))</span>
+    </MudText>
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="4">
+            <StatCard Title="@L.T("عدد القيود")" Icon="@Icons.Material.Outlined.MenuBook" Color="Color.Primary"
+                      Value="@rows.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <StatCard Title="@L.T("مدين")" Icon="@Icons.Material.Outlined.SouthWest" Color="Color.Info">
+                <ValueContent><MoneyText Value="rows.Sum(e => e.TotalDebit)" ColorNegative="false" /></ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <StatCard Title="@L.T("دائن")" Icon="@Icons.Material.Outlined.NorthEast" Color="Color.Secondary">
+                <ValueContent><MoneyText Value="rows.Sum(e => e.TotalCredit)" ColorNegative="false" /></ValueContent>
+            </StatCard>
+        </MudItem>
+    </MudGrid>
+
+    <EntityGrid T="JournalEntryRow" Items="rows" Title="@L.T("القيود")" Export="export" ExportName="@L.T("قيود اليومية")" Loading="busy"
+                Filterable="false" RowsPerPage="50" RowClick="Open" RowClass="EntryRowClass" Class="mb-4"
+                EmptyText="@L.T("لا توجد قيود في هذه الفترة")">
+        <Columns>
+            <PropertyColumn T="JournalEntryRow" TProperty="string" Property="e => e.EntryNumber" Title="@L.T("القيد")" />
+            <TemplateColumn T="JournalEntryRow" Title="@L.T("التاريخ")" SortBy="e => e.EntryDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@ErpFormat.Date(context.Item.EntryDate)</bdi></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="JournalEntryRow" TProperty="string" Property="e => e.KindName" Title="@L.T("العملية")" />
+            <PropertyColumn T="JournalEntryRow" TProperty="string" Property="e => e.SourceNumber" Title="@L.T("المستند")" />
+            <PropertyColumn T="JournalEntryRow" TProperty="string" Property="e => e.Description" Title="@L.T("البيان")" />
+            <TemplateColumn T="JournalEntryRow" Title="@L.T("المبلغ")" SortBy="e => e.TotalDebit" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.TotalDebit" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="JournalEntryRow" Title="" Sortable="false" CellClass="erp-actions-col no-print" HeaderClass="erp-actions-col no-print">
+                <CellTemplate>
+                    <MudTooltip Text="@L.T("سطور القيد")">
+                        <MudIconButton Icon="@Icons.Material.Outlined.ManageSearch" Size="Size.Small" OnClick="() => Open(context.Item)"
+                                       aria-label="@L.T("سطور القيد")" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+
+    <div id="entry-lines">
+        @if (entry is null)
+        {
+            <EmptyState Icon="@Icons.Material.Outlined.ManageSearch" Title="@L.T("سطور القيد")"
+                        Text="@L.T("اختر قيدًا من القائمة لعرض سطوره")" Class="no-print" />
+        }
+        else
+        {
+            <MudPaper Outlined="true" Class="pa-4 mb-3">
+                <dl class="erp-info-list">
+                    <dt>@L.T("القيد")</dt><dd><bdi class="erp-num">@entry.Entry.EntryNumber</bdi></dd>
+                    <dt>@L.T("التاريخ")</dt><dd><bdi class="erp-num" dir="ltr">@ErpFormat.Date(entry.Entry.EntryDate)</bdi></dd>
+                    <dt>@L.T("العملية")</dt><dd>@entry.Entry.KindName <bdi class="erp-num">@entry.Entry.SourceNumber</bdi></dd>
+                    @if (!string.IsNullOrEmpty(entry.Entry.Description))
+                    {
+                        <dt>@L.T("البيان")</dt><dd>@entry.Entry.Description</dd>
+                    }
+                </dl>
+            </MudPaper>
+            <EntityGrid T="JournalLineView" Items="entry.Lines" Title="@(L.T("سطور القيد") + " " + entry.Entry.EntryNumber)"
+                        Export="lineExport" ExportName="@(L.T("القيد") + " " + entry.Entry.EntryNumber)" Filterable="false"
+                        ShowPager="false" RowsPerPage="1000" EmptyText="@L.T("لا توجد سجلات")">
+                <Columns>
+                    <TemplateColumn T="JournalLineView" Title="@L.T("الحساب")" SortBy="l => l.AccountCode">
+                        <CellTemplate>
+                            <MudLink Href="@("ledger?account=" + context.Item.AccountCode)">
+                                <bdi class="erp-num">@context.Item.AccountCode</bdi> @context.Item.AccountName
+                            </MudLink>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="JournalLineView" Title="@L.T("مدين")" SortBy="l => l.Debit" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate>
+                            @if (context.Item.Debit != 0)
+                            {
+                                <MoneyText Value="context.Item.Debit" />
+                            }
+                        </CellTemplate>
+                        <FooterTemplate><MoneyText Value="entry.Entry.TotalDebit" Bold="true" /></FooterTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="JournalLineView" Title="@L.T("دائن")" SortBy="l => l.Credit" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate>
+                            @if (context.Item.Credit != 0)
+                            {
+                                <MoneyText Value="context.Item.Credit" />
+                            }
+                        </CellTemplate>
+                        <FooterTemplate><MoneyText Value="entry.Entry.TotalCredit" Bold="true" /></FooterTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn T="JournalLineView" TProperty="string" Property="l => l.LineText" Title="@L.T("البيان")" />
+                    <PropertyColumn T="JournalLineView" TProperty="string" Property="l => l.CostCenterName" Title="@L.T("مركز التكلفة")" />
+                </Columns>
+            </EntityGrid>
+        }
+    </div>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", message = "", messageKind = "", kind = "";
+    private bool allowed, loaded, busy;
+    private string denied = "", message = "", kind = "";
     private string? search;
-    private DateTime from = DateTime.Today.AddDays(1 - DateTime.Today.Day), to = DateTime.Today;
+    private Severity severity = Severity.Info;
+    private DateRange range = MonthToDate();
     private List<JournalEntryRow> rows = [];
     private List<(string Key, string Name)> kinds = [];
     private JournalEntryView? entry;
+    private List<GridExport<JournalEntryRow>> export = [];
+    private List<GridExport<JournalLineView>> lineExport = [];
+
+    /// <summary>The period the list opened on, as before: the first of the month to today.</summary>
+    private static DateRange MonthToDate() => new(DateTime.Today.AddDays(1 - DateTime.Today.Day), DateTime.Today);
+
+    private string KindText(string? key) =>
+        string.IsNullOrEmpty(key) ? L.T("كل العمليات") : kinds.FirstOrDefault(k => k.Key == key).Name ?? "";
+
+    private string EntryRowClass(JournalEntryRow e, int _) => entry?.Entry.EntryID == e.EntryID ? "erp-row-selected" : "";
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmJournal");
         allowed = denied.Length == 0;
+        loaded = true;
         if (allowed)
         {
+            export =
+            [
+                new(L.T("القيد"), e => e.EntryNumber),
+                new(L.T("التاريخ"), e => ErpFormat.Date(e.EntryDate)),
+                new(L.T("العملية"), e => e.KindName),
+                new(L.T("المستند"), e => e.SourceNumber),
+                new(L.T("البيان"), e => e.Description),
+                new(L.T("المبلغ"), e => e.TotalDebit),
+            ];
+            lineExport =
+            [
+                new(L.T("الحساب"), l => l.AccountCode),
+                new(L.T("اسم الحساب"), l => l.AccountName),
+                new(L.T("مدين"), l => l.Debit),
+                new(L.T("دائن"), l => l.Credit),
+                new(L.T("البيان"), l => l.LineText),
+                new(L.T("مركز التكلفة"), l => l.CostCenterName),
+            ];
             kinds = await Accounting.EntryKindsAsync(L.English);
             await Load();
         }
     }
 
-    private async Task Load() => rows = await Accounting.EntriesAsync(from, to, kind, search, L.English);
+    private async Task Load()
+    {
+        busy = true;
+        try
+        {
+            rows = await Accounting.EntriesAsync(range.Start ?? DateTime.Today, range.End ?? DateTime.Today, kind, search, L.English);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
 
-    private async Task Open(int id) => entry = await Accounting.EntryAsync(id, L.English);
+    private async Task Reset()
+    {
+        range = MonthToDate();
+        kind = "";
+        search = null;
+        await Load();
+    }
 
-    private async Task Key(KeyboardEventArgs e, int id)
+    private async Task KindChanged(string value)
+    {
+        kind = value ?? "";
+        await Load();
+    }
+
+    private async Task SearchKey(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            await Open(id);
+            await Load();
         }
+    }
+
+    private async Task Open(JournalEntryRow e)
+    {
+        entry = await Accounting.EntryAsync(e.EntryID, L.English);
+        StateHasChanged();
+        await JS.InvokeVoidAsync("erp.scrollToId", "entry-lines");
+    }
+
+    private void Show(string text, Severity level)
+    {
+        message = text;
+        severity = level;
     }
 
     private async Task Sync()
@@ -159,13 +267,14 @@
         try
         {
             var r = await Accounting.SyncAsync(UserInfo.Acting(user));
-            message = r.Ok ? WorkPages.JournalUpdated : r.Message;
-            messageKind = r.Ok ? "success" : "error";
-            await Load();
+            Show(r.Ok ? WorkPages.JournalUpdated : r.Message, r.Ok ? Severity.Success : Severity.Error);
         }
         finally
         {
             busy = false;
         }
+        await Load();
     }
+
+    private async Task Print() => await JS.InvokeVoidAsync("print");
 }

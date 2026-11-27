@@ -3,164 +3,256 @@
 @inject BankReconService Recon
 @inject TreasuryService Treasury
 @inject PermissionService Permissions
+@inject IDialogService Dialogs
 @inject UiLanguage L
 
-@* The bank reconciliation on the web (docs/87): frmBankRecon, modBank.OpenReconciliation ... FinishReconciliation. *@
-<PageTitle>@L.T("التسوية البنكية")</PageTitle>
-
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("التسوية البنكية")</h1>
-            <p class="subtitle">@L.T("مطابقة كشف البنك مع الدفاتر واعتماد التسوية")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
-    {
-        <div class="message error" role="alert">@L.T(denied)</div>
-    }
-    else
-    {
-        <div class="pos">
-            <div class="list-pane">
-                <form class="list-tools" @onsubmit="StartAsync" @onsubmit:preventDefault>
-                    <label class="check">@L.T("البنك")
-                        <select value="@bankId" @onchange="e => BankAsync(e.Value)">
-                            <option value="0"></option>
-                            @foreach (var b in banks)
-                            {
-                                <option value="@b.Id">@b.Name</option>
-                            }
-                        </select>
-                    </label>
-                    <label class="check">@L.T("تاريخ الكشف") <input type="date" @bind="statementDate" /></label>
-                    <label class="check">@L.T("رصيد الكشف") <input type="number" step="any" @bind="statementBalance" /></label>
-                    <button type="submit" class="btn primary" disabled="@busy">@L.T("بدء التسوية")</button>
-                </form>
-
-                @if (view is { } v)
+@* Template B (docs/ui-inventory.md section 8) for the bank reconciliation (docs/87, frmBankRecon): PageHeader (the number
+   and its state, approve / delete for an open one, reopen for an approved one, a bank transaction) -> the head (the bank,
+   the statement date and balance, start) -> the operations not yet on a statement and those cleared on this one (ticked,
+   then "match" / "unmatch") -> the figures card beside them (statement, books, outstanding, adjusted, difference) ->
+   EntityGrid of the reconciliations of the bank (a row opens it). The logic is BankReconService (modBank
+   OpenReconciliation / ClearBankItem / UnclearBankItem / FinishReconciliation / ReopenReconciliation /
+   DeleteReconciliation), its messages, the delete and the reopen asked first through ConfirmDialog. *@
+<PageHeader Title="@L.T("التسوية البنكية")" Description="@L.T("مطابقة كشف البنك مع الدفاتر واعتماد التسوية")"
+            Icon="@NavGroups.IconOf("bank-reconciliation")" Group="@L.T("الخزينة والبنوك")">
+    <Status>
+        @if (view is { } h)
+        {
+            <MudChip T="string" Variant="Variant.Outlined" Icon="@Icons.Material.Outlined.FactCheck" Class="erp-status-chip">
+                <bdi class="erp-num">@h.Recon.ReconNumber</bdi>
+            </MudChip>
+            <StatusChip Text="@ReconState(h.Recon.Status)" Color="@(h.Recon.Status == "OPEN" ? Color.Info : Color.Success)" />
+        }
+    </Status>
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.AccountBalance" Href="bank-transactions">
+                @L.T("حركة بنكية")
+            </MudButton>
+            @if (view is not null)
+            {
+                @if (isOpen)
                 {
-                    <p class="hint">@L.T(BankReconService.StateText(v))</p>
-                    <h2>@L.T("عمليات لم تظهر في كشف بعد")</h2>
-                    <table class="list">
-                        <thead><tr><th></th><th>@L.T("التاريخ")</th><th>@L.T("العملية")</th><th>@L.T("الرقم")</th><th>@L.T("البيان")</th><th>@L.T("وارد")</th><th>@L.T("صادر")</th></tr></thead>
-                        <tbody>
-                            @foreach (var i in v.Open)
-                            {
-                                <tr>
-                                    <td><input type="checkbox" disabled="@(!isOpen)" checked="@picked.Contains(i.Key)" @onchange="() => Toggle(i.Key)" /></td>
-                                    <td data-label="@L.T("التاريخ")">@i.ItemDate.ToString("yyyy-MM-dd")</td>
-                                    <td data-label="@L.T("العملية")">@i.TypeName</td>
-                                    <td data-label="@L.T("الرقم")">@i.ItemNumber</td>
-                                    <td data-label="@L.T("البيان")">@i.ItemText</td>
-                                    <td data-label="@L.T("وارد")">@(i.ItemAmount > 0 ? WorkPages.Money(i.ItemAmount) : "")</td>
-                                    <td data-label="@L.T("صادر")">@(i.ItemAmount < 0 ? WorkPages.Money(-i.ItemAmount) : "")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    @if (isOpen)
-                    {
-                        <div class="actions"><button class="btn" disabled="@busy" @onclick="() => ApplyAsync(true)">@L.T("مطابقة")</button></div>
-                    }
-                    <h2>@L.T("عمليات ظهرت في هذا الكشف")</h2>
-                    <table class="list">
-                        <thead><tr><th></th><th>@L.T("التاريخ")</th><th>@L.T("العملية")</th><th>@L.T("الرقم")</th><th>@L.T("وارد")</th><th>@L.T("صادر")</th></tr></thead>
-                        <tbody>
-                            @foreach (var i in v.Cleared)
-                            {
-                                <tr>
-                                    <td><input type="checkbox" disabled="@(!isOpen)" checked="@picked.Contains(i.Key)" @onchange="() => Toggle(i.Key)" /></td>
-                                    <td data-label="@L.T("التاريخ")">@i.ItemDate.ToString("yyyy-MM-dd")</td>
-                                    <td data-label="@L.T("العملية")">@i.TypeName</td>
-                                    <td data-label="@L.T("الرقم")">@i.ItemNumber</td>
-                                    <td data-label="@L.T("وارد")">@(i.ItemAmount > 0 ? WorkPages.Money(i.ItemAmount) : "")</td>
-                                    <td data-label="@L.T("صادر")">@(i.ItemAmount < 0 ? WorkPages.Money(-i.ItemAmount) : "")</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    @if (isOpen)
-                    {
-                        <div class="actions"><button class="btn" disabled="@busy" @onclick="() => ApplyAsync(false)">@L.T("إلغاء المطابقة")</button></div>
-                    }
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete"
+                               OnClick="DeleteAsync" Disabled="busy">
+                        @L.T("حذف التسوية")
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.TaskAlt"
+                               OnClick="FinishAsync" Disabled="busy">
+                        @L.T("اعتماد التسوية")<kbd class="erp-kbd">F2</kbd>
+                    </MudButton>
                 }
                 else
                 {
-                    <p class="hint">@L.T("اختر البنك، واكتب تاريخ كشف البنك ورصيده، ثم «بدء التسوية».")</p>
+                    <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.LockOpen" OnClick="ReopenAsync" Disabled="busy">
+                        @L.T("إعادة فتح")
+                    </MudButton>
                 }
-            </div>
+            }
+        }
+    </Actions>
+</PageHeader>
 
-            <div class="form-pane">
-                @if (view is { } f)
-                {
-                    <h2>@f.Recon.ReconNumber</h2>
-                    <table class="list">
-                        <tbody>
-                            <tr><td>@L.T("رصيد الكشف")</td><td>@WorkPages.Money(f.Recon.StatementBalance)</td></tr>
-                            <tr><td>@L.T("الرصيد في الدفاتر")</td><td>@WorkPages.Money(f.Figures.Book)</td></tr>
-                            <tr><td>@L.T("عمليات لم تظهر في الكشف")</td><td>@WorkPages.Money(f.Figures.Outstanding)</td></tr>
-                            <tr><td>@L.T("الرصيد المعدل")</td><td>@WorkPages.Money(f.Figures.Adjusted)</td></tr>
-                            <tr><th>@L.T("الفرق")</th><th class="@(f.Figures.Difference == 0 ? "ok" : "bad")">@WorkPages.Money(f.Figures.Difference)</th></tr>
-                        </tbody>
-                    </table>
-                    <div class="actions">
-                        @if (isOpen)
-                        {
-                            <button class="btn primary" disabled="@busy" @onclick="FinishAsync">@L.T("اعتماد التسوية")</button>
-                            <button class="btn" disabled="@busy" @onclick="@(() => asking = "DELETE")">@L.T("حذف التسوية")</button>
-                        }
-                        else
-                        {
-                            <button class="btn" disabled="@busy" @onclick="@(() => asking = "REOPEN")">@L.T("إعادة فتح")</button>
-                        }
-                        <a class="btn" href="bank-transactions">@L.T("حركة بنكية")</a>
-                    </div>
-                }
-                <h2>@L.T("التسويات")</h2>
-                <table class="list">
-                    <thead><tr><th>@L.T("التسوية")</th><th>@L.T("تاريخ الكشف")</th><th>@L.T("رصيد الكشف")</th><th>@L.T("حالة التسوية")</th></tr></thead>
-                    <tbody>
-                        @foreach (var r in recons)
-                        {
-                            <tr class="clickable" @onclick="() => ShowAsync(r.ReconciliationID)">
-                                <td data-label="@L.T("التسوية")">@r.ReconNumber</td>
-                                <td data-label="@L.T("تاريخ الكشف")">@r.StatementDate.ToString("yyyy-MM-dd")</td>
-                                <td data-label="@L.T("رصيد الكشف")">@WorkPages.Money(r.StatementBalance)</td>
-                                <td data-label="@L.T("حالة التسوية")">@(r.Status == "DONE" ? L.T("معتمدة") : L.T("جارية"))</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+@if (!allowed)
+{
+    @if (loaded)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-
+}
+else
+{
+    <KeyboardShortcuts OnSave="SaveKey" />
     @if (message.Length > 0)
     {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
     }
 
-    @if (asking.Length > 0)
+    <MudPaper Outlined="true" Class="pa-4 mb-4">
+        <MudGrid Spacing="3">
+            <MudItem xs="12" sm="6" md="4">
+                <MudSelect T="int" Value="bankId" ValueChanged="BankAsync" Label="@L.T("البنك")" Variant="Variant.Outlined"
+                           Margin="Margin.Dense" Dense="true" Required="true" AutoFocus="true" ToStringFunc="BankText">
+                    @foreach (var b in banks)
+                    {
+                        <MudSelectItem T="int" Value="@b.Id">@b.Name</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudDatePicker @bind-Date="statementDate" Label="@L.T("تاريخ الكشف")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                               DateFormat="yyyy-MM-dd" Culture="@ErpFormat.DateCulture(L.English)" AutoClose="true" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="3">
+                <MudNumericField T="decimal?" @bind-Value="statementBalance" Label="@L.T("رصيد الكشف")" Variant="Variant.Outlined"
+                                 Margin="Margin.Dense" HideSpinButtons="true" Format="0.00" Class="erp-cell-num"
+                                 Culture="System.Globalization.CultureInfo.InvariantCulture" />
+            </MudItem>
+            <MudItem xs="12" sm="6" md="2" Class="d-flex align-start">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.PlayArrow"
+                           OnClick="StartAsync" Disabled="busy">
+                    @L.T("بدء التسوية")
+                </MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    @if (view is { } v)
     {
-        <div class="dialog-backdrop">
-            <div class="dialog" role="dialog" aria-modal="true">
-                <p>@(asking == "DELETE" ? L.T("حذف التسوية الجارية وكل مطابقاتها؟") : L.T("إعادة فتح التسوية المعتمدة؟"))</p>
-                <div class="actions">
-                    <button class="btn primary" @onclick="AnswerAsync">@L.T("نعم")</button>
-                    <button class="btn" @onclick="@(() => asking = "")">@L.T("لا")</button>
-                </div>
+        <MudAlert Severity="@(v.Changed > 0 ? Severity.Warning : Severity.Info)" Variant="Variant.Outlined" Class="mb-4 erp-multiline">
+            @L.T(BankReconService.StateText(v))
+        </MudAlert>
+        <div class="erp-doc mb-4">
+            <div class="erp-doc-main">
+                <EntityGrid T="BankItem" Items="v.Open" Title="@L.T("عمليات لم تظهر في كشف بعد")" Filterable="false" ShowPager="false"
+                            RowsPerPage="1000" RowClass="PickedClass" Class="mb-4" Export="itemExport"
+                            ExportName="@L.T("عمليات لم تظهر في كشف بعد")"
+                            SearchText="@(i => i.ItemNumber + " " + i.ItemText + " " + i.TypeName)" EmptyText="@L.T("لا توجد سجلات")">
+                    <ToolBarContent>
+                        @if (isOpen)
+                        {
+                            <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="mx-2"
+                                       StartIcon="@Icons.Material.Outlined.DoneAll" OnClick="() => ApplyAsync(true)" Disabled="busy">
+                                @L.T("مطابقة")
+                            </MudButton>
+                        }
+                    </ToolBarContent>
+                    <Columns>
+                        <TemplateColumn T="BankItem" Title="" Sortable="false" HeaderClass="erp-check-col" CellClass="erp-check-col">
+                            <CellTemplate>
+                                <MudCheckBox T="bool" Value="@picked.Contains(context.Item.Key)" ValueChanged="_ => Toggle(context.Item.Key)"
+                                             Disabled="!isOpen" Dense="true" Color="Color.Primary" aria-label="@L.T("مطابقة")" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="BankItem" Title="@L.T("التاريخ")" SortBy="i => i.ItemDate">
+                            <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@ErpFormat.Date(context.Item.ItemDate)</bdi></CellTemplate>
+                        </TemplateColumn>
+                        <PropertyColumn T="BankItem" TProperty="string" Property="i => i.TypeName" Title="@L.T("العملية")" />
+                        <PropertyColumn T="BankItem" TProperty="string" Property="i => i.ItemNumber" Title="@L.T("الرقم")" />
+                        <PropertyColumn T="BankItem" TProperty="string" Property="i => i.ItemText" Title="@L.T("البيان")" />
+                        <TemplateColumn T="BankItem" Title="@L.T("وارد")" SortBy="i => i.ItemAmount" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate>
+                                @if (context.Item.ItemAmount > 0)
+                                {
+                                    <MoneyText Value="context.Item.ItemAmount" />
+                                }
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="BankItem" Title="@L.T("صادر")" SortBy="i => -i.ItemAmount" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate>
+                                @if (context.Item.ItemAmount < 0)
+                                {
+                                    <MoneyText Value="-context.Item.ItemAmount" />
+                                }
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </EntityGrid>
+
+                <EntityGrid T="BankItem" Items="v.Cleared" Title="@L.T("عمليات ظهرت في هذا الكشف")" Filterable="false" ShowPager="false"
+                            RowsPerPage="1000" RowClass="PickedClass" Export="itemExport" ExportName="@L.T("عمليات ظهرت في هذا الكشف")"
+                            EmptyText="@L.T("لا توجد سجلات")">
+                    <ToolBarContent>
+                        @if (isOpen)
+                        {
+                            <MudButton Variant="Variant.Outlined" Size="Size.Small" Class="mx-2" StartIcon="@Icons.Material.Outlined.RemoveDone"
+                                       OnClick="() => ApplyAsync(false)" Disabled="busy">
+                                @L.T("إلغاء المطابقة")
+                            </MudButton>
+                        }
+                    </ToolBarContent>
+                    <Columns>
+                        <TemplateColumn T="BankItem" Title="" Sortable="false" HeaderClass="erp-check-col" CellClass="erp-check-col">
+                            <CellTemplate>
+                                <MudCheckBox T="bool" Value="@picked.Contains(context.Item.Key)" ValueChanged="_ => Toggle(context.Item.Key)"
+                                             Disabled="!isOpen" Dense="true" Color="Color.Primary" aria-label="@L.T("إلغاء المطابقة")" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="BankItem" Title="@L.T("التاريخ")" SortBy="i => i.ItemDate">
+                            <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@ErpFormat.Date(context.Item.ItemDate)</bdi></CellTemplate>
+                        </TemplateColumn>
+                        <PropertyColumn T="BankItem" TProperty="string" Property="i => i.TypeName" Title="@L.T("العملية")" />
+                        <PropertyColumn T="BankItem" TProperty="string" Property="i => i.ItemNumber" Title="@L.T("الرقم")" />
+                        <TemplateColumn T="BankItem" Title="@L.T("وارد")" SortBy="i => i.ItemAmount" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate>
+                                @if (context.Item.ItemAmount > 0)
+                                {
+                                    <MoneyText Value="context.Item.ItemAmount" />
+                                }
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="BankItem" Title="@L.T("صادر")" SortBy="i => -i.ItemAmount" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate>
+                                @if (context.Item.ItemAmount < 0)
+                                {
+                                    <MoneyText Value="-context.Item.ItemAmount" />
+                                }
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </EntityGrid>
             </div>
+
+            <aside class="erp-doc-side">
+                <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                    <MudText Typo="Typo.h6" Class="mb-3">@L.T("ملخص التسوية")</MudText>
+                    <dl class="erp-summary-list">
+                        <dt>@L.T("تاريخ الكشف")</dt><dd><bdi class="erp-num" dir="ltr">@ErpFormat.Date(v.Recon.StatementDate)</bdi></dd>
+                        <dt>@L.T("رصيد الكشف")</dt><dd><MoneyText Value="v.Recon.StatementBalance" /></dd>
+                        <dt>@L.T("الرصيد في الدفاتر")</dt><dd><MoneyText Value="v.Figures.Book" /></dd>
+                        <dt>@L.T("عمليات لم تظهر في الكشف")</dt><dd><MoneyText Value="v.Figures.Outstanding" /></dd>
+                        <dt>@L.T("الرصيد المعدل")</dt><dd><MoneyText Value="v.Figures.Adjusted" /></dd>
+                        <dt class="erp-summary-grand">@L.T("الفرق")</dt>
+                        <dd class="erp-summary-grand">
+                            <span class="@(v.Figures.Difference == 0 ? "mud-success-text" : "mud-error-text")">
+                                <MoneyText Value="v.Figures.Difference" ShowCurrency="true" Bold="true" ColorNegative="false" />
+                            </span>
+                        </dd>
+                    </dl>
+                    @if (isOpen)
+                    {
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                                   StartIcon="@Icons.Material.Outlined.TaskAlt" OnClick="FinishAsync" Disabled="busy">
+                            @L.T("اعتماد التسوية")
+                        </MudButton>
+                    }
+                </MudPaper>
+            </aside>
         </div>
     }
-</section>
+    else
+    {
+        <EmptyState Icon="@Icons.Material.Outlined.FactCheck" Title="@L.T("التسوية البنكية")"
+                    Text="@L.T("اختر البنك، واكتب تاريخ كشف البنك ورصيده، ثم «بدء التسوية».")" Class="mb-4" />
+    }
+
+    <EntityGrid T="ReconRow" Items="recons" Title="@L.T("التسويات")" Filterable="false" RowClick="r => ShowAsync(r.ReconciliationID)"
+                RowClass="ReconRowClass" EmptyText="@L.T("لا توجد سجلات")">
+        <Columns>
+            <PropertyColumn T="ReconRow" TProperty="string" Property="r => r.ReconNumber" Title="@L.T("التسوية")" />
+            <TemplateColumn T="ReconRow" Title="@L.T("تاريخ الكشف")" SortBy="r => r.StatementDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@ErpFormat.Date(context.Item.StatementDate)</bdi></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="ReconRow" Title="@L.T("رصيد الكشف")" SortBy="r => r.StatementBalance" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.StatementBalance" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="ReconRow" Title="@L.T("حالة التسوية")" SortBy="r => r.Status">
+                <CellTemplate>
+                    <StatusChip Text="@ReconState(context.Item.Status)" Color="@(context.Item.Status == "OPEN" ? Color.Info : Color.Success)" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", message = "", messageKind = "", asking = "";
+    private bool allowed, loaded, busy;
+    private string denied = "", message = "";
+    private Severity severity = Severity.Info;
     private int bankId;
     private DateTime? statementDate;
     private decimal? statementBalance;
@@ -168,34 +260,59 @@
     private List<ReconRow> recons = [];
     private ReconView? view;
     private HashSet<string> picked = [];
+    private List<GridExport<BankItem>> itemExport = [];
 
     private bool isOpen => view?.Recon.Status == "OPEN";
+
+    private string ReconState(string status) => status == "DONE" ? L.T("معتمدة") : L.T("جارية");
+
+    private string BankText(int id) => banks.FirstOrDefault(b => b.Id == id).Name ?? "";
+
+    private string PickedClass(BankItem i, int _) => picked.Contains(i.Key) ? "erp-row-selected" : "";
+
+    private string ReconRowClass(ReconRow r, int _) => r.ReconciliationID == view?.Recon.ReconciliationID ? "erp-row-selected" : "";
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), BankReconService.Form);
         allowed = denied.Length == 0;
+        loaded = true;
         if (!allowed)
         {
             return;
         }
+        itemExport =
+        [
+            new(L.T("التاريخ"), i => ErpFormat.Date(i.ItemDate)),
+            new(L.T("العملية"), i => i.TypeName),
+            new(L.T("الرقم"), i => i.ItemNumber),
+            new(L.T("البيان"), i => i.ItemText),
+            new(L.T("وارد"), i => i.ItemAmount > 0 ? i.ItemAmount : null),
+            new(L.T("صادر"), i => i.ItemAmount < 0 ? -i.ItemAmount : null),
+        ];
         string sync = await Recon.SyncAsync(UserInfo.Acting(user));        // BankReconLoad: the journal first
         if (sync.Length > 0)
         {
-            (message, messageKind) = (sync, "error");
+            Show(sync, Severity.Error);
         }
         banks = await Treasury.BanksAsync(L.English);
         if (banks.Count > 0)
         {
-            await BankAsync(banks[0].Id.ToString());
+            await BankAsync(banks[0].Id);
         }
     }
 
-    /// <summary>BankReconBankChanged: the open reconciliation of the bank, if there is one.</summary>
-    private async Task BankAsync(object? value)
+    private void Show(string text, Severity kind)
     {
-        bankId = int.TryParse(value as string, out var id) ? id : 0;
+        message = text;
+        severity = kind;
+    }
+
+    /// <summary>BankReconBankChanged: the open reconciliation of the bank, if there is one.</summary>
+    private async Task BankAsync(int id)
+    {
+        bankId = id;
         view = null;
         picked.Clear();
         recons = bankId > 0 ? await Recon.ReconsAsync(bankId) : [];
@@ -227,18 +344,18 @@
         message = "";
         if (bankId == 0)
         {
-            (message, messageKind) = (L.T("اختر البنك."), "error");
+            Show(L.T("اختر البنك."), Severity.Error);
             return;
         }
         if (statementBalance is null)
         {
-            (message, messageKind) = (L.T("اكتب الرصيد الظاهر في كشف البنك في هذا التاريخ."), "error");
+            Show(L.T("اكتب الرصيد الظاهر في كشف البنك في هذا التاريخ."), Severity.Error);
             return;
         }
         var r = await Recon.OpenAsync(UserInfo.Acting(user), bankId, statementDate, statementBalance.Value);
         if (r.Status != SaveStatus.Saved)
         {
-            (message, messageKind) = (r.Message, "error");
+            Show(r.Message, Severity.Error);
             return;
         }
         recons = await Recon.ReconsAsync(bankId);
@@ -261,7 +378,7 @@
         var chosen = list.Where(i => picked.Contains(i.Key)).ToList();
         if (chosen.Count == 0)
         {
-            (message, messageKind) = (L.T("اختر عملية أو أكثر من القائمة."), "error");
+            Show(L.T("اختر عملية أو أكثر من القائمة."), Severity.Error);
             return;
         }
         busy = true;
@@ -273,7 +390,7 @@
                                       : await Recon.UnclearAsync(view.Recon.ReconciliationID, i.SourceType, i.SourceID);
                 if (msg.Length > 0)
                 {
-                    (message, messageKind) = (msg, "error");
+                    Show(msg, Severity.Error);
                     break;
                 }
             }
@@ -285,23 +402,61 @@
         }
     }
 
-    private async Task FinishAsync()
+    private async Task SaveKey()
     {
-        string msg = await Recon.FinishAsync(UserInfo.Acting(user), view!.Recon.ReconciliationID);
-        (message, messageKind) = msg.Length > 0 ? (msg, "error") : (WorkPages.ReconFinished, "success");
-        recons = await Recon.ReconsAsync(bankId);
-        await ShowAsync(view.Recon.ReconciliationID);
+        if (isOpen && !busy)
+        {
+            await FinishAsync();
+        }
     }
 
-    private async Task AnswerAsync()
+    private async Task FinishAsync()
     {
-        string what = asking;
-        asking = "";
+        busy = true;
+        try
+        {
+            string msg = await Recon.FinishAsync(UserInfo.Acting(user), view!.Recon.ReconciliationID);
+            if (msg.Length > 0)
+            {
+                Show(msg, Severity.Error);
+            }
+            else
+            {
+                Show(WorkPages.ReconFinished, Severity.Success);
+            }
+            recons = await Recon.ReconsAsync(bankId);
+            await ShowAsync(view.Recon.ReconciliationID);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task DeleteAsync()
+    {
+        if (await ConfirmDialog.AskAsync(Dialogs, L.T("حذف التسوية"), L.T("حذف التسوية الجارية وكل مطابقاتها؟"), L.T("حذف")))
+        {
+            await AnswerAsync("DELETE");
+        }
+    }
+
+    private async Task ReopenAsync()
+    {
+        if (await ConfirmDialog.AskAsync(Dialogs, L.T("إعادة فتح"), L.T("إعادة فتح التسوية المعتمدة؟"), L.T("إعادة فتح"), Color.Primary))
+        {
+            await AnswerAsync("REOPEN");
+        }
+    }
+
+    private async Task AnswerAsync(string what)
+    {
+        message = "";
         int id = view!.Recon.ReconciliationID;
         string msg = what == "DELETE" ? await Recon.DeleteAsync(UserInfo.Acting(user), id) : await Recon.ReopenAsync(UserInfo.Acting(user), id);
         if (msg.Length > 0)
         {
-            (message, messageKind) = (msg, "error");
+            Show(msg, Severity.Error);
         }
         recons = await Recon.ReconsAsync(bankId);
         if (what == "DELETE" && msg.Length == 0)

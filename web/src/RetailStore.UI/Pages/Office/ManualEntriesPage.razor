@@ -2,136 +2,204 @@
 @attribute [Authorize]
 @inject ManualEntryService Manual
 @inject PermissionService Permissions
+@inject IDialogService Dialogs
 @inject UiLanguage L
 
-@* The manual journal entries on the web (docs/87): frmManualEntry, modManualEntry. *@
-<PageTitle>@L.T("القيود اليدوية")</PageTitle>
+@* Template B (docs/ui-inventory.md section 8) for a manual journal entry (docs/87, frmManualEntry): PageHeader (the number,
+   new F4, save F2, reverse, delete) -> the head (date, reference, description) and the state of the entry -> the lines
+   (account, debit or credit, text, cost centre) -> the totals card beside them (debit, credit, balanced or the difference)
+   -> FilterPanel (the period) and EntityGrid of the entries (a row opens it). The logic is ManualEntryService
+   (modManualEntry: SaveAsync, DeleteAsync asked first through ConfirmDialog, Reversal, TotalsText). *@
+<PageHeader Title="@L.T("القيود اليدوية")" Description="@L.T("قيد يومية يدوي بأسطره المدينة والدائنة، وتعديله وحذفه وعكسه")"
+            Icon="@NavGroups.IconOf("manual-entries")" Group="@L.T("الحسابات")">
+    <Status>
+        @if (allowed)
+        {
+            @if (entryId > 0)
+            {
+                <MudChip T="string" Variant="Variant.Outlined" Icon="@Icons.Material.Outlined.EditNote" Class="erp-status-chip">
+                    <bdi class="erp-num">@number</bdi>
+                </MudChip>
+                <StatusChip Status="POSTED" />
+            }
+            else
+            {
+                <StatusChip Status="DRAFT" />
+            }
+        }
+    </Status>
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.NoteAdd" OnClick="NewAsync" Disabled="busy">
+                @L.T("قيد جديد")<kbd class="erp-kbd">F4</kbd>
+            </MudButton>
+            @if (entryId > 0)
+            {
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.SwapHoriz" OnClick="Reverse" Disabled="busy">
+                    @L.T("قيد عكسي")
+                </MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete" OnClick="DeleteAsync"
+                           Disabled="busy">
+                    @L.T("حذف")
+                </MudButton>
+            }
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save" OnClick="SaveAsync" Disabled="busy">
+                @L.T("حفظ القيد")<kbd class="erp-kbd">F2</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("القيود اليدوية")</h1>
-            <p class="subtitle">@L.T("قيد يومية يدوي بأسطره المدينة والدائنة، وتعديله وحذفه وعكسه")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
-    {
-        <div class="pos">
-            <div class="list-pane">
-                <form class="list-tools" @onsubmit="LoadAsync" @onsubmit:preventDefault>
-                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-                    <button type="submit" class="btn">@L.T("عرض")</button>
-                    <button type="button" class="btn" @onclick="New">@L.T("قيد جديد")</button>
-                </form>
-                <table class="list">
-                    <thead><tr><th>@L.T("رقم القيد")</th><th>@L.T("التاريخ")</th><th>@L.T("البيان")</th><th>@L.T("المبلغ")</th></tr></thead>
-                    <tbody>
-                        @foreach (var r in rows)
-                        {
-                            <tr class="clickable" @onclick="() => OpenAsync(r.ManualEntryID)">
-                                <td data-label="@L.T("رقم القيد")">@r.EntryNumber</td>
-                                <td data-label="@L.T("التاريخ")">@r.EntryDate.ToString("yyyy-MM-dd")</td>
-                                <td data-label="@L.T("البيان")">@r.Description</td>
-                                <td data-label="@L.T("المبلغ")">@WorkPages.Money(r.TotalAmount)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @if (rows.Count == 0)
-                {
-                    <p class="empty">@L.T("لا توجد سجلات")</p>
-                }
-            </div>
-
-            <div class="form-pane">
-                <h2>@(entryId == 0 ? L.T("قيد جديد") : number)</h2>
-                <p class="hint">@status</p>
-                <form class="record" @onsubmit="SaveAsync" @onsubmit:preventDefault>
-                    <div class="field">
-                        <label for="me-date">@L.T("التاريخ") *</label>
-                        <input id="me-date" type="date" @bind="entryDate" />
-                    </div>
-                    <div class="field">
-                        <label for="me-ref">@L.T("المرجع")</label>
-                        <input id="me-ref" type="text" maxlength="50" @bind="reference" />
-                    </div>
-                    <div class="field span-2">
-                        <label for="me-desc">@L.T("البيان") *</label>
-                        <input id="me-desc" type="text" maxlength="255" @bind="description" />
-                    </div>
-                    <div class="span-2">
-                        <table class="list">
-                            <thead><tr><th>@L.T("الحساب")</th><th>@L.T("مدين")</th><th>@L.T("دائن")</th><th>@L.T("البيان")</th><th>@L.T("مركز التكلفة")</th><th></th></tr></thead>
-                            <tbody>
-                                @foreach (var l in lines)
-                                {
-                                    <tr>
-                                        <td data-label="@L.T("الحساب")">
-                                            <select @bind="l.Account">
-                                                <option value="0"></option>
-                                                @foreach (var a in accounts)
-                                                {
-                                                    <option value="@a.Code">@a.Code @a.Name</option>
-                                                }
-                                            </select>
-                                        </td>
-                                        <td data-label="@L.T("مدين")"><input type="number" step="any" min="0" value="@l.Debit" @onchange="e => SetSide(l, e.Value, true)" /></td>
-                                        <td data-label="@L.T("دائن")"><input type="number" step="any" min="0" value="@l.Credit" @onchange="e => SetSide(l, e.Value, false)" /></td>
-                                        <td data-label="@L.T("البيان")"><input type="text" maxlength="150" @bind="l.Text" /></td>
-                                        <td data-label="@L.T("مركز التكلفة")">
-                                            <select @bind="l.Center">
-                                                <option value="0"></option>
-                                                @foreach (var c in centers)
-                                                {
-                                                    <option value="@c.Id">@c.Name</option>
-                                                }
-                                            </select>
-                                        </td>
-                                        <td><button type="button" class="btn" @onclick="() => lines.Remove(l)">×</button></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                        <button type="button" class="btn" @onclick="() => lines.Add(new Row())">@L.T("سطر جديد")</button>
-                        <p class="hint">@L.T(ManualEntryService.TotalsText(Inputs()))</p>
-                    </div>
-                    <div class="actions span-2">
-                        <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ القيد")</button>
-                        @if (entryId > 0)
-                        {
-                            <button type="button" class="btn" disabled="@busy" @onclick="Reverse">@L.T("قيد عكسي")</button>
-                            <button type="button" class="btn" disabled="@busy" @onclick="@(() => asking = true)">@L.T("حذف")</button>
-                        }
-                    </div>
-                </form>
-            </div>
-        </div>
-    }
-
+}
+else
+{
+    <KeyboardShortcuts OnSave="SaveAsync" OnNew="NewAsync" />
     @if (message.Length > 0)
     {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4 erp-multiline" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
     }
 
-    @if (asking)
-    {
-        <div class="dialog-backdrop">
-            <div class="dialog" role="dialog" aria-modal="true">
-                <p>@(L.T("حذف القيد") + " " + number + " " + L.T("نهائيًا؟ يُحذف قيده من اليومية أيضًا."))</p>
-                <div class="actions">
-                    <button class="btn primary" @onclick="DeleteAsync">@L.T("نعم")</button>
-                    <button class="btn" @onclick="() => asking = false">@L.T("لا")</button>
-                </div>
-            </div>
+    <div class="erp-doc mb-4">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4 mb-4">
+                <MudText Typo="Typo.h6" Class="mb-3">@(entryId == 0 ? L.T("قيد جديد") : number)</MudText>
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudDatePicker @ref="dateField" @bind-Date="entryDate" Label="@L.T("التاريخ")" Variant="Variant.Outlined"
+                                       Margin="Margin.Dense" DateFormat="yyyy-MM-dd" Culture="@ErpFormat.DateCulture(L.English)"
+                                       AutoClose="true" Required="true" RequiredError="@L.T("مطلوب")" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="3">
+                        <MudTextField T="string" @bind-Value="reference" Label="@L.T("المرجع")" Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" MaxLength="50" />
+                    </MudItem>
+                    <MudItem xs="12" md="6">
+                        <MudTextField T="string" @bind-Value="description" Label="@L.T("البيان")" Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" MaxLength="255" Required="true" RequiredError="@L.T("مطلوب")" AutoFocus="true" />
+                    </MudItem>
+                </MudGrid>
+                <MudText Typo="Typo.body2" Class="mud-text-secondary mt-3">@status</MudText>
+            </MudPaper>
+
+            <EntityGrid T="Row" Items="lines" Title="@L.T("أسطر القيد")" Filterable="false" ShowPager="false" RowsPerPage="500"
+                        Class="erp-manual-lines" EmptyText="@L.T("أضف سطرًا لكل حساب")">
+                <ToolBarContent>
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" Class="mx-2" StartIcon="@Icons.Material.Outlined.Add"
+                               OnClick="() => lines.Add(new Row())">
+                        @L.T("سطر جديد")
+                    </MudButton>
+                </ToolBarContent>
+                <Columns>
+                    <TemplateColumn T="Row" Title="@L.T("الحساب")" Sortable="false" CellClass="erp-manual-account">
+                        <CellTemplate>
+                            <LookupField T="Account" Items="accounts" Value="AccountOf(context.Item)" ValueChanged="a => context.Item.Account = a?.Code ?? 0"
+                                         CodeOf="a => a.Code.ToString(System.Globalization.CultureInfo.InvariantCulture)" NameOf="a => a.Name"
+                                         Placeholder="@L.T("الحساب")" MaxItems="40" />
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="Row" Title="@L.T("مدين")" Sortable="false" HeaderClass="erp-num" CellClass="erp-manual-amount">
+                        <CellTemplate>
+                            <MudNumericField T="decimal" Value="context.Item.Debit" ValueChanged="v => SetSide(context.Item, v, true)"
+                                             Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="0" Format="0.00"
+                                             Class="erp-cell-num" Culture="System.Globalization.CultureInfo.InvariantCulture"
+                                             aria-label="@L.T("مدين")" />
+                        </CellTemplate>
+                        <FooterTemplate><MoneyText Value="lines.Sum(l => l.Debit)" Bold="true" /></FooterTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="Row" Title="@L.T("دائن")" Sortable="false" HeaderClass="erp-num" CellClass="erp-manual-amount">
+                        <CellTemplate>
+                            <MudNumericField T="decimal" Value="context.Item.Credit" ValueChanged="v => SetSide(context.Item, v, false)"
+                                             Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="0" Format="0.00"
+                                             Class="erp-cell-num" Culture="System.Globalization.CultureInfo.InvariantCulture"
+                                             aria-label="@L.T("دائن")" />
+                        </CellTemplate>
+                        <FooterTemplate><MoneyText Value="lines.Sum(l => l.Credit)" Bold="true" /></FooterTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="Row" Title="@L.T("البيان")" Sortable="false" CellClass="erp-manual-text">
+                        <CellTemplate>
+                            <MudTextField T="string" @bind-Value="context.Item.Text" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                          MaxLength="150" aria-label="@L.T("البيان")" />
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="Row" Title="@L.T("مركز التكلفة")" Sortable="false" CellClass="erp-manual-center">
+                        <CellTemplate>
+                            <MudSelect T="int" @bind-Value="context.Item.Center" Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true"
+                                       ToStringFunc="CenterText" aria-label="@L.T("مركز التكلفة")">
+                                <MudSelectItem T="int" Value="0">&nbsp;</MudSelectItem>
+                                @foreach (var c in centers)
+                                {
+                                    <MudSelectItem T="int" Value="@c.Id">@c.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="Row" Title="" Sortable="false" CellClass="erp-actions-col" HeaderClass="erp-actions-col">
+                        <CellTemplate>
+                            <MudTooltip Text="@L.T("حذف السطر")">
+                                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" Size="Size.Small"
+                                               OnClick="() => lines.Remove(context.Item)" aria-label="@L.T("حذف السطر")" />
+                            </MudTooltip>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </EntityGrid>
         </div>
-    }
-</section>
+
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("ملخص القيد")</MudText>
+                <dl class="erp-summary-list">
+                    <dt>@L.T("عدد الأسطر")</dt><dd class="erp-num">@lines.Count</dd>
+                    <dt>@L.T("مدين")</dt><dd><MoneyText Value="lines.Sum(l => l.Debit)" ColorNegative="false" /></dd>
+                    <dt>@L.T("دائن")</dt><dd><MoneyText Value="lines.Sum(l => l.Credit)" ColorNegative="false" /></dd>
+                    <dt class="erp-summary-grand">@(Balanced ? L.T("متوازن") : L.T("الفرق"))</dt>
+                    <dd class="erp-summary-grand">
+                        @if (Balanced)
+                        {
+                            <MudIcon Icon="@Icons.Material.Outlined.TaskAlt" Color="Color.Success" Size="Size.Small" />
+                        }
+                        else
+                        {
+                            <span class="mud-error-text">
+                                <MoneyText Value="Math.Abs(lines.Sum(l => l.Debit) - lines.Sum(l => l.Credit))" Bold="true" ColorNegative="false" />
+                            </span>
+                        }
+                    </dd>
+                </dl>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary d-block mt-2">@L.T(ManualEntryService.TotalsText(Inputs()))</MudText>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                           StartIcon="@Icons.Material.Outlined.Save" OnClick="SaveAsync" Disabled="busy">
+                    @L.T("حفظ القيد")
+                </MudButton>
+            </MudPaper>
+        </aside>
+    </div>
+
+    <FilterPanel Range="range" RangeChanged="r => range = r ?? MonthToDate()" OnShow="LoadAsync" OnClear="Reset" Busy="listBusy"
+                 Title="@L.T("القيود اليدوية")" Class="no-print" />
+    <EntityGrid T="ManualEntryRow" Items="rows" Title="@L.T("القيود اليدوية")" Export="export" ExportName="@L.T("القيود اليدوية")"
+                Loading="listBusy" Filterable="false" RowClick="r => OpenAsync(r.ManualEntryID)" RowClass="EntryRowClass"
+                SearchText="@(r => r.EntryNumber + " " + r.Description)" EmptyText="@L.T("لا توجد سجلات")">
+        <Columns>
+            <PropertyColumn T="ManualEntryRow" TProperty="string" Property="r => r.EntryNumber" Title="@L.T("رقم القيد")" />
+            <TemplateColumn T="ManualEntryRow" Title="@L.T("التاريخ")" SortBy="r => r.EntryDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@ErpFormat.Date(context.Item.EntryDate)</bdi></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="ManualEntryRow" TProperty="string" Property="r => r.Description" Title="@L.T("البيان")" />
+            <TemplateColumn T="ManualEntryRow" Title="@L.T("المبلغ")" SortBy="r => r.TotalAmount" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.TotalAmount" /></CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+}
 
 @code {
     private sealed class Row
@@ -143,41 +211,89 @@
         public int Center { get; set; }
     }
 
+    /// <summary>An account of the choice list (LookupField needs a class).</summary>
+    private sealed record Account(int Code, string Name);
+
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy, asking;
-    private string denied = "", message = "", messageKind = "", number = "", status = "";
+    private bool allowed, loaded, busy, listBusy;
+    private string denied = "", message = "", number = "", status = "";
     private string? description, reference;
+    private Severity severity = Severity.Info;
     private int entryId;
     private int? reversalOf;
     private string? currency;
     private decimal rate = 1;
     private DateTime? entryDate = DateTime.Today;
-    private DateTime from = DateTime.Today.AddDays(1 - DateTime.Today.Day), to = DateTime.Today;
+    private DateRange range = MonthToDate();
     private List<Row> lines = [];
     private List<ManualEntryRow> rows = [];
-    private List<(int Code, string Name)> accounts = [];
+    private List<Account> accounts = [];
     private List<(int Id, string Name)> centers = [];
+    private List<GridExport<ManualEntryRow>> export = [];
+    private MudDatePicker? dateField;
+
+    /// <summary>The period the list opened on, as before: the first of the month to today.</summary>
+    private static DateRange MonthToDate() => new(DateTime.Today.AddDays(1 - DateTime.Today.Day), DateTime.Today);
+
+    private bool Balanced => lines.Sum(l => l.Debit) == lines.Sum(l => l.Credit) && lines.Sum(l => l.Debit) > 0;
+
+    private Account? AccountOf(Row l) => accounts.FirstOrDefault(a => a.Code == l.Account);
+
+    private string CenterText(int id) => centers.FirstOrDefault(c => c.Id == id).Name ?? "";
+
+    private string EntryRowClass(ManualEntryRow r, int _) => r.ManualEntryID == entryId ? "erp-row-selected" : "";
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), ManualEntryService.Form);
         allowed = denied.Length == 0;
+        loaded = true;
         if (!allowed)
         {
             return;
         }
-        accounts = await Manual.AccountsAsync(L.English);
+        export =
+        [
+            new(L.T("رقم القيد"), r => r.EntryNumber),
+            new(L.T("التاريخ"), r => ErpFormat.Date(r.EntryDate)),
+            new(L.T("البيان"), r => r.Description),
+            new(L.T("المبلغ"), r => r.TotalAmount),
+        ];
+        accounts = (await Manual.AccountsAsync(L.English)).Select(a => new Account(a.Code, a.Name)).ToList();
         centers = await Manual.CostCentersAsync(L.English);
         New();
         await LoadAsync();
     }
 
-    private async Task LoadAsync() => rows = await Manual.EntriesAsync(from, to);
+    private async Task LoadAsync()
+    {
+        listBusy = true;
+        try
+        {
+            rows = await Manual.EntriesAsync(range.Start ?? DateTime.Today, range.End ?? DateTime.Today);
+        }
+        finally
+        {
+            listBusy = false;
+        }
+    }
+
+    private async Task Reset()
+    {
+        range = MonthToDate();
+        await LoadAsync();
+    }
 
     private List<ManualLineInput> Inputs() =>
         lines.Select(l => new ManualLineInput(l.Account == 0 ? null : l.Account, l.Debit, l.Credit, l.Text, l.Center == 0 ? null : l.Center)).ToList();
+
+    private void Show(string text, Severity level)
+    {
+        message = text;
+        severity = level;
+    }
 
     /// <summary>ManualNew.</summary>
     private void New()
@@ -187,6 +303,16 @@
         status = L.T("اكتب التاريخ والبيان، ثم سطرًا لكل حساب: المبلغ في المدين أو في الدائن.");
     }
 
+    private async Task NewAsync()
+    {
+        message = "";
+        New();
+        if (dateField is not null)
+        {
+            await dateField.FocusAsync();
+        }
+    }
+
     /// <summary>ManualOpen.</summary>
     private async Task OpenAsync(int id)
     {
@@ -194,26 +320,24 @@
         var v = await Manual.EntryAsync(id);
         if (v is null)
         {
-            (message, messageKind) = (ManualEntryService.NotFound, "error");
+            Show(ManualEntryService.NotFound, Severity.Error);
             New();
             return;
         }
-        Show(v.ManualEntryID, v.EntryNumber, v.EntryDate, v.Description, v.Reference, v.ReversalOfID, v.CurrencyCode, v.ExchangeRate, v.Lines);
+        Load(v.ManualEntryID, v.EntryNumber, v.EntryDate, v.Description, v.Reference, v.ReversalOfID, v.CurrencyCode, v.ExchangeRate, v.Lines);
         status = v.InClosedPeriod ? L.T("قيد في فترة مقفلة: للعرض فقط. يمكن عمل قيد عكسي بتاريخ مفتوح.")
                                   : L.T("قيد محفوظ: عدّل ثم احفظ، فيتحدث قيده في اليومية بنفس رقمه.");
     }
 
-    private void Show(int id, string no, DateTime? d, string? desc, string? refText, int? reversal, string? code, decimal fx, IEnumerable<ManualLineInput> input)
+    private void Load(int id, string no, DateTime? d, string? desc, string? refText, int? reversal, string? code, decimal fx, IEnumerable<ManualLineInput> input)
     {
         (entryId, number, entryDate, description, reference, reversalOf, currency, rate) = (id, no, d, desc, refText, reversal, code, fx);
         lines = input.Select(l => new Row { Account = l.AccountCode ?? 0, Debit = l.Debit, Credit = l.Credit, Text = l.LineText, Center = l.CostCenterID ?? 0 }).ToList();
     }
 
     /// <summary>ManualLineChanged: one side per line, an amount on one side clears the other.</summary>
-    private static void SetSide(Row l, object? value, bool debit)
+    private static void SetSide(Row l, decimal v, bool debit)
     {
-        decimal.TryParse(Convert.ToString(value, System.Globalization.CultureInfo.InvariantCulture), System.Globalization.NumberStyles.Number,
-                         System.Globalization.CultureInfo.InvariantCulture, out var v);
         if (debit)
         {
             l.Debit = v;
@@ -241,12 +365,16 @@
             return;
         }
         var r = ManualEntryService.Reversal(v, DateTime.Today);
-        Show(0, "", r.EntryDate, r.Description, r.Reference, r.ReversalOfID, r.CurrencyCode, r.ExchangeRate, r.Lines);
+        Load(0, "", r.EntryDate, r.Description, r.Reference, r.ReversalOfID, r.CurrencyCode, r.ExchangeRate, r.Lines);
         status = L.T("قيد عكسي جديد للقيد ") + v.EntryNumber + L.T(": راجع التاريخ والأسطر ثم اضغط «حفظ القيد».");
     }
 
     private async Task SaveAsync()
     {
+        if (busy)
+        {
+            return;
+        }
         message = "";
         busy = true;
         try
@@ -255,14 +383,14 @@
                 new ManualEntryRequest(entryId, entryDate, description, reference, reversalOf, Inputs(), currency, rate));
             if (r.Status != SaveStatus.Saved)
             {
-                (message, messageKind) = (r.Message, "error");
+                Show(r.Message, Severity.Error);
                 return;
             }
             await OpenAsync(r.Id);
             var v = await Manual.EntryAsync(r.Id);
-            message = WorkPages.ManualSaved + r.Number + "." + (r.Message.Length > 0 ? "\n" + r.Message
-                      : v?.JournalNumber is { } jv ? "\n" + L.T("قيد اليومية: ") + jv : "");
-            messageKind = r.Message.Length > 0 ? "error" : "success";
+            Show(WorkPages.ManualSaved + r.Number + "." + (r.Message.Length > 0 ? "\n" + r.Message
+                 : v?.JournalNumber is { } jv ? "\n" + L.T("قيد اليومية: ") + jv : ""),
+                 r.Message.Length > 0 ? Severity.Warning : Severity.Success);
             await LoadAsync();
         }
         finally
@@ -273,14 +401,18 @@
 
     private async Task DeleteAsync()
     {
-        asking = false;
+        if (!await ConfirmDialog.AskAsync(Dialogs, L.T("حذف"),
+                                          L.T("حذف القيد") + " " + number + " " + L.T("نهائيًا؟ يُحذف قيده من اليومية أيضًا."), L.T("حذف")))
+        {
+            return;
+        }
         var r = await Manual.DeleteAsync(UserInfo.Acting(user), entryId);
         if (r.Status != SaveStatus.Saved)
         {
-            (message, messageKind) = (r.Message, "error");
+            Show(r.Message, Severity.Error);
             return;
         }
-        (message, messageKind) = (WorkPages.ManualDeleted, "success");
+        Show(WorkPages.ManualDeleted, Severity.Success);
         New();
         await LoadAsync();
     }

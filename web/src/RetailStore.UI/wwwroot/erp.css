@@ -235,3 +235,13 @@ dt.erp-summary-grand { color: var(--mud-palette-text-primary); font-weight: 700;
     .erp-doc-side { position: static; margin-block-start: 16px; }
     .erp-grid .mud-toolbar, .erp-grid .mud-table-pagination { display: none !important; }
 }
+
+/* batch 4b: banks and entries */
+.erp-multiline { white-space: pre-line; }
+.erp-check-col { width: 48px; }
+.erp-manual-lines table { min-width: 760px; }
+.erp-manual-account { min-width: 220px; }
+.erp-manual-amount { width: 116px; min-width: 108px; }
+.erp-manual-text { min-width: 120px; }
+.erp-manual-center { width: 140px; min-width: 128px; }
+.erp-manual-lines .erp-actions-col { width: 48px; }

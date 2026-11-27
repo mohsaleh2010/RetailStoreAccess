@@ -2,245 +2,353 @@
 @attribute [Authorize]
 @inject TreasuryService Treasury
 @inject PermissionService Permissions
+@inject IDialogService Dialogs
 @inject UiLanguage L
 
-<PageTitle>@L.T("الحركات البنكية")</PageTitle>
+@* Template B for a voucher (docs/ui-inventory.md section 8), as /cash-vouchers: PageHeader (new F4, save F2) -> the bank
+   transaction above the lists (its type, date, bank, the box / other bank / counter account of its type, the amount, the
+   fee and its VAT, the reference, the description) with its card beside it -> EntityGrid of the bank balances (from the
+   journal) -> FilterPanel (the period) -> EntityGrid of the transactions (delete asked first through ConfirmDialog).
+   Posting is TreasuryService.PostBankTxAsync / DeleteBankTxAsync (modBank) with the permission of frmBankTx. *@
+<PageHeader Title="@L.T("الحركات البنكية")" Description="@L.T("أرصدة البنوك، والإيداع والسحب والتحويل وتسوية مدى")"
+            Icon="@NavGroups.IconOf("bank-transactions")" Group="@L.T("الخزينة والبنوك")">
+    <Status>
+        @if (allowed)
+        {
+            <StatusChip Status="DRAFT" />
+        }
+    </Status>
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.NoteAdd" OnClick="New" Disabled="busy">
+                @L.T("حركة جديدة")<kbd class="erp-kbd">F4</kbd>
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save" OnClick="Save" Disabled="busy">
+                @L.T("حفظ الحركة")<kbd class="erp-kbd">F2</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("الحركات البنكية")</h1>
-            <p class="subtitle">@L.T("أرصدة البنوك، والإيداع والسحب والتحويل وتسوية مدى")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
+}
+else
+{
+    <KeyboardShortcuts OnSave="Save" OnNew="New" />
+    @if (message.Length > 0)
     {
-        <div class="pos">
-            <div class="list-pane">
-                <table class="list">
-                    <thead>
-                        <tr>
-                            <th>@L.T("البنك")</th>
-                            <th>@L.T("رقم الحساب")</th>
-                            <th>@L.T("الرصيد في الدفاتر")</th>
-                            <th>@L.T("آخر حركة")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var b in banks)
-                        {
-                            <tr class="@(b.IsActive ? "" : "inactive")">
-                                <td data-label="@L.T("البنك")">@b.BankName</td>
-                                <td data-label="@L.T("رقم الحساب")">@b.AccountNo</td>
-                                <td data-label="@L.T("الرصيد في الدفاتر")">@WorkPages.Money(b.Balance)</td>
-                                <td data-label="@L.T("آخر حركة")">@b.LastItemDate?.ToString("yyyy-MM-dd")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                <p class="hint">@L.T("الرصيد من القيود: يتحدث بعد تحديث القيود.")</p>
-
-                <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
-                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-                    <button type="submit" class="btn">@L.T("عرض")</button>
-                </form>
-                <table class="list">
-                    <thead>
-                        <tr>
-                            <th>@L.T("الرقم")</th>
-                            <th>@L.T("التاريخ")</th>
-                            <th>@L.T("نوع الحركة")</th>
-                            <th>@L.T("البنك")</th>
-                            <th>@L.T("الطرف الآخر")</th>
-                            <th>@L.T("المبلغ")</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var r in rows)
-                        {
-                            <tr>
-                                <td data-label="@L.T("الرقم")">@r.TxNumber</td>
-                                <td data-label="@L.T("التاريخ")">@r.TxDate.ToString("yyyy-MM-dd")</td>
-                                <td data-label="@L.T("نوع الحركة")">@r.TxTypeName</td>
-                                <td data-label="@L.T("البنك")">@r.BankName</td>
-                                <td data-label="@L.T("الطرف الآخر")">@r.OtherName</td>
-                                <td data-label="@L.T("المبلغ")">@WorkPages.Money(r.Amount)</td>
-                                <td class="actions"><button class="btn" disabled="@busy" @onclick="() => Delete(r)">@L.T("حذف")</button></td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @if (rows.Count == 0)
-                {
-                    <p class="empty">@L.T("لا توجد سجلات")</p>
-                }
-            </div>
-
-            <div class="form-pane">
-                <h2>@L.T("حركة جديدة")</h2>
-                <form class="record" @onsubmit="Save" @onsubmit:preventDefault>
-                    <div class="field span-2">
-                        <label for="bt-type">@L.T("نوع الحركة") *</label>
-                        <select id="bt-type" @bind="txType">
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
+    }
+    <div class="erp-doc mb-4">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("حركة جديدة")</MudText>
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect @ref="typeField" T="string" @bind-Value="txType" Label="@L.T("نوع الحركة")" Variant="Variant.Outlined"
+                                   Margin="Margin.Dense" Dense="true" Required="true" AutoFocus="true" ToStringFunc="TypeText">
                             @foreach (var t in TreasuryService.BankTxTypes)
                             {
-                                <option value="@t">@L.T(TreasuryService.BankTxTypeName(t))</option>
+                                <MudSelectItem T="string" Value="@t">@L.T(TreasuryService.BankTxTypeName(t))</MudSelectItem>
                             }
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="bt-date">@L.T("التاريخ") *</label>
-                        <input id="bt-date" type="date" @bind="txDate" />
-                    </div>
-                    <div class="field">
-                        <label for="bt-bank">@L.T("البنك") *</label>
-                        <select id="bt-bank" @bind="bankId">
-                            <option value="0"></option>
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudDatePicker @bind-Date="txDate" Label="@L.T("التاريخ")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                       DateFormat="yyyy-MM-dd" Culture="@ErpFormat.DateCulture(L.English)" AutoClose="true" Required="true"
+                                       RequiredError="@L.T("مطلوب")" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int" @bind-Value="bankId" Label="@L.T("البنك")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   Dense="true" Required="true" ToStringFunc="BankText">
                             @foreach (var b in bankChoices)
                             {
-                                <option value="@b.Id">@b.Name</option>
+                                <MudSelectItem T="int" Value="@b.Id">@b.Name</MudSelectItem>
                             }
-                        </select>
-                    </div>
+                        </MudSelect>
+                    </MudItem>
                     @if (txType is "DEPOSIT" or "WITHDRAW")
                     {
-                        <div class="field span-2">
-                            <label for="bt-box">@L.T("الصندوق") *</label>
-                            <select id="bt-box" @bind="boxId">
-                                <option value="0"></option>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudSelect T="int" @bind-Value="boxId" Label="@L.T("الصندوق")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                       Dense="true" Required="true" ToStringFunc="BoxText">
                                 @foreach (var b in boxes)
                                 {
-                                    <option value="@b.Id">@b.Name (@WorkPages.Money(b.Balance))</option>
+                                    <MudSelectItem T="int" Value="@b.Id">
+                                        @b.Name <span class="mud-text-secondary erp-num" dir="ltr">(@ErpFormat.Money(b.Balance))</span>
+                                    </MudSelectItem>
                                 }
-                            </select>
-                        </div>
+                            </MudSelect>
+                        </MudItem>
                     }
                     else if (txType == "TRANSFER")
                     {
-                        <div class="field span-2">
-                            <label for="bt-to">@L.T("إلى البنك") *</label>
-                            <select id="bt-to" @bind="toBankId">
-                                <option value="0"></option>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudSelect T="int" @bind-Value="toBankId" Label="@L.T("إلى البنك")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                       Dense="true" Required="true" ToStringFunc="ToBankText">
                                 @foreach (var b in bankChoices.Where(b => b.Id != bankId))
                                 {
-                                    <option value="@b.Id">@b.Name</option>
+                                    <MudSelectItem T="int" Value="@b.Id">@b.Name</MudSelectItem>
                                 }
-                            </select>
-                        </div>
+                            </MudSelect>
+                        </MudItem>
                     }
                     else if (txType is "OTHER_IN" or "OTHER_OUT")
                     {
-                        <div class="field span-2">
-                            <label for="bt-account">@L.T("الحساب المقابل") *</label>
-                            <select id="bt-account" @bind="counterAccount">
-                                <option value="0"></option>
-                                @foreach (var a in accounts)
-                                {
-                                    <option value="@a.Code">@a.Code @a.Name</option>
-                                }
-                            </select>
-                        </div>
+                        <MudItem xs="12" sm="6" md="4">
+                            <LookupField T="Account" Label="@L.T("الحساب المقابل")" Items="accounts" Value="CounterAccount"
+                                         ValueChanged="a => counterAccount = a?.Code ?? 0" Required="true" MaxItems="40"
+                                         CodeOf="a => a.Code.ToString(System.Globalization.CultureInfo.InvariantCulture)" NameOf="a => a.Name" />
+                        </MudItem>
                     }
-                    <div class="field">
-                        <label for="bt-amount">@L.T("المبلغ") *</label>
-                        <input id="bt-amount" type="number" step="any" min="0" @bind="amount" />
-                    </div>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudNumericField T="decimal" @bind-Value="amount" Label="@L.T("المبلغ")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                         HideSpinButtons="true" Min="0" Format="0.00" Class="erp-cell-num" Required="true"
+                                         RequiredError="@L.T("مطلوب")" Culture="System.Globalization.CultureInfo.InvariantCulture" />
+                    </MudItem>
                     @if (txType == "SETTLEMENT")
                     {
-                        <div class="field">
-                            <label for="bt-fee">@L.T("العمولة")</label>
-                            <input id="bt-fee" type="number" step="any" min="0" @bind="fee" />
-                        </div>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudNumericField T="decimal" @bind-Value="fee" Label="@L.T("العمولة")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                             HideSpinButtons="true" Min="0" Format="0.00" Class="erp-cell-num"
+                                             Culture="System.Globalization.CultureInfo.InvariantCulture" />
+                        </MudItem>
                     }
                     @if (txType is "SETTLEMENT" or "OTHER_OUT")
                     {
-                        <div class="field">
-                            <label for="bt-vat">@L.T("ضريبة المدخلات")</label>
-                            <input id="bt-vat" type="number" step="any" min="0" @bind="feeVat" />
-                        </div>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudNumericField T="decimal" @bind-Value="feeVat" Label="@L.T("ضريبة المدخلات")" Variant="Variant.Outlined"
+                                             Margin="Margin.Dense" HideSpinButtons="true" Min="0" Format="0.00" Class="erp-cell-num"
+                                             Culture="System.Globalization.CultureInfo.InvariantCulture" />
+                        </MudItem>
                     }
-                    <div class="field">
-                        <label for="bt-ref">@L.T("المرجع")</label>
-                        <input id="bt-ref" type="text" maxlength="40" @bind="reference" />
-                    </div>
-                    <div class="field span-2">
-                        <label for="bt-desc">@L.T("البيان")</label>
-                        <input id="bt-desc" type="text" maxlength="255" @bind="description" />
-                    </div>
-                    <div class="actions span-2">
-                        <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ الحركة")</button>
-                    </div>
-                </form>
-            </div>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudTextField T="string" @bind-Value="reference" Label="@L.T("المرجع")" Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" MaxLength="40" />
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField T="string" @bind-Value="description" Label="@L.T("البيان")" Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" MaxLength="255" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
         </div>
-    }
 
-    @if (message.Length > 0)
-    {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
-    }
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("ملخص الحركة")</MudText>
+                <dl class="erp-summary-list">
+                    <dt>@L.T("نوع الحركة")</dt><dd>@TypeText(txType)</dd>
+                    <dt>@L.T("البنك")</dt><dd>@BankText(bankId)</dd>
+                    <dt>@L.T("الرصيد في الدفاتر")</dt>
+                    <dd><MoneyText Value="@banks.FirstOrDefault(b => b.BankID == bankId)?.Balance" /></dd>
+                    @if (txType is "DEPOSIT" or "WITHDRAW")
+                    {
+                        <dt>@L.T("الصندوق")</dt><dd>@BoxText(boxId)</dd>
+                    }
+                    else if (txType == "TRANSFER")
+                    {
+                        <dt>@L.T("إلى البنك")</dt><dd>@ToBankText(toBankId)</dd>
+                    }
+                    @if (txType == "SETTLEMENT")
+                    {
+                        <dt>@L.T("العمولة")</dt><dd><MoneyText Value="fee" /></dd>
+                    }
+                    @if (txType is "SETTLEMENT" or "OTHER_OUT")
+                    {
+                        <dt>@L.T("ضريبة المدخلات")</dt><dd><MoneyText Value="feeVat" /></dd>
+                    }
+                    <dt class="erp-summary-grand">@L.T("المبلغ")</dt>
+                    <dd class="erp-summary-grand"><MoneyText Value="amount" ShowCurrency="true" Bold="true" /></dd>
+                </dl>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                           StartIcon="@Icons.Material.Outlined.Save" OnClick="Save" Disabled="busy">
+                    @L.T("حفظ الحركة")
+                </MudButton>
+            </MudPaper>
+        </aside>
+    </div>
 
-    @if (toDelete is not null)
-    {
-        <div class="dialog-backdrop">
-            <div class="dialog" role="dialog" aria-modal="true">
-                <p>@L.T("حذف الحركة") @(toDelete.TxNumber)؟</p>
-                <div class="actions">
-                    <button class="btn primary" @onclick="() => Answer(true)">@L.T("نعم")</button>
-                    <button class="btn" @onclick="() => Answer(false)">@L.T("لا")</button>
-                </div>
-            </div>
-        </div>
-    }
-</section>
+    <EntityGrid T="BankBalance" Items="banks" Title="@L.T("أرصدة البنوك")" Export="bankExport" ExportName="@L.T("أرصدة البنوك")"
+                Loading="listBusy" Filterable="false" ShowPager="false" RowsPerPage="200" RowClass="BankRowClass" Class="mb-3"
+                EmptyText="@L.T("لا توجد سجلات")">
+        <Columns>
+            <TemplateColumn T="BankBalance" Title="@L.T("البنك")" SortBy="b => b.BankName">
+                <CellTemplate>
+                    @context.Item.BankName
+                    @if (!context.Item.IsActive)
+                    {
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="erp-chip-inactive">@L.T("موقوف")</MudChip>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="BankBalance" Title="@L.T("رقم الحساب")" SortBy="b => b.AccountNo">
+                <CellTemplate><bdi class="erp-num" dir="ltr">@context.Item.AccountNo</bdi></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="BankBalance" Title="@L.T("الرصيد في الدفاتر")" SortBy="b => b.Balance" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.Balance" Bold="true" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="BankBalance" Title="@L.T("آخر حركة")" SortBy="b => b.LastItemDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@ErpFormat.Date(context.Item.LastItemDate)</bdi></CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+    <MudText Typo="Typo.body2" Class="mud-text-secondary mb-4">@L.T("الرصيد من القيود: يتحدث بعد تحديث القيود.")</MudText>
+
+    <FilterPanel Range="range" RangeChanged="r => range = r ?? MonthToDate()" OnShow="Load" OnClear="Reset" Busy="listBusy"
+                 Title="@L.T("الحركات")" Class="no-print" />
+    <EntityGrid T="BankTxRow" Items="rows" Title="@L.T("الحركات البنكية")" Export="export" ExportName="@L.T("الحركات البنكية")"
+                Loading="listBusy" Filterable="false"
+                SearchText="@(r => r.TxNumber + " " + r.BankName + " " + r.OtherName + " " + r.Reference + " " + r.Description)"
+                EmptyText="@L.T("لا توجد سجلات")">
+        <Columns>
+            <PropertyColumn T="BankTxRow" TProperty="string" Property="r => r.TxNumber" Title="@L.T("الرقم")" />
+            <TemplateColumn T="BankTxRow" Title="@L.T("التاريخ")" SortBy="r => r.TxDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@ErpFormat.Date(context.Item.TxDate)</bdi></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="BankTxRow" TProperty="string" Property="r => r.TxTypeName" Title="@L.T("نوع الحركة")" />
+            <PropertyColumn T="BankTxRow" TProperty="string" Property="r => r.BankName" Title="@L.T("البنك")" />
+            <PropertyColumn T="BankTxRow" TProperty="string" Property="r => r.OtherName" Title="@L.T("الطرف الآخر")" />
+            <TemplateColumn T="BankTxRow" Title="@L.T("المبلغ")" SortBy="r => r.Amount" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.Amount" /></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="BankTxRow" TProperty="string" Property="r => r.Description" Title="@L.T("البيان")" />
+            <TemplateColumn T="BankTxRow" Title="" Sortable="false" CellClass="erp-actions-col no-print" HeaderClass="erp-actions-col no-print">
+                <CellTemplate>
+                    <MudTooltip Text="@L.T("حذف")">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" Size="Size.Small" Disabled="busy"
+                                       OnClick="() => Delete(context.Item)" aria-label="@L.T("حذف")" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+}
 
 @code {
+    /// <summary>A counter account of the choice list (LookupField needs a class).</summary>
+    private sealed record Account(int Code, string Name);
+
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", message = "", messageKind = "", txType = "DEPOSIT";
+    private bool allowed, loaded, busy, listBusy;
+    private string denied = "", message = "", txType = "DEPOSIT";
     private string? reference, description;
+    private Severity severity = Severity.Info;
     private int bankId, toBankId, boxId, counterAccount;
     private decimal amount, fee, feeVat;
-    private DateTime txDate = DateTime.Today, from = DateTime.Today.AddDays(1 - DateTime.Today.Day), to = DateTime.Today;
+    private DateTime? txDate = DateTime.Today;
+    private DateRange range = MonthToDate();
     private List<BankBalance> banks = [];
     private List<BankTxRow> rows = [];
-    private BankTxRow? toDelete;
     private List<(int Id, string Name)> bankChoices = [];
     private List<(int Id, string Name, decimal Balance)> boxes = [];
-    private List<(int Code, string Name)> accounts = [];
+    private List<Account> accounts = [];
+    private List<GridExport<BankBalance>> bankExport = [];
+    private List<GridExport<BankTxRow>> export = [];
+    private MudSelect<string>? typeField;
+
+    /// <summary>The period the list opened on, as before: the first of the month to today.</summary>
+    private static DateRange MonthToDate() => new(DateTime.Today.AddDays(1 - DateTime.Today.Day), DateTime.Today);
+
+    private Account? CounterAccount => accounts.FirstOrDefault(a => a.Code == counterAccount);
+
+    private string TypeText(string? t) => t is null ? "" : L.T(TreasuryService.BankTxTypeName(t));
+
+    private string BankText(int id) => bankChoices.FirstOrDefault(b => b.Id == id).Name ?? "";
+
+    private string ToBankText(int id) => id == 0 ? "" : BankText(id);
+
+    private string BoxText(int id) => boxes.FirstOrDefault(b => b.Id == id).Name ?? "";
+
+    private string BankRowClass(BankBalance b, int _) => (b.IsActive ? "" : "erp-row-inactive ") + (b.BankID == bankId ? "erp-row-selected" : "");
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmBankTx");
         allowed = denied.Length == 0;
+        loaded = true;
         if (!allowed)
         {
             return;
         }
+        bankExport =
+        [
+            new(L.T("البنك"), b => b.BankName),
+            new(L.T("رقم الحساب"), b => b.AccountNo),
+            new(L.T("الرصيد في الدفاتر"), b => b.Balance),
+            new(L.T("آخر حركة"), b => ErpFormat.Date(b.LastItemDate)),
+        ];
+        export =
+        [
+            new(L.T("الرقم"), r => r.TxNumber),
+            new(L.T("التاريخ"), r => ErpFormat.Date(r.TxDate)),
+            new(L.T("نوع الحركة"), r => r.TxTypeName),
+            new(L.T("البنك"), r => r.BankName),
+            new(L.T("الطرف الآخر"), r => r.OtherName),
+            new(L.T("المبلغ"), r => r.Amount),
+            new(L.T("البيان"), r => r.Description),
+        ];
         bankChoices = await Treasury.BanksAsync(L.English);
         boxes = await Treasury.BoxesAsync(L.English);
-        accounts = await Treasury.CounterAccountsAsync(L.English);
+        accounts = (await Treasury.CounterAccountsAsync(L.English)).Select(a => new Account(a.Code, a.Name)).ToList();
         boxId = await Treasury.UserBoxAsync(UserInfo.EmployeeId(user));
         await Load();
     }
 
     private async Task Load()
     {
-        banks = await Treasury.BankBalancesAsync(L.English);
-        rows = await Treasury.BankTxAsync(from, to, 0, L.English);
+        listBusy = true;
+        try
+        {
+            banks = await Treasury.BankBalancesAsync(L.English);
+            rows = await Treasury.BankTxAsync(range.Start ?? DateTime.Today, range.End ?? DateTime.Today, 0, L.English);
+        }
+        finally
+        {
+            listBusy = false;
+        }
+    }
+
+    private async Task Reset()
+    {
+        range = MonthToDate();
+        await Load();
+    }
+
+    private void Show(string text, Severity kind)
+    {
+        message = text;
+        severity = kind;
+    }
+
+    private async Task New()
+    {
+        amount = fee = feeVat = 0;
+        reference = description = null;
+        toBankId = counterAccount = 0;
+        txDate = DateTime.Today;
+        message = "";
+        if (typeField is not null)
+        {
+            await typeField.FocusAsync();
+        }
     }
 
     private async Task Save()
     {
+        if (busy)
+        {
+            return;
+        }
         message = "";
         busy = true;
         try
@@ -250,12 +358,10 @@
             var r = await Treasury.PostBankTxAsync(UserInfo.Acting(user), req);
             if (r.Status != SaveStatus.Saved)
             {
-                message = r.Message;
-                messageKind = "error";
+                Show(r.Message, Severity.Error);
                 return;
             }
-            message = r.Message.Length > 0 ? r.Message : WorkPages.BankTxSaved + r.Number;
-            messageKind = r.Message.Length > 0 ? "error" : "success";
+            Show(r.Message.Length > 0 ? r.Message : WorkPages.BankTxSaved + r.Number, r.Message.Length > 0 ? Severity.Warning : Severity.Success);
             amount = fee = feeVat = 0;
             reference = description = null;
             boxes = await Treasury.BoxesAsync(L.English);
@@ -267,25 +373,20 @@
         }
     }
 
-    private void Delete(BankTxRow r) => toDelete = r;
-
-    private async Task Answer(bool yes)
+    private async Task Delete(BankTxRow row)
     {
-        var row = toDelete;
-        toDelete = null;
-        if (!yes || row is null)
+        if (!await ConfirmDialog.AskAsync(Dialogs, L.T("حذف الحركة"), L.T("حذف الحركة") + " " + row.TxNumber + "؟", L.T("حذف")))
         {
             return;
         }
         var r = await Treasury.DeleteBankTxAsync(UserInfo.Acting(user), row.BankTxID);
-        message = r.Message;
-        messageKind = "error";
-        if (r.Status == SaveStatus.Saved)
+        if (r.Status != SaveStatus.Saved)
         {
-            message = r.Message.Length > 0 ? r.Message : WorkPages.BankTxDeleted + row.TxNumber;
-            messageKind = r.Message.Length > 0 ? "error" : "success";
-            boxes = await Treasury.BoxesAsync(L.English);
-            await Load();
+            Show(r.Message, Severity.Error);
+            return;
         }
+        Show(r.Message.Length > 0 ? r.Message : WorkPages.BankTxDeleted + row.TxNumber, r.Message.Length > 0 ? Severity.Warning : Severity.Success);
+        boxes = await Treasury.BoxesAsync(L.English);
+        await Load();
     }
 }
