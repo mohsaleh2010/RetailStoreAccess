@@ -37,11 +37,11 @@
 | 10 | `/sales/{Id}` | `Pages/Sales/InvoicePage.razor` | مبيعات | B (عرض/طباعة) | 107 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 1، تمت الموافقة) |
 | 11 | `/payments` | `Pages/Sales/PaymentsPage.razor` | مبيعات | B (سند) | 192 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 1، تمت الموافقة) |
 | 12 | `/sales-returns` | `Pages/Office/SalesReturnsPage.razor` | مبيعات | B | 228 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 1، تمت الموافقة) |
-| 13 | `/purchase` | `Pages/Purchases/PurchasePage.razor` | مشتريات | B | 347 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، بانتظار الموافقة) |
-| 14 | `/purchases` | `Pages/Purchases/PurchasesListPage.razor` | مشتريات | C (قائمة مستندات) | 102 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 2، بانتظار الموافقة) |
-| 15 | `/purchases/{Id}` | `Pages/Purchases/PurchaseViewPage.razor` | مشتريات | B (عرض/طباعة) | 110 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، بانتظار الموافقة) |
-| 16 | `/supplier-payments` | `Pages/Purchases/SupplierPaymentsPage.razor` | مشتريات | B (سند) | 193 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، بانتظار الموافقة) |
-| 17 | `/purchase-returns` | `Pages/Office/PurchaseReturnsPage.razor` | مشتريات | B | 254 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، بانتظار الموافقة) |
+| 13 | `/purchase` | `Pages/Purchases/PurchasePage.razor` | مشتريات | B | 347 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، تمت الموافقة) |
+| 14 | `/purchases` | `Pages/Purchases/PurchasesListPage.razor` | مشتريات | C (قائمة مستندات) | 102 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 2، تمت الموافقة) |
+| 15 | `/purchases/{Id}` | `Pages/Purchases/PurchaseViewPage.razor` | مشتريات | B (عرض/طباعة) | 110 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، تمت الموافقة) |
+| 16 | `/supplier-payments` | `Pages/Purchases/SupplierPaymentsPage.razor` | مشتريات | B (سند) | 193 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، تمت الموافقة) |
+| 17 | `/purchase-returns` | `Pages/Office/PurchaseReturnsPage.razor` | مشتريات | B | 254 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، تمت الموافقة) |
 | 18 | `/stock` | `Pages/Stock/StockPage.razor` | مخازن | C (رصيد + كارت صنف) | 177 | ⬜ |
 | 19 | `/transfers` | `Pages/Stock/TransfersPage.razor` | مخازن | B | 371 | ⬜ |
 | 20 | `/treasury` | `Pages/Treasury/TreasuryPage.razor` | حسابات (خزينة) | C (أرصدة + كشف صندوق) | 218 | ⬜ |
@@ -200,7 +200,7 @@
 
 **التالي:** الدفعة 2 (المشتريات: `/purchase`، `/purchases`، `/purchases/{Id}`، `/supplier-payments`، `/purchase-returns`): الخطة معروضة على صاحب المشروع، والتنفيذ بعد موافقته.
 
-## 11) المرحلة 6، الدفعة 2: المشتريات (✅ بانتظار الموافقة)
+## 11) المرحلة 6، الدفعة 2: المشتريات (✅ تمت الموافقة)
 خمس صفحات نُقلت بالمهارة `mudblazor-erp-ui` من المكونات المشتركة؛ لم يتغير أي منطق عمل (نفس الخدمات ووسائطها، ونفس ترتيب الحفظ ← السؤال ← الحفظ مرة أخرى، ونفس الرسائل وصلاحية نموذج Access لكل صفحة).
 
 | الصفحة | القالب | ما تغيّر |
@@ -217,4 +217,4 @@
 
 **التحقق:** `dotnet build` بلا تحذيرات جديدة، و122 xUnit ناجحة، و`test_web*.py` 91 (منها اختبار جديد لـ `ExtraColumn` في `test_web_components.py`، والصفحات الخمس تُفحص بقواعد المهارة في `test_web_rules.py`)؛ ولقطات الصفحات الخمس بالوضعين واللغتين و1440px / 768px بلا تمرير أفقي للصفحة، وتجربة من المتصفح: «اختر المورد.»، وإلغاء الضريبة (الإجمالي بلا ضريبة)، وحفظ فاتورة بسعر بيع جديد (تغيّر سعر الصنف)، وسؤال المبلغ الأكبر من المستحق، ورفض كمية مرتجعة أكبر من المتاح، وحفظ مرتجع. 3 نصوص جديدة في `i18n_web.py`.
 
-**التالي:** الدفعة 3 (المخازن: `/stock` و`/transfers`) بعد موافقة صاحب المشروع.
+**التالي:** الدفعة 3 (المخازن: `/stock` و`/transfers`): الخطة معروضة على صاحب المشروع، والتنفيذ بعد موافقته.
