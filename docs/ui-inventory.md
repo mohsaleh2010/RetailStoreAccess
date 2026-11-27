@@ -47,10 +47,10 @@
 | 20 | `/treasury` | `Pages/Treasury/TreasuryPage.razor` | حسابات (خزينة) | C (أرصدة + كشف صندوق) | 218 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 4أ، تمت الموافقة) |
 | 21 | `/cash-vouchers` | `Pages/Treasury/CashVouchersPage.razor` | حسابات (خزينة) | B (سند) | 210 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4أ، تمت الموافقة) |
 | 22 | `/cash-closing` | `Pages/Office/CashClosingPage.razor` | حسابات (خزينة) | B | 213 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4أ، تمت الموافقة) |
-| 23 | `/bank-transactions` | `Pages/Treasury/BankTxPage.razor` | حسابات (بنوك) | B | 291 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4ب، بانتظار الموافقة) |
-| 24 | `/bank-reconciliation` | `Pages/Office/BankReconPage.razor` | حسابات (بنوك) | B (خاصة) | 316 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4ب، بانتظار الموافقة) |
-| 25 | `/journal` | `Pages/Accounting/JournalPage.razor` | حسابات | C (قيود + سطورها) | 171 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 4ب، بانتظار الموافقة) |
-| 26 | `/manual-entries` | `Pages/Office/ManualEntriesPage.razor` | حسابات | B | 287 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4ب، بانتظار الموافقة) |
+| 23 | `/bank-transactions` | `Pages/Treasury/BankTxPage.razor` | حسابات (بنوك) | B | 291 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4ب، تمت الموافقة) |
+| 24 | `/bank-reconciliation` | `Pages/Office/BankReconPage.razor` | حسابات (بنوك) | B (خاصة) | 316 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4ب، تمت الموافقة) |
+| 25 | `/journal` | `Pages/Accounting/JournalPage.razor` | حسابات | C (قيود + سطورها) | 171 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 4ب، تمت الموافقة) |
+| 26 | `/manual-entries` | `Pages/Office/ManualEntriesPage.razor` | حسابات | B | 287 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4ب، تمت الموافقة) |
 | 27 | `/ledger` | `Pages/Accounting/LedgerPage.razor` | تقارير | C | 122 | ✅ معتمدة (القالب C) |
 | 28 | `/trial-balance` | `Pages/Accounting/TrialBalancePage.razor` | تقارير | C | 95 | ⬜ |
 | 29 | `/financials` | `Pages/Accounting/FinancialsPage.razor` | تقارير | C | 115 | ⬜ |
@@ -252,7 +252,7 @@
 
 **التالي:** الجزء 4ب (البنوك والقيود: `/bank-transactions`، `/bank-reconciliation`، `/journal`، `/manual-entries`) نُفّذ (القسم 14).
 
-## 14) المرحلة 6، الدفعة 4ب: البنوك والقيود (✅ بانتظار الموافقة)
+## 14) المرحلة 6، الدفعة 4ب: البنوك والقيود (✅ تمت الموافقة)
 بعد موافقة صاحب المشروع على 4أ نُقلت أربع صفحات بالمهارة `mudblazor-erp-ui` من المكونات المشتركة؛ لم يتغير أي منطق عمل (نفس خدمات `TreasuryService` و`BankReconService` و`AccountingService` و`ManualEntryService` ووسائطها، ونفس الرسائل وترتيب الحفظ، وصلاحية نموذج Access لكل صفحة).
 
 | الصفحة | القالب | ما تغيّر |
@@ -268,4 +268,4 @@
 
 **التحقق:** `dotnet build` بلا تحذيرات جديدة، و122 xUnit ناجحة، و`test_web*.py` 91 (الصفحات الأربع تُفحص بقواعد المهارة في `test_web_rules.py`)؛ ولقطات الصفحات الأربع بالوضعين واللغتين و1440px / 768px بلا تمرير أفقي للصفحة، وتجربة من المتصفح على قاعدة تطوير جديدة: حفظ بلا بنك («اختر البنك.»)، ووارد آخر وصادر آخر بضريبة مدخلات (`BNK-000001` و`BNK-000002`)، وتحديث القيود وعرض سطور قيد، وقيد يدوي متوازن (`MJ-000001` وقيد اليومية `JV-000003`)، وبدء تسوية بلا رصيد (رسالتها)، ومطابقة بلا اختيار (رسالتها)، ثم مطابقة العمليتين والفرق صفر، والاعتماد بـ F2 («تم اعتماد التسوية البنكية.»)، وإعادة الفتح بسؤالها. 7 نصوص جديدة في `i18n_web.py`.
 
-**التالي:** الدفعة 5 (التقارير: `/trial-balance`، `/financials`، `/reports`) بعد موافقة صاحب المشروع.
+**التالي:** الدفعة 5 (التقارير: `/trial-balance`، `/financials`، `/reports`): عُرضت خطتها على صاحب المشروع، والتنفيذ بعد موافقته.

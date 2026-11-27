@@ -376,4 +376,5 @@
 | الموافقة على المرحلة 6، الدفعة 3 (المخازن)؛ عرض خطة الدفعة 4 (الحسابات والخزينة: `/treasury` و`/cash-vouchers` و`/cash-closing` و`/bank-transactions` و`/bank-reconciliation` و`/journal` و`/manual-entries`) | ✅ |
 | الموافقة على خطة الدفعة 4 مقسومة جزئين؛ إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 4أ (الخزينة): `/treasury` (C) و`/cash-vouchers` (B سند) و`/cash-closing` (B) (`docs/ui-inventory.md` القسم 13) | ✅ تمت الموافقة |
 | الموافقة على المرحلة 6، الدفعة 4أ (الخزينة)؛ بدء الجزء 4ب (البنوك والقيود: `/bank-transactions` و`/bank-reconciliation` و`/journal` و`/manual-entries`) | ✅ |
-| إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 4ب (البنوك والقيود): `/bank-transactions` (B سند) و`/bank-reconciliation` (B) و`/journal` (C) و`/manual-entries` (B) (`docs/ui-inventory.md` القسم 14) | ✅ بانتظار الموافقة |
+| إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 4ب (البنوك والقيود): `/bank-transactions` (B سند) و`/bank-reconciliation` (B) و`/journal` (C) و`/manual-entries` (B) (`docs/ui-inventory.md` القسم 14) | ✅ تمت الموافقة |
+| الموافقة على المرحلة 6، الدفعة 4ب (البنوك والقيود)؛ عرض خطة الدفعة 5 (التقارير: `/trial-balance` و`/financials` و`/reports`) | ✅ |
