@@ -2,94 +2,162 @@
 @attribute [Authorize]
 @inject AccountingService Accounting
 @inject PermissionService Permissions
+@inject IJSRuntime JS
 @inject UiLanguage L
 
-<PageTitle>@L.T("ميزان المراجعة")</PageTitle>
-
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("ميزان المراجعة")</h1>
-            <p class="subtitle">@L.T("رصيد أول المدة وحركة الفترة والرصيد الختامي لكل حساب")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
-    {
-        <div class="message error" role="alert">@L.T(denied)</div>
-    }
-    else
-    {
-        <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
-            <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-            <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-            <button type="submit" class="btn">@L.T("عرض")</button>
-        </form>
-        <table class="list">
-            <thead>
-                <tr>
-                    <th>@L.T("الحساب")</th>
-                    <th>@L.T("رصيد أول المدة")</th>
-                    <th>@L.T("مدين")</th>
-                    <th>@L.T("دائن")</th>
-                    <th>@L.T("الرصيد الختامي")</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var r in rows)
-                {
-                    <tr>
-                        <td data-label="@L.T("الحساب")"><a href="ledger?account=@r.AccountCode">@r.AccountCode @r.AccountName</a></td>
-                        <td data-label="@L.T("رصيد أول المدة")">@L.T(AccountingService.BalanceText(r.OpeningBalance))</td>
-                        <td data-label="@L.T("مدين")">@WorkPages.Money(r.PeriodDebit)</td>
-                        <td data-label="@L.T("دائن")">@WorkPages.Money(r.PeriodCredit)</td>
-                        <td data-label="@L.T("الرصيد الختامي")">@L.T(AccountingService.BalanceText(r.ClosingBalance))</td>
-                    </tr>
-                }
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th>@L.T("الإجمالي")</th>
-                    <th></th>
-                    <th>@WorkPages.Money(rows.Sum(r => r.PeriodDebit))</th>
-                    <th>@WorkPages.Money(rows.Sum(r => r.PeriodCredit))</th>
-                    <th>@L.T(AccountingService.BalanceText(rows.Sum(r => r.ClosingBalance)))</th>
-                </tr>
-            </tfoot>
-        </table>
-        @if (rows.Count == 0)
+@* Template C of the redesign (docs/ui-inventory.md section 8), as /ledger: PageHeader (print) -> FilterPanel (the period,
+   from the first of the year as Access) -> four figures (accounts, debit, credit, closing) -> EntityGrid of the accounts
+   (the account opens its statement, the totals in the footer, CSV). The rows are AccountingService.TrialBalanceAsync
+   (TrialBalanceQuery) with the period checks of frmLedger (PeriodProblem). No pager: Ctrl+P prints every account. *@
+<PageHeader Title="@L.T("ميزان المراجعة")" Description="@L.T("رصيد أول المدة وحركة الفترة والرصيد الختامي لكل حساب")"
+            Icon="@NavGroups.IconOf("trial-balance")" Group="@L.T("الحسابات")">
+    <Actions>
+        @if (allowed)
         {
-            <p class="empty">@L.T("لا توجد سجلات")</p>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">
+                @L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd>
+            </MudButton>
         }
+    </Actions>
+</PageHeader>
+<KeyboardShortcuts OnPrint="Print" />
+
+@if (!allowed)
+{
+    @if (loaded)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
+}
+else
+{
+    <FilterPanel Range="range" RangeChanged="r => range = r" OnShow="Load" OnClear="Reset" Busy="busy" Class="no-print" />
 
     @if (message.Length > 0)
     {
-        <div class="message error" role="status">@L.T(message)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4" role="alert">@L.T(message)</MudAlert>
     }
-</section>
+    else
+    {
+        <MudText Typo="Typo.subtitle1" Class="mb-3 erp-print-title">
+            @L.T("ميزان المراجعة")
+            <span class="mud-text-secondary erp-num" dir="ltr">(@ErpFormat.Date(range.Start) - @ErpFormat.Date(range.End))</span>
+        </MudText>
+        <MudGrid Spacing="3" Class="mb-4">
+            <MudItem xs="6" lg="3">
+                <StatCard Title="@L.T("عدد الحسابات")" Value="@rows.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                          Icon="@Icons.Material.Outlined.AccountTree" Color="Color.Info" />
+            </MudItem>
+            <MudItem xs="6" lg="3">
+                <StatCard Title="@L.T("مدين")" Icon="@Icons.Material.Outlined.SouthWest" Color="Color.Primary">
+                    <ValueContent><MoneyText Value="debit" ColorNegative="false" /></ValueContent>
+                </StatCard>
+            </MudItem>
+            <MudItem xs="6" lg="3">
+                <StatCard Title="@L.T("دائن")" Icon="@Icons.Material.Outlined.NorthEast" Color="Color.Secondary">
+                    <ValueContent><MoneyText Value="credit" ColorNegative="false" /></ValueContent>
+                </StatCard>
+            </MudItem>
+            <MudItem xs="6" lg="3">
+                <StatCard Title="@L.T("الرصيد الختامي")" Value="@L.T(AccountingService.BalanceText(closing))"
+                          Icon="@Icons.Material.Outlined.Balance" Color="Color.Tertiary" />
+            </MudItem>
+        </MudGrid>
+        <EntityGrid T="TrialBalanceRow" Items="rows" Title="@L.T("الحسابات")" Export="export" ExportName="@L.T("ميزان المراجعة")"
+                    SearchText="@(r => r.AccountCode.ToString(System.Globalization.CultureInfo.InvariantCulture) + ' ' + r.AccountName)"
+                    Loading="busy" ShowPager="false" RowsPerPage="100000" Filterable="false" EmptyText="@L.T("لا توجد سجلات")"
+                    Class="erp-wide-grid">
+            <Columns>
+                <TemplateColumn T="TrialBalanceRow" Title="@L.T("الحساب")" SortBy="r => r.AccountCode">
+                    <CellTemplate>
+                        <MudLink Href="@("ledger?account=" + context.Item.AccountCode.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                            <bdi class="erp-num">@context.Item.AccountCode</bdi> @context.Item.AccountName
+                        </MudLink>
+                    </CellTemplate>
+                    <FooterTemplate><strong>@L.T("الإجمالي")</strong></FooterTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="TrialBalanceRow" Title="@L.T("رصيد أول المدة")" SortBy="r => r.OpeningBalance" HeaderClass="erp-num" CellClass="erp-num">
+                    <CellTemplate><bdi class="erp-money">@L.T(AccountingService.BalanceText(context.Item.OpeningBalance))</bdi></CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="TrialBalanceRow" Title="@L.T("مدين")" SortBy="r => r.PeriodDebit" HeaderClass="erp-num" CellClass="erp-num"
+                                FooterClass="erp-num">
+                    <CellTemplate><MoneyText Value="context.Item.PeriodDebit" ColorNegative="false" /></CellTemplate>
+                    <FooterTemplate><MoneyText Value="debit" Bold="true" ColorNegative="false" /></FooterTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="TrialBalanceRow" Title="@L.T("دائن")" SortBy="r => r.PeriodCredit" HeaderClass="erp-num" CellClass="erp-num"
+                                FooterClass="erp-num">
+                    <CellTemplate><MoneyText Value="context.Item.PeriodCredit" ColorNegative="false" /></CellTemplate>
+                    <FooterTemplate><MoneyText Value="credit" Bold="true" ColorNegative="false" /></FooterTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="TrialBalanceRow" Title="@L.T("الرصيد الختامي")" SortBy="r => r.ClosingBalance" HeaderClass="erp-num"
+                                CellClass="erp-num" FooterClass="erp-num">
+                    <CellTemplate><bdi class="erp-money">@L.T(AccountingService.BalanceText(context.Item.ClosingBalance))</bdi></CellTemplate>
+                    <FooterTemplate><strong><bdi class="erp-money">@L.T(AccountingService.BalanceText(closing))</bdi></strong></FooterTemplate>
+                </TemplateColumn>
+            </Columns>
+        </EntityGrid>
+    }
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
-    private bool allowed;
+    private bool allowed, loaded, busy;
     private string denied = "", message = "";
-    private DateTime from = new(DateTime.Today.Year, 1, 1), to = DateTime.Today;
+    private DateRange range = DefaultRange();
     private List<TrialBalanceRow> rows = [];
+    private decimal debit, credit, closing;
+    private List<GridExport<TrialBalanceRow>> export = [];
+
+    /// <summary>The period of the page: from the first of the year to today.</summary>
+    private static DateRange DefaultRange() => new(new DateTime(DateTime.Today.Year, 1, 1), DateTime.Today);
 
     protected override async Task OnInitializedAsync()
     {
         var user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmLedger");
         allowed = denied.Length == 0;
+        loaded = true;
         if (allowed)
         {
+            export =
+            [
+                new(L.T("الحساب"), r => r.AccountCode),
+                new(L.T("اسم الحساب"), r => r.AccountName),
+                new(L.T("رصيد أول المدة"), r => r.OpeningBalance),
+                new(L.T("مدين"), r => r.PeriodDebit),
+                new(L.T("دائن"), r => r.PeriodCredit),
+                new(L.T("الرصيد الختامي"), r => r.ClosingBalance),
+            ];
             await Load();
         }
     }
 
+    private async Task Reset()
+    {
+        range = DefaultRange();
+        await Load();
+    }
+
     private async Task Load()
     {
-        message = AccountingService.PeriodProblem(from, to);
-        rows = message.Length == 0 ? await Accounting.TrialBalanceAsync(from, to, L.English) : [];
+        message = AccountingService.PeriodProblem(range.Start, range.End);
+        rows = [];
+        if (message.Length == 0)
+        {
+            busy = true;
+            try
+            {
+                rows = await Accounting.TrialBalanceAsync(range.Start!.Value, range.End!.Value, L.English);
+            }
+            finally
+            {
+                busy = false;
+            }
+        }
+        debit = rows.Sum(r => r.PeriodDebit);
+        credit = rows.Sum(r => r.PeriodCredit);
+        closing = rows.Sum(r => r.ClosingBalance);
     }
+
+    private async Task Print() => await JS.InvokeVoidAsync("print");
 }

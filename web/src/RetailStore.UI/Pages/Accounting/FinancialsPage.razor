@@ -2,114 +2,184 @@
 @attribute [Authorize]
 @inject AccountingService Accounting
 @inject PermissionService Permissions
+@inject IJSRuntime JS
 @inject UiLanguage L
 
-<PageTitle>@L.T("القوائم المالية")</PageTitle>
-
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("القوائم المالية")</h1>
-            <p class="subtitle">@L.T("قائمة الدخل والميزانية من القيود، مع فترة المقارنة")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
-    {
-        <div class="message error" role="alert">@L.T(denied)</div>
-    }
-    else
-    {
-        <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
-            <select aria-label="@L.T("القائمة")" @bind="kind" @bind:after="Load">
-                <option value="INCOME">@L.T("قائمة الدخل")</option>
-                <option value="BALANCE">@L.T("الميزانية")</option>
-            </select>
-            <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-            <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-            <button type="submit" class="btn">@L.T("عرض")</button>
-        </form>
-
+@* Template C of the redesign (docs/ui-inventory.md section 8): PageHeader (print) -> FilterPanel (the period and the
+   statement, the statement shows at once as before) -> the figures of frmFinancials -> the comparison period -> EntityGrid
+   of the rows in their printed order (no sorting, no pager; an account opens its statement; totals and results bold).
+   The statement is AccountingService.IncomeStatementAsync / BalanceSheetAsync with the period checks (PeriodProblem). *@
+<PageHeader Title="@L.T("القوائم المالية")" Description="@L.T("قائمة الدخل والميزانية من القيود، مع فترة المقارنة")"
+            Icon="@NavGroups.IconOf("financials")" Group="@L.T("الحسابات")">
+    <Actions>
         @if (view is not null)
         {
-            <div class="tiles">
-                @foreach (var f in view.Figures)
-                {
-                    <div class="tile">
-                        <span>@f.Caption</span>
-                        <strong class="@(f.Amount < 0 ? "negative" : "")">@WorkPages.Money(f.Amount)</strong>
-                    </div>
-                }
-            </div>
-            <p class="hint">@L.T("المقارنة"): @L.T("من") <bdi>@view.CompareFrom.ToString("yyyy-MM-dd")</bdi> @L.T("إلى") <bdi>@view.CompareTo.ToString("yyyy-MM-dd")</bdi></p>
-            <table class="list statement">
-                <thead>
-                    <tr>
-                        <th>@L.T("البند")</th>
-                        <th>@L.T("الفترة: الحساب")</th>
-                        <th>@L.T("الفترة: المجموع")</th>
-                        <th>@L.T("المقارنة: الحساب")</th>
-                        <th>@L.T("المقارنة: المجموع")</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var r in view.Rows)
-                    {
-                        bool account = r.RowKind == "A";
-                        bool sum = r.RowKind is "S" or "T" or "R";
-                        <tr class="row-@r.RowKind.ToLowerInvariant()">
-                            <td data-label="@L.T("البند")">
-                                @if (r.LineAccount is { } code)
-                                {
-                                    <a href="ledger?account=@(code)">@r.Caption</a>
-                                }
-                                else
-                                {
-                                    @(r.RowKind == "S" ? L.T("إجمالي") + " " + r.Caption : r.Caption)
-                                }
-                            </td>
-                            <td data-label="@L.T("الفترة: الحساب")">@(account ? WorkPages.Money(r.CurrentValue ?? 0) : "")</td>
-                            <td data-label="@L.T("الفترة: المجموع")">@(sum ? WorkPages.Money(r.CurrentValue ?? 0) : "")</td>
-                            <td data-label="@L.T("المقارنة: الحساب")">@(account ? WorkPages.Money(r.PriorValue ?? 0) : "")</td>
-                            <td data-label="@L.T("المقارنة: المجموع")">@(sum ? WorkPages.Money(r.PriorValue ?? 0) : "")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">
+                @L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd>
+            </MudButton>
         }
+    </Actions>
+</PageHeader>
+<KeyboardShortcuts OnPrint="Print" />
+
+@if (!allowed)
+{
+    @if (loaded)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
+}
+else
+{
+    <FilterPanel Range="range" RangeChanged="r => range = r" OnShow="Load" OnClear="Reset" Busy="busy" Class="no-print">
+        <MudItem xs="12" sm="6" md="4">
+            <MudSelect T="string" Label="@L.T("القائمة")" Value="kind" ValueChanged="KindChanged" Variant="Variant.Outlined"
+                       Margin="Margin.Dense" AnchorOrigin="Origin.BottomCenter">
+                <MudSelectItem T="string" Value="@("INCOME")">@L.T("قائمة الدخل")</MudSelectItem>
+                <MudSelectItem T="string" Value="@("BALANCE")">@L.T("الميزانية")</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+    </FilterPanel>
 
     @if (message.Length > 0)
     {
-        <div class="message error" role="status">@L.T(message)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4" role="alert">@L.T(message)</MudAlert>
     }
-</section>
+
+    @if (view is null)
+    {
+        @if (message.Length == 0)
+        {
+            <EmptyState Icon="@Icons.Material.Outlined.QueryStats" Title="@L.T("القوائم المالية")"
+                        Text="@L.T("قائمة الدخل والميزانية من القيود، مع فترة المقارنة")" />
+        }
+    }
+    else
+    {
+        <MudText Typo="Typo.subtitle1" Class="mb-3 erp-print-title">
+            @(kind == "BALANCE" ? L.T("الميزانية") : L.T("قائمة الدخل"))
+            <span class="mud-text-secondary erp-num" dir="ltr">(@ErpFormat.Date(view.From) - @ErpFormat.Date(view.To))</span>
+        </MudText>
+        <MudGrid Spacing="3" Class="mb-4">
+            @for (int i = 0; i < view.Figures.Count; i++)
+            {
+                var f = view.Figures[i];
+                string icon = FigureIcons[i % FigureIcons.Length];          // copied: the loop variable is read after the loop
+                Color color = FigureColors[i % FigureColors.Length];
+                <MudItem xs="12" sm="6" lg="4">
+                    <StatCard Title="@f.Caption" Icon="@icon" Color="@color">
+                        <ValueContent><MoneyText Value="f.Amount" /></ValueContent>
+                    </StatCard>
+                </MudItem>
+            }
+        </MudGrid>
+        <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Text" Class="mb-3">
+            @L.T("المقارنة"): @L.T("من") <bdi class="erp-num">@ErpFormat.Date(view.CompareFrom)</bdi>
+            @L.T("إلى") <bdi class="erp-num">@ErpFormat.Date(view.CompareTo)</bdi>
+        </MudAlert>
+        <EntityGrid T="StatementRow" Items="view.Rows" Title="@(kind == "BALANCE" ? L.T("الميزانية") : L.T("قائمة الدخل"))"
+                    Export="export" ExportName="@(kind == "BALANCE" ? L.T("الميزانية") : L.T("قائمة الدخل"))"
+                    ShowPager="false" RowsPerPage="100000" Filterable="false" ShowCount="false"
+                    RowClass="@((r, _) => "erp-statement-" + r.RowKind.ToLowerInvariant())" Class="erp-wide-grid erp-statement">
+            <Columns>
+                <TemplateColumn T="StatementRow" Title="@L.T("البند")" Sortable="false">
+                    <CellTemplate>
+                        @if (context.Item.LineAccount is { } code)
+                        {
+                            <MudLink Href="@("ledger?account=" + code.ToString(System.Globalization.CultureInfo.InvariantCulture))">@context.Item.Caption</MudLink>
+                        }
+                        else
+                        {
+                            @(context.Item.RowKind == "S" ? L.T("إجمالي") + " " + context.Item.Caption : context.Item.Caption)
+                        }
+                    </CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="StatementRow" Title="@L.T("الفترة: الحساب")" Sortable="false" HeaderClass="erp-num" CellClass="erp-num">
+                    <CellTemplate>@if (IsAccount(context.Item)) { <MoneyText Value="context.Item.CurrentValue ?? 0" /> }</CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="StatementRow" Title="@L.T("الفترة: المجموع")" Sortable="false" HeaderClass="erp-num" CellClass="erp-num">
+                    <CellTemplate>@if (IsSum(context.Item)) { <MoneyText Value="context.Item.CurrentValue ?? 0" Bold="true" /> }</CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="StatementRow" Title="@L.T("المقارنة: الحساب")" Sortable="false" HeaderClass="erp-num" CellClass="erp-num">
+                    <CellTemplate>@if (IsAccount(context.Item)) { <MoneyText Value="context.Item.PriorValue ?? 0" /> }</CellTemplate>
+                </TemplateColumn>
+                <TemplateColumn T="StatementRow" Title="@L.T("المقارنة: المجموع")" Sortable="false" HeaderClass="erp-num" CellClass="erp-num">
+                    <CellTemplate>@if (IsSum(context.Item)) { <MoneyText Value="context.Item.PriorValue ?? 0" Bold="true" /> }</CellTemplate>
+                </TemplateColumn>
+            </Columns>
+        </EntityGrid>
+    }
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
-    private bool allowed;
+    private bool allowed, loaded, busy;
     private string denied = "", message = "", kind = "INCOME";
-    private DateTime from = new(DateTime.Today.Year, 1, 1), to = DateTime.Today;
+    private DateRange range = DefaultRange();
     private StatementView? view;
+    private List<GridExport<StatementRow>> export = [];
+
+    private static readonly string[] FigureIcons =
+        [Icons.Material.Outlined.TrendingUp, Icons.Material.Outlined.TrendingDown, Icons.Material.Outlined.Savings];
+    private static readonly Color[] FigureColors = [Color.Primary, Color.Secondary, Color.Tertiary];
+
+    /// <summary>The period of the page: from the first of the year to today.</summary>
+    private static DateRange DefaultRange() => new(new DateTime(DateTime.Today.Year, 1, 1), DateTime.Today);
+
+    private static bool IsAccount(StatementRow r) => r.RowKind == "A";
+
+    private static bool IsSum(StatementRow r) => r.RowKind is "S" or "T" or "R";
 
     protected override async Task OnInitializedAsync()
     {
         var user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmFinancials");
         allowed = denied.Length == 0;
+        loaded = true;
         if (allowed)
         {
+            export =
+            [
+                new(L.T("البند"), r => r.RowKind == "S" ? L.T("إجمالي") + " " + r.Caption : r.Caption),
+                new(L.T("الفترة: الحساب"), r => IsAccount(r) ? r.CurrentValue ?? 0 : null),
+                new(L.T("الفترة: المجموع"), r => IsSum(r) ? r.CurrentValue ?? 0 : null),
+                new(L.T("المقارنة: الحساب"), r => IsAccount(r) ? r.PriorValue ?? 0 : null),
+                new(L.T("المقارنة: المجموع"), r => IsSum(r) ? r.PriorValue ?? 0 : null),
+            ];
             await Load();
         }
     }
 
+    private async Task KindChanged(string value)
+    {
+        kind = value;
+        await Load();
+    }
+
+    private async Task Reset()
+    {
+        range = DefaultRange();
+        await Load();
+    }
+
     private async Task Load()
     {
-        message = AccountingService.PeriodProblem(from, to);
+        message = AccountingService.PeriodProblem(range.Start, range.End);
         view = null;
         if (message.Length == 0)
         {
-            view = kind == "BALANCE" ? await Accounting.BalanceSheetAsync(from, to, L.English) : await Accounting.IncomeStatementAsync(from, to, L.English);
+            busy = true;
+            try
+            {
+                DateTime from = range.Start!.Value, to = range.End!.Value;
+                view = kind == "BALANCE" ? await Accounting.BalanceSheetAsync(from, to, L.English) : await Accounting.IncomeStatementAsync(from, to, L.English);
+            }
+            finally
+            {
+                busy = false;
+            }
         }
     }
+
+    private async Task Print() => await JS.InvokeVoidAsync("print");
 }

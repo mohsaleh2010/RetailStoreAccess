@@ -904,6 +904,33 @@ REPORTS: List[ReportEntry] = [
     ReportEntry("INTEGRITY", "فحص سلامة البيانات", "IntegrityCheckQuery", "rptIntegrityCheck"),
 ]
 
+# The groups of the report centre on the web (the owner's decision, phase 6 batch 5 of the web redesign): every report of
+# REPORTS in exactly one group; inside a group the reports keep the order of REPORTS (frmReportCenter). Access is unchanged.
+REPORT_GROUPS: List[Tuple[str, List[str]]] = [
+    ("المبيعات", ["STATISTICS", "DAILY_SALES", "MONTHLY_SALES", "SALES_PERIOD", "SALES_PRODUCT", "BEST_SELLING",
+                  "LEAST_SELLING", "PENDING_ORDERS", "QUOTATIONS", "PRICE_LISTS", "CUSTOMER_STATEMENT",
+                  "CUSTOMER_BALANCES"]),
+    ("المشتريات", ["PURCHASES", "PURCHASE_SUGGEST", "PENDING_PURCHASE_ORDERS", "SUPPLIER_STATEMENT",
+                   "SUPPLIER_BALANCES", "SUPPLIER_FX"]),
+    ("المخزون", ["STOCK", "STOCK_WAREHOUSE", "STOCK_VALUE_WAREHOUSE", "TRANSFERS_IN_TRANSIT", "NOTES_NOT_INVOICED",
+                 "RESERVED_STOCK", "STOCK_COUNT_DIFF", "LOW_STOCK", "ITEM_CARD", "PRODUCT_MOVEMENT", "SLOW_MOVING",
+                 "STOCK_BY_CATEGORY"]),
+    ("المندوبون", ["REP_DAYS", "ROUTE_EXECUTION", "REP_VISITS", "REP_VAN_STOCK", "REP_PERFORMANCE", "REP_CUSTOMERS",
+                   "REP_COMMISSION_BALANCE"]),
+    ("الخزينة والمصروفات", ["EXPENSES", "EXPENSES_BY_TYPE", "CASH_STATEMENT", "CASH_DAILY", "CASH_DAYBOOK",
+                            "CASH_BALANCES", "CASH_CLOSINGS"]),
+    ("الحسابات", ["PROFIT", "JOURNAL", "TRIAL_BALANCE", "TRIAL_BALANCE_TREE", "ACCOUNT_TREE", "GENERAL_LEDGER",
+                  "INCOME_STATEMENT", "BALANCE_SHEET", "OPENING_BALANCES", "COST_CENTER_PROFIT", "COST_CENTER_ACCOUNTS",
+                  "BUDGET_VS_ACTUAL", "FIXED_ASSETS"]),
+    ("الضريبة والفاتورة الإلكترونية", ["VAT_SUMMARY", "EINVOICE_DOCS"]),
+    ("الرقابة", ["AUDIT_TRAIL", "INTEGRITY"]),
+]
+
+
+def report_group_of(key: str) -> str:
+    """The group of a report of REPORTS (REPORT_GROUPS)."""
+    return next(g for g, keys in REPORT_GROUPS if key in keys)
+
 
 # --------------------------------------------------------------------------
 # Layout

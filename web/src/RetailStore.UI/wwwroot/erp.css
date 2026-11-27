@@ -245,3 +245,25 @@ dt.erp-summary-grand { color: var(--mud-palette-text-primary); font-weight: 700;
 .erp-manual-text { min-width: 120px; }
 .erp-manual-center { width: 140px; min-width: 128px; }
 .erp-manual-lines .erp-actions-col { width: 48px; }
+
+/* batch 5: reports */
+.erp-wide-grid .mud-table-container { overflow-x: auto; contain: paint; }
+.erp-wide-grid .mud-table-cell { white-space: nowrap; }
+.erp-grid.erp-wide-grid .mud-table-head .mud-table-cell { white-space: normal; min-width: 72px; }
+.erp-report-groups .mud-chip { margin-inline-end: 4px; }
+.erp-chip-count { margin-inline-start: 4px; opacity: .7; }
+.erp-quick-periods { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.erp-report-card .erp-info-list { gap: 8px 32px; }
+.erp-report-card dd { margin: 0; text-align: end; }
+.erp-statement .mud-table-cell { white-space: normal; }
+.mud-table .mud-table-row.erp-statement-a .mud-table-cell:first-child { padding-inline-start: 32px; }
+.mud-table .mud-table-row.erp-statement-h .mud-table-cell,
+.mud-table .mud-table-row.erp-statement-c .mud-table-cell { font-weight: 700; background: var(--mud-palette-background-gray); }
+.mud-table .mud-table-row.erp-statement-g .mud-table-cell { font-weight: 600; }
+.mud-table .mud-table-row.erp-statement-s .mud-table-cell { font-weight: 600; border-block-start: 1px solid var(--mud-palette-lines-default); }
+.mud-table .mud-table-row.erp-statement-t .mud-table-cell,
+.mud-table .mud-table-row.erp-statement-r .mud-table-cell { font-weight: 700; background: var(--mud-palette-primary-hover); }
+@media print {
+    .erp-wide-grid .mud-table-container { overflow: visible; contain: none; }
+    .erp-wide-grid .mud-table-cell { white-space: normal; }
+}

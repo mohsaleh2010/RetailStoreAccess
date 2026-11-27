@@ -378,3 +378,4 @@
 | الموافقة على المرحلة 6، الدفعة 4أ (الخزينة)؛ بدء الجزء 4ب (البنوك والقيود: `/bank-transactions` و`/bank-reconciliation` و`/journal` و`/manual-entries`) | ✅ |
 | إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 4ب (البنوك والقيود): `/bank-transactions` (B سند) و`/bank-reconciliation` (B) و`/journal` (C) و`/manual-entries` (B) (`docs/ui-inventory.md` القسم 14) | ✅ تمت الموافقة |
 | الموافقة على المرحلة 6، الدفعة 4ب (البنوك والقيود)؛ عرض خطة الدفعة 5 (التقارير: `/trial-balance` و`/financials` و`/reports`) | ✅ |
+| إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 5 (التقارير): `/trial-balance` (C) و`/financials` (C) و`/reports` (C، بمجموعات `forms.REPORT_GROUPS` بقرار صاحب المشروع) (`docs/ui-inventory.md` القسم 15) | ✅ بانتظار الموافقة |

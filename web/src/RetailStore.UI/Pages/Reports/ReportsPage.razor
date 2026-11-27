@@ -3,234 +3,334 @@
 @using RetailStore.Data.Reports
 @inject ReportService Reports
 @inject PermissionService Permissions
+@inject IJSRuntime JS
 @inject UiLanguage L
 
-<PageTitle>@L.T("مركز التقارير")</PageTitle>
-
-<section class="screen">
-    <header class="screen-head no-print">
-        <div>
-            <h1>@L.T("مركز التقارير")</h1>
-            <p class="subtitle">@L.T("تقارير البرنامج كلها من استعلاماته: المبيعات والمخزون والخزينة والحسابات")</p>
-        </div>
-        @if (result is { Ok: true } && result.Report is { Link.Length: 0 })
+@* Template C of the redesign (docs/ui-inventory.md section 8), the report centre (frmReportCenter): PageHeader (print, CSV)
+   -> the report: its group (ReportCatalog.Groups, forms.REPORT_GROUPS) and the report searched by its name -> FilterPanel
+   with the period (only for a dated report, with the quick periods) and the choices the report asks for (Needs) -> the
+   message / warning of the run -> the report: a link page, its empty text, a card, or an EntityGrid of its columns
+   (ReportService.CellText with the running sums, TotalText in the footer) and its summary figures. The run is
+   ReportService.RunAsync (modScreens.PrepareReport); the CSV is ReportService.Csv. No pager: Ctrl+P prints every row. *@
+<PageHeader Title="@L.T("مركز التقارير")" Description="@L.T("تقارير البرنامج كلها من استعلاماته: المبيعات والمخزون والخزينة والحسابات")"
+            Icon="@NavGroups.IconOf("reports")" Group="@L.T("التقارير")">
+    <Actions>
+        @if (Printable)
         {
-            <div class="actions">
-                <button class="btn" onclick="window.print()">@L.T("طباعة")</button>
-                <a class="btn" href="@CsvLink()" download="@(result.Report.Key + ".csv")">@L.T("تصدير إلى Excel")</a>
-            </div>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.FileDownload" Href="@CsvLink()"
+                       download="@(result!.Report!.Key + ".csv")">@L.T("تصدير إلى Excel")</MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">
+                @L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd>
+            </MudButton>
         }
-    </header>
+    </Actions>
+</PageHeader>
+<KeyboardShortcuts OnPrint="Print" />
 
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
+    }
+}
+else
+{
+    <MudPaper Outlined="true" Class="pa-3 mb-4 no-print">
+        <MudChipSet T="string" SelectedValue="group" SelectedValueChanged="GroupChanged" SelectionMode="SelectionMode.SingleSelection"
+                    CheckMark="false" Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Class="mb-3 erp-report-groups">
+            <MudChip T="string" Value="@AllGroups">@L.T("كل التقارير")</MudChip>
+            @foreach (var g in ReportCatalog.Groups)
+            {
+                <MudChip T="string" Value="@g.Group">@L.T(g.Group)<span class="erp-chip-count"><bdi class="erp-num">(@g.Keys.Length)</bdi></span></MudChip>
+            }
+        </MudChipSet>
+        <MudGrid Spacing="3">
+            <MudItem xs="12" md="8">
+                <LookupField T="ReportPick" Label="@L.T("التقرير")" Items="Picks" Value="Pick" ValueChanged="PickChanged"
+                             NameOf="p => p.Title" Placeholder="@L.T("اختر تقريرًا من القائمة")" MaxItems="80" AutoFocus="@(current is null)"
+                             HelperText="@L.T(ReportService.NeedsHint(current))">
+                    <InfoTemplate Context="p">
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Text">@p.Group</MudChip>
+                    </InfoTemplate>
+                </LookupField>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+
+    @if (current is null)
+    {
+        <EmptyState Icon="@Icons.Material.Outlined.Summarize" Title="@L.T("اختر تقريرًا من القائمة")"
+                    Text="@L.T("تقارير البرنامج كلها من استعلاماته: المبيعات والمخزون والخزينة والحسابات")" />
     }
     else
     {
-        <form class="report-choices no-print" @onsubmit="Run" @onsubmit:preventDefault>
-            <div class="field span-2">
-                <label for="report">@L.T("التقرير")</label>
-                <select id="report" @bind="key" @bind:after="Selected">
-                    <option value="">@L.T("اختر تقريرًا من القائمة")</option>
-                    @foreach (var r in ReportCatalog.All)
-                    {
-                        <option value="@r.Key">@L.T(r.Title)</option>
-                    }
-                </select>
-                <span class="hint">@L.T(ReportService.NeedsHint(current))</span>
-            </div>
-            @if (current?.Dated == true)
+        <FilterPanel Range="range" RangeChanged="r => range = r" ShowDates="current.Dated" OnShow="Run" OnClear="Clear" Busy="busy"
+                     ShowText="@L.T("عرض التقرير")" Class="no-print">
+            @if (current.Dated)
             {
-                <div class="field"><label for="from">@L.T("من")</label><input id="from" type="date" @bind="from" /></div>
-                <div class="field"><label for="to">@L.T("إلى")</label><input id="to" type="date" @bind="to" /></div>
-                <div class="field span-2 quick">
-                    <button type="button" class="btn" @onclick="@(() => Quick("TODAY"))">@L.T("اليوم")</button>
-                    <button type="button" class="btn" @onclick="@(() => Quick("MONTH"))">@L.T("هذا الشهر")</button>
-                    <button type="button" class="btn" @onclick="@(() => Quick("LASTMONTH"))">@L.T("الشهر الماضي")</button>
-                    <button type="button" class="btn" @onclick="@(() => Quick("YEAR"))">@L.T("هذه السنة")</button>
-                </div>
+                <MudItem xs="12" sm="6" md="4" Class="erp-quick-periods">
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => Quick("TODAY"))">@L.T("اليوم")</MudButton>
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => Quick("MONTH"))">@L.T("هذا الشهر")</MudButton>
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => Quick("LASTMONTH"))">@L.T("الشهر الماضي")</MudButton>
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" OnClick="@(() => Quick("YEAR"))">@L.T("هذه السنة")</MudButton>
+                </MudItem>
             }
-            @if (lists is { } x && current is { } sel)
+            @if (current.Has('C') || current.Has('c'))
             {
-                @if (sel.Has('C') || sel.Has('c'))
-                {
-                    <div class="field"><label for="customer">@L.T("العميل")</label>
-                        <select id="customer" @bind="customerId"><option value="">@(sel.Has('C') ? L.T("اختر العميل") : L.T("الكل"))</option>
-                            @foreach (var o in x.Customers) { <option value="@o.Id">@o.Name</option> }</select></div>
-                }
-                @if (sel.Has('S') || sel.Has('s'))
-                {
-                    <div class="field"><label for="supplier">@L.T("المورد")</label>
-                        <select id="supplier" @bind="supplierId"><option value="">@(sel.Has('S') ? L.T("اختر المورد") : L.T("الكل"))</option>
-                            @foreach (var o in x.Suppliers) { <option value="@o.Id">@o.Name</option> }</select></div>
-                }
-                @if (sel.Has('R') || sel.Has('r'))
-                {
-                    <div class="field"><label for="product">@L.T("المنتج")</label>
-                        <select id="product" @bind="productId"><option value="">@(sel.Has('R') ? L.T("اختر المنتج") : L.T("الكل"))</option>
-                            @foreach (var o in x.Products) { <option value="@o.Id">@o.Name</option> }</select></div>
-                }
-                @if (sel.Has('W') || sel.Has('w'))
-                {
-                    <div class="field"><label for="warehouse">@L.T("المخزن")</label>
-                        <select id="warehouse" @bind="warehouseId"><option value="">@L.T("كل المخازن")</option>
-                            @foreach (var o in x.Warehouses) { <option value="@o.Id">@o.Name</option> }</select></div>
-                }
-                @if (sel.Has('b'))
-                {
-                    <div class="field"><label for="box">@L.T("الصندوق")</label>
-                        <select id="box" @bind="cashBoxId"><option value="">@L.T("كل الصناديق")</option>
-                            @foreach (var o in x.CashBoxes) { <option value="@o.Id">@o.Name</option> }</select></div>
-                }
-                @if (sel.Has('e'))
-                {
-                    <div class="field"><label for="etype">@L.T("نوع المصروف")</label>
-                        <select id="etype" @bind="expenseTypeId"><option value="">@L.T("الكل")</option>
-                            @foreach (var o in x.ExpenseTypes) { <option value="@o.Id">@o.Name</option> }</select></div>
-                }
+                <MudItem xs="12" sm="6" md="4">
+                    <LookupField T="Opt" Label="@L.T("العميل")" Items="customers" Value="Find(customers, customerId)"
+                                 ValueChanged="o => customerId = o?.Id" NameOf="o => o.Name" MaxItems="40"
+                                 Placeholder="@(current.Has('C') ? L.T("اختر العميل") : L.T("الكل"))" />
+                </MudItem>
             }
-            <div class="span-2">
-                <button type="submit" class="btn primary" disabled="@(current is null || busy)">@L.T("عرض التقرير")</button>
-            </div>
-        </form>
+            @if (current.Has('S') || current.Has('s'))
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <LookupField T="Opt" Label="@L.T("المورد")" Items="suppliers" Value="Find(suppliers, supplierId)"
+                                 ValueChanged="o => supplierId = o?.Id" NameOf="o => o.Name" MaxItems="40"
+                                 Placeholder="@(current.Has('S') ? L.T("اختر المورد") : L.T("الكل"))" />
+                </MudItem>
+            }
+            @if (current.Has('R') || current.Has('r'))
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <LookupField T="Opt" Label="@L.T("المنتج")" Items="products" Value="Find(products, productId)"
+                                 ValueChanged="o => productId = o?.Id" NameOf="o => o.Name" MaxItems="40"
+                                 Placeholder="@(current.Has('R') ? L.T("اختر المنتج") : L.T("الكل"))" />
+                </MudItem>
+            }
+            @if (current.Has('W') || current.Has('w'))
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudSelect T="int?" Label="@L.T("المخزن")" @bind-Value="warehouseId" Variant="Variant.Outlined" Margin="Margin.Dense"
+                               AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem T="int?" Value="null">@L.T("كل المخازن")</MudSelectItem>
+                        @foreach (var o in warehouses)
+                        {
+                            <MudSelectItem T="int?" Value="o.Id">@o.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            @if (current.Has('b'))
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudSelect T="int?" Label="@L.T("الصندوق")" @bind-Value="cashBoxId" Variant="Variant.Outlined" Margin="Margin.Dense"
+                               AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem T="int?" Value="null">@L.T("كل الصناديق")</MudSelectItem>
+                        @foreach (var o in cashBoxes)
+                        {
+                            <MudSelectItem T="int?" Value="o.Id">@o.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+            @if (current.Has('e'))
+            {
+                <MudItem xs="12" sm="6" md="4">
+                    <MudSelect T="int?" Label="@L.T("نوع المصروف")" @bind-Value="expenseTypeId" Variant="Variant.Outlined" Margin="Margin.Dense"
+                               AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem T="int?" Value="null">@L.T("الكل")</MudSelectItem>
+                        @foreach (var o in expenseTypes)
+                        {
+                            <MudSelectItem T="int?" Value="o.Id">@o.Name</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+            }
+        </FilterPanel>
 
         @if (message.Length > 0)
         {
-            <div class="message error" role="alert">@L.T(message)</div>
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4" role="alert">@L.T(message)</MudAlert>
         }
+
         @if (result is { Ok: true, Report: { } rep })
         {
             @if (result.Warning.Length > 0)
             {
-                <div class="message error" role="status">@L.T(result.Warning)</div>
+                <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4 no-print" role="status">@L.T(result.Warning)</MudAlert>
             }
-            <article class="report">
-                <h2>@L.T(rep.Title)</h2>
+            <div class="mb-3">
+                <MudText Typo="Typo.h6" Class="erp-print-title">@L.T(rep.Title)</MudText>
                 @if (result.Criteria.Length > 0)
                 {
-                    <p class="subtitle">@L.T(result.Criteria)</p>
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">@L.T(result.Criteria)</MudText>
                 }
-                @if (rep.Link.Length > 0)
+            </div>
+            @if (rep.Link.Length > 0)
+            {
+                <EmptyState Icon="@Icons.Material.Outlined.QueryStats" Title="@L.T("القوائم المالية")"
+                            Text="@L.T("يُعرض هذا التقرير في صفحة القوائم المالية مع فترة المقارنة.")"
+                            ActionText="@L.T("القوائم المالية")" ActionIcon="@Icons.Material.Outlined.OpenInNew" ActionHref="@rep.Link" />
+            }
+            else if (result.Rows.Count == 0)
+            {
+                <EmptyState Icon="@Icons.Material.Outlined.SearchOff" Title="@L.T(rep.NoData)" />
+            }
+            else if (rep.Card.Count > 0)
+            {
+                <MudPaper Outlined="true" Class="pa-4 mb-4 erp-report-card">
+                    <dl class="erp-info-list">
+                        @foreach (var cr in rep.Card)
+                        {
+                            <dt class="@(cr.Bold ? "erp-bold" : "mud-text-secondary")">@L.T(cr.Caption)</dt>
+                            <dd class="@("erp-num " + (cr.Bold ? "erp-bold" : ""))"><bdi>@ReportRow.Cell(cr.Value(result.Rows[0]), cr.Format)</bdi></dd>
+                        }
+                    </dl>
+                </MudPaper>
+                @if (rep.Note.Length > 0)
                 {
-                    <p>@L.T("يُعرض هذا التقرير في صفحة القوائم المالية مع فترة المقارنة.")</p>
-                    <a class="btn primary" href="@rep.Link">@L.T("القوائم المالية")</a>
+                    <MudAlert Severity="Severity.Info" Dense="true" Variant="Variant.Text" Class="mb-4">@L.T(rep.Note)</MudAlert>
                 }
-                else if (result.Rows.Count == 0)
-                {
-                    <p class="empty">@L.T(rep.NoData)</p>
-                }
-                else if (rep.Card.Count > 0)
-                {
-                    <table class="list card-report">
-                        <tbody>
-                            @foreach (var cr in rep.Card)
-                            {
-                                <tr class="@(cr.Bold ? "bold" : "")">
-                                    <th>@L.T(cr.Caption)</th>
-                                    <td class="num">@ReportRow.Cell(cr.Value(result.Rows[0]), cr.Format)</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    @if (rep.Note.Length > 0)
-                    {
-                        <p class="hint">@L.T(rep.Note)</p>
-                    }
-                }
-                else
-                {
-                    <div class="table-wrap">
-                        <table class="list report-table">
-                            <thead>
-                                <tr>
-                                    @foreach (var c in rep.Columns)
+            }
+            else
+            {
+                bool sortable = rep.Columns.All(c => !c.Running);
+                <EntityGrid T="ReportLine" Items="lines" Title="@L.T(rep.Title)" SearchText="SearchOf" ShowPager="false" RowsPerPage="100000"
+                            Filterable="false" Class="erp-wide-grid mb-4">
+                    <Columns>
+                        @for (int col = 0; col < rep.Columns.Count; col++)
+                        {
+                            int c = col;
+                            var column = rep.Columns[c];
+                            bool number = column.Format.Length > 0;
+                            <TemplateColumn T="ReportLine" Title="@L.T(column.Caption)" Sortable="sortable" SortBy="@(SortOf(c))"
+                                            HeaderClass="@(number ? "erp-num" : "")" CellClass="@(number ? "erp-num" : "")"
+                                            FooterClass="@(number ? "erp-num" : "")">
+                                <CellTemplate>
+                                    @{ string text = ReportService.CellText(rep, result.Rows, running!, context.Item.Index, c); }
+                                    @if (number)
                                     {
-                                        <th class="@(c.Format.Length > 0 ? "num" : "")">@L.T(c.Caption)</th>
+                                        <bdi class="@(text.StartsWith('-') ? "erp-money mud-error-text" : "erp-money")">@text</bdi>
                                     }
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (int i = 0; i < result.Rows.Count; i++)
-                                {
-                                    int row = i;
-                                    <tr>
-                                        @for (int col = 0; col < rep.Columns.Count; col++)
-                                        {
-                                            var c = rep.Columns[col];
-                                            <td data-label="@L.T(c.Caption)" class="@(c.Format.Length > 0 ? "num" : "")">@ReportService.CellText(rep, result.Rows, running!, row, col)</td>
-                                        }
-                                    </tr>
-                                }
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    @for (int col = 0; col < rep.Columns.Count; col++)
+                                    else
                                     {
-                                        var c = rep.Columns[col];
-                                        <th class="num">@(c.Total ? ReportService.TotalText(rep, result.Rows, col) : col == 0 ? L.T("الإجمالي") + " (" + result.Rows.Count + ")" : "")</th>
+                                        @text
                                     }
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                    @if (rep.Summary.Count > 0)
-                    {
-                        <table class="list summary">
-                            <tbody>
-                                @foreach (var sm in rep.Summary)
-                                {
-                                    <tr><th>@L.T(sm.Caption)</th><td class="num">@ReportRow.Cell(sm.Value(result.Rows), "money")</td></tr>
-                                }
-                            </tbody>
-                        </table>
-                    }
+                                </CellTemplate>
+                                <FooterTemplate>
+                                    @if (column.Total)
+                                    {
+                                        <strong><bdi class="erp-money">@ReportService.TotalText(rep, result.Rows, c)</bdi></strong>
+                                    }
+                                    else if (c == 0)
+                                    {
+                                        <strong>@L.T("الإجمالي") (<bdi class="erp-num">@result.Rows.Count</bdi>)</strong>
+                                    }
+                                </FooterTemplate>
+                            </TemplateColumn>
+                        }
+                    </Columns>
+                </EntityGrid>
+                @if (rep.Summary.Count > 0)
+                {
+                    <MudGrid Spacing="3" Class="mb-4">
+                        @foreach (var sm in rep.Summary)
+                        {
+                            <MudItem xs="12" sm="6" lg="3">
+                                <StatCard Title="@L.T(sm.Caption)" Icon="@Icons.Material.Outlined.Functions" Color="Color.Primary">
+                                    <ValueContent><MoneyText Value="sm.Value(result.Rows)" /></ValueContent>
+                                </StatCard>
+                            </MudItem>
+                        }
+                    </MudGrid>
                 }
-            </article>
+            }
         }
     }
-</section>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     [SupplyParameterFromQuery(Name = "report")] public string? ReportParam { get; set; }
     [SupplyParameterFromQuery(Name = "product")] public int? ProductParam { get; set; }
+
+    /// <summary>A report in the picker: its title and group in the language of the page.</summary>
+    private sealed record ReportPick(ReportDef Def, string Title, string Group);
+
+    /// <summary>A choice of a combo box of the report centre (ReportLists).</summary>
+    private sealed record Opt(int Id, string Name);
+
+    /// <summary>A record of the report, by its place in ReportResult.Rows (the running sums are kept by place).</summary>
+    private sealed record ReportLine(int Index);
+
+    private const string AllGroups = "*";
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", message = "", key = "";
+    private bool allowed, loaded, busy;
+    private string denied = "", message = "", key = "", group = AllGroups;
     private ReportDef? current;
-    private ReportLists? lists;
+    private List<ReportPick> picks = [];
+    private List<Opt> customers = [], suppliers = [], products = [], warehouses = [], cashBoxes = [], expenseTypes = [];
     private ReportResult? result;
+    private List<ReportLine> lines = [];
     private decimal?[,]? running;
-    private DateTime from = new(DateTime.Today.Year, DateTime.Today.Month, 1), to = DateTime.Today;
+    private DateRange range = MonthRange();
     private int? customerId, supplierId, productId, warehouseId, cashBoxId, expenseTypeId;
+
+    private IEnumerable<ReportPick> Picks => group == AllGroups ? picks : picks.Where(p => GroupOf(p.Def.Key) == group);
+
+    private ReportPick? Pick => picks.FirstOrDefault(p => p.Def.Key == key);
+
+    private bool Printable => result is { Ok: true, Report: { Link.Length: 0 } } && result.Rows.Count > 0;
+
+    private static DateRange MonthRange() => new(new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1), DateTime.Today);
+
+    private static string GroupOf(string reportKey) => ReportCatalog.Groups.First(g => g.Keys.Contains(reportKey)).Group;
+
+    private static Opt? Find(List<Opt> list, int? id) => id is null ? null : list.FirstOrDefault(o => o.Id == id);
+
+    private static List<Opt> Opts(List<(int Id, string Name)> list) => list.Select(o => new Opt(o.Id, o.Name)).ToList();
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmReportCenter");
         allowed = denied.Length == 0;
+        loaded = true;
         if (!allowed)
         {
             return;
         }
-        lists = await Reports.ListsAsync(L.English);
-        if (ReportCatalog.Find(ReportParam) is { } r)          // a report chosen by the caller ("KEY|ProductID" in Access)
+        picks = ReportCatalog.All.Select(r => new ReportPick(r, L.T(r.Title), L.T(GroupOf(r.Key)))).ToList();
+        var chosen = ReportCatalog.Find(ReportParam);          // a report chosen by the caller ("KEY|ProductID" in Access)
+        if (chosen is not null)
         {
-            key = r.Key;
+            key = chosen.Key;                                  // before the first await: the picker takes the focus only without one
             Selected();
-            if (ProductParam is > 0)
-            {
-                productId = ProductParam;
-                from = (await Reports.FiscalPeriodOfAsync(DateTime.Today)).Start;   // a card covers the year so far
-            }
         }
+        var lists = await Reports.ListsAsync(L.English);
+        (customers, suppliers, products) = (Opts(lists.Customers), Opts(lists.Suppliers), Opts(lists.Products));
+        (warehouses, cashBoxes, expenseTypes) = (Opts(lists.Warehouses), Opts(lists.CashBoxes), Opts(lists.ExpenseTypes));
+        if (chosen is not null && ProductParam is > 0)
+        {
+            productId = ProductParam;
+            range = new((await Reports.FiscalPeriodOfAsync(DateTime.Today)).Start, DateTime.Today);   // a card covers the year so far
+        }
+    }
+
+    private void GroupChanged(string? value)
+    {
+        group = value ?? AllGroups;
+        if (current is not null && group != AllGroups && GroupOf(current.Key) != group)
+        {
+            key = "";
+            Selected();
+        }
+    }
+
+    private void PickChanged(ReportPick? p)
+    {
+        key = p?.Def.Key ?? "";
+        Selected();
     }
 
     private void Selected()
     {
         current = ReportCatalog.Find(key);
         result = null;
+        lines = [];
         message = "";
     }
 
@@ -240,20 +340,28 @@
         switch (which)
         {
             case "TODAY":
-                (from, to) = (d, d);
+                range = new(d, d);
                 break;
             case "MONTH":
-                (from, to) = (new DateTime(d.Year, d.Month, 1), d);
+                range = new(new DateTime(d.Year, d.Month, 1), d);
                 break;
             case "LASTMONTH":
                 var first = new DateTime(d.Year, d.Month, 1);
-                (from, to) = (first.AddMonths(-1), first.AddDays(-1));
+                range = new(first.AddMonths(-1), first.AddDays(-1));
                 break;
             default:
-                from = (await Reports.FiscalPeriodOfAsync(d)).Start;
-                to = d;
+                range = new((await Reports.FiscalPeriodOfAsync(d)).Start, d);
                 break;
         }
+    }
+
+    private void Clear()
+    {
+        range = MonthRange();
+        (customerId, supplierId, productId, warehouseId, cashBoxId, expenseTypeId) = (null, null, null, null, null, null);
+        result = null;
+        lines = [];
+        message = "";
     }
 
     private async Task Run()
@@ -261,16 +369,36 @@
         busy = true;
         try
         {
-            result = await Reports.RunAsync(UserInfo.Acting(user), key, new ReportChoices(from, to, customerId, supplierId, productId, warehouseId,
-                                                                                         cashBoxId, expenseTypeId), L.English);
+            result = await Reports.RunAsync(UserInfo.Acting(user), key, new ReportChoices(range.Start, range.End, customerId, supplierId, productId,
+                                                                                         warehouseId, cashBoxId, expenseTypeId), L.English);
             message = result.Message;
             running = result.Report is { } r && result.Ok ? ReportService.Running(r, result.Rows) : null;
+            lines = result.Ok ? Enumerable.Range(0, result.Rows.Count).Select(i => new ReportLine(i)).ToList() : [];
         }
         finally
         {
             busy = false;
         }
     }
+
+    /// <summary>The text the quick search looks in: every cell of the record as shown.</summary>
+    private string SearchOf(ReportLine line) =>
+        result?.Report is { } r && running is not null
+            ? string.Join(' ', Enumerable.Range(0, r.Columns.Count).Select(c => ReportService.CellText(r, result.Rows, running, line.Index, c)))
+            : "";
+
+    /// <summary>A column sorts by its value: a number for a formatted column, else its text.</summary>
+    private Func<ReportLine, object> SortOf(int col) => line =>
+    {
+        if (result?.Report is not { } r)
+        {
+            return "";
+        }
+        object? v = r.Columns[col].Value(result.Rows[line.Index]);
+        return r.Columns[col].Format.Length > 0 ? ReportRow.ToNumber(v) : v?.ToString() ?? "";
+    };
+
+    private async Task Print() => await JS.InvokeVoidAsync("print");
 
     /// <summary>The report as a CSV file for Excel (UTF-8 with its BOM), in the language of the page.</summary>
     private string CsvLink() =>

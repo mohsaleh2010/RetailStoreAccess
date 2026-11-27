@@ -299,7 +299,7 @@ def specs():
 
 def report_strings() -> List[str]:
     lists, cards = specs()
-    out = []
+    out = [g for g, _ in F.REPORT_GROUPS]
     for r in F.REPORTS:
         out.append(r.title)
         if r.key in lists:
@@ -345,6 +345,13 @@ def _report(r: F.ReportEntry, lists, cards) -> str:
 def build_reports() -> str:
     lists, cards = specs()
     body = ",\n".join(_report(r, lists, cards) for r in F.REPORTS)
+    order = [r.key for r in F.REPORTS]
+    grouped = sorted(k for _, keys in F.REPORT_GROUPS for k in keys)
+    if grouped != sorted(order):
+        raise ValueError("forms.REPORT_GROUPS must hold every report of forms.REPORTS once")
+    groups = ",\n".join(
+        f"        ({cs_str(g)}, [" + ", ".join(cs_str(k) for k in order if k in keys) + "])"
+        for g, keys in F.REPORT_GROUPS)
     return f"""{HEADER}#nullable enable
 namespace RetailStore.Data.Reports;
 
@@ -355,6 +362,12 @@ public static partial class ReportCatalog
     public static readonly IReadOnlyList<ReportDef> All =
     [
 {body}
+    ];
+
+    /// <summary>The groups of the report centre on the web (forms.REPORT_GROUPS): each report in one group, in the order of All.</summary>
+    public static readonly IReadOnlyList<(string Group, string[] Keys)> Groups =
+    [
+{groups}
     ];
 }}
 """

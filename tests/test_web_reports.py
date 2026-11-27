@@ -44,6 +44,17 @@ class CatalogueTests(unittest.TestCase):
         for r in F.REPORTS:
             self.assertIn(f'new("{r.key}", ', text)
 
+    def test_every_report_is_in_one_group(self):
+        """The report centre of the web shows the reports by group (forms.REPORT_GROUPS, phase 6 batch 5)."""
+        keys = [k for _, ks in F.REPORT_GROUPS for k in ks]
+        self.assertEqual(sorted(keys), sorted(r.key for r in F.REPORTS))
+        self.assertEqual(len(keys), len(set(keys)))
+        text = read("web/src/RetailStore.Data/Generated/Reports.g.cs")
+        for g, _ in F.REPORT_GROUPS:
+            self.assertIn(f'("{g}", [', text)
+        page = read("web/src/RetailStore.UI/Pages/Reports/ReportsPage.razor")
+        self.assertIn("ReportCatalog.Groups", page)
+
     def test_the_expressions_become_csharp(self):
         self.assertEqual(G.column_lambda("ProductName"), 'r => r.Value("ProductName")')
         self.assertEqual(G.column_lambda("=GDate([EntryDate],True)"), 'r => (object)ReportRow.GDate(r.Value("EntryDate"), true)')
