@@ -64,14 +64,14 @@
 
 | # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
 |---|---|---|---|---|---|---|
-| P1 | `/login` | `Pages/LoginPage.razor` | دخول | D | 49 | ⬜ |
+| P1 | `/login` | `Pages/LoginPage.razor` | دخول | D | 49 | ✅ بانتظار الموافقة |
 | P2 | `/` | `Pages/SalePage.razor` | مبيعات | B | 287 | ⬜ |
 | P3 | `/sales` | `Pages/SalesPage.razor` | مبيعات | C | 63 | ⬜ |
 | P4 | `/return` | `Pages/ReturnPage.razor` | مبيعات | B | 223 | ⬜ |
 | P5 | `/payment` | `Pages/PaymentPage.razor` | مبيعات | B (سند) | 134 | ⬜ |
 | P6 | `/closing` | `Pages/ClosingPage.razor` | خزينة | B | 241 | ⬜ |
-| P7 | `/settings` | `Pages/SettingsPage.razor` | إعدادات | D | 73 | ⬜ |
-| P8 | `/database` | `Pages/DatabasePage.razor` | إعدادات | D | 113 | ⬜ |
+| P7 | `/settings` | `Pages/SettingsPage.razor` | إعدادات | D | 73 | ✅ بانتظار الموافقة |
+| P8 | `/database` | `Pages/DatabasePage.razor` | إعدادات | D | 113 | ✅ بانتظار الموافقة |
 
 ## 4) جرد الصفحات — تطبيق المندوب (`RetailStore.RepApp`، MAUI Android)
 
@@ -321,7 +321,7 @@
 | الدفعة | المحتوى | القالب |
 |---|---|---|
 | **7أ الأساس** (✅ تمت الموافقة، القسم 18) | مكتبة Razor جديدة `RetailStore.UI.Kit` (MudBlazor + `RetailStore.Domain` فقط): الثيم `ErpTheme`، والمكونات المشتركة الاثنا عشر و`ErpFormat` / `StatusStyles` / `InvoiceLine`، و`UiLanguage` و`UiCurrency` (بواجهة عملة لا تعرف القاعدة) و`ShortcutService` و`ErpMudLocalizer`، والأساس من `erp.css` / `erp.js`؛ تُنقل كما هي بنفس الـ namespaces، و`RetailStore.UI` يعتمد عليها فلا تتغير صفحة ويب. خط Cairo يُضمَّن ملفًا داخل المكتبة (نقطة البيع تعمل بلا إنترنت). ربط `PosSession` / `RepSession` بـ `UiLanguage` (اللغة من إعدادات الجهاز كما هي). مضيف تجريبي للتطوير فقط `RetailStore.AppPreview` (Blazor Server، منصات وهمية، غير مُسلَّم) لتشغيل صفحات التطبيقين في المتصفح للّقطات والاختبار. وفي `RetailStore.Pos` / `RetailStore.App`: `AddMudServices` وروابط `index.html` (تُبنى على جهاز صاحب المشروع) | — |
-| **7ب نقطة البيع: الإطار والإعدادات** | `PosLayout` (شريط علوي `MudAppBar`: اسم المحل، التنقل، المستخدم، متصل / بلا اتصال، إرسال وتحديث بعدد المعلّق)، P1 `/login`، P7 `/settings`، P8 `/database` | D |
+| **7ب نقطة البيع: الإطار والإعدادات** (✅ بانتظار الموافقة، القسم 19) | `PosLayout` (شريط علوي `MudAppBar`: اسم المحل، التنقل، المستخدم، متصل / بلا اتصال، إرسال وتحديث بعدد المعلّق)، P1 `/login`، P7 `/settings`، P8 `/database` | D |
 | **7ج نقطة البيع: البيع** | P2 `/` (الماسح أولًا، الكميات من `PosCart`، الدفع والطباعة والدرج)، P3 `/sales` (فواتير الجهاز وحالتها PENDING / SENT / REJECTED) | B، C |
 | **7د نقطة البيع: المستندات** | P4 `/return`، P5 `/payment`، P6 `/closing` | B |
 | **7هـ المندوب: الإطار والإعدادات** | `RepLayout` (شريط علوي + تنقل سفلي `MudNavMenu` للهاتف، عرض 360px)، R1 `/login`، R2 `/` (لوحة اليوم)، R9 `/settings`، R10 `/password` | D |
@@ -345,3 +345,19 @@
 | `RetailStore.AppPreview` (جديد، للتطوير فقط) | Blazor Server بمنصات الاختبار (`BasicPosPlatform` / `BasicPlatform`) وخدمات برنامجي MAUI نفسها: `dotnet run` = نقطة البيع على http://localhost:5150، و`dotnet run --launch-profile rep` = المندوب على http://localhost:5151 (ملف الجهاز في `App_Data` الخاص به). `IsPublishable=false`، وليس في `RetailStore.Windows.slnx` ولا `RetailStore.Mobile.slnx` ولا `deploy_web.py`؛ هو في `RetailStore.slnx` فيُبنى ويُفحص مع الويب |
 | الاختبارات | `tests/test_web_kit.py` (12): المكتبة لا تعتمد إلا على Domain ولا يذكر ملف فيها `RetailStore.Data`، والملفات نُقلت لا نُسخت، والخط داخلها بلا Google Fonts، والتطبيقان لا يعتمدان على `RetailStore.UI` والمندوب لا يعتمد على Data، وترتيب الروابط والخدمات، والمضيف التجريبي لا يُسلَّم. `KitTests.cs` (4 xUnit): مراجع التجميعات، وخدمات المكتبة في نقطة البيع والمندوب، و`UiCurrency.Use`. اختبارات `test_web_components` / `test_web_pilots` / `test_web_rules` تقرأ الملفات المنقولة من المكتبة |
 | اللقطات | من `RetailStore.AppPreview`: نقطة البيع 1366px (أول تشغيل: إعدادات القاعدة) والمندوب 360px (الدخول) بشكلهما القديم وCSS التطبيق، وMudBlazor و`erp.js` محمّلان وخط Cairo محمّل من المكتبة؛ وصفحة دخول الويب بخط Cairo المحلي. شكل الصفحات يتغير من الدفعة 7ب |
+
+## 19) المرحلة 7، الدفعة 7ب: نقطة البيع، الإطار والدخول والإعدادات (✅ بانتظار الموافقة)
+نُقل إطار نقطة البيع وصفحاتها الثلاث بالمهارة `mudblazor-erp-ui` على القالب D، باستثناءات شاشات اللمس المعتمدة في القسم 17. لم يتغير أي منطق: نفس `PosSession.LoginAsync` و`SetPrinter` و`SetLanguage` و`TestConnectionAsync` / `SaveConnectionAsync` و`Logout`، ونفس الرسائل والتحويلات (أول تشغيل ← `/database`، بلا دخول ← `/login`) ونفس الإرسال كل دقيقة.
+
+| الصفحة | ما تغيّر |
+|---|---|
+| `PosLayout` | `MudRTLProvider` + `MudThemeProvider` بثيم `ErpTheme`، داخل غلاف `dir` / `lang` بلغة الجلسة (صفحة `index.html` ثابتة على `rtl`)؛ شريط علوي `MudAppBar` بلا قائمة جانبية: اسم المحل، ثم شاشات المستخدم أزرارًا كبيرة بأيقونة (نفس شروط الظهور: المرتجع والقبض والتصفية من اللقطة، وإعدادات القاعدة للمدير)، والكاشير، و«متصل / بلا اتصال» `MudChip` أخضر / برتقالي، و«إرسال وتحديث» بشارة عدد المعلّق `MudBadge`، والوضع الليلي واللغة. من 1366px تظهر عناوين الشاشات، وتحتها الأيقونات وحدها والعنوان في التلميح؛ «إعدادات قاعدة البيانات» أيقونة دائمًا، واسم الكاشير يختفي تحت 1600px (موجود في الإعدادات). الفواتير المرفوضة `MudAlert` خطأ برابط `/sales`، ورسالة آخر إرسال `MudAlert` تحذير |
+| P1 `/login` | بطاقة في الوسط (عرضها 480px) كدخول الويب: `PageHeader` ← الاتصال ورمز الجهاز ← رسالة الخدمة `MudAlert` ← اسم المستخدم (تركيز تلقائي) وكلمة المرور (Enter يدخل) ← «دخول» كبير بعرض البطاقة ← ملاحظة الدخول بلا اتصال `MudAlert` معلومة؛ وزر اللغة تحت البطاقة |
+| P7 `/settings` | `PageHeader` بزر «خروج» `Color.Error` ← بطاقتان: «هذا الجهاز» (المستخدم والمخزن والجهاز والقاعدة وآخر تحديث، الرموز `<bdi dir="ltr">`، ثم زر اللغة ومفتاح الوضع الليلي) و«طابعة الإيصالات» (`MudSelect` للطابعة وعرض الورق، `MudCheckBox` للدرج، «حفظ» F2) ← ملاحظة الخروج |
+| P8 `/database` | `PageHeader` ← لغير المدير `MudAlert` خطأ كما كان ← ملاحظة أول تشغيل ← `MudRadioGroup` محلية / خادم بعيد ← الحقول في `MudGrid` (النوع، ملف التجربة أو الخادم والقاعدة وحساب Windows والمستخدم وكلمة المرور والوثوق بالشهادة، أو عنوان الخادم)، والعناوين والأسماء تُكتب من اليسار ← رمز الجهاز وشرحه `HelperText` ← الرسالة نجاح / خطأ (رسالة الخدمة بـ `L.T` فتظهر بالإنجليزية في الواجهة الإنجليزية، وكانت تظهر بالعربية) ← «حفظ» F2 و«اختبار الاتصال»، و`MudProgressLinear` أثناء الانتظار |
+
+**الوضع الليلي في إعدادات الجهاز (الاستثناء المعتمد):** `PosSession.Dark` / `SetDark` يحفظان `Theme` في `pos.db` (لا كوكي في برنامج Windows)؛ الإضافة الوحيدة خارج الصفحات، ولا تمس البيع ولا الإرسال.
+
+**الصفحات الباقية (7ج و7د) بشكلها القديم داخل `pos-legacy`:** قواعد `posapp.css` العامة (`html`، `body`، `button`، `input`، `label`، `select`) كانت ستكسر حقول MudBlazor وأزراره، فصارت كلها تحت `.pos-legacy` الذي يضعه `PosLayout` حول صفحات `/` و`/sales` و`/return` و`/payment` و`/closing` فقط، وألوانها `--pos-*` تُقرأ من متغيرات الثيم فتُقرأ في الوضع الليلي أيضًا؛ تُحذف مع نقل آخر صفحة. لا لون ثابت في الملف.
+
+**التحقق:** `dotnet build` بلا تحذيرات جديدة؛ 128 xUnit ناجحة؛ كل اختبارات Python (1681): ناجحة و14 متخطّاة، بعد تعديل اختبار نصّي في `test_scale.py` كان يبحث عن `href="return"` في `PosLayout` وصارت الشاشات صفوفًا `yield return new("return", ...)` بنفس الشروط (تعديل مقصود)؛ `test_web_rules.py` يفحص صفحات نقطة البيع المعلَّمة ✅ بقواعد المهارة مع استثناء اللمس (`Margin.Normal` بدل `Dense`)، والإطار (`MudRTLProvider`، `IsDarkMode="@S.Dark"`، `MudAppBar`)، وأن `posapp.css` بلا قاعدة عامة خارج `.pos-legacy` وبلا لون ثابت؛ ولقطات من `RetailStore.AppPreview` على ملف تجربة SQLite: الصفحات الثلاث وصفحة البيع القديمة داخل الإطار الجديد، فاتح / داكن، عربي / إنجليزي، 1366px / 1024px، بلا تمرير أفقي.

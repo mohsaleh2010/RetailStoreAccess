@@ -1,49 +1,90 @@
 @page "/settings"
 @inject PosSession S
+@inject UiLanguage L
 @inject NavigationManager Nav
 
-<section class="pos-card">
-    <h2>@S.T("الإعدادات")</h2>
-    <dl class="pos-facts">
-        <dt>@S.T("المستخدم")</dt><dd>@S.User?.EmployeeName (@S.User?.Username)</dd>
-        <dt>@S.T("المخزن")</dt><dd>@S.Snapshot?.User.WarehouseName</dd>
-        <dt>@S.T("الجهاز")</dt><dd>@S.Platform.DeviceName</dd>
-        <dt>@S.T("قاعدة البيانات")</dt><dd dir="ltr">@S.Connection?.Describe()</dd>
-        <dt>@S.T("آخر تحديث للأسعار والأرصدة")</dt><dd dir="ltr">@S.SnapshotAt?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</dd>
-    </dl>
-    <button class="pos-link" @onclick="() => S.SetLanguage(!S.English)">@(S.English ? "العربية" : "English")</button>
-</section>
+@* The settings of the PC (template D): what this PC works with, the receipt printer (PosSession.SetPrinter, F2), the
+   language and the dark mode of the PC, and the logout. *@
+<PageHeader Title="@L.T("الإعدادات")" Icon="@Icons.Material.Outlined.Settings">
+    <Actions>
+        <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Large" StartIcon="@Icons.Material.Outlined.Logout"
+                   OnClick="Logout">@L.T("خروج")</MudButton>
+    </Actions>
+</PageHeader>
+<KeyboardShortcuts OnSave="Save" />
 
-<section class="pos-card">
-    <h2>@S.T("طابعة الإيصالات")</h2>
-    <label>@S.T("الطابعة")
-        <select @bind="printer">
-            <option value="">-</option>
-            @foreach (var p in printers)
-            {
-                <option value="@p">@p</option>
-            }
-        </select>
-    </label>
-    <label>@S.T("عرض الورق")
-        <select @bind="paper">
-            <option value="58">58 mm</option>
-            <option value="80">80 mm</option>
-        </select>
-    </label>
-    <label class="pos-check"><input type="checkbox" @bind="drawer" />@S.T("فتح درج النقود مع البيع النقدي")</label>
-    <p class="pos-muted">@S.T("طابعة إيصالات ESC/POS معرّفة في Windows، والدرج موصول بها.")</p>
-    <button class="pos-primary" @onclick="Save">@S.T("حفظ")</button>
-    @if (message.Length > 0)
-    {
-        <p>@message</p>
-    }
-</section>
+<MudGrid Spacing="3">
+    <MudItem xs="12" md="6">
+        <MudPaper Outlined="true" Class="pa-4 pos-fill">
+            <MudText Typo="Typo.h6" Class="mb-3">@L.T("هذا الجهاز")</MudText>
+            <dl class="pos-facts">
+                <dt>@L.T("المستخدم")</dt>
+                <dd>@S.User?.EmployeeName <bdi dir="ltr">(@S.User?.Username)</bdi></dd>
+                <dt>@L.T("المخزن")</dt>
+                <dd>@S.Snapshot?.User.WarehouseName</dd>
+                <dt>@L.T("الجهاز")</dt>
+                <dd><bdi dir="ltr">@S.Platform.DeviceName</bdi></dd>
+                <dt>@L.T("قاعدة البيانات")</dt>
+                <dd><bdi dir="ltr">@S.Connection?.Describe()</bdi></dd>
+                <dt>@L.T("آخر تحديث للأسعار والأرصدة")</dt>
+                <dd><bdi dir="ltr" class="erp-num">@S.SnapshotAt?.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</bdi></dd>
+            </dl>
+            <MudDivider Class="my-4" />
+            <MudStack Row="true" Wrap="Wrap.Wrap" Spacing="3" AlignItems="AlignItems.Center">
+                <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large"
+                           StartIcon="@Icons.Material.Outlined.Translate"
+                           OnClick="() => S.SetLanguage(!S.English)">@(S.English ? "العربية" : "English")</MudButton>
+                <MudSwitch T="bool" Value="@S.Dark" ValueChanged="S.SetDark" Color="Color.Primary"
+                           Label="@L.T("الوضع الليلي")" />
+            </MudStack>
+        </MudPaper>
+    </MudItem>
 
-<section class="pos-card">
-    <button @onclick="Logout">@S.T("خروج")</button>
-    <p class="pos-muted">@S.T("بعد الخروج تبقى فواتير الجهاز وتُرسل، ويدخل كاشير آخر.")</p>
-</section>
+    <MudItem xs="12" md="6">
+        <MudPaper Outlined="true" Class="pa-4 pos-fill">
+            <MudText Typo="Typo.h6" Class="mb-3">@L.T("طابعة الإيصالات")</MudText>
+            <MudGrid Spacing="3">
+                <MudItem xs="12">
+                    <MudSelect T="string" @bind-Value="printer" Label="@L.T("الطابعة")" Variant="Variant.Outlined"
+                               Margin="Margin.Normal" AutoFocus="true" AnchorOrigin="Origin.BottomCenter">
+                        <MudSelectItem T="string" Value="@("")">-</MudSelectItem>
+                        @foreach (var p in printers)
+                        {
+                            <MudSelectItem T="string" Value="@p">@p</MudSelectItem>
+                        }
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudSelect T="int" @bind-Value="paper" Label="@L.T("عرض الورق")" Variant="Variant.Outlined"
+                               Margin="Margin.Normal" AnchorOrigin="Origin.BottomCenter" ToStringFunc="PaperText">
+                        <MudSelectItem T="int" Value="58">58 mm</MudSelectItem>
+                        <MudSelectItem T="int" Value="80">80 mm</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudCheckBox T="bool" @bind-Value="drawer" Color="Color.Primary" Label="@L.T("فتح درج النقود مع البيع النقدي")" />
+                    <MudText Typo="Typo.body2" Class="mud-text-secondary">@L.T("طابعة إيصالات ESC/POS معرّفة في Windows، والدرج موصول بها.")</MudText>
+                </MudItem>
+                @if (message.Length > 0)
+                {
+                    <MudItem xs="12">
+                        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined" Dense="true" role="status">@message</MudAlert>
+                    </MudItem>
+                }
+                <MudItem xs="12">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large"
+                               StartIcon="@Icons.Material.Outlined.Save" OnClick="Save">
+                        @L.T("حفظ") <kbd class="erp-kbd">F2</kbd>
+                    </MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudItem>
+
+    <MudItem xs="12">
+        <MudAlert Severity="Severity.Info" Variant="Variant.Text" Dense="true">@L.T("بعد الخروج تبقى فواتير الجهاز وتُرسل، ويدخل كاشير آخر.")</MudAlert>
+    </MudItem>
+</MudGrid>
 
 @code {
     private IReadOnlyList<string> printers = [];
@@ -59,10 +100,13 @@
         printers = await S.Platform.PrintersAsync();
     }
 
+    // an isolated left-to-right run, so "80 mm" keeps its order in the Arabic field
+    private static string PaperText(int mm) => "\u2066" + mm.ToString(CultureInfo.InvariantCulture) + " mm\u2069";
+
     private void Save()
     {
         S.SetPrinter(printer, paper, drawer);
-        message = S.T("تم الحفظ");
+        message = L.T("تم الحفظ");
     }
 
     private void Logout()

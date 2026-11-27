@@ -214,7 +214,7 @@ class PosDocumentTests(unittest.TestCase):
         for page, problem in (("return", "ReturnProblem"), ("payment", "PaymentProblem"), ("closing", "ClosingProblem")):
             with self.subTest(page):
                 self.assertIn(f'@page "/{page}"', read(WEB + f"RetailStore.PosApp/Pages/{page.capitalize()}Page.razor"))
-                self.assertIn(f'href="{page}"', layout)
+                self.assertIn(f'yield return new("{page}",', layout)  # a screen of the app bar (redesign batch 7B)
                 self.assertIn(problem, layout)
         session = read(WEB + "RetailStore.PosApp/Offline/PosSession.cs")
         closing = session[session.index("public async Task<(SaveStatus Status, string Message, PosDocument? Document)> SaveClosingAsync"):]

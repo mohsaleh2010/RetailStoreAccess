@@ -35,6 +35,8 @@ public sealed class PosSession(PosStore store, IPosPlatform platform, Func<PosCo
     public string Printer => store.Get("Printer") ?? "";
     public int PaperMillimetres => int.TryParse(store.Get("Paper"), out var p) ? p : 80;
     public bool OpenDrawer => store.Get("OpenDrawer") != "0";
+    /// <summary>The dark mode of the interface, kept in the settings of the PC (docs/ui-inventory.md section 17).</summary>
+    public bool Dark => store.Get("Theme") == "dark";
     public IPosPlatform Platform => platform;
     public string Dir => English ? "ltr" : "rtl";
 
@@ -70,6 +72,12 @@ public sealed class PosSession(PosStore store, IPosPlatform platform, Func<PosCo
     {
         English = english;
         store.Set("Language", english ? "en" : "ar");
+        Notify();
+    }
+
+    public void SetDark(bool dark)
+    {
+        store.Set("Theme", dark ? "dark" : "light");
         Notify();
     }
 

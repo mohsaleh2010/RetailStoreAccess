@@ -1,30 +1,58 @@
 @page "/login"
 @inject PosSession S
+@inject UiLanguage L
 @inject NavigationManager Nav
 
-<section class="pos-card pos-login">
-    <h1>@S.T("نقطة البيع")</h1>
-    @if (S.Connection is { } c)
-    {
-        <p class="pos-muted">@(c.IsLocal ? S.T("قاعدة بيانات محلية") : S.T("خادم بعيد")): <span dir="ltr">@c.Describe()</span>
-            · @S.T("رمز الجهاز") <span dir="ltr">@c.DeviceCode</span></p>
-    }
-    <label>@S.T("اسم المستخدم")<input dir="ltr" @bind="user" autocomplete="username" /></label>
-    <label>@S.T("كلمة المرور")<input dir="ltr" type="password" @bind="password" @onkeyup="KeyAsync" autocomplete="current-password" /></label>
-    @if (message.Length > 0)
-    {
-        <p class="pos-error">@message</p>
-    }
-    <button class="pos-primary" disabled="@busy" @onclick="LoginAsync">@S.T("دخول")</button>
-    <button class="pos-link" @onclick="() => S.SetLanguage(!S.English)">@(S.English ? "العربية" : "English")</button>
-    <p class="pos-muted">@S.T("بلا اتصال بقاعدة البيانات يدخل من دخل على هذا الجهاز من قبل، ويبيع، وتُرسل فواتيره عند عودة الاتصال.")</p>
-</section>
+@* The login of the cashier (template D, a card in the middle as the web login): the same PosSession.LoginAsync, the
+   offline login of a user who logged in on this PC before. Touch screen: large fields and button. *@
+<div class="pos-center">
+    <MudPaper Outlined="true" Class="pos-card-narrow pa-6">
+        <PageHeader Title="@L.T("تسجيل الدخول")" Description="@L.T("نقطة البيع")" Icon="@Icons.Material.Outlined.Login" />
+        @if (S.Connection is { } c)
+        {
+            <MudText Typo="Typo.body2" Class="mud-text-secondary mb-4 pos-conn">
+                @(c.IsLocal ? L.T("قاعدة بيانات محلية") : L.T("خادم بعيد")): <bdi dir="ltr">@c.Describe()</bdi>
+                · @L.T("رمز الجهاز") <bdi dir="ltr">@c.DeviceCode</bdi>
+            </MudText>
+        }
+        @if (message.Length > 0)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4 pos-pre" role="alert">@L.T(message)</MudAlert>
+        }
+        <MudGrid Spacing="3">
+            <MudItem xs="12">
+                <MudTextField T="string" @bind-Value="user" Label="@L.T("اسم المستخدم")" Variant="Variant.Outlined"
+                              Margin="Margin.Normal" Immediate="true" AutoFocus="true" Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Outlined.Person"
+                              UserAttributes="@(Attributes("username"))" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudTextField T="string" @bind-Value="password" Label="@L.T("كلمة المرور")" InputType="InputType.Password"
+                              Variant="Variant.Outlined" Margin="Margin.Normal" Immediate="true" OnKeyUp="KeyAsync"
+                              Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Lock"
+                              UserAttributes="@(Attributes("current-password"))" />
+            </MudItem>
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" FullWidth="true"
+                           StartIcon="@Icons.Material.Outlined.Login" Disabled="@busy" OnClick="LoginAsync">@L.T("دخول")</MudButton>
+            </MudItem>
+        </MudGrid>
+        <MudAlert Severity="Severity.Info" Variant="Variant.Text" Dense="true" Class="mt-4">
+            @L.T("بلا اتصال بقاعدة البيانات يدخل من دخل على هذا الجهاز من قبل، ويبيع، وتُرسل فواتيره عند عودة الاتصال.")
+        </MudAlert>
+    </MudPaper>
+    <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Translate"
+               OnClick="() => S.SetLanguage(!S.English)">@(S.English ? "العربية" : "English")</MudButton>
+</div>
 
 @code {
     private string user = "", password = "", message = "";
     private bool busy;
 
     protected override async Task OnInitializedAsync() => await S.LoadAsync();
+
+    private static Dictionary<string, object?> Attributes(string autocomplete) =>
+        new() { ["autocomplete"] = autocomplete };
 
     private async Task KeyAsync(KeyboardEventArgs e)
     {

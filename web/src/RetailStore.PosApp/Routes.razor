@@ -6,7 +6,7 @@
     </Found>
     <NotFound>
         <LayoutView Layout="typeof(PosLayout)">
-            <p class="pos-empty">@S.T("الصفحة غير موجودة")</p>
+            <EmptyState Icon="@Icons.Material.Outlined.SearchOff" Title="@L.T("الصفحة غير موجودة")" />
         </LayoutView>
     </NotFound>
 </Router>

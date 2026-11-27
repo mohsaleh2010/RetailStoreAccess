@@ -63,7 +63,22 @@ def approved_pages():
     return files
 
 
-def page_problems(rel, text):
+POS = os.path.join(WEB_SRC, "RetailStore.PosApp")
+
+
+def pos_approved_pages():
+    """The .razor files of the rows marked ✅ in the POS table of the inventory (section 3, redesign phase 7)."""
+    text = read(INVENTORY)
+    table = text[text.index("## 3)"):text.index("## 4)")]
+    files = []
+    for row in table.splitlines():
+        cells = [c.strip() for c in row.strip().strip("|").split("|")]
+        if len(cells) >= 7 and cells[6].startswith("✅"):
+            files += re.findall(r"`([^`]+\.razor)`", cells[2])
+    return files
+
+
+def page_problems(rel, text, touch=False):
     problems = []
     wrapper = "<DataScreen T=" in text
     if not wrapper and "<PageHeader " not in text and not rel.endswith("Dialog.razor"):
@@ -82,20 +97,51 @@ def page_problems(rel, text):
             problems.append("currency written in the page: " + word)
     if re.search(r"Quantity\s*\*\s*\w*\.?Price", text):
         problems.append("an amount computed by the page (InvoiceCalculator)")
-    problems += field_problems(text)
+    problems += field_problems(text, touch)
     return problems
 
 
-def field_problems(text):
+def field_problems(text, touch=False):
+    """Fields Outlined and Dense; on a touch screen (the POS and the rep app, docs/ui-inventory.md section 17) Normal."""
     problems = []
     text = re.sub(r"@\*.*?\*@", "", text, flags=re.S)  # the example comments of the components
     for name in FIELDS:
         for tag in open_tags(text, name):
             if 'Variant="Variant.Outlined"' not in tag:
                 problems.append(name + " without Variant.Outlined: " + tag[:60])
-            if 'Margin="Margin.Dense"' not in tag:
-                problems.append(name + " without Margin.Dense: " + tag[:60])
+            margin = 'Margin="Margin.Normal"' if touch else 'Margin="Margin.Dense"'
+            if margin not in tag:
+                problems.append(name + " without " + margin[8:-1] + ": " + tag[:60])
     return problems
+
+
+class PosPagesTests(unittest.TestCase):
+    """Redesign phase 7 (docs/ui-inventory.md sections 17-19): the POS pages marked ✅ follow the same rules, with the
+    touch exception (Margin.Normal), and once one is marked the frame PosLayout is MudBlazor with the dark mode of the PC."""
+
+    def test_every_approved_pos_page_follows_the_rules(self):
+        for rel in pos_approved_pages():
+            with self.subTest(rel):
+                path = os.path.join(POS, *rel.split("/"))
+                self.assertTrue(os.path.isfile(path), rel)
+                self.assertEqual(page_problems(rel, read(path), touch=True), [])
+
+    def test_the_frame_of_the_pos(self):
+        if not pos_approved_pages():
+            self.skipTest("no POS page moved yet")
+        layout = read(os.path.join(POS, "Layout", "PosLayout.razor"))
+        for part in ("<MudRTLProvider", 'IsDarkMode="@S.Dark"', "ErpTheme.Theme", "<MudAppBar", "<MudDialogProvider"):
+            self.assertIn(part, layout)
+        self.assertEqual([p for p in page_problems("Layout/PosLayout.razor", layout, touch=True) if "PageHeader" not in p], [])
+        self.assertIn('store.Get("Theme") == "dark"', read(os.path.join(POS, "Offline", "PosSession.cs")))
+        css = read(os.path.join(POS, "wwwroot", "posapp.css"))
+        self.assertNotRegex(css, r"(?m)^\s*(html|body|button|input|label|select)\b", "plain element rules stay inside .pos-legacy")
+        self.assertNotRegex(css, r"#[0-9A-Fa-f]{3,6}\b", "colors come from the theme")
+
+    def test_the_touch_rule_is_checked(self):
+        tag = '<MudTextField @bind-Value="x" Variant="Variant.Outlined" Margin="Margin.Dense" />'
+        self.assertTrue(any("Normal" in p for p in field_problems(tag, touch=True)))
+        self.assertEqual(field_problems(tag.replace("Dense", "Normal"), touch=True), [])
 
 
 class SkillTests(unittest.TestCase):

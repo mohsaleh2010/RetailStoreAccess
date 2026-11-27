@@ -1,64 +1,137 @@
 @inherits LayoutComponentBase
 @implements IDisposable
 @inject PosSession S
+@inject UiLanguage L
 @inject NavigationManager Nav
 
-<div class="pos" dir="@S.Dir" lang="@(S.English ? "en" : "ar")">
-    <header class="pos-top">
-        <strong class="pos-brand">@(S.Snapshot?.Settings.StoreName is { Length: > 0 } store ? store : S.T("نقطة البيع"))</strong>
-        @if (S.LoggedIn)
-        {
-            <nav class="pos-nav">
-                <NavLink href="" Match="NavLinkMatch.All">@S.T("البيع")</NavLink>
-                <NavLink href="sales">@S.T("فواتير الجهاز")</NavLink>
-                @if (S.Snapshot?.User.ReturnProblem.Length == 0)
-                {
-                    <NavLink href="return">@S.T("مرتجع")</NavLink>
-                }
-                @if (S.Snapshot?.User.PaymentProblem.Length == 0)
-                {
-                    <NavLink href="payment">@S.T("سند قبض")</NavLink>
-                }
-                @if (S.Snapshot?.User.ClosingProblem.Length == 0)
-                {
-                    <NavLink href="closing">@S.T("تصفية الصندوق")</NavLink>
-                }
-                <NavLink href="settings">@S.T("الإعدادات")</NavLink>
-                @if (S.CanEditDatabase)
-                {
-                    <NavLink href="database">@S.T("إعدادات قاعدة البيانات")</NavLink>
-                }
-            </nav>
-            <span class="pos-user">@S.User!.EmployeeName</span>
-        }
-        <span class="@(S.WorkingOffline ? "pos-state pos-off" : "pos-state pos-on")">
-            @(S.WorkingOffline ? S.T("بلا اتصال") : S.T("متصل"))
-        </span>
-        <button class="pos-sync" disabled="@(S.Syncing || !S.LoggedIn)" @onclick="() => S.SyncAsync(refresh: true)">
-            @(S.Syncing ? S.T("جارٍ الإرسال") : S.T("إرسال وتحديث"))
-            @if (S.Waiting > 0)
+@* The page of index.html is rtl: the wrapper sets the direction of the language for the frame, its popovers and dialogs.
+   The frame of the POS (docs/83, redesign batch 7B): a touch screen with no side menu. The app bar holds the store, the
+   screens of the user, the cashier, online / offline and the send-and-refresh button with what waits; the direction
+   follows the language and the dark mode the settings of the PC (PosSession.Dark). *@
+<div dir="@L.Dir" lang="@L.Code" class="pos-root">
+<MudRTLProvider RightToLeft="@(L.Dir == "rtl")">
+    <MudThemeProvider Theme="ErpTheme.Theme" IsDarkMode="@S.Dark" />
+    <MudPopoverProvider />
+    <MudDialogProvider CloseOnEscapeKey="true" />
+    <MudSnackbarProvider />
+
+    <MudLayout Class="erp-app pos-app">
+        <MudAppBar Elevation="0" Class="erp-appbar pos-appbar">
+            <span class="erp-brand pos-brand">
+                <MudIcon Icon="@Icons.Material.Outlined.Storefront" />
+                <span class="erp-brand-name">@(S.Snapshot?.Settings.StoreName is { Length: > 0 } store ? store : L.T("نقطة البيع"))</span>
+            </span>
+            @if (S.LoggedIn)
             {
-                <span class="pos-badge">@S.Waiting</span>
+                <nav class="pos-nav" aria-label="@L.T("القائمة")">
+                    @foreach (var item in Screens())
+                    {
+                        <MudTooltip Text="@item.Caption" Class="pos-nav-tip">
+                            <MudButton Href="@(item.Route.Length == 0 ? "./" : item.Route)" Variant="Variant.Text" Color="Color.Inherit" Size="Size.Large"
+                                       StartIcon="@item.Icon" Class="@NavClass(item.Route)"
+                                       aria-label="@item.Caption" aria-current="@(Active(item.Route) ? "page" : null)">
+                                <span class="pos-nav-text">@item.Caption</span>
+                            </MudButton>
+                        </MudTooltip>
+                    }
+                </nav>
             }
-        </button>
-    </header>
-    @if (S.Refused > 0 && S.LoggedIn)
-    {
-        <a class="pos-alert" href="sales">@S.T("فواتير رفضها البرنامج"): @S.Refused</a>
-    }
-    @if (S.LastSync is { Message.Length: > 0 } last)
-    {
-        <div class="pos-note">@last.Message</div>
-    }
-    <main class="pos-main">@Body</main>
+            <MudSpacer />
+            @if (S.LoggedIn)
+            {
+                <MudChip T="string" Icon="@Icons.Material.Outlined.AccountCircle" Variant="Variant.Text" Color="Color.Inherit"
+                         Class="erp-user-chip pos-user">@S.User!.EmployeeName</MudChip>
+            }
+            <MudChip T="string" Size="Size.Small" Variant="Variant.Filled"
+                     Color="@(S.WorkingOffline ? Color.Warning : Color.Success)"
+                     Icon="@(S.WorkingOffline ? Icons.Material.Outlined.CloudOff : Icons.Material.Outlined.CloudDone)"
+                     Class="pos-state" role="status">@(S.WorkingOffline ? L.T("بلا اتصال") : L.T("متصل"))</MudChip>
+            <MudBadge Content="@S.Waiting" Visible="@(S.Waiting > 0)" Color="Color.Warning" Overlap="true" Bordered="true">
+                <MudButton Variant="Variant.Outlined" Color="Color.Inherit" Size="Size.Large" Class="pos-sync"
+                           StartIcon="@Icons.Material.Outlined.Sync" Disabled="@(S.Syncing || !S.LoggedIn)"
+                           OnClick="() => S.SyncAsync(refresh: true)">
+                    @(S.Syncing ? L.T("جارٍ الإرسال") : L.T("إرسال وتحديث"))
+                </MudButton>
+            </MudBadge>
+            <MudTooltip Text="@(S.Dark ? L.T("الوضع الفاتح") : L.T("الوضع الليلي"))">
+                <MudIconButton Icon="@(S.Dark ? Icons.Material.Outlined.LightMode : Icons.Material.Outlined.DarkMode)"
+                               Color="Color.Inherit" Size="Size.Large" OnClick="() => S.SetDark(!S.Dark)"
+                               aria-label="@(S.Dark ? L.T("الوضع الفاتح") : L.T("الوضع الليلي"))" />
+            </MudTooltip>
+            <MudTooltip Text="@(L.English ? "العربية" : "English")">
+                <MudIconButton Icon="@Icons.Material.Outlined.Translate" Color="Color.Inherit" Size="Size.Large"
+                               OnClick="() => S.SetLanguage(!S.English)" aria-label="@(L.English ? "العربية" : "English")" />
+            </MudTooltip>
+        </MudAppBar>
+
+        <MudMainContent Class="erp-main">
+            <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="pa-4">
+                @if (S.Refused > 0 && S.LoggedIn)
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4" role="alert"
+                              ShowCloseIcon="false">
+                        <MudLink Href="sales" Color="Color.Error" Typo="Typo.body1">
+                            @L.T("فواتير رفضها البرنامج"): <bdi dir="ltr">@S.Refused</bdi>
+                        </MudLink>
+                    </MudAlert>
+                }
+                @if (S.LastSync is { Message.Length: > 0 } last)
+                {
+                    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4" role="status">@last.Message</MudAlert>
+                }
+                @* the screens not moved yet (batches 7C and 7D) keep the plain rules of posapp.css inside pos-legacy *@
+                <div class="@(Legacy ? "pos-legacy" : "pos-page")">@Body</div>
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+</MudRTLProvider>
 </div>
 
 @code {
     private System.Threading.Timer? timer;
 
+    private sealed record Screen(string Route, string Caption, string Icon);
+
+    /// <summary>The screens of the user, as before: the return, the receipt and the closing only when the snapshot allows
+    /// them, the database settings only for the administrator.</summary>
+    private IEnumerable<Screen> Screens()
+    {
+        yield return new("", L.T("البيع"), Icons.Material.Outlined.PointOfSale);
+        yield return new("sales", L.T("فواتير الجهاز"), Icons.Material.Outlined.ReceiptLong);
+        if (S.Snapshot?.User.ReturnProblem.Length == 0)
+        {
+            yield return new("return", L.T("مرتجع"), Icons.Material.Outlined.AssignmentReturn);
+        }
+        if (S.Snapshot?.User.PaymentProblem.Length == 0)
+        {
+            yield return new("payment", L.T("سند قبض"), Icons.Material.Outlined.Payments);
+        }
+        if (S.Snapshot?.User.ClosingProblem.Length == 0)
+        {
+            yield return new("closing", L.T("تصفية الصندوق"), Icons.Material.Outlined.PriceCheck);
+        }
+        yield return new("settings", L.T("الإعدادات"), Icons.Material.Outlined.Settings);
+        if (S.CanEditDatabase)
+        {
+            yield return new("database", L.T("إعدادات قاعدة البيانات"), Icons.Material.Outlined.Storage);
+        }
+    }
+
+    private string Here => Nav.ToBaseRelativePath(Nav.Uri).Split('?', '#')[0].TrimEnd('/');
+
+    private bool Active(string route) => Here == route;
+
+    // the database settings (administrator, seldom) show only their icon; the other captions show from 1366px
+    private string NavClass(string route) =>
+        "pos-nav-link" + (Active(route) ? " pos-nav-active" : "") + (route == "database" ? " pos-nav-icon" : "");
+
+    /// <summary>The pages still on the old markup of posapp.css (moved in batches 7C and 7D).</summary>
+    private bool Legacy => Here is "" or "sales" or "return" or "payment" or "closing";
+
     protected override async Task OnInitializedAsync()
     {
         S.Changed += Refresh;
+        Nav.LocationChanged += Moved;
         await S.LoadAsync();
         string here = Nav.ToBaseRelativePath(Nav.Uri);
         if (S.Connection is null && here != "database")
@@ -81,9 +154,12 @@
 
     private void Refresh() => InvokeAsync(StateHasChanged);
 
+    private void Moved(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e) => Refresh();
+
     public void Dispose()
     {
         S.Changed -= Refresh;
+        Nav.LocationChanged -= Moved;
         timer?.Dispose();
     }
 }
