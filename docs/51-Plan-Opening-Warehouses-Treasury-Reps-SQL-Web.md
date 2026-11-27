@@ -372,4 +372,5 @@
 | الموافقة على المرحلة 6، الدفعة 1 (المبيعات)؛ عرض خطة الدفعة 2 (المشتريات: `/purchase` و`/purchases` و`/purchases/{Id}` و`/supplier-payments` و`/purchase-returns`) | ✅ |
 | الموافقة على خطة الدفعة 2؛ إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 2 (المشتريات): `/purchase` (بعمود «سعر البيع الجديد» عبر `InvoiceLinesEditor.ExtraColumn`) و`/purchases` و`/purchases/{Id}` و`/supplier-payments` و`/purchase-returns` بالقوالب المعتمدة (`docs/ui-inventory.md` القسم 11) | ✅ تمت الموافقة |
 | الموافقة على المرحلة 6، الدفعة 2 (المشتريات)؛ عرض خطة الدفعة 3 (المخازن: `/stock` و`/transfers`) | ✅ |
-| الموافقة على خطة الدفعة 3؛ إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 3 (المخازن): `/stock` (C) و`/transfers` (B)، والحالة `SENT` في `StatusStyles` (`docs/ui-inventory.md` القسم 12) | ✅ بانتظار الموافقة |
+| الموافقة على خطة الدفعة 3؛ إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 3 (المخازن): `/stock` (C) و`/transfers` (B)، والحالة `SENT` في `StatusStyles` (`docs/ui-inventory.md` القسم 12) | ✅ تمت الموافقة |
+| الموافقة على المرحلة 6، الدفعة 3 (المخازن)؛ عرض خطة الدفعة 4 (الحسابات والخزينة: `/treasury` و`/cash-vouchers` و`/cash-closing` و`/bank-transactions` و`/bank-reconciliation` و`/journal` و`/manual-entries`) | ✅ |
