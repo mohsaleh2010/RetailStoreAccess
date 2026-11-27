@@ -2,194 +2,302 @@
 @attribute [Authorize]
 @inject TreasuryService Treasury
 @inject PermissionService Permissions
+@inject IDialogService Dialogs
+@inject IJSRuntime JS
 @inject UiLanguage L
 
-<PageTitle>@L.T("الخزينة")</PageTitle>
+@* Template C (docs/ui-inventory.md section 8) for the treasury: PageHeader (print) -> the figures of the boxes ->
+   EntityGrid of the boxes (a row opens its statement) -> the transfers waiting for their receipt (receive / cancel, the
+   cancel asked first through ConfirmDialog) -> the statement of the chosen box: its period, then EntityGrid of its moves
+   (the opening line first). The data is TreasuryService.BoxBalancesAsync / VouchersAsync / BoxStatementAsync and
+   ReceiveTransferAsync / CancelTransferAsync with the permission of frmTreasury. *@
+<PageHeader Title="@L.T("الخزينة")" Description="@L.T("رصيد كل صندوق وحركته، واستلام التحويلات بين الصناديق")"
+            Icon="@NavGroups.IconOf("treasury")" Group="@L.T("الخزينة والبنوك")">
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Refresh" OnClick="Load" Disabled="busy">
+                @L.T("تحديث")
+            </MudButton>
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">
+                @L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("الخزينة")</h1>
-            <p class="subtitle">@L.T("رصيد كل صندوق وحركته، واستلام التحويلات بين الصناديق")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
-    {
-        <div class="stack">
-            <div class="list-pane">
-                <table class="list">
-                    <thead>
-                        <tr>
-                            <th>@L.T("الصندوق")</th>
-                            <th>@L.T("النوع")</th>
-                            <th>@L.T("الداخل")</th>
-                            <th>@L.T("الخارج")</th>
-                            <th>@L.T("الرصيد")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var b in boxes)
-                        {
-                            <tr tabindex="0" class="@(b.IsActive ? "" : "inactive") @(b.CashBoxID == boxId ? "selected" : "")" @onclick="() => Pick(b.CashBoxID)"
-                                @onkeydown="e => Key(e, b.CashBoxID)">
-                                <td data-label="@L.T("الصندوق")">@b.BoxName</td>
-                                <td data-label="@L.T("النوع")">@b.BoxTypeName</td>
-                                <td data-label="@L.T("الداخل")">@WorkPages.Money(b.TotalIn)</td>
-                                <td data-label="@L.T("الخارج")">@WorkPages.Money(b.TotalOut)</td>
-                                <td data-label="@L.T("الرصيد")">@WorkPages.Money(b.Balance)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                <p class="hint">@L.T("إجمالي النقدية"): @WorkPages.Money(boxes.Sum(b => b.Balance))</p>
-
-                <h2>@L.T("تحويلات بانتظار الاستلام")</h2>
-                @if (pending.Count == 0)
-                {
-                    <p class="empty">@L.T("لا توجد سجلات")</p>
-                }
-                else
-                {
-                    <table class="list">
-                        <thead>
-                            <tr>
-                                <th>@L.T("رقم السند")</th>
-                                <th>@L.T("التاريخ")</th>
-                                <th>@L.T("من")</th>
-                                <th>@L.T("إلى")</th>
-                                <th>@L.T("المبلغ")</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var v in pending)
-                            {
-                                <tr>
-                                    <td data-label="@L.T("رقم السند")">@v.VoucherNumber</td>
-                                    <td data-label="@L.T("التاريخ")">@v.VoucherDate.ToString("yyyy-MM-dd HH:mm")</td>
-                                    <td data-label="@L.T("من")">@v.BoxName</td>
-                                    <td data-label="@L.T("إلى")">@v.ToBoxName</td>
-                                    <td data-label="@L.T("المبلغ")">@WorkPages.Money(v.Amount)</td>
-                                    <td class="actions">
-                                        <button class="btn primary" disabled="@busy" @onclick="() => Receive(v.CashVoucherID)">@L.T("تأكيد الاستلام")</button>
-                                        <button class="btn" disabled="@busy" @onclick="() => Cancel(v.CashVoucherID)">@L.T("إلغاء التحويل")</button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
-
-            <div class="form-pane">
-                <h2>@L.T("حركة الصندوق") @boxName</h2>
-                <form class="list-tools" @onsubmit="LoadStatement" @onsubmit:preventDefault>
-                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-                    <button type="submit" class="btn">@L.T("عرض")</button>
-                </form>
-                <table class="list">
-                    <thead>
-                        <tr>
-                            <th>@L.T("التاريخ")</th>
-                            <th>@L.T("الحركة")</th>
-                            <th>@L.T("المستند")</th>
-                            <th>@L.T("الجهة")</th>
-                            <th>@L.T("داخل")</th>
-                            <th>@L.T("خارج")</th>
-                            <th>@L.T("الرصيد")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var m in statement)
-                        {
-                            <tr>
-                                <td data-label="@L.T("التاريخ")">@m.MoveDate.ToString(m.MoveType == "BALANCE_FWD" ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")</td>
-                                <td data-label="@L.T("الحركة")">@m.MoveTypeName</td>
-                                <td data-label="@L.T("المستند")">@m.DocNumber</td>
-                                <td data-label="@L.T("الجهة")">@m.PartyName</td>
-                                <td data-label="@L.T("داخل")">@(m.AmountIn != 0 ? WorkPages.Money(m.AmountIn) : "")</td>
-                                <td data-label="@L.T("خارج")">@(m.AmountOut != 0 ? WorkPages.Money(m.AmountOut) : "")</td>
-                                <td data-label="@L.T("الرصيد")">@WorkPages.Money(m.Balance)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    }
-
+}
+else
+{
+    <KeyboardShortcuts OnPrint="Print" />
     @if (message.Length > 0)
     {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4 no-print" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
     }
-</section>
+
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("إجمالي النقدية")" Icon="@Icons.Material.Outlined.AccountBalanceWallet" Color="Color.Primary">
+                <ValueContent><MoneyText Value="boxes.Sum(b => b.Balance)" /></ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("الداخل")" Icon="@Icons.Material.Outlined.SouthWest" Color="Color.Success">
+                <ValueContent><MoneyText Value="boxes.Sum(b => b.TotalIn)" /></ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("الخارج")" Icon="@Icons.Material.Outlined.NorthEast" Color="Color.Error">
+                <ValueContent><MoneyText Value="boxes.Sum(b => b.TotalOut)" /></ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("تحويلات بانتظار الاستلام")" Icon="@Icons.Material.Outlined.LocalShipping" Color="Color.Warning"
+                      Value="@pending.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                      Subtitle="@(pending.Count > 0 ? L.T("المبلغ") + ": " + ErpFormat.Money(pending.Sum(v => v.Amount)) : null)" />
+        </MudItem>
+    </MudGrid>
+
+    <EntityGrid T="BoxBalance" Items="boxes" Title="@L.T("الصناديق")" Export="boxExport" ExportName="@L.T("الصناديق")"
+                Loading="busy" Filterable="false" ShowPager="false" RowsPerPage="200" RowClick="Pick" RowClass="BoxRowClass"
+                Class="mb-4" EmptyText="@L.T("لا توجد سجلات")">
+        <Columns>
+            <PropertyColumn T="BoxBalance" TProperty="string" Property="b => b.BoxName" Title="@L.T("الصندوق")" />
+            <PropertyColumn T="BoxBalance" TProperty="string" Property="b => b.BoxTypeName" Title="@L.T("النوع")" />
+            <TemplateColumn T="BoxBalance" Title="@L.T("الداخل")" SortBy="b => b.TotalIn" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.TotalIn" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="BoxBalance" Title="@L.T("الخارج")" SortBy="b => b.TotalOut" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.TotalOut" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="BoxBalance" Title="@L.T("الرصيد")" SortBy="b => b.Balance" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.Balance" Bold="true" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="BoxBalance" Title="" Sortable="false" CellClass="erp-actions-col no-print" HeaderClass="erp-actions-col no-print">
+                <CellTemplate>
+                    @if (!context.Item.IsActive)
+                    {
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined" Class="erp-chip-inactive">@L.T("موقوف")</MudChip>
+                    }
+                    <MudTooltip Text="@L.T("حركة الصندوق")">
+                        <MudIconButton Icon="@Icons.Material.Outlined.ManageSearch" Size="Size.Small" OnClick="() => Pick(context.Item)"
+                                       aria-label="@L.T("حركة الصندوق")" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+
+    <EntityGrid T="CashVoucherRow" Items="pending" Title="@L.T("تحويلات بانتظار الاستلام")" Loading="busy" Filterable="false"
+                ShowPager="false" RowsPerPage="200" Class="mb-4 no-print" EmptyText="@L.T("لا توجد تحويلات بانتظار الاستلام")">
+        <Columns>
+            <PropertyColumn T="CashVoucherRow" TProperty="string" Property="v => v.VoucherNumber" Title="@L.T("رقم السند")" />
+            <TemplateColumn T="CashVoucherRow" Title="@L.T("التاريخ")" SortBy="v => v.VoucherDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@context.Item.VoucherDate.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)</bdi></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="CashVoucherRow" TProperty="string" Property="v => v.BoxName" Title="@L.T("من")" />
+            <PropertyColumn T="CashVoucherRow" TProperty="string" Property="v => v.ToBoxName" Title="@L.T("إلى")" />
+            <TemplateColumn T="CashVoucherRow" Title="@L.T("المبلغ")" SortBy="v => v.Amount" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.Amount" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CashVoucherRow" Title="@L.T("الحالة")" Sortable="false">
+                <CellTemplate><StatusChip Status="SENT" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CashVoucherRow" Title="" Sortable="false" CellClass="erp-actions-col erp-nowrap" HeaderClass="erp-actions-col">
+                <CellTemplate>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Small" Disabled="busy"
+                               StartIcon="@Icons.Material.Outlined.MoveToInbox" OnClick="() => Receive(context.Item)">
+                        @L.T("تأكيد الاستلام")
+                    </MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Error" Size="Size.Small" Disabled="busy"
+                               StartIcon="@Icons.Material.Outlined.Cancel" OnClick="() => Cancel(context.Item)">
+                        @L.T("إلغاء التحويل")
+                    </MudButton>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+
+    <div id="box-statement">
+        @if (boxId == 0)
+        {
+            <EmptyState Icon="@Icons.Material.Outlined.ManageSearch" Title="@L.T("حركة الصندوق")"
+                        Text="@L.T("اختر صندوقًا من القائمة لعرض حركته")" Class="no-print" />
+        }
+        else
+        {
+            <FilterPanel Range="range" RangeChanged="r => range = r ?? Today()" OnShow="LoadStatement" OnClear="ResetStatement"
+                         Busy="statementBusy" Title="@(L.T("حركة الصندوق") + " - " + boxName)" Class="no-print" />
+            <MudText Typo="Typo.subtitle1" Class="mb-3 erp-print-title">
+                @L.T("حركة الصندوق") - @boxName
+                <span class="mud-text-secondary erp-num" dir="ltr">(@ErpFormat.Date(range.Start) - @ErpFormat.Date(range.End))</span>
+            </MudText>
+            <EntityGrid T="BoxStatementLine" Items="statement" Title="@L.T("حركة الصندوق")" Export="statementExport"
+                        ExportName="@(L.T("حركة الصندوق") + " " + boxName)" Loading="statementBusy" Filterable="false" RowsPerPage="50"
+                        RowClass="StatementRowClass" EmptyText="@L.T("لا توجد سجلات")">
+                <Columns>
+                    <TemplateColumn T="BoxStatementLine" Title="@L.T("التاريخ")" SortBy="m => m.MoveDate">
+                        <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@MoveDate(context.Item)</bdi></CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn T="BoxStatementLine" TProperty="string" Property="m => m.MoveTypeName" Title="@L.T("الحركة")" />
+                    <PropertyColumn T="BoxStatementLine" TProperty="string" Property="m => m.DocNumber" Title="@L.T("المستند")" />
+                    <PropertyColumn T="BoxStatementLine" TProperty="string" Property="m => m.PartyName" Title="@L.T("الجهة")" />
+                    <TemplateColumn T="BoxStatementLine" Title="@L.T("داخل")" SortBy="m => m.AmountIn" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate>
+                            @if (context.Item.AmountIn != 0)
+                            {
+                                <MoneyText Value="context.Item.AmountIn" />
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="BoxStatementLine" Title="@L.T("خارج")" SortBy="m => m.AmountOut" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate>
+                            @if (context.Item.AmountOut != 0)
+                            {
+                                <MoneyText Value="context.Item.AmountOut" />
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="BoxStatementLine" Title="@L.T("الرصيد")" SortBy="m => m.Balance" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate><MoneyText Value="context.Item.Balance" /></CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </EntityGrid>
+        }
+    </div>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", boxName = "", message = "", messageKind = "";
+    private bool allowed, loaded, busy, statementBusy;
+    private string denied = "", boxName = "", message = "";
+    private Severity severity = Severity.Info;
     private int boxId;
-    private DateTime from = DateTime.Today, to = DateTime.Today;
+    private DateRange range = Today();
     private List<BoxBalance> boxes = [];
     private List<BoxStatementLine> statement = [];
     private List<CashVoucherRow> pending = [];
+    private List<GridExport<BoxBalance>> boxExport = [];
+    private List<GridExport<BoxStatementLine>> statementExport = [];
+
+    /// <summary>The period the statement opened on, as before: today.</summary>
+    private static DateRange Today() => new(DateTime.Today, DateTime.Today);
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmTreasury");
         allowed = denied.Length == 0;
-        if (allowed)
+        loaded = true;
+        if (!allowed)
         {
-            boxId = await Treasury.UserBoxAsync(UserInfo.EmployeeId(user));
-            await Load();
+            return;
         }
+        boxExport =
+        [
+            new(L.T("الصندوق"), b => b.BoxName),
+            new(L.T("النوع"), b => b.BoxTypeName),
+            new(L.T("الداخل"), b => b.TotalIn),
+            new(L.T("الخارج"), b => b.TotalOut),
+            new(L.T("الرصيد"), b => b.Balance),
+        ];
+        statementExport =
+        [
+            new(L.T("التاريخ"), m => MoveDate(m)),
+            new(L.T("الحركة"), m => m.MoveTypeName),
+            new(L.T("المستند"), m => m.DocNumber),
+            new(L.T("الجهة"), m => m.PartyName),
+            new(L.T("داخل"), m => m.AmountIn),
+            new(L.T("خارج"), m => m.AmountOut),
+            new(L.T("الرصيد"), m => m.Balance),
+        ];
+        boxId = await Treasury.UserBoxAsync(UserInfo.EmployeeId(user));
+        await Load();
     }
 
     private async Task Load()
     {
-        boxes = await Treasury.BoxBalancesAsync(L.English);
-        pending = await Treasury.VouchersAsync(DateTime.Today, DateTime.Today, 0, true, L.English);
+        busy = true;
+        try
+        {
+            boxes = await Treasury.BoxBalancesAsync(L.English);
+            pending = await Treasury.VouchersAsync(DateTime.Today, DateTime.Today, 0, true, L.English);
+        }
+        finally
+        {
+            busy = false;
+        }
         await LoadStatement();
     }
 
     private async Task LoadStatement()
     {
         boxName = boxes.FirstOrDefault(b => b.CashBoxID == boxId)?.BoxName ?? "";
+        var from = range.Start ?? DateTime.Today;
+        var to = range.End ?? DateTime.Today;
         string p = AccountingService.PeriodProblem(from, to);
         if (p.Length > 0)
         {
-            message = p;
-            messageKind = "error";
+            Show(p, Severity.Error);
             return;
         }
-        statement = boxId > 0 ? await Treasury.BoxStatementAsync(boxId, from, to, L.English) : [];
+        statementBusy = true;
+        try
+        {
+            statement = boxId > 0 ? await Treasury.BoxStatementAsync(boxId, from, to, L.English) : [];
+        }
+        finally
+        {
+            statementBusy = false;
+        }
     }
 
-    private async Task Pick(int id)
+    private async Task ResetStatement()
     {
-        boxId = id;
+        range = Today();
         await LoadStatement();
     }
 
-    private async Task Key(KeyboardEventArgs e, int id)
+    private async Task Pick(BoxBalance b)
     {
-        if (e.Key == "Enter")
-        {
-            await Pick(id);
-        }
+        boxId = b.CashBoxID;
+        await LoadStatement();
+        StateHasChanged();
+        await JS.InvokeVoidAsync("erp.scrollToId", "box-statement");
     }
 
-    private async Task Receive(int id) => await Run(() => Treasury.ReceiveTransferAsync(UserInfo.Acting(user), id));
+    private string BoxRowClass(BoxBalance b, int _) =>
+        (b.IsActive ? "" : "erp-row-inactive ") + (b.CashBoxID == boxId ? "erp-row-selected" : "");
 
-    private async Task Cancel(int id) => await Run(() => Treasury.CancelTransferAsync(UserInfo.Acting(user), id));
+    private static string StatementRowClass(BoxStatementLine m, int _) => m.MoveType == "BALANCE_FWD" ? "erp-row-opening" : "";
+
+    private static string MoveDate(BoxStatementLine m) =>
+        m.MoveDate.ToString(m.MoveType == "BALANCE_FWD" ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+
+    private void Show(string text, Severity kind)
+    {
+        message = text;
+        severity = kind;
+    }
+
+    private async Task Receive(CashVoucherRow v) => await Run(() => Treasury.ReceiveTransferAsync(UserInfo.Acting(user), v.CashVoucherID));
+
+    private async Task Cancel(CashVoucherRow v)
+    {
+        if (await ConfirmDialog.AskAsync(Dialogs, L.T("إلغاء التحويل"), L.T("إلغاء التحويل") + " " + v.VoucherNumber + "؟",
+                                         L.T("نعم")))
+        {
+            await Run(() => Treasury.CancelTransferAsync(UserInfo.Acting(user), v.CashVoucherID));
+        }
+    }
 
     private async Task Run(Func<Task<TreasuryResult>> action)
     {
@@ -200,19 +308,20 @@
             var r = await action();
             if (r.Status == SaveStatus.Saved)
             {
-                message = WorkPages.TransferDone + r.Number;
-                messageKind = "success";
-                await Load();
+                Show(WorkPages.TransferDone + r.Number, Severity.Success);
             }
             else
             {
-                message = r.Message;
-                messageKind = "error";
+                Show(r.Message, Severity.Error);
+                return;
             }
         }
         finally
         {
             busy = false;
         }
+        await Load();
     }
+
+    private async Task Print() => await JS.InvokeVoidAsync("print");
 }

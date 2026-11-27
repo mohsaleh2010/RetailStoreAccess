@@ -88,6 +88,10 @@ public static class WorkPages
     public static readonly (string Key, string Name)[] CashOutCategories =
         [("EXPENSE", "مصروف (يُسجل في المصروفات)"), ("OWNER", "تسوية / مسحوبات المالك"), ("OTHER", "صرف آخر")];
 
+    /// <summary>Where the cash of a closing goes (frmCashClosing.cboDestination).</summary>
+    public static readonly (string Key, string Name)[] ClosingDestinations =
+        [("MAIN", "ترحيل إلى الخزينة الرئيسية"), ("OWNER", "تسليم للمالك (تسوية)"), ("KEEP", "يبقى في الصندوق")];
+
     /// <summary>The name of a transfer status (frmStockTransfer).</summary>
     public static string TransferStatusName(string status) => status switch
     {

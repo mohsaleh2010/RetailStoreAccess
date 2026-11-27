@@ -3,155 +3,204 @@
 @inject TreasuryService Treasury
 @inject PosService Pos
 @inject PermissionService Permissions
+@inject IDialogService Dialogs
 @inject UiLanguage L
 
-@* The cashier closing on the web (docs/87): frmCashClosing, modCash.PostCashClosing. *@
-<PageTitle>@L.T("تصفية يومية الكاشير")</PageTitle>
+@* The cashier closing on the web (docs/87): frmCashClosing, modCash.PostCashClosing. Template B (docs/ui-inventory.md
+   section 8): PageHeader (save F2) -> the box and its period, the counted cash, where it goes, the amount moved, the notes
+   -> the breakdown of the moves since the last closing in EntityGrid -> the summary card beside them (the book balance of
+   TreasuryService.ClosingPreviewAsync, the counted cash, the shortage or overage, what stays in the box). The question
+   before saving goes through ConfirmDialog. *@
+<PageHeader Title="@L.T("تصفية يومية الكاشير")"
+            Description="@L.T("الرصيد الدفتري للصندوق من آخر تصفية، والنقدية الفعلية، والعجز أو الزيادة، والترحيل للخزينة")"
+            Icon="@NavGroups.IconOf("cash-closing")" Group="@L.T("الخزينة والبنوك")">
+    <Actions>
+        @if (allowed && preview is not null)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save" OnClick="Ask"
+                       Disabled="@(busy || counted is null)">
+                @L.T("حفظ التصفية")<kbd class="erp-kbd">F2</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("تصفية يومية الكاشير")</h1>
-            <p class="subtitle">@L.T("الرصيد الدفتري للصندوق من آخر تصفية، والنقدية الفعلية، والعجز أو الزيادة، والترحيل للخزينة")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
+}
+else
+{
+    <KeyboardShortcuts OnSave="Ask" />
+    @if (message.Length > 0)
     {
-        <div class="pos">
-            <div class="list-pane">
-                <div class="list-tools">
-                    <label class="check">@L.T("الصندوق")
-                        <select value="@boxId" @onchange="e => ChooseAsync(e.Value)">
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
+    }
+    <div class="erp-doc mb-4">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4 mb-4">
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="int" Value="boxId" ValueChanged="LoadAsync" Label="@L.T("الصندوق")" Variant="Variant.Outlined"
+                                   Margin="Margin.Dense" Dense="true" Required="true" ToStringFunc="BoxText">
                             @foreach (var b in boxes)
                             {
-                                <option value="@b.CashBoxID">@b.BoxName</option>
+                                <MudSelectItem T="int" Value="@b.CashBoxID">@b.BoxName</MudSelectItem>
                             }
-                        </select>
-                    </label>
-                </div>
-                @if (preview is { } p)
-                {
-                    <p class="hint">@(p.PeriodStart is { } since
-                        ? L.T("من آخر تصفية") + ": " + since.ToString("yyyy-MM-dd HH:mm")
-                        : L.T("من بداية الصندوق (لا توجد تصفية سابقة)")) · @L.T("حتى الآن")</p>
-                    <table class="list">
-                        <tbody>
-                            <tr><td>@L.T("رصيد البداية")</td><td>@WorkPages.Money(p.Opening)</td></tr>
-                            <tr><td>@L.T("المقبوضات")</td><td>@WorkPages.Money(p.CashIn)</td></tr>
-                            <tr><td>@L.T("المدفوعات")</td><td>@WorkPages.Money(p.CashOut)</td></tr>
-                            <tr><th>@L.T("الرصيد الدفتري")</th><th>@WorkPages.Money(p.Expected)</th></tr>
-                        </tbody>
-                    </table>
-                    <table class="list">
-                        <thead><tr><th>@L.T("البند")</th><th>@L.T("العدد")</th><th>@L.T("مقبوض")</th><th>@L.T("مدفوع")</th></tr></thead>
-                        <tbody>
-                            @foreach (var line in p.Breakdown)
-                            {
-                                <tr>
-                                    <td data-label="@L.T("البند")">@line.MoveTypeName</td>
-                                    <td data-label="@L.T("العدد")">@line.Count</td>
-                                    <td data-label="@L.T("مقبوض")">@WorkPages.Money(line.AmountIn)</td>
-                                    <td data-label="@L.T("مدفوع")">@WorkPages.Money(line.AmountOut)</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
+                        </MudSelect>
+                    </MudItem>
+                    @if (preview is { } p)
+                    {
+                        <MudItem xs="12" sm="6" Class="d-flex align-center">
+                            <MudText Typo="Typo.body2" Class="mud-text-secondary">
+                                @if (p.PeriodStart is { } since)
+                                {
+                                    @L.T("من آخر تصفية")@(": ")<bdi class="erp-num" dir="ltr">@since.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)</bdi>
+                                }
+                                else
+                                {
+                                    @L.T("من بداية الصندوق (لا توجد تصفية سابقة)")
+                                }
+                                · @L.T("حتى الآن")
+                            </MudText>
+                        </MudItem>
+                    }
+                </MudGrid>
+            </MudPaper>
 
-            <div class="form-pane">
-                <h2>@L.T("النقدية الفعلية")</h2>
-                @if (preview is not null)
-                {
-                    <form class="record" @onsubmit="Ask" @onsubmit:preventDefault>
-                        <div class="field span-2">
-                            <label for="cc-counted">@L.T("النقدية الفعلية") *</label>
-                            <input id="cc-counted" type="number" step="any" min="0" @bind="counted" />
-                            <p class="hint">@DiffText</p>
-                        </div>
-                        <div class="field span-2">
-                            <label for="cc-dest">@L.T("الترحيل إلى")</label>
-                            <select id="cc-dest" @bind="destination">
-                                <option value="MAIN">@L.T("ترحيل إلى الخزينة الرئيسية")</option>
-                                <option value="OWNER">@L.T("تسليم للمالك (تسوية)")</option>
-                                <option value="KEEP">@L.T("يبقى في الصندوق")</option>
-                            </select>
-                        </div>
+            @if (preview is null)
+            {
+                <EmptyState Icon="@Icons.Material.Outlined.LockClock" Title="@L.T("تصفية يومية الكاشير")"
+                            Text="@L.T("لا توجد صناديق يمكنك تصفيتها")" />
+            }
+            else
+            {
+                <MudPaper Outlined="true" Class="pa-4 mb-4">
+                    <MudText Typo="Typo.h6" Class="mb-3">@L.T("النقدية الفعلية")</MudText>
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12" sm="6">
+                            <MudNumericField T="decimal?" @bind-Value="counted" Label="@L.T("النقدية الفعلية")"
+                                             Variant="Variant.Outlined" Margin="Margin.Dense" HideSpinButtons="true" Min="0" Format="0.00"
+                                             Class="erp-cell-num" Required="true" RequiredError="@L.T("مطلوب")" AutoFocus="true"
+                                             Immediate="true" HelperText="@DiffText"
+                                             Culture="System.Globalization.CultureInfo.InvariantCulture" />
+                        </MudItem>
+                        <MudItem xs="12" sm="6">
+                            <MudSelect T="string" @bind-Value="destination" Label="@L.T("الترحيل إلى")" Variant="Variant.Outlined"
+                                       Margin="Margin.Dense" Dense="true" ToStringFunc="DestinationText">
+                                @foreach (var d in Destinations)
+                                {
+                                    <MudSelectItem T="string" Value="@d.Key">@L.T(d.Name)</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
                         @if (destination == "MAIN")
                         {
-                            <div class="field span-2">
-                                <label for="cc-safe">@L.T("الخزينة المستلمة")</label>
-                                <select id="cc-safe" @bind="toBox">
+                            <MudItem xs="12" sm="6">
+                                <MudSelect T="int" @bind-Value="toBox" Label="@L.T("الخزينة المستلمة")" Variant="Variant.Outlined"
+                                           Margin="Margin.Dense" Dense="true" ToStringFunc="SafeText">
                                     @foreach (var b in safes)
                                     {
-                                        <option value="@b.CashBoxID">@b.BoxName</option>
+                                        <MudSelectItem T="int" Value="@b.CashBoxID">@b.BoxName</MudSelectItem>
                                     }
-                                </select>
-                            </div>
+                                </MudSelect>
+                            </MudItem>
                         }
                         @if (destination != "KEEP")
                         {
-                            <div class="field">
-                                <label for="cc-transfer">@L.T("المبلغ المرحَّل")</label>
-                                <input id="cc-transfer" type="number" step="any" min="0" @bind="transfer" />
-                            </div>
+                            <MudItem xs="12" sm="6">
+                                <MudNumericField T="decimal?" @bind-Value="transfer" Label="@L.T("المبلغ المرحَّل")" Variant="Variant.Outlined"
+                                                 Margin="Margin.Dense" HideSpinButtons="true" Min="0" Format="0.00" Class="erp-cell-num"
+                                                 Immediate="true" Culture="System.Globalization.CultureInfo.InvariantCulture" />
+                            </MudItem>
                         }
-                        <div class="field">
-                            <label>@L.T("يبقى في الصندوق (عهدة الكاشير)")</label>
-                            <p>@WorkPages.Money((counted ?? 0) - (destination == "KEEP" ? 0 : transfer ?? 0))</p>
-                        </div>
-                        <div class="field span-2">
-                            <label for="cc-notes">@L.T("ملاحظات")</label>
-                            <input id="cc-notes" type="text" maxlength="255" @bind="notes" />
-                        </div>
-                        <div class="actions span-2">
-                            <button type="submit" class="btn primary" disabled="@(busy || counted is null)">@L.T("حفظ التصفية")</button>
-                        </div>
-                    </form>
-                }
-            </div>
-        </div>
-    }
+                        <MudItem xs="12">
+                            <MudTextField T="string" @bind-Value="notes" Label="@L.T("ملاحظات")" Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" MaxLength="255" />
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
 
-    @if (message.Length > 0)
-    {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
-    }
-
-    @if (asking)
-    {
-        <div class="dialog-backdrop">
-            <div class="dialog" role="dialog" aria-modal="true">
-                <p>@(L.T("حفظ تصفية") + " " + preview?.BoxName + "؟")<br />@DiffText<br />@L.T("لا يمكن تعديل التصفية بعد الحفظ.")</p>
-                <div class="actions">
-                    <button class="btn primary" @onclick="SaveAsync">@L.T("نعم")</button>
-                    <button class="btn" @onclick="() => asking = false">@L.T("لا")</button>
-                </div>
-            </div>
+                <EntityGrid T="ClosingBreakdownLine" Items="preview.Breakdown" Title="@L.T("حركة الصندوق من آخر تصفية")"
+                            Filterable="false" ShowPager="false" RowsPerPage="200" EmptyText="@L.T("لا توجد حركة منذ آخر تصفية")">
+                    <Columns>
+                        <PropertyColumn T="ClosingBreakdownLine" TProperty="string" Property="l => l.MoveTypeName" Title="@L.T("البند")" />
+                        <TemplateColumn T="ClosingBreakdownLine" Title="@L.T("العدد")" SortBy="l => l.Count" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><bdi class="erp-num" dir="ltr">@context.Item.Count</bdi></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="ClosingBreakdownLine" Title="@L.T("مقبوض")" SortBy="l => l.AmountIn" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><MoneyText Value="context.Item.AmountIn" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="ClosingBreakdownLine" Title="@L.T("مدفوع")" SortBy="l => l.AmountOut" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><MoneyText Value="context.Item.AmountOut" /></CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </EntityGrid>
+            }
         </div>
-    }
-</section>
+
+        @if (preview is { } s)
+        {
+            <aside class="erp-doc-side">
+                <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                    <MudText Typo="Typo.h6" Class="mb-3">@L.T("ملخص التصفية")</MudText>
+                    <dl class="erp-summary-list">
+                        <dt>@L.T("رصيد البداية")</dt><dd><MoneyText Value="s.Opening" /></dd>
+                        <dt>@L.T("المقبوضات")</dt><dd><MoneyText Value="s.CashIn" /></dd>
+                        <dt>@L.T("المدفوعات")</dt><dd><MoneyText Value="s.CashOut" /></dd>
+                        <dt class="erp-summary-grand">@L.T("الرصيد الدفتري")</dt>
+                        <dd class="erp-summary-grand"><MoneyText Value="s.Expected" ShowCurrency="true" Bold="true" /></dd>
+                        <dt>@L.T("النقدية الفعلية")</dt><dd><MoneyText Value="counted" /></dd>
+                        @if (counted is not null)
+                        {
+                            <dt>@(Difference < 0 ? L.T("عجز") : Difference > 0 ? L.T("زيادة") : L.T("مطابق"))</dt>
+                            <dd>
+                                <MudText Typo="Typo.body1" Color="@(Difference < 0 ? Color.Error : Difference > 0 ? Color.Warning : Color.Success)">
+                                    <MoneyText Value="Math.Abs(Difference)" Bold="true" />
+                                </MudText>
+                            </dd>
+                            <dt>@L.T("يبقى في الصندوق (عهدة الكاشير)")</dt><dd><MoneyText Value="Remaining" /></dd>
+                        }
+                    </dl>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                               StartIcon="@Icons.Material.Outlined.Save" OnClick="Ask" Disabled="@(busy || counted is null)">
+                        @L.T("حفظ التصفية")
+                    </MudButton>
+                </MudPaper>
+            </aside>
+        }
+    </div>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy, asking;
-    private string denied = "", message = "", messageKind = "", destination = "MAIN", notes = "";
+    private bool allowed, loaded, busy;
+    private string denied = "", message = "", destination = "MAIN", notes = "";
+    private Severity severity = Severity.Info;
     private int boxId, toBox;
     private decimal? counted, transfer;
     private List<ClosingBox> boxes = [], safes = [];
     private ClosingPreview? preview;
+
+    private static (string Key, string Name)[] Destinations => WorkPages.ClosingDestinations;
+
+    private string BoxText(int id) => boxes.FirstOrDefault(b => b.CashBoxID == id)?.BoxName ?? "";
+
+    private string SafeText(int id) => safes.FirstOrDefault(b => b.CashBoxID == id)?.BoxName ?? "";
+
+    private string DestinationText(string? key) => Destinations.Where(d => d.Key == key).Select(d => L.T(d.Name)).FirstOrDefault() ?? "";
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), TreasuryService.ClosingForm);
         allowed = denied.Length == 0;
+        loaded = true;
         if (!allowed)
         {
             return;
@@ -170,9 +219,10 @@
         transfer = null;
     }
 
-    private async Task ChooseAsync(object? value) => await LoadAsync(int.TryParse(value as string, out var id) ? id : 0);
-
     private decimal Difference => (counted ?? 0) - (preview?.Expected ?? 0);
+
+    /// <summary>What stays in the box (frmCashClosing.txtRemain): the counted cash less what is moved.</summary>
+    private decimal Remaining => (counted ?? 0) - (destination == "KEEP" ? 0 : transfer ?? 0);
 
     /// <summary>modCash.ClosingRecalc.</summary>
     private string DiffText => counted is null ? L.T("أدخل النقدية الموجودة فعلًا في الصندوق")
@@ -180,16 +230,29 @@
         : Difference > 0 ? L.T("زيادة") + ": " + WorkPages.Money(Difference)
         : L.T("مطابق: لا يوجد عجز ولا زيادة");
 
-    private void Ask()
+    private void Show(string text, Severity kind)
     {
+        message = text;
+        severity = kind;
+    }
+
+    private async Task Ask()
+    {
+        if (busy || preview is null || counted is null)
+        {
+            return;
+        }
         message = "";
         transfer ??= counted;                   // all the counted cash goes on unless typed otherwise
-        asking = counted is not null;
+        var question = L.T("حفظ تصفية") + " " + preview.BoxName + "؟\n" + DiffText + "\n" + L.T("لا يمكن تعديل التصفية بعد الحفظ.");
+        if (await ConfirmDialog.AskAsync(Dialogs, L.T("حفظ التصفية"), question, L.T("نعم"), Color.Primary))
+        {
+            await SaveAsync();
+        }
     }
 
     private async Task SaveAsync()
     {
-        asking = false;
         busy = true;
         try
         {
@@ -198,10 +261,10 @@
                                        destination == "KEEP" ? 0 : transfer ?? 0, notes));
             if (r.Status != SaveStatus.Saved)
             {
-                (message, messageKind) = (r.Message, "error");
+                Show(r.Message, Severity.Error);
                 return;
             }
-            (message, messageKind) = (WorkPages.ClosingSaved + r.Number, "success");
+            Show(WorkPages.ClosingSaved + r.Number, Severity.Success);
             notes = "";
             await LoadAsync(boxId);
         }

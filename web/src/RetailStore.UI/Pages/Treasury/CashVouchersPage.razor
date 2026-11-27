@@ -4,184 +4,300 @@
 @inject PermissionService Permissions
 @inject UiLanguage L
 
-<PageTitle>@L.T("سندات النقدية والتحويل")</PageTitle>
+@* Template B for a voucher (docs/ui-inventory.md section 8), as /payments: PageHeader (new F4, save F2) -> the voucher above
+   the list (its type, the box with its balance, the receiving box of a transfer or the category, the expense type, the
+   amount, the party, the description) with its card beside it -> FilterPanel (the period) -> EntityGrid of the vouchers
+   (a transfer still on its way = StatusChip SENT). Posting is TreasuryService.PostCashVoucherAsync (modCash.PostCashVoucher)
+   with the permission of frmCashVoucher. *@
+<PageHeader Title="@L.T("سندات النقدية والتحويل")" Description="@L.T("قبض وصرف نقدية من الصناديق، والتحويل بينها")"
+            Icon="@NavGroups.IconOf("cash-vouchers")" Group="@L.T("الخزينة والبنوك")">
+    <Status>
+        @if (allowed)
+        {
+            <StatusChip Status="DRAFT" />
+        }
+    </Status>
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.NoteAdd" OnClick="New" Disabled="busy">
+                @L.T("سند جديد")<kbd class="erp-kbd">F4</kbd>
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save" OnClick="Save" Disabled="busy">
+                @L.T("حفظ السند")<kbd class="erp-kbd">F2</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("سندات النقدية والتحويل")</h1>
-            <p class="subtitle">@L.T("قبض وصرف نقدية من الصناديق، والتحويل بينها")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
+}
+else
+{
+    <KeyboardShortcuts OnSave="Save" OnNew="New" />
+    @if (message.Length > 0)
     {
-        <div class="pos">
-            <div class="list-pane">
-                <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
-                    <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-                    <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-                    <button type="submit" class="btn">@L.T("عرض")</button>
-                </form>
-                <table class="list">
-                    <thead>
-                        <tr>
-                            <th>@L.T("رقم السند")</th>
-                            <th>@L.T("التاريخ")</th>
-                            <th>@L.T("النوع")</th>
-                            <th>@L.T("الصندوق")</th>
-                            <th>@L.T("المبلغ")</th>
-                            <th>@L.T("الجهة")</th>
-                            <th>@L.T("البيان")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var r in rows)
-                        {
-                            <tr>
-                                <td data-label="@L.T("رقم السند")">@r.VoucherNumber</td>
-                                <td data-label="@L.T("التاريخ")">@r.VoucherDate.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td data-label="@L.T("النوع")">@L.T(WorkPages.VoucherTypeName(r.VoucherType))@(r.InTransit && r.ReceivedAt is null ? " (" + L.T("بالطريق") + ")" : "")</td>
-                                <td data-label="@L.T("الصندوق")">@r.BoxName@(r.ToBoxName is { } tb ? " ← " + tb : "")</td>
-                                <td data-label="@L.T("المبلغ")">@WorkPages.Money(r.Amount)</td>
-                                <td data-label="@L.T("الجهة")">@r.PartyName</td>
-                                <td data-label="@L.T("البيان")">@r.Description</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @if (rows.Count == 0)
-                {
-                    <p class="empty">@L.T("لا توجد سجلات")</p>
-                }
-            </div>
-
-            <div class="form-pane">
-                <h2>@L.T("سند جديد")</h2>
-                <form class="record" @onsubmit="Save" @onsubmit:preventDefault>
-                    <div class="field">
-                        <label for="cv-type">@L.T("نوع السند") *</label>
-                        <select id="cv-type" @bind="voucherType" @bind:after="TypeChanged">
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
+    }
+    <div class="erp-doc mb-4">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("سند جديد")</MudText>
+                <MudGrid Spacing="3">
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect @ref="typeField" T="string" Value="voucherType" ValueChanged="TypeChanged" Label="@L.T("نوع السند")"
+                                   Variant="Variant.Outlined" Margin="Margin.Dense" Dense="true" Required="true" AutoFocus="true">
                             @foreach (var t in new[] { "IN", "OUT", "TRANSFER" })
                             {
-                                <option value="@t">@L.T(WorkPages.VoucherTypeName(t))</option>
+                                <MudSelectItem T="string" Value="@t">@L.T(WorkPages.VoucherTypeName(t))</MudSelectItem>
                             }
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label for="cv-box">@L.T("الصندوق") *</label>
-                        <select id="cv-box" @bind="boxId">
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudSelect T="int" @bind-Value="boxId" Label="@L.T("الصندوق")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                   Dense="true" Required="true" ToStringFunc="BoxText">
                             @foreach (var b in boxes)
                             {
-                                <option value="@b.Id">@b.Name (@WorkPages.Money(b.Balance))</option>
+                                <MudSelectItem T="int" Value="@b.Id">
+                                    @b.Name <span class="mud-text-secondary erp-num" dir="ltr">(@ErpFormat.Money(b.Balance))</span>
+                                </MudSelectItem>
                             }
-                        </select>
-                    </div>
+                        </MudSelect>
+                    </MudItem>
                     @if (voucherType == "TRANSFER")
                     {
-                        <div class="field span-2">
-                            <label for="cv-to">@L.T("إلى الصندوق") *</label>
-                            <select id="cv-to" @bind="toBoxId">
-                                <option value="0"></option>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudSelect T="int" @bind-Value="toBoxId" Label="@L.T("إلى الصندوق")" Variant="Variant.Outlined"
+                                       Margin="Margin.Dense" Dense="true" Required="true" ToStringFunc="ToBoxText">
                                 @foreach (var b in boxes.Where(b => b.Id != boxId))
                                 {
-                                    <option value="@b.Id">@b.Name</option>
+                                    <MudSelectItem T="int" Value="@b.Id">@b.Name</MudSelectItem>
                                 }
-                            </select>
-                        </div>
+                            </MudSelect>
+                        </MudItem>
                     }
                     else
                     {
-                        <div class="field">
-                            <label for="cv-category">@L.T("البند") *</label>
-                            <select id="cv-category" @bind="category">
-                                @foreach (var c in voucherType == "IN" ? WorkPages.CashInCategories : WorkPages.CashOutCategories)
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudSelect T="string" @bind-Value="category" Label="@L.T("البند")" Variant="Variant.Outlined"
+                                       Margin="Margin.Dense" Dense="true" Required="true" ToStringFunc="CategoryText">
+                                @foreach (var c in Categories)
                                 {
-                                    <option value="@c.Key">@L.T(c.Name)</option>
+                                    <MudSelectItem T="string" Value="@c.Key">@L.T(c.Name)</MudSelectItem>
                                 }
-                            </select>
-                        </div>
+                            </MudSelect>
+                        </MudItem>
                         @if (voucherType == "OUT" && category == "EXPENSE")
                         {
-                            <div class="field">
-                                <label for="cv-expense">@L.T("نوع المصروف") *</label>
-                                <select id="cv-expense" @bind="expenseTypeId">
-                                    <option value="0"></option>
+                            <MudItem xs="12" sm="6" md="4">
+                                <MudSelect T="int" @bind-Value="expenseTypeId" Label="@L.T("نوع المصروف")" Variant="Variant.Outlined"
+                                           Margin="Margin.Dense" Dense="true" Required="true" ToStringFunc="ExpenseText">
                                     @foreach (var t in expenseTypes)
                                     {
-                                        <option value="@t.Id">@t.Name</option>
+                                        <MudSelectItem T="int" Value="@t.Id">@t.Name</MudSelectItem>
                                     }
-                                </select>
-                            </div>
+                                </MudSelect>
+                            </MudItem>
                         }
                     }
-                    <div class="field">
-                        <label for="cv-amount">@L.T("المبلغ") *</label>
-                        <input id="cv-amount" type="number" step="any" min="0" @bind="amount" />
-                    </div>
+                    <MudItem xs="12" sm="6" md="4">
+                        <MudNumericField T="decimal" @bind-Value="amount" Label="@L.T("المبلغ")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                         HideSpinButtons="true" Min="0" Format="0.00" Class="erp-cell-num" Required="true"
+                                         RequiredError="@L.T("مطلوب")" Culture="System.Globalization.CultureInfo.InvariantCulture" />
+                    </MudItem>
                     @if (voucherType != "TRANSFER")
                     {
-                        <div class="field">
-                            <label for="cv-party">@L.T("الجهة")</label>
-                            <input id="cv-party" type="text" maxlength="100" @bind="party" />
-                        </div>
+                        <MudItem xs="12" sm="6" md="4">
+                            <MudTextField T="string" @bind-Value="party" Label="@L.T("الجهة")" Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" MaxLength="100" />
+                        </MudItem>
                     }
-                    <div class="field span-2">
-                        <label for="cv-desc">@L.T("البيان")</label>
-                        <input id="cv-desc" type="text" maxlength="255" @bind="description" />
-                    </div>
-                    <div class="actions span-2">
-                        <button type="submit" class="btn primary" disabled="@busy">@L.T("حفظ السند")</button>
-                    </div>
-                </form>
-            </div>
+                    <MudItem xs="12">
+                        <MudTextField T="string" @bind-Value="description" Label="@L.T("البيان")" Variant="Variant.Outlined"
+                                      Margin="Margin.Dense" MaxLength="255" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
         </div>
-    }
 
-    @if (message.Length > 0)
-    {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
-    }
-</section>
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("ملخص السند")</MudText>
+                <dl class="erp-summary-list">
+                    <dt>@L.T("نوع السند")</dt><dd>@L.T(WorkPages.VoucherTypeName(voucherType))</dd>
+                    <dt>@L.T("الصندوق")</dt><dd>@Box.Name</dd>
+                    <dt>@L.T("رصيد الصندوق")</dt><dd><MoneyText Value="@(Box.Name is null ? null : Box.Balance)" /></dd>
+                    @if (voucherType == "TRANSFER")
+                    {
+                        <dt>@L.T("إلى الصندوق")</dt><dd>@ToBoxText(toBoxId)</dd>
+                    }
+                    <dt class="erp-summary-grand">@L.T("المبلغ")</dt>
+                    <dd class="erp-summary-grand"><MoneyText Value="amount" ShowCurrency="true" Bold="true" /></dd>
+                </dl>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                           StartIcon="@Icons.Material.Outlined.Save" OnClick="Save" Disabled="busy">
+                    @L.T("حفظ السند")
+                </MudButton>
+            </MudPaper>
+        </aside>
+    </div>
+
+    <FilterPanel Range="range" RangeChanged="r => range = r ?? Today()" OnShow="Load" OnClear="Reset" Busy="listBusy"
+                 Title="@L.T("السندات")" Class="no-print" />
+    <EntityGrid T="CashVoucherRow" Items="rows" Title="@L.T("سندات النقدية والتحويل")" Export="export"
+                ExportName="@L.T("سندات النقدية والتحويل")" Loading="listBusy" Filterable="false"
+                SearchText="@(r => r.VoucherNumber + " " + r.BoxName + " " + r.ToBoxName + " " + r.PartyName + " " + r.Description)"
+                EmptyText="@L.T("لا توجد سندات في هذه الفترة")">
+        <Columns>
+            <PropertyColumn T="CashVoucherRow" TProperty="string" Property="r => r.VoucherNumber" Title="@L.T("رقم السند")" />
+            <TemplateColumn T="CashVoucherRow" Title="@L.T("التاريخ")" SortBy="r => r.VoucherDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@context.Item.VoucherDate.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)</bdi></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CashVoucherRow" Title="@L.T("النوع")" SortBy="r => r.VoucherType">
+                <CellTemplate>
+                    @L.T(WorkPages.VoucherTypeName(context.Item.VoucherType))
+                    @if (context.Item.InTransit && context.Item.ReceivedAt is null)
+                    {
+                        <StatusChip Status="SENT" />
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CashVoucherRow" Title="@L.T("الصندوق")" SortBy="r => r.BoxName" CellClass="erp-nowrap">
+                <CellTemplate>
+                    @context.Item.BoxName
+                    @if (context.Item.ToBoxName is { } tb)
+                    {
+                        <MudIcon Icon="@(L.Dir == "rtl" ? Icons.Material.Outlined.West : Icons.Material.Outlined.East)" Size="Size.Small"
+                                 Class="erp-arrow-icon" />
+                        @tb
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="CashVoucherRow" Title="@L.T("المبلغ")" SortBy="r => r.Amount" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.Amount" /></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="CashVoucherRow" TProperty="string" Property="r => r.PartyName" Title="@L.T("الجهة")" />
+            <PropertyColumn T="CashVoucherRow" TProperty="string" Property="r => r.Description" Title="@L.T("البيان")" />
+            <PropertyColumn T="CashVoucherRow" TProperty="string" Property="r => r.EmployeeName" Title="@L.T("المستخدم")" />
+        </Columns>
+    </EntityGrid>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", message = "", messageKind = "", voucherType = "IN", category = "OTHER";
+    private bool allowed, loaded, busy, listBusy;
+    private string denied = "", message = "", voucherType = "IN", category = "OTHER";
     private string? party, description;
+    private Severity severity = Severity.Info;
     private int boxId, toBoxId, expenseTypeId;
     private decimal amount;
-    private DateTime from = DateTime.Today, to = DateTime.Today;
+    private DateRange range = Today();
     private List<CashVoucherRow> rows = [];
     private List<(int Id, string Name, decimal Balance)> boxes = [];
     private List<(int Id, string Name)> expenseTypes = [];
+    private List<GridExport<CashVoucherRow>> export = [];
+    private MudSelect<string>? typeField;
+
+    /// <summary>The period the Access list opens on: today.</summary>
+    private static DateRange Today() => new(DateTime.Today, DateTime.Today);
+
+    private (int Id, string Name, decimal Balance) Box => boxes.FirstOrDefault(b => b.Id == boxId);
+
+    private (string Key, string Name)[] Categories => voucherType == "IN" ? WorkPages.CashInCategories : WorkPages.CashOutCategories;
+
+    private string BoxText(int id) => boxes.FirstOrDefault(b => b.Id == id).Name ?? "";
+
+    private string ToBoxText(int id) => id == 0 ? "" : BoxText(id);
+
+    private string CategoryText(string? key) => Categories.Where(c => c.Key == key).Select(c => L.T(c.Name)).FirstOrDefault() ?? "";
+
+    private string ExpenseText(int id) => expenseTypes.FirstOrDefault(t => t.Id == id).Name ?? "";
 
     protected override async Task OnInitializedAsync()
     {
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmCashVoucher");
         allowed = denied.Length == 0;
+        loaded = true;
         if (!allowed)
         {
             return;
         }
+        export =
+        [
+            new(L.T("رقم السند"), r => r.VoucherNumber),
+            new(L.T("التاريخ"), r => r.VoucherDate.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)),
+            new(L.T("النوع"), r => L.T(WorkPages.VoucherTypeName(r.VoucherType))),
+            new(L.T("الصندوق"), r => r.BoxName),
+            new(L.T("إلى الصندوق"), r => r.ToBoxName),
+            new(L.T("المبلغ"), r => r.Amount),
+            new(L.T("الجهة"), r => r.PartyName),
+            new(L.T("البيان"), r => r.Description),
+            new(L.T("المستخدم"), r => r.EmployeeName),
+        ];
         boxes = await Treasury.BoxesAsync(L.English);
         expenseTypes = await Treasury.ExpenseTypesAsync(L.English);
         boxId = await Treasury.UserBoxAsync(UserInfo.EmployeeId(user));
         await Load();
     }
 
-    private async Task Load() => rows = await Treasury.VouchersAsync(from, to, 0, false, L.English);
+    private async Task Load()
+    {
+        listBusy = true;
+        try
+        {
+            rows = await Treasury.VouchersAsync(range.Start ?? DateTime.Today, range.End ?? DateTime.Today, 0, false, L.English);
+        }
+        finally
+        {
+            listBusy = false;
+        }
+    }
 
-    private void TypeChanged() => category = voucherType == "OUT" ? "EXPENSE" : "OTHER";
+    private async Task Reset()
+    {
+        range = Today();
+        await Load();
+    }
+
+    private void TypeChanged(string type)
+    {
+        voucherType = type;
+        category = voucherType == "OUT" ? "EXPENSE" : "OTHER";
+    }
+
+    private void Show(string text, Severity kind)
+    {
+        message = text;
+        severity = kind;
+    }
+
+    private async Task New()
+    {
+        TypeChanged("IN");
+        toBoxId = expenseTypeId = 0;
+        amount = 0;
+        party = description = null;
+        message = "";
+        if (typeField is not null)
+        {
+            await typeField.FocusAsync();
+        }
+    }
 
     private async Task Save()
     {
+        if (busy)
+        {
+            return;
+        }
         message = "";
         busy = true;
         try
@@ -191,12 +307,10 @@
             var r = await Treasury.PostCashVoucherAsync(UserInfo.Acting(user), req);
             if (r.Status != SaveStatus.Saved)
             {
-                message = r.Message;
-                messageKind = "error";
+                Show(r.Message, Severity.Error);
                 return;
             }
-            message = WorkPages.VoucherSaved + r.Number;
-            messageKind = "success";
+            Show(WorkPages.VoucherSaved + r.Number, Severity.Success);
             amount = 0;
             party = description = null;
             boxes = await Treasury.BoxesAsync(L.English);

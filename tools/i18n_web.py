@@ -18,6 +18,14 @@ WEB_SRC = os.path.join(ROOT, "web", "src")
 LANGUAGE_NAMES = {"العربية"}           # the link to the Arabic interface is written in Arabic in both languages
 
 WEB_EN = {
+    # phase 6, batch 4a of the redesign: the treasury pages (/treasury, /cash-vouchers, /cash-closing)
+    'اختر صندوقًا من القائمة لعرض حركته': 'Choose a cash box in the list to see its moves',
+    'موقوف': 'Inactive',
+    'لا توجد صناديق يمكنك تصفيتها': 'There is no cash box you can close',
+    'لا توجد حركة منذ آخر تصفية': 'No moves since the last closing',
+    'ملخص التصفية': 'Closing summary',
+    'حركة الصندوق من آخر تصفية': 'Box moves since the last closing',
+    'لا توجد تحويلات بانتظار الاستلام': 'No transfers waiting for their receipt',
     # phase 6, batch 2 of the redesign: the purchase pages (/purchase, /purchases, /purchases/{id}, /supplier-payments,
     # /purchase-returns)
     'رقم السند أو اسم المورد': 'Voucher number or supplier name',

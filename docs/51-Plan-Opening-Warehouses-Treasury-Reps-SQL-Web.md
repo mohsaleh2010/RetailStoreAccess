@@ -374,3 +374,4 @@
 | الموافقة على المرحلة 6، الدفعة 2 (المشتريات)؛ عرض خطة الدفعة 3 (المخازن: `/stock` و`/transfers`) | ✅ |
 | الموافقة على خطة الدفعة 3؛ إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 3 (المخازن): `/stock` (C) و`/transfers` (B)، والحالة `SENT` في `StatusStyles` (`docs/ui-inventory.md` القسم 12) | ✅ تمت الموافقة |
 | الموافقة على المرحلة 6، الدفعة 3 (المخازن)؛ عرض خطة الدفعة 4 (الحسابات والخزينة: `/treasury` و`/cash-vouchers` و`/cash-closing` و`/bank-transactions` و`/bank-reconciliation` و`/journal` و`/manual-entries`) | ✅ |
+| الموافقة على خطة الدفعة 4 مقسومة جزئين؛ إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 4أ (الخزينة): `/treasury` (C) و`/cash-vouchers` (B سند) و`/cash-closing` (B) (`docs/ui-inventory.md` القسم 13) | ✅ بانتظار الموافقة |

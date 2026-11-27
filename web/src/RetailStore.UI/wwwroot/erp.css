@@ -204,6 +204,7 @@ dt.erp-summary-grand { color: var(--mud-palette-text-primary); font-weight: 700;
 .mud-table .mud-table-row.erp-row-selected .mud-table-cell { background: var(--mud-palette-primary-hover); }
 .erp-card-warehouse { margin-inline-start: 4px; font-size: .8rem; }
 .erp-low-icon { margin-inline-start: 4px; vertical-align: middle; }
+.erp-arrow-icon { margin-inline: 4px; vertical-align: middle; color: var(--mud-palette-text-secondary); }
 .erp-row-opening .mud-table-cell { font-weight: 600; background: var(--mud-palette-background-gray); }
 
 /* D: the dashboard */
