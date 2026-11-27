@@ -52,9 +52,9 @@
 | 25 | `/journal` | `Pages/Accounting/JournalPage.razor` | حسابات | C (قيود + سطورها) | 171 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 4ب، تمت الموافقة) |
 | 26 | `/manual-entries` | `Pages/Office/ManualEntriesPage.razor` | حسابات | B | 287 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4ب، تمت الموافقة) |
 | 27 | `/ledger` | `Pages/Accounting/LedgerPage.razor` | تقارير | C | 122 | ✅ معتمدة (القالب C) |
-| 28 | `/trial-balance` | `Pages/Accounting/TrialBalancePage.razor` | تقارير | C | 95 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، بانتظار الموافقة) |
-| 29 | `/financials` | `Pages/Accounting/FinancialsPage.razor` | تقارير | C | 115 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، بانتظار الموافقة) |
-| 30 | `/reports` | `Pages/Reports/ReportsPage.razor` | تقارير | C (مركز التقارير: كل تقارير `forms.REPORTS`) | 278 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، بانتظار الموافقة) |
+| 28 | `/trial-balance` | `Pages/Accounting/TrialBalancePage.razor` | تقارير | C | 95 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
+| 29 | `/financials` | `Pages/Accounting/FinancialsPage.razor` | تقارير | C | 115 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
+| 30 | `/reports` | `Pages/Reports/ReportsPage.razor` | تقارير | C (مركز التقارير: كل تقارير `forms.REPORTS`) | 278 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
 | 31 | `/not-found` | `RetailStore.Web/Components/Pages/NotFound.razor` | عام | D | 6 | ⬜ |
 | 32 | `/Error` | `RetailStore.Web/Components/Pages/Error.razor` | عام | D (SSR) | 22 | ⬜ |
 
@@ -270,7 +270,7 @@
 
 **التالي:** الدفعة 5 (التقارير: `/trial-balance`، `/financials`، `/reports`) نُفّذت (القسم 15).
 
-## 15) المرحلة 6، الدفعة 5: التقارير (✅ بانتظار الموافقة)
+## 15) المرحلة 6، الدفعة 5: التقارير (✅ تمت الموافقة)
 بعد موافقة صاحب المشروع على الخطة، وبقراره أن تُقسَّم تقارير مركز التقارير مجموعات، نُقلت ثلاث صفحات بالمهارة `mudblazor-erp-ui` على القالب C من المكونات المشتركة. لم يتغير أي منطق عمل: نفس `AccountingService` (`TrialBalanceAsync` و`IncomeStatementAsync` و`BalanceSheetAsync` و`PeriodProblem`) و`ReportService` (`RunAsync` و`CellText` و`TotalText` و`Running` و`Csv` و`NeedsHint`) ووسائطها ورسائلها، وصلاحية نموذج Access لكل صفحة (`frmLedger` و`frmFinancials` و`frmReportCenter`).
 
 **الجداول الثلاثة بلا تقسيم صفحات** (`ShowPager="false"`): الصفحات القديمة كانت تعرض كل الأسطر، فتطبع Ctrl+P التقرير كله كما كانت. والجدول العريض يمرّ داخل إطاره على الشاشة ويلتف عند الطباعة (`erp-wide-grid`).
@@ -289,4 +289,4 @@
 
 **التحقق:** `dotnet build` بلا تحذيرات جديدة، و122 xUnit ناجحة، و`test_web*.py` 92 (منها اختبار المجموعات، والصفحات الثلاث تُفحص بقواعد المهارة في `test_web_rules.py`)؛ ولقطات الصفحات بالوضعين واللغتين و1440px / 768px بلا تمرير أفقي للصفحة، على نسخة من قاعدة التطوير: ميزان المراجعة (مدين = دائن والرصيد صفر)، وقائمة الدخل والميزانية، ومركز التقارير فارغًا، وتقرير جدول (المبيعات اليومية لهذه السنة)، وتقرير بطاقة (الأرباح)، وكشف حساب عميل بلا عميل (رسالته). 6 نصوص جديدة في `i18n_web.py`.
 
-**التالي:** الدفعة 6 (الإعدادات) بعد موافقة صاحب المشروع.
+**التالي:** الدفعة 6 (الدخول والإعدادات): عُرضت خطتها على صاحب المشروع، والتنفيذ بعد موافقته.
