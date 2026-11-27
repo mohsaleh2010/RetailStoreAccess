@@ -312,3 +312,21 @@
 
 **بهذا تمت المرحلة 6 كلها** (كل صفحات الويب على MudBlazor). نقطة البيع على Windows وتطبيق المندوب (القسمان 3 و4) خارج هذه المرحلة، وتُنقل فقط بقرار من صاحب المشروع.
 
+
+## 17) المرحلة 7: نقطة البيع على Windows وتطبيق المندوب (🟨 الخطة بانتظار الموافقة)
+قرار صاحب المشروع (2026-11-27): تُنقل صفحات `RetailStore.PosApp` (القسم 3، ثماني صفحات) و`RetailStore.RepApp` (القسم 4، عشر صفحات) إلى MudBlazor بنفس المهارة `mudblazor-erp-ui` ونفس الثيم والمكونات، على دفعات، ولكل دفعة موافقة. الواجهة فقط: `PosSession` / `PosCart` / `PosStore` / `PosSync` و`RepSession` / `OrderDraft` / `SaleDraft` / `SyncService` / `VisitBoard` والخدمات لا تتغير (نفس الفحوصات وترتيبها ورسائلها).
+
+**ما يمنع النقل المباشر:** المكونات المشتركة والثيم في `RetailStore.UI`، وهو يعتمد على `RetailStore.Data`؛ وتطبيق المندوب ممنوع أن يعتمد عليه (قاعدة `docs/78`: الهاتف يصل للبرنامج بالـ API فقط). والتطبيقان لا يُبنيان في السحابة (MAUI لـ Windows وAndroid)، فلا لقطات لهما هنا إلا بمضيف تجريبي.
+
+| الدفعة | المحتوى | القالب |
+|---|---|---|
+| **7أ الأساس** | مكتبة Razor جديدة `RetailStore.UI.Kit` (MudBlazor + `RetailStore.Domain` فقط): الثيم `ErpTheme`، والمكونات المشتركة الاثنا عشر و`ErpFormat` / `StatusStyles` / `InvoiceLine`، و`UiLanguage` و`UiCurrency` (بواجهة عملة لا تعرف القاعدة) و`ShortcutService` و`ErpMudLocalizer`، والأساس من `erp.css` / `erp.js`؛ تُنقل كما هي بنفس الـ namespaces، و`RetailStore.UI` يعتمد عليها فلا تتغير صفحة ويب. خط Cairo يُضمَّن ملفًا داخل المكتبة (نقطة البيع تعمل بلا إنترنت). ربط `PosSession` / `RepSession` بـ `UiLanguage` (اللغة من إعدادات الجهاز كما هي). مضيف تجريبي للتطوير فقط `RetailStore.AppPreview` (Blazor Server، منصات وهمية، غير مُسلَّم) لتشغيل صفحات التطبيقين في المتصفح للّقطات والاختبار. وفي `RetailStore.Pos` / `RetailStore.App`: `AddMudServices` وروابط `index.html` (تُبنى على جهاز صاحب المشروع) | — |
+| **7ب نقطة البيع: الإطار والإعدادات** | `PosLayout` (شريط علوي `MudAppBar`: اسم المحل، التنقل، المستخدم، متصل / بلا اتصال، إرسال وتحديث بعدد المعلّق)، P1 `/login`، P7 `/settings`، P8 `/database` | D |
+| **7ج نقطة البيع: البيع** | P2 `/` (الماسح أولًا، الكميات من `PosCart`، الدفع والطباعة والدرج)، P3 `/sales` (فواتير الجهاز وحالتها PENDING / SENT / REJECTED) | B، C |
+| **7د نقطة البيع: المستندات** | P4 `/return`، P5 `/payment`، P6 `/closing` | B |
+| **7هـ المندوب: الإطار والإعدادات** | `RepLayout` (شريط علوي + تنقل سفلي `MudNavMenu` للهاتف، عرض 360px)، R1 `/login`، R2 `/` (لوحة اليوم)، R9 `/settings`، R10 `/password` | D |
+| **7و المندوب: العملاء والمستندات** | R3 `/customers`، R4 `/customers/{Id}`، R5 `/orders`، R6 `/orders/new/{CustomerId}`، R7 `/invoice/{CustomerId}`، R8 `/payment/{CustomerId}` | A، D، C، B |
+
+**استثناءات مقترحة من قواعد الويب (تحتاج موافقة):** شاشات اللمس (الكاشير والهاتف) أزرار `Size.Large` وحقول `Margin.Normal` بدل `Dense`؛ بلا قائمة جانبية؛ الوضع الليلي يُحفظ في إعدادات الجهاز (`PosStore` / `LocalStore`) بدل الكوكي. مبالغ سطور نقطة البيع تبقى من `PosCart` (لا من `InvoiceLinesEditor` إن لم يناسب مسار الماسح).
+
+**التحقق لكل دفعة:** `dotnet build` و`dotnet test` و`test_web*.py` (يُوسَّع `test_web_rules.py` ليفحص صفحات التطبيقين المعلَّمة ✅، ويفحص أن `RetailStore.UI.Kit` و`RetailStore.RepApp` لا يعتمدان على `RetailStore.Data`)، ولقطات من `RetailStore.AppPreview` (نقطة البيع 1366px و1024px، المندوب 360px و412px، فاتح / داكن، عربي / إنجليزي)، ثم بناء `RetailStore.Pos` و`RetailStore.App` وتجربتهما على جهاز صاحب المشروع.
