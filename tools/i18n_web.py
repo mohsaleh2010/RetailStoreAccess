@@ -407,6 +407,12 @@ WEB_EN = {
     'لا توجد مبيعات في آخر 12 شهرًا': 'No sales in the last 12 months',
     'لا توجد مبيعات في آخر 30 يومًا': 'No sales in the last 30 days',
     'ملخص الفاتورة': 'Invoice summary',
+    # phase 6, batch 3 (stock)
+    'التحويلات': 'Transfers',
+    'حركة الصنف': 'Item moves',
+    'رصيد المخزون': 'Stock on hand',
+    'عدد الأصناف': 'Number of items',
+    'ملخص التحويل': 'Transfer summary',
 }
 
 _CS_LITERAL = re.compile(r'"((?:[^"\\\n]|\\.)*)"')

@@ -20,6 +20,7 @@ public static class StatusStyles
         ["DELIVERED"] = new("تم التسليم", Color.Success, Icons.Material.Outlined.LocalShipping),
         ["RECEIVED"] = new("مستلم", Color.Success, Icons.Material.Outlined.MoveToInbox),
         ["INVOICED"] = new("مفوتر", Color.Success, Icons.Material.Outlined.ReceiptLong),
+        ["SENT"] = new("بالطريق", Color.Warning, Icons.Material.Outlined.LocalShipping),
         ["IN_TRANSIT"] = new("في الطريق", Color.Warning, Icons.Material.Outlined.LocalShipping),
         ["INTRANSIT"] = new("في الطريق", Color.Warning, Icons.Material.Outlined.LocalShipping),
         ["PENDING"] = new("بانتظار الإرسال", Color.Warning, Icons.Material.Outlined.Schedule),

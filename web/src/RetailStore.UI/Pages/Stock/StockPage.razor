@@ -2,148 +2,236 @@
 @attribute [Authorize]
 @inject StockService Stock
 @inject PermissionService Permissions
+@inject IJSRuntime JS
 @inject UiLanguage L
 
-<PageTitle>@L.T("المخزون")</PageTitle>
+@* Template C (docs/ui-inventory.md section 8) for the stock and the item card: PageHeader (print) -> FilterPanel (the
+   warehouse, the search the service looks in, the items under the reorder level) -> the figures of the rows shown ->
+   EntityGrid of the stock (a row opens its card) -> the item card of the chosen product: its period, then EntityGrid of
+   its moves (the opening line first). The data is StockService.StockAsync / ItemCardAsync with the permission of
+   frmInventory. *@
+<PageHeader Title="@L.T("المخزون")" Description="@L.T("رصيد كل صنف في كل مخزن، وكارت الصنف")"
+            Icon="@NavGroups.IconOf("stock")" Group="@L.T("المخازن")">
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Print" OnClick="Print">
+                @L.T("طباعة")<kbd class="erp-kbd">Ctrl+P</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("المخزون")</h1>
-            <p class="subtitle">@L.T("رصيد كل صنف في كل مخزن، وكارت الصنف")</p>
-        </div>
-    </header>
-
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
-    {
-        <div class="pos">
-            <div class="list-pane">
-                <form class="list-tools" @onsubmit="Load" @onsubmit:preventDefault>
-                    <select aria-label="@L.T("المخزن")" @bind="warehouseId" @bind:after="Load">
-                        <option value="0">@L.T("كل المخازن")</option>
-                        @foreach (var w in warehouses)
-                        {
-                            <option value="@w.Id">@w.Name</option>
-                        }
-                    </select>
-                    <input type="search" class="search" placeholder="@L.T("بحث")" aria-label="@L.T("بحث")" @bind="search" />
-                    <label class="check"><input type="checkbox" @bind="lowOnly" @bind:after="Load" /> @L.T("الأصناف تحت حد الطلب")</label>
-                    <button type="submit" class="btn">@L.T("عرض")</button>
-                </form>
-                <table class="list">
-                    <thead>
-                        <tr>
-                            <th>@L.T("الرمز")</th>
-                            <th>@L.T("الصنف")</th>
-                            <th>@L.T("الوحدة")</th>
-                            <th>@L.T("الكمية")</th>
-                            @if (warehouseId > 0)
-                            {
-                                <th>@L.T("محجوز")</th>
-                            }
-                            <th>@L.T("الحد الأدنى")</th>
-                            <th>@L.T("متوسط التكلفة")</th>
-                            <th>@L.T("القيمة")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var r in rows)
-                        {
-                            <tr tabindex="0" class="@(r.IsLow ? "low" : "") @(r.ProductID == productId ? "selected" : "")"
-                                @onclick="() => Card(r)" @onkeydown="e => Key(e, r)">
-                                <td data-label="@L.T("الرمز")">@r.ProductCode</td>
-                                <td data-label="@L.T("الصنف")">@r.ProductName</td>
-                                <td data-label="@L.T("الوحدة")">@r.UnitName</td>
-                                <td data-label="@L.T("الكمية")">@WorkPages.Qty(r.Quantity)</td>
-                                @if (warehouseId > 0)
-                                {
-                                    <td data-label="@L.T("محجوز")">@WorkPages.Qty(r.Reserved)</td>
-                                }
-                                <td data-label="@L.T("الحد الأدنى")">@WorkPages.Qty(r.MinimumQuantity)</td>
-                                <td data-label="@L.T("متوسط التكلفة")">@r.AverageCost.ToString("0.00##")</td>
-                                <td data-label="@L.T("القيمة")">@WorkPages.Money(r.Value)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @if (rows.Count == 0)
+}
+else
+{
+    <KeyboardShortcuts OnPrint="Print" />
+    <FilterPanel ShowDates="false" OnShow="Load" OnClear="Reset" Busy="busy" Class="no-print">
+        <MudItem xs="12" sm="6" md="3">
+            <MudSelect T="int" Value="warehouseId" ValueChanged="WarehouseChanged" Label="@L.T("المخزن")" Variant="Variant.Outlined"
+                       Margin="Margin.Dense" Dense="true">
+                <MudSelectItem T="int" Value="0">@L.T("كل المخازن")</MudSelectItem>
+                @foreach (var w in warehouses)
                 {
-                    <p class="empty">@L.T("لا توجد سجلات")</p>
+                    <MudSelectItem T="int" Value="@w.Id">@w.Name</MudSelectItem>
                 }
-                else
-                {
-                    <p class="hint">@L.T("قيمة المخزون"): @WorkPages.Money(rows.Sum(r => r.Value)) (@rows.Count)</p>
-                }
-            </div>
+            </MudSelect>
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <MudTextField T="string" @bind-Value="search" Label="@L.T("بحث")" Placeholder="@L.T("ابحث عن صنف أو اكتب الباركود")"
+                          Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Outlined.Search" Clearable="true" AutoFocus="true" Immediate="true"
+                          OnKeyDown="SearchKey" data-erp-search="true" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4" Class="d-flex align-center">
+            <MudSwitch T="bool" Value="lowOnly" ValueChanged="LowChanged" Color="Color.Warning" Label="@L.T("الأصناف تحت حد الطلب")" />
+        </MudItem>
+    </FilterPanel>
 
-            <div class="form-pane">
-                <h2>@L.T("كارت الصنف") @productName</h2>
-                @if (productId == 0)
-                {
-                    <p class="empty">@L.T("اختر صنفًا من القائمة لعرض حركته")</p>
-                }
-                else
-                {
-                    <form class="list-tools" @onsubmit="LoadCard" @onsubmit:preventDefault>
-                        <label class="check">@L.T("من") <input type="date" @bind="from" /></label>
-                        <label class="check">@L.T("إلى") <input type="date" @bind="to" /></label>
-                        <button type="submit" class="btn">@L.T("عرض")</button>
-                    </form>
-                    <table class="list">
-                        <thead>
-                            <tr>
-                                <th>@L.T("التاريخ")</th>
-                                <th>@L.T("الحركة")</th>
-                                <th>@L.T("المرجع")</th>
-                                <th>@L.T("الجهة")</th>
-                                <th>@L.T("وارد")</th>
-                                <th>@L.T("صادر")</th>
-                                <th>@L.T("الرصيد")</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var c in card)
+    <MudText Typo="Typo.subtitle1" Class="mb-3 erp-print-title">
+        @L.T("المخزون") - @WarehouseName
+    </MudText>
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("عدد الأصناف")" Value="@rows.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                      Icon="@Icons.Material.Outlined.Inventory2" Color="Color.Info" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("قيمة المخزون")" Icon="@Icons.Material.Outlined.Savings" Color="Color.Primary">
+                <ValueContent><MoneyText Value="rows.Sum(r => r.Value)" /></ValueContent>
+            </StatCard>
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("الأصناف تحت حد الطلب")" Value="@rows.Count(r => r.IsLow).ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                      Icon="@Icons.Material.Outlined.ReportProblem" Color="Color.Warning" />
+        </MudItem>
+        <MudItem xs="12" sm="6" lg="3">
+            <StatCard Title="@L.T("الكمية")" Icon="@Icons.Material.Outlined.Numbers" Color="Color.Secondary"
+                      Subtitle="@(warehouseId > 0 ? L.T("محجوز") + ": " + ErpFormat.Qty(rows.Sum(r => r.Reserved)) : null)">
+                <ValueContent><QtyText Value="rows.Sum(r => r.Quantity)" /></ValueContent>
+            </StatCard>
+        </MudItem>
+    </MudGrid>
+
+    <EntityGrid T="StockRow" Items="rows" Title="@L.T("رصيد المخزون")" Export="export" ExportName="@L.T("المخزون")"
+                Loading="busy" Filterable="false" RowsPerPage="50" RowClick="Card" RowClass="StockRowClass" Class="mb-4"
+                EmptyText="@L.T("لا توجد سجلات")">
+        <Columns>
+            <PropertyColumn T="StockRow" TProperty="string" Property="r => r.ProductCode" Title="@L.T("الرمز")" />
+            <PropertyColumn T="StockRow" TProperty="string" Property="r => r.ProductName" Title="@L.T("الصنف")" />
+            <PropertyColumn T="StockRow" TProperty="string" Property="r => r.UnitName" Title="@L.T("الوحدة")" />
+            <TemplateColumn T="StockRow" Title="@L.T("الكمية")" SortBy="r => r.Quantity" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><QtyText Value="context.Item.Quantity" /></CellTemplate>
+            </TemplateColumn>
+            @if (warehouseId > 0)
+            {
+                <TemplateColumn T="StockRow" Title="@L.T("محجوز")" SortBy="r => r.Reserved" HeaderClass="erp-num" CellClass="erp-num">
+                    <CellTemplate><QtyText Value="context.Item.Reserved" /></CellTemplate>
+                </TemplateColumn>
+            }
+            <TemplateColumn T="StockRow" Title="@L.T("الحد الأدنى")" SortBy="r => r.MinimumQuantity" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate>
+                    <QtyText Value="context.Item.MinimumQuantity" />
+                    @if (context.Item.IsLow)
+                    {
+                        <MudTooltip Text="@L.T("الأصناف تحت حد الطلب")">
+                            <MudIcon Icon="@Icons.Material.Outlined.ReportProblem" Color="Color.Warning" Size="Size.Small" Class="erp-low-icon" />
+                        </MudTooltip>
+                    }
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="StockRow" Title="@L.T("متوسط التكلفة")" SortBy="r => r.AverageCost" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.AverageCost" Decimals="4" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="StockRow" Title="@L.T("القيمة")" SortBy="r => r.Value" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><MoneyText Value="context.Item.Value" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="StockRow" Title="" Sortable="false" CellClass="erp-actions-col no-print" HeaderClass="erp-actions-col no-print">
+                <CellTemplate>
+                    <MudTooltip Text="@L.T("كارت الصنف")">
+                        <MudIconButton Icon="@Icons.Material.Outlined.ManageSearch" Size="Size.Small" OnClick="() => Card(context.Item)"
+                                       aria-label="@L.T("كارت الصنف")" />
+                    </MudTooltip>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </EntityGrid>
+
+    <div id="item-card">
+        @if (productId == 0)
+        {
+            <EmptyState Icon="@Icons.Material.Outlined.ManageSearch" Title="@L.T("كارت الصنف")"
+                        Text="@L.T("اختر صنفًا من القائمة لعرض حركته")" Class="no-print" />
+        }
+        else
+        {
+            <FilterPanel Range="range" RangeChanged="r => range = r ?? ThisMonth()" OnShow="LoadCard" OnClear="ResetCard" Busy="cardBusy"
+                         Title="@(L.T("كارت الصنف") + " - " + productName)" Class="no-print" />
+            <MudText Typo="Typo.subtitle1" Class="mb-3 erp-print-title">
+                @L.T("كارت الصنف") - @productName
+                <span class="mud-text-secondary erp-num" dir="ltr">(@ErpFormat.Date(range.Start) - @ErpFormat.Date(range.End))</span>
+            </MudText>
+            <EntityGrid T="ItemCardLine" Items="card" Title="@L.T("حركة الصنف")" Export="cardExport"
+                        ExportName="@(L.T("كارت الصنف") + " " + productName)" Loading="cardBusy" Filterable="false" RowsPerPage="50"
+                        RowClass="CardRowClass" EmptyText="@L.T("لا توجد سجلات")">
+                <Columns>
+                    <TemplateColumn T="ItemCardLine" Title="@L.T("التاريخ")" SortBy="c => c.MovementDate">
+                        <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@CardDate(context.Item)</bdi></CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="ItemCardLine" Title="@L.T("الحركة")" SortBy="c => c.MovementType">
+                        <CellTemplate>@L.T(context.Item.MovementType)</CellTemplate>
+                    </TemplateColumn>
+                    <PropertyColumn T="ItemCardLine" TProperty="string" Property="c => c.ReferenceNumber" Title="@L.T("المرجع")" />
+                    <TemplateColumn T="ItemCardLine" Title="@L.T("الجهة")" SortBy="c => c.PartyName">
+                        <CellTemplate>
+                            @context.Item.PartyName
+                            @if (warehouseId == 0 && context.Item.WarehouseName is { } wn)
                             {
-                                <tr>
-                                    <td data-label="@L.T("التاريخ")">@c.MovementDate.ToString(c.MoveID == 0 ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm")</td>
-                                    <td data-label="@L.T("الحركة")">@L.T(c.MovementType)</td>
-                                    <td data-label="@L.T("المرجع")">@c.ReferenceNumber</td>
-                                    <td data-label="@L.T("الجهة")">@c.PartyName @(warehouseId == 0 && c.WarehouseName is { } wn ? "(" + wn + ")" : "")</td>
-                                    <td data-label="@L.T("وارد")">@(c.QtyIn != 0 ? WorkPages.Qty(c.QtyIn) : "")</td>
-                                    <td data-label="@L.T("صادر")">@(c.QtyOut != 0 ? WorkPages.Qty(c.QtyOut) : "")</td>
-                                    <td data-label="@L.T("الرصيد")">@WorkPages.Qty(c.Balance)</td>
-                                </tr>
+                                <span class="mud-text-secondary erp-card-warehouse">(@wn)</span>
                             }
-                        </tbody>
-                    </table>
-                }
-            </div>
-        </div>
-    }
-</section>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="ItemCardLine" Title="@L.T("وارد")" SortBy="c => c.QtyIn" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate>
+                            @if (context.Item.QtyIn != 0)
+                            {
+                                <QtyText Value="context.Item.QtyIn" />
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="ItemCardLine" Title="@L.T("صادر")" SortBy="c => c.QtyOut" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate>
+                            @if (context.Item.QtyOut != 0)
+                            {
+                                <QtyText Value="context.Item.QtyOut" />
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn T="ItemCardLine" Title="@L.T("الرصيد")" SortBy="c => c.Balance" HeaderClass="erp-num" CellClass="erp-num">
+                        <CellTemplate><QtyText Value="context.Item.Balance" /></CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </EntityGrid>
+        }
+    </div>
+}
 
 @code {
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
-    private bool allowed, lowOnly;
+    private bool allowed, loaded, busy, cardBusy, lowOnly;
     private string denied = "", productName = "";
     private string? search;
     private int warehouseId, productId;
-    private DateTime from = DateTime.Today.AddDays(1 - DateTime.Today.Day), to = DateTime.Today;
+    private DateRange range = ThisMonth();
     private List<StockRow> rows = [];
     private List<ItemCardLine> card = [];
     private List<(int Id, string Name)> warehouses = [];
+    private List<GridExport<StockRow>> export = [];
+    private List<GridExport<ItemCardLine>> cardExport = [];
+
+    /// <summary>The period the card opened on, as before: the first of this month to today.</summary>
+    private static DateRange ThisMonth() => new(DateTime.Today.AddDays(1 - DateTime.Today.Day), DateTime.Today);
+
+    private string WarehouseName => warehouseId == 0
+        ? L.T("كل المخازن")
+        : warehouses.FirstOrDefault(w => w.Id == warehouseId).Name ?? "";
 
     protected override async Task OnInitializedAsync()
     {
         var user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(UserInfo.EmployeeId(user), "frmInventory");
         allowed = denied.Length == 0;
+        loaded = true;
         if (allowed)
         {
+            export =
+            [
+                new(L.T("الرمز"), r => r.ProductCode),
+                new(L.T("الصنف"), r => r.ProductName),
+                new(L.T("الوحدة"), r => r.UnitName),
+                new(L.T("الكمية"), r => r.Quantity),
+                new(L.T("محجوز"), r => r.Reserved),
+                new(L.T("الحد الأدنى"), r => r.MinimumQuantity),
+                new(L.T("متوسط التكلفة"), r => r.AverageCost),
+                new(L.T("القيمة"), r => r.Value),
+            ];
+            cardExport =
+            [
+                new(L.T("التاريخ"), c => CardDate(c)),
+                new(L.T("الحركة"), c => L.T(c.MovementType)),
+                new(L.T("المرجع"), c => c.ReferenceNumber),
+                new(L.T("الجهة"), c => c.PartyName),
+                new(L.T("المخزن"), c => c.WarehouseName),
+                new(L.T("وارد"), c => c.QtyIn),
+                new(L.T("صادر"), c => c.QtyOut),
+                new(L.T("الرصيد"), c => c.Balance),
+            ];
             (warehouses, _) = await Stock.WarehousesAsync(UserInfo.EmployeeId(user), L.English);
             await Load();
         }
@@ -151,27 +239,84 @@
 
     private async Task Load()
     {
-        rows = await Stock.StockAsync(warehouseId, search, lowOnly, L.English);
-        if (productId > 0)
+        busy = true;
+        try
         {
-            await LoadCard();
+            rows = await Stock.StockAsync(warehouseId, search, lowOnly, L.English);
+            if (productId > 0)
+            {
+                await LoadCard();
+            }
+        }
+        finally
+        {
+            busy = false;
         }
     }
+
+    private async Task Reset()
+    {
+        warehouseId = 0;
+        search = null;
+        lowOnly = false;
+        await Load();
+    }
+
+    private async Task WarehouseChanged(int id)
+    {
+        warehouseId = id;
+        await Load();
+    }
+
+    private async Task LowChanged(bool value)
+    {
+        lowOnly = value;
+        await Load();
+    }
+
+    private async Task SearchKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await Load();
+        }
+    }
+
+    private string StockRowClass(StockRow r, int _) =>
+        (r.IsLow ? "erp-row-low " : "") + (r.ProductID == productId ? "erp-row-selected" : "");
+
+    private static string CardRowClass(ItemCardLine c, int _) => c.MoveID == 0 ? "erp-row-opening" : "";
 
     private async Task Card(StockRow r)
     {
         productId = r.ProductID;
         productName = r.ProductName;
         await LoadCard();
+        StateHasChanged();
+        await JS.InvokeVoidAsync("erp.scrollToId", "item-card");
     }
 
-    private async Task LoadCard() => card = await Stock.ItemCardAsync(productId, warehouseId, from, to, L.English);
-
-    private async Task Key(KeyboardEventArgs e, StockRow r)
+    private async Task LoadCard()
     {
-        if (e.Key == "Enter")
+        cardBusy = true;
+        try
         {
-            await Card(r);
+            card = await Stock.ItemCardAsync(productId, warehouseId, range.Start ?? DateTime.Today, range.End ?? DateTime.Today, L.English);
+        }
+        finally
+        {
+            cardBusy = false;
         }
     }
+
+    private async Task ResetCard()
+    {
+        range = ThisMonth();
+        await LoadCard();
+    }
+
+    private static string CardDate(ItemCardLine c) =>
+        c.MovementDate.ToString(c.MoveID == 0 ? "yyyy-MM-dd" : "yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+
+    private async Task Print() => await JS.InvokeVoidAsync("print");
 }

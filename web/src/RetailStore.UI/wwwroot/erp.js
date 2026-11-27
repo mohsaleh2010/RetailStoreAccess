@@ -20,6 +20,14 @@ window.erp = {
         setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     },
 
+    // bring a section of the page into view (the item card of /stock after its row is chosen)
+    scrollToId: function (id) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    },
+
     // the keyboard shortcuts of the screens (Services/ShortcutService.cs): F2 save, F3 search, F4 new, Esc close,
     // Ctrl+P print. Only the keys that have a handler in .NET are taken from the browser; F3 without one goes to the
     // search box of the page, Ctrl+P without one stays the print of the browser.

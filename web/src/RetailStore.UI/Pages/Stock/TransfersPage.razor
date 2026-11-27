@@ -3,228 +3,316 @@
 @inject StockService Stock
 @inject PurchaseService Purchases
 @inject PermissionService Permissions
+@inject IDialogService Dialogs
 @inject UiLanguage L
 
-<PageTitle>@L.T("التحويل بين المخازن")</PageTitle>
-
-<section class="screen">
-    <header class="screen-head">
-        <div>
-            <h1>@L.T("التحويل بين المخازن")</h1>
-            <p class="subtitle">@L.T("إرسال الأصناف من مخزن إلى آخر واستلامها")</p>
-        </div>
-        @if (allowed && current is not null)
+@* Template B (docs/ui-inventory.md section 8) for a transfer between warehouses: PageHeader (the number and StatusChip,
+   new F4, the action of the state: save the draft F2, send, confirm the receipt) -> the head (from / to warehouse, notes)
+   -> the lines (scan or search a product, the quantity, what the sending warehouse has) -> the summary card beside them
+   -> FilterPanel (the status) and EntityGrid of the transfers (a row opens it). The logic is StockService
+   CreateTransferAsync / SendTransferAsync (its question through ConfirmDialog, then sent again with the answer) /
+   ReceiveTransferAsync / UnpostTransferAsync / DeleteTransferAsync, with the permission of its Access form. *@
+<PageHeader Title="@L.T("التحويل بين المخازن")" Description="@L.T("إرسال الأصناف من مخزن إلى آخر واستلامها")"
+            Icon="@NavGroups.IconOf("transfers")" Group="@L.T("المخازن")">
+    <Status>
+        @if (allowed)
         {
-            <button class="btn" @onclick="New">@L.T("تحويل جديد")</button>
+            @if (current is { } h)
+            {
+                <MudChip T="string" Variant="Variant.Outlined" Icon="@Icons.Material.Outlined.SyncAlt" Class="erp-status-chip">
+                    <bdi class="erp-num">@h.TransferNumber</bdi>
+                </MudChip>
+                <StatusChip Status="@h.Status" />
+            }
+            else
+            {
+                <StatusChip Status="DRAFT" />
+            }
         }
-    </header>
+    </Status>
+    <Actions>
+        @if (allowed)
+        {
+            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.NoteAdd" OnClick="New" Disabled="busy">
+                @L.T("تحويل جديد")<kbd class="erp-kbd">F4</kbd>
+            </MudButton>
+            @if (current is null)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Save" OnClick="Create"
+                           Disabled="@(busy || lines.Count == 0)">
+                    @L.T("حفظ مسودة")<kbd class="erp-kbd">F2</kbd>
+                </MudButton>
+            }
+            else if (current.Status == "DRAFT")
+            {
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" StartIcon="@Icons.Material.Outlined.Delete" OnClick="Delete" Disabled="busy">
+                    @L.T("حذف")
+                </MudButton>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.LocalShipping"
+                           OnClick="() => Send(false)" Disabled="busy">
+                    @L.T("إرسال")
+                </MudButton>
+            }
+            else if (current.Status == "SENT")
+            {
+                <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Undo" OnClick="Unpost" Disabled="busy">
+                    @L.T("إلغاء الترحيل")
+                </MudButton>
+                @if (current.CanReceive)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.MoveToInbox"
+                               OnClick="Receive" Disabled="busy">
+                        @L.T("تأكيد الاستلام")
+                    </MudButton>
+                }
+            }
+        }
+    </Actions>
+</PageHeader>
 
-    @if (!allowed)
+@if (!allowed)
+{
+    @if (loaded)
     {
-        <div class="message error" role="alert">@L.T(denied)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" role="alert">@L.T(denied)</MudAlert>
     }
-    else
-    {
-        <div class="pos">
-            <div class="list-pane">
-                <div class="list-tools">
-                    <select aria-label="@L.T("الحالة")" @bind="status" @bind:after="Load">
-                        <option value="">@L.T("الكل")</option>
-                        <option value="DRAFT">@L.T("مسودة")</option>
-                        <option value="SENT">@L.T("بالطريق")</option>
-                        <option value="RECEIVED">@L.T("مستلم")</option>
-                    </select>
-                </div>
-                <table class="list">
-                    <thead>
-                        <tr>
-                            <th>@L.T("رقم التحويل")</th>
-                            <th>@L.T("التاريخ")</th>
-                            <th>@L.T("من مخزن")</th>
-                            <th>@L.T("إلى مخزن")</th>
-                            <th>@L.T("الحالة")</th>
-                            <th>@L.T("الكمية")</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var r in rows)
-                        {
-                            <tr tabindex="0" class="@(current?.StockTransferID == r.StockTransferID ? "selected" : "")"
-                                @onclick="() => Open(r.StockTransferID)" @onkeydown="e => Key(e, r.StockTransferID)">
-                                <td data-label="@L.T("رقم التحويل")">@r.TransferNumber</td>
-                                <td data-label="@L.T("التاريخ")">@r.TransferDate.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td data-label="@L.T("من مخزن")">@r.FromName</td>
-                                <td data-label="@L.T("إلى مخزن")">@r.ToName</td>
-                                <td data-label="@L.T("الحالة")">@L.T(WorkPages.TransferStatusName(r.Status))</td>
-                                <td data-label="@L.T("الكمية")">@WorkPages.Qty(r.Quantity) (@r.LineCount)</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-                @if (rows.Count == 0)
-                {
-                    <p class="empty">@L.T("لا توجد سجلات")</p>
-                }
-            </div>
-
-            <div class="form-pane">
-                @if (current is { } t)
-                {
-                    <h2>@t.TransferNumber - @L.T(WorkPages.TransferStatusName(t.Status))</h2>
-                    <p>@L.T("من مخزن"): @t.FromName - @L.T("إلى مخزن"): @t.ToName</p>
-                    <p class="hint">@t.TransferDate.ToString("yyyy-MM-dd HH:mm") - @t.EmployeeName @(t.ReceivedAt is { } at ? " - " + at.ToString("yyyy-MM-dd HH:mm") + " " + t.ReceivedBy : "")</p>
-                    @if (!string.IsNullOrEmpty(t.Notes))
-                    {
-                        <p class="hint">@t.Notes</p>
-                    }
-                    <table class="list">
-                        <thead>
-                            <tr>
-                                <th>@L.T("الصنف")</th>
-                                <th>@L.T("الكمية")</th>
-                                <th>@(t.Status == "DRAFT" ? L.T("المتوفر") : L.T("التكلفة"))</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var l in t.Lines)
-                            {
-                                <tr class="@(t.Status == "DRAFT" && l.Quantity > l.Available ? "low" : "")">
-                                    <td data-label="@L.T("الصنف")">@l.ProductName (@l.ProductCode)</td>
-                                    <td data-label="@L.T("الكمية")">@WorkPages.Qty(l.Quantity) @l.UnitName</td>
-                                    <td>@(t.Status == "DRAFT" ? WorkPages.Qty(l.Available) : l.UnitCost.ToString("0.00##"))</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <div class="actions">
-                        @if (t.Status == "DRAFT")
-                        {
-                            <button class="btn primary" disabled="@busy" @onclick="() => Send(false)">@L.T("إرسال")</button>
-                            <button class="btn" disabled="@busy" @onclick="Delete">@L.T("حذف")</button>
-                        }
-                        else if (t.Status == "SENT")
-                        {
-                            @if (t.CanReceive)
-                            {
-                                <button class="btn primary" disabled="@busy" @onclick="Receive">@L.T("تأكيد الاستلام")</button>
-                            }
-                            <button class="btn" disabled="@busy" @onclick="Unpost">@L.T("إلغاء الترحيل")</button>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <h2>@L.T("تحويل جديد")</h2>
-                    <div class="record">
-                        <div class="field">
-                            <label for="tr-from">@L.T("من مخزن")</label>
-                            <select id="tr-from" @bind="fromId">
-                                @foreach (var w in warehouses)
-                                {
-                                    <option value="@w.Id">@w.Name</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="field">
-                            <label for="tr-to">@L.T("إلى مخزن")</label>
-                            <select id="tr-to" @bind="toId">
-                                <option value="0"></option>
-                                @foreach (var w in warehouses.Where(w => w.Id != fromId))
-                                {
-                                    <option value="@w.Id">@w.Name</option>
-                                }
-                            </select>
-                        </div>
-                        <div class="field span-2">
-                            <label for="tr-notes">@L.T("ملاحظات")</label>
-                            <input id="tr-notes" type="text" maxlength="255" @bind="notes" />
-                        </div>
-                    </div>
-                    <form class="pos-scan" @onsubmit="Find" @onsubmit:preventDefault>
-                        <input type="search" class="search" placeholder="@L.T("ابحث عن صنف أو اكتب الباركود")"
-                               aria-label="@L.T("ابحث عن صنف أو اكتب الباركود")" @bind="code" @bind:event="oninput" />
-                        <button type="submit" class="btn">@L.T("إضافة")</button>
-                    </form>
-                    @if (choices.Count > 0)
-                    {
-                        <ul class="pos-choices">
-                            @foreach (var p in choices)
-                            {
-                                <li><button class="btn link" @onclick="() => Add(p)">@p.ProductName (@p.ProductCode) - @WorkPages.Qty(p.Available)</button></li>
-                            }
-                        </ul>
-                    }
-                    <table class="list pos-lines">
-                        <thead>
-                            <tr>
-                                <th>@L.T("الصنف")</th>
-                                <th>@L.T("الكمية")</th>
-                                <th>@L.T("المتوفر")</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (int i = 0; i < lines.Count; i++)
-                            {
-                                var line = lines[i];
-                                int index = i;
-                                <tr>
-                                    <td data-label="@L.T("الصنف")">@line.Name</td>
-                                    <td data-label="@L.T("الكمية")"><input type="number" step="any" min="0" aria-label="@L.T("الكمية")" @bind="line.Quantity" /></td>
-                                    <td data-label="@L.T("المتوفر")">@WorkPages.Qty(line.Available)</td>
-                                    <td><button class="btn link" aria-label="@L.T("حذف")" @onclick="() => lines.RemoveAt(index)">&#10005;</button></td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                    <p class="hint">@L.T("الكميات بالوحدة الصغرى للصنف")</p>
-                    <div class="actions">
-                        <button class="btn primary" disabled="@(busy || lines.Count == 0)" @onclick="Create">@L.T("حفظ مسودة")</button>
-                    </div>
-                }
-            </div>
-        </div>
-    }
-
+}
+else
+{
+    <KeyboardShortcuts OnSave="SaveKey" OnNew="New" />
     @if (message.Length > 0)
     {
-        <div class="message @messageKind" role="status">@L.T(message)</div>
+        <MudAlert Severity="@severity" Variant="Variant.Outlined" Class="mb-4" role="status" ShowCloseIcon="true"
+                  CloseIconClicked="() => message = string.Empty">@L.T(message)</MudAlert>
     }
 
-    @if (question is not null)
-    {
-        <div class="dialog-backdrop">
-            <div class="dialog" role="dialog" aria-modal="true">
-                <p>@L.T(question)</p>
-                <div class="actions">
-                    <button class="btn primary" @onclick="() => Answer(true)">@L.T("نعم")</button>
-                    <button class="btn" @onclick="() => Answer(false)">@L.T("لا")</button>
-                </div>
-            </div>
+    <div class="erp-doc mb-4">
+        <div class="erp-doc-main">
+            @if (current is { } t)
+            {
+                <MudPaper Outlined="true" Class="pa-4 mb-4">
+                    <dl class="erp-info-list">
+                        <dt>@L.T("من مخزن")</dt><dd>@t.FromName</dd>
+                        <dt>@L.T("إلى مخزن")</dt><dd>@t.ToName</dd>
+                        <dt>@L.T("التاريخ")</dt>
+                        <dd><bdi class="erp-num erp-nowrap" dir="ltr">@Stamp(t.TransferDate)</bdi> - @t.EmployeeName</dd>
+                        @if (t.ReceivedAt is { } at)
+                        {
+                            <dt>@L.T("مستلم")</dt>
+                            <dd><bdi class="erp-num erp-nowrap" dir="ltr">@Stamp(at)</bdi> - @t.ReceivedBy</dd>
+                        }
+                        @if (!string.IsNullOrEmpty(t.Notes))
+                        {
+                            <dt>@L.T("ملاحظات")</dt><dd>@t.Notes</dd>
+                        }
+                    </dl>
+                </MudPaper>
+                <EntityGrid T="TransferLineView" Items="t.Lines" Title="@L.T("الأصناف")" Filterable="false" ShowPager="false" RowsPerPage="500"
+                            RowClass="ViewLineClass"
+                            EmptyText="@L.T("لا توجد سجلات")">
+                    <Columns>
+                        <PropertyColumn T="TransferLineView" TProperty="string" Property="l => l.ProductCode" Title="@L.T("الرمز")" />
+                        <PropertyColumn T="TransferLineView" TProperty="string" Property="l => l.ProductName" Title="@L.T("الصنف")" />
+                        <TemplateColumn T="TransferLineView" Title="@L.T("الكمية")" SortBy="l => l.Quantity" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><QtyText Value="context.Item.Quantity" Unit="@context.Item.UnitName" /></CellTemplate>
+                        </TemplateColumn>
+                        @if (t.Status == "DRAFT")
+                        {
+                            <TemplateColumn T="TransferLineView" Title="@L.T("المتوفر")" SortBy="l => l.Available" HeaderClass="erp-num" CellClass="erp-num">
+                                <CellTemplate><QtyText Value="context.Item.Available" /></CellTemplate>
+                            </TemplateColumn>
+                        }
+                        else
+                        {
+                            <TemplateColumn T="TransferLineView" Title="@L.T("التكلفة")" SortBy="l => l.UnitCost" HeaderClass="erp-num" CellClass="erp-num">
+                                <CellTemplate><MoneyText Value="context.Item.UnitCost" Decimals="4" /></CellTemplate>
+                            </TemplateColumn>
+                        }
+                    </Columns>
+                </EntityGrid>
+            }
+            else
+            {
+                <MudPaper Outlined="true" Class="pa-4 mb-4">
+                    <MudGrid Spacing="3">
+                        <MudItem xs="12" sm="6" md="3">
+                            <MudSelect T="int" Value="fromId" ValueChanged="FromChanged" Label="@L.T("من مخزن")" Variant="Variant.Outlined"
+                                       Margin="Margin.Dense" Dense="true">
+                                @foreach (var w in warehouses)
+                                {
+                                    <MudSelectItem T="int" Value="@w.Id">@w.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" sm="6" md="3">
+                            <MudSelect T="int" @bind-Value="toId" Label="@L.T("إلى مخزن")" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                       Dense="true">
+                                <MudSelectItem T="int" Value="0">&nbsp;</MudSelectItem>
+                                @foreach (var w in warehouses.Where(w => w.Id != fromId))
+                                {
+                                    <MudSelectItem T="int" Value="@w.Id">@w.Name</MudSelectItem>
+                                }
+                            </MudSelect>
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" @bind-Value="notes" Label="@L.T("ملاحظات")" Variant="Variant.Outlined"
+                                          Margin="Margin.Dense" MaxLength="255" />
+                        </MudItem>
+                        <MudItem xs="12" md="6">
+                            <MudTextField T="string" @ref="scan" @bind-Value="code" Label="@L.T("ابحث عن صنف أو اكتب الباركود")"
+                                          Variant="Variant.Outlined" Margin="Margin.Dense" Adornment="Adornment.Start"
+                                          AdornmentIcon="@Icons.Material.Outlined.QrCodeScanner" Immediate="true" AutoFocus="true"
+                                          OnKeyDown="ScanKey" data-erp-search="true" Clearable="true" HelperText="@L.T("Enter للإضافة")" />
+                            @if (choices.Count > 0)
+                            {
+                                <MudPaper Outlined="true" Class="erp-pos-choices mt-1">
+                                    <MudList T="PurchaseProduct" Dense="true">
+                                        @foreach (var p in choices)
+                                        {
+                                            <MudListItem T="PurchaseProduct" OnClick="() => Add(p)">
+                                                <div class="erp-lookup-item">
+                                                    <span class="erp-lookup-code erp-num">@p.ProductCode</span>
+                                                    <span class="erp-lookup-name">@p.ProductName</span>
+                                                    <span class="erp-lookup-info"><QtyText Value="p.Available" /></span>
+                                                </div>
+                                            </MudListItem>
+                                        }
+                                    </MudList>
+                                </MudPaper>
+                            }
+                        </MudItem>
+                        <MudItem xs="12" md="6" Class="d-flex align-start">
+                            <MudButton Variant="Variant.Outlined" StartIcon="@Icons.Material.Outlined.Add" OnClick="Find" Disabled="busy">
+                                @L.T("إضافة")
+                            </MudButton>
+                        </MudItem>
+                    </MudGrid>
+                </MudPaper>
+                <EntityGrid T="Line" Items="lines" Title="@L.T("الأصناف")" Filterable="false" ShowPager="false" RowsPerPage="500"
+                            RowClass="LineClass"
+                            EmptyText="@L.T("ابحث عن صنف أو اكتب الباركود")">
+                    <Columns>
+                        <PropertyColumn T="Line" TProperty="string" Property="l => l.Code" Title="@L.T("الرمز")" />
+                        <PropertyColumn T="Line" TProperty="string" Property="l => l.Name" Title="@L.T("الصنف")" />
+                        <TemplateColumn T="Line" Title="@L.T("الكمية")" Sortable="false" HeaderClass="erp-num" CellClass="erp-return-qty">
+                            <CellTemplate>
+                                <MudNumericField T="decimal" @bind-Value="context.Item.Quantity" Variant="Variant.Outlined" Margin="Margin.Dense"
+                                                 HideSpinButtons="true" Min="0" Class="erp-cell-num" Immediate="true"
+                                                 Culture="System.Globalization.CultureInfo.InvariantCulture" aria-label="@L.T("الكمية")" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="Line" Title="@L.T("المتوفر")" SortBy="l => l.Available" HeaderClass="erp-num" CellClass="erp-num">
+                            <CellTemplate><QtyText Value="context.Item.Available" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="Line" Title="" Sortable="false" CellClass="erp-actions-col" HeaderClass="erp-actions-col">
+                            <CellTemplate>
+                                <MudTooltip Text="@L.T("حذف")">
+                                    <MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" Size="Size.Small"
+                                                   OnClick="() => lines.Remove(context.Item)" aria-label="@L.T("حذف")" />
+                                </MudTooltip>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </EntityGrid>
+                <MudText Typo="Typo.caption" Class="mud-text-secondary mt-2 d-block">@L.T("الكميات بالوحدة الصغرى للصنف")</MudText>
+            }
         </div>
-    }
-</section>
+
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("ملخص التحويل")</MudText>
+                <dl class="erp-summary-list">
+                    <dt>@L.T("من مخزن")</dt><dd>@(current?.FromName ?? NameOf(fromId))</dd>
+                    <dt>@L.T("إلى مخزن")</dt><dd>@(current?.ToName ?? NameOf(toId))</dd>
+                    <dt>@L.T("عدد الأصناف")</dt>
+                    <dd><bdi class="erp-num">@(current?.Lines.Count ?? lines.Count)</bdi></dd>
+                    <dt class="erp-summary-grand">@L.T("الكمية")</dt>
+                    <dd class="erp-summary-grand"><QtyText Value="current?.Lines.Sum(l => l.Quantity) ?? lines.Sum(l => l.Quantity)" /></dd>
+                </dl>
+                @if (current is null)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                               StartIcon="@Icons.Material.Outlined.Save" OnClick="Create" Disabled="@(busy || lines.Count == 0)">
+                        @L.T("حفظ مسودة")
+                    </MudButton>
+                }
+                else if (current.Status == "DRAFT")
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                               StartIcon="@Icons.Material.Outlined.LocalShipping" OnClick="() => Send(false)" Disabled="busy">
+                        @L.T("إرسال")
+                    </MudButton>
+                }
+                else if (current.Status == "SENT" && current.CanReceive)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-3"
+                               StartIcon="@Icons.Material.Outlined.MoveToInbox" OnClick="Receive" Disabled="busy">
+                        @L.T("تأكيد الاستلام")
+                    </MudButton>
+                }
+            </MudPaper>
+        </aside>
+    </div>
+
+    <FilterPanel ShowDates="false" OnShow="Load" OnClear="Reset" Busy="listBusy" Title="@L.T("التحويلات")" Class="no-print">
+        <MudItem xs="12" sm="6" md="3">
+            <MudSelect T="string" Value="status" ValueChanged="StatusChanged" Label="@L.T("الحالة")" Variant="Variant.Outlined"
+                       Margin="Margin.Dense" Dense="true">
+                <MudSelectItem T="string" Value="@string.Empty">@L.T("الكل")</MudSelectItem>
+                <MudSelectItem T="string" Value="@("DRAFT")">@L.T("مسودة")</MudSelectItem>
+                <MudSelectItem T="string" Value="@("SENT")">@L.T("بالطريق")</MudSelectItem>
+                <MudSelectItem T="string" Value="@("RECEIVED")">@L.T("مستلم")</MudSelectItem>
+            </MudSelect>
+        </MudItem>
+    </FilterPanel>
+    <EntityGrid T="TransferRow" Items="rows" Title="@L.T("التحويلات")" Export="export" ExportName="@L.T("التحويل بين المخازن")"
+                Loading="listBusy" Filterable="false" RowClick="r => Open(r.StockTransferID)"
+                RowClass="RowClassOf"
+                EmptyText="@L.T("لا توجد سجلات")">
+        <Columns>
+            <PropertyColumn T="TransferRow" TProperty="string" Property="r => r.TransferNumber" Title="@L.T("رقم التحويل")" />
+            <TemplateColumn T="TransferRow" Title="@L.T("التاريخ")" SortBy="r => r.TransferDate">
+                <CellTemplate><bdi class="erp-num erp-nowrap" dir="ltr">@Stamp(context.Item.TransferDate)</bdi></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="TransferRow" TProperty="string" Property="r => r.FromName" Title="@L.T("من مخزن")" />
+            <PropertyColumn T="TransferRow" TProperty="string" Property="r => r.ToName" Title="@L.T("إلى مخزن")" />
+            <TemplateColumn T="TransferRow" Title="@L.T("الحالة")" SortBy="r => r.Status">
+                <CellTemplate><StatusChip Status="@context.Item.Status" /></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="TransferRow" Title="@L.T("عدد الأصناف")" SortBy="r => r.LineCount" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><bdi class="erp-num">@context.Item.LineCount</bdi></CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn T="TransferRow" Title="@L.T("الكمية")" SortBy="r => r.Quantity" HeaderClass="erp-num" CellClass="erp-num">
+                <CellTemplate><QtyText Value="context.Item.Quantity" /></CellTemplate>
+            </TemplateColumn>
+            <PropertyColumn T="TransferRow" TProperty="string" Property="r => r.EmployeeName" Title="@L.T("المستخدم")" />
+        </Columns>
+    </EntityGrid>
+}
 
 @code {
     private sealed class Line
     {
         public int ProductID;
-        public string Name = "";
-        public decimal Quantity = 1;
-        public decimal Available;
+        public string Code { get; set; } = "";
+        public string Name { get; set; } = "";
+        public decimal Quantity { get; set; } = 1;
+        public decimal Available { get; set; }
     }
 
     [CascadingParameter] private Task<AuthenticationState>? AuthState { get; set; }
     private ClaimsPrincipal? user;
-    private bool allowed, busy;
-    private string denied = "", status = "", notes = "", code = "", message = "", messageKind = "";
-    private string? question;
+    private bool allowed, loaded, busy, listBusy;
+    private string denied = "", status = "", notes = "", code = "", message = "";
+    private Severity severity = Severity.Info;
     private int fromId, toId;
     private TransferView? current;
+    private MudTextField<string>? scan;
     private List<TransferRow> rows = [];
     private List<Line> lines = [];
     private List<PurchaseProduct> choices = [];
     private List<(int Id, string Name)> warehouses = [];
+    private List<GridExport<TransferRow>> export = [];
 
     private int EmployeeId => UserInfo.EmployeeId(user);
 
@@ -233,14 +321,61 @@
         user = AuthState is null ? null : (await AuthState).User;
         denied = await Permissions.OpenProblemAsync(EmployeeId, StockService.TransferForm);
         allowed = denied.Length == 0;
+        loaded = true;
         if (allowed)
         {
+            export =
+            [
+                new(L.T("رقم التحويل"), r => r.TransferNumber),
+                new(L.T("التاريخ"), r => Stamp(r.TransferDate)),
+                new(L.T("من مخزن"), r => r.FromName),
+                new(L.T("إلى مخزن"), r => r.ToName),
+                new(L.T("الحالة"), r => L.T(WorkPages.TransferStatusName(r.Status))),
+                new(L.T("عدد الأصناف"), r => r.LineCount),
+                new(L.T("الكمية"), r => r.Quantity),
+                new(L.T("المستخدم"), r => r.EmployeeName),
+            ];
             (warehouses, fromId) = await Stock.WarehousesAsync(EmployeeId, L.English);
             await Load();
         }
     }
 
-    private async Task Load() => rows = await Stock.TransfersAsync(status, 0, L.English);
+    private static string Stamp(DateTime d) => d.ToString("yyyy-MM-dd HH:mm", System.Globalization.CultureInfo.InvariantCulture);
+
+    /// <summary>A draft line over what the sending warehouse has, as the old page marked it.</summary>
+    private string ViewLineClass(TransferLineView l, int _) =>
+        current?.Status == "DRAFT" && l.Quantity > l.Available ? "erp-row-low" : "";
+
+    private static string LineClass(Line l, int _) => l.Quantity > l.Available ? "erp-row-low" : "";
+
+    private string RowClassOf(TransferRow r, int _) => current?.StockTransferID == r.StockTransferID ? "erp-row-selected" : "";
+
+    private string NameOf(int id) => warehouses.FirstOrDefault(w => w.Id == id).Name ?? "-";
+
+    private async Task Load()
+    {
+        listBusy = true;
+        try
+        {
+            rows = await Stock.TransfersAsync(status, 0, L.English);
+        }
+        finally
+        {
+            listBusy = false;
+        }
+    }
+
+    private async Task StatusChanged(string value)
+    {
+        status = value ?? "";
+        await Load();
+    }
+
+    private async Task Reset()
+    {
+        status = "";
+        await Load();
+    }
 
     private async Task Open(int id)
     {
@@ -248,20 +383,38 @@
         current = await Stock.TransferAsync(id, EmployeeId, L.English);
     }
 
-    private async Task Key(KeyboardEventArgs e, int id)
-    {
-        if (e.Key == "Enter")
-        {
-            await Open(id);
-        }
-    }
-
-    private void New()
+    private async Task New()
     {
         current = null;
         lines = [];
+        choices = [];
         notes = "";
+        code = "";
         toId = 0;
+        message = "";
+        StateHasChanged();
+        await Task.Yield();
+        if (scan is not null)
+        {
+            await scan.FocusAsync();
+        }
+    }
+
+    private void FromChanged(int id)
+    {
+        fromId = id;
+        if (toId == fromId)
+        {
+            toId = 0;
+        }
+    }
+
+    private async Task ScanKey(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await Find();
+        }
     }
 
     private async Task Find()
@@ -271,15 +424,15 @@
         if (choices.Count == 0)
         {
             message = WorkPages.NoProduct;
-            messageKind = "warning";
+            severity = Severity.Warning;
         }
         else if (choices.Count == 1)
         {
-            Add(choices[0]);
+            await Add(choices[0]);
         }
     }
 
-    private void Add(PurchaseProduct p)
+    private async Task Add(PurchaseProduct p)
     {
         choices = [];
         code = "";
@@ -290,7 +443,19 @@
         }
         else
         {
-            lines.Add(new Line { ProductID = p.ProductID, Name = p.ProductName, Available = p.Available });
+            lines.Add(new Line { ProductID = p.ProductID, Code = p.ProductCode, Name = p.ProductName, Available = p.Available });
+        }
+        if (scan is not null)
+        {
+            await scan.FocusAsync();
+        }
+    }
+
+    private async Task SaveKey()
+    {
+        if (current is null && lines.Count > 0 && !busy)
+        {
+            await Create();
         }
     }
 
@@ -305,13 +470,13 @@
             if (r.Status != SaveStatus.Saved)
             {
                 message = r.Message;
-                messageKind = "error";
+                severity = Severity.Error;
                 return;
             }
             message = WorkPages.TransferSaved + r.Number;
-            messageKind = "success";
+            severity = Severity.Success;
             await Load();
-            await Open(r.Id);
+            current = await Stock.TransferAsync(r.Id, EmployeeId, L.English);
         }
         finally
         {
@@ -323,17 +488,20 @@
     {
         if (r.Status == SaveStatus.NeedsConfirmation)
         {
-            question = r.Message;
+            if (await ConfirmDialog.AskAsync(Dialogs, L.T("تأكيد"), L.T(r.Message), L.T("نعم"), Color.Primary))
+            {
+                await Send(true);
+            }
             return;
         }
         if (r.Status == SaveStatus.Refused)
         {
             message = r.Message;
-            messageKind = "error";
+            severity = Severity.Error;
             return;
         }
         message = WorkPages.TransferDone + r.Number;
-        messageKind = "success";
+        severity = Severity.Success;
         await Load();
         current = await Stock.TransferAsync(r.Id, EmployeeId, L.English);
     }
@@ -342,14 +510,16 @@
     {
         busy = true;
         message = "";
+        StockResult r;
         try
         {
-            await Done(await action());
+            r = await action();
         }
         finally
         {
             busy = false;
         }
+        await Done(r);
     }
 
     private Task Send(bool confirmed) => Act(() => Stock.SendTransferAsync(UserInfo.Acting(user), current!.StockTransferID, confirmed));
@@ -358,14 +528,11 @@
 
     private Task Unpost() => Act(() => Stock.UnpostTransferAsync(UserInfo.Acting(user), current!.StockTransferID));
 
-    private Task Delete() => Act(() => Stock.DeleteTransferAsync(UserInfo.Acting(user), current!.StockTransferID));
-
-    private async Task Answer(bool yes)
+    private async Task Delete()
     {
-        question = null;
-        if (yes)
+        if (await ConfirmDialog.AskAsync(Dialogs, L.T("حذف مسودة التحويل"), current!.TransferNumber, L.T("حذف")))
         {
-            await Send(true);
+            await Act(() => Stock.DeleteTransferAsync(UserInfo.Acting(user), current!.StockTransferID));
         }
     }
 }

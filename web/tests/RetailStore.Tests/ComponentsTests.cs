@@ -96,6 +96,9 @@ public class ComponentsTests
         Assert.Equal(Color.Success, StatusStyles.For("posted").Color);
         Assert.Equal(Color.Error, StatusStyles.For("CANCELLED").Color);
         Assert.Equal(Color.Warning, StatusStyles.For("PARTIAL_PAID").Color);
+        // a transfer sent and not yet received (StockTransfers.Status SENT) shows the caption of its page
+        Assert.Equal(Color.Warning, StatusStyles.For("SENT").Color);
+        Assert.Equal(RetailStore.UI.Services.WorkPages.TransferStatusName("SENT"), StatusStyles.For("SENT").Caption);
         Assert.Equal("مسودة", StatusStyles.For("DRAFT").Caption);
         Assert.Equal("XYZ", StatusStyles.For("XYZ").Caption);
         Assert.Equal(Color.Default, StatusStyles.For(null).Color);

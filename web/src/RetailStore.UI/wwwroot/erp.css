@@ -199,6 +199,11 @@ dt.erp-summary-grand { color: var(--mud-palette-text-primary); font-weight: 700;
 .erp-return-lines .erp-grid-title, .erp-invoice-lines .erp-grid-title { margin-inline-end: 12px; }
 
 /* C: a report */
+/* a row under its reorder level (/stock) or a line over what the warehouse has (/transfers); the row whose card is shown */
+.mud-table .mud-table-row.erp-row-low .mud-table-cell { color: var(--mud-palette-warning-darken); font-weight: 500; }
+.mud-table .mud-table-row.erp-row-selected .mud-table-cell { background: var(--mud-palette-primary-hover); }
+.erp-card-warehouse { margin-inline-start: 4px; font-size: .8rem; }
+.erp-low-icon { margin-inline-start: 4px; vertical-align: middle; }
 .erp-row-opening .mud-table-cell { font-weight: 600; background: var(--mud-palette-background-gray); }
 
 /* D: the dashboard */
