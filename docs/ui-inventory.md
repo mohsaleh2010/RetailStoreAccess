@@ -44,9 +44,9 @@
 | 17 | `/purchase-returns` | `Pages/Office/PurchaseReturnsPage.razor` | مشتريات | B | 254 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 2، تمت الموافقة) |
 | 18 | `/stock` | `Pages/Stock/StockPage.razor` | مخازن | C (رصيد + كارت صنف) | 177 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 3، تمت الموافقة) |
 | 19 | `/transfers` | `Pages/Stock/TransfersPage.razor` | مخازن | B | 371 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 3، تمت الموافقة) |
-| 20 | `/treasury` | `Pages/Treasury/TreasuryPage.razor` | حسابات (خزينة) | C (أرصدة + كشف صندوق) | 218 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 4أ، بانتظار الموافقة) |
-| 21 | `/cash-vouchers` | `Pages/Treasury/CashVouchersPage.razor` | حسابات (خزينة) | B (سند) | 210 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4أ، بانتظار الموافقة) |
-| 22 | `/cash-closing` | `Pages/Office/CashClosingPage.razor` | حسابات (خزينة) | B | 213 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4أ، بانتظار الموافقة) |
+| 20 | `/treasury` | `Pages/Treasury/TreasuryPage.razor` | حسابات (خزينة) | C (أرصدة + كشف صندوق) | 218 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 4أ، تمت الموافقة) |
+| 21 | `/cash-vouchers` | `Pages/Treasury/CashVouchersPage.razor` | حسابات (خزينة) | B (سند) | 210 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4أ، تمت الموافقة) |
+| 22 | `/cash-closing` | `Pages/Office/CashClosingPage.razor` | حسابات (خزينة) | B | 213 | ✅ نُقلت (القالب B، المرحلة 6 الدفعة 4أ، تمت الموافقة) |
 | 23 | `/bank-transactions` | `Pages/Treasury/BankTxPage.razor` | حسابات (بنوك) | B | 291 | ⬜ |
 | 24 | `/bank-reconciliation` | `Pages/Office/BankReconPage.razor` | حسابات (بنوك) | B (خاصة) | 316 | ⬜ |
 | 25 | `/journal` | `Pages/Accounting/JournalPage.razor` | حسابات | C (قيود + سطورها) | 171 | ⬜ |
@@ -235,7 +235,7 @@
 
 **التالي:** الدفعة 4 (الحسابات والخزينة)، على جزئين بموافقة صاحب المشروع: 4أ الخزينة نُفّذت (القسم 13)، ثم 4ب البنوك والقيود.
 
-## 13) المرحلة 6، الدفعة 4أ: الخزينة (✅ بانتظار الموافقة)
+## 13) المرحلة 6، الدفعة 4أ: الخزينة (✅ تمت الموافقة)
 وافق صاحب المشروع على خطة الدفعة 4 مقسومة جزئين: 4أ الخزينة (هذا القسم) ثم 4ب البنوك والقيود (`/bank-transactions`، `/bank-reconciliation`، `/journal`، `/manual-entries`). ثلاث صفحات نُقلت بالمهارة `mudblazor-erp-ui` من المكونات المشتركة؛ لم يتغير أي منطق عمل (نفس خدمات `TreasuryService` و`PosService.ClosingBoxesAsync` ووسائطها، ونفس الرسائل وترتيب الحفظ، وصلاحية نموذج Access لكل صفحة).
 
 | الصفحة | القالب | ما تغيّر |
