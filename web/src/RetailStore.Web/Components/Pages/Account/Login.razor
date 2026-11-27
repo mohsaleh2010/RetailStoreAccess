@@ -6,19 +6,31 @@
 @inject UiLanguage L
 @inject NavigationManager Nav
 
-<PageTitle>@L.T("تسجيل الدخول")</PageTitle>
-
-<EditForm Model="Input" method="post" OnSubmit="SignIn" FormName="login" class="card">
-    <h1>@L.T("تسجيل الدخول")</h1>
-    <label for="username">@L.T("اسم المستخدم")</label>
-    <InputText id="username" @bind-Value="Input.Username" autocomplete="username" autofocus />
-    <label for="password">@L.T("كلمة المرور")</label>
-    <InputText id="password" type="password" @bind-Value="Input.Password" autocomplete="current-password" />
-    <button type="submit" class="btn primary">@L.T("دخول")</button>
+@* A static page (it writes the cookie): a plain EditForm post, its fields named as InputText named them (Input.*). *@
+<EditForm Model="Input" method="post" OnSubmit="SignIn" FormName="login">
+    <PageHeader Title="@L.T("تسجيل الدخول")" Icon="@Icons.Material.Outlined.Login" />
     @if (message.Length > 0)
     {
-        <div class="message error" role="alert">@L.T(message)</div>
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Dense="true" Class="mb-4" role="alert">@L.T(message)</MudAlert>
     }
+    <MudGrid Spacing="3">
+        <MudItem xs="12">
+            <MudTextField T="string" Value="Input.Username" Label="@L.T("اسم المستخدم")" Variant="Variant.Outlined"
+                          Margin="Margin.Dense" ShrinkLabel="true" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Outlined.Person"
+                          UserAttributes="@(Field("username", "Input.Username", "username", autofocus: true))" />
+        </MudItem>
+        <MudItem xs="12">
+            <MudTextField T="string" Value="Input.Password" Label="@L.T("كلمة المرور")" InputType="InputType.Password"
+                          Variant="Variant.Outlined" Margin="Margin.Dense" ShrinkLabel="true" Adornment="Adornment.Start"
+                          AdornmentIcon="@Icons.Material.Outlined.Lock"
+                          UserAttributes="@(Field("password", "Input.Password", "current-password"))" />
+        </MudItem>
+        <MudItem xs="12">
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" FullWidth="true"
+                       StartIcon="@Icons.Material.Outlined.Login">@L.T("دخول")</MudButton>
+        </MudItem>
+    </MudGrid>
 </EditForm>
 
 @code {
@@ -40,6 +52,18 @@
         }
         await AccountEndpoints.SignInAsync(HttpContext, r.EmployeeID, r.EmployeeName, computer, r.MustChangePassword);
         Nav.NavigateTo(r.MustChangePassword ? "account/change-password" : AccountEndpoints.SafeReturn(ReturnUrl), forceLoad: true);
+    }
+
+    /// <summary>The attributes of a posted field: its id, the form name the model binds (Input.X) and the browser hints.</summary>
+    // the first field is marked data-erp-autofocus: erp.js focuses it (MudBlazor's AutoFocus needs an interactive page).
+    private static Dictionary<string, object?> Field(string id, string name, string autocomplete, bool autofocus = false)
+    {
+        var a = new Dictionary<string, object?> { ["id"] = id, ["name"] = name, ["autocomplete"] = autocomplete };
+        if (autofocus)
+        {
+            a["data-erp-autofocus"] = "true";
+        }
+        return a;
     }
 
     private sealed class LoginInput

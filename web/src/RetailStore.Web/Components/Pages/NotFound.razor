@@ -1,6 +1,8 @@
 @page "/not-found"
 @inject UiLanguage L
 
-<PageTitle>@L.T("الصفحة غير موجودة")</PageTitle>
-<h1>@L.T("الصفحة غير موجودة")</h1>
-<p><a href="">@L.T("الرئيسية")</a></p>
+<PageHeader Title="@L.T("الصفحة غير موجودة")" Icon="@Icons.Material.Outlined.SearchOff" />
+<MudPaper Outlined="true" Class="mb-4">
+    <EmptyState Icon="@Icons.Material.Outlined.SearchOff" Title="@L.T("الصفحة غير موجودة")"
+                ActionText="@L.T("الرئيسية")" ActionIcon="@Icons.Material.Outlined.Home" ActionHref="" />
+</MudPaper>

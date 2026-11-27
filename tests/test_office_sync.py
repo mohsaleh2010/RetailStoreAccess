@@ -124,7 +124,9 @@ class CodeTests(unittest.TestCase):
 class WebTests(unittest.TestCase):
     def test_web_warns_who_may_run_the_tasks(self):
         home = read("web", "src", "RetailStore.UI", "Pages", "Home.razor")
-        self.assertIn('HasPermissionAsync(UserInfo.EmployeeId(user), "OFFICE_SYNC")', home)
+        # only who has OFFICE_SYNC is warned: the id of the user (emp = UserInfo.EmployeeId(user) since the redesign)
+        self.assertIn("int emp = UserInfo.EmployeeId(user);", home)
+        self.assertIn('HasPermissionAsync(emp, "OFFICE_SYNC")', home)
         self.assertIn("NeedsAttention", home)
         api = read("web", "src", "RetailStore.Web", "Api", "TreasuryApi.cs")
         self.assertIn('"/dashboard/office-sync"', api)

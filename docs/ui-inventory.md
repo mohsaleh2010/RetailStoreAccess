@@ -26,8 +26,8 @@
 | # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
 |---|---|---|---|---|---|---|
 | 1 | `/` | `Pages/Home.razor` | الرئيسية | D | 147 | ✅ معتمدة (القالب D) |
-| 2 | `/account/login` | `RetailStore.Web/Components/Pages/Account/Login.razor` | إعدادات/دخول | D (SSR) | 50 | ⬜ |
-| 3 | `/account/change-password` | `RetailStore.Web/Components/Pages/Account/ChangePassword.razor` | إعدادات/دخول | D (SSR) | 65 | ⬜ |
+| 2 | `/account/login` | `RetailStore.Web/Components/Pages/Account/Login.razor` | إعدادات/دخول | D (SSR) | 74 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، بانتظار الموافقة) |
+| 3 | `/account/change-password` | `RetailStore.Web/Components/Pages/Account/ChangePassword.razor` | إعدادات/دخول | D (SSR) | 90 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، بانتظار الموافقة) |
 | 4 | `/products` | `Pages/ProductsPage.razor` → `Components/DataScreen.razor` | مخازن | A | 4 (+421) | ✅ معتمدة (القالب A) |
 | 5 | `/customers` | `Pages/CustomersPage.razor` → `DataScreen` | مبيعات | A | 4 | ✅ معتمدة (القالب A) |
 | 6 | `/suppliers` | `Pages/SuppliersPage.razor` → `DataScreen` | مشتريات | A | 4 | ✅ معتمدة (القالب A) |
@@ -55,8 +55,8 @@
 | 28 | `/trial-balance` | `Pages/Accounting/TrialBalancePage.razor` | تقارير | C | 95 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
 | 29 | `/financials` | `Pages/Accounting/FinancialsPage.razor` | تقارير | C | 115 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
 | 30 | `/reports` | `Pages/Reports/ReportsPage.razor` | تقارير | C (مركز التقارير: كل تقارير `forms.REPORTS`) | 278 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
-| 31 | `/not-found` | `RetailStore.Web/Components/Pages/NotFound.razor` | عام | D | 6 | ⬜ |
-| 32 | `/Error` | `RetailStore.Web/Components/Pages/Error.razor` | عام | D (SSR) | 22 | ⬜ |
+| 31 | `/not-found` | `RetailStore.Web/Components/Pages/NotFound.razor` | عام | D | 8 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، بانتظار الموافقة) |
+| 32 | `/Error` | `RetailStore.Web/Components/Pages/Error.razor` | عام | D (SSR) | 20 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، بانتظار الموافقة) |
 
 مكونات وتخطيط الويب: `Layout/MainLayout.razor` (44)، `Layout/NavMenu.razor` (40)، `Layout/MustChangePasswordGuard.razor`، `Components/DataScreen.razor` (421، الشاشة العامة للبيانات الأساسية)، `Components/QrImage.razor`، `Components/RedirectToLogin.razor`، `RetailStore.Web/Components/Layout/AccountLayout.razor` و`ReconnectModal.razor`.
 
@@ -117,7 +117,7 @@
 - **`Theme/ErpTheme.cs`**: ألوان الخطة مع تعديلات التباين: Secondary `#0B7A6B`، Warning `#B45309`، نص غامق على Tertiary، ونص غامق على Primary (وSecondary) في الوضع الداكن؛ خط **Cairo** (400/600/700 من Google Fonts)؛ زوايا 8px؛ القائمة 260px.
 - **`Layout/MainLayout.razor`**: `MudRTLProvider` مربوط بـ `L.Dir` (عربي RTL / إنجليزي LTR)، `MudThemeProvider` بالوضع الليلي من كوكي `theme` (يقرؤها `App.razor` ويمررها `Routes` مثل اللغة، ويكتبها `erp.js` عند التبديل مع `data-theme` على `<html>`)، شريط علوي: القائمة، اسم المحل، **بحث عن شاشة** (`MudAutocomplete` على شاشات المستخدم)، الوضع الليلي، اللغة، قائمة المستخدم (تغيير كلمة المرور، الخروج). القائمة الجانبية `Responsive`: ثابتة على الكمبيوتر ومنبثقة على الموبايل.
 - **`Layout/NavGroups.cs`**: المبيعات، المشتريات، المخازن، الخزينة والبنوك، الحسابات، التقارير، بأيقونات Material؛ الشاشات وصلاحياتها كما هي من `ScreenSpecs` و`WorkPages` (صلاحية كل نموذج تُسأل مرة واحدة)، وأي مسار جديد غير مصنّف يظهر في آخر مجموعة.
-- **`wwwroot/erp.css`**: الخط، أرقام `tabular-nums`، الشريط والقائمة، الطباعة؛ ومتغيرات `retailstore.css` مربوطة بألوان الثيم فتتبع الصفحات القديمة الوضع الليلي إلى أن يُعاد تصميمها (`retailstore.css` صار يتبع `data-theme` لا إعداد نظام التشغيل).
+- **`wwwroot/erp.css`**: الخط، أرقام `tabular-nums`، الشريط والقائمة، الطباعة؛ ومتغيرات `retailstore.css` مربوطة بألوان الثيم فتتبع الصفحات القديمة الوضع الليلي إلى أن يُعاد تصميمها (`retailstore.css` صار يتبع `data-theme` لا إعداد نظام التشغيل). (حُذف `retailstore.css` في المرحلة 6 الدفعة 6، القسم 16.)
 - صفحتا الدخول وتغيير كلمة المرور (SSR) لم تتغيرا بعد سوى الخط والوضع الليلي.
 
 ## 7) المرحلة 3: المكونات المشتركة واختصارات الكيبورد (✅ تمت الموافقة 2026-11-26)
@@ -289,4 +289,26 @@
 
 **التحقق:** `dotnet build` بلا تحذيرات جديدة، و122 xUnit ناجحة، و`test_web*.py` 92 (منها اختبار المجموعات، والصفحات الثلاث تُفحص بقواعد المهارة في `test_web_rules.py`)؛ ولقطات الصفحات بالوضعين واللغتين و1440px / 768px بلا تمرير أفقي للصفحة، على نسخة من قاعدة التطوير: ميزان المراجعة (مدين = دائن والرصيد صفر)، وقائمة الدخل والميزانية، ومركز التقارير فارغًا، وتقرير جدول (المبيعات اليومية لهذه السنة)، وتقرير بطاقة (الأرباح)، وكشف حساب عميل بلا عميل (رسالته). 6 نصوص جديدة في `i18n_web.py`.
 
-**التالي:** الدفعة 6 (الدخول والإعدادات): عُرضت خطتها على صاحب المشروع، والتنفيذ بعد موافقته.
+**التالي:** الدفعة 6 (الدخول والإعدادات)، القسم 16.
+
+## 16) المرحلة 6، الدفعة 6: الدخول والإعدادات (✅ بانتظار الموافقة)
+بعد موافقة صاحب المشروع على الخطة نُقلت الصفحات الأربع الباقية من جدول القسم 2 بالمهارة `mudblazor-erp-ui` على القالب D، فلم تبقَ صفحة ويب على الواجهة القديمة. لم يتغير أي منطق عمل: نفس `SecurityService.LoginAsync` و`ChangePasswordAsync`، ونفس `AccountEndpoints.SignInAsync` / `SafeReturn` / `ComputerOf`، ونفس الرسائل والتحويلات.
+
+**الصفحات الثابتة (SSR) تبقى نماذج `EditForm` عادية بـ `method="post"` و`FormName` نفسه** (`login`، `change-password`): هي التي تكتب الكوكي فلا تكون تفاعلية. حقول `MudTextField` (Outlined + Dense) تحمل في `UserAttributes` الاسم الذي كان `InputText` يولده (`Input.Username`، `Input.Password`، `Input.Old`، `Input.New`، `Input.Confirm`)، فيربطها `[SupplyParameterFromForm]` كما كان، و`ShrinkLabel` يبقي العنوان فوق الحقل لأن صفحة ثابتة لا تنفذ كود المكوّن في المتصفح. والتركيز على أول حقل بالسمة `data-erp-autofocus` يقرؤها `erp.js` عند تحميل الصفحة (`AutoFocus` في MudBlazor يحتاج صفحة تفاعلية).
+
+| الصفحة | ما تغيّر |
+|---|---|
+| `AccountLayout` | `MudRTLProvider` يتبع `L.Dir` و`MudThemeProvider` بثيم `ErpTheme` والوضع الليلي من الكوكي `theme` (`UiTheme`) كما في `MainLayout`؛ اسم المحل (`IStoreInfo`) بأيقونة فوق بطاقة `MudPaper` في وسط الصفحة (عرضها 420px على الأكثر)، ورابط اللغة زر نصي تحتها بنفس العنوان |
+| `/account/login` | `PageHeader` (أيقونة الدخول) ← رسالة الخدمة `MudAlert` خطأ ← اسم المستخدم وكلمة المرور بأيقونتين ← زر «دخول» `Variant.Filled` بعرض البطاقة |
+| `/account/change-password` | `PageHeader` ← «يجب تغيير كلمة المرور قبل المتابعة.» `MudAlert` معلومة ← رسالة الخدمة `MudAlert` خطأ ← الحقول الثلاثة ← «حفظ» `Variant.Filled`، و«الرئيسية» `Variant.Outlined` لمن لا يُلزم بالتغيير كما كان |
+| `/not-found` | داخل `MainLayout`: `PageHeader` ← `EmptyState` بزر «الرئيسية» |
+| `/Error` | `PageHeader` ← «حدث خطأ غير متوقع.» `MudAlert` خطأ ← رقم الطلب `<bdi dir="ltr">` ← زر «الرئيسية» |
+
+**حذف `retailstore.css`:** لم تعد صفحة تستعمل أصنافه. نُقل منه إلى `erp.css` ما يلزم: `.qr` (رمز QR للفاتورة، أبيض في الوضعين ليقرأه الهاتف)، و`#blazor-error-ui` (مخفي حتى يظهره Blazor، بألوان التحذير من الثيم)، ولون الروابط؛ وحُذف من `erp.css` ربط متغيرات `retailstore.css` بألوان MudBlazor في `.erp-app`، ومن `App.razor` رابط الملف. أصناف جديدة: `erp-account*`.
+
+**مشكلة وُجدت وحُلّت (ليست من الدفعة):** العنوان غير الموجود (`/no-such-page`) كان يعيد 404 بصفحة فارغة تمامًا: `UseStatusCodePagesWithReExecute("/not-found")` يعيد تنفيذ الطلب بعد التوجيه الضمني في أول المسار، فلا يجد الطلب المعاد صفحته. أُضيف `app.UseRouting()` بعد صفحات الأخطاء في `Program.cs` (تغيير استضافة لا منطق عمل)، فتظهر صفحة «الصفحة غير موجودة» برمز 404. واختبار `AnUnknownAddressShowsTheNotFoundPage` يفشل بدونه (جُرّب).
+
+**التحقق:** `dotnet build` بلا تحذيرات جديدة؛ xUnit جديدة `AccountPagesTests` (نموذج الدخول يرسل الأسماء نفسها ويعيد رسالة الخدمة والاسم المكتوب، والعنوان غير الموجود)؛ والصفحات الأربع تُفحص بقواعد المهارة في `test_web_rules.py`؛ ولقطات الدخول برسالة خطأ، وتغيير كلمة المرور الإجباري، وصفحة الخطأ، و«غير موجودة» بالوضعين واللغتين و1440px / 768px بلا تمرير أفقي، على قاعدة تطوير جديدة: الدخول الأول لـ `admin` يحوّل إلى تغيير كلمة المرور، ورسالة عدم التطابق، ثم الحفظ والدخول إلى الرئيسية. لا نصوص جديدة. وكل اختبارات Python (1666): 1652 ناجحة و14 متخطّاة، بعد تعديل اختبار نصّي قديم في `test_office_sync.py` كان يبحث عن `HasPermissionAsync(UserInfo.EmployeeId(user), ...)` وصار في `Home.razor` منذ المرحلة 4 `HasPermissionAsync(emp, ...)` بنفس المعنى (تعديل مقصود).
+
+**بهذا تمت المرحلة 6 كلها** (كل صفحات الويب على MudBlazor). نقطة البيع على Windows وتطبيق المندوب (القسمان 3 و4) خارج هذه المرحلة، وتُنقل فقط بقرار من صاحب المشروع.
+

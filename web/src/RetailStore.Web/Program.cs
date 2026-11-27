@@ -105,6 +105,9 @@ app.UseWhen(context => !ApiSetup.IsApi(context), screens =>
     screens.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 });
 app.UseWhen(ApiSetup.IsApi, api => api.UseExceptionHandler());
+// routing after the error pages: a re-executed request (/not-found for an unknown address, /Error) finds its page again;
+// with the implicit routing at the start of the pipeline it kept no page and answered 404 with an empty body
+app.UseRouting();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

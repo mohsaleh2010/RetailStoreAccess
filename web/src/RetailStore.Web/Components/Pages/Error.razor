@@ -4,15 +4,13 @@
 @layout AccountLayout
 @inject UiLanguage L
 
-<PageTitle>@L.T("خطأ")</PageTitle>
-<div class="card">
-    <h1>@L.T("حدث خطأ غير متوقع.")</h1>
-    @if (!string.IsNullOrEmpty(RequestId))
-    {
-        <p><code>@RequestId</code></p>
-    }
-    <a href="">@L.T("الرئيسية")</a>
-</div>
+<PageHeader Title="@L.T("خطأ")" Icon="@Icons.Material.Outlined.ErrorOutline" />
+<MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4" role="alert">@L.T("حدث خطأ غير متوقع.")</MudAlert>
+@if (!string.IsNullOrEmpty(RequestId))
+{
+    <MudText Typo="Typo.body2" Class="mud-text-secondary mb-4"><bdi dir="ltr" class="erp-num">@RequestId</bdi></MudText>
+}
+<MudButton Variant="Variant.Filled" Color="Color.Primary" Href="" StartIcon="@Icons.Material.Outlined.Home">@L.T("الرئيسية")</MudButton>
 
 @code {
     [CascadingParameter] private HttpContext? HttpContext { get; set; }

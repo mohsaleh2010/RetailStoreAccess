@@ -1,7 +1,7 @@
 // RetailStore web: the few browser calls MudBlazor has no API for.
 window.erp = {
     // the light / dark choice: kept a year in the cookie "theme" (read back by App.razor on the next request) and set
-    // on <html data-theme> at once, which the page styles of retailstore.css follow
+    // on <html data-theme> at once (the interactive pages repaint through MudThemeProvider)
     setTheme: function (value) {
         document.cookie = "theme=" + encodeURIComponent(value) + "; path=/; max-age=31536000; samesite=lax";
         document.documentElement.setAttribute("data-theme", value);
@@ -151,3 +151,12 @@ window.erp = {
         }
     }
 };
+
+// the static pages (AccountLayout: login, change of password) run no component code in the browser, so the first
+// field marked data-erp-autofocus takes the focus here when the page loads
+document.addEventListener("DOMContentLoaded", function () {
+    const field = document.querySelector("[data-erp-autofocus]");
+    if (field) {
+        field.focus();
+    }
+});

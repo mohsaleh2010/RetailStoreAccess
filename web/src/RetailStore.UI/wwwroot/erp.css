@@ -6,18 +6,8 @@ html, body, .mud-typography, .mud-input, .mud-button-root, .mud-nav-link, .mud-t
     font-family: Cairo, "Segoe UI", Tahoma, sans-serif;
 }
 
-/* the page styles of retailstore.css take the colors of the MudBlazor palette, so the pages not yet redesigned follow
-   the theme and its dark mode */
+/* the frame of the interactive pages */
 .erp-app {
-    --bg: var(--mud-palette-background);
-    --surface: var(--mud-palette-surface);
-    --text: var(--mud-palette-text-primary);
-    --muted: var(--mud-palette-text-secondary);
-    --line: var(--mud-palette-lines-default);
-    --primary: var(--mud-palette-primary);
-    --primary-text: var(--mud-palette-primary-text);
-    --danger: var(--mud-palette-error);
-    --radius: var(--mud-default-borderradius);
     background: var(--mud-palette-background);
     color: var(--mud-palette-text-primary);
     min-height: 100vh;
@@ -51,6 +41,29 @@ html, body, .mud-typography, .mud-input, .mud-button-root, .mud-nav-link, .mud-t
 /* main area */
 .erp-main { min-width: 0; }
 h1:focus { outline: none; }
+a { color: var(--mud-palette-primary); }
+
+/* the message of a broken interactive session (MainLayout), hidden until Blazor shows it */
+#blazor-error-ui {
+    display: none; position: fixed; inset-inline: 0; inset-block-end: 0; padding: 10px 16px; z-index: 2000;
+    background: var(--mud-palette-warning); color: var(--mud-palette-warning-text);
+}
+#blazor-error-ui .reload { color: inherit; margin-inline-start: 8px; }
+
+/* the QR code of an invoice (QrImage): dark modules on a white square in both modes, so a phone reads it */
+.qr { width: 140px; flex: none; background: #fff; padding: 4px; }
+.qr svg { width: 100%; height: auto; display: block; }
+
+/* AccountLayout: the static pages (login, change of password, error) in one card in the middle of the page */
+.erp-account {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    padding: 24px 16px; background: var(--mud-palette-background); color: var(--mud-palette-text-primary);
+}
+.erp-account-brand { display: flex; align-items: center; gap: 12px; max-width: 420px; }
+.erp-account-store { font-weight: 700; }
+.erp-account-card { width: 100%; max-width: 420px; }
+.erp-account-card .erp-page-header { margin-block-end: 20px; }
+.erp-account-foot { display: flex; justify-content: center; }
 
 /* ---- the shared components (Components/Shared, phase 3) ---- */
 

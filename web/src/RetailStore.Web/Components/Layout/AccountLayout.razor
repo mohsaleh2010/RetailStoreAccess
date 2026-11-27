@@ -1,7 +1,31 @@
 @inherits LayoutComponentBase
 @inject UiLanguage L
+@inject UiTheme Mode
+@inject IStoreInfo Store
 
-<main class="account" dir="@L.Dir">
-    @Body
-    <p><a href="@("lang/" + (L.English ? "ar" : "en") + "?returnUrl=/account/login")">@(L.English ? "العربية" : "English")</a></p>
-</main>
+@* The frame of the plain (static) pages: the login, the change of password and the error page. They write the cookie,
+   so they are never interactive: the theme, the direction and the dark mode of the cookie "theme" are set here as in
+   MainLayout, and the forms are plain EditForm posts. *@
+<MudRTLProvider RightToLeft="@(L.Dir == "rtl")">
+    <MudThemeProvider Theme="ErpTheme.Theme" IsDarkMode="@Mode.Dark" />
+
+    <main class="erp-account" dir="@L.Dir">
+        <div class="erp-account-brand">
+            <span class="erp-page-icon"><MudIcon Icon="@Icons.Material.Outlined.Storefront" /></span>
+            <MudText Typo="Typo.h6" Class="erp-account-store">@storeName</MudText>
+        </div>
+        <MudPaper Outlined="true" Class="erp-account-card pa-6">
+            @Body
+        </MudPaper>
+        <div class="erp-account-foot">
+            <MudButton Variant="Variant.Text" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Translate"
+                       Href="@("lang/" + (L.English ? "ar" : "en") + "?returnUrl=/account/login")">@(L.English ? "العربية" : "English")</MudButton>
+        </div>
+    </main>
+</MudRTLProvider>
+
+@code {
+    private string storeName = "";
+
+    protected override async Task OnInitializedAsync() => storeName = await Store.StoreNameAsync(L.English);
+}
