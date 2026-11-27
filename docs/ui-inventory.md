@@ -26,8 +26,8 @@
 | # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
 |---|---|---|---|---|---|---|
 | 1 | `/` | `Pages/Home.razor` | الرئيسية | D | 147 | ✅ معتمدة (القالب D) |
-| 2 | `/account/login` | `RetailStore.Web/Components/Pages/Account/Login.razor` | إعدادات/دخول | D (SSR) | 74 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، بانتظار الموافقة) |
-| 3 | `/account/change-password` | `RetailStore.Web/Components/Pages/Account/ChangePassword.razor` | إعدادات/دخول | D (SSR) | 90 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، بانتظار الموافقة) |
+| 2 | `/account/login` | `RetailStore.Web/Components/Pages/Account/Login.razor` | إعدادات/دخول | D (SSR) | 74 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، تمت الموافقة) |
+| 3 | `/account/change-password` | `RetailStore.Web/Components/Pages/Account/ChangePassword.razor` | إعدادات/دخول | D (SSR) | 90 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، تمت الموافقة) |
 | 4 | `/products` | `Pages/ProductsPage.razor` → `Components/DataScreen.razor` | مخازن | A | 4 (+421) | ✅ معتمدة (القالب A) |
 | 5 | `/customers` | `Pages/CustomersPage.razor` → `DataScreen` | مبيعات | A | 4 | ✅ معتمدة (القالب A) |
 | 6 | `/suppliers` | `Pages/SuppliersPage.razor` → `DataScreen` | مشتريات | A | 4 | ✅ معتمدة (القالب A) |
@@ -55,8 +55,8 @@
 | 28 | `/trial-balance` | `Pages/Accounting/TrialBalancePage.razor` | تقارير | C | 95 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
 | 29 | `/financials` | `Pages/Accounting/FinancialsPage.razor` | تقارير | C | 115 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
 | 30 | `/reports` | `Pages/Reports/ReportsPage.razor` | تقارير | C (مركز التقارير: كل تقارير `forms.REPORTS`) | 278 | ✅ نُقلت (القالب C، المرحلة 6 الدفعة 5، تمت الموافقة) |
-| 31 | `/not-found` | `RetailStore.Web/Components/Pages/NotFound.razor` | عام | D | 8 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، بانتظار الموافقة) |
-| 32 | `/Error` | `RetailStore.Web/Components/Pages/Error.razor` | عام | D (SSR) | 20 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، بانتظار الموافقة) |
+| 31 | `/not-found` | `RetailStore.Web/Components/Pages/NotFound.razor` | عام | D | 8 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، تمت الموافقة) |
+| 32 | `/Error` | `RetailStore.Web/Components/Pages/Error.razor` | عام | D (SSR) | 20 | ✅ نُقلت (القالب D، المرحلة 6 الدفعة 6، تمت الموافقة) |
 
 مكونات وتخطيط الويب: `Layout/MainLayout.razor` (44)، `Layout/NavMenu.razor` (40)، `Layout/MustChangePasswordGuard.razor`، `Components/DataScreen.razor` (421، الشاشة العامة للبيانات الأساسية)، `Components/QrImage.razor`، `Components/RedirectToLogin.razor`، `RetailStore.Web/Components/Layout/AccountLayout.razor` و`ReconnectModal.razor`.
 
@@ -291,7 +291,7 @@
 
 **التالي:** الدفعة 6 (الدخول والإعدادات)، القسم 16.
 
-## 16) المرحلة 6، الدفعة 6: الدخول والإعدادات (✅ بانتظار الموافقة)
+## 16) المرحلة 6، الدفعة 6: الدخول والإعدادات (✅ تمت الموافقة)
 بعد موافقة صاحب المشروع على الخطة نُقلت الصفحات الأربع الباقية من جدول القسم 2 بالمهارة `mudblazor-erp-ui` على القالب D، فلم تبقَ صفحة ويب على الواجهة القديمة. لم يتغير أي منطق عمل: نفس `SecurityService.LoginAsync` و`ChangePasswordAsync`، ونفس `AccountEndpoints.SignInAsync` / `SafeReturn` / `ComputerOf`، ونفس الرسائل والتحويلات.
 
 **الصفحات الثابتة (SSR) تبقى نماذج `EditForm` عادية بـ `method="post"` و`FormName` نفسه** (`login`، `change-password`): هي التي تكتب الكوكي فلا تكون تفاعلية. حقول `MudTextField` (Outlined + Dense) تحمل في `UserAttributes` الاسم الذي كان `InputText` يولده (`Input.Username`، `Input.Password`، `Input.Old`، `Input.New`، `Input.Confirm`)، فيربطها `[SupplyParameterFromForm]` كما كان، و`ShrinkLabel` يبقي العنوان فوق الحقل لأن صفحة ثابتة لا تنفذ كود المكوّن في المتصفح. والتركيز على أول حقل بالسمة `data-erp-autofocus` يقرؤها `erp.js` عند تحميل الصفحة (`AutoFocus` في MudBlazor يحتاج صفحة تفاعلية).

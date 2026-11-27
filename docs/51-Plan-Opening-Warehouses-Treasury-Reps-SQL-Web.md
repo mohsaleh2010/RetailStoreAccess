@@ -380,4 +380,5 @@
 | الموافقة على المرحلة 6، الدفعة 4ب (البنوك والقيود)؛ عرض خطة الدفعة 5 (التقارير: `/trial-balance` و`/financials` و`/reports`) | ✅ |
 | إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 5 (التقارير): `/trial-balance` (C) و`/financials` (C) و`/reports` (C، بمجموعات `forms.REPORT_GROUPS` بقرار صاحب المشروع) (`docs/ui-inventory.md` القسم 15) | ✅ تمت الموافقة |
 | الموافقة على المرحلة 6، الدفعة 5 (التقارير)؛ عرض خطة الدفعة 6 (الدخول والإعدادات) | ✅ |
-| إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 6 (الدخول والإعدادات): `/account/login` و`/account/change-password` و`/Error` (D، `AccountLayout` بـ `MudThemeProvider`) و`/not-found` (D)؛ حذف `retailstore.css`؛ إصلاح العنوان غير الموجود (`docs/ui-inventory.md` القسم 16) | ✅ بانتظار الموافقة |
+| إعادة تصميم الويب بـ MudBlazor، المرحلة 6، الدفعة 6 (الدخول والإعدادات): `/account/login` و`/account/change-password` و`/Error` (D، `AccountLayout` بـ `MudThemeProvider`) و`/not-found` (D)؛ حذف `retailstore.css`؛ إصلاح العنوان غير الموجود (`docs/ui-inventory.md` القسم 16) | ✅ تمت الموافقة |
+| الموافقة على المرحلة 6، الدفعة 6 (الدخول والإعدادات)، آخر دفعات إعادة تصميم الويب؛ عرض ملخص إعادة التصميم والخطوة التالية على صاحب المشروع | ✅ |
