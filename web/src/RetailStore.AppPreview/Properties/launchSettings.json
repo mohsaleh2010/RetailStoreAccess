@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "profiles": {
+    "pos": {
+      "commandName": "Project",
+      "commandLineArgs": "--app pos",
+      "applicationUrl": "http://localhost:5150",
+      "environmentVariables": { "ASPNETCORE_ENVIRONMENT": "Development" }
+    },
+    "rep": {
+      "commandName": "Project",
+      "commandLineArgs": "--app rep",
+      "applicationUrl": "http://localhost:5151",
+      "environmentVariables": { "ASPNETCORE_ENVIRONMENT": "Development" }
+    }
+  }
+}

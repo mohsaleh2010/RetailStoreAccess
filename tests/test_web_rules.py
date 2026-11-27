@@ -9,7 +9,8 @@ import unittest
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB_SRC = os.path.join(ROOT, "web", "src")
 UI = os.path.join(WEB_SRC, "RetailStore.UI")
-SHARED = os.path.join(UI, "Components", "Shared")
+KIT = os.path.join(WEB_SRC, "RetailStore.UI.Kit")
+SHARED = os.path.join(KIT, "Components", "Shared")
 SKILL = os.path.join(ROOT, ".claude", "skills", "mudblazor-erp-ui", "SKILL.md")
 INVENTORY = os.path.join(ROOT, "docs", "ui-inventory.md")
 
@@ -29,10 +30,16 @@ def read(path):
 
 
 def ui_path(rel):
-    """A path of the inventory or the skill: RetailStore.Web/... is under web/src, any other under RetailStore.UI."""
+    """A path of the inventory or the skill: RetailStore.Web/... is under web/src, any other under RetailStore.UI, else
+    under RetailStore.UI.Kit (the shared components, the theme, erp.css: docs/ui-inventory.md section 17)."""
     if rel.startswith("RetailStore."):
         return os.path.join(WEB_SRC, *rel.split("/"))
-    return os.path.join(UI, *rel.split("/"))
+    path = os.path.join(UI, *rel.split("/"))
+    if not os.path.exists(path):
+        kit = os.path.join(KIT, *rel.split("/"))
+        if os.path.exists(kit):
+            return kit
+    return path
 
 
 def open_tags(text, name):

@@ -1,3 +1,4 @@
+using MudBlazor.Services;
 using RetailStore.PosApp;
 
 namespace RetailStore.Pos;
@@ -15,6 +16,7 @@ public static class MauiProgram
         builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
         builder.Services.AddPosApp(Path.Combine(FileSystem.AppDataDirectory, "pos.db"));
+        builder.Services.AddMudServices();   // after the kit (its Arabic MudLocalizer), docs/ui-inventory.md section 17
         builder.Services.AddSingleton<IPosPlatform, WindowsPlatform>();
         return builder.Build();
     }

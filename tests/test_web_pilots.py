@@ -8,10 +8,15 @@ import unittest
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 UI = os.path.join(ROOT, "web", "src", "RetailStore.UI")
+KIT = os.path.join(ROOT, "web", "src", "RetailStore.UI.Kit")
 
 
 def read(*parts):
-    with open(os.path.join(UI, *parts), encoding="utf-8-sig") as fh:
+    """A file of RetailStore.UI, else of RetailStore.UI.Kit (the theme and erp.css, docs/ui-inventory.md section 17)."""
+    path = os.path.join(UI, *parts)
+    if not os.path.exists(path):
+        path = os.path.join(KIT, *parts)
+    with open(path, encoding="utf-8-sig") as fh:
         return fh.read()
 
 

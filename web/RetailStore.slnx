@@ -5,8 +5,10 @@
     <Project Path="src/RetailStore.OfficeService/RetailStore.OfficeService.csproj" />
     <Project Path="src/RetailStore.PosApp/RetailStore.PosApp.csproj" />
     <Project Path="src/RetailStore.RepApp/RetailStore.RepApp.csproj" />
+    <Project Path="src/RetailStore.UI.Kit/RetailStore.UI.Kit.csproj" />
     <Project Path="src/RetailStore.UI/RetailStore.UI.csproj" />
     <Project Path="src/RetailStore.Web/RetailStore.Web.csproj" />
+    <Project Path="src/RetailStore.AppPreview/RetailStore.AppPreview.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/RetailStore.Tests/RetailStore.Tests.csproj" />

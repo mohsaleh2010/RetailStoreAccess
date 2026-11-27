@@ -6,12 +6,9 @@ using RetailStore.Domain.Common;
 namespace RetailStore.UI.Services;
 
 /// <summary>Small reads of the settings for the layout.</summary>
-public interface IStoreInfo
+public interface IStoreInfo : ICurrencySource
 {
     Task<string> StoreNameAsync(bool english);
-
-    /// <summary>The currency of the program: Settings.CurrencyCode, else that of the operating country.</summary>
-    Task<string> CurrencyCodeAsync();
 }
 
 public sealed class StoreInfo(IDbContextFactory<RetailDbContext> factory) : IStoreInfo

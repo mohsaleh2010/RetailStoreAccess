@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using RetailStore.RepApp.Client;
 using RetailStore.RepApp.Offline;
+using RetailStore.UI;
+using RetailStore.UI.Services;
 
 namespace RetailStore.RepApp;
 
@@ -12,6 +14,10 @@ public static class RepAppServices
         services.AddSingleton(_ => new LocalStore(databasePath));
         services.AddSingleton(_ => new RepApiClient(new HttpClient { Timeout = TimeSpan.FromSeconds(30) }));
         services.AddSingleton<RepSession>();
+        // the shared components (RetailStore.UI.Kit); the host calls AddMudServices after this. The snapshot of the API
+        // has no currency, so MoneyText shows the amount alone
+        services.AddErpUiKit();
+        services.AddSingleton<ICurrencySource>(new FixedCurrencySource(""));
         return services;
     }
 }

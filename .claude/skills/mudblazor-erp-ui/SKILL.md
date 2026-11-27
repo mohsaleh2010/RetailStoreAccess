@@ -7,7 +7,12 @@ description: Build or redesign any Razor page of the RetailStoreAccess web (Reta
 
 The rules of `AGENTS.md` ("Web (`docs/76`)" and the rest of the web rules) apply in full; this skill is how a screen is
 built. The decisions, the components and the problems already met are in `docs/ui-inventory.md` sections 6-8, the
-original plan in `docs/ERP-Redesign-Prompt.md`. Paths below are under `web/src/RetailStore.UI/`.
+original plan in `docs/ERP-Redesign-Prompt.md`. Paths below are under `web/src/RetailStore.UI/`, except the shared
+components (`Components/Shared`), the theme (`Theme/ErpTheme.cs`), their services (`UiLanguage`, `UiTheme`, `UiCurrency`,
+`ShortcutService`, `ErpMudLocalizer`) and `wwwroot/erp.css` / `erp.js` with the Cairo font: those live in
+`web/src/RetailStore.UI.Kit/` (same namespaces, no database: the Windows POS and the rep app use it too; docs/ui-inventory.md
+section 17). The screens of the two apps run in a browser with `RetailStore.AppPreview` (`dotnet run`: the POS on
+http://localhost:5150; `--launch-profile rep`: the rep app on http://localhost:5151).
 
 ## 1) The approved templates: copy the pattern from them
 | Type | Approved screen | Use it for |

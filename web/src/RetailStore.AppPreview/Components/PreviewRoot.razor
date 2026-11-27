@@ -1,0 +1,4 @@
+@inject PreviewApp Preview
+@* The interactive root of the preview: the router of the chosen app (a root component of the page cannot take a Type
+   parameter, so the choice is read here from the service). *@
+<DynamicComponent Type="Preview.Routes" />

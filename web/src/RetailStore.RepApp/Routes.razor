@@ -1,3 +1,4 @@
+@implements IDisposable
 @* The router of the rep app (docs/78): the Android app (RetailStore.App) shows it in its BlazorWebView. *@
 <Router AppAssembly="typeof(Routes).Assembly">
     <Found Context="routeData">
@@ -12,4 +13,16 @@
 
 @code {
     [Inject] private RepSession S { get; set; } = default!;
+    [Inject] private UiLanguage L { get; set; } = default!;
+
+    // the shared components (RetailStore.UI.Kit) read the language of the session: the language of the settings of the phone
+    protected override void OnInitialized()
+    {
+        Bind();
+        S.Changed += Bind;
+    }
+
+    private void Bind() => L.Set(S.English ? "en" : "ar");
+
+    public void Dispose() => S.Changed -= Bind;
 }

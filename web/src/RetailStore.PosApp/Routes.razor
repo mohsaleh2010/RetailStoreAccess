@@ -1,3 +1,4 @@
+@implements IDisposable
 @* The router of the POS (docs/83): the Windows program (RetailStore.Pos) shows it in its BlazorWebView. *@
 <Router AppAssembly="typeof(Routes).Assembly">
     <Found Context="routeData">
@@ -12,4 +13,22 @@
 
 @code {
     [Inject] private PosSession S { get; set; } = default!;
+    [Inject] private UiLanguage L { get; set; } = default!;
+    [Inject] private UiCurrency Currency { get; set; } = default!;
+
+    // the shared components (RetailStore.UI.Kit) read the language and the currency of the session: the language of the
+    // settings of the PC, the currency of the snapshot of the user
+    protected override void OnInitialized()
+    {
+        Bind();
+        S.Changed += Bind;
+    }
+
+    private void Bind()
+    {
+        L.Set(S.English ? "en" : "ar");
+        Currency.Use(S.Snapshot?.Settings.Currency);
+    }
+
+    public void Dispose() => S.Changed -= Bind;
 }

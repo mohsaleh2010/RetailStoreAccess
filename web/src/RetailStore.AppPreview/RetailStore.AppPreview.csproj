@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <!-- For development only, never delivered (docs/ui-inventory.md section 17): the screens of the Windows POS
+       (RetailStore.PosApp) or of the rep app (RetailStore.RepApp) in a browser, on Blazor Server with the platforms of
+       the tests (secrets in memory, no printer), so they can be run, tested and photographed on a machine without the
+       MAUI workload: dotnet run (the POS, http://localhost:5150) or dotnet run with the launch profile rep
+       (http://localhost:5151). -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPublishable>false</IsPublishable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RetailStore.PosApp\RetailStore.PosApp.csproj" />
+    <ProjectReference Include="..\RetailStore.RepApp\RetailStore.RepApp.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,22 @@
+@inject PreviewApp Preview
+@* The page of the preview: the same links as wwwroot/index.html of RetailStore.Pos / RetailStore.App (MudBlazor, the kit,
+   the app), then the router of the app, interactive on the server without prerendering (the session is a singleton that
+   loads itself, as in the MAUI program). *@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@Preview.Title</title>
+    <base href="/" />
+    <link rel="stylesheet" href="@Assets["_content/MudBlazor/MudBlazor.min.css"]" />
+    <link rel="stylesheet" href="@Assets["_content/RetailStore.UI.Kit/erp.css"]" />
+    <link rel="stylesheet" href="@Assets[Preview.Css]" />
+</head>
+<body>
+    <PreviewRoot @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <script src="@Assets["_content/MudBlazor/MudBlazor.min.js"]"></script>
+    <script src="@Assets["_content/RetailStore.UI.Kit/erp.js"]"></script>
+</body>
+</html>

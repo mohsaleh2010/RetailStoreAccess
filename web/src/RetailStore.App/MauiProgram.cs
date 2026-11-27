@@ -1,3 +1,4 @@
+using MudBlazor.Services;
 using RetailStore.RepApp;
 
 namespace RetailStore.App;
@@ -15,6 +16,7 @@ public static class MauiProgram
         builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
         builder.Services.AddRepApp(Path.Combine(FileSystem.AppDataDirectory, "rep.db"));
+        builder.Services.AddMudServices();   // after the kit (its Arabic MudLocalizer), docs/ui-inventory.md section 17
         builder.Services.AddSingleton<IRepPlatform, PhonePlatform>();
         return builder.Build();
     }

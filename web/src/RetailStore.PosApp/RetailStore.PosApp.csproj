@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RetailStore.Data\RetailStore.Data.csproj" />
+    <!-- MudBlazor, the theme and the shared components of the web (docs/ui-inventory.md section 17); never RetailStore.UI -->
+    <ProjectReference Include="..\RetailStore.UI.Kit\RetailStore.UI.Kit.csproj" />
   </ItemGroup>
 
 </Project>
