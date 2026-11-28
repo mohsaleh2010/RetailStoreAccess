@@ -79,8 +79,7 @@
                 {
                     <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="mb-4" role="status">@last.Message</MudAlert>
                 }
-                @* the screens not moved yet (batch 7D) keep the plain rules of posapp.css inside pos-legacy *@
-                <div class="@(Legacy ? "pos-legacy" : "pos-page")">@Body</div>
+                <div class="pos-page">@Body</div>
             </MudContainer>
         </MudMainContent>
     </MudLayout>
@@ -124,9 +123,6 @@
     // the database settings (administrator, seldom) show only their icon; the other captions show from 1366px
     private string NavClass(string route) =>
         "pos-nav-link" + (Active(route) ? " pos-nav-active" : "") + (route == "database" ? " pos-nav-icon" : "");
-
-    /// <summary>The pages still on the old markup of posapp.css (moved in batch 7D).</summary>
-    private bool Legacy => Here is "return" or "payment" or "closing";
 
     protected override async Task OnInitializedAsync()
     {

@@ -435,6 +435,9 @@ WEB_EN = {
     'رصيد المخزون': 'Stock on hand',
     'عدد الأصناف': 'Number of items',
     'ملخص التحويل': 'Transfer summary',
+    # phase 7, batch 7D (the documents of the POS)
+    'تحصيل من عميل آجل: يُحفظ في البرنامج فورًا ويُطبع': 'A receipt from a credit customer: saved on the program at once and printed',
+    'سند القبض': 'Receipt',
 }
 
 _CS_LITERAL = re.compile(r'"((?:[^"\\\n]|\\.)*)"')

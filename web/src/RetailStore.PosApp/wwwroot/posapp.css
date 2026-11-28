@@ -1,4 +1,4 @@
-/* The POS on Windows (docs/83), redesign batch 7B (docs/ui-inventory.md section 19): MudBlazor with the theme of the kit
+/* The POS on Windows (docs/83), redesign batch 7B (docs/ui-inventory.md sections 19-21): MudBlazor with the theme of the kit
    (erp.css), large buttons for a touch screen, right to left in Arabic, no side menu. Colors come from the theme
    (var(--mud-palette-*)) and logical properties only. */
 .pos-appbar { gap: 8px; }
@@ -30,46 +30,6 @@
 .pos-facts { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; margin: 0; }
 .pos-facts dt { color: var(--mud-palette-text-secondary); }
 .pos-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
-
-/* ---- the screens not moved yet (batch 7D: return, receipt, closing): their plain
-   markup keeps its old look inside .pos-legacy (PosLayout), its colors read from the theme so the dark mode works. */
-.pos-legacy { --pos-brand: var(--mud-palette-primary); --pos-bg: var(--mud-palette-background);
-              --pos-card: var(--mud-palette-surface); --pos-text: var(--mud-palette-text-primary);
-              --pos-muted: var(--mud-palette-text-secondary); --pos-ok: var(--mud-palette-success);
-              --pos-warn: var(--mud-palette-warning); --pos-bad: var(--mud-palette-error);
-              --pos-line: var(--mud-palette-lines-default); font-size: 16px; line-height: 1.45; }
-.pos-legacy .pos-card { background: var(--pos-card); border-radius: 10px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-.pos-legacy .pos-card h1, .pos-legacy .pos-card h2 { margin: 0 0 10px; font-size: 20px; }
-.pos-legacy .pos-card h2 small { color: var(--pos-muted); font-weight: 400; font-size: 14px; }
-.pos-legacy .pos-narrow { max-width: 560px; margin: 24px auto; }
-.pos-legacy .pos-sale { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 12px; align-items: start; }
-@media (max-width: 900px) { .pos-legacy .pos-narrow { max-width: 560px; margin: 24px auto; }
-.pos-legacy .pos-sale { grid-template-columns: 1fr; } }
-.pos-legacy .pos-find { display: flex; gap: 8px; }
-.pos-legacy .pos-find input { flex: 1; font-size: 20px; }
-.pos-legacy .pos-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-.pos-legacy .pos-table th, .pos-legacy .pos-table td { padding: 6px; border-bottom: 1px solid var(--pos-line); text-align: start; vertical-align: middle; }
-.pos-legacy .pos-table th { color: var(--pos-muted); font-weight: 600; font-size: 14px; }
-.pos-legacy .pos-num { width: 100px; text-align: end; }
-.pos-legacy .pos-amount { text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.pos-legacy label { display: block; margin: 8px 0; color: var(--pos-muted); font-size: 14px; }
-.pos-legacy input, .pos-legacy select { display: block; width: 100%; margin-top: 4px; padding: 9px 10px; font: inherit; color: var(--pos-text);
-                border: 1px solid var(--pos-line); border-radius: 8px; background: var(--pos-card); }
-.pos-legacy td input, .pos-legacy td select { margin: 0; }
-.pos-legacy button { font: inherit; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--pos-line); background: var(--pos-card);
-         color: var(--pos-text); cursor: pointer; }
-.pos-legacy button:disabled { opacity: .5; cursor: default; }
-.pos-legacy .pos-primary { background: var(--pos-brand); color: var(--mud-palette-primary-text); border-color: var(--pos-brand); font-weight: 600; }
-.pos-legacy .pos-big { width: 100%; padding: 16px; font-size: 20px; }
-.pos-legacy .pos-link { background: none; border: 0; color: var(--pos-brand); text-decoration: underline; }
-.pos-legacy .pos-totals { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin: 12px 0; }
-.pos-legacy .pos-totals dd { margin: 0; text-align: end; font-variant-numeric: tabular-nums; }
-.pos-legacy .pos-total { font-size: 22px; font-weight: 700; color: var(--pos-brand); }
-.pos-legacy .pos-question { padding: 10px; border: 1px solid var(--pos-warn); border-radius: 8px; background: var(--mud-palette-warning-hover); white-space: pre-line; }
-.pos-legacy .pos-muted { color: var(--pos-muted); font-size: 14px; }
-.pos-legacy .pos-error { color: var(--pos-bad); white-space: pre-line; }
-.pos-legacy .pos-ok { color: var(--pos-ok); }
-.pos-legacy .pos-empty { color: var(--pos-muted); text-align: center; padding: 40px; }
 
 /* ---- the sale (batch 7C, template B): the scan box with its button, the lines, the payment card beside them from 1000px
    (a cashier screen is 1024px or more: the save button stays in sight), under them below */
@@ -109,3 +69,11 @@
 .pos-sales .erp-num { white-space: nowrap; }
 /* the cashier column shows from 1280px (on a 1024px screen the actions keep their place beside the row) */
 @media (max-width: 1279.98px) { .pos-sales .pos-col-wide { display: none; } }
+
+/* ---- the documents (batch 7D, template B): the return, the receipt and the closing share the frame of the sale */
+.pos-col-check { width: 72px; }
+.pos-reprint-number { margin-inline: 6px; }
+.pos-count input { font-size: 1.25rem; }
+@media (max-width: 1279.98px) { .pos-lines .pos-col-wide { display: none; } }
+/* the side card is 280px on a 1024px screen: the grand total of a long caption stays on one line or two, not three */
+@media (max-width: 1279.98px) { .pos-doc .erp-doc-side .pos-grand { font-size: 1.2rem; } }

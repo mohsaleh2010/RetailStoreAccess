@@ -135,7 +135,7 @@ class PosPagesTests(unittest.TestCase):
         self.assertEqual([p for p in page_problems("Layout/PosLayout.razor", layout, touch=True) if "PageHeader" not in p], [])
         self.assertIn('store.Get("Theme") == "dark"', read(os.path.join(POS, "Offline", "PosSession.cs")))
         css = read(os.path.join(POS, "wwwroot", "posapp.css"))
-        self.assertNotRegex(css, r"(?m)^\s*(html|body|button|input|label|select)\b", "plain element rules stay inside .pos-legacy")
+        self.assertNotRegex(css, r"(?m)^\s*(html|body|button|input|label|select)\b", "no plain element rules: every POS page is MudBlazor (batch 7D)")
         self.assertNotRegex(css, r"#[0-9A-Fa-f]{3,6}\b", "colors come from the theme")
 
     def test_the_touch_rule_is_checked(self):

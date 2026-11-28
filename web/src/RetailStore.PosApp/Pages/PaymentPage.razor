@@ -1,75 +1,132 @@
 @page "/payment"
 @inject PosSession S
+@inject UiLanguage L
+@inject IDialogService Dialogs
 @inject NavigationManager Nav
 
-@* A customer receipt on the POS (docs/86): saved on the program at once (modSales.PostCustomerPayment) and printed. *@
+@* A customer receipt on the POS (docs/86), template B for a voucher (redesign batch 7D, docs/ui-inventory.md section 21):
+   PageHeader (save and print F9 / F2) -> the customer, the amount, the method and the notes -> the card of the receipt
+   beside them (the balance due, the amount, the big save button, print again). Saved on the program at once
+   (modSales.PostCustomerPayment through PosSession.SavePaymentAsync) and printed; the question of the service (an amount
+   over the balance) goes through ConfirmDialog, yes = save again with the confirmation, as before. *@
+<PageHeader Title="@L.T("سند قبض من عميل")" Icon="@Icons.Material.Outlined.Payments"
+            Description="@L.T("تحصيل من عميل آجل: يُحفظ في البرنامج فورًا ويُطبع")">
+    <Actions>
+        @if (Allowed)
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" StartIcon="@Icons.Material.Outlined.Print"
+                       OnClick="() => SaveAsync(false)" Disabled="@(!CanSave)">
+                @L.T("حفظ وطباعة") <kbd class="erp-kbd">F9</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
+
 @if (!S.LoggedIn)
 {
-    <p class="pos-empty">@S.T("سجّل الدخول أولًا.")</p>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" role="status">@L.T("سجّل الدخول أولًا.")</MudAlert>
 }
-else if (S.Snapshot!.User.PaymentProblem.Length > 0)
+else if (!Allowed)
 {
-    <p class="pos-error">@S.T(S.Snapshot.User.PaymentProblem)</p>
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="pos-pre" role="alert">@L.T(S.Snapshot!.User.PaymentProblem)</MudAlert>
 }
 else
 {
-    <section class="pos-card pos-narrow">
-        <h2>@S.T("سند قبض من عميل")</h2>
-        <label>@S.T("العميل")
-            <select value="@customerId" @onchange="e => Choose(e.Value)">
-                <option value="0">-</option>
-                @foreach (var c in S.Snapshot.Customers.Where(c => c.CustomerID != S.Snapshot.Settings.DefaultCustomerID))
+    <KeyboardShortcuts OnSave="() => SaveAsync(false)" />
+    @if (message.Length > 0)
+    {
+        <MudAlert Severity="@(error ? Severity.Error : Severity.Success)" Variant="Variant.Outlined" Class="mb-4 pos-pre"
+                  role="@(error ? "alert" : "status")" ShowCloseIcon="true" CloseIconClicked="() => message = string.Empty">
+            @message
+        </MudAlert>
+    }
+    <div class="erp-doc pos-doc">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4 mb-4" @onkeyup="KeyAsync">
+                <MudGrid Spacing="3">
+                    <MudItem xs="12">
+                        <MudSelect T="int" Value="customerId" ValueChanged="Choose" Label="@L.T("العميل")" Variant="Variant.Outlined"
+                                   Margin="Margin.Normal" AnchorOrigin="Origin.BottomCenter" AutoFocus="true"
+                                   AdornmentIcon="@Icons.Material.Outlined.Person" Adornment="Adornment.Start"
+                                   HelperText="@CustomerFacts">
+                            <MudSelectItem T="int" Value="0">-</MudSelectItem>
+                            @foreach (var c in S.Snapshot!.Customers.Where(c => c.CustomerID != S.Snapshot.Settings.DefaultCustomerID))
+                            {
+                                <MudSelectItem T="int" Value="@c.CustomerID">@c.CustomerName</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudNumericField T="decimal?" @bind-Value="amount" @bind-Value:after="Edited" Label="@L.T("المبلغ")"
+                                         Variant="Variant.Outlined" Margin="Margin.Normal" HideSpinButtons="true" Min="0" Format="0.00"
+                                         Immediate="true" Class="erp-cell-num" Culture="CultureInfo.InvariantCulture" />
+                    </MudItem>
+                    <MudItem xs="12" sm="6">
+                        <MudSelect T="int" Value="method" ValueChanged="m => { method = m; Edited(); }" Label="@L.T("طريقة الدفع")"
+                                   Variant="Variant.Outlined" Margin="Margin.Normal" AnchorOrigin="Origin.BottomCenter">
+                            @foreach (var m in S.Snapshot!.Methods)
+                            {
+                                <MudSelectItem T="int" Value="@m.PaymentMethodID">@m.MethodName</MudSelectItem>
+                            }
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12">
+                        <MudTextField T="string" @bind-Value="notes" @bind-Value:after="Edited" Label="@L.T("ملاحظات")"
+                                      Variant="Variant.Outlined" Margin="Margin.Normal" MaxLength="255" Immediate="true" />
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+            @if (customerId == 0)
+            {
+                <EmptyState Icon="@Icons.Material.Outlined.Payments" Title="@L.T("اختر العميل")"
+                            Text="@L.T("تحصيل من عميل آجل: يُحفظ في البرنامج فورًا ويُطبع")" />
+            }
+        </div>
+
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("سند القبض")</MudText>
+                <dl class="erp-summary-list">
+                    <dt>@L.T("العميل")</dt><dd>@(Customer?.CustomerName ?? "-")</dd>
+                    <dt>@L.T("الرصيد المستحق")</dt><dd><MoneyText Value="Customer?.CurrentBalance" /></dd>
+                    <dt class="erp-summary-grand pos-grand">@L.T("المبلغ")</dt>
+                    <dd class="erp-summary-grand pos-grand"><MoneyText Value="amount" ShowCurrency="true" Bold="true" /></dd>
+                </dl>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-4 pos-save"
+                           StartIcon="@Icons.Material.Outlined.Print" OnClick="() => SaveAsync(false)" Disabled="@(!CanSave)">
+                    @L.T("حفظ وطباعة") <kbd class="erp-kbd">F9</kbd>
+                </MudButton>
+                @if (busy)
                 {
-                    <option value="@c.CustomerID">@c.CustomerName</option>
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mt-2" />
                 }
-            </select>
-        </label>
-        @if (Customer is { } cust)
-        {
-            <p class="pos-muted">@S.T("الرصيد المستحق"): @Money(cust.CurrentBalance)</p>
-        }
-        <label>@S.T("المبلغ")<input class="pos-num" type="number" step="any" min="0" @bind="amount" @bind:after="Edited" /></label>
-        <label>@S.T("طريقة الدفع")
-            <select value="@method" @onchange="e => { method = int.TryParse(e.Value as string, out var m) ? m : SalesService.CashMethodId; Edited(); }">
-                @foreach (var m in S.Snapshot.Methods)
+                @if (last is not null)
                 {
-                    <option value="@m.PaymentMethodID">@m.MethodName</option>
+                    <MudButton Variant="Variant.Outlined" FullWidth="true" Size="Size.Large" Class="mt-3"
+                               StartIcon="@Icons.Material.Outlined.Print" OnClick="ReprintAsync" Disabled="@busy">
+                        @L.T("طباعة مرة أخرى") <bdi dir="ltr" class="erp-num pos-reprint-number">@last.Number</bdi>
+                    </MudButton>
                 }
-            </select>
-        </label>
-        <label>@S.T("ملاحظات")<input @bind="notes" @bind:after="Edited" maxlength="255" /></label>
-        @if (question.Length > 0)
-        {
-            <div class="pos-question">
-                <p>@question</p>
-                <button class="pos-primary" @onclick="() => SaveAsync(true)">@S.T("نعم")</button>
-                <button @onclick="() => question = string.Empty">@S.T("لا")</button>
-            </div>
-        }
-        else
-        {
-            <button class="pos-primary pos-big" disabled="@(busy || customerId == 0 || amount is not > 0)" @onclick="() => SaveAsync(false)">
-                @S.T("حفظ وطباعة")</button>
-        }
-        @if (message.Length > 0)
-        {
-            <p class="@(error ? "pos-error" : "pos-ok")">@message</p>
-        }
-        @if (last is not null)
-        {
-            <button class="pos-link" @onclick="ReprintAsync">@S.T("طباعة مرة أخرى") @last.Number</button>
-        }
-    </section>
+            </MudPaper>
+        </aside>
+    </div>
 }
 
 @code {
     private int customerId, method = SalesService.CashMethodId;
     private decimal? amount;
-    private string notes = "", message = "", question = "", reference = PosSession.NewReference();
+    private string notes = "", message = "", reference = PosSession.NewReference();
     private bool busy, error, lastCash;
     private PosDocument? last;
 
+    private bool Allowed => S.Snapshot?.User.PaymentProblem.Length == 0;
+
+    private bool CanSave => !busy && customerId != 0 && amount is > 0;
+
     private PosCustomer? Customer => S.Snapshot?.Customers.FirstOrDefault(c => c.CustomerID == customerId);
+
+    /// <summary>The balance due under the customer, as the old page showed it.</summary>
+    private string? CustomerFacts => Customer is { } c ? L.T("الرصيد المستحق") + ": " + Money(c.CurrentBalance) : null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,17 +139,24 @@ else
 
     private static string Money(decimal v) => v.ToString("#,##0.00", CultureInfo.InvariantCulture);
 
-    private void Choose(object? value)
+    private void Choose(int id)
     {
-        customerId = int.TryParse(value as string, out var v) ? v : 0;
+        customerId = id;
         Edited();
+    }
+
+    private async Task KeyAsync(KeyboardEventArgs e)
+    {
+        if (e.Key == "F9")
+        {
+            await SaveAsync(false);
+        }
     }
 
     /// <summary>Another receipt: a new number on the PC (the same one is kept to send it again after a lost answer).</summary>
     private void Edited()
     {
         reference = PosSession.NewReference();
-        question = "";
     }
 
     private void Show(string text, bool isError)
@@ -109,17 +173,27 @@ else
         }
         busy = true;
         var (status, text, doc) = await S.SavePaymentAsync(new DevicePaymentRequest(reference, customerId, a, method, notes, confirm));
-        question = status == SaveStatus.NeedsConfirmation ? text : "";
+        if (status == SaveStatus.NeedsConfirmation)
+        {
+            busy = false;
+            message = "";
+            if (await ConfirmDialog.AskAsync(Dialogs, L.T("سند قبض من عميل"), text, L.T("نعم"), Color.Primary,
+                                             Icons.Material.Outlined.HelpOutline))
+            {
+                await SaveAsync(true);
+            }
+            return;
+        }
         if (status != SaveStatus.Saved || doc is null)
         {
-            Show(status == SaveStatus.NeedsConfirmation ? "" : text, true);
+            Show(text, true);
             busy = false;
             return;
         }
         last = doc;
         lastCash = method == SalesService.CashMethodId;
         string printed = await S.PrintDocumentAsync(doc, lastCash);
-        Show(S.T("تم حفظ سند القبض") + " " + doc.Number + (printed.Length > 0 ? " · " + printed : ""), printed.Length > 0);
+        Show(L.T("تم حفظ سند القبض") + " " + doc.Number + (printed.Length > 0 ? " · " + printed : ""), printed.Length > 0);
         amount = null;
         notes = "";
         Edited();
