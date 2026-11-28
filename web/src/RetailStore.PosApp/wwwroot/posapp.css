@@ -31,7 +31,7 @@
 .pos-facts dt { color: var(--mud-palette-text-secondary); }
 .pos-facts dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
 
-/* ---- the screens not moved yet (batches 7C and 7D: sale, invoices of the PC, return, receipt, closing): their plain
+/* ---- the screens not moved yet (batch 7D: return, receipt, closing): their plain
    markup keeps its old look inside .pos-legacy (PosLayout), its colors read from the theme so the dark mode works. */
 .pos-legacy { --pos-brand: var(--mud-palette-primary); --pos-bg: var(--mud-palette-background);
               --pos-card: var(--mud-palette-surface); --pos-text: var(--mud-palette-text-primary);
@@ -47,23 +47,15 @@
 .pos-legacy .pos-sale { grid-template-columns: 1fr; } }
 .pos-legacy .pos-find { display: flex; gap: 8px; }
 .pos-legacy .pos-find input { flex: 1; font-size: 20px; }
-.pos-legacy .pos-found { list-style: none; margin: 6px 0; padding: 0; border: 1px solid var(--pos-line); border-radius: 8px; max-height: 260px; overflow: auto; }
-.pos-legacy .pos-found button { width: 100%; text-align: start; border: 0; border-bottom: 1px solid var(--pos-line); border-radius: 0; }
-.pos-legacy .pos-found small { color: var(--pos-muted); }
 .pos-legacy .pos-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
 .pos-legacy .pos-table th, .pos-legacy .pos-table td { padding: 6px; border-bottom: 1px solid var(--pos-line); text-align: start; vertical-align: middle; }
 .pos-legacy .pos-table th { color: var(--pos-muted); font-weight: 600; font-size: 14px; }
-.pos-legacy .pos-bad td { background: var(--mud-palette-error-hover); }
 .pos-legacy .pos-num { width: 100px; text-align: end; }
 .pos-legacy .pos-amount { text-align: end; white-space: nowrap; font-variant-numeric: tabular-nums; }
-.pos-legacy .pos-actions button { margin: 2px; padding: 6px 10px; font-size: 14px; }
 .pos-legacy label { display: block; margin: 8px 0; color: var(--pos-muted); font-size: 14px; }
 .pos-legacy input, .pos-legacy select { display: block; width: 100%; margin-top: 4px; padding: 9px 10px; font: inherit; color: var(--pos-text);
                 border: 1px solid var(--pos-line); border-radius: 8px; background: var(--pos-card); }
 .pos-legacy td input, .pos-legacy td select { margin: 0; }
-.pos-legacy .pos-choice { display: flex; gap: 16px; }
-.pos-legacy .pos-check { display: flex; align-items: center; gap: 8px; color: var(--pos-text); }
-.pos-legacy .pos-check input { width: auto; margin: 0; }
 .pos-legacy button { font: inherit; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--pos-line); background: var(--pos-card);
          color: var(--pos-text); cursor: pointer; }
 .pos-legacy button:disabled { opacity: .5; cursor: default; }
@@ -78,3 +70,42 @@
 .pos-legacy .pos-error { color: var(--pos-bad); white-space: pre-line; }
 .pos-legacy .pos-ok { color: var(--pos-ok); }
 .pos-legacy .pos-empty { color: var(--pos-muted); text-align: center; padding: 40px; }
+
+/* ---- the sale (batch 7C, template B): the scan box with its button, the lines, the payment card beside them from 1000px
+   (a cashier screen is 1024px or more: the save button stays in sight), under them below */
+.pos-scan { display: flex; align-items: flex-start; gap: 12px; }
+.pos-scan-box { flex: 1; min-width: 0; }
+.pos-scan-box input { font-size: 1.25rem; }
+.pos-scan-button { margin-block-start: 16px; min-height: 56px; }
+.pos-choice-unit { color: var(--mud-palette-text-secondary); }
+.pos-choice { min-height: 52px; }
+@media (min-width: 1000px) {
+  .pos-doc { grid-template-columns: minmax(0, 1fr) 280px; }
+  .pos-doc .erp-doc-side { position: sticky; inset-block-start: 72px; }
+}
+.pos-lines.mud-table .mud-table-row .mud-table-cell { padding-block: 4px; padding-inline: 4px; }
+.pos-lines.mud-table .mud-table-row .mud-table-cell:first-child { padding-inline-start: 12px; }
+.pos-lines input.mud-input-slot { padding-inline: 6px; }
+.pos-lines .erp-actions-col { width: 56px; }
+@media (min-width: 1280px) { .pos-doc { grid-template-columns: minmax(0, 1fr) 340px; } }
+.pos-line-name { display: block; font-weight: 600; min-width: 112px; }
+.pos-line-code { display: block; color: var(--mud-palette-text-secondary); font-size: .82rem; }
+.pos-col-unit { min-width: 80px; }
+.pos-col-num { width: 100px; min-width: 84px; }
+.pos-col-amount { white-space: nowrap; }
+.pos-lines .mud-input-control { margin-block: 0; }
+.pos-pay-type { display: flex; gap: 8px; margin-block: 4px; }
+.pos-grand { font-size: 1.5rem; }
+.pos-save { min-height: 64px; font-size: 1.25rem; }
+
+/* ---- the invoices of the PC (batch 7C, template C) */
+.mud-table .mud-table-row.pos-row-bad .mud-table-cell { background: var(--mud-palette-error-hover); }
+.pos-reason { color: var(--mud-palette-error); margin-block-start: 4px; }
+.pos-sale-actions { width: 1%; }
+.pos-icon-actions { display: flex; justify-content: flex-end; gap: 2px; white-space: nowrap; }
+.pos-reason { max-width: 220px; }
+.pos-sales.mud-table .mud-table-row .mud-table-cell { padding-inline: 8px; }
+.pos-sales .pos-icon-actions .mud-icon-button { padding: 10px; }
+.pos-sales .erp-num { white-space: nowrap; }
+/* the cashier column shows from 1280px (on a 1024px screen the actions keep their place beside the row) */
+@media (max-width: 1279.98px) { .pos-sales .pos-col-wide { display: none; } }

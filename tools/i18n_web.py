@@ -239,6 +239,8 @@ WEB_EN = {
     'عنوان الخادم غير صالح، مثل': 'The server address is not valid, such as',
     'فتح درج النقود مع البيع النقدي': 'Open the cash drawer on a cash sale',
     'فواتير الجهاز': 'Invoices of the PC',
+    'كل فواتير الجهاز': 'All invoices of the PC',
+    'لا توجد فواتير على هذا الجهاز': 'No invoices on this PC',
     'فواتير بانتظار دخول الكاشير الذي باعها': 'Invoices waiting for the cashier who made them to log in',
     'فواتير رفضها البرنامج': 'Invoices refused by the program',
     'قاعدة البيانات لا تحتوي إعدادات البرنامج': 'The database has no settings of the program',

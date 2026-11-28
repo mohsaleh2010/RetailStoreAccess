@@ -1,144 +1,241 @@
 @page "/"
 @inject PosSession S
+@inject UiLanguage L
+@inject IDialogService Dialogs
 @inject NavigationManager Nav
+
+@* The sale of the POS (template B, redesign batch 7C, docs/ui-inventory.md section 20): PageHeader (new invoice F4, save
+   and print F9 / F2) -> the scan box first (Enter = the product, the unit or the scale label; several = a list to pick)
+   -> the lines of the cart (unit, quantity, price, discount, their amount from PosCart) -> the payment card beside them
+   (customer, cash / credit, method, invoice discount, tendered, notes, the totals of PosCart.Totals and the big save
+   button). The checks, prices, messages, the question on the stock (now in ConfirmDialog, yes = save again with the
+   confirmation), the printing and the sending stay those of PosCart / PosSession. *@
+<PageHeader Title="@L.T("البيع")" Icon="@Icons.Material.Outlined.PointOfSale"
+            Description="@L.T("فاتورة بيع: الأصناف بالباركود أو الاسم، والعميل، والدفع")">
+    <Status>
+        @if (cart is not null && Allowed)
+        {
+            <StatusChip Status="DRAFT" />
+        }
+    </Status>
+    <Actions>
+        @if (cart is not null && Allowed)
+        {
+            <MudButton Variant="Variant.Outlined" Size="Size.Large" StartIcon="@Icons.Material.Outlined.NoteAdd"
+                       OnClick="NewSale" Disabled="@(busy || cart.Items.Count == 0)">
+                @L.T("فاتورة جديدة") <kbd class="erp-kbd">F4</kbd>
+            </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Size="Size.Large" StartIcon="@Icons.Material.Outlined.Print"
+                       OnClick="() => SaveAsync(false)" Disabled="@(busy || cart.Items.Count == 0)">
+                @L.T("حفظ وطباعة") <kbd class="erp-kbd">F9</kbd>
+            </MudButton>
+        }
+    </Actions>
+</PageHeader>
 
 @if (cart is null)
 {
-    <p class="pos-empty">@S.T("سجّل الدخول أولًا.")</p>
+    <MudAlert Severity="Severity.Info" Variant="Variant.Outlined" role="status">@L.T("سجّل الدخول أولًا.")</MudAlert>
 }
-else if (S.Snapshot!.User.SellProblem.Length > 0)
+else if (!Allowed)
 {
-    <p class="pos-error">@S.Snapshot.User.SellProblem</p>
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="pos-pre" role="alert">@S.Snapshot!.User.SellProblem</MudAlert>
 }
 else
 {
-    <div class="pos-sale">
-        <section class="pos-card pos-lines">
-            <div class="pos-find">
-                <input @ref="codeBox" @bind="code" @bind:event="oninput" @onkeyup="CodeKeyAsync"
-                       placeholder="@S.T("الباركود أو الرمز أو جزء من الاسم")" />
-                <button @onclick="FindAsync">@S.T("بحث")</button>
-            </div>
-            @if (found.Count > 0)
+    <KeyboardShortcuts OnSave="() => SaveAsync(false)" OnNew="NewSale" OnSearch="FocusScanAsync" />
+    @if (message.Length > 0)
+    {
+        <MudAlert Severity="@(error ? Severity.Error : Severity.Success)" Variant="Variant.Outlined" Class="mb-4 pos-pre"
+                  role="@(error ? "alert" : "status")" ShowCloseIcon="true" CloseIconClicked="() => message = string.Empty">
+            @message
+        </MudAlert>
+    }
+    <div class="erp-doc pos-doc">
+        <div class="erp-doc-main">
+            <MudPaper Outlined="true" Class="pa-4 mb-4">
+                <div class="pos-scan">
+                    <MudTextField T="string" @ref="scan" @bind-Value="code" Label="@L.T("الباركود أو الرمز أو جزء من الاسم")"
+                                  Variant="Variant.Outlined" Margin="Margin.Normal" Adornment="Adornment.Start"
+                                  AdornmentIcon="@Icons.Material.Outlined.QrCodeScanner" Immediate="true" AutoFocus="true"
+                                  OnKeyUp="CodeKeyAsync" data-erp-search="true" Clearable="true" Class="pos-scan-box"
+                                  HelperText="@L.T("Enter للإضافة")" />
+                    <MudButton Variant="Variant.Outlined" Color="Color.Primary" Size="Size.Large"
+                               StartIcon="@Icons.Material.Outlined.Search" OnClick="FindAsync" Class="pos-scan-button">
+                        @L.T("بحث")
+                    </MudButton>
+                </div>
+                @if (found.Count > 0)
+                {
+                    <MudPaper Outlined="true" Class="erp-pos-choices mt-2">
+                        <MudList T="string" Dense="false">
+                            @foreach (var f in found)
+                            {
+                                <MudListItem T="string" OnClick="() => Pick(f.Product, f.Unit)" Class="pos-choice">
+                                    <div class="erp-lookup-item">
+                                        <span class="erp-lookup-code"><bdi dir="ltr" class="erp-num">@f.Product.ProductCode</bdi></span>
+                                        <span class="erp-lookup-name">@f.Product.ProductName
+                                            @if (f.Unit is { } u)
+                                            {
+                                                <span class="pos-choice-unit">· @u.UnitName</span>
+                                            }
+                                        </span>
+                                        <span class="erp-lookup-info"><MoneyText Value="cart.PriceFor(f.Product, f.Unit?.UnitID, cart.CustomerID)" /></span>
+                                        <span class="erp-lookup-info">@L.T("المتوفر") <QtyText Value="f.Product.Available" /></span>
+                                    </div>
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudPaper>
+                }
+            </MudPaper>
+
+            @if (cart.Items.Count == 0)
             {
-                <ul class="pos-found">
-                    @foreach (var f in found)
-                    {
-                        <li><button @onclick="() => Pick(f.Product, f.Unit)">
-                            @f.Product.ProductName <small>@f.Product.ProductCode · @Money(cart.PriceFor(f.Product, f.Unit?.UnitID, cart.CustomerID))
-                            · @S.T("المتوفر") @Qty(f.Product.Available)</small></button></li>
-                    }
-                </ul>
+                <EmptyState Icon="@Icons.Material.Outlined.QrCodeScanner" Title="@L.T("الفاتورة فارغة")"
+                            Text="@L.T("امسح الباركود أو ابحث عن صنف لإضافته")" />
             }
-            <table class="pos-table">
-                <thead>
-                    <tr><th>@S.T("الصنف")</th><th>@S.T("الوحدة")</th><th>@S.T("الكمية")</th><th>@S.T("السعر")</th>
-                        <th>@S.T("الخصم")</th><th>@S.T("الإجمالي")</th><th></th></tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in cart.Items)
-                    {
-                        <tr>
-                            <td>@item.Product.ProductName</td>
-                            <td>
+            else
+            {
+                <EntityGrid T="CartItem" Items="cart.Items" Filterable="false" ShowPager="false" RowsPerPage="1000"
+                            Title="@L.T("الأصناف")" Class="pos-lines">
+                    <Columns>
+                        <TemplateColumn T="CartItem" Title="@L.T("الصنف")" Sortable="false">
+                            <CellTemplate>
+                                <span class="pos-line-name">@context.Item.Product.ProductName</span>
+                                <span class="pos-line-code"><bdi dir="ltr" class="erp-num">@context.Item.Product.ProductCode</bdi></span>
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="CartItem" Title="@L.T("الوحدة")" Sortable="false" CellClass="pos-col-unit">
+                            <CellTemplate>
+                                @{ var item = context.Item; }
                                 @if (item.Product.Units.Length > 0)
                                 {
-                                    <select value="@(item.UnitID ?? 0)" @onchange="e => ChangeUnit(item, e.Value)">
-                                        <option value="0">@item.Product.UnitName</option>
+                                    <MudSelect T="int" Value="@(item.UnitID ?? 0)" ValueChanged="u => ChangeUnit(item, u)"
+                                               Variant="Variant.Outlined" Margin="Margin.Normal" aria-label="@L.T("الوحدة")">
+                                        <MudSelectItem T="int" Value="0">@item.Product.UnitName</MudSelectItem>
                                         @foreach (var u in item.Product.Units)
                                         {
-                                            <option value="@u.UnitID">@u.UnitName</option>
+                                            <MudSelectItem T="int" Value="@u.UnitID">@u.UnitName</MudSelectItem>
                                         }
-                                    </select>
+                                    </MudSelect>
                                 }
                                 else
                                 {
                                     @item.UnitName
                                 }
-                            </td>
-                            <td><input class="pos-num" type="number" step="any" @bind="item.Quantity" @bind:after="Changed" /></td>
-                            <td><input class="pos-num" type="number" step="any" @bind="item.UnitPrice" @bind:after="Changed" /></td>
-                            <td><input class="pos-num" type="number" step="any" @bind="item.LineDiscount" @bind:after="Changed" /></td>
-                            <td class="pos-amount">@Money(item.Gross)</td>
-                            <td><button class="pos-link" @onclick="() => Remove(item)">✕</button></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </section>
-
-        <section class="pos-card pos-pay">
-            <label>@S.T("العميل")
-                <select value="@cart.CustomerID" @onchange="e => ChangeCustomer(e.Value)">
-                    @foreach (var c in S.Snapshot.Customers)
-                    {
-                        <option value="@c.CustomerID">@c.CustomerName</option>
-                    }
-                </select>
-            </label>
-            @if (cart.Customer is { } cust && cust.CustomerID != S.Snapshot.Settings.DefaultCustomerID)
-            {
-                <p class="pos-muted">@S.T("الرصيد") @Money(cust.CurrentBalance) · @S.T("حد الائتمان") @Money(cust.CreditLimit)</p>
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="CartItem" Title="@L.T("الكمية")" Sortable="false" CellClass="pos-col-num">
+                            <CellTemplate>
+                                <MudNumericField T="decimal" @bind-Value="context.Item.Quantity" @bind-Value:after="Changed"
+                                                 Variant="Variant.Outlined" Margin="Margin.Normal" HideSpinButtons="true"
+                                                 Class="erp-cell-num" Culture="CultureInfo.InvariantCulture" aria-label="@L.T("الكمية")" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="CartItem" Title="@L.T("السعر")" Sortable="false" CellClass="pos-col-num">
+                            <CellTemplate>
+                                <MudNumericField T="decimal" @bind-Value="context.Item.UnitPrice" @bind-Value:after="Changed"
+                                                 Variant="Variant.Outlined" Margin="Margin.Normal" HideSpinButtons="true" Format="0.00"
+                                                 Class="erp-cell-num" Culture="CultureInfo.InvariantCulture" aria-label="@L.T("السعر")" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="CartItem" Title="@L.T("الخصم")" Sortable="false" CellClass="pos-col-num">
+                            <CellTemplate>
+                                <MudNumericField T="decimal" @bind-Value="context.Item.LineDiscount" @bind-Value:after="Changed"
+                                                 Variant="Variant.Outlined" Margin="Margin.Normal" HideSpinButtons="true" Format="0.00"
+                                                 Class="erp-cell-num" Culture="CultureInfo.InvariantCulture" aria-label="@L.T("الخصم")" />
+                            </CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="CartItem" Title="@L.T("الإجمالي")" Sortable="false" HeaderClass="erp-num" CellClass="erp-num pos-col-amount">
+                            <CellTemplate><MoneyText Value="context.Item.Gross" Bold="true" /></CellTemplate>
+                        </TemplateColumn>
+                        <TemplateColumn T="CartItem" Sortable="false" CellClass="erp-actions-col">
+                            <CellTemplate>
+                                <MudTooltip Text="@L.T("حذف")">
+                                    <MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" Size="Size.Large"
+                                                   OnClick="() => Remove(context.Item)" aria-label="@L.T("حذف")" />
+                                </MudTooltip>
+                            </CellTemplate>
+                        </TemplateColumn>
+                    </Columns>
+                </EntityGrid>
             }
-            <div class="pos-choice">
-                <label class="pos-check"><input type="radio" name="pay" checked="@(cart.PaymentType == "CASH")"
-                                                @onchange="@(() => SetPayment("CASH"))" />@S.T("نقدي")</label>
-                <label class="pos-check"><input type="radio" name="pay" checked="@(cart.PaymentType == "CREDIT")"
-                                                @onchange="@(() => SetPayment("CREDIT"))" />@S.T("آجل")</label>
-            </div>
-            <label>@S.T("طريقة الدفع")
-                <select value="@(cart.PaymentMethodID ?? 0)" @onchange="e => cart.PaymentMethodID = int.TryParse(e.Value as string, out var m) && m > 0 ? m : null">
+        </div>
+
+        <aside class="erp-doc-side">
+            <MudPaper Outlined="true" Class="pa-4 erp-summary">
+                <MudText Typo="Typo.h6" Class="mb-3">@L.T("الدفع")</MudText>
+                <MudSelect T="int" Value="cart.CustomerID" ValueChanged="ChangeCustomer" Label="@L.T("العميل")"
+                           Variant="Variant.Outlined" Margin="Margin.Normal" AnchorOrigin="Origin.BottomCenter"
+                           HelperText="@CustomerFacts">
+                    @foreach (var c in S.Snapshot!.Customers)
+                    {
+                        <MudSelectItem T="int" Value="@c.CustomerID">@c.CustomerName</MudSelectItem>
+                    }
+                </MudSelect>
+                <MudRadioGroup T="string" Value="cart.PaymentType" ValueChanged="SetPayment" Class="pos-pay-type">
+                    <MudRadio T="string" Value="@("CASH")" Color="Color.Primary" Size="Size.Large">@L.T("نقدي")</MudRadio>
+                    <MudRadio T="string" Value="@("CREDIT")" Color="Color.Primary" Size="Size.Large">@L.T("آجل")</MudRadio>
+                </MudRadioGroup>
+                <MudSelect T="int" Value="@(cart.PaymentMethodID ?? 0)" ValueChanged="m => cart.PaymentMethodID = m > 0 ? m : null"
+                           Label="@L.T("طريقة الدفع")" Variant="Variant.Outlined" Margin="Margin.Normal" AnchorOrigin="Origin.BottomCenter">
                     @if (cart.PaymentType == "CREDIT")
                     {
-                        <option value="0">-</option>
+                        <MudSelectItem T="int" Value="0">-</MudSelectItem>
                     }
-                    @foreach (var m in S.Snapshot.Methods)
+                    @foreach (var m in S.Snapshot!.Methods)
                     {
-                        <option value="@m.PaymentMethodID">@m.MethodName</option>
+                        <MudSelectItem T="int" Value="@m.PaymentMethodID">@m.MethodName</MudSelectItem>
                     }
-                </select>
-            </label>
-            <label>@S.T("خصم الفاتورة")<input class="pos-num" type="number" step="any" @bind="cart.InvoiceDiscount" @bind:after="Changed" /></label>
-            <label>@S.T("المبلغ المستلم")<input class="pos-num" type="number" step="any" @bind="cart.Tendered" @bind:after="Changed" /></label>
-            <label>@S.T("ملاحظات")<input @bind="cart.Notes" maxlength="255" /></label>
-            <dl class="pos-totals">
-                <dt>@S.T("قبل الضريبة")</dt><dd>@Money(totals.SubTotal - totals.Discount)</dd>
-                <dt>@S.T("الضريبة")</dt><dd>@Money(totals.Tax)</dd>
-                <dt class="pos-total">@S.T("الإجمالي")</dt><dd class="pos-total">@Money(totals.Total) @S.Snapshot.Settings.Currency</dd>
-                @if (cart.PaymentType == "CASH" && cart.Tendered is { } t && t > totals.Total)
+                </MudSelect>
+                <MudNumericField T="decimal" @bind-Value="cart.InvoiceDiscount" @bind-Value:after="Changed" Label="@L.T("خصم الفاتورة")"
+                                 Variant="Variant.Outlined" Margin="Margin.Normal" HideSpinButtons="true" Format="0.00" Class="erp-cell-num"
+                                 Culture="CultureInfo.InvariantCulture" />
+                <MudNumericField T="decimal?" @bind-Value="cart.Tendered" @bind-Value:after="Changed" Label="@L.T("المبلغ المستلم")"
+                                 Variant="Variant.Outlined" Margin="Margin.Normal" HideSpinButtons="true" Class="erp-cell-num"
+                                 Culture="CultureInfo.InvariantCulture" />
+                <MudTextField T="string" @bind-Value="cart.Notes" Label="@L.T("ملاحظات")" Variant="Variant.Outlined"
+                              Margin="Margin.Normal" MaxLength="255" Class="mb-3" />
+                <dl class="erp-summary-list">
+                    <dt>@L.T("قبل الضريبة")</dt><dd><MoneyText Value="totals.SubTotal - totals.Discount" /></dd>
+                    <dt>@L.T("الضريبة")</dt><dd><MoneyText Value="totals.Tax" /></dd>
+                    <dt class="erp-summary-grand pos-grand">@L.T("الإجمالي")</dt>
+                    <dd class="erp-summary-grand pos-grand"><MoneyText Value="totals.Total" ShowCurrency="true" Bold="true" /></dd>
+                    @if (cart.PaymentType == "CASH" && cart.Tendered is { } t && t > totals.Total)
+                    {
+                        <dt>@L.T("الباقي للعميل")</dt><dd><MoneyText Value="t - totals.Total" Bold="true" /></dd>
+                    }
+                </dl>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" FullWidth="true" Size="Size.Large" Class="mt-4 pos-save"
+                           StartIcon="@Icons.Material.Outlined.Print" OnClick="() => SaveAsync(false)"
+                           Disabled="@(busy || cart.Items.Count == 0)">
+                    @L.T("حفظ وطباعة") <kbd class="erp-kbd">F9</kbd>
+                </MudButton>
+                @if (busy)
                 {
-                    <dt>@S.T("الباقي للعميل")</dt><dd>@Money(t - totals.Total)</dd>
+                    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mt-2" />
                 }
-            </dl>
-            @if (question.Length > 0)
-            {
-                <div class="pos-question">
-                    <p>@question</p>
-                    <button class="pos-primary" @onclick="() => SaveAsync(true)">@S.T("نعم")</button>
-                    <button @onclick="() => question = string.Empty">@S.T("لا")</button>
-                </div>
-            }
-            else
-            {
-                <button class="pos-primary pos-big" disabled="@(busy || cart.Items.Count == 0)" @onclick="() => SaveAsync(false)">
-                    @S.T("حفظ وطباعة") (F9)</button>
-            }
-            @if (message.Length > 0)
-            {
-                <p class="@(error ? "pos-error" : "pos-ok")">@message</p>
-            }
-            <button class="pos-link" disabled="@(cart.Items.Count == 0)" @onclick="NewSale">@S.T("فاتورة جديدة")</button>
-        </section>
+            </MudPaper>
+        </aside>
     </div>
 }
 
 @code {
     private PosCart? cart;
     private CartTotals totals = new("", 0, 0, 0, 0);
-    private string code = "", message = "", question = "";
+    private string code = "", message = "";
     private bool busy, error;
     private List<(PosProduct Product, PosUnit? Unit)> found = [];
-    private ElementReference codeBox;
+    private MudTextField<string>? scan;
+
+    private bool Allowed => S.Snapshot?.User.SellProblem.Length == 0;
+
+    /// <summary>The balance and credit limit of a customer other than the cash customer, as the old page showed them.</summary>
+    private string? CustomerFacts =>
+        cart?.Customer is { } cust && cust.CustomerID != S.Snapshot!.Settings.DefaultCustomerID
+            ? L.T("الرصيد") + " " + Money(cust.CurrentBalance) + " · " + L.T("حد الائتمان") + " " + Money(cust.CreditLimit)
+            : null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -151,29 +248,19 @@ else
         cart = S.NewCart();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender && cart is not null)
-        {
-            try
-            {
-                await codeBox.FocusAsync();
-            }
-            catch (InvalidOperationException)
-            {
-                // not rendered yet
-            }
-        }
-    }
-
     private static string Money(decimal v) => v.ToString("#,##0.00", CultureInfo.InvariantCulture);
 
-    private static string Qty(decimal v) => v.ToString("0.###", CultureInfo.InvariantCulture);
+    private async Task FocusScanAsync()
+    {
+        if (scan is not null)
+        {
+            await scan.FocusAsync();
+        }
+    }
 
     private void Changed()
     {
         totals = cart!.Totals();
-        question = "";
     }
 
     private async Task CodeKeyAsync(KeyboardEventArgs e)
@@ -190,10 +277,10 @@ else
 
     private async Task FindAsync()
     {
-        var (scale, problem) = cart!.ScanScale(code);
-        if (scale)
+        var (scaleLabel, problem) = cart!.ScanScale(code);
+        if (scaleLabel)
         {
-            Show(S.T(problem), problem.Length > 0);
+            Show(L.T(problem), problem.Length > 0);
             found = [];
             code = "";
             Changed();
@@ -204,34 +291,35 @@ else
                                          || found[0].Product.ProductCode == code.Trim());
         if (exact)
         {
-            Pick(found[0].Product, found[0].Unit);
+            await PickAsync(found[0].Product, found[0].Unit);
         }
         else if (found.Count == 0 && code.Trim().Length > 0)
         {
-            Show(S.T("لا يوجد صنف بهذا الرمز."), true);
+            Show(L.T("لا يوجد صنف بهذا الرمز."), true);
         }
-        await Task.CompletedTask;
     }
 
-    private void Pick(PosProduct p, PosUnit? unit)
+    private Task Pick(PosProduct p, PosUnit? unit) => PickAsync(p, unit);
+
+    private async Task PickAsync(PosProduct p, PosUnit? unit)
     {
         string problem = cart!.Add(p.ProductID, unit?.UnitID);
-        Show(S.T(problem), problem.Length > 0);
+        Show(L.T(problem), problem.Length > 0);
         found = [];
         code = "";
         Changed();
+        await FocusScanAsync();
     }
 
-    private void ChangeUnit(CartItem item, object? value)
+    private void ChangeUnit(CartItem item, int id)
     {
-        int id = int.TryParse(value as string, out var v) ? v : 0;
-        Show(S.T(cart!.SetUnit(item, id == 0 ? null : id)), true);
+        Show(L.T(cart!.SetUnit(item, id == 0 ? null : id)), true);
         Changed();
     }
 
-    private void ChangeCustomer(object? value)
+    private void ChangeCustomer(int id)
     {
-        cart!.ChangeCustomer(int.TryParse(value as string, out var v) ? v : S.Snapshot!.Settings.DefaultCustomerID);
+        cart!.ChangeCustomer(id > 0 ? id : S.Snapshot!.Settings.DefaultCustomerID);
         Changed();
     }
 
@@ -254,11 +342,16 @@ else
         error = isError && text.Length > 0;
     }
 
-    private void NewSale()
+    private async Task NewSale()
     {
-        cart!.Clear();
-        message = question = "";
+        if (cart is null || busy)
+        {
+            return;
+        }
+        cart.Clear();
+        message = "";
         Changed();
+        await FocusScanAsync();
     }
 
     private async Task SaveAsync(bool confirmStock)
@@ -269,19 +362,29 @@ else
         }
         busy = true;
         var (status, text, sale) = S.SaveSale(cart, confirmStock);
-        question = status == SaveStatus.NeedsConfirmation ? text : "";
         if (sale is null)
         {
-            Show(status == SaveStatus.NeedsConfirmation ? "" : text, true);
             busy = false;
+            if (status == SaveStatus.NeedsConfirmation)
+            {
+                message = "";
+                if (await ConfirmDialog.AskAsync(Dialogs, L.T("البيع"), text, L.T("نعم"), Color.Primary,
+                                                 Icons.Material.Outlined.HelpOutline))
+                {
+                    await SaveAsync(true);
+                }
+                return;
+            }
+            Show(text, true);
             return;
         }
         string printed = await S.PrintAsync(sale);
-        Show(S.T("تم حفظ الفاتورة") + " " + sale.InvoiceNumber + " · " + S.T("الباقي للعميل") + " " + Money(sale.Receipt.Change) +
+        Show(L.T("تم حفظ الفاتورة") + " " + sale.InvoiceNumber + " · " + L.T("الباقي للعميل") + " " + Money(sale.Receipt.Change) +
              (printed.Length > 0 ? " · " + printed : ""), printed.Length > 0);
         cart.Clear();
         totals = cart.Totals();
         busy = false;
         _ = S.SyncAsync();
+        await FocusScanAsync();
     }
 }

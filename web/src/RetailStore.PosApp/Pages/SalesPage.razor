@@ -1,63 +1,161 @@
 @page "/sales"
+@implements IDisposable
 @inject PosSession S
+@inject UiLanguage L
+@inject IDialogService Dialogs
 
-<section class="pos-card">
-    <h2>@S.T("فواتير الجهاز") <small>@S.T("بانتظار الإرسال") @S.Waiting · @S.T("رفضها البرنامج") @S.Refused</small></h2>
-    @if (message.Length > 0)
-    {
-        <p class="pos-error">@message</p>
-    }
-    <table class="pos-table">
-        <thead>
-            <tr><th>@S.T("رقم الفاتورة")</th><th>@S.T("التاريخ")</th><th>@S.T("العميل")</th><th>@S.T("الكاشير")</th>
-                <th>@S.T("الإجمالي")</th><th>@S.T("الحالة")</th><th></th></tr>
-        </thead>
-        <tbody>
-            @foreach (var s in S.Sales())
-            {
-                <tr class="@(s.State == SaleStates.Rejected ? "pos-bad" : "")">
-                    <td dir="ltr">@s.InvoiceNumber</td>
-                    <td dir="ltr">@s.CreatedAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</td>
-                    <td>@s.Receipt.CustomerName</td>
-                    <td>@s.EmployeeName</td>
-                    <td class="pos-amount">@s.Receipt.Total.ToString("#,##0.00", CultureInfo.InvariantCulture)</td>
-                    <td>@StateText(s)@if (s.Message is { Length: > 0 } m) { <br /><small>@m</small> }</td>
-                    <td class="pos-actions">
-                        <button @onclick="() => PrintAsync(s)">@S.T("طباعة")</button>
-                        @if (s.State == SaleStates.Rejected)
+@* The invoices of the PC (template C, redesign batch 7C, docs/ui-inventory.md section 20): PageHeader -> a StatCard
+   for each state (waiting to be sent, refused by the program, all on the PC) -> the message of the last action ->
+   EntityGrid of the sales of the PC (search by number, customer or cashier; the state as a chip with the program's
+   reason under it; print, and for a refused one send again, send again accepting the stock and delete for the
+   administrator, as before) -> the note on the seven days. PosSession.Sales / PrintAsync / Retry / Delete as they were. *@
+<PageHeader Title="@L.T("فواتير الجهاز")" Icon="@Icons.Material.Outlined.ReceiptLong"
+            Description="@L.T("تبقى الفواتير المرسلة هنا سبعة أيام للطباعة، وهي في البرنامج بأرقامها نفسها.")" />
+
+<MudGrid Spacing="3" Class="mb-4">
+    <MudItem xs="12" sm="4">
+        <StatCard Title="@L.T("بانتظار الإرسال")" Icon="@Icons.Material.Outlined.Schedule" Color="Color.Warning">
+            <ValueContent><bdi dir="ltr" class="erp-num">@S.Waiting</bdi></ValueContent>
+        </StatCard>
+    </MudItem>
+    <MudItem xs="12" sm="4">
+        <StatCard Title="@L.T("رفضها البرنامج")" Icon="@Icons.Material.Outlined.Block" Color="Color.Error">
+            <ValueContent><bdi dir="ltr" class="erp-num">@S.Refused</bdi></ValueContent>
+        </StatCard>
+    </MudItem>
+    <MudItem xs="12" sm="4">
+        <StatCard Title="@L.T("كل فواتير الجهاز")" Icon="@Icons.Material.Outlined.ReceiptLong" Color="Color.Primary">
+            <ValueContent><bdi dir="ltr" class="erp-num">@rows.Count</bdi></ValueContent>
+        </StatCard>
+    </MudItem>
+</MudGrid>
+
+@if (message.Length > 0)
+{
+    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined" Class="mb-4 pos-pre" role="alert" ShowCloseIcon="true"
+              CloseIconClicked="() => message = string.Empty">@message</MudAlert>
+}
+
+<EntityGrid T="StoredSale" Items="rows" SearchText="@(s => s.InvoiceNumber + " " + s.Receipt.CustomerName + " " + s.EmployeeName)"
+            Export="exportColumns" ExportName="@L.T("فواتير الجهاز")" Filterable="false" RowClass="RowClass"
+            EmptyText="@L.T("لا توجد فواتير على هذا الجهاز")" Class="pos-sales">
+    <Columns>
+        <PropertyColumn Property="s => s.InvoiceNumber" Title="@L.T("رقم الفاتورة")">
+            <CellTemplate><bdi dir="ltr" class="erp-num">@context.Item.InvoiceNumber</bdi></CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="s => s.CreatedAt" Title="@L.T("التاريخ")">
+            <CellTemplate><bdi dir="ltr" class="erp-num">@context.Item.CreatedAt.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture)</bdi></CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="s => s.Receipt.CustomerName" Title="@L.T("العميل")" />
+        <PropertyColumn Property="s => s.EmployeeName" Title="@L.T("الكاشير")" HeaderClass="pos-col-wide" CellClass="pos-col-wide" />
+        <PropertyColumn Property="s => s.Receipt.Total" Title="@L.T("الإجمالي")" HeaderClass="erp-num" CellClass="erp-num">
+            <CellTemplate><MoneyText Value="context.Item.Receipt.Total" /></CellTemplate>
+        </PropertyColumn>
+        <PropertyColumn Property="s => s.State" Title="@L.T("الحالة")">
+            <CellTemplate>
+                <StatusChip Text="@StateText(context.Item)" Color="@StateColor(context.Item)" />
+                @if (context.Item.Message is { Length: > 0 } m)
+                {
+                    <MudText Typo="Typo.body2" Class="pos-pre pos-reason">@m</MudText>
+                }
+            </CellTemplate>
+        </PropertyColumn>
+        <TemplateColumn T="StoredSale" Sortable="false" CellClass="pos-sale-actions">
+            <CellTemplate>
+                @{ var s = context.Item; }
+                @* icons with their caption as tooltip and label, so the four fit beside the row on a 1024px screen *@
+                <div class="pos-icon-actions">
+                    <MudTooltip Text="@L.T("طباعة")">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Print" Size="Size.Large" OnClick="() => PrintAsync(s)"
+                                       aria-label="@L.T("طباعة")" />
+                    </MudTooltip>
+                    @if (s.State == SaleStates.Rejected)
+                    {
+                        <MudTooltip Text="@L.T("إعادة الإرسال")">
+                            <MudIconButton Icon="@Icons.Material.Outlined.Send" Color="Color.Primary" Size="Size.Large"
+                                           OnClick="() => Retry(s, false)" aria-label="@L.T("إعادة الإرسال")" />
+                        </MudTooltip>
+                        @if (S.User?.IsAdmin == true)
                         {
-                            <button @onclick="() => Retry(s, false)">@S.T("إعادة الإرسال")</button>
-                            @if (S.User?.IsAdmin == true)
-                            {
-                                <button @onclick="() => Retry(s, true)">@S.T("إعادة الإرسال بالموافقة على المخزون")</button>
-                                <button @onclick="() => Delete(s)">@S.T("حذف من الجهاز")</button>
-                            }
+                            <MudTooltip Text="@L.T("إعادة الإرسال بالموافقة على المخزون")">
+                                <MudIconButton Icon="@Icons.Material.Outlined.Inventory2" Color="Color.Warning" Size="Size.Large"
+                                               OnClick="() => Retry(s, true)" aria-label="@L.T("إعادة الإرسال بالموافقة على المخزون")" />
+                            </MudTooltip>
+                            <MudTooltip Text="@L.T("حذف من الجهاز")">
+                                <MudIconButton Icon="@Icons.Material.Outlined.Delete" Color="Color.Error" Size="Size.Large"
+                                               OnClick="() => DeleteAsync(s)" aria-label="@L.T("حذف من الجهاز")" />
+                            </MudTooltip>
                         }
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-    <p class="pos-muted">@S.T("تبقى الفواتير المرسلة هنا سبعة أيام للطباعة، وهي في البرنامج بأرقامها نفسها.")</p>
-</section>
+                    }
+                </div>
+            </CellTemplate>
+        </TemplateColumn>
+    </Columns>
+</EntityGrid>
 
 @code {
+    private List<StoredSale> rows = [];
     private string message = "";
+    private IReadOnlyList<GridExport<StoredSale>> exportColumns = [];
+
+    protected override void OnInitialized()
+    {
+        exportColumns =
+        [
+            new(L.T("رقم الفاتورة"), s => s.InvoiceNumber),
+            new(L.T("التاريخ"), s => s.CreatedAt),
+            new(L.T("العميل"), s => s.Receipt.CustomerName),
+            new(L.T("الكاشير"), s => s.EmployeeName),
+            new(L.T("الإجمالي"), s => s.Receipt.Total),
+            new(L.T("الحالة"), s => StateText(s)),
+        ];
+        Load();
+        S.Changed += Refresh;
+    }
+
+    private void Load() => rows = S.Sales();
+
+    // the sending in the background changes the states: the list is read again
+    private void Refresh() => InvokeAsync(() =>
+    {
+        Load();
+        StateHasChanged();
+    });
 
     private string StateText(StoredSale s) => s.State switch
     {
-        SaleStates.Sent => S.T("وصلت إلى البرنامج"),
-        SaleStates.Rejected => S.T("رفضها البرنامج"),
-        _ => S.T("بانتظار الإرسال"),
+        SaleStates.Sent => L.T("وصلت إلى البرنامج"),
+        SaleStates.Rejected => L.T("رفضها البرنامج"),
+        _ => L.T("بانتظار الإرسال"),
     };
+
+    private static Color StateColor(StoredSale s) => s.State switch
+    {
+        SaleStates.Sent => Color.Success,
+        SaleStates.Rejected => Color.Error,
+        _ => Color.Warning,
+    };
+
+    private static string RowClass(StoredSale s, int _) => s.State == SaleStates.Rejected ? "pos-row-bad" : "";
 
     private async Task PrintAsync(StoredSale s) => message = await S.PrintAsync(s, reprint: true);
 
     private void Retry(StoredSale s, bool confirmStock)
     {
         message = S.Retry(s.Id, confirmStock);
+        Load();
         _ = S.SyncAsync();
     }
 
-    private void Delete(StoredSale s) => message = S.Delete(s.Id);
+    private async Task DeleteAsync(StoredSale s)
+    {
+        if (!await ConfirmDialog.AskAsync(Dialogs, L.T("حذف من الجهاز"), s.InvoiceNumber, L.T("حذف")))
+        {
+            return;
+        }
+        message = S.Delete(s.Id);
+        Load();
+    }
+
+    public void Dispose() => S.Changed -= Refresh;
 }
