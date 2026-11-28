@@ -64,14 +64,14 @@
 
 | # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
 |---|---|---|---|---|---|---|
-| P1 | `/login` | `Pages/LoginPage.razor` | دخول | D | 49 | ✅ بانتظار الموافقة |
+| P1 | `/login` | `Pages/LoginPage.razor` | دخول | D | 49 | ✅ نُقلت (القالب D، المرحلة 7 الدفعة 7ب، تمت الموافقة) |
 | P2 | `/` | `Pages/SalePage.razor` | مبيعات | B | 287 | ⬜ |
 | P3 | `/sales` | `Pages/SalesPage.razor` | مبيعات | C | 63 | ⬜ |
 | P4 | `/return` | `Pages/ReturnPage.razor` | مبيعات | B | 223 | ⬜ |
 | P5 | `/payment` | `Pages/PaymentPage.razor` | مبيعات | B (سند) | 134 | ⬜ |
 | P6 | `/closing` | `Pages/ClosingPage.razor` | خزينة | B | 241 | ⬜ |
-| P7 | `/settings` | `Pages/SettingsPage.razor` | إعدادات | D | 73 | ✅ بانتظار الموافقة |
-| P8 | `/database` | `Pages/DatabasePage.razor` | إعدادات | D | 113 | ✅ بانتظار الموافقة |
+| P7 | `/settings` | `Pages/SettingsPage.razor` | إعدادات | D | 73 | ✅ نُقلت (القالب D، المرحلة 7 الدفعة 7ب، تمت الموافقة) |
+| P8 | `/database` | `Pages/DatabasePage.razor` | إعدادات | D | 113 | ✅ نُقلت (القالب D، المرحلة 7 الدفعة 7ب، تمت الموافقة) |
 
 ## 4) جرد الصفحات — تطبيق المندوب (`RetailStore.RepApp`، MAUI Android)
 
