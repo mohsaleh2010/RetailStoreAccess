@@ -65,8 +65,8 @@
 | # | المسار | الملف | الموديول | النوع | الأسطر | الحالة |
 |---|---|---|---|---|---|---|
 | P1 | `/login` | `Pages/LoginPage.razor` | دخول | D | 49 | ✅ نُقلت (القالب D، المرحلة 7 الدفعة 7ب، تمت الموافقة) |
-| P2 | `/` | `Pages/SalePage.razor` | مبيعات | B | 390 | ✅ بانتظار الموافقة |
-| P3 | `/sales` | `Pages/SalesPage.razor` | مبيعات | C | 152 | ✅ بانتظار الموافقة |
+| P2 | `/` | `Pages/SalePage.razor` | مبيعات | B | 390 | ✅ نُقلت (القالب B، المرحلة 7 الدفعة 7ج، تمت الموافقة) |
+| P3 | `/sales` | `Pages/SalesPage.razor` | مبيعات | C | 152 | ✅ نُقلت (القالب C، المرحلة 7 الدفعة 7ج، تمت الموافقة) |
 | P4 | `/return` | `Pages/ReturnPage.razor` | مبيعات | B | 223 | ⬜ |
 | P5 | `/payment` | `Pages/PaymentPage.razor` | مبيعات | B (سند) | 134 | ⬜ |
 | P6 | `/closing` | `Pages/ClosingPage.razor` | خزينة | B | 241 | ⬜ |
@@ -322,7 +322,7 @@
 |---|---|---|
 | **7أ الأساس** (✅ تمت الموافقة، القسم 18) | مكتبة Razor جديدة `RetailStore.UI.Kit` (MudBlazor + `RetailStore.Domain` فقط): الثيم `ErpTheme`، والمكونات المشتركة الاثنا عشر و`ErpFormat` / `StatusStyles` / `InvoiceLine`، و`UiLanguage` و`UiCurrency` (بواجهة عملة لا تعرف القاعدة) و`ShortcutService` و`ErpMudLocalizer`، والأساس من `erp.css` / `erp.js`؛ تُنقل كما هي بنفس الـ namespaces، و`RetailStore.UI` يعتمد عليها فلا تتغير صفحة ويب. خط Cairo يُضمَّن ملفًا داخل المكتبة (نقطة البيع تعمل بلا إنترنت). ربط `PosSession` / `RepSession` بـ `UiLanguage` (اللغة من إعدادات الجهاز كما هي). مضيف تجريبي للتطوير فقط `RetailStore.AppPreview` (Blazor Server، منصات وهمية، غير مُسلَّم) لتشغيل صفحات التطبيقين في المتصفح للّقطات والاختبار. وفي `RetailStore.Pos` / `RetailStore.App`: `AddMudServices` وروابط `index.html` (تُبنى على جهاز صاحب المشروع) | — |
 | **7ب نقطة البيع: الإطار والإعدادات** (✅ تمت الموافقة، القسم 19) | `PosLayout` (شريط علوي `MudAppBar`: اسم المحل، التنقل، المستخدم، متصل / بلا اتصال، إرسال وتحديث بعدد المعلّق)، P1 `/login`، P7 `/settings`، P8 `/database` | D |
-| **7ج نقطة البيع: البيع** (✅ بانتظار الموافقة، القسم 20) | P2 `/` (الماسح أولًا، الكميات من `PosCart`، الدفع والطباعة والدرج)، P3 `/sales` (فواتير الجهاز وحالتها PENDING / SENT / REJECTED) | B، C |
+| **7ج نقطة البيع: البيع** (✅ تمت الموافقة، القسم 20) | P2 `/` (الماسح أولًا، الكميات من `PosCart`، الدفع والطباعة والدرج)، P3 `/sales` (فواتير الجهاز وحالتها PENDING / SENT / REJECTED) | B، C |
 | **7د نقطة البيع: المستندات** | P4 `/return`، P5 `/payment`، P6 `/closing` | B |
 | **7هـ المندوب: الإطار والإعدادات** | `RepLayout` (شريط علوي + تنقل سفلي `MudNavMenu` للهاتف، عرض 360px)، R1 `/login`، R2 `/` (لوحة اليوم)، R9 `/settings`، R10 `/password` | D |
 | **7و المندوب: العملاء والمستندات** | R3 `/customers`، R4 `/customers/{Id}`، R5 `/orders`، R6 `/orders/new/{CustomerId}`، R7 `/invoice/{CustomerId}`، R8 `/payment/{CustomerId}` | A، D، C، B |
@@ -362,7 +362,7 @@
 
 **التحقق:** `dotnet build` بلا تحذيرات جديدة؛ 128 xUnit ناجحة؛ كل اختبارات Python (1681): ناجحة و14 متخطّاة، بعد تعديل اختبار نصّي في `test_scale.py` كان يبحث عن `href="return"` في `PosLayout` وصارت الشاشات صفوفًا `yield return new("return", ...)` بنفس الشروط (تعديل مقصود)؛ `test_web_rules.py` يفحص صفحات نقطة البيع المعلَّمة ✅ بقواعد المهارة مع استثناء اللمس (`Margin.Normal` بدل `Dense`)، والإطار (`MudRTLProvider`، `IsDarkMode="@S.Dark"`، `MudAppBar`)، وأن `posapp.css` بلا قاعدة عامة خارج `.pos-legacy` وبلا لون ثابت؛ ولقطات من `RetailStore.AppPreview` على ملف تجربة SQLite: الصفحات الثلاث وصفحة البيع القديمة داخل الإطار الجديد، فاتح / داكن، عربي / إنجليزي، 1366px / 1024px، بلا تمرير أفقي.
 
-## 20) المرحلة 7، الدفعة 7ج: نقطة البيع، البيع وفواتير الجهاز (✅ بانتظار الموافقة)
+## 20) المرحلة 7، الدفعة 7ج: نقطة البيع، البيع وفواتير الجهاز (✅ تمت الموافقة 2026-11-28)
 نُقلت صفحتا البيع بالمهارة `mudblazor-erp-ui`: `/` على القالب B و`/sales` على القالب C، باستثناءات شاشات اللمس (القسم 17). لم يتغير أي منطق: نفس `PosCart` (`Find` و`ScanScale` و`Add` و`SetUnit` و`ChangeCustomer` و`Totals`) و`PosSession` (`NewCart` و`SaveSale` و`PrintAsync` و`SyncAsync` و`Sales` و`Retry` و`Delete`)، ونفس الرسائل وترتيبها. مبالغ السطور والإجماليات من `PosCart` لا من `InvoiceLinesEditor` (مسار الماسح والوحدات وأسعار القوائم في `PosCart`)، كما قررت الخطة.
 
 | الصفحة | ما تغيّر |
