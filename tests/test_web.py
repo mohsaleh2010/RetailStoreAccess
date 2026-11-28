@@ -386,6 +386,23 @@ class PosAppTests(unittest.TestCase):
         self.assertIn("RetailStore.PosApp.csproj", read("web/src/RetailStore.Pos/RetailStore.Pos.csproj"))
         self.assertIn("<WindowsPackageType>None</WindowsPackageType>", read("web/src/RetailStore.Pos/RetailStore.Pos.csproj"))
 
+    def test_drawing_types_are_not_ambiguous_with_maui(self):
+        """A MAUI app imports Microsoft.Maui.Graphics implicitly: a platform file that also imports System.Drawing (GDI+,
+        the receipt of the Windows POS) or Android.Graphics names each shared type through an alias, else the build on
+        the owner's PC fails (error CS0104: 'Font' is an ambiguous reference, RetailStore.Pos)."""
+        shared = ("Color", "Font", "Paint", "Point", "PointF", "Rect", "RectF", "Size", "SizeF")
+        files = ("web/src/RetailStore.Pos/Platforms/Windows/WindowsPlatform.cs",
+                 "web/src/RetailStore.App/Platforms/Android/PhonePlatform.cs")
+        for rel in files:
+            text = read(rel)
+            if "using System.Drawing;" not in text and "using Android.Graphics;" not in text:
+                continue
+            body = text.split("namespace ", 1)[1]
+            for name in shared:
+                if re.search(r"(?<![\w.])%s(?=\s*\(|\.|\s+[A-Za-z_])(?!\s*=)" % name, body):
+                    with self.subTest(rel=rel, name=name):
+                        self.assertRegex(text, r"(?m)^using %s = " % name, name + " needs an alias in " + rel)
+
     def test_secrets_stay_out_of_the_file_of_the_pc(self):
         session = read(self.APP + "Offline/PosSession.cs")
         self.assertIn("platform.SetSecretAsync(PasswordKey", session)

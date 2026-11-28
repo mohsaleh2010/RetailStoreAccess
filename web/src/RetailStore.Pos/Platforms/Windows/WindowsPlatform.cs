@@ -9,6 +9,9 @@ using System.Text;
 using System.Text.Json;
 using RetailStore.Domain.Printing;
 using RetailStore.PosApp;
+// MAUI brings Microsoft.Maui.Graphics.Font / Color by its implicit usings: the receipt is drawn with GDI+
+using Color = System.Drawing.Color;
+using Font = System.Drawing.Font;
 
 namespace RetailStore.Pos;
 
