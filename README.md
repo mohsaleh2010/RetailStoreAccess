@@ -6,6 +6,8 @@
 
 افتح المجلد في تبويب **Code** في Claude Desktop. التجهيز والأوامر وطريقة العمل في [docs/00-Claude-Desktop.md](docs/00-Claude-Desktop.md).
 
+**تنزيل المشروع وتشغيل كل تطبيق فيه على Windows خطوة بخطوة:** [docs/00-Run-Locally.md](docs/00-Run-Locally.md).
+
 **من الطرفية على جهازك (Claude Code CLI):** [docs/00-Claude-CLI.md](docs/00-Claude-CLI.md). حالة العمل والخطوة التالية في [docs/dev/05-Progress.md](docs/dev/05-Progress.md)، ويُحدَّث بعد كل عملية. اكتب `/continue` لتكمل من حيث توقّف العمل. **في تطبيق Claude على السحابة** لا تبدأ الرسالة بـ `/continue` (يفهمها التطبيق استئنافًا لجلسة طرفية فيرفضها)، بل اكتب «تابع الخطة …» بكلمات عادية.
 
 ## للمطوّرين ولأي ذكاء اصطناعي آخر
